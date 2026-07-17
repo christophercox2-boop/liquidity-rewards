@@ -2,7 +2,7 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-07-17 18:17 UTC
+## ✅ Last successful check: 2026-07-17 19:35 UTC
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
@@ -65,6 +65,7 @@ This runs automatically every hour. **If the timestamp above is more than ~2 hou
 
 | Checked (UTC) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-07-17 19:35:58 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 18:17:44 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 16:36:29 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 14:54:59 | ✅ ok | 72 | $80.91 |
