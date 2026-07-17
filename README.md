@@ -1,7 +1,7 @@
 # Polymarket Liquidity Rewards Tracker
 
 Automatically records your [Polymarket US liquidity rewards](https://docs.polymarket.us/incentives/liquidity)
-every 6 hours and keeps a running history in this private repo.
+every hour and keeps a running history in this private repo.
 
 ## Setup (once)
 
@@ -13,16 +13,16 @@ every 6 hours and keeps a running history in this private repo.
    - `POLYMARKET_KEY_ID`
    - `POLYMARKET_SECRET_KEY`
 
-That's it. It runs by itself every 6 hours.
+That's it. It runs by itself every hour.
 
-(Optional: to see it work right away, go to the **Actions** tab → **Track
-liquidity rewards** → **Run workflow**.)
+(It also runs immediately whenever anything is pushed to `main`, so any edit —
+even to this README — kicks off a fresh check.)
 
 ## Checking it's working
 
 Open **[STATUS.md](STATUS.md)**. That one page tells you everything:
 
-- ✅ and a recent timestamp (under 7 hours old) → **working**
+- ✅ and a recent timestamp (under 2 hours old) → **working**
 - ❌ or an old timestamp → **broken** (GitHub will have also emailed you)
 
 Below that it shows your total earnings, the last 14 days, monthly totals, and

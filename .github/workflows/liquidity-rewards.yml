@@ -2,7 +2,9 @@ name: Track liquidity rewards
 
 on:
   schedule:
-    - cron: "23 */6 * * *" # every 6 hours; keep RUN_EVERY_HOURS in track_rewards.py in sync
+    - cron: "23 * * * *" # hourly; keep RUN_EVERY_HOURS in track_rewards.py in sync
+  push:
+    branches: [main] # any push starts a run (the tracker's own data commits carry [skip ci], so no loops)
   workflow_dispatch: {} # lets you trigger a run manually from the Actions tab
 
 permissions:

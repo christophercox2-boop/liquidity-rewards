@@ -37,7 +37,7 @@ API_BASE = "https://api.prod.polymarketexchange.com"
 EARNINGS_PATH = "/v1/incentives/earnings"
 # Earliest date the earnings endpoint serves (its documented default).
 START_DATE = os.environ.get("REWARDS_START_DATE", "2026-03-21")
-RUN_EVERY_HOURS = 6  # keep in sync with .github/workflows/liquidity-rewards.yml
+RUN_EVERY_HOURS = 1  # keep in sync with .github/workflows/liquidity-rewards.yml
 # Set automatically by GitHub Actions; fallback for local runs.
 REPO = os.environ.get("GITHUB_REPOSITORY", "wfco223/liquidity-rewards")
 WORKFLOW_URL = f"https://github.com/{REPO}/actions/workflows/liquidity-rewards.yml"

@@ -9,5 +9,5 @@ Two steps to turn it on (details in the [README](README.md)):
 1. Create an API key on polymarket.us (**Settings → API**).
 2. Add the two repo secrets: `POLYMARKET_KEY_ID` and `POLYMARKET_SECRET_KEY`.
 
-This page then updates itself every 6 hours with your totals and history.
+This page then updates itself every hour with your totals and history.
 ✅ + fresh timestamp = working. ❌ = broken (you'll also get an email).
