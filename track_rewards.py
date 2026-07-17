@@ -339,6 +339,13 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
         if not current:
             return
         tp = current[-1]
+        try:  # skip programs whose current period already ended
+            end = tp.get("end")
+            if end and dt.datetime.fromisoformat(str(end).replace("Z", "+00:00")) < dt.datetime.now(dt.timezone.utc):
+                stats["ended"] = stats.get("ended", 0) + 1
+                return
+        except Exception:  # noqa: BLE001 — unparseable end date: keep the candidate
+            pass
         df, target, pool = _num(tp.get("discountFactor")), _num(tp.get("targetSize")), _num(tp.get("rewardPool"))
         if pool < 25 or not df:
             stats["no_pool_or_df"] += 1
