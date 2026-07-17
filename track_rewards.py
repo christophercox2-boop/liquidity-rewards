@@ -215,6 +215,103 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     order["verdict"] = f"✅ scoring — ~{share * 100:.1f}% of {side_name} side"
 
 
+def _fetch_book(slug: str) -> dict:
+    """Fetch a market's order book: sorted (price, qty) levels + tick size."""
+    r = requests.get(f"{GATEWAY}/v1/markets/{slug}/book", timeout=15)
+    if r.status_code >= 400:
+        raise RuntimeError(f"book HTTP {r.status_code}: {' '.join(r.text.split())[:150]}")
+    b = r.json()
+    md = b.get("book") or b.get("marketData") or b  # tolerate wrappers
+    bids = [(_num(l.get("px")), _num(l.get("qty"))) for l in md.get("bids") or []]
+    asks = [(_num(l.get("px")), _num(l.get("qty"))) for l in md.get("offers") or md.get("asks") or []]
+    bids = sorted([(p, q) for p, q in bids if p > 0 and q > 0], key=lambda x: -x[0])
+    asks = sorted([(p, q) for p, q in asks if p > 0 and q > 0], key=lambda x: x[0])
+    all_px = [p for p, _ in bids + asks]
+    tick = 0.001 if any(round(p * 1000) % 10 for p in all_px) else 0.01
+    return {"bids": bids, "asks": asks, "tick": tick}
+
+
+def _probe_share(levels: list[tuple[float, float]], tick: float, df: float,
+                 target: float, probe: float) -> float | None:
+    """Estimated share of a side's score if you joined the best price with
+    `probe` contracts. None = the side (even with your order) misses Target
+    Size, so it wouldn't qualify at all."""
+    if not levels:
+        return 1.0 if (not target or probe >= target) else None
+    best = levels[0][0]
+    merged = [(best, levels[0][1] + probe)] + levels[1:]
+    if target and sum(q for _, q in merged) < target:
+        return None
+    window: list[tuple[float, float]] = []
+    cum = 0.0
+    for px, qty in merged:
+        window.append((px, qty))
+        cum += qty
+        if target and cum >= target:
+            break
+    denom = sum(q * df ** round(abs(best - px) / tick) for px, q in window)
+    return probe / denom if denom else None
+
+
+def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
+    """Markets with active reward pools you're NOT in, ranked by the share of
+    a side's score a `probe`-contract order at the best price would capture.
+
+    Familiar market families (same slug prefix as markets you trade) are
+    probed first; book probing is capped to keep runs fast.
+    """
+    programs: list[dict] = []
+    params: dict = {"pageSize": 100}
+    for _ in range(10):  # bounded pagination
+        r = requests.get(HOSTS[0] + "/v1/incentives", params=params, timeout=30)
+        if r.status_code >= 400:
+            raise RuntimeError(f"/v1/incentives -> HTTP {r.status_code}")
+        data = r.json()
+        programs.extend(data.get("programs") or [])
+        token = data.get("nextPageToken")
+        if not token:
+            break
+        params["pageToken"] = token
+
+    candidates: list[dict] = []
+    for p in programs:
+        slug = p.get("marketSlug", "")
+        if not slug or slug in exclude:
+            continue
+        periods = p.get("timePeriods") or []
+        current = [
+            tp for tp in periods
+            if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
+        ] or periods
+        if not current:
+            continue
+        tp = current[-1]
+        df, target, pool = _num(tp.get("discountFactor")), _num(tp.get("targetSize")), _num(tp.get("rewardPool"))
+        if pool < 25 or not df:
+            continue
+        candidates.append({"market": slug, "df": df, "target": target, "pool": pool})
+
+    familiar = {s.split("-")[0] for s in exclude if s}
+    candidates.sort(key=lambda c: (c["market"].split("-")[0] not in familiar, -c["pool"]))
+
+    out: list[dict] = []
+    for c in candidates[:30]:  # cap book probes
+        try:
+            book = _fetch_book(c["market"])
+        except Exception:  # noqa: BLE001 — skip unreadable books
+            continue
+        best: tuple[str, float] | None = None
+        for side, levels in (("BUY", book["bids"]), ("SELL", book["asks"])):
+            share = _probe_share(levels, book["tick"], c["df"], c["target"], probe)
+            if share is not None and (best is None or share > best[1]):
+                best = (side, share)
+        if best:
+            c["side"], c["share"] = best
+            out.append(c)
+    out.sort(key=lambda c: -c["share"])
+    return out[:12]
+
+
 def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
     """Snapshot of resting orders scored with the official reward formula.
 
@@ -252,21 +349,7 @@ def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
     debug: dict[str, str] = {}
     for slug in slugs:
         try:
-            r = requests.get(f"{GATEWAY}/v1/markets/{slug}/book", timeout=15)
-            if r.status_code >= 400:
-                debug[slug] = f"book HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
-                continue
-            b = r.json()
-            md = b.get("book") or b.get("marketData") or b  # tolerate wrappers
-            bids = [(_num(l.get("px")), _num(l.get("qty"))) for l in md.get("bids") or []]
-            asks = [(_num(l.get("px")), _num(l.get("qty"))) for l in md.get("offers") or md.get("asks") or []]
-            bids = sorted([(p, q) for p, q in bids if p > 0 and q > 0], key=lambda x: -x[0])
-            asks = sorted([(p, q) for p, q in asks if p > 0 and q > 0], key=lambda x: x[0])
-            all_px = [p for p, _ in bids + asks]
-            tick = 0.001 if any(round(p * 1000) % 10 for p in all_px) else 0.01
-            books[slug] = {"bids": bids, "asks": asks, "tick": tick}
-            if not bids and not asks:
-                debug[slug] = f"empty book parsed from: {json.dumps(b)[:200]}"
+            books[slug] = _fetch_book(slug)
         except Exception as e:  # noqa: BLE001 — a market without a book still gets listed
             debug[slug] = f"book {type(e).__name__}: {e}"
 
@@ -384,6 +467,7 @@ def write_status(
     error: str | None,
     live_orders: list[dict] | None = None,
     live_error: str | None = None,
+    opportunities: list[dict] | None = None,
 ) -> None:
     now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     total = sum(r["reward_usd"] for r in rows)
@@ -439,6 +523,24 @@ def write_status(
                 )
             if len(live_orders) > 30:
                 lines.append(f"| …and {len(live_orders) - 30} more | | | | | | |")
+        lines.append("")
+
+    if opportunities:
+        lines.append("## 💡 Suggested markets — active pools you're not in")
+        lines.append("")
+        lines.append(
+            "Ranked by the estimated share of a side's score a **200-contract order at "
+            "the best price** would capture today, using each market's real book, "
+            "Discount Factor, and Target Size. Higher = less competition for the pool."
+        )
+        lines.append("")
+        lines.append("| Market | Reward pool | Discount | Target Size | Best entry | Est. share |")
+        lines.append("|---|---:|---:|---:|---|---:|")
+        for c in opportunities:
+            lines.append(
+                f"| `{c['market']}` | {_usd(c['pool'])} | {c['df']:.2f} | {c['target']:,.0f} "
+                f"| {c['side']} side | ~{c['share'] * 100:.1f}% |"
+            )
         lines.append("")
 
     lines.append("## Totals")
@@ -537,16 +639,22 @@ def main() -> int:
 
     live_orders: list[dict] | None = None
     live_error: str | None = None
+    opportunities: list[dict] | None = None
     if not error:
         try:
             live_orders = fetch_live_orders(key_id, secret_key)
             write_live_csv(live_orders)
         except Exception as e:  # noqa: BLE001 — live view is informational only
             live_error = f"{type(e).__name__}: {e}"
+        try:
+            my_markets = {o["market"] for o in live_orders or [] if o["market"]}
+            opportunities = fetch_opportunities(my_markets)
+        except Exception:  # noqa: BLE001 — suggestions are informational only
+            opportunities = None
 
     total = sum(r["reward_usd"] for r in rows)
     beats = append_heartbeat("ok" if not error else "error", len(rows), total, error or "")
-    write_status(rows, beats, error, live_orders, live_error)
+    write_status(rows, beats, error, live_orders, live_error, opportunities)
 
     if error:
         print(f"FAILED: {error}", file=sys.stderr)
