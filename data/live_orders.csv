@@ -1,23 +1,5 @@
 market,side,price,size,ticks,share,pool,verdict
-vmc-ussep-misen-2026-08-04-els15-20,SELL,0.45,234.0,1,0.2192379762648345,250.0,✅ scoring — ~21.9% of ask side
-enwc-ussep-nh-2026-09-01-rep-scobro,SELL,0.1,146.0,0,0.19801980198019803,250.0,✅ scoring — ~19.8% of ask side
 apdc-jerpowgov-2026-12-31,BUY,0.02,2500.0,1,0.19244723629218224,250.0,✅ scoring — ~19.2% of bid side
-vmc-ussep-misen-2026-08-04-stegte20,SELL,0.45,234.0,1,0.1903470715835141,250.0,✅ scoring — ~19.0% of ask side
-vmc-ussep-misen-2026-08-04-elsgte20,SELL,0.45,234.0,1,0.1903470715835141,250.0,✅ scoring — ~19.0% of ask side
-vmc-ussep-misen-2026-08-04-ste15-20,SELL,0.45,234.0,1,0.1903470715835141,250.0,✅ scoring — ~19.0% of ask side
-enwc-ussep-nh-2026-09-01-rep-johsun,BUY,0.89,147.0,0,0.09090909090909093,250.0,✅ scoring — ~9.1% of bid side
-enwc-ussep-nh-2026-09-08-dem-karman,SELL,0.12,149.0,0,0.0905775075987842,250.0,✅ scoring — ~9.1% of ask side
-enwc-ussep-nh-2026-09-08-dem-chrpap,BUY,0.88,149.0,0,0.09030303030303032,250.0,✅ scoring — ~9.0% of bid side
-ewc-usgub-ca-2026-11-03-xavbec,BUY,0.89,136.0,0,0.053438953853891615,250.0,✅ scoring — ~5.3% of bid side
-ewc-usgub-ca-2026-11-03-stehil,SELL,0.11,147.0,0,0.017347527623282507,250.0,✅ scoring — ~1.7% of ask side
-ewc-usse-tx-2026-11-03-rep,BUY,0.58,206.0,0,0.012542773292417103,250.0,✅ scoring — ~1.3% of bid side
-paccc-usho-midterms-2026-11-03-dem,BUY,0.831,213.0,2,0.002967873581280567,250.0,✅ scoring — ~0.3% of bid side
-nphc-attgen-kenpax,SELL,0.43,306.0,0,,,❌ no active reward program on this market
-nphc-attgen-jeapir,SELL,0.47,328.0,0,,,❌ no active reward program on this market
-nphc-attgen-todbla,BUY,0.42,412.0,0,,,❌ no active reward program on this market
-pvwc-housepopw-2026-11-03-dem,BUY,0.84,211.0,0,,,❌ no active reward program on this market
-nphc-attgen-ailcan,SELL,0.49,341.0,0,,,❌ no active reward program on this market
-nphc-attgen-matgae,SELL,0.37,278.0,0,,,❌ no active reward program on this market
-pvwc-housepopw-2026-11-03-rep,SELL,0.28,244.0,1,,,❌ no active reward program on this market
-enwc-ussep-me-2026-07-27-dem-dankle,SELL,0.05,20.0,1,,250.0,❌ outside Target Size window (order 1 ticks from best; window ends 0)
+enwc-ussep-nh-2026-09-01-rep-johsun,BUY,0.89,76.69,0,0.04788067603593704,250.0,✅ scoring — ~4.8% of bid side
 enwc-ussep-me-2026-07-27-dem-dankle,SELL,0.05,9.06,1,,250.0,❌ outside Target Size window (order 1 ticks from best; window ends 0)
+enwc-ussep-me-2026-07-27-dem-dankle,SELL,0.05,20.0,1,,250.0,❌ outside Target Size window (order 1 ticks from best; window ends 0)
