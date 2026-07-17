@@ -206,7 +206,8 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     window_end_ticks = round(abs(best - window[-1][0]) / tick)
     if not any(abs(px - order["price"]) < tick / 2 for px, _ in window):
         order["verdict"] = (
-            f"❌ outside Target Size window (order {ticks} ticks from best; window ends {window_end_ticks})"
+            f"❌ outside Target Size window (order {ticks} tick{'s' if ticks != 1 else ''} "
+            f"from best; window ends {window_end_ticks})"
         )
         return
     denom = sum(q * df ** round(abs(best - px) / tick) for px, q in window)
@@ -339,15 +340,27 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
         except Exception:  # noqa: BLE001 — skip unreadable books
             continue
         best: tuple[str, float] | None = None
+        best_gap: tuple[str, float] | None = None
         for side, levels in (("BUY", book["bids"]), ("SELL", book["asks"])):
             share = _probe_share(levels, book["tick"], c["df"], c["target"], probe)
-            if share is not None and (best is None or share > best[1]):
-                best = (side, share)
+            if share is not None:
+                if best is None or share > best[1]:
+                    best = (side, share)
+            else:
+                # Side can't reach Target Size even with the probe — the pool
+                # pays nobody on this side until someone brings the missing size.
+                gap = (c["target"] or 0) - (sum(q for _, q in levels) + probe)
+                if gap > 0 and (best_gap is None or gap < best_gap[1]):
+                    best_gap = (side, gap)
         if best:
             c["side"], c["share"] = best
             c["est_day"] = c["share"] * _daily_pool(c) / 2
             out.append(c)
-    out.sort(key=lambda c: -c["est_day"])
+        elif best_gap:
+            c["side"], c["gap"] = best_gap
+            c["share"] = c["est_day"] = None
+            out.append(c)
+    out.sort(key=lambda c: (c["est_day"] is None, -(c["est_day"] or 0.0), c.get("gap") or 0.0))
     return out[:12]
 
 
@@ -581,10 +594,20 @@ def write_status(
         lines.append("| Market | Reward pool | Discount | Target Size | Best entry | Est. share | Est. $/day |")
         lines.append("|---|---:|---:|---:|---|---:|---:|")
         for c in opportunities:
+            if c.get("share") is not None:
+                entry, share, est = f"{c['side']} side", f"~{c['share'] * 100:.1f}%", f"~{_usd(c['est_day'])}"
+            else:
+                entry = f"{c['side']} — needs +{c['gap']:,.0f} contracts to unlock the pool"
+                share = est = "—"
             lines.append(
                 f"| `{c['market']}` | {_usd(c['pool'])} | {c['df']:.2f} | {c['target']:,.0f} "
-                f"| {c['side']} side | ~{c['share'] * 100:.1f}% | ~{_usd(c['est_day'])} |"
+                f"| {entry} | {share} | {est} |"
             )
+        lines.append("")
+    elif opportunities is not None:
+        lines.append("## 💡 Suggested political markets")
+        lines.append("")
+        lines.append("_No political markets with reachable pools found this run._")
         lines.append("")
 
     lines.append("## Totals")
@@ -693,8 +716,9 @@ def main() -> int:
         try:
             my_markets = {o["market"] for o in live_orders or [] if o["market"]}
             opportunities = fetch_opportunities(my_markets)
-        except Exception:  # noqa: BLE001 — suggestions are informational only
+        except Exception as e:  # noqa: BLE001 — suggestions are informational only
             opportunities = None
+            print(f"suggestions failed: {type(e).__name__}: {e}", file=sys.stderr)
 
     total = sum(r["reward_usd"] for r in rows)
     beats = append_heartbeat("ok" if not error else "error", len(rows), total, error or "")
