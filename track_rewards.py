@@ -172,6 +172,7 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     """
     order["ticks"] = None
     order["share"] = None
+    order["est_day"] = None
     if book is None:
         order["verdict"] = "⚠️ book unavailable"
         return
@@ -212,7 +213,41 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     share = (order["size"] * df ** ticks) / denom if denom else 0.0
     order["share"] = share
     side_name = "bid" if order["side"] == "BUY" else "ask"
-    order["verdict"] = f"✅ scoring — ~{share * 100:.1f}% of {side_name} side"
+    verdict = f"✅ scoring — ~{share * 100:.1f}% of {side_name} side"
+    if prog.get("pool"):
+        order["est_day"] = share * _daily_pool(prog) / 2  # pool assumed split per side
+        verdict += f" ≈ {_usd(order['est_day'])}/day"
+    order["verdict"] = verdict
+
+
+def _daily_pool(prog: dict) -> float:
+    """Reward pool normalized to $/day using the time period's start/end.
+    Missing or sub-day periods are treated as one day."""
+    days = 1.0
+    try:
+        s, e = prog.get("start"), prog.get("end")
+        if s and e:
+            sd = dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+            ed = dt.datetime.fromisoformat(str(e).replace("Z", "+00:00"))
+            days = max((ed - sd).total_seconds() / 86400.0, 1.0)
+    except Exception:  # noqa: BLE001 — fall back to daily
+        pass
+    return (prog.get("pool") or 0.0) / days
+
+
+# Slug fragments that mark U.S. politics markets (elections, primaries,
+# nominations, appointments). Everything else — sports etc. — is filtered out
+# of the suggestions.
+POLITICS_HINTS = (
+    "usse", "usho", "usgub", "ussep", "midterm", "attgen", "housepop",
+    "gov", "pres", "senat", "mayor", "elect",
+)
+
+
+def _is_politics(slug: str) -> bool:
+    if any(h in slug for h in POLITICS_HINTS):
+        return True
+    return bool({"dem", "rep"} & set(slug.split("-")))
 
 
 def _fetch_book(slug: str) -> dict:
@@ -287,9 +322,12 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
             continue
         tp = current[-1]
         df, target, pool = _num(tp.get("discountFactor")), _num(tp.get("targetSize")), _num(tp.get("rewardPool"))
-        if pool < 25 or not df:
+        if pool < 25 or not df or not _is_politics(slug):
             continue
-        candidates.append({"market": slug, "df": df, "target": target, "pool": pool})
+        candidates.append(
+            {"market": slug, "df": df, "target": target, "pool": pool,
+             "start": tp.get("start"), "end": tp.get("end")}
+        )
 
     familiar = {s.split("-")[0] for s in exclude if s}
     candidates.sort(key=lambda c: (c["market"].split("-")[0] not in familiar, -c["pool"]))
@@ -307,8 +345,9 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
                 best = (side, share)
         if best:
             c["side"], c["share"] = best
+            c["est_day"] = c["share"] * _daily_pool(c) / 2
             out.append(c)
-    out.sort(key=lambda c: -c["share"])
+    out.sort(key=lambda c: -c["est_day"])
     return out[:12]
 
 
@@ -373,6 +412,8 @@ def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
                             "df": _num(tp.get("discountFactor")),
                             "target": _num(tp.get("targetSize")),
                             "pool": _num(tp.get("rewardPool")),
+                            "start": tp.get("start"),
+                            "end": tp.get("end"),
                         }
             else:
                 debug["_incentives"] = f"HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
@@ -455,7 +496,7 @@ def write_live_csv(orders: list[dict]) -> None:
     DATA.mkdir(exist_ok=True)
     with LIVE_CSV.open("w", newline="") as f:
         writer = csv.DictWriter(
-            f, fieldnames=["market", "side", "price", "size", "ticks", "share", "pool", "verdict"]
+            f, fieldnames=["market", "side", "price", "size", "ticks", "share", "est_day", "pool", "verdict"]
         )
         writer.writeheader()
         writer.writerows(orders)
@@ -505,11 +546,14 @@ def write_status(
         elif not live_orders:
             lines.append("_No resting orders on the book right now._")
         else:
+            rate = sum(o["est_day"] for o in live_orders if o.get("est_day"))
+            lines.append(f"### Estimated earning rate: ~{_usd(rate)}/day (~{_usd(rate / 24)}/hour)")
+            lines.append("")
             lines.append(
+                "Rough estimate — assumes the books, pools, and your orders stay as they are, "
+                "both sides keep qualifying, and each pool splits evenly between bid and ask. "
                 "Scored with the official formula: `DiscountFactor ^ (ticks from best price) × size`, "
-                "counting only orders inside the Target Size window. "
-                "\"Share\" is your estimated cut of that side's score this second. "
-                "Earning orders first."
+                "counting only orders inside the Target Size window. Earning orders first."
             )
             lines.append("")
             lines.append("| Market | Side | Price | Size | Ticks off best | Reward pool | Earning? |")
@@ -526,20 +570,20 @@ def write_status(
         lines.append("")
 
     if opportunities:
-        lines.append("## 💡 Suggested markets — active pools you're not in")
+        lines.append("## 💡 Suggested political markets — active pools you're not in")
         lines.append("")
         lines.append(
-            "Ranked by the estimated share of a side's score a **200-contract order at "
-            "the best price** would capture today, using each market's real book, "
-            "Discount Factor, and Target Size. Higher = less competition for the pool."
+            "Politics only. Ranked by what a **200-contract order at the best price** "
+            "would earn today, using each market's real book, Discount Factor, and "
+            "Target Size (same assumptions as the earning rate above)."
         )
         lines.append("")
-        lines.append("| Market | Reward pool | Discount | Target Size | Best entry | Est. share |")
-        lines.append("|---|---:|---:|---:|---|---:|")
+        lines.append("| Market | Reward pool | Discount | Target Size | Best entry | Est. share | Est. $/day |")
+        lines.append("|---|---:|---:|---:|---|---:|---:|")
         for c in opportunities:
             lines.append(
                 f"| `{c['market']}` | {_usd(c['pool'])} | {c['df']:.2f} | {c['target']:,.0f} "
-                f"| {c['side']} side | ~{c['share'] * 100:.1f}% |"
+                f"| {c['side']} side | ~{c['share'] * 100:.1f}% | ~{_usd(c['est_day'])} |"
             )
         lines.append("")
 
