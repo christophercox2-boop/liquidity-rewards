@@ -246,9 +246,36 @@ POLITICS_HINTS = (
 
 
 def _is_politics(slug: str) -> bool:
-    if any(h in slug for h in POLITICS_HINTS):
+    """Token-based check — substring matching is too loose (a tennis player
+    code like 'russer' contains 'usse')."""
+    tokens = slug.split("-")
+    if {"dem", "rep"} & set(tokens):
         return True
-    return bool({"dem", "rep"} & set(slug.split("-")))
+    return any(t.startswith(POLITICS_HINTS) or t.endswith("gov") for t in tokens)
+
+
+def _political_market_slugs(stats: dict) -> list[str]:
+    """Open market slugs from events tagged politics/elections (authoritative,
+    unlike slug heuristics)."""
+    slugs: list[str] = []
+    for tag in ("politics", "elections"):
+        params: dict = {"tagSlug": tag, "active": True, "pageSize": 100}
+        for _ in range(10):
+            r = requests.get(GATEWAY + "/v1/events", params=params, timeout=30)
+            if r.status_code >= 400:
+                break
+            data = r.json()
+            for ev in data.get("events") or []:
+                for m in ev.get("markets") or []:
+                    if m.get("slug") and not m.get("closed"):
+                        slugs.append(m["slug"])
+            token = data.get("nextPageToken")
+            if not token:
+                break
+            params["pageToken"] = token
+    slugs = list(dict.fromkeys(slugs))
+    stats["tag_slugs"] = len(slugs)
+    return slugs
 
 
 def _fetch_book(slug: str) -> dict:
@@ -296,48 +323,68 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
     Familiar market families (same slug prefix as markets you trade) are
     probed first; book probing is capped to keep runs fast.
     """
-    # The program list is huge and alphabetical — sports fill the first
-    # thousands of entries. Page deep, filtering as we go, and stop as soon
-    # as we have enough political candidates.
-    stats = {"programs": 0, "pages": 0, "excluded": 0, "not_politics": 0,
+    stats = {"tag_slugs": 0, "programs": 0, "pages": 0, "excluded": 0, "not_politics": 0,
              "no_pool_or_df": 0, "candidates": 0, "book_failures": 0, "listed": 0}
+
+    def add_candidate(p: dict) -> None:
+        slug = p.get("marketSlug", "")
+        if not slug or slug in exclude:
+            stats["excluded"] += 1
+            return
+        periods = p.get("timePeriods") or []
+        current = [
+            tp for tp in periods
+            if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
+        ] or periods
+        if not current:
+            return
+        tp = current[-1]
+        df, target, pool = _num(tp.get("discountFactor")), _num(tp.get("targetSize")), _num(tp.get("rewardPool"))
+        if pool < 25 or not df:
+            stats["no_pool_or_df"] += 1
+            return
+        candidates.append(
+            {"market": slug, "df": df, "target": target, "pool": pool,
+             "start": tp.get("start"), "end": tp.get("end")}
+        )
+
     candidates: list[dict] = []
-    params: dict = {"pageSize": 100}
-    for _ in range(100):  # hard cap; early-exits once enough candidates found
-        r = requests.get(HOSTS[0] + "/v1/incentives", params=params, timeout=30)
+    # Preferred path: markets from events tagged politics, then their programs
+    # via the symbols filter — avoids crawling the sports-dominated program list.
+    pol_slugs = [s for s in _political_market_slugs(stats) if s not in exclude][:150]
+    for i in range(0, len(pol_slugs), 25):
+        r = requests.get(
+            HOSTS[0] + "/v1/incentives",
+            params={"symbols": pol_slugs[i:i + 25], "pageSize": 100},
+            timeout=30,
+        )
         if r.status_code >= 400:
-            raise RuntimeError(f"/v1/incentives -> HTTP {r.status_code}")
-        data = r.json()
-        stats["pages"] += 1
-        for p in data.get("programs") or []:
+            continue
+        for p in r.json().get("programs") or []:
             stats["programs"] += 1
-            slug = p.get("marketSlug", "")
-            if not slug or slug in exclude:
-                stats["excluded"] += 1
-                continue
-            if not _is_politics(slug):
-                stats["not_politics"] += 1
-                continue
-            periods = p.get("timePeriods") or []
-            current = [
-                tp for tp in periods
-                if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
-            ] or periods
-            if not current:
-                continue
-            tp = current[-1]
-            df, target, pool = _num(tp.get("discountFactor")), _num(tp.get("targetSize")), _num(tp.get("rewardPool"))
-            if pool < 25 or not df:
-                stats["no_pool_or_df"] += 1
-                continue
-            candidates.append(
-                {"market": slug, "df": df, "target": target, "pool": pool,
-                 "start": tp.get("start"), "end": tp.get("end")}
-            )
-        token = data.get("nextPageToken")
-        if not token or len(candidates) >= 60:
-            break
-        params["pageToken"] = token
+            add_candidate(p)
+
+    if not candidates:
+        # Fallback: deep alphabetical crawl of the program list with the slug
+        # classifier. Sports fill the first thousands of entries, hence the cap
+        # and early exit.
+        params = {"pageSize": 100}
+        for _ in range(100):
+            r = requests.get(HOSTS[0] + "/v1/incentives", params=params, timeout=30)
+            if r.status_code >= 400:
+                raise RuntimeError(f"/v1/incentives -> HTTP {r.status_code}")
+            data = r.json()
+            stats["pages"] += 1
+            for p in data.get("programs") or []:
+                stats["programs"] += 1
+                if not _is_politics(p.get("marketSlug", "")):
+                    stats["not_politics"] += 1
+                    continue
+                add_candidate(p)
+            token = data.get("nextPageToken")
+            if not token or len(candidates) >= 60:
+                break
+            params["pageToken"] = token
 
     familiar = {s.split("-")[0] for s in exclude if s}
     candidates.sort(key=lambda c: (c["market"].split("-")[0] not in familiar, -c["pool"]))
