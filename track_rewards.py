@@ -138,6 +138,27 @@ def _fetch_from_host(host: str, key_id: str, secret_key: str) -> tuple[list[dict
     return rows, raw
 
 
+def _num(x) -> float:
+    """Best-effort numeric parse: plain numbers, numeric strings, and the
+    protobuf-style dict encodings the trading API uses (units/nanos, value)."""
+    if x is None:
+        return 0.0
+    if isinstance(x, (int, float)):
+        return float(x)
+    if isinstance(x, str):
+        try:
+            return float(x)
+        except ValueError:
+            return 0.0
+    if isinstance(x, dict):
+        if "units" in x or "nanos" in x:
+            return float(x.get("units", 0) or 0) + float(x.get("nanos", 0) or 0) / 1e9
+        for key in ("value", "amount", "px", "price", "qty", "quantity", "decimal"):
+            if key in x:
+                return _num(x[key])
+    return 0.0
+
+
 def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
     """Snapshot of resting orders: price vs. live midpoint + market reward pool.
 
@@ -152,15 +173,21 @@ def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
     )
     if resp.status_code >= 400:
         raise RuntimeError(f"{path} -> HTTP {resp.status_code}: {' '.join(resp.text.split())[:200]}")
+    payload = resp.json()
+    DATA.mkdir(exist_ok=True)
+    (DATA / "live_raw.json").write_text(json.dumps(payload, indent=2))  # schema reference
     orders: list[dict] = []
-    for o in resp.json().get("orders") or []:
+    for o in payload.get("orders") or []:
         slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+        size = _num(o.get("leavesQuantity"))
+        if not size:
+            size = _num(o.get("quantity"))
         orders.append(
             {
                 "market": slug,
                 "side": "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL",
-                "price": float(o.get("price") or 0),
-                "size": float(o.get("leavesQuantity") or o.get("quantity") or 0),
+                "price": _num(o.get("price")),
+                "size": size,
             }
         )
 
@@ -173,7 +200,9 @@ def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
             r.raise_for_status()
             b = r.json()
             if b.get("bestBid") is not None and b.get("bestAsk") is not None:
-                mids[slug] = (float(b["bestBid"]) + float(b["bestAsk"])) / 2
+                bid, ask = _num(b["bestBid"]), _num(b["bestAsk"])
+                if bid or ask:
+                    mids[slug] = (bid + ask) / 2
         except Exception:  # noqa: BLE001 — a market without a mid still gets listed
             pass
 
@@ -191,7 +220,7 @@ def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
                         if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
                     ] or periods
                     if current:
-                        pools[p.get("marketSlug", "")] = float(current[-1].get("rewardPool", 0) or 0)
+                        pools[p.get("marketSlug", "")] = _num(current[-1].get("rewardPool"))
         except Exception:  # noqa: BLE001 — pools are nice-to-have
             pass
 
