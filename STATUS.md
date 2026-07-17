@@ -2,30 +2,38 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-07-17 19:51 UTC
+## ✅ Last successful check: 2026-07-17 20:34 UTC
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
 ## 📍 Right now — your resting orders
 
-Closer to the midpoint and larger size = bigger share of a market's reward pool. Ordered best-positioned first.
+Scored with the official formula: `DiscountFactor ^ (ticks from best price) × size`, counting only orders inside the Target Size window. "Share" is your estimated cut of that side's score this second. Earning orders first.
 
-| Market | Side | Price | Size | Midpoint | Off mid | Reward pool |
-|---|---|---:|---:|---:|---:|---:|
-| `ewc-usgub-ca-2026-11-03-stehil` | SELL | 11.0¢ | 147 | 10.5¢ | 0.5¢ | $250.00 |
-| `ewc-usse-tx-2026-11-03-rep` | BUY | 58.0¢ | 206 | 58.5¢ | 0.5¢ | $250.00 |
-| `ewc-usgub-ca-2026-11-03-xavbec` | BUY | 89.0¢ | 136 | 89.5¢ | 0.5¢ | $250.00 |
-| `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 5.0¢ | 20 | 2.5¢ | 2.5¢ | $250.00 |
-| `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 5.0¢ | 9 | 2.5¢ | 2.5¢ | $250.00 |
-| `enwc-ussep-nh-2026-09-01-rep-scobro` | SELL | 10.0¢ | 146 | 5.5¢ | 4.5¢ | $250.00 |
-| `enwc-ussep-nh-2026-09-01-rep-johsun` | BUY | 89.0¢ | 147 | 94.0¢ | 5.0¢ | $250.00 |
-| `enwc-ussep-nh-2026-09-08-dem-karman` | SELL | 12.0¢ | 149 | 6.5¢ | 5.5¢ | $250.00 |
-| `enwc-ussep-nh-2026-09-08-dem-chrpap` | BUY | 88.0¢ | 149 | 93.5¢ | 5.5¢ | $250.00 |
-| `apdc-jerpowgov-2026-12-31` | BUY | 2.0¢ | 2,500 | 18.0¢ | 16.0¢ | $250.00 |
-| `vmc-ussep-misen-2026-08-04-stegte20` | SELL | 45.0¢ | 234 | 22.5¢ | 22.5¢ | $250.00 |
-| `vmc-ussep-misen-2026-08-04-ste15-20` | SELL | 45.0¢ | 234 | 22.5¢ | 22.5¢ | $250.00 |
-| `vmc-ussep-misen-2026-08-04-elsgte20` | SELL | 45.0¢ | 234 | 22.5¢ | 22.5¢ | $250.00 |
-| `vmc-ussep-misen-2026-08-04-els15-20` | SELL | 45.0¢ | 234 | 22.5¢ | 22.5¢ | $250.00 |
+| Market | Side | Price | Size | Ticks off best | Reward pool | Earning? |
+|---|---|---:|---:|---:|---:|---|
+| `enwc-ussep-nh-2026-09-01-rep-scobro` | SELL | 10.0¢ | 146 | 0 | $250.00 | ✅ scoring — ~19.8% of ask side |
+| `apdc-jerpowgov-2026-12-31` | BUY | 2.0¢ | 2,500 | 1 | $250.00 | ✅ scoring — ~19.2% of bid side |
+| `vmc-ussep-misen-2026-08-04-stegte20` | SELL | 45.0¢ | 234 | 1 | $250.00 | ✅ scoring — ~19.0% of ask side |
+| `vmc-ussep-misen-2026-08-04-els15-20` | SELL | 45.0¢ | 234 | 1 | $250.00 | ✅ scoring — ~19.0% of ask side |
+| `vmc-ussep-misen-2026-08-04-ste15-20` | SELL | 45.0¢ | 234 | 1 | $250.00 | ✅ scoring — ~19.0% of ask side |
+| `vmc-ussep-misen-2026-08-04-elsgte20` | SELL | 45.0¢ | 234 | 1 | $250.00 | ✅ scoring — ~19.0% of ask side |
+| `enwc-ussep-nh-2026-09-01-rep-johsun` | BUY | 89.0¢ | 147 | 0 | $250.00 | ✅ scoring — ~9.1% of bid side |
+| `enwc-ussep-nh-2026-09-08-dem-karman` | SELL | 12.0¢ | 149 | 0 | $250.00 | ✅ scoring — ~9.1% of ask side |
+| `enwc-ussep-nh-2026-09-08-dem-chrpap` | BUY | 88.0¢ | 149 | 0 | $250.00 | ✅ scoring — ~9.0% of bid side |
+| `ewc-usgub-ca-2026-11-03-xavbec` | BUY | 89.0¢ | 136 | 0 | $250.00 | ✅ scoring — ~5.3% of bid side |
+| `ewc-usgub-ca-2026-11-03-stehil` | SELL | 11.0¢ | 147 | 0 | $250.00 | ✅ scoring — ~1.7% of ask side |
+| `ewc-usse-tx-2026-11-03-rep` | BUY | 58.0¢ | 206 | 0 | $250.00 | ✅ scoring — ~1.3% of bid side |
+| `paccc-usho-midterms-2026-11-03-dem` | BUY | 83.1¢ | 213 | 2 | $250.00 | ✅ scoring — ~0.3% of bid side |
+| `nphc-attgen-ailcan` | SELL | 49.0¢ | 341 | 0 | — | ⚠️ no program params for this market |
+| `nphc-attgen-jeapir` | SELL | 47.0¢ | 328 | 0 | — | ⚠️ no program params for this market |
+| `pvwc-housepopw-2026-11-03-dem` | BUY | 84.0¢ | 211 | 0 | — | ⚠️ no program params for this market |
+| `nphc-attgen-kenpax` | SELL | 43.0¢ | 306 | 0 | — | ⚠️ no program params for this market |
+| `nphc-attgen-todbla` | BUY | 42.0¢ | 412 | 0 | — | ⚠️ no program params for this market |
+| `nphc-attgen-matgae` | SELL | 37.0¢ | 278 | 0 | — | ⚠️ no program params for this market |
+| `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 5.0¢ | 20 | 1 | $250.00 | ❌ outside Target Size window (order 1 ticks from best; window ends 0) |
+| `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 5.0¢ | 9 | 1 | $250.00 | ❌ outside Target Size window (order 1 ticks from best; window ends 0) |
+| `pvwc-housepopw-2026-11-03-rep` | SELL | 28.0¢ | 244 | 1 | — | ⚠️ no program params for this market |
 
 ## Totals
 
@@ -86,6 +94,7 @@ Closer to the midpoint and larger size = bigger share of a market's reward pool.
 
 | Checked (UTC) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-07-17 20:34:20 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 19:51:06 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 19:48:51 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 19:46:02 | ✅ ok | 72 | $80.91 |
@@ -95,6 +104,5 @@ Closer to the midpoint and larger size = bigger share of a market's reward pool.
 | 2026-07-17 16:36:29 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 14:54:59 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 12:38:54 | ✅ ok | 72 | $80.91 |
-| 2026-07-17 11:28:46 | ✅ ok | 72 | $80.91 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
