@@ -1,5 +1,5 @@
 market,side,price,size,ticks,share,est_day,pool,verdict
-enwc-ussep-nh-2026-09-01-rep-johsun,BUY,0.89,130.0,0,0.08145363408521304,10.18170426065163,250.0,✅ scoring — ~8.1% of bid side ≈ $10.18/day
-enwc-ussep-nh-2026-09-01-rep-johsun,SELL,0.92,70.31,0,0.07416460914639182,9.270576143298978,250.0,✅ scoring — ~7.4% of ask side ≈ $9.27/day
+enwc-ussep-nh-2026-09-01-rep-johsun,SELL,0.92,70.31,0,0.10760686075999738,13.450857594999674,250.0,✅ scoring — ~10.8% of ask side ≈ $13.45/day
+enwc-ussep-nh-2026-09-01-rep-johsun,BUY,0.89,130.0,0,0.08019740900678594,10.024676125848243,250.0,✅ scoring — ~8.0% of bid side ≈ $10.02/day
 enwc-ussep-me-2026-07-27-dem-dankle,SELL,0.03,29.06,0,0.00934928223507686,1.1686602793846075,250.0,✅ scoring — ~0.9% of ask side ≈ $1.17/day
-apdc-jerpowgov-2026-12-31,BUY,0.02,2500.0,4,0.009120885185328581,1.1401106481660725,250.0,✅ scoring — ~0.9% of bid side ≈ $1.14/day
+apdc-jerpowgov-2026-12-31,BUY,0.02,2500.0,4,0.00921678179356315,1.1520977241953936,250.0,✅ scoring — ~0.9% of bid side ≈ $1.15/day
