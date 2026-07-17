@@ -236,22 +236,20 @@ def _daily_pool(prog: dict) -> float:
     return (prog.get("pool") or 0.0) / days
 
 
-# Slug fragments that mark U.S. politics markets (elections, primaries,
-# nominations, appointments). Everything else — sports etc. — is filtered out
-# of the suggestions.
-POLITICS_HINTS = (
-    "usse", "usho", "usgub", "ussep", "midterm", "attgen", "housepop",
-    "gov", "pres", "senat", "mayor", "elect",
-)
+# Slug tokens that mark U.S. politics markets (elections, primaries,
+# nominations, appointments). Everything else — sports, foreign elections —
+# is filtered out of the suggestions.
+US_POLITICS_HINTS = ("midterm", "attgen", "housepop")
 
 
-def _is_politics(slug: str) -> bool:
+def _is_us_politics(slug: str) -> bool:
     """Token-based check — substring matching is too loose (a tennis player
-    code like 'russer' contains 'usse')."""
+    code like 'russer' contains 'usse'). US-only: dem/rep tokens, us*-prefixed
+    race codes (usse, usgub, ussep, …), or US-specific terms."""
     tokens = slug.split("-")
     if {"dem", "rep"} & set(tokens):
         return True
-    return any(t.startswith(POLITICS_HINTS) or t.endswith("gov") for t in tokens)
+    return any(t.startswith("us") or t.startswith(US_POLITICS_HINTS) or t.endswith("gov") for t in tokens)
 
 
 def _political_market_slugs(stats: dict) -> list[str]:
@@ -331,6 +329,9 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
         if not slug or slug in exclude:
             stats["excluded"] += 1
             return
+        if not _is_us_politics(slug):  # tags include foreign races; US only
+            stats["not_politics"] += 1
+            return
         periods = p.get("timePeriods") or []
         current = [
             tp for tp in periods
@@ -384,9 +385,6 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
             stats["pages"] += 1
             for p in data.get("programs") or []:
                 stats["programs"] += 1
-                if not _is_politics(p.get("marketSlug", "")):
-                    stats["not_politics"] += 1
-                    continue
                 add_candidate(p)
             token = data.get("nextPageToken")
             if not token or len(candidates) >= 60:
@@ -656,10 +654,10 @@ def write_status(
         lines.append("")
 
     if opportunities:
-        lines.append("## 💡 Suggested political markets — active pools you're not in")
+        lines.append("## 💡 Suggested U.S. political markets — active pools you're not in")
         lines.append("")
         lines.append(
-            "Politics only. Ranked by what a **200-contract order at the best price** "
+            "U.S. politics only. Ranked by what a **200-contract order at the best price** "
             "would earn today, using each market's real book, Discount Factor, and "
             "Target Size (same assumptions as the earning rate above)."
         )
@@ -678,9 +676,9 @@ def write_status(
             )
         lines.append("")
     elif opportunities is not None:
-        lines.append("## 💡 Suggested political markets")
+        lines.append("## 💡 Suggested U.S. political markets")
         lines.append("")
-        lines.append("_No political markets with reachable pools found this run._")
+        lines.append("_No U.S. political markets with reachable pools found this run._")
         lines.append("")
 
     lines.append("## Totals")
