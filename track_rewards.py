@@ -174,8 +174,6 @@ def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
     if resp.status_code >= 400:
         raise RuntimeError(f"{path} -> HTTP {resp.status_code}: {' '.join(resp.text.split())[:200]}")
     payload = resp.json()
-    DATA.mkdir(exist_ok=True)
-    (DATA / "live_raw.json").write_text(json.dumps(payload, indent=2))  # schema reference
     orders: list[dict] = []
     for o in payload.get("orders") or []:
         slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
@@ -194,17 +192,25 @@ def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
     slugs = sorted({o["market"] for o in orders if o["market"]})[:25]
 
     mids: dict[str, float] = {}
+    bbo_debug: dict[str, str] = {}
     for slug in slugs:
         try:
             r = requests.get(f"{GATEWAY}/v1/markets/{slug}/bbo", timeout=15)
-            r.raise_for_status()
+            if r.status_code >= 400:
+                bbo_debug[slug] = f"HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
+                continue
             b = r.json()
-            if b.get("bestBid") is not None and b.get("bestAsk") is not None:
-                bid, ask = _num(b["bestBid"]), _num(b["bestAsk"])
-                if bid or ask:
-                    mids[slug] = (bid + ask) / 2
-        except Exception:  # noqa: BLE001 — a market without a mid still gets listed
-            pass
+            bid, ask = _num(b.get("bestBid")), _num(b.get("bestAsk"))
+            if bid or ask:
+                mids[slug] = (bid + ask) / 2
+            else:
+                bbo_debug[slug] = f"no bid/ask parsed from: {json.dumps(b)[:150]}"
+        except Exception as e:  # noqa: BLE001 — a market without a mid still gets listed
+            bbo_debug[slug] = f"{type(e).__name__}: {e}"
+    DATA.mkdir(exist_ok=True)
+    (DATA / "live_raw.json").write_text(  # schema + failure reference for debugging
+        json.dumps({"orders": payload, "bbo_debug": bbo_debug}, indent=2)
+    )
 
     pools: dict[str, float] = {}
     if slugs:
