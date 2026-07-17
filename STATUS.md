@@ -2,13 +2,31 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-07-17 19:43 UTC
+## ✅ Last successful check: 2026-07-17 19:46 UTC
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
 ## 📍 Right now — your resting orders
 
-⚠️ Couldn't fetch live orders this run: `TypeError: float() argument must be a string or a real number, not 'dict'`
+Closer to the midpoint and larger size = bigger share of a market's reward pool. Ordered best-positioned first.
+
+| Market | Side | Price | Size | Midpoint | Off mid | Reward pool |
+|---|---|---:|---:|---:|---:|---:|
+| `apdc-jerpowgov-2026-12-31` | BUY | 2.0¢ | 2,500 | — | — | $250.00 |
+| `vmc-ussep-misen-2026-08-04-stegte20` | SELL | 45.0¢ | 234 | — | — | $250.00 |
+| `vmc-ussep-misen-2026-08-04-elsgte20` | SELL | 45.0¢ | 234 | — | — | $250.00 |
+| `vmc-ussep-misen-2026-08-04-ste15-20` | SELL | 45.0¢ | 234 | — | — | $250.00 |
+| `vmc-ussep-misen-2026-08-04-els15-20` | SELL | 45.0¢ | 234 | — | — | $250.00 |
+| `ewc-usse-tx-2026-11-03-rep` | BUY | 58.0¢ | 206 | — | — | $250.00 |
+| `enwc-ussep-nh-2026-09-08-dem-chrpap` | BUY | 88.0¢ | 149 | — | — | $250.00 |
+| `enwc-ussep-nh-2026-09-08-dem-karman` | SELL | 12.0¢ | 149 | — | — | $250.00 |
+| `enwc-ussep-nh-2026-09-01-rep-johsun` | BUY | 89.0¢ | 147 | — | — | $250.00 |
+| `ewc-usgub-ca-2026-11-03-stehil` | SELL | 11.0¢ | 147 | — | — | $250.00 |
+| `enwc-ussep-nh-2026-09-01-rep-scobro` | SELL | 10.0¢ | 146 | — | — | $250.00 |
+| `ewc-usgub-ca-2026-11-03-xavbec` | BUY | 89.0¢ | 136 | — | — | $250.00 |
+| `ewc-usgub-ca-2026-11-03-xavbec` | SELL | 90.0¢ | 52 | — | — | $250.00 |
+| `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 5.0¢ | 20 | — | — | $250.00 |
+| `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 5.0¢ | 9 | — | — | $250.00 |
 
 ## Totals
 
@@ -69,6 +87,7 @@ This runs automatically every hour. **If the timestamp above is more than ~2 hou
 
 | Checked (UTC) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-07-17 19:46:02 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 19:43:28 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 19:35:58 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 18:17:44 | ✅ ok | 72 | $80.91 |
