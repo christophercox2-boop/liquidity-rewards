@@ -216,7 +216,7 @@ def write_status(rows: list[dict], beats: list[dict], error: str | None) -> None
         lines.append(f"## ✅ Last successful check: {now}")
         lines.append("")
         lines.append(
-            f"This runs automatically every {RUN_EVERY_HOURS} hours. "
+            f"This runs automatically every {'hour' if RUN_EVERY_HOURS == 1 else f'{RUN_EVERY_HOURS} hours'}. "
             f"**If the timestamp above is more than ~{RUN_EVERY_HOURS + 1} hours old, something is broken** — "
             f"check the [Actions tab]({WORKFLOW_URL})."
         )
