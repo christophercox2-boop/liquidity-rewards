@@ -1,0 +1,5 @@
+Edit this file (type anything below the line) and commit — that push makes
+the tracker run immediately and refresh STATUS.md with your current orders.
+
+----
+poke #1

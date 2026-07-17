@@ -39,6 +39,9 @@ HOSTS = [
     "https://api.polymarket.us",
 ]
 EARNINGS_PATH = "/v1/incentives/earnings"
+# Trading API (authenticated) and public gateway, per the polymarket-us SDK.
+TRADE_API = "https://api.polymarket.us"
+GATEWAY = "https://gateway.polymarket.us"
 # Earliest date the earnings endpoint serves (its documented default).
 START_DATE = os.environ.get("REWARDS_START_DATE", "2026-03-21")
 RUN_EVERY_HOURS = 1  # keep in sync with .github/workflows/liquidity-rewards.yml
@@ -51,6 +54,7 @@ DATA = HERE / "data"
 REWARDS_CSV = DATA / "rewards.csv"
 CHECKS_CSV = DATA / "checks.csv"
 RAW_JSON = DATA / "latest_response.json"
+LIVE_CSV = DATA / "live_orders.csv"
 STATUS_MD = HERE / "STATUS.md"
 
 MAX_HEARTBEATS = 1000  # cap checks.csv so it never grows unbounded
@@ -134,6 +138,72 @@ def _fetch_from_host(host: str, key_id: str, secret_key: str) -> tuple[list[dict
     return rows, raw
 
 
+def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
+    """Snapshot of resting orders: price vs. live midpoint + market reward pool.
+
+    This is the "where am I earning right now" view. Informational only — a
+    failure here shows a warning in STATUS.md but never fails the run.
+    """
+    path = "/v1/orders/open"
+    resp = requests.get(
+        TRADE_API + path,
+        headers=auth_headers(key_id, secret_key, "GET", path),
+        timeout=30,
+    )
+    if resp.status_code >= 400:
+        raise RuntimeError(f"{path} -> HTTP {resp.status_code}: {' '.join(resp.text.split())[:200]}")
+    orders: list[dict] = []
+    for o in resp.json().get("orders") or []:
+        slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+        orders.append(
+            {
+                "market": slug,
+                "side": "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL",
+                "price": float(o.get("price") or 0),
+                "size": float(o.get("leavesQuantity") or o.get("quantity") or 0),
+            }
+        )
+
+    slugs = sorted({o["market"] for o in orders if o["market"]})[:25]
+
+    mids: dict[str, float] = {}
+    for slug in slugs:
+        try:
+            r = requests.get(f"{GATEWAY}/v1/markets/{slug}/bbo", timeout=15)
+            r.raise_for_status()
+            b = r.json()
+            if b.get("bestBid") is not None and b.get("bestAsk") is not None:
+                mids[slug] = (float(b["bestBid"]) + float(b["bestAsk"])) / 2
+        except Exception:  # noqa: BLE001 — a market without a mid still gets listed
+            pass
+
+    pools: dict[str, float] = {}
+    if slugs:
+        try:
+            r = requests.get(
+                HOSTS[0] + "/v1/incentives", params={"symbols": slugs, "pageSize": 100}, timeout=20
+            )
+            if r.status_code < 400:
+                for p in r.json().get("programs") or []:
+                    periods = p.get("timePeriods") or []
+                    current = [
+                        tp for tp in periods
+                        if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
+                    ] or periods
+                    if current:
+                        pools[p.get("marketSlug", "")] = float(current[-1].get("rewardPool", 0) or 0)
+        except Exception:  # noqa: BLE001 — pools are nice-to-have
+            pass
+
+    for o in orders:
+        mid = mids.get(o["market"])
+        o["mid"] = mid
+        o["off_mid_cents"] = abs(o["price"] - mid) * 100 if mid is not None else None
+        o["pool"] = pools.get(o["market"])
+    orders.sort(key=lambda o: (o["off_mid_cents"] is None, o["off_mid_cents"] or 0.0, -o["size"]))
+    return orders
+
+
 # --------------------------------------------------------------------------
 # Files
 # --------------------------------------------------------------------------
@@ -193,7 +263,23 @@ def _group_sum(rows: list[dict], key) -> dict[str, float]:
     return out
 
 
-def write_status(rows: list[dict], beats: list[dict], error: str | None) -> None:
+def write_live_csv(orders: list[dict]) -> None:
+    DATA.mkdir(exist_ok=True)
+    with LIVE_CSV.open("w", newline="") as f:
+        writer = csv.DictWriter(
+            f, fieldnames=["market", "side", "price", "size", "mid", "off_mid_cents", "pool"]
+        )
+        writer.writeheader()
+        writer.writerows(orders)
+
+
+def write_status(
+    rows: list[dict],
+    beats: list[dict],
+    error: str | None,
+    live_orders: list[dict] | None = None,
+    live_error: str | None = None,
+) -> None:
     now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     total = sum(r["reward_usd"] for r in rows)
     by_status = _group_sum(rows, lambda r: r["status"] or "UNKNOWN")
@@ -221,6 +307,33 @@ def write_status(rows: list[dict], beats: list[dict], error: str | None) -> None
             f"check the [Actions tab]({WORKFLOW_URL})."
         )
     lines.append("")
+
+    if live_orders is not None or live_error:
+        lines.append("## 📍 Right now — your resting orders")
+        lines.append("")
+        if live_error:
+            lines.append(f"⚠️ Couldn't fetch live orders this run: `{live_error}`")
+        elif not live_orders:
+            lines.append("_No resting orders on the book right now._")
+        else:
+            lines.append(
+                "Closer to the midpoint and larger size = bigger share of a market's "
+                "reward pool. Ordered best-positioned first."
+            )
+            lines.append("")
+            lines.append("| Market | Side | Price | Size | Midpoint | Off mid | Reward pool |")
+            lines.append("|---|---|---:|---:|---:|---:|---:|")
+            for o in live_orders[:30]:
+                mid = f"{o['mid'] * 100:.1f}¢" if o.get("mid") is not None else "—"
+                off = f"{o['off_mid_cents']:.1f}¢" if o.get("off_mid_cents") is not None else "—"
+                pool = _usd(o["pool"]) if o.get("pool") else "—"
+                lines.append(
+                    f"| `{o['market']}` | {o['side']} | {o['price'] * 100:.1f}¢ "
+                    f"| {o['size']:,.0f} | {mid} | {off} | {pool} |"
+                )
+            if len(live_orders) > 30:
+                lines.append(f"| …and {len(live_orders) - 30} more | | | | | | |")
+        lines.append("")
 
     lines.append("## Totals")
     lines.append("")
@@ -316,9 +429,18 @@ def main() -> int:
     if error:
         rows = load_existing_rows()  # keep showing last good data
 
+    live_orders: list[dict] | None = None
+    live_error: str | None = None
+    if not error:
+        try:
+            live_orders = fetch_live_orders(key_id, secret_key)
+            write_live_csv(live_orders)
+        except Exception as e:  # noqa: BLE001 — live view is informational only
+            live_error = f"{type(e).__name__}: {e}"
+
     total = sum(r["reward_usd"] for r in rows)
     beats = append_heartbeat("ok" if not error else "error", len(rows), total, error or "")
-    write_status(rows, beats, error)
+    write_status(rows, beats, error, live_orders, live_error)
 
     if error:
         print(f"FAILED: {error}", file=sys.stderr)

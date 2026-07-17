@@ -25,8 +25,17 @@ Open **[STATUS.md](STATUS.md)**. That one page tells you everything:
 - ✅ and a recent timestamp (under 2 hours old) → **working**
 - ❌ or an old timestamp → **broken** (GitHub will have also emailed you)
 
-Below that it shows your total earnings, the last 14 days, monthly totals, and
-top markets. The full history lives in [`data/rewards.csv`](data/rewards.csv).
+It shows **"Right now"** (your resting orders, how far each sits from the
+live midpoint, and the market's reward pool), then your total earnings, the
+last 14 days, monthly totals, and top markets. The full history lives in
+[`data/rewards.csv`](data/rewards.csv).
+
+## Refreshing on demand (works on your phone)
+
+The page updates hourly by itself. To refresh it *right now*: open
+[`poke.txt`](poke.txt), tap the pencil (edit) icon, type anything, and
+commit. That push triggers an immediate run — STATUS.md is fresh about a
+minute later.
 
 ---
 
