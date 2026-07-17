@@ -183,8 +183,11 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     best = levels[0][0]
     ticks = round(abs(best - order["price"]) / tick)
     order["ticks"] = ticks
-    if prog is None or not prog.get("df"):
-        order["verdict"] = "⚠️ no program params for this market"
+    if prog is None:
+        order["verdict"] = "❌ no active reward program on this market"
+        return
+    if not prog.get("df"):
+        order["verdict"] = "⚠️ program has no Discount Factor — can't score"
         return
     df, target = prog["df"], prog.get("target") or 0.0
 
