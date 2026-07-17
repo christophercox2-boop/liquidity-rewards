@@ -102,56 +102,6 @@
         "lastTransactTime": "2026-07-16T12:24:30.263246341Z"
       },
       {
-        "id": "BA760F6XC75P",
-        "marketSlug": "apdc-jerpowgov-2026-12-31",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.02",
-          "currency": "USD"
-        },
-        "quantity": 2500,
-        "cumQuantity": 0,
-        "leavesQuantity": 2500,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "apdc-jerpowgov-2026-12-31",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/jerpowgov-f178f30782.jpg",
-          "title": "Jerome Powell Announced Out as Fed Governor?",
-          "outcome": "Yes",
-          "eventSlug": "jerpowgov",
-          "subject": {
-            "id": 0,
-            "name": "By December 31, 2026",
-            "subjectType": ""
-          },
-          "eventId": "44389"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-17T17:20:52.339759722Z",
-        "createTime": "2026-07-17T17:20:52.336536342Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-17T17:20:52.339759722Z"
-      },
-      {
         "id": "BA8BCKWWM75R",
         "marketSlug": "enwc-ussep-nh-2026-09-01-rep-johsun",
         "side": "ORDER_SIDE_BUY",
@@ -200,6 +150,106 @@
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
         "lastTransactTime": "2026-07-17T20:51:47.097692606Z"
+      },
+      {
+        "id": "BAANTGKKW75H",
+        "marketSlug": "enwc-ussep-nh-2026-09-01-rep-johsun",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.92",
+          "currency": "USD"
+        },
+        "quantity": 70.31,
+        "cumQuantity": 0,
+        "leavesQuantity": 70.31,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_LONG",
+        "marketMetadata": {
+          "slug": "enwc-ussep-nh-2026-09-01-rep-johsun",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
+          "title": "New Hampshire Senate Republican Primary Winner?",
+          "outcome": "Yes",
+          "eventSlug": "ussep-nh-2026-09-01-rep",
+          "subject": {
+            "id": 0,
+            "name": "John E. Sununu",
+            "subjectType": ""
+          },
+          "eventId": "50268"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-17T21:26:33.922146099Z",
+        "createTime": "2026-07-17T21:26:33.920430740Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-17T21:26:33.922146099Z"
+      },
+      {
+        "id": "BA760F6XC75P",
+        "marketSlug": "apdc-jerpowgov-2026-12-31",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.02",
+          "currency": "USD"
+        },
+        "quantity": 2500,
+        "cumQuantity": 0,
+        "leavesQuantity": 2500,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "apdc-jerpowgov-2026-12-31",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/jerpowgov-f178f30782.jpg",
+          "title": "Jerome Powell Announced Out as Fed Governor?",
+          "outcome": "Yes",
+          "eventSlug": "jerpowgov",
+          "subject": {
+            "id": 0,
+            "name": "By December 31, 2026",
+            "subjectType": ""
+          },
+          "eventId": "44389"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-17T17:20:52.339759722Z",
+        "createTime": "2026-07-17T17:20:52.336536342Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-17T17:20:52.339759722Z"
       }
     ]
   },
