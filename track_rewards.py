@@ -33,7 +33,11 @@ from pathlib import Path
 import requests
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-API_BASE = "https://api.prod.polymarketexchange.com"
+# The documented incentives host, then the main API host as a fallback.
+HOSTS = [
+    "https://api.prod.polymarketexchange.com",
+    "https://api.polymarket.us",
+]
 EARNINGS_PATH = "/v1/incentives/earnings"
 # Earliest date the earnings endpoint serves (its documented default).
 START_DATE = os.environ.get("REWARDS_START_DATE", "2026-03-21")
@@ -76,18 +80,41 @@ def auth_headers(key_id: str, secret_key: str, method: str, path: str) -> dict[s
 
 
 def fetch_all_rewards(key_id: str, secret_key: str) -> tuple[list[dict], dict]:
-    """Return (normalized reward rows, last raw response page)."""
+    """Return (normalized reward rows, last raw response page).
+
+    Tries each host in HOSTS; if all fail, raises with each host's actual
+    response body plus a no-auth probe of the public /v1/incentives endpoint,
+    so a red run is a complete diagnostic.
+    """
+    errors: list[str] = []
+    for host in HOSTS:
+        try:
+            return _fetch_from_host(host, key_id, secret_key)
+        except Exception as e:  # noqa: BLE001 — collect and try next host
+            errors.append(str(e))
+    for host in HOSTS:  # is the API itself up? (public endpoint, no auth)
+        try:
+            r = requests.get(host + "/v1/incentives", params={"pageSize": 1}, timeout=15)
+            errors.append(f"probe {host}/v1/incentives (no auth) -> HTTP {r.status_code}")
+        except Exception as pe:  # noqa: BLE001
+            errors.append(f"probe {host}/v1/incentives (no auth) -> {type(pe).__name__}: {pe}")
+    raise RuntimeError("\n".join(errors))
+
+
+def _fetch_from_host(host: str, key_id: str, secret_key: str) -> tuple[list[dict], dict]:
     rows: list[dict] = []
     params: dict = {"startDate": START_DATE}
     raw: dict = {}
     for _ in range(50):  # bounded pagination
         resp = requests.get(
-            API_BASE + EARNINGS_PATH,
+            host + EARNINGS_PATH,
             params=params,
             headers=auth_headers(key_id, secret_key, "GET", EARNINGS_PATH),
             timeout=30,
         )
-        resp.raise_for_status()
+        if resp.status_code >= 400:
+            body = " ".join(resp.text.split())[:300]
+            raise RuntimeError(f"{host}{EARNINGS_PATH} -> HTTP {resp.status_code}: {body}")
         raw = resp.json()
         for r in raw.get("rewards") or []:
             rows.append(
@@ -132,7 +159,7 @@ def append_heartbeat(result: str, n_rows: int, total: float, note: str) -> list[
             "result": result,
             "reward_rows": str(n_rows),
             "total_usd": f"{total:.2f}",
-            "note": note[:200].replace("\n", " "),
+            "note": " ".join(note.split())[:400],
         }
     )
     beats = beats[-MAX_HEARTBEATS:]
