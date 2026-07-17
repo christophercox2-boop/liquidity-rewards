@@ -52,6 +52,56 @@
         "lastTransactTime": "2026-07-17T17:20:52.339759722Z"
       },
       {
+        "id": "BAAW9FPDC75E",
+        "marketSlug": "enwc-ussep-me-2026-07-27-dem-dankle",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.03",
+          "currency": "USD"
+        },
+        "quantity": 29.06,
+        "cumQuantity": 0,
+        "leavesQuantity": 29.06,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_LONG",
+        "marketMetadata": {
+          "slug": "enwc-ussep-me-2026-07-27-dem-dankle",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ussep-me-2026-07-27-dem-a35f2f6e74.png",
+          "title": "Next Maine Democratic Senate Nominee",
+          "outcome": "Yes",
+          "eventSlug": "ussep-me-2026-07-27-dem",
+          "subject": {
+            "id": 0,
+            "name": "Dan Kleban",
+            "subjectType": ""
+          },
+          "eventId": "47823"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-17T21:40:16.070531499Z",
+        "createTime": "2026-07-17T21:40:16.069061915Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-17T21:40:16.070531499Z"
+      },
+      {
         "id": "BAAWKHKDM75P",
         "marketSlug": "enwc-ussep-nh-2026-09-01-rep-johsun",
         "side": "ORDER_SIDE_BUY",
@@ -150,56 +200,6 @@
         "action": "ORDER_ACTION_SELL",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
         "lastTransactTime": "2026-07-17T21:26:33.922146099Z"
-      },
-      {
-        "id": "BAAW9FPDC75E",
-        "marketSlug": "enwc-ussep-me-2026-07-27-dem-dankle",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.03",
-          "currency": "USD"
-        },
-        "quantity": 29.06,
-        "cumQuantity": 0,
-        "leavesQuantity": 29.06,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_LONG",
-        "marketMetadata": {
-          "slug": "enwc-ussep-me-2026-07-27-dem-dankle",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ussep-me-2026-07-27-dem-a35f2f6e74.png",
-          "title": "Next Maine Democratic Senate Nominee",
-          "outcome": "Yes",
-          "eventSlug": "ussep-me-2026-07-27-dem",
-          "subject": {
-            "id": 0,
-            "name": "Dan Kleban",
-            "subjectType": ""
-          },
-          "eventId": "47823"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-17T21:40:16.070531499Z",
-        "createTime": "2026-07-17T21:40:16.069061915Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_SELL",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-17T21:40:16.070531499Z"
       }
     ]
   },
