@@ -2,22 +2,22 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-07-17 21:39 UTC
+## ✅ Last successful check: 2026-07-17 21:42 UTC
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
 ## 📍 Right now — your resting orders
 
-### Estimated earning rate: ~$6.56/day (~$0.27/hour)
+### Estimated earning rate: ~$18.19/day (~$0.76/hour)
 
 Rough estimate — assumes the books, pools, and your orders stay as they are, both sides keep qualifying, and each pool splits evenly between bid and ask. Scored with the official formula: `DiscountFactor ^ (ticks from best price) × size`, counting only orders inside the Target Size window. Earning orders first.
 
 | Market | Side | Price | Size | Ticks off best | Reward pool | Earning? |
 |---|---|---:|---:|---:|---:|---|
+| `enwc-ussep-nh-2026-09-01-rep-johsun` | BUY | 89.0¢ | 130 | 0 | $250.00 | ✅ scoring — ~8.7% of bid side ≈ $10.86/day |
 | `enwc-ussep-nh-2026-09-01-rep-johsun` | SELL | 92.0¢ | 70 | 0 | $250.00 | ✅ scoring — ~3.8% of ask side ≈ $4.76/day |
-| `apdc-jerpowgov-2026-12-31` | BUY | 2.0¢ | 2,500 | 4 | $250.00 | ✅ scoring — ~1.4% of bid side ≈ $1.80/day |
-| `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 5.0¢ | 9 | 1 | $250.00 | ❌ outside Target Size window (order 1 tick from best; window ends 0) |
-| `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 5.0¢ | 20 | 1 | $250.00 | ❌ outside Target Size window (order 1 tick from best; window ends 0) |
+| `apdc-jerpowgov-2026-12-31` | BUY | 2.0¢ | 2,500 | 4 | $250.00 | ✅ scoring — ~1.1% of bid side ≈ $1.41/day |
+| `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 3.0¢ | 29 | 0 | $250.00 | ✅ scoring — ~0.9% of ask side ≈ $1.17/day |
 
 ## 💡 Suggested political markets — active pools you're not in
 
@@ -25,18 +25,18 @@ Politics only. Ranked by what a **200-contract order at the best price** would e
 
 | Market | Reward pool | Discount | Target Size | Best entry | Est. share | Est. $/day |
 |---|---:|---:|---:|---|---:|---:|
-| `enwc-usgubp-wi-2026-08-11-dem-manbar` | $250.00 | 0.30 | 10,000 | SELL side | ~97.5% | ~$121.82 |
+| `enwc-usgubp-wi-2026-08-11-dem-manbar` | $250.00 | 0.30 | 10,000 | SELL side | ~97.6% | ~$121.95 |
 | `enwc-usgubp-wi-2026-08-11-dem-joebre` | $250.00 | 0.30 | 10,000 | SELL side | ~88.9% | ~$111.11 |
-| `enwc-usgubp-mn-2026-08-11-rep-miklin` | $250.00 | 0.30 | 10,000 | SELL side | ~61.7% | ~$77.19 |
 | `ewc-pres-bra-2026-10-04-flabol` | $250.00 | 0.30 | 10,000 | SELL side | ~58.8% | ~$73.51 |
-| `enwc-usgubp-wi-2026-08-11-dem-sarrod` | $250.00 | 0.30 | 10,000 | SELL side | ~40.1% | ~$50.14 |
-| `ewc-pres-bra-2026-10-04-luisil` | $250.00 | 0.30 | 10,000 | BUY side | ~37.8% | ~$47.26 |
+| `enwc-usgubp-mn-2026-08-11-rep-miklin` | $250.00 | 0.30 | 10,000 | SELL side | ~58.1% | ~$72.65 |
+| `enwc-usgubp-wi-2026-08-11-dem-sarrod` | $250.00 | 0.30 | 10,000 | SELL side | ~44.4% | ~$55.56 |
+| `ewc-pres-fra-2027-04-11-domvil` | $250.00 | 0.30 | 10,000 | SELL side | ~41.6% | ~$51.98 |
+| `ewc-pres-fra-2027-04-11-frahol` | $250.00 | 0.30 | 10,000 | SELL side | ~41.6% | ~$51.98 |
+| `paccc-usho-midterms-2026-11-03-dem` | $250.00 | 0.30 | 10,000 | SELL side | ~39.5% | ~$49.39 |
+| `ewc-pres-bra-2026-10-04-luisil` | $250.00 | 0.30 | 10,000 | BUY side | ~38.5% | ~$48.17 |
+| `ewc-pres-fra-2027-04-11-gabatt` | $250.00 | 0.30 | 10,000 | SELL side | ~37.8% | ~$47.21 |
+| `ewc-pres-fra-2027-04-11-davlis` | $250.00 | 0.30 | 10,000 | SELL side | ~33.0% | ~$41.26 |
 | `enwc-usgubp-wi-2026-08-11-dem-kelroy` | $250.00 | 0.30 | 10,000 | SELL side | ~30.1% | ~$37.61 |
-| `enwc-usgubp-sd-2026-06-02-rep-larrho` | $250.00 | 0.30 | 10,000 | SELL side | ~21.3% | ~$26.69 |
-| `enwc-ushrp-mo01-2026-08-04-dem-wesbel` | $500.00 | 0.30 | 10,000 | SELL side | ~98.1% | ~$24.52 |
-| `enwc-ushrp-az05-2026-07-21-rep-dankee` | $500.00 | 0.30 | 10,000 | BUY side | ~95.1% | ~$23.78 |
-| `enwc-usgubp-sd-2026-06-02-rep-tobdoe` | $250.00 | 0.30 | 10,000 | BUY side | ~12.0% | ~$14.97 |
-| `enwc-usgubp-mn-2026-08-11-rep-kenqua` | $250.00 | 0.30 | 10,000 | SELL side | ~3.6% | ~$4.48 |
 
 ## Totals
 
@@ -97,6 +97,7 @@ Politics only. Ranked by what a **200-contract order at the best price** would e
 
 | Checked (UTC) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-07-17 21:42:22 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 21:39:48 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 21:35:48 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 21:32:37 | ✅ ok | 72 | $80.91 |
@@ -106,6 +107,5 @@ Politics only. Ranked by what a **200-contract order at the best price** would e
 | 2026-07-17 21:09:18 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 20:36:53 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 20:34:20 | ✅ ok | 72 | $80.91 |
-| 2026-07-17 19:51:06 | ✅ ok | 72 | $80.91 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
