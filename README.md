@@ -25,9 +25,11 @@ Open **[STATUS.md](STATUS.md)**. That one page tells you everything:
 - ✅ and a recent timestamp (under 2 hours old) → **working**
 - ❌ or an old timestamp → **broken** (GitHub will have also emailed you)
 
-It shows **"Right now"** (your resting orders, how far each sits from the
-live midpoint, and the market's reward pool), then your total earnings, the
-last 14 days, monthly totals, and top markets. The full history lives in
+It shows **"Right now"** — each resting order scored with Polymarket's
+official reward formula (`DiscountFactor ^ ticks-from-best × size`, inside
+the Target Size window), with a ✅/❌ verdict and your estimated share of
+that side's score — then your total earnings, the last 14 days, monthly
+totals, and top markets. The full history lives in
 [`data/rewards.csv`](data/rewards.csv).
 
 ## Refreshing on demand (works on your phone)

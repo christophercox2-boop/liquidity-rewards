@@ -159,8 +159,61 @@ def _num(x) -> float:
     return 0.0
 
 
+def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
+    """Score one resting order per the official program rules
+    (https://docs.polymarket.us/incentives/liquidity):
+
+        Score = DiscountFactor ^ (ticks from best price on your side) x Size
+
+    scored only if the order sits inside the Target Size window — the levels
+    reached while walking from the best price outward until Target Size
+    contracts (raw size, all participants) have accumulated — and only if the
+    side holds at least Target Size in total. Sets ticks/share/verdict.
+    """
+    order["ticks"] = None
+    order["share"] = None
+    if book is None:
+        order["verdict"] = "⚠️ book unavailable"
+        return
+    levels = book["bids"] if order["side"] == "BUY" else book["asks"]
+    if not levels:
+        order["verdict"] = "⚠️ empty book side"
+        return
+    tick = book["tick"]
+    best = levels[0][0]
+    ticks = round(abs(best - order["price"]) / tick)
+    order["ticks"] = ticks
+    if prog is None or not prog.get("df"):
+        order["verdict"] = "⚠️ no program params for this market"
+        return
+    df, target = prog["df"], prog.get("target") or 0.0
+
+    side_total = sum(q for _, q in levels)
+    if target and side_total < target:
+        order["verdict"] = f"❌ side has {side_total:,.0f} of {target:,.0f} Target Size — side not qualifying"
+        return
+    window: list[tuple[float, float]] = []
+    cum = 0.0
+    for px, qty in levels:
+        window.append((px, qty))
+        cum += qty
+        if target and cum >= target:
+            break
+    window_end_ticks = round(abs(best - window[-1][0]) / tick)
+    if not any(abs(px - order["price"]) < tick / 2 for px, _ in window):
+        order["verdict"] = (
+            f"❌ outside Target Size window (order {ticks} ticks from best; window ends {window_end_ticks})"
+        )
+        return
+    denom = sum(q * df ** round(abs(best - px) / tick) for px, q in window)
+    share = (order["size"] * df ** ticks) / denom if denom else 0.0
+    order["share"] = share
+    side_name = "bid" if order["side"] == "BUY" else "ask"
+    order["verdict"] = f"✅ scoring — ~{share * 100:.1f}% of {side_name} side"
+
+
 def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
-    """Snapshot of resting orders: price vs. live midpoint + market reward pool.
+    """Snapshot of resting orders scored with the official reward formula.
 
     This is the "where am I earning right now" view. Informational only — a
     failure here shows a warning in STATUS.md but never fails the run.
@@ -191,34 +244,31 @@ def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
 
     slugs = sorted({o["market"] for o in orders if o["market"]})[:25]
 
-    mids: dict[str, float] = {}
-    bbo_debug: dict[str, str] = {}
+    # Full order books (public) — needed for ticks-from-best and the window walk.
+    books: dict[str, dict] = {}
+    debug: dict[str, str] = {}
     for slug in slugs:
         try:
-            r = requests.get(f"{GATEWAY}/v1/markets/{slug}/bbo", timeout=15)
+            r = requests.get(f"{GATEWAY}/v1/markets/{slug}/book", timeout=15)
             if r.status_code >= 400:
-                bbo_debug[slug] = f"HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
+                debug[slug] = f"book HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
                 continue
             b = r.json()
-            md = b.get("marketData") or b  # responses arrive wrapped in marketData
-            bid, ask = _num(md.get("bestBid")), _num(md.get("bestAsk"))
-            current = _num(md.get("currentPx"))
-            if bid and ask:
-                mids[slug] = (bid + ask) / 2
-            elif current:
-                mids[slug] = current
-            elif bid or ask:
-                mids[slug] = bid or ask
-            else:
-                bbo_debug[slug] = f"no price parsed from: {json.dumps(b)[:200]}"
-        except Exception as e:  # noqa: BLE001 — a market without a mid still gets listed
-            bbo_debug[slug] = f"{type(e).__name__}: {e}"
-    DATA.mkdir(exist_ok=True)
-    (DATA / "live_raw.json").write_text(  # schema + failure reference for debugging
-        json.dumps({"orders": payload, "bbo_debug": bbo_debug}, indent=2)
-    )
+            md = b.get("book") or b.get("marketData") or b  # tolerate wrappers
+            bids = [(_num(l.get("px")), _num(l.get("qty"))) for l in md.get("bids") or []]
+            asks = [(_num(l.get("px")), _num(l.get("qty"))) for l in md.get("offers") or md.get("asks") or []]
+            bids = sorted([(p, q) for p, q in bids if p > 0 and q > 0], key=lambda x: -x[0])
+            asks = sorted([(p, q) for p, q in asks if p > 0 and q > 0], key=lambda x: x[0])
+            all_px = [p for p, _ in bids + asks]
+            tick = 0.001 if any(round(p * 1000) % 10 for p in all_px) else 0.01
+            books[slug] = {"bids": bids, "asks": asks, "tick": tick}
+            if not bids and not asks:
+                debug[slug] = f"empty book parsed from: {json.dumps(b)[:200]}"
+        except Exception as e:  # noqa: BLE001 — a market without a book still gets listed
+            debug[slug] = f"book {type(e).__name__}: {e}"
 
-    pools: dict[str, float] = {}
+    # Program parameters: Discount Factor, Target Size, reward pool.
+    progs: dict[str, dict] = {}
     if slugs:
         try:
             r = requests.get(
@@ -232,16 +282,27 @@ def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
                         if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
                     ] or periods
                     if current:
-                        pools[p.get("marketSlug", "")] = _num(current[-1].get("rewardPool"))
-        except Exception:  # noqa: BLE001 — pools are nice-to-have
-            pass
+                        tp = current[-1]
+                        progs[p.get("marketSlug", "")] = {
+                            "df": _num(tp.get("discountFactor")),
+                            "target": _num(tp.get("targetSize")),
+                            "pool": _num(tp.get("rewardPool")),
+                        }
+            else:
+                debug["_incentives"] = f"HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
+        except Exception as e:  # noqa: BLE001 — params are needed for verdicts but not fatal
+            debug["_incentives"] = f"{type(e).__name__}: {e}"
+
+    DATA.mkdir(exist_ok=True)
+    (DATA / "live_raw.json").write_text(  # schema + failure reference for debugging
+        json.dumps({"orders": payload, "programs": progs, "debug": debug}, indent=2)
+    )
 
     for o in orders:
-        mid = mids.get(o["market"])
-        o["mid"] = mid
-        o["off_mid_cents"] = abs(o["price"] - mid) * 100 if mid is not None else None
-        o["pool"] = pools.get(o["market"])
-    orders.sort(key=lambda o: (o["off_mid_cents"] is None, o["off_mid_cents"] or 0.0, -o["size"]))
+        prog = progs.get(o["market"])
+        o["pool"] = prog.get("pool") if prog else None
+        _score_order(o, books.get(o["market"]), prog)
+    orders.sort(key=lambda o: (o["share"] is None, -(o["share"] or 0.0), o["ticks"] if o["ticks"] is not None else 999))
     return orders
 
 
@@ -308,7 +369,7 @@ def write_live_csv(orders: list[dict]) -> None:
     DATA.mkdir(exist_ok=True)
     with LIVE_CSV.open("w", newline="") as f:
         writer = csv.DictWriter(
-            f, fieldnames=["market", "side", "price", "size", "mid", "off_mid_cents", "pool"]
+            f, fieldnames=["market", "side", "price", "size", "ticks", "share", "pool", "verdict"]
         )
         writer.writeheader()
         writer.writerows(orders)
@@ -358,19 +419,20 @@ def write_status(
             lines.append("_No resting orders on the book right now._")
         else:
             lines.append(
-                "Closer to the midpoint and larger size = bigger share of a market's "
-                "reward pool. Ordered best-positioned first."
+                "Scored with the official formula: `DiscountFactor ^ (ticks from best price) × size`, "
+                "counting only orders inside the Target Size window. "
+                "\"Share\" is your estimated cut of that side's score this second. "
+                "Earning orders first."
             )
             lines.append("")
-            lines.append("| Market | Side | Price | Size | Midpoint | Off mid | Reward pool |")
-            lines.append("|---|---|---:|---:|---:|---:|---:|")
+            lines.append("| Market | Side | Price | Size | Ticks off best | Reward pool | Earning? |")
+            lines.append("|---|---|---:|---:|---:|---:|---|")
             for o in live_orders[:30]:
-                mid = f"{o['mid'] * 100:.1f}¢" if o.get("mid") is not None else "—"
-                off = f"{o['off_mid_cents']:.1f}¢" if o.get("off_mid_cents") is not None else "—"
+                ticks = f"{o['ticks']}" if o.get("ticks") is not None else "—"
                 pool = _usd(o["pool"]) if o.get("pool") else "—"
                 lines.append(
                     f"| `{o['market']}` | {o['side']} | {o['price'] * 100:.1f}¢ "
-                    f"| {o['size']:,.0f} | {mid} | {off} | {pool} |"
+                    f"| {o['size']:,.0f} | {ticks} | {pool} | {o.get('verdict', '—')} |"
                 )
             if len(live_orders) > 30:
                 lines.append(f"| …and {len(live_orders) - 30} more | | | | | | |")
