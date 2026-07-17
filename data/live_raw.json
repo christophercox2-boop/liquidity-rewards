@@ -2,54 +2,54 @@
   "orders": {
     "orders": [
       {
-        "id": "B9EAYCWK275J",
-        "marketSlug": "enwc-ussep-me-2026-07-27-dem-dankle",
-        "side": "ORDER_SIDE_SELL",
+        "id": "BA8BCKWWM75R",
+        "marketSlug": "enwc-ussep-nh-2026-09-01-rep-johsun",
+        "side": "ORDER_SIDE_BUY",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.05",
+          "value": "0.89",
           "currency": "USD"
         },
-        "quantity": 9.06,
-        "cumQuantity": 0,
-        "leavesQuantity": 9.06,
+        "quantity": 147,
+        "cumQuantity": 70.31,
+        "leavesQuantity": 76.69,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_LONG",
+        "intent": "ORDER_INTENT_BUY_LONG",
         "marketMetadata": {
-          "slug": "enwc-ussep-me-2026-07-27-dem-dankle",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ussep-me-2026-07-27-dem-a35f2f6e74.png",
-          "title": "Next Maine Democratic Senate Nominee",
+          "slug": "enwc-ussep-nh-2026-09-01-rep-johsun",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
+          "title": "New Hampshire Senate Republican Primary Winner?",
           "outcome": "Yes",
-          "eventSlug": "ussep-me-2026-07-27-dem",
+          "eventSlug": "ussep-nh-2026-09-01-rep",
           "subject": {
             "id": 0,
-            "name": "Dan Kleban",
+            "name": "John E. Sununu",
             "subjectType": ""
           },
-          "eventId": "47823"
+          "eventId": "50268"
         },
-        "state": "ORDER_STATE_NEW",
+        "state": "ORDER_STATE_PARTIALLY_FILLED",
         "commissionNotionalTotalCollected": {
-          "value": "0.0000",
+          "value": "-0.0900",
           "currency": "USD"
         },
         "commissionsBasisPoints": "0",
         "makerCommissionsBasisPoints": "0",
         "avgPx": {
-          "value": "0.0000",
+          "value": "0.8900",
           "currency": "USD"
         },
         "cashOrderQty": {
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-16T12:24:30.263246341Z",
-        "createTime": "2026-07-16T12:24:30.261952783Z",
+        "insertTime": "2026-07-17T18:38:17.898481158Z",
+        "createTime": "2026-07-17T18:38:17.897349522Z",
         "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_SELL",
+        "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-16T12:24:30.263246341Z"
+        "lastTransactTime": "2026-07-17T20:51:47.097692606Z"
       },
       {
         "id": "B9EAPC0C075D",
@@ -102,54 +102,54 @@
         "lastTransactTime": "2026-07-16T12:24:01.230126954Z"
       },
       {
-        "id": "BA8BCKWWM75R",
-        "marketSlug": "enwc-ussep-nh-2026-09-01-rep-johsun",
-        "side": "ORDER_SIDE_BUY",
+        "id": "B9EAYCWK275J",
+        "marketSlug": "enwc-ussep-me-2026-07-27-dem-dankle",
+        "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.89",
+          "value": "0.05",
           "currency": "USD"
         },
-        "quantity": 147,
-        "cumQuantity": 70.31,
-        "leavesQuantity": 76.69,
+        "quantity": 9.06,
+        "cumQuantity": 0,
+        "leavesQuantity": 9.06,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
+        "intent": "ORDER_INTENT_SELL_LONG",
         "marketMetadata": {
-          "slug": "enwc-ussep-nh-2026-09-01-rep-johsun",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
-          "title": "New Hampshire Senate Republican Primary Winner?",
+          "slug": "enwc-ussep-me-2026-07-27-dem-dankle",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ussep-me-2026-07-27-dem-a35f2f6e74.png",
+          "title": "Next Maine Democratic Senate Nominee",
           "outcome": "Yes",
-          "eventSlug": "ussep-nh-2026-09-01-rep",
+          "eventSlug": "ussep-me-2026-07-27-dem",
           "subject": {
             "id": 0,
-            "name": "John E. Sununu",
+            "name": "Dan Kleban",
             "subjectType": ""
           },
-          "eventId": "50268"
+          "eventId": "47823"
         },
-        "state": "ORDER_STATE_PARTIALLY_FILLED",
+        "state": "ORDER_STATE_NEW",
         "commissionNotionalTotalCollected": {
-          "value": "-0.0900",
+          "value": "0.0000",
           "currency": "USD"
         },
         "commissionsBasisPoints": "0",
         "makerCommissionsBasisPoints": "0",
         "avgPx": {
-          "value": "0.8900",
+          "value": "0.0000",
           "currency": "USD"
         },
         "cashOrderQty": {
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-17T18:38:17.898481158Z",
-        "createTime": "2026-07-17T18:38:17.897349522Z",
+        "insertTime": "2026-07-16T12:24:30.263246341Z",
+        "createTime": "2026-07-16T12:24:30.261952783Z",
         "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
+        "action": "ORDER_ACTION_SELL",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-17T20:51:47.097692606Z"
+        "lastTransactTime": "2026-07-16T12:24:30.263246341Z"
       },
       {
         "id": "BA760F6XC75P",

@@ -2,7 +2,7 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-07-17 21:09 UTC
+## ✅ Last successful check: 2026-07-17 21:11 UTC
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
@@ -12,10 +12,10 @@ Scored with the official formula: `DiscountFactor ^ (ticks from best price) × s
 
 | Market | Side | Price | Size | Ticks off best | Reward pool | Earning? |
 |---|---|---:|---:|---:|---:|---|
-| `apdc-jerpowgov-2026-12-31` | BUY | 2.0¢ | 2,500 | 1 | $250.00 | ✅ scoring — ~19.2% of bid side |
+| `apdc-jerpowgov-2026-12-31` | BUY | 2.0¢ | 2,500 | 1 | $250.00 | ✅ scoring — ~18.6% of bid side |
 | `enwc-ussep-nh-2026-09-01-rep-johsun` | BUY | 89.0¢ | 77 | 0 | $250.00 | ✅ scoring — ~4.8% of bid side |
-| `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 5.0¢ | 9 | 1 | $250.00 | ❌ outside Target Size window (order 1 ticks from best; window ends 0) |
 | `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 5.0¢ | 20 | 1 | $250.00 | ❌ outside Target Size window (order 1 ticks from best; window ends 0) |
+| `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 5.0¢ | 9 | 1 | $250.00 | ❌ outside Target Size window (order 1 ticks from best; window ends 0) |
 
 ## 💡 Suggested markets — active pools you're not in
 
@@ -23,7 +23,7 @@ Ranked by the estimated share of a side's score a **200-contract order at the be
 
 | Market | Reward pool | Discount | Target Size | Best entry | Est. share |
 |---|---:|---:|---:|---|---:|
-| `atc-lmx-asl-caz-2026-07-17-asl` | $2,400.00 | 0.35 | 10,000 | BUY side | ~2.4% |
+| `atc-lmx-asl-caz-2026-07-17-asl` | $2,400.00 | 0.35 | 10,000 | SELL side | ~3.1% |
 | `atc-lmx-ju-pue-2026-07-17-draw` | $2,400.00 | 0.35 | 10,000 | BUY side | ~2.1% |
 | `atc-lmx-pum-pac-2026-07-18-pum` | $2,400.00 | 0.35 | 10,000 | SELL side | ~1.7% |
 | `atc-lmx-leo-atl-2026-07-17-leo` | $2,400.00 | 0.35 | 10,000 | BUY side | ~1.4% |
@@ -95,6 +95,7 @@ Ranked by the estimated share of a side's score a **200-contract order at the be
 
 | Checked (UTC) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-07-17 21:11:09 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 21:09:18 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 20:36:53 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 20:34:20 | ✅ ok | 72 | $80.91 |
@@ -104,6 +105,5 @@ Ranked by the estimated share of a side's score a **200-contract order at the be
 | 2026-07-17 19:43:28 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 19:35:58 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 18:17:44 | ✅ ok | 72 | $80.91 |
-| 2026-07-17 16:36:29 | ✅ ok | 72 | $80.91 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
