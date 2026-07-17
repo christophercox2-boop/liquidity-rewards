@@ -296,46 +296,48 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
     Familiar market families (same slug prefix as markets you trade) are
     probed first; book probing is capped to keep runs fast.
     """
-    programs: list[dict] = []
+    # The program list is huge and alphabetical — sports fill the first
+    # thousands of entries. Page deep, filtering as we go, and stop as soon
+    # as we have enough political candidates.
+    stats = {"programs": 0, "pages": 0, "excluded": 0, "not_politics": 0,
+             "no_pool_or_df": 0, "candidates": 0, "book_failures": 0, "listed": 0}
+    candidates: list[dict] = []
     params: dict = {"pageSize": 100}
-    for _ in range(10):  # bounded pagination
+    for _ in range(100):  # hard cap; early-exits once enough candidates found
         r = requests.get(HOSTS[0] + "/v1/incentives", params=params, timeout=30)
         if r.status_code >= 400:
             raise RuntimeError(f"/v1/incentives -> HTTP {r.status_code}")
         data = r.json()
-        programs.extend(data.get("programs") or [])
+        stats["pages"] += 1
+        for p in data.get("programs") or []:
+            stats["programs"] += 1
+            slug = p.get("marketSlug", "")
+            if not slug or slug in exclude:
+                stats["excluded"] += 1
+                continue
+            if not _is_politics(slug):
+                stats["not_politics"] += 1
+                continue
+            periods = p.get("timePeriods") or []
+            current = [
+                tp for tp in periods
+                if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
+            ] or periods
+            if not current:
+                continue
+            tp = current[-1]
+            df, target, pool = _num(tp.get("discountFactor")), _num(tp.get("targetSize")), _num(tp.get("rewardPool"))
+            if pool < 25 or not df:
+                stats["no_pool_or_df"] += 1
+                continue
+            candidates.append(
+                {"market": slug, "df": df, "target": target, "pool": pool,
+                 "start": tp.get("start"), "end": tp.get("end")}
+            )
         token = data.get("nextPageToken")
-        if not token:
+        if not token or len(candidates) >= 60:
             break
         params["pageToken"] = token
-
-    stats = {"programs": len(programs), "excluded": 0, "not_politics": 0,
-             "no_pool_or_df": 0, "candidates": 0, "book_failures": 0, "listed": 0}
-    candidates: list[dict] = []
-    for p in programs:
-        slug = p.get("marketSlug", "")
-        if not slug or slug in exclude:
-            stats["excluded"] += 1
-            continue
-        periods = p.get("timePeriods") or []
-        current = [
-            tp for tp in periods
-            if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
-        ] or periods
-        if not current:
-            continue
-        tp = current[-1]
-        df, target, pool = _num(tp.get("discountFactor")), _num(tp.get("targetSize")), _num(tp.get("rewardPool"))
-        if not _is_politics(slug):
-            stats["not_politics"] += 1
-            continue
-        if pool < 25 or not df:
-            stats["no_pool_or_df"] += 1
-            continue
-        candidates.append(
-            {"market": slug, "df": df, "target": target, "pool": pool,
-             "start": tp.get("start"), "end": tp.get("end")}
-        )
 
     familiar = {s.split("-")[0] for s in exclude if s}
     candidates.sort(key=lambda c: (c["market"].split("-")[0] not in familiar, -c["pool"]))
