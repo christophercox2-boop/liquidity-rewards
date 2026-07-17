@@ -1,0 +1,53 @@
+name: Track liquidity rewards
+
+on:
+  schedule:
+    - cron: "23 */6 * * *" # every 6 hours; keep RUN_EVERY_HOURS in track_rewards.py in sync
+  workflow_dispatch: {} # lets you trigger a run manually from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: liquidity-rewards
+  cancel-in-progress: false
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # continue-on-error so a failed fetch still commits the ❌ banner into
+      # STATUS.md; the last step then fails the job so GitHub emails you.
+      - name: Fetch rewards
+        id: fetch
+        continue-on-error: true
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: python track_rewards.py
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add STATUS.md data
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Liquidity rewards check [skip ci]"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push
+          fi
+
+      - name: Fail the run if the fetch failed
+        if: steps.fetch.outcome == 'failure'
+        run: exit 1
