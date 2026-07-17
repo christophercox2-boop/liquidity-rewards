@@ -309,10 +309,13 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
             break
         params["pageToken"] = token
 
+    stats = {"programs": len(programs), "excluded": 0, "not_politics": 0,
+             "no_pool_or_df": 0, "candidates": 0, "book_failures": 0, "listed": 0}
     candidates: list[dict] = []
     for p in programs:
         slug = p.get("marketSlug", "")
         if not slug or slug in exclude:
+            stats["excluded"] += 1
             continue
         periods = p.get("timePeriods") or []
         current = [
@@ -323,7 +326,11 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
             continue
         tp = current[-1]
         df, target, pool = _num(tp.get("discountFactor")), _num(tp.get("targetSize")), _num(tp.get("rewardPool"))
-        if pool < 25 or not df or not _is_politics(slug):
+        if not _is_politics(slug):
+            stats["not_politics"] += 1
+            continue
+        if pool < 25 or not df:
+            stats["no_pool_or_df"] += 1
             continue
         candidates.append(
             {"market": slug, "df": df, "target": target, "pool": pool,
@@ -333,11 +340,13 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
     familiar = {s.split("-")[0] for s in exclude if s}
     candidates.sort(key=lambda c: (c["market"].split("-")[0] not in familiar, -c["pool"]))
 
+    stats["candidates"] = len(candidates)
     out: list[dict] = []
     for c in candidates[:30]:  # cap book probes
         try:
             book = _fetch_book(c["market"])
         except Exception:  # noqa: BLE001 — skip unreadable books
+            stats["book_failures"] += 1
             continue
         best: tuple[str, float] | None = None
         best_gap: tuple[str, float] | None = None
@@ -361,6 +370,14 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
             c["share"] = c["est_day"] = None
             out.append(c)
     out.sort(key=lambda c: (c["est_day"] is None, -(c["est_day"] or 0.0), c.get("gap") or 0.0))
+    stats["listed"] = min(len(out), 12)
+    try:  # append to the debug file the live snapshot already wrote
+        raw_path = DATA / "live_raw.json"
+        raw = json.loads(raw_path.read_text()) if raw_path.exists() else {}
+        raw["suggestion_stats"] = stats
+        raw_path.write_text(json.dumps(raw, indent=2))
+    except Exception:  # noqa: BLE001 — diagnostics only
+        pass
     return out[:12]
 
 
