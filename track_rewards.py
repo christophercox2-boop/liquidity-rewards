@@ -200,11 +200,17 @@ def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
                 bbo_debug[slug] = f"HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
                 continue
             b = r.json()
-            bid, ask = _num(b.get("bestBid")), _num(b.get("bestAsk"))
-            if bid or ask:
+            md = b.get("marketData") or b  # responses arrive wrapped in marketData
+            bid, ask = _num(md.get("bestBid")), _num(md.get("bestAsk"))
+            current = _num(md.get("currentPx"))
+            if bid and ask:
                 mids[slug] = (bid + ask) / 2
+            elif current:
+                mids[slug] = current
+            elif bid or ask:
+                mids[slug] = bid or ask
             else:
-                bbo_debug[slug] = f"no bid/ask parsed from: {json.dumps(b)[:150]}"
+                bbo_debug[slug] = f"no price parsed from: {json.dumps(b)[:200]}"
         except Exception as e:  # noqa: BLE001 — a market without a mid still gets listed
             bbo_debug[slug] = f"{type(e).__name__}: {e}"
     DATA.mkdir(exist_ok=True)
