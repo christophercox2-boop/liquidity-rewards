@@ -1,14 +1,14 @@
 market,side,price,size,mid,off_mid_cents,pool
 apdc-jerpowgov-2026-12-31,BUY,0.02,2500.0,,,250.0
-vmc-ussep-misen-2026-08-04-stegte20,SELL,0.45,234.0,,,250.0
 vmc-ussep-misen-2026-08-04-elsgte20,SELL,0.45,234.0,,,250.0
-vmc-ussep-misen-2026-08-04-ste15-20,SELL,0.45,234.0,,,250.0
 vmc-ussep-misen-2026-08-04-els15-20,SELL,0.45,234.0,,,250.0
+vmc-ussep-misen-2026-08-04-ste15-20,SELL,0.45,234.0,,,250.0
+vmc-ussep-misen-2026-08-04-stegte20,SELL,0.45,234.0,,,250.0
 ewc-usse-tx-2026-11-03-rep,BUY,0.58,206.0,,,250.0
 enwc-ussep-nh-2026-09-08-dem-chrpap,BUY,0.88,149.0,,,250.0
 enwc-ussep-nh-2026-09-08-dem-karman,SELL,0.12,149.0,,,250.0
-enwc-ussep-nh-2026-09-01-rep-johsun,BUY,0.89,147.0,,,250.0
 ewc-usgub-ca-2026-11-03-stehil,SELL,0.11,147.0,,,250.0
+enwc-ussep-nh-2026-09-01-rep-johsun,BUY,0.89,147.0,,,250.0
 enwc-ussep-nh-2026-09-01-rep-scobro,SELL,0.1,146.0,,,250.0
 ewc-usgub-ca-2026-11-03-xavbec,BUY,0.89,136.0,,,250.0
 ewc-usgub-ca-2026-11-03-xavbec,SELL,0.9,51.82,,,250.0

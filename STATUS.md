@@ -2,7 +2,7 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-07-17 19:46 UTC
+## ✅ Last successful check: 2026-07-17 19:48 UTC
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
@@ -13,15 +13,15 @@ Closer to the midpoint and larger size = bigger share of a market's reward pool.
 | Market | Side | Price | Size | Midpoint | Off mid | Reward pool |
 |---|---|---:|---:|---:|---:|---:|
 | `apdc-jerpowgov-2026-12-31` | BUY | 2.0¢ | 2,500 | — | — | $250.00 |
-| `vmc-ussep-misen-2026-08-04-stegte20` | SELL | 45.0¢ | 234 | — | — | $250.00 |
 | `vmc-ussep-misen-2026-08-04-elsgte20` | SELL | 45.0¢ | 234 | — | — | $250.00 |
-| `vmc-ussep-misen-2026-08-04-ste15-20` | SELL | 45.0¢ | 234 | — | — | $250.00 |
 | `vmc-ussep-misen-2026-08-04-els15-20` | SELL | 45.0¢ | 234 | — | — | $250.00 |
+| `vmc-ussep-misen-2026-08-04-ste15-20` | SELL | 45.0¢ | 234 | — | — | $250.00 |
+| `vmc-ussep-misen-2026-08-04-stegte20` | SELL | 45.0¢ | 234 | — | — | $250.00 |
 | `ewc-usse-tx-2026-11-03-rep` | BUY | 58.0¢ | 206 | — | — | $250.00 |
 | `enwc-ussep-nh-2026-09-08-dem-chrpap` | BUY | 88.0¢ | 149 | — | — | $250.00 |
 | `enwc-ussep-nh-2026-09-08-dem-karman` | SELL | 12.0¢ | 149 | — | — | $250.00 |
-| `enwc-ussep-nh-2026-09-01-rep-johsun` | BUY | 89.0¢ | 147 | — | — | $250.00 |
 | `ewc-usgub-ca-2026-11-03-stehil` | SELL | 11.0¢ | 147 | — | — | $250.00 |
+| `enwc-ussep-nh-2026-09-01-rep-johsun` | BUY | 89.0¢ | 147 | — | — | $250.00 |
 | `enwc-ussep-nh-2026-09-01-rep-scobro` | SELL | 10.0¢ | 146 | — | — | $250.00 |
 | `ewc-usgub-ca-2026-11-03-xavbec` | BUY | 89.0¢ | 136 | — | — | $250.00 |
 | `ewc-usgub-ca-2026-11-03-xavbec` | SELL | 90.0¢ | 52 | — | — | $250.00 |
@@ -87,6 +87,7 @@ Closer to the midpoint and larger size = bigger share of a market's reward pool.
 
 | Checked (UTC) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-07-17 19:48:51 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 19:46:02 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 19:43:28 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 19:35:58 | ✅ ok | 72 | $80.91 |
@@ -96,6 +97,5 @@ Closer to the midpoint and larger size = bigger share of a market's reward pool.
 | 2026-07-17 12:38:54 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 11:28:46 | ✅ ok | 72 | $80.91 |
 | 2026-07-17 11:26:41 | ✅ ok | 72 | $80.91 |
-| 2026-07-17 11:22:03 | ❌ error | 0 | $0.00 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
