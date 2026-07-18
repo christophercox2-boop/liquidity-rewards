@@ -246,21 +246,40 @@ def _daily_pool(prog: dict) -> float:
     return (prog.get("pool") or 0.0) / days / max(prog.get("event_n") or 1, 1)
 
 
+EVENT_DEBUG: dict[str, str] = {}  # per-slug event lookup outcomes, for live_raw.json
+
+
 def _event_size(slug: str) -> int | None:
     """Number of open markets in the event this market belongs to."""
     try:
         r = requests.get(f"{GATEWAY}/v1/market/slug/{slug}", timeout=15)
-        r.raise_for_status()
-        md = r.json().get("market") or r.json()
-        ev_slug = md.get("eventSlug")
+        if r.status_code >= 400:
+            EVENT_DEBUG[slug] = f"market detail HTTP {r.status_code}"
+            return None
+        j = r.json()
+        md = j.get("market") or j.get("marketData") or j
+        ev_slug = (
+            md.get("eventSlug")
+            or (md.get("event") or {}).get("slug")
+            or (md.get("marketMetadata") or {}).get("eventSlug")
+        )
         if not ev_slug:
+            EVENT_DEBUG[slug] = f"no eventSlug in: {json.dumps(j)[:250]}"
             return None
         r = requests.get(f"{GATEWAY}/v1/events/slug/{ev_slug}", timeout=15)
-        r.raise_for_status()
-        ev = r.json().get("event") or r.json()
+        if r.status_code >= 400:
+            EVENT_DEBUG[slug] = f"event {ev_slug} -> HTTP {r.status_code}"
+            return None
+        j = r.json()
+        ev = j.get("event") or j
         n = len([m for m in ev.get("markets") or [] if not m.get("closed")])
-        return n or None
-    except Exception:  # noqa: BLE001
+        if not n:
+            EVENT_DEBUG[slug] = f"event {ev_slug} had no open markets: {json.dumps(j)[:250]}"
+            return None
+        EVENT_DEBUG[slug] = f"event {ev_slug}: {n} open markets"
+        return n
+    except Exception as e:  # noqa: BLE001
+        EVENT_DEBUG[slug] = f"{type(e).__name__}: {e}"
         return None
 
 
@@ -604,7 +623,10 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
 
     DATA.mkdir(exist_ok=True)
     (DATA / "live_raw.json").write_text(  # schema + failure reference for debugging
-        json.dumps({"orders": payload, "programs": progs, "debug": debug}, indent=2)
+        json.dumps(
+            {"orders": payload, "programs": progs, "debug": debug, "event_debug": EVENT_DEBUG},
+            indent=2,
+        )
     )
 
     for o in orders:
