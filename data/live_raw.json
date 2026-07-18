@@ -2,6 +2,107 @@
   "orders": {
     "orders": [
       {
+        "id": "BA760F6XC75P",
+        "marketSlug": "apdc-jerpowgov-2026-12-31",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.02",
+          "currency": "USD"
+        },
+        "quantity": 2500,
+        "cumQuantity": 0,
+        "leavesQuantity": 2500,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "apdc-jerpowgov-2026-12-31",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/jerpowgov-f178f30782.jpg",
+          "title": "Jerome Powell Announced Out as Fed Governor?",
+          "outcome": "Yes",
+          "eventSlug": "jerpowgov",
+          "subject": {
+            "id": 0,
+            "name": "By December 31, 2026",
+            "subjectType": ""
+          },
+          "eventId": "44389"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-17T17:20:52.339759722Z",
+        "createTime": "2026-07-17T17:20:52.336536342Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-17T17:20:52.339759722Z"
+      },
+      {
+        "id": "BAD29MAR875M",
+        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-frahon",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.33",
+          "currency": "USD"
+        },
+        "quantity": 10,
+        "cumQuantity": 0,
+        "leavesQuantity": 10,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "enwc-usgubp-wi-2026-08-11-dem-frahon",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
+          "title": "Wisconsin Governor Democratic Primary Winner",
+          "outcome": "Yes",
+          "eventSlug": "usgubp-wi-2026-08-11-dem",
+          "subject": {
+            "id": 0,
+            "name": "Francesca Hong",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/south-carolina-governor-democratic-primary-winner-JcrLjxqeFLcJ.png"
+          },
+          "eventId": "50267"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-17T23:58:55.131406948Z",
+        "createTime": "2026-07-17T23:58:55.129987554Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-17T23:58:55.131406948Z"
+      },
+      {
         "id": "BAAW9FPDC75E",
         "marketSlug": "enwc-ussep-me-2026-07-27-dem-dankle",
         "side": "ORDER_SIDE_SELL",
@@ -50,6 +151,57 @@
         "action": "ORDER_ACTION_SELL",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
         "lastTransactTime": "2026-07-17T21:40:16.070531499Z"
+      },
+      {
+        "id": "BAD1Q2G8475H",
+        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-joebre",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.45",
+          "currency": "USD"
+        },
+        "quantity": 10,
+        "cumQuantity": 0,
+        "leavesQuantity": 10,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "enwc-usgubp-wi-2026-08-11-dem-joebre",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
+          "title": "Wisconsin Governor Democratic Primary Winner",
+          "outcome": "No",
+          "eventSlug": "usgubp-wi-2026-08-11-dem",
+          "subject": {
+            "id": 0,
+            "name": "Joel Brennan",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/south-carolina-governor-democratic-primary-winner-JcrLjxqeFLcJ.png"
+          },
+          "eventId": "50267"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-17T23:57:47.160463575Z",
+        "createTime": "2026-07-17T23:57:47.158624116Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-17T23:57:47.160463575Z"
       },
       {
         "id": "BACPDMPB675J",
@@ -103,32 +255,32 @@
         "lastTransactTime": "2026-07-17T23:35:13.994712719Z"
       },
       {
-        "id": "BAAWKHKDM75P",
-        "marketSlug": "enwc-ussep-nh-2026-09-01-rep-johsun",
-        "side": "ORDER_SIDE_BUY",
+        "id": "BAD1T5P3R75P",
+        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
+        "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.89",
+          "value": "0.37",
           "currency": "USD"
         },
-        "quantity": 130,
+        "quantity": 10,
         "cumQuantity": 0,
-        "leavesQuantity": 130,
+        "leavesQuantity": 10,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
+        "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "enwc-ussep-nh-2026-09-01-rep-johsun",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
-          "title": "New Hampshire Senate Republican Primary Winner?",
-          "outcome": "Yes",
-          "eventSlug": "ussep-nh-2026-09-01-rep",
+          "slug": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
+          "title": "Wisconsin Governor Democratic Primary Winner",
+          "outcome": "No",
+          "eventSlug": "usgubp-wi-2026-08-11-dem",
           "subject": {
             "id": 0,
-            "name": "John E. Sununu",
+            "name": "Kelda Roys",
             "subjectType": ""
           },
-          "eventId": "50268"
+          "eventId": "50267"
         },
         "state": "ORDER_STATE_NEW",
         "commissionNotionalTotalCollected": {
@@ -145,12 +297,12 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-17T21:39:46.791675745Z",
-        "createTime": "2026-07-17T21:39:46.790124543Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
+        "insertTime": "2026-07-17T23:58:00.489940440Z",
+        "createTime": "2026-07-17T23:58:00.488289100Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-17T21:39:46.791675745Z"
+        "lastTransactTime": "2026-07-17T23:58:00.489940440Z"
       },
       {
         "id": "BAANTGKKW75H",
@@ -203,32 +355,32 @@
         "lastTransactTime": "2026-07-17T21:26:33.922146099Z"
       },
       {
-        "id": "BA760F6XC75P",
-        "marketSlug": "apdc-jerpowgov-2026-12-31",
+        "id": "BAAWKHKDM75P",
+        "marketSlug": "enwc-ussep-nh-2026-09-01-rep-johsun",
         "side": "ORDER_SIDE_BUY",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.02",
+          "value": "0.89",
           "currency": "USD"
         },
-        "quantity": 2500,
+        "quantity": 130,
         "cumQuantity": 0,
-        "leavesQuantity": 2500,
+        "leavesQuantity": 130,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_LONG",
         "marketMetadata": {
-          "slug": "apdc-jerpowgov-2026-12-31",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/jerpowgov-f178f30782.jpg",
-          "title": "Jerome Powell Announced Out as Fed Governor?",
+          "slug": "enwc-ussep-nh-2026-09-01-rep-johsun",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
+          "title": "New Hampshire Senate Republican Primary Winner?",
           "outcome": "Yes",
-          "eventSlug": "jerpowgov",
+          "eventSlug": "ussep-nh-2026-09-01-rep",
           "subject": {
             "id": 0,
-            "name": "By December 31, 2026",
+            "name": "John E. Sununu",
             "subjectType": ""
           },
-          "eventId": "44389"
+          "eventId": "50268"
         },
         "state": "ORDER_STATE_NEW",
         "commissionNotionalTotalCollected": {
@@ -245,17 +397,38 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-17T17:20:52.339759722Z",
-        "createTime": "2026-07-17T17:20:52.336536342Z",
+        "insertTime": "2026-07-17T21:39:46.791675745Z",
+        "createTime": "2026-07-17T21:39:46.790124543Z",
         "outcomeSide": "OUTCOME_SIDE_YES",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-17T17:20:52.339759722Z"
+        "lastTransactTime": "2026-07-17T21:39:46.791675745Z"
       }
     ]
   },
   "programs": {
     "apdc-jerpowgov-2026-12-31": {
+      "df": 0.3,
+      "target": 10000.0,
+      "pool": 250.0,
+      "start": "2026-07-13T00:00:00Z",
+      "end": null
+    },
+    "enwc-usgubp-wi-2026-08-11-dem-frahon": {
+      "df": 0.3,
+      "target": 10000.0,
+      "pool": 250.0,
+      "start": "2026-07-13T00:00:00Z",
+      "end": null
+    },
+    "enwc-usgubp-wi-2026-08-11-dem-joebre": {
+      "df": 0.3,
+      "target": 10000.0,
+      "pool": 250.0,
+      "start": "2026-07-13T00:00:00Z",
+      "end": null
+    },
+    "enwc-usgubp-wi-2026-08-11-dem-kelroy": {
       "df": 0.3,
       "target": 10000.0,
       "pool": 250.0,
@@ -287,12 +460,12 @@
   "debug": {},
   "suggestion_stats": {
     "tag_slugs": 62,
-    "programs": 61,
+    "programs": 58,
     "pages": 0,
     "excluded": 0,
     "not_politics": 18,
     "no_pool_or_df": 0,
-    "candidates": 29,
+    "candidates": 26,
     "book_failures": 0,
     "listed": 12,
     "ended": 14
