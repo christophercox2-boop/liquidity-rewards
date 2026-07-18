@@ -215,6 +215,8 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     order["share"] = share
     side_name = "bid" if order["side"] == "BUY" else "ask"
     verdict = f"✅ scoring — ~{share * 100:.1f}% of {side_name} side"
+    if target:  # show the qualification check so it's verifiable at a glance
+        verdict += f" ({side_total:,.0f} resting ≥ {target:,.0f} ✓)"
     if prog.get("pool"):
         order["est_day"] = share * _daily_pool(prog) / 2  # pool assumed split per side
         verdict += f" ≈ {_usd(order['est_day'])}/day"
@@ -402,13 +404,13 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
         except Exception:  # noqa: BLE001 — skip unreadable books
             stats["book_failures"] += 1
             continue
-        best: tuple[str, float] | None = None
+        best: tuple[str, float, float] | None = None
         best_gap: tuple[str, float] | None = None
         for side, levels in (("BUY", book["bids"]), ("SELL", book["asks"])):
             share = _probe_share(levels, book["tick"], c["df"], c["target"], probe)
             if share is not None:
                 if best is None or share > best[1]:
-                    best = (side, share)
+                    best = (side, share, sum(q for _, q in levels))
             else:
                 # Side can't reach Target Size even with the probe — the pool
                 # pays nobody on this side until someone brings the missing size.
@@ -416,7 +418,7 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
                 if gap > 0 and (best_gap is None or gap < best_gap[1]):
                     best_gap = (side, gap)
         if best:
-            c["side"], c["share"] = best
+            c["side"], c["share"], c["side_depth"] = best
             c["est_day"] = c["share"] * _daily_pool(c) / 2
             out.append(c)
         elif best_gap:
@@ -666,7 +668,8 @@ def write_status(
         lines.append("|---|---:|---:|---:|---|---:|---:|")
         for c in opportunities:
             if c.get("share") is not None:
-                entry, share, est = f"{c['side']} side", f"~{c['share'] * 100:.1f}%", f"~{_usd(c['est_day'])}"
+                entry = f"{c['side']} side ({c['side_depth']:,.0f} resting)"
+                share, est = f"~{c['share'] * 100:.1f}%", f"~{_usd(c['est_day'])}"
             else:
                 entry = f"{c['side']} — needs +{c['gap']:,.0f} contracts to unlock the pool"
                 share = est = "—"
