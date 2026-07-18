@@ -316,6 +316,26 @@ def fetch_politics_events() -> tuple[list[str], dict[str, int]]:
     return slugs, sizes
 
 
+def _race_size(race_key: str) -> int | None:
+    """Count open markets whose slug starts with the race prefix, via search.
+    Slugs follow a naming convention: everything before the final token names
+    the race, so this finds all sibling markets sharing one reward pool."""
+    try:
+        r = requests.get(
+            GATEWAY + "/v1/search", params={"query": race_key, "limit": 50}, timeout=15
+        )
+        r.raise_for_status()
+        seen: set[str] = set()
+        for ev in r.json().get("events") or []:
+            for m in ev.get("markets") or []:
+                s = m.get("slug", "")
+                if (s.startswith(race_key + "-") or s == race_key) and not m.get("closed"):
+                    seen.add(s)
+        return len(seen) or None
+    except Exception:  # noqa: BLE001 — search is a best-effort refinement
+        return None
+
+
 def _fetch_book(slug: str) -> dict:
     """Fetch a market's order book: sorted (price, qty) levels + tick size."""
     r = requests.get(f"{GATEWAY}/v1/markets/{slug}/book", timeout=15)
@@ -572,6 +592,15 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
         progs[slug]["event_n"] = max(
             event_sizes.get(slug, 1), race_counts.get(slug.rsplit("-", 1)[0], 1)
         )
+    # Definitive pass: search the race prefix to find ALL sibling markets,
+    # including ones neither the tag map nor our portfolio knows about.
+    race_search: dict[str, int | None] = {}
+    for slug in progs:
+        key = slug.rsplit("-", 1)[0]
+        if key not in race_search:
+            race_search[key] = _race_size(key) if len(race_search) < 10 else None
+        if race_search[key]:
+            progs[slug]["event_n"] = max(progs[slug]["event_n"], race_search[key])
 
     DATA.mkdir(exist_ok=True)
     (DATA / "live_raw.json").write_text(  # schema + failure reference for debugging
