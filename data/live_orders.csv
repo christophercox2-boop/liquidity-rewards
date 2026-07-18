@@ -1,5 +1,5 @@
 market,side,price,size,ticks,share,est_day,pool,verdict
-enwc-usgubp-wi-2026-08-11-dem-sarrod,SELL,0.06,191.0,0,1.186335226451867,148.29190330648336,250.0,"✅ scoring — ~118.6% of ask side (10,621 resting ≥ 10,000 ✓) ≈ $148.29/day"
-enwc-ussep-me-2026-07-27-dem-dankle,SELL,0.03,29.06,0,0.009256368929688544,1.1570461162110681,250.0,"✅ scoring — ~0.9% of ask side (80,883 resting ≥ 10,000 ✓) ≈ $1.16/day"
-enwc-usgubp-wi-2026-08-11-dem-kelroy,SELL,0.3,50.0,19,5.1885988444663875e-11,6.485748555582985e-09,250.0,"✅ scoring — ~0.0% of ask side (50,913 resting ≥ 10,000 ✓) ≈ $0.00/day"
-enwc-usgubp-wi-2026-08-11-dem-frahon,BUY,0.35,100.0,28,5.676623437955545e-15,7.095779297444431e-13,250.0,"✅ scoring — ~0.0% of bid side (13,743 resting ≥ 10,000 ✓) ≈ $0.00/day"
+enwc-usgubp-wi-2026-08-11-dem-manbar,SELL,0.14,5.0,0,0.49912672787690604,62.390840984613256,250.0,"✅ scoring — ~49.9% of ask side (11,185 resting ≥ 10,000 ✓) ≈ $62.39/day"
+enwc-usgubp-wi-2026-08-11-dem-manbar,BUY,0.13,100.0,0,0.4691843988730967,58.64804985913709,250.0,"✅ scoring — ~46.9% of bid side (11,168 resting ≥ 10,000 ✓) ≈ $58.65/day"
+enwc-usgubp-wi-2026-08-11-dem-sarrod,SELL,0.06,191.0,0,0.45432921027592754,56.791151284490944,250.0,"✅ scoring — ~45.4% of ask side (10,530 resting ≥ 10,000 ✓) ≈ $56.79/day"
+enwc-ussep-me-2026-07-27-dem-dankle,SELL,0.03,29.06,0,0.009256368929688544,1.1570461162110681,250.0,"✅ scoring — ~0.9% of ask side (30,883 resting ≥ 10,000 ✓) ≈ $1.16/day"
