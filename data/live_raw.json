@@ -2,358 +2,6 @@
   "orders": {
     "orders": [
       {
-        "id": "BARMRVM2P75E",
-        "marketSlug": "stsc-hormuz-normal-aug31",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.12",
-          "currency": "USD"
-        },
-        "quantity": 100,
-        "cumQuantity": 0,
-        "leavesQuantity": 100,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "stsc-hormuz-normal-aug31",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hormuz-b2ec39932b.jpg",
-          "title": "Strait of Hormuz Traffic Returns to Normal?",
-          "outcome": "Yes",
-          "eventSlug": "hormuz-normal",
-          "subject": {
-            "id": 0,
-            "name": "By August 31",
-            "subjectType": ""
-          },
-          "eventId": "44402"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-18T13:45:32.976487201Z",
-        "createTime": "2026-07-18T13:45:32.975081830Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-18T13:45:32.976487201Z"
-      },
-      {
-        "id": "BARQQSCGT75M",
-        "marketSlug": "cranc-uspres28-12-31-2026-dontru",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.35",
-          "currency": "USD"
-        },
-        "quantity": 20,
-        "cumQuantity": 0,
-        "leavesQuantity": 20,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "cranc-uspres28-12-31-2026-dontru",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/uspres28-12-31-2026-9612b36f85.jpg",
-          "title": "Who Will Announce a Presidential Run in 2026?",
-          "outcome": "No",
-          "eventSlug": "uspres28-12-31-2026",
-          "subject": {
-            "id": 0,
-            "name": "Donald Trump",
-            "subjectType": ""
-          },
-          "eventId": "44781"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-18T13:53:26.834607203Z",
-        "createTime": "2026-07-18T13:53:26.830519438Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-18T13:53:26.834607203Z"
-      },
-      {
-        "id": "BARY2Z9NC75R",
-        "marketSlug": "enwc-usgubp-mn-2026-08-11-rep-kenqua",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.01",
-          "currency": "USD"
-        },
-        "quantity": 10000,
-        "cumQuantity": 0,
-        "leavesQuantity": 10000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-usgubp-mn-2026-08-11-rep-kenqua",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mi-f9cf816aa1.png",
-          "title": "Minnesota Governor Republican Primary Winner?",
-          "outcome": "Yes",
-          "eventSlug": "usgubp-mn-2026-08-11-rep",
-          "subject": {
-            "id": 0,
-            "name": "Kendall Qualls",
-            "subjectType": "",
-            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/kenqua-44d0cea27f.jpg"
-          },
-          "eventId": "53742"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-18T14:07:30.378694898Z",
-        "createTime": "2026-07-18T14:07:30.377226504Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-18T14:07:30.378694898Z"
-      },
-      {
-        "id": "BAQDP58MY75D",
-        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-joebre",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.01",
-          "currency": "USD"
-        },
-        "quantity": 10000,
-        "cumQuantity": 0,
-        "leavesQuantity": 10000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-usgubp-wi-2026-08-11-dem-joebre",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
-          "title": "Wisconsin Governor Democratic Primary Winner",
-          "outcome": "Yes",
-          "eventSlug": "usgubp-wi-2026-08-11-dem",
-          "subject": {
-            "id": 0,
-            "name": "Joel Brennan",
-            "subjectType": "",
-            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/south-carolina-governor-democratic-primary-winner-JcrLjxqeFLcJ.png"
-          },
-          "eventId": "50267"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-18T12:22:28.293076060Z",
-        "createTime": "2026-07-18T12:22:28.290511590Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-18T12:22:28.293076060Z"
-      },
-      {
-        "id": "BAAW9FPDC75E",
-        "marketSlug": "enwc-ussep-me-2026-07-27-dem-dankle",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.03",
-          "currency": "USD"
-        },
-        "quantity": 29.06,
-        "cumQuantity": 0,
-        "leavesQuantity": 29.06,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_LONG",
-        "marketMetadata": {
-          "slug": "enwc-ussep-me-2026-07-27-dem-dankle",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ussep-me-2026-07-27-dem-a35f2f6e74.png",
-          "title": "Next Maine Democratic Senate Nominee",
-          "outcome": "Yes",
-          "eventSlug": "ussep-me-2026-07-27-dem",
-          "subject": {
-            "id": 0,
-            "name": "Dan Kleban",
-            "subjectType": ""
-          },
-          "eventId": "47823"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-17T21:40:16.070531499Z",
-        "createTime": "2026-07-17T21:40:16.069061915Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_SELL",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-17T21:40:16.070531499Z"
-      },
-      {
-        "id": "BARPZWGJ075G",
-        "marketSlug": "lawec-saveact-2026-12-31",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.2",
-          "currency": "USD"
-        },
-        "quantity": 100,
-        "cumQuantity": 0,
-        "leavesQuantity": 100,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "lawec-saveact-2026-12-31",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/bramul-372ab7ef73.jpg",
-          "title": "Save Act Becomes Law?",
-          "outcome": "Yes",
-          "eventSlug": "saveact",
-          "subject": {
-            "id": 0,
-            "name": "By December 31, 2026",
-            "subjectType": ""
-          },
-          "eventId": "44784"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-18T13:51:24.321304682Z",
-        "createTime": "2026-07-18T13:51:24.319386039Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-18T13:51:24.321304682Z"
-      },
-      {
-        "id": "BARQ727AM75D",
-        "marketSlug": "pic-congress-trump-2026-12-31",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.08",
-          "currency": "USD"
-        },
-        "quantity": 100,
-        "cumQuantity": 0,
-        "leavesQuantity": 100,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "pic-congress-trump-2026-12-31",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/will-trump-be-impeached-in-2025-bm5xwPQil7AC.jpg",
-          "title": "Trump Impeached?",
-          "outcome": "No",
-          "eventSlug": "congress-trump",
-          "subject": {
-            "id": 0,
-            "name": "By December 31, 2026",
-            "subjectType": ""
-          },
-          "eventId": "47821"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-18T13:51:56.656752558Z",
-        "createTime": "2026-07-18T13:51:56.655423655Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-18T13:51:56.656752558Z"
-      },
-      {
         "id": "BARQZXFAJ75D",
         "marketSlug": "cranc-uspres28-12-31-2026-jdvan",
         "side": "ORDER_SIDE_SELL",
@@ -404,12 +52,12 @@
         "lastTransactTime": "2026-07-18T13:52:31.960886120Z"
       },
       {
-        "id": "BARQQS4TP75M",
-        "marketSlug": "cranc-uspres28-12-31-2026-marrub",
+        "id": "BARQQSCGT75M",
+        "marketSlug": "cranc-uspres28-12-31-2026-dontru",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.4",
+          "value": "0.35",
           "currency": "USD"
         },
         "quantity": 20,
@@ -419,14 +67,14 @@
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "cranc-uspres28-12-31-2026-marrub",
+          "slug": "cranc-uspres28-12-31-2026-dontru",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/uspres28-12-31-2026-9612b36f85.jpg",
           "title": "Who Will Announce a Presidential Run in 2026?",
           "outcome": "No",
           "eventSlug": "uspres28-12-31-2026",
           "subject": {
             "id": 0,
-            "name": "Marco Rubio",
+            "name": "Donald Trump",
             "subjectType": ""
           },
           "eventId": "44781"
@@ -446,12 +94,12 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-18T13:52:44.016638877Z",
-        "createTime": "2026-07-18T13:52:44.015060785Z",
+        "insertTime": "2026-07-18T13:53:26.834607203Z",
+        "createTime": "2026-07-18T13:53:26.830519438Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-18T13:52:44.016638877Z"
+        "lastTransactTime": "2026-07-18T13:53:26.834607203Z"
       },
       {
         "id": "BARWCZD7E75R",
@@ -554,57 +202,6 @@
         "lastTransactTime": "2026-07-18T14:05:19.240094864Z"
       },
       {
-        "id": "BATBG5CR475E",
-        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-frahon",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.17",
-          "currency": "USD"
-        },
-        "quantity": 767,
-        "cumQuantity": 0,
-        "leavesQuantity": 767,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-usgubp-wi-2026-08-11-dem-frahon",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
-          "title": "Wisconsin Governor Democratic Primary Winner",
-          "outcome": "Yes",
-          "eventSlug": "usgubp-wi-2026-08-11-dem",
-          "subject": {
-            "id": 0,
-            "name": "Francesca Hong",
-            "subjectType": "",
-            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/south-carolina-governor-democratic-primary-winner-JcrLjxqeFLcJ.png"
-          },
-          "eventId": "50267"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-18T15:38:51.774014345Z",
-        "createTime": "2026-07-18T15:38:51.772046933Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-18T15:38:51.774014345Z"
-      },
-      {
         "id": "BATCPCG3C75N",
         "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
         "side": "ORDER_SIDE_SELL",
@@ -654,6 +251,160 @@
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
         "lastTransactTime": "2026-07-18T15:41:07.453260782Z"
+      },
+      {
+        "id": "BAV4P7KA275N",
+        "marketSlug": "paccc-usse-midterms-2026-11-03-rep",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.566",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 0,
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "paccc-usse-midterms-2026-11-03-rep",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/event-images/us-senate-midterm-winner.png",
+          "title": "U.S Senate Midterm Winner",
+          "outcome": "Yes",
+          "eventSlug": "usse-midterms-2026-11-03",
+          "subject": {
+            "id": 260,
+            "name": "Republican Party",
+            "subjectType": "candidate",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/event-images/republican.png",
+            "color": "#E7000A",
+            "darkColor": "#E7000A",
+            "slug": "republican-party"
+          },
+          "eventId": "8350"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-18T16:30:17.385310759Z",
+        "createTime": "2026-07-18T16:30:17.383838074Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-18T16:30:17.385310759Z"
+      },
+      {
+        "id": "BARQ727AM75D",
+        "marketSlug": "pic-congress-trump-2026-12-31",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.08",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 0,
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "pic-congress-trump-2026-12-31",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/will-trump-be-impeached-in-2025-bm5xwPQil7AC.jpg",
+          "title": "Trump Impeached?",
+          "outcome": "No",
+          "eventSlug": "congress-trump",
+          "subject": {
+            "id": 0,
+            "name": "By December 31, 2026",
+            "subjectType": ""
+          },
+          "eventId": "47821"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-18T13:51:56.656752558Z",
+        "createTime": "2026-07-18T13:51:56.655423655Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-18T13:51:56.656752558Z"
+      },
+      {
+        "id": "BAAW9FPDC75E",
+        "marketSlug": "enwc-ussep-me-2026-07-27-dem-dankle",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.03",
+          "currency": "USD"
+        },
+        "quantity": 29.06,
+        "cumQuantity": 0,
+        "leavesQuantity": 29.06,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_LONG",
+        "marketMetadata": {
+          "slug": "enwc-ussep-me-2026-07-27-dem-dankle",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ussep-me-2026-07-27-dem-a35f2f6e74.png",
+          "title": "Next Maine Democratic Senate Nominee",
+          "outcome": "Yes",
+          "eventSlug": "ussep-me-2026-07-27-dem",
+          "subject": {
+            "id": 0,
+            "name": "Dan Kleban",
+            "subjectType": ""
+          },
+          "eventId": "47823"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-17T21:40:16.070531499Z",
+        "createTime": "2026-07-17T21:40:16.069061915Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-17T21:40:16.070531499Z"
       },
       {
         "id": "BAPMVX34075J",
@@ -707,82 +458,32 @@
         "lastTransactTime": "2026-07-18T11:29:13.970890300Z"
       },
       {
-        "id": "BAQEJ6BVY75E",
-        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.01",
-          "currency": "USD"
-        },
-        "quantity": 10000,
-        "cumQuantity": 0,
-        "leavesQuantity": 10000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
-          "title": "Wisconsin Governor Democratic Primary Winner",
-          "outcome": "Yes",
-          "eventSlug": "usgubp-wi-2026-08-11-dem",
-          "subject": {
-            "id": 0,
-            "name": "Kelda Roys",
-            "subjectType": ""
-          },
-          "eventId": "50267"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-18T12:25:15.554125900Z",
-        "createTime": "2026-07-18T12:25:15.552852101Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-18T12:25:15.554125900Z"
-      },
-      {
-        "id": "BATBG5VBJ75E",
-        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
+        "id": "BARQQS4TP75M",
+        "marketSlug": "cranc-uspres28-12-31-2026-marrub",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.5",
+          "value": "0.4",
           "currency": "USD"
         },
-        "quantity": 265,
+        "quantity": 20,
         "cumQuantity": 0,
-        "leavesQuantity": 265,
+        "leavesQuantity": 20,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
-          "title": "Wisconsin Governor Democratic Primary Winner",
+          "slug": "cranc-uspres28-12-31-2026-marrub",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/uspres28-12-31-2026-9612b36f85.jpg",
+          "title": "Who Will Announce a Presidential Run in 2026?",
           "outcome": "No",
-          "eventSlug": "usgubp-wi-2026-08-11-dem",
+          "eventSlug": "uspres28-12-31-2026",
           "subject": {
             "id": 0,
-            "name": "Kelda Roys",
+            "name": "Marco Rubio",
             "subjectType": ""
           },
-          "eventId": "50267"
+          "eventId": "44781"
         },
         "state": "ORDER_STATE_NEW",
         "commissionNotionalTotalCollected": {
@@ -799,12 +500,220 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-18T15:40:05.851112015Z",
-        "createTime": "2026-07-18T15:40:05.849529344Z",
+        "insertTime": "2026-07-18T13:52:44.016638877Z",
+        "createTime": "2026-07-18T13:52:44.015060785Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-18T15:40:05.851112015Z"
+        "lastTransactTime": "2026-07-18T13:52:44.016638877Z"
+      },
+      {
+        "id": "BAV4Z1ZYC75G",
+        "marketSlug": "paccc-usho-midterms-2026-11-03-rep",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.179",
+          "currency": "USD"
+        },
+        "quantity": 115,
+        "cumQuantity": 0,
+        "leavesQuantity": 115,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "paccc-usho-midterms-2026-11-03-rep",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/event-images/us-house-midterm-winner.png",
+          "title": "U.S House Midterm Winner",
+          "outcome": "No",
+          "eventSlug": "usho-midterms-2026-11-03",
+          "subject": {
+            "id": 260,
+            "name": "Republican Party",
+            "subjectType": "candidate",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/event-images/republican.png",
+            "color": "#E7000A",
+            "darkColor": "#E7000A",
+            "slug": "republican-party"
+          },
+          "eventId": "8349"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-18T16:31:21.419630336Z",
+        "createTime": "2026-07-18T16:31:21.417821548Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-18T16:31:21.419630336Z"
+      },
+      {
+        "id": "BARMRVM2P75E",
+        "marketSlug": "stsc-hormuz-normal-aug31",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.12",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 0,
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "stsc-hormuz-normal-aug31",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hormuz-b2ec39932b.jpg",
+          "title": "Strait of Hormuz Traffic Returns to Normal?",
+          "outcome": "Yes",
+          "eventSlug": "hormuz-normal",
+          "subject": {
+            "id": 0,
+            "name": "By August 31",
+            "subjectType": ""
+          },
+          "eventId": "44402"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-18T13:45:32.976487201Z",
+        "createTime": "2026-07-18T13:45:32.975081830Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-18T13:45:32.976487201Z"
+      },
+      {
+        "id": "BARPZWGJ075G",
+        "marketSlug": "lawec-saveact-2026-12-31",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.2",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 0,
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "lawec-saveact-2026-12-31",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/bramul-372ab7ef73.jpg",
+          "title": "Save Act Becomes Law?",
+          "outcome": "Yes",
+          "eventSlug": "saveact",
+          "subject": {
+            "id": 0,
+            "name": "By December 31, 2026",
+            "subjectType": ""
+          },
+          "eventId": "44784"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-18T13:51:24.321304682Z",
+        "createTime": "2026-07-18T13:51:24.319386039Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-18T13:51:24.321304682Z"
+      },
+      {
+        "id": "BAV63THYW75D",
+        "marketSlug": "paccc-usho-midterms-2026-11-03-dem",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.838",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 0,
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_LONG",
+        "marketMetadata": {
+          "slug": "paccc-usho-midterms-2026-11-03-dem",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/event-images/us-house-midterm-winner.png",
+          "title": "U.S House Midterm Winner",
+          "outcome": "Yes",
+          "eventSlug": "usho-midterms-2026-11-03",
+          "subject": {
+            "id": 259,
+            "name": "Democratic Party",
+            "subjectType": "candidate",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/event-images/democratic.png",
+            "color": "#0044C9",
+            "darkColor": "#0044C9",
+            "slug": "democratic-party"
+          },
+          "eventId": "8349"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-18T16:34:10.880989605Z",
+        "createTime": "2026-07-18T16:34:10.878080126Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-18T16:34:10.880989605Z"
       }
     ]
   },
@@ -841,38 +750,6 @@
       "end": null,
       "event_n": 3
     },
-    "enwc-usgubp-mn-2026-08-11-rep-kenqua": {
-      "df": 0.3,
-      "target": 10000.0,
-      "pool": 250.0,
-      "start": "2026-07-13T00:00:00Z",
-      "end": null,
-      "event_n": 3
-    },
-    "enwc-usgubp-wi-2026-08-11-dem-frahon": {
-      "df": 0.3,
-      "target": 10000.0,
-      "pool": 250.0,
-      "start": "2026-07-13T00:00:00Z",
-      "end": null,
-      "event_n": 5
-    },
-    "enwc-usgubp-wi-2026-08-11-dem-joebre": {
-      "df": 0.3,
-      "target": 10000.0,
-      "pool": 250.0,
-      "start": "2026-07-13T00:00:00Z",
-      "end": null,
-      "event_n": 5
-    },
-    "enwc-usgubp-wi-2026-08-11-dem-kelroy": {
-      "df": 0.3,
-      "target": 10000.0,
-      "pool": 250.0,
-      "start": "2026-07-13T00:00:00Z",
-      "end": null,
-      "event_n": 5
-    },
     "enwc-usgubp-wi-2026-08-11-dem-manbar": {
       "df": 0.3,
       "target": 10000.0,
@@ -905,6 +782,30 @@
       "end": null,
       "event_n": 2
     },
+    "paccc-usho-midterms-2026-11-03-dem": {
+      "df": 0.3,
+      "target": 10000.0,
+      "pool": 250.0,
+      "start": "2026-07-13T00:00:00Z",
+      "end": null,
+      "event_n": 2
+    },
+    "paccc-usho-midterms-2026-11-03-rep": {
+      "df": 0.3,
+      "target": 10000.0,
+      "pool": 250.0,
+      "start": "2026-07-13T00:00:00Z",
+      "end": null,
+      "event_n": 2
+    },
+    "paccc-usse-midterms-2026-11-03-rep": {
+      "df": 0.3,
+      "target": 10000.0,
+      "pool": 250.0,
+      "start": "2026-07-13T00:00:00Z",
+      "end": null,
+      "event_n": 2
+    },
     "pic-congress-trump-2026-12-31": {
       "df": 0.3,
       "target": 10000.0,
@@ -929,9 +830,9 @@
     "programs": 150,
     "pages": 0,
     "excluded": 0,
-    "not_politics": 46,
+    "not_politics": 49,
     "no_pool_or_df": 0,
-    "candidates": 104,
+    "candidates": 101,
     "book_failures": 0,
     "listed": 12
   }
