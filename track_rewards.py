@@ -263,24 +263,47 @@ def _event_size(slug: str) -> int | None:
             or (md.get("event") or {}).get("slug")
             or (md.get("marketMetadata") or {}).get("eventSlug")
         )
-        if not ev_slug:
-            EVENT_DEBUG[slug] = f"no eventSlug in: {json.dumps(j)[:250]}"
-            return None
-        r = requests.get(f"{GATEWAY}/v1/events/slug/{ev_slug}", timeout=15)
-        if r.status_code >= 400:
-            EVENT_DEBUG[slug] = f"event {ev_slug} -> HTTP {r.status_code}"
-            return None
-        j = r.json()
-        ev = j.get("event") or j
-        n = len([m for m in ev.get("markets") or [] if not m.get("closed")])
-        if not n:
-            EVENT_DEBUG[slug] = f"event {ev_slug} had no open markets: {json.dumps(j)[:250]}"
-            return None
-        EVENT_DEBUG[slug] = f"event {ev_slug}: {n} open markets"
-        return n
+        if ev_slug:
+            r = requests.get(f"{GATEWAY}/v1/events/slug/{ev_slug}", timeout=15)
+            if r.status_code < 400:
+                ev = r.json().get("event") or r.json()
+                n = len([m for m in ev.get("markets") or [] if not m.get("closed")])
+                if n:
+                    EVENT_DEBUG[slug] = f"event {ev_slug}: {n} open markets"
+                    return n
+        # Market details carry no eventSlug in practice, but race siblings
+        # share the exact `question` text — search for it and count the open
+        # markets of the event that contains this market.
+        return _race_size_for(slug, md.get("question") or md.get("title"))
     except Exception as e:  # noqa: BLE001
         EVENT_DEBUG[slug] = f"{type(e).__name__}: {e}"
         return None
+
+
+def _race_size_for(slug: str, question: str | None) -> int | None:
+    """Find the event containing this market via search (by its question,
+    then by race slug prefix) and count that event's open markets."""
+    queries = [q for q in (question, slug.rsplit("-", 1)[0]) if q]
+    for query in queries:
+        try:
+            r = requests.get(
+                GATEWAY + "/v1/search", params={"query": query, "limit": 20}, timeout=15
+            )
+            if r.status_code >= 400:
+                continue
+            for ev in r.json().get("events") or []:
+                mkts = [m for m in ev.get("markets") or [] if m.get("slug")]
+                if any(m["slug"] == slug for m in mkts):
+                    n = len([m for m in mkts if not m.get("closed")])
+                    if n:
+                        EVENT_DEBUG[slug] = (
+                            f"search '{str(query)[:40]}': event {ev.get('slug', '?')} with {n} open markets"
+                        )
+                        return n
+        except Exception as e:  # noqa: BLE001
+            EVENT_DEBUG[slug] = f"search {type(e).__name__}: {e}"
+    EVENT_DEBUG.setdefault(slug, f"no event found via search for {slug}")
+    return None
 
 
 # Slug tokens that mark U.S. politics markets (elections, primaries,
