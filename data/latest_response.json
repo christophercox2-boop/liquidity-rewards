@@ -1,6 +1,83 @@
 {
   "rewards": [
     {
+      "reward": 2.49,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-alito-2026-12-31",
+      "date": "2026-07-16",
+      "status": "PENDING"
+    },
+    {
+      "reward": 3.75,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-jerpowgov-2026-12-31",
+      "date": "2026-07-16",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.94,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-me-2026-07-27-dem-dankle",
+      "date": "2026-07-16",
+      "status": "PENDING"
+    },
+    {
+      "reward": 3.08,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-ca-2026-11-03-stehil",
+      "date": "2026-07-16",
+      "status": "PENDING"
+    },
+    {
+      "reward": 2.75,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-ca-2026-11-03-xavbec",
+      "date": "2026-07-16",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usmayor-losang-2026-11-03-nitram",
+      "date": "2026-07-16",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.26,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-oh-2026-11-03-rep",
+      "date": "2026-07-16",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-tx-2026-11-03-rep",
+      "date": "2026-07-16",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "paccc-usho-midterms-2026-11-03-dem",
+      "date": "2026-07-16",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.09,
+      "programType": "liquidityProgram",
+      "marketSlug": "paccc-usse-midterms-2026-11-03-rep",
+      "date": "2026-07-16",
+      "status": "PENDING"
+    },
+    {
+      "reward": 3.6,
+      "programType": "liquidityProgram",
+      "marketSlug": "pic-congress-trump-2026-12-31",
+      "date": "2026-07-16",
+      "status": "PENDING"
+    },
+    {
       "reward": 0.08,
       "programType": "liquidityProgram",
       "marketSlug": "enwc-ussep-me-2026-07-27-dem-dankle",

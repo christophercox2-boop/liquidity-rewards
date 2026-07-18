@@ -1,9 +1,10 @@
 market,side,price,size,ticks,share,est_day,pool,verdict
-enwc-usgubp-wi-2026-08-11-dem-sarrod,SELL,0.25,10.0,0,0.999852399289186,124.98154991114825,250.0,✅ scoring — ~100.0% of ask side ≈ $124.98/day
-enwc-usgubp-wi-2026-08-11-dem-kelroy,SELL,0.36,100.0,0,0.22883281029732494,28.60410128716562,250.0,✅ scoring — ~22.9% of ask side ≈ $28.60/day
-enwc-usgubp-wi-2026-08-11-dem-frahon,BUY,0.34,100.0,0,0.2159825528039978,26.997819100499726,250.0,✅ scoring — ~21.6% of bid side ≈ $27.00/day
-enwc-usgubp-wi-2026-08-11-dem-joebre,SELL,0.4,100.0,1,0.10714285714285714,13.392857142857142,250.0,✅ scoring — ~10.7% of ask side ≈ $13.39/day
-enwc-ussep-nh-2026-09-01-rep-johsun,BUY,0.89,130.0,0,0.06413418845584608,8.016773556980759,250.0,✅ scoring — ~6.4% of bid side ≈ $8.02/day
-enwc-ussep-nh-2026-09-01-rep-johsun,SELL,0.92,70.31,0,0.036450883587874315,4.5563604484842894,250.0,✅ scoring — ~3.6% of ask side ≈ $4.56/day
-enwc-ussep-me-2026-07-27-dem-dankle,SELL,0.03,29.06,0,0.00934928223507686,1.1686602793846075,250.0,✅ scoring — ~0.9% of ask side ≈ $1.17/day
-apdc-jerpowgov-2026-12-31,BUY,0.02,2500.0,5,0.005660410194882151,0.7075512743602689,250.0,✅ scoring — ~0.6% of bid side ≈ $0.71/day
+enwc-usgubp-wi-2026-08-11-dem-sarrod,SELL,0.25,10.0,0,0.5555099967919436,69.43874959899294,250.0,"✅ scoring — ~55.6% of ask side (10,764 resting ≥ 10,000 ✓) ≈ $69.44/day"
+enwc-ussep-nh-2026-09-01-rep-johsun,SELL,0.91,70.31,0,0.13177373899878572,16.471717374848215,250.0,"✅ scoring — ~13.2% of ask side (11,612 resting ≥ 10,000 ✓) ≈ $16.47/day"
+enwc-ussep-nh-2026-09-01-rep-johsun,BUY,0.9,129.0,0,0.06922234862306555,8.652793577883193,250.0,"✅ scoring — ~6.9% of bid side (55,679 resting ≥ 10,000 ✓) ≈ $8.65/day"
+enwc-usgubp-wi-2026-08-11-dem-frahon,BUY,0.34,100.0,1,0.0548245505413983,6.853068817674788,250.0,"✅ scoring — ~5.5% of bid side (11,326 resting ≥ 10,000 ✓) ≈ $6.85/day"
+enwc-usgubp-wi-2026-08-11-dem-kelroy,SELL,0.3,50.0,1,0.031712473568972346,3.9640591961215432,250.0,"✅ scoring — ~3.2% of ask side (11,252 resting ≥ 10,000 ✓) ≈ $3.96/day"
+enwc-usgubp-wi-2026-08-11-dem-joebre,SELL,0.45,50.0,1,0.023310023310023312,2.913752913752914,250.0,"✅ scoring — ~2.3% of ask side (10,981 resting ≥ 10,000 ✓) ≈ $2.91/day"
+enwc-ussep-me-2026-07-27-dem-dankle,SELL,0.03,29.06,0,0.008691334984268264,1.086416873033533,250.0,"✅ scoring — ~0.9% of ask side (31,561 resting ≥ 10,000 ✓) ≈ $1.09/day"
+apdc-jerpowgov-2026-12-31,BUY,0.02,2500.0,5,0.007221458760402718,0.9026823450503397,250.0,"✅ scoring — ~0.7% of bid side (15,326 resting ≥ 10,000 ✓) ≈ $0.90/day"
+enwc-usgubp-wi-2026-08-11-dem-sarrod,SELL,0.99,10000.0,74,1.1263276043043075e-36,1.4079095053803844e-34,250.0,"✅ scoring — ~0.0% of ask side (10,764 resting ≥ 10,000 ✓) ≈ $0.00/day"
