@@ -303,7 +303,17 @@ def fetch_politics_events() -> tuple[list[str], dict[str, int]]:
             if not token:
                 break
             params["pageToken"] = token
-    return list(dict.fromkeys(slugs)), sizes
+    slugs = list(dict.fromkeys(slugs))
+    # Candidate markets of one race are sometimes modeled as separate
+    # single-market events, but the pool covers the whole race — also group by
+    # the slug minus its last token and prorate by the larger grouping.
+    race_counts: dict[str, int] = {}
+    for s in slugs:
+        key = s.rsplit("-", 1)[0]
+        race_counts[key] = race_counts.get(key, 0) + 1
+    for s in slugs:
+        sizes[s] = max(sizes.get(s, 1), race_counts[s.rsplit("-", 1)[0]])
+    return slugs, sizes
 
 
 def _fetch_book(slug: str) -> dict:
@@ -684,8 +694,8 @@ def write_status(
             lines.append("")
             lines.append(
                 "Rough estimate — assumes the books, pools, and your orders stay as they are, "
-                "both sides keep qualifying, each pool covers its whole event (so it's divided "
-                "across the event's open markets), and splits evenly between bid and ask. "
+                "both sides keep qualifying, each pool covers its whole event/race (so it's "
+                "divided across that race's open markets), and splits evenly between bid and ask. "
                 "Scored with the official formula: `DiscountFactor ^ (ticks from best price) × size`, "
                 "counting only orders inside the Target Size window. Earning orders first."
             )
