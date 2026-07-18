@@ -224,12 +224,16 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     if prog.get("pool"):
         order["est_day"] = share * _daily_pool(prog) / 2  # pool assumed split per side
         verdict += f" ≈ {_usd(order['est_day'])}/day"
+        n = prog.get("event_n") or 1
+        if n > 1:
+            verdict += f" (pool ÷ {n} markets)"
     order["verdict"] = verdict
 
 
 def _daily_pool(prog: dict) -> float:
-    """Reward pool normalized to $/day using the time period's start/end.
-    Missing or sub-day periods are treated as one day."""
+    """Reward pool normalized to $/day using the time period's start/end,
+    prorated across the open markets of the event it covers (the pool is per
+    event, not per candidate market). Missing/sub-day periods count as one day."""
     days = 1.0
     try:
         s, e = prog.get("start"), prog.get("end")
@@ -239,7 +243,25 @@ def _daily_pool(prog: dict) -> float:
             days = max((ed - sd).total_seconds() / 86400.0, 1.0)
     except Exception:  # noqa: BLE001 — fall back to daily
         pass
-    return (prog.get("pool") or 0.0) / days
+    return (prog.get("pool") or 0.0) / days / max(prog.get("event_n") or 1, 1)
+
+
+def _event_size(slug: str) -> int | None:
+    """Number of open markets in the event this market belongs to."""
+    try:
+        r = requests.get(f"{GATEWAY}/v1/market/slug/{slug}", timeout=15)
+        r.raise_for_status()
+        md = r.json().get("market") or r.json()
+        ev_slug = md.get("eventSlug")
+        if not ev_slug:
+            return None
+        r = requests.get(f"{GATEWAY}/v1/events/slug/{ev_slug}", timeout=15)
+        r.raise_for_status()
+        ev = r.json().get("event") or r.json()
+        n = len([m for m in ev.get("markets") or [] if not m.get("closed")])
+        return n or None
+    except Exception:  # noqa: BLE001
+        return None
 
 
 # Slug tokens that mark U.S. politics markets (elections, primaries,
@@ -258,10 +280,12 @@ def _is_us_politics(slug: str) -> bool:
     return any(t.startswith("us") or t.startswith(US_POLITICS_HINTS) or t.endswith("gov") for t in tokens)
 
 
-def _political_market_slugs(stats: dict) -> list[str]:
-    """Open market slugs from events tagged politics/elections (authoritative,
-    unlike slug heuristics)."""
+def fetch_politics_events() -> tuple[list[str], dict[str, int]]:
+    """From events tagged politics/elections (authoritative, unlike slug
+    heuristics): (ordered open market slugs, market slug -> number of open
+    markets in its event). The event size prorates the event-level pool."""
     slugs: list[str] = []
+    sizes: dict[str, int] = {}
     for tag in ("politics", "elections"):
         params: dict = {"tagSlug": tag, "active": True, "pageSize": 100}
         for _ in range(10):
@@ -270,16 +294,16 @@ def _political_market_slugs(stats: dict) -> list[str]:
                 break
             data = r.json()
             for ev in data.get("events") or []:
-                for m in ev.get("markets") or []:
-                    if m.get("slug") and not m.get("closed"):
-                        slugs.append(m["slug"])
+                open_mkts = [m["slug"] for m in ev.get("markets") or []
+                             if m.get("slug") and not m.get("closed")]
+                for s in open_mkts:
+                    slugs.append(s)
+                    sizes[s] = len(open_mkts)
             token = data.get("nextPageToken")
             if not token:
                 break
             params["pageToken"] = token
-    slugs = list(dict.fromkeys(slugs))
-    stats["tag_slugs"] = len(slugs)
-    return slugs
+    return list(dict.fromkeys(slugs)), sizes
 
 
 def _fetch_book(slug: str) -> dict:
@@ -320,7 +344,12 @@ def _probe_share(levels: list[tuple[float, float]], tick: float, df: float,
     return probe / denom if denom else None
 
 
-def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
+def fetch_opportunities(
+    exclude: set[str],
+    pol_slugs: list[str],
+    event_sizes: dict[str, int],
+    probe: float = 200.0,
+) -> list[dict]:
     """Markets with active reward pools you're NOT in, ranked by the share of
     a side's score a `probe`-contract order at the best price would capture.
 
@@ -359,13 +388,15 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
             return
         candidates.append(
             {"market": slug, "df": df, "target": target, "pool": pool,
-             "start": tp.get("start"), "end": tp.get("end")}
+             "start": tp.get("start"), "end": tp.get("end"),
+             "event_n": event_sizes.get(slug, 1)}
         )
 
     candidates: list[dict] = []
     # Preferred path: markets from events tagged politics, then their programs
     # via the symbols filter — avoids crawling the sports-dominated program list.
-    pol_slugs = [s for s in _political_market_slugs(stats) if s not in exclude][:150]
+    stats["tag_slugs"] = len(pol_slugs)
+    pol_slugs = [s for s in pol_slugs if s not in exclude][:150]
     for i in range(0, len(pol_slugs), 25):
         r = requests.get(
             HOSTS[0] + "/v1/incentives",
@@ -441,7 +472,7 @@ def fetch_opportunities(exclude: set[str], probe: float = 200.0) -> list[dict]:
     return out[:12]
 
 
-def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
+def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] | None = None) -> list[dict]:
     """Snapshot of resting orders scored with the official reward formula.
 
     This is the "where am I earning right now" view. Informational only — a
@@ -509,6 +540,18 @@ def fetch_live_orders(key_id: str, secret_key: str) -> list[dict]:
                 debug["_incentives"] = f"HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
         except Exception as e:  # noqa: BLE001 — params are needed for verdicts but not fatal
             debug["_incentives"] = f"{type(e).__name__}: {e}"
+
+    # Event sizes prorate the event-level pool; look up any market the
+    # politics-tag map doesn't cover (bounded).
+    event_sizes = dict(event_sizes or {})
+    lookups = 0
+    for slug in progs:
+        if slug not in event_sizes and lookups < 10:
+            lookups += 1
+            n = _event_size(slug)
+            if n:
+                event_sizes[slug] = n
+        progs[slug]["event_n"] = event_sizes.get(slug, 1)
 
     DATA.mkdir(exist_ok=True)
     (DATA / "live_raw.json").write_text(  # schema + failure reference for debugging
@@ -641,7 +684,8 @@ def write_status(
             lines.append("")
             lines.append(
                 "Rough estimate — assumes the books, pools, and your orders stay as they are, "
-                "both sides keep qualifying, and each pool splits evenly between bid and ask. "
+                "both sides keep qualifying, each pool covers its whole event (so it's divided "
+                "across the event's open markets), and splits evenly between bid and ask. "
                 "Scored with the official formula: `DiscountFactor ^ (ticks from best price) × size`, "
                 "counting only orders inside the Target Size window. Earning orders first."
             )
@@ -677,8 +721,10 @@ def write_status(
             else:
                 entry = f"{c['side']} — needs +{c['gap']:,.0f} contracts to unlock the pool"
                 share = est = "—"
+            n = c.get("event_n") or 1
+            pool_cell = f"{_usd(c['pool'])} ÷ {n}" if n > 1 else _usd(c["pool"])
             lines.append(
-                f"| `{c['market']}` | {_usd(c['pool'])} | {c['df']:.2f} | {c['target']:,.0f} "
+                f"| `{c['market']}` | {pool_cell} | {c['df']:.2f} | {c['target']:,.0f} "
                 f"| {entry} | {share} | {est} |"
             )
         lines.append("")
@@ -786,14 +832,20 @@ def main() -> int:
     live_error: str | None = None
     opportunities: list[dict] | None = None
     if not error:
+        pol_slugs: list[str] = []
+        event_sizes: dict[str, int] = {}
         try:
-            live_orders = fetch_live_orders(key_id, secret_key)
+            pol_slugs, event_sizes = fetch_politics_events()
+        except Exception as e:  # noqa: BLE001 — proration then falls back to 1
+            print(f"politics events fetch failed: {type(e).__name__}: {e}", file=sys.stderr)
+        try:
+            live_orders = fetch_live_orders(key_id, secret_key, event_sizes)
             write_live_csv(live_orders)
         except Exception as e:  # noqa: BLE001 — live view is informational only
             live_error = f"{type(e).__name__}: {e}"
         try:
             my_markets = {o["market"] for o in live_orders or [] if o["market"]}
-            opportunities = fetch_opportunities(my_markets)
+            opportunities = fetch_opportunities(my_markets, pol_slugs, event_sizes)
         except Exception as e:  # noqa: BLE001 — suggestions are informational only
             opportunities = None
             print(f"suggestions failed: {type(e).__name__}: {e}", file=sys.stderr)
