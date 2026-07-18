@@ -329,22 +329,25 @@ def fetch_politics_events() -> tuple[list[str], dict[str, int]]:
     slugs: list[str] = []
     sizes: dict[str, int] = {}
     for tag in ("politics", "elections"):
-        params: dict = {"tagSlug": tag, "active": True, "pageSize": 100}
-        for _ in range(10):
-            r = requests.get(GATEWAY + "/v1/events", params=params, timeout=30)
+        offset = 0
+        for _ in range(30):  # events paginate with limit/offset, not pageToken
+            r = requests.get(
+                GATEWAY + "/v1/events",
+                params={"tagSlug": tag, "active": "true", "limit": 100, "offset": offset},
+                timeout=30,
+            )
             if r.status_code >= 400:
                 break
-            data = r.json()
-            for ev in data.get("events") or []:
+            events = r.json().get("events") or []
+            for ev in events:
                 open_mkts = [m["slug"] for m in ev.get("markets") or []
                              if m.get("slug") and not m.get("closed")]
                 for s in open_mkts:
                     slugs.append(s)
                     sizes[s] = len(open_mkts)
-            token = data.get("nextPageToken")
-            if not token:
+            if len(events) < 100:
                 break
-            params["pageToken"] = token
+            offset += 100
     slugs = list(dict.fromkeys(slugs))
     # Candidate markets of one race are sometimes modeled as separate
     # single-market events, but the pool covers the whole race — also group by
