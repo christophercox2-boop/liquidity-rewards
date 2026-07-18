@@ -768,6 +768,40 @@ def write_status(
         )
     lines.append("")
 
+    # ---- the answer up top; all supporting detail lives below the divider ----
+    lines.append("## 📌 Summary")
+    lines.append("")
+    if live_orders:
+        rate = sum(o["est_day"] for o in live_orders if o.get("est_day"))
+        lines.append(f"**Earning right now:** ~{_usd(rate)}/day estimated (ceiling, not promise — details below)")
+    else:
+        lines.append("**Earning right now:** couldn't be estimated this run — see details below")
+    lines.append("")
+    recent = sorted(by_day)[-3:][::-1]
+    if recent:
+        days_out = " · ".join(f"{d}: **{_usd(by_day[d])}**" for d in recent)
+        lines.append(
+            f"**Earned:** {_usd(total)} lifetime ({_usd(by_status.get('PAID', 0))} paid). "
+            f"Last three recorded days — {days_out} _(Polymarket reports ~1–2 days behind)_"
+        )
+    else:
+        lines.append(f"**Earned:** {_usd(total)} lifetime")
+    lines.append("")
+    recs = [c for c in (opportunities or []) if c.get("share") is not None][:3]
+    if recs:
+        first = recs[0]
+        rest = ", ".join(f"`{c['market']}` (~{_usd(c['est_day'])}/day)" for c in recs[1:])
+        lines.append(
+            f"**What else to join:** `{first['market']}` — {first['side']} at the best price, "
+            f"~{_usd(first['est_day'])}/day for 200 contracts"
+            + (f". Runners-up: {rest}" if rest else "")
+        )
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+    lines.append("# The details (how the numbers above are computed)")
+    lines.append("")
+
     if live_orders is not None or live_error:
         lines.append("## 📍 Right now — your resting orders")
         lines.append("")
