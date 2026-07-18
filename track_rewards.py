@@ -556,12 +556,22 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     event_sizes = dict(event_sizes or {})
     lookups = 0
     for slug in progs:
-        if slug not in event_sizes and lookups < 10:
+        if slug not in event_sizes and lookups < 20:
             lookups += 1
             n = _event_size(slug)
             if n:
                 event_sizes[slug] = n
-        progs[slug]["event_n"] = event_sizes.get(slug, 1)
+    # Race grouping across everything known (tag map + our own markets):
+    # candidate markets of one race share the pool even when modeled as
+    # separate single-market events the tag map missed.
+    race_counts: dict[str, int] = {}
+    for s in set(event_sizes) | set(progs):
+        key = s.rsplit("-", 1)[0]
+        race_counts[key] = race_counts.get(key, 0) + 1
+    for slug in progs:
+        progs[slug]["event_n"] = max(
+            event_sizes.get(slug, 1), race_counts.get(slug.rsplit("-", 1)[0], 1)
+        )
 
     DATA.mkdir(exist_ok=True)
     (DATA / "live_raw.json").write_text(  # schema + failure reference for debugging
