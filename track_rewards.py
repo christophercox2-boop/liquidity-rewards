@@ -211,7 +211,11 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         )
         return
     denom = sum(q * df ** round(abs(best - px) / tick) for px, q in window)
-    share = (order["size"] * df ** ticks) / denom if denom else 0.0
+    score = order["size"] * df ** ticks
+    # The orders and book snapshots are seconds apart, so the book may not
+    # fully contain this order — never report a share above 100%.
+    denom = max(denom, score)
+    share = score / denom if denom else 0.0
     order["share"] = share
     side_name = "bid" if order["side"] == "BUY" else "ask"
     verdict = f"✅ scoring — ~{share * 100:.1f}% of {side_name} side"
