@@ -283,6 +283,8 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         order["est_day"] = share * _daily_pool(prog) / 2  # pool assumed split per side
         verdict += f" ≈ {_usd(order['est_day'])}/day"
         n = prog.get("event_n") or 1
+        order["event_n"] = n
+        order["siblings"] = prog.get("siblings") or []
         if n > 1:
             verdict += f" (pool ÷ {n} markets)"
         side_pool = _daily_pool(prog) / 2
@@ -310,6 +312,15 @@ def _daily_pool(prog: dict) -> float:
 
 
 EVENT_DEBUG: dict[str, str] = {}  # per-slug event lookup outcomes, for live_raw.json
+RACE_MEMBERS: dict[str, list[str]] = {}  # per-slug: the sibling markets its divisor counted
+SEARCH_KEY_MEMBERS: dict[str, list[str]] = {}  # per race-key: slugs found by prefix search
+
+
+def _note_members(slug: str, members: list[str]) -> None:
+    """Remember the largest known sibling list for a market — it's what the
+    proration divisor counted, shown so the division can be audited."""
+    if len(members) > len(RACE_MEMBERS.get(slug, [])):
+        RACE_MEMBERS[slug] = sorted(members)
 
 
 def _event_size(slug: str) -> int | None:
@@ -330,10 +341,12 @@ def _event_size(slug: str) -> int | None:
             r = requests.get(f"{GATEWAY}/v1/events/slug/{ev_slug}", timeout=15)
             if r.status_code < 400:
                 ev = r.json().get("event") or r.json()
-                n = len([m for m in ev.get("markets") or [] if not m.get("closed")])
-                if n:
-                    EVENT_DEBUG[slug] = f"event {ev_slug}: {n} open markets"
-                    return n
+                open_slugs = [m["slug"] for m in ev.get("markets") or []
+                              if m.get("slug") and not m.get("closed")]
+                if open_slugs:
+                    EVENT_DEBUG[slug] = f"event {ev_slug}: {len(open_slugs)} open markets"
+                    _note_members(slug, open_slugs)
+                    return len(open_slugs)
         # Market details carry no eventSlug in practice, but race siblings
         # share the exact `question` text — search for it and count the open
         # markets of the event that contains this market.
@@ -357,12 +370,14 @@ def _race_size_for(slug: str, question: str | None) -> int | None:
             for ev in r.json().get("events") or []:
                 mkts = [m for m in ev.get("markets") or [] if m.get("slug")]
                 if any(m["slug"] == slug for m in mkts):
-                    n = len([m for m in mkts if not m.get("closed")])
-                    if n:
+                    open_slugs = [m["slug"] for m in mkts if not m.get("closed")]
+                    if open_slugs:
                         EVENT_DEBUG[slug] = (
-                            f"search '{str(query)[:40]}': event {ev.get('slug', '?')} with {n} open markets"
+                            f"search '{str(query)[:40]}': event {ev.get('slug', '?')} "
+                            f"with {len(open_slugs)} open markets"
                         )
-                        return n
+                        _note_members(slug, open_slugs)
+                        return len(open_slugs)
         except Exception as e:  # noqa: BLE001
             EVENT_DEBUG[slug] = f"search {type(e).__name__}: {e}"
     EVENT_DEBUG.setdefault(slug, f"no event found via search for {slug}")
@@ -408,6 +423,7 @@ def fetch_politics_events() -> tuple[list[str], dict[str, int]]:
                 for s in open_mkts:
                     slugs.append(s)
                     sizes[s] = len(open_mkts)
+                    _note_members(s, open_mkts)
             if len(events) < 100:
                 break
             offset += 100
@@ -415,12 +431,14 @@ def fetch_politics_events() -> tuple[list[str], dict[str, int]]:
     # Candidate markets of one race are sometimes modeled as separate
     # single-market events, but the pool covers the whole race — also group by
     # the slug minus its last token and prorate by the larger grouping.
-    race_counts: dict[str, int] = {}
+    race_map: dict[str, list[str]] = {}
     for s in slugs:
-        key = s.rsplit("-", 1)[0]
-        race_counts[key] = race_counts.get(key, 0) + 1
+        race_map.setdefault(s.rsplit("-", 1)[0], []).append(s)
     for s in slugs:
-        sizes[s] = max(sizes.get(s, 1), race_counts[s.rsplit("-", 1)[0]])
+        group = race_map[s.rsplit("-", 1)[0]]
+        if len(group) > sizes.get(s, 1):
+            sizes[s] = len(group)
+            _note_members(s, group)
     return slugs, sizes
 
 
@@ -439,6 +457,8 @@ def _race_size(race_key: str) -> int | None:
                 s = m.get("slug", "")
                 if (s.startswith(race_key + "-") or s == race_key) and not m.get("closed"):
                     seen.add(s)
+        if seen:
+            SEARCH_KEY_MEMBERS[race_key] = sorted(seen)
         return len(seen) or None
     except Exception:  # noqa: BLE001 — search is a best-effort refinement
         return None
@@ -692,14 +712,14 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     # Race grouping across everything known (tag map + our own markets):
     # candidate markets of one race share the pool even when modeled as
     # separate single-market events the tag map missed.
-    race_counts: dict[str, int] = {}
+    race_map: dict[str, list[str]] = {}
     for s in set(event_sizes) | set(progs):
-        key = s.rsplit("-", 1)[0]
-        race_counts[key] = race_counts.get(key, 0) + 1
+        race_map.setdefault(s.rsplit("-", 1)[0], []).append(s)
     for slug in progs:
-        progs[slug]["event_n"] = max(
-            event_sizes.get(slug, 1), race_counts.get(slug.rsplit("-", 1)[0], 1)
-        )
+        group = race_map.get(slug.rsplit("-", 1)[0], [])
+        progs[slug]["event_n"] = max(event_sizes.get(slug, 1), len(group))
+        if len(group) >= progs[slug]["event_n"]:
+            _note_members(slug, group)
     # Definitive pass: search the race prefix to find ALL sibling markets,
     # including ones neither the tag map nor our portfolio knows about.
     race_search: dict[str, int | None] = {}
@@ -709,6 +729,9 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
             race_search[key] = _race_size(key) if len(race_search) < 10 else None
         if race_search[key]:
             progs[slug]["event_n"] = max(progs[slug]["event_n"], race_search[key])
+            _note_members(slug, SEARCH_KEY_MEMBERS.get(key, []))
+    for slug in progs:
+        progs[slug]["siblings"] = RACE_MEMBERS.get(slug, [])[:40]
 
     DATA.mkdir(exist_ok=True)
     (DATA / "live_raw.json").write_text(  # schema + failure reference for debugging
@@ -967,6 +990,18 @@ def write_status(
                     lines.append("")
                 for c in o.get("calc", []):
                     lines.append(f"`{c}`  ")
+                sibs = o.get("siblings") or []
+                n = o.get("event_n") or 1
+                if n > 1 and sibs:
+                    note = "" if len(sibs) == n else f" ({len(sibs)} known)"
+                    lines.append("")
+                    lines.append(f"<details><summary>÷ {n} markets in this race{note} — tap to list</summary>")
+                    lines.append("")
+                    for i, s in enumerate(sibs, 1):
+                        marker = " ← this one" if s == o["market"] else ""
+                        lines.append(f"{i}. `{s}`{marker}")
+                    lines.append("")
+                    lines.append("</details>")
                 lines.append("")
                 lines.append("</details>")
         lines.append("")

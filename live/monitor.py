@@ -181,7 +181,8 @@ class Monitor:
                 "orders": [
                     {k: o.get(k) for k in ("market", "side", "price", "size", "ticks", "share",
                                            "est_day", "verdict", "window", "window_more",
-                                           "window_more_score", "denom", "df", "calc")}
+                                           "window_more_score", "denom", "df", "calc",
+                                           "event_n", "siblings")}
                     for o in self.orders
                 ],
                 "history": self.state["history"][-7:][::-1],
@@ -249,8 +250,13 @@ async function refresh(){
               (o.window_more_score||0).toFixed(1)+'</td></tr>' : '') +
             (o.denom != null ? '<tr><td></td><td class="r">Σ</td><td class="r"><b>'+o.denom.toFixed(1)+'</b></td></tr>' : '');
           const calc = (o.calc || []).map(c => '<div class="calc">'+esc(c)+'</div>').join('');
+          const sibs = (o.event_n > 1 && o.siblings && o.siblings.length) ?
+            '<details><summary class="mkt">÷ '+o.event_n+' markets in this race — list</summary>'+
+            '<div class="mkt" style="padding:4px 0 0 8px">'+
+            o.siblings.map((s,j)=>(j+1)+'. '+esc(s)+(s===o.market?' ←':'')).join('<br>')+
+            '</div></details>' : '';
           return '<div class="ord"><div class="oh">'+o.side+' '+o.size.toLocaleString()+' @ '+
-            (o.price*100).toFixed(1)+'¢ → '+est+'</div><table class="bk">'+rows+'</table>'+calc+'</div>';
+            (o.price*100).toFixed(1)+'¢ → '+est+'</div><table class="bk">'+rows+'</table>'+calc+sibs+'</div>';
         }).join('');
         return '<tr onclick="tgl('+i+')"><td class="mkt">'+m+'</td><td class="r">$'+v.toFixed(2)+'</td></tr>' +
           '<tr id="d'+i+'" style="display:'+(OPEN[i]?'':'none')+'"><td colspan="2" ' +
