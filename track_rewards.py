@@ -55,6 +55,7 @@ REWARDS_CSV = DATA / "rewards.csv"
 CHECKS_CSV = DATA / "checks.csv"
 RAW_JSON = DATA / "latest_response.json"
 LIVE_CSV = DATA / "live_orders.csv"
+EST_CSV = DATA / "estimates.csv"
 STATUS_MD = HERE / "STATUS.md"
 
 MAX_HEARTBEATS = 1000  # cap checks.csv so it never grows unbounded
@@ -675,6 +676,45 @@ def write_rewards_csv(rows: list[dict]) -> None:
         writer.writerows(rows)
 
 
+def append_estimates(live_orders: list[dict]) -> None:
+    """Record each run's per-market estimated $/day so days can later be
+    reconciled against what Polymarket actually paid."""
+    DATA.mkdir(exist_ok=True)
+    rows: list[dict] = []
+    if EST_CSV.exists():
+        with EST_CSV.open(newline="") as f:
+            rows = list(csv.DictReader(f))
+    ts = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    for o in live_orders:
+        if o.get("est_day"):
+            rows.append({"checked_at_utc": ts, "market": o["market"], "est_day": f"{o['est_day']:.4f}"})
+    rows = rows[-30000:]
+    with EST_CSV.open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["checked_at_utc", "market", "est_day"])
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def _estimate_days() -> dict[str, dict]:
+    """Per day: time-averaged estimated $/day, total and per market."""
+    if not EST_CSV.exists():
+        return {}
+    samples: dict[str, set[str]] = {}
+    sums: dict[str, dict[str, float]] = {}
+    with EST_CSV.open(newline="") as f:
+        for r in csv.DictReader(f):
+            day = r["checked_at_utc"][:10]
+            samples.setdefault(day, set()).add(r["checked_at_utc"])
+            sums.setdefault(day, {})
+            sums[day][r["market"]] = sums[day].get(r["market"], 0.0) + float(r["est_day"])
+    out: dict[str, dict] = {}
+    for day, per_market in sums.items():
+        n = max(len(samples[day]), 1)
+        avg = {m: v / n for m, v in per_market.items()}
+        out[day] = {"per_market": avg, "total": sum(avg.values()), "samples": n}
+    return out
+
+
 def append_heartbeat(result: str, n_rows: int, total: float, note: str) -> list[dict]:
     """Append one line to checks.csv and return all heartbeats (newest last)."""
     DATA.mkdir(exist_ok=True)
@@ -834,6 +874,50 @@ def write_status(
                 lines.append(f"| …and {len(live_orders) - 30} more | | | | | | |")
         lines.append("")
 
+    lines.append("## 📊 Estimate vs. actual — where the gap is")
+    lines.append("")
+    est_days = _estimate_days()
+    actual_by_day_market: dict[str, dict[str, float]] = {}
+    for r in rows:
+        actual_by_day_market.setdefault(r["date"], {})
+        actual_by_day_market[r["date"]][r["market"]] = (
+            actual_by_day_market[r["date"]].get(r["market"], 0.0) + r["reward_usd"]
+        )
+    reconciled = sorted(set(est_days) & set(by_day))[-3:]
+    if reconciled:
+        lines.append(
+            "Time-averaged estimate for each day (across that day's hourly snapshots) "
+            "vs. what Polymarket actually recorded. Low capture = your position decayed "
+            "between snapshots (competition joining the best price, prices moving away, fills)."
+        )
+        lines.append("")
+        lines.append("| Day | Estimated | Recorded | Captured |")
+        lines.append("|---|---:|---:|---:|")
+        for day in reversed(reconciled):
+            est = est_days[day]["total"]
+            act = by_day[day]
+            pct = f"{act / est * 100:.0f}%" if est else "—"
+            lines.append(f"| {day} | ~{_usd(est)} | {_usd(act)} | {pct} |")
+        lines.append("")
+        latest = reconciled[-1]
+        gaps = []
+        for m, est in est_days[latest]["per_market"].items():
+            act = actual_by_day_market.get(latest, {}).get(m, 0.0)
+            gaps.append((est - act, m, est, act))
+        gaps.sort(reverse=True)
+        if gaps and gaps[0][0] > 0.5:
+            worst = ", ".join(
+                f"`{m}` (est ~{_usd(e)} → got {_usd(a)})" for _, m, e, a in gaps[:3]
+            )
+            lines.append(f"Biggest gaps on {latest}: {worst}")
+            lines.append("")
+    else:
+        lines.append(
+            "_Collecting estimate history (started 2026-07-18). This comparison fills in "
+            "once Polymarket posts results for a day with estimate coverage — about two days._"
+        )
+        lines.append("")
+
     if opportunities:
         lines.append("## 💡 Suggested U.S. political markets — active pools you're not in")
         lines.append("")
@@ -972,6 +1056,7 @@ def main() -> int:
         try:
             live_orders = fetch_live_orders(key_id, secret_key, event_sizes)
             write_live_csv(live_orders)
+            append_estimates(live_orders)
         except Exception as e:  # noqa: BLE001 — live view is informational only
             live_error = f"{type(e).__name__}: {e}"
         try:
