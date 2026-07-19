@@ -33,6 +33,28 @@ from pathlib import Path
 import requests
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
+try:
+    from zoneinfo import ZoneInfo
+    ET = ZoneInfo("America/New_York")  # Polymarket's reward day runs midnight–midnight ET
+except Exception:  # noqa: BLE001 — no tz database: fall back to fixed EDT offset
+    ET = dt.timezone(dt.timedelta(hours=-4), "ET")
+
+
+def _et_str(utc_str: str | None = None) -> str:
+    """A UTC 'YYYY-mm-dd HH:MM:SS' timestamp (or now) rendered in Eastern Time."""
+    if utc_str:
+        t = dt.datetime.strptime(utc_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=dt.timezone.utc)
+    else:
+        t = dt.datetime.now(dt.timezone.utc)
+    loc = t.astimezone(ET)
+    return loc.strftime("%Y-%m-%d %I:%M %p ET").replace(" 0", " ")
+
+
+def _et_day(utc_str: str) -> str:
+    """The Eastern-Time reward day a UTC timestamp belongs to."""
+    t = dt.datetime.strptime(utc_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=dt.timezone.utc)
+    return t.astimezone(ET).strftime("%Y-%m-%d")
+
 # The documented incentives host, then the main API host as a fallback.
 HOSTS = [
     "https://api.prod.polymarketexchange.com",
@@ -703,7 +725,7 @@ def _estimate_days() -> dict[str, dict]:
     sums: dict[str, dict[str, float]] = {}
     with EST_CSV.open(newline="") as f:
         for r in csv.DictReader(f):
-            day = r["checked_at_utc"][:10]
+            day = _et_day(r["checked_at_utc"])  # reward days are Eastern Time
             samples.setdefault(day, set()).add(r["checked_at_utc"])
             sums.setdefault(day, {})
             sums[day][r["market"]] = sums[day].get(r["market"], 0.0) + float(r["est_day"])
@@ -780,7 +802,7 @@ def write_status(
     live_error: str | None = None,
     opportunities: list[dict] | None = None,
 ) -> None:
-    now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    now = _et_str()
     total = sum(r["reward_usd"] for r in rows)
     by_status = _group_sum(rows, lambda r: r["status"] or "UNKNOWN")
     by_day = _group_sum(rows, lambda r: r["date"])
@@ -887,8 +909,9 @@ def write_status(
     if reconciled:
         lines.append(
             "Time-averaged estimate for each day (across that day's hourly snapshots) "
-            "vs. what Polymarket actually recorded. Low capture = your position decayed "
-            "between snapshots (competition joining the best price, prices moving away, fills)."
+            "vs. what Polymarket actually recorded. Days run midnight-to-midnight Eastern, "
+            "matching the reward day. Low capture = your position decayed between snapshots "
+            "(competition joining the best price, prices moving away, fills)."
         )
         lines.append("")
         lines.append("| Day | Estimated | Recorded | Captured |")
@@ -993,11 +1016,11 @@ def write_status(
 
     lines.append("## Recent checks")
     lines.append("")
-    lines.append("| Checked (UTC) | Result | Rows | Total |")
+    lines.append("| Checked (ET) | Result | Rows | Total |")
     lines.append("|---|---|---:|---:|")
     for b in reversed(beats[-10:]):
         icon = "✅" if b["result"] == "ok" else "❌"
-        lines.append(f"| {b['checked_at_utc']} | {icon} {b['result']} | {b['reward_rows']} | ${b['total_usd']} |")
+        lines.append(f"| {_et_str(b['checked_at_utc'])} | {icon} {b['result']} | {b['reward_rows']} | ${b['total_usd']} |")
     lines.append("")
     lines.append("Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)")
     lines.append("")

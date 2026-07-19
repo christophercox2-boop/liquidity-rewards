@@ -102,7 +102,10 @@ class Monitor:
                     for o in self.orders
                 ],
                 "history": self.state["history"][-7:][::-1],
-                "updated_utc": self.updated.strftime("%Y-%m-%d %H:%M:%S") if self.updated else None,
+                "updated": (
+                    self.updated.astimezone(ET).strftime("%Y-%m-%d %I:%M:%S %p ET")
+                    if self.updated else None
+                ),
                 "error": self.error,
                 "poll_seconds": POLL_SECONDS,
             }
@@ -138,7 +141,7 @@ async function refresh(){
     document.getElementById('earned').textContent = '$' + d.earned_today.toFixed(2);
     document.getElementById('rate').textContent =
       'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + d.orders.length + ' orders';
-    document.getElementById('updated').textContent = 'updated ' + d.updated_utc + ' UTC · refreshes every ' + d.poll_seconds + 's';
+    document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · refreshes every ' + d.poll_seconds + 's';
     const err = document.getElementById('err');
     err.style.display = d.error ? 'block' : 'none'; err.textContent = d.error || '';
     document.getElementById('markets').innerHTML =
