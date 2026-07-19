@@ -193,6 +193,7 @@ class Monitor:
                 "error": self.error,
                 "poll_seconds": POLL_SECONDS,
                 "persistence": self.persistence,
+                "actions": ACTIONS[-10:][::-1],
             }
 
 
@@ -202,9 +203,37 @@ SECRET_KEY = ""
 POLL_KICK = threading.Event()  # set after a reprice so the next poll runs immediately
 
 
+ACTIONS: list[dict] = []  # audit log of every reprice: request + raw response + verification
+
+
+def _verify_resting(market: str, side: str, price_value: str) -> tuple[bool, str]:
+    """After a modify, confirm an order is actually resting at the new price."""
+    try:
+        time.sleep(1.0)  # give the exchange a beat to settle the replace
+        path = "/v1/orders/open"
+        r = requests.request(
+            "GET", tr.TRADE_API + path,
+            headers=tr.auth_headers(KEY_ID, SECRET_KEY, "GET", path), timeout=20,
+        )
+        if r.status_code >= 400:
+            return False, f"verify fetch HTTP {r.status_code}"
+        want = float(price_value)
+        for o in r.json().get("orders") or []:
+            slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+            oside = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+            if slug == market and oside == side and abs(tr._num(o.get("price")) - want) < 0.0005:
+                return True, f"verified resting at {want * 100:g}¢ (id {o.get('id')})"
+        return False, "NO order found at the new price — it may have been cancelled; check the app"
+    except Exception as e:  # noqa: BLE001
+        return False, f"verify failed: {type(e).__name__}: {e}"[:150]
+
+
 def do_reprice(order_id: str, price_cents: float) -> tuple[int, dict]:
     """Modify one of OUR resting orders to a new price. The order must be in
-    the latest snapshot (can't touch anything else) and the price sane."""
+    the latest snapshot (can't touch anything else) and the price sane.
+    Modify is cancel-and-replace on the exchange, so the request carries the
+    FULL replacement (price and remaining quantity) and the result is
+    verified against the open-orders list before reporting success."""
     known = {o.get("id"): o for o in MONITOR.orders if o.get("id")}
     o = known.get(order_id)
     if o is None:
@@ -213,20 +242,37 @@ def do_reprice(order_id: str, price_cents: float) -> tuple[int, dict]:
         return 400, {"ok": False, "error": "price out of range (0.1–99.9¢)"}
     path = f"/v1/order/{order_id}/modify"
     value = f"{price_cents / 100:.3f}".rstrip("0").rstrip(".")
+    record = {"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+              "market": o["market"], "side": o["side"],
+              "from": round(o["price"] * 100, 1), "to": price_cents, "size": o["size"]}
     try:
         r = requests.request(
             "POST", tr.TRADE_API + path,
             headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
                      "Content-Type": "application/json"},
-            json={"marketSlug": o["market"], "price": {"value": value, "currency": "USD"}},
+            json={"marketSlug": o["market"],
+                  "price": {"value": value, "currency": "USD"},
+                  "quantity": int(round(o["size"]))},
             timeout=20,
         )
+        record["status"] = r.status_code
+        record["response"] = " ".join(r.text.split())[:300]
         ok = r.status_code < 300
+        verified, note = _verify_resting(o["market"], o["side"], value) if ok else (False, "")
+        record["verified"] = verified
+        record["note"] = note
         POLL_KICK.set()
-        return (200 if ok else 502), {"ok": ok, "status": r.status_code,
-                                      "detail": " ".join(r.text.split())[:200]}
+        payload = {"ok": ok and verified, "status": r.status_code,
+                   "detail": (note or record["response"])[:250]}
+        return (200 if ok else 502), payload
     except Exception as e:  # noqa: BLE001
-        return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
+        record["status"] = "error"
+        record["response"] = f"{type(e).__name__}: {e}"[:300]
+        record["verified"] = False
+        return 502, {"ok": False, "error": record["response"][:200]}
+    finally:
+        ACTIONS.append(record)
+        del ACTIONS[:-20]
 
 DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -259,6 +305,7 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div class="err" id="err"></div>
 <h3>By market today <span class="sub">(tap a row for the math)</span></h3><table id="markets"></table>
 <h3>Previous days</h3><table id="history"></table>
+<div id="acts"></div>
 <script>
 let OPEN = {};
 function tgl(i){ OPEN[i] = !OPEN[i];
@@ -319,6 +366,10 @@ async function refresh(){
     document.getElementById('history').innerHTML =
       d.history.map(h => '<tr><td>'+h.day+'</td><td class="r">$'+h.earned.toFixed(2)+'</td></tr>').join('')
       || '<tr><td>collecting…</td></tr>';
+    document.getElementById('acts').innerHTML = (d.actions && d.actions.length) ?
+      '<h3>Recent actions</h3>' + d.actions.map(a =>
+        '<div class="mkt" style="margin:4px 0">'+(a.verified?'✅':'⚠️')+' '+a.ts+' — '+esc(a.market)+' '+a.side+
+        ' '+a.from+'¢ → '+a.to+'¢ ('+a.size+') · HTTP '+a.status+' · '+esc(a.note||a.response||'')+'</div>').join('') : '';
   }catch(e){}
 }
 refresh(); setInterval(refresh, 15000);
