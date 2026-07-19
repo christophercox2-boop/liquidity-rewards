@@ -99,7 +99,7 @@ class Monitor:
                     self.state["per_market"].items(), key=lambda kv: -kv[1])},
                 "orders": [
                     {k: o.get(k) for k in ("market", "side", "price", "size", "ticks", "share",
-                                           "est_day", "verdict", "math")}
+                                           "est_day", "verdict", "window", "window_more", "calc")}
                     for o in self.orders
                 ],
                 "history": self.state["history"][-7:][::-1],
@@ -127,6 +127,12 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  td.r,th.r{text-align:right}
  .mkt{color:#8b949e;font-size:11px;word-break:break-all}
  h3{margin:18px 0 4px;font-size:15px}
+ .bk{width:auto;min-width:60%;margin:6px 0;font-family:ui-monospace,monospace;font-size:12px}
+ .bk td{padding:2px 10px 2px 0;border-bottom:none;color:#8b949e}
+ .bk tr.me td{color:#58a6ff;font-weight:600}
+ .calc{font-family:ui-monospace,monospace;font-size:12px;color:#e6edf3;margin:2px 0}
+ .ord{margin:8px 0 14px}
+ .oh{font-size:12px;color:#e6edf3;margin-bottom:2px}
 </style></head><body>
 <div class="sub">Earned today (ET) — live estimate</div>
 <div class="big" id="earned">…</div>
@@ -151,12 +157,19 @@ async function refresh(){
     err.style.display = d.error ? 'block' : 'none'; err.textContent = d.error || '';
     document.getElementById('markets').innerHTML =
       Object.entries(d.per_market_today).map(([m,v],i) => {
-        const math = d.orders.filter(o => o.market === m).map(o =>
-          esc(o.verdict || '') + '\\n' + (o.math || []).map(s => '  · ' + esc(s)).join('\\n')
-        ).join('\\n\\n');
+        const detail = d.orders.filter(o => o.market === m).map(o => {
+          const est = o.est_day ? '$' + o.est_day.toFixed(2) + '/day' : '$0';
+          const rows = (o.window || []).map(([px,qty,me]) =>
+            '<tr'+(me?' class="me"':'')+'><td>'+(me?'▶ ':'')+px+'¢</td><td class="r">'+qty.toLocaleString()+
+            (me?' ('+o.size.toLocaleString()+' yours)':'')+'</td></tr>').join('') +
+            (o.window_more ? '<tr><td>…</td><td class="r">+'+o.window_more+' levels</td></tr>' : '');
+          const calc = (o.calc || []).map(c => '<div class="calc">'+esc(c)+'</div>').join('');
+          return '<div class="ord"><div class="oh">'+o.side+' '+o.size.toLocaleString()+' @ '+
+            (o.price*100).toFixed(1)+'¢ → '+est+'</div><table class="bk">'+rows+'</table>'+calc+'</div>';
+        }).join('');
         return '<tr onclick="tgl('+i+')"><td class="mkt">'+m+'</td><td class="r">$'+v.toFixed(2)+'</td></tr>' +
-          '<tr id="d'+i+'" style="display:'+(OPEN[i]?'':'none')+'"><td colspan="2" class="mkt" ' +
-          'style="white-space:pre-wrap;background:#161b22">'+math+'</td></tr>';
+          '<tr id="d'+i+'" style="display:'+(OPEN[i]?'':'none')+'"><td colspan="2" ' +
+          'style="background:#161b22">'+detail+'</td></tr>';
       }).join('') || '<tr><td>nothing yet today</td></tr>';
     document.getElementById('history').innerHTML =
       d.history.map(h => '<tr><td>'+h.day+'</td><td class="r">$'+h.earned.toFixed(2)+'</td></tr>').join('')
