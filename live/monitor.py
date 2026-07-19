@@ -31,6 +31,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import requests
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import track_rewards as tr  # noqa: E402 — reuse the tracker's scoring code
 
@@ -41,22 +43,88 @@ STATE_PATH = Path(os.environ.get("STATE_PATH", "state.json"))
 ET = ZoneInfo("America/New_York")
 MAX_GAP_SECONDS = 300  # an outage never extrapolates more than 5 minutes
 
+# Optional but recommended: persist the counter to the repo so redeploys
+# (which replace this container's disk) don't reset "earned today".
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
+GITHUB_REPO = os.environ.get("GITHUB_REPO", "wfco223/Liquidity-rewards")
+STATE_BRANCH = os.environ.get("STATE_BRANCH", "live-state")
+SAVE_INTERVAL = int(os.environ.get("SAVE_INTERVAL", "120"))
+GH_API = "https://api.github.com"
+
+
+def _gh(method: str, path: str, **kw):
+    return requests.request(
+        method, GH_API + path,
+        headers={"Authorization": f"Bearer {GITHUB_TOKEN}", "Accept": "application/vnd.github+json"},
+        timeout=15, **kw,
+    )
+
+
+def load_remote_state() -> dict | None:
+    if not GITHUB_TOKEN:
+        return None
+    try:
+        r = _gh("GET", f"/repos/{GITHUB_REPO}/contents/state.json", params={"ref": STATE_BRANCH})
+        if r.status_code != 200:
+            return None
+        return json.loads(base64.b64decode(r.json()["content"]))
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def save_remote_state(state: dict) -> bool:
+    """Store state.json as a single orphan commit, force-updating the state
+    branch in place — no history accumulates."""
+    if not GITHUB_TOKEN:
+        return False
+    try:
+        r = _gh("POST", f"/repos/{GITHUB_REPO}/git/blobs",
+                json={"content": json.dumps(state), "encoding": "utf-8"})
+        blob = r.json()["sha"]
+        r = _gh("POST", f"/repos/{GITHUB_REPO}/git/trees",
+                json={"tree": [{"path": "state.json", "mode": "100644", "type": "blob", "sha": blob}]})
+        tree = r.json()["sha"]
+        r = _gh("POST", f"/repos/{GITHUB_REPO}/git/commits",
+                json={"message": "live counter state", "tree": tree, "parents": []})
+        commit = r.json()["sha"]
+        r = _gh("PATCH", f"/repos/{GITHUB_REPO}/git/refs/heads/{STATE_BRANCH}",
+                json={"sha": commit, "force": True})
+        if r.status_code in (404, 422):  # branch doesn't exist yet
+            r = _gh("POST", f"/repos/{GITHUB_REPO}/git/refs",
+                    json={"ref": f"refs/heads/{STATE_BRANCH}", "sha": commit})
+        return r.status_code < 300
+    except Exception:  # noqa: BLE001
+        return False
+
 
 class Monitor:
     def __init__(self) -> None:
         self.lock = threading.Lock()
-        self.state: dict = {"day": None, "earned": 0.0, "per_market": {}, "history": []}
+        self.state: dict = {"day": None, "earned": 0.0, "per_market": {}, "history": [],
+                            "saved_at": 0.0, "rate": 0.0, "market_rates": {}, "ts": None}
+        local: dict = {}
         if STATE_PATH.exists():
             try:
-                self.state.update(json.loads(STATE_PATH.read_text()))
+                local = json.loads(STATE_PATH.read_text())
             except Exception:  # noqa: BLE001 — corrupt state: start fresh
                 pass
+        remote = load_remote_state() or {}
+        # A redeploy replaces the local disk — take whichever copy is newest.
+        best = max((local, remote), key=lambda s: s.get("saved_at", 0.0) or 0.0)
+        self.state.update(best)
         self.last_ts: dt.datetime | None = None
-        self.rate = 0.0
-        self.market_rates: dict[str, float] = {}
+        self.rate = float(self.state.get("rate") or 0.0)
+        self.market_rates: dict[str, float] = dict(self.state.get("market_rates") or {})
+        if self.state.get("ts"):
+            try:  # credit the (capped) deploy gap using the pre-restart rate
+                self.last_ts = dt.datetime.fromisoformat(self.state["ts"])
+            except Exception:  # noqa: BLE001
+                pass
         self.orders: list[dict] = []
         self.error: str | None = None
         self.updated: dt.datetime | None = None
+        self._last_remote_save = 0.0
+        self.persistence = "github" if GITHUB_TOKEN else "local only — resets on redeploy"
 
     def sample(self, now_utc: dt.datetime, orders: list[dict]) -> None:
         """Integrate earnings since the previous sample, then adopt the new rate."""
@@ -84,10 +152,23 @@ class Monitor:
             self.last_ts = now_utc
             self.orders = orders
             self.updated = now_utc
+            self.state["saved_at"] = now_utc.timestamp()
+            self.state["rate"] = self.rate
+            self.state["market_rates"] = self.market_rates
+            self.state["ts"] = now_utc.isoformat()
             try:
                 STATE_PATH.write_text(json.dumps(self.state))
             except Exception:  # noqa: BLE001 — read-only disk: keep running in memory
                 pass
+
+    def maybe_save_remote(self) -> None:
+        """Called from the poll loop (outside the lock) — throttled remote save."""
+        if not GITHUB_TOKEN or time.time() - self._last_remote_save < SAVE_INTERVAL:
+            return
+        with self.lock:
+            copy = json.loads(json.dumps(self.state))
+        if save_remote_state(copy):
+            self._last_remote_save = time.time()
 
     def snapshot(self) -> dict:
         with self.lock:
@@ -109,6 +190,7 @@ class Monitor:
                 ),
                 "error": self.error,
                 "poll_seconds": POLL_SECONDS,
+                "persistence": self.persistence,
             }
 
 
@@ -152,7 +234,7 @@ async function refresh(){
     document.getElementById('earned').textContent = '$' + d.earned_today.toFixed(2);
     document.getElementById('rate').textContent =
       'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + d.orders.length + ' orders';
-    document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · refreshes every ' + d.poll_seconds + 's';
+    document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence;
     const err = document.getElementById('err');
     err.style.display = d.error ? 'block' : 'none'; err.textContent = d.error || '';
     document.getElementById('markets').innerHTML =
@@ -232,6 +314,7 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             orders = tr.fetch_live_orders(key_id, secret_key, event_sizes)
             MONITOR.sample(dt.datetime.now(dt.timezone.utc), orders)
             MONITOR.error = None
+            MONITOR.maybe_save_remote()
         except Exception as e:  # noqa: BLE001 — shown on the dashboard, loop survives
             MONITOR.error = f"{type(e).__name__}: {e}"
         time.sleep(POLL_SECONDS)

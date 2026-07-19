@@ -23,6 +23,20 @@ hosting service from your phone's browser.
    - `POLYMARKET_KEY_ID` — same value as your GitHub secret
    - `POLYMARKET_SECRET_KEY` — same value as your GitHub secret
    - `DASH_PASSWORD` — any password you choose for the dashboard
+   - `GITHUB_TOKEN` — so the counter survives redeploys (below)
+
+### The GITHUB_TOKEN (keeps "earned today" from resetting)
+
+Every code update redeploys the server with a fresh disk. With this token the
+monitor saves its counter to a `live-state` branch of this repo every ~2
+minutes and reloads it on boot, so a redeploy costs at most ~5 minutes of
+counting instead of the whole day.
+
+On your phone: GitHub → **Settings → Developer settings → Fine-grained
+tokens → Generate new token**. Repository access: **only this repo**.
+Permissions: **Contents → Read and write**. Nothing else. Copy the token into
+the `GITHUB_TOKEN` variable on your hosting app. (Without it, everything
+still works — the dashboard just notes "saves: local only".)
 6. Tap **Create App**. In a couple of minutes you get a URL like
    `https://liquidity-rewards-xxxxx.ondigitalocean.app`.
 7. Open it on your phone, enter any username + your `DASH_PASSWORD`, and
