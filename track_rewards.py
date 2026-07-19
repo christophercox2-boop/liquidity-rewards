@@ -227,10 +227,21 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         return
     df, target = prog["df"], prog.get("target") or 0.0
 
+    order["df"] = df
+
+    def scored(lvls: list[tuple[float, float]]) -> list[tuple[float, float, int, float]]:
+        out = []
+        for px, qty in lvls:
+            t = round(abs(best - px) / tick)
+            out.append((px, qty, t, qty * df ** t))
+        return out
+
     side_total = sum(q for _, q in levels)
     if target and side_total < target:
         order["verdict"] = f"❌ side has {side_total:,.0f} of {target:,.0f} Target Size — side not qualifying"
-        order["window"] = [[round(px * 100, 1), q, mine(px)] for px, q in levels[:10]]
+        order["window"] = [
+            [round(px * 100, 1), q, mine(px), t, round(c, 1)] for px, q, t, c in scored(levels[:10])
+        ]
         calc.append(f"side {side_total:,.0f} < target {target:,.0f} → side pays nobody")
         return
     window: list[tuple[float, float]] = []
@@ -241,8 +252,14 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         if target and cum >= target:
             break
     window_end_ticks = round(abs(best - window[-1][0]) / tick)
-    order["window"] = [[round(px * 100, 1), q, mine(px)] for px, q in window[:10]]
+    window_scored = scored(window)
+    denom = sum(c for _, _, _, c in window_scored)
+    order["window"] = [
+        [round(px * 100, 1), q, mine(px), t, round(c, 1)] for px, q, t, c in window_scored[:10]
+    ]
     order["window_more"] = max(len(window) - 10, 0)
+    order["window_more_score"] = round(sum(c for *_, c in window_scored[10:]), 1)
+    order["denom"] = round(denom, 1)
     if not any(mine(px) for px, _ in window):
         order["verdict"] = (
             f"❌ outside Target Size window (order {ticks} tick{'s' if ticks != 1 else ''} "
@@ -250,7 +267,6 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         )
         calc.append(f"you {ticks}t from best, window ends {window_end_ticks}t → score 0")
         return
-    denom = sum(q * df ** round(abs(best - px) / tick) for px, q in window)
     score = order["size"] * df ** ticks
     # The orders and book snapshots are seconds apart, so the book may not
     # fully contain this order — never report a share above 100%.
@@ -259,8 +275,7 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     denom = max(denom, score)
     share = score / denom if denom else 0.0
     order["share"] = share
-    calc.append(f"{df:g}^{ticks} × {order['size']:,.0f} = {score:,.1f}")
-    calc.append(f"{score:,.1f} / {denom:,.1f} = {share * 100:.1f}%")
+    calc.append(f"yours {score:,.1f} / Σ {denom:,.1f} = {share * 100:.1f}%")
     verdict = f"✅ scoring — ~{share * 100:.1f}% of {side_name} side"
     if target:  # show the qualification check so it's verifiable at a glance
         verdict += f" ({side_total:,.0f} resting ≥ {target:,.0f} ✓)"
@@ -935,14 +950,20 @@ def write_status(
                 lines.append("")
                 if o.get("window"):
                     side_label = "Bids" if o["side"] == "BUY" else "Asks"
-                    lines.append(f"| | {side_label} | Resting |")
-                    lines.append("|---|---:|---:|")
-                    for px, qty, is_mine in o["window"]:
+                    df = o.get("df")
+                    lines.append(f"| | {side_label} | Resting | Score |")
+                    lines.append("|---|---:|---:|---:|")
+                    for px, qty, is_mine, t, c in o["window"]:
                         marker = "▶" if is_mine else ""
                         yours = f" ({o['size']:,.0f} yours)" if is_mine else ""
-                        lines.append(f"| {marker} | {px:g}¢ | {qty:,.0f}{yours} |")
+                        cell = f"×{df:g}^{t} = {c:,.1f}" if df is not None else ""
+                        lines.append(f"| {marker} | {px:g}¢ | {qty:,.0f}{yours} | {cell} |")
                     if o.get("window_more"):
-                        lines.append(f"| | … | +{o['window_more']} levels |")
+                        lines.append(
+                            f"| | … | +{o['window_more']} levels | {o.get('window_more_score', 0):,.1f} |"
+                        )
+                    if o.get("denom") is not None:
+                        lines.append(f"| | | **Σ** | **{o['denom']:,.1f}** |")
                     lines.append("")
                 for c in o.get("calc", []):
                     lines.append(f"`{c}`  ")

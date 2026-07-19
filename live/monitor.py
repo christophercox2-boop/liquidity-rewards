@@ -180,7 +180,8 @@ class Monitor:
                     self.state["per_market"].items(), key=lambda kv: -kv[1])},
                 "orders": [
                     {k: o.get(k) for k in ("market", "side", "price", "size", "ticks", "share",
-                                           "est_day", "verdict", "window", "window_more", "calc")}
+                                           "est_day", "verdict", "window", "window_more",
+                                           "window_more_score", "denom", "df", "calc")}
                     for o in self.orders
                 ],
                 "history": self.state["history"][-7:][::-1],
@@ -241,10 +242,12 @@ async function refresh(){
       Object.entries(d.per_market_today).map(([m,v],i) => {
         const detail = d.orders.filter(o => o.market === m).map(o => {
           const est = o.est_day ? '$' + o.est_day.toFixed(2) + '/day' : '$0';
-          const rows = (o.window || []).map(([px,qty,me]) =>
+          const rows = (o.window || []).map(([px,qty,me,t,c]) =>
             '<tr'+(me?' class="me"':'')+'><td>'+(me?'▶ ':'')+px+'¢</td><td class="r">'+qty.toLocaleString()+
-            (me?' ('+o.size.toLocaleString()+' yours)':'')+'</td></tr>').join('') +
-            (o.window_more ? '<tr><td>…</td><td class="r">+'+o.window_more+' levels</td></tr>' : '');
+            (me?' ('+o.size.toLocaleString()+' yours)':'')+'</td><td class="r">×'+o.df+'^'+t+' = '+c.toFixed(1)+'</td></tr>').join('') +
+            (o.window_more ? '<tr><td>…</td><td class="r">+'+o.window_more+' levels</td><td class="r">'+
+              (o.window_more_score||0).toFixed(1)+'</td></tr>' : '') +
+            (o.denom != null ? '<tr><td></td><td class="r">Σ</td><td class="r"><b>'+o.denom.toFixed(1)+'</b></td></tr>' : '');
           const calc = (o.calc || []).map(c => '<div class="calc">'+esc(c)+'</div>').join('');
           return '<div class="ord"><div class="oh">'+o.side+' '+o.size.toLocaleString()+' @ '+
             (o.price*100).toFixed(1)+'¢ → '+est+'</div><table class="bk">'+rows+'</table>'+calc+'</div>';
