@@ -196,19 +196,29 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     order["ticks"] = None
     order["share"] = None
     order["est_day"] = None
+    math: list[str] = []
+    order["math"] = math
     if book is None:
         order["verdict"] = "⚠️ book unavailable"
+        math.append("Couldn't fetch this market's order book, so nothing can be scored.")
         return
     levels = book["bids"] if order["side"] == "BUY" else book["asks"]
+    side_name = "bid" if order["side"] == "BUY" else "ask"
     if not levels:
         order["verdict"] = "⚠️ empty book side"
+        math.append(f"The {side_name} side of the book is empty — no orders to score against.")
         return
     tick = book["tick"]
     best = levels[0][0]
     ticks = round(abs(best - order["price"]) / tick)
     order["ticks"] = ticks
+    math.append(
+        f"Your order: {order['side']} {order['size']:,.0f} @ {order['price'] * 100:.1f}¢. "
+        f"Best {side_name}: {best * 100:.1f}¢ (tick = {tick * 100:g}¢) → you are {ticks} tick{'s' if ticks != 1 else ''} from best."
+    )
     if prog is None:
         order["verdict"] = "❌ no active reward program on this market"
+        math.append("This market has no reward program — position doesn't matter, there is no pool.")
         return
     if not prog.get("df"):
         order["verdict"] = "⚠️ program has no Discount Factor — can't score"
@@ -218,7 +228,15 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     side_total = sum(q for _, q in levels)
     if target and side_total < target:
         order["verdict"] = f"❌ side has {side_total:,.0f} of {target:,.0f} Target Size — side not qualifying"
+        math.append(
+            f"Target Size check: the whole {side_name} side holds {side_total:,.0f} resting contracts, "
+            f"below the {target:,.0f} required — nobody earns on this side until someone adds "
+            f"{target - side_total:,.0f} more."
+        )
         return
+    math.append(
+        f"Target Size check: {side_name} side holds {side_total:,.0f} resting ≥ {target:,.0f} required ✓"
+    )
     window: list[tuple[float, float]] = []
     cum = 0.0
     for px, qty in levels:
@@ -227,20 +245,39 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         if target and cum >= target:
             break
     window_end_ticks = round(abs(best - window[-1][0]) / tick)
+    preview = " · ".join(f"{px * 100:.1f}¢×{q:,.0f}" for px, q in window[:6])
+    if len(window) > 6:
+        preview += f" · …{len(window) - 6} more levels"
+    math.append(
+        f"Window walk: from best outward until {target:,.0f} contracts accumulate — "
+        f"ends {window_end_ticks} tick{'s' if window_end_ticks != 1 else ''} out. Levels: {preview}"
+    )
     if not any(abs(px - order["price"]) < tick / 2 for px, _ in window):
         order["verdict"] = (
             f"❌ outside Target Size window (order {ticks} tick{'s' if ticks != 1 else ''} "
             f"from best; window ends {window_end_ticks})"
         )
+        math.append(
+            f"Your price level ({order['price'] * 100:.1f}¢) is beyond the window, so your order scores 0 "
+            f"no matter its size."
+        )
         return
     denom = sum(q * df ** round(abs(best - px) / tick) for px, q in window)
     score = order["size"] * df ** ticks
+    math.append(
+        f"Your score = DiscountFactor^ticks × size = {df:g}^{ticks} × {order['size']:,.0f} = {score:,.1f}"
+    )
+    math.append(
+        f"Whole {side_name}-side score = Σ (level size × {df:g}^ticks) over the window = {denom:,.1f}"
+    )
     # The orders and book snapshots are seconds apart, so the book may not
     # fully contain this order — never report a share above 100%.
+    if score > denom:
+        math.append("(book snapshot doesn't fully contain your order yet — share capped at 100%)")
     denom = max(denom, score)
     share = score / denom if denom else 0.0
     order["share"] = share
-    side_name = "bid" if order["side"] == "BUY" else "ask"
+    math.append(f"Your share = {score:,.1f} / {denom:,.1f} = {share * 100:.1f}% of the {side_name} side")
     verdict = f"✅ scoring — ~{share * 100:.1f}% of {side_name} side"
     if target:  # show the qualification check so it's verifiable at a glance
         verdict += f" ({side_total:,.0f} resting ≥ {target:,.0f} ✓)"
@@ -250,6 +287,14 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         n = prog.get("event_n") or 1
         if n > 1:
             verdict += f" (pool ÷ {n} markets)"
+        side_pool = _daily_pool(prog) / 2
+        math.append(
+            f"Pool: {_usd(prog['pool'])}/day ÷ {n} market{'s' if n != 1 else ''} in this race ÷ 2 sides "
+            f"= {_usd(side_pool)}/day for this side"
+        )
+        math.append(
+            f"Estimate = {share * 100:.1f}% × {_usd(side_pool)} = {_usd(order['est_day'])}/day"
+        )
     order["verdict"] = verdict
 
 
@@ -788,7 +833,9 @@ def write_live_csv(orders: list[dict]) -> None:
     DATA.mkdir(exist_ok=True)
     with LIVE_CSV.open("w", newline="") as f:
         writer = csv.DictWriter(
-            f, fieldnames=["market", "side", "price", "size", "ticks", "share", "est_day", "pool", "verdict"]
+            f,
+            fieldnames=["market", "side", "price", "size", "ticks", "share", "est_day", "pool", "verdict"],
+            extrasaction="ignore",
         )
         writer.writeheader()
         writer.writerows(orders)
@@ -894,6 +941,21 @@ def write_status(
                 )
             if len(live_orders) > 30:
                 lines.append(f"| …and {len(live_orders) - 30} more | | | | | | |")
+            lines.append("")
+            lines.append("**Tap any order below to see the math behind its number:**")
+            lines.append("")
+            for o in live_orders[:30]:
+                if not o.get("math"):
+                    continue
+                lines.append(
+                    f"<details><summary><code>{o['market']}</code> {o['side']} "
+                    f"{o['size']:,.0f} @ {o['price'] * 100:.1f}¢ — {o.get('verdict', '')[:60]}</summary>"
+                )
+                lines.append("")
+                for step in o["math"]:
+                    lines.append(f"- {step}")
+                lines.append("")
+                lines.append("</details>")
         lines.append("")
 
     lines.append("## 📊 Estimate vs. actual — where the gap is")

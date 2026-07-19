@@ -98,7 +98,8 @@ class Monitor:
                 "per_market_today": {m: round(v, 4) for m, v in sorted(
                     self.state["per_market"].items(), key=lambda kv: -kv[1])},
                 "orders": [
-                    {k: o.get(k) for k in ("market", "side", "price", "size", "ticks", "share", "est_day", "verdict")}
+                    {k: o.get(k) for k in ("market", "side", "price", "size", "ticks", "share",
+                                           "est_day", "verdict", "math")}
                     for o in self.orders
                 ],
                 "history": self.state["history"][-7:][::-1],
@@ -132,9 +133,13 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div class="sub" id="rate"></div>
 <div class="sub" id="updated"></div>
 <div class="err" id="err"></div>
-<h3>By market today</h3><table id="markets"></table>
+<h3>By market today <span class="sub">(tap a row for the math)</span></h3><table id="markets"></table>
 <h3>Previous days</h3><table id="history"></table>
 <script>
+let OPEN = {};
+function tgl(i){ OPEN[i] = !OPEN[i];
+  const e = document.getElementById('d'+i); if(e) e.style.display = OPEN[i] ? '' : 'none'; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 async function refresh(){
   try{
     const r = await fetch('data.json'); const d = await r.json();
@@ -145,8 +150,14 @@ async function refresh(){
     const err = document.getElementById('err');
     err.style.display = d.error ? 'block' : 'none'; err.textContent = d.error || '';
     document.getElementById('markets').innerHTML =
-      Object.entries(d.per_market_today).map(([m,v]) =>
-        '<tr><td class="mkt">'+m+'</td><td class="r">$'+v.toFixed(2)+'</td></tr>').join('') || '<tr><td>nothing yet today</td></tr>';
+      Object.entries(d.per_market_today).map(([m,v],i) => {
+        const math = d.orders.filter(o => o.market === m).map(o =>
+          esc(o.verdict || '') + '\\n' + (o.math || []).map(s => '  · ' + esc(s)).join('\\n')
+        ).join('\\n\\n');
+        return '<tr onclick="tgl('+i+')"><td class="mkt">'+m+'</td><td class="r">$'+v.toFixed(2)+'</td></tr>' +
+          '<tr id="d'+i+'" style="display:'+(OPEN[i]?'':'none')+'"><td colspan="2" class="mkt" ' +
+          'style="white-space:pre-wrap;background:#161b22">'+math+'</td></tr>';
+      }).join('') || '<tr><td>nothing yet today</td></tr>';
     document.getElementById('history').innerHTML =
       d.history.map(h => '<tr><td>'+h.day+'</td><td class="r">$'+h.earned.toFixed(2)+'</td></tr>').join('')
       || '<tr><td>collecting…</td></tr>';
