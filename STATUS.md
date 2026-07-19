@@ -2,17 +2,17 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-07-19 09:20 UTC
+## ✅ Last successful check: 2026-07-19 10:46 UTC
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
 ## 📌 Summary
 
-**Earning right now:** ~$68.13/day estimated (ceiling, not promise — details below)
+**Earning right now:** ~$54.91/day estimated (ceiling, not promise — details below)
 
 **Earned:** $112.64 lifetime ($78.17 paid). Last three recorded days — 2026-07-17: **$14.71** · 2026-07-16: **$17.02** · 2026-07-15: **$1.53** _(Polymarket reports ~1–2 days behind)_
 
-**What else to join:** `enwc-usgubp-ok-2026-06-16-rep-gendru` — BUY at the best price, ~$12.72/day for 200 contracts. Runners-up: `enwc-usgubp-sd-2026-06-02-rep-tobdoe` (~$12.56/day), `enwc-ussep-mn-2026-08-11-dem-pegfla` (~$9.83/day)
+**What else to join:** `enwc-ussep-mn-2026-08-11-dem-angcra` — BUY at the best price, ~$45.41/day for 200 contracts. Runners-up: `enwc-usgubp-ok-2026-06-16-rep-gendru` (~$12.72/day), `enwc-usgubp-sd-2026-06-02-rep-tobdoe` (~$12.56/day)
 
 ---
 
@@ -20,31 +20,31 @@ This runs automatically every hour. **If the timestamp above is more than ~2 hou
 
 ## 📍 Right now — your resting orders
 
-### Estimated earning rate: ~$68.13/day (~$2.84/hour)
+### Estimated earning rate: ~$54.91/day (~$2.29/hour)
 
 Rough estimate — assumes the books, pools, and your orders stay as they are, both sides keep qualifying, each pool covers its whole event/race (so it's divided across that race's open markets), and splits evenly between bid and ask. Scored with the official formula: `DiscountFactor ^ (ticks from best price) × size`, counting only orders inside the Target Size window. Earning orders first.
 
 | Market | Side | Price | Size | Ticks off best | Reward pool | Earning? |
 |---|---|---:|---:|---:|---:|---|
-| `apdc-jerpowgov-2026-12-31` | BUY | 1.0¢ | 10,000 | 0 | $250.00 | ✅ scoring — ~98.3% of bid side (10,175 resting ≥ 10,000 ✓) ≈ $40.95/day (pool ÷ 3 markets) |
+| `apdc-jerpowgov-2026-12-31` | BUY | 1.0¢ | 10,000 | 1 | $250.00 | ✅ scoring — ~56.4% of bid side (12,387 resting ≥ 10,000 ✓) ≈ $23.51/day (pool ÷ 3 markets) |
+| `vmc-ussep-misen-2026-08-04-stegte20` | SELL | 51.0¢ | 250 | 1 | $250.00 | ✅ scoring — ~18.4% of ask side (11,180 resting ≥ 10,000 ✓) ≈ $2.30/day (pool ÷ 10 markets) |
+| `vmc-ussep-misen-2026-08-04-ste15-20` | SELL | 51.0¢ | 250 | 1 | $250.00 | ✅ scoring — ~18.4% of ask side (11,180 resting ≥ 10,000 ✓) ≈ $2.30/day (pool ÷ 10 markets) |
 | `enwc-ussep-nh-2026-09-08-dem-karman` | SELL | 13.0¢ | 100 | 0 | $250.00 | ✅ scoring — ~17.9% of ask side (13,465 resting ≥ 10,000 ✓) ≈ $11.16/day (pool ÷ 2 markets) |
-| `enwc-ussep-nh-2026-09-01-rep-johsun` | BUY | 90.0¢ | 63 | 0 | $250.00 | ✅ scoring — ~14.4% of bid side (38,760 resting ≥ 10,000 ✓) ≈ $9.01/day (pool ÷ 2 markets) |
-| `enwc-ussep-mi-2026-08-04-dem-abdels` | BUY | 68.0¢ | 100 | 0 | $250.00 | ✅ scoring — ~7.2% of bid side (41,035 resting ≥ 10,000 ✓) ≈ $3.00/day (pool ÷ 3 markets) |
-| `enwc-ussep-nh-2026-09-08-dem-chrpap` | BUY | 86.0¢ | 65 | 1 | $250.00 | ✅ scoring — ~4.5% of bid side (11,162 resting ≥ 10,000 ✓) ≈ $2.82/day (pool ÷ 2 markets) |
-| `enwc-ussep-mi-2026-08-04-dem-halste` | BUY | 33.0¢ | 100 | 1 | $250.00 | ✅ scoring — ~1.1% of bid side (73,972 resting ≥ 10,000 ✓) ≈ $0.46/day (pool ÷ 3 markets) |
+| `enwc-ussep-nh-2026-09-01-rep-johsun` | BUY | 90.0¢ | 63 | 0 | $250.00 | ✅ scoring — ~14.9% of bid side (38,596 resting ≥ 10,000 ✓) ≈ $9.33/day (pool ÷ 2 markets) |
+| `vmc-ussep-misen-2026-08-04-els15-20` | SELL | 51.0¢ | 100 | 1 | $250.00 | ✅ scoring — ~9.7% of ask side (11,000 resting ≥ 10,000 ✓) ≈ $1.22/day (pool ÷ 10 markets) |
+| `vmc-ussep-misen-2026-08-04-elsgte20` | SELL | 51.0¢ | 100 | 1 | $250.00 | ✅ scoring — ~8.3% of ask side (11,180 resting ≥ 10,000 ✓) ≈ $1.04/day (pool ÷ 10 markets) |
+| `enwc-ussep-mi-2026-08-04-dem-abdels` | BUY | 68.0¢ | 100 | 0 | $250.00 | ✅ scoring — ~6.8% of bid side (41,119 resting ≥ 10,000 ✓) ≈ $2.83/day (pool ÷ 3 markets) |
+| `enwc-ussep-mi-2026-08-04-dem-halste` | BUY | 33.0¢ | 100 | 1 | $250.00 | ✅ scoring — ~1.2% of bid side (73,716 resting ≥ 10,000 ✓) ≈ $0.51/day (pool ÷ 3 markets) |
 | `enwc-usgubp-wi-2026-08-11-dem-manbar` | SELL | 10.0¢ | 98 | 3 | $250.00 | ✅ scoring — ~0.9% of ask side (10,641 resting ≥ 10,000 ✓) ≈ $0.22/day (pool ÷ 5 markets) |
-| `enwc-ussep-mi-2026-08-04-dem-halste` | SELL | 35.0¢ | 59 | 0 | $250.00 | ✅ scoring — ~0.5% of ask side (34,662 resting ≥ 10,000 ✓) ≈ $0.20/day (pool ÷ 3 markets) |
-| `enwc-ussep-nh-2026-09-01-rep-scobro` | SELL | 9.0¢ | 100 | 0 | $250.00 | ✅ scoring — ~0.5% of ask side (76,713 resting ≥ 10,000 ✓) ≈ $0.29/day (pool ÷ 2 markets) |
-| `cranc-uspres28-12-31-2026-jdvan` | SELL | 94.0¢ | 500 | 45 | $250.00 | ✅ scoring — ~0.0% of ask side (29,476 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 33 markets) |
+| `enwc-ussep-mi-2026-08-04-dem-halste` | SELL | 35.0¢ | 59 | 0 | $250.00 | ✅ scoring — ~0.5% of ask side (34,146 resting ≥ 10,000 ✓) ≈ $0.21/day (pool ÷ 3 markets) |
+| `enwc-ussep-nh-2026-09-01-rep-scobro` | SELL | 9.0¢ | 100 | 0 | $250.00 | ✅ scoring — ~0.5% of ask side (76,661 resting ≥ 10,000 ✓) ≈ $0.29/day (pool ÷ 2 markets) |
+| `cranc-uspres28-12-31-2026-jdvan` | SELL | 94.0¢ | 500 | 45 | $250.00 | ✅ scoring — ~0.0% of ask side (29,655 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 33 markets) |
 | `enwc-ussep-nh-2026-09-08-dem-karman` | SELL | 99.0¢ | 5,000 | 86 | $250.00 | ✅ scoring — ~0.0% of ask side (13,465 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 2 markets) |
 | `enwc-usgubp-wi-2026-08-11-dem-manbar` | SELL | 99.0¢ | 10,000 | 92 | $250.00 | ✅ scoring — ~0.0% of ask side (10,641 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 5 markets) |
 | `opdc-trump-resig-2026-12-31` | SELL | 20.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
-| `vmc-ussep-misen-2026-08-04-stegte20` | SELL | 51.0¢ | 250 | 1 | $250.00 | ❌ side has 529 of 10,000 Target Size — side not qualifying |
-| `vmc-ussep-misen-2026-08-04-ste15-20` | SELL | 51.0¢ | 250 | 1 | $250.00 | ❌ side has 709 of 10,000 Target Size — side not qualifying |
 | `enwc-ussep-mi-2026-08-04-dem-abdels` | SELL | 70.0¢ | 100 | 1 | $250.00 | ❌ outside Target Size window (order 1 tick from best; window ends 0) |
 | `cranc-uspres28-12-31-2026-jdvan` | BUY | 1.0¢ | 9,987 | 1 | $250.00 | ❌ outside Target Size window (order 1 tick from best; window ends 0) |
-| `vmc-ussep-misen-2026-08-04-els15-20` | SELL | 51.0¢ | 100 | 1 | $250.00 | ❌ side has 154 of 10,000 Target Size — side not qualifying |
-| `vmc-ussep-misen-2026-08-04-elsgte20` | SELL | 51.0¢ | 100 | 1 | $250.00 | ❌ side has 559 of 10,000 Target Size — side not qualifying |
+| `enwc-ussep-nh-2026-09-08-dem-chrpap` | BUY | 86.0¢ | 65 | 1 | $250.00 | ❌ side has 415 of 10,000 Target Size — side not qualifying |
 | `enwc-ussep-nh-2026-09-01-rep-scobro` | SELL | 99.0¢ | 2,000 | 90 | $250.00 | ❌ outside Target Size window (order 90 ticks from best; window ends 1) |
 
 ## 💡 Suggested U.S. political markets — active pools you're not in
@@ -53,10 +53,10 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 
 | Market | Reward pool | Discount | Target Size | Best entry | Est. share | Est. $/day |
 |---|---:|---:|---:|---|---:|---:|
+| `enwc-ussep-mn-2026-08-11-dem-angcra` | $250.00 ÷ 2 | 0.30 | 10,000 | BUY side (36,606 resting) | ~72.7% | ~$45.41 |
 | `enwc-usgubp-ok-2026-06-16-rep-gendru` | $250.00 ÷ 2 | 0.30 | 10,000 | BUY side (26,378 resting) | ~20.3% | ~$12.72 |
 | `enwc-usgubp-sd-2026-06-02-rep-tobdoe` | $250.00 ÷ 2 | 0.30 | 10,000 | SELL side (26,782 resting) | ~20.1% | ~$12.56 |
-| `enwc-ussep-mn-2026-08-11-dem-pegfla` | $250.00 ÷ 2 | 0.30 | 10,000 | SELL side (10,176 resting) | ~15.7% | ~$9.83 |
-| `enwc-ussep-mn-2026-08-11-dem-angcra` | $250.00 ÷ 2 | 0.30 | 10,000 | BUY side (35,028 resting) | ~14.3% | ~$8.92 |
+| `enwc-ussep-mn-2026-08-11-dem-pegfla` | $250.00 ÷ 2 | 0.30 | 10,000 | SELL side (11,000 resting) | ~9.5% | ~$5.96 |
 | `enwc-usgubp-sd-2026-06-02-rep-larrho` | $250.00 ÷ 2 | 0.30 | 10,000 | SELL side (26,385 resting) | ~5.9% | ~$3.66 |
 | `cranc-uspres28-12-31-2026-kamhar` | $250.00 ÷ 33 | 0.30 | 10,000 | SELL side (21,014 resting) | ~94.8% | ~$3.59 |
 | `cranc-uspres28-12-31-2026-jonoss` | $250.00 ÷ 33 | 0.30 | 10,000 | SELL side (17,600 resting) | ~92.1% | ~$3.49 |
@@ -64,7 +64,7 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 | `cranc-uspres28-12-31-2026-andyan` | $250.00 ÷ 33 | 0.30 | 10,000 | SELL side (21,240 resting) | ~90.1% | ~$3.41 |
 | `cranc-uspres28-12-31-2026-hunbid` | $250.00 ÷ 33 | 0.30 | 10,000 | SELL side (21,000 resting) | ~88.9% | ~$3.37 |
 | `cranc-uspres28-12-31-2026-margre` | $250.00 ÷ 33 | 0.30 | 10,000 | SELL side (21,600 resting) | ~88.9% | ~$3.37 |
-| `cranc-uspres28-12-31-2026-marrub` | $250.00 ÷ 33 | 0.30 | 10,000 | SELL side (28,770 resting) | ~84.7% | ~$3.21 |
+| `cranc-uspres28-12-31-2026-gavnew` | $250.00 ÷ 33 | 0.30 | 10,000 | SELL side (29,186 resting) | ~72.2% | ~$2.73 |
 
 ## Totals
 
@@ -126,6 +126,7 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 
 | Checked (UTC) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-07-19 10:46:58 | ✅ ok | 102 | $112.64 |
 | 2026-07-19 09:20:41 | ✅ ok | 102 | $112.64 |
 | 2026-07-19 06:45:08 | ✅ ok | 102 | $112.64 |
 | 2026-07-19 03:59:31 | ✅ ok | 102 | $112.64 |
@@ -135,6 +136,5 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 | 2026-07-18 22:10:04 | ✅ ok | 83 | $97.93 |
 | 2026-07-18 21:08:25 | ✅ ok | 83 | $97.93 |
 | 2026-07-18 19:35:32 | ✅ ok | 83 | $97.93 |
-| 2026-07-18 18:10:35 | ✅ ok | 83 | $97.93 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
