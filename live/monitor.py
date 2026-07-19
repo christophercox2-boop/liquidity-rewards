@@ -179,7 +179,7 @@ class Monitor:
                 "per_market_today": {m: round(v, 4) for m, v in sorted(
                     self.state["per_market"].items(), key=lambda kv: -kv[1])},
                 "orders": [
-                    {k: o.get(k) for k in ("market", "side", "price", "size", "ticks", "share",
+                    {k: o.get(k) for k in ("id", "market", "side", "price", "size", "ticks", "share",
                                            "est_day", "verdict", "window", "window_more",
                                            "window_more_score", "denom", "df", "calc",
                                            "event_n", "siblings")}
@@ -197,6 +197,36 @@ class Monitor:
 
 
 MONITOR = Monitor()
+KEY_ID = ""
+SECRET_KEY = ""
+POLL_KICK = threading.Event()  # set after a reprice so the next poll runs immediately
+
+
+def do_reprice(order_id: str, price_cents: float) -> tuple[int, dict]:
+    """Modify one of OUR resting orders to a new price. The order must be in
+    the latest snapshot (can't touch anything else) and the price sane."""
+    known = {o.get("id"): o for o in MONITOR.orders if o.get("id")}
+    o = known.get(order_id)
+    if o is None:
+        return 400, {"ok": False, "error": "unknown order id — wait for the next refresh"}
+    if not (0.1 <= price_cents <= 99.9):
+        return 400, {"ok": False, "error": "price out of range (0.1–99.9¢)"}
+    path = f"/v1/order/{order_id}/modify"
+    value = f"{price_cents / 100:.3f}".rstrip("0").rstrip(".")
+    try:
+        r = requests.request(
+            "POST", tr.TRADE_API + path,
+            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
+                     "Content-Type": "application/json"},
+            json={"marketSlug": o["market"], "price": {"value": value, "currency": "USD"}},
+            timeout=20,
+        )
+        ok = r.status_code < 300
+        POLL_KICK.set()
+        return (200 if ok else 502), {"ok": ok, "status": r.status_code,
+                                      "detail": " ".join(r.text.split())[:200]}
+    except Exception as e:  # noqa: BLE001
+        return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
 
 DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -217,6 +247,10 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  .calc{font-family:ui-monospace,monospace;font-size:12px;color:#e6edf3;margin:2px 0}
  .ord{margin:8px 0 14px}
  .oh{font-size:12px;color:#e6edf3;margin-bottom:2px}
+ .rp{margin:6px 0}
+ .rp input{width:70px;background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:5px;font-size:14px}
+ .rp button{background:#238636;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;margin-left:6px}
+ .rp button.alt{background:#21262d;color:#8b949e}
 </style></head><body>
 <div class="sub">Earned today (ET) — live estimate</div>
 <div class="big" id="earned">…</div>
@@ -230,6 +264,20 @@ let OPEN = {};
 function tgl(i){ OPEN[i] = !OPEN[i];
   const e = document.getElementById('d'+i); if(e) e.style.display = OPEN[i] ? '' : 'none'; }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+async function reprice(id, label){
+  const inp = document.getElementById('p'+id);
+  const cents = parseFloat(inp.value);
+  if(!(cents >= 0.1 && cents <= 99.9)){ alert('Price out of range (0.1–99.9¢)'); return; }
+  if(!confirm('Reprice ' + label + ' to ' + cents + '¢?')) return;
+  try{
+    const r = await fetch('reprice', {method:'POST',
+      headers:{'Content-Type':'application/json','X-Reprice':'1'},
+      body: JSON.stringify({order_id:id, price_cents:cents})});
+    const d = await r.json().catch(()=>({ok:false,error:'HTTP '+r.status}));
+    alert(d.ok ? 'Repriced ✓' : 'Failed: ' + (d.detail || d.error || ('HTTP '+r.status)));
+  }catch(e){ alert('Failed: '+e); }
+  setTimeout(refresh, 1500);
+}
 async function refresh(){
   try{
     const r = await fetch('data.json'); const d = await r.json();
@@ -255,8 +303,14 @@ async function refresh(){
             '<div class="mkt" style="padding:4px 0 0 8px">'+
             o.siblings.map((s,j)=>(j+1)+'. '+esc(s)+(s===o.market?' ←':'')).join('<br>')+
             '</div></details>' : '';
-          return '<div class="ord"><div class="oh">'+o.side+' '+o.size.toLocaleString()+' @ '+
-            (o.price*100).toFixed(1)+'¢ → '+est+'</div><table class="bk">'+rows+'</table>'+calc+sibs+'</div>';
+          const best = (o.window && o.window.length) ? o.window[0][0] : null;
+          const rp = o.id ?
+            '<div class="rp"><input id="p'+o.id+'" type="number" step="0.1" min="0.1" max="99.9" value="'+
+            (o.price*100).toFixed(1)+'">¢'+
+            (best !== null ? '<button class="alt" onclick="event.stopPropagation();document.getElementById(\\'p'+o.id+'\\').value='+best+'">best '+best+'¢</button>' : '')+
+            '<button onclick="event.stopPropagation();reprice(\\''+o.id+'\\',\\''+esc(o.market)+' '+o.side+'\\')">Reprice</button></div>' : '';
+          return '<div class="ord" onclick="event.stopPropagation()"><div class="oh">'+o.side+' '+o.size.toLocaleString()+' @ '+
+            (o.price*100).toFixed(1)+'¢ → '+est+'</div><table class="bk">'+rows+'</table>'+calc+sibs+rp+'</div>';
         }).join('');
         return '<tr onclick="tgl('+i+')"><td class="mkt">'+m+'</td><td class="r">$'+v.toFixed(2)+'</td></tr>' +
           '<tr id="d'+i+'" style="display:'+(OPEN[i]?'':'none')+'"><td colspan="2" ' +
@@ -298,6 +352,29 @@ class Handler(BaseHTTPRequestHandler):
         else:
             self._send(200, "text/html; charset=utf-8", DASH_HTML.encode())
 
+    def do_POST(self) -> None:  # noqa: N802 — http.server API
+        if not DASH_PASSWORD or not self._authed():
+            self.send_response(401)
+            self.send_header("WWW-Authenticate", 'Basic realm="rewards"')
+            self.end_headers()
+            return
+        if self.path != "/reprice":
+            self._send(404, "text/plain", b"not found")
+            return
+        # Cross-origin requests can't set custom headers without a CORS
+        # preflight (which we never grant) — this blocks CSRF.
+        if self.headers.get("X-Reprice") != "1":
+            self._send(403, "text/plain", b"missing X-Reprice header")
+            return
+        try:
+            body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
+            order_id, cents = str(body["order_id"]), float(body["price_cents"])
+        except Exception:  # noqa: BLE001
+            self._send(400, "application/json", b'{"ok": false, "error": "bad request"}')
+            return
+        code, payload = do_reprice(order_id, cents)
+        self._send(code, "application/json", json.dumps(payload).encode())
+
     def _send(self, code: int, ctype: str, body: bytes) -> None:
         self.send_response(code)
         self.send_header("Content-Type", ctype)
@@ -326,15 +403,18 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             MONITOR.maybe_save_remote()
         except Exception as e:  # noqa: BLE001 — shown on the dashboard, loop survives
             MONITOR.error = f"{type(e).__name__}: {e}"
-        time.sleep(POLL_SECONDS)
+        POLL_KICK.wait(POLL_SECONDS)  # a reprice wakes the loop immediately
+        POLL_KICK.clear()
 
 
 def main() -> None:
+    global KEY_ID, SECRET_KEY
     key_id = os.environ.get("POLYMARKET_KEY_ID", "").strip()
     secret_key = os.environ.get("POLYMARKET_SECRET_KEY", "").strip()
     if not key_id or not secret_key:
         print("Set POLYMARKET_KEY_ID and POLYMARKET_SECRET_KEY", file=sys.stderr)
         sys.exit(1)
+    KEY_ID, SECRET_KEY = key_id, secret_key
     threading.Thread(target=poll_loop, args=(key_id, secret_key), daemon=True).start()
     server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
     print(f"live monitor on :{PORT}, polling every {POLL_SECONDS}s")
