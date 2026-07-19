@@ -2,158 +2,6 @@
   "orders": {
     "orders": [
       {
-        "id": "BB39QS17475E",
-        "marketSlug": "vmc-ussep-misen-2026-08-04-stegte20",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.51",
-          "currency": "USD"
-        },
-        "quantity": 250,
-        "cumQuantity": 0,
-        "leavesQuantity": 250,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "vmc-ussep-misen-2026-08-04-stegte20",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
-          "title": "Michigan Senate Democratic Primary Margin of Victory?",
-          "outcome": "No",
-          "eventSlug": "ussep-misen-2026-08-04",
-          "subject": {
-            "id": 0,
-            "name": "Stevens 20+",
-            "subjectType": "",
-            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ste00-0235c22722.jpg"
-          },
-          "eventId": "53743"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-19T02:02:16.245465590Z",
-        "createTime": "2026-07-19T02:02:16.243801887Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T02:02:16.245465590Z"
-      },
-      {
-        "id": "BB3AR6JDP75P",
-        "marketSlug": "vmc-ussep-misen-2026-08-04-ste15-20",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.51",
-          "currency": "USD"
-        },
-        "quantity": 250,
-        "cumQuantity": 0,
-        "leavesQuantity": 250,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "vmc-ussep-misen-2026-08-04-ste15-20",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
-          "title": "Michigan Senate Democratic Primary Margin of Victory?",
-          "outcome": "No",
-          "eventSlug": "ussep-misen-2026-08-04",
-          "subject": {
-            "id": 0,
-            "name": "Stevens 15-20",
-            "subjectType": "",
-            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ste00-0235c22722.jpg"
-          },
-          "eventId": "53743"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-19T02:03:04.278044705Z",
-        "createTime": "2026-07-19T02:03:04.276839653Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T02:03:04.278044705Z"
-      },
-      {
-        "id": "BB2YE7ZRP75J",
-        "marketSlug": "cranc-uspres28-12-31-2026-jdvan",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.45",
-          "currency": "USD"
-        },
-        "quantity": 20,
-        "cumQuantity": 0,
-        "leavesQuantity": 20,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_SHORT",
-        "marketMetadata": {
-          "slug": "cranc-uspres28-12-31-2026-jdvan",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/uspres28-12-31-2026-9612b36f85.jpg",
-          "title": "Who Will Announce a Presidential Run in 2026?",
-          "outcome": "No",
-          "eventSlug": "uspres28-12-31-2026",
-          "subject": {
-            "id": 0,
-            "name": "J.D. Vance",
-            "subjectType": ""
-          },
-          "eventId": "44781"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-19T01:34:41.075702028Z",
-        "createTime": "2026-07-19T01:34:41.073643443Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_SELL",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T01:34:41.075702028Z"
-      },
-      {
         "id": "BB2YY0EVT75J",
         "marketSlug": "cranc-uspres28-12-31-2026-jdvan",
         "side": "ORDER_SIDE_BUY",
@@ -163,8 +11,8 @@
           "currency": "USD"
         },
         "quantity": 10000,
-        "cumQuantity": 0,
-        "leavesQuantity": 10000,
+        "cumQuantity": 13.12,
+        "leavesQuantity": 9986.88,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_LONG",
@@ -181,7 +29,7 @@
           },
           "eventId": "44781"
         },
-        "state": "ORDER_STATE_NEW",
+        "state": "ORDER_STATE_PARTIALLY_FILLED",
         "commissionNotionalTotalCollected": {
           "value": "0.0000",
           "currency": "USD"
@@ -189,7 +37,7 @@
         "commissionsBasisPoints": "0",
         "makerCommissionsBasisPoints": "0",
         "avgPx": {
-          "value": "0.0000",
+          "value": "0.0100",
           "currency": "USD"
         },
         "cashOrderQty": {
@@ -201,7 +49,7 @@
         "outcomeSide": "OUTCOME_SIDE_YES",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T01:35:01.512378304Z"
+        "lastTransactTime": "2026-07-19T02:50:26.656913968Z"
       },
       {
         "id": "BB38Z0JW475J",
@@ -252,108 +100,6 @@
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
         "lastTransactTime": "2026-07-19T01:59:19.603343349Z"
-      },
-      {
-        "id": "BB2XA83XG75H",
-        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.99",
-          "currency": "USD"
-        },
-        "quantity": 10000,
-        "cumQuantity": 0,
-        "leavesQuantity": 10000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
-          "title": "Wisconsin Governor Democratic Primary Winner",
-          "outcome": "No",
-          "eventSlug": "usgubp-wi-2026-08-11-dem",
-          "subject": {
-            "id": 0,
-            "name": "Mandela Barnes",
-            "subjectType": "",
-            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/south-carolina-governor-democratic-primary-winner-JcrLjxqeFLcJ.png"
-          },
-          "eventId": "50267"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-19T01:31:46.516739008Z",
-        "createTime": "2026-07-19T01:31:46.515513662Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T01:31:46.516739008Z"
-      },
-      {
-        "id": "BB2XT55WJ75P",
-        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.1",
-          "currency": "USD"
-        },
-        "quantity": 100,
-        "cumQuantity": 0,
-        "leavesQuantity": 100,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_LONG",
-        "marketMetadata": {
-          "slug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
-          "title": "Wisconsin Governor Democratic Primary Winner",
-          "outcome": "Yes",
-          "eventSlug": "usgubp-wi-2026-08-11-dem",
-          "subject": {
-            "id": 0,
-            "name": "Mandela Barnes",
-            "subjectType": "",
-            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/south-carolina-governor-democratic-primary-winner-JcrLjxqeFLcJ.png"
-          },
-          "eventId": "50267"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-19T01:32:24.012031165Z",
-        "createTime": "2026-07-19T01:32:24.010934876Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_SELL",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T01:32:24.012031165Z"
       },
       {
         "id": "BB36WHB6C75C",
@@ -456,8 +202,108 @@
         "lastTransactTime": "2026-07-19T01:53:36.901613236Z"
       },
       {
-        "id": "BB3A0SDJG75M",
-        "marketSlug": "vmc-ussep-misen-2026-08-04-els15-20",
+        "id": "BB36YM67R75H",
+        "marketSlug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.01",
+          "currency": "USD"
+        },
+        "quantity": 10000,
+        "cumQuantity": 0,
+        "leavesQuantity": 10000,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
+          "title": "New Hampshire Senate Democratic Primary Winner?",
+          "outcome": "Yes",
+          "eventSlug": "ussep-nh-2026-09-08-dem",
+          "subject": {
+            "id": 0,
+            "name": "Chris Pappas",
+            "subjectType": ""
+          },
+          "eventId": "53736"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-19T01:54:00.400824335Z",
+        "createTime": "2026-07-19T01:54:00.399415242Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-19T01:54:00.400824335Z"
+      },
+      {
+        "id": "BB36X5X6Y75M",
+        "marketSlug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.86",
+          "currency": "USD"
+        },
+        "quantity": 65,
+        "cumQuantity": 0,
+        "leavesQuantity": 65,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
+          "title": "New Hampshire Senate Democratic Primary Winner?",
+          "outcome": "Yes",
+          "eventSlug": "ussep-nh-2026-09-08-dem",
+          "subject": {
+            "id": 0,
+            "name": "Chris Pappas",
+            "subjectType": ""
+          },
+          "eventId": "53736"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-19T01:54:19.397748940Z",
+        "createTime": "2026-07-19T01:54:19.396005367Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-19T01:54:19.397748940Z"
+      },
+      {
+        "id": "BB39TBGKW75R",
+        "marketSlug": "vmc-ussep-misen-2026-08-04-elsgte20",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
@@ -471,14 +317,14 @@
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "vmc-ussep-misen-2026-08-04-els15-20",
+          "slug": "vmc-ussep-misen-2026-08-04-elsgte20",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
           "title": "Michigan Senate Democratic Primary Margin of Victory?",
           "outcome": "No",
           "eventSlug": "ussep-misen-2026-08-04",
           "subject": {
             "id": 0,
-            "name": "El-Sayed 15-20",
+            "name": "El-Sayed 20+",
             "subjectType": "",
             "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/els20-f5bde389bb.jpg"
           },
@@ -499,40 +345,41 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-19T02:01:44.317596998Z",
-        "createTime": "2026-07-19T02:01:44.316514859Z",
+        "insertTime": "2026-07-19T02:01:31.245238677Z",
+        "createTime": "2026-07-19T02:01:31.244112001Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T02:01:44.317596998Z"
+        "lastTransactTime": "2026-07-19T02:01:31.245238677Z"
       },
       {
-        "id": "BB3ATPPNP75J",
-        "marketSlug": "enwc-ussep-mi-2026-08-04-dem-abdels",
+        "id": "BB39QS17475E",
+        "marketSlug": "vmc-ussep-misen-2026-08-04-stegte20",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.7",
+          "value": "0.51",
           "currency": "USD"
         },
-        "quantity": 100,
+        "quantity": 250,
         "cumQuantity": 0,
-        "leavesQuantity": 100,
+        "leavesQuantity": 250,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "enwc-ussep-mi-2026-08-04-dem-abdels",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mich-dem-81b947cd7e.png",
-          "title": "Michigan Senate Democratic Primary Winner",
+          "slug": "vmc-ussep-misen-2026-08-04-stegte20",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
+          "title": "Michigan Senate Democratic Primary Margin of Victory?",
           "outcome": "No",
-          "eventSlug": "ussep-mi-2026-08-04-dem",
+          "eventSlug": "ussep-misen-2026-08-04",
           "subject": {
             "id": 0,
-            "name": "Abdul El-Sayed",
-            "subjectType": ""
+            "name": "Stevens 20+",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ste00-0235c22722.jpg"
           },
-          "eventId": "15723"
+          "eventId": "53743"
         },
         "state": "ORDER_STATE_NEW",
         "commissionNotionalTotalCollected": {
@@ -549,12 +396,12 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-19T02:03:58.531703527Z",
-        "createTime": "2026-07-19T02:03:58.529425837Z",
+        "insertTime": "2026-07-19T02:02:16.245465590Z",
+        "createTime": "2026-07-19T02:02:16.243801887Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T02:03:58.531703527Z"
+        "lastTransactTime": "2026-07-19T02:02:16.245465590Z"
       },
       {
         "id": "BB3AR6T8M75P",
@@ -607,62 +454,12 @@
         "lastTransactTime": "2026-07-19T02:03:45.040232308Z"
       },
       {
-        "id": "BB3B0R9HP75N",
-        "marketSlug": "enwc-ussep-mi-2026-08-04-dem-halste",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.33",
-          "currency": "USD"
-        },
-        "quantity": 100,
-        "cumQuantity": 0,
-        "leavesQuantity": 100,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-ussep-mi-2026-08-04-dem-halste",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mich-dem-81b947cd7e.png",
-          "title": "Michigan Senate Democratic Primary Winner",
-          "outcome": "Yes",
-          "eventSlug": "ussep-mi-2026-08-04-dem",
-          "subject": {
-            "id": 0,
-            "name": "Haley Stevens",
-            "subjectType": ""
-          },
-          "eventId": "15723"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-19T02:04:08.064238174Z",
-        "createTime": "2026-07-19T02:04:08.062951744Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T02:04:08.064238174Z"
-      },
-      {
-        "id": "BB3AQJSC075M",
-        "marketSlug": "enwc-ussep-mi-2026-08-04-dem-halste",
+        "id": "BB3ATPPNP75J",
+        "marketSlug": "enwc-ussep-mi-2026-08-04-dem-abdels",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.35",
+          "value": "0.7",
           "currency": "USD"
         },
         "quantity": 100,
@@ -672,14 +469,14 @@
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "enwc-ussep-mi-2026-08-04-dem-halste",
+          "slug": "enwc-ussep-mi-2026-08-04-dem-abdels",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mich-dem-81b947cd7e.png",
           "title": "Michigan Senate Democratic Primary Winner",
           "outcome": "No",
           "eventSlug": "ussep-mi-2026-08-04-dem",
           "subject": {
             "id": 0,
-            "name": "Haley Stevens",
+            "name": "Abdul El-Sayed",
             "subjectType": ""
           },
           "eventId": "15723"
@@ -699,12 +496,114 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-19T02:04:22.139067233Z",
-        "createTime": "2026-07-19T02:04:22.135628830Z",
+        "insertTime": "2026-07-19T02:03:58.531703527Z",
+        "createTime": "2026-07-19T02:03:58.529425837Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T02:04:22.139067233Z"
+        "lastTransactTime": "2026-07-19T02:03:58.531703527Z"
+      },
+      {
+        "id": "BB2XT55WJ75P",
+        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.1",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 2,
+        "leavesQuantity": 98,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_LONG",
+        "marketMetadata": {
+          "slug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
+          "title": "Wisconsin Governor Democratic Primary Winner",
+          "outcome": "Yes",
+          "eventSlug": "usgubp-wi-2026-08-11-dem",
+          "subject": {
+            "id": 0,
+            "name": "Mandela Barnes",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/south-carolina-governor-democratic-primary-winner-JcrLjxqeFLcJ.png"
+          },
+          "eventId": "50267"
+        },
+        "state": "ORDER_STATE_PARTIALLY_FILLED",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.1000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-19T01:32:24.012031165Z",
+        "createTime": "2026-07-19T01:32:24.010934876Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-19T02:30:41.718249616Z"
+      },
+      {
+        "id": "BB2XA83XG75H",
+        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.99",
+          "currency": "USD"
+        },
+        "quantity": 10000,
+        "cumQuantity": 0,
+        "leavesQuantity": 10000,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
+          "title": "Wisconsin Governor Democratic Primary Winner",
+          "outcome": "No",
+          "eventSlug": "usgubp-wi-2026-08-11-dem",
+          "subject": {
+            "id": 0,
+            "name": "Mandela Barnes",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/south-carolina-governor-democratic-primary-winner-JcrLjxqeFLcJ.png"
+          },
+          "eventId": "50267"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-19T01:31:46.516739008Z",
+        "createTime": "2026-07-19T01:31:46.515513662Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-19T01:31:46.516739008Z"
       },
       {
         "id": "BB3631SN875P",
@@ -805,106 +704,6 @@
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
         "lastTransactTime": "2026-07-19T01:53:06.407361774Z"
-      },
-      {
-        "id": "BB36YM67R75H",
-        "marketSlug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.01",
-          "currency": "USD"
-        },
-        "quantity": 10000,
-        "cumQuantity": 0,
-        "leavesQuantity": 10000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
-          "title": "New Hampshire Senate Democratic Primary Winner?",
-          "outcome": "Yes",
-          "eventSlug": "ussep-nh-2026-09-08-dem",
-          "subject": {
-            "id": 0,
-            "name": "Chris Pappas",
-            "subjectType": ""
-          },
-          "eventId": "53736"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-19T01:54:00.400824335Z",
-        "createTime": "2026-07-19T01:54:00.399415242Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T01:54:00.400824335Z"
-      },
-      {
-        "id": "BB36X5X6Y75M",
-        "marketSlug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.86",
-          "currency": "USD"
-        },
-        "quantity": 65,
-        "cumQuantity": 0,
-        "leavesQuantity": 65,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
-          "title": "New Hampshire Senate Democratic Primary Winner?",
-          "outcome": "Yes",
-          "eventSlug": "ussep-nh-2026-09-08-dem",
-          "subject": {
-            "id": 0,
-            "name": "Chris Pappas",
-            "subjectType": ""
-          },
-          "eventId": "53736"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-19T01:54:19.397748940Z",
-        "createTime": "2026-07-19T01:54:19.396005367Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T01:54:19.397748940Z"
       },
       {
         "id": "BB37E189A75R",
@@ -1107,8 +906,8 @@
         "lastTransactTime": "2026-07-19T01:58:09.416336446Z"
       },
       {
-        "id": "BB39TBGKW75R",
-        "marketSlug": "vmc-ussep-misen-2026-08-04-elsgte20",
+        "id": "BB3A0SDJG75M",
+        "marketSlug": "vmc-ussep-misen-2026-08-04-els15-20",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
@@ -1122,14 +921,14 @@
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "vmc-ussep-misen-2026-08-04-elsgte20",
+          "slug": "vmc-ussep-misen-2026-08-04-els15-20",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
           "title": "Michigan Senate Democratic Primary Margin of Victory?",
           "outcome": "No",
           "eventSlug": "ussep-misen-2026-08-04",
           "subject": {
             "id": 0,
-            "name": "El-Sayed 20+",
+            "name": "El-Sayed 15-20",
             "subjectType": "",
             "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/els20-f5bde389bb.jpg"
           },
@@ -1150,12 +949,163 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-19T02:01:31.245238677Z",
-        "createTime": "2026-07-19T02:01:31.244112001Z",
+        "insertTime": "2026-07-19T02:01:44.317596998Z",
+        "createTime": "2026-07-19T02:01:44.316514859Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T02:01:31.245238677Z"
+        "lastTransactTime": "2026-07-19T02:01:44.317596998Z"
+      },
+      {
+        "id": "BB3AR6JDP75P",
+        "marketSlug": "vmc-ussep-misen-2026-08-04-ste15-20",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.51",
+          "currency": "USD"
+        },
+        "quantity": 250,
+        "cumQuantity": 0,
+        "leavesQuantity": 250,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "vmc-ussep-misen-2026-08-04-ste15-20",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
+          "title": "Michigan Senate Democratic Primary Margin of Victory?",
+          "outcome": "No",
+          "eventSlug": "ussep-misen-2026-08-04",
+          "subject": {
+            "id": 0,
+            "name": "Stevens 15-20",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ste00-0235c22722.jpg"
+          },
+          "eventId": "53743"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-19T02:03:04.278044705Z",
+        "createTime": "2026-07-19T02:03:04.276839653Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-19T02:03:04.278044705Z"
+      },
+      {
+        "id": "BB3B0R9HP75N",
+        "marketSlug": "enwc-ussep-mi-2026-08-04-dem-halste",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.33",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 0,
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "enwc-ussep-mi-2026-08-04-dem-halste",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mich-dem-81b947cd7e.png",
+          "title": "Michigan Senate Democratic Primary Winner",
+          "outcome": "Yes",
+          "eventSlug": "ussep-mi-2026-08-04-dem",
+          "subject": {
+            "id": 0,
+            "name": "Haley Stevens",
+            "subjectType": ""
+          },
+          "eventId": "15723"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-19T02:04:08.064238174Z",
+        "createTime": "2026-07-19T02:04:08.062951744Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-19T02:04:08.064238174Z"
+      },
+      {
+        "id": "BB3AQJSC075M",
+        "marketSlug": "enwc-ussep-mi-2026-08-04-dem-halste",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.35",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 0,
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "enwc-ussep-mi-2026-08-04-dem-halste",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mich-dem-81b947cd7e.png",
+          "title": "Michigan Senate Democratic Primary Winner",
+          "outcome": "No",
+          "eventSlug": "ussep-mi-2026-08-04-dem",
+          "subject": {
+            "id": 0,
+            "name": "Haley Stevens",
+            "subjectType": ""
+          },
+          "eventId": "15723"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-19T02:04:22.139067233Z",
+        "createTime": "2026-07-19T02:04:22.135628830Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-19T02:04:22.139067233Z"
       }
     ]
   },
