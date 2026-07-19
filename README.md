@@ -32,6 +32,13 @@ that side's score — then your total earnings, the last 14 days, monthly
 totals, and top markets. The full history lives in
 [`data/rewards.csv`](data/rewards.csv).
 
+## Real-time counter (optional, ~$5/month)
+
+The hourly tracker above is free and permanent. For a **live "earned today"
+counter** that samples every 30 seconds around the clock, deploy the
+[`live/` monitor](live/README.md) to a small always-on server — setup is
+~5 minutes from your phone, no command line.
+
 ## Refreshing on demand (works on your phone)
 
 The page updates hourly by itself. To refresh it *right now*: open
