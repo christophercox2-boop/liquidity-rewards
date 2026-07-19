@@ -149,6 +149,26 @@ class Monitor:
             for o in orders:
                 if o.get("est_day"):
                     self.market_rates[o["market"]] = self.market_rates.get(o["market"], 0.0) + o["est_day"]
+            # Per-market rate history for the graphs: 1-minute buckets, ~8h,
+            # including zero-rate markets so dead orders chart their flatline.
+            rates_all: dict[str, float] = {}
+            for o in orders:
+                if o.get("market"):
+                    rates_all[o["market"]] = rates_all.get(o["market"], 0.0) + (o.get("est_day") or 0.0)
+            minute = int(now_utc.timestamp() // 60) * 60
+            series = self.state.setdefault("series", {})
+            for mkt, r in rates_all.items():
+                s = series.setdefault(mkt, [])
+                if s and s[-1][0] == minute:
+                    s[-1][1] = round(r, 4)
+                else:
+                    s.append([minute, round(r, 4)])
+                del s[:-480]
+            cutoff = minute - 8 * 3600
+            self.state["series"] = {
+                mkt: [p for p in s if p[0] >= cutoff]
+                for mkt, s in series.items() if s and s[-1][0] >= cutoff
+            }
             self.last_ts = now_utc
             self.orders = orders
             self.updated = now_utc
@@ -307,9 +327,39 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <h3>Previous days</h3><table id="history"></table>
 <div id="acts"></div>
 <script>
-let OPEN = {};
-function tgl(i){ OPEN[i] = !OPEN[i];
-  const e = document.getElementById('d'+i); if(e) e.style.display = OPEN[i] ? '' : 'none'; }
+let OPEN = {}, GOPEN = {}, SERIES = null, RATES = {};
+let SEEN = JSON.parse(localStorage.getItem('seenRates') || '{}');
+function tgl(i, m){ OPEN[m] = !OPEN[m];
+  const e = document.getElementById('d'+i); if(e) e.style.display = OPEN[m] ? '' : 'none';
+  if(OPEN[m]){ SEEN[m] = RATES[m] || 0; localStorage.setItem('seenRates', JSON.stringify(SEEN));
+    const row = document.getElementById('r'+i); if(row) row.style.background=''; } }
+async function tglGraph(i, m){ GOPEN[m] = !GOPEN[m];
+  const e = document.getElementById('g'+i); if(!e) return;
+  if(GOPEN[m]){ if(!SERIES){ try{ SERIES = (await (await fetch('series.json')).json()).series || {}; }catch(_){ SERIES = {}; } }
+    e.cells[0].innerHTML = spark(SERIES[m]); e.style.display = ''; }
+  else e.style.display = 'none'; }
+function spark(pts){
+  if(!pts || pts.length < 2) return '<div class="mkt">not enough history yet — collecting a point per minute</div>';
+  const w = 330, h = 96, p = 10;
+  const ts = pts.map(q=>q[0]), rs = pts.map(q=>q[1]);
+  const t0 = Math.min(...ts), t1 = Math.max(...ts);
+  const r0 = Math.min(...rs), r1 = Math.max(...rs);
+  const X = t => p + (w-2*p)*(t-t0)/Math.max(t1-t0,1);
+  const Y = r => h-p - (h-2*p)*(r-r0)/Math.max(r1-r0,1e-9);
+  const dpath = pts.map((q,i)=>(i?'L':'M')+X(q[0]).toFixed(1)+' '+Y(q[1]).toFixed(1)).join(' ');
+  const hrs = ((t1-t0)/3600).toFixed(1);
+  return '<svg width="'+w+'" height="'+h+'" style="background:#010409;border-radius:8px;max-width:100%">'+
+    '<path d="'+dpath+'" fill="none" stroke="#58a6ff" stroke-width="2"/></svg>'+
+    '<div class="mkt">$/day over last '+hrs+'h · min $'+r0.toFixed(2)+' · max $'+r1.toFixed(2)+
+    ' · now $'+rs[rs.length-1].toFixed(2)+'</div>';
+}
+function tint(m, cur){
+  const seen = SEEN[m];
+  if(seen === undefined) return '';
+  const delta = cur - seen;
+  if(Math.abs(delta) < Math.max(0.5, 0.25*Math.max(seen, 0.01))) return '';
+  return delta < 0 ? 'background:#3d1418' : 'background:#12341c';
+}
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 async function reprice(id, label){
   const inp = document.getElementById('p'+id);
@@ -337,6 +387,11 @@ async function refresh(){
     const allMarkets = {};
     d.orders.forEach(o => { if(o.market) allMarkets[o.market] = 0; });
     Object.entries(d.per_market_today).forEach(([m,v]) => { allMarkets[m] = v; });
+    RATES = {};
+    d.orders.forEach(o => { if(o.market) RATES[o.market] = (RATES[o.market]||0) + (o.est_day||0); });
+    if(Object.values(GOPEN).some(v=>v)){
+      try{ SERIES = (await (await fetch('series.json')).json()).series || {}; }catch(_){}
+    }
     document.getElementById('markets').innerHTML =
       Object.entries(allMarkets).sort((a,b) => b[1]-a[1]).map(([m,v],i) => {
         const dead = d.orders.some(o => o.market === m) &&
@@ -364,9 +419,13 @@ async function refresh(){
           return '<div class="ord" onclick="event.stopPropagation()"><div class="oh">'+o.side+' '+o.size.toLocaleString()+' @ '+
             (o.price*100).toFixed(1)+'¢ → '+est+'</div><table class="bk">'+rows+'</table>'+calc+sibs+rp+'</div>';
         }).join('');
-        return '<tr onclick="tgl('+i+')"><td class="mkt">'+m+'</td><td class="r">'+
-          (dead ? '⚠️ $0.00' : '$'+v.toFixed(2))+'</td></tr>' +
-          '<tr id="d'+i+'" style="display:'+(OPEN[i]?'':'none')+'"><td colspan="2" ' +
+        const gcell = GOPEN[m] && SERIES ? spark(SERIES[m]) : '';
+        return '<tr id="r'+i+'" onclick="tgl('+i+',\\''+esc(m)+'\\')" style="'+tint(m, RATES[m]||0)+'">'+
+          '<td class="mkt">'+m+'</td><td class="r">'+(dead ? '⚠️ $0.00' : '$'+v.toFixed(2))+
+          ' <button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
+          'onclick="event.stopPropagation();tglGraph('+i+',\\''+esc(m)+'\\')">📈</button></td></tr>' +
+          '<tr id="g'+i+'" style="display:'+(GOPEN[m]?'':'none')+'"><td colspan="2" style="background:#161b22">'+gcell+'</td></tr>' +
+          '<tr id="d'+i+'" style="display:'+(OPEN[m]?'':'none')+'"><td colspan="2" ' +
           'style="background:#161b22">'+detail+'</td></tr>';
       }).join('') || '<tr><td>nothing yet today</td></tr>';
     document.getElementById('history').innerHTML =
@@ -406,6 +465,10 @@ class Handler(BaseHTTPRequestHandler):
             return
         if self.path.startswith("/data.json"):
             self._send(200, "application/json", json.dumps(MONITOR.snapshot()).encode())
+        elif self.path.startswith("/series.json"):
+            with MONITOR.lock:
+                payload = json.dumps({"series": MONITOR.state.get("series", {})})
+            self._send(200, "application/json", payload.encode())
         else:
             self._send(200, "text/html; charset=utf-8", DASH_HTML.encode())
 
