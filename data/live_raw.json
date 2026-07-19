@@ -2,62 +2,12 @@
   "orders": {
     "orders": [
       {
-        "id": "BBDD8PTNT75E",
+        "id": "BBDHNAXMM75P",
         "marketSlug": "enwc-ussep-nh-2026-09-01-rep-scobro",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.45",
-          "currency": "USD"
-        },
-        "quantity": 30,
-        "cumQuantity": 0,
-        "leavesQuantity": 30,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "enwc-ussep-nh-2026-09-01-rep-scobro",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
-          "title": "New Hampshire Senate Republican Primary Winner?",
-          "outcome": "No",
-          "eventSlug": "ussep-nh-2026-09-01-rep",
-          "subject": {
-            "id": 0,
-            "name": "Scott Brown",
-            "subjectType": ""
-          },
-          "eventId": "50268"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-19T13:46:01.431612375Z",
-        "createTime": "2026-07-19T13:46:01.430167057Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T13:46:01.431612375Z"
-      },
-      {
-        "id": "BBD3AGEX675H",
-        "marketSlug": "enwc-ussep-nh-2026-09-01-rep-scobro",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.09",
+          "value": "0.25",
           "currency": "USD"
         },
         "quantity": 100,
@@ -65,56 +15,6 @@
         "leavesQuantity": 100,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_SHORT",
-        "marketMetadata": {
-          "slug": "enwc-ussep-nh-2026-09-01-rep-scobro",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
-          "title": "New Hampshire Senate Republican Primary Winner?",
-          "outcome": "No",
-          "eventSlug": "ussep-nh-2026-09-01-rep",
-          "subject": {
-            "id": 0,
-            "name": "Scott Brown",
-            "subjectType": ""
-          },
-          "eventId": "50268"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-19T13:26:38.641543269Z",
-        "createTime": "2026-07-19T13:26:38.639879701Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_SELL",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T13:26:38.641543269Z"
-      },
-      {
-        "id": "BBDDE7H8075J",
-        "marketSlug": "enwc-ussep-nh-2026-09-01-rep-scobro",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.5",
-          "currency": "USD"
-        },
-        "quantity": 30,
-        "cumQuantity": 0,
-        "leavesQuantity": 30,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
           "slug": "enwc-ussep-nh-2026-09-01-rep-scobro",
@@ -144,90 +44,41 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-19T13:45:55.211817590Z",
-        "createTime": "2026-07-19T13:45:55.210117439Z",
+        "insertTime": "2026-07-19T13:55:55.201245832Z",
+        "createTime": "2026-07-19T13:55:55.199524384Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T13:45:55.211817590Z"
+        "lastTransactTime": "2026-07-19T13:55:55.201245832Z"
       },
       {
-        "id": "BBD7JHSBP75M",
-        "marketSlug": "enwc-ussep-me-2026-07-27-dem-trojac",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.93",
-          "currency": "USD"
-        },
-        "quantity": 30,
-        "cumQuantity": 0,
-        "leavesQuantity": 30,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-ussep-me-2026-07-27-dem-trojac",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ussep-me-2026-07-27-dem-a35f2f6e74.png",
-          "title": "Next Maine Democratic Senate Nominee",
-          "outcome": "Yes",
-          "eventSlug": "ussep-me-2026-07-27-dem",
-          "subject": {
-            "id": 0,
-            "name": "Troy Jackson",
-            "subjectType": ""
-          },
-          "eventId": "47823"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-19T13:33:32.815166491Z",
-        "createTime": "2026-07-19T13:33:32.813903546Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T13:33:32.815166491Z"
-      },
-      {
-        "id": "BBDBSY61A75M",
-        "marketSlug": "cranc-uspres28-12-31-2026-jdvan",
+        "id": "BB3A0SDJG75M",
+        "marketSlug": "vmc-ussep-misen-2026-08-04-els15-20",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.15",
+          "value": "0.51",
           "currency": "USD"
         },
-        "quantity": 13.12,
+        "quantity": 100,
         "cumQuantity": 0,
-        "leavesQuantity": 13.12,
+        "leavesQuantity": 100,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_LONG",
+        "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "cranc-uspres28-12-31-2026-jdvan",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/uspres28-12-31-2026-9612b36f85.jpg",
-          "title": "Who Will Announce a Presidential Run in 2026?",
-          "outcome": "Yes",
-          "eventSlug": "uspres28-12-31-2026",
+          "slug": "vmc-ussep-misen-2026-08-04-els15-20",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
+          "title": "Michigan Senate Democratic Primary Margin of Victory?",
+          "outcome": "No",
+          "eventSlug": "ussep-misen-2026-08-04",
           "subject": {
             "id": 0,
-            "name": "J.D. Vance",
-            "subjectType": ""
+            "name": "El-Sayed 15-20",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/els20-f5bde389bb.jpg"
           },
-          "eventId": "44781"
+          "eventId": "53743"
         },
         "state": "ORDER_STATE_NEW",
         "commissionNotionalTotalCollected": {
@@ -244,12 +95,12 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-19T13:42:55.953511748Z",
-        "createTime": "2026-07-19T13:42:55.951264288Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_SELL",
+        "insertTime": "2026-07-19T02:01:44.317596998Z",
+        "createTime": "2026-07-19T02:01:44.316514859Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T13:42:55.953511748Z"
+        "lastTransactTime": "2026-07-19T02:01:44.317596998Z"
       },
       {
         "id": "BBC9R8JNE75H",
@@ -354,33 +205,32 @@
         "lastTransactTime": "2026-07-19T02:01:31.245238677Z"
       },
       {
-        "id": "BB3A0SDJG75M",
-        "marketSlug": "vmc-ussep-misen-2026-08-04-els15-20",
+        "id": "BBDBSY61A75M",
+        "marketSlug": "cranc-uspres28-12-31-2026-jdvan",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.51",
+          "value": "0.15",
           "currency": "USD"
         },
-        "quantity": 100,
+        "quantity": 13.12,
         "cumQuantity": 0,
-        "leavesQuantity": 100,
+        "leavesQuantity": 13.12,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
+        "intent": "ORDER_INTENT_SELL_LONG",
         "marketMetadata": {
-          "slug": "vmc-ussep-misen-2026-08-04-els15-20",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
-          "title": "Michigan Senate Democratic Primary Margin of Victory?",
-          "outcome": "No",
-          "eventSlug": "ussep-misen-2026-08-04",
+          "slug": "cranc-uspres28-12-31-2026-jdvan",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/uspres28-12-31-2026-9612b36f85.jpg",
+          "title": "Who Will Announce a Presidential Run in 2026?",
+          "outcome": "Yes",
+          "eventSlug": "uspres28-12-31-2026",
           "subject": {
             "id": 0,
-            "name": "El-Sayed 15-20",
-            "subjectType": "",
-            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/els20-f5bde389bb.jpg"
+            "name": "J.D. Vance",
+            "subjectType": ""
           },
-          "eventId": "53743"
+          "eventId": "44781"
         },
         "state": "ORDER_STATE_NEW",
         "commissionNotionalTotalCollected": {
@@ -397,12 +247,12 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-19T02:01:44.317596998Z",
-        "createTime": "2026-07-19T02:01:44.316514859Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
+        "insertTime": "2026-07-19T13:42:55.953511748Z",
+        "createTime": "2026-07-19T13:42:55.951264288Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_SELL",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T02:01:44.317596998Z"
+        "lastTransactTime": "2026-07-19T13:42:55.953511748Z"
       }
     ]
   },
@@ -422,14 +272,6 @@
       "start": "2026-07-13T00:00:00Z",
       "end": null,
       "event_n": 5
-    },
-    "enwc-ussep-me-2026-07-27-dem-trojac": {
-      "df": 0.3,
-      "target": 10000.0,
-      "pool": 250.0,
-      "start": "2026-07-13T00:00:00Z",
-      "end": null,
-      "event_n": 9
     },
     "enwc-ussep-nh-2026-09-01-rep-scobro": {
       "df": 0.3,
@@ -463,9 +305,9 @@
     "programs": 150,
     "pages": 0,
     "excluded": 0,
-    "not_politics": 44,
+    "not_politics": 43,
     "no_pool_or_df": 0,
-    "candidates": 106,
+    "candidates": 107,
     "book_failures": 0,
     "listed": 12
   }
