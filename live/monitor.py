@@ -334,8 +334,13 @@ async function refresh(){
     document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence;
     const err = document.getElementById('err');
     err.style.display = d.error ? 'block' : 'none'; err.textContent = d.error || '';
+    const allMarkets = {};
+    d.orders.forEach(o => { if(o.market) allMarkets[o.market] = 0; });
+    Object.entries(d.per_market_today).forEach(([m,v]) => { allMarkets[m] = v; });
     document.getElementById('markets').innerHTML =
-      Object.entries(d.per_market_today).map(([m,v],i) => {
+      Object.entries(allMarkets).sort((a,b) => b[1]-a[1]).map(([m,v],i) => {
+        const dead = d.orders.some(o => o.market === m) &&
+                     d.orders.filter(o => o.market === m).every(o => !o.est_day);
         const detail = d.orders.filter(o => o.market === m).map(o => {
           const est = o.est_day ? '$' + o.est_day.toFixed(2) + '/day' : '$0';
           const rows = (o.window || []).map(([px,qty,me,t,c]) =>
@@ -359,7 +364,8 @@ async function refresh(){
           return '<div class="ord" onclick="event.stopPropagation()"><div class="oh">'+o.side+' '+o.size.toLocaleString()+' @ '+
             (o.price*100).toFixed(1)+'¢ → '+est+'</div><table class="bk">'+rows+'</table>'+calc+sibs+rp+'</div>';
         }).join('');
-        return '<tr onclick="tgl('+i+')"><td class="mkt">'+m+'</td><td class="r">$'+v.toFixed(2)+'</td></tr>' +
+        return '<tr onclick="tgl('+i+')"><td class="mkt">'+m+'</td><td class="r">'+
+          (dead ? '⚠️ $0.00' : '$'+v.toFixed(2))+'</td></tr>' +
           '<tr id="d'+i+'" style="display:'+(OPEN[i]?'':'none')+'"><td colspan="2" ' +
           'style="background:#161b22">'+detail+'</td></tr>';
       }).join('') || '<tr><td>nothing yet today</td></tr>';
