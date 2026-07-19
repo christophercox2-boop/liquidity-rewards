@@ -2,34 +2,35 @@
   "orders": {
     "orders": [
       {
-        "id": "BBHXW8J4M75M",
-        "marketSlug": "cranc-uspres28-12-31-2026-dontru",
+        "id": "BBJK96FFA75N",
+        "marketSlug": "vmc-ussep-misen-2026-08-04-els15-20",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.45",
+          "value": "0.49",
           "currency": "USD"
         },
         "quantity": 100,
         "cumQuantity": 0,
         "leavesQuantity": 100,
-        "tif": "TIME_IN_FORCE_DAY",
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "cranc-uspres28-12-31-2026-dontru",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/uspres28-12-31-2026-9612b36f85.jpg",
-          "title": "Who Will Announce a Presidential Run in 2026?",
+          "slug": "vmc-ussep-misen-2026-08-04-els15-20",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
+          "title": "Michigan Senate Democratic Primary Margin of Victory?",
           "outcome": "No",
-          "eventSlug": "uspres28-12-31-2026",
+          "eventSlug": "ussep-misen-2026-08-04",
           "subject": {
             "id": 0,
-            "name": "Donald Trump",
-            "subjectType": ""
+            "name": "El-Sayed 15-20",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/els20-f5bde389bb.jpg"
           },
-          "eventId": "44781"
+          "eventId": "53743"
         },
-        "state": "ORDER_STATE_REPLACED",
+        "state": "ORDER_STATE_NEW",
         "commissionNotionalTotalCollected": {
           "value": "0.0000",
           "currency": "USD"
@@ -44,12 +45,114 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-19T19:19:58.466651615Z",
-        "createTime": "2026-07-19T18:59:14.424661804Z",
+        "insertTime": "2026-07-19T19:40:07.740477121Z",
+        "createTime": "2026-07-19T19:40:07.739629044Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T19:19:58.466651615Z"
+        "lastTransactTime": "2026-07-19T19:40:07.740477121Z"
+      },
+      {
+        "id": "BBJKS19WT75D",
+        "marketSlug": "vmc-ussep-misen-2026-08-04-stegte20",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.5",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 0,
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "vmc-ussep-misen-2026-08-04-stegte20",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
+          "title": "Michigan Senate Democratic Primary Margin of Victory?",
+          "outcome": "No",
+          "eventSlug": "ussep-misen-2026-08-04",
+          "subject": {
+            "id": 0,
+            "name": "Stevens 20+",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ste00-0235c22722.jpg"
+          },
+          "eventId": "53743"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-19T19:40:24.833079744Z",
+        "createTime": "2026-07-19T19:40:24.831495592Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-19T19:40:24.833079744Z"
+      },
+      {
+        "id": "BBJKS1D0T75D",
+        "marketSlug": "vmc-ussep-misen-2026-08-04-ste15-20",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.5",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 0,
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "vmc-ussep-misen-2026-08-04-ste15-20",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
+          "title": "Michigan Senate Democratic Primary Margin of Victory?",
+          "outcome": "No",
+          "eventSlug": "ussep-misen-2026-08-04",
+          "subject": {
+            "id": 0,
+            "name": "Stevens 15-20",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/ste00-0235c22722.jpg"
+          },
+          "eventId": "53743"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-19T19:40:38.287407529Z",
+        "createTime": "2026-07-19T19:40:38.286374870Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-19T19:40:38.287407529Z"
       },
       {
         "id": "BBC9R8JNE75H",
@@ -103,34 +206,35 @@
         "lastTransactTime": "2026-07-19T12:29:35.698648116Z"
       },
       {
-        "id": "BBDHNAXMM75P",
-        "marketSlug": "enwc-ussep-nh-2026-09-01-rep-scobro",
+        "id": "BBJK969CT75N",
+        "marketSlug": "vmc-ussep-misen-2026-08-04-elsgte20",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.22",
+          "value": "0.49",
           "currency": "USD"
         },
         "quantity": 100,
         "cumQuantity": 0,
         "leavesQuantity": 100,
-        "tif": "TIME_IN_FORCE_DAY",
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "enwc-ussep-nh-2026-09-01-rep-scobro",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
-          "title": "New Hampshire Senate Republican Primary Winner?",
+          "slug": "vmc-ussep-misen-2026-08-04-elsgte20",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
+          "title": "Michigan Senate Democratic Primary Margin of Victory?",
           "outcome": "No",
-          "eventSlug": "ussep-nh-2026-09-01-rep",
+          "eventSlug": "ussep-misen-2026-08-04",
           "subject": {
             "id": 0,
-            "name": "Scott Brown",
-            "subjectType": ""
+            "name": "El-Sayed 20+",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/els20-f5bde389bb.jpg"
           },
-          "eventId": "50268"
+          "eventId": "53743"
         },
-        "state": "ORDER_STATE_REPLACED",
+        "state": "ORDER_STATE_NEW",
         "commissionNotionalTotalCollected": {
           "value": "0.0000",
           "currency": "USD"
@@ -145,59 +249,16 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-19T19:26:54.561073480Z",
-        "createTime": "2026-07-19T13:55:55.199524384Z",
+        "insertTime": "2026-07-19T19:39:48.781012891Z",
+        "createTime": "2026-07-19T19:39:48.768492422Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T19:26:54.561073480Z"
+        "lastTransactTime": "2026-07-19T19:39:48.781012891Z"
       }
     ]
   },
   "programs": {
-    "cranc-uspres28-12-31-2026-dontru": {
-      "df": 0.3,
-      "target": 10000.0,
-      "pool": 250.0,
-      "start": "2026-07-13T00:00:00Z",
-      "end": null,
-      "event_n": 33,
-      "siblings": [
-        "cranc-uspres28-12-31-2026-aleoca",
-        "cranc-uspres28-12-31-2026-andyan",
-        "cranc-uspres28-12-31-2026-bersan",
-        "cranc-uspres28-12-31-2026-betoro",
-        "cranc-uspres28-12-31-2026-corboo",
-        "cranc-uspres28-12-31-2026-dontru",
-        "cranc-uspres28-12-31-2026-dontrujr",
-        "cranc-uspres28-12-31-2026-dwajoh",
-        "cranc-uspres28-12-31-2026-elomus",
-        "cranc-uspres28-12-31-2026-erikir",
-        "cranc-uspres28-12-31-2026-gavnew",
-        "cranc-uspres28-12-31-2026-hilcli",
-        "cranc-uspres28-12-31-2026-hunbid",
-        "cranc-uspres28-12-31-2026-jdvan",
-        "cranc-uspres28-12-31-2026-jonoss",
-        "cranc-uspres28-12-31-2026-jossha",
-        "cranc-uspres28-12-31-2026-kamhar",
-        "cranc-uspres28-12-31-2026-krinoe",
-        "cranc-uspres28-12-31-2026-margre",
-        "cranc-uspres28-12-31-2026-markel",
-        "cranc-uspres28-12-31-2026-marrub",
-        "cranc-uspres28-12-31-2026-micoba",
-        "cranc-uspres28-12-31-2026-nikhal",
-        "cranc-uspres28-12-31-2026-oprwin",
-        "cranc-uspres28-12-31-2026-petbut",
-        "cranc-uspres28-12-31-2026-rahema",
-        "cranc-uspres28-12-31-2026-robken",
-        "cranc-uspres28-12-31-2026-steban",
-        "cranc-uspres28-12-31-2026-stesmi",
-        "cranc-uspres28-12-31-2026-tedcru",
-        "cranc-uspres28-12-31-2026-tuccar",
-        "cranc-uspres28-12-31-2026-vivram",
-        "cranc-uspres28-12-31-2026-zohmam"
-      ]
-    },
     "enwc-usgubp-wi-2026-08-11-dem-manbar": {
       "df": 0.3,
       "target": 10000.0,
@@ -214,16 +275,84 @@
         "enwc-usgubp-wi-2026-08-11-dem-sarrod"
       ]
     },
-    "enwc-ussep-nh-2026-09-01-rep-scobro": {
+    "vmc-ussep-misen-2026-08-04-els15-20": {
       "df": 0.3,
       "target": 10000.0,
       "pool": 250.0,
       "start": "2026-07-13T00:00:00Z",
       "end": null,
-      "event_n": 2,
+      "event_n": 10,
       "siblings": [
-        "enwc-ussep-nh-2026-09-01-rep-johsun",
-        "enwc-ussep-nh-2026-09-01-rep-scobro"
+        "vmc-ussep-misen-2026-08-04-els0-5",
+        "vmc-ussep-misen-2026-08-04-els10-15",
+        "vmc-ussep-misen-2026-08-04-els15-20",
+        "vmc-ussep-misen-2026-08-04-els5-10",
+        "vmc-ussep-misen-2026-08-04-elsgte20",
+        "vmc-ussep-misen-2026-08-04-ste0-5",
+        "vmc-ussep-misen-2026-08-04-ste05-10",
+        "vmc-ussep-misen-2026-08-04-ste10-15",
+        "vmc-ussep-misen-2026-08-04-ste15-20",
+        "vmc-ussep-misen-2026-08-04-stegte20"
+      ]
+    },
+    "vmc-ussep-misen-2026-08-04-elsgte20": {
+      "df": 0.3,
+      "target": 10000.0,
+      "pool": 250.0,
+      "start": "2026-07-13T00:00:00Z",
+      "end": null,
+      "event_n": 10,
+      "siblings": [
+        "vmc-ussep-misen-2026-08-04-els0-5",
+        "vmc-ussep-misen-2026-08-04-els10-15",
+        "vmc-ussep-misen-2026-08-04-els15-20",
+        "vmc-ussep-misen-2026-08-04-els5-10",
+        "vmc-ussep-misen-2026-08-04-elsgte20",
+        "vmc-ussep-misen-2026-08-04-ste0-5",
+        "vmc-ussep-misen-2026-08-04-ste05-10",
+        "vmc-ussep-misen-2026-08-04-ste10-15",
+        "vmc-ussep-misen-2026-08-04-ste15-20",
+        "vmc-ussep-misen-2026-08-04-stegte20"
+      ]
+    },
+    "vmc-ussep-misen-2026-08-04-ste15-20": {
+      "df": 0.3,
+      "target": 10000.0,
+      "pool": 250.0,
+      "start": "2026-07-13T00:00:00Z",
+      "end": null,
+      "event_n": 10,
+      "siblings": [
+        "vmc-ussep-misen-2026-08-04-els0-5",
+        "vmc-ussep-misen-2026-08-04-els10-15",
+        "vmc-ussep-misen-2026-08-04-els15-20",
+        "vmc-ussep-misen-2026-08-04-els5-10",
+        "vmc-ussep-misen-2026-08-04-elsgte20",
+        "vmc-ussep-misen-2026-08-04-ste0-5",
+        "vmc-ussep-misen-2026-08-04-ste05-10",
+        "vmc-ussep-misen-2026-08-04-ste10-15",
+        "vmc-ussep-misen-2026-08-04-ste15-20",
+        "vmc-ussep-misen-2026-08-04-stegte20"
+      ]
+    },
+    "vmc-ussep-misen-2026-08-04-stegte20": {
+      "df": 0.3,
+      "target": 10000.0,
+      "pool": 250.0,
+      "start": "2026-07-13T00:00:00Z",
+      "end": null,
+      "event_n": 10,
+      "siblings": [
+        "vmc-ussep-misen-2026-08-04-els0-5",
+        "vmc-ussep-misen-2026-08-04-els10-15",
+        "vmc-ussep-misen-2026-08-04-els15-20",
+        "vmc-ussep-misen-2026-08-04-els5-10",
+        "vmc-ussep-misen-2026-08-04-elsgte20",
+        "vmc-ussep-misen-2026-08-04-ste0-5",
+        "vmc-ussep-misen-2026-08-04-ste05-10",
+        "vmc-ussep-misen-2026-08-04-ste10-15",
+        "vmc-ussep-misen-2026-08-04-ste15-20",
+        "vmc-ussep-misen-2026-08-04-stegte20"
       ]
     }
   },
@@ -234,9 +363,9 @@
     "programs": 150,
     "pages": 0,
     "excluded": 0,
-    "not_politics": 43,
+    "not_politics": 42,
     "no_pool_or_df": 0,
-    "candidates": 107,
+    "candidates": 108,
     "book_failures": 0,
     "listed": 12
   }
