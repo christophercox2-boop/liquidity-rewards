@@ -1,3 +1,5 @@
 market,side,price,size,ticks,share,est_day,pool,verdict
-enwc-usgubp-wi-2026-08-11-dem-manbar,SELL,0.06,98.0,0,0.22533915842718805,4.6945658005664175,250.0,"✅ scoring — ~22.5% of ask side (11,279 resting ≥ 10,000 ✓) ≈ $4.69/day (pool ÷ 6 markets)"
+cranc-uspres28-12-31-2026-jdvan,SELL,0.14,13.0,0,0.5870670704935462,2.223738903384645,250.0,"✅ scoring — ~58.7% of ask side (11,013 resting ≥ 10,000 ✓) ≈ $2.22/day (pool ÷ 33 markets)"
+enwc-usgubp-wi-2026-08-11-dem-manbar,SELL,0.06,98.0,0,0.22570244127126685,4.702134193151393,250.0,"✅ scoring — ~22.6% of ask side (11,279 resting ≥ 10,000 ✓) ≈ $4.70/day (pool ÷ 6 markets)"
+cranc-uspres28-12-31-2026-dontru,SELL,0.45,100.0,0,0.09192781827708883,0.34821143286776074,250.0,"✅ scoring — ~9.2% of ask side (12,917 resting ≥ 10,000 ✓) ≈ $0.35/day (pool ÷ 33 markets)"
 enwc-ussep-nh-2026-09-01-rep-scobro,SELL,0.25,100.0,3,,,250.0,❌ outside Target Size window (order 3 ticks from best; window ends 2)

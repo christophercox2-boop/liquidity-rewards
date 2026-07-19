@@ -2,6 +2,57 @@
   "orders": {
     "orders": [
       {
+        "id": "BBC9R8JNE75H",
+        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.06",
+          "currency": "USD"
+        },
+        "quantity": 98,
+        "cumQuantity": 0,
+        "leavesQuantity": 98,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_LONG",
+        "marketMetadata": {
+          "slug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
+          "title": "Wisconsin Governor Democratic Primary Winner",
+          "outcome": "Yes",
+          "eventSlug": "usgubp-wi-2026-08-11-dem",
+          "subject": {
+            "id": 0,
+            "name": "Mandela Barnes",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/south-carolina-governor-democratic-primary-winner-JcrLjxqeFLcJ.png"
+          },
+          "eventId": "50267"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-19T12:29:35.698648116Z",
+        "createTime": "2026-07-19T12:29:35.697493227Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-19T12:29:35.698648116Z"
+      },
+      {
         "id": "BBDHNAXMM75P",
         "marketSlug": "enwc-ussep-nh-2026-09-01-rep-scobro",
         "side": "ORDER_SIDE_SELL",
@@ -52,35 +103,34 @@
         "lastTransactTime": "2026-07-19T13:55:55.201245832Z"
       },
       {
-        "id": "BBC9R8JNE75H",
-        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
+        "id": "BBHXW8J4M75M",
+        "marketSlug": "cranc-uspres28-12-31-2026-dontru",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.06",
+          "value": "0.45",
           "currency": "USD"
         },
-        "quantity": 98,
+        "quantity": 100,
         "cumQuantity": 0,
-        "leavesQuantity": 98,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_DAY",
         "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_LONG",
+        "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
-          "title": "Wisconsin Governor Democratic Primary Winner",
-          "outcome": "Yes",
-          "eventSlug": "usgubp-wi-2026-08-11-dem",
+          "slug": "cranc-uspres28-12-31-2026-dontru",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/uspres28-12-31-2026-9612b36f85.jpg",
+          "title": "Who Will Announce a Presidential Run in 2026?",
+          "outcome": "No",
+          "eventSlug": "uspres28-12-31-2026",
           "subject": {
             "id": 0,
-            "name": "Mandela Barnes",
-            "subjectType": "",
-            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/south-carolina-governor-democratic-primary-winner-JcrLjxqeFLcJ.png"
+            "name": "Donald Trump",
+            "subjectType": ""
           },
-          "eventId": "50267"
+          "eventId": "44781"
         },
-        "state": "ORDER_STATE_NEW",
+        "state": "ORDER_STATE_REPLACED",
         "commissionNotionalTotalCollected": {
           "value": "0.0000",
           "currency": "USD"
@@ -95,16 +145,152 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-19T12:29:35.698648116Z",
-        "createTime": "2026-07-19T12:29:35.697493227Z",
+        "insertTime": "2026-07-19T19:19:58.466651615Z",
+        "createTime": "2026-07-19T18:59:14.424661804Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-19T19:19:58.466651615Z"
+      },
+      {
+        "id": "BBHXFMR1875H",
+        "marketSlug": "cranc-uspres28-12-31-2026-jdvan",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.14",
+          "currency": "USD"
+        },
+        "quantity": 13,
+        "cumQuantity": 0,
+        "leavesQuantity": 13,
+        "tif": "TIME_IN_FORCE_DAY",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_LONG",
+        "marketMetadata": {
+          "slug": "cranc-uspres28-12-31-2026-jdvan",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/uspres28-12-31-2026-9612b36f85.jpg",
+          "title": "Who Will Announce a Presidential Run in 2026?",
+          "outcome": "Yes",
+          "eventSlug": "uspres28-12-31-2026",
+          "subject": {
+            "id": 0,
+            "name": "J.D. Vance",
+            "subjectType": ""
+          },
+          "eventId": "44781"
+        },
+        "state": "ORDER_STATE_REPLACED",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-19T19:00:15.516046088Z",
+        "createTime": "2026-07-19T18:58:29.377032788Z",
         "outcomeSide": "OUTCOME_SIDE_YES",
         "action": "ORDER_ACTION_SELL",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-19T12:29:35.698648116Z"
+        "lastTransactTime": "2026-07-19T19:00:15.516046088Z"
       }
     ]
   },
   "programs": {
+    "cranc-uspres28-12-31-2026-dontru": {
+      "df": 0.3,
+      "target": 10000.0,
+      "pool": 250.0,
+      "start": "2026-07-13T00:00:00Z",
+      "end": null,
+      "event_n": 33,
+      "siblings": [
+        "cranc-uspres28-12-31-2026-aleoca",
+        "cranc-uspres28-12-31-2026-andyan",
+        "cranc-uspres28-12-31-2026-bersan",
+        "cranc-uspres28-12-31-2026-betoro",
+        "cranc-uspres28-12-31-2026-corboo",
+        "cranc-uspres28-12-31-2026-dontru",
+        "cranc-uspres28-12-31-2026-dontrujr",
+        "cranc-uspres28-12-31-2026-dwajoh",
+        "cranc-uspres28-12-31-2026-elomus",
+        "cranc-uspres28-12-31-2026-erikir",
+        "cranc-uspres28-12-31-2026-gavnew",
+        "cranc-uspres28-12-31-2026-hilcli",
+        "cranc-uspres28-12-31-2026-hunbid",
+        "cranc-uspres28-12-31-2026-jdvan",
+        "cranc-uspres28-12-31-2026-jonoss",
+        "cranc-uspres28-12-31-2026-jossha",
+        "cranc-uspres28-12-31-2026-kamhar",
+        "cranc-uspres28-12-31-2026-krinoe",
+        "cranc-uspres28-12-31-2026-margre",
+        "cranc-uspres28-12-31-2026-markel",
+        "cranc-uspres28-12-31-2026-marrub",
+        "cranc-uspres28-12-31-2026-micoba",
+        "cranc-uspres28-12-31-2026-nikhal",
+        "cranc-uspres28-12-31-2026-oprwin",
+        "cranc-uspres28-12-31-2026-petbut",
+        "cranc-uspres28-12-31-2026-rahema",
+        "cranc-uspres28-12-31-2026-robken",
+        "cranc-uspres28-12-31-2026-steban",
+        "cranc-uspres28-12-31-2026-stesmi",
+        "cranc-uspres28-12-31-2026-tedcru",
+        "cranc-uspres28-12-31-2026-tuccar",
+        "cranc-uspres28-12-31-2026-vivram",
+        "cranc-uspres28-12-31-2026-zohmam"
+      ]
+    },
+    "cranc-uspres28-12-31-2026-jdvan": {
+      "df": 0.3,
+      "target": 10000.0,
+      "pool": 250.0,
+      "start": "2026-07-13T00:00:00Z",
+      "end": null,
+      "event_n": 33,
+      "siblings": [
+        "cranc-uspres28-12-31-2026-aleoca",
+        "cranc-uspres28-12-31-2026-andyan",
+        "cranc-uspres28-12-31-2026-bersan",
+        "cranc-uspres28-12-31-2026-betoro",
+        "cranc-uspres28-12-31-2026-corboo",
+        "cranc-uspres28-12-31-2026-dontru",
+        "cranc-uspres28-12-31-2026-dontrujr",
+        "cranc-uspres28-12-31-2026-dwajoh",
+        "cranc-uspres28-12-31-2026-elomus",
+        "cranc-uspres28-12-31-2026-erikir",
+        "cranc-uspres28-12-31-2026-gavnew",
+        "cranc-uspres28-12-31-2026-hilcli",
+        "cranc-uspres28-12-31-2026-hunbid",
+        "cranc-uspres28-12-31-2026-jdvan",
+        "cranc-uspres28-12-31-2026-jonoss",
+        "cranc-uspres28-12-31-2026-jossha",
+        "cranc-uspres28-12-31-2026-kamhar",
+        "cranc-uspres28-12-31-2026-krinoe",
+        "cranc-uspres28-12-31-2026-margre",
+        "cranc-uspres28-12-31-2026-markel",
+        "cranc-uspres28-12-31-2026-marrub",
+        "cranc-uspres28-12-31-2026-micoba",
+        "cranc-uspres28-12-31-2026-nikhal",
+        "cranc-uspres28-12-31-2026-oprwin",
+        "cranc-uspres28-12-31-2026-petbut",
+        "cranc-uspres28-12-31-2026-rahema",
+        "cranc-uspres28-12-31-2026-robken",
+        "cranc-uspres28-12-31-2026-steban",
+        "cranc-uspres28-12-31-2026-stesmi",
+        "cranc-uspres28-12-31-2026-tedcru",
+        "cranc-uspres28-12-31-2026-tuccar",
+        "cranc-uspres28-12-31-2026-vivram",
+        "cranc-uspres28-12-31-2026-zohmam"
+      ]
+    },
     "enwc-usgubp-wi-2026-08-11-dem-manbar": {
       "df": 0.3,
       "target": 10000.0,
@@ -141,9 +327,9 @@
     "programs": 150,
     "pages": 0,
     "excluded": 0,
-    "not_politics": 42,
+    "not_politics": 44,
     "no_pool_or_df": 0,
-    "candidates": 108,
+    "candidates": 106,
     "book_failures": 0,
     "listed": 12
   }
