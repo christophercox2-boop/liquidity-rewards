@@ -323,7 +323,7 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div class="sub" id="rate"></div>
 <div class="sub" id="updated"></div>
 <div class="err" id="err"></div>
-<h3>By market today <span class="sub">(tap a row for the math)</span></h3><table id="markets"></table>
+<h3>By market <span class="sub">(sorted by current rate · tap a row for the math)</span></h3><table id="markets"></table>
 <h3>Previous days</h3><table id="history"></table>
 <div id="acts"></div>
 <script>
@@ -393,7 +393,10 @@ async function refresh(){
       try{ SERIES = (await (await fetch('series.json')).json()).series || {}; }catch(_){}
     }
     document.getElementById('markets').innerHTML =
-      Object.entries(allMarkets).sort((a,b) => b[1]-a[1]).map(([m,v],i) => {
+      Object.entries(allMarkets)
+        .sort((a,b) => (RATES[b[0]]||0) - (RATES[a[0]]||0) || b[1] - a[1])
+        .map(([m,v],i) => {
+        const rate = RATES[m] || 0;
         const dead = d.orders.some(o => o.market === m) &&
                      d.orders.filter(o => o.market === m).every(o => !o.est_day);
         const detail = d.orders.filter(o => o.market === m).map(o => {
@@ -420,8 +423,11 @@ async function refresh(){
             (o.price*100).toFixed(1)+'¢ → '+est+'</div><table class="bk">'+rows+'</table>'+calc+sibs+rp+'</div>';
         }).join('');
         const gcell = GOPEN[m] && SERIES ? spark(SERIES[m]) : '';
-        return '<tr id="r'+i+'" onclick="tgl('+i+',\\''+esc(m)+'\\')" style="'+tint(m, RATES[m]||0)+'">'+
-          '<td class="mkt">'+m+'</td><td class="r">'+(dead ? '⚠️ $0.00' : '$'+v.toFixed(2))+
+        const rateTxt = dead ? '<b style="color:#d29922">⚠️ $0.00/day</b>'
+                             : '<b>$'+rate.toFixed(2)+'/day</b>';
+        return '<tr id="r'+i+'" onclick="tgl('+i+',\\''+esc(m)+'\\')" style="'+tint(m, rate)+'">'+
+          '<td class="mkt">'+m+'</td><td class="r" style="white-space:nowrap">'+rateTxt+
+          '<br><span class="sub" style="font-size:11px">$'+v.toFixed(2)+' today</span>'+
           ' <button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
           'onclick="event.stopPropagation();tglGraph('+i+',\\''+esc(m)+'\\')">📈</button></td></tr>' +
           '<tr id="g'+i+'" style="display:'+(GOPEN[m]?'':'none')+'"><td colspan="2" style="background:#161b22">'+gcell+'</td></tr>' +
