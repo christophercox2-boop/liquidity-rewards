@@ -434,25 +434,31 @@ function spark(pts){
 function bigSpark(pts, dayEnd){
   if(!pts || pts.length < 3) return '<div class="mkt">collecting today’s earnings curve — one point per minute…</div>';
   const w = 360, h = 110, p = 10;
-  const t0 = pts[0][0], t1 = Math.max(dayEnd || 0, pts[pts.length-1][0]);
-  // least-squares trendline over today's cumulative points, projected to midnight
+  // Frame ONLY the data — x spans first..last sample, y spans the day's
+  // min..max — so the moves fill the chart instead of being squeezed by the
+  // midnight projection (which stays in the caption).
+  const t0 = pts[0][0], t1 = pts[pts.length-1][0];
+  const ys = pts.map(q=>q[1]);
+  const ymin = Math.min(...ys), ymax = Math.max(...ys);
+  const pad = Math.max((ymax - ymin) * 0.06, 0.005);
+  const y0 = ymin - pad, y1 = ymax + pad;
   let n = pts.length, sx = 0, sy = 0, sxx = 0, sxy = 0;
   pts.forEach(([x,y]) => { sx += x; sy += y; sxx += x*x; sxy += x*y; });
   const den = n*sxx - sx*sx;
   const slope = den ? (n*sxy - sx*sy)/den : 0, icept = (sy - slope*sx)/n;
-  const proj = Math.max(slope*t1 + icept, 0);
-  const ymax = Math.max(...pts.map(q=>q[1]), proj, 0.01);
+  const proj = Math.max(slope*(dayEnd || t1) + icept, 0);
   const X = t => p + (w-2*p)*(t-t0)/Math.max(t1-t0, 1);
-  const Y = y => h-p - (h-2*p)*y/ymax;
+  const Y = y => h-p - (h-2*p)*(y-y0)/Math.max(y1-y0, 1e-9);
   const curve = pts.map((q,i)=>(i?'L':'M')+X(q[0]).toFixed(1)+' '+Y(q[1]).toFixed(1)).join(' ');
-  const trend = 'M'+X(t0).toFixed(1)+' '+Y(Math.max(slope*t0+icept,0)).toFixed(1)+
-                ' L'+X(t1).toFixed(1)+' '+Y(proj).toFixed(1);
+  const trend = 'M'+X(t0).toFixed(1)+' '+Y(slope*t0+icept).toFixed(1)+
+                ' L'+X(t1).toFixed(1)+' '+Y(slope*t1+icept).toFixed(1);
   const now = pts[pts.length-1][1];
+  const hrs = ((t1-t0)/3600).toFixed(1);
   return '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;background:#010409;border-radius:8px">'+
     '<path d="'+trend+'" fill="none" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="5,4"/>'+
     '<path d="'+curve+'" fill="none" stroke="#58a6ff" stroke-width="2.5"/></svg>'+
-    '<div class="mkt">cumulative today: $'+now.toFixed(2)+' · trend pace ≈ <b style="color:#3fb950">$'+proj.toFixed(2)+
-    '</b> by midnight ET</div>';
+    '<div class="mkt">last '+hrs+'h: $'+ymin.toFixed(2)+' → $'+now.toFixed(2)+
+    ' · trend pace ≈ <b style="color:#3fb950">$'+proj.toFixed(2)+'</b> by midnight ET</div>';
 }
 function tint(m, cur){
   const seen = SEEN[m];
