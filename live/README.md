@@ -45,6 +45,20 @@ still works — the dashboard just notes "saves: local only".)
 (Railway.app works the same way — connect repo, add the three variables,
 ~$5/mo — if you prefer it.)
 
+### Phone notifications (optional, free — ntfy)
+
+1. Install the **ntfy** app (App Store / Play Store).
+2. In the app, tap **+ Subscribe to topic** and enter a long random name
+   nobody could guess, e.g. `wf-rewards-k93jx2rq8v`. (The topic name acts as
+   the password — anyone who knows it can read your alerts.)
+3. Add the same string as a `NTFY_TOPIC` environment variable on your
+   hosting app.
+
+You'll then get pushed: order stopped earning / big rate drops or jumps /
+order vanished from the book (filled or cancelled) / reprice failed
+verification / monitor down for 10+ minutes / a nightly "day closed,
+earned ≈ $X" summary. The dashboard footer shows "alerts: ntfy" when active.
+
 ## What you'll see
 
 - **Earned today** — integrated in real time, resetting at midnight Eastern

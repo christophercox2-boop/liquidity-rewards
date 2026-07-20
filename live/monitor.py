@@ -43,6 +43,24 @@ STATE_PATH = Path(os.environ.get("STATE_PATH", "state.json"))
 ET = ZoneInfo("America/New_York")
 MAX_GAP_SECONDS = 300  # an outage never extrapolates more than 5 minutes
 
+# Optional: phone notifications via ntfy (https://ntfy.sh). Install the ntfy
+# app, subscribe to a long random topic, set NTFY_TOPIC to the same string.
+NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "").strip()
+NTFY_SERVER = os.environ.get("NTFY_SERVER", "https://ntfy.sh").rstrip("/")
+
+
+def notify(title: str, message: str, priority: str = "default") -> None:
+    if not NTFY_TOPIC:
+        return
+    try:
+        requests.request(
+            "POST", f"{NTFY_SERVER}/{NTFY_TOPIC}", data=message.encode(),
+            headers={"Title": title, "Priority": priority}, timeout=10,
+        )
+    except Exception:  # noqa: BLE001 — alerts must never break the monitor
+        pass
+
+
 # Optional but recommended: persist the counter to the repo so redeploys
 # (which replace this container's disk) don't reset "earned today".
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
@@ -125,6 +143,42 @@ class Monitor:
         self.updated: dt.datetime | None = None
         self._last_remote_save = 0.0
         self.persistence = "github" if GITHUB_TOKEN else "local only — resets on redeploy"
+        self.alert_base: dict[str, float] = {}  # per-market rate at last alert
+        self.pending_alerts: list[tuple[str, str, str]] = []
+
+    def _check_alerts(self, rates_all: dict[str, float], old_day_earned: float | None) -> None:
+        """Queue phone alerts for meaningful transitions (called under lock)."""
+        if old_day_earned is not None:
+            self.pending_alerts.append(
+                ("Rewards day closed", f"Integrated estimate: ${old_day_earned:.2f}", "default"))
+        for mkt in list(self.alert_base):
+            if mkt not in rates_all:  # order left the book: filled or cancelled
+                self.pending_alerts.append(
+                    ("Order gone from book",
+                     f"{mkt}: no resting order any more (filled or cancelled?)", "high"))
+                del self.alert_base[mkt]
+        for mkt, r in rates_all.items():
+            base = self.alert_base.get(mkt)
+            if base is None:
+                self.alert_base[mkt] = r
+            elif base >= 0.5 and r < 0.01:
+                self.pending_alerts.append(
+                    ("Order stopped earning", f"{mkt}: was ${base:.2f}/day, now $0", "high"))
+                self.alert_base[mkt] = r
+            elif r < base * 0.5 and base - r > 1.0:
+                self.pending_alerts.append(
+                    ("Rate dropped", f"{mkt}: ${base:.2f} → ${r:.2f}/day", "default"))
+                self.alert_base[mkt] = r
+            elif r > base * 2 and r - base > 1.0:
+                self.pending_alerts.append(
+                    ("Rate jumped", f"{mkt}: ${base:.2f} → ${r:.2f}/day", "low"))
+                self.alert_base[mkt] = r
+
+    def drain_alerts(self) -> list[tuple[str, str, str]]:
+        with self.lock:
+            out = self.pending_alerts[:]
+            self.pending_alerts.clear()
+        return out
 
     def sample(self, now_utc: dt.datetime, orders: list[dict]) -> None:
         """Integrate earnings since the previous sample, then adopt the new rate."""
@@ -138,10 +192,12 @@ class Monitor:
                     for m, r in self.market_rates.items():
                         self.state["per_market"][m] = self.state["per_market"].get(m, 0.0) + r * frac
             # …then roll the day over at midnight ET.
+            old_day_earned = None
             if self.state["day"] != day:
                 if self.state["day"]:
+                    old_day_earned = round(self.state["earned"], 2)
                     self.state["history"] = (self.state["history"] + [
-                        {"day": self.state["day"], "earned": round(self.state["earned"], 2)}
+                        {"day": self.state["day"], "earned": old_day_earned}
                     ])[-30:]
                 self.state.update({"day": day, "earned": 0.0, "per_market": {}})
             self.rate = sum(o.get("est_day") or 0.0 for o in orders)
@@ -169,6 +225,7 @@ class Monitor:
                 mkt: [p for p in s if p[0] >= cutoff]
                 for mkt, s in series.items() if s and s[-1][0] >= cutoff
             }
+            self._check_alerts(rates_all, old_day_earned)
             self.last_ts = now_utc
             self.orders = orders
             self.updated = now_utc
@@ -213,6 +270,7 @@ class Monitor:
                 "error": self.error,
                 "poll_seconds": POLL_SECONDS,
                 "persistence": self.persistence,
+                "alerts": "ntfy" if NTFY_TOPIC else "off",
                 "actions": ACTIONS[-10:][::-1],
             }
 
@@ -281,6 +339,8 @@ def do_reprice(order_id: str, price_cents: float) -> tuple[int, dict]:
         verified, note = _verify_resting(o["market"], o["side"], value) if ok else (False, "")
         record["verified"] = verified
         record["note"] = note
+        if ok and not verified:
+            notify("Reprice NOT verified", f"{o['market']} → {price_cents}¢: {note}", "high")
         POLL_KICK.set()
         payload = {"ok": ok and verified, "status": r.status_code,
                    "detail": (note or record["response"])[:250]}
@@ -381,7 +441,7 @@ async function refresh(){
     document.getElementById('earned').textContent = '$' + d.earned_today.toFixed(2);
     document.getElementById('rate').textContent =
       'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + d.orders.length + ' orders';
-    document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence;
+    document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence + ' · alerts: ' + d.alerts;
     const err = document.getElementById('err');
     err.style.display = d.error ? 'block' : 'none'; err.textContent = d.error || '';
     const allMarkets = {};
@@ -515,6 +575,8 @@ class Handler(BaseHTTPRequestHandler):
 def poll_loop(key_id: str, secret_key: str) -> None:
     event_sizes: dict[str, int] = {}
     events_refreshed = 0.0
+    last_ok = time.time()
+    err_notified = 0.0
     while True:
         try:
             if time.time() - events_refreshed > 900:  # refresh proration map every 15 min
@@ -526,9 +588,15 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             orders = tr.fetch_live_orders(key_id, secret_key, event_sizes)
             MONITOR.sample(dt.datetime.now(dt.timezone.utc), orders)
             MONITOR.error = None
+            last_ok = time.time()
             MONITOR.maybe_save_remote()
         except Exception as e:  # noqa: BLE001 — shown on the dashboard, loop survives
             MONITOR.error = f"{type(e).__name__}: {e}"
+            if time.time() - last_ok > 600 and time.time() - err_notified > 3600:
+                notify("Live monitor failing", MONITOR.error, "high")
+                err_notified = time.time()
+        for title, msg, prio in MONITOR.drain_alerts():
+            notify(title, msg, prio)
         POLL_KICK.wait(POLL_SECONDS)  # a reprice wakes the loop immediately
         POLL_KICK.clear()
 
