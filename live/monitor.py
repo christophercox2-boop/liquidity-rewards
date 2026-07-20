@@ -199,7 +199,8 @@ class Monitor:
                     self.state["history"] = (self.state["history"] + [
                         {"day": self.state["day"], "earned": old_day_earned}
                     ])[-30:]
-                self.state.update({"day": day, "earned": 0.0, "per_market": {}})
+                self.state.update({"day": day, "earned": 0.0, "per_market": {},
+                                   "earned_series": []})
             self.rate = sum(o.get("est_day") or 0.0 for o in orders)
             self.market_rates = {}
             for o in orders:
@@ -225,6 +226,13 @@ class Monitor:
                 mkt: [p for p in s if p[0] >= cutoff]
                 for mkt, s in series.items() if s and s[-1][0] >= cutoff
             }
+            # Cumulative earned-today curve for the overall graph.
+            es = self.state.setdefault("earned_series", [])
+            if es and es[-1][0] == minute:
+                es[-1][1] = round(self.state["earned"], 4)
+            else:
+                es.append([minute, round(self.state["earned"], 4)])
+            del es[:-1500]
             self._check_alerts(rates_all, old_day_earned)
             self.last_ts = now_utc
             self.orders = orders
@@ -249,8 +257,17 @@ class Monitor:
 
     def snapshot(self) -> dict:
         with self.lock:
+            day_end = None
+            if self.state.get("day"):
+                try:
+                    d0 = dt.datetime.strptime(self.state["day"], "%Y-%m-%d").replace(tzinfo=ET)
+                    day_end = (d0 + dt.timedelta(days=1)).timestamp()
+                except Exception:  # noqa: BLE001
+                    pass
             return {
                 "day": self.state["day"],
+                "earned_series": self.state.get("earned_series", []),
+                "day_end": day_end,
                 "earned_today": round(self.state["earned"], 4),
                 "rate_per_day": round(self.rate, 2),
                 "per_market_today": {m: round(v, 4) for m, v in sorted(
@@ -383,6 +400,7 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div class="sub" id="rate"></div>
 <div class="sub" id="updated"></div>
 <div class="err" id="err"></div>
+<div id="ovg" style="margin:10px 0"></div>
 <h3>By market <span class="sub">(sorted by current rate · tap a row for the math)</span></h3><table id="markets"></table>
 <h3>Previous days</h3><table id="history"></table>
 <div id="acts"></div>
@@ -412,6 +430,29 @@ function spark(pts){
     '<path d="'+dpath+'" fill="none" stroke="#58a6ff" stroke-width="2"/></svg>'+
     '<div class="mkt">$/day over last '+hrs+'h · min $'+r0.toFixed(2)+' · max $'+r1.toFixed(2)+
     ' · now $'+rs[rs.length-1].toFixed(2)+'</div>';
+}
+function bigSpark(pts, dayEnd){
+  if(!pts || pts.length < 3) return '<div class="mkt">collecting today’s earnings curve — one point per minute…</div>';
+  const w = 360, h = 110, p = 10;
+  const t0 = pts[0][0], t1 = Math.max(dayEnd || 0, pts[pts.length-1][0]);
+  // least-squares trendline over today's cumulative points, projected to midnight
+  let n = pts.length, sx = 0, sy = 0, sxx = 0, sxy = 0;
+  pts.forEach(([x,y]) => { sx += x; sy += y; sxx += x*x; sxy += x*y; });
+  const den = n*sxx - sx*sx;
+  const slope = den ? (n*sxy - sx*sy)/den : 0, icept = (sy - slope*sx)/n;
+  const proj = Math.max(slope*t1 + icept, 0);
+  const ymax = Math.max(...pts.map(q=>q[1]), proj, 0.01);
+  const X = t => p + (w-2*p)*(t-t0)/Math.max(t1-t0, 1);
+  const Y = y => h-p - (h-2*p)*y/ymax;
+  const curve = pts.map((q,i)=>(i?'L':'M')+X(q[0]).toFixed(1)+' '+Y(q[1]).toFixed(1)).join(' ');
+  const trend = 'M'+X(t0).toFixed(1)+' '+Y(Math.max(slope*t0+icept,0)).toFixed(1)+
+                ' L'+X(t1).toFixed(1)+' '+Y(proj).toFixed(1);
+  const now = pts[pts.length-1][1];
+  return '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;background:#010409;border-radius:8px">'+
+    '<path d="'+trend+'" fill="none" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="5,4"/>'+
+    '<path d="'+curve+'" fill="none" stroke="#58a6ff" stroke-width="2.5"/></svg>'+
+    '<div class="mkt">cumulative today: $'+now.toFixed(2)+' · trend pace ≈ <b style="color:#3fb950">$'+proj.toFixed(2)+
+    '</b> by midnight ET</div>';
 }
 function tint(m, cur){
   const seen = SEEN[m];
@@ -444,6 +485,7 @@ async function refresh(){
     document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence + ' · alerts: ' + d.alerts;
     const err = document.getElementById('err');
     err.style.display = d.error ? 'block' : 'none'; err.textContent = d.error || '';
+    document.getElementById('ovg').innerHTML = bigSpark(d.earned_series, d.day_end);
     const allMarkets = {};
     d.orders.forEach(o => { if(o.market) allMarkets[o.market] = 0; });
     Object.entries(d.per_market_today).forEach(([m,v]) => { allMarkets[m] = v; });
