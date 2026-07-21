@@ -1,28 +1,28 @@
 market,side,price,size,ticks,share,est_day,pool,verdict
-enwc-usgubp-wi-2026-08-11-dem-kelroy,BUY,0.01,10000.0,0,0.2962524070508073,6.171925146891819,250.0,"✅ scoring — ~29.6% of bid side (33,755 resting ≥ 10,000 ✓) ≈ $6.17/day (pool ÷ 6 markets)"
-vmc-ussep-misen-2026-08-04-elsgte20,SELL,0.1,100.0,0,0.2851568099618986,3.564460124523733,250.0,"✅ scoring — ~28.5% of ask side (12,635 resting ≥ 10,000 ✓) ≈ $3.56/day (pool ÷ 10 markets)"
-vmc-ussep-misen-2026-08-04-els5-10,BUY,0.01,10000.0,2,0.27355955695509976,3.419494461938747,250.0,"✅ scoring — ~27.4% of bid side (35,817 resting ≥ 10,000 ✓) ≈ $3.42/day (pool ÷ 10 markets)"
-vmc-ussep-misen-2026-08-04-ste10-15,SELL,0.07,20.0,0,0.26313570459644103,3.289196307455513,250.0,"✅ scoring — ~26.3% of ask side (11,534 resting ≥ 10,000 ✓) ≈ $3.29/day (pool ÷ 10 markets)"
-enwc-usgubp-wi-2026-08-11-dem-joebre,BUY,0.01,10000.0,0,0.14509576320371445,3.022828400077384,250.0,"✅ scoring — ~14.5% of bid side (68,920 resting ≥ 10,000 ✓) ≈ $3.02/day (pool ÷ 6 markets)"
-vmc-ussep-misen-2026-08-04-ste10-15,BUY,0.01,9792.98,4,0.12037769274223067,1.5047211592778835,250.0,"✅ scoring — ~12.0% of bid side (30,237 resting ≥ 10,000 ✓) ≈ $1.50/day (pool ÷ 10 markets)"
-enwc-usgubp-wi-2026-08-11-dem-davcro,SELL,0.21,171.35,0,0.11119359691007046,2.316533268959801,250.0,"✅ scoring — ~11.1% of ask side (62,150 resting ≥ 10,000 ✓) ≈ $2.32/day (pool ÷ 6 markets)"
-enwc-usgubp-wi-2026-08-11-dem-davcro,BUY,0.01,10000.0,6,0.08204631846689306,1.7092983013936054,250.0,"✅ scoring — ~8.2% of bid side (30,391 resting ≥ 10,000 ✓) ≈ $1.71/day (pool ÷ 6 markets)"
-vmc-ussep-misen-2026-08-04-stegte20,SELL,0.15,20.0,0,0.07911947926979532,0.9889934908724415,250.0,"✅ scoring — ~7.9% of ask side (11,715 resting ≥ 10,000 ✓) ≈ $0.99/day (pool ÷ 10 markets)"
-enwc-usgubp-wi-2026-08-11-dem-davcro,BUY,0.05,50.0,2,0.05064587559684758,1.0551224082676578,250.0,"✅ scoring — ~5.1% of bid side (30,391 resting ≥ 10,000 ✓) ≈ $1.06/day (pool ÷ 6 markets)"
-enwc-usgubp-wi-2026-08-11-dem-manbar,BUY,0.08,30.0,0,0.028012459942182284,0.5835929154621309,250.0,"✅ scoring — ~2.8% of bid side (52,902 resting ≥ 10,000 ✓) ≈ $0.58/day (pool ÷ 6 markets)"
-enwc-usgubp-wi-2026-08-11-dem-manbar,BUY,0.08,30.0,0,0.028012459942182284,0.5835929154621309,250.0,"✅ scoring — ~2.8% of bid side (52,902 resting ≥ 10,000 ✓) ≈ $0.58/day (pool ÷ 6 markets)"
-ewc-usgub-wi-2026-11-03-rep,BUY,0.39,200.0,0,0.018754688672168042,1.1721680420105027,250.0,"✅ scoring — ~1.9% of bid side (135,330 resting ≥ 10,000 ✓) ≈ $1.17/day (pool ÷ 2 markets)"
-enwc-usgubp-ok-2026-06-16-rep-gendru,SELL,0.18,50.0,0,0.007540306709515716,0.4712691693447323,250.0,"✅ scoring — ~0.8% of ask side (95,805 resting ≥ 10,000 ✓) ≈ $0.47/day (pool ÷ 2 markets)"
-vmc-ussep-misen-2026-08-04-els15-20,BUY,0.01,10000.0,17,2.7685069638093833e-07,3.460633704761729e-06,250.0,"✅ scoring — ~0.0% of bid side (10,750 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
-vmc-ussep-misen-2026-08-04-els15-20,BUY,0.03,50.0,15,1.5380594243385465e-08,1.922574280423183e-07,250.0,"✅ scoring — ~0.0% of bid side (10,750 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
-vmc-ussep-misen-2026-08-04-els10-15,BUY,0.01,10000.0,21,6.104016205746643e-09,7.630020257183303e-08,250.0,"✅ scoring — ~0.0% of bid side (10,725 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
-vmc-ussep-misen-2026-08-04-stegte20,SELL,0.3,10.0,15,5.676390249653603e-10,7.095487812067003e-09,250.0,"✅ scoring — ~0.0% of ask side (11,715 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
-vmc-ussep-misen-2026-08-04-els15-20,SELL,0.35,10.0,16,5.96808609124264e-11,7.4601076140533e-10,250.0,"✅ scoring — ~0.0% of ask side (11,799 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
-vmc-ussep-misen-2026-08-04-ste05-10,BUY,0.01,10000.0,29,2.364401260647392e-13,2.95550157580924e-12,250.0,"✅ scoring — ~0.0% of bid side (10,210 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
-vmc-ussep-misen-2026-08-04-els0-5,BUY,0.01,10000.0,33,2.136422961540921e-15,2.6705287019261513e-14,250.0,"✅ scoring — ~0.0% of bid side (10,179 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
-enwc-ussep-nh-2026-09-01-rep-scobro,BUY,0.01,10000.0,6,,,250.0,❌ outside Target Size window (order 6 ticks from best; window ends 0)
+enwc-usgubp-wi-2026-08-11-dem-davcro,SELL,0.17,171.0,0,0.811802757565788,16.91255744928725,250.0,"✅ scoring — ~81.2% of ask side (40,533 resting ≥ 10,000 ✓) ≈ $16.91/day (pool ÷ 6 markets)"
+vmc-ussep-misen-2026-08-04-elsgte20,SELL,0.1,100.0,0,0.3147601323095025,3.9345016538687814,250.0,"✅ scoring — ~31.5% of ask side (12,619 resting ≥ 10,000 ✓) ≈ $3.93/day (pool ÷ 10 markets)"
+vmc-ussep-misen-2026-08-04-ste10-15,SELL,0.07,20.0,0,0.26306934506577795,3.2883668133222246,250.0,"✅ scoring — ~26.3% of ask side (11,540 resting ≥ 10,000 ✓) ≈ $3.29/day (pool ÷ 10 markets)"
+vmc-ussep-misen-2026-08-04-els5-10,BUY,0.01,10000.0,2,0.25105372828733935,3.1381716035917417,250.0,"✅ scoring — ~25.1% of bid side (39,024 resting ≥ 10,000 ✓) ≈ $3.14/day (pool ÷ 10 markets)"
+enwc-usgubp-wi-2026-08-11-dem-davcro,BUY,0.01,10000.0,4,0.24251497005988024,5.052395209580838,250.0,"✅ scoring — ~24.3% of bid side (30,091 resting ≥ 10,000 ✓) ≈ $5.05/day (pool ÷ 6 markets)"
+enwc-usgubp-wi-2026-08-11-dem-kelroy,BUY,0.01,10000.0,0,0.17954933117874136,3.7406110662237784,250.0,"✅ scoring — ~18.0% of bid side (55,695 resting ≥ 10,000 ✓) ≈ $3.74/day (pool ÷ 6 markets)"
+enwc-usgubp-wi-2026-08-11-dem-davcro,BUY,0.05,50.0,0,0.1497005988023952,3.1187624750498997,250.0,"✅ scoring — ~15.0% of bid side (30,091 resting ≥ 10,000 ✓) ≈ $3.12/day (pool ÷ 6 markets)"
+vmc-ussep-misen-2026-08-04-ste10-15,BUY,0.01,9792.98,4,0.14533526924761508,1.8166908655951886,250.0,"✅ scoring — ~14.5% of bid side (30,130 resting ≥ 10,000 ✓) ≈ $1.82/day (pool ÷ 10 markets)"
+enwc-usgubp-wi-2026-08-11-dem-joebre,BUY,0.01,10000.0,0,0.11906321065853862,2.480483555386221,250.0,"✅ scoring — ~11.9% of bid side (83,989 resting ≥ 10,000 ✓) ≈ $2.48/day (pool ÷ 6 markets)"
+vmc-ussep-misen-2026-08-04-stegte20,SELL,0.15,20.0,0,0.07599296680948597,0.9499120851185747,250.0,"✅ scoring — ~7.6% of ask side (11,731 resting ≥ 10,000 ✓) ≈ $0.95/day (pool ÷ 10 markets)"
+enwc-usgubp-wi-2026-08-11-dem-manbar,BUY,0.08,30.0,0,0.027628236875882964,0.5755882682475617,250.0,"✅ scoring — ~2.8% of bid side (52,966 resting ≥ 10,000 ✓) ≈ $0.58/day (pool ÷ 6 markets)"
+enwc-usgubp-wi-2026-08-11-dem-manbar,BUY,0.08,30.0,0,0.027628236875882964,0.5755882682475617,250.0,"✅ scoring — ~2.8% of bid side (52,966 resting ≥ 10,000 ✓) ≈ $0.58/day (pool ÷ 6 markets)"
+enwc-usgubp-ok-2026-06-16-rep-gendru,SELL,0.18,50.0,0,0.007491781515677302,0.4682363447298314,250.0,"✅ scoring — ~0.7% of ask side (95,198 resting ≥ 10,000 ✓) ≈ $0.47/day (pool ÷ 2 markets)"
+ewc-usgub-wi-2026-11-03-rep,BUY,0.39,200.0,0,0.006626334378085387,0.4141458986303367,250.0,"✅ scoring — ~0.7% of bid side (138,098 resting ≥ 10,000 ✓) ≈ $0.41/day (pool ÷ 2 markets)"
+enwc-ussep-nh-2026-09-01-rep-scobro,BUY,0.01,10000.0,6,0.0007926010080518155,0.049537563003238465,250.0,"✅ scoring — ~0.1% of bid side (29,708 resting ≥ 10,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
+enwc-ussep-nh-2026-09-08-dem-karman,BUY,0.01,7000.0,9,1.4890235749239989e-05,0.0009306397343274993,250.0,"✅ scoring — ~0.0% of bid side (27,007 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+vmc-ussep-misen-2026-08-04-els15-20,BUY,0.01,10000.0,17,3.955226052702556e-07,4.944032565878195e-06,250.0,"✅ scoring — ~0.0% of bid side (10,742 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
+vmc-ussep-misen-2026-08-04-els15-20,BUY,0.03,50.0,15,2.197347807056976e-08,2.74668475882122e-07,250.0,"✅ scoring — ~0.0% of bid side (10,742 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
+vmc-ussep-misen-2026-08-04-els10-15,BUY,0.01,10000.0,21,7.423166369721406e-09,9.278957962151758e-08,250.0,"✅ scoring — ~0.0% of bid side (10,726 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
+vmc-ussep-misen-2026-08-04-stegte20,SELL,0.3,10.0,15,5.452080067017003e-10,6.815100083771254e-09,250.0,"✅ scoring — ~0.0% of ask side (11,731 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
+vmc-ussep-misen-2026-08-04-els15-20,SELL,0.35,10.0,16,5.4625308320100126e-11,6.828163540012516e-10,250.0,"✅ scoring — ~0.0% of ask side (11,807 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
+vmc-ussep-misen-2026-08-04-ste05-10,BUY,0.01,10000.0,29,2.9807172741958124e-13,3.725896592744766e-12,250.0,"✅ scoring — ~0.0% of bid side (10,332 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
+vmc-ussep-misen-2026-08-04-els0-5,BUY,0.01,10000.0,33,3.064327151060024e-15,3.8304089388250296e-14,250.0,"✅ scoring — ~0.0% of bid side (10,182 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 10 markets)"
 enwc-usgubp-wi-2026-08-11-dem-manbar,BUY,0.01,10000.0,7,,,250.0,❌ outside Target Size window (order 7 ticks from best; window ends 4)
-enwc-ussep-nh-2026-09-08-dem-karman,BUY,0.01,7000.0,9,,,250.0,❌ outside Target Size window (order 9 ticks from best; window ends 0)
-enwc-usgubp-wi-2026-08-11-dem-frahon,BUY,0.01,10000.0,67,,,250.0,❌ outside Target Size window (order 67 ticks from best; window ends 2)
-enwc-usgubp-wi-2026-08-11-dem-joebre,SELL,0.99,10000.0,68,,,250.0,❌ outside Target Size window (order 68 ticks from best; window ends 2)
-enwc-usgubp-wi-2026-08-11-dem-davcro,SELL,0.99,10000.0,78,,,250.0,❌ outside Target Size window (order 78 ticks from best; window ends 3)
+enwc-usgubp-wi-2026-08-11-dem-frahon,BUY,0.01,10000.0,70,,,250.0,❌ outside Target Size window (order 70 ticks from best; window ends 5)
+enwc-usgubp-wi-2026-08-11-dem-davcro,SELL,0.99,10000.0,82,,,250.0,❌ outside Target Size window (order 82 ticks from best; window ends 7)
+enwc-usgubp-wi-2026-08-11-dem-joebre,SELL,0.99,10000.0,92,,,250.0,❌ outside Target Size window (order 92 ticks from best; window ends 2)
