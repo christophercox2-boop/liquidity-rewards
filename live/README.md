@@ -54,10 +54,17 @@ still works — the dashboard just notes "saves: local only".)
 3. Add the same string as a `NTFY_TOPIC` environment variable on your
    hosting app.
 
-You'll then get pushed: order stopped earning / big rate drops or jumps /
-order vanished from the book (filled or cancelled) / reprice failed
-verification / monitor down for 10+ minutes / a nightly "day closed,
-earned ≈ $X" summary. The dashboard footer shows "alerts: ntfy" when active.
+You'll then get pushed:
+
+- your overall earning rate dropping **10% below what the app last showed
+  you** — and again at every further 10% step — until you open the dashboard,
+  which resets the baseline to the current rate;
+- any market that was making **more than $1/day going to $0** (including its
+  order disappearing from the book);
+- plus two safety alerts: a reprice that failed verification, and the
+  monitor being unable to fetch data for 10+ minutes.
+
+The dashboard footer shows "alerts: ntfy" when active.
 
 ## What you'll see
 

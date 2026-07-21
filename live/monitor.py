@@ -143,36 +143,55 @@ class Monitor:
         self.updated: dt.datetime | None = None
         self._last_remote_save = 0.0
         self.persistence = "github" if GITHUB_TOKEN else "local only — resets on redeploy"
-        self.alert_base: dict[str, float] = {}  # per-market rate at last alert
+        self.alert_high: dict[str, float] = {}  # per-market peak rate since it last hit $0
+        self.seen_rate: float | None = self.state.get("alert_seen_rate")  # rate when app last opened
+        self.drop_steps: int = int(self.state.get("alert_drop_steps") or 0)
         self.pending_alerts: list[tuple[str, str, str]] = []
 
-    def _check_alerts(self, rates_all: dict[str, float], old_day_earned: float | None) -> None:
-        """Queue phone alerts for meaningful transitions (called under lock)."""
-        if old_day_earned is not None:
-            self.pending_alerts.append(
-                ("Rewards day closed", f"Integrated estimate: ${old_day_earned:.2f}", "default"))
-        for mkt in list(self.alert_base):
-            if mkt not in rates_all:  # order left the book: filled or cancelled
+    def _check_alerts(self, rates_all: dict[str, float]) -> None:
+        """Queue phone alerts (called under lock). Exactly two, by request:
+        1. Overall rate 10% below what the app last showed you — and again at
+           every further 10% step — until you open the dashboard, which
+           re-baselines to the current rate.
+        2. A market that was making > $1/day hitting $0 (including its order
+           leaving the book).
+        """
+        if self.seen_rate is None:
+            self.seen_rate = self.rate
+            self.state["alert_seen_rate"] = self.seen_rate
+        if self.seen_rate > 0:
+            steps = int((self.seen_rate - self.rate) / self.seen_rate / 0.10)
+            if steps > self.drop_steps:
                 self.pending_alerts.append(
-                    ("Order gone from book",
-                     f"{mkt}: no resting order any more (filled or cancelled?)", "high"))
-                del self.alert_base[mkt]
+                    (f"Earning rate down {steps * 10}%",
+                     f"${self.seen_rate:.2f}/day when you last checked → "
+                     f"${self.rate:.2f}/day now", "high"))
+                self.drop_steps = steps  # high-water mark: next alert at the next 10% step
+                self.state["alert_drop_steps"] = self.drop_steps
+        for mkt in list(self.alert_high):
+            if mkt not in rates_all:  # order left the book: earning went to $0
+                if self.alert_high[mkt] > 1.0:
+                    self.pending_alerts.append(
+                        ("Market stopped earning",
+                         f"{mkt}: was ${self.alert_high[mkt]:.2f}/day, "
+                         "order no longer resting", "high"))
+                del self.alert_high[mkt]
         for mkt, r in rates_all.items():
-            base = self.alert_base.get(mkt)
-            if base is None:
-                self.alert_base[mkt] = r
-            elif base >= 0.5 and r < 0.01:
+            high = max(self.alert_high.get(mkt, 0.0), r)
+            if r < 0.01 and high > 1.0:
                 self.pending_alerts.append(
-                    ("Order stopped earning", f"{mkt}: was ${base:.2f}/day, now $0", "high"))
-                self.alert_base[mkt] = r
-            elif r < base * 0.5 and base - r > 1.0:
-                self.pending_alerts.append(
-                    ("Rate dropped", f"{mkt}: ${base:.2f} → ${r:.2f}/day", "default"))
-                self.alert_base[mkt] = r
-            elif r > base * 2 and r - base > 1.0:
-                self.pending_alerts.append(
-                    ("Rate jumped", f"{mkt}: ${base:.2f} → ${r:.2f}/day", "low"))
-                self.alert_base[mkt] = r
+                    ("Market stopped earning",
+                     f"{mkt}: was ${high:.2f}/day, now $0", "high"))
+                high = 0.0  # re-arm only after it earns > $1/day again
+            self.alert_high[mkt] = high
+
+    def mark_opened(self) -> None:
+        """Dashboard viewed — re-baseline the overall rate-drop alert."""
+        with self.lock:
+            self.seen_rate = self.rate
+            self.drop_steps = 0
+            self.state["alert_seen_rate"] = self.seen_rate
+            self.state["alert_drop_steps"] = 0
 
     def drain_alerts(self) -> list[tuple[str, str, str]]:
         with self.lock:
@@ -240,7 +259,7 @@ class Monitor:
             else:
                 rs.append([minute, round(self.rate, 4)])
             del rs[:-1500]
-            self._check_alerts(rates_all, old_day_earned)
+            self._check_alerts(rates_all)
             self.last_ts = now_utc
             self.orders = orders
             self.updated = now_utc
@@ -586,6 +605,7 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             return
         if self.path.startswith("/data.json"):
+            MONITOR.mark_opened()  # you've seen the current rate: reset the drop alert baseline
             self._send(200, "application/json", json.dumps(MONITOR.snapshot()).encode())
         elif self.path.startswith("/series.json"):
             with MONITOR.lock:
