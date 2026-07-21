@@ -53,106 +53,6 @@
         "lastTransactTime": "2026-07-20T20:04:56.735196495Z"
       },
       {
-        "id": "BC7TBHRZC75R",
-        "marketSlug": "enwc-ussep-mi-2026-08-04-dem-abdels",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.75",
-          "currency": "USD"
-        },
-        "quantity": 20,
-        "cumQuantity": 0,
-        "leavesQuantity": 20,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-ussep-mi-2026-08-04-dem-abdels",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mich-dem-81b947cd7e.png",
-          "title": "Michigan Senate Democratic Primary Winner",
-          "outcome": "Yes",
-          "eventSlug": "ussep-mi-2026-08-04-dem",
-          "subject": {
-            "id": 0,
-            "name": "Abdul El-Sayed",
-            "subjectType": ""
-          },
-          "eventId": "15723"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-20T20:45:37.966892077Z",
-        "createTime": "2026-07-20T20:45:37.964446207Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-20T20:45:37.966892077Z"
-      },
-      {
-        "id": "BC7831H2A75H",
-        "marketSlug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.9",
-          "currency": "USD"
-        },
-        "quantity": 100,
-        "cumQuantity": 0,
-        "leavesQuantity": 100,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/hn-36333d31b8.png",
-          "title": "New Hampshire Senate Democratic Primary Winner?",
-          "outcome": "Yes",
-          "eventSlug": "ussep-nh-2026-09-08-dem",
-          "subject": {
-            "id": 0,
-            "name": "Chris Pappas",
-            "subjectType": ""
-          },
-          "eventId": "53736"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-20T20:06:50.147935567Z",
-        "createTime": "2026-07-20T20:06:50.146396133Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-20T20:06:50.147935567Z"
-      },
-      {
         "id": "BC7AFGFPP75J",
         "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-frahon",
         "side": "ORDER_SIDE_BUY",
@@ -204,18 +104,18 @@
         "lastTransactTime": "2026-07-20T20:10:41.109466349Z"
       },
       {
-        "id": "BC9SN178P75M",
+        "id": "BCB987Z9A75D",
         "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-frahon",
         "side": "ORDER_SIDE_BUY",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.5",
+          "value": "0.65",
           "currency": "USD"
         },
         "quantity": 10,
         "cumQuantity": 0,
         "leavesQuantity": 10,
-        "tif": "TIME_IN_FORCE_DAY",
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_LONG",
         "marketMetadata": {
@@ -232,7 +132,7 @@
           },
           "eventId": "50267"
         },
-        "state": "ORDER_STATE_REPLACED",
+        "state": "ORDER_STATE_NEW",
         "commissionNotionalTotalCollected": {
           "value": "0.0000",
           "currency": "USD"
@@ -247,12 +147,12 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-20T23:58:36.804341244Z",
-        "createTime": "2026-07-20T23:08:01.188064769Z",
+        "insertTime": "2026-07-21T00:40:50.570279599Z",
+        "createTime": "2026-07-21T00:40:50.568885888Z",
         "outcomeSide": "OUTCOME_SIDE_YES",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-20T23:58:36.804341244Z"
+        "lastTransactTime": "2026-07-21T00:40:50.570279599Z"
       },
       {
         "id": "BC84GZYHW75H",
@@ -260,7 +160,7 @@
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.09",
+          "value": "0.04",
           "currency": "USD"
         },
         "quantity": 100,
@@ -298,163 +198,12 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-21T00:03:26.876988700Z",
+        "insertTime": "2026-07-21T00:47:58.821071315Z",
         "createTime": "2026-07-20T21:07:14.063616537Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-21T00:03:26.876988700Z"
-      },
-      {
-        "id": "BC7A1XHBR75E",
-        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.01",
-          "currency": "USD"
-        },
-        "quantity": 10000,
-        "cumQuantity": 0,
-        "leavesQuantity": 10000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
-          "title": "Wisconsin Governor Democratic Primary Winner",
-          "outcome": "Yes",
-          "eventSlug": "usgubp-wi-2026-08-11-dem",
-          "subject": {
-            "id": 0,
-            "name": "Kelda Roys",
-            "subjectType": ""
-          },
-          "eventId": "50267"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-20T20:12:10.866511357Z",
-        "createTime": "2026-07-20T20:12:10.865056832Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-20T20:12:10.866511357Z"
-      },
-      {
-        "id": "BC7AFGZ1075J",
-        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.23",
-          "currency": "USD"
-        },
-        "quantity": 100,
-        "cumQuantity": 0,
-        "leavesQuantity": 100,
-        "tif": "TIME_IN_FORCE_DAY",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
-          "title": "Wisconsin Governor Democratic Primary Winner",
-          "outcome": "No",
-          "eventSlug": "usgubp-wi-2026-08-11-dem",
-          "subject": {
-            "id": 0,
-            "name": "Kelda Roys",
-            "subjectType": ""
-          },
-          "eventId": "50267"
-        },
-        "state": "ORDER_STATE_REPLACED",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-20T22:09:51.060867925Z",
-        "createTime": "2026-07-20T20:12:25.410503667Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-20T22:09:51.060867925Z"
-      },
-      {
-        "id": "BC9TAM02G75R",
-        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-joebre",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.01",
-          "currency": "USD"
-        },
-        "quantity": 10000,
-        "cumQuantity": 0,
-        "leavesQuantity": 10000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-usgubp-wi-2026-08-11-dem-joebre",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
-          "title": "Wisconsin Governor Democratic Primary Winner",
-          "outcome": "Yes",
-          "eventSlug": "usgubp-wi-2026-08-11-dem",
-          "subject": {
-            "id": 0,
-            "name": "Joel Brennan",
-            "subjectType": "",
-            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/south-carolina-governor-democratic-primary-winner-JcrLjxqeFLcJ.png"
-          },
-          "eventId": "50267"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-20T23:08:22.964171341Z",
-        "createTime": "2026-07-20T23:08:22.962699423Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-20T23:08:22.964171341Z"
+        "lastTransactTime": "2026-07-21T00:47:58.821071315Z"
       },
       {
         "id": "BC7D6HKHC75J",
@@ -761,56 +510,6 @@
         "lastTransactTime": "2026-07-20T23:06:09.240941078Z"
       },
       {
-        "id": "BC79PH5XW75N",
-        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-davcro",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.01",
-          "currency": "USD"
-        },
-        "quantity": 10000,
-        "cumQuantity": 0,
-        "leavesQuantity": 10000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "enwc-usgubp-wi-2026-08-11-dem-davcro",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
-          "title": "Wisconsin Governor Democratic Primary Winner",
-          "outcome": "Yes",
-          "eventSlug": "usgubp-wi-2026-08-11-dem",
-          "subject": {
-            "id": 0,
-            "name": "David Crowley",
-            "subjectType": ""
-          },
-          "eventId": "50267"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-20T20:11:38.602509959Z",
-        "createTime": "2026-07-20T20:11:38.601338340Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-20T20:11:38.602509959Z"
-      },
-      {
         "id": "BC9SYVYPA75N",
         "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-davcro",
         "side": "ORDER_SIDE_BUY",
@@ -909,6 +608,156 @@
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
         "lastTransactTime": "2026-07-20T20:14:07.202561189Z"
+      },
+      {
+        "id": "BCBVZ5XXT75E",
+        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-davcro",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.27",
+          "currency": "USD"
+        },
+        "quantity": 20,
+        "cumQuantity": 0,
+        "leavesQuantity": 20,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_LONG",
+        "marketMetadata": {
+          "slug": "enwc-usgubp-wi-2026-08-11-dem-davcro",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
+          "title": "Wisconsin Governor Democratic Primary Winner",
+          "outcome": "Yes",
+          "eventSlug": "usgubp-wi-2026-08-11-dem",
+          "subject": {
+            "id": 0,
+            "name": "David Crowley",
+            "subjectType": ""
+          },
+          "eventId": "50267"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-21T01:22:36.869896764Z",
+        "createTime": "2026-07-21T01:22:36.868853568Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-21T01:22:36.869896764Z"
+      },
+      {
+        "id": "BCB987TRR75D",
+        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-davcro",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.28",
+          "currency": "USD"
+        },
+        "quantity": 20,
+        "cumQuantity": 0,
+        "leavesQuantity": 20,
+        "tif": "TIME_IN_FORCE_DAY",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_LONG",
+        "marketMetadata": {
+          "slug": "enwc-usgubp-wi-2026-08-11-dem-davcro",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
+          "title": "Wisconsin Governor Democratic Primary Winner",
+          "outcome": "Yes",
+          "eventSlug": "usgubp-wi-2026-08-11-dem",
+          "subject": {
+            "id": 0,
+            "name": "David Crowley",
+            "subjectType": ""
+          },
+          "eventId": "50267"
+        },
+        "state": "ORDER_STATE_REPLACED",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-21T00:54:39.620383239Z",
+        "createTime": "2026-07-21T00:40:29.511219036Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-21T00:54:39.620383239Z"
+      },
+      {
+        "id": "BC79PH5XW75N",
+        "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-davcro",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.01",
+          "currency": "USD"
+        },
+        "quantity": 10000,
+        "cumQuantity": 0,
+        "leavesQuantity": 10000,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "enwc-usgubp-wi-2026-08-11-dem-davcro",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/wisconsin-governor-democratic-primary-winner-fNuGCJUY2lhq.png",
+          "title": "Wisconsin Governor Democratic Primary Winner",
+          "outcome": "Yes",
+          "eventSlug": "usgubp-wi-2026-08-11-dem",
+          "subject": {
+            "id": 0,
+            "name": "David Crowley",
+            "subjectType": ""
+          },
+          "eventId": "50267"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-20T20:11:38.602509959Z",
+        "createTime": "2026-07-20T20:11:38.601338340Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-20T20:11:38.602509959Z"
       },
       {
         "id": "BC7B9GQH475R",
@@ -1530,22 +1379,6 @@
         "enwc-usgubp-wi-2026-08-11-dem-sarrod"
       ]
     },
-    "enwc-usgubp-wi-2026-08-11-dem-kelroy": {
-      "df": 0.3,
-      "target": 10000.0,
-      "pool": 250.0,
-      "start": "2026-07-13T00:00:00Z",
-      "end": null,
-      "event_n": 6,
-      "siblings": [
-        "enwc-usgubp-wi-2026-08-11-dem-davcro",
-        "enwc-usgubp-wi-2026-08-11-dem-frahon",
-        "enwc-usgubp-wi-2026-08-11-dem-joebre",
-        "enwc-usgubp-wi-2026-08-11-dem-kelroy",
-        "enwc-usgubp-wi-2026-08-11-dem-manbar",
-        "enwc-usgubp-wi-2026-08-11-dem-sarrod"
-      ]
-    },
     "enwc-usgubp-wi-2026-08-11-dem-manbar": {
       "df": 0.3,
       "target": 10000.0,
@@ -1578,19 +1411,6 @@
         "enwc-usgubp-wi-2026-08-11-dem-sarrod"
       ]
     },
-    "enwc-ussep-mi-2026-08-04-dem-abdels": {
-      "df": 0.3,
-      "target": 10000.0,
-      "pool": 250.0,
-      "start": "2026-07-13T00:00:00Z",
-      "end": null,
-      "event_n": 3,
-      "siblings": [
-        "enwc-ussep-mi-2026-08-04-dem-abdels",
-        "enwc-ussep-mi-2026-08-04-dem-halste",
-        "enwc-ussep-mi-2026-08-04-dem-malmcm"
-      ]
-    },
     "enwc-ussep-nh-2026-09-01-rep-scobro": {
       "df": 0.3,
       "target": 10000.0,
@@ -1601,18 +1421,6 @@
       "siblings": [
         "enwc-ussep-nh-2026-09-01-rep-johsun",
         "enwc-ussep-nh-2026-09-01-rep-scobro"
-      ]
-    },
-    "enwc-ussep-nh-2026-09-08-dem-chrpap": {
-      "df": 0.3,
-      "target": 10000.0,
-      "pool": 250.0,
-      "start": "2026-07-13T00:00:00Z",
-      "end": null,
-      "event_n": 2,
-      "siblings": [
-        "enwc-ussep-nh-2026-09-08-dem-chrpap",
-        "enwc-ussep-nh-2026-09-08-dem-karman"
       ]
     },
     "enwc-ussep-nh-2026-09-08-dem-karman": {
@@ -1815,9 +1623,9 @@
     "programs": 150,
     "pages": 0,
     "excluded": 0,
-    "not_politics": 44,
+    "not_politics": 43,
     "no_pool_or_df": 0,
-    "candidates": 106,
+    "candidates": 107,
     "book_failures": 0,
     "listed": 12
   }
