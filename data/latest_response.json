@@ -1,6 +1,111 @@
 {
   "rewards": [
     {
+      "reward": 0.25,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-ok-2026-06-16-rep-gendru",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 25.6,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-davcro",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 4.48,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-frahon",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 5.39,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-joebre",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 5.57,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 5.24,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-manbar",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 8.38,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-me-2026-07-27-dem-dankle",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-me-2026-07-27-dem-jorwoo",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-me-2026-07-27-dem-nirsha",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-me-2026-07-27-dem-shebel",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 2.44,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-nh-2026-09-01-rep-scobro",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.06,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 4.48,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-nh-2026-09-08-dem-karman",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.33,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-wi-2026-11-03-rep",
+      "date": "2026-07-21",
+      "status": "PENDING"
+    },
+    {
       "reward": 2.61,
       "programType": "liquidityProgram",
       "marketSlug": "apdc-jerpowgov-2026-12-31",
