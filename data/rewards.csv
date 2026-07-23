@@ -200,3 +200,13 @@ date,market,program_type,reward_usd,status
 2026-07-21,enwc-ussep-nh-2026-09-08-dem-chrpap,liquidityProgram,0.06,PENDING
 2026-07-21,enwc-ussep-nh-2026-09-08-dem-karman,liquidityProgram,4.48,PENDING
 2026-07-21,ewc-usgub-wi-2026-11-03-rep,liquidityProgram,0.33,PENDING
+2026-07-21,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,3.14,PENDING
+2026-07-21,vmc-ussep-misen-2026-08-04-els10-15,liquidityProgram,2.25,PENDING
+2026-07-21,vmc-ussep-misen-2026-08-04-els15-20,liquidityProgram,0.24,PENDING
+2026-07-21,vmc-ussep-misen-2026-08-04-els5-10,liquidityProgram,3.06,PENDING
+2026-07-21,vmc-ussep-misen-2026-08-04-elsgte20,liquidityProgram,5.26,PENDING
+2026-07-21,vmc-ussep-misen-2026-08-04-ste0-5,liquidityProgram,2.9,PENDING
+2026-07-21,vmc-ussep-misen-2026-08-04-ste05-10,liquidityProgram,3.35,PENDING
+2026-07-21,vmc-ussep-misen-2026-08-04-ste10-15,liquidityProgram,5.19,PENDING
+2026-07-21,vmc-ussep-misen-2026-08-04-ste15-20,liquidityProgram,0.19,PENDING
+2026-07-21,vmc-ussep-misen-2026-08-04-stegte20,liquidityProgram,3.57,PENDING
