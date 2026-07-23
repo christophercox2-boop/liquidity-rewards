@@ -5,5 +5,4 @@ the tracker run immediately and refresh STATUS.md with your current orders.
 poke #1
 poke
 nn
-pol
-m
+polh
