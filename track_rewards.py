@@ -287,12 +287,6 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         order["siblings"] = prog.get("siblings") or []
         if n > 1:
             verdict += f" (pool ÷ {n} markets)"
-        if prog.get("end"):  # worth knowing when a program stops paying
-            try:
-                ed = dt.datetime.fromisoformat(str(prog["end"]).replace("Z", "+00:00"))
-                verdict += f" (program ends {ed.astimezone(ET).strftime('%b %d')})"
-            except Exception:  # noqa: BLE001
-                pass
         side_pool = _daily_pool(prog) / 2
         calc.append(
             f"${prog['pool']:,.0f} ÷ {n} ÷ 2 = {_usd(side_pool)} × {share * 100:.1f}% "
@@ -302,12 +296,19 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
 
 
 def _daily_pool(prog: dict) -> float:
-    """Daily reward pool for one market. Pools pay out daily (midnight to
-    midnight ET, per the docs) — a program's start/end is its active window,
-    NOT a period the pool is spread over — so the pool amount is $/day,
+    """Reward pool normalized to $/day using the time period's start/end,
     prorated across the open markets of the event it covers (the pool is per
-    event, not per candidate market)."""
-    return (prog.get("pool") or 0.0) / max(prog.get("event_n") or 1, 1)
+    event, not per candidate market). Missing/sub-day periods count as one day."""
+    days = 1.0
+    try:
+        s, e = prog.get("start"), prog.get("end")
+        if s and e:
+            sd = dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+            ed = dt.datetime.fromisoformat(str(e).replace("Z", "+00:00"))
+            days = max((ed - sd).total_seconds() / 86400.0, 1.0)
+    except Exception:  # noqa: BLE001 — fall back to daily
+        pass
+    return (prog.get("pool") or 0.0) / days / max(prog.get("event_n") or 1, 1)
 
 
 EVENT_DEBUG: dict[str, str] = {}  # per-slug event lookup outcomes, for live_raw.json
