@@ -285,46 +285,29 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         n = prog.get("event_n") or 1
         order["event_n"] = n
         order["siblings"] = prog.get("siblings") or []
-        days = _pool_days(prog)
-        notes = []
-        if days > 1.001:
-            notes.append(f"${prog['pool']:,.0f} pool covers {_days_txt(days)} days")
         if n > 1:
-            notes.append(f"pool ÷ {n} markets")
-        if notes:
-            verdict += " (" + ", ".join(notes) + ")"
+            verdict += f" (pool ÷ {n} markets)"
+        if prog.get("end"):  # worth knowing when a program stops paying
+            try:
+                ed = dt.datetime.fromisoformat(str(prog["end"]).replace("Z", "+00:00"))
+                verdict += f" (program ends {ed.astimezone(ET).strftime('%b %d')})"
+            except Exception:  # noqa: BLE001
+                pass
         side_pool = _daily_pool(prog) / 2
-        days_term = f" ÷ {_days_txt(days)} days" if days > 1.001 else ""
         calc.append(
-            f"${prog['pool']:,.0f}{days_term} ÷ {n} ÷ 2 = {_usd(side_pool)} × {share * 100:.1f}% "
+            f"${prog['pool']:,.0f} ÷ {n} ÷ 2 = {_usd(side_pool)} × {share * 100:.1f}% "
             f"= {_usd(order['est_day'])}/day"
         )
     order["verdict"] = verdict
 
 
-def _pool_days(prog: dict) -> float:
-    """Length of the program's reward period in days — the pool covers the
-    whole period, not each day. Open-ended or sub-day periods count as one day."""
-    try:
-        s, e = prog.get("start"), prog.get("end")
-        if s and e:
-            sd = dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
-            ed = dt.datetime.fromisoformat(str(e).replace("Z", "+00:00"))
-            return max((ed - sd).total_seconds() / 86400.0, 1.0)
-    except Exception:  # noqa: BLE001 — fall back to daily
-        pass
-    return 1.0
-
-
-def _days_txt(days: float) -> str:
-    return f"{days:.1f}".rstrip("0").rstrip(".")
-
-
 def _daily_pool(prog: dict) -> float:
-    """Reward pool normalized to $/day using the time period's start/end,
+    """Daily reward pool for one market. Pools pay out daily (midnight to
+    midnight ET, per the docs) — a program's start/end is its active window,
+    NOT a period the pool is spread over — so the pool amount is $/day,
     prorated across the open markets of the event it covers (the pool is per
     event, not per candidate market)."""
-    return (prog.get("pool") or 0.0) / _pool_days(prog) / max(prog.get("event_n") or 1, 1)
+    return (prog.get("pool") or 0.0) / max(prog.get("event_n") or 1, 1)
 
 
 EVENT_DEBUG: dict[str, str] = {}  # per-slug event lookup outcomes, for live_raw.json
@@ -1087,10 +1070,7 @@ def write_status(
                 entry = f"{c['side']} — needs +{c['gap']:,.0f} contracts to unlock the pool"
                 share = est = "—"
             n = c.get("event_n") or 1
-            days = _pool_days(c)
             pool_cell = f"{_usd(c['pool'])} ÷ {n}" if n > 1 else _usd(c["pool"])
-            if days > 1.001:
-                pool_cell += f" over {_days_txt(days)}d"
             lines.append(
                 f"| `{c['market']}` | {pool_cell} | {c['df']:.2f} | {c['target']:,.0f} "
                 f"| {entry} | {share} | {est} |"
