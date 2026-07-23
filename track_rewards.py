@@ -661,11 +661,14 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
             }
         )
 
-    slugs = sorted({o["market"] for o in orders if o["market"]})[:25]
+    slugs = sorted({o["market"] for o in orders if o["market"]})
+    debug: dict[str, str] = {}
+    if len(slugs) > 100:  # safety bound — never truncate silently
+        debug["_slug_cap"] = f"{len(slugs)} markets with orders; scoring the first 100"
+        slugs = slugs[:100]
 
     # Full order books (public) — needed for ticks-from-best and the window walk.
     books: dict[str, dict] = {}
-    debug: dict[str, str] = {}
     for slug in slugs:
         try:
             books[slug] = _fetch_book(slug)
