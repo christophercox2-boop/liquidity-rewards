@@ -656,6 +656,7 @@ def poll_loop(key_id: str, secret_key: str) -> None:
     events_refreshed = 0.0
     last_ok = time.time()
     err_notified = 0.0
+    err_streak = 0
     while True:
         try:
             if time.time() - events_refreshed > 900:  # refresh proration map every 15 min
@@ -667,16 +668,21 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             orders = tr.fetch_live_orders(key_id, secret_key, event_sizes)
             MONITOR.sample(dt.datetime.now(dt.timezone.utc), orders)
             MONITOR.error = None
+            err_streak = 0
             last_ok = time.time()
             MONITOR.maybe_save_remote()
         except Exception as e:  # noqa: BLE001 — shown on the dashboard, loop survives
             MONITOR.error = f"{type(e).__name__}: {e}"
+            err_streak += 1
             if time.time() - last_ok > 600 and time.time() - err_notified > 3600:
                 notify("Live monitor failing", MONITOR.error, "high")
                 err_notified = time.time()
         for title, msg, prio in MONITOR.drain_alerts():
             notify(title, msg, prio)
-        POLL_KICK.wait(POLL_SECONDS)  # a reprice wakes the loop immediately
+        # Back off while failing — retrying a rate limiter every poll keeps
+        # the block alive. 30s -> 1m -> 2m ... capped at 10 minutes.
+        wait = POLL_SECONDS if not err_streak else min(POLL_SECONDS * 2 ** err_streak, 600)
+        POLL_KICK.wait(wait)  # a reprice wakes the loop immediately
         POLL_KICK.clear()
 
 

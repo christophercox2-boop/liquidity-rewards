@@ -468,7 +468,7 @@ def _fetch_book(slug: str) -> dict:
     """Fetch a market's order book: sorted (price, qty) levels + tick size."""
     r = requests.get(f"{GATEWAY}/v1/markets/{slug}/book", timeout=15)
     if r.status_code >= 400:
-        raise RuntimeError(f"book HTTP {r.status_code}: {' '.join(r.text.split())[:150]}")
+        raise RuntimeError(f"book {_http_err(r)}")
     b = r.json()
     md = b.get("book") or b.get("marketData") or b  # tolerate wrappers
     bids = [(_num(l.get("px")), _num(l.get("qty"))) for l in md.get("bids") or []]
@@ -634,6 +634,21 @@ PROG_TTL_SECONDS = 300  # reuse fetched program params this long between polls
 _PROG_CACHE: dict = {"ts": 0.0, "progs": {}, "slugs": (), "fails": 0, "retry_at": 0.0}
 LAST_DEBUG: dict[str, str] = {}  # diagnostics from the most recent fetch, for the dashboard
 
+# The live monitor calls fetch_live_orders every poll; refreshing every book
+# every time tripped the exchange's per-IP rate limit once the portfolio grew.
+# Refresh a rotating subset per call instead — a fresh process (the hourly
+# tracker) still fetches everything on its first call.
+BOOK_REFRESH_PER_CALL = 15
+_BOOK_CACHE: dict[str, tuple[float, dict]] = {}  # slug -> (fetched_at, book)
+
+
+def _http_err(resp) -> str:
+    """Readable one-line HTTP error — never a raw Cloudflare HTML page."""
+    body = " ".join(resp.text.split())
+    if body.lstrip().lower().startswith(("<!doctype", "<html")):
+        body = "rate limited" if resp.status_code == 429 else "HTML error page"
+    return f"HTTP {resp.status_code}: {body[:150]}"
+
 
 def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] | None = None) -> list[dict]:
     """Snapshot of resting orders scored with the official reward formula.
@@ -648,7 +663,7 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
         timeout=30,
     )
     if resp.status_code >= 400:
-        raise RuntimeError(f"{path} -> HTTP {resp.status_code}: {' '.join(resp.text.split())[:200]}")
+        raise RuntimeError(f"{path} -> {_http_err(resp)}")
     payload = resp.json()
     orders: list[dict] = []
     for o in payload.get("orders") or []:
@@ -673,12 +688,24 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
         slugs = slugs[:100]
 
     # Full order books (public) — needed for ticks-from-best and the window walk.
+    # Rotate refreshes through the cache, oldest first; a cold cache (fresh
+    # process, e.g. the hourly tracker) fetches everything.
     books: dict[str, dict] = {}
+    now_books = time.time()
+    for gone in set(_BOOK_CACHE) - set(slugs):
+        del _BOOK_CACHE[gone]
+    oldest_first = sorted(slugs, key=lambda s: _BOOK_CACHE.get(s, (0.0,))[0])
+    to_fetch = set(oldest_first) if not _BOOK_CACHE else set(oldest_first[:BOOK_REFRESH_PER_CALL])
     for slug in slugs:
-        try:
-            books[slug] = _fetch_book(slug)
-        except Exception as e:  # noqa: BLE001 — a market without a book still gets listed
-            debug[slug] = f"book {type(e).__name__}: {e}"
+        if slug in to_fetch:
+            try:
+                books[slug] = _fetch_book(slug)
+                _BOOK_CACHE[slug] = (now_books, books[slug])
+                continue
+            except Exception as e:  # noqa: BLE001 — a market without a book still gets listed
+                debug[slug] = f"book {type(e).__name__}: {e}"
+        if slug in _BOOK_CACHE:  # not refreshed this call (or refresh failed): use last known
+            books[slug] = _BOOK_CACHE[slug][1]
 
     # Program parameters: Discount Factor, Target Size, reward pool.
     # Cached between calls: the params change ~daily, while the live monitor
@@ -710,8 +737,7 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                         headers=headers, timeout=20,
                     )
                     if r.status_code >= 400:
-                        debug[f"_incentives {host.split('//')[-1]}"] = \
-                            f"HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
+                        debug[f"_incentives {host.split('//')[-1]}"] = _http_err(r)
                         continue
                     fetched = {}
                     for p in r.json().get("programs") or []:
