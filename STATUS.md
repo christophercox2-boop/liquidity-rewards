@@ -2,16 +2,9 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ❌ Last check FAILED — 2026-07-24 2:42 AM ET
+## ✅ Last successful check: 2026-07-24 5:38 AM ET
 
-```
-RuntimeError: https://api.prod.polymarketexchange.com/v1/incentives/earnings -> HTTP 401: {"message":"Unauthorized"}
-https://api.polymarket.us/v1/incentives/earnings -> HTTP 500: {"code":2, "message":"The server was unable to process your request.", "details":[]}
-probe https://api.prod.polymarketexchange.com/v1/incentives (no auth) -> HTTP 503
-probe https://api.polymarket.us/v1/incentives (no auth) -> HTTP 401
-```
-
-The data below is from the last successful run. See the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml) for logs.
+This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
 ## 📌 Summary
 
@@ -19,10 +12,15 @@ The data below is from the last successful run. See the [Actions tab](https://gi
 
 **Earned:** $606.98 lifetime ($155.84 paid). Last three recorded days — 2026-07-23: **$133.19** · 2026-07-22: **$82.95** · 2026-07-21: **$91.44** _(Polymarket reports ~1–2 days behind)_
 
+**What else to join:** `paccc-usse-midterms-2026-11-03-dem` — BUY at the best price, ~$13.08/day for 200 contracts. Runners-up: `enwc-usgubp-ok-2026-06-16-rep-gendru` (~$6.67/day), `paccc-usse-midterms-2026-11-03-rep` (~$6.51/day)
 
 ---
 
 # The details (how the numbers above are computed)
+
+## 📍 Right now — your resting orders
+
+_No resting orders on the book right now._
 
 ## 📊 Estimate vs. actual — where the gap is
 
@@ -35,6 +33,25 @@ Time-averaged estimate for each day (across that day's hourly snapshots) vs. wha
 | 2026-07-21 | ~$87.94 | $91.44 | 104% |
 
 Biggest gaps on 2026-07-23: `scc-hrep-rep-2026-11-03-gte210` (est ~$2.21 → got $0.00), `scc-senate-gop-2026-11-03-55` (est ~$2.14 → got $0.00), `opdc-trump-resig-2027-12-31` (est ~$2.12 → got $0.00)
+
+## 💡 Suggested U.S. political markets — active pools you're not in
+
+U.S. politics only. Ranked by what a **200-contract order at the best price** would earn today, using each market's real book, Discount Factor, and Target Size (same assumptions as the earning rate above).
+
+| Market | Reward pool | Discount | Target Size | Best entry | Est. share | Est. $/day |
+|---|---:|---:|---:|---|---:|---:|
+| `paccc-usse-midterms-2026-11-03-dem` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (415,447 resting) | ~34.9% | ~$13.08 |
+| `enwc-usgubp-ok-2026-06-16-rep-gendru` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (27,056 resting) | ~17.8% | ~$6.67 |
+| `paccc-usse-midterms-2026-11-03-rep` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (467,304 resting) | ~17.4% | ~$6.51 |
+| `enwc-ussep-mn-2026-08-11-dem-pegfla` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (30,290 resting) | ~17.0% | ~$6.37 |
+| `paccc-usho-midterms-2026-11-03-rep` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (299,338 resting) | ~14.4% | ~$5.42 |
+| `ewc-usgub-ks-2026-11-03-rep` | $150.00 ÷ 2 | 0.50 | 2,000 | SELL side (52,928 resting) | ~13.6% | ~$5.10 |
+| `ewc-usse-ne-2026-11-03-danosb` | $150.00 ÷ 3 | 0.50 | 2,000 | BUY side (91,711 resting) | ~13.5% | ~$3.38 |
+| `paccc-usho-midterms-2026-11-03-dem` | $150.00 ÷ 2 | 0.50 | 2,000 | SELL side (268,277 resting) | ~8.2% | ~$3.06 |
+| `enwc-usgubp-sd-2026-06-02-rep-tobdoe` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (52,789 resting) | ~5.9% | ~$2.22 |
+| `ewc-usse-ak-2026-11-03-dem` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (86,147 resting) | ~5.8% | ~$2.19 |
+| `ewc-usgub-mi-2026-11-03-rep` | $150.00 ÷ 3 | 0.50 | 2,000 | BUY side (91,755 resting) | ~6.5% | ~$1.61 |
+| `enwc-usgubp-sd-2026-06-02-rep-larrho` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (59,985 resting) | ~4.0% | ~$1.50 |
 
 ## Totals
 
@@ -96,6 +113,7 @@ Biggest gaps on 2026-07-23: `scc-hrep-rep-2026-11-03-gte210` (est ~$2.21 → got
 
 | Checked (ET) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-07-24 5:38 AM ET | ✅ ok | 257 | $606.98 |
 | 2026-07-24 2:42 AM ET | ❌ error | 257 | $606.98 |
 | 2026-07-23 11:48 PM ET | ✅ ok | 257 | $606.98 |
 | 2026-07-23 9:18 PM ET | ✅ ok | 257 | $606.98 |
@@ -105,6 +123,5 @@ Biggest gaps on 2026-07-23: `scc-hrep-rep-2026-11-03-gte210` (est ~$2.21 → got
 | 2026-07-23 8:53 PM ET | ✅ ok | 211 | $390.84 |
 | 2026-07-23 8:49 PM ET | ✅ ok | 211 | $390.84 |
 | 2026-07-23 8:13 PM ET | ✅ ok | 211 | $390.84 |
-| 2026-07-23 8:11 PM ET | ✅ ok | 211 | $390.84 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
