@@ -630,6 +630,10 @@ def fetch_opportunities(
     return out[:12]
 
 
+PROG_TTL_SECONDS = 300  # reuse fetched program params this long between polls
+_PROG_CACHE: dict = {"ts": 0.0, "progs": {}, "slugs": ()}
+
+
 def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] | None = None) -> list[dict]:
     """Snapshot of resting orders scored with the official reward formula.
 
@@ -676,32 +680,51 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
             debug[slug] = f"book {type(e).__name__}: {e}"
 
     # Program parameters: Discount Factor, Target Size, reward pool.
+    # Cached between calls: the params change ~daily, while the live monitor
+    # calls this every poll — refetching each time both wastes rate limit and
+    # turns one failed request into a page full of "no rewards program".
     progs: dict[str, dict] = {}
     if slugs:
-        try:
-            r = requests.get(
-                HOSTS[0] + "/v1/incentives", params={"symbols": slugs, "pageSize": 100}, timeout=20
-            )
-            if r.status_code < 400:
-                for p in r.json().get("programs") or []:
-                    periods = p.get("timePeriods") or []
-                    current = [
-                        tp for tp in periods
-                        if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
-                    ] or periods
-                    if current:
-                        tp = current[-1]
-                        progs[p.get("marketSlug", "")] = {
-                            "df": _num(tp.get("discountFactor")),
-                            "target": _num(tp.get("targetSize")),
-                            "pool": _num(tp.get("rewardPool")),
-                            "start": tp.get("start"),
-                            "end": tp.get("end"),
-                        }
-            else:
-                debug["_incentives"] = f"HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
-        except Exception as e:  # noqa: BLE001 — params are needed for verdicts but not fatal
-            debug["_incentives"] = f"{type(e).__name__}: {e}"
+        now = time.time()
+        cache_ok = (now - _PROG_CACHE["ts"] < PROG_TTL_SECONDS
+                    and set(slugs) <= set(_PROG_CACHE["slugs"]))
+        if cache_ok:
+            progs = {s: _PROG_CACHE["progs"][s] for s in slugs if s in _PROG_CACHE["progs"]}
+        else:
+            fetched: dict[str, dict] | None = None
+            for host in HOSTS:  # try each host before giving up
+                try:
+                    r = requests.get(
+                        host + "/v1/incentives", params={"symbols": slugs, "pageSize": 100}, timeout=20
+                    )
+                    if r.status_code >= 400:
+                        debug["_incentives"] = f"{host}: HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
+                        continue
+                    fetched = {}
+                    for p in r.json().get("programs") or []:
+                        periods = p.get("timePeriods") or []
+                        current = [
+                            tp for tp in periods
+                            if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
+                        ] or periods
+                        if current:
+                            tp = current[-1]
+                            fetched[p.get("marketSlug", "")] = {
+                                "df": _num(tp.get("discountFactor")),
+                                "target": _num(tp.get("targetSize")),
+                                "pool": _num(tp.get("rewardPool")),
+                                "start": tp.get("start"),
+                                "end": tp.get("end"),
+                            }
+                    break
+                except Exception as e:  # noqa: BLE001 — params are needed for verdicts but not fatal
+                    debug["_incentives"] = f"{host}: {type(e).__name__}: {e}"
+            if fetched is not None:
+                progs = fetched
+                _PROG_CACHE.update(ts=now, progs=dict(fetched), slugs=tuple(slugs))
+            elif _PROG_CACHE["progs"]:  # fetch failed — stale params beat none at all
+                progs = {s: _PROG_CACHE["progs"][s] for s in slugs if s in _PROG_CACHE["progs"]}
+                debug["_incentives_note"] = "programs fetch failed — using cached parameters"
 
     # Event sizes prorate the event-level pool; look up any market the
     # politics-tag map doesn't cover (bounded).
