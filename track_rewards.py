@@ -631,7 +631,8 @@ def fetch_opportunities(
 
 
 PROG_TTL_SECONDS = 300  # reuse fetched program params this long between polls
-_PROG_CACHE: dict = {"ts": 0.0, "progs": {}, "slugs": ()}
+_PROG_CACHE: dict = {"ts": 0.0, "progs": {}, "slugs": (), "fails": 0, "retry_at": 0.0}
+LAST_DEBUG: dict[str, str] = {}  # diagnostics from the most recent fetch, for the dashboard
 
 
 def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] | None = None) -> list[dict]:
@@ -690,6 +691,12 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                     and set(slugs) <= set(_PROG_CACHE["slugs"]))
         if cache_ok:
             progs = {s: _PROG_CACHE["progs"][s] for s in slugs if s in _PROG_CACHE["progs"]}
+        elif now < _PROG_CACHE["retry_at"]:  # backing off after failures — don't hammer
+            progs = {s: _PROG_CACHE["progs"][s] for s in slugs if s in _PROG_CACHE["progs"]}
+            debug["_incentives_note"] = (
+                f"programs fetch failing ({_PROG_CACHE['fails']}x) — "
+                f"retrying in {int(_PROG_CACHE['retry_at'] - now)}s"
+            )
         else:
             fetched: dict[str, dict] | None = None
             for host in HOSTS:  # try each host before giving up
@@ -721,10 +728,15 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                     debug["_incentives"] = f"{host}: {type(e).__name__}: {e}"
             if fetched is not None:
                 progs = fetched
-                _PROG_CACHE.update(ts=now, progs=dict(fetched), slugs=tuple(slugs))
-            elif _PROG_CACHE["progs"]:  # fetch failed — stale params beat none at all
-                progs = {s: _PROG_CACHE["progs"][s] for s in slugs if s in _PROG_CACHE["progs"]}
-                debug["_incentives_note"] = "programs fetch failed — using cached parameters"
+                _PROG_CACHE.update(ts=now, progs=dict(fetched), slugs=tuple(slugs),
+                                   fails=0, retry_at=0.0)
+            else:  # both hosts failed: back off exponentially (1 min → 15 min)
+                fails = _PROG_CACHE["fails"] + 1
+                _PROG_CACHE.update(fails=fails,
+                                   retry_at=now + min(60.0 * 2 ** (fails - 1), 900.0))
+                if _PROG_CACHE["progs"]:  # stale params beat none at all
+                    progs = {s: _PROG_CACHE["progs"][s] for s in slugs if s in _PROG_CACHE["progs"]}
+                    debug["_incentives_note"] = "programs fetch failed — using cached parameters"
 
     # Event sizes prorate the event-level pool; look up any market the
     # politics-tag map doesn't cover (bounded).
@@ -767,6 +779,8 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
             indent=2,
         )
     )
+    LAST_DEBUG.clear()
+    LAST_DEBUG.update(debug)
 
     for o in orders:
         prog = progs.get(o["market"])

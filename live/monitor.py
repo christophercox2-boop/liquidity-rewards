@@ -312,6 +312,7 @@ class Monitor:
                     if self.updated else None
                 ),
                 "error": self.error,
+                "diag": {k: v for k, v in tr.LAST_DEBUG.items() if k.startswith("_")},
                 "poll_seconds": POLL_SECONDS,
                 "persistence": self.persistence,
                 "alerts": "ntfy" if NTFY_TOPIC else "off",
@@ -517,7 +518,9 @@ async function refresh(){
       'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + d.orders.length + ' orders';
     document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence + ' · alerts: ' + d.alerts;
     const err = document.getElementById('err');
-    err.style.display = d.error ? 'block' : 'none'; err.textContent = d.error || '';
+    const diag = Object.entries(d.diag || {}).map(([k,v]) => k.replace(/^_/,'') + ': ' + v).join(' · ');
+    const msg = [d.error, diag].filter(Boolean).join(' · ');
+    err.style.display = msg ? 'block' : 'none'; err.textContent = msg;
     document.getElementById('ovg').innerHTML = bigSpark(d.rate_series);
     const allMarkets = {};
     d.orders.forEach(o => { if(o.market) allMarkets[o.market] = 0; });
