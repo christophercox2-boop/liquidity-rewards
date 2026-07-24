@@ -701,11 +701,17 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
             fetched: dict[str, dict] | None = None
             for host in HOSTS:  # try each host before giving up
                 try:
+                    # api.polymarket.us requires the signed API-key headers
+                    # (same scheme as the orders endpoint; query isn't signed).
+                    headers = (auth_headers(key_id, secret_key, "GET", "/v1/incentives")
+                               if host == TRADE_API else {})
                     r = requests.get(
-                        host + "/v1/incentives", params={"symbols": slugs, "pageSize": 100}, timeout=20
+                        host + "/v1/incentives", params={"symbols": slugs, "pageSize": 100},
+                        headers=headers, timeout=20,
                     )
                     if r.status_code >= 400:
-                        debug["_incentives"] = f"{host}: HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
+                        debug[f"_incentives {host.split('//')[-1]}"] = \
+                            f"HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"
                         continue
                     fetched = {}
                     for p in r.json().get("programs") or []:
@@ -725,8 +731,10 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                             }
                     break
                 except Exception as e:  # noqa: BLE001 — params are needed for verdicts but not fatal
-                    debug["_incentives"] = f"{host}: {type(e).__name__}: {e}"
+                    debug[f"_incentives {host.split('//')[-1]}"] = f"{type(e).__name__}: {e}"
             if fetched is not None:
+                for k in [k for k in debug if k.startswith("_incentives")]:
+                    del debug[k]  # a host that failed before the one that worked isn't an error
                 progs = fetched
                 _PROG_CACHE.update(ts=now, progs=dict(fetched), slugs=tuple(slugs),
                                    fails=0, retry_at=0.0)
