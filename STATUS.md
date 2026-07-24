@@ -2,7 +2,7 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-07-23 9:02 PM ET
+## ✅ Last successful check: 2026-07-23 9:06 PM ET
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
@@ -26,116 +26,111 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 
 | Market | Side | Price | Size | Ticks off best | Reward pool | Earning? |
 |---|---|---:|---:|---:|---:|---|
+| `pvwc-housepopw-2026-11-03-dem` | BUY | 53.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
+| `pvwc-housepopw-2026-11-03-dem` | SELL | 97.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
+| `scc-senate-gop-2026-11-03-54` | SELL | 44.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
+| `enwc-ussep-sc-2026-08-11-rep-joewil` | BUY | 1.0¢ | 2,000 | 0 | — | ❌ no active reward program on this market |
+| `enwc-ussep-sc-2026-08-11-rep-wiltim` | BUY | 1.0¢ | 2,000 | 0 | — | ❌ no active reward program on this market |
+| `vmc-ussep-misen-2026-08-04-ste10-15` | SELL | 3.0¢ | 11 | 0 | — | ❌ no active reward program on this market |
+| `vmc-ussep-misen-2026-08-04-elsgte20` | SELL | 11.0¢ | 10 | 0 | — | ❌ no active reward program on this market |
+| `scc-senate-gop-2026-11-03-50` | BUY | 10.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
+| `scc-senate-gop-2026-11-03-50` | SELL | 44.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
+| `scc-hrep-rep-2026-11-03-gte230` | SELL | 51.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
+| `pvwc-housepopw-2026-11-03-rep` | SELL | 12.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
 | `enwc-ussep-sc-2026-08-11-rep-tregow` | SELL | 2.0¢ | 600 | 0 | — | ❌ no active reward program on this market |
-| `enwc-ussep-sc-2026-08-11-rep-marlyn` | SELL | 5.0¢ | 400 | 0 | — | ❌ no active reward program on this market |
-| `scc-senate-gop-2026-11-03-46` | SELL | 10.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
-| `scc-senate-gop-2026-11-03-49` | BUY | 10.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
-| `scc-senate-gop-2026-11-03-49` | SELL | 44.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte195` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte195` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte195` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte195` | BUY | 49.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte195` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte195` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte195` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte195` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte195` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte235` | SELL | 49.0¢ | 300 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte235` | BUY | 1.0¢ | 2,000 | 0 | — | ❌ no active reward program on this market |
+| `enwc-ussep-sc-2026-08-11-rep-pameve` | BUY | 2.0¢ | 2,000 | 0 | — | ❌ no active reward program on this market |
+| `vmc-ussep-misen-2026-08-04-els10-15` | SELL | 21.0¢ | 11 | 0 | — | ❌ no active reward program on this market |
+| `vmc-ussep-misen-2026-08-04-els10-15` | BUY | 20.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
 | `enwc-usgubp-wi-2026-08-11-dem-sarrod` | SELL | 3.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
+| `scc-hrep-rep-2026-11-03-gte215` | BUY | 23.0¢ | 30 | 0 | — | ❌ no active reward program on this market |
+| `scc-hrep-rep-2026-11-03-gte215` | SELL | 73.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
+| `scc-hrep-rep-2026-11-03-gte215` | BUY | 23.0¢ | 30 | 0 | — | ❌ no active reward program on this market |
 | `scc-senate-gop-2026-11-03-lte45` | SELL | 10.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
-| `scc-senate-gop-2026-11-03-48` | SELL | 44.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
+| `scc-senate-gop-2026-11-03-53` | BUY | 2.0¢ | 2,000 | 0 | — | ❌ no active reward program on this market |
+| `scc-senate-gop-2026-11-03-53` | SELL | 43.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
+| `scc-senate-gop-2026-11-03-55` | SELL | 10.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
+| `apdc-alito-2026-12-31` | SELL | 17.0¢ | 75 | 0 | — | ❌ no active reward program on this market |
 | `scc-hrep-rep-2026-11-03-gte200` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte200` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte200` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte200` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte200` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
+| `scc-hrep-rep-2026-11-03-gte200` | BUY | 49.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
 | `scc-hrep-rep-2026-11-03-gte200` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
 | `scc-hrep-rep-2026-11-03-gte200` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
 | `scc-hrep-rep-2026-11-03-gte200` | SELL | 99.0¢ | 155 | 0 | — | ❌ no active reward program on this market |
 | `scc-hrep-rep-2026-11-03-gte200` | BUY | 49.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte200` | BUY | 49.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
-| `scc-hrep-rep-2026-11-03-gte185` | BUY | 49.0¢ | 100 | 0 | — | ❌ no active reward program on this market |
 | …and 118 more | | | | | | |
 
 **Tap an order for its book window and the math:**
 
+<details><summary><code>pvwc-housepopw-2026-11-03-dem</code> BUY 100 @ 53¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>pvwc-housepopw-2026-11-03-dem</code> SELL 100 @ 97¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>scc-senate-gop-2026-11-03-54</code> SELL 100 @ 44¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>enwc-ussep-sc-2026-08-11-rep-joewil</code> BUY 2,000 @ 1¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>enwc-ussep-sc-2026-08-11-rep-wiltim</code> BUY 2,000 @ 1¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>vmc-ussep-misen-2026-08-04-ste10-15</code> SELL 11 @ 3¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>vmc-ussep-misen-2026-08-04-elsgte20</code> SELL 10 @ 11¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>scc-senate-gop-2026-11-03-50</code> BUY 100 @ 10¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>scc-senate-gop-2026-11-03-50</code> SELL 100 @ 44¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>scc-hrep-rep-2026-11-03-gte230</code> SELL 100 @ 51¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>pvwc-housepopw-2026-11-03-rep</code> SELL 100 @ 12¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
 <details><summary><code>enwc-ussep-sc-2026-08-11-rep-tregow</code> SELL 600 @ 2¢ → $0</summary>
 
 `no reward program → $0`  
 
 </details>
-<details><summary><code>enwc-ussep-sc-2026-08-11-rep-marlyn</code> SELL 400 @ 5¢ → $0</summary>
+<details><summary><code>enwc-ussep-sc-2026-08-11-rep-pameve</code> BUY 2,000 @ 2¢ → $0</summary>
 
 `no reward program → $0`  
 
 </details>
-<details><summary><code>scc-senate-gop-2026-11-03-46</code> SELL 100 @ 10¢ → $0</summary>
+<details><summary><code>vmc-ussep-misen-2026-08-04-els10-15</code> SELL 11 @ 21¢ → $0</summary>
 
 `no reward program → $0`  
 
 </details>
-<details><summary><code>scc-senate-gop-2026-11-03-49</code> BUY 100 @ 10¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-senate-gop-2026-11-03-49</code> SELL 100 @ 44¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte195</code> SELL 155 @ 99¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte195</code> SELL 155 @ 99¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte195</code> SELL 155 @ 99¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte195</code> BUY 100 @ 49¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte195</code> SELL 155 @ 99¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte195</code> SELL 155 @ 99¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte195</code> SELL 155 @ 99¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte195</code> SELL 155 @ 99¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte195</code> SELL 155 @ 99¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte235</code> SELL 300 @ 49¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte235</code> BUY 2,000 @ 1¢ → $0</summary>
+<details><summary><code>vmc-ussep-misen-2026-08-04-els10-15</code> BUY 100 @ 20¢ → $0</summary>
 
 `no reward program → $0`  
 
@@ -145,12 +140,42 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 `no reward program → $0`  
 
 </details>
+<details><summary><code>scc-hrep-rep-2026-11-03-gte215</code> BUY 30 @ 23¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>scc-hrep-rep-2026-11-03-gte215</code> SELL 100 @ 73¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>scc-hrep-rep-2026-11-03-gte215</code> BUY 30 @ 23¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
 <details><summary><code>scc-senate-gop-2026-11-03-lte45</code> SELL 100 @ 10¢ → $0</summary>
 
 `no reward program → $0`  
 
 </details>
-<details><summary><code>scc-senate-gop-2026-11-03-48</code> SELL 100 @ 44¢ → $0</summary>
+<details><summary><code>scc-senate-gop-2026-11-03-53</code> BUY 2,000 @ 2¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>scc-senate-gop-2026-11-03-53</code> SELL 100 @ 43¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>scc-senate-gop-2026-11-03-55</code> SELL 100 @ 10¢ → $0</summary>
+
+`no reward program → $0`  
+
+</details>
+<details><summary><code>apdc-alito-2026-12-31</code> SELL 75 @ 17¢ → $0</summary>
 
 `no reward program → $0`  
 
@@ -160,22 +185,7 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 `no reward program → $0`  
 
 </details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte200</code> SELL 155 @ 99¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte200</code> SELL 155 @ 99¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte200</code> SELL 155 @ 99¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte200</code> SELL 155 @ 99¢ → $0</summary>
+<details><summary><code>scc-hrep-rep-2026-11-03-gte200</code> BUY 100 @ 49¢ → $0</summary>
 
 `no reward program → $0`  
 
@@ -196,16 +206,6 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 
 </details>
 <details><summary><code>scc-hrep-rep-2026-11-03-gte200</code> BUY 100 @ 49¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte200</code> BUY 100 @ 49¢ → $0</summary>
-
-`no reward program → $0`  
-
-</details>
-<details><summary><code>scc-hrep-rep-2026-11-03-gte185</code> BUY 100 @ 49¢ → $0</summary>
 
 `no reward program → $0`  
 
@@ -229,18 +229,18 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 
 | Market | Reward pool | Discount | Target Size | Best entry | Est. share | Est. $/day |
 |---|---:|---:|---:|---|---:|---:|
-| `enwc-ussep-mn-2026-08-11-dem-pegfla` | $150.00 ÷ 2 | 0.50 | 2,000 | SELL side (6,896 resting) | ~42.0% | ~$15.76 |
+| `enwc-ussep-mn-2026-08-11-dem-pegfla` | $150.00 ÷ 2 | 0.50 | 2,000 | SELL side (6,876 resting) | ~42.0% | ~$15.76 |
 | `enwc-ussep-mn-2026-08-11-dem-angcra` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (10,891 resting) | ~21.8% | ~$8.17 |
 | `enwc-usgubp-ok-2026-06-16-rep-gendru` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (37,035 resting) | ~13.4% | ~$5.01 |
 | `ewc-usgub-ks-2026-11-03-rep` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (230,906 resting) | ~10.9% | ~$4.07 |
 | `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (87,837 resting) | ~9.9% | ~$3.73 |
-| `ewc-usgub-ga-2026-11-03-rep` | $150.00 ÷ 2 | 0.50 | 2,000 | SELL side (102,740 resting) | ~7.2% | ~$2.70 |
+| `ewc-usgub-ga-2026-11-03-rep` | $150.00 ÷ 2 | 0.50 | 2,000 | SELL side (102,720 resting) | ~7.2% | ~$2.70 |
 | `ewc-usgub-ks-2026-11-03-dem` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (192,498 resting) | ~7.0% | ~$2.63 |
 | `enwc-usgubp-fl-2026-08-18-rep-byrdon` | $150.00 ÷ 3 | 0.50 | 2,000 | SELL side (2,595 resting) | ~9.8% | ~$2.44 |
 | `enwc-usgubp-fl-2026-08-18-rep-jamfis` | $150.00 ÷ 3 | 0.50 | 2,000 | BUY side (84,763 resting) | ~8.6% | ~$2.16 |
-| `ewc-usgub-ia-2026-11-03-rep` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (141,547 resting) | ~5.3% | ~$1.97 |
+| `ewc-usgub-ia-2026-11-03-rep` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (141,348 resting) | ~5.5% | ~$2.08 |
 | `ewc-usgub-ia-2026-11-03-dem` | $150.00 ÷ 2 | 0.50 | 2,000 | BUY side (132,813 resting) | ~5.1% | ~$1.91 |
-| `ewc-usgub-ga-2026-11-03-dem` | $150.00 ÷ 2 | 0.50 | 2,000 | SELL side (83,887 resting) | ~4.9% | ~$1.85 |
+| `ewc-usgub-ga-2026-11-03-dem` | $150.00 ÷ 2 | 0.50 | 2,000 | SELL side (83,867 resting) | ~4.9% | ~$1.85 |
 
 ## Totals
 
@@ -302,6 +302,7 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 
 | Checked (ET) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-07-23 9:06 PM ET | ✅ ok | 211 | $390.84 |
 | 2026-07-23 9:02 PM ET | ✅ ok | 211 | $390.84 |
 | 2026-07-23 8:55 PM ET | ✅ ok | 211 | $390.84 |
 | 2026-07-23 8:53 PM ET | ✅ ok | 211 | $390.84 |
@@ -311,6 +312,5 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 | 2026-07-23 7:14 PM ET | ✅ ok | 211 | $390.84 |
 | 2026-07-23 6:17 PM ET | ✅ ok | 211 | $390.84 |
 | 2026-07-23 4:43 PM ET | ✅ ok | 211 | $390.84 |
-| 2026-07-23 4:32 PM ET | ✅ ok | 211 | $390.84 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
