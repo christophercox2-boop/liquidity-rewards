@@ -147,6 +147,7 @@ class Monitor:
         self.positions: dict[str, dict] = {}  # raw /v1/portfolio/positions, for the P/L tab
         self.pnl_updated: dt.datetime | None = None
         self.pnl_error: str | None = None
+        self.buying_power: float | None = None  # available cash, for the Plan tab
         self.alert_high: dict[str, float] = {}  # per-market peak rate since it last hit $0
         self.seen_rate: float | None = self.state.get("alert_seen_rate")  # rate when app last opened
         self.drop_steps: int = int(self.state.get("alert_drop_steps") or 0)
@@ -371,6 +372,7 @@ class Monitor:
                 "error": self.error,
                 "diag": {k: v for k, v in tr.LAST_DEBUG.items() if k.startswith("_")},
                 "pnl": self._pnl(),
+                "buying_power": self.buying_power,
                 "poll_seconds": POLL_SECONDS,
                 "persistence": self.persistence,
                 "alerts": "ntfy" if NTFY_TOPIC else "off",
@@ -385,6 +387,21 @@ POLL_KICK = threading.Event()  # set after a reprice so the next poll runs immed
 
 
 ACTIONS: list[dict] = []  # audit log of every reprice: request + raw response + verification
+
+
+def fetch_buying_power(key_id: str, secret_key: str) -> float | None:
+    """Available buying power from /v1/account/balances (authenticated)."""
+    path = "/v1/account/balances"
+    r = requests.get(
+        tr.TRADE_API + path,
+        headers=tr.auth_headers(key_id, secret_key, "GET", path), timeout=20,
+    )
+    if r.status_code >= 400:
+        raise RuntimeError(f"{path} -> {tr._http_err(r)}")
+    for b in r.json().get("balances") or []:
+        if b.get("buyingPower") is not None:
+            return float(b["buyingPower"])
+    return None
 
 
 def fetch_positions(key_id: str, secret_key: str) -> dict[str, dict]:
@@ -725,6 +742,7 @@ booked (closed trades and resolved markets). Refreshes every 2 min.</div>
 </div>
 <div id="viewL" style="display:none">
 <div class="sub">Passive placement plan <span id="planGen"></span></div>
+<div class="sub" id="planBP"></div>
 <div style="margin:10px 0">Max buy price: <b id="capLbl">10¢</b>
  <input type="range" id="capSlider" min="1" max="99" value="10" style="width:55%;vertical-align:middle"
         oninput="planCap(this.value)"></div>
@@ -767,7 +785,7 @@ function showTab(t){
   });
   if(t==='L') loadPlan();
 }
-let PLAN = null, PSEL = {};
+let PLAN = null, PSEL = {}, BP = null;
 async function loadPlan(){
   if(PLAN) return;
   try{
@@ -816,7 +834,15 @@ function renderPlan(){
   planSum();
 }
 function planAll(on){
-  planRows().forEach(r => { if(on && r.risk) return; PSEL[pkey(r)] = on; });
+  let spent = 0;
+  planRows().forEach(r => {
+    if(!on){ PSEL[pkey(r)] = false; return; }
+    if(r.risk) return;
+    const c = ord(r).capital;
+    if(BP != null && spent + c > BP) return; // budget: stay inside buying power
+    spent += c;
+    PSEL[pkey(r)] = true;
+  });
   renderPlan();
 }
 function planSum(){
@@ -837,6 +863,8 @@ async function placeBatch(){
   if(!confirm('Place ' + sel.length + ' post-only orders (' + (sel.length-nS) + ' buys, ' + nS +
               ' sells)?\\n$' + capD.toFixed(0) +
               ' locked capital, ~$' + est.toFixed(2) + '/day at current books.' +
+              (BP != null && capD > BP ? '\\n⚠ exceeds your $' + BP.toFixed(0) +
+               ' buying power — the excess will be rejected by the exchange!' : '') +
               (nRisk ? '\\n⚠ includes ' + nRisk + ' flagged-risky order' + (nRisk>1?'s':'') + '!' : ''))) return;
   try{
     const r = await fetch('place', {method:'POST',
@@ -986,6 +1014,9 @@ async function refresh(){
     err.style.display = msg ? 'block' : 'none'; err.textContent = msg;
     document.getElementById('ovg').innerHTML = bigSpark(d.rate_series);
     renderPnl(d.pnl);
+    BP = d.buying_power;
+    document.getElementById('planBP').textContent =
+      BP != null ? 'Buying power: $' + BP.toFixed(2) + ' — full-size Select-all stops there' : '';
     const allMarkets = {};
     d.orders.forEach(o => { if(o.market) allMarkets[o.market] = 0; });
     Object.entries(d.per_market_today).forEach(([m,v]) => { allMarkets[m] = v; });
@@ -1165,13 +1196,17 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             err_streak = 0
             last_ok = time.time()
             MONITOR.maybe_save_remote()
-            if time.time() - pos_refreshed > POS_REFRESH_SECONDS:  # P/L tab data
+            if time.time() - pos_refreshed > POS_REFRESH_SECONDS:  # P/L + Plan tab data
                 pos_refreshed = time.time()
                 try:
                     MONITOR.set_positions(fetch_positions(key_id, secret_key))
                     MONITOR.pnl_error = None
                 except Exception as e:  # noqa: BLE001 — shown on the P/L tab
                     MONITOR.pnl_error = f"{type(e).__name__}: {e}"
+                try:
+                    MONITOR.buying_power = fetch_buying_power(key_id, secret_key)
+                except Exception:  # noqa: BLE001 — plan tab just shows no number
+                    pass
         except Exception as e:  # noqa: BLE001 — shown on the dashboard, loop survives
             MONITOR.error = f"{type(e).__name__}: {e}"
             err_streak += 1
@@ -1195,6 +1230,9 @@ def main() -> None:
         print("Set POLYMARKET_KEY_ID and POLYMARKET_SECRET_KEY", file=sys.stderr)
         sys.exit(1)
     KEY_ID, SECRET_KEY = key_id, secret_key
+    # A reboot must not burst hundreds of book fetches at the rate limiter —
+    # let the 15-per-poll rotation fill the cache instead (full in ~10 min).
+    tr.BOOK_COLD_FETCH_ALL = False
     threading.Thread(target=poll_loop, args=(key_id, secret_key), daemon=True).start()
     server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
     print(f"live monitor on :{PORT}, polling every {POLL_SECONDS}s")

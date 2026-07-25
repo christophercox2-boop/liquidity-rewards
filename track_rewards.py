@@ -655,6 +655,7 @@ LAST_DEBUG: dict[str, str] = {}  # diagnostics from the most recent fetch, for t
 # Refresh a rotating subset per call instead — a fresh process (the hourly
 # tracker) still fetches everything on its first call.
 BOOK_REFRESH_PER_CALL = 15
+BOOK_COLD_FETCH_ALL = True  # one-shot runs sweep every book; the monitor sets False
 _BOOK_CACHE: dict[str, tuple[float, dict]] = {}  # slug -> (fetched_at, book)
 
 
@@ -699,29 +700,36 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
 
     slugs = sorted({o["market"] for o in orders if o["market"]})
     debug: dict[str, str] = {}
-    if len(slugs) > 100:  # safety bound — never truncate silently
-        debug["_slug_cap"] = f"{len(slugs)} markets with orders; scoring the first 100"
-        slugs = slugs[:100]
+    if len(slugs) > 500:  # safety bound — never truncate silently
+        debug["_slug_cap"] = f"{len(slugs)} markets with orders; scoring the first 500"
+        slugs = slugs[:500]
 
     # Full order books (public) — needed for ticks-from-best and the window walk.
-    # Rotate refreshes through the cache, oldest first; a cold cache (fresh
-    # process, e.g. the hourly tracker) fetches everything.
+    # Rotate refreshes through the cache, oldest first. A cold cache fetches
+    # everything only in one-shot runs (the hourly tracker); the monitor flips
+    # BOOK_COLD_FETCH_ALL off so a reboot fills the cache gradually instead of
+    # bursting hundreds of requests at the rate limiter.
     books: dict[str, dict] = {}
     now_books = time.time()
     for gone in set(_BOOK_CACHE) - set(slugs):
         del _BOOK_CACHE[gone]
     oldest_first = sorted(slugs, key=lambda s: _BOOK_CACHE.get(s, (0.0,))[0])
-    to_fetch = set(oldest_first) if not _BOOK_CACHE else set(oldest_first[:BOOK_REFRESH_PER_CALL])
+    cold_all = not _BOOK_CACHE and BOOK_COLD_FETCH_ALL
+    to_fetch = set(oldest_first) if cold_all else set(oldest_first[:BOOK_REFRESH_PER_CALL])
     for slug in slugs:
         if slug in to_fetch:
             try:
                 books[slug] = _fetch_book(slug)
                 _BOOK_CACHE[slug] = (now_books, books[slug])
+                if cold_all:
+                    time.sleep(0.05)  # be gentle when sweeping every book
                 continue
             except Exception as e:  # noqa: BLE001 — a market without a book still gets listed
                 debug[slug] = f"book {type(e).__name__}: {e}"
         if slug in _BOOK_CACHE:  # not refreshed this call (or refresh failed): use last known
             books[slug] = _BOOK_CACHE[slug][1]
+        else:
+            debug.setdefault(slug, "book pending — rotation will reach it shortly")
 
     # Program parameters: Discount Factor, Target Size, reward pool.
     # Cached between calls: the params change ~daily, while the live monitor
@@ -741,39 +749,48 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                 f"retrying in {int(_PROG_CACHE['retry_at'] - now)}s"
             )
         else:
-            fetched: dict[str, dict] | None = None
-            for host in HOSTS:  # try each host before giving up
-                try:
-                    # api.polymarket.us requires the signed API-key headers
-                    # (same scheme as the orders endpoint; query isn't signed).
-                    headers = (auth_headers(key_id, secret_key, "GET", "/v1/incentives")
-                               if host == TRADE_API else {})
-                    r = requests.get(
-                        host + "/v1/incentives", params={"symbols": slugs, "pageSize": 100},
-                        headers=headers, timeout=20,
-                    )
-                    if r.status_code >= 400:
-                        debug[f"_incentives {host.split('//')[-1]}"] = _http_err(r)
-                        continue
-                    fetched = {}
-                    for p in r.json().get("programs") or []:
-                        periods = p.get("timePeriods") or []
-                        current = [
-                            tp for tp in periods
-                            if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
-                        ] or periods
-                        if current:
-                            tp = current[-1]
-                            fetched[p.get("marketSlug", "")] = {
-                                "df": _num(tp.get("discountFactor")),
-                                "target": _num(tp.get("targetSize")),
-                                "pool": _num(tp.get("rewardPool")),
-                                "start": tp.get("start"),
-                                "end": tp.get("end"),
-                            }
+            # Batched: hundreds of symbols in one query overflows the URL.
+            fetched: dict[str, dict] | None = {}
+            for i in range(0, len(slugs), 40):
+                batch = slugs[i:i + 40]
+                got: dict[str, dict] | None = None
+                for host in HOSTS:  # try each host before giving up on a batch
+                    try:
+                        # api.polymarket.us requires the signed API-key headers
+                        # (same scheme as the orders endpoint; query isn't signed).
+                        headers = (auth_headers(key_id, secret_key, "GET", "/v1/incentives")
+                                   if host == TRADE_API else {})
+                        r = requests.get(
+                            host + "/v1/incentives", params={"symbols": batch, "pageSize": 100},
+                            headers=headers, timeout=20,
+                        )
+                        if r.status_code >= 400:
+                            debug[f"_incentives {host.split('//')[-1]}"] = _http_err(r)
+                            continue
+                        got = {}
+                        for p in r.json().get("programs") or []:
+                            periods = p.get("timePeriods") or []
+                            current = [
+                                tp for tp in periods
+                                if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
+                            ] or periods
+                            if current:
+                                tp = current[-1]
+                                got[p.get("marketSlug", "")] = {
+                                    "df": _num(tp.get("discountFactor")),
+                                    "target": _num(tp.get("targetSize")),
+                                    "pool": _num(tp.get("rewardPool")),
+                                    "start": tp.get("start"),
+                                    "end": tp.get("end"),
+                                }
+                        break
+                    except Exception as e:  # noqa: BLE001 — params needed for verdicts, not fatal
+                        debug[f"_incentives {host.split('//')[-1]}"] = f"{type(e).__name__}: {e}"
+                if got is None:  # a failed batch poisons the refresh — fall back whole
+                    fetched = None
                     break
-                except Exception as e:  # noqa: BLE001 — params are needed for verdicts but not fatal
-                    debug[f"_incentives {host.split('//')[-1]}"] = f"{type(e).__name__}: {e}"
+                fetched.update(got)
+                time.sleep(0.05)
             if fetched is not None:
                 for k in [k for k in debug if k.startswith("_incentives")]:
                     del debug[k]  # a host that failed before the one that worked isn't an error
