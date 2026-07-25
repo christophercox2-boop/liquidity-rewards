@@ -1066,38 +1066,47 @@ function renderPlan(){
         '<td class="r">$'+p.est_day.toFixed(2)+upTo+'</td></tr>'; }).join('');
   planSum();
 }
+function perMktCap(rows){
+  const m = {};
+  rows.forEach(r => { m[r.market] = (m[r.market] || 0) + ord(r).capital; });
+  return m;
+}
 function planAll(on){
-  let spent = 0;
+  const used = {};
   planRows().forEach(r => {
     if(!on){ PSEL[pkey(r)] = false; return; }
     if(r.risk) return;
-    const c = ord(r).capital;
-    if(BP != null && spent + c > BP) return; // budget: stay inside buying power
-    spent += c;
+    const c = ord(r).capital, u = used[r.market] || 0;
+    // buying power applies PER MARKET — the same cash backs every market
+    if(BP != null && u + c > BP) return;
+    used[r.market] = u + c;
     PSEL[pkey(r)] = true;
   });
   renderPlan();
 }
 function planSum(){
   const sel = planRows().filter(r => PSEL[pkey(r)]);
-  const cap = sel.reduce((s,r)=>s+ord(r).capital,0), est = sel.reduce((s,r)=>s+ord(r).est_day,0);
+  const worst = Math.max(0, ...Object.values(perMktCap(sel)));
+  const est = sel.reduce((s,r)=>s+ord(r).est_day,0);
   document.getElementById('planSel').textContent =
-    sel.length + ' selected (' + szmode() + ' size) · $' + cap.toFixed(0) +
-    ' locked capital · ~$' + est.toFixed(2) + '/day at current books';
+    sel.length + ' selected (' + szmode() + ' size) · max $' + worst.toFixed(0) +
+    ' locked in any one market · ~$' + est.toFixed(2) + '/day at current books';
 }
 async function placeBatch(){
   const capC = +document.getElementById('capSlider').value;
   const sMin = +document.getElementById('sellSlider').value;
   const sel = planRows().filter(r => PSEL[pkey(r)]);
   if(!sel.length){ alert('Nothing selected'); return; }
-  const capD = sel.reduce((s,r)=>s+ord(r).capital,0), est = sel.reduce((s,r)=>s+ord(r).est_day,0);
+  const est = sel.reduce((s,r)=>s+ord(r).est_day,0);
+  const worst = Math.max(0, ...Object.values(perMktCap(sel)));
   const nS = sel.filter(r=>r.side==='SELL').length;
   const nRisk = sel.filter(r=>r.risk).length;
   if(!confirm('Place ' + sel.length + ' post-only orders (' + (sel.length-nS) + ' buys, ' + nS +
-              ' sells)?\\n$' + capD.toFixed(0) +
-              ' locked capital, ~$' + est.toFixed(2) + '/day at current books.' +
-              (BP != null && capD > BP ? '\\n⚠ exceeds your $' + BP.toFixed(0) +
-               ' buying power — the excess will be rejected by the exchange!' : '') +
+              ' sells)?\\nMax $' + worst.toFixed(0) +
+              ' locked in any one market (buying power applies per market), ~$' +
+              est.toFixed(2) + '/day at current books.' +
+              (BP != null && worst > BP ? '\\n⚠ at least one market exceeds your $' + BP.toFixed(0) +
+               ' buying power — its excess orders will be rejected!' : '') +
               (nRisk ? '\\n⚠ includes ' + nRisk + ' flagged-risky order' + (nRisk>1?'s':'') + '!' : ''))) return;
   try{
     const r = await fetch('place', {method:'POST',
@@ -1313,7 +1322,7 @@ async function refresh(){
     renderPnl(d.pnl);
     BP = d.buying_power;
     document.getElementById('planBP').textContent =
-      BP != null ? 'Buying power: $' + BP.toFixed(2) + ' — full-size Select-all stops there' : '';
+      BP != null ? 'Buying power: $' + BP.toFixed(2) + ' per market — Select-all fits each market inside it' : '';
     const allMarkets = {};
     d.orders.forEach(o => { if(o.market) allMarkets[o.market] = 0; });
     Object.entries(d.per_market_today).forEach(([m,v]) => { allMarkets[m] = v; });
