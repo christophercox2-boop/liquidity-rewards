@@ -159,6 +159,8 @@ def main() -> None:
         r = evaluate_market(slug, book, prog)
         r["event_n"] = prog["event_n"]
         r["already_in"] = slug in mine
+        # program params ride along so the dashboard can revalidate at placement time
+        r["prog"] = {k: prog.get(k) for k in ("df", "target", "pool", "event_n")}
         results.append(r)
         if i % 25 == 0:
             print(f"  scanned {i}...")

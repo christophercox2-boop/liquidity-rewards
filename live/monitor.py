@@ -421,6 +421,175 @@ def _verify_resting(market: str, side: str, price_value: str) -> tuple[bool, str
         return False, f"verify failed: {type(e).__name__}: {e}"[:150]
 
 
+PLAN_CACHE: dict = {"ts": 0.0, "data": None}
+
+
+def fetch_plan() -> dict:
+    """data/scan.json from the repo's main branch (via GITHUB_TOKEN)."""
+    if PLAN_CACHE["data"] and time.time() - PLAN_CACHE["ts"] < 300:
+        return PLAN_CACHE["data"]
+    if not GITHUB_TOKEN:
+        raise RuntimeError("GITHUB_TOKEN not set — the Plan tab needs it to read scan.json")
+    r = requests.get(
+        f"https://api.github.com/repos/{GITHUB_REPO}/contents/data/scan.json",
+        params={"ref": "main"},
+        headers={"Authorization": f"Bearer {GITHUB_TOKEN}",
+                 "Accept": "application/vnd.github.raw+json"},
+        timeout=20,
+    )
+    if r.status_code >= 400:
+        raise RuntimeError(f"scan.json fetch failed: HTTP {r.status_code}")
+    PLAN_CACHE.update(ts=time.time(), data=r.json())
+    return PLAN_CACHE["data"]
+
+
+# One batch at a time; progress is polled by the dashboard.
+PLACER: dict = {"running": False, "results": [], "total": 0, "abort": False, "summary": ""}
+
+
+def _place_one(spec: dict, plan_row: dict) -> dict:
+    """Revalidate against the LIVE book, then place ONE post-only resting bid."""
+    slug = spec["market"]
+    price = round(spec["price_cents"] / 100.0, 4)
+    size = int(spec["size"])
+    res: dict = {"market": slug, "price_cents": spec["price_cents"], "size": size}
+    try:
+        book = tr._fetch_book(slug)
+        asks = book.get("asks") or []
+        if asks and price >= asks[0][0]:
+            res.update(status="skipped", note="would cross the spread now")
+            return res
+        prog = dict(plan_row.get("prog") or {})
+        if prog.get("pool"):  # drift check: still worth placing at today's book?
+            probe = {"market": slug, "side": "BUY", "price": price, "size": float(size)}
+            bids = dict(book.get("bids") or [])
+            bids[price] = bids.get(price, 0) + size
+            merged = dict(book, bids=sorted(bids.items(), key=lambda x: -x[0]))
+            tr._score_order(probe, merged, prog)
+            est = probe.get("est_day") or 0.0
+            if est < 0.08:
+                res.update(status="skipped", note=f"drifted — est now ${est:.2f}/day")
+                return res
+            res["est_day"] = round(est, 2)
+        path = "/v1/orders"
+        value = f"{price:.3f}".rstrip("0").rstrip(".")
+        r = requests.request(
+            "POST", tr.TRADE_API + path,
+            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
+                     "Content-Type": "application/json"},
+            json={"marketSlug": slug, "intent": "ORDER_INTENT_BUY_LONG",
+                  "type": "ORDER_TYPE_LIMIT",
+                  "price": {"value": value, "currency": "USD"},
+                  "quantity": size, "tif": "TIME_IN_FORCE_DAY",
+                  "participateDontInitiate": True},  # post-only: rest or reject, never fill
+            timeout=20,
+        )
+        if r.status_code < 300:
+            oid = ""
+            try:
+                oid = (r.json() or {}).get("id") or ""
+            except Exception:  # noqa: BLE001
+                pass
+            res.update(status="placed", id=oid)
+        else:
+            res.update(status="rejected", note=f"HTTP {r.status_code}: {' '.join(r.text.split())[:150]}")
+    except Exception as e:  # noqa: BLE001
+        res.update(status="error", note=f"{type(e).__name__}: {e}"[:150])
+    return res
+
+
+def run_batch(specs: list[dict], plan_rows: dict[str, dict]) -> None:
+    placed = skipped = failed = 0
+    consec_err = 0
+    try:
+        for spec in specs:
+            if PLACER["abort"]:
+                PLACER["summary"] = "stopped by user"
+                break
+            res = _place_one(spec, plan_rows.get(spec["market"], {}))
+            PLACER["results"].append(res)
+            ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                            "market": res["market"], "side": "BUY (new)", "from": "—",
+                            "to": res["price_cents"], "size": res["size"],
+                            "status": res["status"],
+                            "response": (res.get("note") or res.get("id") or "")[:150],
+                            "verified": res["status"] == "placed"})
+            if res["status"] == "placed":
+                placed += 1
+                consec_err = 0
+            elif res["status"] == "skipped":
+                skipped += 1
+            else:
+                failed += 1
+                consec_err += 1
+                if consec_err >= 3:
+                    PLACER["summary"] = "stopped after 3 consecutive failures"
+                    break
+            time.sleep(1.0)  # gentle on the rate limit
+    finally:
+        PLACER["summary"] = PLACER["summary"] or "done"
+        PLACER["running"] = False
+        POLL_KICK.set()  # rescore right away so the new orders show up
+        notify("Batch placement finished",
+               f"{placed} placed, {skipped} skipped, {failed} failed ({PLACER['summary']})",
+               "high" if failed else "default")
+
+
+def start_batch(payload: dict) -> tuple[int, dict]:
+    if PLACER["running"]:
+        return 409, {"ok": False, "error": "a batch is already running"}
+    try:
+        plan = fetch_plan()
+    except Exception as e:  # noqa: BLE001
+        return 502, {"ok": False, "error": f"can't load plan: {e}"[:200]}
+    plan_rows = {r["market"]: r for r in plan.get("results") or [] if r.get("pick")}
+    try:
+        max_c = float(payload.get("max_price_cents") or 0)
+        specs = payload.get("orders") or []
+        assert 0.1 <= max_c <= 99, "bad max price"
+        assert 1 <= len(specs) <= 400, "1-400 orders per batch"
+        open_now = {(o.get("market"), round((o.get("price") or 0) * 100, 1))
+                    for o in MONITOR.orders}
+        clean = []
+        for s in specs:
+            m, pc, q = str(s.get("market")), float(s.get("price_cents")), int(s.get("size"))
+            assert m in plan_rows, f"{m}: not in the scan plan"
+            assert 0.1 <= pc <= max_c, f"{m}: price over the slider cap"
+            assert 1 <= q <= 20000, f"{m}: size out of range"
+            if any(mm == m and abs(ppc - pc) <= 1.0 for mm, ppc in open_now):
+                continue  # an order already rests within a tick — never double up
+            clean.append({"market": m, "price_cents": pc, "size": q})
+        assert clean, "nothing to place — every order duplicates an existing one"
+    except (AssertionError, TypeError, ValueError, KeyError) as e:
+        return 400, {"ok": False, "error": str(e)[:200]}
+    PLACER.update(running=True, results=[], total=len(clean), abort=False, summary="")
+    threading.Thread(target=run_batch, args=(clean, plan_rows), daemon=True).start()
+    return 200, {"ok": True, "started": len(clean)}
+
+
+def do_cancel_all() -> tuple[int, dict]:
+    """Emergency stop: cancel every open order on the account."""
+    path = "/v1/orders/open/cancel"
+    try:
+        r = requests.request(
+            "POST", tr.TRADE_API + path,
+            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
+                     "Content-Type": "application/json"},
+            json={}, timeout=30,
+        )
+        ok = r.status_code < 300
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": "ALL", "side": "CANCEL ALL", "from": "—", "to": "—",
+                        "size": "", "status": r.status_code,
+                        "response": " ".join(r.text.split())[:150], "verified": ok})
+        notify("CANCEL ALL sent", f"HTTP {r.status_code} — all resting orders cancelled",
+               "high")
+        POLL_KICK.set()
+        return (200 if ok else 502), {"ok": ok, "status": r.status_code}
+    except Exception as e:  # noqa: BLE001
+        return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
+
+
 def do_reprice(order_id: str, price_cents: float) -> tuple[int, dict]:
     """Modify one of OUR resting orders to a new price. The order must be in
     the latest snapshot (can't touch anything else) and the price sane.
@@ -500,6 +669,7 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div style="display:flex;gap:8px;margin-bottom:12px">
  <button class="tab on" id="tabR" onclick="showTab('R')">Rewards</button>
  <button class="tab" id="tabP" onclick="showTab('P')">P/L</button>
+ <button class="tab" id="tabL" onclick="showTab('L')">Plan</button>
 </div>
 <div id="viewR">
 <div class="sub">Earned today (ET) — live estimate</div>
@@ -521,14 +691,126 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 at current prices. Unreal. = value − what it cost. Real. = P/L the exchange has already
 booked (closed trades and resolved markets). Refreshes every 2 min.</div>
 </div>
+<div id="viewL" style="display:none">
+<div class="sub">Passive placement plan <span id="planGen"></span></div>
+<div style="margin:10px 0">Max price: <b id="capLbl">10¢</b>
+ <input type="range" id="capSlider" min="1" max="50" value="10" style="width:60%;vertical-align:middle"
+        oninput="planCap(this.value)"></div>
+<div style="margin:6px 0">
+ <button class="tab" onclick="planAll(true)">Select all shown</button>
+ <button class="tab" onclick="planAll(false)">Clear</button></div>
+<div class="sub" id="planSel"></div>
+<div class="err" id="planErr"></div>
+<table id="plan"></table>
+<div class="rp" style="margin-top:10px">
+ <button onclick="placeBatch()">Place selected</button>
+ <button class="alt" onclick="abortBatch()">Stop batch</button></div>
+<div id="placeProg" class="mkt" style="margin:8px 0"></div>
+<div class="mkt">Every order is a post-only resting bid — it can never cross the spread and
+fill on placement. Each is revalidated against the live book just before placing; anything
+that drifted below ~$0.08/day is skipped. Markets where you already have an order within
+1¢ of the suggestion are skipped automatically (✔ marks markets you're already in).</div>
+<div style="margin-top:26px;border-top:1px solid #30363d;padding-top:12px">
+ <button class="tab" style="background:#8b1a1a;color:#fff" onclick="cancelAll()">⚠ Cancel ALL open orders</button>
+</div>
+</div>
 <script>
 let OPEN = {}, GOPEN = {}, SERIES = null, RATES = {};
 let SEEN = JSON.parse(localStorage.getItem('seenRates') || '{}');
 function showTab(t){
-  document.getElementById('viewR').style.display = t==='R' ? '' : 'none';
-  document.getElementById('viewP').style.display = t==='P' ? '' : 'none';
-  document.getElementById('tabR').className = 'tab' + (t==='R' ? ' on' : '');
-  document.getElementById('tabP').className = 'tab' + (t==='P' ? ' on' : '');
+  ['R','P','L'].forEach(k => {
+    document.getElementById('view'+k).style.display = k===t ? '' : 'none';
+    document.getElementById('tab'+k).className = 'tab' + (k===t ? ' on' : '');
+  });
+  if(t==='L') loadPlan();
+}
+let PLAN = null, PSEL = {};
+async function loadPlan(){
+  if(PLAN) return;
+  try{
+    const d = await (await fetch('plan.json')).json();
+    const err = document.getElementById('planErr');
+    if(d.error){ err.textContent = d.error; err.style.display = 'block'; return; }
+    PLAN = d; renderPlan();
+  }catch(e){
+    const err = document.getElementById('planErr');
+    err.textContent = 'plan load failed: ' + e; err.style.display = 'block';
+  }
+}
+function planCap(v){ document.getElementById('capLbl').textContent = v + '¢'; renderPlan(); }
+function planRows(){
+  const cap = +document.getElementById('capSlider').value;
+  return ((PLAN && PLAN.plan.results) || [])
+    .filter(r => r.pick && r.pick.price*100 <= cap)
+    .sort((a,b) => b.pick.est_day/Math.max(b.pick.capital,0.01) - a.pick.est_day/Math.max(a.pick.capital,0.01));
+}
+function renderPlan(){
+  if(!PLAN) return;
+  document.getElementById('planGen').textContent = '· scanned ' + (PLAN.plan.generated || '');
+  const mine = new Set(PLAN.mine || []);
+  document.getElementById('plan').innerHTML =
+    '<tr><th></th><th>Market</th><th class="r">Buy @</th><th class="r">Size</th><th class="r">Cap.</th><th class="r">$/day</th></tr>' +
+    planRows().map(r => { const p = r.pick, k = r.market;
+      return '<tr><td><input type="checkbox" '+(PSEL[k]?'checked':'')+
+        ' onchange="PSEL[\''+k+'\']=this.checked;planSum()"></td>'+
+        '<td class="mkt">'+esc(k)+(mine.has(k)?' ✔':'')+'</td>'+
+        '<td class="r">'+(p.price*100).toFixed(0)+'¢</td>'+
+        '<td class="r">'+p.size.toLocaleString()+'</td>'+
+        '<td class="r">$'+p.capital.toFixed(0)+'</td>'+
+        '<td class="r">$'+p.est_day.toFixed(2)+'</td></tr>'; }).join('');
+  planSum();
+}
+function planAll(on){ planRows().forEach(r => PSEL[r.market] = on); renderPlan(); }
+function planSum(){
+  const sel = planRows().filter(r => PSEL[r.market]);
+  const cap = sel.reduce((s,r)=>s+r.pick.capital,0), est = sel.reduce((s,r)=>s+r.pick.est_day,0);
+  document.getElementById('planSel').textContent =
+    sel.length + ' selected · $' + cap.toFixed(0) + ' resting capital · ~$' + est.toFixed(2) + '/day at current books';
+}
+async function placeBatch(){
+  const capC = +document.getElementById('capSlider').value;
+  const sel = planRows().filter(r => PSEL[r.market]);
+  if(!sel.length){ alert('Nothing selected'); return; }
+  const capD = sel.reduce((s,r)=>s+r.pick.capital,0), est = sel.reduce((s,r)=>s+r.pick.est_day,0);
+  if(!confirm('Place ' + sel.length + ' post-only bids?\n$' + capD.toFixed(0) +
+              ' resting capital, ~$' + est.toFixed(2) + '/day at current books.')) return;
+  try{
+    const r = await fetch('place', {method:'POST',
+      headers:{'Content-Type':'application/json','X-Reprice':'1'},
+      body: JSON.stringify({max_price_cents: capC,
+        orders: sel.map(r => ({market: r.market, price_cents: +(r.pick.price*100).toFixed(1), size: r.pick.size}))})});
+    const d = await r.json();
+    if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
+    pollPlace();
+  }catch(e){ alert('Failed: ' + e); }
+}
+async function pollPlace(){
+  try{
+    const d = await (await fetch('place_status')).json();
+    const done = d.results.length;
+    const placed = d.results.filter(x=>x.status==='placed').length;
+    const skip = d.results.filter(x=>x.status==='skipped').length;
+    document.getElementById('placeProg').textContent =
+      (d.running ? 'placing… ' : 'batch ' + (d.summary || 'done') + ': ') +
+      done + '/' + d.total + ' — ' + placed + ' placed, ' + skip + ' skipped, ' +
+      (done - placed - skip) + ' failed';
+    if(d.running) setTimeout(pollPlace, 2000);
+    else { PSEL = {}; setTimeout(refresh, 1500); }
+  }catch(e){ setTimeout(pollPlace, 3000); }
+}
+async function abortBatch(){
+  try{ await fetch('place_abort', {method:'POST', headers:{'X-Reprice':'1'}}); }catch(e){}
+  pollPlace();
+}
+async function cancelAll(){
+  if(!confirm('Cancel EVERY open order on your account?')) return;
+  if(!confirm('Are you SURE? All reward earning stops until you re-place orders.')) return;
+  try{
+    const r = await fetch('cancel_all', {method:'POST', headers:{'X-Reprice':'1'}});
+    const d = await r.json().catch(()=>({}));
+    alert(d.ok ? 'All orders cancelled' : 'Failed: ' + (d.error || ('HTTP ' + r.status)));
+  }catch(e){ alert('Failed: ' + e); }
+  setTimeout(refresh, 1500);
 }
 function usd(v){ return (v<0?'-$':'$') + Math.abs(v||0).toFixed(2); }
 function cls(v){ return v>0.004 ? 'pos' : (v<-0.004 ? 'neg' : ''); }
@@ -727,6 +1009,18 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.startswith("/data.json"):
             MONITOR.mark_opened()  # you've seen the current rate: reset the drop alert baseline
             self._send(200, "application/json", json.dumps(MONITOR.snapshot()).encode())
+        elif self.path.startswith("/plan.json"):
+            try:
+                plan = fetch_plan()
+                mine = sorted({o.get("market") for o in MONITOR.orders if o.get("market")})
+                self._send(200, "application/json",
+                           json.dumps({"plan": plan, "mine": mine}).encode())
+            except Exception as e:  # noqa: BLE001
+                self._send(502, "application/json",
+                           json.dumps({"error": str(e)[:200]}).encode())
+        elif self.path.startswith("/place_status"):
+            self._send(200, "application/json", json.dumps(
+                {k: PLACER[k] for k in ("running", "results", "total", "summary")}).encode())
         elif self.path.startswith("/series.json"):
             with MONITOR.lock:
                 payload = json.dumps({"series": MONITOR.state.get("series", {})})
@@ -740,7 +1034,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("WWW-Authenticate", 'Basic realm="rewards"')
             self.end_headers()
             return
-        if self.path != "/reprice":
+        if self.path not in ("/reprice", "/place", "/place_abort", "/cancel_all"):
             self._send(404, "text/plain", b"not found")
             return
         # Cross-origin requests can't set custom headers without a CORS
@@ -749,12 +1043,25 @@ class Handler(BaseHTTPRequestHandler):
             self._send(403, "text/plain", b"missing X-Reprice header")
             return
         try:
-            body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
-            order_id, cents = str(body["order_id"]), float(body["price_cents"])
+            length = int(self.headers.get("Content-Length", 0))
+            body = json.loads(self.rfile.read(length)) if length else {}
         except Exception:  # noqa: BLE001
             self._send(400, "application/json", b'{"ok": false, "error": "bad request"}')
             return
-        code, payload = do_reprice(order_id, cents)
+        if self.path == "/place":
+            code, payload = start_batch(body)
+        elif self.path == "/place_abort":
+            PLACER["abort"] = True
+            code, payload = 200, {"ok": True}
+        elif self.path == "/cancel_all":
+            code, payload = do_cancel_all()
+        else:
+            try:
+                order_id, cents = str(body["order_id"]), float(body["price_cents"])
+            except Exception:  # noqa: BLE001
+                self._send(400, "application/json", b'{"ok": false, "error": "bad request"}')
+                return
+            code, payload = do_reprice(order_id, cents)
         self._send(code, "application/json", json.dumps(payload).encode())
 
     def _send(self, code: int, ctype: str, body: bytes) -> None:
