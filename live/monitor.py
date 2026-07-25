@@ -622,26 +622,31 @@ def start_batch(payload: dict) -> tuple[int, dict]:
         assert 1 <= len(specs) <= 400, "1-400 orders per batch"
         open_now = {(o.get("market"), o.get("side"), round((o.get("price") or 0) * 100, 1))
                     for o in MONITOR.orders}
-        clean = []
+        clean, precheck_skips = [], []
         for s in specs:
             m, side = str(s.get("market")), str(s.get("side") or "BUY")
             pc, q = float(s.get("price_cents")), int(s.get("size"))
+            # security checks stay hard failures — these should be impossible
             assert side in ("BUY", "SELL"), f"{m}: bad side"
             assert (m, side) in plan_rows, f"{m} {side}: not in the scan plan"
-            if side == "BUY":
-                assert 0.1 <= pc <= max_c, f"{m}: buy over the max-price slider"
-            else:
-                assert min_s <= pc <= 99.9, f"{m}: sell below the min-sell slider"
-            assert 1 <= q <= 20000, f"{m}: size out of range"
+            assert 0.1 <= pc <= 99.9 and 1 <= q <= 20000, f"{m}: price/size out of range"
+            # slider caps are user config — skip and report, don't kill the batch
+            if side == "BUY" and pc > max_c:
+                precheck_skips.append(f"{m}: {pc:g}¢ over the max-buy slider")
+                continue
+            if side == "SELL" and pc < min_s:
+                precheck_skips.append(f"{m}: {pc:g}¢ under the min-sell slider")
+                continue
             if any(mm == m and ss == side and abs(ppc - pc) <= 1.0 for mm, ss, ppc in open_now):
                 continue  # an order already rests within a tick — never double up
             clean.append({"market": m, "side": side, "price_cents": pc, "size": q})
-        assert clean, "nothing to place — every order duplicates an existing one"
+        assert clean, "nothing to place — every order duplicates an existing one or missed the sliders"
     except (AssertionError, TypeError, ValueError, KeyError) as e:
         return 400, {"ok": False, "error": str(e)[:200]}
     PLACER.update(running=True, results=[], total=len(clean), abort=False, summary="")
     threading.Thread(target=run_batch, args=(clean, plan_rows), daemon=True).start()
-    return 200, {"ok": True, "started": len(clean)}
+    return 200, {"ok": True, "started": len(clean),
+                 "precheck_skipped": precheck_skips[:20]}
 
 
 def _book_without(book: dict, side: str, price: float, size: float) -> dict:
@@ -1061,9 +1066,12 @@ function planRows(){
   const sMin = +document.getElementById('sellSlider').value;
   const hide = document.getElementById('hideRisk').checked;
   return ((PLAN && PLAN.plan.results) || [])
-    .filter(r => r.pick && (r.side === 'SELL' ? r.pick.price*100 >= sMin : r.pick.price*100 <= cap))
-    .filter(r => !(hide && r.risk))
-    .filter(r => ord(r))
+    .filter(r => r.pick && !(hide && r.risk))
+    .filter(r => {
+      const o = ord(r);  // filter on the price actually being placed
+      if(!o) return false;
+      return r.side === 'SELL' ? o.price*100 >= sMin : o.price*100 <= cap;
+    })
     .sort((a,b) => (ord(b).est_day) - (ord(a).est_day));
 }
 function renderPlan(){
@@ -1137,6 +1145,9 @@ async function placeBatch(){
           price_cents: +(ord(r).price*100).toFixed(1), size: ord(r).size}))})});
     const d = await r.json();
     if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
+    if(d.precheck_skipped && d.precheck_skipped.length)
+      alert(d.precheck_skipped.length + ' order(s) skipped by the sliders:\\n' +
+            d.precheck_skipped.slice(0,5).join('\\n'));
     pollPlace();
   }catch(e){ alert('Failed: ' + e); }
 }
