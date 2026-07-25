@@ -400,6 +400,19 @@ def _is_us_politics(slug: str) -> bool:
     return any(t.startswith("us") or t.startswith(US_POLITICS_HINTS) or t.endswith("gov") for t in tokens)
 
 
+def _is_econ(slug: str) -> bool:
+    """Economic-data markets (CPI prints, jobs numbers, Fed decisions…) —
+    excluded from suggestions and the placement plan by request, even though
+    the exchange's politics tag includes them."""
+    tokens = slug.lower().split("-")
+    return any(
+        "cpi" in t or "gdp" in t
+        or t.startswith(("fomc", "fedfund", "payroll", "nfp", "unemploy",
+                         "inflat", "recess", "jobless"))
+        for t in tokens
+    )
+
+
 def fetch_politics_events() -> tuple[list[str], dict[str, int]]:
     """From events tagged politics/elections (authoritative, unlike slug
     heuristics): (ordered open market slugs, market slug -> number of open
@@ -521,6 +534,9 @@ def fetch_opportunities(
         slug = p.get("marketSlug", "")
         if not slug or slug in exclude:
             stats["excluded"] += 1
+            return
+        if _is_econ(slug):  # no econ-data markets, per standing instruction
+            stats["not_politics"] += 1
             return
         if not _is_us_politics(slug):  # tags include foreign races; US only
             stats["not_politics"] += 1

@@ -249,9 +249,13 @@ def main() -> None:
           f"{len(mine)} already quoted, inventory in {len(held)}")
 
     results, no_pick, skipped = [], [], []
+    econ_skipped = 0
     for i, slug in enumerate(sorted(progs)):
         prog = progs[slug]
         if not prog.get("pool"):
+            continue
+        if tr._is_econ(slug):  # no econ-data markets, per standing instruction
+            econ_skipped += 1
             continue
         prog = dict(prog)
         prog["event_n"] = max(event_sizes.get(slug, 1), len(race.get(slug.rsplit("-", 1)[0], [])))
@@ -282,7 +286,8 @@ def main() -> None:
 
     lines = ["# Passive placement plan — every politics market, both sides", ""]
     lines.append(f"_Scanned {len(results)} market-sides with live reward pools "
-                 f"({len(skipped)} unreadable books). Generated {tr._et_str()}._")
+                 f"({len(skipped)} unreadable books; {econ_skipped} econ-data markets "
+                 f"excluded by request). Generated {tr._et_str()}._")
     lines.append("")
     lines.append(f"**If you place everything below:** ~${tot_day:,.2f}/day "
                  f"(~${tot_day * 30:,.0f}/month) for ~${tot_cap:,.0f} of locked capital.")
