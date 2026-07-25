@@ -1035,7 +1035,27 @@ function planCap(v){ document.getElementById('capLbl').textContent = v + '¢'; r
 function planSell(v){ document.getElementById('sellLbl').textContent = v + '¢'; renderPlan(); }
 function pkey(r){ return r.market + '|' + (r.side || 'BUY'); }
 function szmode(){ const el = document.querySelector('input[name="szmode"]:checked'); return el ? el.value : 'pick'; }
-function ord(r){ return (szmode() === 'max' && r.max) ? r.max : r.pick; }
+function shareAt(m, q){
+  // share = kS/(D+kS): recover D/k from the known (size, share) point, rescale
+  const s = Math.min(m.share/100, 0.999);
+  if(s <= 0) return 0;
+  const Dk = m.size * (1 - s) / s;
+  return q / (Dk + q);
+}
+function afford(r){
+  // the full-size order, shrunk to what per-market buying power can back
+  const m = r.max; if(!m) return null;
+  if(BP == null || m.covered || m.capital <= BP) return m;
+  const unit = r.side === 'SELL' ? (1 - m.price) : m.price;  // lock per contract
+  const q = Math.min(m.size, Math.floor(BP / Math.max(unit, 0.0001)));
+  if(q < 1) return null;
+  const s0 = Math.min(m.share/100, 0.999), sq = shareAt(m, q);
+  return {side: m.side, price: m.price, size: q, covered: m.covered,
+          capital: +(unit * q).toFixed(2),
+          est_day: +(m.est_day * (s0 > 0 ? sq / s0 : 0)).toFixed(2),
+          share: +(sq * 100).toFixed(1), sized_down: true};
+}
+function ord(r){ return (szmode() === 'max' && r.max) ? afford(r) : r.pick; }
 function planRows(){
   const cap = +document.getElementById('capSlider').value;
   const sMin = +document.getElementById('sellSlider').value;
@@ -1043,7 +1063,8 @@ function planRows(){
   return ((PLAN && PLAN.plan.results) || [])
     .filter(r => r.pick && (r.side === 'SELL' ? r.pick.price*100 >= sMin : r.pick.price*100 <= cap))
     .filter(r => !(hide && r.risk))
-    .sort((a,b) => ((b.max||b.pick).est_day) - ((a.max||a.pick).est_day));
+    .filter(r => ord(r))
+    .sort((a,b) => (ord(b).est_day) - (ord(a).est_day));
 }
 function renderPlan(){
   if(!PLAN) return;
@@ -1061,7 +1082,7 @@ function renderPlan(){
         '<td'+(r.side==='SELL'?' style="color:#f0883e"':'')+'>'+(r.side==='SELL'?'SELL':'BUY')+
         (p.covered?' 📦':'')+'</td>'+
         '<td class="r">'+(p.price*100).toFixed(0)+'¢</td>'+
-        '<td class="r">'+p.size.toLocaleString()+'</td>'+
+        '<td class="r">'+p.size.toLocaleString()+(p.sized_down?' <span class="sub">↓fit</span>':'')+'</td>'+
         '<td class="r">$'+p.capital.toFixed(0)+'</td>'+
         '<td class="r">$'+p.est_day.toFixed(2)+upTo+'</td></tr>'; }).join('');
   planSum();
