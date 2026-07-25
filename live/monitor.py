@@ -660,27 +660,32 @@ def _book_without(book: dict, side: str, price: float, size: float) -> dict:
     return b
 
 
+TARGET_ORDER_EST = 0.15  # ~$4.50/month per order — "a few dollars across every market"
+
+
 def _optimal_price(order: dict, book: dict, prog: dict,
                    min_off: int = 1) -> tuple[float | None, float]:
-    """(best price, est $/day) for this order's size on the current book.
-    min_off = how many ticks behind the best price to stay (0 joins the touch;
-    the default keeps 1 tick of cushion — 50% weight under DF 0.50, far fewer
-    fills). The deep quote is always a candidate; never crosses."""
+    """The SAFEST price that clears the modest earnings target for this
+    order's size — candidates are tried deepest-first (deep quote, then
+    stepping toward the touch), and the first one earning >= TARGET_ORDER_EST
+    wins. Only if nothing clears the target does it fall back to whichever
+    candidate earns most (joining the touch as a last resort — where the
+    whole window sits at the best level, queued behind the wall)."""
     side, size = order["side"], order["size"]
     base = _book_without(book, side, order["price"], size)
     tick = book.get("tick") or 0.01
     bids, asks = base.get("bids") or [], base.get("asks") or []
-    offs = (min_off, min_off + 1, min_off + 2)
+    offs = range(min_off, min_off + 6)
     if side == "BUY":
         best = bids[0][0] if bids else None
-        cands = [round(best - o * tick, 4) for o in offs] if best else []
-        cands = [p for p in cands if p >= 0.01] + [0.01]
+        near = [round(best - o * tick, 4) for o in offs] if best else []
+        cands = [0.01] + [p for p in reversed(near) if p >= 0.01]  # deepest first
         if asks:
             cands = [p for p in cands if p <= round(asks[0][0] - tick, 4)]
     else:
         best = asks[0][0] if asks else None
-        cands = [round(best + o * tick, 4) for o in offs] if best else []
-        cands = [p for p in cands if p <= 0.99] + [0.99]
+        near = [round(best + o * tick, 4) for o in offs] if best else []
+        cands = [0.99] + [p for p in reversed(near) if p <= 0.99]  # deepest first
         if bids:
             cands = [p for p in cands if p >= round(bids[0][0] + tick, 4)]
     best_p, best_est = None, -1.0
@@ -693,6 +698,8 @@ def _optimal_price(order: dict, book: dict, prog: dict,
         probe = {"market": order["market"], "side": side, "price": p, "size": float(size)}
         tr._score_order(probe, merged, prog)
         est = probe.get("est_day") or 0.0
+        if est >= TARGET_ORDER_EST:
+            return p, est  # safest price that pays the few dollars — done
         if est > best_est:
             best_p, best_est = p, est
     if best_est <= 0 and min_off > 0:
@@ -714,8 +721,10 @@ def compute_reprice_plan(min_off: int = 1) -> list[dict]:
         if not cached or not prog or not prog.get("pool"):
             continue
         book = cached[1]
-        p, est = _optimal_price(o, book, prog, min_off)
         cur = o.get("est_day") or 0.0
+        if cur >= TARGET_ORDER_EST:
+            continue  # already paying its few dollars — leave it alone
+        p, est = _optimal_price(o, book, prog, min_off)
         tick = book.get("tick") or 0.01
         if p is None or abs(p - o["price"]) < tick / 2:
             continue  # already optimal
