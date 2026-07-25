@@ -649,6 +649,100 @@ def start_batch(payload: dict) -> tuple[int, dict]:
                  "precheck_skipped": precheck_skips[:20]}
 
 
+def compute_dead_orders() -> list[dict]:
+    """Resting orders earning ~nothing for a DEFINITIVE reason — scored
+    against a real book (no program, outside the window, ~0% share). Orders
+    whose book simply hasn't been fetched yet are never flagged."""
+    out = []
+    for o in MONITOR.orders:
+        if not o.get("id"):
+            continue
+        if (o.get("est_day") or 0.0) >= 0.01:
+            continue
+        v = o.get("verdict") or ""
+        if not (v.startswith("❌") or v.startswith("✅")):
+            continue  # book unavailable/pending — can't judge, leave alone
+        locked = o["price"] * o["size"] if o["side"] == "BUY" else (1 - o["price"]) * o["size"]
+        out.append({"id": o["id"], "market": o["market"], "side": o["side"],
+                    "price_cents": round(o["price"] * 100, 1), "size": o["size"],
+                    "locked": round(locked, 2), "why": v[:90]})
+    out.sort(key=lambda r: -r["locked"])
+    return out
+
+
+def run_cancel_batch(specs: list[dict]) -> None:
+    done = failed = 0
+    consec_err = 0
+    try:
+        for spec in specs:
+            if PLACER["abort"]:
+                PLACER["summary"] = "stopped by user"
+                break
+            res = {"market": spec["market"], "side": spec["side"],
+                   "price_cents": spec["price_cents"], "size": spec["size"]}
+            try:
+                path = f"/v1/order/{spec['id']}/cancel"
+                r = requests.request(
+                    "POST", tr.TRADE_API + path,
+                    headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
+                             "Content-Type": "application/json"},
+                    json={"marketSlug": spec["market"]}, timeout=20,
+                )
+                if r.status_code < 300:
+                    res["status"] = "cancelled"
+                else:
+                    res.update(status="rejected", note=tr._http_err(r))
+            except Exception as e:  # noqa: BLE001
+                res.update(status="error", note=f"{type(e).__name__}: {e}"[:150])
+            PLACER["results"].append(res)
+            ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                            "market": res["market"], "side": f"{res['side']} (cancel)",
+                            "from": res["price_cents"], "to": "—", "size": res["size"],
+                            "status": res["status"], "response": (res.get("note") or "")[:150],
+                            "verified": res["status"] == "cancelled"})
+            if res["status"] == "cancelled":
+                done += 1
+                consec_err = 0
+            else:
+                failed += 1
+                if "429" in (res.get("note") or "") or "rate limited" in (res.get("note") or ""):
+                    PLACER["summary"] = "rate limited — stopped; wait a few minutes and retry"
+                    break
+                consec_err += 1
+                if consec_err >= 3:
+                    PLACER["summary"] = "stopped after 3 consecutive failures"
+                    break
+            time.sleep(BATCH_SPACING_SECONDS)
+    finally:
+        PLACER["summary"] = PLACER["summary"] or "done"
+        PLACER["running"] = False
+        POLL_KICK.set()
+        notify("Dead-order cleanup finished",
+               f"{done} cancelled, {failed} failed ({PLACER['summary']})",
+               "high" if failed else "default")
+
+
+def start_cancel_batch(payload: dict) -> tuple[int, dict]:
+    if PLACER["running"]:
+        return 409, {"ok": False, "error": "a batch is already running"}
+    known = {o.get("id"): o for o in MONITOR.orders if o.get("id")}
+    try:
+        specs = payload.get("orders") or []
+        assert 1 <= len(specs) <= 400, "1-400 orders per batch"
+        clean = []
+        for s in specs:
+            oid = str(s.get("id"))
+            o = known.get(oid)
+            assert o is not None, f"{oid}: not one of your resting orders"
+            clean.append({"id": oid, "market": o["market"], "side": o["side"],
+                          "price_cents": round(o["price"] * 100, 1), "size": o["size"]})
+    except (AssertionError, TypeError, ValueError) as e:
+        return 400, {"ok": False, "error": str(e)[:200]}
+    PLACER.update(running=True, results=[], total=len(clean), abort=False, summary="")
+    threading.Thread(target=run_cancel_batch, args=(clean,), daemon=True).start()
+    return 200, {"ok": True, "started": len(clean)}
+
+
 def _book_without(book: dict, side: str, price: float, size: float) -> dict:
     """The book with OUR resting order removed — scoring candidates against a
     book that still contains us double-counts our size."""
@@ -958,6 +1052,7 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div class="sub" id="updated"></div>
 <div class="err" id="err"></div>
 <div style="margin:8px 0"><button class="tab" onclick="loadReprice()">⚡ Optimize prices</button>
+ <button class="tab" onclick="loadDead()">🧹 Cancel dead orders</button>
  <span class="sub" style="margin-left:8px">distance:
   <label><input type="radio" name="qdist" value="0"> join</label>
   <label><input type="radio" name="qdist" value="1" checked> 1 back</label>
@@ -1232,6 +1327,64 @@ async function pollReprice(){
     if(d.running) setTimeout(pollReprice, 2000); else setTimeout(refresh, 1500);
   }catch(e){ setTimeout(pollReprice, 3000); }
 }
+let DPLAN = null, DSEL = {};
+async function loadDead(){
+  document.getElementById('rpl').innerHTML = '<div class="mkt">checking…</div>';
+  try{
+    const d = await (await fetch('dead_plan')).json();
+    DPLAN = d.plan || [];
+  }catch(e){ document.getElementById('rpl').innerHTML = '<div class="mkt">failed: '+e+'</div>'; return; }
+  if(!DPLAN.length){
+    document.getElementById('rpl').innerHTML =
+      '<div class="mkt">No definitively dead orders — everything is earning or awaiting its book 🎉</div>';
+    return;
+  }
+  DSEL = {}; DPLAN.forEach(r => DSEL[r.id] = true);
+  renderDead();
+}
+function renderDead(){
+  const sel = DPLAN.filter(r => DSEL[r.id]);
+  const freed = sel.reduce((s,r)=>s+r.locked,0);
+  document.getElementById('rpl').innerHTML =
+    '<table><tr><th></th><th>Market</th><th class="r">Order</th><th class="r">Locked</th></tr>'+
+    DPLAN.map(r =>
+      '<tr><td><input type="checkbox" '+(DSEL[r.id]?'checked':'')+
+      ' onchange="DSEL[\\''+r.id+'\\']=this.checked;renderDead()"></td>'+
+      '<td class="mkt">'+esc(r.market)+'<div class="sub" style="font-size:10px">'+esc(r.why)+'</div></td>'+
+      '<td class="r" style="white-space:nowrap">'+r.side+' '+r.size.toLocaleString()+' @ '+r.price_cents+'¢</td>'+
+      '<td class="r">$'+r.locked.toFixed(0)+'</td></tr>').join('')+
+    '</table><div class="rp"><button onclick="goCancelDead()">Cancel '+sel.length+
+    ' orders (frees ~$'+freed.toFixed(0)+')</button>'+
+    '<button class="alt" onclick="DPLAN=null;document.getElementById(\\'rpl\\').innerHTML=\\'\\'">Close</button></div>';
+}
+async function goCancelDead(){
+  const sel = DPLAN.filter(r => DSEL[r.id]);
+  if(!sel.length){ alert('Nothing selected'); return; }
+  const freed = sel.reduce((s,r)=>s+r.locked,0);
+  if(!confirm('Cancel ' + sel.length + ' resting orders earning ~$0/day?\\nFrees ~$' +
+              freed.toFixed(0) + ' of locked collateral. Positions are untouched — this only ' +
+              'removes unfilled orders.')) return;
+  try{
+    const r = await fetch('cancel_batch', {method:'POST',
+      headers:{'Content-Type':'application/json','X-Reprice':'1'},
+      body: JSON.stringify({orders: sel.map(r => ({id: r.id}))})});
+    const d = await r.json();
+    if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
+    DPLAN = null; document.getElementById('rpl').innerHTML = '';
+    pollCancelDead();
+  }catch(e){ alert('Failed: ' + e); }
+}
+async function pollCancelDead(){
+  try{
+    const d = await (await fetch('place_status')).json();
+    const done = d.results.length;
+    const ok = d.results.filter(x=>x.status==='cancelled').length;
+    document.getElementById('rpProg').textContent =
+      (d.running ? 'cancelling… ' : 'cleanup ' + (d.summary || 'done') + ': ') +
+      done + '/' + d.total + ' — ' + ok + ' cancelled, ' + (done - ok) + ' failed';
+    if(d.running) setTimeout(pollCancelDead, 2000); else setTimeout(refresh, 1500);
+  }catch(e){ setTimeout(pollCancelDead, 3000); }
+}
 async function cancelAll(){
   if(!confirm('Cancel EVERY open order on your account?')) return;
   if(!confirm('Are you SURE? All reward earning stops until you re-place orders.')) return;
@@ -1459,6 +1612,9 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path.startswith("/place_status"):
             self._send(200, "application/json", json.dumps(
                 {k: PLACER[k] for k in ("running", "results", "total", "summary")}).encode())
+        elif self.path.startswith("/dead_plan"):
+            self._send(200, "application/json",
+                       json.dumps({"plan": compute_dead_orders()}).encode())
         elif self.path.startswith("/reprice_plan"):
             try:
                 from urllib.parse import parse_qs, urlparse
@@ -1481,7 +1637,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("WWW-Authenticate", 'Basic realm="rewards"')
             self.end_headers()
             return
-        if self.path not in ("/reprice", "/place", "/place_abort", "/cancel_all", "/reprice_batch"):
+        if self.path not in ("/reprice", "/place", "/place_abort", "/cancel_all",
+                             "/reprice_batch", "/cancel_batch"):
             self._send(404, "text/plain", b"not found")
             return
         # Cross-origin requests can't set custom headers without a CORS
@@ -1499,6 +1656,8 @@ class Handler(BaseHTTPRequestHandler):
             code, payload = start_batch(body)
         elif self.path == "/reprice_batch":
             code, payload = start_reprice_batch(body)
+        elif self.path == "/cancel_batch":
+            code, payload = start_cancel_batch(body)
         elif self.path == "/place_abort":
             PLACER["abort"] = True
             code, payload = 200, {"ok": True}
