@@ -660,22 +660,26 @@ def _book_without(book: dict, side: str, price: float, size: float) -> dict:
     return b
 
 
-def _optimal_price(order: dict, book: dict, prog: dict) -> tuple[float | None, float]:
-    """(best price, est $/day) for this order's size on the current book —
-    join best, 1-2 ticks behind, or the deep quote; never crossing."""
+def _optimal_price(order: dict, book: dict, prog: dict,
+                   min_off: int = 1) -> tuple[float | None, float]:
+    """(best price, est $/day) for this order's size on the current book.
+    min_off = how many ticks behind the best price to stay (0 joins the touch;
+    the default keeps 1 tick of cushion — 50% weight under DF 0.50, far fewer
+    fills). The deep quote is always a candidate; never crosses."""
     side, size = order["side"], order["size"]
     base = _book_without(book, side, order["price"], size)
     tick = book.get("tick") or 0.01
     bids, asks = base.get("bids") or [], base.get("asks") or []
+    offs = (min_off, min_off + 1, min_off + 2)
     if side == "BUY":
         best = bids[0][0] if bids else None
-        cands = [round(best - o * tick, 4) for o in (0, 1, 2)] if best else []
+        cands = [round(best - o * tick, 4) for o in offs] if best else []
         cands = [p for p in cands if p >= 0.01] + [0.01]
         if asks:
             cands = [p for p in cands if p <= round(asks[0][0] - tick, 4)]
     else:
         best = asks[0][0] if asks else None
-        cands = [round(best + o * tick, 4) for o in (0, 1, 2)] if best else []
+        cands = [round(best + o * tick, 4) for o in offs] if best else []
         cands = [p for p in cands if p <= 0.99] + [0.99]
         if bids:
             cands = [p for p in cands if p >= round(bids[0][0] + tick, 4)]
@@ -691,10 +695,14 @@ def _optimal_price(order: dict, book: dict, prog: dict) -> tuple[float | None, f
         est = probe.get("est_day") or 0.0
         if est > best_est:
             best_p, best_est = p, est
+    if best_est <= 0 and min_off > 0:
+        # The touch holds the whole Target Size window — behind it everything
+        # scores zero, so joining (queued behind the wall) is the only play.
+        return _optimal_price(order, book, prog, 0)
     return best_p, best_est
 
 
-def compute_reprice_plan() -> list[dict]:
+def compute_reprice_plan(min_off: int = 1) -> list[dict]:
     """Orders whose current price leaves meaningful money on the table."""
     out = []
     progs = tr._PROG_CACHE.get("progs") or {}
@@ -706,7 +714,7 @@ def compute_reprice_plan() -> list[dict]:
         if not cached or not prog or not prog.get("pool"):
             continue
         book = cached[1]
-        p, est = _optimal_price(o, book, prog)
+        p, est = _optimal_price(o, book, prog, min_off)
         cur = o.get("est_day") or 0.0
         tick = book.get("tick") or 0.01
         if p is None or abs(p - o["price"]) < tick / 2:
@@ -930,7 +938,11 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div class="sub" id="rate"></div>
 <div class="sub" id="updated"></div>
 <div class="err" id="err"></div>
-<div style="margin:8px 0"><button class="tab" onclick="loadReprice()">⚡ Optimize prices</button></div>
+<div style="margin:8px 0"><button class="tab" onclick="loadReprice()">⚡ Optimize prices</button>
+ <span class="sub" style="margin-left:8px">distance:
+  <label><input type="radio" name="qdist" value="0"> join</label>
+  <label><input type="radio" name="qdist" value="1" checked> 1 back</label>
+  <label><input type="radio" name="qdist" value="2"> 2 back</label></span></div>
 <div id="rpl"></div>
 <div id="rpProg" class="mkt"></div>
 <div id="ovg" style="margin:10px 0"></div>
@@ -1103,10 +1115,14 @@ async function abortBatch(){
   pollPlace();
 }
 let RPLAN = null, RSEL = {};
+(function(){ const v = localStorage.getItem('qdist');
+  if(v !== null){ const el = document.querySelector('input[name="qdist"][value="'+v+'"]'); if(el) el.checked = true; } })();
 async function loadReprice(){
   document.getElementById('rpl').innerHTML = '<div class="mkt">computing…</div>';
+  const off = (document.querySelector('input[name="qdist"]:checked')||{value:'1'}).value;
+  localStorage.setItem('qdist', off);
   try{
-    const d = await (await fetch('reprice_plan')).json();
+    const d = await (await fetch('reprice_plan?offset=' + off)).json();
     RPLAN = d.plan || [];
   }catch(e){ document.getElementById('rpl').innerHTML = '<div class="mkt">failed: '+e+'</div>'; return; }
   if(!RPLAN.length){
@@ -1389,8 +1405,14 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, "application/json", json.dumps(
                 {k: PLACER[k] for k in ("running", "results", "total", "summary")}).encode())
         elif self.path.startswith("/reprice_plan"):
+            try:
+                from urllib.parse import parse_qs, urlparse
+                q = parse_qs(urlparse(self.path).query)
+                min_off = max(0, min(3, int(q.get("offset", ["1"])[0])))
+            except Exception:  # noqa: BLE001
+                min_off = 1
             self._send(200, "application/json",
-                       json.dumps({"plan": compute_reprice_plan()}).encode())
+                       json.dumps({"plan": compute_reprice_plan(min_off)}).encode())
         elif self.path.startswith("/series.json"):
             with MONITOR.lock:
                 payload = json.dumps({"series": MONITOR.state.get("series", {})})

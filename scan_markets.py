@@ -183,10 +183,13 @@ def evaluate_side(slug: str, book: dict, prog: dict, side: str, held: float = 0.
     best_bid = bids[0][0] if bids else None
     best_ask = asks[0][0] if asks else None
 
+    # Candidates include the join, but the pick rule prefers lower capital, so
+    # a behind-the-touch quote wins whenever it clears the target — the join
+    # only gets chosen where the window forces it (thick touch = queued last).
     prices: list[float] = []
     if side == "BUY":
         if best_bid:
-            for off in (0, 1, 2):  # join, 1 back, 2 back
+            for off in (0, 1, 2):
                 p = round(best_bid - off * tick, 4)
                 if p >= 0.01:
                     prices.append(p)
@@ -196,7 +199,7 @@ def evaluate_side(slug: str, book: dict, prog: dict, side: str, held: float = 0.
         deep_ok = lambda p: p <= 0.02  # noqa: E731
     else:
         if best_ask:
-            for off in (0, 1, 2):  # join, 1 back (higher), 2 back
+            for off in (0, 1, 2):
                 p = round(best_ask + off * tick, 4)
                 if p <= 0.99:
                     prices.append(p)
