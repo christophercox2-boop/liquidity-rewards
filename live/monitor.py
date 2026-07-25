@@ -37,6 +37,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import track_rewards as tr  # noqa: E402 — reuse the tracker's scoring code
 
 POLL_SECONDS = int(os.environ.get("POLL_SECONDS", "30"))
+POS_REFRESH_SECONDS = int(os.environ.get("POS_REFRESH_SECONDS", "120"))  # P/L tab data
 PORT = int(os.environ.get("PORT", "8080"))
 DASH_PASSWORD = os.environ.get("DASH_PASSWORD", "")
 STATE_PATH = Path(os.environ.get("STATE_PATH", "state.json"))
@@ -143,6 +144,9 @@ class Monitor:
         self.updated: dt.datetime | None = None
         self._last_remote_save = 0.0
         self.persistence = "github" if GITHUB_TOKEN else "local only — resets on redeploy"
+        self.positions: dict[str, dict] = {}  # raw /v1/portfolio/positions, for the P/L tab
+        self.pnl_updated: dt.datetime | None = None
+        self.pnl_error: str | None = None
         self.alert_high: dict[str, float] = {}  # per-market peak rate since it last hit $0
         self.seen_rate: float | None = self.state.get("alert_seen_rate")  # rate when app last opened
         self.drop_steps: int = int(self.state.get("alert_drop_steps") or 0)
@@ -184,6 +188,47 @@ class Monitor:
                      f"{mkt}: was ${high:.2f}/day, now $0", "high"))
                 high = 0.0  # re-arm only after it earns > $1/day again
             self.alert_high[mkt] = high
+
+    def set_positions(self, positions: dict[str, dict]) -> None:
+        with self.lock:
+            self.positions = positions
+            self.pnl_updated = dt.datetime.now(dt.timezone.utc)
+
+    def _pnl(self) -> dict:
+        """P/L per market from the portfolio positions (called under lock).
+        Unrealized = current cash value − cost of the open position; the
+        exchange reports realized P/L (closed trades + resolutions) directly."""
+        rows = []
+        totals = {"cash": 0.0, "realized": 0.0, "unrealized": 0.0, "total": 0.0}
+        for slug, p in self.positions.items():
+            net = tr._num(p.get("netPosition"))
+            bought, sold = tr._num(p.get("qtyBought")), tr._num(p.get("qtySold"))
+            if not (net or bought or sold):
+                continue  # never filled — nothing to show
+            cost, cash = tr._num(p.get("cost")), tr._num(p.get("cashValue"))
+            realized = tr._num(p.get("realized"))
+            unrealized = cash - cost
+            rows.append({
+                "market": slug,
+                "net": net,
+                "avg_cents": round(cost / net * 100, 2) if net else None,
+                "cost": round(cost, 2), "cash": round(cash, 2),
+                "realized": round(realized, 2), "unrealized": round(unrealized, 2),
+                "total": round(realized + unrealized, 2),
+                "expired": bool(p.get("expired")),
+            })
+            totals["cash"] += cash
+            totals["realized"] += realized
+            totals["unrealized"] += unrealized
+            totals["total"] += realized + unrealized
+        rows.sort(key=lambda r: -r["total"])
+        return {
+            "rows": rows,
+            "totals": {k: round(v, 2) for k, v in totals.items()},
+            "updated": (self.pnl_updated.astimezone(ET).strftime("%I:%M:%S %p ET")
+                        if self.pnl_updated else None),
+            "error": self.pnl_error,
+        }
 
     def mark_opened(self) -> None:
         """Dashboard viewed — re-baseline the overall rate-drop alert."""
@@ -313,6 +358,7 @@ class Monitor:
                 ),
                 "error": self.error,
                 "diag": {k: v for k, v in tr.LAST_DEBUG.items() if k.startswith("_")},
+                "pnl": self._pnl(),
                 "poll_seconds": POLL_SECONDS,
                 "persistence": self.persistence,
                 "alerts": "ntfy" if NTFY_TOPIC else "off",
@@ -327,6 +373,30 @@ POLL_KICK = threading.Event()  # set after a reprice so the next poll runs immed
 
 
 ACTIONS: list[dict] = []  # audit log of every reprice: request + raw response + verification
+
+
+def fetch_positions(key_id: str, secret_key: str) -> dict[str, dict]:
+    """All portfolio positions keyed by market slug (paginated, authenticated)."""
+    path = "/v1/portfolio/positions"
+    out: dict[str, dict] = {}
+    cursor = None
+    for _ in range(20):
+        params: dict = {"limit": 100}
+        if cursor:
+            params["cursor"] = cursor
+        r = requests.get(
+            tr.TRADE_API + path,
+            headers=tr.auth_headers(key_id, secret_key, "GET", path),
+            params=params, timeout=20,
+        )
+        if r.status_code >= 400:
+            raise RuntimeError(f"{path} -> {tr._http_err(r)}")
+        j = r.json()
+        out.update(j.get("positions") or {})
+        cursor = j.get("nextCursor")
+        if j.get("eof") or not cursor:
+            break
+    return out
 
 
 def _verify_resting(market: str, side: str, price_value: str) -> tuple[bool, str]:
@@ -422,7 +492,16 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  .rp input{width:70px;background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:5px;font-size:14px}
  .rp button{background:#238636;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;margin-left:6px}
  .rp button.alt{background:#21262d;color:#8b949e}
+ .tab{background:#21262d;color:#8b949e;border:none;border-radius:8px;padding:8px 16px;font-size:14px}
+ .tab.on{background:#238636;color:#fff}
+ .pos{color:#3fb950}
+ .neg{color:#f85149}
 </style></head><body>
+<div style="display:flex;gap:8px;margin-bottom:12px">
+ <button class="tab on" id="tabR" onclick="showTab('R')">Rewards</button>
+ <button class="tab" id="tabP" onclick="showTab('P')">P/L</button>
+</div>
+<div id="viewR">
 <div class="sub">Earned today (ET) — live estimate</div>
 <div class="big" id="earned">…</div>
 <div class="sub" id="rate"></div>
@@ -432,9 +511,46 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <h3>By market <span class="sub">(sorted by current rate · tap a row for the math)</span></h3><table id="markets"></table>
 <h3>Previous days</h3><table id="history"></table>
 <div id="acts"></div>
+</div>
+<div id="viewP" style="display:none">
+<div class="sub">Profit / loss on filled orders</div>
+<div class="big" id="pnlTotal">…</div>
+<div class="sub" id="pnlSub"></div>
+<table id="pnl"></table>
+<div class="mkt" id="pnlNote" style="margin-top:10px">Value = what the open position is worth
+at current prices. Unreal. = value − what it cost. Real. = P/L the exchange has already
+booked (closed trades and resolved markets). Refreshes every 2 min.</div>
+</div>
 <script>
 let OPEN = {}, GOPEN = {}, SERIES = null, RATES = {};
 let SEEN = JSON.parse(localStorage.getItem('seenRates') || '{}');
+function showTab(t){
+  document.getElementById('viewR').style.display = t==='R' ? '' : 'none';
+  document.getElementById('viewP').style.display = t==='P' ? '' : 'none';
+  document.getElementById('tabR').className = 'tab' + (t==='R' ? ' on' : '');
+  document.getElementById('tabP').className = 'tab' + (t==='P' ? ' on' : '');
+}
+function usd(v){ return (v<0?'-$':'$') + Math.abs(v||0).toFixed(2); }
+function cls(v){ return v>0.004 ? 'pos' : (v<-0.004 ? 'neg' : ''); }
+function renderPnl(pn){
+  const t = (pn && pn.totals) || {};
+  const big = document.getElementById('pnlTotal');
+  big.textContent = usd(t.total); big.className = 'big ' + cls(t.total);
+  document.getElementById('pnlSub').textContent =
+    usd(t.realized) + ' realized · ' + usd(t.unrealized) + ' unrealized · positions worth ' + usd(t.cash) +
+    (pn && pn.updated ? ' · as of ' + pn.updated : '') + (pn && pn.error ? ' · ' + pn.error : '');
+  document.getElementById('pnl').innerHTML =
+    '<tr><th>Market</th><th class="r">Pos</th><th class="r">Avg</th><th class="r">Value</th>'+
+    '<th class="r">Real.</th><th class="r">Unreal.</th><th class="r">P/L</th></tr>' +
+    ((pn && pn.rows) || []).map(r =>
+      '<tr><td class="mkt">' + esc(r.market) + (r.expired ? ' <span class="sub">(resolved)</span>' : '') + '</td>' +
+      '<td class="r">' + (r.net||0).toLocaleString() + '</td>' +
+      '<td class="r">' + (r.avg_cents==null ? '—' : r.avg_cents.toFixed(1) + '¢') + '</td>' +
+      '<td class="r">' + usd(r.cash) + '</td>' +
+      '<td class="r ' + cls(r.realized) + '">' + usd(r.realized) + '</td>' +
+      '<td class="r ' + cls(r.unrealized) + '">' + usd(r.unrealized) + '</td>' +
+      '<td class="r ' + cls(r.total) + '"><b>' + usd(r.total) + '</b></td></tr>').join('');
+}
 function tgl(i, m){ OPEN[m] = !OPEN[m];
   const e = document.getElementById('d'+i); if(e) e.style.display = OPEN[m] ? '' : 'none';
   if(OPEN[m]){ SEEN[m] = RATES[m] || 0; localStorage.setItem('seenRates', JSON.stringify(SEEN));
@@ -522,6 +638,7 @@ async function refresh(){
     const msg = [d.error, diag].filter(Boolean).join(' · ');
     err.style.display = msg ? 'block' : 'none'; err.textContent = msg;
     document.getElementById('ovg').innerHTML = bigSpark(d.rate_series);
+    renderPnl(d.pnl);
     const allMarkets = {};
     d.orders.forEach(o => { if(o.market) allMarkets[o.market] = 0; });
     Object.entries(d.per_market_today).forEach(([m,v]) => { allMarkets[m] = v; });
@@ -654,6 +771,7 @@ class Handler(BaseHTTPRequestHandler):
 def poll_loop(key_id: str, secret_key: str) -> None:
     event_sizes: dict[str, int] = {}
     events_refreshed = 0.0
+    pos_refreshed = 0.0
     last_ok = time.time()
     err_notified = 0.0
     err_streak = 0
@@ -671,6 +789,13 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             err_streak = 0
             last_ok = time.time()
             MONITOR.maybe_save_remote()
+            if time.time() - pos_refreshed > POS_REFRESH_SECONDS:  # P/L tab data
+                pos_refreshed = time.time()
+                try:
+                    MONITOR.set_positions(fetch_positions(key_id, secret_key))
+                    MONITOR.pnl_error = None
+                except Exception as e:  # noqa: BLE001 — shown on the P/L tab
+                    MONITOR.pnl_error = f"{type(e).__name__}: {e}"
         except Exception as e:  # noqa: BLE001 — shown on the dashboard, loop survives
             MONITOR.error = f"{type(e).__name__}: {e}"
             err_streak += 1
