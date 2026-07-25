@@ -805,7 +805,7 @@ async function placeBatch(){
   const capD = sel.reduce((s,r)=>s+r.pick.capital,0), est = sel.reduce((s,r)=>s+r.pick.est_day,0);
   const nS = sel.filter(r=>r.side==='SELL').length;
   if(!confirm('Place ' + sel.length + ' post-only orders (' + (sel.length-nS) + ' buys, ' + nS +
-              ' sells)?\n$' + capD.toFixed(0) +
+              ' sells)?\\n$' + capD.toFixed(0) +
               ' locked capital, ~$' + est.toFixed(2) + '/day at current books.')) return;
   try{
     const r = await fetch('place', {method:'POST',
