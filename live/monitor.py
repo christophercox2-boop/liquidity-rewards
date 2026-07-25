@@ -732,6 +732,10 @@ booked (closed trades and resolved markets). Refreshes every 2 min.</div>
  <input type="range" id="sellSlider" min="10" max="99" value="85" style="width:55%;vertical-align:middle"
         oninput="planSell(this.value)"></div>
 <div style="margin:6px 0">
+ <label class="sub"><input type="checkbox" id="hideRisk" checked onchange="renderPlan()"> hide ⚠ risky</label>
+ &nbsp; <label class="sub"><input type="radio" name="szmode" value="pick" checked onchange="renderPlan()"> minimal size</label>
+ <label class="sub"><input type="radio" name="szmode" value="max" onchange="renderPlan()"> full size (20k)</label></div>
+<div style="margin:6px 0">
  <button class="tab" onclick="planAll(true)">Select all shown</button>
  <button class="tab" onclick="planAll(false)">Clear</button></div>
 <div class="sub" id="planSel"></div>
@@ -779,12 +783,16 @@ async function loadPlan(){
 function planCap(v){ document.getElementById('capLbl').textContent = v + '¢'; renderPlan(); }
 function planSell(v){ document.getElementById('sellLbl').textContent = v + '¢'; renderPlan(); }
 function pkey(r){ return r.market + '|' + (r.side || 'BUY'); }
+function szmode(){ const el = document.querySelector('input[name="szmode"]:checked'); return el ? el.value : 'pick'; }
+function ord(r){ return (szmode() === 'max' && r.max) ? r.max : r.pick; }
 function planRows(){
   const cap = +document.getElementById('capSlider').value;
   const sMin = +document.getElementById('sellSlider').value;
+  const hide = document.getElementById('hideRisk').checked;
   return ((PLAN && PLAN.plan.results) || [])
     .filter(r => r.pick && (r.side === 'SELL' ? r.pick.price*100 >= sMin : r.pick.price*100 <= cap))
-    .sort((a,b) => b.pick.est_day/Math.max(b.pick.capital,0.01) - a.pick.est_day/Math.max(a.pick.capital,0.01));
+    .filter(r => !(hide && r.risk))
+    .sort((a,b) => ((b.max||b.pick).est_day) - ((a.max||a.pick).est_day));
 }
 function renderPlan(){
   if(!PLAN) return;
@@ -792,7 +800,9 @@ function renderPlan(){
   const mine = new Set(PLAN.mine || []);
   document.getElementById('plan').innerHTML =
     '<tr><th></th><th>Market</th><th>Side</th><th class="r">@</th><th class="r">Size</th><th class="r">Cap.</th><th class="r">$/day</th></tr>' +
-    planRows().map(r => { const p = r.pick, k = pkey(r);
+    planRows().map(r => { const p = ord(r), k = pkey(r);
+      const upTo = (szmode() !== 'max' && r.max) ?
+        '<div class="sub" style="font-size:10px">up to $'+r.max.est_day.toFixed(2)+'</div>' : '';
       return '<tr><td><input type="checkbox" '+(PSEL[k]?'checked':'')+
         ' onchange="PSEL[\\''+k+'\\']=this.checked;planSum()"></td>'+
         '<td class="mkt">'+esc(r.market)+(mine.has(r.market)?' ✔':'')+
@@ -802,7 +812,7 @@ function renderPlan(){
         '<td class="r">'+(p.price*100).toFixed(0)+'¢</td>'+
         '<td class="r">'+p.size.toLocaleString()+'</td>'+
         '<td class="r">$'+p.capital.toFixed(0)+'</td>'+
-        '<td class="r">$'+p.est_day.toFixed(2)+'</td></tr>'; }).join('');
+        '<td class="r">$'+p.est_day.toFixed(2)+upTo+'</td></tr>'; }).join('');
   planSum();
 }
 function planAll(on){
@@ -811,16 +821,17 @@ function planAll(on){
 }
 function planSum(){
   const sel = planRows().filter(r => PSEL[pkey(r)]);
-  const cap = sel.reduce((s,r)=>s+r.pick.capital,0), est = sel.reduce((s,r)=>s+r.pick.est_day,0);
+  const cap = sel.reduce((s,r)=>s+ord(r).capital,0), est = sel.reduce((s,r)=>s+ord(r).est_day,0);
   document.getElementById('planSel').textContent =
-    sel.length + ' selected · $' + cap.toFixed(0) + ' locked capital · ~$' + est.toFixed(2) + '/day at current books';
+    sel.length + ' selected (' + szmode() + ' size) · $' + cap.toFixed(0) +
+    ' locked capital · ~$' + est.toFixed(2) + '/day at current books';
 }
 async function placeBatch(){
   const capC = +document.getElementById('capSlider').value;
   const sMin = +document.getElementById('sellSlider').value;
   const sel = planRows().filter(r => PSEL[pkey(r)]);
   if(!sel.length){ alert('Nothing selected'); return; }
-  const capD = sel.reduce((s,r)=>s+r.pick.capital,0), est = sel.reduce((s,r)=>s+r.pick.est_day,0);
+  const capD = sel.reduce((s,r)=>s+ord(r).capital,0), est = sel.reduce((s,r)=>s+ord(r).est_day,0);
   const nS = sel.filter(r=>r.side==='SELL').length;
   const nRisk = sel.filter(r=>r.risk).length;
   if(!confirm('Place ' + sel.length + ' post-only orders (' + (sel.length-nS) + ' buys, ' + nS +
@@ -832,7 +843,7 @@ async function placeBatch(){
       headers:{'Content-Type':'application/json','X-Reprice':'1'},
       body: JSON.stringify({max_price_cents: capC, min_sell_cents: sMin,
         orders: sel.map(r => ({market: r.market, side: r.side || 'BUY',
-          price_cents: +(r.pick.price*100).toFixed(1), size: r.pick.size}))})});
+          price_cents: +(ord(r).price*100).toFixed(1), size: ord(r).size}))})});
     const d = await r.json();
     if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
     pollPlace();

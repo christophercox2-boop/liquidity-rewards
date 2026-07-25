@@ -226,7 +226,20 @@ def evaluate_side(slug: str, book: dict, prog: dict, side: str, held: float = 0.
                 break  # sizes grow monotonically — first hit is cheapest at this price
     if not best:
         return None
-    out = {"market": slug, "side": side, "pick": best[1],
+    # What the side yields if you commit big: the same candidates at the
+    # 20,000-contract placement cap — this is what the list sorts by.
+    mx = None
+    for p in prices:
+        q = 20000
+        o = {"market": slug, "side": side, "price": p, "size": float(q)}
+        tr._score_order(o, _merged(book, side, p, q), prog)
+        est = o.get("est_day") or 0.0
+        cap, covered = _capital(side, p, q, held)
+        if est > 0 and (mx is None or (est, -cap) > (mx["est_day"], -mx["capital"])):
+            mx = {"side": side, "price": p, "size": q, "capital": cap,
+                  "covered": covered, "est_day": round(est, 3),
+                  "share": round((o.get("share") or 0) * 100, 1)}
+    out = {"market": slug, "side": side, "pick": best[1], "max": mx,
            "side_pool": round(tr._daily_pool(prog) / 2, 2),
            "best_bid": best_bid, "best_ask": best_ask, "held": held,
            "risk": _risk(slug, side, best[1], best_bid, best_ask)}
@@ -279,8 +292,7 @@ def main() -> None:
             print(f"  scanned {i}...")
         time.sleep(0.05)
 
-    results.sort(key=lambda r: (r["pick"]["est_day"] < TARGET_EST_DAY,
-                                -r["pick"]["est_day"] / max(r["pick"]["capital"], 0.01)))
+    results.sort(key=lambda r: -((r.get("max") or r["pick"])["est_day"]))
     tot_day = sum(r["pick"]["est_day"] for r in results)
     tot_cap = sum(r["pick"]["capital"] for r in results)
 
@@ -297,7 +309,12 @@ def main() -> None:
                  "Deep quotes (1¢ bid / 99¢ ask) almost never fill; join/1-2-ticks-back "
                  "keeps 100/50/25% weight under DF 0.50. ✔ = market you already quote.")
     lines.append("")
-    lines.append("| # | Market | Side | @ | Size | Capital | Est $/day | ≈$/mo | Share | Note |")
+    lines.append("Sorted by what the side could pay **at full size** (a 20,000-contract "
+                 "order — the placement cap); the Entry columns are the smallest order "
+                 "that clears the monthly target.")
+    lines.append("")
+    lines.append("| # | Market | Side | Entry @ | Size | Cap. | Est $/day "
+                 "| Full-size $/day | Full-size cap. | Note |")
     lines.append("|--:|---|---|--:|--:|--:|--:|--:|--:|---|")
     risky = sum(1 for r in results if r.get("risk"))
     if risky:
@@ -309,9 +326,10 @@ def main() -> None:
         p = r["pick"]
         note = ("✔ " if r["already_in"] else "") + ("📦 covered " if p.get("covered") else "") \
                + (f"⚠ {r['risk']} " if r.get("risk") else "") + (r.get("note") or "")
+        mx = r.get("max") or p
         lines.append(f"| {i} | `{r['market']}` | {r['side']} | {p['price'] * 100:g}¢ "
                      f"| {p['size']:,} | ${p['capital']:,.0f} | ${p['est_day']:.2f} "
-                     f"| ${p['est_day'] * 30:,.0f} | {p['share']:.0f}% | {note} |")
+                     f"| ${mx['est_day']:.2f} | ${mx['capital']:,.0f} | {note} |")
     if no_pick:
         lines.append("")
         lines.append(f"**Not worth an order on either side ({len(no_pick)}):** "
