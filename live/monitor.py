@@ -615,6 +615,151 @@ def start_batch(payload: dict) -> tuple[int, dict]:
     return 200, {"ok": True, "started": len(clean)}
 
 
+def _book_without(book: dict, side: str, price: float, size: float) -> dict:
+    """The book with OUR resting order removed — scoring candidates against a
+    book that still contains us double-counts our size."""
+    b = dict(book)
+    key = "bids" if side == "BUY" else "asks"
+    levels = []
+    for px, q in b.get(key) or []:
+        if abs(px - price) < 1e-9:
+            q -= size
+            if q <= 0:
+                continue
+        levels.append((px, q))
+    b[key] = levels
+    return b
+
+
+def _optimal_price(order: dict, book: dict, prog: dict) -> tuple[float | None, float]:
+    """(best price, est $/day) for this order's size on the current book —
+    join best, 1-2 ticks behind, or the deep quote; never crossing."""
+    side, size = order["side"], order["size"]
+    base = _book_without(book, side, order["price"], size)
+    tick = book.get("tick") or 0.01
+    bids, asks = base.get("bids") or [], base.get("asks") or []
+    if side == "BUY":
+        best = bids[0][0] if bids else None
+        cands = [round(best - o * tick, 4) for o in (0, 1, 2)] if best else []
+        cands = [p for p in cands if p >= 0.01] + [0.01]
+        if asks:
+            cands = [p for p in cands if p <= round(asks[0][0] - tick, 4)]
+    else:
+        best = asks[0][0] if asks else None
+        cands = [round(best + o * tick, 4) for o in (0, 1, 2)] if best else []
+        cands = [p for p in cands if p <= 0.99] + [0.99]
+        if bids:
+            cands = [p for p in cands if p >= round(bids[0][0] + tick, 4)]
+    best_p, best_est = None, -1.0
+    key = "bids" if side == "BUY" else "asks"
+    for p in dict.fromkeys(cands):
+        levels = dict(base.get(key) or [])
+        levels[p] = levels.get(p, 0) + size
+        merged = dict(base)
+        merged[key] = sorted(levels.items(), key=lambda x: (-x[0] if side == "BUY" else x[0]))
+        probe = {"market": order["market"], "side": side, "price": p, "size": float(size)}
+        tr._score_order(probe, merged, prog)
+        est = probe.get("est_day") or 0.0
+        if est > best_est:
+            best_p, best_est = p, est
+    return best_p, best_est
+
+
+def compute_reprice_plan() -> list[dict]:
+    """Orders whose current price leaves meaningful money on the table."""
+    out = []
+    progs = tr._PROG_CACHE.get("progs") or {}
+    for o in MONITOR.orders:
+        if not o.get("id"):
+            continue
+        cached = tr._BOOK_CACHE.get(o["market"])
+        prog = progs.get(o["market"])
+        if not cached or not prog or not prog.get("pool"):
+            continue
+        book = cached[1]
+        p, est = _optimal_price(o, book, prog)
+        cur = o.get("est_day") or 0.0
+        tick = book.get("tick") or 0.01
+        if p is None or abs(p - o["price"]) < tick / 2:
+            continue  # already optimal
+        if est - cur < 0.05:
+            continue  # not worth the churn
+        out.append({"id": o["id"], "market": o["market"], "side": o["side"],
+                    "size": o["size"], "from_cents": round(o["price"] * 100, 1),
+                    "to_cents": round(p * 100, 1),
+                    "est_now": round(cur, 2), "est_after": round(est, 2)})
+    out.sort(key=lambda r: -(r["est_after"] - r["est_now"]))
+    return out
+
+
+def run_reprice_batch(specs: list[dict]) -> None:
+    done = skipped = failed = 0
+    consec_err = 0
+    try:
+        for spec in specs:
+            if PLACER["abort"]:
+                PLACER["summary"] = "stopped by user"
+                break
+            res = {"market": spec["market"], "side": spec["side"],
+                   "price_cents": spec["to_cents"], "size": spec.get("size", 0)}
+            try:  # fresh-book cross guard: a reprice that crosses fills instantly
+                book = tr._fetch_book(spec["market"])
+                price = spec["to_cents"] / 100.0
+                bids, asks = book.get("bids") or [], book.get("asks") or []
+                crosses = ((asks and price >= asks[0][0]) if spec["side"] == "BUY"
+                           else (bids and price <= bids[0][0]))
+                if crosses:
+                    res.update(status="skipped", note="would cross the spread now")
+                else:
+                    code, payload = do_reprice(spec["id"], spec["to_cents"])
+                    res.update(status="repriced" if payload.get("ok") else "rejected",
+                               note=str(payload.get("detail") or payload.get("error") or "")[:150])
+            except Exception as e:  # noqa: BLE001
+                res.update(status="error", note=f"{type(e).__name__}: {e}"[:150])
+            PLACER["results"].append(res)
+            if res["status"] == "repriced":
+                done += 1
+                consec_err = 0
+            elif res["status"] == "skipped":
+                skipped += 1
+            else:
+                failed += 1
+                consec_err += 1
+                if consec_err >= 3:
+                    PLACER["summary"] = "stopped after 3 consecutive failures"
+                    break
+            time.sleep(1.0)
+    finally:
+        PLACER["summary"] = PLACER["summary"] or "done"
+        PLACER["running"] = False
+        POLL_KICK.set()
+        notify("Batch reprice finished",
+               f"{done} repriced, {skipped} skipped, {failed} failed ({PLACER['summary']})",
+               "high" if failed else "default")
+
+
+def start_reprice_batch(payload: dict) -> tuple[int, dict]:
+    if PLACER["running"]:
+        return 409, {"ok": False, "error": "a batch is already running"}
+    known = {o.get("id"): o for o in MONITOR.orders if o.get("id")}
+    try:
+        specs = payload.get("orders") or []
+        assert 1 <= len(specs) <= 400, "1-400 orders per batch"
+        clean = []
+        for s in specs:
+            oid, tc = str(s.get("id")), float(s.get("to_cents"))
+            o = known.get(oid)
+            assert o is not None, f"{oid}: not one of your resting orders"
+            assert 0.1 <= tc <= 99.9, f"{o['market']}: price out of range"
+            clean.append({"id": oid, "market": o["market"], "side": o["side"],
+                          "size": o["size"], "to_cents": tc})
+    except (AssertionError, TypeError, ValueError) as e:
+        return 400, {"ok": False, "error": str(e)[:200]}
+    PLACER.update(running=True, results=[], total=len(clean), abort=False, summary="")
+    threading.Thread(target=run_reprice_batch, args=(clean,), daemon=True).start()
+    return 200, {"ok": True, "started": len(clean)}
+
+
 def do_cancel_all() -> tuple[int, dict]:
     """Emergency stop: cancel every open order on the account."""
     path = "/v1/orders/open/cancel"
@@ -726,6 +871,9 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div class="sub" id="rate"></div>
 <div class="sub" id="updated"></div>
 <div class="err" id="err"></div>
+<div style="margin:8px 0"><button class="tab" onclick="loadReprice()">⚡ Optimize prices</button></div>
+<div id="rpl"></div>
+<div id="rpProg" class="mkt"></div>
 <div id="ovg" style="margin:10px 0"></div>
 <h3>By market <span class="sub">(sorted by current rate · tap a row for the math)</span></h3><table id="markets"></table>
 <h3>Previous days</h3><table id="history"></table>
@@ -894,6 +1042,65 @@ async function pollPlace(){
 async function abortBatch(){
   try{ await fetch('place_abort', {method:'POST', headers:{'X-Reprice':'1'}}); }catch(e){}
   pollPlace();
+}
+let RPLAN = null, RSEL = {};
+async function loadReprice(){
+  document.getElementById('rpl').innerHTML = '<div class="mkt">computing…</div>';
+  try{
+    const d = await (await fetch('reprice_plan')).json();
+    RPLAN = d.plan || [];
+  }catch(e){ document.getElementById('rpl').innerHTML = '<div class="mkt">failed: '+e+'</div>'; return; }
+  if(!RPLAN.length){
+    document.getElementById('rpl').innerHTML =
+      '<div class="mkt">All resting orders are already at (or within $0.05/day of) their best price 👍</div>';
+    return;
+  }
+  RSEL = {}; RPLAN.forEach(r => RSEL[r.id] = true);
+  renderRpl();
+}
+function renderRpl(){
+  const sel = RPLAN.filter(r => RSEL[r.id]);
+  const gain = sel.reduce((s,r)=>s+(r.est_after-r.est_now),0);
+  document.getElementById('rpl').innerHTML =
+    '<table><tr><th></th><th>Market</th><th class="r">Move</th><th class="r">$/day</th></tr>'+
+    RPLAN.map(r =>
+      '<tr><td><input type="checkbox" '+(RSEL[r.id]?'checked':'')+
+      ' onchange="RSEL[\\''+r.id+'\\']=this.checked;renderRpl()"></td>'+
+      '<td class="mkt">'+esc(r.market)+'<div class="sub" style="font-size:10px">'+r.side+' '+r.size.toLocaleString()+'</div></td>'+
+      '<td class="r" style="white-space:nowrap">'+r.from_cents+'¢ → <b>'+r.to_cents+'¢</b></td>'+
+      '<td class="r">$'+r.est_now.toFixed(2)+' → <b class="pos">$'+r.est_after.toFixed(2)+'</b></td></tr>').join('')+
+    '</table><div class="rp"><button onclick="goReprice()">Reprice '+sel.length+
+    ' orders (+$'+gain.toFixed(2)+'/day)</button>'+
+    '<button class="alt" onclick="RPLAN=null;document.getElementById(\\'rpl\\').innerHTML=\\'\\'">Close</button></div>';
+}
+async function goReprice(){
+  const sel = RPLAN.filter(r => RSEL[r.id]);
+  if(!sel.length){ alert('Nothing selected'); return; }
+  const gain = sel.reduce((s,r)=>s+(r.est_after-r.est_now),0);
+  if(!confirm('Reprice ' + sel.length + ' orders to their optimal prices?\\nEstimated gain ~$' +
+              gain.toFixed(2) + '/day. Each move is checked against the live book first.')) return;
+  try{
+    const r = await fetch('reprice_batch', {method:'POST',
+      headers:{'Content-Type':'application/json','X-Reprice':'1'},
+      body: JSON.stringify({orders: sel.map(r => ({id: r.id, to_cents: r.to_cents}))})});
+    const d = await r.json();
+    if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
+    RPLAN = null; document.getElementById('rpl').innerHTML = '';
+    pollReprice();
+  }catch(e){ alert('Failed: ' + e); }
+}
+async function pollReprice(){
+  try{
+    const d = await (await fetch('place_status')).json();
+    const done = d.results.length;
+    const ok = d.results.filter(x=>x.status==='repriced').length;
+    const skip = d.results.filter(x=>x.status==='skipped').length;
+    document.getElementById('rpProg').textContent =
+      (d.running ? 'repricing… ' : 'batch ' + (d.summary || 'done') + ': ') +
+      done + '/' + d.total + ' — ' + ok + ' repriced, ' + skip + ' skipped, ' +
+      (done - ok - skip) + ' failed';
+    if(d.running) setTimeout(pollReprice, 2000); else setTimeout(refresh, 1500);
+  }catch(e){ setTimeout(pollReprice, 3000); }
 }
 async function cancelAll(){
   if(!confirm('Cancel EVERY open order on your account?')) return;
@@ -1121,6 +1328,9 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path.startswith("/place_status"):
             self._send(200, "application/json", json.dumps(
                 {k: PLACER[k] for k in ("running", "results", "total", "summary")}).encode())
+        elif self.path.startswith("/reprice_plan"):
+            self._send(200, "application/json",
+                       json.dumps({"plan": compute_reprice_plan()}).encode())
         elif self.path.startswith("/series.json"):
             with MONITOR.lock:
                 payload = json.dumps({"series": MONITOR.state.get("series", {})})
@@ -1134,7 +1344,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("WWW-Authenticate", 'Basic realm="rewards"')
             self.end_headers()
             return
-        if self.path not in ("/reprice", "/place", "/place_abort", "/cancel_all"):
+        if self.path not in ("/reprice", "/place", "/place_abort", "/cancel_all", "/reprice_batch"):
             self._send(404, "text/plain", b"not found")
             return
         # Cross-origin requests can't set custom headers without a CORS
@@ -1150,6 +1360,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         if self.path == "/place":
             code, payload = start_batch(body)
+        elif self.path == "/reprice_batch":
+            code, payload = start_reprice_batch(body)
         elif self.path == "/place_abort":
             PLACER["abort"] = True
             code, payload = 200, {"ok": True}
