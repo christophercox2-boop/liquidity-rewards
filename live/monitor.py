@@ -780,7 +780,7 @@ function renderPlan(){
     '<tr><th></th><th>Market</th><th>Side</th><th class="r">@</th><th class="r">Size</th><th class="r">Cap.</th><th class="r">$/day</th></tr>' +
     planRows().map(r => { const p = r.pick, k = pkey(r);
       return '<tr><td><input type="checkbox" '+(PSEL[k]?'checked':'')+
-        ' onchange="PSEL[\''+k+'\']=this.checked;planSum()"></td>'+
+        ' onchange="PSEL[\\''+k+'\\']=this.checked;planSum()"></td>'+
         '<td class="mkt">'+esc(r.market)+(mine.has(r.market)?' ✔':'')+'</td>'+
         '<td'+(r.side==='SELL'?' style="color:#f0883e"':'')+'>'+(r.side==='SELL'?'SELL':'BUY')+
         (p.covered?' 📦':'')+'</td>'+
