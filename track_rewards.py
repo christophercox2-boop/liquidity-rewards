@@ -949,6 +949,21 @@ def write_status(
     by_month = _group_sum(rows, lambda r: r["date"][:7])
     by_market = _group_sum(rows, lambda r: r["market"])
 
+    # Since the 2026-07-23 program restructure, Polymarket accumulates pending
+    # rewards under the period's start date instead of posting one row per day
+    # (the "2026-07-23" total grew across days while no newer date appeared).
+    # Flag that bucket so a multi-day sum never reads as one record day.
+    accum_day = None
+    if by_day:
+        last_day = max(by_day)
+        last_rows = [r for r in rows if r["date"] == last_day]
+        try:
+            days_since = (dt.datetime.now(ET).date() - dt.date.fromisoformat(last_day)).days
+        except ValueError:
+            days_since = 0
+        if last_rows and all(r["status"] == "PENDING" for r in last_rows) and days_since >= 2:
+            accum_day = last_day
+
     lines: list[str] = []
     lines.append("# Polymarket US — Liquidity Rewards")
     lines.append("")
@@ -981,7 +996,11 @@ def write_status(
     lines.append("")
     recent = sorted(by_day)[-3:][::-1]
     if recent:
-        days_out = " · ".join(f"{d}: **{_usd(by_day[d])}**" for d in recent)
+        days_out = " · ".join(
+            f"{d}: **{_usd(by_day[d])}**"
+            + (" ⚠️ pending bucket — covers every day since then, still growing" if d == accum_day else "")
+            for d in recent
+        )
         lines.append(
             f"**Earned:** {_usd(total)} lifetime ({_usd(by_status.get('PAID', 0))} paid). "
             f"Last three recorded days — {days_out} _(Polymarket reports ~1–2 days behind)_"
@@ -1090,7 +1109,7 @@ def write_status(
         actual_by_day_market[r["date"]][r["market"]] = (
             actual_by_day_market[r["date"]].get(r["market"], 0.0) + r["reward_usd"]
         )
-    reconciled = sorted(set(est_days) & set(by_day))[-3:]
+    reconciled = sorted((set(est_days) & set(by_day)) - {accum_day})[-3:]
     if reconciled:
         lines.append(
             "Time-averaged estimate for each day (across that day's hourly snapshots) "
@@ -1118,6 +1137,13 @@ def write_status(
                 f"`{m}` (est ~{_usd(e)} → got {_usd(a)})" for _, m, e, a in gaps[:3]
             )
             lines.append(f"Biggest gaps on {latest}: {worst}")
+            lines.append("")
+        if accum_day:
+            lines.append(
+                f"_{accum_day} is excluded: since the program restructure, pending rewards "
+                f"accumulate under that one date (its total keeps growing day over day), so it "
+                f"can't be compared against a single day's estimate until it's finalized._"
+            )
             lines.append("")
     else:
         lines.append(
@@ -1176,7 +1202,8 @@ def write_status(
         recent = sorted(by_day)[-14:]
         peak = max(by_day[d] for d in recent)
         for d in reversed(recent):
-            lines.append(f"| {d} | {_usd(by_day[d])} | `{_bar(by_day[d], peak)}` |")
+            flag = " ⚠️ multi-day pending bucket" if d == accum_day else ""
+            lines.append(f"| {d}{flag} | {_usd(by_day[d])} | `{_bar(by_day[d], peak)}` |")
         lines.append("")
 
         lines.append("## By month")
