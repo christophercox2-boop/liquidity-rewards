@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import base64
 import datetime as dt
+import gzip
 import json
 import os
 import sys
@@ -79,26 +80,53 @@ def _gh(method: str, path: str, **kw):
     )
 
 
+SAVE_STATUS = {"ok_ts": 0.0, "err": ""}  # surfaced in the dashboard footer
+SLIM_EXCLUDE = ("series",)  # per-market graph history: huge, rebuilds in hours
+
+
 def load_remote_state() -> dict | None:
     if not GITHUB_TOKEN:
         return None
     try:
+        raw = b""
         r = _gh("GET", f"/repos/{GITHUB_REPO}/contents/state.json", params={"ref": STATE_BRANCH})
-        if r.status_code != 200:
-            return None
-        return json.loads(base64.b64decode(r.json()["content"]))
+        if r.status_code == 200:
+            raw = base64.b64decode(r.json().get("content") or "")
+        if not raw:  # files >1MB return empty content — refetch as raw media
+            r = requests.get(
+                f"{GH_API}/repos/{GITHUB_REPO}/contents/state.json",
+                params={"ref": STATE_BRANCH},
+                headers={"Authorization": f"Bearer {GITHUB_TOKEN}",
+                         "Accept": "application/vnd.github.raw+json"},
+                timeout=30,
+            )
+            if r.status_code != 200:
+                return None
+            raw = r.content
+        try:
+            raw = gzip.decompress(raw)
+        except Exception:  # noqa: BLE001 — older saves were plain JSON
+            pass
+        return json.loads(raw)
     except Exception:  # noqa: BLE001
         return None
 
 
 def save_remote_state(state: dict) -> bool:
-    """Store state.json as a single orphan commit, force-updating the state
-    branch in place — no history accumulates."""
+    """Store state.json (gzipped, without the bulky graph series) as a single
+    orphan commit, force-updating the state branch — no history accumulates.
+    GitHub rejects ~1MB+ request bodies, which is how saves silently died as
+    the portfolio grew."""
     if not GITHUB_TOKEN:
         return False
     try:
+        slim = {k: v for k, v in state.items() if k not in SLIM_EXCLUDE}
+        payload = base64.b64encode(gzip.compress(json.dumps(slim).encode())).decode()
         r = _gh("POST", f"/repos/{GITHUB_REPO}/git/blobs",
-                json={"content": json.dumps(state), "encoding": "utf-8"})
+                json={"content": payload, "encoding": "base64"})
+        if r.status_code >= 300:
+            SAVE_STATUS["err"] = f"blob HTTP {r.status_code}"
+            return False
         blob = r.json()["sha"]
         r = _gh("POST", f"/repos/{GITHUB_REPO}/git/trees",
                 json={"tree": [{"path": "state.json", "mode": "100644", "type": "blob", "sha": blob}]})
@@ -111,8 +139,13 @@ def save_remote_state(state: dict) -> bool:
         if r.status_code in (404, 422):  # branch doesn't exist yet
             r = _gh("POST", f"/repos/{GITHUB_REPO}/git/refs",
                     json={"ref": f"refs/heads/{STATE_BRANCH}", "sha": commit})
-        return r.status_code < 300
-    except Exception:  # noqa: BLE001
+        if r.status_code < 300:
+            SAVE_STATUS.update(ok_ts=time.time(), err="")
+            return True
+        SAVE_STATUS["err"] = f"ref HTTP {r.status_code}"
+        return False
+    except Exception as e:  # noqa: BLE001
+        SAVE_STATUS["err"] = f"{type(e).__name__}: {e}"[:120]
         return False
 
 
@@ -399,7 +432,12 @@ class Monitor:
                 "buying_power": self.buying_power,
                 "warming": self.warming,
                 "poll_seconds": POLL_SECONDS,
-                "persistence": self.persistence,
+                "persistence": (
+                    f"github — SAVES FAILING ({SAVE_STATUS['err']})"
+                    if GITHUB_TOKEN and SAVE_STATUS["err"]
+                    and time.time() - SAVE_STATUS["ok_ts"] > 600
+                    else self.persistence
+                ),
                 "alerts": "ntfy" if NTFY_TOPIC else "off",
                 "actions": ACTIONS[-10:][::-1],
             }
