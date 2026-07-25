@@ -1,39 +1,51 @@
 {
- "generated": "2026-07-25 10:22 AM ET",
+ "generated": "2026-07-25 11:37 AM ET",
  "results": [
   {
    "market": "apdc-alito-2026-07-31",
    "side_pool": 16.67,
    "best_bid": 0.02,
    "best_ask": 0.03,
-   "bid_depth": 35962.0,
+   "bid_depth": 36002.0,
    "pick": {
     "price": 0.02,
     "size": 500,
     "capital": 10.0,
-    "est_day": 0.231,
+    "est_day": 0.23,
     "share": 1.4,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-alito-2026-08-31",
    "side_pool": 16.67,
    "best_bid": 0.02,
    "best_ask": 0.05,
-   "bid_depth": 42337.0,
+   "bid_depth": 67977.0,
    "pick": {
     "price": 0.02,
-    "size": 200,
-    "capital": 4.0,
-    "est_day": 0.151,
-    "share": 0.9,
+    "size": 500,
+    "capital": 10.0,
+    "est_day": 0.173,
+    "share": 1.0,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-alito-2026-12-31",
@@ -50,14 +62,20 @@
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-andburpm-2026-12-31",
    "side_pool": 50.0,
    "best_bid": 0.16,
-   "best_ask": 0.31,
-   "bid_depth": 354.0,
+   "best_ask": 0.32,
+   "bid_depth": 329.0,
    "pick": {
     "price": 0.01,
     "size": 10000,
@@ -67,109 +85,151 @@
     "ticks": 15
    },
    "event_n": 1,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 1
+   }
   },
   {
    "market": "apdc-jerpowgov-2026-07-31",
    "side_pool": 16.67,
    "best_bid": 0.01,
    "best_ask": 0.02,
-   "bid_depth": 2220.0,
+   "bid_depth": 2833.0,
    "pick": {
     "price": 0.01,
     "size": 100,
     "capital": 1.0,
-    "est_day": 0.718,
-    "share": 4.3,
+    "est_day": 0.568,
+    "share": 3.4,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-jerpowgov-2026-08-31",
    "side_pool": 16.67,
    "best_bid": 0.06,
    "best_ask": 0.07,
-   "bid_depth": 197818.0,
+   "bid_depth": 188825.0,
    "pick": {
     "price": 0.06,
     "size": 2000,
     "capital": 120.0,
-    "est_day": 0.169,
-    "share": 1.0,
+    "est_day": 0.177,
+    "share": 1.1,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-jerpowgov-2026-12-31",
    "side_pool": 16.67,
-   "best_bid": 0.36,
+   "best_bid": 0.29,
    "best_ask": 0.42,
-   "bid_depth": 20493.0,
+   "bid_depth": 20454.0,
    "pick": {
-    "price": 0.34,
+    "price": 0.27,
     "size": 100,
-    "capital": 34.0,
-    "est_day": 6.761,
-    "share": 40.6,
+    "capital": 27.0,
+    "est_day": 7.137,
+    "share": 42.8,
     "ticks": 2
    },
    "event_n": 3,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-kashpatel-2026-07-31",
    "side_pool": 16.67,
    "best_bid": 0.03,
    "best_ask": 0.05,
-   "bid_depth": 78674.0,
+   "bid_depth": 123235.0,
    "pick": {
     "price": 0.03,
-    "size": 1000,
-    "capital": 30.0,
-    "est_day": 0.21,
-    "share": 1.3,
+    "size": 2000,
+    "capital": 60.0,
+    "est_day": 0.267,
+    "share": 1.6,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-kashpatel-2026-08-31",
    "side_pool": 16.67,
    "best_bid": 0.09,
    "best_ask": 0.12,
-   "bid_depth": 69666.0,
+   "bid_depth": 69644.0,
    "pick": {
     "price": 0.07,
     "size": 100,
     "capital": 7.0,
-    "est_day": 1.204,
-    "share": 7.2,
+    "est_day": 1.286,
+    "share": 7.7,
     "ticks": 2
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-kashpatel-2026-12-31",
    "side_pool": 16.67,
-   "best_bid": 0.52,
-   "best_ask": 0.53,
-   "bid_depth": 50410.0,
+   "best_bid": 0.53,
+   "best_ask": 0.55,
+   "bid_depth": 50331.0,
    "pick": {
-    "price": 0.5,
+    "price": 0.51,
     "size": 100,
-    "capital": 50.0,
-    "est_day": 3.472,
-    "share": 20.8,
+    "capital": 51.0,
+    "est_day": 3.098,
+    "share": 18.6,
     "ticks": 2
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-petehegseth-2026-07-31",
@@ -179,24 +239,36 @@
    "bid_depth": 0,
    "pick": null,
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-petehegseth-2026-08-31",
    "side_pool": 16.67,
    "best_bid": 0.15,
-   "best_ask": 0.16,
-   "bid_depth": 62897.0,
+   "best_ask": 0.18,
+   "bid_depth": 65826.0,
    "pick": {
     "price": 0.15,
-    "size": 100,
-    "capital": 15.0,
-    "est_day": 0.154,
-    "share": 0.9,
+    "size": 200,
+    "capital": 30.0,
+    "est_day": 0.241,
+    "share": 1.4,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-petehegseth-2026-12-31",
@@ -213,371 +285,503 @@
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "apdc-trumpadmin-2026-brorol",
    "side_pool": 2.94,
-   "best_bid": 0.28,
+   "best_bid": 0.31,
    "best_ask": 0.35,
-   "bid_depth": 200422.0,
+   "bid_depth": 200661.0,
    "pick": {
-    "price": 0.26,
+    "price": 0.29,
     "size": 100,
-    "capital": 26.0,
-    "est_day": 0.466,
-    "share": 15.8,
+    "capital": 29.0,
+    "est_day": 0.319,
+    "share": 10.9,
     "ticks": 2
    },
    "event_n": 17,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
   },
   {
    "market": "apdc-trumpadmin-2026-howlut",
    "side_pool": 2.94,
-   "best_bid": 0.05,
-   "best_ask": 0.52,
-   "bid_depth": 92011.0,
+   "best_bid": 0.07,
+   "best_ask": 0.51,
+   "bid_depth": 101752.0,
    "pick": {
-    "price": 0.04,
-    "size": 200,
-    "capital": 8.0,
-    "est_day": 0.176,
-    "share": 6.0,
-    "ticks": 1
+    "price": 0.05,
+    "size": 500,
+    "capital": 25.0,
+    "est_day": 0.421,
+    "share": 14.3,
+    "ticks": 2
    },
    "event_n": 17,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
   },
   {
    "market": "apdc-trumpadmin-2026-johrat",
    "side_pool": 2.94,
-   "best_bid": 0.34,
+   "best_bid": 0.24,
    "best_ask": 0.46,
-   "bid_depth": 50433.0,
+   "bid_depth": 50915.0,
    "pick": {
-    "price": 0.32,
+    "price": 0.23,
     "size": 100,
-    "capital": 32.0,
-    "est_day": 0.734,
-    "share": 25.0,
-    "ticks": 2
+    "capital": 23.0,
+    "est_day": 0.213,
+    "share": 7.2,
+    "ticks": 1
    },
    "event_n": 17,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
   },
   {
    "market": "apdc-trumpadmin-2026-karlea",
    "side_pool": 2.94,
-   "best_bid": 0.29,
-   "best_ask": 0.37,
-   "bid_depth": 55473.0,
+   "best_bid": 0.32,
+   "best_ask": 0.36,
+   "bid_depth": 55665.0,
    "pick": {
-    "price": 0.27,
+    "price": 0.3,
     "size": 100,
-    "capital": 27.0,
-    "est_day": 0.586,
-    "share": 19.9,
+    "capital": 30.0,
+    "est_day": 0.421,
+    "share": 14.3,
     "ticks": 2
    },
    "event_n": 17,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
   },
   {
    "market": "apdc-trumpadmin-2026-kaspat",
    "side_pool": 2.94,
-   "best_bid": 0.38,
+   "best_bid": 0.39,
    "best_ask": 0.97,
-   "bid_depth": 100203.0,
+   "bid_depth": 100654.0,
    "pick": {
-    "price": 0.36,
+    "price": 0.37,
     "size": 100,
-    "capital": 36.0,
-    "est_day": 2.644,
-    "share": 89.9,
+    "capital": 37.0,
+    "est_day": 0.154,
+    "share": 5.2,
     "ticks": 2
    },
    "event_n": 17,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
   },
   {
    "market": "apdc-trumpadmin-2026-linmcm",
    "side_pool": 2.94,
-   "best_bid": 0.02,
-   "best_ask": 0.46,
-   "bid_depth": 150978.0,
-   "pick": {
-    "price": 0.02,
-    "size": 2000,
-    "capital": 40.0,
-    "est_day": 2.94,
-    "share": 100.0,
-    "ticks": 0
-   },
-   "event_n": 17,
-   "already_in": false
-  },
-  {
-   "market": "apdc-trumpadmin-2026-marrub",
-   "side_pool": 2.94,
-   "best_bid": 0.29,
-   "best_ask": 0.36,
-   "bid_depth": 100260.0,
-   "pick": {
-    "price": 0.27,
-    "size": 100,
-    "capital": 27.0,
-    "est_day": 2.722,
-    "share": 92.5,
-    "ticks": 2
-   },
-   "event_n": 17,
-   "already_in": false
-  },
-  {
-   "market": "apdc-trumpadmin-2026-petheg",
-   "side_pool": 2.94,
-   "best_bid": 0.29,
-   "best_ask": 0.34,
-   "bid_depth": 80855.0,
-   "pick": {
-    "price": 0.27,
-    "size": 100,
-    "capital": 27.0,
-    "est_day": 0.158,
-    "share": 5.4,
-    "ticks": 2
-   },
-   "event_n": 17,
-   "already_in": false
-  },
-  {
-   "market": "apdc-trumpadmin-2026-robken",
-   "side_pool": 2.94,
-   "best_bid": 0.08,
-   "best_ask": 0.44,
-   "bid_depth": 92547.0,
-   "pick": {
-    "price": 0.06,
-    "size": 100,
-    "capital": 6.0,
-    "est_day": 0.372,
-    "share": 12.7,
-    "ticks": 2
-   },
-   "event_n": 17,
-   "already_in": false
-  },
-  {
-   "market": "apdc-trumpadmin-2026-rodsco",
-   "side_pool": 2.94,
    "best_bid": 0.23,
-   "best_ask": 0.49,
-   "bid_depth": 50700.0,
+   "best_ask": 0.44,
+   "bid_depth": 50877.0,
    "pick": {
     "price": 0.21,
     "size": 100,
     "capital": 21.0,
-    "est_day": 0.37,
-    "share": 12.6,
+    "est_day": 0.212,
+    "share": 7.2,
     "ticks": 2
    },
    "event_n": 17,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
+  },
+  {
+   "market": "apdc-trumpadmin-2026-marrub",
+   "side_pool": 2.94,
+   "best_bid": 0.18,
+   "best_ask": 0.37,
+   "bid_depth": 100336.0,
+   "pick": {
+    "price": 0.16,
+    "size": 100,
+    "capital": 16.0,
+    "est_day": 0.567,
+    "share": 19.3,
+    "ticks": 2
+   },
+   "event_n": 17,
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
+  },
+  {
+   "market": "apdc-trumpadmin-2026-petheg",
+   "side_pool": 2.94,
+   "best_bid": 0.3,
+   "best_ask": 0.55,
+   "bid_depth": 80797.0,
+   "pick": {
+    "price": 0.28,
+    "size": 100,
+    "capital": 28.0,
+    "est_day": 0.187,
+    "share": 6.3,
+    "ticks": 2
+   },
+   "event_n": 17,
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
+  },
+  {
+   "market": "apdc-trumpadmin-2026-robken",
+   "side_pool": 2.94,
+   "best_bid": 0.33,
+   "best_ask": 0.51,
+   "bid_depth": 52492.0,
+   "pick": {
+    "price": 0.31,
+    "size": 100,
+    "capital": 31.0,
+    "est_day": 0.553,
+    "share": 18.8,
+    "ticks": 2
+   },
+   "event_n": 17,
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
+  },
+  {
+   "market": "apdc-trumpadmin-2026-rodsco",
+   "side_pool": 2.94,
+   "best_bid": 0.24,
+   "best_ask": 0.51,
+   "bid_depth": 50396.0,
+   "pick": {
+    "price": 0.22,
+    "size": 100,
+    "capital": 22.0,
+    "est_day": 0.541,
+    "share": 18.4,
+    "ticks": 2
+   },
+   "event_n": 17,
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
   },
   {
    "market": "apdc-trumpadmin-2026-rusvou",
    "side_pool": 2.94,
-   "best_bid": 0.41,
-   "best_ask": 0.5,
-   "bid_depth": 50558.0,
+   "best_bid": 0.22,
+   "best_ask": 0.51,
+   "bid_depth": 50588.0,
    "pick": {
-    "price": 0.39,
+    "price": 0.2,
     "size": 100,
-    "capital": 39.0,
-    "est_day": 2.372,
-    "share": 80.6,
+    "capital": 20.0,
+    "est_day": 0.211,
+    "share": 7.2,
     "ticks": 2
    },
    "event_n": 17,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
   },
   {
    "market": "apdc-trumpadmin-2026-scobes",
    "side_pool": 2.94,
-   "best_bid": 0.01,
-   "best_ask": 0.38,
-   "bid_depth": 201089.0,
+   "best_bid": 0.16,
+   "best_ask": 0.34,
+   "bid_depth": 100629.0,
    "pick": {
-    "price": 0.01,
-    "size": 20000,
+    "price": 0.14,
+    "size": 100,
+    "capital": 14.0,
+    "est_day": 0.161,
+    "share": 5.5,
+    "ticks": 2
+   },
+   "event_n": 17,
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
+  },
+  {
+   "market": "apdc-trumpadmin-2026-steche",
+   "side_pool": 2.94,
+   "best_bid": 0.05,
+   "best_ask": 0.99,
+   "bid_depth": 67912.0,
+   "pick": {
+    "price": 0.04,
+    "size": 1000,
+    "capital": 40.0,
+    "est_day": 1.096,
+    "share": 37.3,
+    "ticks": 1
+   },
+   "event_n": 17,
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
+  },
+  {
+   "market": "apdc-trumpadmin-2026-stemil",
+   "side_pool": 2.94,
+   "best_bid": 0.02,
+   "best_ask": 0.48,
+   "bid_depth": 100950.0,
+   "pick": {
+    "price": 0.02,
+    "size": 10000,
     "capital": 200.0,
     "est_day": 0.266,
     "share": 9.0,
     "ticks": 0
    },
    "event_n": 17,
-   "already_in": false
-  },
-  {
-   "market": "apdc-trumpadmin-2026-steche",
-   "side_pool": 2.94,
-   "best_bid": 0.03,
-   "best_ask": 0.99,
-   "bid_depth": 74101.0,
-   "pick": {
-    "price": 0.03,
-    "size": 500,
-    "capital": 15.0,
-    "est_day": 0.342,
-    "share": 11.6,
-    "ticks": 0
-   },
-   "event_n": 17,
-   "already_in": false
-  },
-  {
-   "market": "apdc-trumpadmin-2026-stemil",
-   "side_pool": 2.94,
-   "best_bid": 0.02,
-   "best_ask": 0.47,
-   "bid_depth": 167075.0,
-   "pick": {
-    "price": 0.02,
-    "size": 10000,
-    "capital": 200.0,
-    "est_day": 0.166,
-    "share": 5.7,
-    "ticks": 0
-   },
-   "event_n": 17,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
   },
   {
    "market": "apdc-trumpadmin-2026-stewit",
    "side_pool": 2.94,
    "best_bid": 0.24,
    "best_ask": 0.71,
-   "bid_depth": 51286.0,
+   "bid_depth": 51261.0,
    "pick": {
-    "price": 0.24,
+    "price": 0.23,
     "size": 100,
-    "capital": 24.0,
-    "est_day": 0.285,
-    "share": 9.7,
-    "ticks": 0
+    "capital": 23.0,
+    "est_day": 0.151,
+    "share": 5.2,
+    "ticks": 1
    },
    "event_n": 17,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
   },
   {
    "market": "apdc-trumpadmin-2026-suswil",
    "side_pool": 2.94,
-   "best_bid": 0.33,
+   "best_bid": 0.25,
    "best_ask": 0.44,
-   "bid_depth": 40511.0,
+   "bid_depth": 43480.0,
    "pick": {
-    "price": 0.31,
+    "price": 0.24,
     "size": 100,
-    "capital": 31.0,
-    "est_day": 1.291,
-    "share": 43.9,
-    "ticks": 2
+    "capital": 24.0,
+    "est_day": 0.186,
+    "share": 6.3,
+    "ticks": 1
    },
    "event_n": 17,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
   },
   {
    "market": "apdc-trumpadmin-2026-tomhom",
    "side_pool": 2.94,
-   "best_bid": 0.02,
-   "best_ask": 0.48,
-   "bid_depth": 104739.0,
+   "best_bid": 0.04,
+   "best_ask": 0.51,
+   "bid_depth": 107275.0,
    "pick": {
-    "price": 0.02,
-    "size": 10000,
-    "capital": 200.0,
-    "est_day": 0.257,
-    "share": 8.7,
-    "ticks": 0
+    "price": 0.03,
+    "size": 2000,
+    "capital": 60.0,
+    "est_day": 2.881,
+    "share": 97.9,
+    "ticks": 1
    },
    "event_n": 17,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 17
+   }
   },
   {
    "market": "cpic-uscpi-july-yoy-2026-08-12-gt2pt9pct",
    "side_pool": 7.5,
-   "best_bid": 0.62,
+   "best_bid": 0.64,
    "best_ask": 0.99,
-   "bid_depth": 12530.0,
+   "bid_depth": 12016.0,
    "pick": {
-    "price": 0.61,
+    "price": 0.64,
     "size": 100,
-    "capital": 61.0,
-    "est_day": 0.453,
-    "share": 6.0,
-    "ticks": 1
+    "capital": 64.0,
+    "est_day": 0.675,
+    "share": 9.0,
+    "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 500.0,
+    "pool": 150.0,
+    "event_n": 10
+   }
   },
   {
    "market": "cpic-uscpi-july-yoy-2026-08-12-gt3pt0pct",
    "side_pool": 7.5,
-   "best_bid": 0.92,
+   "best_bid": 0.97,
    "best_ask": 0.99,
-   "bid_depth": 1010.0,
+   "bid_depth": 343.0,
    "pick": {
-    "price": 0.9,
-    "size": 100,
-    "capital": 90.0,
-    "est_day": 5.137,
-    "share": 68.5,
+    "price": 0.95,
+    "size": 200,
+    "capital": 190.0,
+    "est_day": 4.934,
+    "share": 65.8,
     "ticks": 2
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 500.0,
+    "pool": 150.0,
+    "event_n": 10
+   }
   },
   {
    "market": "cpic-uscpi-july-yoy-2026-08-12-gt3pt1pct",
    "side_pool": 7.5,
    "best_bid": 0.96,
    "best_ask": 0.97,
-   "bid_depth": 398.0,
+   "bid_depth": 472.0,
    "pick": {
     "price": 0.94,
-    "size": 200,
-    "capital": 188.0,
-    "est_day": 0.843,
-    "share": 11.2,
+    "size": 100,
+    "capital": 94.0,
+    "est_day": 0.444,
+    "share": 5.9,
     "ticks": 2
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 500.0,
+    "pool": 150.0,
+    "event_n": 10
+   }
   },
   {
    "market": "cpic-uscpi-july-yoy-2026-08-12-gt3pt2pct",
    "side_pool": 7.5,
-   "best_bid": 0.86,
+   "best_bid": 0.87,
    "best_ask": 0.89,
-   "bid_depth": 1509.0,
+   "bid_depth": 109.0,
    "pick": {
-    "price": 0.84,
-    "size": 100,
-    "capital": 84.0,
-    "est_day": 5.916,
-    "share": 78.9,
+    "price": 0.85,
+    "size": 500,
+    "capital": 425.0,
+    "est_day": 6.51,
+    "share": 86.8,
     "ticks": 2
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 500.0,
+    "pool": 150.0,
+    "event_n": 10
+   }
   },
   {
    "market": "cpic-uscpi-july-yoy-2026-08-12-gt3pt3pct",
    "side_pool": 7.5,
    "best_bid": 0.55,
-   "best_ask": 0.62,
-   "bid_depth": 11338.0,
+   "best_ask": 0.61,
+   "bid_depth": 11314.0,
    "pick": {
     "price": 0.55,
     "size": 100,
@@ -587,31 +791,43 @@
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 500.0,
+    "pool": 150.0,
+    "event_n": 10
+   }
   },
   {
    "market": "cpic-uscpi-july-yoy-2026-08-12-gt3pt5pct",
    "side_pool": 7.5,
    "best_bid": 0.04,
-   "best_ask": 0.09,
-   "bid_depth": 593.0,
+   "best_ask": 0.08,
+   "bid_depth": 310.0,
    "pick": {
-    "price": 0.03,
-    "size": 100,
-    "capital": 3.0,
-    "est_day": 0.709,
-    "share": 9.5,
-    "ticks": 1
+    "price": 0.01,
+    "size": 200,
+    "capital": 2.0,
+    "est_day": 0.591,
+    "share": 7.9,
+    "ticks": 3
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 500.0,
+    "pool": 150.0,
+    "event_n": 10
+   }
   },
   {
    "market": "cpic-uscpi-july-yoy-2026-08-12-gt3pt6pct",
    "side_pool": 7.5,
    "best_bid": 0.02,
    "best_ask": 0.03,
-   "bid_depth": 234627.0,
+   "bid_depth": 234561.0,
    "pick": {
     "price": 0.02,
     "size": 5000,
@@ -621,65 +837,89 @@
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 500.0,
+    "pool": 150.0,
+    "event_n": 10
+   }
   },
   {
    "market": "cpic-uscpi-july-yoy-2026-08-12-gt3pt7pct",
    "side_pool": 7.5,
    "best_bid": 0.02,
    "best_ask": 0.03,
-   "bid_depth": 53634.0,
+   "bid_depth": 53568.0,
    "pick": {
     "price": 0.02,
     "size": 2000,
     "capital": 40.0,
-    "est_day": 0.274,
+    "est_day": 0.271,
     "share": 3.6,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 500.0,
+    "pool": 150.0,
+    "event_n": 10
+   }
   },
   {
    "market": "cpic-uscpi-july-yoy-2026-08-12-gt3pt8pct",
    "side_pool": 7.5,
    "best_bid": 0.01,
    "best_ask": 0.02,
-   "bid_depth": 91857.0,
+   "bid_depth": 111291.0,
    "pick": {
     "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "est_day": 0.16,
-    "share": 2.1,
+    "size": 5000,
+    "capital": 50.0,
+    "est_day": 0.322,
+    "share": 4.3,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 500.0,
+    "pool": 150.0,
+    "event_n": 10
+   }
   },
   {
    "market": "cpic-uscpi-july-yoy-2026-08-12-gt3pt9pct",
    "side_pool": 7.5,
    "best_bid": 0.01,
    "best_ask": 0.02,
-   "bid_depth": 348150.0,
+   "bid_depth": 572688.0,
    "pick": {
     "price": 0.01,
-    "size": 10000,
-    "capital": 100.0,
-    "est_day": 0.209,
-    "share": 2.8,
+    "size": 20000,
+    "capital": 200.0,
+    "est_day": 0.253,
+    "share": 3.4,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 500.0,
+    "pool": 150.0,
+    "event_n": 10
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-aleoca",
    "side_pool": 1.52,
    "best_bid": 0.09,
-   "best_ask": 0.3,
-   "bid_depth": 70863.0,
+   "best_ask": 0.29,
+   "bid_depth": 70845.0,
    "pick": {
     "price": 0.09,
     "size": 100,
@@ -689,31 +929,43 @@
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-andyan",
    "side_pool": 1.52,
-   "best_bid": 0.12,
-   "best_ask": 0.44,
-   "bid_depth": 50720.0,
+   "best_bid": 0.13,
+   "best_ask": 0.48,
+   "bid_depth": 50682.0,
    "pick": {
     "price": 0.11,
     "size": 100,
     "capital": 11.0,
-    "est_day": 0.219,
-    "share": 14.5,
-    "ticks": 1
+    "est_day": 0.235,
+    "share": 15.5,
+    "ticks": 2
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-bersan",
    "side_pool": 1.52,
    "best_bid": 0.07,
    "best_ask": 0.08,
-   "bid_depth": 20398.0,
+   "bid_depth": 20402.0,
    "pick": {
     "price": 0.06,
     "size": 100,
@@ -723,14 +975,20 @@
     "ticks": 1
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-betoro",
    "side_pool": 1.52,
    "best_bid": 0.07,
    "best_ask": 0.18,
-   "bid_depth": 25229.0,
+   "bid_depth": 25204.0,
    "pick": {
     "price": 0.07,
     "size": 500,
@@ -740,14 +998,20 @@
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-corboo",
    "side_pool": 1.52,
    "best_bid": 0.06,
    "best_ask": 0.16,
-   "bid_depth": 25200.0,
+   "bid_depth": 25135.0,
    "pick": {
     "price": 0.06,
     "size": 2000,
@@ -757,65 +1021,89 @@
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-dontru",
    "side_pool": 1.52,
-   "best_bid": 0.09,
+   "best_bid": 0.1,
    "best_ask": 0.44,
-   "bid_depth": 120798.0,
+   "bid_depth": 120796.0,
    "pick": {
-    "price": 0.09,
+    "price": 0.1,
     "size": 100,
-    "capital": 9.0,
-    "est_day": 0.184,
-    "share": 12.1,
+    "capital": 10.0,
+    "est_day": 0.178,
+    "share": 11.8,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-dontrujr",
    "side_pool": 1.52,
    "best_bid": 0.03,
    "best_ask": 0.11,
-   "bid_depth": 29310.0,
+   "bid_depth": 29650.0,
    "pick": {
     "price": 0.03,
-    "size": 2000,
-    "capital": 60.0,
-    "est_day": 0.151,
-    "share": 10.0,
+    "size": 5000,
+    "capital": 150.0,
+    "est_day": 0.323,
+    "share": 21.3,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-dwajoh",
    "side_pool": 1.52,
    "best_bid": 0.01,
    "best_ask": 0.05,
-   "bid_depth": 82200.0,
+   "bid_depth": 81840.0,
    "pick": {
     "price": 0.01,
     "size": 10000,
     "capital": 100.0,
-    "est_day": 0.164,
-    "share": 10.8,
+    "est_day": 0.165,
+    "share": 10.9,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-elomus",
    "side_pool": 1.52,
    "best_bid": 0.06,
-   "best_ask": 0.09,
-   "bid_depth": 33287.0,
+   "best_ask": 0.08,
+   "bid_depth": 33270.0,
    "pick": {
     "price": 0.06,
     "size": 100,
@@ -825,30 +1113,42 @@
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-erikir",
    "side_pool": 1.52,
    "best_bid": 0.03,
    "best_ask": 0.04,
-   "bid_depth": 31511.0,
+   "bid_depth": 31851.0,
    "pick": {
     "price": 0.03,
     "size": 5000,
     "capital": 150.0,
-    "est_day": 0.298,
-    "share": 19.7,
+    "est_day": 0.293,
+    "share": 19.3,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-gavnew",
    "side_pool": 1.52,
    "best_bid": 0.16,
-   "best_ask": 0.26,
+   "best_ask": 0.25,
    "bid_depth": 51532.0,
    "pick": {
     "price": 0.15,
@@ -859,82 +1159,112 @@
     "ticks": 1
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-hilcli",
    "side_pool": 1.52,
    "best_bid": 0.03,
-   "best_ask": 0.09,
-   "bid_depth": 61323.0,
+   "best_ask": 0.08,
+   "bid_depth": 61380.0,
    "pick": {
     "price": 0.02,
     "size": 2000,
     "capital": 40.0,
-    "est_day": 1.367,
-    "share": 90.3,
+    "est_day": 1.284,
+    "share": 84.7,
     "ticks": 1
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-hunbid",
    "side_pool": 1.52,
-   "best_bid": 0.14,
+   "best_bid": 0.15,
    "best_ask": 0.47,
-   "bid_depth": 50451.0,
+   "bid_depth": 50617.0,
    "pick": {
-    "price": 0.12,
+    "price": 0.13,
     "size": 100,
-    "capital": 12.0,
-    "est_day": 0.303,
-    "share": 20.0,
+    "capital": 13.0,
+    "est_day": 0.326,
+    "share": 21.5,
     "ticks": 2
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-jdvan",
    "side_pool": 1.52,
-   "best_bid": 0.06,
-   "best_ask": 0.35,
-   "bid_depth": 71021.0,
+   "best_bid": 0.08,
+   "best_ask": 0.36,
+   "bid_depth": 95846.0,
    "pick": {
-    "price": 0.06,
-    "size": 500,
-    "capital": 30.0,
-    "est_day": 0.242,
-    "share": 16.0,
+    "price": 0.08,
+    "size": 200,
+    "capital": 16.0,
+    "est_day": 0.236,
+    "share": 15.6,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-jonoss",
    "side_pool": 1.52,
-   "best_bid": 0.09,
+   "best_bid": 0.11,
    "best_ask": 0.48,
-   "bid_depth": 121071.0,
+   "bid_depth": 121069.0,
    "pick": {
-    "price": 0.09,
-    "size": 200,
-    "capital": 18.0,
-    "est_day": 0.229,
-    "share": 15.1,
+    "price": 0.11,
+    "size": 100,
+    "capital": 11.0,
+    "est_day": 0.27,
+    "share": 17.8,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-jossha",
    "side_pool": 1.52,
    "best_bid": 0.05,
    "best_ask": 0.12,
-   "bid_depth": 25510.0,
+   "bid_depth": 25460.0,
    "pick": {
     "price": 0.05,
     "size": 2000,
@@ -944,109 +1274,151 @@
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-kamhar",
    "side_pool": 1.52,
-   "best_bid": 0.12,
+   "best_bid": 0.13,
    "best_ask": 0.28,
-   "bid_depth": 122918.0,
+   "bid_depth": 122865.0,
    "pick": {
-    "price": 0.12,
-    "size": 2000,
-    "capital": 240.0,
-    "est_day": 0.22,
+    "price": 0.13,
+    "size": 1000,
+    "capital": 130.0,
+    "est_day": 0.219,
     "share": 14.5,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-krinoe",
    "side_pool": 1.52,
-   "best_bid": 0.05,
+   "best_bid": 0.06,
    "best_ask": 0.47,
-   "bid_depth": 30901.0,
+   "bid_depth": 30784.0,
    "pick": {
-    "price": 0.04,
-    "size": 500,
-    "capital": 20.0,
-    "est_day": 0.153,
-    "share": 10.1,
-    "ticks": 1
+    "price": 0.06,
+    "size": 200,
+    "capital": 12.0,
+    "est_day": 0.211,
+    "share": 13.9,
+    "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-margre",
    "side_pool": 1.52,
-   "best_bid": 0.09,
-   "best_ask": 0.49,
-   "bid_depth": 52784.0,
+   "best_bid": 0.22,
+   "best_ask": 0.48,
+   "bid_depth": 52437.0,
    "pick": {
-    "price": 0.09,
+    "price": 0.2,
     "size": 100,
-    "capital": 9.0,
-    "est_day": 0.185,
-    "share": 12.2,
-    "ticks": 0
+    "capital": 20.0,
+    "est_day": 0.316,
+    "share": 20.8,
+    "ticks": 2
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-markel",
    "side_pool": 1.52,
    "best_bid": 0.02,
    "best_ask": 0.23,
-   "bid_depth": 54212.0,
+   "bid_depth": 55007.0,
    "pick": {
     "price": 0.02,
     "size": 500,
     "capital": 10.0,
-    "est_day": 0.233,
-    "share": 15.4,
+    "est_day": 0.178,
+    "share": 11.8,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-marrub",
    "side_pool": 1.52,
-   "best_bid": 0.12,
-   "best_ask": 0.2,
-   "bid_depth": 50852.0,
+   "best_bid": 0.13,
+   "best_ask": 0.19,
+   "bid_depth": 50720.0,
    "pick": {
-    "price": 0.11,
+    "price": 0.12,
     "size": 100,
-    "capital": 11.0,
-    "est_day": 0.261,
-    "share": 17.2,
+    "capital": 12.0,
+    "est_day": 0.236,
+    "share": 15.6,
     "ticks": 1
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-micoba",
    "side_pool": 1.52,
    "best_bid": 0.01,
    "best_ask": 0.06,
-   "bid_depth": 82199.0,
+   "bid_depth": 157458.0,
    "pick": {
     "price": 0.01,
-    "size": 10000,
-    "capital": 100.0,
-    "est_day": 0.164,
-    "share": 10.8,
+    "size": 20000,
+    "capital": 200.0,
+    "est_day": 0.171,
+    "share": 11.3,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-nikhal",
@@ -1063,82 +1435,112 @@
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-oprwin",
    "side_pool": 1.52,
    "best_bid": 0.02,
    "best_ask": 0.08,
-   "bid_depth": 35472.0,
+   "bid_depth": 36212.0,
    "pick": {
     "price": 0.02,
     "size": 500,
     "capital": 10.0,
-    "est_day": 0.237,
-    "share": 15.6,
+    "est_day": 0.176,
+    "share": 11.6,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-petbut",
    "side_pool": 1.52,
-   "best_bid": 0.1,
+   "best_bid": 0.11,
    "best_ask": 0.21,
-   "bid_depth": 64040.0,
+   "bid_depth": 64123.0,
    "pick": {
-    "price": 0.1,
-    "size": 1000,
-    "capital": 100.0,
-    "est_day": 0.189,
-    "share": 12.5,
+    "price": 0.11,
+    "size": 500,
+    "capital": 55.0,
+    "est_day": 0.185,
+    "share": 12.2,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-rahema",
    "side_pool": 1.52,
    "best_bid": 0.14,
    "best_ask": 0.49,
-   "bid_depth": 101216.0,
+   "bid_depth": 105119.0,
    "pick": {
     "price": 0.14,
-    "size": 200,
-    "capital": 28.0,
-    "est_day": 0.265,
-    "share": 17.5,
+    "size": 500,
+    "capital": 70.0,
+    "est_day": 0.155,
+    "share": 10.2,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-robken",
    "side_pool": 1.52,
-   "best_bid": 0.09,
-   "best_ask": 0.49,
-   "bid_depth": 70730.0,
+   "best_bid": 0.1,
+   "best_ask": 0.5,
+   "bid_depth": 70683.0,
    "pick": {
     "price": 0.09,
     "size": 100,
     "capital": 9.0,
-    "est_day": 0.238,
-    "share": 15.7,
-    "ticks": 0
+    "est_day": 0.248,
+    "share": 16.3,
+    "ticks": 1
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-steban",
    "side_pool": 1.52,
    "best_bid": 0.08,
    "best_ask": 0.24,
-   "bid_depth": 84328.0,
+   "bid_depth": 84275.0,
    "pick": {
     "price": 0.08,
     "size": 500,
@@ -1148,65 +1550,89 @@
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-stesmi",
    "side_pool": 1.52,
-   "best_bid": 0.04,
+   "best_bid": 0.05,
    "best_ask": 0.2,
-   "bid_depth": 33490.0,
+   "bid_depth": 33300.0,
    "pick": {
-    "price": 0.04,
-    "size": 5000,
-    "capital": 200.0,
-    "est_day": 0.279,
-    "share": 18.4,
+    "price": 0.05,
+    "size": 2000,
+    "capital": 100.0,
+    "est_day": 1.513,
+    "share": 99.9,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-tedcru",
    "side_pool": 1.52,
-   "best_bid": 0.06,
+   "best_bid": 0.08,
    "best_ask": 0.24,
-   "bid_depth": 76867.0,
+   "bid_depth": 76702.0,
    "pick": {
-    "price": 0.06,
-    "size": 2000,
-    "capital": 120.0,
-    "est_day": 0.173,
-    "share": 11.4,
+    "price": 0.08,
+    "size": 500,
+    "capital": 40.0,
+    "est_day": 0.171,
+    "share": 11.3,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-tuccar",
    "side_pool": 1.52,
-   "best_bid": 0.03,
-   "best_ask": 0.44,
+   "best_bid": 0.04,
+   "best_ask": 0.43,
    "bid_depth": 71884.0,
    "pick": {
     "price": 0.02,
     "size": 500,
     "capital": 10.0,
-    "est_day": 0.252,
-    "share": 16.6,
-    "ticks": 1
+    "est_day": 0.196,
+    "share": 12.9,
+    "ticks": 2
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-vivram",
    "side_pool": 1.52,
    "best_bid": 0.06,
    "best_ask": 0.17,
-   "bid_depth": 25292.0,
+   "bid_depth": 25227.0,
    "pick": {
     "price": 0.06,
     "size": 2000,
@@ -1216,31 +1642,43 @@
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "cranc-uspres28-12-31-2026-zohmam",
    "side_pool": 1.52,
-   "best_bid": 0.03,
-   "best_ask": 0.17,
-   "bid_depth": 34036.0,
+   "best_bid": 0.05,
+   "best_ask": 0.16,
+   "bid_depth": 14498.0,
    "pick": {
-    "price": 0.03,
-    "size": 200,
-    "capital": 6.0,
-    "est_day": 0.176,
-    "share": 11.6,
+    "price": 0.05,
+    "size": 100,
+    "capital": 5.0,
+    "est_day": 0.155,
+    "share": 10.3,
     "ticks": 0
    },
    "event_n": 33,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 33
+   }
   },
   {
    "market": "dipcc-us-iran-contnts-2026--dilut",
    "side_pool": 20.83,
    "best_bid": 0.32,
    "best_ask": 0.33,
-   "bid_depth": 31086.0,
+   "bid_depth": 31045.0,
    "pick": {
     "price": 0.32,
     "size": 100,
@@ -1250,31 +1688,43 @@
     "ticks": 0
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 250.0,
+    "event_n": 6
+   }
   },
   {
    "market": "dipcc-us-iran-contnts-2026--enrcap",
    "side_pool": 20.83,
    "best_bid": 0.33,
    "best_ask": 0.35,
-   "bid_depth": 23394.0,
+   "bid_depth": 23439.0,
    "pick": {
     "price": 0.32,
     "size": 100,
     "capital": 32.0,
-    "est_day": 0.636,
-    "share": 3.1,
+    "est_day": 0.617,
+    "share": 3.0,
     "ticks": 1
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 250.0,
+    "event_n": 6
+   }
   },
   {
    "market": "dipcc-us-iran-contnts-2026--enrcaplte5",
    "side_pool": 20.83,
    "best_bid": 0.29,
    "best_ask": 0.3,
-   "bid_depth": 62285.0,
+   "bid_depth": 62260.0,
    "pick": {
     "price": 0.29,
     "size": 100,
@@ -1284,211 +1734,289 @@
     "ticks": 0
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 250.0,
+    "event_n": 6
+   }
   },
   {
    "market": "dipcc-us-iran-contnts-2026--enrmor",
    "side_pool": 20.83,
    "best_bid": 0.25,
    "best_ask": 0.26,
-   "bid_depth": 52826.0,
+   "bid_depth": 54950.0,
    "pick": {
     "price": 0.23,
     "size": 100,
     "capital": 23.0,
-    "est_day": 1.067,
-    "share": 5.1,
+    "est_day": 0.501,
+    "share": 2.4,
     "ticks": 2
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 250.0,
+    "event_n": 6
+   }
   },
   {
    "market": "dipcc-us-iran-contnts-2026--irnfnd",
    "side_pool": 20.83,
    "best_bid": 0.46,
    "best_ask": 0.47,
-   "bid_depth": 28130.0,
+   "bid_depth": 28007.0,
    "pick": {
     "price": 0.45,
     "size": 100,
     "capital": 45.0,
-    "est_day": 0.344,
+    "est_day": 0.346,
     "share": 1.7,
     "ticks": 1
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 250.0,
+    "event_n": 6
+   }
   },
   {
    "market": "dipcc-us-iran-contnts-2026--urnsur",
    "side_pool": 20.83,
-   "best_bid": 0.18,
-   "best_ask": 0.19,
-   "bid_depth": 31934.0,
+   "best_bid": 0.17,
+   "best_ask": 0.18,
+   "bid_depth": 32005.0,
    "pick": {
     "price": 0.17,
     "size": 100,
     "capital": 17.0,
-    "est_day": 0.236,
+    "est_day": 0.235,
     "share": 1.1,
-    "ticks": 1
+    "ticks": 0
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 250.0,
+    "event_n": 6
+   }
   },
   {
    "market": "enwc-usgubp-fl-2026-08-18-rep-byrdon",
    "side_pool": 16.67,
-   "best_bid": 0.88,
+   "best_bid": 0.89,
    "best_ask": 0.96,
    "bid_depth": 236028.0,
    "pick": {
-    "price": 0.88,
-    "size": 200,
-    "capital": 176.0,
-    "est_day": 0.183,
+    "price": 0.89,
+    "size": 100,
+    "capital": 89.0,
+    "est_day": 0.182,
     "share": 1.1,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-usgubp-fl-2026-08-18-rep-jamfis",
    "side_pool": 16.67,
    "best_bid": 0.03,
    "best_ask": 0.04,
-   "bid_depth": 45364.0,
+   "bid_depth": 148606.0,
    "pick": {
     "price": 0.03,
-    "size": 200,
-    "capital": 6.0,
-    "est_day": 0.158,
-    "share": 0.9,
+    "size": 1000,
+    "capital": 30.0,
+    "est_day": 0.292,
+    "share": 1.8,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-usgubp-fl-2026-08-18-rep-jaycol",
    "side_pool": 16.67,
    "best_bid": 0.01,
    "best_ask": 0.03,
-   "bid_depth": 1040.0,
+   "bid_depth": 940.0,
    "pick": {
     "price": 0.01,
-    "size": 1000,
-    "capital": 10.0,
-    "est_day": 8.17,
-    "share": 49.0,
+    "size": 2000,
+    "capital": 20.0,
+    "est_day": 11.338,
+    "share": 68.0,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-usgubp-mich-2026-08-04-rep-johjam",
    "side_pool": 16.67,
    "best_bid": 0.89,
    "best_ask": 0.9,
-   "bid_depth": 38495.0,
+   "bid_depth": 37662.0,
    "pick": {
     "price": 0.89,
     "size": 100,
     "capital": 89.0,
-    "est_day": 0.155,
-    "share": 0.9,
+    "est_day": 0.166,
+    "share": 1.0,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-usgubp-mich-2026-08-04-rep-mikcox",
    "side_pool": 16.67,
    "best_bid": 0.01,
    "best_ask": 0.06,
-   "bid_depth": 3816.0,
+   "bid_depth": 2279.0,
    "pick": {
     "price": 0.01,
     "size": 100,
     "capital": 1.0,
-    "est_day": 0.426,
-    "share": 2.6,
+    "est_day": 0.701,
+    "share": 4.2,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-usgubp-mich-2026-08-04-rep-perjoh",
    "side_pool": 16.67,
-   "best_bid": 0.05,
-   "best_ask": 0.17,
-   "bid_depth": 531.0,
+   "best_bid": 0.08,
+   "best_ask": 0.18,
+   "bid_depth": 436.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 8.061,
-    "share": 48.4,
-    "ticks": 4
+    "est_day": 7.209,
+    "share": 43.3,
+    "ticks": 7
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-usgubp-mn-2026-08-11-rep-kenqua",
    "side_pool": 16.67,
    "best_bid": 0.01,
    "best_ask": 0.08,
-   "bid_depth": 6039.0,
+   "bid_depth": 6607.0,
    "pick": {
     "price": 0.01,
     "size": 100,
     "capital": 1.0,
-    "est_day": 0.271,
-    "share": 1.6,
+    "est_day": 0.248,
+    "share": 1.5,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-usgubp-mn-2026-08-11-rep-lisdem",
    "side_pool": 16.67,
-   "best_bid": 0.22,
+   "best_bid": 0.23,
    "best_ask": 0.52,
-   "bid_depth": 2624.0,
+   "bid_depth": 2986.0,
    "pick": {
-    "price": 0.2,
+    "price": 0.23,
     "size": 100,
-    "capital": 20.0,
-    "est_day": 3.788,
-    "share": 22.7,
-    "ticks": 2
+    "capital": 23.0,
+    "est_day": 0.541,
+    "share": 3.2,
+    "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-usgubp-mn-2026-08-11-rep-miklin",
    "side_pool": 16.67,
    "best_bid": 0.51,
    "best_ask": 0.52,
-   "bid_depth": 16718.0,
+   "bid_depth": 40739.0,
    "pick": {
-    "price": 0.5,
+    "price": 0.51,
     "size": 100,
-    "capital": 50.0,
-    "est_day": 0.179,
-    "share": 1.1,
-    "ticks": 1
+    "capital": 51.0,
+    "est_day": 0.156,
+    "share": 0.9,
+    "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-usgubp-ok-2026-06-16-rep-gendru",
@@ -1505,7 +2033,13 @@
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-usgubp-ok-2026-06-16-rep-mikmaz",
@@ -1522,31 +2056,43 @@
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-usgubp-sd-2026-06-02-rep-larrho",
    "side_pool": 25.0,
    "best_bid": 0.92,
    "best_ask": 0.93,
-   "bid_depth": 89623.0,
+   "bid_depth": 89637.0,
    "pick": {
     "price": 0.92,
     "size": 200,
     "capital": 184.0,
-    "est_day": 0.285,
+    "est_day": 0.284,
     "share": 1.1,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-usgubp-sd-2026-06-02-rep-tobdoe",
    "side_pool": 25.0,
    "best_bid": 0.07,
    "best_ask": 0.08,
-   "bid_depth": 92861.0,
+   "bid_depth": 92875.0,
    "pick": {
     "price": 0.07,
     "size": 100,
@@ -1556,41 +2102,59 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-usgubp-wi-2026-08-11-dem-davcro",
    "side_pool": 8.33,
    "best_bid": 0.01,
-   "best_ask": 0.51,
-   "bid_depth": 17757.0,
+   "best_ask": 0.99,
+   "bid_depth": 22000.0,
    "pick": {
     "price": 0.01,
     "size": 500,
     "capital": 5.0,
-    "est_day": 0.228,
-    "share": 2.7,
+    "est_day": 0.185,
+    "share": 2.2,
     "ticks": 0
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 6
+   }
   },
   {
    "market": "enwc-usgubp-wi-2026-08-11-dem-frahon",
    "side_pool": 8.33,
-   "best_bid": 0.27,
+   "best_bid": 0.31,
    "best_ask": 0.91,
-   "bid_depth": 291.0,
+   "bid_depth": 35825.0,
    "pick": {
-    "price": 0.25,
-    "size": 2000,
-    "capital": 500.0,
-    "est_day": 5.268,
-    "share": 63.2,
-    "ticks": 2
+    "price": 0.31,
+    "size": 100,
+    "capital": 31.0,
+    "est_day": 0.167,
+    "share": 2.0,
+    "ticks": 0
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 6
+   }
   },
   {
    "market": "enwc-usgubp-wi-2026-08-11-dem-joebre",
@@ -1607,47 +2171,65 @@
     "ticks": 1
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 6
+   }
   },
   {
    "market": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
    "side_pool": 8.33,
    "best_bid": 0.01,
-   "best_ask": 0.51,
-   "bid_depth": 753.0,
+   "best_ask": 0.54,
+   "bid_depth": 1028.0,
    "pick": {
     "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "est_day": 6.054,
-    "share": 72.6,
+    "size": 1000,
+    "capital": 10.0,
+    "est_day": 4.109,
+    "share": 49.3,
     "ticks": 0
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 6
+   }
   },
   {
    "market": "enwc-usgubp-wi-2026-08-11-dem-manbar",
    "side_pool": 8.33,
-   "best_bid": 0.11,
-   "best_ask": 0.14,
-   "bid_depth": 45592.0,
+   "best_bid": 0.02,
+   "best_ask": 0.12,
+   "bid_depth": 10495.0,
    "pick": {
-    "price": 0.1,
+    "price": 0.02,
     "size": 100,
-    "capital": 10.0,
-    "est_day": 0.275,
-    "share": 3.3,
-    "ticks": 1
+    "capital": 2.0,
+    "est_day": 0.156,
+    "share": 1.9,
+    "ticks": 0
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 6
+   }
   },
   {
    "market": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
    "side_pool": 8.33,
    "best_bid": null,
-   "best_ask": 0.51,
+   "best_ask": 0.98,
    "bid_depth": 0,
    "pick": {
     "price": 0.01,
@@ -1658,24 +2240,36 @@
     "ticks": 0
    },
    "event_n": 6,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 6
+   }
   },
   {
    "market": "enwc-ushrp-mo01-2026-08-04-dem-corbus",
    "side_pool": 25.0,
    "best_bid": 0.55,
-   "best_ask": 0.65,
-   "bid_depth": 2797.0,
+   "best_ask": 0.99,
+   "bid_depth": 1662.0,
    "pick": {
     "price": 0.53,
-    "size": 100,
-    "capital": 53.0,
-    "est_day": 0.862,
-    "share": 3.4,
+    "size": 500,
+    "capital": 265.0,
+    "est_day": 1.88,
+    "share": 7.5,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-ushrp-mo01-2026-08-04-dem-wesbel",
@@ -1692,14 +2286,20 @@
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-ussep-ma-2026-09-01-dem-edmark",
    "side_pool": 25.0,
    "best_bid": 0.67,
    "best_ask": 0.68,
-   "bid_depth": 97036.0,
+   "bid_depth": 96911.0,
    "pick": {
     "price": 0.67,
     "size": 1000,
@@ -1709,24 +2309,36 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-ussep-ma-2026-09-01-dem-setmou",
    "side_pool": 25.0,
    "best_bid": 0.29,
    "best_ask": 0.3,
-   "bid_depth": 27280.0,
+   "bid_depth": 29013.0,
    "pick": {
     "price": 0.28,
     "size": 100,
     "capital": 28.0,
-    "est_day": 0.173,
+    "est_day": 0.163,
     "share": 0.7,
     "ticks": 1
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-ussep-me-2026-07-27-dem-dankle",
@@ -1736,7 +2348,13 @@
    "bid_depth": 0,
    "pick": null,
    "event_n": 9,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 9
+   }
   },
   {
    "market": "enwc-ussep-me-2026-07-27-dem-janmil",
@@ -1746,7 +2364,13 @@
    "bid_depth": 0,
    "pick": null,
    "event_n": 9,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 9
+   }
   },
   {
    "market": "enwc-ussep-me-2026-07-27-dem-jargol",
@@ -1763,7 +2387,13 @@
     "ticks": 0
    },
    "event_n": 9,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 9
+   }
   },
   {
    "market": "enwc-ussep-me-2026-07-27-dem-jorwoo",
@@ -1780,7 +2410,13 @@
     "ticks": 0
    },
    "event_n": 9,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 9
+   }
   },
   {
    "market": "enwc-ussep-me-2026-07-27-dem-nirsha",
@@ -1790,24 +2426,29 @@
    "bid_depth": 0,
    "pick": null,
    "event_n": 9,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 9
+   }
   },
   {
    "market": "enwc-ussep-me-2026-07-27-dem-pailou",
    "side_pool": 5.56,
    "best_bid": null,
-   "best_ask": 0.02,
+   "best_ask": 0.01,
    "bid_depth": 0,
-   "pick": {
-    "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "est_day": 5.556,
-    "share": 100.0,
-    "ticks": 0
-   },
+   "pick": null,
    "event_n": 9,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 9
+   }
   },
   {
    "market": "enwc-ussep-me-2026-07-27-dem-shebel",
@@ -1824,14 +2465,20 @@
     "ticks": 0
    },
    "event_n": 9,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 9
+   }
   },
   {
    "market": "enwc-ussep-me-2026-07-27-dem-trojac",
    "side_pool": 5.56,
    "best_bid": 0.98,
    "best_ask": 0.99,
-   "bid_depth": 166322.0,
+   "bid_depth": 166847.0,
    "pick": {
     "price": 0.98,
     "size": 5000,
@@ -1841,7 +2488,13 @@
     "ticks": 0
    },
    "event_n": 9,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 9
+   }
   },
   {
    "market": "enwc-ussep-me-2026-07-27-dem-valgei",
@@ -1858,330 +2511,443 @@
     "ticks": 0
    },
    "event_n": 9,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 9
+   }
   },
   {
    "market": "enwc-ussep-mi-2026-08-04-dem-abdels",
    "side_pool": 16.67,
-   "best_bid": 0.62,
+   "best_bid": 0.64,
    "best_ask": 0.65,
-   "bid_depth": 126370.0,
+   "bid_depth": 137362.0,
    "pick": {
-    "price": 0.61,
+    "price": 0.62,
     "size": 100,
-    "capital": 61.0,
-    "est_day": 0.233,
-    "share": 1.4,
-    "ticks": 1
+    "capital": 62.0,
+    "est_day": 0.335,
+    "share": 2.0,
+    "ticks": 2
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-ussep-mi-2026-08-04-dem-halste",
    "side_pool": 16.67,
    "best_bid": 0.37,
    "best_ask": 0.38,
-   "bid_depth": 103278.0,
+   "bid_depth": 102478.0,
    "pick": {
     "price": 0.37,
     "size": 100,
     "capital": 37.0,
-    "est_day": 0.509,
-    "share": 3.1,
+    "est_day": 0.668,
+    "share": 4.0,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-ussep-mi-2026-08-04-dem-malmcm",
    "side_pool": 16.67,
    "best_bid": null,
-   "best_ask": 0.02,
+   "best_ask": 0.01,
    "bid_depth": 0,
-   "pick": {
-    "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "est_day": 16.667,
-    "share": 100.0,
-    "ticks": 0
-   },
+   "pick": null,
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "enwc-ussep-mn-2026-08-11-dem-angcra",
    "side_pool": 25.0,
-   "best_bid": 0.19,
-   "best_ask": 0.24,
-   "bid_depth": 266.0,
+   "best_bid": 0.15,
+   "best_ask": 0.23,
+   "bid_depth": 3180.0,
    "pick": {
-    "price": 0.17,
-    "size": 2000,
-    "capital": 340.0,
-    "est_day": 19.32,
-    "share": 77.3,
-    "ticks": 2
+    "price": 0.15,
+    "size": 100,
+    "capital": 15.0,
+    "est_day": 0.762,
+    "share": 3.0,
+    "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-ussep-mn-2026-08-11-dem-pegfla",
    "side_pool": 25.0,
-   "best_bid": 0.78,
+   "best_bid": 0.75,
    "best_ask": 0.83,
-   "bid_depth": 51.0,
+   "bid_depth": 35.0,
    "pick": {
-    "price": 0.76,
+    "price": 0.73,
     "size": 2000,
-    "capital": 1520.0,
-    "est_day": 23.148,
-    "share": 92.6,
+    "capital": 1460.0,
+    "est_day": 23.764,
+    "share": 95.1,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-ussep-nh-2026-09-01-rep-johsun",
    "side_pool": 25.0,
-   "best_bid": 0.02,
+   "best_bid": 0.52,
    "best_ask": 0.91,
-   "bid_depth": 65247.0,
+   "bid_depth": 23442.0,
    "pick": {
-    "price": 0.02,
-    "size": 200,
-    "capital": 4.0,
-    "est_day": 0.152,
-    "share": 0.6,
-    "ticks": 0
+    "price": 0.51,
+    "size": 100,
+    "capital": 51.0,
+    "est_day": 0.193,
+    "share": 0.8,
+    "ticks": 1
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-ussep-nh-2026-09-01-rep-scobro",
    "side_pool": 25.0,
    "best_bid": 0.07,
    "best_ask": 0.08,
-   "bid_depth": 2805.0,
+   "bid_depth": 2211.0,
    "pick": {
     "price": 0.05,
     "size": 100,
     "capital": 5.0,
-    "est_day": 0.521,
-    "share": 2.1,
+    "est_day": 1.033,
+    "share": 4.1,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-ussep-nh-2026-09-08-dem-chrpap",
    "side_pool": 25.0,
    "best_bid": 0.92,
    "best_ask": 0.93,
-   "bid_depth": 17003.0,
+   "bid_depth": 16010.0,
    "pick": {
     "price": 0.91,
     "size": 100,
     "capital": 91.0,
-    "est_day": 0.268,
+    "est_day": 0.283,
     "share": 1.1,
     "ticks": 1
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-ussep-nh-2026-09-08-dem-karman",
    "side_pool": 25.0,
    "best_bid": 0.04,
-   "best_ask": 0.13,
-   "bid_depth": 716.0,
+   "best_ask": 0.14,
+   "bid_depth": 650.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 8.245,
-    "share": 33.0,
+    "est_day": 8.621,
+    "share": 34.5,
     "ticks": 3
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-alawil",
    "side_pool": 4.17,
    "best_bid": 0.01,
-   "best_ask": 0.48,
-   "bid_depth": 703.0,
+   "best_ask": 0.5,
+   "bid_depth": 678.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 3.083,
-    "share": 74.0,
+    "est_day": 3.112,
+    "share": 74.7,
     "ticks": 0
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-andbau",
    "side_pool": 4.17,
    "best_bid": 0.01,
-   "best_ask": 0.49,
-   "bid_depth": 2703.0,
+   "best_ask": 0.5,
+   "bid_depth": 2678.0,
    "pick": {
     "price": 0.01,
     "size": 200,
     "capital": 2.0,
-    "est_day": 0.287,
+    "est_day": 0.29,
     "share": 6.9,
     "ticks": 0
    },
    "event_n": 12,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-darnor",
    "side_pool": 4.17,
-   "best_bid": 0.66,
+   "best_bid": 0.67,
    "best_ask": 0.93,
-   "bid_depth": 262.0,
+   "bid_depth": 843.0,
    "pick": {
-    "price": 0.64,
+    "price": 0.65,
     "size": 2000,
-    "capital": 1280.0,
-    "est_day": 4.118,
-    "share": 98.8,
+    "capital": 1300.0,
+    "est_day": 4.093,
+    "share": 98.2,
     "ticks": 2
    },
    "event_n": 12,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-joewil",
    "side_pool": 4.17,
-   "best_bid": 0.01,
-   "best_ask": 0.47,
-   "bid_depth": 2649.0,
+   "best_bid": 0.03,
+   "best_ask": 0.48,
+   "bid_depth": 3449.0,
    "pick": {
-    "price": 0.01,
+    "price": 0.02,
     "size": 100,
-    "capital": 1.0,
+    "capital": 2.0,
     "est_day": 0.152,
-    "share": 3.6,
-    "ticks": 0
+    "share": 3.7,
+    "ticks": 1
    },
    "event_n": 12,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-marlyn",
    "side_pool": 4.17,
    "best_bid": 0.01,
    "best_ask": 0.02,
-   "bid_depth": 2200.0,
+   "bid_depth": 2000.0,
    "pick": {
     "price": 0.01,
     "size": 100,
     "capital": 1.0,
-    "est_day": 0.181,
-    "share": 4.3,
+    "est_day": 0.198,
+    "share": 4.8,
     "ticks": 0
    },
    "event_n": 12,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-nanmac",
    "side_pool": 4.17,
    "best_bid": 0.01,
    "best_ask": 0.48,
-   "bid_depth": 2725.0,
+   "bid_depth": 2500.0,
    "pick": {
     "price": 0.01,
-    "size": 200,
-    "capital": 2.0,
-    "est_day": 0.285,
-    "share": 6.8,
+    "size": 100,
+    "capital": 1.0,
+    "est_day": 0.16,
+    "share": 3.8,
     "ticks": 0
    },
    "event_n": 12,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-pameve",
    "side_pool": 4.17,
    "best_bid": 0.02,
-   "best_ask": 0.49,
-   "bid_depth": 2277.0,
+   "best_ask": 0.5,
+   "bid_depth": 2652.0,
    "pick": {
     "price": 0.02,
     "size": 100,
     "capital": 2.0,
-    "est_day": 0.24,
-    "share": 5.8,
+    "est_day": 0.187,
+    "share": 4.5,
     "ticks": 0
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-paudan",
    "side_pool": 4.17,
    "best_bid": 0.01,
    "best_ask": 0.48,
-   "bid_depth": 2525.0,
+   "bid_depth": 2500.0,
    "pick": {
     "price": 0.01,
     "size": 100,
     "capital": 1.0,
-    "est_day": 0.159,
+    "est_day": 0.16,
     "share": 3.8,
     "ticks": 0
    },
    "event_n": 12,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-ralnor",
    "side_pool": 4.17,
    "best_bid": 0.04,
    "best_ask": 0.2,
-   "bid_depth": 2566.0,
+   "bid_depth": 2500.0,
    "pick": {
     "price": 0.03,
     "size": 100,
     "capital": 3.0,
-    "est_day": 0.187,
-    "share": 4.5,
+    "est_day": 0.193,
+    "share": 4.6,
     "ticks": 1
    },
    "event_n": 12,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-rusfry",
    "side_pool": 4.17,
    "best_bid": 0.02,
-   "best_ask": 0.5,
-   "bid_depth": 3100.0,
+   "best_ask": 0.49,
+   "bid_depth": 3740.0,
    "pick": {
     "price": 0.02,
     "size": 100,
     "capital": 2.0,
-    "est_day": 0.183,
-    "share": 4.4,
+    "est_day": 0.19,
+    "share": 4.6,
     "ticks": 0
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-tregow",
@@ -2198,235 +2964,319 @@
     "ticks": 0
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "enwc-ussep-sc-2026-08-11-rep-wiltim",
    "side_pool": 4.17,
    "best_bid": 0.01,
-   "best_ask": 0.49,
-   "bid_depth": 2525.0,
+   "best_ask": 0.5,
+   "bid_depth": 2500.0,
    "pick": {
     "price": 0.01,
     "size": 100,
     "capital": 1.0,
-    "est_day": 0.159,
+    "est_day": 0.16,
     "share": 3.8,
     "ticks": 0
    },
    "event_n": 12,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "ewc-pres-arg-2027-10-24-axekic",
    "side_pool": 4.55,
    "best_bid": 0.16,
-   "best_ask": 0.64,
-   "bid_depth": 2638.0,
+   "best_ask": 0.66,
+   "bid_depth": 1826.0,
    "pick": {
-    "price": 0.15,
-    "size": 100,
-    "capital": 15.0,
-    "est_day": 0.279,
-    "share": 6.1,
-    "ticks": 1
+    "price": 0.14,
+    "size": 200,
+    "capital": 28.0,
+    "est_day": 0.263,
+    "share": 5.8,
+    "ticks": 2
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-arg-2027-10-24-dangeb",
    "side_pool": 4.55,
-   "best_bid": 0.01,
+   "best_bid": 0.02,
    "best_ask": 0.51,
-   "bid_depth": 1175.0,
+   "bid_depth": 2027.0,
    "pick": {
     "price": 0.01,
-    "size": 1000,
-    "capital": 10.0,
-    "est_day": 2.09,
-    "share": 46.0,
-    "ticks": 0
+    "size": 100,
+    "capital": 1.0,
+    "est_day": 0.211,
+    "share": 4.6,
+    "ticks": 1
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-arg-2027-10-24-estbul",
    "side_pool": 4.55,
    "best_bid": 0.01,
    "best_ask": 0.44,
-   "bid_depth": 925.0,
+   "bid_depth": 700.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 3.108,
-    "share": 68.4,
+    "est_day": 3.367,
+    "share": 74.1,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-arg-2027-10-24-facman",
    "side_pool": 4.55,
    "best_bid": 0.01,
    "best_ask": 0.51,
-   "bid_depth": 925.0,
+   "bid_depth": 2780.0,
    "pick": {
     "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "est_day": 3.108,
-    "share": 68.4,
+    "size": 100,
+    "capital": 1.0,
+    "est_day": 0.158,
+    "share": 3.5,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-arg-2027-10-24-javmil",
    "side_pool": 4.55,
-   "best_bid": 0.55,
-   "best_ask": 0.81,
-   "bid_depth": 20701.0,
+   "best_bid": 0.56,
+   "best_ask": 0.82,
+   "bid_depth": 20936.0,
    "pick": {
-    "price": 0.53,
+    "price": 0.54,
     "size": 100,
-    "capital": 53.0,
-    "est_day": 0.216,
-    "share": 4.8,
+    "capital": 54.0,
+    "est_day": 0.496,
+    "share": 10.9,
     "ticks": 2
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-arg-2027-10-24-juagra",
    "side_pool": 4.55,
    "best_bid": 0.01,
-   "best_ask": 0.48,
-   "bid_depth": 1175.0,
+   "best_ask": 0.47,
+   "bid_depth": 950.0,
    "pick": {
     "price": 0.01,
-    "size": 1000,
-    "capital": 10.0,
-    "est_day": 2.09,
-    "share": 46.0,
+    "size": 2000,
+    "capital": 20.0,
+    "est_day": 3.082,
+    "share": 67.8,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-arg-2027-10-24-juasch",
    "side_pool": 4.55,
    "best_bid": 0.01,
    "best_ask": 0.49,
-   "bid_depth": 925.0,
+   "bid_depth": 4530.0,
    "pick": {
     "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "est_day": 3.108,
-    "share": 68.4,
+    "size": 200,
+    "capital": 2.0,
+    "est_day": 0.192,
+    "share": 4.2,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-arg-2027-10-24-maumac",
    "side_pool": 4.55,
    "best_bid": 0.01,
-   "best_ask": 0.48,
-   "bid_depth": 925.0,
+   "best_ask": 0.5,
+   "bid_depth": 700.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 3.108,
-    "share": 68.4,
+    "est_day": 3.367,
+    "share": 74.1,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-arg-2027-10-24-myrbre",
    "side_pool": 4.55,
    "best_bid": 0.01,
    "best_ask": 0.51,
-   "bid_depth": 925.0,
+   "bid_depth": 700.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 3.108,
-    "share": 68.4,
+    "est_day": 3.367,
+    "share": 74.1,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-arg-2027-10-24-sermas",
    "side_pool": 4.55,
    "best_bid": 0.01,
-   "best_ask": 0.49,
-   "bid_depth": 925.0,
+   "best_ask": 0.5,
+   "bid_depth": 700.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 3.108,
-    "share": 68.4,
+    "est_day": 3.367,
+    "share": 74.1,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-arg-2027-10-24-vicvil",
    "side_pool": 4.55,
    "best_bid": 0.01,
    "best_ask": 0.49,
-   "bid_depth": 925.0,
+   "bid_depth": 700.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 3.108,
-    "share": 68.4,
+    "est_day": 3.367,
+    "share": 74.1,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-bra-2026-10-04-camsan",
    "side_pool": 7.14,
    "best_bid": 0.01,
    "best_ask": 0.02,
-   "bid_depth": 65936.0,
+   "bid_depth": 65711.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 0.21,
-    "share": 2.9,
+    "est_day": 0.211,
+    "share": 3.0,
     "ticks": 0
    },
    "event_n": 7,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 7
+   }
   },
   {
    "market": "ewc-pres-bra-2026-10-04-ferhad",
    "side_pool": 7.14,
    "best_bid": 0.01,
    "best_ask": 0.02,
-   "bid_depth": 66147.0,
+   "bid_depth": 65947.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
@@ -2436,24 +3286,36 @@
     "ticks": 0
    },
    "event_n": 7,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 7
+   }
   },
   {
    "market": "ewc-pres-bra-2026-10-04-flabol",
    "side_pool": 7.14,
-   "best_bid": 0.19,
-   "best_ask": 0.28,
-   "bid_depth": 2489.0,
+   "best_bid": 0.2,
+   "best_ask": 0.26,
+   "bid_depth": 466.0,
    "pick": {
-    "price": 0.17,
-    "size": 100,
-    "capital": 17.0,
-    "est_day": 4.726,
-    "share": 66.2,
+    "price": 0.18,
+    "size": 2000,
+    "capital": 360.0,
+    "est_day": 6.187,
+    "share": 86.6,
     "ticks": 2
    },
    "event_n": 7,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 7
+   }
   },
   {
    "market": "ewc-pres-bra-2026-10-04-luisil",
@@ -2470,14 +3332,20 @@
     "ticks": 2
    },
    "event_n": 7,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 7
+   }
   },
   {
    "market": "ewc-pres-bra-2026-10-04-rensan",
    "side_pool": 7.14,
    "best_bid": 0.07,
    "best_ask": 0.08,
-   "bid_depth": 17366.0,
+   "bid_depth": 17300.0,
    "pick": {
     "price": 0.07,
     "size": 200,
@@ -2487,14 +3355,20 @@
     "ticks": 0
    },
    "event_n": 7,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 7
+   }
   },
   {
    "market": "ewc-pres-bra-2026-10-04-romzem",
    "side_pool": 7.14,
    "best_bid": 0.01,
    "best_ask": 0.02,
-   "bid_depth": 66117.0,
+   "bid_depth": 65892.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
@@ -2504,14 +3378,20 @@
     "ticks": 0
    },
    "event_n": 7,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 7
+   }
   },
   {
    "market": "ewc-pres-bra-2026-10-04-roncai",
    "side_pool": 7.14,
    "best_bid": 0.01,
    "best_ask": 0.02,
-   "bid_depth": 66117.0,
+   "bid_depth": 65917.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
@@ -2521,31 +3401,43 @@
     "ticks": 0
    },
    "event_n": 7,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 7
+   }
   },
   {
    "market": "ewc-pres-fra-2027-04-11-bruret",
    "side_pool": 4.55,
-   "best_bid": 0.05,
+   "best_bid": 0.07,
    "best_ask": 0.08,
-   "bid_depth": 46252.0,
+   "bid_depth": 46073.0,
    "pick": {
-    "price": 0.05,
-    "size": 200,
-    "capital": 10.0,
-    "est_day": 0.286,
-    "share": 6.3,
-    "ticks": 0
+    "price": 0.06,
+    "size": 100,
+    "capital": 6.0,
+    "est_day": 0.281,
+    "share": 6.2,
+    "ticks": 1
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-fra-2027-04-11-davlis",
    "side_pool": 4.55,
    "best_bid": 0.01,
    "best_ask": 0.08,
-   "bid_depth": 98316.0,
+   "bid_depth": 98116.0,
    "pick": {
     "price": 0.01,
     "size": 5000,
@@ -2555,228 +3447,312 @@
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-fra-2027-04-11-domvil",
    "side_pool": 4.55,
-   "best_bid": 0.03,
-   "best_ask": 0.12,
-   "bid_depth": 19372.0,
+   "best_bid": 0.04,
+   "best_ask": 0.11,
+   "bid_depth": 19151.0,
    "pick": {
-    "price": 0.03,
-    "size": 1000,
-    "capital": 30.0,
-    "est_day": 0.226,
+    "price": 0.04,
+    "size": 500,
+    "capital": 20.0,
+    "est_day": 0.225,
     "share": 5.0,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-fra-2027-04-11-edophi",
    "side_pool": 4.55,
    "best_bid": 0.15,
    "best_ask": 0.22,
-   "bid_depth": 25323.0,
+   "bid_depth": 25491.0,
    "pick": {
     "price": 0.13,
     "size": 100,
     "capital": 13.0,
-    "est_day": 3.348,
-    "share": 73.7,
+    "est_day": 3.541,
+    "share": 77.9,
     "ticks": 2
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-fra-2027-04-11-frahol",
    "side_pool": 4.55,
    "best_bid": 0.01,
    "best_ask": 0.12,
-   "bid_depth": 46731.0,
+   "bid_depth": 46346.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 0.187,
+    "est_day": 0.188,
     "share": 4.1,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-fra-2027-04-11-gabatt",
    "side_pool": 4.55,
-   "best_bid": 0.07,
+   "best_bid": 0.05,
    "best_ask": 0.08,
-   "bid_depth": 45767.0,
+   "bid_depth": 45813.0,
    "pick": {
-    "price": 0.06,
-    "size": 100,
-    "capital": 6.0,
-    "est_day": 0.261,
-    "share": 5.8,
-    "ticks": 1
+    "price": 0.05,
+    "size": 200,
+    "capital": 10.0,
+    "est_day": 0.268,
+    "share": 5.9,
+    "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-fra-2027-04-11-jeamel",
    "side_pool": 4.55,
-   "best_bid": 0.02,
+   "best_bid": 0.04,
    "best_ask": 0.21,
-   "bid_depth": 83068.0,
+   "bid_depth": 83079.0,
    "pick": {
-    "price": 0.02,
-    "size": 2000,
-    "capital": 40.0,
-    "est_day": 4.485,
-    "share": 98.7,
+    "price": 0.04,
+    "size": 500,
+    "capital": 20.0,
+    "est_day": 0.208,
+    "share": 4.6,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-fra-2027-04-11-jorbar",
    "side_pool": 4.55,
    "best_bid": 0.02,
    "best_ask": 0.2,
-   "bid_depth": 36775.0,
+   "bid_depth": 36750.0,
    "pick": {
     "price": 0.02,
     "size": 2000,
     "capital": 40.0,
-    "est_day": 0.237,
+    "est_day": 0.236,
     "share": 5.2,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-fra-2027-04-11-marlep",
    "side_pool": 4.55,
    "best_bid": 0.45,
-   "best_ask": 0.48,
-   "bid_depth": 25940.0,
+   "best_ask": 0.47,
+   "bid_depth": 25907.0,
    "pick": {
     "price": 0.43,
     "size": 100,
     "capital": 43.0,
-    "est_day": 2.46,
-    "share": 54.1,
+    "est_day": 4.341,
+    "share": 95.5,
     "ticks": 2
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-fra-2027-04-11-rapglu",
    "side_pool": 4.55,
    "best_bid": 0.01,
-   "best_ask": 0.21,
-   "bid_depth": 45650.0,
+   "best_ask": 0.2,
+   "bid_depth": 45450.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 0.191,
+    "est_day": 0.192,
     "share": 4.2,
     "ticks": 0
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-pres-fra-2027-04-11-sarkna",
    "side_pool": 4.55,
-   "best_bid": 0.04,
-   "best_ask": 0.08,
-   "bid_depth": 13920.0,
+   "best_bid": 0.05,
+   "best_ask": 0.07,
+   "bid_depth": 13333.0,
    "pick": {
     "price": 0.04,
     "size": 500,
     "capital": 20.0,
-    "est_day": 0.161,
-    "share": 3.5,
-    "ticks": 0
+    "est_day": 0.164,
+    "share": 3.6,
+    "ticks": 1
    },
    "event_n": 11,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 11
+   }
   },
   {
    "market": "ewc-ref-ca-blntax-2026-11-03-pass",
    "side_pool": 50.0,
-   "best_bid": 0.35,
+   "best_bid": 0.37,
    "best_ask": 0.38,
-   "bid_depth": 6036.0,
+   "bid_depth": 7422.0,
    "pick": {
-    "price": 0.33,
+    "price": 0.35,
     "size": 100,
-    "capital": 33.0,
-    "est_day": 1.581,
-    "share": 3.2,
+    "capital": 35.0,
+    "est_day": 2.026,
+    "share": 4.1,
     "ticks": 2
    },
    "event_n": 1,
-   "already_in": false
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 1
+   }
   },
   {
    "market": "ewc-ref-fl-tax-2026-11-03-pass",
    "side_pool": 50.0,
-   "best_bid": 0.32,
-   "best_ask": 0.74,
-   "bid_depth": 2600.0,
+   "best_bid": 0.33,
+   "best_ask": 0.75,
+   "bid_depth": 225.0,
    "pick": {
-    "price": 0.3,
-    "size": 100,
-    "capital": 30.0,
-    "est_day": 3.2,
-    "share": 6.4,
+    "price": 0.31,
+    "size": 2000,
+    "capital": 620.0,
+    "est_day": 47.619,
+    "share": 95.2,
     "ticks": 2
    },
    "event_n": 1,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 1
+   }
   },
   {
    "market": "ewc-ukpol-leg-clacton-2026-08-13-coubin",
    "side_pool": 25.0,
    "best_bid": 0.07,
    "best_ask": 0.08,
-   "bid_depth": 20149.0,
+   "bid_depth": 43609.0,
    "pick": {
     "price": 0.07,
-    "size": 200,
-    "capital": 14.0,
-    "est_day": 0.275,
-    "share": 1.1,
+    "size": 500,
+    "capital": 35.0,
+    "est_day": 0.298,
+    "share": 1.2,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-ukpol-leg-clacton-2026-08-13-nigfar",
    "side_pool": 25.0,
-   "best_bid": 0.91,
+   "best_bid": 0.92,
    "best_ask": 0.95,
-   "bid_depth": 137582.0,
+   "bid_depth": 137399.0,
    "pick": {
-    "price": 0.91,
-    "size": 1000,
-    "capital": 910.0,
+    "price": 0.92,
+    "size": 500,
+    "capital": 460.0,
     "est_day": 0.181,
     "share": 0.7,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-az-2026-11-03-dem",
@@ -2793,48 +3769,66 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-az-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.18,
    "best_ask": 0.19,
-   "bid_depth": 97349.0,
+   "bid_depth": 100127.0,
    "pick": {
     "price": 0.18,
     "size": 100,
     "capital": 18.0,
-    "est_day": 0.215,
-    "share": 0.9,
+    "est_day": 0.173,
+    "share": 0.7,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-ca-2026-11-03-stehil",
    "side_pool": 25.0,
-   "best_bid": 0.06,
-   "best_ask": 0.09,
-   "bid_depth": 161698.0,
+   "best_bid": 0.05,
+   "best_ask": 0.1,
+   "bid_depth": 174110.0,
    "pick": {
     "price": 0.05,
-    "size": 500,
-    "capital": 25.0,
-    "est_day": 0.154,
-    "share": 0.6,
-    "ticks": 1
+    "size": 1000,
+    "capital": 50.0,
+    "est_day": 0.284,
+    "share": 1.1,
+    "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-ca-2026-11-03-xavbec",
    "side_pool": 25.0,
    "best_bid": 0.93,
    "best_ask": 0.95,
-   "bid_depth": 193159.0,
+   "bid_depth": 192572.0,
    "pick": {
     "price": 0.93,
     "size": 2000,
@@ -2844,41 +3838,59 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-ga-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.61,
    "best_ask": 0.62,
-   "bid_depth": 46976.0,
+   "bid_depth": 45976.0,
    "pick": {
     "price": 0.61,
     "size": 100,
     "capital": 61.0,
-    "est_day": 0.703,
-    "share": 2.8,
+    "est_day": 0.977,
+    "share": 3.9,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-ga-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.4,
    "best_ask": 0.41,
-   "bid_depth": 56897.0,
+   "bid_depth": 59488.0,
    "pick": {
-    "price": 0.38,
+    "price": 0.4,
     "size": 100,
-    "capital": 38.0,
-    "est_day": 0.491,
-    "share": 2.0,
-    "ticks": 2
+    "capital": 40.0,
+    "est_day": 0.664,
+    "share": 2.7,
+    "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-ia-2026-11-03-dem",
@@ -2895,48 +3907,66 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-ia-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.39,
    "best_ask": 0.4,
-   "bid_depth": 102792.0,
+   "bid_depth": 101221.0,
    "pick": {
     "price": 0.37,
     "size": 100,
     "capital": 37.0,
-    "est_day": 0.156,
+    "est_day": 0.16,
     "share": 0.6,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-ks-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.26,
    "best_ask": 0.27,
-   "bid_depth": 155582.0,
+   "bid_depth": 185041.0,
    "pick": {
     "price": 0.26,
     "size": 100,
     "capital": 26.0,
-    "est_day": 0.733,
-    "share": 2.9,
+    "est_day": 1.012,
+    "share": 4.0,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-ks-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.69,
    "best_ask": 0.7,
-   "bid_depth": 177098.0,
+   "bid_depth": 186098.0,
    "pick": {
     "price": 0.68,
     "size": 100,
@@ -2946,14 +3976,20 @@
     "ticks": 1
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-mi-2026-11-03-dem",
    "side_pool": 16.67,
    "best_bid": 0.82,
-   "best_ask": 0.84,
-   "bid_depth": 94730.0,
+   "best_ask": 0.83,
+   "bid_depth": 79695.0,
    "pick": {
     "price": 0.82,
     "size": 500,
@@ -2963,14 +3999,20 @@
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "ewc-usgub-mi-2026-11-03-mikdug",
    "side_pool": 16.67,
    "best_bid": 0.01,
    "best_ask": 0.02,
-   "bid_depth": 181898.0,
+   "bid_depth": 181698.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
@@ -2980,58 +4022,82 @@
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "ewc-usgub-mi-2026-11-03-rep",
    "side_pool": 16.67,
    "best_bid": 0.18,
    "best_ask": 0.19,
-   "bid_depth": 88180.0,
+   "bid_depth": 91513.0,
    "pick": {
     "price": 0.18,
     "size": 100,
     "capital": 18.0,
-    "est_day": 0.256,
-    "share": 1.5,
+    "est_day": 0.241,
+    "share": 1.4,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "ewc-usgub-nv-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.57,
    "best_ask": 0.58,
-   "bid_depth": 107559.0,
+   "bid_depth": 104352.0,
    "pick": {
     "price": 0.56,
     "size": 100,
     "capital": 56.0,
-    "est_day": 1.124,
-    "share": 4.5,
+    "est_day": 0.802,
+    "share": 3.2,
     "ticks": 1
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-nv-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.44,
    "best_ask": 0.45,
-   "bid_depth": 97667.0,
+   "bid_depth": 97568.0,
    "pick": {
     "price": 0.44,
     "size": 100,
     "capital": 44.0,
-    "est_day": 0.174,
+    "est_day": 0.175,
     "share": 0.7,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-oh-2026-11-03-dem",
@@ -3048,14 +4114,20 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-oh-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.57,
    "best_ask": 0.58,
-   "bid_depth": 101753.0,
+   "bid_depth": 86684.0,
    "pick": {
     "price": 0.57,
     "size": 100,
@@ -3065,75 +4137,105 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-wi-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.56,
    "best_ask": 0.57,
-   "bid_depth": 115570.0,
+   "bid_depth": 100158.0,
    "pick": {
     "price": 0.56,
     "size": 100,
     "capital": 56.0,
-    "est_day": 0.158,
+    "est_day": 0.161,
     "share": 0.6,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usgub-wi-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.46,
    "best_ask": 0.47,
-   "bid_depth": 71496.0,
+   "bid_depth": 71075.0,
    "pick": {
-    "price": 0.44,
+    "price": 0.46,
     "size": 100,
-    "capital": 44.0,
-    "est_day": 0.291,
-    "share": 1.2,
-    "ticks": 2
+    "capital": 46.0,
+    "est_day": 0.932,
+    "share": 3.7,
+    "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usmayor-losang-2026-11-03-karbas",
    "side_pool": 25.0,
-   "best_bid": 0.63,
-   "best_ask": 0.73,
-   "bid_depth": 103313.0,
+   "best_bid": 0.66,
+   "best_ask": 0.69,
+   "bid_depth": 103765.0,
    "pick": {
-    "price": 0.61,
+    "price": 0.64,
     "size": 100,
-    "capital": 61.0,
-    "est_day": 0.755,
-    "share": 3.0,
+    "capital": 64.0,
+    "est_day": 0.681,
+    "share": 2.7,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usmayor-losang-2026-11-03-nitram",
    "side_pool": 25.0,
-   "best_bid": 0.33,
-   "best_ask": 0.43,
-   "bid_depth": 149483.0,
+   "best_bid": 0.32,
+   "best_ask": 0.48,
+   "bid_depth": 139412.0,
    "pick": {
-    "price": 0.33,
+    "price": 0.32,
     "size": 100,
-    "capital": 33.0,
-    "est_day": 0.2,
-    "share": 0.8,
+    "capital": 32.0,
+    "est_day": 0.248,
+    "share": 1.0,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-ak-2026-11-03-dem",
@@ -3150,75 +4252,105 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-ak-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.45,
    "best_ask": 0.46,
-   "bid_depth": 103128.0,
+   "bid_depth": 102275.0,
    "pick": {
     "price": 0.45,
     "size": 100,
     "capital": 45.0,
-    "est_day": 0.435,
-    "share": 1.7,
+    "est_day": 0.511,
+    "share": 2.0,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-ga-2026-11-03-dem",
    "side_pool": 25.0,
-   "best_bid": 0.92,
+   "best_bid": 0.91,
    "best_ask": 0.93,
-   "bid_depth": 53466.0,
+   "bid_depth": 73158.0,
    "pick": {
     "price": 0.91,
     "size": 100,
     "capital": 91.0,
-    "est_day": 0.202,
-    "share": 0.8,
-    "ticks": 1
+    "est_day": 0.181,
+    "share": 0.7,
+    "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-ga-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.09,
    "best_ask": 0.1,
-   "bid_depth": 130927.0,
+   "bid_depth": 137512.0,
    "pick": {
     "price": 0.09,
     "size": 500,
     "capital": 45.0,
-    "est_day": 0.269,
-    "share": 1.1,
+    "est_day": 0.252,
+    "share": 1.0,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-ia-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.41,
    "best_ask": 0.42,
-   "bid_depth": 169683.0,
+   "bid_depth": 170947.0,
    "pick": {
-    "price": 0.4,
+    "price": 0.41,
     "size": 100,
-    "capital": 40.0,
-    "est_day": 0.158,
-    "share": 0.6,
-    "ticks": 1
+    "capital": 41.0,
+    "est_day": 0.29,
+    "share": 1.2,
+    "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-ia-2026-11-03-rep",
@@ -3235,48 +4367,66 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-me-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.64,
    "best_ask": 0.65,
-   "bid_depth": 182264.0,
+   "bid_depth": 165734.0,
    "pick": {
     "price": 0.64,
     "size": 100,
     "capital": 64.0,
-    "est_day": 1.006,
-    "share": 4.0,
+    "est_day": 0.766,
+    "share": 3.1,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-me-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.37,
    "best_ask": 0.38,
-   "bid_depth": 282154.0,
+   "bid_depth": 282109.0,
    "pick": {
     "price": 0.37,
     "size": 100,
     "capital": 37.0,
-    "est_day": 0.218,
+    "est_day": 0.219,
     "share": 0.9,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-mi-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.69,
    "best_ask": 0.7,
-   "bid_depth": 275611.0,
+   "bid_depth": 275617.0,
    "pick": {
     "price": 0.69,
     "size": 500,
@@ -3286,48 +4436,66 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-mi-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.29,
    "best_ask": 0.3,
-   "bid_depth": 408528.0,
+   "bid_depth": 395309.0,
    "pick": {
     "price": 0.29,
     "size": 200,
     "capital": 58.0,
-    "est_day": 0.181,
+    "est_day": 0.176,
     "share": 0.7,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-mn-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.9,
    "best_ask": 0.92,
-   "bid_depth": 163633.0,
+   "bid_depth": 163510.0,
    "pick": {
     "price": 0.9,
     "size": 100,
     "capital": 90.0,
-    "est_day": 1.087,
+    "est_day": 1.086,
     "share": 4.3,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-mn-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.07,
    "best_ask": 0.08,
-   "bid_depth": 157572.0,
+   "bid_depth": 157539.0,
    "pick": {
     "price": 0.07,
     "size": 1000,
@@ -3337,7 +4505,13 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-nc-2026-11-03-dem",
@@ -3354,24 +4528,36 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-nc-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.09,
    "best_ask": 0.11,
-   "bid_depth": 129636.0,
+   "bid_depth": 135130.0,
    "pick": {
     "price": 0.09,
-    "size": 500,
-    "capital": 45.0,
-    "est_day": 0.155,
-    "share": 0.6,
+    "size": 1000,
+    "capital": 90.0,
+    "est_day": 0.288,
+    "share": 1.2,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-ne-2026-11-03-danosb",
@@ -3388,7 +4574,13 @@
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "ewc-usse-ne-2026-11-03-dem",
@@ -3398,31 +4590,43 @@
    "bid_depth": 0,
    "pick": null,
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "ewc-usse-ne-2026-11-03-rep",
    "side_pool": 16.67,
    "best_bid": 0.7,
    "best_ask": 0.71,
-   "bid_depth": 90177.0,
+   "bid_depth": 89573.0,
    "pick": {
     "price": 0.7,
     "size": 100,
     "capital": 70.0,
-    "est_day": 0.334,
-    "share": 2.0,
+    "est_day": 0.379,
+    "share": 2.3,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "ewc-usse-nh-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.86,
    "best_ask": 0.87,
-   "bid_depth": 132744.0,
+   "bid_depth": 132742.0,
    "pick": {
     "price": 0.86,
     "size": 200,
@@ -3432,31 +4636,43 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-nh-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.16,
    "best_ask": 0.17,
-   "bid_depth": 97844.0,
+   "bid_depth": 88136.0,
    "pick": {
-    "price": 0.15,
-    "size": 100,
-    "capital": 15.0,
-    "est_day": 0.744,
-    "share": 3.0,
-    "ticks": 1
+    "price": 0.16,
+    "size": 200,
+    "capital": 32.0,
+    "est_day": 0.203,
+    "share": 0.8,
+    "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-oh-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.49,
    "best_ask": 0.5,
-   "bid_depth": 112587.0,
+   "bid_depth": 96265.0,
    "pick": {
     "price": 0.49,
     "size": 500,
@@ -3466,7 +4682,13 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-oh-2026-11-03-rep",
@@ -3483,82 +4705,112 @@
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-tx-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.43,
    "best_ask": 0.44,
-   "bid_depth": 53596.0,
+   "bid_depth": 49465.0,
    "pick": {
-    "price": 0.42,
+    "price": 0.43,
     "size": 100,
-    "capital": 42.0,
-    "est_day": 0.183,
-    "share": 0.7,
-    "ticks": 1
+    "capital": 43.0,
+    "est_day": 0.335,
+    "share": 1.3,
+    "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "ewc-usse-tx-2026-11-03-rep",
    "side_pool": 25.0,
-   "best_bid": 0.56,
+   "best_bid": 0.57,
    "best_ask": 0.58,
-   "bid_depth": 99226.0,
+   "bid_depth": 123449.0,
    "pick": {
-    "price": 0.56,
-    "size": 500,
-    "capital": 280.0,
-    "est_day": 0.21,
-    "share": 0.8,
+    "price": 0.57,
+    "size": 100,
+    "capital": 57.0,
+    "est_day": 0.242,
+    "share": 1.0,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "gsc-usfedgvmt-by-2026-10-01",
    "side_pool": 50.0,
-   "best_bid": 0.68,
-   "best_ask": 0.69,
-   "bid_depth": 2503.0,
+   "best_bid": 0.45,
+   "best_ask": 0.75,
+   "bid_depth": 210.0,
    "pick": {
-    "price": 0.66,
-    "size": 100,
-    "capital": 66.0,
-    "est_day": 12.492,
-    "share": 25.0,
+    "price": 0.43,
+    "size": 2000,
+    "capital": 860.0,
+    "est_day": 49.505,
+    "share": 99.0,
     "ticks": 2
    },
    "event_n": 1,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 1
+   }
   },
   {
    "market": "iarc-group-2026-12-31-antfau",
    "side_pool": 5.0,
-   "best_bid": 0.06,
+   "best_bid": 0.07,
    "best_ask": 0.08,
-   "bid_depth": 40225.0,
+   "bid_depth": 49215.0,
    "pick": {
-    "price": 0.06,
+    "price": 0.07,
     "size": 500,
-    "capital": 30.0,
-    "est_day": 0.161,
-    "share": 3.2,
+    "capital": 35.0,
+    "est_day": 0.263,
+    "share": 5.3,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "iarc-group-2026-12-31-baroba",
    "side_pool": 5.0,
    "best_bid": 0.06,
    "best_ask": 0.07,
-   "bid_depth": 35508.0,
+   "bid_depth": 35468.0,
    "pick": {
     "price": 0.06,
     "size": 500,
@@ -3568,31 +4820,43 @@
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "iarc-group-2026-12-31-bilcli",
    "side_pool": 5.0,
    "best_bid": 0.02,
    "best_ask": 0.08,
-   "bid_depth": 23265.0,
+   "bid_depth": 23440.0,
    "pick": {
     "price": 0.02,
     "size": 1000,
     "capital": 20.0,
-    "est_day": 0.21,
-    "share": 4.2,
+    "est_day": 0.206,
+    "share": 4.1,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "iarc-group-2026-12-31-canowe",
    "side_pool": 5.0,
    "best_bid": 0.05,
    "best_ask": 0.12,
-   "bid_depth": 54524.0,
+   "bid_depth": 54474.0,
    "pick": {
     "price": 0.05,
     "size": 500,
@@ -3602,14 +4866,20 @@
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "iarc-group-2026-12-31-gavnew",
    "side_pool": 5.0,
    "best_bid": 0.07,
    "best_ask": 0.13,
-   "bid_depth": 66442.0,
+   "bid_depth": 66384.0,
    "pick": {
     "price": 0.07,
     "size": 1000,
@@ -3619,41 +4889,59 @@
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "iarc-group-2026-12-31-hilcli",
    "side_pool": 5.0,
    "best_bid": 0.06,
    "best_ask": 0.1,
-   "bid_depth": 79326.0,
+   "bid_depth": 65571.0,
    "pick": {
     "price": 0.06,
-    "size": 2000,
-    "capital": 120.0,
-    "est_day": 0.272,
-    "share": 5.4,
+    "size": 1000,
+    "capital": 60.0,
+    "est_day": 0.226,
+    "share": 4.5,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "iarc-group-2026-12-31-joebid",
    "side_pool": 5.0,
    "best_bid": 0.02,
    "best_ask": 0.07,
-   "bid_depth": 2467.0,
+   "bid_depth": 2567.0,
    "pick": {
     "price": 0.02,
     "size": 100,
     "capital": 2.0,
-    "est_day": 0.231,
-    "share": 4.6,
+    "est_day": 0.203,
+    "share": 4.1,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "iarc-group-2026-12-31-johbre",
@@ -3670,381 +4958,519 @@
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "iarc-group-2026-12-31-tomhom",
    "side_pool": 5.0,
    "best_bid": 0.02,
    "best_ask": 0.09,
-   "bid_depth": 39934.0,
+   "bid_depth": 28720.0,
    "pick": {
     "price": 0.02,
-    "size": 2000,
-    "capital": 40.0,
-    "est_day": 0.241,
-    "share": 4.8,
+    "size": 1000,
+    "capital": 20.0,
+    "est_day": 0.169,
+    "share": 3.4,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "iarc-group-2026-12-31-tuccar",
    "side_pool": 5.0,
-   "best_bid": 0.01,
-   "best_ask": 0.44,
-   "bid_depth": 3317.0,
+   "best_bid": 0.02,
+   "best_ask": 0.45,
+   "bid_depth": 3256.0,
    "pick": {
-    "price": 0.01,
-    "size": 200,
+    "price": 0.02,
+    "size": 100,
     "capital": 2.0,
-    "est_day": 0.284,
-    "share": 5.7,
+    "est_day": 0.289,
+    "share": 5.8,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "iarc-netanyahu-2026-12-31",
    "side_pool": 50.0,
    "best_bid": 0.04,
    "best_ask": 0.11,
-   "bid_depth": 82037.0,
+   "bid_depth": 70300.0,
    "pick": {
     "price": 0.04,
-    "size": 200,
-    "capital": 8.0,
-    "est_day": 0.238,
-    "share": 0.5,
+    "size": 100,
+    "capital": 4.0,
+    "est_day": 0.166,
+    "share": 0.3,
     "ticks": 0
    },
    "event_n": 1,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 1
+   }
   },
   {
    "market": "lawec-cryptoleg-2026-08-10",
    "side_pool": 25.0,
-   "best_bid": 0.09,
+   "best_bid": 0.07,
    "best_ask": 0.31,
-   "bid_depth": 3751.0,
+   "bid_depth": 3691.0,
    "pick": {
-    "price": 0.07,
+    "price": 0.05,
     "size": 100,
-    "capital": 7.0,
-    "est_day": 1.468,
+    "capital": 5.0,
+    "est_day": 1.472,
     "share": 5.9,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "lawec-cryptoleg-2026-12-31",
    "side_pool": 25.0,
    "best_bid": 0.38,
    "best_ask": 0.47,
-   "bid_depth": 37939.0,
+   "bid_depth": 38424.0,
    "pick": {
-    "price": 0.36,
+    "price": 0.37,
     "size": 100,
-    "capital": 36.0,
-    "est_day": 0.394,
-    "share": 1.6,
-    "ticks": 2
+    "capital": 37.0,
+    "est_day": 0.607,
+    "share": 2.4,
+    "ticks": 1
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "lawec-saveact-2026-08-31",
    "side_pool": 25.0,
    "best_bid": 0.04,
    "best_ask": 0.05,
-   "bid_depth": 3823.0,
+   "bid_depth": 19018.0,
    "pick": {
     "price": 0.04,
-    "size": 100,
-    "capital": 4.0,
-    "est_day": 0.696,
-    "share": 2.8,
+    "size": 200,
+    "capital": 8.0,
+    "est_day": 0.263,
+    "share": 1.1,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "lawec-saveact-2026-12-31",
    "side_pool": 25.0,
-   "best_bid": 0.13,
-   "best_ask": 0.15,
-   "bid_depth": 37761.0,
+   "best_bid": 0.11,
+   "best_ask": 0.16,
+   "bid_depth": 46645.0,
    "pick": {
-    "price": 0.11,
+    "price": 0.09,
     "size": 100,
-    "capital": 11.0,
-    "est_day": 6.221,
-    "share": 24.9,
+    "capital": 9.0,
+    "est_day": 0.401,
+    "share": 1.6,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "mlaec-isrpol-pm-2026-10-27-avilie",
    "side_pool": 5.0,
    "best_bid": 0.01,
-   "best_ask": 0.23,
-   "bid_depth": 1495.0,
-   "pick": {
-    "price": 0.01,
-    "size": 1000,
-    "capital": 10.0,
-    "est_day": 2.004,
-    "share": 40.1,
-    "ticks": 0
-   },
-   "event_n": 10,
-   "already_in": false
-  },
-  {
-   "market": "mlaec-isrpol-pm-2026-10-27-ayesha",
-   "side_pool": 5.0,
-   "best_bid": 0.02,
-   "best_ask": 0.16,
-   "bid_depth": 2134.0,
-   "pick": {
-    "price": 0.01,
-    "size": 100,
-    "capital": 1.0,
-    "est_day": 0.22,
-    "share": 4.4,
-    "ticks": 1
-   },
-   "event_n": 10,
-   "already_in": false
-  },
-  {
-   "market": "mlaec-isrpol-pm-2026-10-27-bengan",
-   "side_pool": 5.0,
-   "best_bid": 0.01,
-   "best_ask": 0.18,
-   "bid_depth": 610.0,
+   "best_ask": 0.4,
+   "bid_depth": 950.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 3.831,
-    "share": 76.6,
+    "est_day": 3.39,
+    "share": 67.8,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
+  },
+  {
+   "market": "mlaec-isrpol-pm-2026-10-27-ayesha",
+   "side_pool": 5.0,
+   "best_bid": 0.03,
+   "best_ask": 0.17,
+   "bid_depth": 1587.0,
+   "pick": {
+    "price": 0.01,
+    "size": 500,
+    "capital": 5.0,
+    "est_day": 0.814,
+    "share": 16.3,
+    "ticks": 2
+   },
+   "event_n": 10,
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
+  },
+  {
+   "market": "mlaec-isrpol-pm-2026-10-27-bengan",
+   "side_pool": 5.0,
+   "best_bid": 0.02,
+   "best_ask": 0.16,
+   "bid_depth": 1526.0,
+   "pick": {
+    "price": 0.01,
+    "size": 500,
+    "capital": 5.0,
+    "est_day": 1.218,
+    "share": 24.4,
+    "ticks": 1
+   },
+   "event_n": 10,
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "mlaec-isrpol-pm-2026-10-27-bennet",
    "side_pool": 5.0,
-   "best_bid": 0.46,
+   "best_bid": 0.34,
    "best_ask": 0.47,
-   "bid_depth": 35945.0,
+   "bid_depth": 35562.0,
    "pick": {
-    "price": 0.44,
+    "price": 0.32,
     "size": 100,
-    "capital": 44.0,
-    "est_day": 0.232,
-    "share": 4.6,
+    "capital": 32.0,
+    "est_day": 1.81,
+    "share": 36.2,
     "ticks": 2
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "mlaec-isrpol-pm-2026-10-27-gadeiz",
    "side_pool": 5.0,
-   "best_bid": 0.27,
+   "best_bid": 0.28,
    "best_ask": 0.5,
-   "bid_depth": 56034.0,
+   "bid_depth": 55812.0,
    "pick": {
-    "price": 0.25,
+    "price": 0.26,
     "size": 100,
-    "capital": 25.0,
-    "est_day": 0.19,
-    "share": 3.8,
+    "capital": 26.0,
+    "est_day": 0.286,
+    "share": 5.7,
     "ticks": 2
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "mlaec-isrpol-pm-2026-10-27-gidsaa",
    "side_pool": 5.0,
    "best_bid": 0.01,
-   "best_ask": 0.38,
-   "bid_depth": 675.0,
+   "best_ask": 0.45,
+   "bid_depth": 450.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 3.738,
-    "share": 74.8,
+    "est_day": 4.082,
+    "share": 81.6,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "mlaec-isrpol-pm-2026-10-27-itaben",
    "side_pool": 5.0,
-   "best_bid": 0.02,
-   "best_ask": 0.19,
-   "bid_depth": 32982.0,
+   "best_bid": 0.03,
+   "best_ask": 0.43,
+   "bid_depth": 12935.0,
    "pick": {
     "price": 0.02,
-    "size": 1000,
-    "capital": 20.0,
-    "est_day": 2.313,
-    "share": 46.3,
-    "ticks": 0
+    "size": 100,
+    "capital": 2.0,
+    "est_day": 0.175,
+    "share": 3.5,
+    "ticks": 1
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "mlaec-isrpol-pm-2026-10-27-nafben",
    "side_pool": 5.0,
    "best_bid": 0.01,
-   "best_ask": 0.43,
-   "bid_depth": 63851.0,
+   "best_ask": 0.48,
+   "bid_depth": 30650.0,
    "pick": {
     "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "est_day": 0.152,
-    "share": 3.0,
+    "size": 1000,
+    "capital": 10.0,
+    "est_day": 0.158,
+    "share": 3.2,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "mlaec-isrpol-pm-2026-10-27-yailap",
    "side_pool": 5.0,
    "best_bid": 0.01,
-   "best_ask": 0.22,
-   "bid_depth": 675.0,
+   "best_ask": 0.45,
+   "bid_depth": 450.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 3.738,
-    "share": 74.8,
+    "est_day": 4.082,
+    "share": 81.6,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "mlaec-isrpol-pm-2026-10-27-yoahen",
    "side_pool": 5.0,
-   "best_bid": 0.01,
+   "best_bid": 0.03,
    "best_ask": 0.15,
-   "bid_depth": 694.0,
+   "bid_depth": 924.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 3.712,
-    "share": 74.2,
-    "ticks": 0
+    "est_day": 2.713,
+    "share": 54.3,
+    "ticks": 2
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "mlaec-swepm-2026-09-13-ebbbus",
    "side_pool": 10.0,
    "best_bid": 0.01,
    "best_ask": 0.49,
-   "bid_depth": 675.0,
+   "bid_depth": 750.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 7.477,
-    "share": 74.8,
+    "est_day": 7.273,
+    "share": 72.7,
     "ticks": 0
    },
    "event_n": 5,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 5
+   }
   },
   {
    "market": "mlaec-swepm-2026-09-13-jimake",
    "side_pool": 10.0,
    "best_bid": 0.01,
-   "best_ask": 0.49,
-   "bid_depth": 3238.0,
+   "best_ask": 0.5,
+   "bid_depth": 2911.0,
    "pick": {
     "price": 0.01,
     "size": 100,
     "capital": 1.0,
-    "est_day": 0.3,
-    "share": 3.0,
+    "est_day": 0.332,
+    "share": 3.3,
     "ticks": 0
    },
    "event_n": 5,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 5
+   }
   },
   {
    "market": "mlaec-swepm-2026-09-13-magand",
    "side_pool": 10.0,
-   "best_bid": 0.48,
+   "best_bid": 0.49,
    "best_ask": 0.98,
-   "bid_depth": 3525.0,
+   "bid_depth": 225.0,
    "pick": {
-    "price": 0.46,
-    "size": 100,
-    "capital": 46.0,
-    "est_day": 2.5,
-    "share": 25.0,
+    "price": 0.47,
+    "size": 2000,
+    "capital": 940.0,
+    "est_day": 9.524,
+    "share": 95.2,
     "ticks": 2
    },
    "event_n": 5,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 5
+   }
   },
   {
    "market": "mlaec-swepm-2026-09-13-noodad",
    "side_pool": 10.0,
    "best_bid": 0.01,
-   "best_ask": 0.49,
-   "bid_depth": 1134.0,
+   "best_ask": 0.5,
+   "bid_depth": 1509.0,
    "pick": {
     "price": 0.01,
-    "size": 1000,
-    "capital": 10.0,
-    "est_day": 4.686,
-    "share": 46.9,
+    "size": 500,
+    "capital": 5.0,
+    "est_day": 2.489,
+    "share": 24.9,
     "ticks": 0
    },
    "event_n": 5,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 5
+   }
   },
   {
    "market": "mlaec-swepm-2026-09-13-ulfkri",
    "side_pool": 10.0,
-   "best_bid": 0.01,
-   "best_ask": 0.49,
-   "bid_depth": 915.0,
+   "best_bid": 0.03,
+   "best_ask": 0.5,
+   "bid_depth": 1398.0,
    "pick": {
     "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "est_day": 6.861,
-    "share": 68.6,
-    "ticks": 0
+    "size": 1000,
+    "capital": 10.0,
+    "est_day": 2.762,
+    "share": 27.6,
+    "ticks": 2
    },
    "event_n": 5,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 5
+   }
   },
   {
    "market": "mowc-nato-us-07-31-2026",
@@ -4054,660 +5480,940 @@
    "bid_depth": 0,
    "pick": null,
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "mowc-nato-us-12-31-2026",
    "side_pool": 25.0,
    "best_bid": 0.12,
    "best_ask": 0.19,
-   "bid_depth": 103883.0,
+   "bid_depth": 113889.0,
    "pick": {
     "price": 0.1,
     "size": 100,
     "capital": 10.0,
-    "est_day": 1.234,
-    "share": 4.9,
+    "est_day": 1.069,
+    "share": 4.3,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "nocc-attgen-todblanche-2026-08-07",
    "side_pool": 50.0,
-   "best_bid": 0.36,
+   "best_bid": 0.27,
    "best_ask": 0.38,
-   "bid_depth": 631.0,
+   "bid_depth": 2132.0,
    "pick": {
-    "price": 0.34,
-    "size": 2000,
-    "capital": 680.0,
-    "est_day": 28.778,
-    "share": 57.6,
-    "ticks": 2
+    "price": 0.26,
+    "size": 100,
+    "capital": 26.0,
+    "est_day": 2.233,
+    "share": 4.5,
+    "ticks": 1
    },
    "event_n": 1,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 1
+   }
   },
   {
    "market": "nocc-dni-jayclay-2026-08-07",
    "side_pool": 25.0,
-   "best_bid": 0.65,
+   "best_bid": 0.66,
    "best_ask": 0.99,
-   "bid_depth": 2917.0,
+   "bid_depth": 1034.0,
    "pick": {
-    "price": 0.63,
-    "size": 100,
-    "capital": 63.0,
-    "est_day": 0.76,
-    "share": 3.0,
+    "price": 0.64,
+    "size": 1000,
+    "capital": 640.0,
+    "est_day": 9.858,
+    "share": 39.4,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "nocc-dni-jayclay-2026-12-18",
    "side_pool": 25.0,
-   "best_bid": 0.81,
-   "best_ask": 0.82,
-   "bid_depth": 10672.0,
+   "best_bid": 0.6,
+   "best_ask": 0.81,
+   "bid_depth": 10350.0,
    "pick": {
-    "price": 0.79,
+    "price": 0.58,
     "size": 100,
-    "capital": 79.0,
-    "est_day": 2.796,
-    "share": 11.2,
+    "capital": 58.0,
+    "est_day": 7.396,
+    "share": 29.6,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "nphc-attgen-ailcan",
    "side_pool": 3.12,
    "best_bid": 0.01,
-   "best_ask": 0.36,
-   "bid_depth": 3175.0,
+   "best_ask": 0.43,
+   "bid_depth": 4867.0,
    "pick": {
     "price": 0.01,
-    "size": 200,
-    "capital": 2.0,
-    "est_day": 0.185,
-    "share": 5.9,
+    "size": 500,
+    "capital": 5.0,
+    "est_day": 0.291,
+    "share": 9.3,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-alihab",
    "side_pool": 3.12,
    "best_bid": 0.01,
-   "best_ask": 0.41,
-   "bid_depth": 6579.0,
+   "best_ask": 0.43,
+   "bid_depth": 4867.0,
    "pick": {
     "price": 0.01,
     "size": 500,
     "capital": 5.0,
-    "est_day": 0.221,
-    "share": 7.1,
+    "est_day": 0.291,
+    "share": 9.3,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-andbai",
    "side_pool": 3.12,
    "best_bid": 0.01,
-   "best_ask": 0.39,
-   "bid_depth": 2675.0,
+   "best_ask": 0.45,
+   "bid_depth": 2450.0,
    "pick": {
     "price": 0.01,
     "size": 200,
     "capital": 2.0,
-    "est_day": 0.217,
-    "share": 7.0,
+    "est_day": 0.236,
+    "share": 7.5,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-ashmoo",
    "side_pool": 3.12,
    "best_bid": 0.01,
-   "best_ask": 0.44,
-   "bid_depth": 2675.0,
+   "best_ask": 0.45,
+   "bid_depth": 2450.0,
    "pick": {
     "price": 0.01,
     "size": 200,
     "capital": 2.0,
-    "est_day": 0.217,
-    "share": 7.0,
+    "est_day": 0.236,
+    "share": 7.5,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-edmar",
    "side_pool": 3.12,
    "best_bid": 0.01,
    "best_ask": 0.44,
-   "bid_depth": 4413.0,
+   "bid_depth": 5077.0,
    "pick": {
     "price": 0.01,
     "size": 500,
     "capital": 5.0,
-    "est_day": 0.318,
-    "share": 10.2,
+    "est_day": 0.28,
+    "share": 9.0,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-hardhi",
    "side_pool": 3.12,
    "best_bid": 0.01,
-   "best_ask": 0.22,
-   "bid_depth": 5128.0,
+   "best_ask": 0.21,
+   "bid_depth": 6660.0,
    "pick": {
     "price": 0.01,
     "size": 500,
     "capital": 5.0,
-    "est_day": 0.278,
-    "share": 8.9,
+    "est_day": 0.218,
+    "share": 7.0,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-jeapir",
    "side_pool": 3.12,
-   "best_bid": 0.01,
-   "best_ask": 0.51,
-   "bid_depth": 229.0,
+   "best_bid": 0.02,
+   "best_ask": 0.45,
+   "bid_depth": 1508.0,
    "pick": {
     "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "est_day": 2.804,
-    "share": 89.7,
-    "ticks": 0
+    "size": 500,
+    "capital": 5.0,
+    "est_day": 0.776,
+    "share": 24.8,
+    "ticks": 1
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-jefjen",
    "side_pool": 3.12,
    "best_bid": 0.01,
    "best_ask": 0.43,
-   "bid_depth": 653.0,
+   "bid_depth": 628.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 2.356,
-    "share": 75.4,
+    "est_day": 2.378,
+    "share": 76.1,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-kenpax",
    "side_pool": 3.12,
    "best_bid": 0.01,
    "best_ask": 0.36,
-   "bid_depth": 2475.0,
+   "bid_depth": 2450.0,
    "pick": {
     "price": 0.01,
     "size": 200,
     "capital": 2.0,
-    "est_day": 0.234,
+    "est_day": 0.236,
     "share": 7.5,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-leezel",
    "side_pool": 3.12,
    "best_bid": 0.01,
    "best_ask": 0.44,
-   "bid_depth": 452.0,
+   "bid_depth": 427.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 2.549,
-    "share": 81.6,
+    "est_day": 2.575,
+    "share": 82.4,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-matgae",
    "side_pool": 3.12,
    "best_bid": 0.01,
    "best_ask": 0.23,
-   "bid_depth": 4083.0,
+   "bid_depth": 2450.0,
    "pick": {
     "price": 0.01,
-    "size": 500,
-    "capital": 5.0,
-    "est_day": 0.341,
-    "share": 10.9,
+    "size": 200,
+    "capital": 2.0,
+    "est_day": 0.236,
+    "share": 7.5,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-matwhi",
    "side_pool": 3.12,
    "best_bid": 0.01,
-   "best_ask": 0.51,
-   "bid_depth": 225.0,
+   "best_ask": 0.45,
+   "bid_depth": 200.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 2.809,
-    "share": 89.9,
+    "est_day": 2.841,
+    "share": 90.9,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-robgiu",
    "side_pool": 3.12,
    "best_bid": 0.01,
    "best_ask": 0.43,
-   "bid_depth": 4413.0,
+   "bid_depth": 4042.0,
    "pick": {
     "price": 0.01,
     "size": 500,
     "capital": 5.0,
-    "est_day": 0.318,
-    "share": 10.2,
+    "est_day": 0.344,
+    "share": 11.0,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-rondes",
    "side_pool": 3.12,
    "best_bid": 0.03,
-   "best_ask": 0.44,
-   "bid_depth": 1364.0,
+   "best_ask": 0.45,
+   "bid_depth": 1481.0,
    "pick": {
     "price": 0.01,
     "size": 1000,
     "capital": 10.0,
-    "est_day": 0.744,
-    "share": 23.8,
+    "est_day": 0.632,
+    "share": 20.2,
     "ticks": 2
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-tedcru",
    "side_pool": 3.12,
    "best_bid": 0.02,
    "best_ask": 0.44,
-   "bid_depth": 4127.0,
+   "bid_depth": 4402.0,
    "pick": {
     "price": 0.02,
     "size": 200,
     "capital": 4.0,
-    "est_day": 0.241,
-    "share": 7.7,
+    "est_day": 0.21,
+    "share": 6.7,
     "ticks": 0
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "nphc-attgen-todbla",
    "side_pool": 3.12,
    "best_bid": 0.5,
    "best_ask": 0.99,
-   "bid_depth": 10771.0,
+   "bid_depth": 10921.0,
    "pick": {
-    "price": 0.49,
+    "price": 0.48,
     "size": 100,
-    "capital": 49.0,
-    "est_day": 0.262,
-    "share": 8.4,
-    "ticks": 1
+    "capital": 48.0,
+    "est_day": 0.375,
+    "share": 12.0,
+    "ticks": 2
    },
    "event_n": 16,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 16
+   }
   },
   {
    "market": "opdc-delrod-venpres-2026-12-31",
    "side_pool": 25.0,
    "best_bid": 0.01,
-   "best_ask": 0.51,
-   "bid_depth": 83451.0,
+   "best_ask": null,
+   "bid_depth": 50200.0,
    "pick": {
     "price": 0.01,
-    "size": 1000,
-    "capital": 10.0,
-    "est_day": 0.296,
-    "share": 1.2,
+    "size": 500,
+    "capital": 5.0,
+    "est_day": 0.247,
+    "share": 1.0,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "opdc-delrod-venpres-2027-06-30",
    "side_pool": 25.0,
    "best_bid": 0.02,
    "best_ask": 0.47,
-   "bid_depth": 103660.0,
+   "bid_depth": 107470.0,
    "pick": {
     "price": 0.02,
     "size": 100,
     "capital": 2.0,
-    "est_day": 1.083,
-    "share": 4.3,
+    "est_day": 0.396,
+    "share": 1.6,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "opdc-mcconnell-resign-2026-11-02",
    "side_pool": 50.0,
    "best_bid": 0.36,
    "best_ask": 0.46,
-   "bid_depth": 10808.0,
+   "bid_depth": 10943.0,
    "pick": {
     "price": 0.34,
     "size": 100,
     "capital": 34.0,
-    "est_day": 9.187,
-    "share": 18.4,
+    "est_day": 9.768,
+    "share": 19.5,
     "ticks": 2
    },
    "event_n": 1,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 1
+   }
   },
   {
    "market": "opdc-trump-resig-2026-12-31",
    "side_pool": 25.0,
-   "best_bid": 0.06,
+   "best_bid": 0.16,
    "best_ask": 0.32,
-   "bid_depth": 15804.0,
+   "bid_depth": 15863.0,
    "pick": {
-    "price": 0.01,
-    "size": 200,
-    "capital": 2.0,
-    "est_day": 0.215,
-    "share": 0.9,
-    "ticks": 5
+    "price": 0.14,
+    "size": 100,
+    "capital": 14.0,
+    "est_day": 5.745,
+    "share": 23.0,
+    "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "opdc-trump-resig-2027-12-31",
    "side_pool": 25.0,
    "best_bid": 0.24,
-   "best_ask": 0.32,
-   "bid_depth": 90237.0,
+   "best_ask": 0.31,
+   "bid_depth": 90541.0,
    "pick": {
     "price": 0.22,
     "size": 100,
     "capital": 22.0,
-    "est_day": 10.67,
-    "share": 42.7,
+    "est_day": 8.793,
+    "share": 35.2,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "opdc-zelenskyy-presuk-2026-12-31",
    "side_pool": 25.0,
-   "best_bid": 0.02,
-   "best_ask": 0.07,
-   "bid_depth": 51738.0,
+   "best_bid": 0.04,
+   "best_ask": 0.05,
+   "bid_depth": 51034.0,
    "pick": {
-    "price": 0.02,
-    "size": 200,
+    "price": 0.03,
+    "size": 100,
+    "capital": 3.0,
+    "est_day": 0.186,
+    "share": 0.7,
+    "ticks": 1
+   },
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
+  },
+  {
+   "market": "opdc-zelenskyy-presuk-2027-06-30",
+   "side_pool": 25.0,
+   "best_bid": 0.04,
+   "best_ask": null,
+   "bid_depth": 101137.0,
+   "pick": {
+    "price": 0.04,
+    "size": 100,
     "capital": 4.0,
     "est_day": 0.191,
     "share": 0.8,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
-  },
-  {
-   "market": "opdc-zelenskyy-presuk-2027-06-30",
-   "side_pool": 25.0,
-   "best_bid": 0.02,
-   "best_ask": 0.99,
-   "bid_depth": 102102.0,
-   "pick": {
-    "price": 0.02,
-    "size": 500,
-    "capital": 10.0,
-    "est_day": 0.241,
-    "share": 1.0,
-    "ticks": 0
-   },
-   "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "paccc-usho-midterms-2026-11-03-dem",
    "side_pool": 25.0,
-   "best_bid": 0.846,
-   "best_ask": 0.854,
-   "bid_depth": 533591.0,
+   "best_bid": 0.851,
+   "best_ask": 0.856,
+   "bid_depth": 526919.0,
    "pick": {
-    "price": 0.846,
+    "price": 0.849,
     "size": 100,
-    "capital": 84.6,
-    "est_day": 0.32,
-    "share": 1.3,
-    "ticks": 0
+    "capital": 84.9,
+    "est_day": 0.989,
+    "share": 4.0,
+    "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "paccc-usho-midterms-2026-11-03-rep",
    "side_pool": 25.0,
    "best_bid": 0.174,
    "best_ask": 0.178,
-   "bid_depth": 520109.0,
+   "bid_depth": 522902.0,
    "pick": {
-    "price": 0.172,
+    "price": 0.174,
     "size": 100,
-    "capital": 17.2,
-    "est_day": 0.5,
-    "share": 2.0,
-    "ticks": 2
+    "capital": 17.4,
+    "est_day": 0.607,
+    "share": 2.4,
+    "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "paccc-usse-midterms-2026-11-03-dem",
    "side_pool": 25.0,
-   "best_bid": 0.436,
+   "best_bid": 0.437,
    "best_ask": 0.438,
-   "bid_depth": 924336.0,
+   "bid_depth": 806849.0,
    "pick": {
-    "price": 0.436,
+    "price": 0.437,
     "size": 100,
-    "capital": 43.6,
-    "est_day": 0.439,
-    "share": 1.8,
+    "capital": 43.7,
+    "est_day": 0.592,
+    "share": 2.4,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "paccc-usse-midterms-2026-11-03-rep",
    "side_pool": 25.0,
-   "best_bid": 0.56,
-   "best_ask": 0.561,
-   "bid_depth": 875060.0,
+   "best_bid": 0.563,
+   "best_ask": 0.564,
+   "bid_depth": 825567.0,
    "pick": {
-    "price": 0.558,
+    "price": 0.561,
     "size": 100,
-    "capital": 55.8,
-    "est_day": 0.551,
-    "share": 2.2,
+    "capital": 56.1,
+    "est_day": 1.846,
+    "share": 7.4,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "pic-congress-trump-2026-12-31",
    "side_pool": 50.0,
    "best_bid": 0.07,
    "best_ask": 0.08,
-   "bid_depth": 53235.0,
+   "bid_depth": 53146.0,
    "pick": {
     "price": 0.06,
     "size": 100,
     "capital": 6.0,
-    "est_day": 1.756,
+    "est_day": 1.73,
     "share": 3.5,
     "ticks": 1
    },
    "event_n": 1,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 1
+   }
   },
   {
    "market": "pintc-meet-put-zel-2026-07-31",
    "side_pool": 16.67,
    "best_bid": 0.01,
    "best_ask": 0.06,
-   "bid_depth": 613.0,
+   "bid_depth": 353.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 12.757,
-    "share": 76.5,
+    "est_day": 14.166,
+    "share": 85.0,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "pintc-meet-put-zel-2026-09-30",
    "side_pool": 16.67,
-   "best_bid": 0.01,
-   "best_ask": 0.44,
-   "bid_depth": 12634.0,
+   "best_bid": 0.02,
+   "best_ask": 0.45,
+   "bid_depth": 11678.0,
    "pick": {
-    "price": 0.01,
-    "size": 200,
+    "price": 0.02,
+    "size": 100,
     "capital": 2.0,
-    "est_day": 0.26,
-    "share": 1.6,
+    "est_day": 0.277,
+    "share": 1.7,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "pintc-meet-put-zel-2026-12-31",
    "side_pool": 16.67,
    "best_bid": 0.02,
-   "best_ask": 0.23,
-   "bid_depth": 24308.0,
+   "best_ask": 0.44,
+   "bid_depth": 51057.0,
    "pick": {
     "price": 0.02,
-    "size": 100,
-    "capital": 2.0,
-    "est_day": 0.564,
-    "share": 3.4,
+    "size": 500,
+    "capital": 10.0,
+    "est_day": 0.266,
+    "share": 1.6,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 3
+   }
   },
   {
    "market": "pintc-meet-trump-2026-12-31-delrod",
    "side_pool": 3.85,
-   "best_bid": 0.02,
+   "best_bid": 0.04,
    "best_ask": 0.45,
-   "bid_depth": 51365.0,
+   "bid_depth": 50808.0,
    "pick": {
-    "price": 0.02,
-    "size": 2000,
-    "capital": 40.0,
-    "est_day": 3.627,
-    "share": 94.3,
+    "price": 0.04,
+    "size": 500,
+    "capital": 20.0,
+    "est_day": 0.272,
+    "share": 7.1,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "pintc-meet-trump-2026-12-31-elomus",
    "side_pool": 3.85,
-   "best_bid": 0.49,
-   "best_ask": 0.99,
-   "bid_depth": 20486.0,
+   "best_bid": 0.5,
+   "best_ask": 0.98,
+   "bid_depth": 20213.0,
    "pick": {
-    "price": 0.47,
+    "price": 0.48,
     "size": 100,
-    "capital": 47.0,
-    "est_day": 1.576,
-    "share": 41.0,
+    "capital": 48.0,
+    "est_day": 2.581,
+    "share": 67.1,
     "ticks": 2
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "pintc-meet-trump-2026-12-31-joerog",
    "side_pool": 3.85,
-   "best_bid": 0.49,
+   "best_bid": 0.51,
    "best_ask": 0.98,
-   "bid_depth": 50466.0,
+   "bid_depth": 50474.0,
    "pick": {
-    "price": 0.47,
+    "price": 0.49,
     "size": 100,
-    "capital": 47.0,
+    "capital": 49.0,
     "est_day": 2.345,
     "share": 61.0,
     "ticks": 2
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "pintc-meet-trump-2026-12-31-kanwes",
    "side_pool": 3.85,
+   "best_bid": 0.02,
+   "best_ask": 0.45,
+   "bid_depth": 11503.0,
+   "pick": {
+    "price": 0.01,
+    "size": 500,
+    "capital": 5.0,
+    "est_day": 0.16,
+    "share": 4.2,
+    "ticks": 1
+   },
+   "event_n": 13,
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
+  },
+  {
+   "market": "pintc-meet-trump-2026-12-31-kimjon",
+   "side_pool": 3.85,
+   "best_bid": 0.06,
+   "best_ask": 0.45,
+   "bid_depth": 10780.0,
+   "pick": {
+    "price": 0.04,
+    "size": 100,
+    "capital": 4.0,
+    "est_day": 0.15,
+    "share": 3.9,
+    "ticks": 2
+   },
+   "event_n": 13,
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
+  },
+  {
+   "market": "pintc-meet-trump-2026-12-31-kimkar",
+   "side_pool": 3.85,
    "best_bid": 0.01,
    "best_ask": 0.45,
-   "bid_depth": 10676.0,
+   "bid_depth": 10700.0,
    "pick": {
     "price": 0.01,
     "size": 500,
@@ -4717,109 +6423,105 @@
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": false
-  },
-  {
-   "market": "pintc-meet-trump-2026-12-31-kimjon",
-   "side_pool": 3.85,
-   "best_bid": 0.05,
-   "best_ask": 0.45,
-   "bid_depth": 10916.0,
-   "pick": {
-    "price": 0.04,
-    "size": 100,
-    "capital": 4.0,
-    "est_day": 0.179,
-    "share": 4.7,
-    "ticks": 1
-   },
-   "event_n": 13,
-   "already_in": false
-  },
-  {
-   "market": "pintc-meet-trump-2026-12-31-kimkar",
-   "side_pool": 3.85,
-   "best_bid": 0.01,
-   "best_ask": 0.45,
-   "bid_depth": 10925.0,
-   "pick": {
-    "price": 0.01,
-    "size": 500,
-    "capital": 5.0,
-    "est_day": 0.168,
-    "share": 4.4,
-    "ticks": 0
-   },
-   "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "pintc-meet-trump-2026-12-31-leoxiv",
    "side_pool": 3.85,
-   "best_bid": 0.01,
+   "best_bid": 0.03,
    "best_ask": 0.45,
-   "bid_depth": 50687.0,
+   "bid_depth": 51169.0,
    "pick": {
-    "price": 0.01,
-    "size": 5000,
-    "capital": 50.0,
-    "est_day": 0.345,
-    "share": 9.0,
+    "price": 0.03,
+    "size": 1000,
+    "capital": 30.0,
+    "est_day": 0.274,
+    "share": 7.1,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "pintc-meet-trump-2026-12-31-mojkha",
    "side_pool": 3.85,
    "best_bid": 0.01,
    "best_ask": 0.99,
-   "bid_depth": 34321.0,
+   "bid_depth": 33966.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 0.212,
-    "share": 5.5,
+    "est_day": 0.214,
+    "share": 5.6,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "pintc-meet-trump-2026-12-31-talswi",
    "side_pool": 3.85,
    "best_bid": 0.01,
    "best_ask": 0.45,
-   "bid_depth": 10715.0,
+   "bid_depth": 10240.0,
    "pick": {
     "price": 0.01,
     "size": 500,
     "capital": 5.0,
-    "est_day": 0.171,
-    "share": 4.5,
+    "est_day": 0.179,
+    "share": 4.7,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "pintc-meet-trump-2026-12-31-vlaput",
    "side_pool": 3.85,
-   "best_bid": 0.2,
+   "best_bid": 0.22,
    "best_ask": 0.45,
-   "bid_depth": 50640.0,
+   "bid_depth": 50576.0,
    "pick": {
-    "price": 0.18,
+    "price": 0.2,
     "size": 100,
-    "capital": 18.0,
-    "est_day": 0.582,
-    "share": 15.1,
+    "capital": 20.0,
+    "est_day": 0.911,
+    "share": 23.7,
     "ticks": 2
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "pintc-meet-trump-2026-12-31-volzel",
@@ -4836,14 +6538,20 @@
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "pintc-meet-trump-2026-12-31-xijin",
    "side_pool": 3.85,
    "best_bid": 0.75,
    "best_ask": 0.99,
-   "bid_depth": 55346.0,
+   "bid_depth": 55321.0,
    "pick": {
     "price": 0.75,
     "size": 500,
@@ -4853,694 +6561,940 @@
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "pintc-meet-trump-2026-12-31-zohmam",
    "side_pool": 3.85,
-   "best_bid": 0.06,
+   "best_bid": 0.08,
    "best_ask": 0.45,
-   "bid_depth": 50881.0,
+   "bid_depth": 50690.0,
    "pick": {
-    "price": 0.06,
+    "price": 0.07,
     "size": 100,
-    "capital": 6.0,
-    "est_day": 0.181,
-    "share": 4.7,
-    "ticks": 0
+    "capital": 7.0,
+    "est_day": 0.268,
+    "share": 7.0,
+    "ticks": 1
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "pvwc-housepopw-2026-11-03-dem",
    "side_pool": 25.0,
    "best_bid": 0.85,
-   "best_ask": 0.93,
-   "bid_depth": 2499.0,
+   "best_ask": 0.94,
+   "bid_depth": 2657.0,
    "pick": {
     "price": 0.83,
     "size": 100,
     "capital": 83.0,
-    "est_day": 1.031,
-    "share": 4.1,
+    "est_day": 0.818,
+    "share": 3.3,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "pvwc-housepopw-2026-11-03-rep",
    "side_pool": 25.0,
-   "best_bid": 0.25,
-   "best_ask": 0.33,
-   "bid_depth": 2144.0,
+   "best_bid": 0.13,
+   "best_ask": 0.32,
+   "bid_depth": 2056.0,
    "pick": {
-    "price": 0.23,
+    "price": 0.11,
     "size": 100,
-    "capital": 23.0,
-    "est_day": 7.521,
-    "share": 30.1,
+    "capital": 11.0,
+    "est_day": 1.176,
+    "share": 4.7,
     "ticks": 2
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 2
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte180",
    "side_pool": 4.17,
-   "best_bid": 0.49,
+   "best_bid": 0.01,
    "best_ask": 0.99,
-   "bid_depth": 2788.0,
+   "bid_depth": 200.0,
    "pick": {
-    "price": 0.47,
-    "size": 100,
-    "capital": 47.0,
-    "est_day": 0.298,
-    "share": 7.1,
-    "ticks": 2
+    "price": 0.01,
+    "size": 2000,
+    "capital": 20.0,
+    "est_day": 3.788,
+    "share": 90.9,
+    "ticks": 0
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte185",
    "side_pool": 4.17,
-   "best_bid": 0.49,
+   "best_bid": 0.5,
    "best_ask": 0.99,
-   "bid_depth": 2788.0,
+   "bid_depth": 462.0,
    "pick": {
-    "price": 0.47,
-    "size": 100,
-    "capital": 47.0,
-    "est_day": 0.298,
-    "share": 7.1,
+    "price": 0.48,
+    "size": 2000,
+    "capital": 960.0,
+    "est_day": 4.069,
+    "share": 97.7,
     "ticks": 2
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte190",
    "side_pool": 4.17,
-   "best_bid": 0.49,
+   "best_bid": 0.5,
    "best_ask": 0.99,
-   "bid_depth": 2763.0,
+   "bid_depth": 462.0,
    "pick": {
-    "price": 0.47,
-    "size": 100,
-    "capital": 47.0,
-    "est_day": 0.321,
-    "share": 7.7,
+    "price": 0.48,
+    "size": 2000,
+    "capital": 960.0,
+    "est_day": 4.069,
+    "share": 97.7,
     "ticks": 2
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte195",
    "side_pool": 4.17,
    "best_bid": 0.49,
    "best_ask": 0.99,
-   "bid_depth": 2788.0,
+   "bid_depth": 462.0,
    "pick": {
     "price": 0.47,
-    "size": 100,
-    "capital": 47.0,
-    "est_day": 0.298,
-    "share": 7.1,
+    "size": 2000,
+    "capital": 940.0,
+    "est_day": 4.069,
+    "share": 97.7,
     "ticks": 2
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte200",
    "side_pool": 4.17,
-   "best_bid": 0.49,
-   "best_ask": 0.99,
-   "bid_depth": 2738.0,
+   "best_bid": 0.01,
+   "best_ask": 0.98,
+   "bid_depth": 200.0,
    "pick": {
-    "price": 0.47,
-    "size": 100,
-    "capital": 47.0,
-    "est_day": 2.083,
-    "share": 50.0,
-    "ticks": 2
+    "price": 0.01,
+    "size": 2000,
+    "capital": 20.0,
+    "est_day": 3.788,
+    "share": 90.9,
+    "ticks": 0
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte205",
    "side_pool": 4.17,
-   "best_bid": 0.48,
-   "best_ask": 0.98,
-   "bid_depth": 2550.0,
+   "best_bid": 0.01,
+   "best_ask": 0.99,
+   "bid_depth": 200.0,
    "pick": {
-    "price": 0.46,
-    "size": 100,
-    "capital": 46.0,
-    "est_day": 0.231,
-    "share": 5.6,
-    "ticks": 2
+    "price": 0.01,
+    "size": 2000,
+    "capital": 20.0,
+    "est_day": 3.788,
+    "share": 90.9,
+    "ticks": 0
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte210",
    "side_pool": 4.17,
-   "best_bid": 0.27,
-   "best_ask": 0.77,
-   "bid_depth": 2762.0,
+   "best_bid": 0.04,
+   "best_ask": 0.76,
+   "bid_depth": 714.0,
    "pick": {
-    "price": 0.25,
-    "size": 100,
-    "capital": 25.0,
-    "est_day": 1.68,
-    "share": 40.3,
-    "ticks": 2
+    "price": 0.01,
+    "size": 2000,
+    "capital": 20.0,
+    "est_day": 1.954,
+    "share": 46.9,
+    "ticks": 3
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte215",
    "side_pool": 4.17,
-   "best_bid": 0.21,
-   "best_ask": 0.7,
-   "bid_depth": 2745.0,
+   "best_bid": 0.22,
+   "best_ask": 0.96,
+   "bid_depth": 205.0,
    "pick": {
-    "price": 0.19,
-    "size": 100,
-    "capital": 19.0,
-    "est_day": 2.401,
-    "share": 57.6,
+    "price": 0.2,
+    "size": 2000,
+    "capital": 400.0,
+    "est_day": 4.132,
+    "share": 99.2,
     "ticks": 2
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte220",
    "side_pool": 4.17,
-   "best_bid": 0.02,
+   "best_bid": 0.03,
    "best_ask": 0.5,
-   "bid_depth": 2389.0,
+   "bid_depth": 2301.0,
    "pick": {
-    "price": 0.01,
+    "price": 0.02,
     "size": 100,
-    "capital": 1.0,
-    "est_day": 0.164,
-    "share": 3.9,
+    "capital": 2.0,
+    "est_day": 0.229,
+    "share": 5.5,
     "ticks": 1
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte225",
    "side_pool": 4.17,
    "best_bid": 0.02,
-   "best_ask": 0.49,
-   "bid_depth": 4517.0,
+   "best_ask": 0.5,
+   "bid_depth": 29449.0,
    "pick": {
     "price": 0.02,
-    "size": 200,
-    "capital": 4.0,
-    "est_day": 0.257,
-    "share": 6.2,
+    "size": 2000,
+    "capital": 40.0,
+    "est_day": 0.267,
+    "share": 6.4,
     "ticks": 0
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte230",
    "side_pool": 4.17,
    "best_bid": 0.01,
-   "best_ask": 0.49,
-   "bid_depth": 925.0,
+   "best_ask": 0.5,
+   "bid_depth": 700.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 2.849,
-    "share": 68.4,
+    "est_day": 3.086,
+    "share": 74.1,
     "ticks": 0
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte235",
    "side_pool": 4.17,
-   "best_bid": 0.01,
-   "best_ask": 0.48,
-   "bid_depth": 678.0,
+   "best_bid": 0.02,
+   "best_ask": 0.5,
+   "bid_depth": 1756.0,
    "pick": {
     "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "est_day": 3.112,
-    "share": 74.7,
-    "ticks": 0
+    "size": 500,
+    "capital": 5.0,
+    "est_day": 0.922,
+    "share": 22.1,
+    "ticks": 1
    },
    "event_n": 12,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 12
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-46",
    "side_pool": 3.85,
    "best_bid": 0.01,
    "best_ask": 0.48,
-   "bid_depth": 89343.0,
+   "bid_depth": 30450.0,
    "pick": {
     "price": 0.01,
-    "size": 5000,
-    "capital": 50.0,
-    "est_day": 0.204,
-    "share": 5.3,
+    "size": 2000,
+    "capital": 20.0,
+    "est_day": 0.237,
+    "share": 6.2,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-47",
    "side_pool": 3.85,
    "best_bid": 0.01,
    "best_ask": 0.48,
-   "bid_depth": 191992.0,
+   "bid_depth": 188832.0,
    "pick": {
     "price": 0.01,
     "size": 10000,
     "capital": 100.0,
-    "est_day": 0.19,
+    "est_day": 0.193,
     "share": 5.0,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-48",
    "side_pool": 3.85,
-   "best_bid": 0.03,
+   "best_bid": 0.04,
    "best_ask": 0.25,
-   "bid_depth": 21178.0,
+   "bid_depth": 21915.0,
    "pick": {
-    "price": 0.03,
-    "size": 1000,
-    "capital": 30.0,
-    "est_day": 0.176,
-    "share": 4.6,
+    "price": 0.04,
+    "size": 500,
+    "capital": 20.0,
+    "est_day": 0.169,
+    "share": 4.4,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-49",
    "side_pool": 3.85,
    "best_bid": 0.12,
-   "best_ask": 0.44,
-   "bid_depth": 200625.0,
+   "best_ask": 0.47,
+   "bid_depth": 200795.0,
    "pick": {
     "price": 0.1,
     "size": 100,
     "capital": 10.0,
-    "est_day": 0.227,
-    "share": 5.9,
+    "est_day": 0.155,
+    "share": 4.0,
     "ticks": 2
    },
    "event_n": 13,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-50",
    "side_pool": 3.85,
-   "best_bid": 0.16,
-   "best_ask": 0.44,
-   "bid_depth": 200525.0,
+   "best_bid": 0.24,
+   "best_ask": 0.47,
+   "bid_depth": 200737.0,
    "pick": {
-    "price": 0.14,
+    "price": 0.22,
     "size": 100,
-    "capital": 14.0,
-    "est_day": 0.275,
-    "share": 7.2,
+    "capital": 22.0,
+    "est_day": 1.347,
+    "share": 35.0,
     "ticks": 2
    },
    "event_n": 13,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-51",
    "side_pool": 3.85,
-   "best_bid": 0.16,
-   "best_ask": 0.43,
-   "bid_depth": 200643.0,
+   "best_bid": 0.18,
+   "best_ask": 0.5,
+   "bid_depth": 200407.0,
    "pick": {
-    "price": 0.14,
+    "price": 0.16,
     "size": 100,
-    "capital": 14.0,
-    "est_day": 0.206,
-    "share": 5.3,
+    "capital": 16.0,
+    "est_day": 1.091,
+    "share": 28.4,
     "ticks": 2
    },
    "event_n": 13,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-52",
    "side_pool": 3.85,
-   "best_bid": 0.08,
-   "best_ask": 0.44,
-   "bid_depth": 50547.0,
+   "best_bid": 0.14,
+   "best_ask": 0.49,
+   "bid_depth": 50925.0,
    "pick": {
-    "price": 0.07,
+    "price": 0.12,
     "size": 100,
-    "capital": 7.0,
-    "est_day": 0.17,
-    "share": 4.4,
-    "ticks": 1
+    "capital": 12.0,
+    "est_day": 1.492,
+    "share": 38.8,
+    "ticks": 2
    },
    "event_n": 13,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-53",
    "side_pool": 3.85,
    "best_bid": 0.02,
-   "best_ask": 0.46,
-   "bid_depth": 106427.0,
+   "best_ask": 0.5,
+   "bid_depth": 132557.0,
    "pick": {
     "price": 0.02,
-    "size": 500,
-    "capital": 10.0,
-    "est_day": 0.353,
-    "share": 9.2,
+    "size": 2000,
+    "capital": 40.0,
+    "est_day": 0.224,
+    "share": 5.8,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-54",
    "side_pool": 3.85,
    "best_bid": 0.01,
    "best_ask": 0.48,
-   "bid_depth": 50675.0,
+   "bid_depth": 50450.0,
    "pick": {
     "price": 0.01,
     "size": 5000,
     "capital": 50.0,
-    "est_day": 0.345,
+    "est_day": 0.347,
     "share": 9.0,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-55",
    "side_pool": 3.85,
    "best_bid": 0.01,
-   "best_ask": 0.48,
-   "bid_depth": 10675.0,
+   "best_ask": 0.5,
+   "bid_depth": 18867.0,
    "pick": {
     "price": 0.01,
-    "size": 500,
-    "capital": 5.0,
-    "est_day": 0.172,
-    "share": 4.5,
+    "size": 1000,
+    "capital": 10.0,
+    "est_day": 0.194,
+    "share": 5.0,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-56",
    "side_pool": 3.85,
    "best_bid": 0.01,
    "best_ask": 0.47,
-   "bid_depth": 13879.0,
+   "bid_depth": 13330.0,
    "pick": {
     "price": 0.01,
     "size": 1000,
     "capital": 10.0,
-    "est_day": 0.258,
-    "share": 6.7,
+    "est_day": 0.268,
+    "share": 7.0,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-gte57",
    "side_pool": 3.85,
    "best_bid": 0.01,
    "best_ask": 0.47,
-   "bid_depth": 10675.0,
+   "bid_depth": 10450.0,
    "pick": {
     "price": 0.01,
     "size": 500,
     "capital": 5.0,
-    "est_day": 0.172,
-    "share": 4.5,
+    "est_day": 0.176,
+    "share": 4.6,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "scc-senate-gop-2026-11-03-lte45",
    "side_pool": 3.85,
    "best_bid": 0.01,
-   "best_ask": 0.48,
-   "bid_depth": 132389.0,
+   "best_ask": 0.49,
+   "bid_depth": 50878.0,
    "pick": {
     "price": 0.01,
-    "size": 10000,
-    "capital": 100.0,
-    "est_day": 0.27,
-    "share": 7.0,
+    "size": 5000,
+    "capital": 50.0,
+    "est_day": 0.344,
+    "share": 8.9,
     "ticks": 0
    },
    "event_n": 13,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 13
+   }
   },
   {
    "market": "stsc-bab-el-mandeb-clsd-2026-07-31",
    "side_pool": 41.67,
    "best_bid": 0.06,
    "best_ask": 0.13,
-   "bid_depth": 6553.0,
+   "bid_depth": 14886.0,
    "pick": {
     "price": 0.06,
     "size": 100,
     "capital": 6.0,
-    "est_day": 0.769,
-    "share": 1.8,
+    "est_day": 0.303,
+    "share": 0.7,
     "ticks": 0
    },
    "event_n": 3,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 250.0,
+    "event_n": 3
+   }
   },
   {
    "market": "stsc-bab-el-mandeb-clsd-2026-08-31",
    "side_pool": 41.67,
    "best_bid": 0.25,
    "best_ask": 0.26,
-   "bid_depth": 3226.0,
+   "bid_depth": 3925.0,
    "pick": {
     "price": 0.23,
     "size": 100,
     "capital": 23.0,
-    "est_day": 1.135,
-    "share": 2.7,
+    "est_day": 0.6,
+    "share": 1.4,
     "ticks": 2
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 250.0,
+    "event_n": 3
+   }
   },
   {
    "market": "stsc-bab-el-mandeb-clsd-2026-12-31",
    "side_pool": 41.67,
    "best_bid": 0.43,
    "best_ask": 0.44,
-   "bid_depth": 23015.0,
+   "bid_depth": 22848.0,
    "pick": {
     "price": 0.41,
     "size": 100,
     "capital": 41.0,
-    "est_day": 4.746,
-    "share": 11.4,
+    "est_day": 1.785,
+    "share": 4.3,
     "ticks": 2
    },
    "event_n": 3,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 250.0,
+    "event_n": 3
+   }
   },
   {
    "market": "stsc-hormuz-normal-aug31",
    "side_pool": 62.5,
    "best_bid": 0.07,
    "best_ask": 0.09,
-   "bid_depth": 3719.0,
+   "bid_depth": 11032.0,
    "pick": {
     "price": 0.07,
     "size": 100,
     "capital": 7.0,
-    "est_day": 2.5,
-    "share": 4.0,
+    "est_day": 0.634,
+    "share": 1.0,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 250.0,
+    "event_n": 2
+   }
   },
   {
    "market": "stsc-hormuz-normal-jul31",
    "side_pool": 62.5,
    "best_bid": 0.01,
    "best_ask": 0.02,
-   "bid_depth": 6703.0,
+   "bid_depth": 6421.0,
    "pick": {
     "price": 0.01,
     "size": 100,
     "capital": 1.0,
-    "est_day": 0.919,
+    "est_day": 0.958,
     "share": 1.5,
     "ticks": 0
    },
    "event_n": 2,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 250.0,
+    "event_n": 2
+   }
   },
   {
    "market": "usgcc-aliens-12-31-2026",
    "side_pool": 50.0,
-   "best_bid": 0.07,
+   "best_bid": 0.06,
    "best_ask": 0.08,
-   "bid_depth": 60488.0,
+   "bid_depth": 68833.0,
    "pick": {
-    "price": 0.07,
-    "size": 100,
-    "capital": 7.0,
-    "est_day": 0.206,
+    "price": 0.06,
+    "size": 200,
+    "capital": 12.0,
+    "est_day": 0.176,
     "share": 0.4,
     "ticks": 0
    },
    "event_n": 1,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 1
+   }
   },
   {
    "market": "vmc-ussep-misen-2026-08-04-els0-5",
    "side_pool": 5.0,
    "best_bid": 0.32,
    "best_ask": 0.34,
-   "bid_depth": 10367.0,
+   "bid_depth": 10342.0,
    "pick": {
     "price": 0.3,
     "size": 100,
     "capital": 30.0,
-    "est_day": 1.504,
-    "share": 30.1,
+    "est_day": 1.838,
+    "share": 36.8,
     "ticks": 2
    },
    "event_n": 10,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vmc-ussep-misen-2026-08-04-els10-15",
    "side_pool": 5.0,
    "best_bid": 0.02,
-   "best_ask": 0.39,
-   "bid_depth": 9760.0,
+   "best_ask": 0.4,
+   "bid_depth": 36514.0,
    "pick": {
     "price": 0.02,
-    "size": 200,
-    "capital": 4.0,
-    "est_day": 0.258,
-    "share": 5.2,
+    "size": 1000,
+    "capital": 20.0,
+    "est_day": 0.159,
+    "share": 3.2,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vmc-ussep-misen-2026-08-04-els15-20",
    "side_pool": 5.0,
    "best_bid": 0.02,
    "best_ask": 0.24,
-   "bid_depth": 34254.0,
+   "bid_depth": 34332.0,
    "pick": {
     "price": 0.02,
-    "size": 100,
-    "capital": 2.0,
-    "est_day": 0.153,
-    "share": 3.1,
+    "size": 200,
+    "capital": 4.0,
+    "est_day": 0.287,
+    "share": 5.7,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vmc-ussep-misen-2026-08-04-els5-10",
    "side_pool": 5.0,
-   "best_bid": 0.01,
+   "best_bid": 0.02,
    "best_ask": 0.29,
-   "bid_depth": 338.0,
+   "bid_depth": 1337.0,
    "pick": {
     "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "est_day": 4.277,
-    "share": 85.5,
-    "ticks": 0
+    "size": 1000,
+    "capital": 10.0,
+    "est_day": 2.108,
+    "share": 42.2,
+    "ticks": 1
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vmc-ussep-misen-2026-08-04-elsgte20",
    "side_pool": 5.0,
-   "best_bid": 0.02,
-   "best_ask": 0.37,
-   "bid_depth": 24522.0,
+   "best_bid": 0.03,
+   "best_ask": 0.36,
+   "bid_depth": 24461.0,
    "pick": {
     "price": 0.02,
-    "size": 500,
-    "capital": 10.0,
-    "est_day": 0.185,
-    "share": 3.7,
-    "ticks": 0
+    "size": 100,
+    "capital": 2.0,
+    "est_day": 0.194,
+    "share": 3.9,
+    "ticks": 1
    },
    "event_n": 10,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vmc-ussep-misen-2026-08-04-ste0-5",
    "side_pool": 5.0,
    "best_bid": 0.03,
-   "best_ask": 0.11,
-   "bid_depth": 11063.0,
+   "best_ask": 0.06,
+   "bid_depth": 12696.0,
    "pick": {
-    "price": 0.03,
+    "price": 0.02,
     "size": 100,
-    "capital": 3.0,
-    "est_day": 0.156,
-    "share": 3.1,
-    "ticks": 0
+    "capital": 2.0,
+    "est_day": 0.162,
+    "share": 3.2,
+    "ticks": 1
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vmc-ussep-misen-2026-08-04-ste05-10",
    "side_pool": 5.0,
    "best_bid": 0.25,
-   "best_ask": 0.38,
-   "bid_depth": 7684.0,
+   "best_ask": 0.39,
+   "bid_depth": 7909.0,
    "pick": {
     "price": 0.23,
     "size": 100,
@@ -5550,116 +7504,158 @@
     "ticks": 2
    },
    "event_n": 10,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vmc-ussep-misen-2026-08-04-ste10-15",
    "side_pool": 5.0,
    "best_bid": 0.11,
-   "best_ask": 0.14,
-   "bid_depth": 2901.0,
+   "best_ask": 0.13,
+   "bid_depth": 2879.0,
    "pick": {
     "price": 0.09,
     "size": 100,
     "capital": 9.0,
-    "est_day": 0.449,
-    "share": 9.0,
+    "est_day": 0.488,
+    "share": 9.8,
     "ticks": 2
    },
    "event_n": 10,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vmc-ussep-misen-2026-08-04-ste15-20",
    "side_pool": 5.0,
    "best_bid": 0.01,
    "best_ask": 0.05,
-   "bid_depth": 22352.0,
+   "bid_depth": 19988.0,
    "pick": {
     "price": 0.01,
     "size": 1000,
     "capital": 10.0,
-    "est_day": 0.214,
-    "share": 4.3,
+    "est_day": 0.238,
+    "share": 4.8,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": true
+   "already_in": true,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vmc-ussep-misen-2026-08-04-stegte20",
    "side_pool": 5.0,
    "best_bid": 0.01,
-   "best_ask": 0.05,
-   "bid_depth": 8003.0,
+   "best_ask": 0.04,
+   "bid_depth": 19295.0,
    "pick": {
     "price": 0.01,
-    "size": 500,
-    "capital": 5.0,
-    "est_day": 0.294,
-    "share": 5.9,
+    "size": 1000,
+    "capital": 10.0,
+    "est_day": 0.246,
+    "share": 4.9,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vtc-hrep-to-2026-11-03-100-105m",
    "side_pool": 5.0,
    "best_bid": 0.02,
-   "best_ask": 0.2,
-   "bid_depth": 51690.0,
+   "best_ask": 0.38,
+   "bid_depth": 54208.0,
    "pick": {
     "price": 0.02,
     "size": 1000,
     "capital": 20.0,
-    "est_day": 0.183,
-    "share": 3.7,
+    "est_day": 0.167,
+    "share": 3.3,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vtc-hrep-to-2026-11-03-105-110m",
    "side_pool": 5.0,
-   "best_bid": 0.09,
-   "best_ask": 0.26,
-   "bid_depth": 40526.0,
+   "best_bid": 0.06,
+   "best_ask": 0.39,
+   "bid_depth": 41814.0,
    "pick": {
-    "price": 0.07,
+    "price": 0.05,
     "size": 100,
-    "capital": 7.0,
-    "est_day": 0.427,
-    "share": 8.5,
-    "ticks": 2
+    "capital": 5.0,
+    "est_day": 0.163,
+    "share": 3.3,
+    "ticks": 1
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vtc-hrep-to-2026-11-03-110-115m",
    "side_pool": 5.0,
-   "best_bid": 0.12,
-   "best_ask": 0.33,
-   "bid_depth": 76394.0,
+   "best_bid": 0.09,
+   "best_ask": 0.16,
+   "bid_depth": 76588.0,
    "pick": {
-    "price": 0.1,
+    "price": 0.07,
     "size": 100,
-    "capital": 10.0,
-    "est_day": 0.579,
-    "share": 11.6,
+    "capital": 7.0,
+    "est_day": 0.17,
+    "share": 3.4,
     "ticks": 2
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vtc-hrep-to-2026-11-03-115-120m",
    "side_pool": 5.0,
    "best_bid": 0.18,
    "best_ask": 0.21,
-   "bid_depth": 76632.0,
+   "bid_depth": 76604.0,
    "pick": {
     "price": 0.16,
     "size": 100,
@@ -5669,109 +7665,151 @@
     "ticks": 2
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vtc-hrep-to-2026-11-03-120-125m",
    "side_pool": 5.0,
    "best_bid": 0.2,
-   "best_ask": 0.23,
-   "bid_depth": 68678.0,
+   "best_ask": 0.22,
+   "bid_depth": 68559.0,
    "pick": {
     "price": 0.19,
     "size": 100,
     "capital": 19.0,
-    "est_day": 0.192,
-    "share": 3.8,
+    "est_day": 0.203,
+    "share": 4.1,
     "ticks": 1
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vtc-hrep-to-2026-11-03-125-130m",
    "side_pool": 5.0,
    "best_bid": 0.01,
    "best_ask": 0.39,
-   "bid_depth": 38284.0,
+   "bid_depth": 37867.0,
    "pick": {
     "price": 0.01,
     "size": 2000,
     "capital": 20.0,
-    "est_day": 0.248,
+    "est_day": 0.251,
     "share": 5.0,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vtc-hrep-to-2026-11-03-90-95m",
    "side_pool": 5.0,
    "best_bid": 0.01,
-   "best_ask": 0.13,
-   "bid_depth": 5421.0,
+   "best_ask": 0.12,
+   "bid_depth": 8685.0,
    "pick": {
     "price": 0.01,
-    "size": 200,
-    "capital": 2.0,
-    "est_day": 0.178,
-    "share": 3.6,
+    "size": 500,
+    "capital": 5.0,
+    "est_day": 0.272,
+    "share": 5.4,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vtc-hrep-to-2026-11-03-95-100m",
    "side_pool": 5.0,
    "best_bid": 0.01,
-   "best_ask": 0.15,
-   "bid_depth": 30635.0,
+   "best_ask": 0.39,
+   "bid_depth": 32052.0,
    "pick": {
     "price": 0.01,
     "size": 1000,
     "capital": 10.0,
-    "est_day": 0.158,
-    "share": 3.2,
+    "est_day": 0.151,
+    "share": 3.0,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vtc-hrep-to-2026-11-03-gte130m",
    "side_pool": 5.0,
-   "best_bid": 0.02,
-   "best_ask": 0.39,
-   "bid_depth": 16770.0,
+   "best_bid": 0.07,
+   "best_ask": 0.4,
+   "bid_depth": 41737.0,
    "pick": {
-    "price": 0.02,
-    "size": 200,
-    "capital": 4.0,
-    "est_day": 0.181,
-    "share": 3.6,
-    "ticks": 0
+    "price": 0.06,
+    "size": 100,
+    "capital": 6.0,
+    "est_day": 0.169,
+    "share": 3.4,
+    "ticks": 1
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   },
   {
    "market": "vtc-hrep-to-2026-11-03-lt90m",
    "side_pool": 5.0,
    "best_bid": 0.01,
-   "best_ask": 0.14,
-   "bid_depth": 9208.0,
+   "best_ask": 0.39,
+   "bid_depth": 4528.0,
    "pick": {
     "price": 0.01,
-    "size": 500,
-    "capital": 5.0,
-    "est_day": 0.258,
-    "share": 5.2,
+    "size": 200,
+    "capital": 2.0,
+    "est_day": 0.212,
+    "share": 4.2,
     "ticks": 0
    },
    "event_n": 10,
-   "already_in": false
+   "already_in": false,
+   "prog": {
+    "df": 0.5,
+    "target": 2000.0,
+    "pool": 100.0,
+    "event_n": 10
+   }
   }
  ],
  "skipped": []
