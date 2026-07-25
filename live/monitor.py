@@ -149,6 +149,56 @@ def save_remote_state(state: dict) -> bool:
         return False
 
 
+def tracker_day_integral(day_et: str) -> tuple[float, dict[str, float]] | None:
+    """Rebuild 'earned so far today' from the hourly tracker's estimate
+    snapshots (data/estimates.csv on main) — piecewise-constant integration
+    from midnight ET to now. Independent of this process, so it survives any
+    monitor outage or state loss."""
+    if not GITHUB_TOKEN:
+        return None
+    try:
+        r = requests.get(
+            f"{GH_API}/repos/{GITHUB_REPO}/contents/data/estimates.csv",
+            params={"ref": "main"},
+            headers={"Authorization": f"Bearer {GITHUB_TOKEN}",
+                     "Accept": "application/vnd.github.raw+json"},
+            timeout=30,
+        )
+        if r.status_code != 200:
+            return None
+        import csv as _csv
+        import io as _io
+        runs: dict[str, dict[str, float]] = {}  # utc run ts -> market -> est $/day
+        for row in _csv.DictReader(_io.StringIO(r.text)):
+            try:
+                if tr._et_day(row["checked_at_utc"]) != day_et:
+                    continue
+                mkts = runs.setdefault(row["checked_at_utc"], {})
+                mkts[row["market"]] = mkts.get(row["market"], 0.0) + float(row["est_day"])
+            except Exception:  # noqa: BLE001 — one bad row must not kill the rebuild
+                continue
+        if not runs:
+            return None
+        times = sorted(runs)
+        midnight = dt.datetime.strptime(day_et, "%Y-%m-%d").replace(tzinfo=ET)
+        now = dt.datetime.now(dt.timezone.utc)
+
+        def _utc(ts: str) -> dt.datetime:
+            return dt.datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").replace(tzinfo=dt.timezone.utc)
+
+        total, per_market = 0.0, {}
+        for i, ts in enumerate(times):
+            start = midnight.astimezone(dt.timezone.utc) if i == 0 else _utc(ts)
+            end = _utc(times[i + 1]) if i + 1 < len(times) else now
+            frac = max((end - start).total_seconds(), 0.0) / 86400.0
+            for m, est in runs[ts].items():
+                total += est * frac
+                per_market[m] = per_market.get(m, 0.0) + est * frac
+        return round(total, 2), {m: round(v, 4) for m, v in per_market.items()}
+    except Exception:  # noqa: BLE001
+        return None
+
+
 class Monitor:
     def __init__(self) -> None:
         self.lock = threading.Lock()
@@ -164,6 +214,23 @@ class Monitor:
         # A redeploy replaces the local disk — take whichever copy is newest.
         best = max((local, remote), key=lambda s: s.get("saved_at", 0.0) or 0.0)
         self.state.update(best)
+        # Backfill: if the restored counter is materially below what the
+        # hourly tracker's data says today has produced, rebuild from that —
+        # outages and state loss stop costing the day's number.
+        self.backfilled: float | None = None
+        try:
+            today = dt.datetime.now(ET).strftime("%Y-%m-%d")
+            if self.state.get("day") in (None, today):
+                rebuilt = tracker_day_integral(today)
+                if rebuilt and rebuilt[0] > (self.state.get("earned") or 0.0) + 1.0:
+                    self.state["day"] = today
+                    self.state["earned"] = rebuilt[0]
+                    pm = self.state.setdefault("per_market", {})
+                    for m, v in rebuilt[1].items():
+                        pm[m] = max(pm.get(m, 0.0), v)
+                    self.backfilled = rebuilt[0]
+        except Exception:  # noqa: BLE001 — backfill is best-effort
+            pass
         self.last_ts: dt.datetime | None = None
         self.rate = float(self.state.get("rate") or 0.0)
         self.market_rates: dict[str, float] = dict(self.state.get("market_rates") or {})
@@ -431,6 +498,7 @@ class Monitor:
                 "pnl": self._pnl(),
                 "buying_power": self.buying_power,
                 "warming": self.warming,
+                "backfilled": self.backfilled,
                 "poll_seconds": POLL_SECONDS,
                 "persistence": (
                     f"github — SAVES FAILING ({SAVE_STATUS['err']})"
@@ -1536,7 +1604,8 @@ async function refresh(){
     document.getElementById('rate').textContent =
       'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + d.orders.length + ' orders';
     document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence + ' · alerts: ' + d.alerts +
-      (d.warming ? ' · ⏳ warming up: ' + d.warming + ' markets on saved rates' : '');
+      (d.warming ? ' · ⏳ warming up: ' + d.warming + ' markets on saved rates' : '') +
+      (d.backfilled ? ' · ♻️ counter rebuilt from tracker data ($' + d.backfilled.toFixed(2) + ' at boot)' : '');
     const err = document.getElementById('err');
     const diag = Object.entries(d.diag || {}).map(([k,v]) => k.replace(/^_/,'') + ': ' + v).join(' · ');
     const msg = [d.error, diag].filter(Boolean).join(' · ');
