@@ -448,36 +448,46 @@ PLACER: dict = {"running": False, "results": [], "total": 0, "abort": False, "su
 
 
 def _place_one(spec: dict, plan_row: dict) -> dict:
-    """Revalidate against the LIVE book, then place ONE post-only resting bid."""
+    """Revalidate against the LIVE book, then place ONE post-only resting order."""
     slug = spec["market"]
+    side = spec.get("side", "BUY")
     price = round(spec["price_cents"] / 100.0, 4)
     size = int(spec["size"])
-    res: dict = {"market": slug, "price_cents": spec["price_cents"], "size": size}
+    res: dict = {"market": slug, "side": side, "price_cents": spec["price_cents"], "size": size}
     try:
         book = tr._fetch_book(slug)
+        bids = book.get("bids") or []
         asks = book.get("asks") or []
-        if asks and price >= asks[0][0]:
+        crosses = (asks and price >= asks[0][0]) if side == "BUY" else (bids and price <= bids[0][0])
+        if crosses:
             res.update(status="skipped", note="would cross the spread now")
             return res
         prog = dict(plan_row.get("prog") or {})
         if prog.get("pool"):  # drift check: still worth placing at today's book?
-            probe = {"market": slug, "side": "BUY", "price": price, "size": float(size)}
-            bids = dict(book.get("bids") or [])
-            bids[price] = bids.get(price, 0) + size
-            merged = dict(book, bids=sorted(bids.items(), key=lambda x: -x[0]))
+            probe = {"market": slug, "side": side, "price": price, "size": float(size)}
+            key = "bids" if side == "BUY" else "asks"
+            levels = dict(book.get(key) or [])
+            levels[price] = levels.get(price, 0) + size
+            merged = dict(book)
+            merged[key] = sorted(levels.items(), key=lambda x: (-x[0] if side == "BUY" else x[0]))
             tr._score_order(probe, merged, prog)
             est = probe.get("est_day") or 0.0
             if est < 0.08:
                 res.update(status="skipped", note=f"drifted — est now ${est:.2f}/day")
                 return res
             res["est_day"] = round(est, 2)
+        intent = "ORDER_INTENT_BUY_LONG"
+        if side == "SELL":  # sell inventory if we hold enough, else open a short
+            net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
+            intent = "ORDER_INTENT_SELL_LONG" if net >= size else "ORDER_INTENT_SELL_SHORT"
+            res["intent"] = intent
         path = "/v1/orders"
         value = f"{price:.3f}".rstrip("0").rstrip(".")
         r = requests.request(
             "POST", tr.TRADE_API + path,
             headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
                      "Content-Type": "application/json"},
-            json={"marketSlug": slug, "intent": "ORDER_INTENT_BUY_LONG",
+            json={"marketSlug": slug, "intent": intent,
                   "type": "ORDER_TYPE_LIMIT",
                   "price": {"value": value, "currency": "USD"},
                   "quantity": size, "tif": "TIME_IN_FORCE_DAY",
@@ -506,10 +516,10 @@ def run_batch(specs: list[dict], plan_rows: dict[str, dict]) -> None:
             if PLACER["abort"]:
                 PLACER["summary"] = "stopped by user"
                 break
-            res = _place_one(spec, plan_rows.get(spec["market"], {}))
+            res = _place_one(spec, plan_rows.get((spec["market"], spec.get("side", "BUY")), {}))
             PLACER["results"].append(res)
             ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
-                            "market": res["market"], "side": "BUY (new)", "from": "—",
+                            "market": res["market"], "side": f"{res.get('side', 'BUY')} (new)", "from": "—",
                             "to": res["price_cents"], "size": res["size"],
                             "status": res["status"],
                             "response": (res.get("note") or res.get("id") or "")[:150],
@@ -542,23 +552,31 @@ def start_batch(payload: dict) -> tuple[int, dict]:
         plan = fetch_plan()
     except Exception as e:  # noqa: BLE001
         return 502, {"ok": False, "error": f"can't load plan: {e}"[:200]}
-    plan_rows = {r["market"]: r for r in plan.get("results") or [] if r.get("pick")}
+    plan_rows = {(r["market"], r.get("side", "BUY")): r
+                 for r in plan.get("results") or [] if r.get("pick")}
     try:
         max_c = float(payload.get("max_price_cents") or 0)
+        min_s = float(payload.get("min_sell_cents") or 99)
         specs = payload.get("orders") or []
-        assert 0.1 <= max_c <= 99, "bad max price"
+        assert 0.1 <= max_c <= 99, "bad max buy price"
+        assert 0.1 <= min_s <= 99.9, "bad min sell price"
         assert 1 <= len(specs) <= 400, "1-400 orders per batch"
-        open_now = {(o.get("market"), round((o.get("price") or 0) * 100, 1))
+        open_now = {(o.get("market"), o.get("side"), round((o.get("price") or 0) * 100, 1))
                     for o in MONITOR.orders}
         clean = []
         for s in specs:
-            m, pc, q = str(s.get("market")), float(s.get("price_cents")), int(s.get("size"))
-            assert m in plan_rows, f"{m}: not in the scan plan"
-            assert 0.1 <= pc <= max_c, f"{m}: price over the slider cap"
+            m, side = str(s.get("market")), str(s.get("side") or "BUY")
+            pc, q = float(s.get("price_cents")), int(s.get("size"))
+            assert side in ("BUY", "SELL"), f"{m}: bad side"
+            assert (m, side) in plan_rows, f"{m} {side}: not in the scan plan"
+            if side == "BUY":
+                assert 0.1 <= pc <= max_c, f"{m}: buy over the max-price slider"
+            else:
+                assert min_s <= pc <= 99.9, f"{m}: sell below the min-sell slider"
             assert 1 <= q <= 20000, f"{m}: size out of range"
-            if any(mm == m and abs(ppc - pc) <= 1.0 for mm, ppc in open_now):
+            if any(mm == m and ss == side and abs(ppc - pc) <= 1.0 for mm, ss, ppc in open_now):
                 continue  # an order already rests within a tick — never double up
-            clean.append({"market": m, "price_cents": pc, "size": q})
+            clean.append({"market": m, "side": side, "price_cents": pc, "size": q})
         assert clean, "nothing to place — every order duplicates an existing one"
     except (AssertionError, TypeError, ValueError, KeyError) as e:
         return 400, {"ok": False, "error": str(e)[:200]}
@@ -693,9 +711,12 @@ booked (closed trades and resolved markets). Refreshes every 2 min.</div>
 </div>
 <div id="viewL" style="display:none">
 <div class="sub">Passive placement plan <span id="planGen"></span></div>
-<div style="margin:10px 0">Max price: <b id="capLbl">10¢</b>
- <input type="range" id="capSlider" min="1" max="50" value="10" style="width:60%;vertical-align:middle"
+<div style="margin:10px 0">Max buy price: <b id="capLbl">10¢</b>
+ <input type="range" id="capSlider" min="1" max="99" value="10" style="width:55%;vertical-align:middle"
         oninput="planCap(this.value)"></div>
+<div style="margin:10px 0">Min sell price: <b id="sellLbl">85¢</b>
+ <input type="range" id="sellSlider" min="10" max="99" value="85" style="width:55%;vertical-align:middle"
+        oninput="planSell(this.value)"></div>
 <div style="margin:6px 0">
  <button class="tab" onclick="planAll(true)">Select all shown</button>
  <button class="tab" onclick="planAll(false)">Clear</button></div>
@@ -706,10 +727,14 @@ booked (closed trades and resolved markets). Refreshes every 2 min.</div>
  <button onclick="placeBatch()">Place selected</button>
  <button class="alt" onclick="abortBatch()">Stop batch</button></div>
 <div id="placeProg" class="mkt" style="margin:8px 0"></div>
-<div class="mkt">Every order is a post-only resting bid — it can never cross the spread and
-fill on placement. Each is revalidated against the live book just before placing; anything
-that drifted below ~$0.08/day is skipped. Markets where you already have an order within
-1¢ of the suggestion are skipped automatically (✔ marks markets you're already in).</div>
+<div class="mkt">Every order is post-only — it can never cross the spread and fill on
+placement. Each is revalidated against the live book just before placing; anything that
+drifted below ~$0.08/day is skipped, and same-side orders already resting within 1¢ are
+never doubled up (✔ = market you're already in). Capital = price for buys, max loss
+(100¢ − price) for shorts, nothing for sells covered by inventory (📦 — placed as
+sell-your-position, doubling as a take-profit). Sells you aren't covered for are shorts:
+they win if the outcome doesn't happen and lose up to 100¢ − price per contract if it
+does.</div>
 <div style="margin-top:26px;border-top:1px solid #30363d;padding-top:12px">
  <button class="tab" style="background:#8b1a1a;color:#fff" onclick="cancelAll()">⚠ Cancel ALL open orders</button>
 </div>
@@ -738,10 +763,13 @@ async function loadPlan(){
   }
 }
 function planCap(v){ document.getElementById('capLbl').textContent = v + '¢'; renderPlan(); }
+function planSell(v){ document.getElementById('sellLbl').textContent = v + '¢'; renderPlan(); }
+function pkey(r){ return r.market + '|' + (r.side || 'BUY'); }
 function planRows(){
   const cap = +document.getElementById('capSlider').value;
+  const sMin = +document.getElementById('sellSlider').value;
   return ((PLAN && PLAN.plan.results) || [])
-    .filter(r => r.pick && r.pick.price*100 <= cap)
+    .filter(r => r.pick && (r.side === 'SELL' ? r.pick.price*100 >= sMin : r.pick.price*100 <= cap))
     .sort((a,b) => b.pick.est_day/Math.max(b.pick.capital,0.01) - a.pick.est_day/Math.max(a.pick.capital,0.01));
 }
 function renderPlan(){
@@ -749,36 +777,42 @@ function renderPlan(){
   document.getElementById('planGen').textContent = '· scanned ' + (PLAN.plan.generated || '');
   const mine = new Set(PLAN.mine || []);
   document.getElementById('plan').innerHTML =
-    '<tr><th></th><th>Market</th><th class="r">Buy @</th><th class="r">Size</th><th class="r">Cap.</th><th class="r">$/day</th></tr>' +
-    planRows().map(r => { const p = r.pick, k = r.market;
+    '<tr><th></th><th>Market</th><th>Side</th><th class="r">@</th><th class="r">Size</th><th class="r">Cap.</th><th class="r">$/day</th></tr>' +
+    planRows().map(r => { const p = r.pick, k = pkey(r);
       return '<tr><td><input type="checkbox" '+(PSEL[k]?'checked':'')+
         ' onchange="PSEL[\''+k+'\']=this.checked;planSum()"></td>'+
-        '<td class="mkt">'+esc(k)+(mine.has(k)?' ✔':'')+'</td>'+
+        '<td class="mkt">'+esc(r.market)+(mine.has(r.market)?' ✔':'')+'</td>'+
+        '<td'+(r.side==='SELL'?' style="color:#f0883e"':'')+'>'+(r.side==='SELL'?'SELL':'BUY')+
+        (p.covered?' 📦':'')+'</td>'+
         '<td class="r">'+(p.price*100).toFixed(0)+'¢</td>'+
         '<td class="r">'+p.size.toLocaleString()+'</td>'+
         '<td class="r">$'+p.capital.toFixed(0)+'</td>'+
         '<td class="r">$'+p.est_day.toFixed(2)+'</td></tr>'; }).join('');
   planSum();
 }
-function planAll(on){ planRows().forEach(r => PSEL[r.market] = on); renderPlan(); }
+function planAll(on){ planRows().forEach(r => PSEL[pkey(r)] = on); renderPlan(); }
 function planSum(){
-  const sel = planRows().filter(r => PSEL[r.market]);
+  const sel = planRows().filter(r => PSEL[pkey(r)]);
   const cap = sel.reduce((s,r)=>s+r.pick.capital,0), est = sel.reduce((s,r)=>s+r.pick.est_day,0);
   document.getElementById('planSel').textContent =
-    sel.length + ' selected · $' + cap.toFixed(0) + ' resting capital · ~$' + est.toFixed(2) + '/day at current books';
+    sel.length + ' selected · $' + cap.toFixed(0) + ' locked capital · ~$' + est.toFixed(2) + '/day at current books';
 }
 async function placeBatch(){
   const capC = +document.getElementById('capSlider').value;
-  const sel = planRows().filter(r => PSEL[r.market]);
+  const sMin = +document.getElementById('sellSlider').value;
+  const sel = planRows().filter(r => PSEL[pkey(r)]);
   if(!sel.length){ alert('Nothing selected'); return; }
   const capD = sel.reduce((s,r)=>s+r.pick.capital,0), est = sel.reduce((s,r)=>s+r.pick.est_day,0);
-  if(!confirm('Place ' + sel.length + ' post-only bids?\n$' + capD.toFixed(0) +
-              ' resting capital, ~$' + est.toFixed(2) + '/day at current books.')) return;
+  const nS = sel.filter(r=>r.side==='SELL').length;
+  if(!confirm('Place ' + sel.length + ' post-only orders (' + (sel.length-nS) + ' buys, ' + nS +
+              ' sells)?\n$' + capD.toFixed(0) +
+              ' locked capital, ~$' + est.toFixed(2) + '/day at current books.')) return;
   try{
     const r = await fetch('place', {method:'POST',
       headers:{'Content-Type':'application/json','X-Reprice':'1'},
-      body: JSON.stringify({max_price_cents: capC,
-        orders: sel.map(r => ({market: r.market, price_cents: +(r.pick.price*100).toFixed(1), size: r.pick.size}))})});
+      body: JSON.stringify({max_price_cents: capC, min_sell_cents: sMin,
+        orders: sel.map(r => ({market: r.market, side: r.side || 'BUY',
+          price_cents: +(r.pick.price*100).toFixed(1), size: r.pick.size}))})});
     const d = await r.json();
     if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
     pollPlace();
