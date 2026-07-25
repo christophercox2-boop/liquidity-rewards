@@ -660,17 +660,19 @@ def _book_without(book: dict, side: str, price: float, size: float) -> dict:
     return b
 
 
-TARGET_ORDER_EST = 0.15  # ~$4.50/month per order — "a few dollars across every market"
+TARGET_ORDER_EST = 0.15  # ~$4.50/month per order — the churn-threshold baseline
+EASY_KEEP = 0.8  # take the deepest price still earning this share of the safe max
 
 
 def _optimal_price(order: dict, book: dict, prog: dict,
                    min_off: int = 1) -> tuple[float | None, float]:
-    """The SAFEST price that clears the modest earnings target for this
-    order's size — candidates are tried deepest-first (deep quote, then
-    stepping toward the touch), and the first one earning >= TARGET_ORDER_EST
-    wins. Only if nothing clears the target does it fall back to whichever
-    candidate earns most (joining the touch as a last resort — where the
-    whole window sits at the best level, queued behind the wall)."""
+    """Take what the market gives WITHOUT leaving the safe zone: among
+    cushioned candidates (>= min_off ticks behind the touch, deep quote
+    included), find the max earning, then pick the DEEPEST price still making
+    >= EASY_KEEP of it. Easy markets (uncontested sides) yield their full
+    money at the deep quote; contested ones step up only when stepping up
+    genuinely multiplies the earnings. Joins the touch only as a last resort
+    (window entirely at the best level — queued behind the wall)."""
     side, size = order["side"], order["size"]
     base = _book_without(book, side, order["price"], size)
     tick = book.get("tick") or 0.01
@@ -688,8 +690,8 @@ def _optimal_price(order: dict, book: dict, prog: dict,
         cands = [0.99] + [p for p in reversed(near) if p <= 0.99]  # deepest first
         if bids:
             cands = [p for p in cands if p >= round(bids[0][0] + tick, 4)]
-    best_p, best_est = None, -1.0
     key = "bids" if side == "BUY" else "asks"
+    scored: list[tuple[float, float]] = []  # (price, est) — deepest first
     for p in dict.fromkeys(cands):
         levels = dict(base.get(key) or [])
         levels[p] = levels.get(p, 0) + size
@@ -697,16 +699,18 @@ def _optimal_price(order: dict, book: dict, prog: dict,
         merged[key] = sorted(levels.items(), key=lambda x: (-x[0] if side == "BUY" else x[0]))
         probe = {"market": order["market"], "side": side, "price": p, "size": float(size)}
         tr._score_order(probe, merged, prog)
-        est = probe.get("est_day") or 0.0
-        if est >= TARGET_ORDER_EST:
-            return p, est  # safest price that pays the few dollars — done
-        if est > best_est:
-            best_p, best_est = p, est
-    if best_est <= 0 and min_off > 0:
-        # The touch holds the whole Target Size window — behind it everything
-        # scores zero, so joining (queued behind the wall) is the only play.
-        return _optimal_price(order, book, prog, 0)
-    return best_p, best_est
+        scored.append((p, probe.get("est_day") or 0.0))
+    mx = max((e for _, e in scored), default=0.0)
+    if mx <= 0:
+        if min_off > 0:
+            # The touch holds the whole Target Size window — behind it everything
+            # scores zero, so joining (queued behind the wall) is the only play.
+            return _optimal_price(order, book, prog, 0)
+        return (scored[0][0] if scored else None), 0.0
+    for p, est in scored:  # deepest price keeping >= EASY_KEEP of the safe max
+        if est >= EASY_KEEP * mx:
+            return p, est
+    return scored[-1]
 
 
 def compute_reprice_plan(min_off: int = 1) -> list[dict]:
@@ -722,14 +726,15 @@ def compute_reprice_plan(min_off: int = 1) -> list[dict]:
             continue
         book = cached[1]
         cur = o.get("est_day") or 0.0
-        if cur >= TARGET_ORDER_EST:
-            continue  # already paying its few dollars — leave it alone
         p, est = _optimal_price(o, book, prog, min_off)
         tick = book.get("tick") or 0.01
         if p is None or abs(p - o["price"]) < tick / 2:
             continue  # already optimal
-        if est - cur < 0.05:
-            continue  # not worth the churn
+        # Below target: any $0.05/day gain is worth it. At/above target: move
+        # only for meaningfully more (easy-market upside), never for pennies.
+        threshold = 0.05 if cur < TARGET_ORDER_EST else max(0.25, cur * 0.25)
+        if est - cur < threshold:
+            continue
         out.append({"id": o["id"], "market": o["market"], "side": o["side"],
                     "size": o["size"], "from_cents": round(o["price"] * 100, 1),
                     "to_cents": round(p * 100, 1),
