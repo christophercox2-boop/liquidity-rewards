@@ -148,6 +148,12 @@ class Monitor:
         self.pnl_updated: dt.datetime | None = None
         self.pnl_error: str | None = None
         self.buying_power: float | None = None  # available cash, for the Plan tab
+        # Warm-up: books refill gradually after a reboot; until each market's
+        # book arrives, its last saved rate stands in so a deploy doesn't look
+        # like earnings collapsing to zero.
+        self._boot_rates: dict[str, float] = dict(self.state.get("market_rates") or {})
+        self._boot_ts: float = time.time()
+        self.warming: int = 0
         self.alert_high: dict[str, float] = {}  # per-market peak rate since it last hit $0
         self.seen_rate: float | None = self.state.get("alert_seen_rate")  # rate when app last opened
         self.drop_steps: int = int(self.state.get("alert_drop_steps") or 0)
@@ -281,6 +287,24 @@ class Monitor:
             for o in orders:
                 if o.get("est_day"):
                     self.market_rates[o["market"]] = self.market_rates.get(o["market"], 0.0) + o["est_day"]
+            # Warm-up substitution: a market whose orders are ALL unscored only
+            # because its book hasn't been fetched yet keeps its last saved
+            # rate for up to 20 minutes after boot.
+            warming: dict[str, float] = {}
+            if time.time() - self._boot_ts < 1200 and self._boot_rates:
+                by_mkt: dict[str, list] = {}
+                for o in orders:
+                    if o.get("market"):
+                        by_mkt.setdefault(o["market"], []).append(o)
+                for m, os_ in by_mkt.items():
+                    if m in self._boot_rates and m not in self.market_rates \
+                            and all(o.get("est_day") is None for o in os_) \
+                            and any("book" in (o.get("verdict") or "") for o in os_):
+                        warming[m] = self._boot_rates[m]
+            self.warming = len(warming)
+            for m, r in warming.items():
+                self.market_rates[m] = r
+                self.rate += r
             # Per-market rate history for the graphs: 1-minute buckets, ~8h,
             # including zero-rate markets so dead orders chart their flatline.
             rates_all: dict[str, float] = {}
@@ -373,6 +397,7 @@ class Monitor:
                 "diag": {k: v for k, v in tr.LAST_DEBUG.items() if k.startswith("_")},
                 "pnl": self._pnl(),
                 "buying_power": self.buying_power,
+                "warming": self.warming,
                 "poll_seconds": POLL_SECONDS,
                 "persistence": self.persistence,
                 "alerts": "ntfy" if NTFY_TOPIC else "off",
@@ -474,6 +499,7 @@ def fetch_plan() -> dict:
 
 # One batch at a time; progress is polled by the dashboard.
 PLACER: dict = {"running": False, "results": [], "total": 0, "abort": False, "summary": ""}
+BATCH_SPACING_SECONDS = 2.5  # ~2 requests per order -> stays under the safe req/min
 
 
 def _place_one(spec: dict, plan_row: dict) -> dict:
@@ -561,11 +587,14 @@ def run_batch(specs: list[dict], plan_rows: dict[str, dict]) -> None:
                 skipped += 1
             else:
                 failed += 1
+                if "429" in (res.get("note") or "") or "rate limited" in (res.get("note") or ""):
+                    PLACER["summary"] = "rate limited — stopped; wait a few minutes and retry"
+                    break  # hammering a rate limiter keeps the ban alive
                 consec_err += 1
                 if consec_err >= 3:
                     PLACER["summary"] = "stopped after 3 consecutive failures"
                     break
-            time.sleep(1.0)  # gentle on the rate limit
+            time.sleep(BATCH_SPACING_SECONDS)
     finally:
         PLACER["summary"] = PLACER["summary"] or "done"
         PLACER["running"] = False
@@ -711,7 +740,7 @@ def run_reprice_batch(specs: list[dict]) -> None:
                 if crosses:
                     res.update(status="skipped", note="would cross the spread now")
                 else:
-                    code, payload = do_reprice(spec["id"], spec["to_cents"])
+                    code, payload = do_reprice(spec["id"], spec["to_cents"], verify=False)
                     res.update(status="repriced" if payload.get("ok") else "rejected",
                                note=str(payload.get("detail") or payload.get("error") or "")[:150])
             except Exception as e:  # noqa: BLE001
@@ -724,18 +753,45 @@ def run_reprice_batch(specs: list[dict]) -> None:
                 skipped += 1
             else:
                 failed += 1
+                if "429" in (res.get("note") or "") or "rate limited" in (res.get("note") or ""):
+                    PLACER["summary"] = "rate limited — stopped; wait a few minutes and retry"
+                    break  # hammering a rate limiter keeps the ban alive
                 consec_err += 1
                 if consec_err >= 3:
                     PLACER["summary"] = "stopped after 3 consecutive failures"
                     break
-            time.sleep(1.0)
+            time.sleep(BATCH_SPACING_SECONDS)
     finally:
+        unverified = 0
+        if done:  # ONE verification sweep for the whole batch
+            try:
+                path = "/v1/orders/open"
+                r = requests.get(tr.TRADE_API + path,
+                                 headers=tr.auth_headers(KEY_ID, SECRET_KEY, "GET", path),
+                                 timeout=30)
+                open_now = [(o.get("marketSlug"),
+                             "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL",
+                             tr._num(o.get("price")))
+                            for o in (r.json().get("orders") or [])]
+                for res in PLACER["results"]:
+                    if res.get("status") == "repriced":
+                        want = res["price_cents"] / 100.0
+                        if not any(m == res["market"] and s == res["side"]
+                                   and p is not None and abs(p - want) < 0.0005
+                                   for m, s, p in open_now):
+                            res["status"] = "unverified"
+                            unverified += 1
+            except Exception:  # noqa: BLE001 — verification is best-effort
+                unverified = -1
         PLACER["summary"] = PLACER["summary"] or "done"
         PLACER["running"] = False
         POLL_KICK.set()
+        vtxt = ("" if unverified == 0 else
+                f", {unverified} UNVERIFIED — check the app!" if unverified > 0 else
+                ", verification sweep failed — check the app")
         notify("Batch reprice finished",
-               f"{done} repriced, {skipped} skipped, {failed} failed ({PLACER['summary']})",
-               "high" if failed else "default")
+               f"{done} repriced, {skipped} skipped, {failed} failed ({PLACER['summary']}){vtxt}",
+               "high" if failed or unverified else "default")
 
 
 def start_reprice_batch(payload: dict) -> tuple[int, dict]:
@@ -783,7 +839,7 @@ def do_cancel_all() -> tuple[int, dict]:
         return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
 
 
-def do_reprice(order_id: str, price_cents: float) -> tuple[int, dict]:
+def do_reprice(order_id: str, price_cents: float, verify: bool = True) -> tuple[int, dict]:
     """Modify one of OUR resting orders to a new price. The order must be in
     the latest snapshot (can't touch anything else) and the price sane.
     Modify is cancel-and-replace on the exchange, so the request carries the
@@ -813,11 +869,14 @@ def do_reprice(order_id: str, price_cents: float) -> tuple[int, dict]:
         record["status"] = r.status_code
         record["response"] = " ".join(r.text.split())[:300]
         ok = r.status_code < 300
-        verified, note = _verify_resting(o["market"], o["side"], value) if ok else (False, "")
+        if verify:  # batches verify once at the end instead — one orders fetch, not N
+            verified, note = _verify_resting(o["market"], o["side"], value) if ok else (False, "")
+            if ok and not verified:
+                notify("Reprice NOT verified", f"{o['market']} → {price_cents}¢: {note}", "high")
+        else:
+            verified, note = ok, ""
         record["verified"] = verified
         record["note"] = note
-        if ok and not verified:
-            notify("Reprice NOT verified", f"{o['market']} → {price_cents}¢: {note}", "high")
         POLL_KICK.set()
         payload = {"ok": ok and verified, "status": r.status_code,
                    "detail": (note or record["response"])[:250]}
@@ -1214,7 +1273,8 @@ async function refresh(){
     document.getElementById('earned').textContent = '$' + d.earned_today.toFixed(2);
     document.getElementById('rate').textContent =
       'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + d.orders.length + ' orders';
-    document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence + ' · alerts: ' + d.alerts;
+    document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence + ' · alerts: ' + d.alerts +
+      (d.warming ? ' · ⏳ warming up: ' + d.warming + ' markets on saved rates' : '');
     const err = document.getElementById('err');
     const diag = Object.entries(d.diag || {}).map(([k,v]) => k.replace(/^_/,'') + ': ' + v).join(' · ');
     const msg = [d.error, diag].filter(Boolean).join(' · ');
@@ -1395,6 +1455,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
     err_notified = 0.0
     err_streak = 0
     while True:
+        if PLACER["running"]:  # a batch owns the request budget — pause polling
+            POLL_KICK.wait(10)
+            POLL_KICK.clear()
+            continue
         try:
             if time.time() - events_refreshed > 900:  # refresh proration map every 15 min
                 events_refreshed = time.time()

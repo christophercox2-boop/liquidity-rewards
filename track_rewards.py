@@ -654,7 +654,7 @@ LAST_DEBUG: dict[str, str] = {}  # diagnostics from the most recent fetch, for t
 # every time tripped the exchange's per-IP rate limit once the portfolio grew.
 # Refresh a rotating subset per call instead — a fresh process (the hourly
 # tracker) still fetches everything on its first call.
-BOOK_REFRESH_PER_CALL = 15
+BOOK_REFRESH_PER_CALL = 20
 BOOK_COLD_FETCH_ALL = True  # one-shot runs sweep every book; the monitor sets False
 _BOOK_CACHE: dict[str, tuple[float, dict]] = {}  # slug -> (fetched_at, book)
 
