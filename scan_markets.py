@@ -19,8 +19,10 @@ Run by .github/workflows/scan.yml — the Actions runner has API access.
 from __future__ import annotations
 
 import copy
+import datetime as dt
 import json
 import os
+import re
 import sys
 import time
 
@@ -109,6 +111,51 @@ def my_positions(key_id: str, secret_key: str) -> dict[str, float]:
     return out
 
 
+_MONTHS = {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+           "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12}
+
+
+def _resolution_date(slug: str) -> dt.date | None:
+    """Best-effort resolution date from the slug (2026-08-04, 12-31-2026, aug31)."""
+    m = re.search(r"(20\d{2})-(\d{2})-(\d{2})", slug)
+    if m:
+        try:
+            return dt.date(int(m[1]), int(m[2]), int(m[3]))
+        except ValueError:
+            pass
+    m = re.search(r"(\d{1,2})-(\d{1,2})-(20\d{2})", slug)
+    if m:
+        try:
+            return dt.date(int(m[3]), int(m[1]), int(m[2]))
+        except ValueError:
+            pass
+    m = re.search(r"(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)(\d{1,2})", slug)
+    if m:
+        today = dt.date.today()
+        try:
+            d = dt.date(today.year, _MONTHS[m[1]], int(m[2]))
+            return d if d >= today - dt.timedelta(days=45) else d.replace(year=today.year + 1)
+        except ValueError:
+            pass
+    return None
+
+
+def _risk(slug: str, side: str, pick: dict,
+          best_bid: float | None, best_ask: float | None) -> str | None:
+    """Why a passive quote here might get sniped — None if nothing stands out."""
+    notes = []
+    rd = _resolution_date(slug)
+    if rd is not None:
+        days = (rd - dt.date.today()).days
+        if days <= 14:
+            notes.append(f"resolves ~{rd.isoformat()} ({max(days, 0)}d)")
+    if side == "BUY" and pick["price"] <= 0.02 and best_ask is not None and best_ask <= 0.05:
+        notes.append("market priced near 0 — deep bid sits in the exit path (snipe risk)")
+    if side == "SELL" and best_bid is not None and best_bid >= 0.95:
+        notes.append("near-certain outcome — a resting ask will get lifted")
+    return "; ".join(notes) or None
+
+
 def _merged(book: dict, side: str, price: float, size: float) -> dict:
     """The book as it would look with our order resting at `price`."""
     b = copy.deepcopy(book)
@@ -181,7 +228,8 @@ def evaluate_side(slug: str, book: dict, prog: dict, side: str, held: float = 0.
         return None
     out = {"market": slug, "side": side, "pick": best[1],
            "side_pool": round(tr._daily_pool(prog) / 2, 2),
-           "best_bid": best_bid, "best_ask": best_ask, "held": held}
+           "best_bid": best_bid, "best_ask": best_ask, "held": held,
+           "risk": _risk(slug, side, best[1], best_bid, best_ask)}
     if best[1]["est_day"] < TARGET_EST_DAY:
         out["note"] = "below target — best available"
     return out
@@ -246,10 +294,16 @@ def main() -> None:
     lines.append("")
     lines.append("| # | Market | Side | @ | Size | Capital | Est $/day | ≈$/mo | Share | Note |")
     lines.append("|--:|---|---|--:|--:|--:|--:|--:|--:|---|")
+    risky = sum(1 for r in results if r.get("risk"))
+    if risky:
+        lines.append(f"⚠ {risky} rows are flagged risky (soon-to-resolve market, or a deep "
+                     f"quote that's actually fillable) — they're listed but excluded from "
+                     f"the dashboard's Select-all; pick them only deliberately.")
+        lines.append("")
     for i, r in enumerate(results, 1):
         p = r["pick"]
         note = ("✔ " if r["already_in"] else "") + ("📦 covered " if p.get("covered") else "") \
-               + (r.get("note") or "")
+               + (f"⚠ {r['risk']} " if r.get("risk") else "") + (r.get("note") or "")
         lines.append(f"| {i} | `{r['market']}` | {r['side']} | {p['price'] * 100:g}¢ "
                      f"| {p['size']:,} | ${p['capital']:,.0f} | ${p['est_day']:.2f} "
                      f"| ${p['est_day'] * 30:,.0f} | {p['share']:.0f}% | {note} |")

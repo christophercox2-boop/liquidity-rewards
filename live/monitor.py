@@ -189,6 +189,16 @@ class Monitor:
                 high = 0.0  # re-arm only after it earns > $1/day again
             self.alert_high[mkt] = high
 
+    def note_batch_order(self, order_id: str) -> None:
+        """Remember an order the Plan tab placed, so the earnings list can badge it."""
+        if not order_id:
+            return
+        with self.lock:
+            ids = self.state.setdefault("batch_ids", [])
+            if order_id not in ids:
+                ids.append(order_id)
+                del ids[:-2000]
+
     def set_positions(self, positions: dict[str, dict]) -> None:
         with self.lock:
             self.positions = positions
@@ -328,6 +338,7 @@ class Monitor:
 
     def snapshot(self) -> dict:
         with self.lock:
+            batch_ids = set(self.state.get("batch_ids") or [])
             day_end = None
             if self.state.get("day"):
                 try:
@@ -345,10 +356,11 @@ class Monitor:
                 "per_market_today": {m: round(v, 4) for m, v in sorted(
                     self.state["per_market"].items(), key=lambda kv: -kv[1])},
                 "orders": [
-                    {k: o.get(k) for k in ("id", "market", "side", "price", "size", "ticks", "share",
-                                           "est_day", "verdict", "window", "window_more",
-                                           "window_more_score", "denom", "df", "calc",
-                                           "event_n", "siblings")}
+                    {**{k: o.get(k) for k in ("id", "market", "side", "price", "size", "ticks", "share",
+                                              "est_day", "verdict", "window", "window_more",
+                                              "window_more_score", "denom", "df", "calc",
+                                              "event_n", "siblings")},
+                     "batch": o.get("id") in batch_ids}
                     for o in self.orders
                 ],
                 "history": self.state["history"][-7:][::-1],
@@ -527,6 +539,7 @@ def run_batch(specs: list[dict], plan_rows: dict[str, dict]) -> None:
             if res["status"] == "placed":
                 placed += 1
                 consec_err = 0
+                MONITOR.note_batch_order(res.get("id") or "")
             elif res["status"] == "skipped":
                 skipped += 1
             else:
@@ -683,6 +696,7 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  .tab.on{background:#238636;color:#fff}
  .pos{color:#3fb950}
  .neg{color:#f85149}
+ .bdg{background:#1f3a5f;color:#79b8ff;border-radius:5px;padding:1px 6px;font-size:10px;vertical-align:middle}
 </style></head><body>
 <div style="display:flex;gap:8px;margin-bottom:12px">
  <button class="tab on" id="tabR" onclick="showTab('R')">Rewards</button>
@@ -781,7 +795,8 @@ function renderPlan(){
     planRows().map(r => { const p = r.pick, k = pkey(r);
       return '<tr><td><input type="checkbox" '+(PSEL[k]?'checked':'')+
         ' onchange="PSEL[\\''+k+'\\']=this.checked;planSum()"></td>'+
-        '<td class="mkt">'+esc(r.market)+(mine.has(r.market)?' ✔':'')+'</td>'+
+        '<td class="mkt">'+esc(r.market)+(mine.has(r.market)?' ✔':'')+
+        (r.risk?'<div style="color:#d29922">⚠ '+esc(r.risk)+'</div>':'')+'</td>'+
         '<td'+(r.side==='SELL'?' style="color:#f0883e"':'')+'>'+(r.side==='SELL'?'SELL':'BUY')+
         (p.covered?' 📦':'')+'</td>'+
         '<td class="r">'+(p.price*100).toFixed(0)+'¢</td>'+
@@ -790,7 +805,10 @@ function renderPlan(){
         '<td class="r">$'+p.est_day.toFixed(2)+'</td></tr>'; }).join('');
   planSum();
 }
-function planAll(on){ planRows().forEach(r => PSEL[pkey(r)] = on); renderPlan(); }
+function planAll(on){
+  planRows().forEach(r => { if(on && r.risk) return; PSEL[pkey(r)] = on; });
+  renderPlan();
+}
 function planSum(){
   const sel = planRows().filter(r => PSEL[pkey(r)]);
   const cap = sel.reduce((s,r)=>s+r.pick.capital,0), est = sel.reduce((s,r)=>s+r.pick.est_day,0);
@@ -804,9 +822,11 @@ async function placeBatch(){
   if(!sel.length){ alert('Nothing selected'); return; }
   const capD = sel.reduce((s,r)=>s+r.pick.capital,0), est = sel.reduce((s,r)=>s+r.pick.est_day,0);
   const nS = sel.filter(r=>r.side==='SELL').length;
+  const nRisk = sel.filter(r=>r.risk).length;
   if(!confirm('Place ' + sel.length + ' post-only orders (' + (sel.length-nS) + ' buys, ' + nS +
               ' sells)?\\n$' + capD.toFixed(0) +
-              ' locked capital, ~$' + est.toFixed(2) + '/day at current books.')) return;
+              ' locked capital, ~$' + est.toFixed(2) + '/day at current books.' +
+              (nRisk ? '\\n⚠ includes ' + nRisk + ' flagged-risky order' + (nRisk>1?'s':'') + '!' : ''))) return;
   try{
     const r = await fetch('place', {method:'POST',
       headers:{'Content-Type':'application/json','X-Reprice':'1'},
@@ -991,13 +1011,17 @@ async function refresh(){
             (best !== null ? '<button class="alt" onclick="event.stopPropagation();document.getElementById(\\'p'+o.id+'\\').value='+best+'">best '+best+'¢</button>' : '')+
             '<button onclick="event.stopPropagation();reprice(\\''+o.id+'\\',\\''+esc(o.market)+' '+o.side+'\\')">Reprice</button></div>' : '';
           return '<div class="ord" onclick="event.stopPropagation()"><div class="oh">'+o.side+' '+o.size.toLocaleString()+' @ '+
-            (o.price*100).toFixed(1)+'¢ → '+est+'</div><table class="bk">'+rows+'</table>'+calc+sibs+rp+'</div>';
+            (o.price*100).toFixed(1)+'¢ → '+est+
+            (o.batch?' <span class="bdg">batch</span>':'')+
+            '</div><table class="bk">'+rows+'</table>'+calc+sibs+rp+'</div>';
         }).join('');
         const gcell = GOPEN[m] && SERIES ? spark(SERIES[m]) : '';
         const rateTxt = dead ? '<b style="color:#d29922">⚠️ $0.00/day</b>'
                              : '<b>$'+rate.toFixed(2)+'/day</b>';
+        const hasBatch = d.orders.some(o => o.market === m && o.batch);
         return '<tr id="r'+i+'" onclick="tgl('+i+',\\''+esc(m)+'\\')" style="'+tint(m, rate)+'">'+
-          '<td class="mkt">'+m+'</td><td class="r" style="white-space:nowrap">'+rateTxt+
+          '<td class="mkt">'+m+(hasBatch?' <span class="bdg">batch</span>':'')+
+          '</td><td class="r" style="white-space:nowrap">'+rateTxt+
           '<br><span class="sub" style="font-size:11px">$'+v.toFixed(2)+' today</span>'+
           ' <button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
           'onclick="event.stopPropagation();tglGraph('+i+',\\''+esc(m)+'\\')">📈</button></td></tr>' +
