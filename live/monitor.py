@@ -320,11 +320,19 @@ class Monitor:
         for slug, p in self.positions.items():
             net = tr._num(p.get("netPosition"))
             bought, sold = tr._num(p.get("qtyBought")), tr._num(p.get("qtySold"))
-            if not (net or bought or sold):
-                continue  # never filled — nothing to show
             cost, cash = tr._num(p.get("cost")), tr._num(p.get("cashValue"))
             realized = tr._num(p.get("realized"))
+            if not (net or bought or sold or realized or cash):
+                continue  # never traded at all — nothing to show
             unrealized = cash - cost
+            ts, traded = 0.0, None
+            if p.get("updateTime"):
+                try:
+                    t = dt.datetime.fromisoformat(str(p["updateTime"]).replace("Z", "+00:00"))
+                    ts = t.timestamp()
+                    traded = t.astimezone(ET).strftime("%b %d %I:%M %p ET")
+                except Exception:  # noqa: BLE001
+                    pass
             rows.append({
                 "market": slug,
                 "net": net,
@@ -333,12 +341,15 @@ class Monitor:
                 "realized": round(realized, 2), "unrealized": round(unrealized, 2),
                 "total": round(realized + unrealized, 2),
                 "expired": bool(p.get("expired")),
+                "traded": traded, "_ts": ts,
             })
             totals["cash"] += cash
             totals["realized"] += realized
             totals["unrealized"] += unrealized
             totals["total"] += realized + unrealized
-        rows.sort(key=lambda r: -r["total"])
+        rows.sort(key=lambda r: (-r["_ts"], -r["total"]))  # most recently traded first
+        for r in rows:
+            r.pop("_ts")
         return {
             "rows": rows,
             "totals": {k: round(v, 2) for k, v in totals.items()},
@@ -1193,9 +1204,10 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div class="big" id="pnlTotal">…</div>
 <div class="sub" id="pnlSub"></div>
 <table id="pnl"></table>
-<div class="mkt" id="pnlNote" style="margin-top:10px">Value = what the open position is worth
-at current prices. Unreal. = value − what it cost. Real. = P/L the exchange has already
-booked (closed trades and resolved markets). Refreshes every 2 min.</div>
+<div class="mkt" id="pnlNote" style="margin-top:10px">Sorted by most recent trade. Value =
+what the open position is worth at current prices. Unreal. = value − what it cost.
+Real. = P/L the exchange has already booked (closed trades and resolved markets).
+Refreshes every 2 min.</div>
 </div>
 <div id="viewL" style="display:none">
 <div class="sub">Passive placement plan <span id="planGen"></span></div>
@@ -1541,7 +1553,8 @@ function renderPnl(pn){
     '<tr><th>Market</th><th class="r">Pos</th><th class="r">Avg</th><th class="r">Value</th>'+
     '<th class="r">Real.</th><th class="r">Unreal.</th><th class="r">P/L</th></tr>' +
     ((pn && pn.rows) || []).map(r =>
-      '<tr><td class="mkt">' + esc(r.market) + (r.expired ? ' <span class="sub">(resolved)</span>' : '') + '</td>' +
+      '<tr><td class="mkt">' + esc(r.market) + (r.expired ? ' <span class="sub">(resolved)</span>' : '') +
+      (r.traded ? '<div class="sub" style="font-size:10px">traded ' + esc(r.traded) + '</div>' : '') + '</td>' +
       '<td class="r">' + (r.net||0).toLocaleString() + '</td>' +
       '<td class="r">' + (r.avg_cents==null ? '—' : r.avg_cents.toFixed(1) + '¢') + '</td>' +
       '<td class="r">' + usd(r.cash) + '</td>' +
