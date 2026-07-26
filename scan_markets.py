@@ -183,27 +183,32 @@ def evaluate_side(slug: str, book: dict, prog: dict, side: str, held: float = 0.
     best_bid = bids[0][0] if bids else None
     best_ask = asks[0][0] if asks else None
 
-    # Candidates include the join, but the pick rule prefers lower capital, so
-    # a behind-the-touch quote wins whenever it clears the target — the join
-    # only gets chosen where the window forces it (thick touch = queued last).
+    # Conservative candidates: stay >= 1 tick behind the touch. Joining the
+    # best price is allowed ONLY when that level already holds the full Target
+    # Size — a wall you queue behind (price-time priority: you fill last).
+    target = prog.get("target") or 0
     prices: list[float] = []
     if side == "BUY":
+        prices.append(0.01)  # the deep bid — deepest first
         if best_bid:
-            for off in (0, 1, 2):
+            for off in (3, 2, 1):
                 p = round(best_bid - off * tick, 4)
                 if p >= 0.01:
                     prices.append(p)
-        prices.append(0.01)  # the deep bid
+            if bids[0][1] >= target > 0:
+                prices.append(best_bid)  # queued wall-join
         if best_ask:  # never cross the spread
             prices = [p for p in prices if p <= round(best_ask - tick, 4)]
         deep_ok = lambda p: p <= 0.02  # noqa: E731
     else:
+        prices.append(0.99)  # the deep ask — max loss 1c/contract, deepest first
         if best_ask:
-            for off in (0, 1, 2):
+            for off in (3, 2, 1):
                 p = round(best_ask + off * tick, 4)
                 if p <= 0.99:
                     prices.append(p)
-        prices.append(0.99)  # the deep ask — max loss 1c/contract
+            if asks[0][1] >= target > 0:
+                prices.append(best_ask)  # queued wall-join
         if best_bid:  # never cross the spread
             prices = [p for p in prices if p >= round(best_bid + tick, 4)]
         deep_ok = lambda p: p >= 0.98  # noqa: E731
@@ -229,19 +234,23 @@ def evaluate_side(slug: str, book: dict, prog: dict, side: str, held: float = 0.
                 break  # sizes grow monotonically — first hit is cheapest at this price
     if not best:
         return None
-    # What the side yields if you commit big: the same candidates at the
-    # 20,000-contract placement cap — this is what the list sorts by.
-    mx = None
-    for p in prices:
+    # What the side yields if you commit big: the same cushioned candidates at
+    # the 20,000-contract cap, keeping the DEEPEST price that makes >= 80% of
+    # the best — never standing at the touch just to squeeze the last 20%.
+    scored_big = []
+    for p in prices:  # deepest first by construction
         q = 20000
         o = {"market": slug, "side": side, "price": p, "size": float(q)}
         tr._score_order(o, _merged(book, side, p, q), prog)
         est = o.get("est_day") or 0.0
         cap, covered = _capital(side, p, q, held)
-        if est > 0 and (mx is None or (est, -cap) > (mx["est_day"], -mx["capital"])):
-            mx = {"side": side, "price": p, "size": q, "capital": cap,
-                  "covered": covered, "est_day": round(est, 3),
-                  "share": round((o.get("share") or 0) * 100, 1)}
+        scored_big.append({"side": side, "price": p, "size": q, "capital": cap,
+                           "covered": covered, "est_day": round(est, 3),
+                           "share": round((o.get("share") or 0) * 100, 1)})
+    mx = None
+    peak = max((c["est_day"] for c in scored_big), default=0.0)
+    if peak > 0:
+        mx = next(c for c in scored_big if c["est_day"] >= 0.8 * peak)
     out = {"market": slug, "side": side, "pick": best[1], "max": mx,
            "side_pool": round(tr._daily_pool(prog) / 2, 2),
            "best_bid": best_bid, "best_ask": best_ask, "held": held,
