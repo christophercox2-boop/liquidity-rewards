@@ -281,3 +281,9 @@ date,market,program_type,reward_usd,status
 2026-07-23,vmc-ussep-misen-2026-08-04-ste10-15,liquidityProgram,16.08,PENDING
 2026-07-23,vmc-ussep-misen-2026-08-04-ste15-20,liquidityProgram,9.370000000000001,PENDING
 2026-07-23,vmc-ussep-misen-2026-08-04-stegte20,liquidityProgram,8.690000000000001,PENDING
+2026-07-24,apdc-alito-2026-07-31,liquidityProgram,0.06,PENDING
+2026-07-24,apdc-alito-2026-08-31,liquidityProgram,2.86,PENDING
+2026-07-24,apdc-alito-2026-12-31,liquidityProgram,2.12,PENDING
+2026-07-24,apdc-jerpowgov-2026-07-31,liquidityProgram,0.02,PENDING
+2026-07-24,apdc-jerpowgov-2026-08-31,liquidityProgram,0.25,PENDING
+2026-07-24,apdc-jerpowgov-2026-12-31,liquidityProgram,1.99,PENDING
