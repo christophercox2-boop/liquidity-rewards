@@ -1242,7 +1242,10 @@ function showTab(t){
   });
   if(t==='L') loadPlan();
 }
-let PLAN = null, PSEL = {}, BP = null;
+let PLAN = null, PSEL = {}, BP = null, OLOCK = {};
+function mroom(m){  // per-market budget left after existing resting orders
+  return BP == null ? null : BP - (OLOCK[m] || 0);
+}
 async function loadPlan(){
   if(PLAN) return;
   try{
@@ -1267,11 +1270,13 @@ function shareAt(m, q){
   return q / (Dk + q);
 }
 function afford(r){
-  // the full-size order, shrunk to what per-market buying power can back
+  // the full-size order, shrunk to what's LEFT of this market's buying power
+  // after the orders already resting there
   const m = r.max; if(!m) return null;
-  if(BP == null || m.covered || m.capital <= BP) return m;
+  const room = mroom(r.market);
+  if(room == null || m.covered || m.capital <= room) return (room != null && room < 1 && !m.covered) ? null : m;
   const unit = r.side === 'SELL' ? (1 - m.price) : m.price;  // lock per contract
-  const q = Math.min(m.size, Math.floor(BP / Math.max(unit, 0.0001)));
+  const q = Math.min(m.size, Math.floor(room / Math.max(unit, 0.0001)));
   if(q < 1) return null;
   const s0 = Math.min(m.share/100, 0.999), sq = shareAt(m, q);
   return {side: m.side, price: m.price, size: q, covered: m.covered,
@@ -1287,8 +1292,12 @@ function planRows(){
   return ((PLAN && PLAN.plan.results) || [])
     .filter(r => r.pick && !(hide && r.risk))
     .filter(r => {
+      const room = mroom(r.market);
+      if(room != null && room < 1) return false;  // maxed out — drop the market
       const o = ord(r);  // filter on the price actually being placed
       if(!o) return false;
+      if(room != null && szmode() !== 'max' && !o.covered && o.capital > room + 0.01)
+        return false;  // even the minimal entry doesn't fit what's left
       return r.side === 'SELL' ? o.price*100 >= sMin : o.price*100 <= cap;
     })
     .sort((a,b) => (ord(b).est_day) - (ord(a).est_day));
@@ -1320,12 +1329,12 @@ function perMktCap(rows){
   return m;
 }
 function planAll(on){
-  const used = {};
+  const used = {};  // starts from what existing orders already lock per market
   planRows().forEach(r => {
     if(!on){ PSEL[pkey(r)] = false; return; }
     if(r.risk) return;
-    const c = ord(r).capital, u = used[r.market] || 0;
-    // buying power applies PER MARKET — the same cash backs every market
+    const c = ord(r).capital;
+    const u = used[r.market] !== undefined ? used[r.market] : (OLOCK[r.market] || 0);
     if(BP != null && u + c > BP) return;
     used[r.market] = u + c;
     PSEL[pkey(r)] = true;
@@ -1632,12 +1641,16 @@ async function refresh(){
     renderPnl(d.pnl);
     BP = d.buying_power;
     document.getElementById('planBP').textContent =
-      BP != null ? 'Buying power: $' + BP.toFixed(2) + ' per market — Select-all fits each market inside it' : '';
+      BP != null ? 'Buying power: $' + BP.toFixed(2) + ' per market, minus what your existing orders there already lock — maxed-out markets are hidden' : '';
     const allMarkets = {};
     d.orders.forEach(o => { if(o.market) allMarkets[o.market] = 0; });
     Object.entries(d.per_market_today).forEach(([m,v]) => { allMarkets[m] = v; });
     RATES = {};
     d.orders.forEach(o => { if(o.market) RATES[o.market] = (RATES[o.market]||0) + (o.est_day||0); });
+    OLOCK = {};  // capital your resting orders already lock, per market
+    d.orders.forEach(o => { if(o.market){
+      const l = o.side === 'SELL' ? (1 - o.price) * o.size : o.price * o.size;
+      OLOCK[o.market] = (OLOCK[o.market] || 0) + l; } });
     if(Object.values(GOPEN).some(v=>v)){
       try{ SERIES = (await (await fetch('series.json')).json()).series || {}; }catch(_){}
     }
