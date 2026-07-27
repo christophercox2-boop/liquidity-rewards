@@ -1,8 +1,8 @@
 # Passive placement plan — every politics market, both sides
 
-_Scanned 650 market-sides with live reward pools (0 unreadable books; 10 econ-data markets excluded by request). Generated 2026-07-27 11:42 AM ET._
+_Scanned 649 market-sides with live reward pools (0 unreadable books; 10 econ-data markets excluded by request). Generated 2026-07-27 11:52 AM ET._
 
-**If you place everything below:** ~$906.91/day (~$27,207/month) for ~$138,672 of locked capital.
+**If you place everything below:** ~$931.79/day (~$27,954/month) for ~$133,388 of locked capital.
 
 Capital = what the exchange locks: price for bids, max loss (1 − price) for shorts, nothing for sells covered by inventory (marked 📦). Deep quotes (1¢ bid / 99¢ ask) almost never fill; join/1-2-ticks-back keeps 100/50/25% weight under DF 0.50. ✔ = market you already quote.
 
@@ -10,655 +10,654 @@ Sorted by what the side could pay **at full size** (a 20,000-contract order — 
 
 | # | Market | Side | Entry @ | Size | Cap. | Est $/day | Full-size $/day | Full-size cap. | Note |
 |--:|---|---|--:|--:|--:|--:|--:|--:|---|
-⚠ 89 rows are flagged risky (soon-to-resolve market, or a deep quote that's actually fillable) — they're listed but excluded from the dashboard's Select-all; pick them only deliberately.
+⚠ 87 rows are flagged risky (soon-to-resolve market, or a deep quote that's actually fillable) — they're listed but excluded from the dashboard's Select-all; pick them only deliberately.
 
-| 1 | `stsc-hormuz-normal-jul31` | BUY | 1¢ | 1,000 | $10 | $28.41 | $58.96 | $200 | ⚠ resolves ~2026-07-31 (4d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 2 | `stsc-hormuz-normal-aug31` | SELL | 14¢ | 100 | $86 | $1.66 | $52.82 | $17,200 | ✔  |
-| 3 | `stsc-hormuz-normal-aug31` | BUY | 10¢ | 100 | $10 | $1.23 | $50.04 | $2,000 | ✔  |
+| 1 | `stsc-hormuz-normal-jul31` | BUY | 1¢ | 2,000 | $20 | $56.82 | $61.88 | $200 | ⚠ resolves ~2026-07-31 (4d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 2 | `stsc-hormuz-normal-aug31` | SELL | 14¢ | 100 | $86 | $1.69 | $52.95 | $17,200 | ✔  |
+| 3 | `stsc-hormuz-normal-aug31` | BUY | 10¢ | 100 | $10 | $1.25 | $50.21 | $2,000 | ✔  |
 | 4 | `apdc-andburpm-2026-12-31` | SELL | 27¢ | 2,000 | $1,460 | $49.60 | $49.96 | $14,600 |  |
-| 5 | `ewc-ref-ca-blntax-2026-11-03-pass` | BUY | 21¢ | 100 | $21 | $0.36 | $49.94 | $4,400 |  |
-| 6 | `apdc-andburpm-2026-12-31` | BUY | 20¢ | 2,000 | $400 | $47.94 | $49.79 | $4,000 |  |
-| 7 | `usgcc-aliens-12-31-2026` | BUY | 3¢ | 100 | $3 | $0.40 | $49.59 | $800 |  |
-| 8 | `gsc-usfedgvmt-by-2026-10-01` | SELL | 78¢ | 100 | $22 | $1.32 | $49.46 | $4,400 | ✔  |
-| 9 | `opdc-mcconnell-resign-2026-11-02` | BUY | 35¢ | 100 | $35 | $12.24 | $49.27 | $7,000 | ✔  |
-| 10 | `opdc-mcconnell-resign-2026-11-02` | SELL | 45¢ | 2,000 | $1,100 | $43.36 | $49.25 | $11,000 | ✔  |
-| 11 | `gsc-usfedgvmt-by-2026-10-01` | BUY | 63¢ | 100 | $63 | $9.21 | $48.92 | $12,600 | ✔  |
-| 12 | `pic-congress-trump-2026-12-31` | SELL | 11¢ | 100 | $89 | $6.13 | $48.43 | $17,800 |  |
-| 13 | `ewc-ref-fl-tax-2026-11-03-pass` | SELL | 68¢ | 100 | $32 | $1.68 | $47.98 | $6,400 |  |
-| 14 | `nocc-attgen-todblanche-2026-08-07` | BUY | 1¢ | 500 | $5 | $0.35 | $47.46 | $1,400 | ⚠ resolves ~2026-08-07 (11d)  |
-| 15 | `nocc-attgen-todblanche-2026-08-07` | SELL | 61¢ | 100 | $39 | $3.50 | $46.89 | $7,800 | ⚠ resolves ~2026-08-07 (11d)  |
-| 16 | `ewc-ref-ca-blntax-2026-11-03-pass` | SELL | 40¢ | 100 | $60 | $0.48 | $43.65 | $12,000 |  |
-| 17 | `stsc-bab-el-mandeb-clsd-2026-08-31` | SELL | 19¢ | 100 | $81 | $10.62 | $41.12 | $16,200 |  |
-| 18 | `stsc-bab-el-mandeb-clsd-2026-12-31` | BUY | 40¢ | 100 | $40 | $0.51 | $40.11 | $8,200 |  |
-| 19 | `pic-congress-trump-2026-12-31` | BUY | 6¢ | 100 | $6 | $0.86 | $38.93 | $1,200 |  |
-| 20 | `stsc-bab-el-mandeb-clsd-2026-07-31` | SELL | 13¢ | 100 | $87 | $0.83 | $38.70 | $17,400 | ⚠ resolves ~2026-07-31 (4d)  |
-| 21 | `ewc-ref-fl-tax-2026-11-03-pass` | BUY | 22¢ | 100 | $22 | $0.41 | $38.27 | $4,600 |  |
-| 22 | `stsc-bab-el-mandeb-clsd-2026-12-31` | SELL | 44¢ | 100 | $56 | $1.15 | $35.43 | $11,200 |  |
-| 23 | `stsc-bab-el-mandeb-clsd-2026-07-31` | BUY | 6¢ | 100 | $6 | $0.83 | $33.42 | $1,200 | ⚠ resolves ~2026-07-31 (4d)  |
-| 24 | `stsc-bab-el-mandeb-clsd-2026-08-31` | BUY | 13¢ | 100 | $13 | $0.46 | $28.74 | $2,600 |  |
-| 25 | `iarc-netanyahu-2026-12-31` | SELL | 10¢ | 100 | $90 | $0.31 | $27.72 | $18,000 |  |
-| 26 | `opdc-zelenskyy-presuk-2027-06-30` | SELL | 99¢ | 2,000 | $20 | $25.00 | $25.00 | $200 |  |
-| 27 | `opdc-zelenskyy-presuk-2027-06-30` | BUY | 47¢ | 100 | $47 | $20.85 | $24.98 | $9,400 |  |
-| 28 | `enwc-ussep-nh-2026-09-08-dem-chrpap` | SELL | 94¢ | 100 | $6 | $1.87 | $24.96 | $1,200 |  |
-| 29 | `pvwc-housepopw-2026-11-03-dem` | SELL | 93¢ | 100 | $7 | $1.11 | $24.92 | $1,400 | ✔  |
-| 30 | `paccc-usse-midterms-2026-11-03-rep` | SELL | 55.8¢ | 100 | $44 | $3.87 | $24.90 | $8,840 |  |
-| 31 | `pvwc-housepopw-2026-11-03-rep` | SELL | 7¢ | 100 | $93 | $8.42 | $24.83 | $18,600 | ✔  |
-| 32 | `paccc-usho-midterms-2026-11-03-rep` | BUY | 17.8¢ | 100 | $18 | $5.56 | $24.77 | $3,560 |  |
-| 33 | `ewc-usgub-ca-2026-11-03-stehil` | BUY | 6¢ | 100 | $6 | $0.29 | $24.73 | $1,200 | ✔  |
-| 34 | `opdc-delrod-venpres-2027-06-30` | BUY | 50¢ | 100 | $50 | $6.87 | $24.67 | $10,000 |  |
-| 35 | `pvwc-housepopw-2026-11-03-dem` | BUY | 83¢ | 100 | $83 | $5.95 | $24.61 | $16,600 | ✔  |
-| 36 | `opdc-trump-resig-2026-12-31` | SELL | 17¢ | 100 | $83 | $5.27 | $24.54 | $16,600 |  |
-| 37 | `nocc-dni-jayclay-2026-12-18` | BUY | 83¢ | 100 | $83 | $5.17 | $24.53 | $16,600 |  |
-| 38 | `enwc-ushrp-mo01-2026-08-04-dem-corbus` | BUY | 48¢ | 100 | $48 | $1.14 | $24.46 | $9,600 | ⚠ resolves ~2026-08-04 (8d)  |
-| 39 | `opdc-trump-resig-2027-12-31` | SELL | 13¢ | 100 | $87 | $4.46 | $24.44 | $17,400 | ✔  |
-| 40 | `opdc-trump-resig-2027-12-31` | BUY | 4¢ | 100 | $4 | $0.39 | $24.38 | $800 | ✔  |
+| 5 | `ewc-ref-ca-blntax-2026-11-03-pass` | BUY | 21¢ | 100 | $21 | $0.36 | $49.91 | $4,400 |  |
+| 6 | `usgcc-aliens-12-31-2026` | SELL | 10¢ | 100 | $90 | $0.22 | $49.80 | $18,200 |  |
+| 7 | `apdc-andburpm-2026-12-31` | BUY | 20¢ | 2,000 | $400 | $47.94 | $49.79 | $4,000 |  |
+| 8 | `usgcc-aliens-12-31-2026` | BUY | 3¢ | 100 | $3 | $0.40 | $49.65 | $800 |  |
+| 9 | `opdc-mcconnell-resign-2026-11-02` | SELL | 45¢ | 2,000 | $1,100 | $44.48 | $49.39 | $11,000 | ✔  |
+| 10 | `opdc-mcconnell-resign-2026-11-02` | BUY | 36¢ | 100 | $36 | $10.96 | $49.13 | $7,200 | ✔  |
+| 11 | `gsc-usfedgvmt-by-2026-10-01` | BUY | 62¢ | 100 | $62 | $9.90 | $49.01 | $12,400 | ✔  |
+| 12 | `pic-congress-trump-2026-12-31` | SELL | 11¢ | 100 | $89 | $8.01 | $48.88 | $17,800 |  |
+| 13 | `ewc-ref-fl-tax-2026-11-03-pass` | SELL | 69¢ | 100 | $31 | $2.77 | $48.81 | $6,200 |  |
+| 14 | `nocc-attgen-todblanche-2026-08-07` | BUY | 10¢ | 100 | $10 | $4.77 | $47.75 | $2,000 | ⚠ resolves ~2026-08-07 (11d)  |
+| 15 | `ewc-ref-ca-blntax-2026-11-03-pass` | SELL | 39¢ | 100 | $61 | $1.32 | $47.73 | $12,200 |  |
+| 16 | `nocc-attgen-todblanche-2026-08-07` | SELL | 61¢ | 100 | $39 | $3.50 | $46.89 | $7,800 | ⚠ resolves ~2026-08-07 (11d)  |
+| 17 | `ewc-ref-fl-tax-2026-11-03-pass` | BUY | 24¢ | 100 | $24 | $1.32 | $42.23 | $4,800 |  |
+| 18 | `stsc-bab-el-mandeb-clsd-2026-08-31` | SELL | 19¢ | 100 | $81 | $10.01 | $41.08 | $16,200 |  |
+| 19 | `stsc-bab-el-mandeb-clsd-2026-12-31` | BUY | 40¢ | 100 | $40 | $0.51 | $40.11 | $8,200 |  |
+| 20 | `gsc-usfedgvmt-by-2026-10-01` | SELL | 75¢ | 100 | $25 | $0.96 | $39.84 | $5,000 | ✔  |
+| 21 | `pic-congress-trump-2026-12-31` | BUY | 6¢ | 100 | $6 | $0.85 | $38.78 | $1,200 |  |
+| 22 | `stsc-bab-el-mandeb-clsd-2026-07-31` | SELL | 13¢ | 100 | $87 | $0.83 | $38.77 | $17,400 | ⚠ resolves ~2026-07-31 (4d)  |
+| 23 | `stsc-bab-el-mandeb-clsd-2026-12-31` | SELL | 44¢ | 100 | $56 | $1.15 | $35.43 | $11,200 |  |
+| 24 | `stsc-bab-el-mandeb-clsd-2026-07-31` | BUY | 6¢ | 100 | $6 | $0.83 | $33.42 | $1,200 | ⚠ resolves ~2026-07-31 (4d)  |
+| 25 | `stsc-bab-el-mandeb-clsd-2026-08-31` | BUY | 13¢ | 100 | $13 | $0.46 | $28.74 | $2,600 |  |
+| 26 | `iarc-netanyahu-2026-12-31` | SELL | 10¢ | 100 | $90 | $0.31 | $27.72 | $18,000 |  |
+| 27 | `opdc-zelenskyy-presuk-2027-06-30` | SELL | 99¢ | 2,000 | $20 | $25.00 | $25.00 | $200 |  |
+| 28 | `opdc-zelenskyy-presuk-2027-06-30` | BUY | 47¢ | 100 | $47 | $20.85 | $24.98 | $9,400 |  |
+| 29 | `enwc-ussep-nh-2026-09-08-dem-chrpap` | SELL | 94¢ | 100 | $6 | $1.87 | $24.96 | $1,200 |  |
+| 30 | `pvwc-housepopw-2026-11-03-dem` | SELL | 93¢ | 100 | $7 | $1.11 | $24.92 | $1,400 | ✔  |
+| 31 | `pvwc-housepopw-2026-11-03-rep` | SELL | 6¢ | 100 | $94 | $11.24 | $24.87 | $18,800 | ✔  |
+| 32 | `ewc-usgub-ca-2026-11-03-stehil` | BUY | 6¢ | 100 | $6 | $0.29 | $24.73 | $1,200 | ✔  |
+| 33 | `opdc-delrod-venpres-2027-06-30` | BUY | 50¢ | 100 | $50 | $6.87 | $24.67 | $10,000 |  |
+| 34 | `pvwc-housepopw-2026-11-03-dem` | BUY | 83¢ | 100 | $83 | $5.95 | $24.61 | $16,600 | ✔  |
+| 35 | `nocc-dni-jayclay-2026-12-18` | BUY | 83¢ | 100 | $83 | $5.06 | $24.53 | $16,600 |  |
+| 36 | `enwc-ushrp-mo01-2026-08-04-dem-corbus` | BUY | 48¢ | 100 | $48 | $1.14 | $24.46 | $9,600 | ⚠ resolves ~2026-08-04 (8d)  |
+| 37 | `opdc-trump-resig-2027-12-31` | SELL | 13¢ | 100 | $87 | $4.46 | $24.44 | $17,400 | ✔  |
+| 38 | `enwc-ussep-nh-2026-09-01-rep-johsun` | SELL | 99¢ | 2,000 | $20 | $20.11 | $24.41 | $200 |  |
+| 39 | `opdc-trump-resig-2027-12-31` | BUY | 4¢ | 100 | $4 | $0.38 | $24.38 | $800 | ✔  |
+| 40 | `lawec-saveact-2026-08-31` | BUY | 1¢ | 2,000 | $20 | $19.52 | $24.32 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
 | 41 | `opdc-zelenskyy-presuk-2026-12-31` | BUY | 7¢ | 100 | $7 | $1.35 | $24.21 | $1,400 |  |
 | 42 | `lawec-cryptoleg-2026-08-10` | BUY | 4¢ | 100 | $4 | $1.96 | $24.20 | $800 | ✔ ⚠ resolves ~2026-08-10 (14d)  |
-| 43 | `opdc-trump-resig-2026-12-31` | BUY | 10¢ | 100 | $10 | $2.68 | $24.10 | $2,000 |  |
+| 43 | `paccc-usho-midterms-2026-11-03-rep` | BUY | 17.8¢ | 100 | $18 | $2.63 | $24.17 | $3,560 |  |
 | 44 | `nocc-dni-jayclay-2026-08-07` | BUY | 58¢ | 2,000 | $1,160 | $17.78 | $24.02 | $11,600 | ⚠ resolves ~2026-08-07 (11d)  |
 | 45 | `enwc-usgubp-sd-2026-06-02-rep-tobdoe` | BUY | 1¢ | 200 | $2 | $0.18 | $23.95 | $400 | ⚠ resolves ~2026-06-02 (0d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 46 | `usgcc-aliens-12-31-2026` | SELL | 10¢ | 100 | $90 | $0.22 | $23.61 | $18,000 |  |
-| 47 | `ewc-usgub-ia-2026-11-03-rep` | BUY | 38¢ | 100 | $38 | $0.16 | $23.34 | $7,600 |  |
-| 48 | `enwc-ussep-nh-2026-09-01-rep-johsun` | SELL | 99¢ | 1,000 | $10 | $9.86 | $23.22 | $200 |  |
-| 49 | `nocc-dni-jayclay-2026-08-07` | SELL | 99¢ | 2,000 | $20 | $13.77 | $23.11 | $200 | ⚠ resolves ~2026-08-07 (11d)  |
-| 50 | `ewc-usgub-wi-2026-11-03-rep` | BUY | 44¢ | 100 | $44 | $0.23 | $22.78 | $8,800 |  |
-| 51 | `enwc-usgubp-sd-2026-06-02-rep-tobdoe` | SELL | 7¢ | 100 | $93 | $1.19 | $22.73 | $18,600 | ⚠ resolves ~2026-06-02 (0d)  |
-| 52 | `ewc-usgub-az-2026-11-03-dem` | BUY | 82¢ | 100 | $82 | $1.16 | $22.68 | $16,400 |  |
-| 53 | `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | BUY | 76¢ | 100 | $76 | $0.32 | $22.47 | $15,200 | ⚠ resolves ~2026-06-16 (0d)  |
-| 54 | `lawec-cryptoleg-2026-12-31` | SELL | 51¢ | 100 | $49 | $0.94 | $22.17 | $9,800 |  |
-| 55 | `ewc-usgub-nv-2026-11-03-rep` | BUY | 42¢ | 100 | $42 | $0.23 | $22.07 | $8,600 |  |
-| 56 | `ewc-usgub-nv-2026-11-03-dem` | BUY | 55¢ | 100 | $55 | $0.24 | $22.01 | $11,200 | ✔  |
-| 57 | `ewc-usgub-ks-2026-11-03-dem` | SELL | 28¢ | 200 | $144 | $0.22 | $21.96 | $14,400 | ✔  |
-| 58 | `ewc-usse-ia-2026-11-03-dem` | BUY | 41¢ | 100 | $41 | $0.79 | $21.66 | $8,200 |  |
-| 59 | `lawec-saveact-2026-12-31` | BUY | 14¢ | 100 | $14 | $0.77 | $21.58 | $2,800 | ✔  |
-| 60 | `ewc-usse-oh-2026-11-03-dem` | SELL | 50¢ | 100 | $50 | $0.74 | $21.50 | $10,000 |  |
-| 61 | `ewc-usse-oh-2026-11-03-rep` | SELL | 49¢ | 100 | $51 | $0.72 | $21.40 | $10,200 |  |
-| 62 | `enwc-ushrp-mo01-2026-08-04-dem-wesbel` | SELL | 48¢ | 100 | $52 | $0.69 | $21.27 | $10,400 | ⚠ resolves ~2026-08-04 (8d)  |
-| 63 | `iarc-netanyahu-2026-12-31` | BUY | 4¢ | 100 | $4 | $0.18 | $21.21 | $800 |  |
-| 64 | `lawec-saveact-2026-08-31` | BUY | 1¢ | 100 | $1 | $0.67 | $21.17 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 65 | `lawec-cryptoleg-2026-08-10` | SELL | 31¢ | 500 | $345 | $2.97 | $21.09 | $13,800 | ✔ ⚠ resolves ~2026-08-10 (14d)  |
-| 66 | `enwc-ussep-mn-2026-08-11-dem-pegfla` | SELL | 84¢ | 100 | $16 | $0.19 | $21.00 | $3,200 |  |
-| 67 | `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | SELL | 83¢ | 100 | $17 | $0.18 | $20.96 | $3,400 | ⚠ resolves ~2026-06-16 (0d)  |
-| 68 | `enwc-ussep-ma-2026-09-01-dem-edmark` | BUY | 64¢ | 100 | $64 | $0.19 | $20.94 | $12,800 |  |
-| 69 | `opdc-delrod-venpres-2026-12-31` | SELL | 52¢ | 100 | $48 | $0.61 | $20.85 | $9,600 | ✔  |
-| 70 | `enwc-ussep-mn-2026-08-11-dem-pegfla` | BUY | 78¢ | 100 | $78 | $0.20 | $20.84 | $15,600 |  |
-| 71 | `ewc-usse-tx-2026-11-03-dem` | BUY | 42¢ | 100 | $42 | $0.15 | $20.83 | $8,200 |  |
-| 72 | `enwc-usgubp-ok-2026-06-16-rep-gendru` | SELL | 22¢ | 100 | $78 | $0.18 | $20.83 | $15,600 | ⚠ resolves ~2026-06-16 (0d)  |
-| 73 | `enwc-ussep-nh-2026-09-08-dem-chrpap` | BUY | 87¢ | 100 | $87 | $0.17 | $20.78 | $17,400 |  |
-| 74 | `opdc-delrod-venpres-2027-06-30` | SELL | 55¢ | 100 | $45 | $0.59 | $20.75 | $9,000 |  |
-| 75 | `enwc-ussep-mn-2026-08-11-dem-angcra` | BUY | 19¢ | 100 | $19 | $0.57 | $20.60 | $3,800 |  |
-| 76 | `paccc-usse-midterms-2026-11-03-dem` | SELL | 44.4¢ | 100 | $56 | $0.27 | $20.57 | $11,140 |  |
-| 77 | `nocc-dni-jayclay-2026-12-18` | SELL | 99¢ | 2,000 | $20 | $7.87 | $20.53 | $200 |  |
-| 78 | `lawec-cryptoleg-2026-12-31` | BUY | 36¢ | 100 | $36 | $0.28 | $20.50 | $7,400 |  |
-| 79 | `enwc-ussep-ma-2026-09-01-dem-setmou` | BUY | 26¢ | 2,000 | $520 | $7.68 | $20.40 | $5,200 |  |
-| 80 | `enwc-usgubp-ok-2026-06-16-rep-gendru` | BUY | 16¢ | 100 | $16 | $0.26 | $20.30 | $3,400 | ⚠ resolves ~2026-06-16 (0d)  |
-| 81 | `enwc-ussep-ma-2026-09-01-dem-edmark` | SELL | 71¢ | 100 | $29 | $0.16 | $20.29 | $5,800 |  |
-| 82 | `ewc-usse-mn-2026-11-03-rep` | BUY | 8¢ | 100 | $8 | $0.52 | $20.23 | $1,600 |  |
+| 46 | `opdc-trump-resig-2026-12-31` | SELL | 17¢ | 100 | $83 | $2.47 | $23.91 | $16,600 |  |
+| 47 | `opdc-trump-resig-2026-12-31` | BUY | 10¢ | 100 | $10 | $2.08 | $23.79 | $2,000 |  |
+| 48 | `ewc-usgub-ia-2026-11-03-rep` | BUY | 38¢ | 100 | $38 | $0.16 | $23.34 | $7,600 |  |
+| 49 | `enwc-ussep-mn-2026-08-11-dem-pegfla` | BUY | 78¢ | 100 | $78 | $0.42 | $23.07 | $15,600 |  |
+| 50 | `nocc-dni-jayclay-2026-08-07` | SELL | 99¢ | 2,000 | $20 | $13.40 | $23.01 | $200 | ⚠ resolves ~2026-08-07 (11d)  |
+| 51 | `enwc-usgubp-sd-2026-06-02-rep-tobdoe` | SELL | 8¢ | 100 | $92 | $1.19 | $22.73 | $18,400 | ⚠ resolves ~2026-06-02 (0d)  |
+| 52 | `paccc-usse-midterms-2026-11-03-rep` | BUY | 55.4¢ | 100 | $55 | $1.17 | $22.68 | $11,080 |  |
+| 53 | `ewc-ukpol-leg-clacton-2026-08-13-nigfar` | BUY | 92¢ | 100 | $92 | $1.07 | $22.48 | $18,400 |  |
+| 54 | `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | BUY | 76¢ | 100 | $76 | $0.32 | $22.47 | $15,200 | ⚠ resolves ~2026-06-16 (0d)  |
+| 55 | `nocc-dni-jayclay-2026-12-18` | SELL | 99¢ | 2,000 | $20 | $11.74 | $22.46 | $200 |  |
+| 56 | `ewc-usse-mn-2026-11-03-dem` | BUY | 91¢ | 100 | $91 | $1.05 | $22.45 | $18,200 |  |
+| 57 | `ewc-usse-oh-2026-11-03-rep` | SELL | 49¢ | 100 | $51 | $0.97 | $22.25 | $10,200 |  |
+| 58 | `lawec-cryptoleg-2026-12-31` | SELL | 51¢ | 100 | $49 | $0.94 | $22.17 | $9,800 |  |
+| 59 | `ewc-usgub-az-2026-11-03-dem` | BUY | 81¢ | 100 | $81 | $0.29 | $22.03 | $16,200 |  |
+| 60 | `opdc-zelenskyy-presuk-2026-12-31` | SELL | 39¢ | 100 | $61 | $0.83 | $21.82 | $12,200 |  |
+| 61 | `enwc-ussep-mn-2026-08-11-dem-angcra` | BUY | 19¢ | 100 | $19 | $0.81 | $21.73 | $3,800 |  |
+| 62 | `lawec-saveact-2026-12-31` | BUY | 14¢ | 100 | $14 | $0.79 | $21.68 | $2,800 | ✔  |
+| 63 | `ewc-usse-ia-2026-11-03-dem` | BUY | 41¢ | 100 | $41 | $0.79 | $21.66 | $8,200 |  |
+| 64 | `ewc-usgub-wi-2026-11-03-rep` | BUY | 44¢ | 100 | $44 | $0.20 | $21.28 | $8,800 |  |
+| 65 | `enwc-ushrp-mo01-2026-08-04-dem-wesbel` | SELL | 48¢ | 100 | $52 | $0.69 | $21.27 | $10,400 | ⚠ resolves ~2026-08-04 (8d)  |
+| 66 | `ewc-usmayor-losang-2026-11-03-nitram` | BUY | 36¢ | 100 | $36 | $0.68 | $21.22 | $7,200 |  |
+| 67 | `iarc-netanyahu-2026-12-31` | BUY | 4¢ | 100 | $4 | $0.18 | $21.21 | $800 |  |
+| 68 | `lawec-cryptoleg-2026-12-31` | BUY | 38¢ | 100 | $38 | $0.67 | $21.18 | $7,600 |  |
+| 69 | `enwc-usgubp-ok-2026-06-16-rep-gendru` | SELL | 22¢ | 100 | $78 | $0.19 | $21.16 | $15,600 | ⚠ resolves ~2026-06-16 (0d)  |
+| 70 | `ewc-usse-oh-2026-11-03-dem` | SELL | 50¢ | 100 | $50 | $0.67 | $21.14 | $10,000 |  |
+| 71 | `enwc-ussep-nh-2026-09-08-dem-chrpap` | BUY | 87¢ | 100 | $87 | $0.17 | $21.03 | $17,400 |  |
+| 72 | `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | SELL | 83¢ | 100 | $17 | $0.18 | $20.96 | $3,400 | ⚠ resolves ~2026-06-16 (0d)  |
+| 73 | `opdc-delrod-venpres-2026-12-31` | SELL | 52¢ | 100 | $48 | $0.61 | $20.85 | $9,600 | ✔  |
+| 74 | `ewc-usgub-nv-2026-11-03-rep` | BUY | 43¢ | 100 | $43 | $0.61 | $20.84 | $8,600 |  |
+| 75 | `enwc-ussep-mn-2026-08-11-dem-angcra` | SELL | 23¢ | 100 | $77 | $0.16 | $20.83 | $15,400 |  |
+| 76 | `opdc-delrod-venpres-2027-06-30` | SELL | 55¢ | 100 | $45 | $0.59 | $20.75 | $9,000 |  |
+| 77 | `enwc-ussep-ma-2026-09-01-dem-setmou` | BUY | 26¢ | 100 | $26 | $0.55 | $20.46 | $5,200 |  |
+| 78 | `ewc-usgub-wi-2026-11-03-dem` | SELL | 56¢ | 100 | $44 | $0.55 | $20.46 | $8,800 |  |
+| 79 | `enwc-ussep-ma-2026-09-01-dem-edmark` | BUY | 65¢ | 100 | $65 | $0.27 | $20.44 | $13,000 |  |
+| 80 | `enwc-ussep-ma-2026-09-01-dem-edmark` | SELL | 71¢ | 100 | $29 | $0.16 | $20.29 | $5,800 |  |
+| 81 | `enwc-usgubp-ok-2026-06-16-rep-gendru` | BUY | 16¢ | 100 | $16 | $0.26 | $20.25 | $3,400 | ⚠ resolves ~2026-06-16 (0d)  |
+| 82 | `enwc-ussep-nh-2026-09-08-dem-karman` | BUY | 7¢ | 100 | $7 | $0.26 | $20.23 | $1,600 |  |
 | 83 | `lawec-saveact-2026-08-31` | SELL | 4¢ | 100 | $96 | $0.51 | $20.17 | $19,200 |  |
 | 84 | `enwc-ussep-nh-2026-09-08-dem-karman` | SELL | 13¢ | 100 | $87 | $0.27 | $20.14 | $17,200 |  |
-| 85 | `enwc-ussep-mn-2026-08-11-dem-angcra` | SELL | 22¢ | 100 | $78 | $0.29 | $20.00 | $15,400 |  |
-| 86 | `paccc-usse-midterms-2026-11-03-dem` | BUY | 43.7¢ | 100 | $44 | $0.24 | $19.95 | $8,760 |  |
-| 87 | `ewc-usse-mi-2026-11-03-dem` | SELL | 71¢ | 100 | $29 | $0.47 | $19.85 | $5,800 |  |
-| 88 | `enwc-ussep-nh-2026-09-01-rep-scobro` | BUY | 7¢ | 100 | $7 | $0.46 | $19.78 | $1,400 | ✔  |
-| 89 | `paccc-usho-midterms-2026-11-03-dem` | SELL | 85.6¢ | 100 | $14 | $0.46 | $19.77 | $2,880 |  |
-| 90 | `paccc-usse-midterms-2026-11-03-rep` | BUY | 55.4¢ | 100 | $55 | $0.44 | $19.50 | $11,080 |  |
-| 91 | `enwc-ushrp-mo01-2026-08-04-dem-corbus` | SELL | 53¢ | 100 | $47 | $0.23 | $19.49 | $9,200 | ⚠ resolves ~2026-08-04 (8d)  |
-| 92 | `ewc-usmayor-losang-2026-11-03-nitram` | SELL | 39¢ | 100 | $61 | $0.26 | $19.46 | $12,000 |  |
+| 85 | `ewc-usmayor-losang-2026-11-03-nitram` | SELL | 41¢ | 100 | $59 | $0.25 | $20.02 | $12,000 |  |
+| 86 | `ewc-usse-mi-2026-11-03-dem` | SELL | 71¢ | 100 | $29 | $0.49 | $20.01 | $5,800 |  |
+| 87 | `enwc-ussep-mn-2026-08-11-dem-pegfla` | SELL | 84¢ | 100 | $16 | $0.18 | $19.96 | $3,200 |  |
+| 88 | `paccc-usse-midterms-2026-11-03-dem` | BUY | 43.7¢ | 100 | $44 | $0.23 | $19.95 | $8,760 |  |
+| 89 | `paccc-usse-midterms-2026-11-03-rep` | SELL | 55.8¢ | 100 | $44 | $0.26 | $19.89 | $8,840 |  |
+| 90 | `enwc-ushrp-mo01-2026-08-04-dem-corbus` | SELL | 53¢ | 100 | $47 | $0.23 | $19.80 | $9,200 | ⚠ resolves ~2026-08-04 (8d)  |
+| 91 | `enwc-ussep-nh-2026-09-01-rep-scobro` | BUY | 7¢ | 100 | $7 | $0.46 | $19.78 | $1,400 | ✔  |
+| 92 | `paccc-usho-midterms-2026-11-03-dem` | BUY | 84.8¢ | 100 | $85 | $0.45 | $19.61 | $16,960 |  |
 | 93 | `ewc-usgub-ks-2026-11-03-rep` | SELL | 73¢ | 100 | $27 | $0.21 | $19.36 | $5,600 |  |
-| 94 | `ewc-usmayor-losang-2026-11-03-nitram` | BUY | 36¢ | 100 | $36 | $0.25 | $19.25 | $7,000 |  |
+| 94 | `ewc-usgub-ga-2026-11-03-dem` | BUY | 61¢ | 100 | $61 | $0.41 | $19.28 | $12,200 |  |
 | 95 | `ewc-usmayor-losang-2026-11-03-karbas` | SELL | 64¢ | 100 | $36 | $0.19 | $19.20 | $7,000 |  |
-| 96 | `opdc-zelenskyy-presuk-2026-12-31` | SELL | 41¢ | 100 | $59 | $0.40 | $19.15 | $11,800 |  |
+| 96 | `lawec-cryptoleg-2026-08-10` | SELL | 31¢ | 100 | $69 | $0.41 | $19.20 | $13,800 | ✔ ⚠ resolves ~2026-08-10 (14d)  |
 | 97 | `mowc-nato-us-12-31-2026` | SELL | 13¢ | 100 | $87 | $0.20 | $19.10 | $17,600 | ✔  |
-| 98 | `ewc-usse-ga-2026-11-03-dem` | SELL | 91¢ | 100 | $9 | $0.40 | $19.07 | $1,800 |  |
-| 99 | `enwc-ussep-nh-2026-09-08-dem-karman` | BUY | 7¢ | 100 | $7 | $0.37 | $18.82 | $1,400 |  |
-| 100 | `enwc-usgubp-sd-2026-06-02-rep-larrho` | SELL | 99¢ | 2,000 | $20 | $5.68 | $18.66 | $200 | ⚠ resolves ~2026-06-02 (0d)  |
-| 101 | `enwc-usgubp-sd-2026-06-02-rep-larrho` | BUY | 91¢ | 100 | $91 | $0.36 | $18.64 | $18,200 | ⚠ resolves ~2026-06-02 (0d)  |
-| 102 | `paccc-usho-midterms-2026-11-03-dem` | BUY | 84.7¢ | 100 | $85 | $0.36 | $18.62 | $16,940 |  |
-| 103 | `ewc-usgub-ga-2026-11-03-dem` | BUY | 61¢ | 100 | $61 | $0.35 | $18.49 | $12,200 |  |
-| 104 | `dipcc-us-iran-contnts-2026--enrcaplte5` | SELL | 33¢ | 100 | $67 | $0.71 | $18.24 | $13,400 | ✔  |
-| 105 | `ewc-usgub-ga-2026-11-03-rep` | BUY | 40¢ | 100 | $40 | $0.33 | $18.21 | $8,000 |  |
-| 106 | `dipcc-us-iran-contnts-2026--enrmor` | SELL | 29¢ | 2,000 | $1,420 | $8.16 | $18.03 | $14,200 | ✔  |
+| 98 | `ewc-usse-ga-2026-11-03-dem` | SELL | 91¢ | 100 | $9 | $0.39 | $19.00 | $1,800 |  |
+| 99 | `ewc-usse-tx-2026-11-03-dem` | BUY | 42¢ | 100 | $42 | $0.23 | $18.96 | $8,200 |  |
+| 100 | `ewc-usgub-ga-2026-11-03-rep` | SELL | 42¢ | 100 | $58 | $0.38 | $18.83 | $11,600 |  |
+| 101 | `paccc-usho-midterms-2026-11-03-dem` | SELL | 85.7¢ | 100 | $14 | $0.37 | $18.72 | $2,860 |  |
+| 102 | `enwc-usgubp-sd-2026-06-02-rep-larrho` | SELL | 99¢ | 2,000 | $20 | $5.68 | $18.66 | $200 | ⚠ resolves ~2026-06-02 (0d)  |
+| 103 | `enwc-usgubp-sd-2026-06-02-rep-larrho` | BUY | 91¢ | 100 | $91 | $0.36 | $18.64 | $18,200 | ⚠ resolves ~2026-06-02 (0d)  |
+| 104 | `ewc-usgub-ks-2026-11-03-dem` | SELL | 28¢ | 100 | $72 | $0.18 | $18.64 | $14,200 | ✔  |
+| 105 | `ewc-usgub-nv-2026-11-03-dem` | BUY | 55¢ | 100 | $55 | $0.33 | $18.19 | $11,000 | ✔  |
+| 106 | `ewc-usgub-ga-2026-11-03-rep` | BUY | 40¢ | 100 | $40 | $0.31 | $17.82 | $8,000 |  |
 | 107 | `ewc-usgub-ga-2026-11-03-dem` | SELL | 63¢ | 100 | $37 | $0.30 | $17.68 | $7,400 |  |
-| 108 | `dipcc-us-iran-contnts-2026--dilut` | SELL | 33¢ | 100 | $67 | $0.54 | $17.52 | $13,400 | ✔  |
-| 109 | `ewc-usgub-ga-2026-11-03-rep` | SELL | 41¢ | 100 | $59 | $0.28 | $17.35 | $11,800 |  |
-| 110 | `dipcc-us-iran-contnts-2026--irnfnd` | SELL | 47¢ | 100 | $53 | $0.47 | $17.11 | $10,600 |  |
-| 111 | `dipcc-us-iran-contnts-2026--enrcap` | BUY | 32¢ | 100 | $32 | $0.43 | $16.84 | $6,400 | ✔  |
-| 112 | `dipcc-us-iran-contnts-2026--irnfnd` | BUY | 45¢ | 100 | $45 | $0.42 | $16.79 | $9,000 |  |
-| 113 | `pintc-meet-put-zel-2026-09-30` | BUY | 1¢ | 500 | $5 | $0.18 | $16.60 | $1,600 | ✔  |
-| 114 | `enwc-usgubp-mn-2026-08-11-rep-lisdem` | BUY | 38¢ | 100 | $38 | $3.27 | $16.58 | $7,600 |  |
-| 115 | `dipcc-us-iran-contnts-2026--enrmor` | BUY | 22¢ | 100 | $22 | $0.40 | $16.58 | $4,400 | ✔  |
-| 116 | `enwc-usgubp-mich-2026-08-04-rep-perjoh` | BUY | 5¢ | 100 | $5 | $1.52 | $16.57 | $1,000 | ⚠ resolves ~2026-08-04 (8d)  |
-| 117 | `pintc-meet-put-zel-2026-09-30` | SELL | 22¢ | 100 | $78 | $6.89 | $16.55 | $15,600 | ✔  |
-| 118 | `enwc-ussep-mi-2026-08-04-dem-halste` | BUY | 32¢ | 100 | $32 | $2.46 | $16.53 | $6,400 | ⚠ resolves ~2026-08-04 (8d)  |
-| 119 | `ewc-usse-me-2026-11-03-dem` | BUY | 63¢ | 100 | $63 | $0.24 | $16.51 | $12,600 |  |
-| 120 | `pintc-meet-put-zel-2026-12-31` | SELL | 27¢ | 100 | $73 | $5.55 | $16.50 | $14,600 | ✔  |
-| 121 | `enwc-ussep-mi-2026-08-04-dem-abdels` | SELL | 68¢ | 100 | $32 | $1.91 | $16.48 | $6,400 | ⚠ resolves ~2026-08-04 (8d)  |
-| 122 | `apdc-jerpowgov-2026-12-31` | BUY | 20¢ | 100 | $20 | $4.83 | $16.47 | $4,000 | ✔  |
-| 123 | `enwc-usgubp-mich-2026-08-04-rep-perjoh` | SELL | 14¢ | 100 | $86 | $1.58 | $16.44 | $17,200 | ⚠ resolves ~2026-08-04 (8d)  |
-| 124 | `apdc-kashpatel-2026-12-31` | SELL | 47¢ | 100 | $53 | $3.20 | $16.44 | $10,600 | ✔  |
-| 125 | `apdc-kashpatel-2026-08-31` | SELL | 10¢ | 100 | $90 | $0.21 | $16.43 | $18,000 | ✔  |
-| 126 | `pintc-meet-put-zel-2026-12-31` | BUY | 7¢ | 100 | $7 | $1.70 | $16.32 | $1,400 | ✔  |
-| 127 | `pvwc-housepopw-2026-11-03-rep` | BUY | 2¢ | 100 | $2 | $0.23 | $16.29 | $400 | ✔ ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 128 | `apdc-alito-2026-08-31` | SELL | 5¢ | 100 | $95 | $0.28 | $16.28 | $19,200 |  |
-| 129 | `paccc-usho-midterms-2026-11-03-rep` | SELL | 18.3¢ | 100 | $82 | $0.23 | $16.17 | $16,340 |  |
-| 130 | `enwc-ussep-nh-2026-09-01-rep-johsun` | BUY | 93¢ | 100 | $93 | $0.23 | $16.15 | $18,600 |  |
-| 131 | `enwc-usgubp-fl-2026-08-18-rep-byrdon` | SELL | 99¢ | 100 | $1 | $0.20 | $15.95 | $400 | ⚠ near-certain outcome — a resting ask will get lifted  |
-| 132 | `apdc-jerpowgov-2026-12-31` | SELL | 27¢ | 100 | $73 | $1.56 | $15.90 | $14,600 | ✔  |
-| 133 | `apdc-kashpatel-2026-12-31` | BUY | 40¢ | 100 | $40 | $1.27 | $15.73 | $8,000 | ✔  |
-| 134 | `ewc-usmayor-losang-2026-11-03-karbas` | BUY | 61¢ | 100 | $61 | $0.20 | $15.56 | $12,200 |  |
-| 135 | `apdc-petehegseth-2026-08-31` | BUY | 4¢ | 100 | $4 | $0.24 | $15.53 | $400 | ✔  |
-| 136 | `enwc-usgubp-mn-2026-08-11-rep-lisdem` | SELL | 46¢ | 100 | $54 | $0.44 | $15.39 | $10,800 |  |
-| 137 | `stsc-hormuz-normal-jul31` | SELL | 2¢ | 200 | $196 | $0.20 | $15.34 | $19,600 | ⚠ resolves ~2026-07-31 (4d)  |
-| 138 | `mowc-nato-us-12-31-2026` | BUY | 8¢ | 100 | $8 | $0.20 | $15.29 | $1,600 | ✔  |
-| 139 | `apdc-alito-2026-07-31` | SELL | 2¢ | 100 | $98 | $0.79 | $15.13 | $19,600 | ⚠ resolves ~2026-07-31 (4d)  |
-| 140 | `ewc-usse-mn-2026-11-03-dem` | BUY | 90¢ | 100 | $90 | $0.19 | $15.12 | $18,000 |  |
-| 141 | `apdc-kashpatel-2026-08-31` | BUY | 5¢ | 100 | $5 | $0.30 | $15.03 | $1,000 | ✔  |
-| 142 | `apdc-petehegseth-2026-12-31` | BUY | 36¢ | 100 | $36 | $0.63 | $14.79 | $7,200 |  |
-| 143 | `ewc-usse-ne-2026-11-03-danosb` | BUY | 30¢ | 100 | $30 | $0.61 | $14.74 | $6,000 | ✔  |
-| 144 | `ewc-usgub-ks-2026-11-03-dem` | BUY | 25¢ | 100 | $25 | $0.18 | $14.70 | $5,000 | ✔  |
-| 145 | `ewc-usse-me-2026-11-03-rep` | SELL | 38¢ | 100 | $62 | $0.18 | $14.65 | $12,400 |  |
-| 146 | `ewc-usse-ak-2026-11-03-dem` | BUY | 54¢ | 100 | $54 | $0.17 | $14.48 | $10,800 |  |
-| 147 | `apdc-alito-2026-07-31` | BUY | 1¢ | 100 | $1 | $0.51 | $14.39 | $200 | ⚠ resolves ~2026-07-31 (4d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 148 | `ewc-usse-ne-2026-11-03-rep` | SELL | 71¢ | 100 | $29 | $0.49 | $14.31 | $5,800 |  |
-| 149 | `enwc-ussep-mi-2026-08-04-dem-abdels` | BUY | 64¢ | 100 | $64 | $0.46 | $14.17 | $12,800 | ⚠ resolves ~2026-08-04 (8d)  |
-| 150 | `dipcc-us-iran-contnts-2026--dilut` | BUY | 32¢ | 100 | $32 | $0.22 | $14.11 | $6,400 | ✔  |
-| 151 | `enwc-usgubp-mich-2026-08-04-rep-johjam` | BUY | 88¢ | 100 | $88 | $0.16 | $13.96 | $17,400 | ⚠ resolves ~2026-08-04 (8d)  |
-| 152 | `enwc-usgubp-mn-2026-08-11-rep-miklin` | BUY | 50¢ | 100 | $50 | $0.25 | $13.91 | $9,800 |  |
-| 153 | `dipcc-us-iran-contnts-2026--urnsur` | BUY | 17¢ | 100 | $17 | $0.20 | $13.85 | $3,400 | ✔  |
-| 154 | `enwc-usgubp-fl-2026-08-18-rep-jaycol` | SELL | 2¢ | 100 | $98 | $0.40 | $13.83 | $19,600 |  |
-| 155 | `enwc-usgubp-mich-2026-08-04-rep-mikcox` | BUY | 1¢ | 100 | $1 | $0.38 | $13.75 | $200 | ⚠ resolves ~2026-08-04 (8d)  |
-| 156 | `pintc-meet-put-zel-2026-07-31` | SELL | 5¢ | 100 | $95 | $0.38 | $13.74 | $19,000 | ⚠ resolves ~2026-07-31 (4d)  |
-| 157 | `apdc-alito-2026-12-31` | SELL | 19¢ | 1,000 | $810 | $3.15 | $13.73 | $16,200 |  |
-| 158 | `ewc-usgub-mi-2026-11-03-rep` | BUY | 17¢ | 100 | $17 | $0.19 | $13.67 | $3,200 | ✔  |
-| 159 | `dipcc-us-iran-contnts-2026--enrcaplte5` | BUY | 29¢ | 100 | $29 | $0.19 | $13.52 | $5,800 | ✔  |
-| 160 | `enwc-usgubp-mn-2026-08-11-rep-miklin` | SELL | 55¢ | 100 | $45 | $0.18 | $13.50 | $9,200 |  |
-| 161 | `enwc-usgubp-mich-2026-08-04-rep-johjam` | SELL | 92¢ | 100 | $8 | $0.21 | $13.48 | $1,400 | ⚠ resolves ~2026-08-04 (8d)  |
-| 162 | `enwc-ussep-mi-2026-08-04-dem-halste` | SELL | 39¢ | 100 | $61 | $0.17 | $13.44 | $12,400 | ⚠ resolves ~2026-08-04 (8d)  |
-| 163 | `ewc-usse-tx-2026-11-03-rep` | BUY | 57¢ | 200 | $114 | $0.28 | $13.18 | $11,400 |  |
-| 164 | `enwc-usgubp-mn-2026-08-11-rep-kenqua` | SELL | 7¢ | 100 | $93 | $0.17 | $12.97 | $18,400 |  |
-| 165 | `enwc-usgubp-mich-2026-08-04-rep-mikcox` | SELL | 10¢ | 100 | $90 | $0.17 | $12.90 | $17,800 | ⚠ resolves ~2026-08-04 (8d)  |
-| 166 | `pintc-meet-put-zel-2026-07-31` | BUY | 1¢ | 100 | $1 | $0.28 | $12.89 | $200 | ⚠ resolves ~2026-07-31 (4d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 167 | `ewc-usse-ak-2026-11-03-rep` | BUY | 45¢ | 200 | $90 | $0.26 | $12.86 | $9,000 |  |
-| 168 | `apdc-kashpatel-2026-07-31` | BUY | 1¢ | 100 | $1 | $0.27 | $12.82 | $200 | ⚠ resolves ~2026-07-31 (4d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 169 | `apdc-jerpowgov-2026-07-31` | BUY | 1¢ | 100 | $1 | $0.26 | $12.70 | $200 | ⚠ resolves ~2026-07-31 (4d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 108 | `ewc-usgub-ks-2026-11-03-rep` | BUY | 69¢ | 100 | $69 | $0.30 | $17.66 | $13,800 |  |
+| 109 | `dipcc-us-iran-contnts-2026--enrcaplte5` | SELL | 33¢ | 100 | $67 | $0.54 | $17.56 | $13,400 | ✔  |
+| 110 | `dipcc-us-iran-contnts-2026--dilut` | SELL | 33¢ | 100 | $67 | $0.54 | $17.52 | $13,400 | ✔  |
+| 111 | `dipcc-us-iran-contnts-2026--enrmor` | SELL | 29¢ | 100 | $71 | $0.50 | $17.32 | $14,200 | ✔  |
+| 112 | `dipcc-us-iran-contnts-2026--irnfnd` | SELL | 47¢ | 100 | $53 | $0.47 | $17.11 | $10,600 |  |
+| 113 | `dipcc-us-iran-contnts-2026--enrcap` | BUY | 32¢ | 100 | $32 | $0.43 | $16.84 | $6,400 | ✔  |
+| 114 | `dipcc-us-iran-contnts-2026--irnfnd` | BUY | 45¢ | 100 | $45 | $0.42 | $16.79 | $9,000 |  |
+| 115 | `pintc-meet-put-zel-2026-09-30` | BUY | 1¢ | 500 | $5 | $0.18 | $16.60 | $1,600 | ✔  |
+| 116 | `enwc-usgubp-mn-2026-08-11-rep-lisdem` | BUY | 38¢ | 100 | $38 | $3.27 | $16.58 | $7,600 |  |
+| 117 | `dipcc-us-iran-contnts-2026--enrmor` | BUY | 22¢ | 100 | $22 | $0.40 | $16.58 | $4,400 | ✔  |
+| 118 | `pintc-meet-put-zel-2026-09-30` | SELL | 22¢ | 100 | $78 | $6.89 | $16.55 | $15,600 | ✔  |
+| 119 | `enwc-usgubp-mich-2026-08-04-rep-perjoh` | BUY | 5¢ | 100 | $5 | $1.47 | $16.54 | $1,000 | ⚠ resolves ~2026-08-04 (8d)  |
+| 120 | `enwc-ussep-mi-2026-08-04-dem-halste` | BUY | 32¢ | 100 | $32 | $2.46 | $16.53 | $6,400 | ⚠ resolves ~2026-08-04 (8d)  |
+| 121 | `apdc-jerpowgov-2026-12-31` | SELL | 27¢ | 100 | $73 | $5.62 | $16.51 | $14,600 | ✔  |
+| 122 | `ewc-usse-me-2026-11-03-dem` | BUY | 63¢ | 100 | $63 | $0.24 | $16.51 | $12,600 |  |
+| 123 | `apdc-jerpowgov-2026-12-31` | BUY | 20¢ | 100 | $20 | $4.83 | $16.47 | $4,000 | ✔  |
+| 124 | `enwc-usgubp-mich-2026-08-04-rep-perjoh` | SELL | 14¢ | 100 | $86 | $0.65 | $16.44 | $17,200 | ⚠ resolves ~2026-08-04 (8d)  |
+| 125 | `enwc-ussep-mi-2026-08-04-dem-abdels` | SELL | 68¢ | 100 | $32 | $1.81 | $16.44 | $6,400 | ⚠ resolves ~2026-08-04 (8d)  |
+| 126 | `apdc-kashpatel-2026-08-31` | SELL | 10¢ | 100 | $90 | $0.21 | $16.43 | $18,000 | ✔  |
+| 127 | `pintc-meet-put-zel-2026-12-31` | BUY | 7¢ | 100 | $7 | $1.70 | $16.32 | $1,400 | ✔  |
+| 128 | `apdc-kashpatel-2026-12-31` | SELL | 47¢ | 100 | $53 | $2.05 | $16.29 | $10,600 | ✔  |
+| 129 | `apdc-alito-2026-08-31` | SELL | 5¢ | 100 | $95 | $0.28 | $16.28 | $19,200 |  |
+| 130 | `pvwc-housepopw-2026-11-03-rep` | BUY | 2¢ | 100 | $2 | $0.23 | $16.27 | $400 | ✔ ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 131 | `apdc-kashpatel-2026-12-31` | BUY | 40¢ | 100 | $40 | $2.44 | $16.22 | $8,000 | ✔  |
+| 132 | `enwc-usgubp-fl-2026-08-18-rep-byrdon` | SELL | 99¢ | 100 | $1 | $0.21 | $16.18 | $400 | ⚠ near-certain outcome — a resting ask will get lifted  |
+| 133 | `paccc-usho-midterms-2026-11-03-rep` | SELL | 18.3¢ | 100 | $82 | $0.23 | $16.17 | $16,340 |  |
+| 134 | `enwc-ussep-nh-2026-09-01-rep-johsun` | BUY | 93¢ | 100 | $93 | $0.23 | $16.15 | $18,600 |  |
+| 135 | `pintc-meet-put-zel-2026-12-31` | SELL | 27¢ | 100 | $73 | $1.73 | $15.98 | $14,600 | ✔  |
+| 136 | `enwc-usgubp-mn-2026-08-11-rep-lisdem` | SELL | 46¢ | 100 | $54 | $0.55 | $15.93 | $10,800 |  |
+| 137 | `enwc-usgubp-mn-2026-08-11-rep-kenqua` | SELL | 8¢ | 100 | $92 | $1.21 | $15.66 | $18,400 |  |
+| 138 | `ewc-usmayor-losang-2026-11-03-karbas` | BUY | 61¢ | 100 | $61 | $0.20 | $15.56 | $12,200 |  |
+| 139 | `apdc-petehegseth-2026-08-31` | BUY | 4¢ | 100 | $4 | $0.23 | $15.44 | $400 | ✔  |
+| 140 | `stsc-hormuz-normal-jul31` | SELL | 2¢ | 200 | $196 | $0.20 | $15.17 | $19,600 | ⚠ resolves ~2026-07-31 (4d)  |
+| 141 | `apdc-alito-2026-07-31` | SELL | 2¢ | 100 | $98 | $0.79 | $15.13 | $19,600 | ⚠ resolves ~2026-07-31 (4d)  |
+| 142 | `enwc-ussep-mi-2026-08-04-dem-abdels` | BUY | 64¢ | 100 | $64 | $0.70 | $14.96 | $12,800 | ⚠ resolves ~2026-08-04 (8d)  |
+| 143 | `enwc-usgubp-mn-2026-08-11-rep-miklin` | BUY | 51¢ | 100 | $51 | $0.66 | $14.86 | $10,200 |  |
+| 144 | `apdc-petehegseth-2026-12-31` | BUY | 36¢ | 100 | $36 | $0.63 | $14.79 | $7,200 |  |
+| 145 | `ewc-usse-ne-2026-11-03-danosb` | BUY | 30¢ | 100 | $30 | $0.61 | $14.74 | $6,000 | ✔  |
+| 146 | `ewc-usse-me-2026-11-03-rep` | SELL | 38¢ | 100 | $62 | $0.18 | $14.66 | $12,400 |  |
+| 147 | `apdc-kashpatel-2026-08-31` | BUY | 5¢ | 100 | $5 | $0.28 | $14.66 | $1,000 | ✔  |
+| 148 | `ewc-usgub-mi-2026-11-03-rep` | BUY | 17¢ | 100 | $17 | $0.57 | $14.59 | $3,400 | ✔  |
+| 149 | `ewc-usse-ak-2026-11-03-dem` | BUY | 54¢ | 100 | $54 | $0.17 | $14.48 | $10,800 |  |
+| 150 | `apdc-alito-2026-07-31` | BUY | 1¢ | 100 | $1 | $0.51 | $14.39 | $200 | ⚠ resolves ~2026-07-31 (4d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 151 | `ewc-usse-ne-2026-11-03-rep` | SELL | 71¢ | 100 | $29 | $0.49 | $14.31 | $5,800 |  |
+| 152 | `ewc-usgub-ks-2026-11-03-dem` | BUY | 25¢ | 100 | $25 | $0.16 | $14.14 | $5,000 | ✔  |
+| 153 | `dipcc-us-iran-contnts-2026--dilut` | BUY | 32¢ | 100 | $32 | $0.22 | $14.11 | $6,400 | ✔  |
+| 154 | `apdc-alito-2026-12-31` | SELL | 19¢ | 100 | $81 | $0.22 | $14.07 | $16,400 |  |
+| 155 | `enwc-usgubp-mich-2026-08-04-rep-johjam` | BUY | 88¢ | 100 | $88 | $0.16 | $13.96 | $17,400 | ⚠ resolves ~2026-08-04 (8d)  |
+| 156 | `dipcc-us-iran-contnts-2026--urnsur` | BUY | 17¢ | 100 | $17 | $0.20 | $13.85 | $3,400 | ✔  |
+| 157 | `enwc-usgubp-fl-2026-08-18-rep-jaycol` | SELL | 2¢ | 100 | $98 | $0.40 | $13.83 | $19,600 |  |
+| 158 | `mowc-nato-us-12-31-2026` | BUY | 8¢ | 100 | $8 | $0.15 | $13.81 | $1,600 | ✔  |
+| 159 | `pintc-meet-put-zel-2026-07-31` | SELL | 5¢ | 100 | $95 | $0.38 | $13.74 | $19,000 | ⚠ resolves ~2026-07-31 (4d)  |
+| 160 | `dipcc-us-iran-contnts-2026--enrcaplte5` | BUY | 29¢ | 100 | $29 | $0.19 | $13.52 | $5,800 | ✔  |
+| 161 | `enwc-usgubp-mn-2026-08-11-rep-miklin` | SELL | 55¢ | 100 | $45 | $0.18 | $13.50 | $9,200 |  |
+| 162 | `enwc-usgubp-mich-2026-08-04-rep-johjam` | SELL | 92¢ | 100 | $8 | $0.21 | $13.48 | $1,400 | ⚠ resolves ~2026-08-04 (8d)  |
+| 163 | `apdc-jerpowgov-2026-07-31` | BUY | 1¢ | 100 | $1 | $0.31 | $13.22 | $200 | ⚠ resolves ~2026-07-31 (4d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 164 | `enwc-usgubp-mich-2026-08-04-rep-mikcox` | SELL | 10¢ | 100 | $90 | $0.17 | $12.90 | $17,800 | ⚠ resolves ~2026-08-04 (8d)  |
+| 165 | `ewc-usse-ak-2026-11-03-rep` | BUY | 45¢ | 200 | $90 | $0.26 | $12.86 | $9,000 |  |
+| 166 | `ewc-usse-tx-2026-11-03-rep` | BUY | 57¢ | 200 | $114 | $0.26 | $12.84 | $11,400 |  |
+| 167 | `apdc-kashpatel-2026-07-31` | BUY | 1¢ | 100 | $1 | $0.27 | $12.82 | $200 | ⚠ resolves ~2026-07-31 (4d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 168 | `enwc-ussep-mi-2026-08-04-dem-halste` | SELL | 38¢ | 100 | $62 | $0.27 | $12.73 | $12,400 | ⚠ resolves ~2026-08-04 (8d)  |
+| 169 | `enwc-usgubp-fl-2026-08-18-rep-jaycol` | BUY | 1¢ | 100 | $1 | $0.26 | $12.70 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
 | 170 | `apdc-petehegseth-2026-12-31` | SELL | 39¢ | 100 | $61 | $0.26 | $12.68 | $12,200 |  |
 | 171 | `apdc-jerpowgov-2026-07-31` | SELL | 2¢ | 100 | $98 | $0.25 | $12.49 | $19,600 | ⚠ resolves ~2026-07-31 (4d)  |
 | 172 | `ewc-usgub-oh-2026-11-03-dem` | BUY | 44¢ | 200 | $88 | $0.22 | $11.77 | $8,800 |  |
 | 173 | `apdc-kashpatel-2026-07-31` | SELL | 5¢ | 100 | $95 | $0.19 | $11.64 | $19,000 | ⚠ resolves ~2026-07-31 (4d)  |
-| 174 | `enwc-usgubp-mn-2026-08-11-rep-kenqua` | BUY | 1¢ | 100 | $1 | $0.19 | $11.60 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 175 | `enwc-usgubp-fl-2026-08-18-rep-jaycol` | BUY | 1¢ | 100 | $1 | $0.16 | $10.96 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 176 | `ewc-usgub-wi-2026-11-03-dem` | SELL | 56¢ | 200 | $88 | $0.19 | $10.94 | $8,800 |  |
-| 177 | `ewc-usgub-oh-2026-11-03-rep` | BUY | 57¢ | 200 | $114 | $0.19 | $10.89 | $11,400 |  |
-| 178 | `apdc-petehegseth-2026-08-31` | SELL | 7¢ | 100 | $93 | $0.15 | $10.84 | $18,600 | ✔  |
+| 174 | `pintc-meet-put-zel-2026-07-31` | BUY | 1¢ | 100 | $1 | $0.19 | $11.63 | $200 | ⚠ resolves ~2026-07-31 (4d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 175 | `ewc-ukpol-leg-clacton-2026-08-13-coubin` | BUY | 7¢ | 200 | $14 | $0.20 | $11.04 | $1,400 | ✔  |
+| 176 | `ewc-usgub-oh-2026-11-03-rep` | BUY | 57¢ | 200 | $114 | $0.19 | $10.89 | $11,400 |  |
+| 177 | `apdc-petehegseth-2026-08-31` | SELL | 7¢ | 100 | $93 | $0.15 | $10.85 | $18,600 | ✔  |
+| 178 | `enwc-usgubp-mich-2026-08-04-rep-mikcox` | BUY | 1¢ | 100 | $1 | $0.15 | $10.80 | $200 | ⚠ resolves ~2026-08-04 (8d)  |
 | 179 | `ewc-usse-ne-2026-11-03-rep` | BUY | 70¢ | 200 | $140 | $0.29 | $10.69 | $14,000 |  |
 | 180 | `lawec-saveact-2026-12-31` | SELL | 18¢ | 200 | $164 | $0.18 | $10.66 | $16,400 | ✔  |
-| 181 | `dipcc-us-iran-contnts-2026--urnsur` | SELL | 19¢ | 200 | $162 | $0.21 | $10.40 | $16,200 | ✔  |
-| 182 | `ewc-usse-ia-2026-11-03-rep` | BUY | 59¢ | 200 | $118 | $0.17 | $10.09 | $11,800 |  |
-| 183 | `mlaec-swepm-2026-09-13-noodad` | BUY | 1¢ | 500 | $5 | $0.15 | $9.99 | $1,400 | ✔  |
-| 184 | `mlaec-swepm-2026-09-13-ulfkri` | BUY | 1¢ | 500 | $5 | $0.20 | $9.99 | $1,400 | ✔  |
-| 185 | `mlaec-swepm-2026-09-13-ulfkri` | SELL | 33¢ | 100 | $67 | $8.06 | $9.99 | $13,400 | ✔  |
-| 186 | `enwc-usgubp-fl-2026-08-18-rep-jamfis` | BUY | 3¢ | 200 | $6 | $0.24 | $9.97 | $600 | ✔  |
-| 187 | `mlaec-swepm-2026-09-13-noodad` | SELL | 32¢ | 500 | $340 | $3.82 | $9.61 | $13,600 | ✔  |
-| 188 | `mlaec-swepm-2026-09-13-magand` | SELL | 99¢ | 2,000 | $20 | $7.03 | $9.59 | $200 | ✔  |
-| 189 | `ewc-ukpol-leg-clacton-2026-08-13-coubin` | BUY | 7¢ | 200 | $14 | $0.15 | $9.56 | $1,400 | ✔  |
-| 190 | `ewc-usse-ga-2026-11-03-rep` | BUY | 9¢ | 200 | $18 | $0.15 | $9.53 | $1,800 | ✔  |
-| 191 | `enwc-ushrp-mo01-2026-08-04-dem-wesbel` | BUY | 46¢ | 200 | $92 | $0.15 | $9.53 | $9,200 | ⚠ resolves ~2026-08-04 (8d)  |
+| 181 | `enwc-usgubp-mn-2026-08-11-rep-kenqua` | BUY | 1¢ | 200 | $2 | $0.28 | $10.52 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 182 | `dipcc-us-iran-contnts-2026--urnsur` | SELL | 19¢ | 200 | $162 | $0.21 | $10.40 | $16,200 | ✔  |
+| 183 | `ewc-usse-ia-2026-11-03-rep` | BUY | 59¢ | 200 | $118 | $0.17 | $10.11 | $11,800 |  |
+| 184 | `enwc-ushrp-mo01-2026-08-04-dem-wesbel` | BUY | 46¢ | 200 | $92 | $0.17 | $10.02 | $9,200 | ⚠ resolves ~2026-08-04 (8d)  |
+| 185 | `mlaec-swepm-2026-09-13-noodad` | BUY | 1¢ | 500 | $5 | $0.15 | $9.99 | $1,400 | ✔  |
+| 186 | `mlaec-swepm-2026-09-13-ulfkri` | BUY | 1¢ | 500 | $5 | $0.20 | $9.99 | $1,400 | ✔  |
+| 187 | `mlaec-swepm-2026-09-13-ulfkri` | SELL | 33¢ | 100 | $67 | $8.06 | $9.99 | $13,400 | ✔  |
+| 188 | `enwc-usgubp-fl-2026-08-18-rep-jamfis` | BUY | 3¢ | 200 | $6 | $0.24 | $9.97 | $600 | ✔  |
+| 189 | `mlaec-swepm-2026-09-13-noodad` | SELL | 32¢ | 500 | $340 | $3.82 | $9.61 | $13,600 | ✔  |
+| 190 | `mlaec-swepm-2026-09-13-magand` | SELL | 99¢ | 2,000 | $20 | $7.03 | $9.59 | $200 | ✔  |
+| 191 | `ewc-usse-ga-2026-11-03-rep` | BUY | 9¢ | 200 | $18 | $0.15 | $9.53 | $1,800 | ✔  |
 | 192 | `ewc-usse-nh-2026-11-03-rep` | BUY | 15¢ | 200 | $30 | $0.15 | $9.49 | $3,000 | ✔  |
 | 193 | `mlaec-swepm-2026-09-13-ebbbus` | SELL | 32¢ | 2,000 | $1,360 | $6.23 | $9.43 | $13,600 | ✔  |
-| 194 | `mlaec-swepm-2026-09-13-jimake` | SELL | 32¢ | 1,000 | $680 | $4.53 | $9.43 | $13,600 | ✔  |
+| 194 | `mlaec-swepm-2026-09-13-jimake` | SELL | 32¢ | 100 | $68 | $0.77 | $9.43 | $13,600 | ✔  |
 | 195 | `ewc-usgub-ia-2026-11-03-dem` | SELL | 64¢ | 500 | $180 | $0.35 | $9.03 | $7,200 |  |
 | 196 | `ewc-usgub-wi-2026-11-03-dem` | BUY | 54¢ | 500 | $270 | $0.34 | $8.97 | $10,800 |  |
-| 197 | `mlaec-swepm-2026-09-13-magand` | BUY | 8¢ | 100 | $8 | $0.28 | $8.54 | $1,600 | ✔  |
-| 198 | `apdc-alito-2026-08-31` | BUY | 2¢ | 200 | $4 | $0.17 | $8.50 | $400 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 197 | `apdc-alito-2026-08-31` | BUY | 2¢ | 200 | $4 | $0.17 | $8.58 | $400 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 198 | `mlaec-swepm-2026-09-13-magand` | BUY | 8¢ | 100 | $8 | $0.28 | $8.54 | $1,600 | ✔  |
 | 199 | `enwc-usgubp-wi-2026-08-11-dem-joebre` | BUY | 1¢ | 2,000 | $20 | $8.33 | $8.33 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
 | 200 | `enwc-usgubp-wi-2026-08-11-dem-davcro` | BUY | 1¢ | 500 | $5 | $0.22 | $8.32 | $1,400 | ✔  |
 | 201 | `ewc-usgub-az-2026-11-03-rep` | BUY | 18¢ | 500 | $90 | $0.30 | $8.17 | $3,600 |  |
-| 202 | `apdc-petehegseth-2026-07-31` | SELL | 1¢ | 500 | $495 | $0.37 | $7.91 | $19,800 | ⚠ resolves ~2026-07-31 (4d)  |
+| 202 | `apdc-petehegseth-2026-07-31` | SELL | 1¢ | 500 | $495 | $0.37 | $7.92 | $19,800 | ⚠ resolves ~2026-07-31 (4d)  |
 | 203 | `enwc-usgubp-fl-2026-08-18-rep-byrdon` | BUY | 95¢ | 500 | $475 | $0.36 | $7.85 | $19,000 |  |
 | 204 | `enwc-usgubp-wi-2026-08-11-dem-manbar` | SELL | 11¢ | 100 | $89 | $0.44 | $7.65 | $17,800 |  |
 | 205 | `dipcc-us-iran-contnts-2026--enrcap` | SELL | 35¢ | 500 | $325 | $0.30 | $7.63 | $13,000 | ✔  |
 | 206 | `ewc-usse-nc-2026-11-03-dem` | BUY | 90¢ | 500 | $450 | $0.27 | $7.60 | $18,000 |  |
-| 207 | `enwc-usgubp-wi-2026-08-11-dem-sarrod` | SELL | 2¢ | 100 | $0 | $1.29 | $7.51 | $19,200 | 📦 covered  |
-| 208 | `ewc-usse-oh-2026-11-03-dem` | BUY | 49¢ | 500 | $245 | $0.26 | $7.49 | $9,800 |  |
-| 209 | `ewc-usse-mn-2026-11-03-dem` | SELL | 93¢ | 500 | $35 | $0.26 | $7.47 | $1,400 |  |
-| 210 | `enwc-usgubp-wi-2026-08-11-dem-frahon` | SELL | 88¢ | 100 | $12 | $0.29 | $7.32 | $2,400 |  |
+| 207 | `enwc-usgubp-wi-2026-08-11-dem-joebre` | SELL | 5¢ | 500 | $475 | $1.63 | $7.56 | $19,000 |  |
+| 208 | `ewc-usse-mn-2026-11-03-dem` | SELL | 93¢ | 500 | $35 | $0.27 | $7.54 | $1,400 |  |
+| 209 | `enwc-usgubp-wi-2026-08-11-dem-sarrod` | SELL | 2¢ | 100 | $0 | $1.29 | $7.51 | $19,200 | 📦 covered  |
+| 210 | `ewc-usse-oh-2026-11-03-dem` | BUY | 49¢ | 500 | $245 | $0.26 | $7.49 | $9,800 |  |
 | 211 | `ewc-usse-tx-2026-11-03-dem` | SELL | 45¢ | 500 | $275 | $0.26 | $7.29 | $11,000 |  |
-| 212 | `apdc-jerpowgov-2026-08-31` | SELL | 7¢ | 500 | $465 | $0.32 | $7.29 | $18,600 | ✔  |
+| 212 | `apdc-jerpowgov-2026-08-31` | SELL | 7¢ | 500 | $465 | $0.31 | $7.21 | $18,600 | ✔  |
 | 213 | `ewc-usse-mi-2026-11-03-rep` | BUY | 28¢ | 500 | $140 | $0.25 | $7.15 | $5,600 |  |
 | 214 | `ewc-pres-bra-2026-10-04-luisil` | BUY | 20¢ | 100 | $20 | $5.28 | $7.13 | $4,000 |  |
 | 215 | `ewc-pres-bra-2026-10-04-luisil` | SELL | 65¢ | 100 | $35 | $2.90 | $7.12 | $7,000 |  |
 | 216 | `enwc-usgubp-wi-2026-08-11-dem-frahon` | BUY | 78¢ | 100 | $78 | $0.23 | $7.07 | $15,600 |  |
-| 217 | `enwc-usgubp-wi-2026-08-11-dem-kelroy` | SELL | 5¢ | 100 | $95 | $0.22 | $7.05 | $19,000 |  |
-| 218 | `enwc-usgubp-wi-2026-08-11-dem-joebre` | SELL | 5¢ | 100 | $95 | $0.21 | $6.97 | $19,000 |  |
-| 219 | `enwc-usgubp-wi-2026-08-11-dem-kelroy` | BUY | 1¢ | 100 | $1 | $0.20 | $6.95 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 220 | `ewc-usgub-az-2026-11-03-rep` | SELL | 20¢ | 500 | $400 | $0.23 | $6.86 | $16,000 |  |
-| 221 | `enwc-usgubp-wi-2026-08-11-dem-manbar` | BUY | 4¢ | 100 | $4 | $0.17 | $6.75 | $800 |  |
-| 222 | `ewc-usse-nc-2026-11-03-rep` | BUY | 9¢ | 500 | $45 | $0.22 | $6.61 | $1,800 |  |
-| 223 | `ewc-pres-bra-2026-10-04-rensan` | SELL | 9¢ | 100 | $91 | $0.19 | $6.55 | $18,000 |  |
-| 224 | `ewc-usse-ga-2026-11-03-dem` | BUY | 90¢ | 500 | $450 | $0.22 | $6.53 | $18,000 |  |
-| 225 | `ewc-usse-nh-2026-11-03-dem` | BUY | 84¢ | 500 | $420 | $0.22 | $6.53 | $16,800 |  |
-| 226 | `enwc-usgubp-wi-2026-08-11-dem-davcro` | SELL | 14¢ | 100 | $86 | $0.25 | $6.29 | $17,000 | ✔  |
-| 227 | `ewc-pres-bra-2026-10-04-flabol` | SELL | 28¢ | 100 | $72 | $0.19 | $6.21 | $14,200 |  |
-| 228 | `ewc-usgub-ks-2026-11-03-rep` | BUY | 69¢ | 500 | $345 | $0.20 | $6.16 | $13,800 |  |
+| 217 | `ewc-usse-mn-2026-11-03-rep` | BUY | 8¢ | 500 | $40 | $0.24 | $7.04 | $1,600 |  |
+| 218 | `enwc-usgubp-wi-2026-08-11-dem-davcro` | SELL | 15¢ | 100 | $85 | $0.21 | $6.98 | $17,000 | ✔  |
+| 219 | `enwc-usgubp-wi-2026-08-11-dem-kelroy` | SELL | 42¢ | 100 | $58 | $0.20 | $6.94 | $11,600 |  |
+| 220 | `enwc-usgubp-wi-2026-08-11-dem-manbar` | BUY | 4¢ | 100 | $4 | $0.18 | $6.87 | $800 |  |
+| 221 | `ewc-usgub-az-2026-11-03-rep` | SELL | 20¢ | 500 | $400 | $0.23 | $6.86 | $16,000 |  |
+| 222 | `enwc-usgubp-wi-2026-08-11-dem-frahon` | SELL | 88¢ | 100 | $12 | $0.19 | $6.86 | $2,400 |  |
+| 223 | `enwc-usgubp-wi-2026-08-11-dem-kelroy` | BUY | 1¢ | 100 | $1 | $0.18 | $6.76 | $200 |  |
+| 224 | `ewc-usse-nc-2026-11-03-rep` | BUY | 9¢ | 500 | $45 | $0.22 | $6.61 | $1,800 |  |
+| 225 | `ewc-pres-bra-2026-10-04-rensan` | SELL | 9¢ | 100 | $91 | $0.19 | $6.55 | $18,000 |  |
+| 226 | `ewc-usse-nh-2026-11-03-dem` | BUY | 84¢ | 500 | $420 | $0.22 | $6.52 | $16,800 |  |
+| 227 | `ewc-usse-ga-2026-11-03-dem` | BUY | 90¢ | 500 | $450 | $0.22 | $6.49 | $18,000 |  |
+| 228 | `ewc-pres-bra-2026-10-04-flabol` | SELL | 28¢ | 100 | $72 | $0.19 | $6.21 | $14,200 |  |
 | 229 | `ewc-usse-mi-2026-11-03-dem` | BUY | 69¢ | 500 | $345 | $0.20 | $6.06 | $13,800 |  |
-| 230 | `ewc-usgub-mi-2026-11-03-mikdug` | BUY | 1¢ | 500 | $5 | $0.23 | $6.05 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 231 | `ewc-pres-bra-2026-10-04-camsan` | SELL | 4¢ | 100 | $96 | $0.18 | $5.98 | $19,200 |  |
-| 232 | `ewc-usgub-ia-2026-11-03-dem` | BUY | 62¢ | 500 | $310 | $0.19 | $5.96 | $12,400 |  |
-| 233 | `ewc-usse-oh-2026-11-03-rep` | BUY | 48¢ | 500 | $240 | $0.19 | $5.88 | $9,600 |  |
-| 234 | `ewc-usgub-mi-2026-11-03-dem` | BUY | 82¢ | 500 | $410 | $0.22 | $5.83 | $16,400 |  |
-| 235 | `ewc-usse-me-2026-11-03-rep` | BUY | 37¢ | 500 | $185 | $0.19 | $5.79 | $7,400 |  |
-| 236 | `ewc-pres-bra-2026-10-04-flabol` | BUY | 24¢ | 100 | $24 | $0.25 | $5.60 | $4,600 |  |
-| 237 | `ewc-pres-bra-2026-10-04-ferhad` | SELL | 4¢ | 100 | $96 | $0.22 | $5.45 | $19,000 |  |
-| 238 | `ewc-pres-bra-2026-10-04-romzem` | SELL | 4¢ | 100 | $96 | $0.22 | $5.45 | $19,000 |  |
-| 239 | `ewc-pres-bra-2026-10-04-roncai` | SELL | 4¢ | 100 | $96 | $0.22 | $5.41 | $19,000 |  |
-| 240 | `enwc-ussep-nh-2026-09-01-rep-scobro` | SELL | 8¢ | 500 | $460 | $0.17 | $5.25 | $18,400 | ✔  |
-| 241 | `mowc-nato-us-07-31-2026` | SELL | 1¢ | 500 | $495 | $0.16 | $5.17 | $19,800 | ⚠ resolves ~2026-07-31 (4d)  |
-| 242 | `enwc-ussep-me-2026-07-27-dem-janmil` | SELL | 1¢ | 100 | $99 | $0.26 | $5.04 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
-| 243 | `enwc-ussep-me-2026-07-27-dem-shebel` | SELL | 1¢ | 100 | $99 | $0.26 | $5.04 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
-| 244 | `mlaec-isrpol-pm-2026-10-27-yoahen` | BUY | 6¢ | 100 | $6 | $0.57 | $5.00 | $1,200 | ✔  |
-| 245 | `vmc-ussep-misen-2026-08-04-ste15-20` | SELL | 5¢ | 100 | $95 | $4.24 | $5.00 | $19,000 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
-| 246 | `mlaec-isrpol-pm-2026-10-27-nafben` | BUY | 7¢ | 100 | $7 | $0.80 | $5.00 | $1,400 | ✔  |
-| 247 | `mlaec-isrpol-pm-2026-10-27-avilie` | BUY | 7¢ | 100 | $7 | $1.05 | $4.99 | $1,400 | ✔  |
-| 248 | `mlaec-isrpol-pm-2026-10-27-gidsaa` | BUY | 7¢ | 100 | $7 | $1.08 | $4.99 | $1,400 | ✔  |
-| 249 | `vmc-ussep-misen-2026-08-04-els5-10` | SELL | 33¢ | 100 | $67 | $3.62 | $4.99 | $13,400 | ⚠ resolves ~2026-08-04 (8d)  |
-| 250 | `vtc-hrep-to-2026-11-03-125-130m` | SELL | 28¢ | 100 | $72 | $3.77 | $4.99 | $14,400 | ✔  |
-| 251 | `vtc-hrep-to-2026-11-03-125-130m` | BUY | 7¢ | 100 | $7 | $0.63 | $4.99 | $1,400 | ✔  |
-| 252 | `vmc-ussep-misen-2026-08-04-ste05-10` | SELL | 22¢ | 100 | $78 | $3.78 | $4.99 | $15,600 | ⚠ resolves ~2026-08-04 (8d)  |
-| 253 | `vmc-ussep-misen-2026-08-04-ste05-10` | BUY | 15¢ | 100 | $15 | $3.35 | $4.99 | $3,000 | ⚠ resolves ~2026-08-04 (8d)  |
-| 254 | `enwc-ussep-me-2026-07-27-dem-jorwoo` | SELL | 1¢ | 100 | $99 | $0.23 | $4.99 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
-| 255 | `mlaec-isrpol-pm-2026-10-27-bennet` | SELL | 42¢ | 100 | $58 | $2.21 | $4.98 | $11,600 |  |
-| 256 | `mlaec-isrpol-pm-2026-10-27-nafben` | SELL | 15¢ | 100 | $85 | $2.91 | $4.98 | $17,000 | ✔  |
-| 257 | `vmc-ussep-misen-2026-08-04-stegte20` | SELL | 7¢ | 100 | $93 | $2.73 | $4.98 | $18,600 | ⚠ resolves ~2026-08-04 (8d)  |
-| 258 | `vmc-ussep-misen-2026-08-04-els0-5` | BUY | 23¢ | 100 | $23 | $2.42 | $4.97 | $4,600 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
-| 259 | `vmc-ussep-misen-2026-08-04-els0-5` | SELL | 30¢ | 100 | $70 | $2.08 | $4.97 | $14,000 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
-| 260 | `ewc-usse-ga-2026-11-03-rep` | SELL | 10¢ | 500 | $450 | $0.15 | $4.95 | $18,000 | ✔  |
-| 261 | `vmc-ussep-misen-2026-08-04-ste0-5` | SELL | 27¢ | 100 | $73 | $1.51 | $4.94 | $14,600 | ⚠ resolves ~2026-08-04 (8d)  |
-| 262 | `enwc-ussep-me-2026-07-27-dem-jargol` | SELL | 1¢ | 100 | $99 | $0.21 | $4.94 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
-| 263 | `enwc-ussep-me-2026-07-27-dem-nirsha` | SELL | 1¢ | 100 | $99 | $0.21 | $4.93 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
-| 264 | `vmc-ussep-misen-2026-08-04-ste0-5` | BUY | 10¢ | 100 | $10 | $1.25 | $4.93 | $2,000 | ⚠ resolves ~2026-08-04 (8d)  |
-| 265 | `mlaec-isrpol-pm-2026-10-27-bengan` | BUY | 1¢ | 2,000 | $20 | $0.20 | $4.92 | $1,600 |  |
-| 266 | `vmc-ussep-misen-2026-08-04-els10-15` | SELL | 24¢ | 100 | $76 | $1.16 | $4.92 | $15,200 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
-| 267 | `vmc-ussep-misen-2026-08-04-els5-10` | BUY | 1¢ | 2,000 | $20 | $4.01 | $4.88 | $200 | ⚠ resolves ~2026-08-04 (8d)  |
-| 268 | `vmc-ussep-misen-2026-08-04-els10-15` | BUY | 10¢ | 100 | $10 | $0.80 | $4.88 | $2,000 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
-| 269 | `vtc-hrep-to-2026-11-03-gte130m` | BUY | 7¢ | 100 | $7 | $0.44 | $4.86 | $1,400 |  |
-| 270 | `mlaec-isrpol-pm-2026-10-27-itaben` | SELL | 5¢ | 100 | $95 | $0.67 | $4.84 | $19,000 | ✔  |
-| 271 | `vtc-hrep-to-2026-11-03-120-125m` | BUY | 18¢ | 100 | $18 | $0.56 | $4.84 | $3,600 | ✔  |
-| 272 | `vtc-hrep-to-2026-11-03-gte130m` | SELL | 33¢ | 100 | $67 | $0.51 | $4.79 | $13,400 |  |
-| 273 | `vtc-hrep-to-2026-11-03-110-115m` | SELL | 18¢ | 100 | $82 | $0.31 | $4.78 | $16,400 | ✔  |
-| 274 | `vtc-hrep-to-2026-11-03-120-125m` | SELL | 27¢ | 100 | $73 | $0.50 | $4.78 | $14,600 | ✔  |
-| 275 | `vtc-hrep-to-2026-11-03-105-110m` | BUY | 5¢ | 100 | $5 | $0.19 | $4.77 | $800 |  |
-| 276 | `vmc-ussep-misen-2026-08-04-ste10-15` | SELL | 29¢ | 100 | $71 | $0.47 | $4.77 | $14,200 | ⚠ resolves ~2026-08-04 (8d)  |
-| 277 | `vmc-ussep-misen-2026-08-04-elsgte20` | SELL | 14¢ | 100 | $86 | $0.44 | $4.75 | $17,200 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
-| 278 | `ewc-ukpol-leg-clacton-2026-08-13-coubin` | SELL | 8¢ | 1,000 | $920 | $0.29 | $4.73 | $18,400 | ✔  |
-| 279 | `vtc-hrep-to-2026-11-03-115-120m` | BUY | 16¢ | 100 | $16 | $0.22 | $4.73 | $3,200 | ✔  |
-| 280 | `mlaec-isrpol-pm-2026-10-27-ayesha` | SELL | 16¢ | 100 | $84 | $0.26 | $4.72 | $16,800 | ✔  |
-| 281 | `mlaec-isrpol-pm-2026-10-27-gadeiz` | SELL | 53¢ | 100 | $47 | $0.39 | $4.72 | $9,400 |  |
-| 282 | `opdc-delrod-venpres-2026-12-31` | BUY | 1¢ | 1,000 | $10 | $0.29 | $4.71 | $200 | ✔  |
-| 283 | `vtc-hrep-to-2026-11-03-110-115m` | BUY | 9¢ | 100 | $9 | $0.16 | $4.68 | $1,800 | ✔  |
-| 284 | `iarc-group-2026-12-31-tuccar` | SELL | 47¢ | 100 | $53 | $0.33 | $4.67 | $10,600 |  |
-| 285 | `enwc-ussep-me-2026-07-27-dem-valgei` | SELL | 1¢ | 200 | $198 | $0.27 | $4.63 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
-| 286 | `mlaec-swepm-2026-09-13-ebbbus` | BUY | 1¢ | 500 | $5 | $0.21 | $4.63 | $200 | ✔  |
-| 287 | `enwc-ussep-me-2026-07-27-dem-pailou` | SELL | 2¢ | 200 | $196 | $0.24 | $4.57 | $19,600 | ⚠ resolves ~2026-07-27 (0d)  |
-| 288 | `ewc-pres-arg-2027-10-24-sermas` | BUY | 7¢ | 100 | $7 | $0.98 | $4.54 | $1,400 | ✔  |
-| 289 | `ewc-pres-arg-2027-10-24-axekic` | BUY | 29¢ | 2,000 | $580 | $4.51 | $4.54 | $5,800 |  |
-| 290 | `ewc-pres-arg-2027-10-24-axekic` | SELL | 42¢ | 100 | $58 | $3.88 | $4.54 | $11,600 |  |
-| 291 | `ewc-pres-arg-2027-10-24-estbul` | BUY | 7¢ | 100 | $7 | $0.98 | $4.54 | $1,400 | ✔  |
-| 292 | `ewc-pres-arg-2027-10-24-facman` | BUY | 7¢ | 100 | $7 | $0.97 | $4.54 | $1,400 | ✔  |
-| 293 | `ewc-pres-arg-2027-10-24-juagra` | SELL | 33¢ | 100 | $67 | $3.92 | $4.54 | $13,400 |  |
-| 294 | `ewc-pres-arg-2027-10-24-juasch` | BUY | 7¢ | 100 | $7 | $0.98 | $4.54 | $1,400 | ✔  |
-| 295 | `ewc-pres-arg-2027-10-24-maumac` | BUY | 7¢ | 100 | $7 | $0.98 | $4.54 | $1,400 | ✔  |
-| 296 | `ewc-pres-arg-2027-10-24-myrbre` | BUY | 7¢ | 100 | $7 | $0.97 | $4.54 | $1,400 | ✔  |
-| 297 | `ewc-pres-arg-2027-10-24-sermas` | SELL | 33¢ | 100 | $67 | $3.92 | $4.54 | $13,400 | ✔  |
-| 298 | `ewc-pres-arg-2027-10-24-vicvil` | BUY | 7¢ | 100 | $7 | $0.97 | $4.54 | $1,400 | ✔  |
-| 299 | `ewc-pres-arg-2027-10-24-javmil` | SELL | 73¢ | 100 | $27 | $3.67 | $4.54 | $5,400 |  |
-| 300 | `ewc-pres-fra-2027-04-11-jorbar` | BUY | 9¢ | 100 | $9 | $1.11 | $4.54 | $1,800 |  |
-| 301 | `ewc-pres-fra-2027-04-11-jorbar` | SELL | 20¢ | 100 | $80 | $1.00 | $4.54 | $16,000 |  |
-| 302 | `ewc-pres-arg-2027-10-24-dangeb` | BUY | 7¢ | 100 | $7 | $0.98 | $4.54 | $1,400 |  |
-| 303 | `ewc-usgub-nv-2026-11-03-dem` | SELL | 58¢ | 1,000 | $420 | $0.27 | $4.54 | $8,400 | ✔  |
-| 304 | `ewc-pres-fra-2027-04-11-frahol` | BUY | 8¢ | 100 | $8 | $1.34 | $4.53 | $1,600 |  |
-| 305 | `ewc-pres-fra-2027-04-11-jeamel` | BUY | 8¢ | 100 | $8 | $0.51 | $4.51 | $1,600 |  |
-| 306 | `ewc-pres-fra-2027-04-11-sarkna` | SELL | 9¢ | 500 | $455 | $0.24 | $4.50 | $18,200 | ✔  |
-| 307 | `vmc-ussep-misen-2026-08-04-ste10-15` | BUY | 3¢ | 100 | $3 | $0.21 | $4.49 | $600 | ⚠ resolves ~2026-08-04 (8d)  |
-| 308 | `ewc-pres-fra-2027-04-11-bruret` | SELL | 9¢ | 500 | $455 | $0.25 | $4.49 | $18,200 | ✔  |
-| 309 | `ewc-pres-fra-2027-04-11-bruret` | BUY | 5¢ | 100 | $5 | $0.26 | $4.48 | $600 | ✔  |
-| 310 | `ewc-pres-fra-2027-04-11-frahol` | SELL | 15¢ | 100 | $85 | $0.43 | $4.47 | $17,000 |  |
-| 311 | `ewc-pres-fra-2027-04-11-gabatt` | BUY | 5¢ | 200 | $10 | $0.27 | $4.47 | $1,000 | ✔  |
-| 312 | `ewc-pres-fra-2027-04-11-domvil` | BUY | 5¢ | 200 | $10 | $0.18 | $4.45 | $800 | ✔  |
-| 313 | `ewc-usse-tx-2026-11-03-rep` | SELL | 58¢ | 1,000 | $420 | $0.27 | $4.44 | $8,400 |  |
-| 314 | `ewc-pres-arg-2027-10-24-javmil` | BUY | 57¢ | 100 | $57 | $0.65 | $4.42 | $11,400 |  |
-| 315 | `ewc-usse-mi-2026-11-03-rep` | SELL | 30¢ | 1,000 | $700 | $0.26 | $4.39 | $14,000 |  |
-| 316 | `vmc-ussep-misen-2026-08-04-elsgte20` | BUY | 7¢ | 100 | $7 | $0.16 | $4.39 | $1,400 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
-| 317 | `ewc-pres-arg-2027-10-24-estbul` | SELL | 29¢ | 100 | $71 | $0.50 | $4.37 | $14,200 | ✔  |
-| 318 | `ewc-pres-fra-2027-04-11-edophi` | BUY | 13¢ | 100 | $13 | $0.50 | $4.37 | $2,600 | ✔  |
-| 319 | `ewc-pres-arg-2027-10-24-dangeb` | SELL | 41¢ | 100 | $59 | $0.50 | $4.37 | $11,800 |  |
-| 320 | `ewc-pres-arg-2027-10-24-juasch` | SELL | 32¢ | 100 | $68 | $0.50 | $4.37 | $13,600 | ✔  |
-| 321 | `ewc-pres-arg-2027-10-24-maumac` | SELL | 32¢ | 100 | $68 | $0.50 | $4.37 | $13,600 | ✔  |
-| 322 | `ewc-pres-arg-2027-10-24-myrbre` | SELL | 32¢ | 100 | $68 | $0.50 | $4.37 | $13,600 | ✔  |
-| 323 | `ewc-pres-arg-2027-10-24-vicvil` | SELL | 32¢ | 100 | $68 | $0.50 | $4.37 | $13,600 | ✔  |
-| 324 | `ewc-pres-arg-2027-10-24-facman` | SELL | 33¢ | 100 | $67 | $0.50 | $4.37 | $13,400 | ✔  |
-| 325 | `ewc-pres-fra-2027-04-11-domvil` | SELL | 10¢ | 100 | $90 | $0.16 | $4.36 | $17,600 | ✔  |
-| 326 | `ewc-pres-fra-2027-04-11-gabatt` | SELL | 11¢ | 100 | $89 | $0.37 | $4.34 | $17,800 | ✔  |
-| 327 | `ewc-pres-arg-2027-10-24-juagra` | BUY | 1¢ | 2,000 | $20 | $2.82 | $4.28 | $200 |  |
-| 328 | `vtc-hrep-to-2026-11-03-100-105m` | BUY | 8¢ | 200 | $16 | $0.28 | $4.28 | $1,600 | ✔  |
-| 329 | `vtc-hrep-to-2026-11-03-lt90m` | SELL | 16¢ | 100 | $84 | $0.24 | $4.23 | $16,600 | ✔  |
-| 330 | `mlaec-isrpol-pm-2026-10-27-bennet` | BUY | 37¢ | 100 | $37 | $0.23 | $4.21 | $7,200 |  |
-| 331 | `enwc-ussep-sc-2026-08-11-rep-marlyn` | BUY | 1¢ | 2,000 | $20 | $4.17 | $4.17 | $200 | ✔ ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 332 | `enwc-ussep-sc-2026-08-11-rep-nanmac` | SELL | 13¢ | 100 | $87 | $3.86 | $4.17 | $17,400 | ✔  |
-| 333 | `enwc-ussep-sc-2026-08-11-rep-pameve` | SELL | 13¢ | 100 | $87 | $3.86 | $4.17 | $17,400 | ✔  |
-| 334 | `enwc-ussep-sc-2026-08-11-rep-ralnor` | SELL | 33¢ | 200 | $134 | $3.86 | $4.16 | $13,400 |  |
-| 335 | `scc-hrep-rep-2026-11-03-gte185` | BUY | 7¢ | 100 | $7 | $0.83 | $4.16 | $1,400 | ✔  |
-| 336 | `scc-hrep-rep-2026-11-03-gte190` | BUY | 7¢ | 100 | $7 | $0.89 | $4.16 | $1,400 | ✔  |
-| 337 | `enwc-ussep-sc-2026-08-11-rep-andbau` | SELL | 23¢ | 100 | $77 | $3.36 | $4.16 | $15,400 | ✔  |
-| 338 | `scc-hrep-rep-2026-11-03-gte185` | SELL | 33¢ | 1,000 | $670 | $4.07 | $4.16 | $13,400 | ✔  |
-| 339 | `scc-hrep-rep-2026-11-03-gte190` | SELL | 33¢ | 100 | $67 | $3.36 | $4.16 | $13,400 | ✔  |
-| 340 | `scc-hrep-rep-2026-11-03-gte195` | BUY | 7¢ | 100 | $7 | $0.88 | $4.16 | $1,400 | ✔  |
-| 341 | `scc-hrep-rep-2026-11-03-gte195` | SELL | 33¢ | 100 | $67 | $3.36 | $4.16 | $13,400 | ✔  |
-| 342 | `scc-hrep-rep-2026-11-03-gte200` | BUY | 7¢ | 100 | $7 | $0.88 | $4.16 | $1,400 | ✔  |
-| 343 | `scc-hrep-rep-2026-11-03-gte200` | SELL | 33¢ | 100 | $67 | $3.36 | $4.16 | $13,400 | ✔  |
-| 344 | `scc-hrep-rep-2026-11-03-gte205` | BUY | 7¢ | 100 | $7 | $0.88 | $4.16 | $1,400 | ✔  |
-| 345 | `scc-hrep-rep-2026-11-03-gte235` | BUY | 7¢ | 100 | $7 | $0.88 | $4.16 | $1,400 |  |
-| 346 | `scc-hrep-rep-2026-11-03-gte220` | SELL | 33¢ | 2,000 | $1,340 | $4.11 | $4.16 | $13,400 |  |
-| 347 | `enwc-ussep-sc-2026-08-11-rep-rusfry` | SELL | 23¢ | 100 | $77 | $3.14 | $4.16 | $15,400 |  |
-| 348 | `scc-hrep-rep-2026-11-03-gte180` | BUY | 7¢ | 100 | $7 | $0.81 | $4.16 | $1,400 | ✔  |
-| 349 | `scc-hrep-rep-2026-11-03-gte180` | SELL | 33¢ | 100 | $67 | $3.16 | $4.16 | $13,400 | ✔  |
-| 350 | `scc-hrep-rep-2026-11-03-gte205` | SELL | 33¢ | 100 | $67 | $3.16 | $4.16 | $13,400 | ✔  |
-| 351 | `scc-hrep-rep-2026-11-03-gte210` | BUY | 7¢ | 100 | $7 | $0.86 | $4.16 | $1,400 | ✔  |
-| 352 | `scc-hrep-rep-2026-11-03-gte210` | SELL | 33¢ | 100 | $67 | $3.16 | $4.16 | $13,400 | ✔  |
-| 353 | `scc-hrep-rep-2026-11-03-gte215` | SELL | 33¢ | 100 | $67 | $3.16 | $4.16 | $13,400 |  |
-| 354 | `enwc-ussep-sc-2026-08-11-rep-paudan` | BUY | 1¢ | 200 | $2 | $0.16 | $4.16 | $1,400 | ✔  |
-| 355 | `scc-hrep-rep-2026-11-03-gte215` | BUY | 19¢ | 100 | $19 | $2.98 | $4.16 | $3,800 |  |
-| 356 | `enwc-ussep-sc-2026-08-11-rep-andbau` | BUY | 1¢ | 500 | $5 | $0.32 | $4.16 | $1,400 | ✔  |
-| 357 | `enwc-ussep-sc-2026-08-11-rep-darnor` | BUY | 59¢ | 100 | $59 | $1.90 | $4.14 | $11,800 |  |
-| 358 | `enwc-ussep-sc-2026-08-11-rep-joewil` | BUY | 1¢ | 2,000 | $20 | $0.16 | $4.13 | $1,800 |  |
-| 359 | `scc-hrep-rep-2026-11-03-gte230` | SELL | 32¢ | 2,000 | $1,360 | $3.77 | $4.12 | $13,600 |  |
-| 360 | `scc-hrep-rep-2026-11-03-gte225` | SELL | 33¢ | 2,000 | $1,340 | $3.76 | $4.12 | $13,400 |  |
-| 361 | `enwc-ussep-sc-2026-08-11-rep-ralnor` | BUY | 1¢ | 2,000 | $20 | $0.20 | $4.11 | $1,600 |  |
-| 362 | `enwc-ussep-sc-2026-08-11-rep-tregow` | SELL | 12¢ | 100 | $88 | $1.04 | $4.11 | $17,600 | ✔  |
-| 363 | `ewc-usse-ak-2026-11-03-rep` | SELL | 46¢ | 1,000 | $540 | $0.24 | $4.10 | $10,800 |  |
-| 364 | `scc-hrep-rep-2026-11-03-gte235` | SELL | 32¢ | 100 | $68 | $0.97 | $4.10 | $13,600 |  |
-| 365 | `ewc-usgub-ca-2026-11-03-stehil` | SELL | 9¢ | 1,000 | $910 | $0.24 | $4.09 | $18,200 | ✔  |
-| 366 | `ewc-pres-bra-2026-10-04-rensan` | BUY | 6¢ | 500 | $30 | $0.23 | $4.09 | $1,200 |  |
-| 367 | `vtc-hrep-to-2026-11-03-100-105m` | SELL | 13¢ | 100 | $87 | $0.20 | $4.06 | $17,200 | ✔  |
-| 368 | `vmc-ussep-misen-2026-08-04-els15-20` | SELL | 16¢ | 100 | $84 | $0.21 | $4.06 | $16,600 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
-| 369 | `vmc-ussep-misen-2026-08-04-els15-20` | BUY | 12¢ | 100 | $12 | $0.20 | $4.02 | $2,200 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
+| 230 | `ewc-pres-bra-2026-10-04-camsan` | SELL | 4¢ | 100 | $96 | $0.18 | $5.98 | $19,200 |  |
+| 231 | `ewc-usgub-ia-2026-11-03-dem` | BUY | 62¢ | 500 | $310 | $0.19 | $5.96 | $12,400 |  |
+| 232 | `ewc-usse-oh-2026-11-03-rep` | BUY | 48¢ | 500 | $240 | $0.19 | $5.87 | $9,600 |  |
+| 233 | `ewc-usgub-mi-2026-11-03-dem` | BUY | 82¢ | 500 | $410 | $0.22 | $5.82 | $16,400 |  |
+| 234 | `ewc-usse-me-2026-11-03-rep` | BUY | 37¢ | 500 | $185 | $0.19 | $5.79 | $7,400 |  |
+| 235 | `ewc-pres-bra-2026-10-04-flabol` | BUY | 24¢ | 100 | $24 | $0.25 | $5.60 | $4,600 |  |
+| 236 | `ewc-pres-bra-2026-10-04-ferhad` | SELL | 4¢ | 100 | $96 | $0.22 | $5.45 | $19,000 |  |
+| 237 | `ewc-pres-bra-2026-10-04-romzem` | SELL | 4¢ | 100 | $96 | $0.22 | $5.45 | $19,000 |  |
+| 238 | `ewc-pres-bra-2026-10-04-roncai` | SELL | 4¢ | 100 | $96 | $0.22 | $5.41 | $19,000 |  |
+| 239 | `enwc-ussep-nh-2026-09-01-rep-scobro` | SELL | 8¢ | 500 | $460 | $0.17 | $5.25 | $18,400 | ✔  |
+| 240 | `mowc-nato-us-07-31-2026` | SELL | 1¢ | 500 | $495 | $0.16 | $5.17 | $19,800 | ⚠ resolves ~2026-07-31 (4d)  |
+| 241 | `enwc-ussep-me-2026-07-27-dem-janmil` | SELL | 1¢ | 100 | $99 | $0.26 | $5.04 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
+| 242 | `enwc-ussep-me-2026-07-27-dem-shebel` | SELL | 1¢ | 100 | $99 | $0.26 | $5.04 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
+| 243 | `mlaec-isrpol-pm-2026-10-27-yoahen` | BUY | 6¢ | 100 | $6 | $0.57 | $5.00 | $1,200 | ✔  |
+| 244 | `vmc-ussep-misen-2026-08-04-ste15-20` | SELL | 5¢ | 100 | $95 | $4.37 | $5.00 | $19,000 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
+| 245 | `vmc-ussep-misen-2026-08-04-ste05-10` | SELL | 22¢ | 100 | $78 | $4.31 | $5.00 | $15,600 | ⚠ resolves ~2026-08-04 (8d)  |
+| 246 | `mlaec-isrpol-pm-2026-10-27-avilie` | BUY | 7¢ | 100 | $7 | $1.05 | $4.99 | $1,400 | ✔  |
+| 247 | `mlaec-isrpol-pm-2026-10-27-gidsaa` | BUY | 7¢ | 100 | $7 | $1.08 | $4.99 | $1,400 | ✔  |
+| 248 | `vmc-ussep-misen-2026-08-04-els5-10` | SELL | 33¢ | 100 | $67 | $3.90 | $4.99 | $13,400 | ⚠ resolves ~2026-08-04 (8d)  |
+| 249 | `vtc-hrep-to-2026-11-03-125-130m` | BUY | 7¢ | 100 | $7 | $0.63 | $4.99 | $1,400 | ✔  |
+| 250 | `mlaec-isrpol-pm-2026-10-27-nafben` | BUY | 7¢ | 100 | $7 | $0.79 | $4.99 | $1,400 | ✔  |
+| 251 | `vtc-hrep-to-2026-11-03-125-130m` | SELL | 28¢ | 100 | $72 | $3.47 | $4.99 | $14,400 | ✔  |
+| 252 | `enwc-ussep-me-2026-07-27-dem-jorwoo` | SELL | 1¢ | 100 | $99 | $0.23 | $4.99 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
+| 253 | `mlaec-isrpol-pm-2026-10-27-bennet` | SELL | 42¢ | 100 | $58 | $2.21 | $4.98 | $11,600 |  |
+| 254 | `vmc-ussep-misen-2026-08-04-ste0-5` | BUY | 11¢ | 100 | $11 | $2.24 | $4.98 | $2,200 | ⚠ resolves ~2026-08-04 (8d)  |
+| 255 | `vmc-ussep-misen-2026-08-04-stegte20` | SELL | 7¢ | 100 | $93 | $2.71 | $4.98 | $18,600 | ⚠ resolves ~2026-08-04 (8d)  |
+| 256 | `mlaec-isrpol-pm-2026-10-27-nafben` | SELL | 15¢ | 100 | $85 | $2.43 | $4.97 | $17,000 | ✔  |
+| 257 | `vmc-ussep-misen-2026-08-04-ste0-5` | SELL | 26¢ | 100 | $74 | $2.42 | $4.97 | $14,800 | ⚠ resolves ~2026-08-04 (8d)  |
+| 258 | `vmc-ussep-misen-2026-08-04-els0-5` | SELL | 30¢ | 100 | $70 | $2.10 | $4.97 | $14,000 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
+| 259 | `enwc-ussep-me-2026-07-27-dem-jargol` | SELL | 1¢ | 100 | $99 | $0.21 | $4.94 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
+| 260 | `enwc-ussep-me-2026-07-27-dem-nirsha` | SELL | 1¢ | 100 | $99 | $0.21 | $4.93 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
+| 261 | `vmc-ussep-misen-2026-08-04-els5-10` | BUY | 1¢ | 2,000 | $20 | $0.52 | $4.93 | $1,400 | ⚠ resolves ~2026-08-04 (8d)  |
+| 262 | `mlaec-isrpol-pm-2026-10-27-bengan` | BUY | 1¢ | 2,000 | $20 | $0.20 | $4.92 | $1,600 |  |
+| 263 | `vmc-ussep-misen-2026-08-04-els10-15` | SELL | 24¢ | 100 | $76 | $1.14 | $4.92 | $15,200 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
+| 264 | `ewc-usse-ga-2026-11-03-rep` | SELL | 10¢ | 500 | $450 | $0.15 | $4.91 | $18,000 | ✔  |
+| 265 | `vmc-ussep-misen-2026-08-04-els0-5` | BUY | 23¢ | 100 | $23 | $0.82 | $4.88 | $4,600 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
+| 266 | `vmc-ussep-misen-2026-08-04-els10-15` | BUY | 11¢ | 100 | $11 | $0.81 | $4.88 | $2,200 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
+| 267 | `vtc-hrep-to-2026-11-03-120-125m` | BUY | 18¢ | 100 | $18 | $0.31 | $4.84 | $3,600 | ✔  |
+| 268 | `vtc-hrep-to-2026-11-03-gte130m` | SELL | 33¢ | 100 | $67 | $0.55 | $4.81 | $13,400 |  |
+| 269 | `vmc-ussep-misen-2026-08-04-elsgte20` | SELL | 14¢ | 100 | $86 | $0.53 | $4.80 | $17,200 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
+| 270 | `vtc-hrep-to-2026-11-03-120-125m` | SELL | 27¢ | 100 | $73 | $0.36 | $4.79 | $14,600 | ✔  |
+| 271 | `vtc-hrep-to-2026-11-03-110-115m` | SELL | 18¢ | 100 | $82 | $0.31 | $4.78 | $16,400 | ✔  |
+| 272 | `vtc-hrep-to-2026-11-03-105-110m` | BUY | 5¢ | 100 | $5 | $0.19 | $4.77 | $800 |  |
+| 273 | `vmc-ussep-misen-2026-08-04-ste10-15` | SELL | 29¢ | 100 | $71 | $0.47 | $4.77 | $14,200 | ⚠ resolves ~2026-08-04 (8d)  |
+| 274 | `vtc-hrep-to-2026-11-03-gte130m` | BUY | 5¢ | 100 | $5 | $0.22 | $4.76 | $600 |  |
+| 275 | `ewc-ukpol-leg-clacton-2026-08-13-coubin` | SELL | 8¢ | 1,000 | $920 | $0.29 | $4.73 | $18,400 | ✔  |
+| 276 | `vtc-hrep-to-2026-11-03-115-120m` | BUY | 16¢ | 100 | $16 | $0.22 | $4.73 | $3,200 | ✔  |
+| 277 | `mlaec-isrpol-pm-2026-10-27-gadeiz` | SELL | 53¢ | 100 | $47 | $0.39 | $4.72 | $9,400 |  |
+| 278 | `mlaec-isrpol-pm-2026-10-27-itaben` | SELL | 5¢ | 100 | $95 | $0.34 | $4.68 | $19,000 | ✔  |
+| 279 | `vtc-hrep-to-2026-11-03-110-115m` | BUY | 9¢ | 100 | $9 | $0.16 | $4.68 | $1,800 | ✔  |
+| 280 | `iarc-group-2026-12-31-tuccar` | SELL | 47¢ | 100 | $53 | $0.33 | $4.67 | $10,600 |  |
+| 281 | `mlaec-swepm-2026-09-13-ebbbus` | BUY | 1¢ | 500 | $5 | $0.21 | $4.64 | $200 | ✔  |
+| 282 | `enwc-ussep-me-2026-07-27-dem-valgei` | SELL | 1¢ | 200 | $198 | $0.27 | $4.63 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
+| 283 | `enwc-ussep-me-2026-07-27-dem-pailou` | SELL | 2¢ | 200 | $196 | $0.24 | $4.57 | $19,600 | ⚠ resolves ~2026-07-27 (0d)  |
+| 284 | `ewc-pres-arg-2027-10-24-axekic` | BUY | 29¢ | 2,000 | $580 | $4.51 | $4.54 | $5,800 |  |
+| 285 | `ewc-pres-arg-2027-10-24-axekic` | SELL | 42¢ | 100 | $58 | $3.88 | $4.54 | $11,600 |  |
+| 286 | `ewc-pres-arg-2027-10-24-estbul` | BUY | 7¢ | 100 | $7 | $0.96 | $4.54 | $1,400 | ✔  |
+| 287 | `ewc-pres-arg-2027-10-24-facman` | BUY | 7¢ | 100 | $7 | $0.96 | $4.54 | $1,400 | ✔  |
+| 288 | `ewc-pres-arg-2027-10-24-juagra` | SELL | 33¢ | 100 | $67 | $3.92 | $4.54 | $13,400 |  |
+| 289 | `ewc-pres-arg-2027-10-24-juasch` | BUY | 7¢ | 100 | $7 | $0.96 | $4.54 | $1,400 | ✔  |
+| 290 | `ewc-pres-arg-2027-10-24-maumac` | BUY | 7¢ | 100 | $7 | $0.96 | $4.54 | $1,400 | ✔  |
+| 291 | `ewc-pres-arg-2027-10-24-myrbre` | BUY | 7¢ | 100 | $7 | $0.96 | $4.54 | $1,400 | ✔  |
+| 292 | `ewc-pres-arg-2027-10-24-sermas` | BUY | 7¢ | 100 | $7 | $0.97 | $4.54 | $1,400 | ✔  |
+| 293 | `ewc-pres-arg-2027-10-24-vicvil` | BUY | 7¢ | 100 | $7 | $0.96 | $4.54 | $1,400 | ✔  |
+| 294 | `ewc-pres-arg-2027-10-24-javmil` | SELL | 73¢ | 100 | $27 | $3.67 | $4.54 | $5,400 |  |
+| 295 | `ewc-pres-fra-2027-04-11-jorbar` | BUY | 9¢ | 100 | $9 | $1.11 | $4.54 | $1,800 |  |
+| 296 | `ewc-pres-arg-2027-10-24-dangeb` | BUY | 7¢ | 100 | $7 | $0.98 | $4.54 | $1,400 |  |
+| 297 | `ewc-pres-fra-2027-04-11-jorbar` | SELL | 20¢ | 100 | $80 | $1.00 | $4.54 | $16,000 |  |
+| 298 | `ewc-usgub-nv-2026-11-03-dem` | SELL | 58¢ | 1,000 | $420 | $0.27 | $4.54 | $8,400 | ✔  |
+| 299 | `ewc-pres-fra-2027-04-11-frahol` | BUY | 8¢ | 100 | $8 | $1.34 | $4.53 | $1,600 |  |
+| 300 | `ewc-pres-fra-2027-04-11-jeamel` | BUY | 8¢ | 100 | $8 | $0.51 | $4.51 | $1,600 |  |
+| 301 | `ewc-pres-fra-2027-04-11-sarkna` | SELL | 9¢ | 500 | $455 | $0.24 | $4.50 | $18,200 | ✔  |
+| 302 | `mlaec-swepm-2026-09-13-jimake` | BUY | 1¢ | 500 | $5 | $0.20 | $4.49 | $200 | ✔  |
+| 303 | `vmc-ussep-misen-2026-08-04-ste10-15` | BUY | 3¢ | 100 | $3 | $0.21 | $4.49 | $600 | ⚠ resolves ~2026-08-04 (8d)  |
+| 304 | `ewc-pres-fra-2027-04-11-frahol` | SELL | 15¢ | 100 | $85 | $0.43 | $4.47 | $17,000 |  |
+| 305 | `ewc-pres-fra-2027-04-11-bruret` | BUY | 5¢ | 100 | $5 | $0.26 | $4.47 | $600 | ✔  |
+| 306 | `ewc-pres-fra-2027-04-11-gabatt` | BUY | 5¢ | 200 | $10 | $0.27 | $4.47 | $1,000 | ✔  |
+| 307 | `ewc-pres-fra-2027-04-11-bruret` | SELL | 9¢ | 500 | $455 | $0.24 | $4.46 | $18,200 | ✔  |
+| 308 | `ewc-pres-fra-2027-04-11-domvil` | BUY | 5¢ | 200 | $10 | $0.18 | $4.45 | $800 | ✔  |
+| 309 | `ewc-usse-tx-2026-11-03-rep` | SELL | 58¢ | 1,000 | $420 | $0.27 | $4.44 | $8,400 |  |
+| 310 | `ewc-pres-arg-2027-10-24-javmil` | BUY | 57¢ | 100 | $57 | $0.65 | $4.42 | $11,400 |  |
+| 311 | `ewc-usse-mi-2026-11-03-rep` | SELL | 30¢ | 1,000 | $700 | $0.26 | $4.39 | $14,000 |  |
+| 312 | `vmc-ussep-misen-2026-08-04-elsgte20` | BUY | 7¢ | 100 | $7 | $0.16 | $4.39 | $1,400 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
+| 313 | `apdc-alito-2026-12-31` | BUY | 15¢ | 1,000 | $150 | $0.29 | $4.37 | $3,000 |  |
+| 314 | `ewc-pres-fra-2027-04-11-edophi` | BUY | 13¢ | 100 | $13 | $0.50 | $4.37 | $2,600 | ✔  |
+| 315 | `ewc-pres-arg-2027-10-24-dangeb` | SELL | 41¢ | 100 | $59 | $0.50 | $4.37 | $11,800 |  |
+| 316 | `ewc-pres-arg-2027-10-24-estbul` | SELL | 32¢ | 100 | $68 | $0.50 | $4.37 | $13,600 | ✔  |
+| 317 | `ewc-pres-arg-2027-10-24-juasch` | SELL | 32¢ | 100 | $68 | $0.50 | $4.37 | $13,600 | ✔  |
+| 318 | `ewc-pres-arg-2027-10-24-maumac` | SELL | 32¢ | 100 | $68 | $0.50 | $4.37 | $13,600 | ✔  |
+| 319 | `ewc-pres-arg-2027-10-24-myrbre` | SELL | 32¢ | 100 | $68 | $0.50 | $4.37 | $13,600 | ✔  |
+| 320 | `ewc-pres-arg-2027-10-24-sermas` | SELL | 32¢ | 100 | $68 | $0.50 | $4.37 | $13,600 | ✔  |
+| 321 | `ewc-pres-arg-2027-10-24-vicvil` | SELL | 32¢ | 100 | $68 | $0.50 | $4.37 | $13,600 | ✔  |
+| 322 | `ewc-pres-arg-2027-10-24-facman` | SELL | 33¢ | 100 | $67 | $0.50 | $4.37 | $13,400 | ✔  |
+| 323 | `ewc-pres-fra-2027-04-11-domvil` | SELL | 10¢ | 100 | $90 | $0.16 | $4.36 | $17,600 | ✔  |
+| 324 | `mlaec-isrpol-pm-2026-10-27-bennet` | BUY | 37¢ | 100 | $37 | $0.27 | $4.35 | $7,200 |  |
+| 325 | `ewc-pres-fra-2027-04-11-gabatt` | SELL | 11¢ | 100 | $89 | $0.37 | $4.34 | $17,800 | ✔  |
+| 326 | `ewc-pres-arg-2027-10-24-juagra` | BUY | 1¢ | 2,000 | $20 | $2.82 | $4.28 | $200 |  |
+| 327 | `vtc-hrep-to-2026-11-03-100-105m` | BUY | 8¢ | 200 | $16 | $0.28 | $4.28 | $1,600 | ✔  |
+| 328 | `enwc-ussep-sc-2026-08-11-rep-nanmac` | SELL | 13¢ | 100 | $87 | $3.86 | $4.17 | $17,400 | ✔  |
+| 329 | `enwc-ussep-sc-2026-08-11-rep-pameve` | SELL | 13¢ | 100 | $87 | $3.86 | $4.17 | $17,400 | ✔  |
+| 330 | `enwc-ussep-sc-2026-08-11-rep-ralnor` | SELL | 33¢ | 100 | $67 | $3.59 | $4.16 | $13,400 |  |
+| 331 | `enwc-ussep-sc-2026-08-11-rep-andbau` | SELL | 23¢ | 100 | $77 | $3.36 | $4.16 | $15,400 | ✔  |
+| 332 | `scc-hrep-rep-2026-11-03-gte185` | SELL | 33¢ | 100 | $67 | $3.36 | $4.16 | $13,400 | ✔  |
+| 333 | `scc-hrep-rep-2026-11-03-gte190` | BUY | 7¢ | 100 | $7 | $0.88 | $4.16 | $1,400 | ✔  |
+| 334 | `scc-hrep-rep-2026-11-03-gte195` | BUY | 7¢ | 100 | $7 | $0.88 | $4.16 | $1,400 | ✔  |
+| 335 | `scc-hrep-rep-2026-11-03-gte195` | SELL | 33¢ | 100 | $67 | $3.36 | $4.16 | $13,400 | ✔  |
+| 336 | `scc-hrep-rep-2026-11-03-gte200` | BUY | 7¢ | 100 | $7 | $0.88 | $4.16 | $1,400 | ✔  |
+| 337 | `scc-hrep-rep-2026-11-03-gte200` | SELL | 33¢ | 100 | $67 | $3.36 | $4.16 | $13,400 | ✔  |
+| 338 | `scc-hrep-rep-2026-11-03-gte205` | BUY | 7¢ | 100 | $7 | $0.88 | $4.16 | $1,400 | ✔  |
+| 339 | `scc-hrep-rep-2026-11-03-gte205` | SELL | 33¢ | 100 | $67 | $3.36 | $4.16 | $13,400 | ✔  |
+| 340 | `scc-hrep-rep-2026-11-03-gte235` | BUY | 7¢ | 100 | $7 | $0.88 | $4.16 | $1,400 |  |
+| 341 | `scc-hrep-rep-2026-11-03-gte220` | SELL | 33¢ | 2,000 | $1,340 | $4.11 | $4.16 | $13,400 |  |
+| 342 | `enwc-ussep-sc-2026-08-11-rep-rusfry` | SELL | 23¢ | 100 | $77 | $3.10 | $4.16 | $15,400 |  |
+| 343 | `scc-hrep-rep-2026-11-03-gte180` | BUY | 7¢ | 100 | $7 | $0.81 | $4.16 | $1,400 | ✔  |
+| 344 | `scc-hrep-rep-2026-11-03-gte180` | SELL | 33¢ | 100 | $67 | $3.16 | $4.16 | $13,400 | ✔  |
+| 345 | `scc-hrep-rep-2026-11-03-gte185` | BUY | 7¢ | 100 | $7 | $0.81 | $4.16 | $1,400 | ✔  |
+| 346 | `scc-hrep-rep-2026-11-03-gte190` | SELL | 33¢ | 100 | $67 | $3.16 | $4.16 | $13,400 | ✔  |
+| 347 | `scc-hrep-rep-2026-11-03-gte210` | BUY | 7¢ | 100 | $7 | $0.86 | $4.16 | $1,400 | ✔  |
+| 348 | `scc-hrep-rep-2026-11-03-gte210` | SELL | 33¢ | 100 | $67 | $3.16 | $4.16 | $13,400 | ✔  |
+| 349 | `scc-hrep-rep-2026-11-03-gte215` | SELL | 33¢ | 100 | $67 | $3.16 | $4.16 | $13,400 |  |
+| 350 | `scc-hrep-rep-2026-11-03-gte215` | BUY | 19¢ | 100 | $19 | $2.98 | $4.16 | $3,800 |  |
+| 351 | `enwc-ussep-sc-2026-08-11-rep-andbau` | BUY | 1¢ | 500 | $5 | $0.29 | $4.15 | $1,400 | ✔  |
+| 352 | `enwc-ussep-sc-2026-08-11-rep-darnor` | BUY | 59¢ | 100 | $59 | $1.71 | $4.14 | $11,800 |  |
+| 353 | `enwc-ussep-sc-2026-08-11-rep-joewil` | BUY | 1¢ | 2,000 | $20 | $0.34 | $4.13 | $1,600 |  |
+| 354 | `vmc-ussep-misen-2026-08-04-els15-20` | SELL | 16¢ | 100 | $84 | $0.23 | $4.12 | $16,600 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
+| 355 | `scc-hrep-rep-2026-11-03-gte230` | SELL | 32¢ | 2,000 | $1,360 | $3.77 | $4.12 | $13,600 |  |
+| 356 | `scc-hrep-rep-2026-11-03-gte225` | SELL | 33¢ | 2,000 | $1,340 | $3.76 | $4.12 | $13,400 |  |
+| 357 | `enwc-ussep-sc-2026-08-11-rep-ralnor` | BUY | 1¢ | 2,000 | $20 | $0.20 | $4.11 | $1,600 |  |
+| 358 | `ewc-usse-ak-2026-11-03-rep` | SELL | 46¢ | 1,000 | $540 | $0.24 | $4.10 | $10,800 |  |
+| 359 | `scc-hrep-rep-2026-11-03-gte235` | SELL | 32¢ | 100 | $68 | $0.97 | $4.10 | $13,600 |  |
+| 360 | `mlaec-isrpol-pm-2026-10-27-avilie` | SELL | 34¢ | 100 | $66 | $0.22 | $4.10 | $13,000 | ✔  |
+| 361 | `ewc-usgub-ca-2026-11-03-stehil` | SELL | 9¢ | 1,000 | $910 | $0.24 | $4.10 | $18,200 | ✔  |
+| 362 | `ewc-pres-bra-2026-10-04-rensan` | BUY | 6¢ | 500 | $30 | $0.23 | $4.09 | $1,200 |  |
+| 363 | `mlaec-isrpol-pm-2026-10-27-yoahen` | SELL | 11¢ | 100 | $89 | $0.21 | $4.09 | $17,600 | ✔  |
+| 364 | `enwc-ussep-sc-2026-08-11-rep-tregow` | SELL | 12¢ | 100 | $88 | $0.69 | $4.06 | $17,600 | ✔  |
+| 365 | `vtc-hrep-to-2026-11-03-100-105m` | SELL | 13¢ | 100 | $87 | $0.20 | $4.06 | $17,200 | ✔  |
+| 366 | `enwc-ussep-sc-2026-08-11-rep-darnor` | SELL | 96¢ | 100 | $4 | $0.42 | $4.05 | $800 |  |
+| 367 | `mlaec-isrpol-pm-2026-10-27-ayesha` | SELL | 13¢ | 100 | $87 | $0.19 | $4.02 | $17,200 | ✔  |
+| 368 | `enwc-ussep-sc-2026-08-11-rep-joewil` | SELL | 24¢ | 100 | $76 | $0.49 | $4.02 | $15,200 |  |
+| 369 | `vmc-ussep-misen-2026-08-04-els15-20` | BUY | 12¢ | 100 | $12 | $0.19 | $4.01 | $2,200 | ✔ ⚠ resolves ~2026-08-04 (8d)  |
 | 370 | `mlaec-isrpol-pm-2026-10-27-bengan` | SELL | 13¢ | 100 | $87 | $0.19 | $4.01 | $17,200 |  |
-| 371 | `enwc-ussep-sc-2026-08-11-rep-paudan` | SELL | 32¢ | 200 | $136 | $0.83 | $4.00 | $13,600 | ✔  |
-| 372 | `enwc-ussep-sc-2026-08-11-rep-wiltim` | SELL | 32¢ | 200 | $136 | $0.83 | $4.00 | $13,600 | ✔  |
-| 373 | `enwc-ussep-sc-2026-08-11-rep-alawil` | SELL | 41¢ | 100 | $59 | $0.45 | $4.00 | $11,800 | ✔  |
-| 374 | `mlaec-isrpol-pm-2026-10-27-gidsaa` | SELL | 31¢ | 100 | $69 | $0.19 | $4.00 | $13,600 | ✔  |
-| 375 | `mlaec-isrpol-pm-2026-10-27-gadeiz` | BUY | 36¢ | 100 | $36 | $0.19 | $3.98 | $7,000 |  |
+| 371 | `enwc-ussep-sc-2026-08-11-rep-alawil` | SELL | 39¢ | 200 | $122 | $0.82 | $4.00 | $12,200 | ✔  |
+| 372 | `enwc-ussep-sc-2026-08-11-rep-paudan` | SELL | 29¢ | 100 | $71 | $0.45 | $4.00 | $14,200 | ✔  |
+| 373 | `enwc-ussep-sc-2026-08-11-rep-wiltim` | SELL | 29¢ | 1,000 | $710 | $2.29 | $4.00 | $14,200 | ✔  |
+| 374 | `mlaec-isrpol-pm-2026-10-27-gadeiz` | BUY | 36¢ | 100 | $36 | $0.19 | $3.98 | $7,000 |  |
+| 375 | `vtc-hrep-to-2026-11-03-115-120m` | SELL | 24¢ | 100 | $76 | $0.19 | $3.98 | $15,000 | ✔  |
 | 376 | `enwc-ussep-ma-2026-09-01-dem-setmou` | SELL | 30¢ | 1,000 | $700 | $0.23 | $3.98 | $14,000 |  |
-| 377 | `vtc-hrep-to-2026-11-03-115-120m` | SELL | 24¢ | 100 | $76 | $0.18 | $3.97 | $15,000 | ✔  |
-| 378 | `enwc-ussep-sc-2026-08-11-rep-joewil` | SELL | 32¢ | 100 | $68 | $0.35 | $3.95 | $13,600 |  |
-| 379 | `vtc-hrep-to-2026-11-03-90-95m` | SELL | 18¢ | 100 | $82 | $0.18 | $3.94 | $16,200 | ✔  |
-| 380 | `ewc-usse-mn-2026-11-03-rep` | SELL | 9¢ | 1,000 | $910 | $0.23 | $3.94 | $18,200 |  |
-| 381 | `enwc-usgubp-fl-2026-08-18-rep-jamfis` | SELL | 4¢ | 1,000 | $960 | $0.25 | $3.91 | $19,200 | ✔  |
-| 382 | `mlaec-isrpol-pm-2026-10-27-avilie` | SELL | 36¢ | 100 | $64 | $0.17 | $3.90 | $12,600 | ✔  |
-| 383 | `vtc-hrep-to-2026-11-03-95-100m` | SELL | 31¢ | 100 | $69 | $0.17 | $3.89 | $13,600 | ✔  |
-| 384 | `mlaec-isrpol-pm-2026-10-27-yailap` | SELL | 32¢ | 100 | $68 | $0.17 | $3.88 | $13,400 | ✔  |
-| 385 | `mlaec-isrpol-pm-2026-10-27-yailap` | BUY | 1¢ | 200 | $2 | $0.16 | $3.85 | $200 | ✔  |
-| 386 | `mlaec-isrpol-pm-2026-10-27-yoahen` | SELL | 12¢ | 100 | $88 | $0.16 | $3.85 | $17,400 | ✔  |
-| 387 | `iarc-group-2026-12-31-gavnew` | SELL | 13¢ | 200 | $174 | $0.16 | $3.85 | $17,400 |  |
-| 388 | `iarc-group-2026-12-31-johbre` | BUY | 33¢ | 200 | $66 | $0.16 | $3.85 | $6,600 |  |
-| 389 | `ewc-usse-ia-2026-11-03-dem` | SELL | 42¢ | 1,000 | $580 | $0.23 | $3.85 | $11,600 |  |
-| 390 | `ewc-pres-fra-2027-04-11-rapglu` | SELL | 5¢ | 100 | $95 | $0.24 | $3.84 | $18,800 | ✔  |
-| 391 | `pintc-meet-trump-2026-12-31-elomus` | SELL | 33¢ | 2,000 | $1,340 | $3.81 | $3.84 | $13,400 | ✔  |
-| 392 | `pintc-meet-trump-2026-12-31-kanwes` | BUY | 7¢ | 100 | $7 | $1.23 | $3.84 | $1,400 | ✔  |
-| 393 | `pintc-meet-trump-2026-12-31-kimkar` | BUY | 7¢ | 100 | $7 | $1.25 | $3.84 | $1,400 | ✔  |
-| 394 | `pintc-meet-trump-2026-12-31-mojkha` | BUY | 7¢ | 100 | $7 | $0.51 | $3.84 | $1,400 |  |
-| 395 | `pintc-meet-trump-2026-12-31-vlaput` | SELL | 33¢ | 2,000 | $1,340 | $3.81 | $3.84 | $13,400 | ✔  |
-| 396 | `pintc-meet-trump-2026-12-31-volzel` | SELL | 99¢ | 2,000 | $20 | $3.82 | $3.84 | $200 |  |
-| 397 | `scc-senate-gop-2026-11-03-50` | SELL | 33¢ | 100 | $67 | $3.32 | $3.84 | $13,400 | ✔  |
-| 398 | `ewc-pres-fra-2027-04-11-marlep` | SELL | 46¢ | 100 | $54 | $0.22 | $3.84 | $10,600 |  |
-| 399 | `scc-senate-gop-2026-11-03-46` | BUY | 7¢ | 100 | $7 | $0.64 | $3.84 | $1,400 |  |
-| 400 | `scc-senate-gop-2026-11-03-46` | SELL | 33¢ | 100 | $67 | $3.10 | $3.84 | $13,400 |  |
-| 401 | `scc-senate-gop-2026-11-03-49` | BUY | 8¢ | 100 | $8 | $0.21 | $3.84 | $1,400 |  |
-| 402 | `scc-senate-gop-2026-11-03-51` | SELL | 33¢ | 100 | $67 | $3.18 | $3.84 | $13,400 | ✔  |
-| 403 | `scc-senate-gop-2026-11-03-52` | SELL | 33¢ | 100 | $67 | $3.10 | $3.84 | $13,400 | ✔  |
-| 404 | `scc-senate-gop-2026-11-03-53` | BUY | 7¢ | 100 | $7 | $0.23 | $3.84 | $1,400 |  |
-| 405 | `scc-senate-gop-2026-11-03-53` | SELL | 33¢ | 100 | $67 | $3.10 | $3.84 | $13,400 |  |
-| 406 | `scc-senate-gop-2026-11-03-55` | BUY | 7¢ | 100 | $7 | $1.21 | $3.84 | $1,400 | ✔  |
-| 407 | `scc-senate-gop-2026-11-03-56` | BUY | 7¢ | 100 | $7 | $0.61 | $3.84 | $1,400 | ✔  |
-| 408 | `scc-senate-gop-2026-11-03-gte57` | BUY | 7¢ | 100 | $7 | $0.61 | $3.84 | $1,400 | ✔  |
-| 409 | `pintc-meet-trump-2026-12-31-zohmam` | SELL | 61¢ | 2,000 | $780 | $3.79 | $3.84 | $7,800 | ✔  |
-| 410 | `pintc-meet-trump-2026-12-31-elomus` | BUY | 7¢ | 100 | $7 | $0.49 | $3.84 | $1,400 | ✔  |
-| 411 | `pintc-meet-trump-2026-12-31-xijin` | SELL | 99¢ | 2,000 | $20 | $3.78 | $3.84 | $200 |  |
-| 412 | `scc-senate-gop-2026-11-03-47` | BUY | 7¢ | 100 | $7 | $0.23 | $3.84 | $1,400 |  |
-| 413 | `scc-senate-gop-2026-11-03-54` | BUY | 7¢ | 100 | $7 | $0.31 | $3.84 | $1,400 |  |
-| 414 | `scc-senate-gop-2026-11-03-lte45` | BUY | 7¢ | 100 | $7 | $0.42 | $3.84 | $1,400 |  |
-| 415 | `pintc-meet-trump-2026-12-31-delrod` | SELL | 33¢ | 2,000 | $1,340 | $3.70 | $3.83 | $13,400 | ✔  |
-| 416 | `pintc-meet-trump-2026-12-31-delrod` | BUY | 12¢ | 100 | $12 | $0.68 | $3.82 | $2,400 | ✔  |
-| 417 | `pintc-meet-trump-2026-12-31-kanwes` | SELL | 32¢ | 100 | $68 | $1.25 | $3.81 | $13,600 | ✔  |
-| 418 | `pintc-meet-trump-2026-12-31-kimjon` | SELL | 32¢ | 100 | $68 | $1.25 | $3.81 | $13,600 | ✔  |
-| 419 | `pintc-meet-trump-2026-12-31-kimkar` | SELL | 32¢ | 2,000 | $1,360 | $3.48 | $3.81 | $13,600 | ✔  |
-| 420 | `pintc-meet-trump-2026-12-31-leoxiv` | SELL | 32¢ | 2,000 | $1,360 | $3.48 | $3.81 | $13,600 | ✔  |
-| 421 | `pintc-meet-trump-2026-12-31-mojkha` | SELL | 32¢ | 100 | $68 | $1.25 | $3.81 | $13,600 |  |
-| 422 | `pintc-meet-trump-2026-12-31-talswi` | SELL | 32¢ | 2,000 | $1,360 | $3.48 | $3.81 | $13,600 | ✔  |
-| 423 | `pintc-meet-trump-2026-12-31-joerog` | BUY | 49¢ | 100 | $49 | $1.03 | $3.79 | $9,800 |  |
-| 424 | `scc-hrep-rep-2026-11-03-gte220` | BUY | 1¢ | 2,000 | $20 | $2.09 | $3.79 | $200 |  |
-| 425 | `scc-hrep-rep-2026-11-03-gte225` | BUY | 1¢ | 2,000 | $20 | $2.09 | $3.79 | $200 |  |
-| 426 | `ewc-pres-fra-2027-04-11-marlep` | BUY | 43¢ | 100 | $43 | $0.22 | $3.79 | $8,400 |  |
-| 427 | `pintc-meet-trump-2026-12-31-kimjon` | BUY | 8¢ | 100 | $8 | $0.57 | $3.78 | $1,600 | ✔  |
-| 428 | `pintc-meet-trump-2026-12-31-talswi` | BUY | 8¢ | 100 | $8 | $0.57 | $3.78 | $1,600 | ✔  |
-| 429 | `scc-senate-gop-2026-11-03-51` | BUY | 14¢ | 100 | $14 | $0.60 | $3.76 | $2,800 | ✔  |
-| 430 | `vtc-hrep-to-2026-11-03-105-110m` | SELL | 11¢ | 100 | $89 | $0.28 | $3.76 | $17,400 |  |
-| 431 | `vmc-ussep-misen-2026-08-04-stegte20` | BUY | 1¢ | 500 | $5 | $0.35 | $3.76 | $200 | ⚠ resolves ~2026-08-04 (8d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 432 | `pintc-meet-trump-2026-12-31-vlaput` | BUY | 21¢ | 100 | $21 | $0.64 | $3.75 | $4,200 | ✔  |
-| 433 | `ewc-usgub-oh-2026-11-03-dem` | SELL | 45¢ | 1,000 | $550 | $0.22 | $3.74 | $11,000 |  |
-| 434 | `pintc-meet-trump-2026-12-31-leoxiv` | BUY | 8¢ | 100 | $8 | $0.35 | $3.73 | $1,600 | ✔  |
-| 435 | `scc-senate-gop-2026-11-03-48` | SELL | 13¢ | 100 | $87 | $0.53 | $3.73 | $17,400 | ✔  |
-| 436 | `scc-senate-gop-2026-11-03-52` | BUY | 20¢ | 100 | $20 | $0.50 | $3.72 | $4,000 | ✔  |
-| 437 | `pintc-meet-trump-2026-12-31-joerog` | SELL | 99¢ | 2,000 | $20 | $2.83 | $3.71 | $200 |  |
-| 438 | `ewc-usse-nc-2026-11-03-dem` | SELL | 91¢ | 1,000 | $90 | $0.22 | $3.71 | $1,800 |  |
+| 377 | `vtc-hrep-to-2026-11-03-95-100m` | SELL | 29¢ | 100 | $71 | $0.18 | $3.94 | $14,000 | ✔  |
+| 378 | `mlaec-isrpol-pm-2026-10-27-gidsaa` | SELL | 29¢ | 100 | $71 | $0.17 | $3.92 | $14,000 | ✔  |
+| 379 | `mlaec-isrpol-pm-2026-10-27-yailap` | SELL | 30¢ | 100 | $70 | $0.17 | $3.92 | $13,800 | ✔  |
+| 380 | `enwc-usgubp-fl-2026-08-18-rep-jamfis` | SELL | 4¢ | 1,000 | $960 | $0.25 | $3.91 | $19,200 | ✔  |
+| 381 | `vmc-ussep-misen-2026-08-04-ste05-10` | BUY | 1¢ | 200 | $2 | $0.17 | $3.90 | $200 | ⚠ resolves ~2026-08-04 (8d)  |
+| 382 | `ewc-usse-mn-2026-11-03-rep` | SELL | 9¢ | 1,000 | $910 | $0.23 | $3.88 | $18,200 |  |
+| 383 | `iarc-group-2026-12-31-gavnew` | SELL | 13¢ | 200 | $174 | $0.16 | $3.86 | $17,400 |  |
+| 384 | `iarc-group-2026-12-31-johbre` | BUY | 33¢ | 200 | $66 | $0.16 | $3.85 | $6,600 |  |
+| 385 | `ewc-usse-ia-2026-11-03-dem` | SELL | 42¢ | 1,000 | $580 | $0.23 | $3.85 | $11,600 |  |
+| 386 | `ewc-pres-fra-2027-04-11-rapglu` | SELL | 5¢ | 100 | $95 | $0.24 | $3.84 | $18,800 | ✔  |
+| 387 | `enwc-ussep-sc-2026-08-11-rep-marlyn` | SELL | 2¢ | 100 | $0 | $0.80 | $3.84 | $19,200 | ✔ 📦 covered  |
+| 388 | `pintc-meet-trump-2026-12-31-elomus` | SELL | 33¢ | 2,000 | $1,340 | $3.81 | $3.84 | $13,400 | ✔  |
+| 389 | `pintc-meet-trump-2026-12-31-kanwes` | BUY | 7¢ | 100 | $7 | $1.23 | $3.84 | $1,400 | ✔  |
+| 390 | `pintc-meet-trump-2026-12-31-kimkar` | BUY | 7¢ | 100 | $7 | $1.25 | $3.84 | $1,400 | ✔  |
+| 391 | `pintc-meet-trump-2026-12-31-mojkha` | BUY | 7¢ | 100 | $7 | $0.51 | $3.84 | $1,400 |  |
+| 392 | `pintc-meet-trump-2026-12-31-vlaput` | SELL | 33¢ | 2,000 | $1,340 | $3.81 | $3.84 | $13,400 | ✔  |
+| 393 | `pintc-meet-trump-2026-12-31-volzel` | SELL | 99¢ | 2,000 | $20 | $3.82 | $3.84 | $200 |  |
+| 394 | `scc-senate-gop-2026-11-03-50` | SELL | 33¢ | 100 | $67 | $3.32 | $3.84 | $13,400 | ✔  |
+| 395 | `scc-senate-gop-2026-11-03-51` | SELL | 33¢ | 100 | $67 | $3.32 | $3.84 | $13,400 | ✔  |
+| 396 | `ewc-pres-fra-2027-04-11-marlep` | SELL | 46¢ | 100 | $54 | $0.22 | $3.84 | $10,600 |  |
+| 397 | `scc-senate-gop-2026-11-03-46` | BUY | 7¢ | 100 | $7 | $0.64 | $3.84 | $1,400 |  |
+| 398 | `scc-senate-gop-2026-11-03-46` | SELL | 33¢ | 100 | $67 | $3.10 | $3.84 | $13,400 |  |
+| 399 | `scc-senate-gop-2026-11-03-49` | BUY | 8¢ | 100 | $8 | $0.21 | $3.84 | $1,400 |  |
+| 400 | `scc-senate-gop-2026-11-03-52` | SELL | 33¢ | 100 | $67 | $3.10 | $3.84 | $13,400 | ✔  |
+| 401 | `scc-senate-gop-2026-11-03-53` | BUY | 7¢ | 100 | $7 | $0.23 | $3.84 | $1,400 |  |
+| 402 | `scc-senate-gop-2026-11-03-53` | SELL | 33¢ | 100 | $67 | $3.10 | $3.84 | $13,400 |  |
+| 403 | `scc-senate-gop-2026-11-03-56` | BUY | 7¢ | 100 | $7 | $0.61 | $3.84 | $1,400 | ✔  |
+| 404 | `scc-senate-gop-2026-11-03-gte57` | BUY | 7¢ | 100 | $7 | $0.61 | $3.84 | $1,400 | ✔  |
+| 405 | `pintc-meet-trump-2026-12-31-zohmam` | SELL | 61¢ | 2,000 | $780 | $3.79 | $3.84 | $7,800 | ✔  |
+| 406 | `pintc-meet-trump-2026-12-31-elomus` | BUY | 7¢ | 100 | $7 | $0.49 | $3.84 | $1,400 | ✔  |
+| 407 | `pintc-meet-trump-2026-12-31-xijin` | SELL | 99¢ | 2,000 | $20 | $3.78 | $3.84 | $200 |  |
+| 408 | `scc-senate-gop-2026-11-03-47` | BUY | 7¢ | 100 | $7 | $0.28 | $3.84 | $1,400 |  |
+| 409 | `scc-senate-gop-2026-11-03-54` | BUY | 7¢ | 100 | $7 | $0.31 | $3.84 | $1,400 |  |
+| 410 | `scc-senate-gop-2026-11-03-55` | BUY | 7¢ | 100 | $7 | $0.60 | $3.84 | $1,400 | ✔  |
+| 411 | `scc-senate-gop-2026-11-03-lte45` | BUY | 7¢ | 100 | $7 | $0.42 | $3.84 | $1,400 |  |
+| 412 | `pintc-meet-trump-2026-12-31-delrod` | SELL | 33¢ | 2,000 | $1,340 | $3.70 | $3.83 | $13,400 | ✔  |
+| 413 | `pintc-meet-trump-2026-12-31-delrod` | BUY | 12¢ | 100 | $12 | $0.68 | $3.82 | $2,400 | ✔  |
+| 414 | `pintc-meet-trump-2026-12-31-kanwes` | SELL | 32¢ | 100 | $68 | $1.25 | $3.81 | $13,600 | ✔  |
+| 415 | `pintc-meet-trump-2026-12-31-kimjon` | SELL | 32¢ | 100 | $68 | $1.25 | $3.81 | $13,600 | ✔  |
+| 416 | `pintc-meet-trump-2026-12-31-kimkar` | SELL | 32¢ | 2,000 | $1,360 | $3.48 | $3.81 | $13,600 | ✔  |
+| 417 | `pintc-meet-trump-2026-12-31-leoxiv` | SELL | 32¢ | 2,000 | $1,360 | $3.48 | $3.81 | $13,600 | ✔  |
+| 418 | `pintc-meet-trump-2026-12-31-mojkha` | SELL | 32¢ | 100 | $68 | $1.25 | $3.81 | $13,600 |  |
+| 419 | `pintc-meet-trump-2026-12-31-talswi` | SELL | 32¢ | 2,000 | $1,360 | $3.48 | $3.81 | $13,600 | ✔  |
+| 420 | `vtc-hrep-to-2026-11-03-90-95m` | SELL | 24¢ | 100 | $76 | $0.15 | $3.80 | $15,000 | ✔  |
+| 421 | `pintc-meet-trump-2026-12-31-joerog` | BUY | 49¢ | 100 | $49 | $1.03 | $3.79 | $9,800 |  |
+| 422 | `scc-hrep-rep-2026-11-03-gte220` | BUY | 1¢ | 2,000 | $20 | $2.09 | $3.79 | $200 |  |
+| 423 | `scc-hrep-rep-2026-11-03-gte225` | BUY | 1¢ | 2,000 | $20 | $2.09 | $3.79 | $200 |  |
+| 424 | `pintc-meet-trump-2026-12-31-kimjon` | BUY | 8¢ | 100 | $8 | $0.56 | $3.78 | $1,600 | ✔  |
+| 425 | `pintc-meet-trump-2026-12-31-talswi` | BUY | 8¢ | 100 | $8 | $0.57 | $3.78 | $1,600 | ✔  |
+| 426 | `ewc-pres-fra-2027-04-11-marlep` | BUY | 43¢ | 100 | $43 | $0.21 | $3.78 | $8,400 |  |
+| 427 | `vtc-hrep-to-2026-11-03-105-110m` | SELL | 11¢ | 100 | $89 | $0.28 | $3.76 | $17,400 |  |
+| 428 | `scc-senate-gop-2026-11-03-51` | BUY | 14¢ | 100 | $14 | $0.60 | $3.76 | $2,800 | ✔  |
+| 429 | `vmc-ussep-misen-2026-08-04-stegte20` | BUY | 1¢ | 500 | $5 | $0.35 | $3.76 | $200 | ⚠ resolves ~2026-08-04 (8d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 430 | `vtc-hrep-to-2026-11-03-lt90m` | BUY | 1¢ | 500 | $5 | $0.35 | $3.76 | $200 | ✔  |
+| 431 | `pintc-meet-trump-2026-12-31-vlaput` | BUY | 21¢ | 100 | $21 | $0.64 | $3.75 | $4,200 | ✔  |
+| 432 | `ewc-usgub-oh-2026-11-03-dem` | SELL | 45¢ | 1,000 | $550 | $0.22 | $3.74 | $11,000 |  |
+| 433 | `pintc-meet-trump-2026-12-31-leoxiv` | BUY | 8¢ | 100 | $8 | $0.35 | $3.73 | $1,600 | ✔  |
+| 434 | `scc-senate-gop-2026-11-03-48` | SELL | 13¢ | 100 | $87 | $0.53 | $3.73 | $17,400 | ✔  |
+| 435 | `scc-senate-gop-2026-11-03-52` | BUY | 20¢ | 100 | $20 | $0.50 | $3.72 | $4,000 | ✔  |
+| 436 | `pintc-meet-trump-2026-12-31-joerog` | SELL | 99¢ | 2,000 | $20 | $2.81 | $3.71 | $200 |  |
+| 437 | `ewc-usse-nc-2026-11-03-dem` | SELL | 91¢ | 1,000 | $90 | $0.22 | $3.71 | $1,800 |  |
+| 438 | `vtc-hrep-to-2026-11-03-lt90m` | SELL | 14¢ | 100 | $86 | $0.27 | $3.71 | $16,800 | ✔  |
 | 439 | `scc-hrep-rep-2026-11-03-gte230` | BUY | 1¢ | 2,000 | $20 | $1.85 | $3.70 | $200 |  |
 | 440 | `scc-senate-gop-2026-11-03-47` | SELL | 32¢ | 100 | $68 | $0.42 | $3.70 | $13,600 |  |
 | 441 | `scc-senate-gop-2026-11-03-49` | SELL | 32¢ | 100 | $68 | $0.42 | $3.70 | $13,600 |  |
 | 442 | `scc-senate-gop-2026-11-03-54` | SELL | 32¢ | 100 | $68 | $0.42 | $3.70 | $13,600 |  |
-| 443 | `scc-senate-gop-2026-11-03-56` | SELL | 32¢ | 100 | $68 | $0.42 | $3.70 | $13,600 | ✔  |
-| 444 | `scc-senate-gop-2026-11-03-gte57` | SELL | 32¢ | 100 | $68 | $0.42 | $3.70 | $13,600 | ✔  |
-| 445 | `scc-senate-gop-2026-11-03-lte45` | SELL | 32¢ | 100 | $68 | $0.42 | $3.70 | $13,600 |  |
-| 446 | `scc-senate-gop-2026-11-03-55` | SELL | 33¢ | 100 | $67 | $0.42 | $3.69 | $13,400 | ✔  |
-| 447 | `scc-senate-gop-2026-11-03-50` | BUY | 12¢ | 100 | $12 | $0.28 | $3.68 | $2,400 | ✔  |
-| 448 | `ewc-usse-ia-2026-11-03-rep` | SELL | 60¢ | 1,000 | $400 | $0.21 | $3.68 | $8,000 |  |
-| 449 | `ewc-usse-ak-2026-11-03-dem` | SELL | 55¢ | 1,000 | $450 | $0.21 | $3.66 | $9,000 |  |
-| 450 | `enwc-ussep-sc-2026-08-11-rep-darnor` | SELL | 99¢ | 200 | $2 | $0.28 | $3.65 | $200 |  |
-| 451 | `pintc-meet-trump-2026-12-31-zohmam` | BUY | 44¢ | 100 | $44 | $0.33 | $3.65 | $8,800 | ✔  |
-| 452 | `enwc-ussep-sc-2026-08-11-rep-marlyn` | SELL | 3¢ | 100 | $0 | $0.49 | $3.63 | $19,000 | ✔ 📦 covered  |
-| 453 | `enwc-ussep-sc-2026-08-11-rep-rusfry` | BUY | 1¢ | 200 | $2 | $0.26 | $3.62 | $200 |  |
-| 454 | `enwc-ussep-sc-2026-08-11-rep-wiltim` | BUY | 1¢ | 200 | $2 | $0.26 | $3.62 | $200 | ✔  |
-| 455 | `ewc-usse-nh-2026-11-03-dem` | SELL | 85¢ | 1,000 | $150 | $0.21 | $3.59 | $3,000 |  |
-| 456 | `iarc-group-2026-12-31-canowe` | SELL | 12¢ | 500 | $440 | $0.30 | $3.59 | $17,600 |  |
-| 457 | `enwc-ussep-sc-2026-08-11-rep-alawil` | BUY | 1¢ | 200 | $2 | $0.22 | $3.54 | $200 | ✔  |
-| 458 | `ewc-pres-fra-2027-04-11-edophi` | SELL | 24¢ | 100 | $76 | $0.29 | $3.51 | $14,800 | ✔  |
-| 459 | `scc-senate-gop-2026-11-03-48` | BUY | 6¢ | 200 | $12 | $0.19 | $3.49 | $800 | ✔  |
-| 460 | `ewc-usgub-wi-2026-11-03-rep` | SELL | 47¢ | 1,000 | $530 | $0.20 | $3.49 | $10,600 |  |
-| 461 | `vmc-ussep-misen-2026-08-04-ste15-20` | BUY | 1¢ | 500 | $5 | $0.26 | $3.42 | $200 | ✔ ⚠ resolves ~2026-08-04 (8d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 462 | `ewc-usgub-oh-2026-11-03-rep` | SELL | 58¢ | 1,000 | $420 | $0.20 | $3.42 | $8,400 |  |
-| 463 | `ewc-usse-nh-2026-11-03-rep` | SELL | 17¢ | 1,000 | $830 | $0.19 | $3.39 | $16,600 | ✔  |
-| 464 | `ewc-usse-nc-2026-11-03-rep` | SELL | 11¢ | 1,000 | $890 | $0.19 | $3.36 | $17,800 |  |
-| 465 | `mlaec-swepm-2026-09-13-jimake` | BUY | 1¢ | 1,000 | $10 | $0.24 | $3.32 | $200 | ✔  |
-| 466 | `ewc-ukpol-leg-clacton-2026-08-13-nigfar` | BUY | 91¢ | 1,000 | $910 | $0.19 | $3.30 | $18,200 |  |
-| 467 | `ewc-usgub-ia-2026-11-03-rep` | SELL | 40¢ | 1,000 | $600 | $0.18 | $3.22 | $12,000 |  |
-| 468 | `pintc-meet-trump-2026-12-31-volzel` | BUY | 51¢ | 100 | $51 | $0.19 | $3.22 | $10,000 |  |
-| 469 | `ewc-usse-me-2026-11-03-dem` | SELL | 65¢ | 1,000 | $350 | $0.18 | $3.21 | $7,000 |  |
-| 470 | `ewc-usgub-nv-2026-11-03-rep` | SELL | 45¢ | 1,000 | $550 | $0.18 | $3.21 | $11,000 |  |
-| 471 | `enwc-ussep-sc-2026-08-11-rep-tregow` | BUY | 1¢ | 500 | $5 | $0.31 | $3.19 | $200 | ✔  |
-| 472 | `iarc-group-2026-12-31-johbre` | SELL | 41¢ | 500 | $295 | $0.20 | $3.15 | $11,800 |  |
-| 473 | `apdc-alito-2026-12-31` | BUY | 15¢ | 1,000 | $150 | $0.19 | $3.13 | $3,000 |  |
-| 474 | `nphc-attgen-andbai` | SELL | 33¢ | 100 | $67 | $2.67 | $3.12 | $13,400 | ✔  |
-| 475 | `nphc-attgen-ailcan` | SELL | 33¢ | 100 | $67 | $2.45 | $3.12 | $13,400 |  |
-| 476 | `nphc-attgen-andbai` | BUY | 7¢ | 100 | $7 | $0.66 | $3.12 | $1,400 | ✔  |
-| 477 | `nphc-attgen-ashmoo` | BUY | 7¢ | 100 | $7 | $0.66 | $3.12 | $1,400 | ✔  |
-| 478 | `nphc-attgen-ashmoo` | SELL | 33¢ | 100 | $67 | $2.52 | $3.12 | $13,400 | ✔  |
-| 479 | `nphc-attgen-edmar` | BUY | 7¢ | 100 | $7 | $0.66 | $3.12 | $1,400 | ✔  |
-| 480 | `nphc-attgen-edmar` | SELL | 33¢ | 100 | $67 | $2.52 | $3.12 | $13,400 | ✔  |
-| 481 | `nphc-attgen-jefjen` | BUY | 7¢ | 100 | $7 | $0.66 | $3.12 | $1,400 | ✔  |
-| 482 | `nphc-attgen-leezel` | SELL | 38¢ | 100 | $62 | $2.39 | $3.12 | $12,400 |  |
-| 483 | `nphc-attgen-matwhi` | BUY | 7¢ | 100 | $7 | $0.66 | $3.12 | $1,400 | ✔  |
-| 484 | `nphc-attgen-robgiu` | BUY | 7¢ | 100 | $7 | $0.66 | $3.12 | $1,400 | ✔  |
-| 485 | `nphc-attgen-jeapir` | SELL | 32¢ | 100 | $68 | $1.51 | $3.12 | $13,600 |  |
-| 486 | `nphc-attgen-jeapir` | BUY | 1¢ | 2,000 | $20 | $0.34 | $3.12 | $1,800 |  |
-| 487 | `nphc-attgen-leezel` | BUY | 30¢ | 2,000 | $600 | $2.95 | $3.11 | $6,000 |  |
-| 488 | `enwc-ussep-sc-2026-08-11-rep-pameve` | BUY | 1¢ | 500 | $5 | $0.28 | $3.10 | $200 | ✔  |
-| 489 | `iarc-group-2026-12-31-antfau` | BUY | 7¢ | 500 | $35 | $0.19 | $3.08 | $1,400 |  |
-| 490 | `iarc-group-2026-12-31-tomhom` | SELL | 9¢ | 500 | $455 | $0.19 | $3.08 | $18,200 |  |
-| 491 | `nphc-attgen-hardhi` | BUY | 9¢ | 100 | $9 | $0.51 | $3.05 | $1,800 | ✔  |
-| 492 | `pintc-meet-trump-2026-12-31-xijin` | BUY | 75¢ | 500 | $375 | $0.33 | $3.04 | $15,000 |  |
-| 493 | `nphc-attgen-todbla` | BUY | 63¢ | 100 | $63 | $0.35 | $3.01 | $12,600 |  |
-| 494 | `nphc-attgen-alihab` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 |  |
-| 495 | `nphc-attgen-hardhi` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 | ✔  |
-| 496 | `nphc-attgen-kenpax` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 |  |
-| 497 | `nphc-attgen-matwhi` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 | ✔  |
-| 498 | `nphc-attgen-robgiu` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 | ✔  |
-| 499 | `nphc-attgen-rondes` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 | ✔  |
-| 500 | `nphc-attgen-tedcru` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 | ✔  |
-| 501 | `nphc-attgen-jefjen` | SELL | 33¢ | 100 | $67 | $0.34 | $3.00 | $13,400 | ✔  |
-| 502 | `nphc-attgen-matgae` | SELL | 47¢ | 100 | $53 | $0.31 | $2.99 | $10,600 | ✔  |
-| 503 | `apdc-trumpadmin-2026-marrub` | BUY | 7¢ | 200 | $14 | $0.18 | $2.94 | $1,000 |  |
-| 504 | `apdc-trumpadmin-2026-kaspat` | SELL | 68¢ | 100 | $32 | $2.45 | $2.94 | $6,400 |  |
-| 505 | `apdc-trumpadmin-2026-rusvou` | SELL | 33¢ | 2,000 | $1,340 | $2.91 | $2.94 | $13,400 |  |
-| 506 | `apdc-trumpadmin-2026-linmcm` | SELL | 41¢ | 2,000 | $1,180 | $2.88 | $2.94 | $11,800 | ✔  |
-| 507 | `apdc-trumpadmin-2026-robken` | SELL | 33¢ | 2,000 | $1,340 | $2.88 | $2.94 | $13,400 |  |
-| 508 | `apdc-trumpadmin-2026-stewit` | SELL | 31¢ | 100 | $69 | $1.94 | $2.93 | $13,800 |  |
-| 509 | `apdc-trumpadmin-2026-stemil` | BUY | 12¢ | 100 | $12 | $1.42 | $2.93 | $2,400 |  |
-| 510 | `apdc-trumpadmin-2026-suswil` | SELL | 32¢ | 100 | $68 | $1.89 | $2.93 | $13,600 |  |
-| 511 | `apdc-trumpadmin-2026-tomhom` | SELL | 33¢ | 2,000 | $1,340 | $2.86 | $2.93 | $13,400 |  |
-| 512 | `apdc-trumpadmin-2026-stewit` | BUY | 24¢ | 100 | $24 | $0.24 | $2.93 | $4,800 |  |
-| 513 | `apdc-trumpadmin-2026-petheg` | SELL | 33¢ | 2,000 | $1,340 | $2.83 | $2.93 | $13,400 | ✔  |
-| 514 | `apdc-trumpadmin-2026-steche` | SELL | 32¢ | 2,000 | $1,360 | $2.79 | $2.93 | $13,600 |  |
-| 515 | `apdc-trumpadmin-2026-kaspat` | BUY | 58¢ | 100 | $58 | $1.29 | $2.92 | $11,600 |  |
-| 516 | `apdc-trumpadmin-2026-stemil` | SELL | 19¢ | 100 | $81 | $1.21 | $2.92 | $16,200 |  |
-| 517 | `apdc-trumpadmin-2026-johrat` | SELL | 28¢ | 2,000 | $1,440 | $2.72 | $2.92 | $14,400 | ✔  |
-| 518 | `apdc-trumpadmin-2026-scobes` | BUY | 14¢ | 100 | $14 | $0.28 | $2.91 | $2,800 | ✔  |
-| 519 | `apdc-trumpadmin-2026-howlut` | SELL | 51¢ | 2,000 | $980 | $2.62 | $2.90 | $9,800 |  |
-| 520 | `apdc-trumpadmin-2026-tomhom` | BUY | 26¢ | 100 | $26 | $0.79 | $2.90 | $5,200 |  |
-| 521 | `apdc-trumpadmin-2026-howlut` | BUY | 34¢ | 100 | $34 | $0.66 | $2.89 | $6,800 |  |
-| 522 | `apdc-trumpadmin-2026-suswil` | BUY | 25¢ | 100 | $25 | $0.55 | $2.88 | $5,000 |  |
-| 523 | `nphc-attgen-ailcan` | BUY | 1¢ | 2,000 | $20 | $1.67 | $2.88 | $200 |  |
-| 524 | `apdc-trumpadmin-2026-marrub` | SELL | 19¢ | 100 | $81 | $0.42 | $2.86 | $16,200 |  |
-| 525 | `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 1¢ | 1,000 | $990 | $0.28 | $2.86 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
-| 526 | `apdc-trumpadmin-2026-rusvou` | BUY | 24¢ | 100 | $24 | $0.34 | $2.83 | $4,800 |  |
-| 527 | `apdc-trumpadmin-2026-karlea` | SELL | 31¢ | 100 | $69 | $0.31 | $2.82 | $13,800 |  |
-| 528 | `apdc-trumpadmin-2026-robken` | BUY | 18¢ | 100 | $18 | $0.29 | $2.81 | $3,600 |  |
-| 529 | `nphc-attgen-alihab` | BUY | 1¢ | 2,000 | $20 | $1.47 | $2.81 | $200 |  |
-| 530 | `apdc-trumpadmin-2026-petheg` | BUY | 25¢ | 100 | $25 | $0.25 | $2.79 | $5,000 | ✔  |
-| 531 | `apdc-trumpadmin-2026-rodsco` | BUY | 20¢ | 100 | $20 | $0.21 | $2.76 | $4,000 | ✔  |
-| 532 | `apdc-trumpadmin-2026-linmcm` | BUY | 20¢ | 100 | $20 | $0.18 | $2.74 | $4,000 | ✔  |
-| 533 | `ewc-pres-fra-2027-04-11-sarkna` | BUY | 4¢ | 500 | $20 | $0.16 | $2.70 | $800 | ✔  |
-| 534 | `ewc-ukpol-leg-clacton-2026-08-13-nigfar` | SELL | 96¢ | 2,000 | $80 | $0.30 | $2.68 | $800 |  |
-| 535 | `iarc-group-2026-12-31-baroba` | BUY | 6¢ | 1,000 | $60 | $0.27 | $2.65 | $1,200 |  |
-| 536 | `iarc-group-2026-12-31-hilcli` | BUY | 8¢ | 1,000 | $80 | $0.27 | $2.64 | $1,600 |  |
-| 537 | `apdc-trumpadmin-2026-johrat` | BUY | 22¢ | 100 | $22 | $0.21 | $2.60 | $4,200 | ✔  |
-| 538 | `apdc-trumpadmin-2026-rodsco` | SELL | 30¢ | 2,000 | $1,400 | $1.22 | $2.58 | $14,000 | ✔  |
-| 539 | `ewc-usgub-mi-2026-11-03-dem` | SELL | 84¢ | 1,000 | $160 | $0.15 | $2.57 | $3,200 |  |
-| 540 | `apdc-trumpadmin-2026-steche` | BUY | 26¢ | 100 | $26 | $0.19 | $2.56 | $5,000 |  |
-| 541 | `ewc-usgub-ca-2026-11-03-xavbec` | SELL | 95¢ | 2,000 | $100 | $0.28 | $2.55 | $1,000 |  |
-| 542 | `ewc-usgub-az-2026-11-03-dem` | SELL | 83¢ | 2,000 | $340 | $0.28 | $2.52 | $3,400 |  |
-| 543 | `nphc-attgen-tedcru` | BUY | 1¢ | 500 | $5 | $0.29 | $2.50 | $200 | ✔  |
-| 544 | `ewc-usgub-ca-2026-11-03-xavbec` | BUY | 93¢ | 2,000 | $1,860 | $0.27 | $2.49 | $18,600 |  |
+| 443 | `scc-senate-gop-2026-11-03-gte57` | SELL | 32¢ | 100 | $68 | $0.42 | $3.70 | $13,600 | ✔  |
+| 444 | `ewc-usse-ia-2026-11-03-rep` | SELL | 60¢ | 1,000 | $400 | $0.21 | $3.68 | $8,000 |  |
+| 445 | `scc-senate-gop-2026-11-03-50` | BUY | 12¢ | 100 | $12 | $0.28 | $3.68 | $2,400 | ✔  |
+| 446 | `ewc-usse-ak-2026-11-03-dem` | SELL | 55¢ | 1,000 | $450 | $0.21 | $3.66 | $9,000 |  |
+| 447 | `scc-senate-gop-2026-11-03-56` | SELL | 32¢ | 100 | $68 | $0.33 | $3.65 | $13,600 | ✔  |
+| 448 | `scc-senate-gop-2026-11-03-lte45` | SELL | 32¢ | 100 | $68 | $0.33 | $3.65 | $13,600 |  |
+| 449 | `pintc-meet-trump-2026-12-31-zohmam` | BUY | 44¢ | 100 | $44 | $0.33 | $3.65 | $8,800 | ✔  |
+| 450 | `scc-senate-gop-2026-11-03-55` | SELL | 33¢ | 100 | $67 | $0.33 | $3.65 | $13,400 | ✔  |
+| 451 | `ewc-usgub-mi-2026-11-03-mikdug` | BUY | 1¢ | 1,000 | $10 | $0.23 | $3.61 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 452 | `iarc-group-2026-12-31-canowe` | SELL | 12¢ | 500 | $440 | $0.30 | $3.59 | $17,600 |  |
+| 453 | `ewc-usse-nh-2026-11-03-dem` | SELL | 85¢ | 1,000 | $150 | $0.21 | $3.58 | $3,000 |  |
+| 454 | `enwc-ussep-sc-2026-08-11-rep-alawil` | BUY | 1¢ | 200 | $2 | $0.22 | $3.54 | $200 | ✔  |
+| 455 | `enwc-ussep-sc-2026-08-11-rep-wiltim` | BUY | 1¢ | 200 | $2 | $0.22 | $3.54 | $200 | ✔  |
+| 456 | `ewc-pres-fra-2027-04-11-edophi` | SELL | 24¢ | 100 | $76 | $0.29 | $3.51 | $14,800 | ✔  |
+| 457 | `ewc-usgub-wi-2026-11-03-rep` | SELL | 47¢ | 1,000 | $530 | $0.20 | $3.49 | $10,600 |  |
+| 458 | `enwc-ussep-sc-2026-08-11-rep-rusfry` | BUY | 1¢ | 200 | $2 | $0.19 | $3.45 | $200 |  |
+| 459 | `ewc-usse-nh-2026-11-03-rep` | SELL | 17¢ | 1,000 | $830 | $0.20 | $3.44 | $16,600 | ✔  |
+| 460 | `ewc-usgub-oh-2026-11-03-rep` | SELL | 58¢ | 1,000 | $420 | $0.20 | $3.42 | $8,400 |  |
+| 461 | `enwc-ussep-sc-2026-08-11-rep-paudan` | BUY | 1¢ | 200 | $2 | $0.18 | $3.40 | $200 | ✔  |
+| 462 | `ewc-usse-nc-2026-11-03-rep` | SELL | 11¢ | 1,000 | $890 | $0.19 | $3.36 | $17,800 |  |
+| 463 | `enwc-ussep-sc-2026-08-11-rep-nanmac` | BUY | 1¢ | 500 | $5 | $0.34 | $3.25 | $200 | ✔  |
+| 464 | `ewc-usgub-ia-2026-11-03-rep` | SELL | 40¢ | 1,000 | $600 | $0.18 | $3.22 | $12,000 |  |
+| 465 | `pintc-meet-trump-2026-12-31-volzel` | BUY | 51¢ | 100 | $51 | $0.19 | $3.22 | $10,000 |  |
+| 466 | `ewc-usse-me-2026-11-03-dem` | SELL | 65¢ | 1,000 | $350 | $0.18 | $3.21 | $7,000 |  |
+| 467 | `ewc-usgub-nv-2026-11-03-rep` | SELL | 45¢ | 1,000 | $550 | $0.18 | $3.21 | $11,000 |  |
+| 468 | `enwc-ussep-sc-2026-08-11-rep-tregow` | BUY | 1¢ | 500 | $5 | $0.31 | $3.19 | $200 | ✔  |
+| 469 | `iarc-group-2026-12-31-johbre` | SELL | 41¢ | 500 | $295 | $0.20 | $3.15 | $11,800 |  |
+| 470 | `nphc-attgen-ailcan` | BUY | 7¢ | 100 | $7 | $0.66 | $3.12 | $1,400 |  |
+| 471 | `nphc-attgen-ailcan` | SELL | 33¢ | 100 | $67 | $2.48 | $3.12 | $13,400 |  |
+| 472 | `nphc-attgen-andbai` | SELL | 33¢ | 100 | $67 | $2.56 | $3.12 | $13,400 | ✔  |
+| 473 | `nphc-attgen-ashmoo` | SELL | 33¢ | 100 | $67 | $2.50 | $3.12 | $13,400 | ✔  |
+| 474 | `nphc-attgen-edmar` | SELL | 33¢ | 100 | $67 | $2.50 | $3.12 | $13,400 | ✔  |
+| 475 | `nphc-attgen-leezel` | SELL | 38¢ | 100 | $62 | $2.52 | $3.12 | $12,400 |  |
+| 476 | `nphc-attgen-andbai` | BUY | 7¢ | 100 | $7 | $0.65 | $3.12 | $1,400 | ✔  |
+| 477 | `nphc-attgen-ashmoo` | BUY | 7¢ | 100 | $7 | $0.65 | $3.12 | $1,400 | ✔  |
+| 478 | `nphc-attgen-edmar` | BUY | 7¢ | 100 | $7 | $0.65 | $3.12 | $1,400 | ✔  |
+| 479 | `nphc-attgen-jefjen` | BUY | 7¢ | 100 | $7 | $0.65 | $3.12 | $1,400 | ✔  |
+| 480 | `nphc-attgen-matwhi` | BUY | 7¢ | 100 | $7 | $0.65 | $3.12 | $1,400 | ✔  |
+| 481 | `nphc-attgen-robgiu` | BUY | 7¢ | 100 | $7 | $0.65 | $3.12 | $1,400 | ✔  |
+| 482 | `nphc-attgen-jeapir` | SELL | 32¢ | 100 | $68 | $1.51 | $3.12 | $13,600 |  |
+| 483 | `nphc-attgen-jeapir` | BUY | 1¢ | 2,000 | $20 | $0.29 | $3.11 | $1,800 |  |
+| 484 | `nphc-attgen-leezel` | BUY | 30¢ | 100 | $30 | $1.42 | $3.11 | $6,000 |  |
+| 485 | `enwc-ussep-sc-2026-08-11-rep-pameve` | BUY | 1¢ | 500 | $5 | $0.28 | $3.10 | $200 | ✔  |
+| 486 | `iarc-group-2026-12-31-antfau` | BUY | 7¢ | 500 | $35 | $0.19 | $3.08 | $1,400 |  |
+| 487 | `iarc-group-2026-12-31-tomhom` | SELL | 9¢ | 500 | $455 | $0.19 | $3.08 | $18,200 |  |
+| 488 | `opdc-delrod-venpres-2026-12-31` | BUY | 1¢ | 1,000 | $10 | $0.17 | $3.07 | $200 | ✔  |
+| 489 | `nphc-attgen-hardhi` | BUY | 10¢ | 100 | $10 | $0.56 | $3.06 | $2,000 | ✔  |
+| 490 | `nphc-attgen-alihab` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 |  |
+| 491 | `nphc-attgen-hardhi` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 | ✔  |
+| 492 | `nphc-attgen-kenpax` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 |  |
+| 493 | `nphc-attgen-matwhi` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 | ✔  |
+| 494 | `nphc-attgen-robgiu` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 | ✔  |
+| 495 | `nphc-attgen-rondes` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 | ✔  |
+| 496 | `nphc-attgen-tedcru` | SELL | 32¢ | 100 | $68 | $0.34 | $3.00 | $13,600 | ✔  |
+| 497 | `nphc-attgen-jefjen` | SELL | 33¢ | 100 | $67 | $0.34 | $3.00 | $13,400 | ✔  |
+| 498 | `nphc-attgen-matgae` | SELL | 47¢ | 100 | $53 | $0.31 | $2.99 | $10,600 | ✔  |
+| 499 | `nphc-attgen-todbla` | BUY | 64¢ | 100 | $64 | $0.23 | $2.94 | $12,800 |  |
+| 500 | `apdc-trumpadmin-2026-marrub` | BUY | 7¢ | 200 | $14 | $0.18 | $2.94 | $1,000 |  |
+| 501 | `apdc-trumpadmin-2026-robken` | SELL | 33¢ | 2,000 | $1,340 | $2.90 | $2.94 | $13,400 |  |
+| 502 | `apdc-trumpadmin-2026-rusvou` | SELL | 33¢ | 2,000 | $1,340 | $2.91 | $2.94 | $13,400 |  |
+| 503 | `apdc-trumpadmin-2026-tomhom` | BUY | 26¢ | 100 | $26 | $2.23 | $2.94 | $5,200 |  |
+| 504 | `apdc-trumpadmin-2026-linmcm` | SELL | 41¢ | 2,000 | $1,180 | $2.88 | $2.94 | $11,800 | ✔  |
+| 505 | `apdc-trumpadmin-2026-kaspat` | SELL | 68¢ | 100 | $32 | $1.94 | $2.93 | $6,400 |  |
+| 506 | `apdc-trumpadmin-2026-stewit` | SELL | 31¢ | 100 | $69 | $1.94 | $2.93 | $13,800 |  |
+| 507 | `apdc-trumpadmin-2026-stemil` | BUY | 12¢ | 100 | $12 | $1.42 | $2.93 | $2,400 |  |
+| 508 | `apdc-trumpadmin-2026-tomhom` | SELL | 33¢ | 2,000 | $1,340 | $2.86 | $2.93 | $13,400 |  |
+| 509 | `apdc-trumpadmin-2026-stewit` | BUY | 24¢ | 100 | $24 | $0.24 | $2.93 | $4,800 |  |
+| 510 | `apdc-trumpadmin-2026-suswil` | SELL | 32¢ | 100 | $68 | $1.56 | $2.93 | $13,600 |  |
+| 511 | `apdc-trumpadmin-2026-steche` | SELL | 32¢ | 2,000 | $1,360 | $2.79 | $2.93 | $13,600 |  |
+| 512 | `scc-senate-gop-2026-11-03-48` | BUY | 6¢ | 200 | $12 | $0.23 | $2.92 | $1,000 | ✔  |
+| 513 | `apdc-trumpadmin-2026-stemil` | SELL | 19¢ | 100 | $81 | $1.32 | $2.92 | $16,200 |  |
+| 514 | `apdc-trumpadmin-2026-kaspat` | BUY | 58¢ | 100 | $58 | $1.29 | $2.92 | $11,600 |  |
+| 515 | `apdc-trumpadmin-2026-johrat` | SELL | 28¢ | 2,000 | $1,440 | $2.72 | $2.92 | $14,400 | ✔  |
+| 516 | `apdc-trumpadmin-2026-scobes` | BUY | 14¢ | 100 | $14 | $0.28 | $2.91 | $2,800 | ✔  |
+| 517 | `iarc-group-2026-12-31-baroba` | BUY | 6¢ | 500 | $30 | $0.17 | $2.90 | $1,200 |  |
+| 518 | `apdc-trumpadmin-2026-howlut` | SELL | 51¢ | 2,000 | $980 | $2.61 | $2.90 | $9,800 |  |
+| 519 | `apdc-trumpadmin-2026-howlut` | BUY | 34¢ | 100 | $34 | $0.66 | $2.89 | $6,800 |  |
+| 520 | `apdc-trumpadmin-2026-suswil` | BUY | 25¢ | 100 | $25 | $0.53 | $2.88 | $5,000 |  |
+| 521 | `enwc-ussep-me-2026-07-27-dem-dankle` | SELL | 1¢ | 1,000 | $990 | $0.28 | $2.86 | $19,800 | ⚠ resolves ~2026-07-27 (0d)  |
+| 522 | `apdc-trumpadmin-2026-petheg` | SELL | 33¢ | 100 | $67 | $0.38 | $2.85 | $13,400 | ✔  |
+| 523 | `iarc-group-2026-12-31-antfau` | SELL | 9¢ | 500 | $455 | $0.16 | $2.85 | $18,200 |  |
+| 524 | `apdc-trumpadmin-2026-rusvou` | BUY | 24¢ | 100 | $24 | $0.34 | $2.83 | $4,800 |  |
+| 525 | `apdc-trumpadmin-2026-karlea` | SELL | 31¢ | 100 | $69 | $0.31 | $2.82 | $13,800 |  |
+| 526 | `apdc-trumpadmin-2026-robken` | BUY | 18¢ | 100 | $18 | $0.29 | $2.81 | $3,600 |  |
+| 527 | `nphc-attgen-alihab` | BUY | 1¢ | 2,000 | $20 | $1.47 | $2.81 | $200 |  |
+| 528 | `vmc-ussep-misen-2026-08-04-ste15-20` | BUY | 1¢ | 500 | $5 | $0.15 | $2.79 | $200 | ✔ ⚠ resolves ~2026-08-04 (8d); market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 529 | `apdc-trumpadmin-2026-linmcm` | BUY | 20¢ | 100 | $20 | $0.24 | $2.79 | $4,000 | ✔  |
+| 530 | `apdc-trumpadmin-2026-rodsco` | BUY | 20¢ | 100 | $20 | $0.21 | $2.76 | $4,000 | ✔  |
+| 531 | `apdc-trumpadmin-2026-marrub` | SELL | 19¢ | 100 | $81 | $0.19 | $2.75 | $16,200 |  |
+| 532 | `ewc-pres-fra-2027-04-11-sarkna` | BUY | 4¢ | 500 | $20 | $0.16 | $2.70 | $800 | ✔  |
+| 533 | `ewc-ukpol-leg-clacton-2026-08-13-nigfar` | SELL | 96¢ | 2,000 | $80 | $0.30 | $2.68 | $800 |  |
+| 534 | `apdc-trumpadmin-2026-petheg` | BUY | 24¢ | 100 | $24 | $0.26 | $2.67 | $4,600 | ✔  |
+| 535 | `iarc-group-2026-12-31-hilcli` | BUY | 8¢ | 1,000 | $80 | $0.27 | $2.64 | $1,600 |  |
+| 536 | `apdc-trumpadmin-2026-johrat` | BUY | 22¢ | 100 | $22 | $0.21 | $2.60 | $4,200 | ✔  |
+| 537 | `apdc-trumpadmin-2026-rodsco` | SELL | 30¢ | 2,000 | $1,400 | $1.22 | $2.58 | $14,000 | ✔  |
+| 538 | `apdc-trumpadmin-2026-steche` | BUY | 26¢ | 100 | $26 | $0.19 | $2.56 | $5,000 |  |
+| 539 | `ewc-usgub-mi-2026-11-03-dem` | SELL | 84¢ | 1,000 | $160 | $0.15 | $2.56 | $3,200 |  |
+| 540 | `ewc-usgub-ca-2026-11-03-xavbec` | SELL | 95¢ | 2,000 | $100 | $0.28 | $2.55 | $1,000 |  |
+| 541 | `ewc-usgub-az-2026-11-03-dem` | SELL | 83¢ | 2,000 | $340 | $0.28 | $2.51 | $3,400 |  |
+| 542 | `apdc-trumpadmin-2026-brorol` | BUY | 27¢ | 100 | $27 | $0.16 | $2.51 | $5,200 | ✔  |
+| 543 | `ewc-usgub-ca-2026-11-03-xavbec` | BUY | 93¢ | 2,000 | $1,860 | $0.27 | $2.49 | $18,600 |  |
+| 544 | `pintc-meet-trump-2026-12-31-xijin` | BUY | 75¢ | 500 | $375 | $0.16 | $2.46 | $15,000 |  |
 | 545 | `apdc-trumpadmin-2026-brorol` | SELL | 31¢ | 200 | $138 | $0.27 | $2.45 | $13,600 | ✔  |
-| 546 | `iarc-group-2026-12-31-canowe` | BUY | 5¢ | 1,000 | $50 | $0.23 | $2.44 | $1,000 |  |
-| 547 | `iarc-group-2026-12-31-gavnew` | BUY | 7¢ | 1,000 | $70 | $0.23 | $2.43 | $1,400 |  |
+| 546 | `iarc-group-2026-12-31-gavnew` | BUY | 7¢ | 1,000 | $70 | $0.23 | $2.44 | $1,400 |  |
+| 547 | `iarc-group-2026-12-31-canowe` | BUY | 5¢ | 1,000 | $50 | $0.23 | $2.44 | $1,000 |  |
 | 548 | `iarc-group-2026-12-31-joebid` | SELL | 7¢ | 1,000 | $930 | $0.23 | $2.43 | $18,600 | ✔  |
 | 549 | `ewc-pres-fra-2027-04-11-davlis` | SELL | 8¢ | 1,000 | $920 | $0.24 | $2.42 | $18,400 |  |
-| 550 | `apdc-trumpadmin-2026-brorol` | BUY | 28¢ | 100 | $28 | $0.25 | $2.41 | $5,200 | ✔  |
-| 551 | `enwc-ussep-sc-2026-08-11-rep-nanmac` | BUY | 1¢ | 1,000 | $10 | $0.27 | $2.40 | $200 | ✔  |
-| 552 | `mlaec-isrpol-pm-2026-10-27-ayesha` | BUY | 1¢ | 1,000 | $10 | $0.21 | $2.35 | $200 | ✔  |
-| 553 | `apdc-trumpadmin-2026-scobes` | SELL | 22¢ | 2,000 | $1,560 | $0.78 | $2.31 | $15,600 | ✔  |
-| 554 | `enwc-ussep-mi-2026-08-04-dem-malmcm` | SELL | 1¢ | 2,000 | $1,980 | $0.26 | $2.28 | $19,800 | ⚠ resolves ~2026-08-04 (8d)  |
-| 555 | `ewc-usse-ne-2026-11-03-danosb` | SELL | 32¢ | 2,000 | $1,360 | $0.26 | $2.25 | $13,600 | ✔  |
-| 556 | `iarc-group-2026-12-31-antfau` | SELL | 9¢ | 1,000 | $910 | $0.19 | $2.23 | $18,200 |  |
-| 557 | `iarc-group-2026-12-31-baroba` | SELL | 8¢ | 1,000 | $920 | $0.19 | $2.23 | $18,400 |  |
-| 558 | `iarc-group-2026-12-31-bilcli` | SELL | 8¢ | 1,000 | $920 | $0.19 | $2.23 | $18,400 |  |
-| 559 | `iarc-group-2026-12-31-hilcli` | SELL | 10¢ | 1,000 | $900 | $0.19 | $2.22 | $18,000 |  |
-| 560 | `ewc-usgub-mi-2026-11-03-rep` | SELL | 19¢ | 2,000 | $1,620 | $0.25 | $2.22 | $16,200 | ✔  |
-| 561 | `iarc-group-2026-12-31-bilcli` | BUY | 2¢ | 1,000 | $20 | $0.19 | $2.21 | $400 |  |
-| 562 | `vtc-hrep-to-2026-11-03-lt90m` | BUY | 1¢ | 1,000 | $10 | $0.18 | $2.15 | $200 | ✔  |
-| 563 | `iarc-group-2026-12-31-tomhom` | BUY | 2¢ | 1,000 | $20 | $0.18 | $2.12 | $400 |  |
-| 564 | `vtc-hrep-to-2026-11-03-90-95m` | BUY | 1¢ | 1,000 | $10 | $0.17 | $2.10 | $200 | ✔  |
-| 565 | `ewc-pres-bra-2026-10-04-ferhad` | BUY | 1¢ | 2,000 | $20 | $0.27 | $2.04 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 566 | `ewc-pres-fra-2027-04-11-rapglu` | BUY | 1¢ | 1,000 | $10 | $0.16 | $1.90 | $200 | ✔ ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 567 | `vtc-hrep-to-2026-11-03-95-100m` | BUY | 1¢ | 2,000 | $20 | $0.29 | $1.89 | $200 | ✔  |
-| 568 | `apdc-jerpowgov-2026-08-31` | BUY | 6¢ | 2,000 | $120 | $0.20 | $1.83 | $1,200 | ✔  |
-| 569 | `iarc-group-2026-12-31-joebid` | BUY | 1¢ | 2,000 | $20 | $0.23 | $1.65 | $200 | ✔  |
-| 570 | `ewc-pres-bra-2026-10-04-camsan` | BUY | 1¢ | 2,000 | $20 | $0.20 | $1.62 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 571 | `ewc-pres-bra-2026-10-04-roncai` | BUY | 1¢ | 2,000 | $20 | $0.20 | $1.60 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 572 | `ewc-pres-bra-2026-10-04-romzem` | BUY | 1¢ | 2,000 | $20 | $0.20 | $1.59 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 573 | `cranc-uspres28-12-31-2026-dwajoh` | BUY | 2¢ | 2,000 | $40 | $1.51 | $1.51 | $400 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 574 | `cranc-uspres28-12-31-2026-erikir` | BUY | 8¢ | 100 | $8 | $0.24 | $1.51 | $1,400 |  |
-| 575 | `cranc-uspres28-12-31-2026-erikir` | SELL | 33¢ | 2,000 | $1,340 | $1.50 | $1.51 | $13,400 |  |
-| 576 | `cranc-uspres28-12-31-2026-steban` | SELL | 21¢ | 100 | $79 | $0.19 | $1.51 | $15,400 |  |
-| 577 | `cranc-uspres28-12-31-2026-tuccar` | BUY | 8¢ | 100 | $8 | $0.23 | $1.51 | $1,400 |  |
-| 578 | `cranc-uspres28-12-31-2026-tuccar` | SELL | 18¢ | 1,000 | $820 | $1.49 | $1.51 | $16,400 |  |
-| 579 | `cranc-uspres28-12-31-2026-vivram` | BUY | 9¢ | 200 | $18 | $0.15 | $1.51 | $1,400 |  |
-| 580 | `cranc-uspres28-12-31-2026-betoro` | SELL | 13¢ | 100 | $87 | $0.51 | $1.51 | $17,400 | ✔  |
-| 581 | `cranc-uspres28-12-31-2026-corboo` | SELL | 13¢ | 100 | $87 | $0.18 | $1.51 | $17,400 |  |
-| 582 | `cranc-uspres28-12-31-2026-dontrujr` | BUY | 7¢ | 200 | $14 | $0.23 | $1.51 | $1,000 |  |
-| 583 | `cranc-uspres28-12-31-2026-gavnew` | SELL | 25¢ | 100 | $75 | $0.61 | $1.51 | $15,000 |  |
-| 584 | `cranc-uspres28-12-31-2026-hunbid` | SELL | 33¢ | 100 | $67 | $1.22 | $1.51 | $13,400 | ✔  |
-| 585 | `cranc-uspres28-12-31-2026-jonoss` | SELL | 33¢ | 100 | $67 | $1.22 | $1.51 | $13,400 | ✔  |
-| 586 | `cranc-uspres28-12-31-2026-petbut` | SELL | 18¢ | 100 | $82 | $0.25 | $1.51 | $16,400 |  |
-| 587 | `cranc-uspres28-12-31-2026-rahema` | SELL | 33¢ | 100 | $67 | $1.22 | $1.51 | $13,400 | ✔  |
-| 588 | `cranc-uspres28-12-31-2026-robken` | SELL | 33¢ | 1,000 | $670 | $1.48 | $1.51 | $13,400 | ✔  |
-| 589 | `cranc-uspres28-12-31-2026-stesmi` | BUY | 8¢ | 200 | $16 | $0.20 | $1.51 | $1,200 |  |
-| 590 | `cranc-uspres28-12-31-2026-stesmi` | SELL | 16¢ | 100 | $84 | $0.19 | $1.51 | $16,400 |  |
-| 591 | `cranc-uspres28-12-31-2026-tedcru` | SELL | 21¢ | 100 | $79 | $0.19 | $1.51 | $15,800 |  |
-| 592 | `cranc-uspres28-12-31-2026-hilcli` | SELL | 8¢ | 500 | $460 | $0.22 | $1.51 | $18,200 |  |
-| 593 | `cranc-uspres28-12-31-2026-krinoe` | BUY | 6¢ | 200 | $12 | $0.17 | $1.51 | $1,000 | ✔  |
-| 594 | `cranc-uspres28-12-31-2026-vivram` | SELL | 15¢ | 200 | $170 | $0.18 | $1.51 | $16,600 |  |
-| 595 | `cranc-uspres28-12-31-2026-markel` | BUY | 7¢ | 200 | $14 | $0.23 | $1.51 | $1,000 |  |
-| 596 | `cranc-uspres28-12-31-2026-nikhal` | BUY | 5¢ | 500 | $25 | $0.16 | $1.51 | $800 |  |
-| 597 | `cranc-uspres28-12-31-2026-hilcli` | BUY | 2¢ | 2,000 | $40 | $1.44 | $1.51 | $400 |  |
-| 598 | `cranc-uspres28-12-31-2026-andyan` | SELL | 33¢ | 100 | $67 | $0.64 | $1.50 | $13,400 | ✔  |
-| 599 | `cranc-uspres28-12-31-2026-petbut` | BUY | 11¢ | 500 | $55 | $0.19 | $1.50 | $2,000 |  |
-| 600 | `cranc-uspres28-12-31-2026-aleoca` | BUY | 23¢ | 100 | $23 | $0.52 | $1.50 | $4,600 | ✔  |
-| 601 | `cranc-uspres28-12-31-2026-jdvan` | BUY | 22¢ | 100 | $22 | $0.54 | $1.50 | $4,400 | ✔  |
-| 602 | `cranc-uspres28-12-31-2026-jossha` | BUY | 7¢ | 500 | $35 | $0.18 | $1.50 | $1,200 |  |
-| 603 | `cranc-uspres28-12-31-2026-robken` | BUY | 8¢ | 100 | $8 | $0.20 | $1.50 | $1,600 | ✔  |
-| 604 | `cranc-uspres28-12-31-2026-markel` | SELL | 21¢ | 100 | $79 | $0.31 | $1.49 | $15,800 |  |
-| 605 | `cranc-uspres28-12-31-2026-kamhar` | BUY | 22¢ | 100 | $22 | $0.33 | $1.49 | $4,400 |  |
-| 606 | `cranc-uspres28-12-31-2026-jdvan` | SELL | 29¢ | 100 | $71 | $0.32 | $1.49 | $14,200 | ✔  |
-| 607 | `cranc-uspres28-12-31-2026-hunbid` | BUY | 12¢ | 100 | $12 | $0.29 | $1.49 | $2,400 | ✔  |
-| 608 | `cranc-uspres28-12-31-2026-zohmam` | SELL | 15¢ | 100 | $85 | $0.29 | $1.48 | $17,000 |  |
-| 609 | `ewc-pres-fra-2027-04-11-jeamel` | SELL | 27¢ | 2,000 | $1,460 | $0.21 | $1.48 | $14,600 |  |
-| 610 | `cranc-uspres28-12-31-2026-betoro` | BUY | 6¢ | 1,000 | $60 | $0.21 | $1.47 | $1,200 | ✔  |
-| 611 | `cranc-uspres28-12-31-2026-marrub` | SELL | 12¢ | 100 | $88 | $0.23 | $1.47 | $17,600 | ✔  |
-| 612 | `cranc-uspres28-12-31-2026-andyan` | BUY | 10¢ | 100 | $10 | $0.19 | $1.47 | $2,000 | ✔  |
-| 613 | `cranc-uspres28-12-31-2026-bersan` | BUY | 5¢ | 500 | $25 | $0.18 | $1.47 | $1,000 | ✔  |
-| 614 | `cranc-uspres28-12-31-2026-oprwin` | BUY | 4¢ | 500 | $20 | $0.17 | $1.46 | $400 |  |
-| 615 | `cranc-uspres28-12-31-2026-krinoe` | SELL | 32¢ | 100 | $68 | $0.17 | $1.46 | $13,600 | ✔  |
-| 616 | `cranc-uspres28-12-31-2026-margre` | SELL | 32¢ | 100 | $68 | $0.15 | $1.46 | $13,600 | ✔  |
-| 617 | `cranc-uspres28-12-31-2026-dontru` | SELL | 32¢ | 100 | $68 | $0.17 | $1.46 | $13,600 | ✔  |
-| 618 | `nphc-attgen-kenpax` | BUY | 1¢ | 2,000 | $20 | $0.25 | $1.46 | $200 |  |
-| 619 | `cranc-uspres28-12-31-2026-tedcru` | BUY | 15¢ | 100 | $15 | $0.24 | $1.44 | $2,800 |  |
-| 620 | `nphc-attgen-matgae` | BUY | 1¢ | 2,000 | $20 | $0.23 | $1.39 | $200 | ✔  |
-| 621 | `nphc-attgen-rondes` | BUY | 1¢ | 2,000 | $20 | $0.22 | $1.36 | $200 | ✔  |
-| 622 | `cranc-uspres28-12-31-2026-rahema` | BUY | 14¢ | 500 | $70 | $0.19 | $1.29 | $2,800 | ✔  |
-| 623 | `cranc-uspres28-12-31-2026-jonoss` | BUY | 15¢ | 200 | $30 | $0.26 | $1.27 | $2,600 | ✔  |
-| 624 | `cranc-uspres28-12-31-2026-dontru` | BUY | 8¢ | 200 | $16 | $0.25 | $1.26 | $1,200 | ✔  |
+| 550 | `mlaec-isrpol-pm-2026-10-27-ayesha` | BUY | 1¢ | 1,000 | $10 | $0.21 | $2.35 | $200 | ✔  |
+| 551 | `apdc-trumpadmin-2026-scobes` | SELL | 22¢ | 2,000 | $1,560 | $0.78 | $2.31 | $15,600 | ✔  |
+| 552 | `enwc-ussep-mi-2026-08-04-dem-malmcm` | SELL | 1¢ | 2,000 | $1,980 | $0.26 | $2.28 | $19,800 | ⚠ resolves ~2026-08-04 (8d)  |
+| 553 | `ewc-usse-ne-2026-11-03-danosb` | SELL | 32¢ | 2,000 | $1,360 | $0.26 | $2.25 | $13,600 | ✔  |
+| 554 | `iarc-group-2026-12-31-baroba` | SELL | 8¢ | 1,000 | $920 | $0.19 | $2.23 | $18,400 |  |
+| 555 | `iarc-group-2026-12-31-bilcli` | SELL | 8¢ | 1,000 | $920 | $0.19 | $2.23 | $18,400 |  |
+| 556 | `iarc-group-2026-12-31-hilcli` | SELL | 10¢ | 1,000 | $900 | $0.19 | $2.22 | $18,000 |  |
+| 557 | `ewc-usgub-mi-2026-11-03-rep` | SELL | 19¢ | 2,000 | $1,620 | $0.25 | $2.22 | $16,200 | ✔  |
+| 558 | `iarc-group-2026-12-31-bilcli` | BUY | 2¢ | 1,000 | $20 | $0.19 | $2.21 | $400 |  |
+| 559 | `mlaec-isrpol-pm-2026-10-27-yailap` | BUY | 1¢ | 1,000 | $10 | $0.18 | $2.17 | $200 | ✔  |
+| 560 | `ewc-pres-bra-2026-10-04-ferhad` | BUY | 1¢ | 2,000 | $20 | $0.28 | $2.07 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 561 | `iarc-group-2026-12-31-tuccar` | BUY | 1¢ | 1,000 | $10 | $0.16 | $1.97 | $200 |  |
+| 562 | `ewc-pres-fra-2027-04-11-rapglu` | BUY | 1¢ | 1,000 | $10 | $0.16 | $1.90 | $200 | ✔ ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 563 | `vtc-hrep-to-2026-11-03-95-100m` | BUY | 1¢ | 2,000 | $20 | $0.29 | $1.89 | $200 | ✔  |
+| 564 | `paccc-usse-midterms-2026-11-03-dem` | SELL | 44.1¢ | 2,000 | $1,118 | $0.20 | $1.83 | $11,180 |  |
+| 565 | `apdc-jerpowgov-2026-08-31` | BUY | 6¢ | 2,000 | $120 | $0.20 | $1.83 | $1,200 | ✔  |
+| 566 | `iarc-group-2026-12-31-joebid` | BUY | 1¢ | 2,000 | $20 | $0.24 | $1.68 | $200 | ✔  |
+| 567 | `ewc-pres-bra-2026-10-04-camsan` | BUY | 1¢ | 2,000 | $20 | $0.20 | $1.60 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 568 | `ewc-pres-bra-2026-10-04-romzem` | BUY | 1¢ | 2,000 | $20 | $0.20 | $1.60 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 569 | `cranc-uspres28-12-31-2026-dwajoh` | BUY | 2¢ | 2,000 | $40 | $1.51 | $1.51 | $400 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
+| 570 | `cranc-uspres28-12-31-2026-erikir` | SELL | 33¢ | 2,000 | $1,340 | $1.50 | $1.51 | $13,400 |  |
+| 571 | `cranc-uspres28-12-31-2026-steban` | SELL | 21¢ | 100 | $79 | $0.19 | $1.51 | $15,400 |  |
+| 572 | `cranc-uspres28-12-31-2026-tuccar` | BUY | 8¢ | 100 | $8 | $0.23 | $1.51 | $1,400 |  |
+| 573 | `cranc-uspres28-12-31-2026-tuccar` | SELL | 18¢ | 1,000 | $820 | $1.49 | $1.51 | $16,400 |  |
+| 574 | `cranc-uspres28-12-31-2026-vivram` | BUY | 9¢ | 200 | $18 | $0.15 | $1.51 | $1,400 |  |
+| 575 | `cranc-uspres28-12-31-2026-betoro` | SELL | 13¢ | 100 | $87 | $0.51 | $1.51 | $17,400 | ✔  |
+| 576 | `cranc-uspres28-12-31-2026-corboo` | SELL | 13¢ | 100 | $87 | $0.18 | $1.51 | $17,400 |  |
+| 577 | `cranc-uspres28-12-31-2026-dontrujr` | BUY | 7¢ | 200 | $14 | $0.23 | $1.51 | $1,000 |  |
+| 578 | `cranc-uspres28-12-31-2026-erikir` | BUY | 8¢ | 100 | $8 | $0.24 | $1.51 | $1,400 |  |
+| 579 | `cranc-uspres28-12-31-2026-gavnew` | SELL | 25¢ | 100 | $75 | $0.61 | $1.51 | $15,000 |  |
+| 580 | `cranc-uspres28-12-31-2026-hunbid` | SELL | 33¢ | 100 | $67 | $1.22 | $1.51 | $13,400 | ✔  |
+| 581 | `cranc-uspres28-12-31-2026-jonoss` | SELL | 33¢ | 100 | $67 | $1.22 | $1.51 | $13,400 | ✔  |
+| 582 | `cranc-uspres28-12-31-2026-petbut` | SELL | 18¢ | 100 | $82 | $0.25 | $1.51 | $16,400 |  |
+| 583 | `cranc-uspres28-12-31-2026-rahema` | SELL | 33¢ | 100 | $67 | $1.22 | $1.51 | $13,400 | ✔  |
+| 584 | `cranc-uspres28-12-31-2026-robken` | SELL | 33¢ | 1,000 | $670 | $1.48 | $1.51 | $13,400 | ✔  |
+| 585 | `cranc-uspres28-12-31-2026-stesmi` | BUY | 8¢ | 200 | $16 | $0.20 | $1.51 | $1,200 |  |
+| 586 | `cranc-uspres28-12-31-2026-stesmi` | SELL | 16¢ | 100 | $84 | $0.19 | $1.51 | $16,400 |  |
+| 587 | `cranc-uspres28-12-31-2026-tedcru` | SELL | 21¢ | 100 | $79 | $0.19 | $1.51 | $15,800 |  |
+| 588 | `cranc-uspres28-12-31-2026-hilcli` | SELL | 8¢ | 500 | $460 | $0.22 | $1.51 | $18,200 |  |
+| 589 | `cranc-uspres28-12-31-2026-krinoe` | BUY | 6¢ | 200 | $12 | $0.17 | $1.51 | $1,000 | ✔  |
+| 590 | `cranc-uspres28-12-31-2026-vivram` | SELL | 15¢ | 200 | $170 | $0.18 | $1.51 | $16,600 |  |
+| 591 | `cranc-uspres28-12-31-2026-markel` | BUY | 7¢ | 200 | $14 | $0.23 | $1.51 | $1,000 |  |
+| 592 | `cranc-uspres28-12-31-2026-nikhal` | BUY | 5¢ | 500 | $25 | $0.16 | $1.51 | $800 |  |
+| 593 | `cranc-uspres28-12-31-2026-hilcli` | BUY | 2¢ | 2,000 | $40 | $1.44 | $1.51 | $400 |  |
+| 594 | `cranc-uspres28-12-31-2026-andyan` | SELL | 33¢ | 100 | $67 | $0.64 | $1.50 | $13,400 | ✔  |
+| 595 | `cranc-uspres28-12-31-2026-petbut` | BUY | 11¢ | 500 | $55 | $0.19 | $1.50 | $2,000 |  |
+| 596 | `cranc-uspres28-12-31-2026-aleoca` | BUY | 23¢ | 100 | $23 | $0.52 | $1.50 | $4,600 | ✔  |
+| 597 | `cranc-uspres28-12-31-2026-jdvan` | BUY | 22¢ | 100 | $22 | $0.54 | $1.50 | $4,400 | ✔  |
+| 598 | `cranc-uspres28-12-31-2026-jossha` | BUY | 7¢ | 500 | $35 | $0.18 | $1.50 | $1,200 |  |
+| 599 | `cranc-uspres28-12-31-2026-robken` | BUY | 8¢ | 100 | $8 | $0.20 | $1.50 | $1,600 | ✔  |
+| 600 | `cranc-uspres28-12-31-2026-markel` | SELL | 21¢ | 100 | $79 | $0.31 | $1.49 | $15,800 |  |
+| 601 | `cranc-uspres28-12-31-2026-kamhar` | BUY | 22¢ | 100 | $22 | $0.33 | $1.49 | $4,400 |  |
+| 602 | `cranc-uspres28-12-31-2026-jdvan` | SELL | 29¢ | 100 | $71 | $0.32 | $1.49 | $14,200 | ✔  |
+| 603 | `cranc-uspres28-12-31-2026-hunbid` | BUY | 12¢ | 100 | $12 | $0.29 | $1.49 | $2,400 | ✔  |
+| 604 | `ewc-pres-fra-2027-04-11-jeamel` | SELL | 27¢ | 2,000 | $1,460 | $0.21 | $1.48 | $14,600 |  |
+| 605 | `cranc-uspres28-12-31-2026-zohmam` | SELL | 15¢ | 100 | $85 | $0.26 | $1.48 | $17,000 |  |
+| 606 | `cranc-uspres28-12-31-2026-betoro` | BUY | 6¢ | 1,000 | $60 | $0.21 | $1.47 | $1,200 | ✔  |
+| 607 | `cranc-uspres28-12-31-2026-marrub` | SELL | 12¢ | 100 | $88 | $0.23 | $1.47 | $17,600 | ✔  |
+| 608 | `cranc-uspres28-12-31-2026-elomus` | BUY | 7¢ | 200 | $14 | $0.20 | $1.47 | $1,200 | ✔  |
+| 609 | `cranc-uspres28-12-31-2026-andyan` | BUY | 10¢ | 100 | $10 | $0.19 | $1.47 | $2,000 | ✔  |
+| 610 | `cranc-uspres28-12-31-2026-bersan` | BUY | 5¢ | 500 | $25 | $0.18 | $1.47 | $1,000 | ✔  |
+| 611 | `iarc-group-2026-12-31-tomhom` | BUY | 2¢ | 2,000 | $40 | $0.20 | $1.47 | $400 |  |
+| 612 | `cranc-uspres28-12-31-2026-oprwin` | BUY | 4¢ | 500 | $20 | $0.17 | $1.46 | $400 |  |
+| 613 | `cranc-uspres28-12-31-2026-krinoe` | SELL | 32¢ | 100 | $68 | $0.17 | $1.46 | $13,600 | ✔  |
+| 614 | `cranc-uspres28-12-31-2026-margre` | SELL | 32¢ | 100 | $68 | $0.15 | $1.46 | $13,600 | ✔  |
+| 615 | `cranc-uspres28-12-31-2026-dontru` | SELL | 32¢ | 100 | $68 | $0.17 | $1.46 | $13,600 | ✔  |
+| 616 | `nphc-attgen-kenpax` | BUY | 1¢ | 2,000 | $20 | $0.25 | $1.45 | $200 |  |
+| 617 | `cranc-uspres28-12-31-2026-tedcru` | BUY | 15¢ | 100 | $15 | $0.24 | $1.44 | $2,800 |  |
+| 618 | `nphc-attgen-rondes` | BUY | 1¢ | 2,000 | $20 | $0.22 | $1.36 | $200 | ✔  |
+| 619 | `nphc-attgen-tedcru` | BUY | 1¢ | 2,000 | $20 | $0.22 | $1.36 | $200 | ✔  |
+| 620 | `cranc-uspres28-12-31-2026-jonoss` | BUY | 15¢ | 200 | $30 | $0.16 | $1.30 | $2,800 | ✔  |
+| 621 | `cranc-uspres28-12-31-2026-rahema` | BUY | 14¢ | 500 | $70 | $0.19 | $1.29 | $2,800 | ✔  |
+| 622 | `cranc-uspres28-12-31-2026-marrub` | BUY | 6¢ | 500 | $30 | $0.16 | $1.26 | $1,000 | ✔  |
+| 623 | `cranc-uspres28-12-31-2026-dontru` | BUY | 8¢ | 200 | $16 | $0.25 | $1.26 | $1,200 | ✔  |
+| 624 | `mlaec-isrpol-pm-2026-10-27-itaben` | BUY | 1¢ | 2,000 | $20 | $0.16 | $1.26 | $200 | ✔ ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
 | 625 | `cranc-uspres28-12-31-2026-gavnew` | BUY | 13¢ | 500 | $65 | $0.16 | $1.25 | $2,600 |  |
 | 626 | `cranc-uspres28-12-31-2026-steban` | BUY | 8¢ | 1,000 | $80 | $0.26 | $1.22 | $1,600 |  |
-| 627 | `cranc-uspres28-12-31-2026-elomus` | BUY | 5¢ | 1,000 | $50 | $0.25 | $1.21 | $1,000 | ✔  |
-| 628 | `cranc-uspres28-12-31-2026-margre` | BUY | 8¢ | 200 | $16 | $0.20 | $1.20 | $1,200 | ✔  |
-| 629 | `cranc-uspres28-12-31-2026-marrub` | BUY | 7¢ | 500 | $35 | $0.24 | $1.20 | $1,200 | ✔  |
+| 627 | `cranc-uspres28-12-31-2026-margre` | BUY | 8¢ | 200 | $16 | $0.20 | $1.20 | $1,200 | ✔  |
+| 628 | `vtc-hrep-to-2026-11-03-90-95m` | BUY | 1¢ | 2,000 | $20 | $0.15 | $1.20 | $200 | ✔  |
+| 629 | `ewc-pres-bra-2026-10-04-roncai` | BUY | 1¢ | 5,000 | $50 | $0.33 | $1.15 | $200 | ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
 | 630 | `cranc-uspres28-12-31-2026-oprwin` | SELL | 8¢ | 1,000 | $920 | $0.20 | $1.13 | $18,400 |  |
-| 631 | `apdc-trumpadmin-2026-karlea` | BUY | 7¢ | 2,000 | $140 | $0.17 | $1.11 | $1,400 |  |
-| 632 | `ewc-usse-ne-2026-11-03-dem` | SELL | 1¢ | 5,000 | $4,950 | $0.29 | $1.11 | $19,800 |  |
-| 633 | `cranc-uspres28-12-31-2026-dwajoh` | SELL | 5¢ | 1,000 | $950 | $0.17 | $1.08 | $19,000 |  |
-| 634 | `cranc-uspres28-12-31-2026-aleoca` | SELL | 30¢ | 1,000 | $700 | $0.17 | $1.08 | $14,000 | ✔  |
-| 635 | `cranc-uspres28-12-31-2026-micoba` | SELL | 6¢ | 1,000 | $940 | $0.16 | $1.07 | $18,800 |  |
-| 636 | `cranc-uspres28-12-31-2026-kamhar` | SELL | 28¢ | 2,000 | $1,440 | $0.26 | $1.02 | $14,400 |  |
-| 637 | `iarc-group-2026-12-31-tuccar` | BUY | 1¢ | 5,000 | $50 | $0.30 | $1.01 | $200 |  |
-| 638 | `cranc-uspres28-12-31-2026-jossha` | SELL | 13¢ | 2,000 | $1,740 | $0.24 | $0.99 | $17,400 |  |
-| 639 | `cranc-uspres28-12-31-2026-dontrujr` | SELL | 12¢ | 2,000 | $1,760 | $0.24 | $0.98 | $17,600 |  |
-| 640 | `mlaec-isrpol-pm-2026-10-27-itaben` | BUY | 1¢ | 5,000 | $50 | $0.28 | $0.96 | $200 | ✔ ⚠ market priced near 0 — deep bid sits in the exit path (snipe risk)  |
-| 641 | `cranc-uspres28-12-31-2026-bersan` | SELL | 8¢ | 2,000 | $1,840 | $0.22 | $0.96 | $18,400 | ✔  |
-| 642 | `cranc-uspres28-12-31-2026-elomus` | SELL | 10¢ | 2,000 | $1,800 | $0.22 | $0.96 | $18,000 | ✔  |
-| 643 | `cranc-uspres28-12-31-2026-nikhal` | SELL | 13¢ | 2,000 | $1,740 | $0.22 | $0.95 | $17,400 |  |
-| 644 | `cranc-uspres28-12-31-2026-zohmam` | BUY | 1¢ | 2,000 | $20 | $0.21 | $0.93 | $200 |  |
-| 645 | `nphc-attgen-todbla` | SELL | 99¢ | 5,000 | $50 | $0.28 | $0.89 | $200 |  |
-| 646 | `cranc-uspres28-12-31-2026-corboo` | BUY | 6¢ | 2,000 | $120 | $0.19 | $0.89 | $1,200 |  |
-| 647 | `ewc-pres-fra-2027-04-11-davlis` | BUY | 1¢ | 5,000 | $50 | $0.22 | $0.76 | $200 |  |
-| 648 | `enwc-ussep-me-2026-07-27-dem-trojac` | BUY | 98¢ | 5,000 | $4,900 | $0.18 | $0.66 | $19,600 | ⚠ resolves ~2026-07-27 (0d)  |
-| 649 | `ewc-usgub-mi-2026-11-03-mikdug` | SELL | 2¢ | 10,000 | $9,800 | $0.27 | $0.54 | $19,600 |  |
-| 650 | `cranc-uspres28-12-31-2026-micoba` | BUY | 1¢ | 10,000 | $100 | $0.16 | $0.29 | $200 |  |
+| 631 | `ewc-usse-ne-2026-11-03-dem` | SELL | 1¢ | 5,000 | $4,950 | $0.29 | $1.11 | $19,800 |  |
+| 632 | `cranc-uspres28-12-31-2026-dwajoh` | SELL | 5¢ | 1,000 | $950 | $0.17 | $1.08 | $19,000 |  |
+| 633 | `cranc-uspres28-12-31-2026-aleoca` | SELL | 30¢ | 1,000 | $700 | $0.17 | $1.08 | $14,000 | ✔  |
+| 634 | `cranc-uspres28-12-31-2026-micoba` | SELL | 6¢ | 1,000 | $940 | $0.16 | $1.07 | $18,800 |  |
+| 635 | `cranc-uspres28-12-31-2026-kamhar` | SELL | 28¢ | 2,000 | $1,440 | $0.26 | $1.02 | $14,400 |  |
+| 636 | `cranc-uspres28-12-31-2026-jossha` | SELL | 13¢ | 2,000 | $1,740 | $0.24 | $0.99 | $17,400 |  |
+| 637 | `cranc-uspres28-12-31-2026-dontrujr` | SELL | 12¢ | 2,000 | $1,760 | $0.24 | $0.98 | $17,600 |  |
+| 638 | `cranc-uspres28-12-31-2026-bersan` | SELL | 8¢ | 2,000 | $1,840 | $0.22 | $0.96 | $18,400 | ✔  |
+| 639 | `apdc-trumpadmin-2026-karlea` | BUY | 7¢ | 5,000 | $350 | $0.32 | $0.96 | $1,400 |  |
+| 640 | `cranc-uspres28-12-31-2026-elomus` | SELL | 10¢ | 2,000 | $1,800 | $0.22 | $0.96 | $18,000 | ✔  |
+| 641 | `cranc-uspres28-12-31-2026-nikhal` | SELL | 13¢ | 2,000 | $1,740 | $0.22 | $0.95 | $17,400 |  |
+| 642 | `cranc-uspres28-12-31-2026-zohmam` | BUY | 1¢ | 2,000 | $20 | $0.21 | $0.93 | $200 |  |
+| 643 | `nphc-attgen-todbla` | SELL | 99¢ | 5,000 | $50 | $0.28 | $0.89 | $200 |  |
+| 644 | `cranc-uspres28-12-31-2026-corboo` | BUY | 6¢ | 2,000 | $120 | $0.19 | $0.89 | $1,200 |  |
+| 645 | `nphc-attgen-matgae` | BUY | 1¢ | 5,000 | $50 | $0.24 | $0.78 | $200 | ✔  |
+| 646 | `enwc-ussep-me-2026-07-27-dem-trojac` | BUY | 98¢ | 5,000 | $4,900 | $0.18 | $0.66 | $19,600 | ⚠ resolves ~2026-07-27 (0d)  |
+| 647 | `ewc-usgub-mi-2026-11-03-mikdug` | SELL | 2¢ | 10,000 | $9,800 | $0.27 | $0.54 | $19,600 |  |
+| 648 | `ewc-pres-fra-2027-04-11-davlis` | BUY | 1¢ | 10,000 | $100 | $0.18 | $0.35 | $200 |  |
+| 649 | `cranc-uspres28-12-31-2026-micoba` | BUY | 1¢ | 20,000 | $200 | $0.15 | $0.15 | $200 |  |
