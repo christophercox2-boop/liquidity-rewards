@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - scan_markets.py
+      - track_rewards.py
       - .github/workflows/scan.yml
   workflow_dispatch: {}
 

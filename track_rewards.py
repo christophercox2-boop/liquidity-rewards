@@ -309,16 +309,21 @@ PRETOURNAMENT_PREFIXES = ("tec-pga-", "tec-liv-", "tec-golf-")
 def _pool_days(prog: dict, slug: str | None = None) -> float:
     """How many days the pool covers. Daily (1.0) for everything except golf
     tournament programs, which fund the pre-tournament window: program start
-    to ~tournament start (the slug's event date minus 3 days) — a $10,000
-    pool over 17 days is ~$588/day. An explicit end date on any program also
-    defines the period."""
+    to an explicit end date, or ~tournament start (the slug's event date
+    minus 3 days) — a $10,000 pool over 17 days is ~$588/day. Politics
+    programs report a start/end cycle window too (e.g. 3-day refreshes),
+    but reconciliation proves those pools pay in FULL daily — actuals held
+    at ~$126-135/day across a window boundary — so the window never divides
+    anything outside golf."""
     try:
+        if not (slug and slug.startswith(PRETOURNAMENT_PREFIXES)):
+            return 1.0
         s, e = prog.get("start"), prog.get("end")
         if s and e:
             sd = dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
             ed = dt.datetime.fromisoformat(str(e).replace("Z", "+00:00"))
             return max((ed - sd).total_seconds() / 86400.0, 1.0)
-        if s and slug and slug.startswith(PRETOURNAMENT_PREFIXES):
+        if s:
             parts = slug.split("-")
             for i in range(len(parts) - 2):
                 if (parts[i].isdigit() and len(parts[i]) == 4
