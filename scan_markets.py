@@ -406,6 +406,48 @@ def evaluate_cheap_yes(slug: str, book: dict, prog: dict) -> dict | None:
             "prog": {k: prog.get(k) for k in ("df", "target", "pool", "event_n", "start")}}
 
 
+def allocate_per_golfer(results: list[dict], books: dict[str, dict]) -> list[dict]:
+    """Cap risk per GOLFER, not per market: one golfer appears in several
+    market types (winner, round leaders), so their combined at-risk must stay
+    within GOLF_MAX_RISK. The budget splits proportionally to each market's
+    estimated flow; allocations under $0.10 are dropped in favor of the
+    golfer's better markets; every resized order is re-scored on its book."""
+    by_code: dict[str, list[dict]] = {}
+    for r in results:
+        by_code.setdefault(r["market"].rsplit("-", 1)[-1], []).append(r)
+    final: list[dict] = []
+    for _code, rows in by_code.items():
+        weights = [(r, ((r.get("max") or r["pick"])["est_day"]) or 0.001) for r in rows]
+        tot = sum(w for _, w in weights) or 1.0
+        for r, w in sorted(weights, key=lambda x: -x[1]):
+            budget = GOLF_MAX_RISK * (w / tot)
+            if len(rows) > 1 and budget < 0.10:
+                continue  # dust — concentrate in the golfer's better markets
+            ok = True
+            for key in ("max", "pick"):  # clamp BOTH variants to the allocation
+                v = r.get(key)
+                if not v or v["capital"] <= budget + 1e-9:
+                    continue
+                book = books.get(r["market"])
+                if book is None:
+                    ok = False
+                    break
+                q = max(int(budget / v["price"]), 1)
+                o = {"market": r["market"], "side": "BUY", "price": v["price"], "size": float(q)}
+                tr._score_order(o, _merged(book, "BUY", v["price"], q),
+                                {**(r.get("prog") or {}), "siblings": []})
+                est = o.get("est_day") or 0.0
+                if key == "max" and est < 0.03:
+                    ok = False
+                    break
+                r[key] = dict(v, size=q, capital=round(v["price"] * q, 2),
+                              est_day=round(est, 3),
+                              share=round((o.get("share") or 0) * 100, 1))
+            if ok:
+                final.append(r)
+    return final
+
+
 def golf_main() -> None:
     key_id = os.environ.get("POLYMARKET_KEY_ID", "").strip()
     secret_key = os.environ.get("POLYMARKET_SECRET_KEY", "").strip()
@@ -417,6 +459,7 @@ def golf_main() -> None:
           f"{len(mine)} already quoted; field: {field_src}")
 
     results, no_pool, not_in_field = [], 0, 0
+    books: dict[str, dict] = {}
     for slug in sorted(progs):
         prog = dict(progs[slug])
         if not prog.get("pool"):
@@ -437,8 +480,10 @@ def golf_main() -> None:
             r["already_in"] = slug in mine
             if field is None:
                 r["risk"] = "field NOT verified — add data/golf_field.txt"
+            books[slug] = book
             results.append(r)
         time.sleep(0.05)
+    results = allocate_per_golfer(results, books)
 
     results.sort(key=lambda r: -((r.get("max") or r["pick"])["est_day"]))
     tot = sum(r["pick"]["est_day"] for r in results)
@@ -447,7 +492,8 @@ def golf_main() -> None:
     lines.append(f"_{len(slugs)} golf markets found; {len(progs)} carry reward programs "
                  f"({no_pool} without pools); {not_in_field} excluded as not in the field; "
                  f"{len(results)} placeable. Field source: {field_src}. "
-                 f"Max ${GOLF_MAX_RISK:g} at risk per market. Generated {tr._et_str()}._")
+                 f"Max ${GOLF_MAX_RISK:g} at risk per GOLFER across all their markets. "
+                 f"Generated {tr._et_str()}._")
     lines.append("")
     if results:
         lines.append(f"**Everything below:** ~${tot:,.2f}/day for ~${cap:,.0f} at risk if every bid filled.")
