@@ -5,7 +5,7 @@ the tracker run immediately and refresh STATUS.md with your current orders.
 poke #1
 poke
 ndj
-p
+pg
 nn2026-07-23T19:01:46Z
 2026-07-23Tpok
 
