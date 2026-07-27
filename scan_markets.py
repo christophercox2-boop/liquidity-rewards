@@ -261,6 +261,53 @@ def evaluate_side(slug: str, book: dict, prog: dict, side: str, held: float = 0.
 
 
 GOLF_TAGS = ("golf", "pga", "pga-tour", "masters", "liv-golf", "the-open")
+GOLF_MAX_RISK = float(os.environ.get("GOLF_MAX_RISK", "1.0"))  # $ at risk per market, max
+GOLF_FIELD_URL = os.environ.get(
+    "GOLF_FIELD_URL",
+    "https://www.pgatour.com/tournaments/2026/rocket-classic/R2026524/field")
+_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
+
+
+def _name_codes(name: str) -> set[str]:
+    """Slug codes for a golfer name: first3(first)+first3(last), plus a
+    variant for multi-part names (e.g. 'Byeong Hun An')."""
+    parts = [re.sub(r"[^a-z]", "", p.lower()) for p in name.split()]
+    parts = [p for p in parts if p]
+    out = set()
+    if len(parts) >= 2:
+        out.add(parts[0][:3] + parts[-1][:3])
+        if len(parts) >= 3:
+            out.add(parts[0][:3] + parts[1][:3])
+    return out
+
+
+def fetch_golf_field() -> tuple[set[str] | None, str]:
+    """(golfer slug-codes for this week's field, source description).
+    Tries the official field page, then the committed data/golf_field.txt."""
+    names: list[str] = []
+    source = ""
+    try:
+        r = requests.get(GOLF_FIELD_URL, headers={"User-Agent": _UA}, timeout=30)
+        if r.status_code == 200:
+            pairs = re.findall(r'"firstName"\s*:\s*"([^"]+)"\s*,\s*"lastName"\s*:\s*"([^"]+)"',
+                               r.text)
+            names = sorted({f"{a} {b}" for a, b in pairs})
+            if names:
+                source = f"pgatour.com field page ({len(names)} players)"
+    except Exception:  # noqa: BLE001
+        pass
+    if not names and os.path.exists("data/golf_field.txt"):
+        names = [ln.strip() for ln in open("data/golf_field.txt")
+                 if ln.strip() and not ln.startswith("#")]
+        if names:
+            source = f"data/golf_field.txt ({len(names)} players)"
+    if not names:
+        return None, "NOT VERIFIED — field page blocked and no data/golf_field.txt"
+    codes: set[str] = set()
+    for n in names:
+        codes |= _name_codes(n)
+    return codes, source
 
 
 def fetch_tag_events(tags: tuple[str, ...]) -> tuple[list[str], dict[str, int]]:
@@ -321,7 +368,11 @@ def evaluate_cheap_yes(slug: str, book: dict, prog: dict) -> dict | None:
     cands = [p for p in dict.fromkeys(cands) if p <= 0.02]  # cheap YES only
     best = None
     for p in cands:  # cheapest first
-        for q in SIZES + DEEP_SIZES:
+        qcap = max(int(GOLF_MAX_RISK / p), 1)  # never more than $GOLF_MAX_RISK at risk
+        sizes = [q for q in SIZES + DEEP_SIZES if q <= qcap]
+        if qcap not in sizes:
+            sizes.append(qcap)
+        for q in sizes:
             o = {"market": slug, "side": "BUY", "price": p, "size": float(q)}
             tr._score_order(o, _merged(book, "BUY", p, q), prog)
             est = o.get("est_day") or 0.0
@@ -338,10 +389,11 @@ def evaluate_cheap_yes(slug: str, book: dict, prog: dict) -> dict | None:
     if not best:
         return None
     p = best[1]["price"]
-    o = {"market": slug, "side": "BUY", "price": p, "size": 20000.0}
-    tr._score_order(o, _merged(book, "BUY", p, 20000), prog)
+    qmax = max(int(GOLF_MAX_RISK / p), 1)  # "full size" = the $-cap size
+    o = {"market": slug, "side": "BUY", "price": p, "size": float(qmax)}
+    tr._score_order(o, _merged(book, "BUY", p, qmax), prog)
     est = o.get("est_day") or 0.0
-    mx = {"side": "BUY", "price": p, "size": 20000, "capital": round(p * 20000, 2),
+    mx = {"side": "BUY", "price": p, "size": qmax, "capital": round(p * qmax, 2),
           "covered": False, "est_day": round(est, 3),
           "share": round((o.get("share") or 0) * 100, 1)} if est > 0 else None
     rd = _resolution_date(slug)
@@ -360,14 +412,20 @@ def golf_main() -> None:
     slugs, event_sizes = fetch_tag_events(GOLF_TAGS)
     progs = fetch_programs(sorted(slugs), key_id, secret_key)
     mine = my_open_market_slugs(key_id, secret_key) if key_id else set()
-    print(f"golf: {len(slugs)} markets found, {len(progs)} with programs, {len(mine)} already quoted")
+    field, field_src = fetch_golf_field()
+    print(f"golf: {len(slugs)} markets found, {len(progs)} with programs, "
+          f"{len(mine)} already quoted; field: {field_src}")
 
-    results, no_pool = [], 0
+    results, no_pool, not_in_field = [], 0, 0
     for slug in sorted(progs):
         prog = dict(progs[slug])
         if not prog.get("pool"):
             no_pool += 1
             continue
+        code = slug.rsplit("-", 1)[-1]
+        if field is not None and code not in field:
+            not_in_field += 1  # withdrawn/never-entered golfer (or a non-player
+            continue           # market like 'tie') — a YES there is a dead ticket
         prog["event_n"] = max(event_sizes.get(slug, 1), 1)
         try:
             book = tr._fetch_book(slug)
@@ -377,6 +435,8 @@ def golf_main() -> None:
         if r:
             r["event_n"] = prog["event_n"]
             r["already_in"] = slug in mine
+            if field is None:
+                r["risk"] = "field NOT verified — add data/golf_field.txt"
             results.append(r)
         time.sleep(0.05)
 
@@ -385,7 +445,9 @@ def golf_main() -> None:
     cap = sum(r["pick"]["capital"] for r in results)
     lines = ["# Golf plan — cheap YES bids at the price floor", ""]
     lines.append(f"_{len(slugs)} golf markets found; {len(progs)} carry reward programs "
-                 f"({no_pool} without pools); {len(results)} placeable. Generated {tr._et_str()}._")
+                 f"({no_pool} without pools); {not_in_field} excluded as not in the field; "
+                 f"{len(results)} placeable. Field source: {field_src}. "
+                 f"Max ${GOLF_MAX_RISK:g} at risk per market. Generated {tr._et_str()}._")
     lines.append("")
     if results:
         lines.append(f"**Everything below:** ~${tot:,.2f}/day for ~${cap:,.0f} at risk if every bid filled.")
