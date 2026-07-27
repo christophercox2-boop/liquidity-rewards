@@ -709,8 +709,19 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
             merged[key] = sorted(levels.items(), key=lambda x: (-x[0] if side == "BUY" else x[0]))
             tr._score_order(probe, merged, prog)
             est = probe.get("est_day") or 0.0
-            if est < 0.08:
-                res.update(status="skipped", note=f"drifted — est now ${est:.2f}/day")
+            # The drift floor is relative to what the plan promised for THIS
+            # order — small per-golfer allocations legitimately earn cents/day
+            # and must not be judged against a politics-sized bar.
+            planned = None
+            for k in ("pick", "max"):
+                v = plan_row.get(k) or {}
+                if (abs((v.get("price") or -1) - price) < 1e-9
+                        and int(v.get("size") or -1) == size):
+                    planned = v.get("est_day")
+            thr = min(0.08, max(0.02, 0.5 * planned)) if planned else 0.08
+            if est < thr:
+                res.update(status="skipped",
+                           note=f"drifted — est now ${est:.2f}/day (planned ${planned or 0:.2f})")
                 return res
             res["est_day"] = round(est, 2)
         intent = "ORDER_INTENT_BUY_LONG"
