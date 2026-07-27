@@ -280,35 +280,60 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     if target:  # show the qualification check so it's verifiable at a glance
         verdict += f" ({side_total:,.0f} resting ≥ {target:,.0f} ✓)"
     if prog.get("pool"):
-        order["est_day"] = share * _daily_pool(prog) / 2  # pool assumed split per side
+        slug = order.get("market") or ""
+        order["est_day"] = share * _daily_pool(prog, slug) / 2  # pool split per side
         verdict += f" ≈ {_usd(order['est_day'])}/day"
         n = prog.get("event_n") or 1
         order["event_n"] = n
         order["siblings"] = prog.get("siblings") or []
+        days = _pool_days(prog, slug)
         if n > 1:
             verdict += f" (pool ÷ {n} markets)"
-        side_pool = _daily_pool(prog) / 2
+        if days > 1.001:
+            verdict += f" (pre-tournament pool over {days:g}d)"
+        side_pool = _daily_pool(prog, slug) / 2
+        days_term = f" ÷ {days:g}d" if days > 1.001 else ""
         calc.append(
-            f"${prog['pool']:,.0f} ÷ {n} ÷ 2 = {_usd(side_pool)} × {share * 100:.1f}% "
+            f"${prog['pool']:,.0f}{days_term} ÷ {n} ÷ 2 = {_usd(side_pool)} × {share * 100:.1f}% "
             f"= {_usd(order['est_day'])}/day"
         )
     order["verdict"] = verdict
 
 
-def _daily_pool(prog: dict) -> float:
-    """Reward pool normalized to $/day using the time period's start/end,
-    prorated across the open markets of the event it covers (the pool is per
-    event, not per candidate market). Missing/sub-day periods count as one day."""
-    days = 1.0
+SPORTS_PREFIXES = ("tec-",)  # tournament event contracts (golf) — pre-tournament pools
+
+
+def _pool_days(prog: dict, slug: str | None = None) -> float:
+    """How many days the pool covers. Politics pools are DAILY (validated by
+    reconciliation) — never divided. Sports tournament pools (tec-*) fund the
+    pre-tournament window: program start to ~tournament start (the slug's
+    event date minus 3 days), so a $10,000 pool over 17 days is ~$588/day.
+    An explicit end date on any program also defines the period."""
     try:
         s, e = prog.get("start"), prog.get("end")
         if s and e:
             sd = dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
             ed = dt.datetime.fromisoformat(str(e).replace("Z", "+00:00"))
-            days = max((ed - sd).total_seconds() / 86400.0, 1.0)
+            return max((ed - sd).total_seconds() / 86400.0, 1.0)
+        if s and slug and slug.startswith(SPORTS_PREFIXES):
+            parts = slug.split("-")
+            for i in range(len(parts) - 2):
+                if (parts[i].isdigit() and len(parts[i]) == 4
+                        and parts[i + 1].isdigit() and parts[i + 2].isdigit()):
+                    ev = dt.date(int(parts[i]), int(parts[i + 1]), int(parts[i + 2][:2]))
+                    sd = dt.datetime.fromisoformat(str(s).replace("Z", "+00:00")).date()
+                    t_start = ev - dt.timedelta(days=3)  # Sun finish -> ~Thu start
+                    return float(max((t_start - sd).days, 1))
     except Exception:  # noqa: BLE001 — fall back to daily
         pass
-    return (prog.get("pool") or 0.0) / days / max(prog.get("event_n") or 1, 1)
+    return 1.0
+
+
+def _daily_pool(prog: dict, slug: str | None = None) -> float:
+    """Reward pool normalized to $/day (see _pool_days), prorated across the
+    open markets of the event it covers (the pool is per event, not per
+    candidate market)."""
+    return (prog.get("pool") or 0.0) / _pool_days(prog, slug) / max(prog.get("event_n") or 1, 1)
 
 
 EVENT_DEBUG: dict[str, str] = {}  # per-slug event lookup outcomes, for live_raw.json
@@ -628,7 +653,7 @@ def fetch_opportunities(
                     best_gap = (side, gap)
         if best:
             c["side"], c["share"], c["side_depth"] = best
-            c["est_day"] = c["share"] * _daily_pool(c) / 2
+            c["est_day"] = c["share"] * _daily_pool(c, c.get("market") or "") / 2
             out.append(c)
         elif best_gap:
             c["side"], c["gap"] = best_gap
