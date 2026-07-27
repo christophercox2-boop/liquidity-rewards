@@ -34,11 +34,18 @@ jobs:
           POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
         run: python scan_markets.py
 
-      - name: Commit plan
+      - name: Scan golf markets
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          SCAN_PLAN: golf
+        run: python scan_markets.py
+
+      - name: Commit plans
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add PLAN.md data/scan.json
+          git add PLAN.md PLAN-GOLF.md data/scan.json data/scan_golf.json
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else

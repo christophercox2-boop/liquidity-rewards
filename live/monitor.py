@@ -617,26 +617,30 @@ def _verify_resting(market: str, side: str, price_value: str) -> tuple[bool, str
         return False, f"verify failed: {type(e).__name__}: {e}"[:150]
 
 
-PLAN_CACHE: dict = {"ts": 0.0, "data": None}
+PLAN_CACHE: dict = {"politics": {"ts": 0.0, "data": None}, "golf": {"ts": 0.0, "data": None}}
+PLAN_FILES = {"politics": "data/scan.json", "golf": "data/scan_golf.json"}
 
 
-def fetch_plan() -> dict:
-    """data/scan.json from the repo's main branch (via GITHUB_TOKEN)."""
-    if PLAN_CACHE["data"] and time.time() - PLAN_CACHE["ts"] < 300:
-        return PLAN_CACHE["data"]
+def fetch_plan(which: str = "politics") -> dict:
+    """A scan plan file from the repo's main branch (via GITHUB_TOKEN)."""
+    which = which if which in PLAN_FILES else "politics"
+    slot = PLAN_CACHE[which]
+    if slot["data"] and time.time() - slot["ts"] < 300:
+        return slot["data"]
     if not GITHUB_TOKEN:
-        raise RuntimeError("GITHUB_TOKEN not set — the Plan tab needs it to read scan.json")
+        raise RuntimeError("GITHUB_TOKEN not set — the Plan tab needs it to read the scan")
     r = requests.get(
-        f"https://api.github.com/repos/{GITHUB_REPO}/contents/data/scan.json",
+        f"https://api.github.com/repos/{GITHUB_REPO}/contents/{PLAN_FILES[which]}",
         params={"ref": "main"},
         headers={"Authorization": f"Bearer {GITHUB_TOKEN}",
                  "Accept": "application/vnd.github.raw+json"},
         timeout=20,
     )
     if r.status_code >= 400:
-        raise RuntimeError(f"scan.json fetch failed: HTTP {r.status_code}")
-    PLAN_CACHE.update(ts=time.time(), data=r.json())
-    return PLAN_CACHE["data"]
+        raise RuntimeError(f"{PLAN_FILES[which]} fetch failed: HTTP {r.status_code}"
+                           + (" — run the Market scan workflow once" if r.status_code == 404 else ""))
+    slot.update(ts=time.time(), data=r.json())
+    return slot["data"]
 
 
 # One batch at a time; progress is polled by the dashboard.
@@ -768,7 +772,7 @@ def start_batch(payload: dict) -> tuple[int, dict]:
     if PLACER["running"]:
         return 409, {"ok": False, "error": "a batch is already running"}
     try:
-        plan = fetch_plan()
+        plan = fetch_plan(str(payload.get("which") or "politics"))
     except Exception as e:  # noqa: BLE001
         return 502, {"ok": False, "error": f"can't load plan: {e}"[:200]}
     plan_rows = {(r["market"], r.get("side", "BUY")): r
@@ -1282,6 +1286,9 @@ Refreshes every 2 min.</div>
 </div>
 <div id="viewL" style="display:none">
 <div class="sub">Passive placement plan <span id="planGen"></span></div>
+<div style="margin:8px 0">
+ <label class="sub"><input type="radio" name="pwhich" value="politics" checked onchange="switchPlan()"> Politics</label>
+ <label class="sub"><input type="radio" name="pwhich" value="golf" onchange="switchPlan()"> Golf (cheap YES)</label></div>
 <div class="sub" id="planBP"></div>
 <div style="margin:10px 0">Max buy price: <b id="capLbl">10¢</b>
  <input type="range" id="capSlider" min="1" max="99" value="10" style="width:55%;vertical-align:middle"
@@ -1326,13 +1333,15 @@ function showTab(t){
   if(t==='L') loadPlan();
 }
 let PLAN = null, PSEL = {}, BP = null, OLOCK = {};
+function pwhich(){ const el = document.querySelector('input[name="pwhich"]:checked'); return el ? el.value : 'politics'; }
+function switchPlan(){ PLAN = null; PSEL = {}; loadPlan(); }
 function mroom(m){  // per-market budget left after existing resting orders
   return BP == null ? null : BP - (OLOCK[m] || 0);
 }
 async function loadPlan(){
   if(PLAN) return;
   try{
-    const d = await (await fetch('plan.json')).json();
+    const d = await (await fetch('plan.json?which=' + pwhich())).json();
     const err = document.getElementById('planErr');
     if(d.error){ err.textContent = d.error; err.style.display = 'block'; return; }
     PLAN = d; renderPlan();
@@ -1451,7 +1460,7 @@ async function placeBatch(){
   try{
     const r = await fetch('place', {method:'POST',
       headers:{'Content-Type':'application/json','X-Reprice':'1'},
-      body: JSON.stringify({max_price_cents: capC, min_sell_cents: sMin,
+      body: JSON.stringify({max_price_cents: capC, min_sell_cents: sMin, which: pwhich(),
         orders: sel.map(r => ({market: r.market, side: r.side || 'BUY',
           price_cents: +(ord(r).price*100).toFixed(1), size: ord(r).size}))})});
     const d = await r.json();
@@ -1827,7 +1836,9 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, "application/json", json.dumps(MONITOR.snapshot()).encode())
         elif self.path.startswith("/plan.json"):
             try:
-                plan = fetch_plan()
+                from urllib.parse import parse_qs, urlparse
+                which = (parse_qs(urlparse(self.path).query).get("which") or ["politics"])[0]
+                plan = fetch_plan(which)
                 mine = sorted({o.get("market") for o in MONITOR.orders if o.get("market")})
                 self._send(200, "application/json",
                            json.dumps({"plan": plan, "mine": mine}).encode())

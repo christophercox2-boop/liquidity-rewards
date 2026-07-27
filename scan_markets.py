@@ -260,6 +260,155 @@ def evaluate_side(slug: str, book: dict, prog: dict, side: str, held: float = 0.
     return out
 
 
+GOLF_TAGS = ("golf", "pga", "pga-tour", "masters", "liv-golf", "the-open")
+
+
+def fetch_tag_events(tags: tuple[str, ...]) -> tuple[list[str], dict[str, int]]:
+    """Open market slugs + event sizes for arbitrary event tags, with a text
+    search fallback when the tags come up empty."""
+    slugs: list[str] = []
+    sizes: dict[str, int] = {}
+
+    def _take(ev: dict) -> None:
+        open_mkts = [m["slug"] for m in ev.get("markets") or []
+                     if m.get("slug") and not m.get("closed")]
+        for s in open_mkts:
+            if s not in sizes:
+                slugs.append(s)
+            sizes[s] = max(sizes.get(s, 0), len(open_mkts))
+
+    for tag in tags:
+        offset = 0
+        for _ in range(30):
+            r = requests.get(tr.GATEWAY + "/v1/events",
+                             params={"tagSlug": tag, "active": "true",
+                                     "limit": 100, "offset": offset}, timeout=30)
+            if r.status_code >= 400:
+                break
+            events = r.json().get("events") or []
+            for ev in events:
+                _take(ev)
+            if len(events) < 100:
+                break
+            offset += 100
+        time.sleep(0.05)
+    if len(slugs) < 5:  # unknown tag names — fall back to search
+        try:
+            r = requests.get(tr.GATEWAY + "/v1/search",
+                             params={"query": "golf", "limit": 50}, timeout=20)
+            if r.status_code < 400:
+                for ev in r.json().get("events") or []:
+                    _take(ev)
+        except Exception:  # noqa: BLE001
+            pass
+    return slugs, sizes
+
+
+def evaluate_cheap_yes(slug: str, book: dict, prog: dict) -> dict | None:
+    """Golf strategy: the cheapest possible resting YES bid — the one-tick
+    price floor (0.1c on fine-tick books) — sized to clear the earnings
+    target. Fills are accepted by design: a filled floor bid is a tiny-cost
+    lottery ticket, and the reward flow is meant to cover those losses."""
+    tick = book.get("tick") or 0.01
+    bids = book.get("bids") or []
+    asks = book.get("asks") or []
+    floor = round(max(tick, 0.001), 4)
+    cands = [floor, round(floor + tick, 4)]
+    if bids and bids[0][0] > floor + tick:
+        cands.append(round(bids[0][0] - tick, 4))  # 1 behind best when best is higher
+    if asks:
+        cands = [p for p in cands if p <= round(asks[0][0] - tick, 4)]
+    cands = [p for p in dict.fromkeys(cands) if p <= 0.02]  # cheap YES only
+    best = None
+    for p in cands:  # cheapest first
+        for q in SIZES + DEEP_SIZES:
+            o = {"market": slug, "side": "BUY", "price": p, "size": float(q)}
+            tr._score_order(o, _merged(book, "BUY", p, q), prog)
+            est = o.get("est_day") or 0.0
+            if est < MIN_EST_DAY:
+                continue
+            cand = {"side": "BUY", "price": p, "size": q, "capital": round(p * q, 2),
+                    "covered": False, "est_day": round(est, 3),
+                    "share": round((o.get("share") or 0) * 100, 1)}
+            key = (est < TARGET_EST_DAY, cand["capital"], -est)
+            if best is None or key < best[0]:
+                best = (key, cand)
+            if est >= TARGET_EST_DAY:
+                break
+    if not best:
+        return None
+    p = best[1]["price"]
+    o = {"market": slug, "side": "BUY", "price": p, "size": 20000.0}
+    tr._score_order(o, _merged(book, "BUY", p, 20000), prog)
+    est = o.get("est_day") or 0.0
+    mx = {"side": "BUY", "price": p, "size": 20000, "capital": round(p * 20000, 2),
+          "covered": False, "est_day": round(est, 3),
+          "share": round((o.get("share") or 0) * 100, 1)} if est > 0 else None
+    rd = _resolution_date(slug)
+    return {"market": slug, "side": "BUY", "pick": best[1], "max": mx,
+            "side_pool": round(tr._daily_pool(prog) / 2, 2),
+            "best_bid": bids[0][0] if bids else None,
+            "best_ask": asks[0][0] if asks else None, "held": 0,
+            "risk": None,  # fills are the accepted cost of this strategy
+            "note": f"resolves ~{rd.isoformat()}" if rd else None,
+            "prog": {k: prog.get(k) for k in ("df", "target", "pool", "event_n")}}
+
+
+def golf_main() -> None:
+    key_id = os.environ.get("POLYMARKET_KEY_ID", "").strip()
+    secret_key = os.environ.get("POLYMARKET_SECRET_KEY", "").strip()
+    slugs, event_sizes = fetch_tag_events(GOLF_TAGS)
+    progs = fetch_programs(sorted(slugs), key_id, secret_key)
+    mine = my_open_market_slugs(key_id, secret_key) if key_id else set()
+    print(f"golf: {len(slugs)} markets found, {len(progs)} with programs, {len(mine)} already quoted")
+
+    results, no_pool = [], 0
+    for slug in sorted(progs):
+        prog = dict(progs[slug])
+        if not prog.get("pool"):
+            no_pool += 1
+            continue
+        prog["event_n"] = max(event_sizes.get(slug, 1), 1)
+        try:
+            book = tr._fetch_book(slug)
+        except Exception:  # noqa: BLE001
+            continue
+        r = evaluate_cheap_yes(slug, book, prog)
+        if r:
+            r["event_n"] = prog["event_n"]
+            r["already_in"] = slug in mine
+            results.append(r)
+        time.sleep(0.05)
+
+    results.sort(key=lambda r: -((r.get("max") or r["pick"])["est_day"]))
+    tot = sum(r["pick"]["est_day"] for r in results)
+    cap = sum(r["pick"]["capital"] for r in results)
+    lines = ["# Golf plan — cheap YES bids at the price floor", ""]
+    lines.append(f"_{len(slugs)} golf markets found; {len(progs)} carry reward programs "
+                 f"({no_pool} without pools); {len(results)} placeable. Generated {tr._et_str()}._")
+    lines.append("")
+    if results:
+        lines.append(f"**Everything below:** ~${tot:,.2f}/day for ~${cap:,.0f} at risk if every bid filled.")
+        lines.append("")
+        lines.append("| # | Market | @ | Size | At risk | Est $/day | Share | Note |")
+        lines.append("|--:|---|--:|--:|--:|--:|--:|---|")
+        for i, r in enumerate(results, 1):
+            p = r["pick"]
+            lines.append(f"| {i} | `{r['market']}` | {p['price'] * 100:g}¢ | {p['size']:,} "
+                         f"| ${p['capital']:,.0f} | ${p['est_day']:.2f} | {p['share']:.0f}% "
+                         f"| {('✔ ' if r['already_in'] else '') + (r.get('note') or '')} |")
+    else:
+        lines.append("_No placeable golf markets this run — either no reward pools on golf "
+                     "right now, or no book allows a sub-2¢ resting bid._")
+    lines.append("")
+    with open("PLAN-GOLF.md", "w") as f:
+        f.write("\n".join(lines))
+    os.makedirs("data", exist_ok=True)
+    with open("data/scan_golf.json", "w") as f:
+        json.dump({"generated": tr._et_str(), "results": results}, f, indent=1)
+    print(f"PLAN-GOLF.md: {len(results)} placements, ~${tot:,.2f}/day, ${cap:,.0f} max at risk")
+
+
 def main() -> None:
     key_id = os.environ.get("POLYMARKET_KEY_ID", "").strip()
     secret_key = os.environ.get("POLYMARKET_SECRET_KEY", "").strip()
@@ -362,4 +511,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(golf_main() if os.environ.get("SCAN_PLAN") == "golf" else main())
