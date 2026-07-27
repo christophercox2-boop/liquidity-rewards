@@ -222,12 +222,30 @@ class Monitor:
             today = dt.datetime.now(ET).strftime("%Y-%m-%d")
             if self.state.get("day") in (None, today):
                 rebuilt = tracker_day_integral(today)
-                if rebuilt and rebuilt[0] > (self.state.get("earned") or 0.0) + 1.0:
+                cur = self.state.get("earned") or 0.0
+                if rebuilt and rebuilt[0] > cur + 1.0:
                     self.state["day"] = today
                     self.state["earned"] = rebuilt[0]
                     pm = self.state.setdefault("per_market", {})
                     for m, v in rebuilt[1].items():
                         pm[m] = max(pm.get(m, 0.0), v)
+                    self.backfilled = rebuilt[0]
+                elif rebuilt and cur > max(rebuilt[0], 0.5) * 1.5:
+                    # Counter grossly ABOVE what the (corrected) tracker data
+                    # supports — e.g. a mispriced pool inflated the accrual.
+                    # Adopt the rebuilt figure and rescale today's curves so
+                    # the graph keeps its shape at the honest height.
+                    scale = rebuilt[0] / cur if cur > 0 else 0.0
+                    self.state["day"] = today
+                    self.state["earned"] = rebuilt[0]
+                    self.state["per_market"] = rebuilt[1]
+                    self.state["rate"] = round((self.state.get("rate") or 0.0) * scale, 4)
+                    self.state["market_rates"] = {
+                        m: round(v * scale, 4)
+                        for m, v in (self.state.get("market_rates") or {}).items()}
+                    for key in ("earned_series", "rate_series"):
+                        self.state[key] = [[t, round(v * scale, 4)]
+                                           for t, v in self.state.get(key) or []]
                     self.backfilled = rebuilt[0]
         except Exception:  # noqa: BLE001 — backfill is best-effort
             pass
