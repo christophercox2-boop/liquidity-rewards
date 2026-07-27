@@ -685,21 +685,22 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
         # Never stand at (or better than) a THIN touch — the book may have
         # moved since the plan. Joining is only safe behind a wall that
         # already holds the full Target Size (price-time: we fill last).
-        # The extreme deep quotes (1c bid / 99c ask) are exempt: there is no
-        # closer-to-danger there, and the dying-market case is risk-flagged.
+        # Deep quotes are FULLY exempt (buys <= 1.1c, sells >= 98.9c):
+        # improving a 0.1c best to 0.2c risks a tenth of a cent per contract,
+        # and the cheap-YES strategy accepts fills by design.
         target = prog.get("target") or 0
-        if (side == "BUY" and price <= 0.011) or (side == "SELL" and price >= 0.989):
-            target = 0  # deep quote — thin-touch guard doesn't apply
-        if side == "BUY" and bids and price >= bids[0][0] - 1e-9:
-            level = sum(q for px, q in bids if abs(px - price) < 1e-9)
-            if price > bids[0][0] + 1e-9 or level < target:
-                res.update(status="skipped", note="book moved — would stand at/above a thin best bid")
-                return res
-        if side == "SELL" and asks and price <= asks[0][0] + 1e-9:
-            level = sum(q for px, q in asks if abs(px - price) < 1e-9)
-            if price < asks[0][0] - 1e-9 or level < target:
-                res.update(status="skipped", note="book moved — would stand at/below a thin best ask")
-                return res
+        deep = (side == "BUY" and price <= 0.011) or (side == "SELL" and price >= 0.989)
+        if not deep:
+            if side == "BUY" and bids and price >= bids[0][0] - 1e-9:
+                level = sum(q for px, q in bids if abs(px - price) < 1e-9)
+                if price > bids[0][0] + 1e-9 or level < target:
+                    res.update(status="skipped", note="book moved — would stand at/above a thin best bid")
+                    return res
+            if side == "SELL" and asks and price <= asks[0][0] + 1e-9:
+                level = sum(q for px, q in asks if abs(px - price) < 1e-9)
+                if price < asks[0][0] - 1e-9 or level < target:
+                    res.update(status="skipped", note="book moved — would stand at/below a thin best ask")
+                    return res
         if prog.get("pool"):  # drift check: still worth placing at today's book?
             probe = {"market": slug, "side": side, "price": price, "size": float(size)}
             key = "bids" if side == "BUY" else "asks"
