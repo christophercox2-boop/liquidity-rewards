@@ -712,13 +712,18 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
             est = probe.get("est_day") or 0.0
             # The drift floor is relative to what the plan promised for THIS
             # order — small per-golfer allocations legitimately earn cents/day
-            # and must not be judged against a politics-sized bar.
+            # and must not be judged against a politics-sized bar. The size may
+            # be a rescale of the planned one (the golf-cap slider): match on
+            # price and scale the promise linearly; an exact size match wins.
             planned = None
             for k in ("pick", "max"):
                 v = plan_row.get(k) or {}
                 if (abs((v.get("price") or -1) - price) < 1e-9
-                        and int(v.get("size") or -1) == size):
-                    planned = v.get("est_day")
+                        and v.get("size") and v.get("est_day")):
+                    planned = v["est_day"] * (size / float(v["size"]))
+                    if int(v["size"]) == size:
+                        planned = v["est_day"]
+                        break
             thr = min(0.08, max(0.02, 0.5 * planned)) if planned else 0.08
             if est < thr:
                 res.update(status="skipped",
@@ -1326,6 +1331,9 @@ Refreshes every 2 min.</div>
 <div style="margin:10px 0">Min sell price: <b id="sellLbl">85¢</b>
  <input type="range" id="sellSlider" min="10" max="99" value="85" style="width:55%;vertical-align:middle"
         oninput="planSell(this.value)"></div>
+<div style="margin:10px 0;display:none" id="golfCapRow">Max $ per golfer: <b id="golfCapLbl">$1.00</b>
+ <input type="range" id="golfCapSlider" min="25" max="1000" step="25" value="100" style="width:55%;vertical-align:middle"
+        oninput="golfCap(this.value)"></div>
 <div style="margin:6px 0">
  <label class="sub"><input type="checkbox" id="hideRisk" checked onchange="renderPlan()"> hide ⚠ risky</label>
  &nbsp; <label class="sub"><input type="radio" name="szmode" value="pick" checked onchange="renderPlan()"> minimal size</label>
@@ -1364,7 +1372,9 @@ function showTab(t){
 }
 let PLAN = null, PSEL = {}, BP = null, OLOCK = {};
 function pwhich(){ const el = document.querySelector('input[name="pwhich"]:checked'); return el ? el.value : 'politics'; }
-function switchPlan(){ PLAN = null; PSEL = {}; loadPlan(); }
+function switchPlan(){ PLAN = null; PSEL = {};
+  document.getElementById('golfCapRow').style.display = pwhich() === 'golf' ? '' : 'none';
+  loadPlan(); }
 function mroom(m){  // per-market budget left after existing resting orders
   return BP == null ? null : BP - (OLOCK[m] || 0);
 }
@@ -1382,6 +1392,22 @@ async function loadPlan(){
 }
 function planCap(v){ document.getElementById('capLbl').textContent = v + '¢'; renderPlan(); }
 function planSell(v){ document.getElementById('sellLbl').textContent = v + '¢'; renderPlan(); }
+function golfCap(v){ localStorage.setItem('golfCap', v);
+  document.getElementById('golfCapLbl').textContent = '$' + (v/100).toFixed(2); renderPlan(); }
+(function(){ const v = localStorage.getItem('golfCap');
+  if(v){ document.getElementById('golfCapSlider').value = v;
+         document.getElementById('golfCapLbl').textContent = '$' + (+v/100).toFixed(2); } })();
+function gfac(){  // chosen per-golfer cap vs the cap the scan allocated with
+  const base = (PLAN && PLAN.plan && PLAN.plan.max_risk) || 1;
+  return (+document.getElementById('golfCapSlider').value / 100) / base;
+}
+function gscale(v){  // rescale one planned order to the chosen golf cap
+  const f = gfac(); if(!v || Math.abs(f - 1) < 1e-9) return v;
+  const q = Math.max(1, Math.round(v.size * f));
+  const s0 = Math.min(v.share/100, 0.999), sq = shareAt(v, q);
+  return Object.assign({}, v, {size: q, capital: +(v.price * q).toFixed(2),
+    est_day: +(v.est_day * (s0 > 0 ? sq/s0 : 0)).toFixed(2), share: +(sq*100).toFixed(1)});
+}
 function pkey(r){ return r.market + '|' + (r.side || 'BUY'); }
 function szmode(){ const el = document.querySelector('input[name="szmode"]:checked'); return el ? el.value : 'pick'; }
 function shareAt(m, q){
@@ -1406,7 +1432,10 @@ function afford(r){
           est_day: +(m.est_day * (s0 > 0 ? sq / s0 : 0)).toFixed(2),
           share: +(sq * 100).toFixed(1), sized_down: true};
 }
-function ord(r){ return (szmode() === 'max' && r.max) ? afford(r) : r.pick; }
+function ord(r){
+  if(pwhich() === 'golf') return gscale((szmode() === 'max' && r.max) ? r.max : r.pick);
+  return (szmode() === 'max' && r.max) ? afford(r) : r.pick;
+}
 function planRows(){
   const cap = +document.getElementById('capSlider').value;
   const sMin = +document.getElementById('sellSlider').value;
@@ -1431,8 +1460,9 @@ function renderPlan(){
   document.getElementById('plan').innerHTML =
     '<tr><th></th><th>Market</th><th>Side</th><th class="r">@</th><th class="r">Size</th><th class="r">Cap.</th><th class="r">$/day</th></tr>' +
     planRows().map(r => { const p = ord(r), k = pkey(r);
-      const upTo = (szmode() !== 'max' && r.max) ?
-        '<div class="sub" style="font-size:10px">up to $'+r.max.est_day.toFixed(2)+'</div>' : '';
+      const mx = (pwhich() === 'golf') ? gscale(r.max) : r.max;
+      const upTo = (szmode() !== 'max' && mx) ?
+        '<div class="sub" style="font-size:10px">up to $'+mx.est_day.toFixed(2)+'</div>' : '';
       return '<tr><td><input type="checkbox" '+(PSEL[k]?'checked':'')+
         ' onchange="PSEL[\\''+k+'\\']=this.checked;planSum()"></td>'+
         '<td class="mkt">'+esc(r.market)+(mine.has(r.market)?' ✔':'')+
@@ -1489,8 +1519,9 @@ async function placeBatch(){
       byG[g] = (byG[g]||0) + ord(r).capital; });
     const gWorst = Math.max(0, ...Object.values(byG));
     const gTot = sel.reduce((s,r)=>s+ord(r).capital,0);
-    capLine = Object.keys(byG).length + ' golfers · max $' + gWorst.toFixed(2) +
-      ' on any one golfer · $' + gTot.toFixed(2) + ' total at risk if every bid filled';
+    const gCap = +document.getElementById('golfCapSlider').value / 100;
+    capLine = Object.keys(byG).length + ' golfers (cap $' + gCap.toFixed(2) + '/golfer) · max $' +
+      gWorst.toFixed(2) + ' on any one golfer · $' + gTot.toFixed(2) + ' total at risk if every bid filled';
   } else {
     capLine = 'Max $' + worst.toFixed(0) +
       ' locked in any one market (buying power applies per market)';

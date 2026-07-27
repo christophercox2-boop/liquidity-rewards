@@ -513,7 +513,8 @@ def golf_main() -> None:
         f.write("\n".join(lines))
     os.makedirs("data", exist_ok=True)
     with open("data/scan_golf.json", "w") as f:
-        json.dump({"generated": tr._et_str(), "results": results}, f, indent=1)
+        json.dump({"generated": tr._et_str(), "max_risk": GOLF_MAX_RISK,
+                   "results": results}, f, indent=1)
     print(f"PLAN-GOLF.md: {len(results)} placements, ~${tot:,.2f}/day, ${cap:,.0f} max at risk")
 
 
