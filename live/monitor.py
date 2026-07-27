@@ -1470,9 +1470,21 @@ async function placeBatch(){
   const worst = Math.max(0, ...Object.values(perMktCap(sel)));
   const nS = sel.filter(r=>r.side==='SELL').length;
   const nRisk = sel.filter(r=>r.risk).length;
+  let capLine;
+  if(pwhich() === 'golf'){
+    const byG = {};
+    sel.forEach(r => { const g = r.market.split('-').pop();
+      byG[g] = (byG[g]||0) + ord(r).capital; });
+    const gWorst = Math.max(0, ...Object.values(byG));
+    const gTot = sel.reduce((s,r)=>s+ord(r).capital,0);
+    capLine = Object.keys(byG).length + ' golfers · max $' + gWorst.toFixed(2) +
+      ' on any one golfer · $' + gTot.toFixed(2) + ' total at risk if every bid filled';
+  } else {
+    capLine = 'Max $' + worst.toFixed(0) +
+      ' locked in any one market (buying power applies per market)';
+  }
   if(!confirm('Place ' + sel.length + ' post-only orders (' + (sel.length-nS) + ' buys, ' + nS +
-              ' sells)?\\nMax $' + worst.toFixed(0) +
-              ' locked in any one market (buying power applies per market), ~$' +
+              ' sells)?\\n' + capLine + ', ~$' +
               est.toFixed(2) + '/day at current books.' +
               (BP != null && worst > BP ? '\\n⚠ at least one market exceeds your $' + BP.toFixed(0) +
                ' buying power — its excess orders will be rejected!' : '') +
