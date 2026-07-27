@@ -2,17 +2,17 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-07-27 1:49 PM ET
+## ✅ Last successful check: 2026-07-27 1:58 PM ET
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
 ## 📌 Summary
 
-**Earning right now:** ~$170.59/day estimated (ceiling, not promise — details below)
+**Earning right now:** ~$173.74/day estimated (ceiling, not promise — details below)
 
 **Earned:** $962.30 lifetime ($155.84 paid). Last three recorded days — 2026-07-25: **$125.69** ⚠️ pending bucket — covers every day since then, still growing · 2026-07-24: **$135.19** · 2026-07-23: **$227.63** _(Polymarket reports ~1–2 days behind)_
 
-**What else to join:** `enwc-ussep-mn-2026-08-11-dem-pegfla` — SELL at the best price, ~$18.78/day for 200 contracts. Runners-up: `enwc-ussep-mi-2026-08-04-dem-abdels` (~$12.99/day), `enwc-ussep-mi-2026-08-04-dem-halste` (~$10.45/day)
+**What else to join:** `enwc-ussep-mn-2026-08-11-dem-pegfla` — BUY at the best price, ~$21.55/day for 200 contracts. Runners-up: `enwc-ussep-mi-2026-08-04-dem-abdels` (~$11.23/day), `enwc-ussep-mi-2026-08-04-dem-halste` (~$10.45/day)
 
 ---
 
@@ -20,7 +20,7 @@ This runs automatically every hour. **If the timestamp above is more than ~2 hou
 
 ## 📍 Right now — your resting orders
 
-### Estimated earning rate: ~$170.59/day (~$7.11/hour)
+### Estimated earning rate: ~$173.74/day (~$7.24/hour)
 
 Rough estimate — assumes the books, pools, and your orders stay as they are, both sides keep qualifying, each pool covers its whole event/race (so it's divided across that race's open markets), and splits evenly between bid and ask. Scored with the official formula: `DiscountFactor ^ (ticks from best price) × size`, counting only orders inside the Target Size window. Earning orders first.
 
@@ -28,34 +28,34 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 |---|---|---:|---:|---:|---:|---|
 | `pvwc-housepopw-2026-11-03-dem` | BUY | 86.0¢ | 40 | 0 | $100.00 | ✅ scoring — ~100.0% of bid side (2,890 resting ≥ 2,000 ✓) ≈ $25.00/day (pool ÷ 2 markets) |
 | `ewc-pres-fra-2027-04-11-edophi` | BUY | 16.0¢ | 100 | 0 | $100.00 | ✅ scoring — ~98.5% of bid side (25,587 resting ≥ 2,000 ✓) ≈ $4.48/day (pool ÷ 11 markets) |
-| `vmc-ussep-misen-2026-08-04-ste15-20` | SELL | 2.0¢ | 1 | 0 | $100.00 | ✅ scoring — ~83.1% of ask side (43,400 resting ≥ 2,000 ✓) ≈ $4.16/day (pool ÷ 10 markets) |
-| `mlaec-isrpol-pm-2026-10-27-ayesha` | BUY | 1.0¢ | 2,000 | 1 | $100.00 | ✅ scoring — ~79.4% of bid side (2,497 resting ≥ 2,000 ✓) ≈ $3.97/day (pool ÷ 10 markets) |
+| `mlaec-isrpol-pm-2026-10-27-ayesha` | BUY | 1.0¢ | 2,000 | 1 | $100.00 | ✅ scoring — ~80.5% of bid side (2,479 resting ≥ 2,000 ✓) ≈ $4.03/day (pool ÷ 10 markets) |
+| `vmc-ussep-misen-2026-08-04-ste15-20` | SELL | 2.0¢ | 1 | 0 | $100.00 | ✅ scoring — ~76.2% of ask side (43,400 resting ≥ 2,000 ✓) ≈ $3.81/day (pool ÷ 10 markets) |
 | `scc-senate-gop-2026-11-03-51` | BUY | 16.0¢ | 100 | 1 | $100.00 | ✅ scoring — ~74.4% of bid side (200,555 resting ≥ 2,000 ✓) ≈ $2.86/day (pool ÷ 13 markets) |
-| `ewc-pres-arg-2027-10-24-vicvil` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~73.7% of bid side (2,201 resting ≥ 2,000 ✓) ≈ $3.35/day (pool ÷ 11 markets) |
+| `vmc-ussep-misen-2026-08-04-els10-15` | SELL | 22.0¢ | 30 | 0 | $100.00 | ✅ scoring — ~72.6% of ask side (61,658 resting ≥ 2,000 ✓) ≈ $3.63/day (pool ÷ 10 markets) |
 | `scc-senate-gop-2026-11-03-48` | SELL | 10.0¢ | 53 | 0 | $100.00 | ✅ scoring — ~66.9% of ask side (103,566 resting ≥ 2,000 ✓) ≈ $2.57/day (pool ÷ 13 markets) |
 | `cranc-uspres28-12-31-2026-jdvan` | BUY | 22.0¢ | 100 | 3 | $100.00 | ✅ scoring — ~63.3% of bid side (50,793 resting ≥ 2,000 ✓) ≈ $0.96/day (pool ÷ 33 markets) |
 | `ewc-pres-arg-2027-10-24-facman` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~62.3% of bid side (2,701 resting ≥ 2,000 ✓) ≈ $2.83/day (pool ÷ 11 markets) |
 | `ewc-pres-arg-2027-10-24-sermas` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~62.3% of bid side (2,701 resting ≥ 2,000 ✓) ≈ $2.83/day (pool ÷ 11 markets) |
-| `ewc-pres-arg-2027-10-24-maumac` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~62.3% of bid side (2,701 resting ≥ 2,000 ✓) ≈ $2.83/day (pool ÷ 11 markets) |
-| `enwc-ussep-sc-2026-08-11-rep-alawil` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~56.8% of bid side (2,509 resting ≥ 2,000 ✓) ≈ $2.36/day (pool ÷ 12 markets) |
 | `enwc-ussep-sc-2026-08-11-rep-wiltim` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~56.8% of bid side (2,509 resting ≥ 2,000 ✓) ≈ $2.36/day (pool ÷ 12 markets) |
-| `apdc-trumpadmin-2026-scobes` | BUY | 15.0¢ | 100 | 2 | $100.00 | ✅ scoring — ~55.8% of bid side (100,677 resting ≥ 2,000 ✓) ≈ $1.64/day (pool ÷ 17 markets) |
-| `ewc-pres-arg-2027-10-24-juasch` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~53.7% of bid side (2,709 resting ≥ 2,000 ✓) ≈ $2.44/day (pool ÷ 11 markets) |
+| `enwc-ussep-sc-2026-08-11-rep-alawil` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~56.8% of bid side (2,509 resting ≥ 2,000 ✓) ≈ $2.36/day (pool ÷ 12 markets) |
 | `ewc-pres-arg-2027-10-24-estbul` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~53.7% of bid side (2,709 resting ≥ 2,000 ✓) ≈ $2.44/day (pool ÷ 11 markets) |
 | `ewc-pres-arg-2027-10-24-myrbre` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~53.7% of bid side (2,709 resting ≥ 2,000 ✓) ≈ $2.44/day (pool ÷ 11 markets) |
-| `cranc-uspres28-12-31-2026-hunbid` | BUY | 13.0¢ | 100 | 2 | $100.00 | ✅ scoring — ~53.1% of bid side (50,381 resting ≥ 2,000 ✓) ≈ $0.80/day (pool ÷ 33 markets) |
+| `ewc-pres-arg-2027-10-24-maumac` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~53.7% of bid side (2,709 resting ≥ 2,000 ✓) ≈ $2.44/day (pool ÷ 11 markets) |
+| `ewc-pres-arg-2027-10-24-juasch` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~53.7% of bid side (2,709 resting ≥ 2,000 ✓) ≈ $2.44/day (pool ÷ 11 markets) |
+| `ewc-pres-arg-2027-10-24-vicvil` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~53.7% of bid side (2,709 resting ≥ 2,000 ✓) ≈ $2.44/day (pool ÷ 11 markets) |
 | `cranc-uspres28-12-31-2026-aleoca` | BUY | 23.0¢ | 100 | 3 | $100.00 | ✅ scoring — ~52.9% of bid side (50,822 resting ≥ 2,000 ✓) ≈ $0.80/day (pool ÷ 33 markets) |
-| `vmc-ussep-misen-2026-08-04-els0-5` | SELL | 27.0¢ | 9 | 0 | $100.00 | ✅ scoring — ~52.0% of ask side (99,485 resting ≥ 2,000 ✓) ≈ $2.60/day (pool ÷ 10 markets) |
+| `vmc-ussep-misen-2026-08-04-els0-5` | SELL | 27.0¢ | 9 | 0 | $100.00 | ✅ scoring — ~52.7% of ask side (99,485 resting ≥ 2,000 ✓) ≈ $2.64/day (pool ÷ 10 markets) |
 | `pintc-meet-put-zel-2026-12-31` | BUY | 8.0¢ | 200 | 2 | $100.00 | ✅ scoring — ~51.1% of bid side (21,178 resting ≥ 2,000 ✓) ≈ $8.51/day (pool ÷ 3 markets) |
-| `scc-hrep-rep-2026-11-03-gte205` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~50.2% of bid side (2,460 resting ≥ 2,000 ✓) ≈ $2.09/day (pool ÷ 12 markets) |
-| `nphc-attgen-edmar` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~50.2% of bid side (2,460 resting ≥ 2,000 ✓) ≈ $1.57/day (pool ÷ 16 markets) |
-| `nphc-attgen-andbai` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~50.2% of bid side (2,453 resting ≥ 2,000 ✓) ≈ $1.57/day (pool ÷ 16 markets) |
 | `nphc-attgen-robgiu` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~50.2% of bid side (2,460 resting ≥ 2,000 ✓) ≈ $1.57/day (pool ÷ 16 markets) |
-| `nphc-attgen-matwhi` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~50.2% of bid side (2,460 resting ≥ 2,000 ✓) ≈ $1.57/day (pool ÷ 16 markets) |
-| `vmc-ussep-misen-2026-08-04-els10-15` | SELL | 22.0¢ | 30 | 0 | $100.00 | ✅ scoring — ~48.8% of ask side (61,678 resting ≥ 2,000 ✓) ≈ $2.44/day (pool ÷ 10 markets) |
-| `nphc-attgen-jefjen` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~44.5% of bid side (2,461 resting ≥ 2,000 ✓) ≈ $1.39/day (pool ÷ 16 markets) |
+| `scc-hrep-rep-2026-11-03-gte205` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~50.2% of bid side (2,460 resting ≥ 2,000 ✓) ≈ $2.09/day (pool ÷ 12 markets) |
+| `nphc-attgen-edmar` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~50.2% of bid side (2,453 resting ≥ 2,000 ✓) ≈ $1.57/day (pool ÷ 16 markets) |
+| `nphc-attgen-andbai` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~50.2% of bid side (2,453 resting ≥ 2,000 ✓) ≈ $1.57/day (pool ÷ 16 markets) |
+| `cranc-uspres28-12-31-2026-hunbid` | BUY | 13.0¢ | 100 | 2 | $100.00 | ✅ scoring — ~47.1% of bid side (50,387 resting ≥ 2,000 ✓) ≈ $0.71/day (pool ÷ 33 markets) |
+| `nphc-attgen-matwhi` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~44.5% of bid side (2,461 resting ≥ 2,000 ✓) ≈ $1.39/day (pool ÷ 16 markets) |
 | `scc-hrep-rep-2026-11-03-gte210` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~44.5% of bid side (2,461 resting ≥ 2,000 ✓) ≈ $1.85/day (pool ÷ 12 markets) |
 | `nphc-attgen-ashmoo` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~44.5% of bid side (2,461 resting ≥ 2,000 ✓) ≈ $1.39/day (pool ÷ 16 markets) |
+| `nphc-attgen-jefjen` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~44.5% of bid side (2,461 resting ≥ 2,000 ✓) ≈ $1.39/day (pool ÷ 16 markets) |
+| `enwc-ussep-sc-2026-08-11-rep-paudan` | BUY | 1.0¢ | 2,000 | 9 | $100.00 | ✅ scoring — ~44.0% of bid side (2,504 resting ≥ 2,000 ✓) ≈ $1.83/day (pool ÷ 12 markets) |
 | …and 93 more | | | | | | |
 
 **Tap an order for its book window and the math:**
@@ -113,45 +113,16 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
-<details><summary><code>vmc-ussep-misen-2026-08-04-ste15-20</code> SELL 1 @ 2¢ → $4.16/day</summary>
-
-| | Asks | Resting | Score |
-|---|---:|---:|---:|
-| ▶ | 2¢ | 1 (1 yours) | ×0.5^0 = 1.0 |
-|  | 8¢ | 6 | ×0.5^6 = 0.1 |
-|  | 10¢ | 28 | ×0.5^8 = 0.1 |
-|  | 43¢ | 3,387 | ×0.5^41 = 0.0 |
-| | | **Σ** | **1.2** |
-
-`yours 1.0 / Σ 1.2 = 83.1%`  
-`$100 ÷ 10 ÷ 2 = $5.00 × 83.1% = $4.16/day`  
-
-<details><summary>÷ 10 markets in this race — tap to list</summary>
-
-1. `vmc-ussep-misen-2026-08-04-els0-5`
-2. `vmc-ussep-misen-2026-08-04-els10-15`
-3. `vmc-ussep-misen-2026-08-04-els15-20`
-4. `vmc-ussep-misen-2026-08-04-els5-10`
-5. `vmc-ussep-misen-2026-08-04-elsgte20`
-6. `vmc-ussep-misen-2026-08-04-ste0-5`
-7. `vmc-ussep-misen-2026-08-04-ste05-10`
-8. `vmc-ussep-misen-2026-08-04-ste10-15`
-9. `vmc-ussep-misen-2026-08-04-ste15-20` ← this one
-10. `vmc-ussep-misen-2026-08-04-stegte20`
-
-</details>
-
-</details>
-<details><summary><code>mlaec-isrpol-pm-2026-10-27-ayesha</code> BUY 2,000 @ 1¢ → $3.97/day</summary>
+<details><summary><code>mlaec-isrpol-pm-2026-10-27-ayesha</code> BUY 2,000 @ 1¢ → $4.03/day</summary>
 
 | | Bids | Resting | Score |
 |---|---:|---:|---:|
-|  | 2¢ | 22 | ×0.5^0 = 22.0 |
+|  | 2¢ | 4 | ×0.5^0 = 4.0 |
 | ▶ | 1¢ | 2,475 (2,000 yours) | ×0.5^1 = 1,237.5 |
-| | | **Σ** | **1,259.5** |
+| | | **Σ** | **1,241.5** |
 
-`yours 1,000.0 / Σ 1,259.5 = 79.4%`  
-`$100 ÷ 10 ÷ 2 = $5.00 × 79.4% = $3.97/day`  
+`yours 1,000.0 / Σ 1,241.5 = 80.5%`  
+`$100 ÷ 10 ÷ 2 = $5.00 × 80.5% = $4.03/day`  
 
 <details><summary>÷ 10 markets in this race — tap to list</summary>
 
@@ -165,6 +136,35 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 8. `mlaec-isrpol-pm-2026-10-27-nafben`
 9. `mlaec-isrpol-pm-2026-10-27-yailap`
 10. `mlaec-isrpol-pm-2026-10-27-yoahen`
+
+</details>
+
+</details>
+<details><summary><code>vmc-ussep-misen-2026-08-04-ste15-20</code> SELL 1 @ 2¢ → $3.81/day</summary>
+
+| | Asks | Resting | Score |
+|---|---:|---:|---:|
+| ▶ | 2¢ | 1 (1 yours) | ×0.5^0 = 1.0 |
+|  | 8¢ | 6 | ×0.5^6 = 0.1 |
+|  | 9¢ | 28 | ×0.5^7 = 0.2 |
+|  | 43¢ | 3,387 | ×0.5^41 = 0.0 |
+| | | **Σ** | **1.3** |
+
+`yours 1.0 / Σ 1.3 = 76.2%`  
+`$100 ÷ 10 ÷ 2 = $5.00 × 76.2% = $3.81/day`  
+
+<details><summary>÷ 10 markets in this race — tap to list</summary>
+
+1. `vmc-ussep-misen-2026-08-04-els0-5`
+2. `vmc-ussep-misen-2026-08-04-els10-15`
+3. `vmc-ussep-misen-2026-08-04-els15-20`
+4. `vmc-ussep-misen-2026-08-04-els5-10`
+5. `vmc-ussep-misen-2026-08-04-elsgte20`
+6. `vmc-ussep-misen-2026-08-04-ste0-5`
+7. `vmc-ussep-misen-2026-08-04-ste05-10`
+8. `vmc-ussep-misen-2026-08-04-ste10-15`
+9. `vmc-ussep-misen-2026-08-04-ste15-20` ← this one
+10. `vmc-ussep-misen-2026-08-04-stegte20`
 
 </details>
 
@@ -200,30 +200,33 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
-<details><summary><code>ewc-pres-arg-2027-10-24-vicvil</code> BUY 2,000 @ 1¢ → $3.35/day</summary>
+<details><summary><code>vmc-ussep-misen-2026-08-04-els10-15</code> SELL 30 @ 22¢ → $3.63/day</summary>
 
-| | Bids | Resting | Score |
+| | Asks | Resting | Score |
 |---|---:|---:|---:|
-|  | 10¢ | 1 | ×0.5^0 = 1.0 |
-| ▶ | 1¢ | 2,200 (2,000 yours) | ×0.5^9 = 4.3 |
-| | | **Σ** | **5.3** |
+| ▶ | 22¢ | 41 (30 yours) | ×0.5^0 = 41.0 |
+|  | 28¢ | 6 | ×0.5^6 = 0.1 |
+|  | 29¢ | 28 | ×0.5^7 = 0.2 |
+|  | 45¢ | 25 | ×0.5^23 = 0.0 |
+|  | 97¢ | 5 | ×0.5^75 = 0.0 |
+|  | 98¢ | 61,053 | ×0.5^76 = 0.0 |
+| | | **Σ** | **41.3** |
 
-`yours 3.9 / Σ 5.3 = 73.7%`  
-`$100 ÷ 11 ÷ 2 = $4.55 × 73.7% = $3.35/day`  
+`yours 30.0 / Σ 41.3 = 72.6%`  
+`$100 ÷ 10 ÷ 2 = $5.00 × 72.6% = $3.63/day`  
 
-<details><summary>÷ 11 markets in this race — tap to list</summary>
+<details><summary>÷ 10 markets in this race — tap to list</summary>
 
-1. `ewc-pres-arg-2027-10-24-axekic`
-2. `ewc-pres-arg-2027-10-24-dangeb`
-3. `ewc-pres-arg-2027-10-24-estbul`
-4. `ewc-pres-arg-2027-10-24-facman`
-5. `ewc-pres-arg-2027-10-24-javmil`
-6. `ewc-pres-arg-2027-10-24-juagra`
-7. `ewc-pres-arg-2027-10-24-juasch`
-8. `ewc-pres-arg-2027-10-24-maumac`
-9. `ewc-pres-arg-2027-10-24-myrbre`
-10. `ewc-pres-arg-2027-10-24-sermas`
-11. `ewc-pres-arg-2027-10-24-vicvil` ← this one
+1. `vmc-ussep-misen-2026-08-04-els0-5`
+2. `vmc-ussep-misen-2026-08-04-els10-15` ← this one
+3. `vmc-ussep-misen-2026-08-04-els15-20`
+4. `vmc-ussep-misen-2026-08-04-els5-10`
+5. `vmc-ussep-misen-2026-08-04-elsgte20`
+6. `vmc-ussep-misen-2026-08-04-ste0-5`
+7. `vmc-ussep-misen-2026-08-04-ste05-10`
+8. `vmc-ussep-misen-2026-08-04-ste10-15`
+9. `vmc-ussep-misen-2026-08-04-ste15-20`
+10. `vmc-ussep-misen-2026-08-04-stegte20`
 
 </details>
 
@@ -370,64 +373,6 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
-<details><summary><code>ewc-pres-arg-2027-10-24-maumac</code> BUY 2,000 @ 1¢ → $2.83/day</summary>
-
-| | Bids | Resting | Score |
-|---|---:|---:|---:|
-|  | 10¢ | 1 | ×0.5^0 = 1.0 |
-| ▶ | 1¢ | 2,700 (2,000 yours) | ×0.5^9 = 5.3 |
-| | | **Σ** | **6.3** |
-
-`yours 3.9 / Σ 6.3 = 62.3%`  
-`$100 ÷ 11 ÷ 2 = $4.55 × 62.3% = $2.83/day`  
-
-<details><summary>÷ 11 markets in this race — tap to list</summary>
-
-1. `ewc-pres-arg-2027-10-24-axekic`
-2. `ewc-pres-arg-2027-10-24-dangeb`
-3. `ewc-pres-arg-2027-10-24-estbul`
-4. `ewc-pres-arg-2027-10-24-facman`
-5. `ewc-pres-arg-2027-10-24-javmil`
-6. `ewc-pres-arg-2027-10-24-juagra`
-7. `ewc-pres-arg-2027-10-24-juasch`
-8. `ewc-pres-arg-2027-10-24-maumac` ← this one
-9. `ewc-pres-arg-2027-10-24-myrbre`
-10. `ewc-pres-arg-2027-10-24-sermas`
-11. `ewc-pres-arg-2027-10-24-vicvil`
-
-</details>
-
-</details>
-<details><summary><code>enwc-ussep-sc-2026-08-11-rep-alawil</code> BUY 2,000 @ 1¢ → $2.36/day</summary>
-
-| | Bids | Resting | Score |
-|---|---:|---:|---:|
-|  | 10¢ | 1 | ×0.5^0 = 1.0 |
-|  | 7¢ | 8 | ×0.5^3 = 1.0 |
-| ▶ | 1¢ | 2,500 (2,000 yours) | ×0.5^9 = 4.9 |
-| | | **Σ** | **6.9** |
-
-`yours 3.9 / Σ 6.9 = 56.8%`  
-`$100 ÷ 12 ÷ 2 = $4.17 × 56.8% = $2.36/day`  
-
-<details><summary>÷ 12 markets in this race — tap to list</summary>
-
-1. `enwc-ussep-sc-2026-08-11-rep-alawil` ← this one
-2. `enwc-ussep-sc-2026-08-11-rep-andbau`
-3. `enwc-ussep-sc-2026-08-11-rep-darnor`
-4. `enwc-ussep-sc-2026-08-11-rep-joewil`
-5. `enwc-ussep-sc-2026-08-11-rep-marlyn`
-6. `enwc-ussep-sc-2026-08-11-rep-nanmac`
-7. `enwc-ussep-sc-2026-08-11-rep-pameve`
-8. `enwc-ussep-sc-2026-08-11-rep-paudan`
-9. `enwc-ussep-sc-2026-08-11-rep-ralnor`
-10. `enwc-ussep-sc-2026-08-11-rep-rusfry`
-11. `enwc-ussep-sc-2026-08-11-rep-tregow`
-12. `enwc-ussep-sc-2026-08-11-rep-wiltim`
-
-</details>
-
-</details>
 <details><summary><code>enwc-ussep-sc-2026-08-11-rep-wiltim</code> BUY 2,000 @ 1¢ → $2.36/day</summary>
 
 | | Bids | Resting | Score |
@@ -458,67 +403,32 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
-<details><summary><code>apdc-trumpadmin-2026-scobes</code> BUY 100 @ 15¢ → $1.64/day</summary>
-
-| | Bids | Resting | Score |
-|---|---:|---:|---:|
-|  | 17¢ | 3 | ×0.5^0 = 3.0 |
-| ▶ | 15¢ | 108 (100 yours) | ×0.5^2 = 27.0 |
-|  | 12¢ | 425 | ×0.5^5 = 13.3 |
-|  | 1¢ | 100,141 | ×0.5^16 = 1.5 |
-| | | **Σ** | **44.8** |
-
-`yours 25.0 / Σ 44.8 = 55.8%`  
-`$100 ÷ 17 ÷ 2 = $2.94 × 55.8% = $1.64/day`  
-
-<details><summary>÷ 17 markets in this race — tap to list</summary>
-
-1. `apdc-trumpadmin-2026-brorol`
-2. `apdc-trumpadmin-2026-howlut`
-3. `apdc-trumpadmin-2026-johrat`
-4. `apdc-trumpadmin-2026-karlea`
-5. `apdc-trumpadmin-2026-kaspat`
-6. `apdc-trumpadmin-2026-linmcm`
-7. `apdc-trumpadmin-2026-marrub`
-8. `apdc-trumpadmin-2026-petheg`
-9. `apdc-trumpadmin-2026-robken`
-10. `apdc-trumpadmin-2026-rodsco`
-11. `apdc-trumpadmin-2026-rusvou`
-12. `apdc-trumpadmin-2026-scobes` ← this one
-13. `apdc-trumpadmin-2026-steche`
-14. `apdc-trumpadmin-2026-stemil`
-15. `apdc-trumpadmin-2026-stewit`
-16. `apdc-trumpadmin-2026-suswil`
-17. `apdc-trumpadmin-2026-tomhom`
-
-</details>
-
-</details>
-<details><summary><code>ewc-pres-arg-2027-10-24-juasch</code> BUY 2,000 @ 1¢ → $2.44/day</summary>
+<details><summary><code>enwc-ussep-sc-2026-08-11-rep-alawil</code> BUY 2,000 @ 1¢ → $2.36/day</summary>
 
 | | Bids | Resting | Score |
 |---|---:|---:|---:|
 |  | 10¢ | 1 | ×0.5^0 = 1.0 |
 |  | 7¢ | 8 | ×0.5^3 = 1.0 |
-| ▶ | 1¢ | 2,700 (2,000 yours) | ×0.5^9 = 5.3 |
-| | | **Σ** | **7.3** |
+| ▶ | 1¢ | 2,500 (2,000 yours) | ×0.5^9 = 4.9 |
+| | | **Σ** | **6.9** |
 
-`yours 3.9 / Σ 7.3 = 53.7%`  
-`$100 ÷ 11 ÷ 2 = $4.55 × 53.7% = $2.44/day`  
+`yours 3.9 / Σ 6.9 = 56.8%`  
+`$100 ÷ 12 ÷ 2 = $4.17 × 56.8% = $2.36/day`  
 
-<details><summary>÷ 11 markets in this race — tap to list</summary>
+<details><summary>÷ 12 markets in this race — tap to list</summary>
 
-1. `ewc-pres-arg-2027-10-24-axekic`
-2. `ewc-pres-arg-2027-10-24-dangeb`
-3. `ewc-pres-arg-2027-10-24-estbul`
-4. `ewc-pres-arg-2027-10-24-facman`
-5. `ewc-pres-arg-2027-10-24-javmil`
-6. `ewc-pres-arg-2027-10-24-juagra`
-7. `ewc-pres-arg-2027-10-24-juasch` ← this one
-8. `ewc-pres-arg-2027-10-24-maumac`
-9. `ewc-pres-arg-2027-10-24-myrbre`
-10. `ewc-pres-arg-2027-10-24-sermas`
-11. `ewc-pres-arg-2027-10-24-vicvil`
+1. `enwc-ussep-sc-2026-08-11-rep-alawil` ← this one
+2. `enwc-ussep-sc-2026-08-11-rep-andbau`
+3. `enwc-ussep-sc-2026-08-11-rep-darnor`
+4. `enwc-ussep-sc-2026-08-11-rep-joewil`
+5. `enwc-ussep-sc-2026-08-11-rep-marlyn`
+6. `enwc-ussep-sc-2026-08-11-rep-nanmac`
+7. `enwc-ussep-sc-2026-08-11-rep-pameve`
+8. `enwc-ussep-sc-2026-08-11-rep-paudan`
+9. `enwc-ussep-sc-2026-08-11-rep-ralnor`
+10. `enwc-ussep-sc-2026-08-11-rep-rusfry`
+11. `enwc-ussep-sc-2026-08-11-rep-tregow`
+12. `enwc-ussep-sc-2026-08-11-rep-wiltim`
 
 </details>
 
@@ -581,54 +491,89 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
-<details><summary><code>cranc-uspres28-12-31-2026-hunbid</code> BUY 100 @ 13¢ → $0.80/day</summary>
+<details><summary><code>ewc-pres-arg-2027-10-24-maumac</code> BUY 2,000 @ 1¢ → $2.44/day</summary>
 
 | | Bids | Resting | Score |
 |---|---:|---:|---:|
-|  | 15¢ | 13 | ×0.5^0 = 13.0 |
-|  | 14¢ | 12 | ×0.5^1 = 6.0 |
-| ▶ | 13¢ | 100 (100 yours) | ×0.5^2 = 25.0 |
-|  | 1¢ | 50,256 | ×0.5^14 = 3.1 |
-| | | **Σ** | **47.1** |
+|  | 10¢ | 1 | ×0.5^0 = 1.0 |
+|  | 7¢ | 8 | ×0.5^3 = 1.0 |
+| ▶ | 1¢ | 2,700 (2,000 yours) | ×0.5^9 = 5.3 |
+| | | **Σ** | **7.3** |
 
-`yours 25.0 / Σ 47.1 = 53.1%`  
-`$100 ÷ 33 ÷ 2 = $1.52 × 53.1% = $0.80/day`  
+`yours 3.9 / Σ 7.3 = 53.7%`  
+`$100 ÷ 11 ÷ 2 = $4.55 × 53.7% = $2.44/day`  
 
-<details><summary>÷ 33 markets in this race — tap to list</summary>
+<details><summary>÷ 11 markets in this race — tap to list</summary>
 
-1. `cranc-uspres28-12-31-2026-aleoca`
-2. `cranc-uspres28-12-31-2026-andyan`
-3. `cranc-uspres28-12-31-2026-bersan`
-4. `cranc-uspres28-12-31-2026-betoro`
-5. `cranc-uspres28-12-31-2026-corboo`
-6. `cranc-uspres28-12-31-2026-dontru`
-7. `cranc-uspres28-12-31-2026-dontrujr`
-8. `cranc-uspres28-12-31-2026-dwajoh`
-9. `cranc-uspres28-12-31-2026-elomus`
-10. `cranc-uspres28-12-31-2026-erikir`
-11. `cranc-uspres28-12-31-2026-gavnew`
-12. `cranc-uspres28-12-31-2026-hilcli`
-13. `cranc-uspres28-12-31-2026-hunbid` ← this one
-14. `cranc-uspres28-12-31-2026-jdvan`
-15. `cranc-uspres28-12-31-2026-jonoss`
-16. `cranc-uspres28-12-31-2026-jossha`
-17. `cranc-uspres28-12-31-2026-kamhar`
-18. `cranc-uspres28-12-31-2026-krinoe`
-19. `cranc-uspres28-12-31-2026-margre`
-20. `cranc-uspres28-12-31-2026-markel`
-21. `cranc-uspres28-12-31-2026-marrub`
-22. `cranc-uspres28-12-31-2026-micoba`
-23. `cranc-uspres28-12-31-2026-nikhal`
-24. `cranc-uspres28-12-31-2026-oprwin`
-25. `cranc-uspres28-12-31-2026-petbut`
-26. `cranc-uspres28-12-31-2026-rahema`
-27. `cranc-uspres28-12-31-2026-robken`
-28. `cranc-uspres28-12-31-2026-steban`
-29. `cranc-uspres28-12-31-2026-stesmi`
-30. `cranc-uspres28-12-31-2026-tedcru`
-31. `cranc-uspres28-12-31-2026-tuccar`
-32. `cranc-uspres28-12-31-2026-vivram`
-33. `cranc-uspres28-12-31-2026-zohmam`
+1. `ewc-pres-arg-2027-10-24-axekic`
+2. `ewc-pres-arg-2027-10-24-dangeb`
+3. `ewc-pres-arg-2027-10-24-estbul`
+4. `ewc-pres-arg-2027-10-24-facman`
+5. `ewc-pres-arg-2027-10-24-javmil`
+6. `ewc-pres-arg-2027-10-24-juagra`
+7. `ewc-pres-arg-2027-10-24-juasch`
+8. `ewc-pres-arg-2027-10-24-maumac` ← this one
+9. `ewc-pres-arg-2027-10-24-myrbre`
+10. `ewc-pres-arg-2027-10-24-sermas`
+11. `ewc-pres-arg-2027-10-24-vicvil`
+
+</details>
+
+</details>
+<details><summary><code>ewc-pres-arg-2027-10-24-juasch</code> BUY 2,000 @ 1¢ → $2.44/day</summary>
+
+| | Bids | Resting | Score |
+|---|---:|---:|---:|
+|  | 10¢ | 1 | ×0.5^0 = 1.0 |
+|  | 7¢ | 8 | ×0.5^3 = 1.0 |
+| ▶ | 1¢ | 2,700 (2,000 yours) | ×0.5^9 = 5.3 |
+| | | **Σ** | **7.3** |
+
+`yours 3.9 / Σ 7.3 = 53.7%`  
+`$100 ÷ 11 ÷ 2 = $4.55 × 53.7% = $2.44/day`  
+
+<details><summary>÷ 11 markets in this race — tap to list</summary>
+
+1. `ewc-pres-arg-2027-10-24-axekic`
+2. `ewc-pres-arg-2027-10-24-dangeb`
+3. `ewc-pres-arg-2027-10-24-estbul`
+4. `ewc-pres-arg-2027-10-24-facman`
+5. `ewc-pres-arg-2027-10-24-javmil`
+6. `ewc-pres-arg-2027-10-24-juagra`
+7. `ewc-pres-arg-2027-10-24-juasch` ← this one
+8. `ewc-pres-arg-2027-10-24-maumac`
+9. `ewc-pres-arg-2027-10-24-myrbre`
+10. `ewc-pres-arg-2027-10-24-sermas`
+11. `ewc-pres-arg-2027-10-24-vicvil`
+
+</details>
+
+</details>
+<details><summary><code>ewc-pres-arg-2027-10-24-vicvil</code> BUY 2,000 @ 1¢ → $2.44/day</summary>
+
+| | Bids | Resting | Score |
+|---|---:|---:|---:|
+|  | 10¢ | 1 | ×0.5^0 = 1.0 |
+|  | 7¢ | 8 | ×0.5^3 = 1.0 |
+| ▶ | 1¢ | 2,700 (2,000 yours) | ×0.5^9 = 5.3 |
+| | | **Σ** | **7.3** |
+
+`yours 3.9 / Σ 7.3 = 53.7%`  
+`$100 ÷ 11 ÷ 2 = $4.55 × 53.7% = $2.44/day`  
+
+<details><summary>÷ 11 markets in this race — tap to list</summary>
+
+1. `ewc-pres-arg-2027-10-24-axekic`
+2. `ewc-pres-arg-2027-10-24-dangeb`
+3. `ewc-pres-arg-2027-10-24-estbul`
+4. `ewc-pres-arg-2027-10-24-facman`
+5. `ewc-pres-arg-2027-10-24-javmil`
+6. `ewc-pres-arg-2027-10-24-juagra`
+7. `ewc-pres-arg-2027-10-24-juasch`
+8. `ewc-pres-arg-2027-10-24-maumac`
+9. `ewc-pres-arg-2027-10-24-myrbre`
+10. `ewc-pres-arg-2027-10-24-sermas`
+11. `ewc-pres-arg-2027-10-24-vicvil` ← this one
 
 </details>
 
@@ -689,19 +634,20 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
-<details><summary><code>vmc-ussep-misen-2026-08-04-els0-5</code> SELL 9 @ 27¢ → $2.60/day</summary>
+<details><summary><code>vmc-ussep-misen-2026-08-04-els0-5</code> SELL 9 @ 27¢ → $2.64/day</summary>
 
 | | Asks | Resting | Score |
 |---|---:|---:|---:|
 | ▶ | 27¢ | 16 (9 yours) | ×0.5^0 = 16.3 |
 |  | 30¢ | 4 | ×0.5^3 = 0.5 |
-|  | 33¢ | 34 | ×0.5^6 = 0.5 |
+|  | 33¢ | 6 | ×0.5^6 = 0.1 |
+|  | 34¢ | 28 | ×0.5^7 = 0.2 |
 |  | 45¢ | 25 | ×0.5^18 = 0.0 |
 |  | 98¢ | 98,906 | ×0.5^71 = 0.0 |
-| | | **Σ** | **17.3** |
+| | | **Σ** | **17.1** |
 
-`yours 9.0 / Σ 17.3 = 52.0%`  
-`$100 ÷ 10 ÷ 2 = $5.00 × 52.0% = $2.60/day`  
+`yours 9.0 / Σ 17.1 = 52.7%`  
+`$100 ÷ 10 ÷ 2 = $5.00 × 52.7% = $2.64/day`  
 
 <details><summary>÷ 10 markets in this race — tap to list</summary>
 
@@ -743,6 +689,40 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
+<details><summary><code>nphc-attgen-robgiu</code> BUY 2,000 @ 1¢ → $1.57/day</summary>
+
+| | Bids | Resting | Score |
+|---|---:|---:|---:|
+|  | 10¢ | 2 | ×0.5^0 = 2.0 |
+|  | 7¢ | 8 | ×0.5^3 = 1.0 |
+| ▶ | 1¢ | 2,450 (2,000 yours) | ×0.5^9 = 4.8 |
+| | | **Σ** | **7.8** |
+
+`yours 3.9 / Σ 7.8 = 50.2%`  
+`$100 ÷ 16 ÷ 2 = $3.12 × 50.2% = $1.57/day`  
+
+<details><summary>÷ 16 markets in this race — tap to list</summary>
+
+1. `nphc-attgen-ailcan`
+2. `nphc-attgen-alihab`
+3. `nphc-attgen-andbai`
+4. `nphc-attgen-ashmoo`
+5. `nphc-attgen-edmar`
+6. `nphc-attgen-hardhi`
+7. `nphc-attgen-jeapir`
+8. `nphc-attgen-jefjen`
+9. `nphc-attgen-kenpax`
+10. `nphc-attgen-leezel`
+11. `nphc-attgen-matgae`
+12. `nphc-attgen-matwhi`
+13. `nphc-attgen-robgiu` ← this one
+14. `nphc-attgen-rondes`
+15. `nphc-attgen-tedcru`
+16. `nphc-attgen-todbla`
+
+</details>
+
+</details>
 <details><summary><code>scc-hrep-rep-2026-11-03-gte205</code> BUY 2,000 @ 1¢ → $2.09/day</summary>
 
 | | Bids | Resting | Score |
@@ -777,8 +757,7 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 
 | | Bids | Resting | Score |
 |---|---:|---:|---:|
-|  | 10¢ | 2 | ×0.5^0 = 2.0 |
-|  | 7¢ | 8 | ×0.5^3 = 1.0 |
+|  | 10¢ | 3 | ×0.5^0 = 3.0 |
 | ▶ | 1¢ | 2,450 (2,000 yours) | ×0.5^9 = 4.8 |
 | | | **Σ** | **7.8** |
 
@@ -840,105 +819,59 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
-<details><summary><code>nphc-attgen-robgiu</code> BUY 2,000 @ 1¢ → $1.57/day</summary>
+<details><summary><code>cranc-uspres28-12-31-2026-hunbid</code> BUY 100 @ 13¢ → $0.71/day</summary>
 
 | | Bids | Resting | Score |
 |---|---:|---:|---:|
-|  | 10¢ | 2 | ×0.5^0 = 2.0 |
-|  | 7¢ | 8 | ×0.5^3 = 1.0 |
-| ▶ | 1¢ | 2,450 (2,000 yours) | ×0.5^9 = 4.8 |
-| | | **Σ** | **7.8** |
+|  | 15¢ | 19 | ×0.5^0 = 19.0 |
+|  | 14¢ | 12 | ×0.5^1 = 6.0 |
+| ▶ | 13¢ | 100 (100 yours) | ×0.5^2 = 25.0 |
+|  | 1¢ | 50,256 | ×0.5^14 = 3.1 |
+| | | **Σ** | **53.1** |
 
-`yours 3.9 / Σ 7.8 = 50.2%`  
-`$100 ÷ 16 ÷ 2 = $3.12 × 50.2% = $1.57/day`  
+`yours 25.0 / Σ 53.1 = 47.1%`  
+`$100 ÷ 33 ÷ 2 = $1.52 × 47.1% = $0.71/day`  
 
-<details><summary>÷ 16 markets in this race — tap to list</summary>
+<details><summary>÷ 33 markets in this race — tap to list</summary>
 
-1. `nphc-attgen-ailcan`
-2. `nphc-attgen-alihab`
-3. `nphc-attgen-andbai`
-4. `nphc-attgen-ashmoo`
-5. `nphc-attgen-edmar`
-6. `nphc-attgen-hardhi`
-7. `nphc-attgen-jeapir`
-8. `nphc-attgen-jefjen`
-9. `nphc-attgen-kenpax`
-10. `nphc-attgen-leezel`
-11. `nphc-attgen-matgae`
-12. `nphc-attgen-matwhi`
-13. `nphc-attgen-robgiu` ← this one
-14. `nphc-attgen-rondes`
-15. `nphc-attgen-tedcru`
-16. `nphc-attgen-todbla`
-
-</details>
-
-</details>
-<details><summary><code>nphc-attgen-matwhi</code> BUY 2,000 @ 1¢ → $1.57/day</summary>
-
-| | Bids | Resting | Score |
-|---|---:|---:|---:|
-|  | 10¢ | 2 | ×0.5^0 = 2.0 |
-|  | 7¢ | 8 | ×0.5^3 = 1.0 |
-| ▶ | 1¢ | 2,450 (2,000 yours) | ×0.5^9 = 4.8 |
-| | | **Σ** | **7.8** |
-
-`yours 3.9 / Σ 7.8 = 50.2%`  
-`$100 ÷ 16 ÷ 2 = $3.12 × 50.2% = $1.57/day`  
-
-<details><summary>÷ 16 markets in this race — tap to list</summary>
-
-1. `nphc-attgen-ailcan`
-2. `nphc-attgen-alihab`
-3. `nphc-attgen-andbai`
-4. `nphc-attgen-ashmoo`
-5. `nphc-attgen-edmar`
-6. `nphc-attgen-hardhi`
-7. `nphc-attgen-jeapir`
-8. `nphc-attgen-jefjen`
-9. `nphc-attgen-kenpax`
-10. `nphc-attgen-leezel`
-11. `nphc-attgen-matgae`
-12. `nphc-attgen-matwhi` ← this one
-13. `nphc-attgen-robgiu`
-14. `nphc-attgen-rondes`
-15. `nphc-attgen-tedcru`
-16. `nphc-attgen-todbla`
+1. `cranc-uspres28-12-31-2026-aleoca`
+2. `cranc-uspres28-12-31-2026-andyan`
+3. `cranc-uspres28-12-31-2026-bersan`
+4. `cranc-uspres28-12-31-2026-betoro`
+5. `cranc-uspres28-12-31-2026-corboo`
+6. `cranc-uspres28-12-31-2026-dontru`
+7. `cranc-uspres28-12-31-2026-dontrujr`
+8. `cranc-uspres28-12-31-2026-dwajoh`
+9. `cranc-uspres28-12-31-2026-elomus`
+10. `cranc-uspres28-12-31-2026-erikir`
+11. `cranc-uspres28-12-31-2026-gavnew`
+12. `cranc-uspres28-12-31-2026-hilcli`
+13. `cranc-uspres28-12-31-2026-hunbid` ← this one
+14. `cranc-uspres28-12-31-2026-jdvan`
+15. `cranc-uspres28-12-31-2026-jonoss`
+16. `cranc-uspres28-12-31-2026-jossha`
+17. `cranc-uspres28-12-31-2026-kamhar`
+18. `cranc-uspres28-12-31-2026-krinoe`
+19. `cranc-uspres28-12-31-2026-margre`
+20. `cranc-uspres28-12-31-2026-markel`
+21. `cranc-uspres28-12-31-2026-marrub`
+22. `cranc-uspres28-12-31-2026-micoba`
+23. `cranc-uspres28-12-31-2026-nikhal`
+24. `cranc-uspres28-12-31-2026-oprwin`
+25. `cranc-uspres28-12-31-2026-petbut`
+26. `cranc-uspres28-12-31-2026-rahema`
+27. `cranc-uspres28-12-31-2026-robken`
+28. `cranc-uspres28-12-31-2026-steban`
+29. `cranc-uspres28-12-31-2026-stesmi`
+30. `cranc-uspres28-12-31-2026-tedcru`
+31. `cranc-uspres28-12-31-2026-tuccar`
+32. `cranc-uspres28-12-31-2026-vivram`
+33. `cranc-uspres28-12-31-2026-zohmam`
 
 </details>
 
 </details>
-<details><summary><code>vmc-ussep-misen-2026-08-04-els10-15</code> SELL 30 @ 22¢ → $2.44/day</summary>
-
-| | Asks | Resting | Score |
-|---|---:|---:|---:|
-| ▶ | 22¢ | 61 (30 yours) | ×0.5^0 = 61.0 |
-|  | 28¢ | 34 | ×0.5^6 = 0.5 |
-|  | 45¢ | 25 | ×0.5^23 = 0.0 |
-|  | 97¢ | 5 | ×0.5^75 = 0.0 |
-|  | 98¢ | 61,053 | ×0.5^76 = 0.0 |
-| | | **Σ** | **61.5** |
-
-`yours 30.0 / Σ 61.5 = 48.8%`  
-`$100 ÷ 10 ÷ 2 = $5.00 × 48.8% = $2.44/day`  
-
-<details><summary>÷ 10 markets in this race — tap to list</summary>
-
-1. `vmc-ussep-misen-2026-08-04-els0-5`
-2. `vmc-ussep-misen-2026-08-04-els10-15` ← this one
-3. `vmc-ussep-misen-2026-08-04-els15-20`
-4. `vmc-ussep-misen-2026-08-04-els5-10`
-5. `vmc-ussep-misen-2026-08-04-elsgte20`
-6. `vmc-ussep-misen-2026-08-04-ste0-5`
-7. `vmc-ussep-misen-2026-08-04-ste05-10`
-8. `vmc-ussep-misen-2026-08-04-ste10-15`
-9. `vmc-ussep-misen-2026-08-04-ste15-20`
-10. `vmc-ussep-misen-2026-08-04-stegte20`
-
-</details>
-
-</details>
-<details><summary><code>nphc-attgen-jefjen</code> BUY 2,000 @ 1¢ → $1.39/day</summary>
+<details><summary><code>nphc-attgen-matwhi</code> BUY 2,000 @ 1¢ → $1.39/day</summary>
 
 | | Bids | Resting | Score |
 |---|---:|---:|---:|
@@ -959,11 +892,11 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 5. `nphc-attgen-edmar`
 6. `nphc-attgen-hardhi`
 7. `nphc-attgen-jeapir`
-8. `nphc-attgen-jefjen` ← this one
+8. `nphc-attgen-jefjen`
 9. `nphc-attgen-kenpax`
 10. `nphc-attgen-leezel`
 11. `nphc-attgen-matgae`
-12. `nphc-attgen-matwhi`
+12. `nphc-attgen-matwhi` ← this one
 13. `nphc-attgen-robgiu`
 14. `nphc-attgen-rondes`
 15. `nphc-attgen-tedcru`
@@ -1036,6 +969,69 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
+<details><summary><code>nphc-attgen-jefjen</code> BUY 2,000 @ 1¢ → $1.39/day</summary>
+
+| | Bids | Resting | Score |
+|---|---:|---:|---:|
+|  | 10¢ | 3 | ×0.5^0 = 3.0 |
+|  | 7¢ | 8 | ×0.5^3 = 1.0 |
+| ▶ | 1¢ | 2,450 (2,000 yours) | ×0.5^9 = 4.8 |
+| | | **Σ** | **8.8** |
+
+`yours 3.9 / Σ 8.8 = 44.5%`  
+`$100 ÷ 16 ÷ 2 = $3.12 × 44.5% = $1.39/day`  
+
+<details><summary>÷ 16 markets in this race — tap to list</summary>
+
+1. `nphc-attgen-ailcan`
+2. `nphc-attgen-alihab`
+3. `nphc-attgen-andbai`
+4. `nphc-attgen-ashmoo`
+5. `nphc-attgen-edmar`
+6. `nphc-attgen-hardhi`
+7. `nphc-attgen-jeapir`
+8. `nphc-attgen-jefjen` ← this one
+9. `nphc-attgen-kenpax`
+10. `nphc-attgen-leezel`
+11. `nphc-attgen-matgae`
+12. `nphc-attgen-matwhi`
+13. `nphc-attgen-robgiu`
+14. `nphc-attgen-rondes`
+15. `nphc-attgen-tedcru`
+16. `nphc-attgen-todbla`
+
+</details>
+
+</details>
+<details><summary><code>enwc-ussep-sc-2026-08-11-rep-paudan</code> BUY 2,000 @ 1¢ → $1.83/day</summary>
+
+| | Bids | Resting | Score |
+|---|---:|---:|---:|
+|  | 10¢ | 4 | ×0.5^0 = 4.0 |
+| ▶ | 1¢ | 2,500 (2,000 yours) | ×0.5^9 = 4.9 |
+| | | **Σ** | **8.9** |
+
+`yours 3.9 / Σ 8.9 = 44.0%`  
+`$100 ÷ 12 ÷ 2 = $4.17 × 44.0% = $1.83/day`  
+
+<details><summary>÷ 12 markets in this race — tap to list</summary>
+
+1. `enwc-ussep-sc-2026-08-11-rep-alawil`
+2. `enwc-ussep-sc-2026-08-11-rep-andbau`
+3. `enwc-ussep-sc-2026-08-11-rep-darnor`
+4. `enwc-ussep-sc-2026-08-11-rep-joewil`
+5. `enwc-ussep-sc-2026-08-11-rep-marlyn`
+6. `enwc-ussep-sc-2026-08-11-rep-nanmac`
+7. `enwc-ussep-sc-2026-08-11-rep-pameve`
+8. `enwc-ussep-sc-2026-08-11-rep-paudan` ← this one
+9. `enwc-ussep-sc-2026-08-11-rep-ralnor`
+10. `enwc-ussep-sc-2026-08-11-rep-rusfry`
+11. `enwc-ussep-sc-2026-08-11-rep-tregow`
+12. `enwc-ussep-sc-2026-08-11-rep-wiltim`
+
+</details>
+
+</details>
 
 ## 📊 Estimate vs. actual — where the gap is
 
@@ -1057,18 +1053,18 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 
 | Market | Reward pool | Discount | Target Size | Best entry | Est. share | Est. $/day |
 |---|---:|---:|---:|---|---:|---:|
-| `enwc-ussep-mn-2026-08-11-dem-pegfla` | $100.00 ÷ 2 | 0.50 | 2,000 | SELL side (35,038 resting) | ~75.1% | ~$18.78 |
-| `enwc-ussep-mi-2026-08-04-dem-abdels` | $100.00 ÷ 3 | 0.50 | 2,000 | SELL side (73,169 resting) | ~77.9% | ~$12.99 |
+| `enwc-ussep-mn-2026-08-11-dem-pegfla` | $100.00 ÷ 2 | 0.50 | 2,000 | BUY side (2,496 resting) | ~86.2% | ~$21.55 |
+| `enwc-ussep-mi-2026-08-04-dem-abdels` | $100.00 ÷ 3 | 0.50 | 2,000 | SELL side (73,275 resting) | ~67.4% | ~$11.23 |
 | `enwc-ussep-mi-2026-08-04-dem-halste` | $100.00 ÷ 3 | 0.50 | 2,000 | BUY side (168,554 resting) | ~62.7% | ~$10.45 |
 | `enwc-usgubp-ok-2026-06-16-rep-gendru` | $100.00 ÷ 2 | 0.50 | 2,000 | SELL side (91,978 resting) | ~33.5% | ~$8.38 |
 | `enwc-usgubp-sd-2026-06-02-rep-tobdoe` | $100.00 ÷ 2 | 0.50 | 2,000 | SELL side (25,898 resting) | ~32.7% | ~$8.17 |
-| `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | $100.00 ÷ 2 | 0.50 | 2,000 | BUY side (72,285 resting) | ~18.6% | ~$4.65 |
-| `enwc-usgubp-sd-2026-06-02-rep-larrho` | $100.00 ÷ 2 | 0.50 | 2,000 | BUY side (28,866 resting) | ~15.0% | ~$3.75 |
+| `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | $100.00 ÷ 2 | 0.50 | 2,000 | BUY side (72,297 resting) | ~18.5% | ~$4.63 |
+| `enwc-usgubp-sd-2026-06-02-rep-larrho` | $100.00 ÷ 2 | 0.50 | 2,000 | BUY side (28,412 resting) | ~15.2% | ~$3.80 |
+| `ewc-usgub-nv-2026-11-03-dem` | $100.00 ÷ 2 | 0.50 | 2,000 | BUY side (73,593 resting) | ~11.5% | ~$2.89 |
 | `enwc-ussep-mn-2026-08-11-dem-angcra` | $100.00 ÷ 2 | 0.50 | 2,000 | SELL side (70,460 resting) | ~11.5% | ~$2.88 |
-| `ewc-usgub-nv-2026-11-03-dem` | $100.00 ÷ 2 | 0.50 | 2,000 | BUY side (74,054 resting) | ~11.3% | ~$2.83 |
-| `ewc-usgub-ks-2026-11-03-rep` | $100.00 ÷ 2 | 0.50 | 2,000 | BUY side (169,459 resting) | ~9.4% | ~$2.36 |
 | `dipcc-us-iran-contnts-2026--irnfnd` | $250.00 ÷ 6 | 0.50 | 2,000 | SELL side (6,489 resting) | ~9.2% | ~$1.91 |
 | `ewc-usse-mi-2026-11-03-dem` | $100.00 ÷ 2 | 0.50 | 2,000 | SELL side (136,405 resting) | ~7.2% | ~$1.79 |
+| `ewc-usgub-oh-2026-11-03-rep` | $100.00 ÷ 2 | 0.50 | 2,000 | BUY side (79,445 resting) | ~7.0% | ~$1.74 |
 
 ## Totals
 
@@ -1130,6 +1126,7 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 
 | Checked (ET) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-07-27 1:58 PM ET | ✅ ok | 567 | $962.30 |
 | 2026-07-27 1:49 PM ET | ✅ ok | 567 | $962.30 |
 | 2026-07-27 1:27 PM ET | ✅ ok | 567 | $962.30 |
 | 2026-07-27 1:13 PM ET | ✅ ok | 567 | $962.30 |
@@ -1139,6 +1136,5 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 | 2026-07-27 11:33 AM ET | ✅ ok | 567 | $962.30 |
 | 2026-07-27 11:23 AM ET | ✅ ok | 567 | $962.30 |
 | 2026-07-27 11:21 AM ET | ✅ ok | 567 | $962.30 |
-| 2026-07-27 11:18 AM ET | ✅ ok | 567 | $962.30 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
