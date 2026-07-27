@@ -245,6 +245,7 @@ class Monitor:
         self._last_remote_save = 0.0
         self.persistence = "github" if GITHUB_TOKEN else "local only — resets on redeploy"
         self.positions: dict[str, dict] = {}  # raw /v1/portfolio/positions, for the P/L tab
+        self.activity_pnl: dict[str, dict] = {}  # closed/settled markets, from activities
         self.pnl_updated: dt.datetime | None = None
         self.pnl_error: str | None = None
         self.buying_power: float | None = None  # available cash, for the Plan tab
@@ -347,6 +348,30 @@ class Monitor:
             totals["realized"] += realized
             totals["unrealized"] += unrealized
             totals["total"] += realized + unrealized
+        # Closed/settled markets the positions endpoint no longer returns:
+        # realized P/L reconstructed from trade + resolution activity.
+        for slug, e in (self.activity_pnl or {}).items():
+            if slug in self.positions:
+                continue
+            realized = e["final"] if e.get("final") is not None else e["realized"]
+            if abs(realized) < 0.005 and not e.get("resolved"):
+                continue
+            ts, traded = 0.0, None
+            if e.get("ts"):
+                try:
+                    t = dt.datetime.fromisoformat(str(e["ts"]).replace("Z", "+00:00"))
+                    ts = t.timestamp()
+                    traded = t.astimezone(ET).strftime("%b %d %I:%M %p ET")
+                except Exception:  # noqa: BLE001
+                    pass
+            rows.append({"market": slug, "net": 0, "avg_cents": None,
+                         "cost": 0.0, "cash": 0.0,
+                         "realized": round(realized, 2), "unrealized": 0.0,
+                         "total": round(realized, 2),
+                         "expired": bool(e.get("resolved")), "closed": True,
+                         "traded": traded, "_ts": ts})
+            totals["realized"] += realized
+            totals["total"] += realized
         rows.sort(key=lambda r: (-r["_ts"], -r["total"]))  # most recently traded first
         for r in rows:
             r.pop("_ts")
@@ -876,6 +901,45 @@ def start_cancel_batch(payload: dict) -> tuple[int, dict]:
     PLACER.update(running=True, results=[], total=len(clean), abort=False, summary="")
     threading.Thread(target=run_cancel_batch, args=(clean,), daemon=True).start()
     return 200, {"ok": True, "started": len(clean)}
+
+
+def fetch_activity_pnl(key_id: str, secret_key: str) -> dict[str, dict]:
+    """Per-market realized P/L rebuilt from trade/resolution history — covers
+    positions the exchange no longer returns once fully closed or settled."""
+    path = "/v1/portfolio/activities"
+    agg: dict[str, dict] = {}
+    cursor = None
+    for _ in range(10):  # up to 1000 most recent activities
+        params: dict = {"limit": 100, "sortOrder": "SORT_ORDER_DESCENDING",
+                        "types": ["ACTIVITY_TYPE_TRADE", "ACTIVITY_TYPE_POSITION_RESOLUTION"]}
+        if cursor:
+            params["cursor"] = cursor
+        r = requests.get(tr.TRADE_API + path,
+                         headers=tr.auth_headers(key_id, secret_key, "GET", path),
+                         params=params, timeout=20)
+        if r.status_code >= 400:
+            raise RuntimeError(f"{path} -> {tr._http_err(r)}")
+        j = r.json()
+        for a in j.get("activities") or []:
+            t = a.get("trade") or {}
+            pr = a.get("positionResolution") or {}
+            if t.get("marketSlug"):
+                e = agg.setdefault(t["marketSlug"],
+                                   {"realized": 0.0, "ts": "", "resolved": False, "final": None})
+                e["realized"] += tr._num(t.get("realizedPnl"))
+                e["ts"] = max(e["ts"], str(t.get("updateTime") or t.get("createTime") or ""))
+            elif pr.get("marketSlug"):
+                e = agg.setdefault(pr["marketSlug"],
+                                   {"realized": 0.0, "ts": "", "resolved": False, "final": None})
+                e["resolved"] = True
+                after = pr.get("afterPosition") or {}
+                if e["final"] is None and after:  # newest activity wins (descending order)
+                    e["final"] = tr._num(after.get("realized"))
+                e["ts"] = max(e["ts"], str(pr.get("updateTime") or ""))
+        cursor = j.get("nextCursor")
+        if j.get("eof") or not cursor:
+            break
+    return agg
 
 
 def _book_without(book: dict, side: str, price: float, size: float) -> dict:
@@ -1553,7 +1617,8 @@ function renderPnl(pn){
     '<tr><th>Market</th><th class="r">Pos</th><th class="r">Avg</th><th class="r">Value</th>'+
     '<th class="r">Real.</th><th class="r">Unreal.</th><th class="r">P/L</th></tr>' +
     ((pn && pn.rows) || []).map(r =>
-      '<tr><td class="mkt">' + esc(r.market) + (r.expired ? ' <span class="sub">(resolved)</span>' : '') +
+      '<tr><td class="mkt">' + esc(r.market) +
+      (r.expired ? ' <span class="sub">(resolved)</span>' : (r.closed ? ' <span class="sub">(closed)</span>' : '')) +
       (r.traded ? '<div class="sub" style="font-size:10px">traded ' + esc(r.traded) + '</div>' : '') + '</td>' +
       '<td class="r">' + (r.net||0).toLocaleString() + '</td>' +
       '<td class="r">' + (r.avg_cents==null ? '—' : r.avg_cents.toFixed(1) + '¢') + '</td>' +
@@ -1838,6 +1903,7 @@ def poll_loop(key_id: str, secret_key: str) -> None:
     event_sizes: dict[str, int] = {}
     events_refreshed = 0.0
     pos_refreshed = 0.0
+    act_refreshed = 0.0
     last_ok = time.time()
     err_notified = 0.0
     err_streak = 0
@@ -1869,6 +1935,12 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                 try:
                     MONITOR.buying_power = fetch_buying_power(key_id, secret_key)
                 except Exception:  # noqa: BLE001 — plan tab just shows no number
+                    pass
+            if time.time() - act_refreshed > 600:  # closed-market P/L history
+                act_refreshed = time.time()
+                try:
+                    MONITOR.activity_pnl = fetch_activity_pnl(key_id, secret_key)
+                except Exception:  # noqa: BLE001 — closed rows just go stale
                     pass
         except Exception as e:  # noqa: BLE001 — shown on the dashboard, loop survives
             MONITOR.error = f"{type(e).__name__}: {e}"
