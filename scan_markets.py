@@ -252,7 +252,7 @@ def evaluate_side(slug: str, book: dict, prog: dict, side: str, held: float = 0.
     if peak > 0:
         mx = next(c for c in scored_big if c["est_day"] >= 0.8 * peak)
     out = {"market": slug, "side": side, "pick": best[1], "max": mx,
-           "side_pool": round(tr._daily_pool(prog) / 2, 2),
+           "side_pool": round(tr._daily_pool(prog) / 2, 2), "tick": tick,
            "best_bid": best_bid, "best_ask": best_ask, "held": held,
            "risk": _risk(slug, side, best[1], best_bid, best_ask)}
     if best[1]["est_day"] < TARGET_EST_DAY:
@@ -346,7 +346,7 @@ def evaluate_cheap_yes(slug: str, book: dict, prog: dict) -> dict | None:
           "share": round((o.get("share") or 0) * 100, 1)} if est > 0 else None
     rd = _resolution_date(slug)
     return {"market": slug, "side": "BUY", "pick": best[1], "max": mx,
-            "side_pool": round(tr._daily_pool(prog) / 2, 2),
+            "side_pool": round(tr._daily_pool(prog) / 2, 2), "tick": tick,
             "best_bid": bids[0][0] if bids else None,
             "best_ask": asks[0][0] if asks else None, "held": 0,
             "risk": None,  # fills are the accepted cost of this strategy

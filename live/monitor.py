@@ -1409,7 +1409,9 @@ function renderPlan(){
         (r.risk?'<div style="color:#d29922">⚠ '+esc(r.risk)+'</div>':'')+'</td>'+
         '<td'+(r.side==='SELL'?' style="color:#f0883e"':'')+'>'+(r.side==='SELL'?'SELL':'BUY')+
         (p.covered?' 📦':'')+'</td>'+
-        '<td class="r">'+(p.price*100).toFixed(0)+'¢</td>'+
+        '<td class="r" style="white-space:nowrap">'+(+(p.price*100).toFixed(2))+'¢'+
+        ((r.side==='SELL' ? p.price >= 0.989 : p.price <= (r.tick||0.01)+1e-9)
+          ? ' <span class="bdg">'+(r.side==='SELL'?'deep':'floor')+'</span>' : '')+'</td>'+
         '<td class="r">'+p.size.toLocaleString()+(p.sized_down?' <span class="sub">↓fit</span>':'')+'</td>'+
         '<td class="r">$'+p.capital.toFixed(0)+'</td>'+
         '<td class="r">$'+p.est_day.toFixed(2)+upTo+'</td></tr>'; }).join('');
