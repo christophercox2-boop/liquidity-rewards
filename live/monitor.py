@@ -1083,24 +1083,31 @@ def run_reprice_batch(specs: list[dict]) -> None:
             time.sleep(BATCH_SPACING_SECONDS)
     finally:
         unverified = 0
-        if done:  # ONE verification sweep for the whole batch
+        if done:  # verification sweep — patient: replacements need a moment to settle
             try:
-                path = "/v1/orders/open"
-                r = requests.get(tr.TRADE_API + path,
-                                 headers=tr.auth_headers(KEY_ID, SECRET_KEY, "GET", path),
-                                 timeout=30)
-                open_now = [(o.get("marketSlug"),
-                             "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL",
-                             tr._num(o.get("price")))
-                            for o in (r.json().get("orders") or [])]
-                for res in PLACER["results"]:
-                    if res.get("status") == "repriced":
-                        want = res["price_cents"] / 100.0
-                        if not any(m == res["market"] and s == res["side"]
-                                   and p is not None and abs(p - want) < 0.0005
-                                   for m, s, p in open_now):
-                            res["status"] = "unverified"
-                            unverified += 1
+                for attempt in range(3):
+                    time.sleep(3.0 if attempt == 0 else 5.0)
+                    path = "/v1/orders/open"
+                    r = requests.get(tr.TRADE_API + path,
+                                     headers=tr.auth_headers(KEY_ID, SECRET_KEY, "GET", path),
+                                     timeout=30)
+                    open_now = [(o.get("marketSlug"),
+                                 "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL",
+                                 tr._num(o.get("price")))
+                                for o in (r.json().get("orders") or [])]
+                    unverified = 0
+                    for res in PLACER["results"]:
+                        if res.get("status") in ("repriced", "unverified"):
+                            want = res["price_cents"] / 100.0
+                            hit = any(m == res["market"] and s == res["side"]
+                                      and p is not None and abs(p - want) < 0.0005
+                                      for m, s, p in open_now)
+                            res["status"] = "repriced" if hit else "unverified"
+                            if not hit:
+                                res["note"] = "not seen resting at the new price yet — check the app"
+                                unverified += 1
+                    if unverified == 0:
+                        break
             except Exception:  # noqa: BLE001 — verification is best-effort
                 unverified = -1
         PLACER["summary"] = PLACER["summary"] or "done"
@@ -1529,10 +1536,12 @@ async function pollReprice(){
     const done = d.results.length;
     const ok = d.results.filter(x=>x.status==='repriced').length;
     const skip = d.results.filter(x=>x.status==='skipped').length;
+    const unv = d.results.filter(x=>x.status==='unverified').length;
     document.getElementById('rpProg').textContent =
       (d.running ? 'repricing… ' : 'batch ' + (d.summary || 'done') + ': ') +
       done + '/' + d.total + ' — ' + ok + ' repriced, ' + skip + ' skipped, ' +
-      (done - ok - skip) + ' failed';
+      (done - ok - skip - unv) + ' failed' +
+      (unv ? ', ' + unv + ' accepted but unconfirmed (check the app)' : '');
     if(d.running) setTimeout(pollReprice, 2000); else setTimeout(refresh, 1500);
   }catch(e){ setTimeout(pollReprice, 3000); }
 }
