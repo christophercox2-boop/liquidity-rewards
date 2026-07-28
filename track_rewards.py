@@ -908,6 +908,39 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     LAST_DEBUG.clear()
     LAST_DEBUG.update(debug)
 
+    # Self-consistency: books refresh on a rotation (each one can lag by
+    # minutes), so a just-placed or just-modified order may be MISSING from
+    # its cached book. Scoring it there yields nonsense — "you 3 ticks from
+    # best" while we ARE the best. Guarantee every own order's remaining
+    # size is present at its price level before scoring.
+    own_by_mkt: dict[str, list[dict]] = {}
+    for o in orders:
+        if o["market"]:
+            own_by_mkt.setdefault(o["market"], []).append(o)
+    for mkt, own in own_by_mkt.items():
+        book = books.get(mkt)
+        if not book:
+            continue
+        for key, side in (("bids", "BUY"), ("asks", "SELL")):
+            want: dict[float, float] = {}
+            for o in own:
+                if o["side"] == side and o["price"]:
+                    want[o["price"]] = want.get(o["price"], 0.0) + o["size"]
+            if not want:
+                continue
+            levels = list(book.get(key) or [])
+            changed = False
+            for px, sz in want.items():
+                have = sum(q for lp, q in levels if abs(lp - px) < 1e-9)
+                if have < sz - 1e-9:  # book predates us here — top the level up
+                    levels = [(lp, q) for lp, q in levels if abs(lp - px) >= 1e-9]
+                    levels.append((px, sz))
+                    changed = True
+            if changed:
+                book = dict(book)
+                book[key] = sorted(levels, key=lambda x: (-x[0] if key == "bids" else x[0]))
+                books[mkt] = book
+
     for o in orders:
         prog = progs.get(o["market"])
         o["pool"] = prog.get("pool") if prog else None
