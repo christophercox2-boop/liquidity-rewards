@@ -1208,8 +1208,30 @@ def _optimal_price(order: dict, book: dict, prog: dict,
     return scored[-1]
 
 
+def _resize_for_risk(side: str, size: float, from_price: float, to_price: float,
+                     market: str) -> int:
+    """Quantity that keeps the LOCKED capital ~level across a price move —
+    a buy walking 10c -> 26c would otherwise lock 2.6x the cash. Covered
+    sells lock nothing new, so their size never changes; moves that would
+    resize by under 10% aren't worth the churn."""
+    size = int(round(size))
+    if side == "SELL":
+        net = tr._num((MONITOR.positions.get(market) or {}).get("netPosition"))
+        if net >= size:
+            return size  # covered by inventory — price doesn't change the risk
+        lock0, lock1 = 1.0 - from_price, 1.0 - to_price
+    else:
+        lock0, lock1 = from_price, to_price
+    if lock0 <= 0 or lock1 <= 0:
+        return size
+    q = max(1, min(int(size * lock0 / lock1 + 1e-6), 20000))
+    return size if abs(q - size) < 0.10 * max(size, 1) else q
+
+
 def compute_reprice_plan(min_off: int = 1) -> list[dict]:
-    """Orders whose current price leaves meaningful money on the table."""
+    """Orders whose current price leaves meaningful money on the table.
+    Price moves carry a matching size move (see _resize_for_risk) so the
+    total amount at risk stays where it was."""
     out = []
     progs = tr._PROG_CACHE.get("progs") or {}
     for o in MONITOR.orders:
@@ -1225,13 +1247,26 @@ def compute_reprice_plan(min_off: int = 1) -> list[dict]:
         tick = book.get("tick") or 0.01
         if p is None or abs(p - o["price"]) < tick / 2:
             continue  # already optimal
+        to_size = _resize_for_risk(o["side"], o["size"], o["price"], p, o["market"])
+        if to_size != int(round(o["size"])):
+            # honesty: the advertised gain must reflect the resized order
+            base = _book_without(book, o["side"], o["price"], o["size"])
+            key = "bids" if o["side"] == "BUY" else "asks"
+            levels = dict(base.get(key) or [])
+            levels[p] = levels.get(p, 0) + to_size
+            merged = dict(base)
+            merged[key] = sorted(levels.items(), key=lambda x: (-x[0] if o["side"] == "BUY" else x[0]))
+            probe = {"market": o["market"], "side": o["side"], "price": p, "size": float(to_size)}
+            tr._score_order(probe, merged, prog)
+            est = probe.get("est_day") or 0.0
         # Below target: any $0.05/day gain is worth it. At/above target: move
         # only for meaningfully more (easy-market upside), never for pennies.
         threshold = 0.05 if cur < TARGET_ORDER_EST else max(0.25, cur * 0.25)
         if est - cur < threshold:
             continue
         out.append({"id": o["id"], "market": o["market"], "side": o["side"],
-                    "size": o["size"], "from_cents": round(o["price"] * 100, 1),
+                    "size": o["size"], "to_size": to_size,
+                    "from_cents": round(o["price"] * 100, 1),
                     "to_cents": round(p * 100, 1),
                     "est_now": round(cur, 2), "est_after": round(est, 2)})
     out.sort(key=lambda r: -(r["est_after"] - r["est_now"]))
@@ -1257,7 +1292,8 @@ def run_reprice_batch(specs: list[dict]) -> None:
                 if crosses:
                     res.update(status="skipped", note="would cross the spread now")
                 else:
-                    code, payload = do_reprice(spec["id"], spec["to_cents"], verify=False)
+                    code, payload = do_reprice(spec["id"], spec["to_cents"], verify=False,
+                                               quantity=spec.get("to_size"))
                     res.update(status="repriced" if payload.get("ok") else "rejected",
                                note=str(payload.get("detail") or payload.get("error") or "")[:150])
             except Exception as e:  # noqa: BLE001
@@ -1331,8 +1367,10 @@ def start_reprice_batch(payload: dict) -> tuple[int, dict]:
             o = known.get(oid)
             assert o is not None, f"{oid}: not one of your resting orders"
             assert 0.1 <= tc <= 99.9, f"{o['market']}: price out of range"
+            ts_ = int(s.get("to_size") or round(o["size"]))
+            assert 1 <= ts_ <= 20000, f"{o['market']}: size out of range"
             clean.append({"id": oid, "market": o["market"], "side": o["side"],
-                          "size": o["size"], "to_cents": tc})
+                          "size": o["size"], "to_cents": tc, "to_size": ts_})
     except (AssertionError, TypeError, ValueError) as e:
         return 400, {"ok": False, "error": str(e)[:200]}
     PLACER.update(running=True, results=[], total=len(clean), abort=False, summary="")
@@ -1363,7 +1401,8 @@ def do_cancel_all() -> tuple[int, dict]:
         return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
 
 
-def do_reprice(order_id: str, price_cents: float, verify: bool = True) -> tuple[int, dict]:
+def do_reprice(order_id: str, price_cents: float, verify: bool = True,
+               quantity: int | None = None) -> tuple[int, dict]:
     """Modify one of OUR resting orders to a new price. The order must be in
     the latest snapshot (can't touch anything else) and the price sane.
     Modify is cancel-and-replace on the exchange, so the request carries the
@@ -1375,11 +1414,16 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True) -> tuple[
         return 400, {"ok": False, "error": "unknown order id — wait for the next refresh"}
     if not (0.1 <= price_cents <= 99.9):
         return 400, {"ok": False, "error": "price out of range (0.1–99.9¢)"}
+    qty = int(quantity) if quantity else int(round(o["size"]))
+    if not (1 <= qty <= 20000):
+        return 400, {"ok": False, "error": "size out of range (1–20,000)"}
     path = f"/v1/order/{order_id}/modify"
     value = f"{price_cents / 100:.3f}".rstrip("0").rstrip(".")
     record = {"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
               "market": o["market"], "side": o["side"],
-              "from": round(o["price"] * 100, 1), "to": price_cents, "size": o["size"]}
+              "from": round(o["price"] * 100, 1), "to": price_cents,
+              "size": (qty if qty == int(round(o["size"]))
+                       else f"{int(round(o['size']))}→{qty}")}
     try:
         r = requests.request(
             "POST", tr.TRADE_API + path,
@@ -1387,7 +1431,7 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True) -> tuple[
                      "Content-Type": "application/json"},
             json={"marketSlug": o["market"],
                   "price": {"value": value, "currency": "USD"},
-                  "quantity": int(round(o["size"]))},
+                  "quantity": qty},
             timeout=20,
         )
         record["status"] = r.status_code
@@ -1918,7 +1962,9 @@ function renderRpl(){
       '<tr><td><input type="checkbox" '+(RSEL[r.id]?'checked':'')+
       ' onchange="RSEL[\\''+r.id+'\\']=this.checked;renderRpl()"></td>'+
       '<td class="mkt">'+esc(r.market)+'<div class="sub" style="font-size:10px">'+r.side+' '+r.size.toLocaleString()+'</div></td>'+
-      '<td class="r" style="white-space:nowrap">'+r.from_cents+'¢ → <b>'+r.to_cents+'¢</b></td>'+
+      '<td class="r" style="white-space:nowrap">'+r.from_cents+'¢ → <b>'+r.to_cents+'¢</b>'+
+      (r.to_size && r.to_size !== Math.round(r.size) ?
+        '<br><span class="sub" style="font-size:10px">'+r.size.toLocaleString()+' → '+r.to_size.toLocaleString()+' (same $ at risk)</span>' : '')+'</td>'+
       '<td class="r">$'+r.est_now.toFixed(2)+' → <b class="pos">$'+r.est_after.toFixed(2)+'</b></td></tr>').join('')+
     '</table><div class="rp"><button onclick="goReprice()">Reprice '+sel.length+
     ' orders (+$'+gain.toFixed(2)+'/day)</button>'+
@@ -1933,7 +1979,7 @@ async function goReprice(){
   try{
     const r = await fetch('reprice_batch', {method:'POST',
       headers:{'Content-Type':'application/json','X-Reprice':'1'},
-      body: JSON.stringify({orders: sel.map(r => ({id: r.id, to_cents: r.to_cents}))})});
+      body: JSON.stringify({orders: sel.map(r => ({id: r.id, to_cents: r.to_cents, to_size: r.to_size}))})});
     const d = await r.json();
     if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
     RPLAN = null; document.getElementById('rpl').innerHTML = '';
