@@ -32,6 +32,9 @@ import track_rewards as tr
 
 TARGET_EST_DAY = 0.15   # ~$4.50/month per market-side — middle of the $3-5 goal
 MIN_EST_DAY = 0.08      # below this a side is listed as "not worth an order"
+GOLF_MIN_EST_DAY = 0.02  # golf floor bids are volume plays: cents/day per
+                         # golfer x the whole field adds up — the politics
+                         # bar would throw away most of the field
 SIZES = [100, 200, 500, 1000, 2000, 5000, 10000]
 DEEP_SIZES = [20000]    # only tried where capital stays tiny (<= 2c of risk)
 
@@ -367,7 +370,7 @@ def evaluate_cheap_yes(slug: str, book: dict, prog: dict) -> dict | None:
             o = {"market": slug, "side": "BUY", "price": p, "size": float(q)}
             tr._score_order(o, _merged(book, "BUY", p, q), prog)
             est = o.get("est_day") or 0.0
-            if est < MIN_EST_DAY:
+            if est < GOLF_MIN_EST_DAY:
                 continue
             cand = {"side": "BUY", "price": p, "size": q, "capital": round(p * q, 2),
                     "covered": False, "est_day": round(est, 3),
@@ -428,7 +431,7 @@ def allocate_per_golfer(results: list[dict], books: dict[str, dict]) -> list[dic
                 tr._score_order(o, _merged(book, "BUY", v["price"], q),
                                 {**(r.get("prog") or {}), "siblings": []})
                 est = o.get("est_day") or 0.0
-                if key == "max" and est < 0.03:
+                if key == "max" and est < 0.01:
                     ok = False
                     break
                 r[key] = dict(v, size=q, capital=round(v["price"] * q, 2),

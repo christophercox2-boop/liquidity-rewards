@@ -824,7 +824,7 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
                     if int(v["size"]) == size:
                         planned = v["est_day"]
                         break
-            thr = min(0.08, max(0.02, 0.5 * planned)) if planned else 0.08
+            thr = min(0.08, max(0.01, 0.5 * planned)) if planned else 0.08
             if est < thr:
                 res.update(status="skipped",
                            note=f"drifted — est now ${est:.2f}/day (planned ${planned or 0:.2f})")
@@ -1632,6 +1632,9 @@ Refreshes every 2 min.</div>
 <div style="margin:10px 0;display:none" id="golfCapRow">Max $ per golfer: <b id="golfCapLbl">$1.00</b>
  <input type="range" id="golfCapSlider" min="25" max="1000" step="25" value="100" style="width:55%;vertical-align:middle"
         oninput="golfCap(this.value)"></div>
+<div style="margin:10px 0" id="polCapRow">Max $ locked per market: <b id="polCapLbl">off (buying power only)</b>
+ <input type="range" id="polCapSlider" min="5" max="205" step="5" value="205" style="width:55%;vertical-align:middle"
+        oninput="polCapSet(this.value)"></div>
 <div style="margin:6px 0">
  <label class="sub"><input type="checkbox" id="hideRisk" checked onchange="renderPlan()"> hide ⚠ risky</label>
  &nbsp; <label class="sub"><input type="radio" name="szmode" value="pick" checked onchange="renderPlan()"> minimal size</label>
@@ -1675,9 +1678,28 @@ let PLAN = null, PSEL = {}, BP = null, OLOCK = {};
 function pwhich(){ const el = document.querySelector('input[name="pwhich"]:checked'); return el ? el.value : 'politics'; }
 function switchPlan(){ PLAN = null; PSEL = {};
   document.getElementById('golfCapRow').style.display = pwhich() === 'golf' ? '' : 'none';
+  document.getElementById('polCapRow').style.display = pwhich() === 'politics' ? '' : 'none';
   loadPlan(); }
+function polCap(){  // user cap on locked capital per market, null = off
+  const v = +document.getElementById('polCapSlider').value;
+  return v > 200 ? null : v;
+}
+function polCapSet(v){
+  localStorage.setItem('polCap', v);
+  document.getElementById('polCapLbl').textContent = +v > 200 ? 'off (buying power only)' : '$' + v;
+  renderPlan();
+}
+(function(){ const v = localStorage.getItem('polCap');
+  if(v){ document.getElementById('polCapSlider').value = v;
+         document.getElementById('polCapLbl').textContent = +v > 200 ? 'off (buying power only)' : '$' + v; } })();
+function mlimit(){  // per-market budget: buying power AND the politics cap
+  const c = pwhich() === 'politics' ? polCap() : null;
+  if(BP == null) return c;
+  return c == null ? BP : Math.min(BP, c);
+}
 function mroom(m){  // per-market budget left after existing resting orders
-  return BP == null ? null : BP - (OLOCK[m] || 0);
+  const lim = mlimit();
+  return lim == null ? null : lim - (OLOCK[m] || 0);
 }
 async function loadPlan(){
   if(PLAN) return;
@@ -1791,7 +1813,8 @@ function planAll(on){
     if(r.risk) return;
     const c = ord(r).capital;
     const u = used[r.market] !== undefined ? used[r.market] : (OLOCK[r.market] || 0);
-    if(BP != null && u + c > BP) return;
+    const lim = mlimit();
+    if(lim != null && u + c > lim) return;
     used[r.market] = u + c;
     PSEL[pkey(r)] = true;
   });
@@ -1826,7 +1849,8 @@ async function placeBatch(){
       gWorst.toFixed(2) + ' on any one golfer · $' + gTot.toFixed(2) + ' total at risk if every bid filled';
   } else {
     capLine = 'Max $' + worst.toFixed(0) +
-      ' locked in any one market (buying power applies per market)';
+      ' locked in any one market (buying power applies per market' +
+      (polCap() != null ? ', your cap $' + polCap() + '/market' : '') + ')';
   }
   if(!confirm('Place ' + sel.length + ' post-only orders (' + (sel.length-nS) + ' buys, ' + nS +
               ' sells)?\\n' + capLine + ', ~$' +
