@@ -1611,6 +1611,60 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
         ACTIONS.append(record)
         del ACTIONS[:-20]
 
+def positions_overview() -> dict:
+    """Every long position with its take-profit state. Target = one tick
+    inside the best ask that ISN'T ours: 'good' means the whole position is
+    covered by a resting sell that is the best ask; 'fix' means attention."""
+    with MONITOR.lock:
+        positions = dict(MONITOR.positions)
+        orders = list(MONITOR.orders)
+    rows = []
+    fetched = 0
+    for slug, p in sorted(positions.items()):
+        net = tr._num(p.get("netPosition"))
+        if net < 1:
+            continue
+        cost = tr._num(p.get("cost"))
+        mine = [o for o in orders
+                if o.get("market") == slug and o.get("side") == "SELL" and o.get("price")]
+        book = None
+        cached = tr._BOOK_CACHE.get(slug)
+        if cached and time.time() - cached[0] < 600:
+            book = cached[1]
+        elif fetched < 15:  # bounded burst — the rest resolve on the next open
+            try:
+                book = tr._fetch_book(slug)
+                fetched += 1
+                time.sleep(0.1)
+            except Exception:  # noqa: BLE001
+                book = None
+        row = {"market": slug, "net": int(net),
+               "avg_cents": round(cost / net * 100, 2) if net else None,
+               "sells": [{"id": o.get("id"), "price_cents": round(o["price"] * 100, 2),
+                          "size": o.get("size")} for o in mine]}
+        if book is None:
+            row["status"] = "unknown"
+        else:
+            tick = book.get("tick") or 0.01
+            others = []
+            for px, q in book.get("asks") or []:
+                q -= sum(o["size"] for o in mine if abs(px - o["price"]) < 1e-9)
+                if q > 1e-9:
+                    others.append((px, q))
+            target = round((others[0][0] - tick) if others else 0.99, 4)
+            target = min(max(target, tick), 0.999)
+            row["target_cents"] = round(target * 100, 2)
+            covered = sum(o["size"] for o in mine)
+            best_my = min((o["price"] for o in mine), default=None)
+            good = (best_my is not None
+                    and covered >= min(net, 20000) - 1e-9
+                    and (not others or best_my <= others[0][0] - 1e-9))
+            row["status"] = "good" if good else "fix"
+        rows.append(row)
+    rows.sort(key=lambda r: ({"fix": 0, "unknown": 1, "good": 2}[r["status"]], r["market"]))
+    return {"rows": rows}
+
+
 def _slug_known(slug: str) -> bool:
     """Only operate on markets we can see: currently quoted, in the tracked
     politics/golf universe, or on a scan plan — never a free-typed slug."""
@@ -1774,7 +1828,7 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div style="display:flex;gap:8px;margin-bottom:12px">
  <button class="tab on" id="tabH" onclick="showTab('H')">Home</button>
  <button class="tab" id="tabR" onclick="showTab('R')">Markets</button>
- <button class="tab" id="tabP" onclick="showTab('P')">P/L</button>
+ <button class="tab" id="tabP" onclick="showTab('P')">Positions</button>
  <button class="tab" id="tabL" onclick="showTab('L')">Plan</button>
  <button class="tab" id="tabS" onclick="showTab('S')">Spreads</button>
 </div>
@@ -1834,14 +1888,19 @@ the position. Markets whose spread has closed below 3 ticks are skipped.</div>
 <div id="acts"></div>
 </div>
 <div id="viewP" style="display:none">
-<div class="sub">Profit / loss on filled orders</div>
-<div class="big" id="pnlTotal">…</div>
-<div class="sub" id="pnlSub"></div>
-<table id="pnl"></table>
-<div class="mkt" id="pnlNote" style="margin-top:10px">Sorted by most recent trade. Value =
-what the open position is worth at current prices. Unreal. = value − what it cost.
-Real. = P/L the exchange has already booked (closed trades and resolved markets).
-Refreshes every 2 min.</div>
+<div class="sub">Positions — take-profit ask one tick inside the best ask</div>
+<div class="sub" id="posSub"></div>
+<div style="margin:6px 0">
+ <button class="tab" onclick="posFixAll()">Price all flagged</button>
+ <button class="tab" onclick="loadPositions()">↻ Refresh</button></div>
+<div class="err" id="posErr"></div>
+<table id="posList"></table>
+<div id="posProg" class="mkt" style="margin:6px 0"></div>
+<div class="mkt" style="margin-top:8px">Green: the whole position is covered by a resting
+sell that IS the best ask — nothing to worry about. Red: no sell resting, only partial
+coverage, or your ask is behind someone else's — the button places (or reprices) a
+post-only sell of your full position one tick inside the current best ask. Selling
+inventory locks no new capital.</div>
 </div>
 <div id="viewL" style="display:none">
 <div class="sub">Passive placement plan <span id="planGen"></span></div>
@@ -1901,6 +1960,7 @@ function showTab(t){
   });
   if(t==='L') loadPlan();
   if(t==='S') loadSpread();
+  if(t==='P') loadPositions();
 }
 let PLAN = null, PSEL = {}, BP = null, OLOCK = {};
 function pwhich(){ const el = document.querySelector('input[name="pwhich"]:checked'); return el ? el.value : 'politics'; }
@@ -2375,26 +2435,70 @@ async function cancelAll(){
 }
 function usd(v){ return (v<0?'-$':'$') + Math.abs(v||0).toFixed(2); }
 function cls(v){ return v>0.004 ? 'pos' : (v<-0.004 ? 'neg' : ''); }
-function renderPnl(pn){
-  const t = (pn && pn.totals) || {};
-  const big = document.getElementById('pnlTotal');
-  big.textContent = usd(t.total); big.className = 'big ' + cls(t.total);
-  document.getElementById('pnlSub').textContent =
-    usd(t.realized) + ' realized · ' + usd(t.unrealized) + ' unrealized · positions worth ' + usd(t.cash) +
-    (pn && pn.updated ? ' · as of ' + pn.updated : '') + (pn && pn.error ? ' · ' + pn.error : '');
-  document.getElementById('pnl').innerHTML =
-    '<tr><th>Market</th><th class="r">Pos</th><th class="r">Avg</th><th class="r">Value</th>'+
-    '<th class="r">Real.</th><th class="r">Unreal.</th><th class="r">P/L</th></tr>' +
-    ((pn && pn.rows) || []).map(r =>
-      '<tr><td class="mkt">' + esc(r.market) +
-      (r.expired ? ' <span class="sub">(resolved)</span>' : (r.closed ? ' <span class="sub">(closed)</span>' : '')) +
-      (r.traded ? '<div class="sub" style="font-size:10px">traded ' + esc(r.traded) + '</div>' : '') + '</td>' +
-      '<td class="r">' + (r.net||0).toLocaleString() + '</td>' +
-      '<td class="r">' + (r.avg_cents==null ? '—' : r.avg_cents.toFixed(1) + '¢') + '</td>' +
-      '<td class="r">' + usd(r.cash) + '</td>' +
-      '<td class="r ' + cls(r.realized) + '">' + usd(r.realized) + '</td>' +
-      '<td class="r ' + cls(r.unrealized) + '">' + usd(r.unrealized) + '</td>' +
-      '<td class="r ' + cls(r.total) + '"><b>' + usd(r.total) + '</b></td></tr>').join('');
+let POSD = [];
+async function loadPositions(){
+  document.getElementById('posSub').textContent = 'loading…';
+  try{
+    const d = await (await fetch('positions.json')).json();
+    POSD = d.rows || [];
+    renderPositions();
+  }catch(e){
+    const err = document.getElementById('posErr');
+    err.textContent = 'positions load failed: ' + e; err.style.display = 'block';
+  }
+}
+function renderPositions(){
+  const nFix = POSD.filter(r => r.status === 'fix').length;
+  document.getElementById('posSub').textContent =
+    POSD.length + ' positions · ' + (nFix ? nFix + ' need attention' : 'all priced to sell ✓');
+  document.getElementById('posList').innerHTML =
+    POSD.map((r, i) => {
+      const bg = r.status === 'good' ? 'background:#12341c'
+               : r.status === 'fix' ? 'background:#3d1418' : '';
+      const sells = (r.sells || []).map(s =>
+        s.size.toLocaleString() + ' @ ' + s.price_cents.toFixed(1) + '¢').join(', ');
+      const btn = (r.status === 'fix' && r.target_cents)
+        ? '<button style="background:#238636;color:#fff;border:none;border-radius:6px;padding:6px 10px" '+
+          'onclick="event.stopPropagation();posFix('+i+', true)">Sell @ '+r.target_cents.toFixed(1)+'¢</button>'
+        : (r.status === 'good' ? '✓' : '<span class="sub" style="font-size:10px">book pending<br>↻ refresh</span>');
+      return '<tr style="'+bg+'" onclick="openMkt(\\''+esc(r.market)+'\\')">'+
+        '<td class="mkt">'+esc(r.market)+'</td>'+
+        '<td class="r">'+r.net.toLocaleString()+
+        (r.avg_cents != null ? '<br><span class="sub" style="font-size:10px">@ '+r.avg_cents.toFixed(1)+'¢ avg</span>' : '')+'</td>'+
+        '<td class="r" style="font-size:11px">'+(sells ? esc(sells) : '<span class="sub">no sell resting</span>')+'</td>'+
+        '<td class="r">'+btn+'</td></tr>';
+    }).join('') || '<tr><td class="sub">no open positions</td></tr>';
+}
+async function posFix(i, ask){
+  const r = POSD[i];
+  if(!r || !r.target_cents) return false;
+  const q = Math.min(Math.round(r.net), 20000);
+  if(ask && !confirm('Sell '+q.toLocaleString()+' '+r.market+' @ '+r.target_cents.toFixed(1)+'¢ (post-only, one tick inside the best ask)?')) return false;
+  const body = (r.sells && r.sells.length)
+    ? {op:'modify', order_id: r.sells[0].id, price_cents: r.target_cents, size: q}
+    : {op:'place', market: r.market, side: 'SELL', price_cents: r.target_cents, size: q};
+  try{
+    const resp = await fetch('maction', {method:'POST',
+      headers:{'Content-Type':'application/json','X-Reprice':'1'},
+      body: JSON.stringify(body)});
+    const d = await resp.json().catch(() => ({ok:false, error:'HTTP '+resp.status}));
+    if(!d.ok){ alert(r.market+' failed: '+(d.detail || d.error || '')); return false; }
+    if(ask){ setTimeout(loadPositions, 1200); }
+    return true;
+  }catch(e){ alert('Failed: '+e); return false; }
+}
+async function posFixAll(){
+  const flagged = POSD.map((r, i) => i).filter(i => POSD[i].status === 'fix' && POSD[i].target_cents);
+  if(!flagged.length){ alert('Nothing flagged — everything is already priced to sell.'); return; }
+  if(!confirm('Price '+flagged.length+' positions to sell, each one tick inside its best ask?')) return;
+  let done = 0;
+  for(const i of flagged){
+    document.getElementById('posProg').textContent = 'pricing… '+done+'/'+flagged.length;
+    if(await posFix(i, false)) done++;
+    await new Promise(res => setTimeout(res, 1500));
+  }
+  document.getElementById('posProg').textContent = 'done — '+done+'/'+flagged.length+' priced';
+  loadPositions();
 }
 function tgl(i, m){ OPEN[m] = !OPEN[m];
   const e = document.getElementById('d'+i); if(e) e.style.display = OPEN[m] ? '' : 'none';
@@ -2458,8 +2562,13 @@ function tint(m, cur){
 }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 function mcat(m){
-  const p = String(m).split('-');
-  return p[0] === 'tec' ? p[0] + '-' + (p[1] || '') : p[0];
+  const s = String(m);
+  if(/^tec-(pga|liv|golf)-/.test(s)) return 'Golf';
+  if(s.indexOf('tec-nba-') === 0) return 'NBA';
+  if(s.indexOf('tec-cbb-') === 0) return 'College BB';
+  if(s.indexOf('tec-') === 0) return 'Other sports';
+  if(s.indexOf('aec-') === 0) return 'Table tennis';
+  return 'Politics';
 }
 function hidCats(){ try{ return JSON.parse(localStorage.getItem('hidCats') || '{}'); }catch(e){ return {}; } }
 function tglCat(c){
@@ -2664,7 +2773,6 @@ async function refresh(){
     err.style.display = msg ? 'block' : 'none'; err.textContent = msg;
     document.getElementById('ovg').innerHTML = bigSpark(d.rate_series);
     renderHome(d);
-    renderPnl(d.pnl);
     BP = d.buying_power;
     document.getElementById('planBP').textContent =
       BP != null ? 'Buying power: $' + BP.toFixed(2) + ' per market, minus what your existing orders there already lock — maxed-out markets are hidden' : '';
@@ -2829,6 +2937,8 @@ class Handler(BaseHTTPRequestHandler):
             with MONITOR.lock:
                 payload = json.dumps({"series": MONITOR.state.get("series", {})})
             self._send(200, "application/json", payload.encode())
+        elif self.path.startswith("/positions.json"):
+            self._send(200, "application/json", json.dumps(positions_overview()).encode())
         elif self.path.startswith("/market.json"):
             from urllib.parse import parse_qs, urlparse
             slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]
