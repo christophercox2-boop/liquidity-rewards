@@ -1,0 +1,13 @@
+name: API probe
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Raw incentives payload (politics + golf samples)
+        run: |
+          curl -sS "https://api.prod.polymarketexchange.com/v1/incentives?symbols=apdc-kashpatel-2026-08-31&symbols=cranc-uspres28-12-31-2026-elomus&symbols=opdc-mcconnell-resign-2026-11-02&symbols=tec-pga-rockclas-2026-08-02-r3l-joedah&pageSize=20" \
+            | python3 -m json.tool
