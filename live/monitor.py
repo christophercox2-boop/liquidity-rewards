@@ -1466,6 +1466,7 @@ function renderPlan(){
       return '<tr><td><input type="checkbox" '+(PSEL[k]?'checked':'')+
         ' onchange="PSEL[\\''+k+'\\']=this.checked;planSum()"></td>'+
         '<td class="mkt">'+esc(r.market)+(mine.has(r.market)?' ✔':'')+
+        (r.prog&&r.prog.tier?' <span class="bdg">'+r.prog.tier+'</span>':'')+
         (r.risk?'<div style="color:#d29922">⚠ '+esc(r.risk)+'</div>':'')+'</td>'+
         '<td'+(r.side==='SELL'?' style="color:#f0883e"':'')+'>'+(r.side==='SELL'?'SELL':'BUY')+
         (p.covered?' 📦':'')+'</td>'+

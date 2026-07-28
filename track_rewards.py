@@ -306,6 +306,52 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
 PRETOURNAMENT_PREFIXES = ("tec-pga-", "tec-liv-", "tec-golf-")
 
 
+def _slug_event_date(slug: str | None) -> "dt.date | None":
+    """The event date embedded in a slug (a YYYY-MM-DD run of parts), or None."""
+    parts = (slug or "").split("-")
+    for i in range(len(parts) - 2):
+        if (parts[i].isdigit() and len(parts[i]) == 4
+                and parts[i + 1].isdigit() and parts[i + 2].isdigit()):
+            try:
+                return dt.date(int(parts[i]), int(parts[i + 1]), int(parts[i + 2][:2]))
+            except ValueError:
+                return None
+    return None
+
+
+def _pick_period(periods: list[dict], slug: str = "") -> dict | None:
+    """The time period that pays TODAY. Politics markets carry one active
+    tier program (low/mid/high, since 2026-07-28). Golf markets carry
+    SEVERAL concurrently-active programs — pretournament plus one per round
+    — so pick by where today falls relative to the tournament (round 1 =
+    slug event date minus 3, the Thursday)."""
+    active = [tp for tp in (periods or [])
+              if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
+              ] or list(periods or [])
+    if not active:
+        return None
+    if len(active) > 1:
+        ev = _slug_event_date(slug)
+        if ev:
+            today = dt.datetime.now(dt.timezone.utc).date()
+            t_start = ev - dt.timedelta(days=3)
+            want = ("pretournament" if today < t_start
+                    else f"round_{min((today - t_start).days + 1, 4)}")
+            for tp in active:
+                if want in str(tp.get("programId") or ""):
+                    return tp
+    return active[-1]
+
+
+def _prog_of(tp: dict) -> dict:
+    """Normalize one time period into the tracker's program dict."""
+    pid = str(tp.get("programId") or "")
+    tier = next((t for t in ("low", "mid", "high") if f"_{t}_" in pid), None)
+    return {"df": _num(tp.get("discountFactor")), "target": _num(tp.get("targetSize")),
+            "pool": _num(tp.get("rewardPool")), "start": tp.get("start"),
+            "end": tp.get("end"), "pid": pid or None, "tier": tier}
+
+
 def _pool_days(prog: dict, slug: str | None = None) -> float:
     """How many days the pool covers. Daily (1.0) for everything except golf
     tournament programs, which fund the pre-tournament window: program start
@@ -318,20 +364,19 @@ def _pool_days(prog: dict, slug: str | None = None) -> float:
     try:
         if not (slug and slug.startswith(PRETOURNAMENT_PREFIXES)):
             return 1.0
+        if "round" in str(prog.get("pid") or ""):
+            return 1.0  # a per-round pool pays over its single round day
         s, e = prog.get("start"), prog.get("end")
         if s and e:
             sd = dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
             ed = dt.datetime.fromisoformat(str(e).replace("Z", "+00:00"))
             return max((ed - sd).total_seconds() / 86400.0, 1.0)
         if s:
-            parts = slug.split("-")
-            for i in range(len(parts) - 2):
-                if (parts[i].isdigit() and len(parts[i]) == 4
-                        and parts[i + 1].isdigit() and parts[i + 2].isdigit()):
-                    ev = dt.date(int(parts[i]), int(parts[i + 1]), int(parts[i + 2][:2]))
-                    sd = dt.datetime.fromisoformat(str(s).replace("Z", "+00:00")).date()
-                    t_start = ev - dt.timedelta(days=3)  # Sun finish -> ~Thu start
-                    return float(max((t_start - sd).days, 1))
+            ev = _slug_event_date(slug)
+            if ev:
+                sd = dt.datetime.fromisoformat(str(s).replace("Z", "+00:00")).date()
+                t_start = ev - dt.timedelta(days=3)  # Sun finish -> ~Thu start
+                return float(max((t_start - sd).days, 1))
     except Exception:  # noqa: BLE001 — fall back to daily
         pass
     return 1.0
@@ -574,14 +619,9 @@ def fetch_opportunities(
         if not _is_us_politics(slug):  # tags include foreign races; US only
             stats["not_politics"] += 1
             return
-        periods = p.get("timePeriods") or []
-        current = [
-            tp for tp in periods
-            if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
-        ] or periods
-        if not current:
+        tp = _pick_period(p.get("timePeriods") or [], slug)
+        if tp is None:
             return
-        tp = current[-1]
         try:  # skip programs whose current period already ended
             end = tp.get("end")
             if end and dt.datetime.fromisoformat(str(end).replace("Z", "+00:00")) < dt.datetime.now(dt.timezone.utc):
@@ -589,15 +629,11 @@ def fetch_opportunities(
                 return
         except Exception:  # noqa: BLE001 — unparseable end date: keep the candidate
             pass
-        df, target, pool = _num(tp.get("discountFactor")), _num(tp.get("targetSize")), _num(tp.get("rewardPool"))
-        if pool < 25 or not df:
+        prog = _prog_of(tp)
+        if prog["pool"] < 25 or not prog["df"]:
             stats["no_pool_or_df"] += 1
             return
-        candidates.append(
-            {"market": slug, "df": df, "target": target, "pool": pool,
-             "start": tp.get("start"), "end": tp.get("end"),
-             "event_n": event_sizes.get(slug, 1)}
-        )
+        candidates.append({"market": slug, **prog, "event_n": event_sizes.get(slug, 1)})
 
     candidates: list[dict] = []
     # Preferred path: markets from events tagged politics, then their programs
@@ -802,20 +838,10 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                             continue
                         got = {}
                         for p in r.json().get("programs") or []:
-                            periods = p.get("timePeriods") or []
-                            current = [
-                                tp for tp in periods
-                                if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
-                            ] or periods
-                            if current:
-                                tp = current[-1]
-                                got[p.get("marketSlug", "")] = {
-                                    "df": _num(tp.get("discountFactor")),
-                                    "target": _num(tp.get("targetSize")),
-                                    "pool": _num(tp.get("rewardPool")),
-                                    "start": tp.get("start"),
-                                    "end": tp.get("end"),
-                                }
+                            mslug = p.get("marketSlug", "")
+                            tp = _pick_period(p.get("timePeriods") or [], mslug)
+                            if tp is not None:
+                                got[mslug] = _prog_of(tp)
                         break
                     except Exception as e:  # noqa: BLE001 — params needed for verdicts, not fatal
                         debug[f"_incentives {host.split('//')[-1]}"] = f"{type(e).__name__}: {e}"

@@ -51,19 +51,10 @@ def fetch_programs(slugs: list[str], key_id: str, secret_key: str) -> dict[str, 
                 if r.status_code >= 400:
                     continue
                 for p in r.json().get("programs") or []:
-                    periods = p.get("timePeriods") or []
-                    current = [tp for tp in periods
-                               if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
-                               ] or periods
-                    if current:
-                        tp = current[-1]
-                        progs[p.get("marketSlug", "")] = {
-                            "df": tr._num(tp.get("discountFactor")),
-                            "target": tr._num(tp.get("targetSize")),
-                            "pool": tr._num(tp.get("rewardPool")),
-                            "start": tp.get("start"),
-                            "end": tp.get("end"),
-                        }
+                    mslug = p.get("marketSlug", "")
+                    tp = tr._pick_period(p.get("timePeriods") or [], mslug)
+                    if tp is not None:
+                        progs[mslug] = tr._prog_of(tp)
                 break
             except Exception:  # noqa: BLE001 — try the next host
                 continue
@@ -403,7 +394,7 @@ def evaluate_cheap_yes(slug: str, book: dict, prog: dict) -> dict | None:
             "best_ask": asks[0][0] if asks else None, "held": 0,
             "risk": None,  # fills are the accepted cost of this strategy
             "note": f"resolves ~{rd.isoformat()}" if rd else None,
-            "prog": {k: prog.get(k) for k in ("df", "target", "pool", "event_n", "start")}}
+            "prog": {k: prog.get(k) for k in ("df", "target", "pool", "event_n", "start", "pid", "tier")}}
 
 
 def allocate_per_golfer(results: list[dict], books: dict[str, dict]) -> list[dict]:
@@ -553,7 +544,7 @@ def main() -> None:
             if r:
                 r["event_n"] = prog["event_n"]
                 r["already_in"] = slug in mine
-                r["prog"] = {k: prog.get(k) for k in ("df", "target", "pool", "event_n", "start")}
+                r["prog"] = {k: prog.get(k) for k in ("df", "target", "pool", "event_n", "start", "pid", "tier")}
                 results.append(r)
                 got_any = True
         if not got_any:
