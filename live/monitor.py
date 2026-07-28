@@ -752,8 +752,48 @@ PLAN_FILES = {"politics": "data/scan.json", "golf": "data/scan_golf.json",
               "tt": "data/scan_tt.json"}
 
 
+def _spread_plan(pol: dict) -> dict:
+    """Derived from the politics scan: markets with the widest bid-ask
+    spreads, entered ONE TICK INSIDE both sides at the reward Target Size —
+    being the best price with the whole window is the max reward share."""
+    rows, seen = [], set()
+    for r in pol.get("results") or []:
+        m = r.get("market")
+        bb, ba = r.get("best_bid"), r.get("best_ask")
+        tick = r.get("tick") or 0.01
+        prog = r.get("prog") or {}
+        target = int(prog.get("target") or 0)
+        if not m or m in seen or not bb or not ba or not target or not prog.get("pool"):
+            continue
+        seen.add(m)
+        ticks = round((ba - bb) / tick)
+        if ticks < 3:
+            continue  # need a tick inside each side AND a gap between our quotes
+        pb, pa = round(bb + tick, 4), round(ba - tick, 4)
+        side_pool = round(tr._daily_pool(prog, m) / 2, 2)  # ~100% share when we ARE the window
+        common = {"market": m, "spread_ok": True, "tick": tick,
+                  "best_bid": bb, "best_ask": ba,
+                  "spread_cents": round((ba - bb) * 100, 1),
+                  "side_pool": side_pool, "held": 0, "risk": r.get("risk"),
+                  "note": r.get("note"), "prog": prog}
+        rows.append({**common, "side": "BUY",
+                     "pick": {"side": "BUY", "price": pb, "size": target,
+                              "capital": round(pb * target, 2),
+                              "covered": False, "est_day": side_pool, "share": 100.0},
+                     "max": None})
+        rows.append({**common, "side": "SELL",
+                     "pick": {"side": "SELL", "price": pa, "size": target,
+                              "capital": round((1 - pa) * target, 2),
+                              "covered": False, "est_day": side_pool, "share": 100.0},
+                     "max": None})
+    rows.sort(key=lambda r: (-r["spread_cents"], r["market"], r["side"]))
+    return {"generated": pol.get("generated"), "results": rows}
+
+
 def fetch_plan(which: str = "politics") -> dict:
     """A scan plan file from the repo's main branch (via GITHUB_TOKEN)."""
+    if which == "spread":
+        return _spread_plan(fetch_plan("politics"))
     which = which if which in PLAN_FILES else "politics"
     slot = PLAN_CACHE[which]
     if slot["data"] and time.time() - slot["ts"] < 300:
@@ -804,6 +844,21 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
             if lv:
                 price = lv[0][0]
                 res["price_cents"] = round(price * 100, 2)
+        if plan_row.get("spread_ok"):  # spread entries: ONE tick inside the live touch
+            tickb = book.get("tick") or 0.01
+            if side == "BUY":
+                if bids:
+                    price = round(bids[0][0] + tickb, 4)
+                if asks and price >= asks[0][0] - 1e-9:
+                    res.update(status="skipped", note="spread closed — no room inside the touch")
+                    return res
+            else:
+                if asks:
+                    price = round(asks[0][0] - tickb, 4)
+                if bids and price <= bids[0][0] + 1e-9:
+                    res.update(status="skipped", note="spread closed — no room inside the touch")
+                    return res
+            res["price_cents"] = round(price * 100, 2)
         crosses = (asks and price >= asks[0][0]) if side == "BUY" else (bids and price <= bids[0][0])
         if crosses:
             res.update(status="skipped", note="would cross the spread now")
@@ -817,7 +872,8 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
         # and the cheap-YES strategy accepts fills by design.
         target = prog.get("target") or 0
         deep = ((side == "BUY" and price <= 0.011) or (side == "SELL" and price >= 0.989)
-                or bool(plan_row.get("join_ok")))  # 1-share touch plans join by design
+                or bool(plan_row.get("join_ok"))    # 1-share touch plans join by design
+                or bool(plan_row.get("spread_ok")))  # spread entries improve by design
         if not deep:
             if side == "BUY" and bids and price >= bids[0][0] - 1e-9:
                 level = sum(q for px, q in bids if abs(px - price) < 1e-9)
@@ -1676,6 +1732,26 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  <button class="tab" id="tabR" onclick="showTab('R')">Markets</button>
  <button class="tab" id="tabP" onclick="showTab('P')">P/L</button>
  <button class="tab" id="tabL" onclick="showTab('L')">Plan</button>
+ <button class="tab" id="tabS" onclick="showTab('S')">Spreads</button>
+</div>
+<div id="viewS" style="display:none">
+<div class="sub">Widest politics spreads — enter ONE tick inside both sides <span id="spGen"></span></div>
+<div style="margin:6px 0">
+ <button class="tab" onclick="spAll(true)">Select all</button>
+ <button class="tab" onclick="spAll(false)">Clear</button></div>
+<div class="sub" id="spSel"></div>
+<div class="err" id="spErr"></div>
+<table id="sptab"></table>
+<div class="rp" style="margin-top:10px">
+ <button onclick="spPlace()">Enter selected (both sides)</button>
+ <button class="alt" onclick="abortBatch()">Stop batch</button></div>
+<div id="spProg" class="mkt" style="margin:8px 0"></div>
+<div class="mkt">Each entry places a post-only BUY one tick above the live best bid and a
+post-only SELL one tick below the live best ask, sized to the reward Target Size (clamped to
+your per-market buying power, split across the two sides). You become the best price on both
+sides — that is the maximum reward share, but also first in line to FILL on both sides: if
+both fill you pocket the spread; if one fills you own the position. Placement re-prices from
+the live book and skips markets whose spread has closed.</div>
 </div>
 <div id="viewH">
 <div class="sub">Earned today (ET) — live estimate</div>
@@ -1769,11 +1845,12 @@ does.</div>
 let OPEN = {}, GOPEN = {}, SERIES = null, RATES = {};
 let SEEN = JSON.parse(localStorage.getItem('seenRates') || '{}');
 function showTab(t){
-  ['H','R','P','L'].forEach(k => {
+  ['H','R','P','L','S'].forEach(k => {
     document.getElementById('view'+k).style.display = k===t ? '' : 'none';
     document.getElementById('tab'+k).className = 'tab' + (k===t ? ' on' : '');
   });
   if(t==='L') loadPlan();
+  if(t==='S') loadSpread();
 }
 let PLAN = null, PSEL = {}, BP = null, OLOCK = {};
 function pwhich(){ const el = document.querySelector('input[name="pwhich"]:checked'); return el ? el.value : 'politics'; }
@@ -1992,6 +2069,114 @@ async function pollPlace(){
 async function abortBatch(){
   try{ await fetch('place_abort', {method:'POST', headers:{'X-Reprice':'1'}}); }catch(e){}
   pollPlace();
+}
+let SPLAN = null, SPSEL = {};
+async function loadSpread(){
+  if(SPLAN){ renderSpread(); return; }
+  try{
+    const d = await (await fetch('plan.json?which=spread')).json();
+    const err = document.getElementById('spErr');
+    if(d.error){ err.textContent = d.error; err.style.display = 'block'; return; }
+    SPLAN = d; renderSpread();
+  }catch(e){
+    const err = document.getElementById('spErr');
+    err.textContent = 'spread plan load failed: ' + e; err.style.display = 'block';
+  }
+}
+function spMarkets(){
+  const by = {};
+  ((SPLAN && SPLAN.plan.results) || []).forEach(r => {
+    const e = by[r.market] = by[r.market] ||
+      {market: r.market, spread: r.spread_cents, pool: r.side_pool, risk: r.risk, note: r.note};
+    e[r.side] = r;
+  });
+  return Object.values(by).filter(x => x.BUY && x.SELL).sort((a,b) => b.spread - a.spread);
+}
+function spOrd(r){  // one side of an entry, clamped to HALF the market's room
+  const p = r.pick;
+  const lock = r.side === 'SELL' ? (1 - p.price) : p.price;
+  const room = mroom(r.market);
+  const q = room == null ? p.size
+    : Math.min(p.size, Math.floor((room / 2) / Math.max(lock, 0.0001)));
+  return q < 1 ? null : {price: p.price, size: q, capital: +(lock * q).toFixed(2),
+                         full: q >= p.size};
+}
+function renderSpread(){
+  if(!SPLAN) return;
+  document.getElementById('spGen').textContent = '· scanned ' + (SPLAN.plan.generated || '');
+  const mine = new Set(SPLAN.mine || []);
+  document.getElementById('sptab').innerHTML =
+    '<tr><th></th><th>Market</th><th class="r">Spread</th><th class="r">Entry</th><th class="r">$/day</th></tr>' +
+    spMarkets().map(x => {
+      const b = spOrd(x.BUY), s = spOrd(x.SELL);
+      if(!b && !s) return '';
+      const entry = (b ? 'buy ' + (+(x.BUY.pick.price*100).toFixed(1)) + '¢ ×' + b.size.toLocaleString() : '') +
+        (b && s ? '<br>' : '') +
+        (s ? 'sell ' + (+(x.SELL.pick.price*100).toFixed(1)) + '¢ ×' + s.size.toLocaleString() : '');
+      const cap = (b ? b.capital : 0) + (s ? s.capital : 0);
+      const full = (!b || b.full) && (!s || s.full);
+      return '<tr><td><input type="checkbox" '+(SPSEL[x.market]?'checked':'')+
+        ' onchange="SPSEL[\\''+esc(x.market)+'\\']=this.checked;spSum()"></td>'+
+        '<td class="mkt" onclick="openMkt(\\''+esc(x.market)+'\\')">'+esc(x.market)+(mine.has(x.market)?' ✔':'')+
+        (x.risk?'<div style="color:#d29922">⚠ '+esc(x.risk)+'</div>':'')+'</td>'+
+        '<td class="r" style="white-space:nowrap">'+(+(x.BUY.best_bid*100).toFixed(1))+'¢ ⇄ '+
+        (+(x.BUY.best_ask*100).toFixed(1))+'¢<br><b>'+x.spread.toFixed(1)+'¢ wide</b></td>'+
+        '<td class="r" style="white-space:nowrap;font-size:12px">'+entry+
+        '<br><span class="sub" style="font-size:10px">$'+cap.toFixed(0)+' locked'+(full?'':' ↓fit')+'</span></td>'+
+        '<td class="r">'+(full ? '$'+(2*x.pool).toFixed(2) : 'up to $'+(2*x.pool).toFixed(2))+'</td></tr>';
+    }).join('') || '<tr><td class="sub">no politics market currently shows a 3+ tick spread</td></tr>';
+  spSum();
+}
+function spAll(on){ spMarkets().forEach(x => { if(!on || !x.risk) SPSEL[x.market] = on; }); renderSpread(); }
+function spSum(){
+  let n = 0, cap = 0, est = 0;
+  spMarkets().forEach(x => {
+    if(!SPSEL[x.market]) return;
+    const b = spOrd(x.BUY), s = spOrd(x.SELL);
+    if(!b && !s) return;
+    n++; cap += (b ? b.capital : 0) + (s ? s.capital : 0); est += 2 * x.pool;
+  });
+  document.getElementById('spSel').textContent =
+    n + ' markets selected · ~$' + cap.toFixed(0) + ' locked · up to ~$' + est.toFixed(2) + '/day';
+}
+async function spPlace(){
+  const orders = [];
+  let cap = 0;
+  spMarkets().forEach(x => {
+    if(!SPSEL[x.market]) return;
+    const b = spOrd(x.BUY), s = spOrd(x.SELL);
+    if(b){ orders.push({market: x.market, side: 'BUY',
+                        price_cents: +(x.BUY.pick.price*100).toFixed(1), size: b.size}); cap += b.capital; }
+    if(s){ orders.push({market: x.market, side: 'SELL',
+                        price_cents: +(x.SELL.pick.price*100).toFixed(1), size: s.size}); cap += s.capital; }
+  });
+  if(!orders.length){ alert('Nothing selected'); return; }
+  if(!confirm('Enter ' + orders.length + ' post-only orders one tick inside the spread?\\n~$' +
+              cap.toFixed(0) + ' locked while they rest. You will be BEST PRICE on both sides — ' +
+              'first to earn, first to fill.')) return;
+  try{
+    const r = await fetch('place', {method:'POST',
+      headers:{'Content-Type':'application/json','X-Reprice':'1'},
+      body: JSON.stringify({max_price_cents: 99.9, min_sell_cents: 0.1, which: 'spread',
+                            orders: orders})});
+    const d = await r.json();
+    if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
+    spPoll();
+  }catch(e){ alert('Failed: ' + e); }
+}
+async function spPoll(){
+  try{
+    const d = await (await fetch('place_status')).json();
+    const done = d.results.length;
+    const placed = d.results.filter(x=>x.status==='placed').length;
+    const skip = d.results.filter(x=>x.status==='skipped').length;
+    document.getElementById('spProg').textContent =
+      (d.running ? 'placing… ' : 'batch ' + (d.summary || 'done') + ': ') +
+      done + '/' + d.total + ' — ' + placed + ' placed, ' + skip + ' skipped, ' +
+      (done - placed - skip) + ' failed';
+    if(d.running) setTimeout(spPoll, 2000);
+    else { SPSEL = {}; SPLAN = null; setTimeout(refresh, 1500); }
+  }catch(e){ setTimeout(spPoll, 3000); }
 }
 let RPLAN = null, RSEL = {};
 (function(){ const v = localStorage.getItem('qdist');
