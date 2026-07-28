@@ -199,6 +199,53 @@ def tracker_day_integral(day_et: str) -> tuple[float, dict[str, float]] | None:
         return None
 
 
+def load_winners() -> list[dict]:
+    """Career paid rewards per market from data/rewards.csv — fresh copy from
+    GitHub when a token is available, else the file shipped with the deploy.
+    Markets not paid in 14 days are dropped (likely resolved or de-listed)."""
+    text = None
+    if GITHUB_TOKEN:
+        try:
+            r = requests.get(
+                f"{GH_API}/repos/{GITHUB_REPO}/contents/data/rewards.csv",
+                params={"ref": "main"},
+                headers={"Authorization": f"Bearer {GITHUB_TOKEN}",
+                         "Accept": "application/vnd.github.raw+json"},
+                timeout=30,
+            )
+            if r.status_code == 200:
+                text = r.text
+        except Exception:  # noqa: BLE001 — fall back to the local file
+            pass
+    if text is None:
+        try:
+            text = (Path(__file__).resolve().parent.parent / "data" / "rewards.csv").read_text()
+        except Exception:  # noqa: BLE001
+            return []
+    try:
+        import csv as _csv
+        import io as _io
+        tot: dict[str, float] = {}
+        last: dict[str, str] = {}
+        for row in _csv.DictReader(_io.StringIO(text)):
+            m = row.get("market") or ""
+            try:
+                tot[m] = tot.get(m, 0.0) + float(row.get("reward_usd") or 0)
+            except ValueError:
+                continue
+            last[m] = max(last.get(m, ""), row.get("date") or "")
+        cutoff = (dt.date.today() - dt.timedelta(days=14)).isoformat()
+        return sorted(
+            [{"market": m, "total": round(v, 2), "last": last[m]}
+             for m, v in tot.items() if m and v >= 2.0 and last[m] >= cutoff],
+            key=lambda w: -w["total"])
+    except Exception:  # noqa: BLE001
+        return []
+
+
+WINNERS: list[dict] = []
+
+
 class Monitor:
     def __init__(self) -> None:
         self.lock = threading.Lock()
@@ -264,6 +311,7 @@ class Monitor:
         self.persistence = "github" if GITHUB_TOKEN else "local only — resets on redeploy"
         self.positions: dict[str, dict] = {}  # raw /v1/portfolio/positions, for the P/L tab
         self.activity_pnl: dict[str, dict] = {}  # closed/settled markets, from activities
+        self.trades: list[dict] = []  # recent fills, for the landing page
         self.pnl_updated: dt.datetime | None = None
         self.pnl_error: str | None = None
         self.buying_power: float | None = None  # available cash, for the Plan tab
@@ -314,6 +362,33 @@ class Monitor:
                      f"{mkt}: was ${high:.2f}/day, now $0", "high"))
                 high = 0.0  # re-arm only after it earns > $1/day again
             self.alert_high[mkt] = high
+
+    def note_markets(self, keys: list[str], kind: str) -> None:
+        """Track the universe of markets (or golf tournaments) we can see, and
+        record anything newly listed for the landing page. The very first
+        sighting of a kind seeds the known set silently — otherwise every
+        market would be 'new' on day one."""
+        keys = [k for k in keys if k]
+        if not keys:
+            return
+        with self.lock:
+            known = self.state.setdefault("known_mkts", {})
+            first = kind not in known
+            seen = set(known.get(kind) or [])
+            fresh = sorted(set(keys) - seen)
+            if not fresh:
+                return
+            known[kind] = sorted(seen | set(fresh))[-5000:]
+            if first:
+                return
+            now = time.time()
+            lst = self.state.setdefault("new_mkts", [])
+            for k in fresh:
+                lst.append({"ts": round(now, 1),
+                            "when": dt.datetime.now(ET).strftime("%b %d"),
+                            "label": k, "kind": kind})
+            cutoff = now - 14 * 86400
+            self.state["new_mkts"] = [e for e in lst if e["ts"] >= cutoff][-120:]
 
     def note_batch_order(self, order_id: str) -> None:
         """Remember an order the Plan tab placed, so the earnings list can badge it."""
@@ -562,7 +637,31 @@ class Monitor:
                 ),
                 "alerts": "ntfy" if NTFY_TOPIC else "off",
                 "actions": ACTIONS[-10:][::-1],
+                "trades": self.trades[:60],
+                "drops": self._drops(),
+                "winners": self._missed_winners(),
+                "new_mkts": (self.state.get("new_mkts") or [])[::-1],
             }
+
+    def _drops(self) -> list[dict]:
+        """Markets earning well below their peak of the stored (~8h) window —
+        called under lock."""
+        out = []
+        for m, s in (self.state.get("series") or {}).items():
+            if len(s) < 5:
+                continue
+            peak = max(v for _, v in s)
+            cur = s[-1][1]
+            if peak >= 0.25 and peak - cur >= max(0.25, 0.3 * peak):
+                out.append({"market": m, "was": round(peak, 2), "now": round(cur, 2)})
+        out.sort(key=lambda d: -(d["was"] - d["now"]))
+        return out[:10]
+
+    def _missed_winners(self) -> list[dict]:
+        """Historical earners (paid rewards) with no current resting order —
+        called under lock."""
+        cur = {o.get("market") for o in self.orders}
+        return [w for w in WINNERS if w["market"] not in cur][:10]
 
 
 MONITOR = Monitor()
@@ -942,11 +1041,14 @@ def start_cancel_batch(payload: dict) -> tuple[int, dict]:
     return 200, {"ok": True, "started": len(clean)}
 
 
-def fetch_activity_pnl(key_id: str, secret_key: str) -> dict[str, dict]:
+def fetch_activity_pnl(key_id: str, secret_key: str) -> tuple[dict[str, dict], list[dict]]:
     """Per-market realized P/L rebuilt from trade/resolution history — covers
-    positions the exchange no longer returns once fully closed or settled."""
+    positions the exchange no longer returns once fully closed or settled.
+    Also returns the individual fills (newest first) for the landing page's
+    since-you-last-checked list."""
     path = "/v1/portfolio/activities"
     agg: dict[str, dict] = {}
+    trades: list[dict] = []
     cursor = None
     for _ in range(10):  # up to 1000 most recent activities
         params: dict = {"limit": 100, "sortOrder": "SORT_ORDER_DESCENDING",
@@ -967,6 +1069,23 @@ def fetch_activity_pnl(key_id: str, secret_key: str) -> dict[str, dict]:
                                    {"realized": 0.0, "ts": "", "resolved": False, "final": None})
                 e["realized"] += tr._num(t.get("realizedPnl"))
                 e["ts"] = max(e["ts"], str(t.get("updateTime") or t.get("createTime") or ""))
+                if len(trades) < 120:
+                    ts = str(t.get("updateTime") or t.get("createTime") or "")
+                    ts_s, when = 0.0, ""
+                    try:
+                        d = dt.datetime.fromisoformat(ts.replace("Z", "+00:00"))
+                        ts_s = d.timestamp()
+                        when = d.astimezone(ET).strftime("%b %d %I:%M %p")
+                    except Exception:  # noqa: BLE001
+                        pass
+                    pv = t.get("price")
+                    pnl = tr._num(t.get("realizedPnl"))
+                    trades.append({"market": t["marketSlug"], "ts_s": round(ts_s, 1),
+                                   "when": when,
+                                   "qty": tr._num(t.get("qty")) or None,
+                                   "price_cents": (round(tr._num(pv) * 100, 2)
+                                                   if pv is not None else None),
+                                   "pnl": round(pnl, 2) if pnl else None})
             elif pr.get("marketSlug"):
                 e = agg.setdefault(pr["marketSlug"],
                                    {"realized": 0.0, "ts": "", "resolved": False, "final": None})
@@ -978,7 +1097,7 @@ def fetch_activity_pnl(key_id: str, secret_key: str) -> dict[str, dict]:
         cursor = j.get("nextCursor")
         if j.get("eof") or not cursor:
             break
-    return agg
+    return agg, trades
 
 
 def _book_without(book: dict, side: str, price: float, size: float) -> dict:
@@ -1256,6 +1375,134 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True) -> tuple[
         ACTIONS.append(record)
         del ACTIONS[:-20]
 
+def _slug_known(slug: str) -> bool:
+    """Only operate on markets we can see: currently quoted, in the tracked
+    politics/golf universe, or on a scan plan — never a free-typed slug."""
+    if any(o.get("market") == slug for o in MONITOR.orders):
+        return True
+    with MONITOR.lock:
+        known = dict(MONITOR.state.get("known_mkts") or {})
+    if slug in (known.get("politics") or []):
+        return True
+    if any(slug.startswith(t + "-") for t in known.get("golf") or []):
+        return True
+    for which in ("politics", "golf"):
+        try:
+            plan = fetch_plan(which)
+            if any(r.get("market") == slug for r in plan.get("results") or []):
+                return True
+        except Exception:  # noqa: BLE001 — plan cache empty is fine
+            pass
+    return False
+
+
+def market_info(slug: str) -> tuple[int, dict]:
+    """Book + my orders + position for the tap-a-market action sheet."""
+    if not slug or len(slug) > 120:
+        return 400, {"error": "bad slug"}
+    if not _slug_known(slug):
+        return 404, {"error": "unknown market — not in the tracked universe"}
+    try:
+        book = tr._fetch_book(slug)
+    except Exception as e:  # noqa: BLE001
+        return 502, {"error": f"book unavailable: {type(e).__name__}: {e}"[:200]}
+    mine = [{k: o.get(k) for k in ("id", "side", "price", "size", "est_day", "verdict")}
+            for o in MONITOR.orders if o.get("market") == slug]
+    net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
+    return 200, {"market": slug, "tick": book.get("tick") or 0.01,
+                 "bids": [[p, q] for p, q in (book.get("bids") or [])[:6]],
+                 "asks": [[p, q] for p, q in (book.get("asks") or [])[:6]],
+                 "orders": mine, "net": net, "buying_power": MONITOR.buying_power}
+
+
+def do_cancel_order(order_id: str) -> tuple[int, dict]:
+    """Cancel ONE of our resting orders (whitelisted against the snapshot)."""
+    o = next((o for o in MONITOR.orders if o.get("id") == order_id), None)
+    if o is None:
+        return 400, {"ok": False, "error": "unknown order id — wait for the next refresh"}
+    path = f"/v1/order/{order_id}/cancel"
+    try:
+        r = requests.request(
+            "POST", tr.TRADE_API + path,
+            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
+                     "Content-Type": "application/json"},
+            json={"marketSlug": o["market"]}, timeout=20,
+        )
+        ok = r.status_code < 300
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": o["market"], "side": f"{o['side']} (cancel)",
+                        "from": round(o["price"] * 100, 1), "to": "—", "size": o["size"],
+                        "status": r.status_code,
+                        "response": " ".join(r.text.split())[:150], "verified": ok})
+        del ACTIONS[:-20]
+        POLL_KICK.set()
+        return (200 if ok else 502), {"ok": ok, "status": r.status_code,
+                                      "detail": "" if ok else tr._http_err(r)[:200]}
+    except Exception as e:  # noqa: BLE001
+        return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
+
+
+def manual_place(slug: str, side: str, price_cents: float, size: int) -> tuple[int, dict]:
+    """Place ONE post-only order from the market sheet. Same protections as
+    the batch placer minus the plan checks: known market, sane price, post-
+    only (rests or rejects — can never cross and fill on arrival)."""
+    if not _slug_known(slug):
+        return 400, {"ok": False, "error": "unknown market"}
+    if side not in ("BUY", "SELL"):
+        return 400, {"ok": False, "error": "side must be BUY or SELL"}
+    if not (0.1 <= price_cents <= 99.9):
+        return 400, {"ok": False, "error": "price out of range (0.1–99.9¢)"}
+    if not (1 <= size <= 20000):
+        return 400, {"ok": False, "error": "size out of range (1–20,000)"}
+    intent = "ORDER_INTENT_BUY_LONG"
+    if side == "SELL":
+        net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
+        intent = "ORDER_INTENT_SELL_LONG" if net >= size else "ORDER_INTENT_SELL_SHORT"
+    path = "/v1/orders"
+    value = f"{price_cents / 100:.3f}".rstrip("0").rstrip(".")
+    try:
+        r = requests.request(
+            "POST", tr.TRADE_API + path,
+            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
+                     "Content-Type": "application/json"},
+            json={"marketSlug": slug, "intent": intent, "type": "ORDER_TYPE_LIMIT",
+                  "price": {"value": value, "currency": "USD"},
+                  "quantity": size, "tif": "TIME_IN_FORCE_DAY",
+                  "participateDontInitiate": True},
+            timeout=20,
+        )
+        ok = r.status_code < 300
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": slug, "side": f"{side} (manual)", "from": "—",
+                        "to": price_cents, "size": size, "status": r.status_code,
+                        "response": " ".join(r.text.split())[:150], "verified": ok})
+        del ACTIONS[:-20]
+        POLL_KICK.set()
+        return (200 if ok else 502), {"ok": ok, "status": r.status_code,
+                                      "detail": "" if ok else tr._http_err(r)[:200]}
+    except Exception as e:  # noqa: BLE001
+        return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
+
+
+def do_maction(body: dict) -> tuple[int, dict]:
+    """Single-order actions from the tap-a-market sheet."""
+    op = body.get("op")
+    if op == "cancel":
+        return do_cancel_order(str(body.get("order_id") or ""))
+    if op == "modify":
+        try:
+            return do_reprice(str(body["order_id"]), float(body["price_cents"]))
+        except (KeyError, TypeError, ValueError):
+            return 400, {"ok": False, "error": "bad request"}
+    if op == "place":
+        try:
+            return manual_place(str(body["market"]), str(body.get("side") or "BUY"),
+                                float(body["price_cents"]), int(body["size"]))
+        except (KeyError, TypeError, ValueError):
+            return 400, {"ok": False, "error": "bad request"}
+    return 400, {"ok": False, "error": "op must be place, modify or cancel"}
+
+
 DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Liquidity rewards — live</title>
@@ -1286,16 +1533,29 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  .bdg{background:#1f3a5f;color:#79b8ff;border-radius:5px;padding:1px 6px;font-size:10px;vertical-align:middle}
 </style></head><body>
 <div style="display:flex;gap:8px;margin-bottom:12px">
- <button class="tab on" id="tabR" onclick="showTab('R')">Rewards</button>
+ <button class="tab on" id="tabH" onclick="showTab('H')">Home</button>
+ <button class="tab" id="tabR" onclick="showTab('R')">Markets</button>
  <button class="tab" id="tabP" onclick="showTab('P')">P/L</button>
  <button class="tab" id="tabL" onclick="showTab('L')">Plan</button>
 </div>
-<div id="viewR">
+<div id="viewH">
 <div class="sub">Earned today (ET) — live estimate</div>
 <div class="big" id="earned">…</div>
 <div class="sub" id="rate"></div>
 <div class="sub" id="updated"></div>
 <div class="err" id="err"></div>
+<div id="ovg" style="margin:10px 0"></div>
+<h3>Since you last checked <button class="tab" style="font-size:11px;padding:4px 10px" onclick="clearTxns()">Clear</button></h3>
+<table id="txns"></table>
+<h3>Biggest drops <span class="sub">(vs their peak over the last ~8h)</span></h3>
+<table id="drops"></table>
+<h3>Earners you're not in <span class="sub">(paid you before · no order resting now)</span></h3>
+<table id="winners"></table>
+<h3>New markets <span class="sub">(golf shown per tournament)</span></h3>
+<table id="newm"></table>
+<div class="mkt" style="margin-top:8px">Tap any market to place, modify or cancel an order there.</div>
+</div>
+<div id="viewR" style="display:none">
 <div style="margin:8px 0"><button class="tab" onclick="loadReprice()">⚡ Optimize prices</button>
  <button class="tab" onclick="loadDead()">🧹 Cancel dead orders</button>
  <span class="sub" style="margin-left:8px">distance:
@@ -1304,7 +1564,6 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
   <label><input type="radio" name="qdist" value="2"> 2 back</label></span></div>
 <div id="rpl"></div>
 <div id="rpProg" class="mkt"></div>
-<div id="ovg" style="margin:10px 0"></div>
 <h3>By market <span class="sub">(sorted by current rate · tap a row for the math)</span></h3><table id="markets"></table>
 <h3>Previous days</h3><table id="history"></table>
 <div id="acts"></div>
@@ -1360,11 +1619,14 @@ does.</div>
  <button class="tab" style="background:#8b1a1a;color:#fff" onclick="cancelAll()">⚠ Cancel ALL open orders</button>
 </div>
 </div>
+<div id="sheet" style="display:none;position:fixed;inset:0;background:rgba(1,4,9,.88);overflow:auto;z-index:10" onclick="closeSheet()">
+ <div id="sheetIn" style="max-width:560px;margin:24px auto;background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px" onclick="event.stopPropagation()"></div>
+</div>
 <script>
 let OPEN = {}, GOPEN = {}, SERIES = null, RATES = {};
 let SEEN = JSON.parse(localStorage.getItem('seenRates') || '{}');
 function showTab(t){
-  ['R','P','L'].forEach(k => {
+  ['H','R','P','L'].forEach(k => {
     document.getElementById('view'+k).style.display = k===t ? '' : 'none';
     document.getElementById('tab'+k).className = 'tab' + (k===t ? ' on' : '');
   });
@@ -1796,12 +2058,131 @@ async function reprice(id, label){
   }catch(e){ alert('Failed: '+e); }
   setTimeout(refresh, 1500);
 }
+let LASTD = null;
+function txnSeen(){ return +(localStorage.getItem('txnSeen') || 0); }
+function clearTxns(){
+  localStorage.setItem('txnSeen', '' + Math.floor(Date.now()/1000));
+  if(LASTD) renderHome(LASTD);
+}
+function mrow(m, mid, right){
+  return '<tr onclick="openMkt(\\''+esc(m)+'\\')"><td class="mkt">'+esc(m)+'</td>'+
+         (mid||'')+'<td class="r" style="white-space:nowrap">'+right+'</td></tr>';
+}
+function renderHome(d){
+  LASTD = d;
+  const seen = txnSeen();
+  const tx = (d.trades || []).filter(t => t.ts_s > seen);
+  document.getElementById('txns').innerHTML = tx.length ? tx.slice(0, 25).map(t =>
+      mrow(t.market,
+        '<td class="r" style="white-space:nowrap">'+(t.qty != null ? (+t.qty).toLocaleString() : '')+
+        (t.price_cents != null ? ' @ ' + (+t.price_cents).toFixed(2) + '¢' : '')+
+        (t.pnl ? '<br><span class="'+(t.pnl > 0 ? 'pos' : 'neg')+'">'+(t.pnl > 0 ? '+' : '')+
+                 t.pnl.toFixed(2)+'</span>' : '')+'</td>',
+        '<span class="sub" style="font-size:11px">'+esc(t.when || '')+'</span>'))
+      .join('') + (tx.length > 25 ? '<tr><td class="sub">+' + (tx.length - 25) + ' more</td></tr>' : '')
+    : '<tr><td class="sub">no fills since you last cleared ✓</td></tr>';
+  document.getElementById('drops').innerHTML = (d.drops || []).length ?
+    d.drops.map(x => mrow(x.market,
+      '', '<span class="sub">was $'+x.was.toFixed(2)+'</span> → <b class="neg">$'+x.now.toFixed(2)+'/day</b>'))
+      .join('')
+    : '<tr><td class="sub">nothing has dropped meaningfully</td></tr>';
+  document.getElementById('winners').innerHTML = (d.winners || []).length ?
+    d.winners.map(w => mrow(w.market,
+      '', '<b class="pos">$'+w.total.toFixed(2)+'</b><br><span class="sub" style="font-size:11px">last paid '+esc(w.last)+'</span>'))
+      .join('')
+    : '<tr><td class="sub">you have orders everywhere you have earned lately</td></tr>';
+  document.getElementById('newm').innerHTML = (d.new_mkts || []).length ?
+    d.new_mkts.map(e => {
+      const click = e.kind === 'politics' ? ' onclick="openMkt(\\''+esc(e.label)+'\\')"' : '';
+      return '<tr'+click+'><td class="mkt">'+esc(e.label)+
+        (e.kind === 'golf' ? ' <span class="bdg">tournament</span>' : '')+'</td>'+
+        '<td class="r sub" style="font-size:11px;white-space:nowrap">'+esc(e.when || '')+'</td></tr>';
+    }).join('')
+    : '<tr><td class="sub">nothing new since tracking began</td></tr>';
+}
+function closeSheet(){ document.getElementById('sheet').style.display = 'none'; }
+async function openMkt(m){
+  document.getElementById('sheet').style.display = 'block';
+  const el = document.getElementById('sheetIn');
+  el.innerHTML = '<div class="mkt">'+esc(m)+'</div><div class="sub">loading live book…</div>';
+  try{
+    const d = await (await fetch('market.json?slug=' + encodeURIComponent(m))).json();
+    if(d.error){
+      el.innerHTML = '<div class="mkt">'+esc(m)+'</div><div class="err" style="display:block">'+esc(d.error)+
+        '</div><div class="rp"><button class="alt" onclick="closeSheet()">Close</button></div>';
+      return;
+    }
+    renderSheet(d);
+  }catch(e){
+    el.innerHTML = '<div class="err" style="display:block">load failed: '+esc(e)+'</div>';
+  }
+}
+function renderSheet(d){
+  const m = d.market;
+  const lv = a => (a && a.length ? a : []).map(x =>
+    '<tr><td>'+(+(x[0]*100).toFixed(2))+'¢</td><td class="r">'+x[1].toLocaleString()+'</td></tr>').join('')
+    || '<tr><td class="sub">empty</td></tr>';
+  const ords = (d.orders || []).map(o =>
+    '<div class="rp" style="margin:10px 0">'+o.side+' '+o.size.toLocaleString()+' @ '+
+    (+(o.price*100).toFixed(2))+'¢'+(o.est_day ? ' · $'+o.est_day.toFixed(2)+'/day' : ' · $0/day')+
+    '<br><input id="mp'+o.id+'" type="number" step="0.1" min="0.1" max="99.9" value="'+(o.price*100).toFixed(1)+'">¢'+
+    '<button onclick="mModify(\\''+o.id+'\\',\\''+esc(m)+'\\')">Modify</button>'+
+    '<button class="alt" style="background:#8b1a1a;color:#fff" onclick="mCancel(\\''+o.id+'\\',\\''+esc(m)+'\\')">Cancel</button>'+
+    '</div>').join('') || '<div class="sub">no resting orders here</div>';
+  document.getElementById('sheetIn').innerHTML =
+    '<div class="mkt" style="font-size:13px">'+esc(m)+'</div>'+
+    (d.net ? '<div class="sub">position: '+d.net.toLocaleString()+' contracts</div>' : '')+
+    '<div style="display:flex;gap:18px;margin-top:8px">'+
+    '<div style="flex:1"><div class="sub">Bids</div><table class="bk">'+lv(d.bids)+'</table></div>'+
+    '<div style="flex:1"><div class="sub">Asks</div><table class="bk">'+lv(d.asks)+'</table></div></div>'+
+    '<h3>Your orders</h3>'+ords+
+    '<h3>Place new</h3><div class="rp">'+
+    '<select id="mSide" style="background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:5px">'+
+    '<option>BUY</option><option>SELL</option></select> '+
+    '<input id="mPrice" type="number" step="0.1" min="0.1" max="99.9" placeholder="price ¢"> '+
+    '<input id="mSize" type="number" step="1" min="1" max="20000" placeholder="qty"> '+
+    '<button onclick="mPlace(\\''+esc(m)+'\\')">Place</button></div>'+
+    '<div class="mkt">post-only — the order rests or is rejected; it can never cross the spread and fill on arrival</div>'+
+    '<div class="rp" style="margin-top:12px"><button class="alt" onclick="closeSheet()">Close</button></div>';
+}
+async function mact(body, m){
+  try{
+    const r = await fetch('maction', {method:'POST',
+      headers:{'Content-Type':'application/json','X-Reprice':'1'},
+      body: JSON.stringify(body)});
+    const d = await r.json().catch(() => ({ok:false, error:'HTTP '+r.status}));
+    alert(d.ok ? 'Done ✓' : 'Failed: ' + (d.detail || d.error || ('HTTP '+r.status)));
+  }catch(e){ alert('Failed: '+e); }
+  setTimeout(function(){ openMkt(m); refresh(); }, 1200);
+}
+function mModify(id, m){
+  const c = parseFloat(document.getElementById('mp'+id).value);
+  if(!(c >= 0.1 && c <= 99.9)){ alert('Price out of range (0.1–99.9¢)'); return; }
+  if(!confirm('Reprice this order to '+c+'¢?')) return;
+  mact({op:'modify', order_id:id, price_cents:c}, m);
+}
+function mCancel(id, m){
+  if(!confirm('Cancel this order?')) return;
+  mact({op:'cancel', order_id:id}, m);
+}
+function mPlace(m){
+  const side = document.getElementById('mSide').value;
+  const c = parseFloat(document.getElementById('mPrice').value);
+  const q = parseInt(document.getElementById('mSize').value, 10);
+  if(!(c >= 0.1 && c <= 99.9)){ alert('Price out of range (0.1–99.9¢)'); return; }
+  if(!(q >= 1 && q <= 20000)){ alert('Size out of range (1–20,000)'); return; }
+  const cap = side === 'BUY' ? c/100*q : (1 - c/100)*q;
+  if(!confirm('Place post-only '+side+' '+q.toLocaleString()+' @ '+c+'¢? Locks ~$'+cap.toFixed(2)+'.')) return;
+  mact({op:'place', market:m, side:side, price_cents:c, size:q}, m);
+}
 async function refresh(){
   try{
     const r = await fetch('data.json'); const d = await r.json();
     document.getElementById('earned').textContent = '$' + d.earned_today.toFixed(2);
+    const nMkts = new Set(d.orders.map(o => o.market).filter(Boolean)).size;
     document.getElementById('rate').textContent =
-      'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + d.orders.length + ' orders';
+      'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + nMkts +
+      ' markets (' + d.orders.length + ' orders)';
     document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence + ' · alerts: ' + d.alerts +
       (d.warming ? ' · ⏳ warming up: ' + d.warming + ' markets on saved rates' : '') +
       (d.backfilled ? ' · ♻️ counter rebuilt from tracker data ($' + d.backfilled.toFixed(2) + ' at boot)' : '');
@@ -1810,6 +2191,7 @@ async function refresh(){
     const msg = [d.error, diag].filter(Boolean).join(' · ');
     err.style.display = msg ? 'block' : 'none'; err.textContent = msg;
     document.getElementById('ovg').innerHTML = bigSpark(d.rate_series);
+    renderHome(d);
     renderPnl(d.pnl);
     BP = d.buying_power;
     document.getElementById('planBP').textContent =
@@ -1867,7 +2249,9 @@ async function refresh(){
           '</td><td class="r" style="white-space:nowrap">'+rateTxt+
           '<br><span class="sub" style="font-size:11px">$'+v.toFixed(2)+' today</span>'+
           ' <button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
-          'onclick="event.stopPropagation();tglGraph('+i+',\\''+esc(m)+'\\')">📈</button></td></tr>' +
+          'onclick="event.stopPropagation();tglGraph('+i+',\\''+esc(m)+'\\')">📈</button>'+
+          ' <button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
+          'onclick="event.stopPropagation();openMkt(\\''+esc(m)+'\\')">⚙</button></td></tr>' +
           '<tr id="g'+i+'" style="display:'+(GOPEN[m]?'':'none')+'"><td colspan="2" style="background:#161b22">'+gcell+'</td></tr>' +
           '<tr id="d'+i+'" style="display:'+(OPEN[m]?'':'none')+'"><td colspan="2" ' +
           'style="background:#161b22">'+detail+'</td></tr>';
@@ -1940,6 +2324,11 @@ class Handler(BaseHTTPRequestHandler):
             with MONITOR.lock:
                 payload = json.dumps({"series": MONITOR.state.get("series", {})})
             self._send(200, "application/json", payload.encode())
+        elif self.path.startswith("/market.json"):
+            from urllib.parse import parse_qs, urlparse
+            slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]
+            code, payload = market_info(slug)
+            self._send(code, "application/json", json.dumps(payload).encode())
         else:
             self._send(200, "text/html; charset=utf-8", DASH_HTML.encode())
 
@@ -1950,7 +2339,7 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             return
         if self.path not in ("/reprice", "/place", "/place_abort", "/cancel_all",
-                             "/reprice_batch", "/cancel_batch"):
+                             "/reprice_batch", "/cancel_batch", "/maction"):
             self._send(404, "text/plain", b"not found")
             return
         # Cross-origin requests can't set custom headers without a CORS
@@ -1975,6 +2364,8 @@ class Handler(BaseHTTPRequestHandler):
             code, payload = 200, {"ok": True}
         elif self.path == "/cancel_all":
             code, payload = do_cancel_all()
+        elif self.path == "/maction":
+            code, payload = do_maction(body)
         else:
             try:
                 order_id, cents = str(body["order_id"]), float(body["price_cents"])
@@ -1995,11 +2386,24 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
+def _golf_tournament(slug: str) -> str | None:
+    """Collapse a golfer market slug to its tournament (through the date)."""
+    parts = slug.split("-")
+    for i in range(len(parts) - 2):
+        if (parts[i].isdigit() and len(parts[i]) == 4
+                and parts[i + 1].isdigit() and parts[i + 2].isdigit()):
+            return "-".join(parts[:i + 3])
+    return None
+
+
 def poll_loop(key_id: str, secret_key: str) -> None:
+    global WINNERS
     event_sizes: dict[str, int] = {}
     events_refreshed = 0.0
     pos_refreshed = 0.0
     act_refreshed = 0.0
+    golf_refreshed = 0.0
+    winners_refreshed = 0.0
     last_ok = time.time()
     err_notified = 0.0
     err_streak = 0
@@ -2012,8 +2416,24 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             if time.time() - events_refreshed > 900:  # refresh proration map every 15 min
                 events_refreshed = time.time()
                 try:
-                    _, event_sizes = tr.fetch_politics_events()
+                    pol_slugs, event_sizes = tr.fetch_politics_events()
+                    MONITOR.note_markets(list(pol_slugs), "politics")
                 except Exception:  # noqa: BLE001 — keep last known map
+                    pass
+            if time.time() - golf_refreshed > 3600:  # new-tournament check hourly
+                golf_refreshed = time.time()
+                try:
+                    import scan_markets as sm
+                    golf_slugs, _ = sm.fetch_tag_events(sm.GOLF_TAGS)
+                    tours = sorted({t for t in (_golf_tournament(s) for s in golf_slugs) if t})
+                    MONITOR.note_markets(tours, "golf")
+                except Exception:  # noqa: BLE001 — discovery is best-effort
+                    pass
+            if time.time() - winners_refreshed > 6 * 3600:  # career totals, 4x/day
+                winners_refreshed = time.time()
+                try:
+                    WINNERS = load_winners()
+                except Exception:  # noqa: BLE001
                     pass
             orders = tr.fetch_live_orders(key_id, secret_key, event_sizes)
             MONITOR.sample(dt.datetime.now(dt.timezone.utc), orders)
@@ -2032,10 +2452,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     MONITOR.buying_power = fetch_buying_power(key_id, secret_key)
                 except Exception:  # noqa: BLE001 — plan tab just shows no number
                     pass
-            if time.time() - act_refreshed > 600:  # closed-market P/L history
+            if time.time() - act_refreshed > 600:  # closed-market P/L + fills
                 act_refreshed = time.time()
                 try:
-                    MONITOR.activity_pnl = fetch_activity_pnl(key_id, secret_key)
+                    MONITOR.activity_pnl, MONITOR.trades = fetch_activity_pnl(key_id, secret_key)
                 except Exception:  # noqa: BLE001 — closed rows just go stale
                     pass
         except Exception as e:  # noqa: BLE001 — shown on the dashboard, loop survives
