@@ -754,8 +754,9 @@ PLAN_FILES = {"politics": "data/scan.json", "golf": "data/scan_golf.json",
 
 def _spread_plan(pol: dict) -> dict:
     """Derived from the politics scan: markets with the widest bid-ask
-    spreads, entered ONE TICK INSIDE both sides at the reward Target Size —
-    being the best price with the whole window is the max reward share."""
+    spreads, entered on BOTH sides at the reward Target Size. The advertised
+    price is the current touch; the placer re-optimizes each order against
+    the live book for maximum reward per dollar (join vs step inside)."""
     rows, seen = [], set()
     for r in pol.get("results") or []:
         m = r.get("market")
@@ -769,7 +770,7 @@ def _spread_plan(pol: dict) -> dict:
         ticks = round((ba - bb) / tick)
         if ticks < 3:
             continue  # need a tick inside each side AND a gap between our quotes
-        pb, pa = round(bb + tick, 4), round(ba - tick, 4)
+        pb, pa = round(bb, 4), round(ba, 4)  # baseline: the touch (placer optimizes)
         side_pool = round(tr._daily_pool(prog, m) / 2, 2)  # ~100% share when we ARE the window
         common = {"market": m, "spread_ok": True, "tick": tick,
                   "best_bid": bb, "best_ask": ba,
@@ -844,21 +845,60 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
             if lv:
                 price = lv[0][0]
                 res["price_cents"] = round(price * 100, 2)
-        if plan_row.get("spread_ok"):  # spread entries: ONE tick inside the live touch
+        if plan_row.get("spread_ok"):
+            # Spread entries: spend the approved budget where it earns the
+            # MOST — candidates are 1 tick behind the live touch, joining it,
+            # and 1-2 ticks inside; each is scored on the merged book at the
+            # size the budget buys (capped at Target Size — contracts beyond
+            # the window add cost, not reward). Joining is cheaper per
+            # contract; stepping inside crushes competitors' df weight. The
+            # scorer decides per market.
             tickb = book.get("tick") or 0.01
-            if side == "BUY":
-                if bids:
-                    price = round(bids[0][0] + tickb, 4)
-                if asks and price >= asks[0][0] - 1e-9:
-                    res.update(status="skipped", note="spread closed — no room inside the touch")
-                    return res
-            else:
-                if asks:
-                    price = round(asks[0][0] - tickb, 4)
-                if bids and price <= bids[0][0] + 1e-9:
-                    res.update(status="skipped", note="spread closed — no room inside the touch")
-                    return res
-            res["price_cents"] = round(price * 100, 2)
+            bb = bids[0][0] if bids else None
+            ba = asks[0][0] if asks else None
+            if bb is not None and ba is not None and round((ba - bb) / tickb) < 3:
+                res.update(status="skipped", note="spread closed — under 3 ticks now")
+                return res
+            prog_sp = dict(plan_row.get("prog") or {})
+            target_sp = int(prog_sp.get("target") or 0) or 20000
+            lockf = (lambda p: p) if side == "BUY" else (lambda p: 1.0 - p)
+            budget = lockf(price) * size
+            base = (bb if side == "BUY" else ba)
+            if base is None:
+                base = price
+            cands = []
+            for off in (-1, 0, 1, 2):  # behind, join, inside, further inside
+                p = round(base + (off if side == "BUY" else -off) * tickb, 4)
+                if p < 0.001 or p > 0.999:
+                    continue
+                if side == "BUY" and ba is not None and p >= ba - 1e-9:
+                    continue
+                if side == "SELL" and bb is not None and p <= bb + 1e-9:
+                    continue
+                cands.append(p)
+            if not cands:
+                res.update(status="skipped", note="spread closed — no room to quote")
+                return res
+            best_c = None
+            for p in cands:
+                q = max(1, min(int(budget / max(lockf(p), 1e-4)), target_sp, 20000))
+                e = 0.0
+                if prog_sp.get("pool"):
+                    key = "bids" if side == "BUY" else "asks"
+                    levels = dict(book.get(key) or [])
+                    levels[p] = levels.get(p, 0) + q
+                    merged = dict(book)
+                    merged[key] = sorted(levels.items(),
+                                         key=lambda x: (-x[0] if side == "BUY" else x[0]))
+                    probe = {"market": slug, "side": side, "price": p, "size": float(q)}
+                    tr._score_order(probe, merged, prog_sp)
+                    e = probe.get("est_day") or 0.0
+                rank = (round(e, 4), -p if side == "BUY" else p)  # tie: farther from danger
+                if best_c is None or rank > best_c[0]:
+                    best_c = (rank, p, q, e)
+            _, price, size, est_sp = best_c
+            res.update(price_cents=round(price * 100, 2), size=size,
+                       est_day=round(est_sp, 2))
         crosses = (asks and price >= asks[0][0]) if side == "BUY" else (bids and price <= bids[0][0])
         if crosses:
             res.update(status="skipped", note="would cross the spread now")
@@ -1736,6 +1776,9 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 </div>
 <div id="viewS" style="display:none">
 <div class="sub">Widest politics spreads — enter ONE tick inside both sides <span id="spGen"></span></div>
+<div style="margin:10px 0">Min spread: <b id="spCutLbl">25¢</b>
+ <input type="range" id="spCutSlider" min="2" max="80" value="25" style="width:55%;vertical-align:middle"
+        oninput="spCut(this.value)"></div>
 <div style="margin:6px 0">
  <button class="tab" onclick="spAll(true)">Select all</button>
  <button class="tab" onclick="spAll(false)">Clear</button></div>
@@ -1746,12 +1789,13 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  <button onclick="spPlace()">Enter selected (both sides)</button>
  <button class="alt" onclick="abortBatch()">Stop batch</button></div>
 <div id="spProg" class="mkt" style="margin:8px 0"></div>
-<div class="mkt">Each entry places a post-only BUY one tick above the live best bid and a
-post-only SELL one tick below the live best ask, sized to the reward Target Size (clamped to
-your per-market buying power, split across the two sides). You become the best price on both
-sides — that is the maximum reward share, but also first in line to FILL on both sides: if
-both fill you pocket the spread; if one fills you own the position. Placement re-prices from
-the live book and skips markets whose spread has closed.</div>
+<div class="mkt">Each entry quotes BOTH sides of the spread, post-only, sized to the reward
+Target Size (clamped to your per-market buying power, split across the two sides). At
+placement each order is re-optimized against the LIVE book for maximum reward per dollar:
+it joins the touch when that's cheapest, or steps 1-2 ticks inside when pushing competitors
+a tick deeper multiplies your share more than the extra capital costs. Quoting at or near
+the touch means you can FILL: if both sides fill you pocket the spread; if one fills you own
+the position. Markets whose spread has closed below 3 ticks are skipped.</div>
 </div>
 <div id="viewH">
 <div class="sub">Earned today (ET) — live estimate</div>
@@ -2071,6 +2115,14 @@ async function abortBatch(){
   pollPlace();
 }
 let SPLAN = null, SPSEL = {};
+function spCut(v){
+  localStorage.setItem('spCut', v);
+  document.getElementById('spCutLbl').textContent = v + '¢';
+  renderSpread();
+}
+(function(){ const v = localStorage.getItem('spCut');
+  if(v){ document.getElementById('spCutSlider').value = v;
+         document.getElementById('spCutLbl').textContent = v + '¢'; } })();
 async function loadSpread(){
   if(SPLAN){ renderSpread(); return; }
   try{
@@ -2090,7 +2142,9 @@ function spMarkets(){
       {market: r.market, spread: r.spread_cents, pool: r.side_pool, risk: r.risk, note: r.note};
     e[r.side] = r;
   });
-  return Object.values(by).filter(x => x.BUY && x.SELL).sort((a,b) => b.spread - a.spread);
+  const cut = +document.getElementById('spCutSlider').value;
+  return Object.values(by).filter(x => x.BUY && x.SELL && x.spread >= cut)
+    .sort((a,b) => b.spread - a.spread);
 }
 function spOrd(r){  // one side of an entry, clamped to HALF the market's room
   const p = r.pick;
@@ -2124,7 +2178,7 @@ function renderSpread(){
         '<td class="r" style="white-space:nowrap;font-size:12px">'+entry+
         '<br><span class="sub" style="font-size:10px">$'+cap.toFixed(0)+' locked'+(full?'':' ↓fit')+'</span></td>'+
         '<td class="r">'+(full ? '$'+(2*x.pool).toFixed(2) : 'up to $'+(2*x.pool).toFixed(2))+'</td></tr>';
-    }).join('') || '<tr><td class="sub">no politics market currently shows a 3+ tick spread</td></tr>';
+    }).join('') || '<tr><td class="sub">no politics market has a spread this wide — lower the min-spread slider</td></tr>';
   spSum();
 }
 function spAll(on){ spMarkets().forEach(x => { if(!on || !x.risk) SPSEL[x.market] = on; }); renderSpread(); }
