@@ -659,9 +659,10 @@ class Monitor:
 
     def _missed_winners(self) -> list[dict]:
         """Historical earners (paid rewards) with no current resting order —
-        called under lock."""
+        called under lock. Sends extra rows so client-side dismissals
+        ('no good anymore') don't shrink the list below ten."""
         cur = {o.get("market") for o in self.orders}
-        return [w for w in WINNERS if w["market"] not in cur][:10]
+        return [w for w in WINNERS if w["market"] not in cur][:25]
 
 
 MONITOR = Monitor()
@@ -1048,8 +1049,57 @@ def fetch_activity_pnl(key_id: str, secret_key: str) -> tuple[dict[str, dict], l
     since-you-last-checked list."""
     path = "/v1/portfolio/activities"
     agg: dict[str, dict] = {}
-    trades: list[dict] = []
+    fills_by_order: dict[str, dict] = {}
     cursor = None
+
+    def _ts(iso: str) -> tuple[float, str]:
+        try:
+            d = dt.datetime.fromisoformat(iso.replace("Z", "+00:00"))
+            return round(d.timestamp(), 1), d.astimezone(ET).strftime("%b %d %I:%M %p")
+        except Exception:  # noqa: BLE001
+            return 0.0, ""
+
+    def _note_fills(t: dict) -> None:
+        """One trade activity = one (often 1-share) execution. Keep only real
+        executions — shares actually traded, never mere order placements —
+        and collapse them to one row per ORDER. Activities arrive newest
+        first, so the first sighting of an order carries its latest
+        cumulative fill, average price and state."""
+        rows_this = []
+        for ex in (t.get("aggressorExecution") or {}, t.get("passiveExecution") or {}):
+            o = ex.get("order") or {}
+            oid = o.get("id")
+            if not oid or tr._num(ex.get("lastShares")) <= 0:
+                continue  # not an accepted execution of one of our orders
+            row = fills_by_order.get(oid)
+            if row is None:
+                if len(fills_by_order) >= 80:
+                    continue
+                ts_s, when = _ts(str(ex.get("transactTime") or ""))
+                state = str(o.get("state") or "")
+                fills_by_order[oid] = row = {
+                    "market": o.get("marketSlug") or t.get("marketSlug") or "",
+                    "side": "SELL" if "SELL" in str(o.get("side") or "") else "BUY",
+                    "qty": tr._num(o.get("quantity")) or None,
+                    "filled": tr._num(o.get("cumQuantity")) or None,
+                    "price_cents": round(tr._num(o.get("avgPx") or o.get("price")) * 100, 2),
+                    "done": state == "ORDER_STATE_FILLED",
+                    "ts_s": ts_s, "when": when, "pnl": 0.0}
+            rows_this.append(row)
+        if not rows_this and t.get("marketSlug"):  # older flat shape (qty/price)
+            qty = tr._num(t.get("qty"))
+            if qty > 0:
+                key = str(t.get("id") or len(fills_by_order))
+                ts_s, when = _ts(str(t.get("updateTime") or t.get("createTime") or ""))
+                fills_by_order[key] = row = {
+                    "market": t["marketSlug"], "side": None, "qty": qty, "filled": qty,
+                    "price_cents": (round(tr._num(t.get("price")) * 100, 2)
+                                    if t.get("price") is not None else None),
+                    "done": True, "ts_s": ts_s, "when": when, "pnl": 0.0}
+                rows_this.append(row)
+        pnl = tr._num(t.get("realizedPnl"))
+        if rows_this and pnl:
+            rows_this[0]["pnl"] += pnl
     for _ in range(10):  # up to 1000 most recent activities
         params: dict = {"limit": 100, "sortOrder": "SORT_ORDER_DESCENDING",
                         "types": ["ACTIVITY_TYPE_TRADE", "ACTIVITY_TYPE_POSITION_RESOLUTION"]}
@@ -1064,28 +1114,13 @@ def fetch_activity_pnl(key_id: str, secret_key: str) -> tuple[dict[str, dict], l
         for a in j.get("activities") or []:
             t = a.get("trade") or {}
             pr = a.get("positionResolution") or {}
+            if t:
+                _note_fills(t)
             if t.get("marketSlug"):
                 e = agg.setdefault(t["marketSlug"],
                                    {"realized": 0.0, "ts": "", "resolved": False, "final": None})
                 e["realized"] += tr._num(t.get("realizedPnl"))
                 e["ts"] = max(e["ts"], str(t.get("updateTime") or t.get("createTime") or ""))
-                if len(trades) < 120:
-                    ts = str(t.get("updateTime") or t.get("createTime") or "")
-                    ts_s, when = 0.0, ""
-                    try:
-                        d = dt.datetime.fromisoformat(ts.replace("Z", "+00:00"))
-                        ts_s = d.timestamp()
-                        when = d.astimezone(ET).strftime("%b %d %I:%M %p")
-                    except Exception:  # noqa: BLE001
-                        pass
-                    pv = t.get("price")
-                    pnl = tr._num(t.get("realizedPnl"))
-                    trades.append({"market": t["marketSlug"], "ts_s": round(ts_s, 1),
-                                   "when": when,
-                                   "qty": tr._num(t.get("qty")) or None,
-                                   "price_cents": (round(tr._num(pv) * 100, 2)
-                                                   if pv is not None else None),
-                                   "pnl": round(pnl, 2) if pnl else None})
             elif pr.get("marketSlug"):
                 e = agg.setdefault(pr["marketSlug"],
                                    {"realized": 0.0, "ts": "", "resolved": False, "final": None})
@@ -1097,6 +1132,10 @@ def fetch_activity_pnl(key_id: str, secret_key: str) -> tuple[dict[str, dict], l
         cursor = j.get("nextCursor")
         if j.get("eof") or not cursor:
             break
+    trades = []
+    for row in fills_by_order.values():
+        row["pnl"] = round(row["pnl"], 2) or None
+        trades.append(row)
     return agg, trades
 
 
@@ -2064,6 +2103,13 @@ function clearTxns(){
   localStorage.setItem('txnSeen', '' + Math.floor(Date.now()/1000));
   if(LASTD) renderHome(LASTD);
 }
+function hidW(){ try{ return JSON.parse(localStorage.getItem('hidWinners') || '{}'); }catch(e){ return {}; } }
+function hideWinner(m){
+  const h = hidW(); h[m] = 1;
+  localStorage.setItem('hidWinners', JSON.stringify(h));
+  if(LASTD) renderHome(LASTD);
+}
+function unhideWinners(){ localStorage.removeItem('hidWinners'); if(LASTD) renderHome(LASTD); }
 function mrow(m, mid, right){
   return '<tr onclick="openMkt(\\''+esc(m)+'\\')"><td class="mkt">'+esc(m)+'</td>'+
          (mid||'')+'<td class="r" style="white-space:nowrap">'+right+'</td></tr>';
@@ -2072,25 +2118,38 @@ function renderHome(d){
   LASTD = d;
   const seen = txnSeen();
   const tx = (d.trades || []).filter(t => t.ts_s > seen);
-  document.getElementById('txns').innerHTML = tx.length ? tx.slice(0, 25).map(t =>
-      mrow(t.market,
-        '<td class="r" style="white-space:nowrap">'+(t.qty != null ? (+t.qty).toLocaleString() : '')+
+  document.getElementById('txns').innerHTML = tx.length ? tx.slice(0, 25).map(t => {
+      const f = t.filled != null ? (+t.filled).toLocaleString() : '';
+      const part = (t.qty != null && t.filled != null && t.qty > t.filled)
+        ? ' of ' + (+t.qty).toLocaleString() : '';
+      return mrow(t.market,
+        '<td class="r" style="white-space:nowrap">'+
+        (t.side ? '<span'+(t.side === 'SELL' ? ' style="color:#f0883e"' : '')+'>'+t.side+'</span> ' : '')+
+        f + part +
         (t.price_cents != null ? ' @ ' + (+t.price_cents).toFixed(2) + '¢' : '')+
         (t.pnl ? '<br><span class="'+(t.pnl > 0 ? 'pos' : 'neg')+'">'+(t.pnl > 0 ? '+' : '')+
                  t.pnl.toFixed(2)+'</span>' : '')+'</td>',
-        '<span class="sub" style="font-size:11px">'+esc(t.when || '')+'</span>'))
-      .join('') + (tx.length > 25 ? '<tr><td class="sub">+' + (tx.length - 25) + ' more</td></tr>' : '')
+        '<span class="sub" style="font-size:11px">'+esc(t.when || '')+'</span>');
+    }).join('') + (tx.length > 25 ? '<tr><td class="sub">+' + (tx.length - 25) + ' more</td></tr>' : '')
     : '<tr><td class="sub">no fills since you last cleared ✓</td></tr>';
   document.getElementById('drops').innerHTML = (d.drops || []).length ?
     d.drops.map(x => mrow(x.market,
       '', '<span class="sub">was $'+x.was.toFixed(2)+'</span> → <b class="neg">$'+x.now.toFixed(2)+'/day</b>'))
       .join('')
     : '<tr><td class="sub">nothing has dropped meaningfully</td></tr>';
-  document.getElementById('winners').innerHTML = (d.winners || []).length ?
-    d.winners.map(w => mrow(w.market,
-      '', '<b class="pos">$'+w.total.toFixed(2)+'</b><br><span class="sub" style="font-size:11px">last paid '+esc(w.last)+'</span>'))
-      .join('')
-    : '<tr><td class="sub">you have orders everywhere you have earned lately</td></tr>';
+  const hidden = hidW();
+  const win = (d.winners || []).filter(w => !hidden[w.market]);
+  const nHid = (d.winners || []).length - win.length;
+  document.getElementById('winners').innerHTML = (win.length ?
+    win.slice(0, 10).map(w =>
+      '<tr><td class="mkt" onclick="openMkt(\\''+esc(w.market)+'\\')">'+esc(w.market)+'</td>'+
+      '<td class="r" style="white-space:nowrap" onclick="openMkt(\\''+esc(w.market)+'\\')">'+
+      '<b class="pos">$'+w.total.toFixed(2)+'</b><br><span class="sub" style="font-size:11px">last paid '+esc(w.last)+'</span></td>'+
+      '<td class="r" style="width:30px"><button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
+      'onclick="hideWinner(\\''+esc(w.market)+'\\')">✕</button></td></tr>').join('')
+    : '<tr><td class="sub">you have orders everywhere you have earned lately</td></tr>') +
+    (nHid ? '<tr><td colspan="3" class="sub" style="font-size:11px">'+nHid+
+            ' dismissed · <a href="#" style="color:#58a6ff" onclick="unhideWinners();return false">unhide all</a></td></tr>' : '');
   document.getElementById('newm').innerHTML = (d.new_mkts || []).length ?
     d.new_mkts.map(e => {
       const click = e.kind === 'politics' ? ' onclick="openMkt(\\''+esc(e.label)+'\\')"' : '';
