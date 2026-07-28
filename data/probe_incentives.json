@@ -1,0 +1,337 @@
+{
+    "programs": [
+        {
+            "marketSlug": "apdc-kashpatel-2026-08-31",
+            "timePeriods": [
+                {
+                    "programId": "politics_futures_v2",
+                    "programType": "liquidityProgram",
+                    "start": "2026-06-27T00:00:00Z",
+                    "end": "2026-07-03T00:00:00Z",
+                    "rewardPool": 500,
+                    "status": "closed",
+                    "discountFactor": 0.3,
+                    "targetSize": 10000,
+                    "period": "daily_event",
+                    "createdAt": "2026-06-26T22:11:57Z"
+                },
+                {
+                    "programId": "politics_futures_v3",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-03T00:00:00Z",
+                    "end": "2026-07-13T00:00:00Z",
+                    "rewardPool": 250,
+                    "status": "closed",
+                    "discountFactor": 0.3,
+                    "targetSize": 10000,
+                    "period": "daily_event",
+                    "createdAt": "2026-07-02T23:11:38Z"
+                },
+                {
+                    "programId": "politics_20260712",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-13T00:00:00Z",
+                    "end": "2026-07-23T18:00:00Z",
+                    "rewardPool": 250,
+                    "status": "closed",
+                    "discountFactor": 0.3,
+                    "targetSize": 10000,
+                    "period": "daily",
+                    "createdAt": "2026-07-12T20:27:48Z"
+                },
+                {
+                    "programId": "politics_20260723",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-23T17:00:00Z",
+                    "end": "2026-07-25T00:00:00Z",
+                    "rewardPool": 150,
+                    "status": "closed",
+                    "discountFactor": 0.5,
+                    "targetSize": 2000,
+                    "period": "daily_event",
+                    "createdAt": "2026-07-23T16:59:02Z"
+                },
+                {
+                    "programId": "politics_20260724",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-25T00:00:00Z",
+                    "end": "2026-07-28T00:00:00Z",
+                    "rewardPool": 100,
+                    "status": "closed",
+                    "discountFactor": 0.5,
+                    "targetSize": 2000,
+                    "period": "daily_event",
+                    "createdAt": "2026-07-24T22:03:13Z"
+                },
+                {
+                    "programId": "politics_low_20260727",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-28T00:00:00Z",
+                    "rewardPool": 25,
+                    "status": "active",
+                    "discountFactor": 0.1,
+                    "targetSize": 2000,
+                    "period": "daily_event",
+                    "createdAt": "2026-07-27T22:53:46Z"
+                }
+            ],
+            "instrumentState": "INSTRUMENT_STATE_OPEN",
+            "category": "POL",
+            "subcategory": "USFEDGOV",
+            "eventStartTime": "2027-01-01T04:59:00.000Z",
+            "instrumentProduct": "apdc"
+        },
+        {
+            "marketSlug": "cranc-uspres28-12-31-2026-elomus",
+            "timePeriods": [
+                {
+                    "programId": "politics_futures_v2",
+                    "programType": "liquidityProgram",
+                    "start": "2026-06-27T00:00:00Z",
+                    "end": "2026-07-03T00:00:00Z",
+                    "rewardPool": 500,
+                    "status": "closed",
+                    "discountFactor": 0.3,
+                    "targetSize": 10000,
+                    "period": "daily_event",
+                    "createdAt": "2026-06-26T22:11:57Z"
+                },
+                {
+                    "programId": "politics_futures_v3",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-03T00:00:00Z",
+                    "end": "2026-07-13T00:00:00Z",
+                    "rewardPool": 250,
+                    "status": "closed",
+                    "discountFactor": 0.3,
+                    "targetSize": 10000,
+                    "period": "daily_event",
+                    "createdAt": "2026-07-02T23:11:38Z"
+                },
+                {
+                    "programId": "politics_20260712",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-13T00:00:00Z",
+                    "end": "2026-07-23T18:00:00Z",
+                    "rewardPool": 250,
+                    "status": "closed",
+                    "discountFactor": 0.3,
+                    "targetSize": 10000,
+                    "period": "daily",
+                    "createdAt": "2026-07-12T20:27:48Z"
+                },
+                {
+                    "programId": "politics_20260723",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-23T17:00:00Z",
+                    "end": "2026-07-25T00:00:00Z",
+                    "rewardPool": 150,
+                    "status": "closed",
+                    "discountFactor": 0.5,
+                    "targetSize": 2000,
+                    "period": "daily_event",
+                    "createdAt": "2026-07-23T16:59:02Z"
+                },
+                {
+                    "programId": "politics_20260724",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-25T00:00:00Z",
+                    "end": "2026-07-28T00:00:00Z",
+                    "rewardPool": 100,
+                    "status": "closed",
+                    "discountFactor": 0.5,
+                    "targetSize": 2000,
+                    "period": "daily_event",
+                    "createdAt": "2026-07-24T22:03:13Z"
+                },
+                {
+                    "programId": "politics_mid_20260727",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-28T00:00:00Z",
+                    "rewardPool": 100,
+                    "status": "active",
+                    "discountFactor": 0.2,
+                    "targetSize": 5000,
+                    "period": "daily_event",
+                    "createdAt": "2026-07-27T22:49:04Z"
+                }
+            ],
+            "instrumentState": "INSTRUMENT_STATE_OPEN",
+            "category": "POL",
+            "subcategory": "USFEDGOV",
+            "eventStartTime": "2027-01-01T04:59:00.000Z",
+            "instrumentProduct": "cranc"
+        },
+        {
+            "marketSlug": "opdc-mcconnell-resign-2026-11-02",
+            "timePeriods": [
+                {
+                    "programId": "politics_20260723",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-23T17:00:00Z",
+                    "end": "2026-07-25T00:00:00Z",
+                    "rewardPool": 150,
+                    "status": "closed",
+                    "discountFactor": 0.5,
+                    "targetSize": 2000,
+                    "period": "daily_event",
+                    "createdAt": "2026-07-23T16:59:02Z"
+                },
+                {
+                    "programId": "politics_20260724",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-25T00:00:00Z",
+                    "end": "2026-07-28T00:00:00Z",
+                    "rewardPool": 100,
+                    "status": "closed",
+                    "discountFactor": 0.5,
+                    "targetSize": 2000,
+                    "period": "daily_event",
+                    "createdAt": "2026-07-24T22:03:13Z"
+                },
+                {
+                    "programId": "politics_low_20260727",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-28T00:00:00Z",
+                    "rewardPool": 25,
+                    "status": "active",
+                    "discountFactor": 0.1,
+                    "targetSize": 2000,
+                    "period": "daily_event",
+                    "createdAt": "2026-07-27T22:53:46Z"
+                }
+            ],
+            "instrumentState": "INSTRUMENT_STATE_OPEN",
+            "category": "POL",
+            "subcategory": "USFEDGOV",
+            "eventStartTime": "2026-11-03T04:59:00.000Z",
+            "instrumentProduct": "opdc"
+        },
+        {
+            "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-joedah",
+            "timePeriods": [
+                {
+                    "programId": "pga_tour_pre_tournament_v3",
+                    "programType": "liquidityProgram",
+                    "start": "2026-06-01T00:00:00Z",
+                    "end": "2026-07-13T00:00:00Z",
+                    "rewardPool": 15000,
+                    "status": "closed",
+                    "discountFactor": 0.9,
+                    "targetSize": 10000,
+                    "period": "tournament_with_cutoff",
+                    "createdAt": "2026-06-02T02:23:24Z"
+                },
+                {
+                    "programId": "pga_tour_round_1_v3",
+                    "programType": "liquidityProgram",
+                    "start": "2026-06-01T00:00:00Z",
+                    "end": "2026-07-13T00:00:00Z",
+                    "rewardPool": 45000,
+                    "status": "closed",
+                    "discountFactor": 0.4,
+                    "targetSize": 10000,
+                    "period": "tournament_with_cutoff",
+                    "createdAt": "2026-06-02T02:23:24Z"
+                },
+                {
+                    "programId": "pga_tour_round_2_v3",
+                    "programType": "liquidityProgram",
+                    "start": "2026-06-01T00:00:00Z",
+                    "end": "2026-07-13T00:00:00Z",
+                    "rewardPool": 30000,
+                    "status": "closed",
+                    "discountFactor": 0.4,
+                    "targetSize": 10000,
+                    "period": "tournament_with_cutoff",
+                    "createdAt": "2026-06-02T02:23:24Z"
+                },
+                {
+                    "programId": "pga_tour_round_3_v3",
+                    "programType": "liquidityProgram",
+                    "start": "2026-06-01T00:00:00Z",
+                    "end": "2026-07-13T00:00:00Z",
+                    "rewardPool": 30000,
+                    "status": "closed",
+                    "discountFactor": 0.35,
+                    "targetSize": 10000,
+                    "period": "tournament_with_cutoff",
+                    "createdAt": "2026-06-02T02:23:24Z"
+                },
+                {
+                    "programId": "pga_tour_round_4_v3",
+                    "programType": "liquidityProgram",
+                    "start": "2026-06-01T00:00:00Z",
+                    "end": "2026-07-13T00:00:00Z",
+                    "rewardPool": 30000,
+                    "status": "closed",
+                    "discountFactor": 0.35,
+                    "targetSize": 10000,
+                    "period": "tournament_with_cutoff",
+                    "createdAt": "2026-06-02T02:23:24Z"
+                },
+                {
+                    "programId": "pga_pretournament_20260712",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-13T00:00:00Z",
+                    "rewardPool": 5000,
+                    "status": "active",
+                    "discountFactor": 0.9,
+                    "targetSize": 10000,
+                    "period": "tournament_with_cutoff",
+                    "createdAt": "2026-07-12T22:15:00Z"
+                },
+                {
+                    "programId": "pga_round_1_20260712",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-13T00:00:00Z",
+                    "rewardPool": 15000,
+                    "status": "active",
+                    "discountFactor": 0.4,
+                    "targetSize": 10000,
+                    "period": "tournament_with_cutoff",
+                    "createdAt": "2026-07-12T22:15:00Z"
+                },
+                {
+                    "programId": "pga_round_2_20260712",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-13T00:00:00Z",
+                    "rewardPool": 10000,
+                    "status": "active",
+                    "discountFactor": 0.4,
+                    "targetSize": 10000,
+                    "period": "tournament_with_cutoff",
+                    "createdAt": "2026-07-12T22:15:01Z"
+                },
+                {
+                    "programId": "pga_round_3_20260712",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-13T00:00:00Z",
+                    "rewardPool": 10000,
+                    "status": "active",
+                    "discountFactor": 0.35,
+                    "targetSize": 10000,
+                    "period": "tournament_with_cutoff",
+                    "createdAt": "2026-07-12T22:15:01Z"
+                },
+                {
+                    "programId": "pga_round_4_20260712",
+                    "programType": "liquidityProgram",
+                    "start": "2026-07-13T00:00:00Z",
+                    "rewardPool": 10000,
+                    "status": "active",
+                    "discountFactor": 0.35,
+                    "targetSize": 10000,
+                    "period": "tournament_with_cutoff",
+                    "createdAt": "2026-07-12T22:15:02Z"
+                }
+            ],
+            "instrumentState": "INSTRUMENT_STATE_OPEN",
+            "category": "SPR",
+            "subcategory": "GOLF",
+            "eventStartTime": "2026-07-30 00:00:00+00",
+            "instrumentProduct": "tec"
+        }
+    ],
+    "nextPageToken": ""
+}
