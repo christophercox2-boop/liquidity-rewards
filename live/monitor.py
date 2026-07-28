@@ -199,10 +199,12 @@ def tracker_day_integral(day_et: str) -> tuple[float, dict[str, float]] | None:
         return None
 
 
-def load_winners() -> list[dict]:
+def load_winners() -> tuple[list[dict], float]:
     """Career paid rewards per market from data/rewards.csv — fresh copy from
     GitHub when a token is available, else the file shipped with the deploy.
-    Markets not paid in 14 days are dropped (likely resolved or de-listed)."""
+    Returns (winners, lifetime total credited): winners drop markets not
+    paid in 14 days (likely resolved or de-listed); the total feeds the
+    'LP rewards paid' phone alert."""
     text = None
     if GITHUB_TOKEN:
         try:
@@ -221,7 +223,7 @@ def load_winners() -> list[dict]:
         try:
             text = (Path(__file__).resolve().parent.parent / "data" / "rewards.csv").read_text()
         except Exception:  # noqa: BLE001
-            return []
+            return [], 0.0
     try:
         import csv as _csv
         import io as _io
@@ -235,12 +237,13 @@ def load_winners() -> list[dict]:
                 continue
             last[m] = max(last.get(m, ""), row.get("date") or "")
         cutoff = (dt.date.today() - dt.timedelta(days=14)).isoformat()
-        return sorted(
+        winners = sorted(
             [{"market": m, "total": round(v, 2), "last": last[m]}
              for m, v in tot.items() if m and v >= 2.0 and last[m] >= cutoff],
             key=lambda w: -w["total"])
+        return winners, round(sum(tot.values()), 2)
     except Exception:  # noqa: BLE001
-        return []
+        return [], 0.0
 
 
 WINNERS: list[dict] = []
@@ -321,47 +324,48 @@ class Monitor:
         self._boot_rates: dict[str, float] = dict(self.state.get("market_rates") or {})
         self._boot_ts: float = time.time()
         self.warming: int = 0
-        self.alert_high: dict[str, float] = {}  # per-market peak rate since it last hit $0
-        self.seen_rate: float | None = self.state.get("alert_seen_rate")  # rate when app last opened
-        self.drop_steps: int = int(self.state.get("alert_drop_steps") or 0)
         self.pending_alerts: list[tuple[str, str, str]] = []
 
-    def _check_alerts(self, rates_all: dict[str, float]) -> None:
-        """Queue phone alerts (called under lock). Exactly two, by request:
-        1. Overall rate 10% below what the app last showed you — and again at
-           every further 10% step — until you open the dashboard, which
-           re-baselines to the current rate.
-        2. A market that was making > $1/day hitting $0 (including its order
-           leaving the book).
-        """
-        if self.seen_rate is None:
-            self.seen_rate = self.rate
-            self.state["alert_seen_rate"] = self.seen_rate
-        if self.seen_rate > 0:
-            steps = int((self.seen_rate - self.rate) / self.seen_rate / 0.10)
-            if steps > self.drop_steps:
+    def note_fills_alert(self) -> None:
+        """Phone alert for fills (bought/sold something), by request. The
+        fills list is per-order with the newest execution time; anything
+        newer than the persisted marker is announced once. First run seeds
+        the marker silently so history isn't replayed."""
+        with self.lock:
+            seen = self.state.get("fill_seen_ts")
+            newest = max((t.get("ts_s") or 0.0 for t in self.trades), default=0.0)
+            if seen is None:
+                self.state["fill_seen_ts"] = newest
+                return
+            fresh = [t for t in self.trades if (t.get("ts_s") or 0.0) > seen]
+            if not fresh:
+                return
+            self.state["fill_seen_ts"] = max(newest, seen)
+            lines = []
+            for t in fresh[:4]:
+                qty = f"{t['filled']:g}" if t.get("filled") else "?"
+                if t.get("qty") and t.get("filled") and t["qty"] > t["filled"]:
+                    qty += f" of {t['qty']:g}"
+                px = f" @ {t['price_cents']:g}¢" if t.get("price_cents") is not None else ""
+                lines.append(f"{t.get('side') or ''} {qty}{px} — {t.get('market', '')}")
+            if len(fresh) > 4:
+                lines.append(f"+{len(fresh) - 4} more")
+            title = "Order filled" if len(fresh) == 1 else f"{len(fresh)} orders filled"
+            self.pending_alerts.append((title, "\n".join(lines), "high"))
+
+    def note_rewards_total(self, total: float) -> None:
+        """Phone alert when LP rewards were paid: lifetime credited total
+        (from the tracker's rewards history) grew since last seen."""
+        with self.lock:
+            prev = self.state.get("rew_total")
+            if prev is None:
+                self.state["rew_total"] = round(total, 2)
+                return
+            if total > prev + 0.005:
                 self.pending_alerts.append(
-                    (f"Earning rate down {steps * 10}%",
-                     f"${self.seen_rate:.2f}/day when you last checked → "
-                     f"${self.rate:.2f}/day now", "high"))
-                self.drop_steps = steps  # high-water mark: next alert at the next 10% step
-                self.state["alert_drop_steps"] = self.drop_steps
-        for mkt in list(self.alert_high):
-            if mkt not in rates_all:  # order left the book: earning went to $0
-                if self.alert_high[mkt] > 1.0:
-                    self.pending_alerts.append(
-                        ("Market stopped earning",
-                         f"{mkt}: was ${self.alert_high[mkt]:.2f}/day, "
-                         "order no longer resting", "high"))
-                del self.alert_high[mkt]
-        for mkt, r in rates_all.items():
-            high = max(self.alert_high.get(mkt, 0.0), r)
-            if r < 0.01 and high > 1.0:
-                self.pending_alerts.append(
-                    ("Market stopped earning",
-                     f"{mkt}: was ${high:.2f}/day, now $0", "high"))
-                high = 0.0  # re-arm only after it earns > $1/day again
-            self.alert_high[mkt] = high
+                    ("LP rewards paid",
+                     f"+${total - prev:.2f} credited (lifetime ${total:,.2f})", "default"))
+            self.state["rew_total"] = round(total, 2)
 
     def note_markets(self, keys: list[str], kind: str) -> None:
         """Track the universe of markets (or golf tournaments) we can see, and
@@ -389,6 +393,11 @@ class Monitor:
                             "label": k, "kind": kind})
             cutoff = now - 14 * 86400
             self.state["new_mkts"] = [e for e in lst if e["ts"] >= cutoff][-120:]
+            what = "market" if kind == "politics" else "golf tournament"
+            title = (f"New {what}" if len(fresh) == 1
+                     else f"{len(fresh)} new {what}s")
+            body = "\n".join(fresh[:5]) + (f"\n+{len(fresh) - 5} more" if len(fresh) > 5 else "")
+            self.pending_alerts.append((title, body, "default"))
 
     def note_batch_order(self, order_id: str) -> None:
         """Remember an order the Plan tab placed, so the earnings list can badge it."""
@@ -476,14 +485,6 @@ class Monitor:
             "error": self.pnl_error,
         }
 
-    def mark_opened(self) -> None:
-        """Dashboard viewed — re-baseline the overall rate-drop alert."""
-        with self.lock:
-            self.seen_rate = self.rate
-            self.drop_steps = 0
-            self.state["alert_seen_rate"] = self.seen_rate
-            self.state["alert_drop_steps"] = 0
-
     def drain_alerts(self) -> list[tuple[str, str, str]]:
         with self.lock:
             out = self.pending_alerts[:]
@@ -568,7 +569,6 @@ class Monitor:
             else:
                 rs.append([minute, round(self.rate, 4)])
             del rs[:-1500]
-            self._check_alerts(rates_all)
             self.last_ts = now_utc
             self.orders = orders
             self.updated = now_utc
@@ -2385,7 +2385,6 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             return
         if self.path.startswith("/data.json"):
-            MONITOR.mark_opened()  # you've seen the current rate: reset the drop alert baseline
             self._send(200, "application/json", json.dumps(MONITOR.snapshot()).encode())
         elif self.path.startswith("/plan.json"):
             try:
@@ -2522,10 +2521,14 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     MONITOR.note_markets(tours, "golf")
                 except Exception:  # noqa: BLE001 — discovery is best-effort
                     pass
-            if time.time() - winners_refreshed > 6 * 3600:  # career totals, 4x/day
+            if time.time() - winners_refreshed > 3600:  # career totals + payout alert
                 winners_refreshed = time.time()
                 try:
-                    WINNERS = load_winners()
+                    winners, rew_total = load_winners()
+                    if winners:
+                        WINNERS = winners
+                    if rew_total:
+                        MONITOR.note_rewards_total(rew_total)
                 except Exception:  # noqa: BLE001
                     pass
             orders = tr.fetch_live_orders(key_id, secret_key, event_sizes)
@@ -2549,6 +2552,7 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                 act_refreshed = time.time()
                 try:
                     MONITOR.activity_pnl, MONITOR.trades = fetch_activity_pnl(key_id, secret_key)
+                    MONITOR.note_fills_alert()
                 except Exception:  # noqa: BLE001 — closed rows just go stale
                     pass
         except Exception as e:  # noqa: BLE001 — shown on the dashboard, loop survives
