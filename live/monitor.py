@@ -959,7 +959,9 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
         intent = "ORDER_INTENT_BUY_LONG"
         if side == "SELL":  # sell inventory if we hold enough, else open a short
             net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
-            intent = "ORDER_INTENT_SELL_LONG" if net >= size else "ORDER_INTENT_SELL_SHORT"
+            # BUY_SHORT opens a short and rests as an ASK; SELL_SHORT would
+            # rest as a BID (it CLOSES a short) — the bidding-against-yourself bug
+            intent = "ORDER_INTENT_SELL_LONG" if net >= size else "ORDER_INTENT_BUY_SHORT"
             res["intent"] = intent
         path = "/v1/orders"
         value = f"{price:.3f}".rstrip("0").rstrip(".")
@@ -1691,7 +1693,9 @@ def manual_place(slug: str, side: str, price_cents: float, size: int) -> tuple[i
     intent = "ORDER_INTENT_BUY_LONG"
     if side == "SELL":
         net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
-        intent = "ORDER_INTENT_SELL_LONG" if net >= size else "ORDER_INTENT_SELL_SHORT"
+        # BUY_SHORT opens a short and rests as an ASK; SELL_SHORT would
+        # rest as a BID (it CLOSES a short) — the bidding-against-yourself bug
+        intent = "ORDER_INTENT_SELL_LONG" if net >= size else "ORDER_INTENT_BUY_SHORT"
     path = "/v1/orders"
     value = f"{price_cents / 100:.3f}".rstrip("0").rstrip(".")
     try:
