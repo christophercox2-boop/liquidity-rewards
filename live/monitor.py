@@ -746,8 +746,10 @@ def _verify_resting(market: str, side: str, price_value: str) -> tuple[bool, str
         return False, f"verify failed: {type(e).__name__}: {e}"[:150]
 
 
-PLAN_CACHE: dict = {"politics": {"ts": 0.0, "data": None}, "golf": {"ts": 0.0, "data": None}}
-PLAN_FILES = {"politics": "data/scan.json", "golf": "data/scan_golf.json"}
+PLAN_CACHE: dict = {"politics": {"ts": 0.0, "data": None}, "golf": {"ts": 0.0, "data": None},
+                    "tt": {"ts": 0.0, "data": None}}
+PLAN_FILES = {"politics": "data/scan.json", "golf": "data/scan_golf.json",
+              "tt": "data/scan_tt.json"}
 
 
 def fetch_plan(which: str = "politics") -> dict:
@@ -785,9 +787,23 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
     size = int(spec["size"])
     res: dict = {"market": slug, "side": side, "price_cents": spec["price_cents"], "size": size}
     try:
+        ev = plan_row.get("event_start")
+        if ev:  # timed events (table tennis games): never quote once started
+            try:
+                if dt.datetime.fromisoformat(str(ev).replace("Z", "+00:00")) \
+                        <= dt.datetime.now(dt.timezone.utc):
+                    res.update(status="skipped", note="event has started — re-run the scan")
+                    return res
+            except Exception:  # noqa: BLE001 — unparseable start: fall through
+                pass
         book = tr._fetch_book(slug)
         bids = book.get("bids") or []
         asks = book.get("asks") or []
+        if plan_row.get("join_ok"):  # join-the-touch plans track the LIVE best
+            lv = bids if side == "BUY" else asks
+            if lv:
+                price = lv[0][0]
+                res["price_cents"] = round(price * 100, 2)
         crosses = (asks and price >= asks[0][0]) if side == "BUY" else (bids and price <= bids[0][0])
         if crosses:
             res.update(status="skipped", note="would cross the spread now")
@@ -800,7 +816,8 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
         # improving a 0.1c best to 0.2c risks a tenth of a cent per contract,
         # and the cheap-YES strategy accepts fills by design.
         target = prog.get("target") or 0
-        deep = (side == "BUY" and price <= 0.011) or (side == "SELL" and price >= 0.989)
+        deep = ((side == "BUY" and price <= 0.011) or (side == "SELL" and price >= 0.989)
+                or bool(plan_row.get("join_ok")))  # 1-share touch plans join by design
         if not deep:
             if side == "BUY" and bids and price >= bids[0][0] - 1e-9:
                 level = sum(q for px, q in bids if abs(px - price) < 1e-9)
@@ -812,7 +829,9 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
                 if price < asks[0][0] - 1e-9 or level < target:
                     res.update(status="skipped", note="book moved — would stand at/below a thin best ask")
                     return res
-        if prog.get("pool"):  # drift check: still worth placing at today's book?
+        if prog.get("pool") and not plan_row.get("join_ok"):
+            # drift check: still worth placing at today's book? (join-the-touch
+            # plans are presence plays — a 1-share order has no est bar to clear)
             probe = {"market": slug, "side": side, "price": price, "size": float(size)}
             key = "bids" if side == "BUY" else "asks"
             levels = dict(book.get(key) or [])
@@ -1702,7 +1721,8 @@ Refreshes every 2 min.</div>
 <div class="sub">Passive placement plan <span id="planGen"></span></div>
 <div style="margin:8px 0">
  <label class="sub"><input type="radio" name="pwhich" value="politics" checked onchange="switchPlan()"> Politics</label>
- <label class="sub"><input type="radio" name="pwhich" value="golf" onchange="switchPlan()"> Golf (cheap YES)</label></div>
+ <label class="sub"><input type="radio" name="pwhich" value="golf" onchange="switchPlan()"> Golf (cheap YES)</label>
+ <label class="sub"><input type="radio" name="pwhich" value="tt" onchange="switchPlan()"> Table tennis (1@touch)</label></div>
 <div class="sub" id="planBP"></div>
 <div style="margin:10px 0">Max buy price: <b id="capLbl">10¢</b>
  <input type="range" id="capSlider" min="1" max="99" value="10" style="width:55%;vertical-align:middle"
@@ -1853,6 +1873,7 @@ function planRows(){
       if(!o) return false;
       if(room != null && szmode() !== 'max' && !o.covered && o.capital > room + 0.01)
         return false;  // even the minimal entry doesn't fit what's left
+      if(pwhich() === 'tt') return true;  // 1-share touch orders: sliders don't apply
       return r.side === 'SELL' ? o.price*100 >= sMin : o.price*100 <= cap;
     })
     .sort((a,b) => (ord(b).est_day) - (ord(a).est_day));
@@ -1910,8 +1931,9 @@ function planSum(){
     ' locked in any one market · ~$' + est.toFixed(2) + '/day at current books';
 }
 async function placeBatch(){
-  const capC = +document.getElementById('capSlider').value;
-  const sMin = +document.getElementById('sellSlider').value;
+  const tt = pwhich() === 'tt';
+  const capC = tt ? 99.9 : +document.getElementById('capSlider').value;
+  const sMin = tt ? 0.1 : +document.getElementById('sellSlider').value;
   const sel = planRows().filter(r => PSEL[pkey(r)]);
   if(!sel.length){ alert('Nothing selected'); return; }
   const est = sel.reduce((s,r)=>s+ord(r).est_day,0);

@@ -58,6 +58,7 @@ def fetch_programs(slugs: list[str], key_id: str, secret_key: str) -> dict[str, 
                     tp = tr._pick_period(p.get("timePeriods") or [], mslug)
                     if tp is not None:
                         progs[mslug] = tr._prog_of(tp)
+                        progs[mslug]["event_start"] = p.get("eventStartTime")
                 break
             except Exception:  # noqa: BLE001 — try the next host
                 continue
@@ -304,7 +305,8 @@ def fetch_golf_field() -> tuple[set[str] | None, str]:
     return codes, source
 
 
-def fetch_tag_events(tags: tuple[str, ...]) -> tuple[list[str], dict[str, int]]:
+def fetch_tag_events(tags: tuple[str, ...],
+                     search_query: str = "golf") -> tuple[list[str], dict[str, int]]:
     """Open market slugs + event sizes for arbitrary event tags, with a text
     search fallback when the tags come up empty."""
     slugs: list[str] = []
@@ -336,7 +338,7 @@ def fetch_tag_events(tags: tuple[str, ...]) -> tuple[list[str], dict[str, int]]:
     if len(slugs) < 5:  # unknown tag names — fall back to search
         try:
             r = requests.get(tr.GATEWAY + "/v1/search",
-                             params={"query": "golf", "limit": 50}, timeout=20)
+                             params={"query": search_query, "limit": 50}, timeout=20)
             if r.status_code < 400:
                 for ev in r.json().get("events") or []:
                     _take(ev)
@@ -613,5 +615,93 @@ def main() -> None:
     print(f"PLAN.md: {len(results)} placements, ~${tot_day:,.2f}/day for ~${tot_cap:,.0f} locked")
 
 
+TT_TAGS = ("table-tennis", "tabletennis", "ping-pong", "tt")
+
+
+def tt_main() -> None:
+    """Table tennis: 1 share on BOTH sides of every market of every game
+    that has not started — BUY joining the best bid, SELL joining the best
+    ask. Risk is ~a dollar per order at most; fills are accepted."""
+    key_id = os.environ.get("POLYMARKET_KEY_ID", "").strip()
+    secret_key = os.environ.get("POLYMARKET_SECRET_KEY", "").strip()
+    slugs, sizes = fetch_tag_events(TT_TAGS, search_query="table tennis")
+    progs = fetch_programs(sorted(slugs), key_id, secret_key) if slugs else {}
+    mine = my_open_market_slugs(key_id, secret_key) if key_id else set()
+    now = dt.datetime.now(dt.timezone.utc)
+    print(f"table tennis: {len(slugs)} markets found, {len(progs)} with programs")
+
+    results, live_n, no_book = [], 0, 0
+    for slug in sorted(slugs):
+        prog = dict(progs.get(slug) or {})
+        start = prog.get("event_start")
+        started = None
+        if start:
+            try:
+                started = dt.datetime.fromisoformat(str(start).replace("Z", "+00:00")) <= now
+            except Exception:  # noqa: BLE001
+                started = None
+        if started:
+            live_n += 1
+            continue  # game is (or may already be) under way — never quote it
+        try:
+            book = tr._fetch_book(slug)
+        except Exception:  # noqa: BLE001
+            no_book += 1
+            continue
+        bids, asks = book.get("bids") or [], book.get("asks") or []
+        tick = book.get("tick") or 0.01
+        note = ("starts " + str(start)[:16].replace("T", " ") + " UTC") if start else None
+        risk = None if started is False else "start time unknown — could be live"
+        prog["event_n"] = max(sizes.get(slug, 1), 1)
+        prog_slim = {k: prog.get(k) for k in ("df", "target", "pool", "event_n",
+                                              "start", "pid", "tier")}
+        for side, lv in (("BUY", bids), ("SELL", asks)):
+            if not lv:
+                continue  # no touch on this side to join
+            p = lv[0][0]
+            o = {"market": slug, "side": side, "price": p, "size": 1.0}
+            if prog.get("pool"):
+                tr._score_order(o, _merged(book, side, p, 1), prog)
+            cap = round(p if side == "BUY" else 1 - p, 2)
+            results.append({
+                "market": slug, "side": side,
+                "pick": {"side": side, "price": p, "size": 1, "capital": cap,
+                         "covered": False, "est_day": round(o.get("est_day") or 0, 3),
+                         "share": round((o.get("share") or 0) * 100, 1)},
+                "max": None, "tick": tick,
+                "best_bid": bids[0][0] if bids else None,
+                "best_ask": asks[0][0] if asks else None, "held": 0,
+                "risk": risk, "note": note, "join_ok": True,
+                "event_start": start, "already_in": slug in mine,
+                "prog": prog_slim})
+        time.sleep(0.05)
+
+    results.sort(key=lambda r: (r["market"], r["side"]))
+    tot = sum(r["pick"]["est_day"] for r in results)
+    cap = sum(r["pick"]["capital"] for r in results)
+    lines = ["# Table tennis plan — 1 share at the touch, both sides", ""]
+    lines.append(f"_{len(slugs)} table-tennis markets found; {live_n} skipped as already "
+                 f"started; {no_book} without books; {len(results)} orders across "
+                 f"{len({r['market'] for r in results})} markets. "
+                 f"~${cap:,.0f} locked if all rest, ~${tot:,.2f}/day at current books. "
+                 f"Generated {tr._et_str()}._")
+    lines.append("")
+    if results:
+        lines.append("| Market | Side | @ | Note |")
+        lines.append("|---|---|--:|---|")
+        for r in results:
+            p = r["pick"]
+            lines.append(f"| `{r['market']}` | {r['side']} | {p['price'] * 100:g}¢ "
+                         f"| {('✔ ' if r['already_in'] else '') + (r.get('note') or '')} |")
+    lines.append("")
+    with open("PLAN-TT.md", "w") as f:
+        f.write("\n".join(lines))
+    os.makedirs("data", exist_ok=True)
+    with open("data/scan_tt.json", "w") as f:
+        json.dump({"generated": tr._et_str(), "results": results}, f, indent=1)
+    print(f"PLAN-TT.md: {len(results)} orders, ~${cap:,.0f} locked, ~${tot:,.2f}/day")
+
+
 if __name__ == "__main__":
-    sys.exit(golf_main() if os.environ.get("SCAN_PLAN") == "golf" else main())
+    which = os.environ.get("SCAN_PLAN")
+    sys.exit(golf_main() if which == "golf" else tt_main() if which == "tt" else main())
