@@ -1656,12 +1656,22 @@ def positions_overview() -> dict:
             row["target_cents"] = round(target * 100, 2)
             covered = sum(o["size"] for o in mine)
             best_my = min((o["price"] for o in mine), default=None)
+            bids_b = book.get("bids") or []
+            bb = bids_b[0][0] if bids_b else None
             good = (best_my is not None
                     and covered >= min(net, 20000) - 1e-9
                     and (not others or best_my <= others[0][0] - 1e-9))
-            row["status"] = "good" if good else "fix"
+            if good:
+                row["status"] = "good"
+            elif others and bb is not None and target <= bb + 1e-9:
+                # best bid sits right under the best ask — no room to undercut
+                # inside the spread; nothing to do but wait for it to widen
+                row["status"] = "wait"
+            else:
+                row["status"] = "fix"
         rows.append(row)
-    rows.sort(key=lambda r: ({"fix": 0, "unknown": 1, "good": 2}[r["status"]], r["market"]))
+    rows.sort(key=lambda r: ({"fix": 0, "unknown": 1, "wait": 2, "good": 3}[r["status"]],
+                             r["market"]))
     return {"rows": rows}
 
 
@@ -1899,8 +1909,9 @@ the position. Markets whose spread has closed below 3 ticks are skipped.</div>
 <div class="mkt" style="margin-top:8px">Green: the whole position is covered by a resting
 sell that IS the best ask — nothing to worry about. Red: no sell resting, only partial
 coverage, or your ask is behind someone else's — the button places (or reprices) a
-post-only sell of your full position one tick inside the current best ask. Selling
-inventory locks no new capital.</div>
+post-only sell of your full position one tick inside the current best ask. Gray: the best
+bid sits right under the best ask, so there's no room to price inside — nothing to do but
+wait for the spread to widen. Selling inventory locks no new capital.</div>
 </div>
 <div id="viewL" style="display:none">
 <div class="sub">Passive placement plan <span id="planGen"></span></div>
@@ -2454,13 +2465,16 @@ function renderPositions(){
   document.getElementById('posList').innerHTML =
     POSD.map((r, i) => {
       const bg = r.status === 'good' ? 'background:#12341c'
-               : r.status === 'fix' ? 'background:#3d1418' : '';
+               : r.status === 'fix' ? 'background:#3d1418'
+               : r.status === 'wait' ? 'background:#2a2f36' : '';
       const sells = (r.sells || []).map(s =>
         s.size.toLocaleString() + ' @ ' + s.price_cents.toFixed(1) + '¢').join(', ');
       const btn = (r.status === 'fix' && r.target_cents)
         ? '<button style="background:#238636;color:#fff;border:none;border-radius:6px;padding:6px 10px" '+
           'onclick="event.stopPropagation();posFix('+i+', true)">Sell @ '+r.target_cents.toFixed(1)+'¢</button>'
-        : (r.status === 'good' ? '✓' : '<span class="sub" style="font-size:10px">book pending<br>↻ refresh</span>');
+        : (r.status === 'good' ? '✓'
+          : r.status === 'wait' ? '<span class="sub" style="font-size:10px">tight spread —<br>wait</span>'
+          : '<span class="sub" style="font-size:10px">book pending<br>↻ refresh</span>');
       return '<tr style="'+bg+'" onclick="openMkt(\\''+esc(r.market)+'\\')">'+
         '<td class="mkt">'+esc(r.market)+'</td>'+
         '<td class="r">'+r.net.toLocaleString()+
