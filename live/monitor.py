@@ -1574,7 +1574,8 @@ def do_maction(body: dict) -> tuple[int, dict]:
         return do_cancel_order(str(body.get("order_id") or ""))
     if op == "modify":
         try:
-            return do_reprice(str(body["order_id"]), float(body["price_cents"]))
+            return do_reprice(str(body["order_id"]), float(body["price_cents"]),
+                              quantity=int(body["size"]) if body.get("size") else None)
         except (KeyError, TypeError, ValueError):
             return 400, {"ok": False, "error": "bad request"}
     if op == "place":
@@ -2231,6 +2232,12 @@ function renderHome(d){
 }
 function closeSheet(){ document.getElementById('sheet').style.display = 'none'; }
 let MSHEET = null;
+function qStep(){ const v = parseInt(localStorage.getItem('qStep') || '10', 10); return v >= 1 ? v : 10; }
+function qStepSet(v){ const n = parseInt(v, 10); if(n >= 1 && n <= 20000) localStorage.setItem('qStep', '' + n); }
+function qBump(id, dir){
+  const el = document.getElementById(id);
+  el.value = Math.max(1, Math.min(20000, (parseInt(el.value, 10) || 0) + dir * qStep()));
+}
 function mBest(){
   if(!MSHEET) return;
   const side = document.getElementById('mSide').value;
@@ -2263,7 +2270,10 @@ function renderSheet(d){
   const ords = (d.orders || []).map(o =>
     '<div class="rp" style="margin:10px 0">'+o.side+' '+o.size.toLocaleString()+' @ '+
     (+(o.price*100).toFixed(2))+'¢'+(o.est_day ? ' · $'+o.est_day.toFixed(2)+'/day' : ' · $0/day')+
-    '<br><input id="mp'+o.id+'" type="number" step="0.1" min="0.1" max="99.9" value="'+(o.price*100).toFixed(1)+'">¢'+
+    '<br><input id="mp'+o.id+'" type="number" step="0.1" min="0.1" max="99.9" value="'+(o.price*100).toFixed(1)+'">¢ '+
+    '<button class="alt" onclick="qBump(\\'mq'+o.id+'\\',-1)">−</button>'+
+    '<input id="mq'+o.id+'" type="number" step="1" min="1" max="20000" value="'+Math.round(o.size)+'">'+
+    '<button class="alt" onclick="qBump(\\'mq'+o.id+'\\',1)">+</button>'+
     '<button onclick="mModify(\\''+o.id+'\\',\\''+esc(m)+'\\')">Modify</button>'+
     '<button class="alt" style="background:#8b1a1a;color:#fff" onclick="mCancel(\\''+o.id+'\\',\\''+esc(m)+'\\')">Cancel</button>'+
     '</div>').join('') || '<div class="sub">no resting orders here</div>';
@@ -2278,9 +2288,14 @@ function renderSheet(d){
     '<select id="mSide" style="background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:5px">'+
     '<option>BUY</option><option>SELL</option></select> '+
     '<input id="mPrice" type="number" step="0.1" min="0.1" max="99.9" placeholder="price ¢"> '+
-    '<input id="mSize" type="number" step="1" min="1" max="20000" placeholder="qty"> '+
+    '<button class="alt" onclick="qBump(\\'mSize\\',-1)">−</button>'+
+    '<input id="mSize" type="number" step="1" min="1" max="20000" placeholder="qty">'+
+    '<button class="alt" onclick="qBump(\\'mSize\\',1)">+</button> '+
     '<button class="alt" onclick="mBest()">match best</button> '+
     '<button onclick="mPlace(\\''+esc(m)+'\\')">Place</button></div>'+
+    '<div class="rp" style="margin-top:4px"><span class="sub">± step:</span> '+
+    '<input id="qStepIn" type="number" step="1" min="1" max="20000" value="'+qStep()+'" '+
+    'style="width:60px" oninput="qStepSet(this.value)"></div>'+
     '<div class="mkt">post-only — the order rests or is rejected; it can never cross the spread and fill on arrival</div>'+
     '<div class="rp" style="margin-top:12px"><button class="alt" onclick="closeSheet()">Close</button></div>';
 }
@@ -2296,9 +2311,11 @@ async function mact(body, m){
 }
 function mModify(id, m){
   const c = parseFloat(document.getElementById('mp'+id).value);
+  const q = parseInt(document.getElementById('mq'+id).value, 10);
   if(!(c >= 0.1 && c <= 99.9)){ alert('Price out of range (0.1–99.9¢)'); return; }
-  if(!confirm('Reprice this order to '+c+'¢?')) return;
-  mact({op:'modify', order_id:id, price_cents:c}, m);
+  if(!(q >= 1 && q <= 20000)){ alert('Size out of range (1–20,000)'); return; }
+  if(!confirm('Modify this order to '+q.toLocaleString()+' @ '+c+'¢?')) return;
+  mact({op:'modify', order_id:id, price_cents:c, size:q}, m);
 }
 function mCancel(id, m){
   if(!confirm('Cancel this order?')) return;
