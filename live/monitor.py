@@ -326,6 +326,17 @@ class Monitor:
         self.warming: int = 0
         self.pending_alerts: list[tuple[str, str, str]] = []
 
+    def merge_fills(self, rows: list[dict]) -> None:
+        """Merge a quick fills page (newest first) into the fills list —
+        updating orders that filled further, prepending new ones — without
+        losing the older history the full sweep collected."""
+        if not rows:
+            return
+        with self.lock:
+            fresh_oids = {r.get("oid") for r in rows}
+            self.trades = (rows + [t for t in self.trades
+                                   if t.get("oid") not in fresh_oids])[:120]
+
     def note_fills_alert(self) -> None:
         """Phone alert for fills (bought/sold something), by request. The
         fills list is per-order with the newest execution time; anything
@@ -1042,6 +1053,80 @@ def start_cancel_batch(payload: dict) -> tuple[int, dict]:
     return 200, {"ok": True, "started": len(clean)}
 
 
+def _fill_ts(iso: str) -> tuple[float, str]:
+    try:
+        d = dt.datetime.fromisoformat(iso.replace("Z", "+00:00"))
+        return round(d.timestamp(), 1), d.astimezone(ET).strftime("%b %d %I:%M %p")
+    except Exception:  # noqa: BLE001
+        return 0.0, ""
+
+
+def _collect_fills(t: dict, fills_by_order: dict[str, dict]) -> None:
+    """One trade activity = one (often 1-share) execution. Keep only real
+    executions — shares actually traded, never mere order placements — and
+    collapse them to one row per ORDER. Activities arrive newest first, so
+    the first sighting of an order carries its latest cumulative fill,
+    average price and state."""
+    rows_this = []
+    for ex in (t.get("aggressorExecution") or {}, t.get("passiveExecution") or {}):
+        o = ex.get("order") or {}
+        oid = o.get("id")
+        if not oid or tr._num(ex.get("lastShares")) <= 0:
+            continue  # not an accepted execution of one of our orders
+        row = fills_by_order.get(oid)
+        if row is None:
+            if len(fills_by_order) >= 80:
+                continue
+            ts_s, when = _fill_ts(str(ex.get("transactTime") or ""))
+            state = str(o.get("state") or "")
+            fills_by_order[oid] = row = {
+                "oid": oid,
+                "market": o.get("marketSlug") or t.get("marketSlug") or "",
+                "side": "SELL" if "SELL" in str(o.get("side") or "") else "BUY",
+                "qty": tr._num(o.get("quantity")) or None,
+                "filled": tr._num(o.get("cumQuantity")) or None,
+                "price_cents": round(tr._num(o.get("avgPx") or o.get("price")) * 100, 2),
+                "done": state == "ORDER_STATE_FILLED",
+                "ts_s": ts_s, "when": when, "pnl": 0.0}
+        rows_this.append(row)
+    if not rows_this and t.get("marketSlug"):  # older flat shape (qty/price)
+        qty = tr._num(t.get("qty"))
+        if qty > 0:
+            key = str(t.get("id") or len(fills_by_order))
+            ts_s, when = _fill_ts(str(t.get("updateTime") or t.get("createTime") or ""))
+            fills_by_order[key] = row = {
+                "oid": key,
+                "market": t["marketSlug"], "side": None, "qty": qty, "filled": qty,
+                "price_cents": (round(tr._num(t.get("price")) * 100, 2)
+                                if t.get("price") is not None else None),
+                "done": True, "ts_s": ts_s, "when": when, "pnl": 0.0}
+            rows_this.append(row)
+    pnl = tr._num(t.get("realizedPnl"))
+    if rows_this and pnl:
+        rows_this[0]["pnl"] += pnl
+
+
+def fetch_recent_fills(key_id: str, secret_key: str) -> list[dict]:
+    """ONE cheap page of the newest trade activities — so a fill reaches the
+    phone in ~a minute instead of waiting for the 10-minute P/L sweep."""
+    path = "/v1/portfolio/activities"
+    r = requests.get(tr.TRADE_API + path,
+                     headers=tr.auth_headers(key_id, secret_key, "GET", path),
+                     params={"limit": 25, "sortOrder": "SORT_ORDER_DESCENDING",
+                             "types": ["ACTIVITY_TYPE_TRADE"]}, timeout=20)
+    if r.status_code >= 400:
+        raise RuntimeError(f"{path} -> {tr._http_err(r)}")
+    fills: dict[str, dict] = {}
+    for a in r.json().get("activities") or []:
+        t = a.get("trade") or {}
+        if t:
+            _collect_fills(t, fills)
+    out = list(fills.values())
+    for row in out:
+        row["pnl"] = round(row["pnl"], 2) or None
+    return out
+
+
 def fetch_activity_pnl(key_id: str, secret_key: str) -> tuple[dict[str, dict], list[dict]]:
     """Per-market realized P/L rebuilt from trade/resolution history — covers
     positions the exchange no longer returns once fully closed or settled.
@@ -1051,55 +1136,6 @@ def fetch_activity_pnl(key_id: str, secret_key: str) -> tuple[dict[str, dict], l
     agg: dict[str, dict] = {}
     fills_by_order: dict[str, dict] = {}
     cursor = None
-
-    def _ts(iso: str) -> tuple[float, str]:
-        try:
-            d = dt.datetime.fromisoformat(iso.replace("Z", "+00:00"))
-            return round(d.timestamp(), 1), d.astimezone(ET).strftime("%b %d %I:%M %p")
-        except Exception:  # noqa: BLE001
-            return 0.0, ""
-
-    def _note_fills(t: dict) -> None:
-        """One trade activity = one (often 1-share) execution. Keep only real
-        executions — shares actually traded, never mere order placements —
-        and collapse them to one row per ORDER. Activities arrive newest
-        first, so the first sighting of an order carries its latest
-        cumulative fill, average price and state."""
-        rows_this = []
-        for ex in (t.get("aggressorExecution") or {}, t.get("passiveExecution") or {}):
-            o = ex.get("order") or {}
-            oid = o.get("id")
-            if not oid or tr._num(ex.get("lastShares")) <= 0:
-                continue  # not an accepted execution of one of our orders
-            row = fills_by_order.get(oid)
-            if row is None:
-                if len(fills_by_order) >= 80:
-                    continue
-                ts_s, when = _ts(str(ex.get("transactTime") or ""))
-                state = str(o.get("state") or "")
-                fills_by_order[oid] = row = {
-                    "market": o.get("marketSlug") or t.get("marketSlug") or "",
-                    "side": "SELL" if "SELL" in str(o.get("side") or "") else "BUY",
-                    "qty": tr._num(o.get("quantity")) or None,
-                    "filled": tr._num(o.get("cumQuantity")) or None,
-                    "price_cents": round(tr._num(o.get("avgPx") or o.get("price")) * 100, 2),
-                    "done": state == "ORDER_STATE_FILLED",
-                    "ts_s": ts_s, "when": when, "pnl": 0.0}
-            rows_this.append(row)
-        if not rows_this and t.get("marketSlug"):  # older flat shape (qty/price)
-            qty = tr._num(t.get("qty"))
-            if qty > 0:
-                key = str(t.get("id") or len(fills_by_order))
-                ts_s, when = _ts(str(t.get("updateTime") or t.get("createTime") or ""))
-                fills_by_order[key] = row = {
-                    "market": t["marketSlug"], "side": None, "qty": qty, "filled": qty,
-                    "price_cents": (round(tr._num(t.get("price")) * 100, 2)
-                                    if t.get("price") is not None else None),
-                    "done": True, "ts_s": ts_s, "when": when, "pnl": 0.0}
-                rows_this.append(row)
-        pnl = tr._num(t.get("realizedPnl"))
-        if rows_this and pnl:
-            rows_this[0]["pnl"] += pnl
     for _ in range(10):  # up to 1000 most recent activities
         params: dict = {"limit": 100, "sortOrder": "SORT_ORDER_DESCENDING",
                         "types": ["ACTIVITY_TYPE_TRADE", "ACTIVITY_TYPE_POSITION_RESOLUTION"]}
@@ -1115,7 +1151,7 @@ def fetch_activity_pnl(key_id: str, secret_key: str) -> tuple[dict[str, dict], l
             t = a.get("trade") or {}
             pr = a.get("positionResolution") or {}
             if t:
-                _note_fills(t)
+                _collect_fills(t, fills_by_order)
             if t.get("marketSlug"):
                 e = agg.setdefault(t["marketSlug"],
                                    {"realized": 0.0, "ts": "", "resolved": False, "final": None})
@@ -2479,6 +2515,17 @@ class Handler(BaseHTTPRequestHandler):
             with MONITOR.lock:
                 payload = json.dumps({"series": MONITOR.state.get("series", {})})
             self._send(200, "application/json", payload.encode())
+        elif self.path.startswith("/widget.json"):
+            with MONITOR.lock:
+                payload = {
+                    "earned_today": round(MONITOR.state.get("earned") or 0.0, 2),
+                    "rate_per_day": round(MONITOR.rate, 2),
+                    "markets": len({o.get("market") for o in MONITOR.orders if o.get("market")}),
+                    "updated": (MONITOR.updated.astimezone(ET).strftime("%I:%M %p ET")
+                                if MONITOR.updated else None),
+                    "error": bool(MONITOR.error),
+                }
+            self._send(200, "application/json", json.dumps(payload).encode())
         elif self.path.startswith("/market.json"):
             from urllib.parse import parse_qs, urlparse
             slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]
@@ -2557,6 +2604,7 @@ def poll_loop(key_id: str, secret_key: str) -> None:
     events_refreshed = 0.0
     pos_refreshed = 0.0
     act_refreshed = 0.0
+    act_quick = 0.0
     golf_refreshed = 0.0
     winners_refreshed = 0.0
     last_ok = time.time()
@@ -2613,10 +2661,18 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     pass
             if time.time() - act_refreshed > 600:  # closed-market P/L + fills
                 act_refreshed = time.time()
+                act_quick = time.time()  # the full sweep covers the quick check too
                 try:
                     MONITOR.activity_pnl, MONITOR.trades = fetch_activity_pnl(key_id, secret_key)
                     MONITOR.note_fills_alert()
                 except Exception:  # noqa: BLE001 — closed rows just go stale
+                    pass
+            elif time.time() - act_quick > 60:  # cheap 1-page fills check
+                act_quick = time.time()
+                try:
+                    MONITOR.merge_fills(fetch_recent_fills(key_id, secret_key))
+                    MONITOR.note_fills_alert()
+                except Exception:  # noqa: BLE001 — the 10-min sweep still covers it
                     pass
         except Exception as e:  # noqa: BLE001 — shown on the dashboard, loop survives
             MONITOR.error = f"{type(e).__name__}: {e}"
