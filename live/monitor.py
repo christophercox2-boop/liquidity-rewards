@@ -2184,6 +2184,14 @@ function renderHome(d){
     : '<tr><td class="sub">nothing new since tracking began</td></tr>';
 }
 function closeSheet(){ document.getElementById('sheet').style.display = 'none'; }
+let MSHEET = null;
+function mBest(){
+  if(!MSHEET) return;
+  const side = document.getElementById('mSide').value;
+  const lv = side === 'BUY' ? (MSHEET.bids || []) : (MSHEET.asks || []);
+  if(!lv.length){ alert('That side of the book is empty — no best price to match.'); return; }
+  document.getElementById('mPrice').value = +(lv[0][0]*100).toFixed(2);
+}
 async function openMkt(m){
   document.getElementById('sheet').style.display = 'block';
   const el = document.getElementById('sheetIn');
@@ -2201,6 +2209,7 @@ async function openMkt(m){
   }
 }
 function renderSheet(d){
+  MSHEET = d;
   const m = d.market;
   const lv = a => (a && a.length ? a : []).map(x =>
     '<tr><td>'+(+(x[0]*100).toFixed(2))+'¢</td><td class="r">'+x[1].toLocaleString()+'</td></tr>').join('')
@@ -2224,6 +2233,7 @@ function renderSheet(d){
     '<option>BUY</option><option>SELL</option></select> '+
     '<input id="mPrice" type="number" step="0.1" min="0.1" max="99.9" placeholder="price ¢"> '+
     '<input id="mSize" type="number" step="1" min="1" max="20000" placeholder="qty"> '+
+    '<button class="alt" onclick="mBest()">match best</button> '+
     '<button onclick="mPlace(\\''+esc(m)+'\\')">Place</button></div>'+
     '<div class="mkt">post-only — the order rests or is rejected; it can never cross the spread and fill on arrival</div>'+
     '<div class="rp" style="margin-top:12px"><button class="alt" onclick="closeSheet()">Close</button></div>';
