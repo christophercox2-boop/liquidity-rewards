@@ -1,24 +1,111 @@
 # Golf plan — cheap YES bids at the price floor
 
-_1087 golf markets found; 579 carry reward programs (0 without pools); 35 excluded as not in the field; 16 placeable. Field source: pgatour.com field page (157 players). Max $1 at risk per GOLFER across all their markets. Generated 2026-07-27 8:18 PM ET._
+_1095 golf markets found; 587 carry reward programs (0 without pools); 35 excluded as not in the field; 103 placeable. Field source: pgatour.com field page (157 players). Max $1 at risk per GOLFER across all their markets. Generated 2026-07-28 7:26 AM ET._
 
-**Everything below:** ~$1.35/day for ~$16 at risk if every bid filled.
+**Everything below:** ~$2.16/day for ~$54 at risk if every bid filled.
 
 | # | Market | @ | Size | At risk | Est $/day | Share | Note |
 |--:|---|--:|--:|--:|--:|--:|---|
-| 1 | `tec-pga-rockclas-2026-08-02-r3l-haoli` | 0.1¢ | 1,000 | $1 | $0.09 | 9% | resolves ~2026-08-02 |
-| 2 | `tec-pga-rockclas-2026-08-02-r3l-jefkan` | 0.1¢ | 1,000 | $1 | $0.09 | 9% | resolves ~2026-08-02 |
-| 3 | `tec-pga-rockclas-2026-08-02-r3l-marhub` | 0.1¢ | 1,000 | $1 | $0.09 | 9% | resolves ~2026-08-02 |
-| 4 | `tec-pga-rockclas-2026-08-02-r2l-beahos` | 0.1¢ | 1,000 | $1 | $0.09 | 8% | resolves ~2026-08-02 |
-| 5 | `tec-pga-rockclas-2026-08-02-r2l-leehod` | 0.1¢ | 1,000 | $1 | $0.09 | 8% | resolves ~2026-08-02 |
-| 6 | `tec-pga-rockclas-2026-08-02-r2l-matmcc` | 0.1¢ | 1,000 | $1 | $0.09 | 8% | resolves ~2026-08-02 |
-| 7 | `tec-pga-rockclas-2026-08-02-r2l-zacbau` | 0.1¢ | 1,000 | $1 | $0.09 | 8% | resolves ~2026-08-02 |
-| 8 | `tec-pga-rockclas-2026-08-02-r2l-andput` | 0.1¢ | 1,000 | $1 | $0.08 | 8% | ✔ resolves ~2026-08-02 |
-| 9 | `tec-pga-rockclas-2026-08-02-r2l-brigar` | 0.1¢ | 1,000 | $1 | $0.08 | 8% | ✔ resolves ~2026-08-02 |
-| 10 | `tec-pga-rockclas-2026-08-02-r2l-kevyu` | 0.1¢ | 1,000 | $1 | $0.08 | 8% | resolves ~2026-08-02 |
-| 11 | `tec-pga-rockclas-2026-08-02-r2l-riccas` | 0.1¢ | 1,000 | $1 | $0.08 | 8% | resolves ~2026-08-02 |
-| 12 | `tec-pga-rockclas-2026-08-02-r2l-seapow` | 0.1¢ | 1,000 | $1 | $0.08 | 8% | resolves ~2026-08-02 |
-| 13 | `tec-pga-rockclas-2026-08-02-r2l-stejae` | 0.1¢ | 1,000 | $1 | $0.08 | 8% | resolves ~2026-08-02 |
-| 14 | `tec-pga-rockclas-2026-08-02-r2l-tonfin` | 0.1¢ | 1,000 | $1 | $0.08 | 8% | resolves ~2026-08-02 |
-| 15 | `tec-pga-rockclas-2026-08-02-r3l-karvil` | 0.1¢ | 1,000 | $1 | $0.08 | 8% | ✔ resolves ~2026-08-02 |
-| 16 | `tec-pga-rockclas-2026-08-02-w-chrlam` | 0.1¢ | 1,000 | $1 | $0.08 | 8% | ✔ resolves ~2026-08-02 |
+| 1 | `tec-pga-rockclas-2026-08-02-r2l-chrbez` | 0.1¢ | 1,000 | $1 | $0.08 | 8% | resolves ~2026-08-02 |
+| 2 | `tec-pga-rockclas-2026-08-02-w-benkoh` | 0.1¢ | 500 | $0 | $0.03 | 3% | resolves ~2026-08-02 |
+| 3 | `tec-pga-rockclas-2026-08-02-w-jusqui` | 0.1¢ | 500 | $0 | $0.04 | 4% | resolves ~2026-08-02 |
+| 4 | `tec-pga-rockclas-2026-08-02-w-ryacel` | 0.1¢ | 500 | $0 | $0.04 | 4% | resolves ~2026-08-02 |
+| 5 | `tec-pga-rockclas-2026-08-02-r3l-samste` | 0.2¢ | 500 | $1 | $0.04 | 4% | resolves ~2026-08-02 |
+| 6 | `tec-pga-rockclas-2026-08-02-r3l-seapow` | 0.2¢ | 500 | $1 | $0.04 | 4% | resolves ~2026-08-02 |
+| 7 | `tec-pga-rockclas-2026-08-02-w-juslow` | 0.1¢ | 500 | $0 | $0.04 | 4% | resolves ~2026-08-02 |
+| 8 | `tec-pga-rockclas-2026-08-02-w-keehus` | 0.1¢ | 500 | $0 | $0.04 | 4% | resolves ~2026-08-02 |
+| 9 | `tec-pga-rockclas-2026-08-02-r1l-aksbha` | 0.1¢ | 1,000 | $1 | $0.04 | 4% | resolves ~2026-08-02 |
+| 10 | `tec-pga-rockclas-2026-08-02-w-hayspr` | 0.1¢ | 500 | $0 | $0.03 | 3% | resolves ~2026-08-02 |
+| 11 | `tec-pga-rockclas-2026-08-02-r2l-takkan` | 0.2¢ | 500 | $1 | $0.04 | 4% | resolves ~2026-08-02 |
+| 12 | `tec-pga-rockclas-2026-08-02-r3l-aarwis` | 0.1¢ | 1,000 | $1 | $0.04 | 3% | resolves ~2026-08-02 |
+| 13 | `tec-pga-rockclas-2026-08-02-r2l-chrkir` | 0.2¢ | 352 | $1 | $0.03 | 3% | resolves ~2026-08-02 |
+| 14 | `tec-pga-rockclas-2026-08-02-w-zacbla` | 0.1¢ | 500 | $0 | $0.03 | 3% | resolves ~2026-08-02 |
+| 15 | `tec-pga-rockclas-2026-08-02-r2l-kevroy` | 0.2¢ | 338 | $1 | $0.03 | 3% | resolves ~2026-08-02 |
+| 16 | `tec-pga-rockclas-2026-08-02-r2l-kevstr` | 0.1¢ | 500 | $0 | $0.03 | 3% | resolves ~2026-08-02 |
+| 17 | `tec-pga-rockclas-2026-08-02-r3l-matpav` | 0.1¢ | 500 | $0 | $0.03 | 3% | resolves ~2026-08-02 |
+| 18 | `tec-pga-rockclas-2026-08-02-r2l-taymoo` | 0.2¢ | 500 | $1 | $0.03 | 3% | resolves ~2026-08-02 |
+| 19 | `tec-pga-rockclas-2026-08-02-w-danaza` | 0.2¢ | 200 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 20 | `tec-pga-rockclas-2026-08-02-r2l-matsch` | 0.2¢ | 313 | $1 | $0.03 | 3% | resolves ~2026-08-02 |
+| 21 | `tec-pga-rockclas-2026-08-02-r2l-riccas` | 0.2¢ | 273 | $1 | $0.03 | 3% | resolves ~2026-08-02 |
+| 22 | `tec-pga-rockclas-2026-08-02-r1l-danaza` | 0.1¢ | 485 | $0 | $0.03 | 2% | resolves ~2026-08-02 |
+| 23 | `tec-pga-rockclas-2026-08-02-r1l-wyncla` | 0.1¢ | 1,000 | $1 | $0.03 | 2% | resolves ~2026-08-02 |
+| 24 | `tec-pga-rockclas-2026-08-02-r3l-jefkan` | 0.2¢ | 252 | $0 | $0.03 | 2% | resolves ~2026-08-02 |
+| 25 | `tec-pga-rockclas-2026-08-02-r2l-keinak` | 0.2¢ | 270 | $1 | $0.03 | 2% | resolves ~2026-08-02 |
+| 26 | `tec-pga-rockclas-2026-08-02-r2l-kevyu` | 0.2¢ | 500 | $1 | $0.03 | 2% | resolves ~2026-08-02 |
+| 27 | `tec-pga-rockclas-2026-08-02-r2l-maxmcg` | 0.2¢ | 252 | $0 | $0.03 | 2% | resolves ~2026-08-02 |
+| 28 | `tec-pga-rockclas-2026-08-02-r2l-brasne` | 0.1¢ | 449 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 29 | `tec-pga-rockclas-2026-08-02-r2l-nicdun` | 0.1¢ | 424 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 30 | `tec-pga-rockclas-2026-08-02-w-camdav` | 0.1¢ | 500 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 31 | `tec-pga-rockclas-2026-08-02-r2l-davlip` | 0.1¢ | 421 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 32 | `tec-pga-rockclas-2026-08-02-r3l-davlip` | 0.1¢ | 421 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 33 | `tec-pga-rockclas-2026-08-02-r2l-dylwu` | 0.1¢ | 458 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 34 | `tec-pga-rockclas-2026-08-02-r2l-emigri` | 0.2¢ | 500 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 35 | `tec-pga-rockclas-2026-08-02-r2l-eriroo` | 0.2¢ | 313 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 36 | `tec-pga-rockclas-2026-08-02-r3l-stefis` | 0.2¢ | 304 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 37 | `tec-pga-rockclas-2026-08-02-r2l-taypen` | 0.1¢ | 633 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 38 | `tec-pga-rockclas-2026-08-02-r2l-zacbla` | 0.1¢ | 458 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 39 | `tec-pga-rockclas-2026-08-02-w-adasve` | 0.1¢ | 1,000 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 40 | `tec-pga-rockclas-2026-08-02-r2l-davril` | 0.1¢ | 426 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 41 | `tec-pga-rockclas-2026-08-02-r3l-machug` | 0.2¢ | 301 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 42 | `tec-pga-rockclas-2026-08-02-r2l-nictay` | 0.2¢ | 500 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 43 | `tec-pga-rockclas-2026-08-02-r3l-adrsad` | 0.1¢ | 603 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 44 | `tec-pga-rockclas-2026-08-02-r3l-tracro` | 0.2¢ | 298 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 45 | `tec-pga-rockclas-2026-08-02-w-adrcha` | 0.1¢ | 471 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 46 | `tec-pga-rockclas-2026-08-02-r2l-gorsar` | 0.1¢ | 586 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 47 | `tec-pga-rockclas-2026-08-02-r2l-johpar` | 0.1¢ | 586 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 48 | `tec-pga-rockclas-2026-08-02-r3l-nicech` | 0.2¢ | 263 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 49 | `tec-pga-rockclas-2026-08-02-r3l-aussmo` | 0.2¢ | 219 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 50 | `tec-pga-rockclas-2026-08-02-r3l-lucglo` | 0.2¢ | 212 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 51 | `tec-pga-rockclas-2026-08-02-r2l-tonfin` | 0.2¢ | 290 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 52 | `tec-pga-rockclas-2026-08-02-r3l-chaphi` | 0.2¢ | 232 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 53 | `tec-pga-rockclas-2026-08-02-r3l-keinak` | 0.2¢ | 229 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 54 | `tec-pga-rockclas-2026-08-02-r3l-leehod` | 0.2¢ | 218 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 55 | `tec-pga-rockclas-2026-08-02-r2l-matmcc` | 0.1¢ | 523 | $1 | $0.02 | 2% | resolves ~2026-08-02 |
+| 56 | `tec-pga-rockclas-2026-08-02-r2l-ponnyh` | 0.2¢ | 234 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 57 | `tec-pga-rockclas-2026-08-02-r3l-riccas` | 0.2¢ | 226 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 58 | `tec-pga-rockclas-2026-08-02-r2l-wiljen` | 0.2¢ | 201 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 59 | `tec-pga-rockclas-2026-08-02-r3l-bretod` | 0.2¢ | 197 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 60 | `tec-pga-rockclas-2026-08-02-r1l-bricam` | 0.1¢ | 385 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 61 | `tec-pga-rockclas-2026-08-02-r3l-auseck` | 0.2¢ | 225 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 62 | `tec-pga-rockclas-2026-08-02-r2l-joedah` | 0.2¢ | 220 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 63 | `tec-pga-rockclas-2026-08-02-r3l-kriven` | 0.2¢ | 207 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 64 | `tec-pga-rockclas-2026-08-02-r3l-sudyel` | 0.2¢ | 218 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 65 | `tec-pga-rockclas-2026-08-02-r1l-brigar` | 0.1¢ | 371 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 66 | `tec-pga-rockclas-2026-08-02-r2l-nicech` | 0.1¢ | 472 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 67 | `tec-pga-rockclas-2026-08-02-r3l-wiljen` | 0.2¢ | 188 | $0 | $0.02 | 2% | resolves ~2026-08-02 |
+| 68 | `tec-pga-rockclas-2026-08-02-r1l-brasne` | 0.1¢ | 355 | $0 | $0.01 | 2% | resolves ~2026-08-02 |
+| 69 | `tec-pga-rockclas-2026-08-02-r3l-aletos` | 0.1¢ | 432 | $0 | $0.01 | 2% | resolves ~2026-08-02 |
+| 70 | `tec-pga-rockclas-2026-08-02-r2l-marhub` | 0.1¢ | 435 | $0 | $0.01 | 2% | resolves ~2026-08-02 |
+| 71 | `tec-pga-rockclas-2026-08-02-w-matmcc` | 0.3¢ | 158 | $0 | $0.01 | 2% | resolves ~2026-08-02 |
+| 72 | `tec-pga-rockclas-2026-08-02-r2l-vinwha` | 0.1¢ | 430 | $0 | $0.01 | 2% | resolves ~2026-08-02 |
+| 73 | `tec-pga-rockclas-2026-08-02-r1l-garhig` | 0.1¢ | 428 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 74 | `tec-pga-rockclas-2026-08-02-r2l-andput` | 0.1¢ | 423 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 75 | `tec-pga-rockclas-2026-08-02-r3l-haoli` | 0.1¢ | 414 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 76 | `tec-pga-rockclas-2026-08-02-r3l-websim` | 0.1¢ | 419 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 77 | `tec-pga-rockclas-2026-08-02-r3l-zacbau` | 0.2¢ | 177 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 78 | `tec-pga-rockclas-2026-08-02-r1l-danwal` | 0.2¢ | 205 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 79 | `tec-pga-rockclas-2026-08-02-r3l-bilhor` | 0.2¢ | 165 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 80 | `tec-pga-rockclas-2026-08-02-w-matkuc` | 0.1¢ | 520 | $1 | $0.01 | 1% | resolves ~2026-08-02 |
+| 81 | `tec-pga-rockclas-2026-08-02-r3l-richoe` | 0.1¢ | 397 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 82 | `tec-pga-rockclas-2026-08-02-r2l-stejae` | 0.2¢ | 271 | $1 | $0.01 | 1% | resolves ~2026-08-02 |
+| 83 | `tec-pga-rockclas-2026-08-02-w-bradal` | 0.1¢ | 333 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 84 | `tec-pga-rockclas-2026-08-02-r2l-chrlam` | 0.1¢ | 500 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 85 | `tec-pga-rockclas-2026-08-02-r3l-chrlam` | 0.1¢ | 500 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 86 | `tec-pga-rockclas-2026-08-02-r2l-leehod` | 0.1¢ | 351 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 87 | `tec-pga-rockclas-2026-08-02-r2l-lucglo` | 0.1¢ | 346 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 88 | `tec-pga-rockclas-2026-08-02-w-patkiz` | 0.1¢ | 510 | $1 | $0.01 | 1% | resolves ~2026-08-02 |
+| 89 | `tec-pga-rockclas-2026-08-02-r2l-thoole` | 0.1¢ | 522 | $1 | $0.01 | 1% | resolves ~2026-08-02 |
+| 90 | `tec-pga-rockclas-2026-08-02-r1l-chabla` | 0.2¢ | 161 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 91 | `tec-pga-rockclas-2026-08-02-r2l-aussmo` | 0.1¢ | 336 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 92 | `tec-pga-rockclas-2026-08-02-r3l-dylwu` | 0.1¢ | 311 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 93 | `tec-pga-rockclas-2026-08-02-r2l-kriven` | 0.1¢ | 340 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 94 | `tec-pga-rockclas-2026-08-02-r2l-matkuc` | 0.1¢ | 479 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 95 | `tec-pga-rockclas-2026-08-02-r2l-neashi` | 0.1¢ | 500 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 96 | `tec-pga-rockclas-2026-08-02-w-neashi` | 0.2¢ | 250 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 97 | `tec-pga-rockclas-2026-08-02-r3l-patfis` | 0.1¢ | 378 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 98 | `tec-pga-rockclas-2026-08-02-r2l-patkiz` | 0.1¢ | 489 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 99 | `tec-pga-rockclas-2026-08-02-r1l-charam` | 0.2¢ | 160 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 100 | `tec-pga-rockclas-2026-08-02-w-gorsar` | 0.1¢ | 413 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 101 | `tec-pga-rockclas-2026-08-02-r3l-johpar` | 0.2¢ | 206 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 102 | `tec-pga-rockclas-2026-08-02-w-thoole` | 0.1¢ | 477 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
+| 103 | `tec-pga-rockclas-2026-08-02-w-tracro` | 0.1¢ | 403 | $0 | $0.01 | 1% | resolves ~2026-08-02 |
