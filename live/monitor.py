@@ -2478,6 +2478,27 @@ class Handler(BaseHTTPRequestHandler):
         if not DASH_PASSWORD:
             self._send(503, "text/plain", b"Set the DASH_PASSWORD environment variable to enable the dashboard.")
             return
+        if self.path.startswith("/widget.json"):
+            # The topline-only endpoint also accepts ?key=<password> — widget
+            # apps and Shortcuts often can't set an Authorization header.
+            from urllib.parse import parse_qs, urlparse
+            key = (parse_qs(urlparse(self.path).query).get("key") or [""])[0]
+            if not (self._authed() or key == DASH_PASSWORD):
+                self.send_response(401)
+                self.send_header("WWW-Authenticate", 'Basic realm="rewards"')
+                self.end_headers()
+                return
+            with MONITOR.lock:
+                payload = {
+                    "earned_today": round(MONITOR.state.get("earned") or 0.0, 2),
+                    "rate_per_day": round(MONITOR.rate, 2),
+                    "markets": len({o.get("market") for o in MONITOR.orders if o.get("market")}),
+                    "updated": (MONITOR.updated.astimezone(ET).strftime("%I:%M %p ET")
+                                if MONITOR.updated else None),
+                    "error": bool(MONITOR.error),
+                }
+            self._send(200, "application/json", json.dumps(payload).encode())
+            return
         if not self._authed():
             self.send_response(401)
             self.send_header("WWW-Authenticate", 'Basic realm="rewards"')
@@ -2515,17 +2536,6 @@ class Handler(BaseHTTPRequestHandler):
             with MONITOR.lock:
                 payload = json.dumps({"series": MONITOR.state.get("series", {})})
             self._send(200, "application/json", payload.encode())
-        elif self.path.startswith("/widget.json"):
-            with MONITOR.lock:
-                payload = {
-                    "earned_today": round(MONITOR.state.get("earned") or 0.0, 2),
-                    "rate_per_day": round(MONITOR.rate, 2),
-                    "markets": len({o.get("market") for o in MONITOR.orders if o.get("market")}),
-                    "updated": (MONITOR.updated.astimezone(ET).strftime("%I:%M %p ET")
-                                if MONITOR.updated else None),
-                    "error": bool(MONITOR.error),
-                }
-            self._send(200, "application/json", json.dumps(payload).encode())
         elif self.path.startswith("/market.json"):
             from urllib.parse import parse_qs, urlparse
             slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]
