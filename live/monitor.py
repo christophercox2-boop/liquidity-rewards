@@ -1827,7 +1827,9 @@ the position. Markets whose spread has closed below 3 ticks are skipped.</div>
   <label><input type="radio" name="qdist" value="2"> 2 back</label></span></div>
 <div id="rpl"></div>
 <div id="rpProg" class="mkt"></div>
-<h3>By market <span class="sub">(sorted by current rate · tap a row for the math)</span></h3><table id="markets"></table>
+<h3>By market <span class="sub">(tap a row for the math)</span></h3>
+<div id="catBar" style="margin:4px 0"></div>
+<table id="markets"></table>
 <h3>Previous days</h3><table id="history"></table>
 <div id="acts"></div>
 </div>
@@ -2455,6 +2457,19 @@ function tint(m, cur){
   return delta < 0 ? 'background:#3d1418' : 'background:#12341c';
 }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function mcat(m){
+  const p = String(m).split('-');
+  return p[0] === 'tec' ? p[0] + '-' + (p[1] || '') : p[0];
+}
+function hidCats(){ try{ return JSON.parse(localStorage.getItem('hidCats') || '{}'); }catch(e){ return {}; } }
+function tglCat(c){
+  const h = hidCats();
+  if(h[c]) delete h[c]; else h[c] = 1;
+  localStorage.setItem('hidCats', JSON.stringify(h));
+  refresh();
+}
+function sortCat(){ return localStorage.getItem('sortCat') === '1'; }
+function tglSortCat(){ localStorage.setItem('sortCat', sortCat() ? '0' : '1'); refresh(); }
 async function reprice(id, label){
   const inp = document.getElementById('p'+id);
   const cents = parseFloat(inp.value);
@@ -2665,9 +2680,22 @@ async function refresh(){
     if(Object.values(GOPEN).some(v=>v)){
       try{ SERIES = (await (await fetch('series.json')).json()).series || {}; }catch(_){}
     }
+    const cats = {};
+    Object.keys(allMarkets).forEach(mm => { const c = mcat(mm); cats[c] = (cats[c]||0)+1; });
+    const hc = hidCats();
+    document.getElementById('catBar').innerHTML =
+      '<label class="sub" style="margin-right:8px"><input type="checkbox" '+(sortCat()?'checked':'')+
+      ' onchange="tglSortCat()"> group by category</label>' +
+      Object.keys(cats).sort().map(c =>
+        '<button class="tab" style="font-size:11px;padding:4px 10px;margin:2px'+
+        (hc[c]?';opacity:.4':'')+'" onclick="tglCat(\\''+esc(c)+'\\')">'+esc(c)+' ('+cats[c]+')'+
+        (hc[c]?' ✕':'')+'</button>').join('');
     document.getElementById('markets').innerHTML =
       Object.entries(allMarkets)
-        .sort((a,b) => (RATES[b[0]]||0) - (RATES[a[0]]||0) || b[1] - a[1])
+        .filter(([m]) => !hc[mcat(m)])
+        .sort((a,b) => (sortCat() && mcat(a[0]) !== mcat(b[0]))
+          ? (mcat(a[0]) < mcat(b[0]) ? -1 : 1)
+          : (RATES[b[0]]||0) - (RATES[a[0]]||0) || b[1] - a[1])
         .map(([m,v],i) => {
         const rate = RATES[m] || 0;
         const dead = d.orders.some(o => o.market === m) &&
