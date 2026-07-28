@@ -946,7 +946,7 @@ def start_batch(payload: dict) -> tuple[int, dict]:
         max_c = float(payload.get("max_price_cents") or 0)
         min_s = float(payload.get("min_sell_cents") or 99)
         specs = payload.get("orders") or []
-        assert 0.1 <= max_c <= 99, "bad max buy price"
+        assert 0.1 <= max_c <= 99.9, "bad max buy price"
         assert 0.1 <= min_s <= 99.9, "bad min sell price"
         assert 1 <= len(specs) <= 400, "1-400 orders per batch"
         open_now = {(o.get("market"), o.get("side"), round((o.get("price") or 0) * 100, 1))
