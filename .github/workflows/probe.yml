@@ -27,11 +27,40 @@ jobs:
             | python3 -m json.tool > data/probe_incentives.json
           head -c 2000 data/probe_incentives.json
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Recent activity payload (trade states)
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, requests
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          path = "/v1/portfolio/activities"
+          r = requests.get(tr.TRADE_API + path,
+                           headers=tr.auth_headers(kid, sec, "GET", path),
+                           params={"limit": 60, "sortOrder": "SORT_ORDER_DESCENDING",
+                                   "types": ["ACTIVITY_TYPE_TRADE"]}, timeout=30)
+          r.raise_for_status()
+          with open("data/probe_activities.json", "w") as f:
+              json.dump(r.json(), f, indent=1)
+          states = {}
+          for a in r.json().get("activities") or []:
+              t = a.get("trade") or {}
+              states[t.get("state")] = states.get(t.get("state"), 0) + 1
+          print("trade states:", states)
+          EOF
+
       - name: Commit probe output
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/probe_incentives.json
+          git add data/probe_incentives.json data/probe_activities.json
           if git diff --cached --quiet; then
             echo "No changes"
           else
