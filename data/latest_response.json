@@ -1,6 +1,160 @@
 {
   "rewards": [
     {
+      "reward": 0.3,
+      "programType": "liquidityProgram",
+      "marketSlug": "aec-setkameua-tymole-popedu-2026-07-28",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r1l-aussmo",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r1l-danwal",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r1l-hidmat",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r1l-jessve",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r1l-macmei",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r1l-rafcam",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r1l-ricfow",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r1l-wilmou",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r2l-aksbha",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r2l-andput",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r2l-aussmo",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r2l-johkee",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r2l-leehod",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r2l-matmcc",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r2l-taymoo",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r2l-zacbau",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-aksbha",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-brasne",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-haoli",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-jefkan",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-marhub",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
       "reward": 0.01,
       "programType": "liquidityProgram",
       "marketSlug": "apdc-andburpm-2026-12-31",
@@ -1411,6 +1565,118 @@
       "reward": 0.03,
       "programType": "liquidityProgram",
       "marketSlug": "tec-cbb-champ-2027-04-05-w-wisc",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.41,
+      "programType": "liquidityProgram",
+      "marketSlug": "usgcc-aliens-12-31-2026",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 3.96,
+      "programType": "liquidityProgram",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-els0-5",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 3.71,
+      "programType": "liquidityProgram",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-els10-15",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 2.53,
+      "programType": "liquidityProgram",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-els15-20",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.18,
+      "programType": "liquidityProgram",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-els5-10",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.92,
+      "programType": "liquidityProgram",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-elsgte20",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 2.83,
+      "programType": "liquidityProgram",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-ste15-20",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.42,
+      "programType": "liquidityProgram",
+      "marketSlug": "vtc-hrep-to-2026-11-03-100-105m",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.19,
+      "programType": "liquidityProgram",
+      "marketSlug": "vtc-hrep-to-2026-11-03-105-110m",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.2,
+      "programType": "liquidityProgram",
+      "marketSlug": "vtc-hrep-to-2026-11-03-110-115m",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.3,
+      "programType": "liquidityProgram",
+      "marketSlug": "vtc-hrep-to-2026-11-03-115-120m",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.6,
+      "programType": "liquidityProgram",
+      "marketSlug": "vtc-hrep-to-2026-11-03-120-125m",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.23,
+      "programType": "liquidityProgram",
+      "marketSlug": "vtc-hrep-to-2026-11-03-125-130m",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.21,
+      "programType": "liquidityProgram",
+      "marketSlug": "vtc-hrep-to-2026-11-03-90-95m",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.69,
+      "programType": "liquidityProgram",
+      "marketSlug": "vtc-hrep-to-2026-11-03-95-100m",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.21,
+      "programType": "liquidityProgram",
+      "marketSlug": "vtc-hrep-to-2026-11-03-lt90m",
       "date": "2026-07-27",
       "status": "PENDING"
     },
