@@ -624,7 +624,7 @@ class Monitor:
                     {**{k: o.get(k) for k in ("id", "market", "side", "price", "size", "ticks", "share",
                                               "est_day", "verdict", "window", "window_more",
                                               "window_more_score", "denom", "df", "calc",
-                                              "event_n", "siblings")},
+                                              "event_n", "siblings", "side_pool")},
                      "batch": o.get("id") in batch_ids}
                     for o in self.orders
                 ],
@@ -2593,6 +2593,21 @@ function tglCat(c){
 }
 function sortCat(){ return localStorage.getItem('sortCat') === '1'; }
 function tglSortCat(){ localStorage.setItem('sortCat', sortCat() ? '0' : '1'); refresh(); }
+let PCTS = {}, PCTBASE = null;
+function pctMode(){ return localStorage.getItem('pctMode') === '1'; }
+function tglPct(){ localStorage.setItem('pctMode', pctMode() ? '0' : '1'); refresh(); }
+function mSort(){ return localStorage.getItem('mktSort') || 'rate'; }
+function setMSort(v){ localStorage.setItem('mktSort', v); refresh(); }
+function pctChg(m){
+  const c = PCTS[m], b = PCTBASE ? PCTBASE[m] : null;
+  return (c == null || b == null) ? 0 : c - b;
+}
+function pctArrow(m){
+  const dd = pctChg(m);
+  if(Math.abs(dd) < 1) return '';
+  return dd > 0 ? ' <span class="pos">▲'+dd.toFixed(0)+'</span>'
+                : ' <span class="neg">▼'+Math.abs(dd).toFixed(0)+'</span>';
+}
 async function reprice(id, label){
   const inp = document.getElementById('p'+id);
   const cents = parseFloat(inp.value);
@@ -2802,10 +2817,30 @@ async function refresh(){
     if(Object.values(GOPEN).some(v=>v)){
       try{ SERIES = (await (await fetch('series.json')).json()).series || {}; }catch(_){}
     }
+    const SPOOL = {};
+    d.orders.forEach(o => { if(o.market && o.side_pool) SPOOL[o.market] = o.side_pool; });
+    PCTS = {};
+    Object.keys(allMarkets).forEach(mm => {
+      const sp = SPOOL[mm];
+      PCTS[mm] = sp ? Math.min(100, (RATES[mm]||0) / (2*sp) * 100) : null;
+    });
+    if(PCTBASE === null){  // baseline = the pcts as of your LAST visit
+      try{ PCTBASE = JSON.parse(localStorage.getItem('pctSeen') || '{}'); }catch(e){ PCTBASE = {}; }
+    }
+    const pstore = {};
+    Object.keys(PCTS).forEach(k => { if(PCTS[k] != null) pstore[k] = +PCTS[k].toFixed(1); });
+    localStorage.setItem('pctSeen', JSON.stringify(pstore));
     const cats = {};
     Object.keys(allMarkets).forEach(mm => { const c = mcat(mm); cats[c] = (cats[c]||0)+1; });
     const hc = hidCats();
     document.getElementById('catBar').innerHTML =
+      '<label class="sub" style="margin-right:8px"><input type="checkbox" '+(pctMode()?'checked':'')+
+      ' onchange="tglPct()"> % of rewards</label>' +
+      '<select onchange="setMSort(this.value)" style="background:#0d1117;color:#8b949e;'+
+      'border:1px solid #30363d;border-radius:6px;padding:3px;font-size:11px;margin-right:8px">'+
+      '<option value="rate"'+(mSort()==='rate'?' selected':'')+'>sort: rate</option>'+
+      '<option value="chg-desc"'+(mSort()==='chg-desc'?' selected':'')+'>sort: biggest % gain</option>'+
+      '<option value="chg-asc"'+(mSort()==='chg-asc'?' selected':'')+'>sort: biggest % drop</option></select>'+
       '<label class="sub" style="margin-right:8px"><input type="checkbox" '+(sortCat()?'checked':'')+
       ' onchange="tglSortCat()"> group by category</label>' +
       Object.keys(cats).sort().map(c =>
@@ -2815,9 +2850,12 @@ async function refresh(){
     document.getElementById('markets').innerHTML =
       Object.entries(allMarkets)
         .filter(([m]) => !hc[mcat(m)])
-        .sort((a,b) => (sortCat() && mcat(a[0]) !== mcat(b[0]))
-          ? (mcat(a[0]) < mcat(b[0]) ? -1 : 1)
-          : (RATES[b[0]]||0) - (RATES[a[0]]||0) || b[1] - a[1])
+        .sort((a,b) => {
+          if(sortCat() && mcat(a[0]) !== mcat(b[0])) return mcat(a[0]) < mcat(b[0]) ? -1 : 1;
+          if(mSort() === 'chg-desc') return pctChg(b[0]) - pctChg(a[0]);
+          if(mSort() === 'chg-asc') return pctChg(a[0]) - pctChg(b[0]);
+          return (RATES[b[0]]||0) - (RATES[a[0]]||0) || b[1] - a[1];
+        })
         .map(([m,v],i) => {
         const rate = RATES[m] || 0;
         const dead = d.orders.some(o => o.market === m) &&
@@ -2848,8 +2886,14 @@ async function refresh(){
             '</div><table class="bk">'+rows+'</table>'+calc+sibs+rp+'</div>';
         }).join('');
         const gcell = GOPEN[m] && SERIES ? spark(SERIES[m]) : '';
-        const rateTxt = dead ? '<b style="color:#d29922">⚠️ $0.00/day</b>'
-                             : '<b>$'+rate.toFixed(2)+'/day</b>';
+        const pct = PCTS[m];
+        const rateTxt = pctMode()
+          ? (dead ? '<b style="color:#d29922">⚠️ 0%</b>' + pctArrow(m)
+                  : (pct == null ? '<b>—</b>'
+                     : '<b>'+pct.toFixed(0)+'%</b>' + pctArrow(m) +
+                       '<br><span class="sub" style="font-size:10px">of this market\\'s daily rewards</span>'))
+          : (dead ? '<b style="color:#d29922">⚠️ $0.00/day</b>'
+                  : '<b>$'+rate.toFixed(2)+'/day</b>');
         const hasBatch = d.orders.some(o => o.market === m && o.batch);
         return '<tr id="r'+i+'" onclick="tgl('+i+',\\''+esc(m)+'\\')" style="'+tint(m, rate)+'">'+
           '<td class="mkt">'+m+(hasBatch?' <span class="bdg">batch</span>':'')+

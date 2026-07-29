@@ -944,6 +944,8 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     for o in orders:
         prog = progs.get(o["market"])
         o["pool"] = prog.get("pool") if prog else None
+        o["side_pool"] = (round(_daily_pool(prog, o["market"]) / 2, 4)
+                          if prog and prog.get("pool") else None)
         _score_order(o, books.get(o["market"]), prog)
     orders.sort(key=lambda o: (o["share"] is None, -(o["share"] or 0.0), o["ticks"] if o["ticks"] is not None else 999))
     return orders
