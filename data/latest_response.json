@@ -1,6 +1,83 @@
 {
   "rewards": [
     {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-andburpm-2026-12-31",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.49,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-jerpowgov-2026-08-31",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.17,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-kashpatel-2026-08-31",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-kashpatel-2026-12-31",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 4.32,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-petehegseth-2026-08-31",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.18,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-petehegseth-2026-12-31",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.06,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-trumpadmin-2026-johrat",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-trumpadmin-2026-marrub",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-trumpadmin-2026-rodsco",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.23,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-trumpadmin-2026-scobes",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-trumpadmin-2026-stewit",
+      "date": "2026-07-27",
+      "status": "PENDING"
+    },
+    {
       "reward": 0.04,
       "programType": "liquidityProgram",
       "marketSlug": "apdc-jerpowgov-2026-08-31",

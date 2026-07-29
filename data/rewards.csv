@@ -822,3 +822,14 @@ date,market,program_type,reward_usd,status
 2026-07-26,vtc-hrep-to-2026-11-03-95-100m,liquidityProgram,0.55,PAID
 2026-07-26,vtc-hrep-to-2026-11-03-gte130m,liquidityProgram,0.03,PAID
 2026-07-26,vtc-hrep-to-2026-11-03-lt90m,liquidityProgram,0.5,PAID
+2026-07-27,apdc-andburpm-2026-12-31,liquidityProgram,0.01,PENDING
+2026-07-27,apdc-jerpowgov-2026-08-31,liquidityProgram,0.49,PENDING
+2026-07-27,apdc-kashpatel-2026-08-31,liquidityProgram,0.17,PENDING
+2026-07-27,apdc-kashpatel-2026-12-31,liquidityProgram,0.04,PENDING
+2026-07-27,apdc-petehegseth-2026-08-31,liquidityProgram,4.32,PENDING
+2026-07-27,apdc-petehegseth-2026-12-31,liquidityProgram,0.18,PENDING
+2026-07-27,apdc-trumpadmin-2026-johrat,liquidityProgram,0.06,PENDING
+2026-07-27,apdc-trumpadmin-2026-marrub,liquidityProgram,0.01,PENDING
+2026-07-27,apdc-trumpadmin-2026-rodsco,liquidityProgram,0.01,PENDING
+2026-07-27,apdc-trumpadmin-2026-scobes,liquidityProgram,0.23,PENDING
+2026-07-27,apdc-trumpadmin-2026-stewit,liquidityProgram,0.02,PENDING
