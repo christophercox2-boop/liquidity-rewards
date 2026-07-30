@@ -2,79 +2,29 @@
   "orders": {
     "orders": [
       {
-        "id": "BJGQFNY1TBAC",
-        "marketSlug": "scc-senate-gop-2026-11-03-47",
+        "id": "BJJ2YV3NCBAE",
+        "marketSlug": "scc-senate-gop-2026-11-03-48",
         "side": "ORDER_SIDE_BUY",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.01",
+          "value": "0.1",
           "currency": "USD"
         },
-        "quantity": 5000,
+        "quantity": 49,
         "cumQuantity": 0,
-        "leavesQuantity": 5000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-47",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "Yes",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "47",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T16:31:47.662296626Z",
-        "createTime": "2026-07-30T16:31:47.660871021Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T16:31:47.662296626Z"
-      },
-      {
-        "id": "BJGQ7YSBGBA3",
-        "marketSlug": "scc-senate-gop-2026-11-03-47",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.06",
-          "currency": "USD"
-        },
-        "quantity": 30,
-        "cumQuantity": 0,
-        "leavesQuantity": 30,
+        "leavesQuantity": 49,
         "tif": "TIME_IN_FORCE_DAY",
         "goodTillTime": null,
         "intent": "ORDER_INTENT_SELL_SHORT",
         "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-47",
+          "slug": "scc-senate-gop-2026-11-03-48",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
           "title": "2026 Midterms: Republican Senate Seats?",
           "outcome": "No",
           "eventSlug": "senate-gop-2026-11-03",
           "subject": {
             "id": 0,
-            "name": "47",
+            "name": "48",
             "subjectType": ""
           },
           "eventId": "59842"
@@ -94,16 +44,16 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-30T16:34:11.986635576Z",
-        "createTime": "2026-07-30T16:32:03.680351010Z",
+        "insertTime": "2026-07-30T20:27:08.269396405Z",
+        "createTime": "2026-07-30T18:12:00.939937830Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_SELL",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T16:34:11.986635576Z"
+        "lastTransactTime": "2026-07-30T20:27:08.269396405Z"
       },
       {
-        "id": "BJHQK4CP6B9R",
-        "marketSlug": "scc-senate-gop-2026-11-03-46",
+        "id": "BJGN4GBQJB9V",
+        "marketSlug": "scc-senate-gop-2026-11-03-48",
         "side": "ORDER_SIDE_BUY",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
@@ -117,14 +67,14 @@
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_LONG",
         "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-46",
+          "slug": "scc-senate-gop-2026-11-03-48",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
           "title": "2026 Midterms: Republican Senate Seats?",
           "outcome": "Yes",
           "eventSlug": "senate-gop-2026-11-03",
           "subject": {
             "id": 0,
-            "name": "46",
+            "name": "48",
             "subjectType": ""
           },
           "eventId": "59842"
@@ -144,862 +94,12 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-30T17:47:27.458179095Z",
-        "createTime": "2026-07-30T17:47:27.456301067Z",
+        "insertTime": "2026-07-30T16:30:58.770805040Z",
+        "createTime": "2026-07-30T16:30:58.769511257Z",
         "outcomeSide": "OUTCOME_SIDE_YES",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T17:47:27.458179095Z"
-      },
-      {
-        "id": "BJHQXTNMJB9V",
-        "marketSlug": "scc-senate-gop-2026-11-03-46",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.4",
-          "currency": "USD"
-        },
-        "quantity": 40,
-        "cumQuantity": 0,
-        "leavesQuantity": 40,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-46",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "46",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T17:47:35.892394413Z",
-        "createTime": "2026-07-30T17:47:35.890721301Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T17:47:35.892394413Z"
-      },
-      {
-        "id": "BJHZHQRD6B9M",
-        "marketSlug": "scc-senate-gop-2026-11-03-46",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.35",
-          "currency": "USD"
-        },
-        "quantity": 20,
-        "cumQuantity": 0,
-        "leavesQuantity": 20,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-46",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "46",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:03:22.479591166Z",
-        "createTime": "2026-07-30T18:03:22.477867860Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:03:22.479591166Z"
-      },
-      {
-        "id": "BJJ011FJWBAJ",
-        "marketSlug": "scc-senate-gop-2026-11-03-46",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.3",
-          "currency": "USD"
-        },
-        "quantity": 10,
-        "cumQuantity": 0,
-        "leavesQuantity": 10,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-46",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "46",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:03:28.462849737Z",
-        "createTime": "2026-07-30T18:03:28.460731798Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:03:28.462849737Z"
-      },
-      {
-        "id": "BJHZNEDDCBA4",
-        "marketSlug": "scc-senate-gop-2026-11-03-46",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.25",
-          "currency": "USD"
-        },
-        "quantity": 5,
-        "cumQuantity": 0,
-        "leavesQuantity": 5,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-46",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "46",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:03:32.943608556Z",
-        "createTime": "2026-07-30T18:03:32.941088241Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:03:32.943608556Z"
-      },
-      {
-        "id": "BJHZ2TPXJB9Q",
-        "marketSlug": "scc-senate-gop-2026-11-03-46",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.2",
-          "currency": "USD"
-        },
-        "quantity": 1,
-        "cumQuantity": 0,
-        "leavesQuantity": 1,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-46",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "46",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:03:38.722102817Z",
-        "createTime": "2026-07-30T18:03:38.720488088Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:03:38.722102817Z"
-      },
-      {
-        "id": "BJJSRAJ76BA8",
-        "marketSlug": "scc-senate-gop-2026-11-03-56",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.2",
-          "currency": "USD"
-        },
-        "quantity": 1,
-        "cumQuantity": 0,
-        "leavesQuantity": 1,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-56",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "56",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:56:27.122511388Z",
-        "createTime": "2026-07-30T18:56:27.120721425Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:56:27.122511388Z"
-      },
-      {
-        "id": "BJJTB9QDWBAB",
-        "marketSlug": "scc-senate-gop-2026-11-03-56",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.01",
-          "currency": "USD"
-        },
-        "quantity": 5000,
-        "cumQuantity": 0,
-        "leavesQuantity": 5000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-56",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "Yes",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "56",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:56:12.183429742Z",
-        "createTime": "2026-07-30T18:56:12.181489671Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:56:12.183429742Z"
-      },
-      {
-        "id": "BJJSNGT8EBA9",
-        "marketSlug": "scc-senate-gop-2026-11-03-56",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.3",
-          "currency": "USD"
-        },
-        "quantity": 10,
-        "cumQuantity": 0,
-        "leavesQuantity": 10,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-56",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "56",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:56:18.354345571Z",
-        "createTime": "2026-07-30T18:56:18.352753727Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:56:18.354345571Z"
-      },
-      {
-        "id": "BJJV0BPAYB9V",
-        "marketSlug": "scc-senate-gop-2026-11-03-56",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.25",
-          "currency": "USD"
-        },
-        "quantity": 5,
-        "cumQuantity": 0,
-        "leavesQuantity": 5,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-56",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "56",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:56:22.634482086Z",
-        "createTime": "2026-07-30T18:56:22.632460649Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:56:22.634482086Z"
-      },
-      {
-        "id": "BJGCRVXDGB9K",
-        "marketSlug": "scc-senate-gop-2026-11-03-gte57",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.05",
-          "currency": "USD"
-        },
-        "quantity": 196,
-        "cumQuantity": 0,
-        "leavesQuantity": 196,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-gte57",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "57+",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T16:10:47.777512797Z",
-        "createTime": "2026-07-30T16:10:47.775787623Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_SELL",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T16:10:47.777512797Z"
-      },
-      {
-        "id": "BJFHCVXARBA7",
-        "marketSlug": "scc-senate-gop-2026-11-03-gte57",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.01",
-          "currency": "USD"
-        },
-        "quantity": 5000,
-        "cumQuantity": 0,
-        "leavesQuantity": 5000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-gte57",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "Yes",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "57+",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T15:01:44.625079762Z",
-        "createTime": "2026-07-30T15:01:44.623419152Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T15:01:44.625079762Z"
-      },
-      {
-        "id": "BJFKA6PV8B9P",
-        "marketSlug": "scc-senate-gop-2026-11-03-gte57",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.17",
-          "currency": "USD"
-        },
-        "quantity": 100,
-        "cumQuantity": 0,
-        "leavesQuantity": 100,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-gte57",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "57+",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T15:02:03.775239272Z",
-        "createTime": "2026-07-30T15:02:03.773483728Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T15:02:03.775239272Z"
-      },
-      {
-        "id": "BJJ00E8EAB9N",
-        "marketSlug": "scc-senate-gop-2026-11-03-gte57",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.13",
-          "currency": "USD"
-        },
-        "quantity": 5,
-        "cumQuantity": 0,
-        "leavesQuantity": 5,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-gte57",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "57+",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:04:46.790510373Z",
-        "createTime": "2026-07-30T18:04:46.789239170Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:04:46.790510373Z"
-      },
-      {
-        "id": "BJJ2EE5KRBA7",
-        "marketSlug": "scc-senate-gop-2026-11-03-gte57",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.09",
-          "currency": "USD"
-        },
-        "quantity": 3,
-        "cumQuantity": 0,
-        "leavesQuantity": 3,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-gte57",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "57+",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:04:50.904414543Z",
-        "createTime": "2026-07-30T18:04:50.902808567Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:04:50.904414543Z"
-      },
-      {
-        "id": "BJHZNEH0YBA4",
-        "marketSlug": "scc-senate-gop-2026-11-03-gte57",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.06",
-          "currency": "USD"
-        },
-        "quantity": 1,
-        "cumQuantity": 0,
-        "leavesQuantity": 1,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-gte57",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "57+",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:04:54.371424850Z",
-        "createTime": "2026-07-30T18:04:54.369641097Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:04:54.371424850Z"
-      },
-      {
-        "id": "BJHWJPRY6BAC",
-        "marketSlug": "scc-senate-gop-2026-11-03-51",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.01",
-          "currency": "USD"
-        },
-        "quantity": 5000,
-        "cumQuantity": 0,
-        "leavesQuantity": 5000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-51",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "Yes",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "51",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T17:54:21.885942606Z",
-        "createTime": "2026-07-30T17:54:21.884569478Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T17:54:21.885942606Z"
-      },
-      {
-        "id": "BJGRS6SKCBAM",
-        "marketSlug": "scc-senate-gop-2026-11-03-51",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.22",
-          "currency": "USD"
-        },
-        "quantity": 17.65,
-        "cumQuantity": 0,
-        "leavesQuantity": 17.65,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_LONG",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-51",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "Yes",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "51",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T16:32:18.144140437Z",
-        "createTime": "2026-07-30T16:32:18.141990647Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_SELL",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T16:32:18.144140437Z"
+        "lastTransactTime": "2026-07-30T16:30:58.770805040Z"
       },
       {
         "id": "BJHWKZ82TBAG",
@@ -1152,8 +252,8 @@
         "lastTransactTime": "2026-07-30T17:58:32.224124314Z"
       },
       {
-        "id": "BJHVV3SWEB9M",
-        "marketSlug": "scc-senate-gop-2026-11-03-53",
+        "id": "BJHWJPRY6BAC",
+        "marketSlug": "scc-senate-gop-2026-11-03-51",
         "side": "ORDER_SIDE_BUY",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
@@ -1167,14 +267,14 @@
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_LONG",
         "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-53",
+          "slug": "scc-senate-gop-2026-11-03-51",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
           "title": "2026 Midterms: Republican Senate Seats?",
           "outcome": "Yes",
           "eventSlug": "senate-gop-2026-11-03",
           "subject": {
             "id": 0,
-            "name": "53",
+            "name": "51",
             "subjectType": ""
           },
           "eventId": "59842"
@@ -1194,20 +294,70 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-30T17:58:57.250217694Z",
-        "createTime": "2026-07-30T17:58:57.248800525Z",
+        "insertTime": "2026-07-30T17:54:21.885942606Z",
+        "createTime": "2026-07-30T17:54:21.884569478Z",
         "outcomeSide": "OUTCOME_SIDE_YES",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T17:58:57.250217694Z"
+        "lastTransactTime": "2026-07-30T17:54:21.885942606Z"
       },
       {
-        "id": "BJHVV3TGPB9M",
-        "marketSlug": "scc-senate-gop-2026-11-03-53",
+        "id": "BJGRS6SKCBAM",
+        "marketSlug": "scc-senate-gop-2026-11-03-51",
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.48",
+          "value": "0.22",
+          "currency": "USD"
+        },
+        "quantity": 17.65,
+        "cumQuantity": 0,
+        "leavesQuantity": 17.65,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_LONG",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-51",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "Yes",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "51",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T16:32:18.144140437Z",
+        "createTime": "2026-07-30T16:32:18.141990647Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T16:32:18.144140437Z"
+      },
+      {
+        "id": "BJGQ7YW2CBA3",
+        "marketSlug": "scc-hrep-rep-2026-11-03-gte200",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.87",
           "currency": "USD"
         },
         "quantity": 50,
@@ -1215,19 +365,19 @@
         "leavesQuantity": 50,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
+        "intent": "ORDER_INTENT_SELL_LONG",
         "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-53",
+          "slug": "scc-hrep-rep-2026-11-03-gte200",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
+          "title": "2026 Midterms: Republican House Seats?",
+          "outcome": "Yes",
+          "eventSlug": "hrep-rep-2026-11-03",
           "subject": {
             "id": 0,
-            "name": "53",
+            "name": "200+",
             "subjectType": ""
           },
-          "eventId": "59842"
+          "eventId": "59841"
         },
         "state": "ORDER_STATE_NEW",
         "commissionNotionalTotalCollected": {
@@ -1244,212 +394,12 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-30T17:59:10.935798467Z",
-        "createTime": "2026-07-30T17:59:10.934600580Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T17:59:10.935798467Z"
-      },
-      {
-        "id": "BJJ0BG180B9W",
-        "marketSlug": "scc-senate-gop-2026-11-03-lte45",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.11",
-          "currency": "USD"
-        },
-        "quantity": 3,
-        "cumQuantity": 0,
-        "leavesQuantity": 3,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-lte45",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "45 Or Less",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:04:27.069800937Z",
-        "createTime": "2026-07-30T18:04:27.067879495Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:04:27.069800937Z"
-      },
-      {
-        "id": "BJJ1RXDCMB9R",
-        "marketSlug": "scc-senate-gop-2026-11-03-lte45",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.07",
-          "currency": "USD"
-        },
-        "quantity": 11,
-        "cumQuantity": 3.57,
-        "leavesQuantity": 7.43,
-        "tif": "TIME_IN_FORCE_DAY",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-lte45",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "45 Or Less",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_PARTIALLY_FILLED",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0700",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:16:44.873453894Z",
-        "createTime": "2026-07-30T18:04:30.787376425Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:54:47.892410898Z"
-      },
-      {
-        "id": "BJJSCKJFABAJ",
-        "marketSlug": "scc-senate-gop-2026-11-03-lte45",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.06",
-          "currency": "USD"
-        },
-        "quantity": 3.56,
-        "cumQuantity": 0.01,
-        "leavesQuantity": 3.55,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-lte45",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "45 Or Less",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_PARTIALLY_FILLED",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0600",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:54:19.383883608Z",
-        "createTime": "2026-07-30T18:54:19.381897709Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
+        "insertTime": "2026-07-30T16:32:56.939871299Z",
+        "createTime": "2026-07-30T16:32:56.937329565Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
         "action": "ORDER_ACTION_SELL",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:54:19.383883608Z"
-      },
-      {
-        "id": "BJHPQA450BAA",
-        "marketSlug": "scc-senate-gop-2026-11-03-lte45",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.01",
-          "currency": "USD"
-        },
-        "quantity": 5000,
-        "cumQuantity": 0,
-        "leavesQuantity": 5000,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-lte45",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "Yes",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "45 Or Less",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T17:38:53.440645115Z",
-        "createTime": "2026-07-30T17:38:53.438858763Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T17:38:53.440645115Z"
+        "lastTransactTime": "2026-07-30T16:32:56.939871299Z"
       },
       {
         "id": "BJHSEBCXMBA3",
@@ -1552,6 +502,206 @@
         "lastTransactTime": "2026-07-30T18:04:21.029122875Z"
       },
       {
+        "id": "BJJ0BG180B9W",
+        "marketSlug": "scc-senate-gop-2026-11-03-lte45",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.11",
+          "currency": "USD"
+        },
+        "quantity": 3,
+        "cumQuantity": 0,
+        "leavesQuantity": 3,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-lte45",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "45 Or Less",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T18:04:27.069800937Z",
+        "createTime": "2026-07-30T18:04:27.067879495Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T18:04:27.069800937Z"
+      },
+      {
+        "id": "BJJ1RXDCMB9R",
+        "marketSlug": "scc-senate-gop-2026-11-03-lte45",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.07",
+          "currency": "USD"
+        },
+        "quantity": 57,
+        "cumQuantity": 3.57,
+        "leavesQuantity": 53.43,
+        "tif": "TIME_IN_FORCE_DAY",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-lte45",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "45 Or Less",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_PARTIALLY_FILLED",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0700",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T20:27:59.049108137Z",
+        "createTime": "2026-07-30T18:04:30.787376425Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T20:27:59.049108137Z"
+      },
+      {
+        "id": "BJJSCKJFABAJ",
+        "marketSlug": "scc-senate-gop-2026-11-03-lte45",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.06",
+          "currency": "USD"
+        },
+        "quantity": 3.56,
+        "cumQuantity": 0.01,
+        "leavesQuantity": 3.55,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-lte45",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "45 Or Less",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_PARTIALLY_FILLED",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0600",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T18:54:19.383883608Z",
+        "createTime": "2026-07-30T18:54:19.381897709Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T18:54:19.383883608Z"
+      },
+      {
+        "id": "BJHPQA450BAA",
+        "marketSlug": "scc-senate-gop-2026-11-03-lte45",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.01",
+          "currency": "USD"
+        },
+        "quantity": 5000,
+        "cumQuantity": 0,
+        "leavesQuantity": 5000,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-lte45",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "Yes",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "45 Or Less",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T17:38:53.440645115Z",
+        "createTime": "2026-07-30T17:38:53.438858763Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T17:38:53.440645115Z"
+      },
+      {
         "id": "BJHWGB7QEBA9",
         "marketSlug": "scc-senate-gop-2026-11-03-52",
         "side": "ORDER_SIDE_BUY",
@@ -1607,13 +757,13 @@
         "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.42",
+          "value": "0.41",
           "currency": "USD"
         },
         "quantity": 50,
         "cumQuantity": 0,
         "leavesQuantity": 50,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "tif": "TIME_IN_FORCE_DAY",
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
@@ -1625,6 +775,107 @@
           "subject": {
             "id": 0,
             "name": "52",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_REPLACED",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T20:27:33.672072240Z",
+        "createTime": "2026-07-30T17:58:50.990232132Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T20:27:33.672072240Z"
+      },
+      {
+        "id": "BJKY47A12BAE",
+        "marketSlug": "ewc-usse-mi-2026-11-03-rep",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.29",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 0,
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "ewc-usse-mi-2026-11-03-rep",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-flag-021e68fef9.png",
+          "title": "Michigan Senate Election Winner",
+          "outcome": "Yes",
+          "eventSlug": "usse-mi-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "Republican Party",
+            "subjectType": "",
+            "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/event-images/republican.png"
+          },
+          "eventId": "15711"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T20:06:49.237219463Z",
+        "createTime": "2026-07-30T20:06:49.235909204Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T20:06:49.237219463Z"
+      },
+      {
+        "id": "BJHVV3SWEB9M",
+        "marketSlug": "scc-senate-gop-2026-11-03-53",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.01",
+          "currency": "USD"
+        },
+        "quantity": 5000,
+        "cumQuantity": 0,
+        "leavesQuantity": 5000,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-53",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "Yes",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "53",
             "subjectType": ""
           },
           "eventId": "59842"
@@ -1644,12 +895,112 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-30T17:58:50.992066096Z",
-        "createTime": "2026-07-30T17:58:50.990232132Z",
+        "insertTime": "2026-07-30T17:58:57.250217694Z",
+        "createTime": "2026-07-30T17:58:57.248800525Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T17:58:57.250217694Z"
+      },
+      {
+        "id": "BJHVV3TGPB9M",
+        "marketSlug": "scc-senate-gop-2026-11-03-53",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.48",
+          "currency": "USD"
+        },
+        "quantity": 50,
+        "cumQuantity": 0,
+        "leavesQuantity": 50,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-53",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "53",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T17:59:10.935798467Z",
+        "createTime": "2026-07-30T17:59:10.934600580Z",
         "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T17:58:50.992066096Z"
+        "lastTransactTime": "2026-07-30T17:59:10.935798467Z"
+      },
+      {
+        "id": "BJKXPDCHCB9V",
+        "marketSlug": "enwc-ussep-mi-2026-08-04-dem-halste",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.08",
+          "currency": "USD"
+        },
+        "quantity": 100,
+        "cumQuantity": 0,
+        "leavesQuantity": 100,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "enwc-ussep-mi-2026-08-04-dem-halste",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mich-dem-81b947cd7e.png",
+          "title": "Michigan Senate Democratic Primary Winner",
+          "outcome": "No",
+          "eventSlug": "ussep-mi-2026-08-04-dem",
+          "subject": {
+            "id": 0,
+            "name": "Haley Stevens",
+            "subjectType": ""
+          },
+          "eventId": "15723"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T20:06:10.347572585Z",
+        "createTime": "2026-07-30T20:06:10.345743303Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T20:06:10.347572585Z"
       },
       {
         "id": "BJBG2XCVTBA4",
@@ -1702,8 +1053,8 @@
         "lastTransactTime": "2026-07-30T10:21:39.871543972Z"
       },
       {
-        "id": "BJGN4GBQJB9V",
-        "marketSlug": "scc-senate-gop-2026-11-03-48",
+        "id": "BJHWGAQHTBA9",
+        "marketSlug": "scc-senate-gop-2026-11-03-49",
         "side": "ORDER_SIDE_BUY",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
@@ -1717,14 +1068,14 @@
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_LONG",
         "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-48",
+          "slug": "scc-senate-gop-2026-11-03-49",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
           "title": "2026 Midterms: Republican Senate Seats?",
           "outcome": "Yes",
           "eventSlug": "senate-gop-2026-11-03",
           "subject": {
             "id": 0,
-            "name": "48",
+            "name": "49",
             "subjectType": ""
           },
           "eventId": "59842"
@@ -1744,112 +1095,12 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-30T16:30:58.770805040Z",
-        "createTime": "2026-07-30T16:30:58.769511257Z",
+        "insertTime": "2026-07-30T17:52:40.278216064Z",
+        "createTime": "2026-07-30T17:52:40.276341470Z",
         "outcomeSide": "OUTCOME_SIDE_YES",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T16:30:58.770805040Z"
-      },
-      {
-        "id": "BJJ2YV3NCBAE",
-        "marketSlug": "scc-senate-gop-2026-11-03-48",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.07",
-          "currency": "USD"
-        },
-        "quantity": 49.12,
-        "cumQuantity": 0,
-        "leavesQuantity": 49.12,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_SHORT",
-        "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-48",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "No",
-          "eventSlug": "senate-gop-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "48",
-            "subjectType": ""
-          },
-          "eventId": "59842"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T18:12:00.941186972Z",
-        "createTime": "2026-07-30T18:12:00.939937830Z",
-        "outcomeSide": "OUTCOME_SIDE_NO",
-        "action": "ORDER_ACTION_SELL",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T18:12:00.941186972Z"
-      },
-      {
-        "id": "BJGQ7YW2CBA3",
-        "marketSlug": "scc-hrep-rep-2026-11-03-gte200",
-        "side": "ORDER_SIDE_SELL",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {
-          "value": "0.87",
-          "currency": "USD"
-        },
-        "quantity": 50,
-        "cumQuantity": 0,
-        "leavesQuantity": 50,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-        "goodTillTime": null,
-        "intent": "ORDER_INTENT_SELL_LONG",
-        "marketMetadata": {
-          "slug": "scc-hrep-rep-2026-11-03-gte200",
-          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-          "title": "2026 Midterms: Republican House Seats?",
-          "outcome": "Yes",
-          "eventSlug": "hrep-rep-2026-11-03",
-          "subject": {
-            "id": 0,
-            "name": "200+",
-            "subjectType": ""
-          },
-          "eventId": "59841"
-        },
-        "state": "ORDER_STATE_NEW",
-        "commissionNotionalTotalCollected": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "commissionsBasisPoints": "0",
-        "makerCommissionsBasisPoints": "0",
-        "avgPx": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "cashOrderQty": {
-          "value": "0.0000",
-          "currency": "USD"
-        },
-        "insertTime": "2026-07-30T16:32:56.939871299Z",
-        "createTime": "2026-07-30T16:32:56.937329565Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
-        "action": "ORDER_ACTION_SELL",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T16:32:56.939871299Z"
+        "lastTransactTime": "2026-07-30T17:52:40.278216064Z"
       },
       {
         "id": "BJHX2SQD0B9S",
@@ -1957,13 +1208,13 @@
         "side": "ORDER_SIDE_BUY",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.15",
+          "value": "0.19",
           "currency": "USD"
         },
         "quantity": 5,
         "cumQuantity": 0,
         "leavesQuantity": 5,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "tif": "TIME_IN_FORCE_DAY",
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_LONG",
         "marketMetadata": {
@@ -1975,6 +1226,56 @@
           "subject": {
             "id": 0,
             "name": "49",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_REPLACED",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T20:27:18.623330639Z",
+        "createTime": "2026-07-30T17:53:23.701230969Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T20:27:18.623330639Z"
+      },
+      {
+        "id": "BJM9PBKQMBA2",
+        "marketSlug": "scc-senate-gop-2026-11-03-55",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.04",
+          "currency": "USD"
+        },
+        "quantity": 50,
+        "cumQuantity": 0,
+        "leavesQuantity": 50,
+        "tif": "TIME_IN_FORCE_DAY",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-55",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "Yes",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "55",
             "subjectType": ""
           },
           "eventId": "59842"
@@ -1994,16 +1295,166 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-30T17:53:23.702592701Z",
-        "createTime": "2026-07-30T17:53:23.701230969Z",
+        "insertTime": "2026-07-30T20:29:59.225251819Z",
+        "createTime": "2026-07-30T20:29:59.223909125Z",
         "outcomeSide": "OUTCOME_SIDE_YES",
         "action": "ORDER_ACTION_BUY",
-        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T17:53:23.702592701Z"
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
+        "lastTransactTime": "2026-07-30T20:29:59.225251819Z"
       },
       {
-        "id": "BJHWGAQHTBA9",
-        "marketSlug": "scc-senate-gop-2026-11-03-49",
+        "id": "BJJWB1MY6B9N",
+        "marketSlug": "scc-senate-gop-2026-11-03-55",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.05",
+          "currency": "USD"
+        },
+        "quantity": 10,
+        "cumQuantity": 0,
+        "leavesQuantity": 10,
+        "tif": "TIME_IN_FORCE_DAY",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-55",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "55",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_REPLACED",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T20:29:20.912496966Z",
+        "createTime": "2026-07-30T18:57:53.496493367Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T20:29:20.912496966Z"
+      },
+      {
+        "id": "BJJZZ0V9WB9P",
+        "marketSlug": "scc-senate-gop-2026-11-03-gte57",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.07",
+          "currency": "USD"
+        },
+        "quantity": 15,
+        "cumQuantity": 0,
+        "leavesQuantity": 15,
+        "tif": "TIME_IN_FORCE_DAY",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-gte57",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "57+",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_REPLACED",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T19:51:54.181031530Z",
+        "createTime": "2026-07-30T19:04:46.539479108Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T19:51:54.181031530Z"
+      },
+      {
+        "id": "BJJY8097TB9Q",
+        "marketSlug": "scc-senate-gop-2026-11-03-gte57",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.06",
+          "currency": "USD"
+        },
+        "quantity": 196,
+        "cumQuantity": 98.17,
+        "leavesQuantity": 97.83,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-gte57",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "57+",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_PARTIALLY_FILLED",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0500",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0600",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T19:02:05.239143449Z",
+        "createTime": "2026-07-30T19:02:05.237407898Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T19:03:06.448011616Z"
+      },
+      {
+        "id": "BJFHCVXARBA7",
+        "marketSlug": "scc-senate-gop-2026-11-03-gte57",
         "side": "ORDER_SIDE_BUY",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
@@ -2017,14 +1468,14 @@
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_LONG",
         "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-49",
+          "slug": "scc-senate-gop-2026-11-03-gte57",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
           "title": "2026 Midterms: Republican Senate Seats?",
           "outcome": "Yes",
           "eventSlug": "senate-gop-2026-11-03",
           "subject": {
             "id": 0,
-            "name": "49",
+            "name": "57+",
             "subjectType": ""
           },
           "eventId": "59842"
@@ -2044,12 +1495,562 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-30T17:52:40.278216064Z",
-        "createTime": "2026-07-30T17:52:40.276341470Z",
+        "insertTime": "2026-07-30T15:01:44.625079762Z",
+        "createTime": "2026-07-30T15:01:44.623419152Z",
         "outcomeSide": "OUTCOME_SIDE_YES",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T17:52:40.278216064Z"
+        "lastTransactTime": "2026-07-30T15:01:44.625079762Z"
+      },
+      {
+        "id": "BJKDPZ5ERB9Z",
+        "marketSlug": "scc-senate-gop-2026-11-03-47",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.2",
+          "currency": "USD"
+        },
+        "quantity": 2,
+        "cumQuantity": 0,
+        "leavesQuantity": 2,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-47",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "47",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T19:37:18.781069835Z",
+        "createTime": "2026-07-30T19:37:18.779825262Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T19:37:18.781069835Z"
+      },
+      {
+        "id": "BJKY97JFGBA6",
+        "marketSlug": "scc-senate-gop-2026-11-03-47",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.15",
+          "currency": "USD"
+        },
+        "quantity": 10,
+        "cumQuantity": 0,
+        "leavesQuantity": 10,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-47",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "47",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T20:09:56.863509421Z",
+        "createTime": "2026-07-30T20:09:56.862255964Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T20:09:56.863509421Z"
+      },
+      {
+        "id": "BJGQFNY1TBAC",
+        "marketSlug": "scc-senate-gop-2026-11-03-47",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.01",
+          "currency": "USD"
+        },
+        "quantity": 5000,
+        "cumQuantity": 0,
+        "leavesQuantity": 5000,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-47",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "Yes",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "47",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T16:31:47.662296626Z",
+        "createTime": "2026-07-30T16:31:47.660871021Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T16:31:47.662296626Z"
+      },
+      {
+        "id": "BJKW6AYGCB9X",
+        "marketSlug": "scc-senate-gop-2026-11-03-47",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.1",
+          "currency": "USD"
+        },
+        "quantity": 30,
+        "cumQuantity": 0,
+        "leavesQuantity": 30,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_SELL_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-47",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "47",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T20:09:39.254675999Z",
+        "createTime": "2026-07-30T20:09:39.253014346Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_SELL",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T20:09:39.254675999Z"
+      },
+      {
+        "id": "BJKDZ6AHTBAE",
+        "marketSlug": "scc-senate-gop-2026-11-03-47",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.34",
+          "currency": "USD"
+        },
+        "quantity": 40,
+        "cumQuantity": 0,
+        "leavesQuantity": 40,
+        "tif": "TIME_IN_FORCE_DAY",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-47",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "47",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T19:36:34.993860496Z",
+        "createTime": "2026-07-30T19:36:34.992683465Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
+        "lastTransactTime": "2026-07-30T19:36:34.993860496Z"
+      },
+      {
+        "id": "BJKF4AJREBA9",
+        "marketSlug": "scc-senate-gop-2026-11-03-47",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.3",
+          "currency": "USD"
+        },
+        "quantity": 5,
+        "cumQuantity": 0,
+        "leavesQuantity": 5,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-47",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "47",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T19:37:07.686134737Z",
+        "createTime": "2026-07-30T19:37:07.684436561Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T19:37:07.686134737Z"
+      },
+      {
+        "id": "BJKEMQGGRBAD",
+        "marketSlug": "scc-senate-gop-2026-11-03-47",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.25",
+          "currency": "USD"
+        },
+        "quantity": 5,
+        "cumQuantity": 0,
+        "leavesQuantity": 5,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-47",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "47",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T19:37:13.159172198Z",
+        "createTime": "2026-07-30T19:37:13.156927522Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T19:37:13.159172198Z"
+      },
+      {
+        "id": "BJHQK4CP6B9R",
+        "marketSlug": "scc-senate-gop-2026-11-03-46",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.01",
+          "currency": "USD"
+        },
+        "quantity": 5000,
+        "cumQuantity": 0,
+        "leavesQuantity": 5000,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-46",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "Yes",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "46",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T17:47:27.458179095Z",
+        "createTime": "2026-07-30T17:47:27.456301067Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T17:47:27.458179095Z"
+      },
+      {
+        "id": "BJK5PBT22B9M",
+        "marketSlug": "scc-senate-gop-2026-11-03-46",
+        "side": "ORDER_SIDE_SELL",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.18",
+          "currency": "USD"
+        },
+        "quantity": 40,
+        "cumQuantity": 0,
+        "leavesQuantity": 40,
+        "tif": "TIME_IN_FORCE_DAY",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_SHORT",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-46",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "No",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "46",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T19:22:34.240643512Z",
+        "createTime": "2026-07-30T19:22:34.238314816Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
+        "lastTransactTime": "2026-07-30T19:22:34.240643512Z"
+      },
+      {
+        "id": "BJHW9E70WBAJ",
+        "marketSlug": "scc-senate-gop-2026-11-03-50",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.05",
+          "currency": "USD"
+        },
+        "quantity": 50,
+        "cumQuantity": 0,
+        "leavesQuantity": 50,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-50",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "Yes",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "50",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T17:53:49.927022882Z",
+        "createTime": "2026-07-30T17:53:49.924804249Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T17:53:49.927022882Z"
+      },
+      {
+        "id": "BJHW69T5MB9F",
+        "marketSlug": "scc-senate-gop-2026-11-03-50",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {
+          "value": "0.1",
+          "currency": "USD"
+        },
+        "quantity": 20,
+        "cumQuantity": 0,
+        "leavesQuantity": 20,
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "goodTillTime": null,
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "marketMetadata": {
+          "slug": "scc-senate-gop-2026-11-03-50",
+          "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+          "title": "2026 Midterms: Republican Senate Seats?",
+          "outcome": "Yes",
+          "eventSlug": "senate-gop-2026-11-03",
+          "subject": {
+            "id": 0,
+            "name": "50",
+            "subjectType": ""
+          },
+          "eventId": "59842"
+        },
+        "state": "ORDER_STATE_NEW",
+        "commissionNotionalTotalCollected": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "commissionsBasisPoints": "0",
+        "makerCommissionsBasisPoints": "0",
+        "avgPx": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "cashOrderQty": {
+          "value": "0.0000",
+          "currency": "USD"
+        },
+        "insertTime": "2026-07-30T17:53:57.938397191Z",
+        "createTime": "2026-07-30T17:53:57.936559367Z",
+        "outcomeSide": "OUTCOME_SIDE_YES",
+        "action": "ORDER_ACTION_BUY",
+        "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+        "lastTransactTime": "2026-07-30T17:53:57.938397191Z"
       },
       {
         "id": "BJHWTZCD0BA2",
@@ -2152,29 +2153,29 @@
         "lastTransactTime": "2026-07-30T17:53:38.020295935Z"
       },
       {
-        "id": "BJHW9E70WBAJ",
-        "marketSlug": "scc-senate-gop-2026-11-03-50",
+        "id": "BJJTB9QDWBAB",
+        "marketSlug": "scc-senate-gop-2026-11-03-56",
         "side": "ORDER_SIDE_BUY",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.05",
+          "value": "0.01",
           "currency": "USD"
         },
-        "quantity": 50,
+        "quantity": 5000,
         "cumQuantity": 0,
-        "leavesQuantity": 50,
+        "leavesQuantity": 5000,
         "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
         "goodTillTime": null,
         "intent": "ORDER_INTENT_BUY_LONG",
         "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-50",
+          "slug": "scc-senate-gop-2026-11-03-56",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
           "title": "2026 Midterms: Republican Senate Seats?",
           "outcome": "Yes",
           "eventSlug": "senate-gop-2026-11-03",
           "subject": {
             "id": 0,
-            "name": "50",
+            "name": "56",
             "subjectType": ""
           },
           "eventId": "59842"
@@ -2194,42 +2195,42 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-30T17:53:49.927022882Z",
-        "createTime": "2026-07-30T17:53:49.924804249Z",
+        "insertTime": "2026-07-30T18:56:12.183429742Z",
+        "createTime": "2026-07-30T18:56:12.181489671Z",
         "outcomeSide": "OUTCOME_SIDE_YES",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T17:53:49.927022882Z"
+        "lastTransactTime": "2026-07-30T18:56:12.183429742Z"
       },
       {
-        "id": "BJHW69T5MB9F",
-        "marketSlug": "scc-senate-gop-2026-11-03-50",
-        "side": "ORDER_SIDE_BUY",
+        "id": "BJJV0BQRYB9V",
+        "marketSlug": "scc-senate-gop-2026-11-03-56",
+        "side": "ORDER_SIDE_SELL",
         "type": "ORDER_TYPE_LIMIT",
         "price": {
-          "value": "0.1",
+          "value": "0.14",
           "currency": "USD"
         },
-        "quantity": 20,
+        "quantity": 45,
         "cumQuantity": 0,
-        "leavesQuantity": 20,
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+        "leavesQuantity": 45,
+        "tif": "TIME_IN_FORCE_DAY",
         "goodTillTime": null,
-        "intent": "ORDER_INTENT_BUY_LONG",
+        "intent": "ORDER_INTENT_BUY_SHORT",
         "marketMetadata": {
-          "slug": "scc-senate-gop-2026-11-03-50",
+          "slug": "scc-senate-gop-2026-11-03-56",
           "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
           "title": "2026 Midterms: Republican Senate Seats?",
-          "outcome": "Yes",
+          "outcome": "No",
           "eventSlug": "senate-gop-2026-11-03",
           "subject": {
             "id": 0,
-            "name": "50",
+            "name": "56",
             "subjectType": ""
           },
           "eventId": "59842"
         },
-        "state": "ORDER_STATE_NEW",
+        "state": "ORDER_STATE_REPLACED",
         "commissionNotionalTotalCollected": {
           "value": "0.0000",
           "currency": "USD"
@@ -2244,12 +2245,12 @@
           "value": "0.0000",
           "currency": "USD"
         },
-        "insertTime": "2026-07-30T17:53:57.938397191Z",
-        "createTime": "2026-07-30T17:53:57.936559367Z",
-        "outcomeSide": "OUTCOME_SIDE_YES",
+        "insertTime": "2026-07-30T20:28:52.248067500Z",
+        "createTime": "2026-07-30T18:56:45.429514533Z",
+        "outcomeSide": "OUTCOME_SIDE_NO",
         "action": "ORDER_ACTION_BUY",
         "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-        "lastTransactTime": "2026-07-30T17:53:57.938397191Z"
+        "lastTransactTime": "2026-07-30T20:28:52.248067500Z"
       }
     ]
   },
@@ -2297,6 +2298,35 @@
         "cranc-uspres28-12-31-2026-tuccar",
         "cranc-uspres28-12-31-2026-vivram",
         "cranc-uspres28-12-31-2026-zohmam"
+      ]
+    },
+    "enwc-ussep-mi-2026-08-04-dem-halste": {
+      "df": 0.2,
+      "target": 10000.0,
+      "pool": 300.0,
+      "start": "2026-07-28T00:00:00Z",
+      "end": null,
+      "pid": "politics_high_20260727",
+      "tier": "high",
+      "event_n": 3,
+      "siblings": [
+        "enwc-ussep-mi-2026-08-04-dem-abdels",
+        "enwc-ussep-mi-2026-08-04-dem-halste",
+        "enwc-ussep-mi-2026-08-04-dem-malmcm"
+      ]
+    },
+    "ewc-usse-mi-2026-11-03-rep": {
+      "df": 0.1,
+      "target": 2000.0,
+      "pool": 25.0,
+      "start": "2026-07-28T00:00:00Z",
+      "end": null,
+      "pid": "politics_low_20260727",
+      "tier": "low",
+      "event_n": 2,
+      "siblings": [
+        "ewc-usse-mi-2026-11-03-dem",
+        "ewc-usse-mi-2026-11-03-rep"
       ]
     },
     "scc-hrep-rep-2026-11-03-gte200": {
@@ -2523,6 +2553,31 @@
         "scc-senate-gop-2026-11-03-lte45"
       ]
     },
+    "scc-senate-gop-2026-11-03-55": {
+      "df": 0.2,
+      "target": 5000.0,
+      "pool": 100.0,
+      "start": "2026-07-28T00:00:00Z",
+      "end": null,
+      "pid": "politics_mid_20260727",
+      "tier": "mid",
+      "event_n": 13,
+      "siblings": [
+        "scc-senate-gop-2026-11-03-46",
+        "scc-senate-gop-2026-11-03-47",
+        "scc-senate-gop-2026-11-03-48",
+        "scc-senate-gop-2026-11-03-49",
+        "scc-senate-gop-2026-11-03-50",
+        "scc-senate-gop-2026-11-03-51",
+        "scc-senate-gop-2026-11-03-52",
+        "scc-senate-gop-2026-11-03-53",
+        "scc-senate-gop-2026-11-03-54",
+        "scc-senate-gop-2026-11-03-55",
+        "scc-senate-gop-2026-11-03-56",
+        "scc-senate-gop-2026-11-03-gte57",
+        "scc-senate-gop-2026-11-03-lte45"
+      ]
+    },
     "scc-senate-gop-2026-11-03-56": {
       "df": 0.2,
       "target": 5000.0,
@@ -2606,9 +2661,9 @@
     "programs": 150,
     "pages": 0,
     "excluded": 0,
-    "not_politics": 54,
+    "not_politics": 56,
     "no_pool_or_df": 0,
-    "candidates": 96,
+    "candidates": 94,
     "book_failures": 0,
     "listed": 12
   }
