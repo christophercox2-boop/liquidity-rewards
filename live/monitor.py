@@ -950,7 +950,8 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
                     if int(v["size"]) == size:
                         planned = v["est_day"]
                         break
-            thr = min(0.08, max(0.01, 0.5 * planned)) if planned else 0.08
+            # purely relative when the plan promised pennies (golf floor bids)
+            thr = min(0.08, 0.5 * planned) if planned else 0.08
             if est < thr:
                 res.update(status="skipped",
                            note=f"drifted — est now ${est:.2f}/day (planned ${planned or 0:.2f})")

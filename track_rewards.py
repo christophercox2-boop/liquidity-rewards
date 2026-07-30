@@ -382,10 +382,22 @@ def _pool_days(prog: dict, slug: str | None = None) -> float:
     return 1.0
 
 
+# Measured, not modeled: paid actuals for pre-tournament golf days came to
+# ~1-4c per market per day (7/28 PAID $0.21 over 21 markets; 7/29 the same
+# shape) — the $5,000 pretournament pool does NOT bleed out daily over its
+# window. Until play starts, a golf market is worth about this much per day.
+GOLF_PRETOURNAMENT_DAILY = 0.03
+
+
 def _daily_pool(prog: dict, slug: str | None = None) -> float:
     """Reward pool normalized to $/day (see _pool_days), prorated across the
     open markets of the event it covers (the pool is per event, not per
-    candidate market)."""
+    candidate market). Pre-tournament golf uses the MEASURED per-market
+    daily flow instead of the (disproven) pool-over-window model; round
+    programs (Thu-Sun) use their real pools normally."""
+    if (slug and slug.startswith(PRETOURNAMENT_PREFIXES)
+            and "round" not in str(prog.get("pid") or "")):
+        return GOLF_PRETOURNAMENT_DAILY
     return (prog.get("pool") or 0.0) / _pool_days(prog, slug) / max(prog.get("event_n") or 1, 1)
 
 

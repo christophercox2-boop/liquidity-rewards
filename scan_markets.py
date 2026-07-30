@@ -32,9 +32,9 @@ import track_rewards as tr
 
 TARGET_EST_DAY = 0.15   # ~$4.50/month per market-side — middle of the $3-5 goal
 MIN_EST_DAY = 0.08      # below this a side is listed as "not worth an order"
-GOLF_MIN_EST_DAY = 0.02  # golf floor bids are volume plays: cents/day per
-                         # golfer x the whole field adds up — the politics
-                         # bar would throw away most of the field
+GOLF_MIN_EST_DAY = 0.001  # pre-tournament golf pays ~pennies per market
+                          # (measured 7/28-29) — list the whole field at
+                          # honest tiny estimates and let the user decide
 SIZES = [100, 200, 500, 1000, 2000, 5000, 10000]
 DEEP_SIZES = [20000]    # only tried where capital stays tiny (<= 2c of risk)
 
@@ -433,7 +433,7 @@ def allocate_per_golfer(results: list[dict], books: dict[str, dict]) -> list[dic
                 tr._score_order(o, _merged(book, "BUY", v["price"], q),
                                 {**(r.get("prog") or {}), "siblings": []})
                 est = o.get("est_day") or 0.0
-                if key == "max" and est < 0.01:
+                if key == "max" and est < 0.0005:
                     ok = False
                     break
                 r[key] = dict(v, size=q, capital=round(v["price"] * q, 2),
