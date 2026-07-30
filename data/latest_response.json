@@ -8,6 +8,1175 @@
       "status": "PAID"
     },
     {
+      "reward": 2,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-andburpm-2026-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-jerpowgov-2026-08-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.85,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-kashpatel-2026-08-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.44,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-petehegseth-2026-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-trumpadmin-2026-stemil",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.31,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-betoro",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-dontru",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-dontrujr",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-elomus",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-erikir",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.06,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-hilcli",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-jonoss",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-krinoe",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.08,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-markel",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.09,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-marrub",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.11,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-micoba",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-nikhal",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-oprwin",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-robken",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.12,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-stesmi",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-tuccar",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "cranc-uspres28-12-31-2026-zohmam",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.09,
+      "programType": "liquidityProgram",
+      "marketSlug": "dipcc-us-iran-contnts-2026--dilut",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.14,
+      "programType": "liquidityProgram",
+      "marketSlug": "dipcc-us-iran-contnts-2026--enrcap",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.09,
+      "programType": "liquidityProgram",
+      "marketSlug": "dipcc-us-iran-contnts-2026--enrcaplte5",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.13,
+      "programType": "liquidityProgram",
+      "marketSlug": "dipcc-us-iran-contnts-2026--enrmor",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.2,
+      "programType": "liquidityProgram",
+      "marketSlug": "dipcc-us-iran-contnts-2026--irnfnd",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.27,
+      "programType": "liquidityProgram",
+      "marketSlug": "dipcc-us-iran-contnts-2026--urnsur",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-fl-2026-08-18-rep-byrdon",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.15,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-fl-2026-08-18-rep-jamfis",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-mich-2026-08-04-rep-johjam",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.08,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-frahon",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.09,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.08,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-ma-2026-09-01-dem-setmou",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 9.25,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-mi-2026-08-04-dem-abdels",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 1.21,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-mi-2026-08-04-dem-halste",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-mi-2026-08-04-dem-malmcm",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.18,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-mn-2026-08-11-dem-angcra",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.34,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-mn-2026-08-11-dem-pegfla",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-nh-2026-09-01-rep-johsun",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.17,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-nh-2026-09-01-rep-scobro",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.09,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-nh-2026-09-08-dem-chrpap",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.06,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-nh-2026-09-08-dem-karman",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.06,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-sc-2026-08-11-rep-darnor",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.26,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-sc-2026-08-11-rep-marlyn",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-sc-2026-08-11-rep-nanmac",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-sc-2026-08-11-rep-pameve",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-sc-2026-08-11-rep-tregow",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-pres-arg-2027-10-24-axekic",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-pres-bra-2026-10-04-luisil",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-pres-bra-2026-10-04-roncai",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-pres-fra-2027-04-11-bruret",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-pres-fra-2027-04-11-davlis",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-pres-fra-2027-04-11-domvil",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-pres-fra-2027-04-11-frahol",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-pres-fra-2027-04-11-gabatt",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-pres-fra-2027-04-11-jorbar",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.09,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-pres-fra-2027-04-11-sarkna",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.48,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-ref-ca-blntax-2026-11-03-pass",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-ref-fl-tax-2026-11-03-pass",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.9,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-ukpol-leg-clacton-2026-08-13-coubin",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.63,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-ukpol-leg-clacton-2026-08-13-nigfar",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-az-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.33,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-ca-2026-11-03-stehil",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.06,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-ca-2026-11-03-xavbec",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.13,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-ga-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.07,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-ga-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-ia-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.63,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-ia-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.12,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-ks-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-ks-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.18,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-mi-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.13,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-nv-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.14,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-oh-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.16,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-oh-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-wi-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usmayor-losang-2026-11-03-karbas",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-ak-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-ak-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.05,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-ga-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.12,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-ga-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.21,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-ia-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-ia-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-me-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-me-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.07,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-mi-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-mn-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.07,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-mn-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.08,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-nc-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.09,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-ne-2026-11-03-danosb",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-nh-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.31,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-nh-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-oh-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-oh-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.2,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-tx-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.18,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-tx-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.24,
+      "programType": "liquidityProgram",
+      "marketSlug": "gsc-usfedgvmt-by-2026-10-01",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "iarc-group-2026-12-31-baroba",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.55,
+      "programType": "liquidityProgram",
+      "marketSlug": "iarc-group-2026-12-31-bilcli",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "iarc-group-2026-12-31-canowe",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "iarc-group-2026-12-31-gavnew",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.06,
+      "programType": "liquidityProgram",
+      "marketSlug": "iarc-group-2026-12-31-hilcli",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.74,
+      "programType": "liquidityProgram",
+      "marketSlug": "iarc-group-2026-12-31-joebid",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "iarc-group-2026-12-31-johbre",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.51,
+      "programType": "liquidityProgram",
+      "marketSlug": "iarc-group-2026-12-31-tomhom",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.06,
+      "programType": "liquidityProgram",
+      "marketSlug": "iarc-group-2026-12-31-tuccar",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.76,
+      "programType": "liquidityProgram",
+      "marketSlug": "iarc-netanyahu-2026-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.05,
+      "programType": "liquidityProgram",
+      "marketSlug": "lawec-cryptoleg-2026-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 1.86,
+      "programType": "liquidityProgram",
+      "marketSlug": "lawec-saveact-2026-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "mlaec-isrpol-pm-2026-10-27-avilie",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "mlaec-isrpol-pm-2026-10-27-ayesha",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.08,
+      "programType": "liquidityProgram",
+      "marketSlug": "mlaec-isrpol-pm-2026-10-27-bengan",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "mlaec-isrpol-pm-2026-10-27-bennet",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.08,
+      "programType": "liquidityProgram",
+      "marketSlug": "mlaec-isrpol-pm-2026-10-27-yailap",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 1.96,
+      "programType": "liquidityProgram",
+      "marketSlug": "mlaec-swepm-2026-09-13-ebbbus",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.11,
+      "programType": "liquidityProgram",
+      "marketSlug": "mlaec-swepm-2026-09-13-jimake",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.46,
+      "programType": "liquidityProgram",
+      "marketSlug": "mlaec-swepm-2026-09-13-magand",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "mlaec-swepm-2026-09-13-noodad",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.18,
+      "programType": "liquidityProgram",
+      "marketSlug": "mlaec-swepm-2026-09-13-ulfkri",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.25,
+      "programType": "liquidityProgram",
+      "marketSlug": "mowc-nato-us-12-31-2026",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.05,
+      "programType": "liquidityProgram",
+      "marketSlug": "nphc-attgen-ailcan",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "nphc-attgen-andbai",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "nphc-attgen-leezel",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "nphc-attgen-matgae",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "nphc-attgen-matwhi",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "nphc-attgen-rondes",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "nphc-attgen-tedcru",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "opdc-delrod-venpres-2026-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.27,
+      "programType": "liquidityProgram",
+      "marketSlug": "opdc-mcconnell-resign-2026-11-02",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "opdc-trump-resig-2026-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.07,
+      "programType": "liquidityProgram",
+      "marketSlug": "opdc-trump-resig-2027-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.07,
+      "programType": "liquidityProgram",
+      "marketSlug": "opdc-zelenskyy-presuk-2026-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.8,
+      "programType": "liquidityProgram",
+      "marketSlug": "paccc-usho-midterms-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.57,
+      "programType": "liquidityProgram",
+      "marketSlug": "paccc-usse-midterms-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.42,
+      "programType": "liquidityProgram",
+      "marketSlug": "pic-congress-trump-2026-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "pintc-meet-put-zel-2026-09-30",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "pintc-meet-put-zel-2026-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "pintc-meet-trump-2026-12-31-delrod",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.74,
+      "programType": "liquidityProgram",
+      "marketSlug": "pvwc-housepopw-2026-11-03-dem",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.12,
+      "programType": "liquidityProgram",
+      "marketSlug": "pvwc-housepopw-2026-11-03-rep",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.1,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte180",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.11,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte185",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.1,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte190",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.09,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte195",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.05,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte200",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.1,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte205",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.21,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte210",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.15,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte215",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte220",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.07,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte230",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.06,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte235",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 1.86,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-46",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 1.32,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-47",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.92,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-48",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 1.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-49",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.47,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-50",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.18,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-52",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.58,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-53",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-54",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.92,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-55",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.11,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-56",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.57,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-gte57",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 1.83,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-lte45",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "stsc-bab-el-mandeb-clsd-2026-08-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.2,
+      "programType": "liquidityProgram",
+      "marketSlug": "stsc-bab-el-mandeb-clsd-2026-12-31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 2.42,
+      "programType": "liquidityProgram",
+      "marketSlug": "stsc-hormuz-normal-aug31",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-cbb-champ-2027-04-05-w-wisc",
+      "date": "2026-07-28",
+      "status": "PENDING"
+    },
+    {
       "reward": 0.01,
       "programType": "liquidityProgram",
       "marketSlug": "tec-pga-rockclas-2026-08-02-r1l-aussmo",
