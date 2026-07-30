@@ -59,7 +59,84 @@
     {
       "reward": 0.03,
       "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-auseck",
+      "date": "2026-07-29",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
       "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-aussmo",
+      "date": "2026-07-29",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-haoli",
+      "date": "2026-07-29",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-johpar",
+      "date": "2026-07-29",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-keinak",
+      "date": "2026-07-29",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-lucglo",
+      "date": "2026-07-29",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-marhub",
+      "date": "2026-07-29",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-nicech",
+      "date": "2026-07-29",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-r3l-richoe",
+      "date": "2026-07-29",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-w-adasve",
+      "date": "2026-07-29",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-w-camdav",
+      "date": "2026-07-29",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-pga-rockclas-2026-08-02-w-ryacel",
       "date": "2026-07-29",
       "status": "PENDING"
     },
