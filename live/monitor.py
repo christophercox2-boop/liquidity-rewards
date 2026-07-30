@@ -1676,6 +1676,116 @@ def positions_overview() -> dict:
     return {"rows": rows}
 
 
+def _seat_token(tok: str) -> tuple[float, str] | None:
+    """(sort key, label) for a seat-count slug tail: '47', 'lte45', 'gte52',
+    '100-105m'. None if the tail isn't a seat count."""
+    t = tok[:-1] if tok.endswith("m") else tok
+    if t.isdigit():
+        return float(t), t
+    if t.startswith("lte") and t[3:].isdigit():
+        return int(t[3:]) - 0.5, "≤" + t[3:]
+    if t.startswith("gte") and t[3:].isdigit():
+        return int(t[3:]) + 0.5, "≥" + t[3:]
+    a, _, b = t.partition("-")
+    if a.isdigit() and b.isdigit() and int(a) < int(b):
+        return float(a), a + "–" + b
+    return None
+
+
+def _seat_split(slug: str) -> tuple[str, float, str] | None:
+    """(family prefix, sort key, label) when the slug ends in a seat count."""
+    p2 = slug.rsplit("-", 2)
+    if len(p2) == 3 and p2[2].endswith("m"):  # ranges like ...-100-105m
+        st = _seat_token(p2[1] + "-" + p2[2])
+        if st:
+            return p2[0], st[0], st[1]
+    p1 = slug.rsplit("-", 1)
+    if len(p1) == 2:
+        st = _seat_token(p1[1])
+        if st:
+            return p1[0], st[0], st[1]
+    return None
+
+
+def _seat_family_title(prefix: str) -> str:
+    low = prefix.lower()
+    if "senate" in low or "usse" in low:
+        base = "Senate seats"
+    elif "hrep" in low or "house" in low:
+        base = "House seats"
+    else:
+        base = prefix
+    for party in ("gop", "rep", "dem"):
+        if f"-{party}" in low:
+            return f"{base} ({party.upper()})"
+    return base
+
+
+def seats_overview() -> dict:
+    """The seat-count ladders (House / Senate), each ordered by increasing
+    seats, with position, resting orders (best-price flagged) and spread."""
+    with MONITOR.lock:
+        known = list((MONITOR.state.get("known_mkts") or {}).get("politics") or [])
+        orders = list(MONITOR.orders)
+        positions = dict(MONITOR.positions)
+    all_slugs = set(known) | {o.get("market") for o in orders if o.get("market")} | set(positions)
+    fams: dict[str, list] = {}
+    for s in sorted(all_slugs):
+        if not s or s.startswith(("tec-", "aec-")):
+            continue
+        sp = _seat_split(s)
+        if sp:
+            fams.setdefault(sp[0], []).append((sp[1], sp[2], s))
+    out = []
+    fetched = 0
+    for prefix, members in sorted(fams.items()):
+        if len(members) < 3:
+            continue  # a real ladder has several rungs
+        rows = []
+        for key, label, slug in sorted(members):
+            p = positions.get(slug) or {}
+            net = tr._num(p.get("netPosition"))
+            cost = tr._num(p.get("cost"))
+            mine = [o for o in orders if o.get("market") == slug and o.get("price")]
+            book = None
+            cached = tr._BOOK_CACHE.get(slug)
+            if cached and time.time() - cached[0] < 600:
+                book = cached[1]
+            elif fetched < 15:
+                try:
+                    book = tr._fetch_book(slug)
+                    fetched += 1
+                    time.sleep(0.1)
+                except Exception:  # noqa: BLE001
+                    book = None
+            bb = ba = None
+            if book:
+                bids_, asks_ = book.get("bids") or [], book.get("asks") or []
+                bb = bids_[0][0] if bids_ else None
+                ba = asks_[0][0] if asks_ else None
+            rows.append({
+                "label": label, "market": slug,
+                "net": int(net) if net else 0,
+                "avg_cents": round(cost / net * 100, 1) if net else None,
+                "orders": [{"side": o["side"],
+                            "price_cents": round(o["price"] * 100, 1),
+                            "size": o.get("size"),
+                            "best": bool(
+                                (o["side"] == "BUY" and bb is not None
+                                 and o["price"] >= bb - 1e-9)
+                                or (o["side"] == "SELL" and ba is not None
+                                    and o["price"] <= ba + 1e-9))}
+                           for o in mine],
+                "best_bid_cents": round(bb * 100, 1) if bb is not None else None,
+                "best_ask_cents": round(ba * 100, 1) if ba is not None else None,
+                "spread_cents": (round((ba - bb) * 100, 1)
+                                 if bb is not None and ba is not None else None),
+            })
+        out.append({"title": _seat_family_title(prefix), "prefix": prefix, "rows": rows})
+    out.sort(key=lambda f: f["title"])
+    return {"families": out}
+
+
 def _slug_known(slug: str) -> bool:
     """Only operate on markets we can see: currently quoted, in the tracked
     politics/golf universe, or on a scan plan — never a free-typed slug."""
@@ -1836,12 +1946,22 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  .neg{color:#f85149}
  .bdg{background:#1f3a5f;color:#79b8ff;border-radius:5px;padding:1px 6px;font-size:10px;vertical-align:middle}
 </style></head><body>
-<div style="display:flex;gap:8px;margin-bottom:12px">
+<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
  <button class="tab on" id="tabH" onclick="showTab('H')">Home</button>
  <button class="tab" id="tabR" onclick="showTab('R')">Markets</button>
  <button class="tab" id="tabP" onclick="showTab('P')">Positions</button>
  <button class="tab" id="tabL" onclick="showTab('L')">Plan</button>
  <button class="tab" id="tabS" onclick="showTab('S')">Spreads</button>
+ <button class="tab" id="tabE" onclick="showTab('E')">Seats</button>
+</div>
+<div id="viewE" style="display:none">
+<div class="sub">Seat-count ladders — House &amp; Senate, in seat order</div>
+<div style="margin:6px 0"><button class="tab" onclick="SEATSD=null;loadSeats()">↻ Refresh</button></div>
+<div class="err" id="seatErr"></div>
+<div id="seatWrap"></div>
+<div class="mkt" style="margin-top:8px">★ = that order is the best price on its side right
+now; "behind" means someone is ahead of you. Own = contracts held @ average cost. Tap any
+row to place, modify or cancel. Books load in batches — if a row shows "…", refresh once.</div>
 </div>
 <div id="viewS" style="display:none">
 <div class="sub">Widest politics spreads — enter ONE tick inside both sides <span id="spGen"></span></div>
@@ -1966,13 +2086,53 @@ does.</div>
 let OPEN = {}, GOPEN = {}, SERIES = null, RATES = {};
 let SEEN = JSON.parse(localStorage.getItem('seenRates') || '{}');
 function showTab(t){
-  ['H','R','P','L','S'].forEach(k => {
+  ['H','R','P','L','S','E'].forEach(k => {
     document.getElementById('view'+k).style.display = k===t ? '' : 'none';
     document.getElementById('tab'+k).className = 'tab' + (k===t ? ' on' : '');
   });
   if(t==='L') loadPlan();
   if(t==='S') loadSpread();
   if(t==='P') loadPositions();
+  if(t==='E') loadSeats();
+}
+let SEATSD = null;
+async function loadSeats(){
+  if(SEATSD){ renderSeats(); return; }
+  document.getElementById('seatWrap').innerHTML = '<div class="sub">loading ladders…</div>';
+  try{
+    const d = await (await fetch('seats.json')).json();
+    SEATSD = d.families || [];
+    renderSeats();
+  }catch(e){
+    const err = document.getElementById('seatErr');
+    err.textContent = 'seats load failed: ' + e; err.style.display = 'block';
+  }
+}
+function renderSeats(){
+  document.getElementById('seatWrap').innerHTML = (SEATSD || []).map(f =>
+    '<h3>'+esc(f.title)+' <span class="sub" style="font-size:11px">'+f.rows.length+' markets</span></h3>'+
+    '<table><tr><th>Seats</th><th class="r">Own</th><th class="r">My orders</th><th class="r">Spread</th></tr>'+
+    f.rows.map(r => {
+      const own = r.net
+        ? '<b class="pos">'+r.net.toLocaleString()+'</b>'+
+          (r.avg_cents != null ? '<br><span class="sub" style="font-size:10px">@ '+r.avg_cents.toFixed(1)+'¢</span>' : '')
+        : '<span class="sub">—</span>';
+      const ords = (r.orders || []).map(o =>
+        '<span'+(o.side === 'SELL' ? ' style="color:#f0883e"' : '')+'>'+
+        (o.side === 'SELL' ? 'S' : 'B')+' '+o.price_cents.toFixed(1)+'¢×'+(o.size||0).toLocaleString()+'</span>'+
+        (o.best ? ' <b class="pos">★</b>' : ' <span class="sub" style="font-size:10px">behind</span>'))
+        .join('<br>') || '<span class="sub">—</span>';
+      const sp = (r.best_bid_cents != null && r.best_ask_cents != null)
+        ? r.best_bid_cents.toFixed(0)+'⇄'+r.best_ask_cents.toFixed(0)+
+          '<br><span class="sub" style="font-size:10px">'+r.spread_cents.toFixed(1)+'¢ wide</span>'
+        : '<span class="sub">…</span>';
+      return '<tr onclick="openMkt(\\''+esc(r.market)+'\\')">'+
+        '<td><b>'+esc(r.label)+'</b><div class="mkt" style="font-size:9px">'+esc(r.market)+'</div></td>'+
+        '<td class="r">'+own+'</td>'+
+        '<td class="r" style="font-size:11px;white-space:nowrap">'+ords+'</td>'+
+        '<td class="r" style="white-space:nowrap">'+sp+'</td></tr>';
+    }).join('')+'</table>').join('')
+    || '<div class="sub">no seat-count ladders found among tracked markets</div>';
 }
 let PLAN = null, PSEL = {}, BP = null, OLOCK = {};
 function pwhich(){ const el = document.querySelector('input[name="pwhich"]:checked'); return el ? el.value : 'politics'; }
@@ -2996,6 +3156,8 @@ class Handler(BaseHTTPRequestHandler):
             with MONITOR.lock:
                 payload = json.dumps({"series": MONITOR.state.get("series", {})})
             self._send(200, "application/json", payload.encode())
+        elif self.path.startswith("/seats.json"):
+            self._send(200, "application/json", json.dumps(seats_overview()).encode())
         elif self.path.startswith("/positions.json"):
             self._send(200, "application/json", json.dumps(positions_overview()).encode())
         elif self.path.startswith("/market.json"):
