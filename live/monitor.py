@@ -747,9 +747,9 @@ def _verify_resting(market: str, side: str, price_value: str) -> tuple[bool, str
 
 
 PLAN_CACHE: dict = {"politics": {"ts": 0.0, "data": None}, "golf": {"ts": 0.0, "data": None},
-                    "tt": {"ts": 0.0, "data": None}}
+                    "tt": {"ts": 0.0, "data": None}, "restore": {"ts": 0.0, "data": None}}
 PLAN_FILES = {"politics": "data/scan.json", "golf": "data/scan_golf.json",
-              "tt": "data/scan_tt.json"}
+              "tt": "data/scan_tt.json", "restore": "data/scan_restore.json"}
 
 
 def _spread_plan(pol: dict) -> dict:
@@ -912,8 +912,9 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
         # and the cheap-YES strategy accepts fills by design.
         target = prog.get("target") or 0
         deep = ((side == "BUY" and price <= 0.011) or (side == "SELL" and price >= 0.989)
-                or bool(plan_row.get("join_ok"))    # 1-share touch plans join by design
-                or bool(plan_row.get("spread_ok")))  # spread entries improve by design
+                or bool(plan_row.get("join_ok"))     # 1-share touch plans join by design
+                or bool(plan_row.get("spread_ok"))   # spread entries improve by design
+                or bool(plan_row.get("restore_ok")))  # restoring what WAS resting there
         if not deep:
             if side == "BUY" and bids and price >= bids[0][0] - 1e-9:
                 level = sum(q for px, q in bids if abs(px - price) < 1e-9)
@@ -964,8 +965,20 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
             # rest as a BID (it CLOSES a short) — the bidding-against-yourself bug
             intent = "ORDER_INTENT_SELL_LONG" if net >= size else "ORDER_INTENT_BUY_SHORT"
             res["intent"] = intent
+        elif plan_row.get("close_short"):  # a restored buy-back of a short
+            net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
+            if net >= 0:
+                res.update(status="skipped", note="no short position to buy back any more")
+                return res
+            intent = "ORDER_INTENT_SELL_SHORT"
+            res["intent"] = intent
         path = "/v1/orders"
         value = f"{price:.3f}".rstrip("0").rstrip(".")
+        # GTC: DAY orders silently expire at 5:00 PM ET (the vanished-orders
+        # incident). Only join-the-touch game plans stay DAY — a stale 1-share
+        # quote must not rest into a live match.
+        tif = ("TIME_IN_FORCE_DAY" if plan_row.get("join_ok")
+               else "TIME_IN_FORCE_GOOD_TILL_CANCEL")
         r = requests.request(
             "POST", tr.TRADE_API + path,
             headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
@@ -973,7 +986,7 @@ def _place_one(spec: dict, plan_row: dict) -> dict:
             json={"marketSlug": slug, "intent": intent,
                   "type": "ORDER_TYPE_LIMIT",
                   "price": {"value": value, "currency": "USD"},
-                  "quantity": size, "tif": "TIME_IN_FORCE_DAY",
+                  "quantity": size, "tif": tif,
                   "participateDontInitiate": True},  # post-only: rest or reject, never fill
             timeout=20,
         )
@@ -2027,7 +2040,7 @@ def manual_place(slug: str, side: str, price_cents: float, size: int,
                      "Content-Type": "application/json"},
             json={"marketSlug": slug, "intent": intent, "type": "ORDER_TYPE_LIMIT",
                   "price": {"value": value, "currency": "USD"},
-                  "quantity": size, "tif": "TIME_IN_FORCE_DAY",
+                  "quantity": size, "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
                   "participateDontInitiate": True},
             timeout=20,
         )
@@ -2197,7 +2210,8 @@ Exiting inventory locks no new capital.</div>
 <div style="margin:8px 0">
  <label class="sub"><input type="radio" name="pwhich" value="politics" checked onchange="switchPlan()"> Politics</label>
  <label class="sub"><input type="radio" name="pwhich" value="golf" onchange="switchPlan()"> Golf (cheap YES)</label>
- <label class="sub"><input type="radio" name="pwhich" value="tt" onchange="switchPlan()"> Table tennis (1@touch)</label></div>
+ <label class="sub"><input type="radio" name="pwhich" value="tt" onchange="switchPlan()"> Table tennis (1@touch)</label>
+ <label class="sub"><input type="radio" name="pwhich" value="restore" onchange="switchPlan()"> Restore</label></div>
 <div class="sub" id="planBP"></div>
 <div style="margin:10px 0">Max buy price: <b id="capLbl">10¢</b>
  <input type="range" id="capSlider" min="1" max="99" value="10" style="width:55%;vertical-align:middle"
@@ -2438,7 +2452,7 @@ function planRows(){
       if(!o) return false;
       if(room != null && szmode() !== 'max' && !o.covered && o.capital > room + 0.01)
         return false;  // even the minimal entry doesn't fit what's left
-      if(pwhich() === 'tt') return true;  // 1-share touch orders: sliders don't apply
+      if(pwhich() === 'tt' || pwhich() === 'restore') return true;  // sliders don't apply
       return r.side === 'SELL' ? o.price*100 >= sMin : o.price*100 <= cap;
     })
     .sort((a,b) => (ord(b).est_day) - (ord(a).est_day));
@@ -2496,7 +2510,7 @@ function planSum(){
     ' locked in any one market · ~$' + est.toFixed(2) + '/day at current books';
 }
 async function placeBatch(){
-  const tt = pwhich() === 'tt';
+  const tt = pwhich() === 'tt' || pwhich() === 'restore';
   const capC = tt ? 99.9 : +document.getElementById('capSlider').value;
   const sMin = tt ? 0.1 : +document.getElementById('sellSlider').value;
   const sel = planRows().filter(r => PSEL[pkey(r)]);
