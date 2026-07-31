@@ -1648,12 +1648,25 @@ def _race_risk(positions: dict, known: list[str]) -> list[dict]:
         if not covers_all:
             scen.append(shorts_pay)  # an unheld outcome wins: longs 0, all Nos pay
         worst_pay, best_pay = min(scen), max(scen)
+
+        def _ord(item):  # seat ladders in seat order, else by name
+            sp = _seat_split(item[0])
+            return (0, sp[1]) if sp else (1, item[0])
+
+        scenarios = []
+        for s, n, _ in sorted(held, key=_ord):
+            tail = s[len(prefix) + 1:] if s.startswith(prefix + "-") else s
+            sp = _seat_split(s)
+            scenarios.append({"outcome": sp[2] if sp else tail, "held": int(n),
+                              "pl": round(shorts_pay + n - cost, 2)})
         races.append({
             "race": prefix, "held": len(held), "outcomes": total,
             "cost": round(cost, 2),
             "worst": round(worst_pay - cost, 2),
             "best": round(best_pay - cost, 2),
             "locked": worst_pay - cost >= 0,
+            "scenarios": scenarios,
+            "other_pl": None if covers_all else round(shorts_pay - cost, 2),
             "rows": [{"market": s, "net": int(n), "cost": round(c, 2)}
                      for s, n, c in sorted(held)],
         })
@@ -2709,20 +2722,40 @@ async function loadPositions(){
     err.textContent = 'positions load failed: ' + e; err.style.display = 'block';
   }
 }
-let RACED = [];
+let RACED = [], RCOPEN = {};
+function tglRace(i){ RCOPEN[i] = !RCOPEN[i]; renderRaces(); }
 function renderRaces(){
   document.getElementById('raceList').innerHTML = (RACED || []).length ?
     '<tr><th>Race</th><th class="r">Held</th><th class="r">Cost</th><th class="r">Worst</th><th class="r">Best</th></tr>' +
-    RACED.map(rc => {
-      const detail = (rc.rows || []).map(x =>
-        esc(x.market.slice(rc.race.length + 1)) + ': ' + x.net.toLocaleString()).join(' · ');
-      return '<tr'+(rc.locked ? ' style="background:#12341c"' : '')+'>'+
+    RACED.map((rc, i) => {
+      const bar = (pl) => {  // little signed bar so the distribution reads at a glance
+        const span = Math.max(Math.abs(rc.worst), Math.abs(rc.best), 0.01);
+        const w = Math.min(60, Math.abs(pl) / span * 60);
+        return '<span style="display:inline-block;height:8px;border-radius:3px;width:'+w.toFixed(0)+
+          'px;background:'+(pl >= 0 ? '#3fb950' : '#f85149')+';vertical-align:middle"></span>';
+      };
+      const scen = (rc.scenarios || []).map(sc =>
+        '<tr><td class="sub" style="font-size:11px;white-space:nowrap">'+esc(sc.outcome)+' wins</td>'+
+        '<td class="r sub" style="font-size:11px;white-space:nowrap">'+
+        (sc.held > 0 ? 'Yes '+sc.held.toLocaleString()
+         : sc.held < 0 ? '<span style="color:#f0883e">No '+(-sc.held).toLocaleString()+'</span>' : '—')+'</td>'+
+        '<td style="width:70px">'+bar(sc.pl)+'</td>'+
+        '<td class="r '+(sc.pl >= 0 ? 'pos' : 'neg')+'" style="white-space:nowrap"><b>'+
+        (sc.pl >= 0 ? '+' : '')+sc.pl.toFixed(2)+'</b></td></tr>').join('') +
+        (rc.other_pl != null ?
+          '<tr><td class="sub" style="font-size:11px">any unheld outcome wins</td><td></td>'+
+          '<td style="width:70px">'+bar(rc.other_pl)+'</td>'+
+          '<td class="r '+(rc.other_pl >= 0 ? 'pos' : 'neg')+'"><b>'+
+          (rc.other_pl >= 0 ? '+' : '')+rc.other_pl.toFixed(2)+'</b></td></tr>' : '');
+      return '<tr'+(rc.locked ? ' style="background:#12341c"' : '')+' onclick="tglRace('+i+')">'+
         '<td class="mkt">'+esc(rc.race)+(rc.locked ? ' 🔒' : '')+
-        '<div class="sub" style="font-size:10px">'+detail+'</div></td>'+
+        '<div class="sub" style="font-size:10px">'+(RCOPEN[i] ? 'tap to collapse' : 'tap for per-outcome breakdown')+'</div></td>'+
         '<td class="r">'+rc.held+'/'+rc.outcomes+'</td>'+
         '<td class="r">$'+rc.cost.toFixed(2)+'</td>'+
         '<td class="r '+(rc.worst >= 0 ? 'pos' : 'neg')+'"><b>'+(rc.worst >= 0 ? '+' : '')+rc.worst.toFixed(2)+'</b></td>'+
-        '<td class="r '+(rc.best >= 0 ? 'pos' : 'neg')+'">'+(rc.best >= 0 ? '+' : '')+rc.best.toFixed(2)+'</td></tr>';
+        '<td class="r '+(rc.best >= 0 ? 'pos' : 'neg')+'">'+(rc.best >= 0 ? '+' : '')+rc.best.toFixed(2)+'</td></tr>'+
+        '<tr style="display:'+(RCOPEN[i] ? '' : 'none')+'"><td colspan="5" style="background:#161b22">'+
+        '<table class="bk" style="width:100%">'+scen+'</table></td></tr>';
     }).join('')
     : '<tr><td class="sub">no race with positions in 2+ outcomes</td></tr>';
 }
