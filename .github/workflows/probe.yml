@@ -49,18 +49,43 @@ jobs:
           r.raise_for_status()
           with open("data/probe_activities.json", "w") as f:
               json.dump(r.json(), f, indent=1)
-          states = {}
-          for a in r.json().get("activities") or []:
-              t = a.get("trade") or {}
-              states[t.get("state")] = states.get(t.get("state"), 0) + 1
-          print("trade states:", states)
+          EOF
+
+      - name: Positions payload (short-position shape)
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, requests
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          path = "/v1/portfolio/positions"
+          out, cursor = {}, None
+          for _ in range(5):
+              params = {"limit": 100}
+              if cursor:
+                  params["cursor"] = cursor
+              r = requests.get(tr.TRADE_API + path,
+                               headers=tr.auth_headers(kid, sec, "GET", path),
+                               params=params, timeout=30)
+              r.raise_for_status()
+              j = r.json()
+              out.update(j.get("positions") or {})
+              cursor = j.get("nextCursor")
+              if j.get("eof") or not cursor:
+                  break
+          with open("data/probe_positions.json", "w") as f:
+              json.dump(out, f, indent=1)
+          neg = {k: v for k, v in out.items() if float(v.get("netPosition") or 0) < 0}
+          print("positions:", len(out), "| net-negative:", len(neg), list(neg)[:5])
           EOF
 
       - name: Commit probe output
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/probe_incentives.json data/probe_activities.json
+          git add data/probe_incentives.json data/probe_activities.json data/probe_positions.json
           if git diff --cached --quiet; then
             echo "No changes"
           else
