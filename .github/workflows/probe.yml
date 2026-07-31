@@ -51,6 +51,24 @@ jobs:
               json.dump(r.json(), f, indent=1)
           EOF
 
+      - name: Open orders payload
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, requests
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          path = "/v1/orders/open"
+          r = requests.get(tr.TRADE_API + path,
+                           headers=tr.auth_headers(kid, sec, "GET", path), timeout=30)
+          r.raise_for_status()
+          with open("data/probe_orders.json", "w") as f:
+              json.dump(r.json(), f, indent=1)
+          print("open orders:", len(r.json().get("orders") or []))
+          EOF
+
       - name: Positions payload (short-position shape)
         env:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
@@ -85,7 +103,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/probe_incentives.json data/probe_activities.json data/probe_positions.json
+          git add data/probe_incentives.json data/probe_activities.json data/probe_positions.json data/probe_orders.json
           if git diff --cached --quiet; then
             echo "No changes"
           else
