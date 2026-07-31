@@ -1612,6 +1612,49 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
         ACTIONS.append(record)
         del ACTIONS[:-20]
 
+def _race_prefix(slug: str) -> str:
+    """Sibling-group key: seat ladders group by their ladder prefix, everything
+    else by the slug minus its last token (the candidate/outcome)."""
+    sp = _seat_split(slug)
+    return sp[0] if sp else slug.rsplit("-", 1)[0]
+
+
+def _race_risk(positions: dict, known: list[str]) -> list[dict]:
+    """Worst/best case per RACE (one outcome resolves YES) across your long
+    positions. 'Locked' = you hold every outcome and even the smallest
+    holding beats total cost — profit no matter who wins (negative risk)."""
+    known_by_prefix: dict[str, int] = {}
+    for s in known:
+        known_by_prefix[_race_prefix(s)] = known_by_prefix.get(_race_prefix(s), 0) + 1
+    groups: dict[str, list] = {}
+    for slug, p in positions.items():
+        net = tr._num(p.get("netPosition"))
+        if net < 1:
+            continue
+        groups.setdefault(_race_prefix(slug), []).append(
+            (slug, net, tr._num(p.get("cost"))))
+    races = []
+    for prefix, held in groups.items():
+        if len(held) < 2:
+            continue  # negative risk takes positions across several outcomes
+        total = max(known_by_prefix.get(prefix, 0), len(held))
+        cost = sum(c for _, _, c in held)
+        payouts = sorted(net for _, net, _ in held)
+        covers_all = len(held) >= total
+        worst_pay = payouts[0] if covers_all else 0.0  # an unheld outcome can win
+        races.append({
+            "race": prefix, "held": len(held), "outcomes": total,
+            "cost": round(cost, 2),
+            "worst": round(worst_pay - cost, 2),
+            "best": round(payouts[-1] - cost, 2),
+            "locked": covers_all and worst_pay - cost >= 0,
+            "rows": [{"market": s, "net": int(n), "cost": round(c, 2)}
+                     for s, n, c in sorted(held)],
+        })
+    races.sort(key=lambda r: r["worst"])
+    return races
+
+
 def positions_overview() -> dict:
     """Every long position with its take-profit state. Target = one tick
     inside the best ask that ISN'T ours: 'good' means the whole position is
@@ -1673,7 +1716,9 @@ def positions_overview() -> dict:
         rows.append(row)
     rows.sort(key=lambda r: ({"fix": 0, "unknown": 1, "wait": 2, "good": 3}[r["status"]],
                              r["market"]))
-    return {"rows": rows}
+    with MONITOR.lock:
+        known = list((MONITOR.state.get("known_mkts") or {}).get("politics") or [])
+    return {"rows": rows, "races": _race_risk(positions, known)}
 
 
 def _seat_token(tok: str) -> tuple[float, str] | None:
@@ -2027,6 +2072,12 @@ the position. Markets whose spread has closed below 3 ticks are skipped.</div>
 <div class="err" id="posErr"></div>
 <table id="posList"></table>
 <div id="posProg" class="mkt" style="margin:6px 0"></div>
+<h3>Race risk <span class="sub">(worst / best case per race — negative-risk check)</span></h3>
+<table id="raceList"></table>
+<div class="mkt">A race = sibling markets where ONE outcome resolves YES (a seat ladder, a
+candidate field). Worst case assumes the outcome you're lightest in — or one you don't hold
+at all — wins. 🔒 = you hold every outcome and even the worst one beats your total cost:
+guaranteed profit whoever wins. Longs only; assumes one winner per race.</div>
 <div class="mkt" style="margin-top:8px">Green: the whole position is covered by a resting
 sell that IS the best ask — nothing to worry about. Red: no sell resting, only partial
 coverage, or your ask is behind someone else's — the button places (or reprices) a
@@ -2613,16 +2664,35 @@ async function loadPositions(){
   try{
     const d = await (await fetch('positions.json')).json();
     POSD = d.rows || [];
+    RACED = d.races || [];
     renderPositions();
   }catch(e){
     const err = document.getElementById('posErr');
     err.textContent = 'positions load failed: ' + e; err.style.display = 'block';
   }
 }
+let RACED = [];
+function renderRaces(){
+  document.getElementById('raceList').innerHTML = (RACED || []).length ?
+    '<tr><th>Race</th><th class="r">Held</th><th class="r">Cost</th><th class="r">Worst</th><th class="r">Best</th></tr>' +
+    RACED.map(rc => {
+      const detail = (rc.rows || []).map(x =>
+        esc(x.market.slice(rc.race.length + 1)) + ': ' + x.net.toLocaleString()).join(' · ');
+      return '<tr'+(rc.locked ? ' style="background:#12341c"' : '')+'>'+
+        '<td class="mkt">'+esc(rc.race)+(rc.locked ? ' 🔒' : '')+
+        '<div class="sub" style="font-size:10px">'+detail+'</div></td>'+
+        '<td class="r">'+rc.held+'/'+rc.outcomes+'</td>'+
+        '<td class="r">$'+rc.cost.toFixed(2)+'</td>'+
+        '<td class="r '+(rc.worst >= 0 ? 'pos' : 'neg')+'"><b>'+(rc.worst >= 0 ? '+' : '')+rc.worst.toFixed(2)+'</b></td>'+
+        '<td class="r '+(rc.best >= 0 ? 'pos' : 'neg')+'">'+(rc.best >= 0 ? '+' : '')+rc.best.toFixed(2)+'</td></tr>';
+    }).join('')
+    : '<tr><td class="sub">no race with positions in 2+ outcomes</td></tr>';
+}
 function renderPositions(){
   const nFix = POSD.filter(r => r.status === 'fix').length;
   document.getElementById('posSub').textContent =
     POSD.length + ' positions · ' + (nFix ? nFix + ' need attention' : 'all priced to sell ✓');
+  renderRaces();
   document.getElementById('posList').innerHTML =
     POSD.map((r, i) => {
       const bg = r.status === 'good' ? 'background:#12341c'
