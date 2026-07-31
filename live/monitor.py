@@ -1625,8 +1625,12 @@ def _race_risk(positions: dict, known: list[str]) -> list[dict]:
     scenario EXCEPT its own outcome winning. 'Locked' = even the worst
     scenario beats total cost — profit no matter who wins (negative risk)."""
     known_by_prefix: dict[str, int] = {}
+    known_labels: dict[str, list[str]] = {}
     for s in known:
         known_by_prefix[_race_prefix(s)] = known_by_prefix.get(_race_prefix(s), 0) + 1
+        sp = _seat_split(s)
+        if sp:
+            known_labels.setdefault(sp[0], []).append(sp[2])
     groups: dict[str, list] = {}
     for slug, p in positions.items():
         net = tr._num(p.get("netPosition"))
@@ -1640,6 +1644,46 @@ def _race_risk(positions: dict, known: list[str]) -> list[dict]:
             continue  # negative risk takes positions across several outcomes
         total = max(known_by_prefix.get(prefix, 0), len(held))
         cost = sum(c for _, _, c in held)
+
+        # THRESHOLD ladders (every rung ≥N or every rung ≤N — e.g. House
+        # gte180/gte195/...): several rungs resolve YES together, so the
+        # scenarios are the RANGES of the underlying count between thresholds,
+        # not one-winner outcomes.
+        fam_labels = known_labels.get(prefix, [])
+        held_sp = {s: _seat_split(s) for s, _, _ in held}
+        all_labels = fam_labels + [sp[2] for sp in held_sp.values() if sp]
+        for sign in ("≥", "≤"):
+            if (all_labels and all(sp is not None for sp in held_sp.values())
+                    and all(lbl.startswith(sign) for lbl in all_labels)):
+                thr = sorted({int(lbl[1:]) for lbl in all_labels})
+                reps = [thr[0] - 1] + thr  # one representative count per range
+                scenarios = []
+                for idx, rep in enumerate(reps):
+                    label = ("<" + str(thr[0]) if idx == 0 else
+                             "≥" + str(thr[-1]) if idx == len(reps) - 1 else
+                             f"{thr[idx - 1]}–{thr[idx] - 1}")
+                    pay = 0.0
+                    for s, n, _ in held:
+                        t = int(held_sp[s][2][1:])
+                        yes = rep >= t if sign == "≥" else rep <= t
+                        pay += n if (yes and n > 0) else (-n if (not yes and n < 0) else 0.0)
+                    scenarios.append({"outcome": label, "held": 0,
+                                      "pl": round(pay - cost, 2)})
+                pls = [sc["pl"] for sc in scenarios]
+                races.append({
+                    "race": prefix, "held": len(held), "outcomes": len(thr),
+                    "cost": round(cost, 2),
+                    "worst": min(pls), "best": max(pls),
+                    "locked": min(pls) >= 0,
+                    "scenarios": scenarios, "other_pl": None,
+                    "rows": [{"market": s, "net": int(n), "cost": round(c, 2)}
+                             for s, n, c in sorted(held)],
+                })
+                break
+        else:
+            pass  # not a threshold ladder — fall through to one-winner math
+        if races and races[-1]["race"] == prefix:
+            continue
         shorts_pay = sum(-n for _, n, _ in held if n < 0)  # all Nos pay...
         scen = []
         for _, n, _ in held:  # ...minus the shorted outcome when IT wins
@@ -2136,11 +2180,11 @@ the position. Markets whose spread has closed below 3 ticks are skipped.</div>
 <div id="posProg" class="mkt" style="margin:6px 0"></div>
 <h3>Race risk <span class="sub">(worst / best case per race — negative-risk check)</span></h3>
 <table id="raceList"></table>
-<div class="mkt">A race = sibling markets where ONE outcome resolves YES (a seat ladder, a
-candidate field). Yes positions pay when their outcome wins; No positions pay in every
-scenario EXCEPT their outcome winning. Worst case = the least favorable winner (including
-outcomes you don't hold). 🔒 = even the worst case beats your total cost: guaranteed profit
-whoever wins. Assumes one winner per race.</div>
+<div class="mkt">Two kinds of race: one-winner fields (candidates, exact seat counts —
+exactly one resolves YES) and THRESHOLD ladders (House ≥N brackets — every threshold at or
+under the result resolves YES together). Threshold races are scored by the RANGE the final
+count lands in; one-winner races by the winning outcome, including ones you don't hold.
+🔒 = even the worst scenario beats your total cost: guaranteed profit however it lands.</div>
 <div class="mkt" style="margin-top:8px">Green: the whole position has a resting exit that IS
 the best price on its side — nothing to worry about. Red: no exit resting, partial coverage,
 or you've been undercut — the button places (or reprices) a post-only exit of the full
