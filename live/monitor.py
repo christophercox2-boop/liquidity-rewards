@@ -1620,16 +1620,17 @@ def _race_prefix(slug: str) -> str:
 
 
 def _race_risk(positions: dict, known: list[str]) -> list[dict]:
-    """Worst/best case per RACE (one outcome resolves YES) across your long
-    positions. 'Locked' = you hold every outcome and even the smallest
-    holding beats total cost — profit no matter who wins (negative risk)."""
+    """Worst/best case per RACE (one outcome resolves YES) across your
+    positions, longs AND shorts. A short (No) pays its size in every
+    scenario EXCEPT its own outcome winning. 'Locked' = even the worst
+    scenario beats total cost — profit no matter who wins (negative risk)."""
     known_by_prefix: dict[str, int] = {}
     for s in known:
         known_by_prefix[_race_prefix(s)] = known_by_prefix.get(_race_prefix(s), 0) + 1
     groups: dict[str, list] = {}
     for slug, p in positions.items():
         net = tr._num(p.get("netPosition"))
-        if net < 1:
+        if abs(net) < 1:
             continue
         groups.setdefault(_race_prefix(slug), []).append(
             (slug, net, tr._num(p.get("cost"))))
@@ -1639,15 +1640,20 @@ def _race_risk(positions: dict, known: list[str]) -> list[dict]:
             continue  # negative risk takes positions across several outcomes
         total = max(known_by_prefix.get(prefix, 0), len(held))
         cost = sum(c for _, _, c in held)
-        payouts = sorted(net for _, net, _ in held)
+        shorts_pay = sum(-n for _, n, _ in held if n < 0)  # all Nos pay...
+        scen = []
+        for _, n, _ in held:  # ...minus the shorted outcome when IT wins
+            scen.append(shorts_pay + (n if n > 0 else n))  # long adds, short deducts its own
         covers_all = len(held) >= total
-        worst_pay = payouts[0] if covers_all else 0.0  # an unheld outcome can win
+        if not covers_all:
+            scen.append(shorts_pay)  # an unheld outcome wins: longs 0, all Nos pay
+        worst_pay, best_pay = min(scen), max(scen)
         races.append({
             "race": prefix, "held": len(held), "outcomes": total,
             "cost": round(cost, 2),
             "worst": round(worst_pay - cost, 2),
-            "best": round(payouts[-1] - cost, 2),
-            "locked": covers_all and worst_pay - cost >= 0,
+            "best": round(best_pay - cost, 2),
+            "locked": worst_pay - cost >= 0,
             "rows": [{"market": s, "net": int(n), "cost": round(c, 2)}
                      for s, n, c in sorted(held)],
         })
@@ -1666,11 +1672,18 @@ def positions_overview() -> dict:
     fetched = 0
     for slug, p in sorted(positions.items()):
         net = tr._num(p.get("netPosition"))
-        if net < 1:
+        if abs(net) < 1:
             continue
+        mag = abs(net)
+        short = net < 0
         cost = tr._num(p.get("cost"))
-        mine = [o for o in orders
-                if o.get("market") == slug and o.get("side") == "SELL" and o.get("price")]
+        if short:  # exit = BUY BACK: close orders carry the SELL_SHORT intent
+            mine = [o for o in orders
+                    if o.get("market") == slug and o.get("side") == "BUY"
+                    and "SELL_SHORT" in str(o.get("intent") or "") and o.get("price")]
+        else:
+            mine = [o for o in orders
+                    if o.get("market") == slug and o.get("side") == "SELL" and o.get("price")]
         book = None
         cached = tr._BOOK_CACHE.get(slug)
         if cached and time.time() - cached[0] < 600:
@@ -1682,34 +1695,49 @@ def positions_overview() -> dict:
                 time.sleep(0.1)
             except Exception:  # noqa: BLE001
                 book = None
-        row = {"market": slug, "net": int(net),
-               "avg_cents": round(cost / net * 100, 2) if net else None,
+        row = {"market": slug, "net": int(net), "short": short,
+               "avg_cents": round(cost / mag * 100, 2) if mag else None,
                "sells": [{"id": o.get("id"), "price_cents": round(o["price"] * 100, 2),
                           "size": o.get("size")} for o in mine]}
         if book is None:
             row["status"] = "unknown"
         else:
             tick = book.get("tick") or 0.01
+            own_key = "bids" if short else "asks"
             others = []
-            for px, q in book.get("asks") or []:
+            for px, q in book.get(own_key) or []:
                 q -= sum(o["size"] for o in mine if abs(px - o["price"]) < 1e-9)
                 if q > 1e-9:
                     others.append((px, q))
-            target = round((others[0][0] - tick) if others else 0.99, 4)
-            target = min(max(target, tick), 0.999)
-            row["target_cents"] = round(target * 100, 2)
             covered = sum(o["size"] for o in mine)
-            best_my = min((o["price"] for o in mine), default=None)
-            bids_b = book.get("bids") or []
-            bb = bids_b[0][0] if bids_b else None
-            good = (best_my is not None
-                    and covered >= min(net, 20000) - 1e-9
-                    and (not others or best_my <= others[0][0] - 1e-9))
+            if short:
+                # stand one tick ABOVE the best bid that isn't ours
+                asks_b = book.get("asks") or []
+                ba = asks_b[0][0] if asks_b else None
+                target = round((others[0][0] + tick) if others else
+                               ((ba - tick) if ba is not None else 0.01), 4)
+                target = min(max(target, tick), 0.999)
+                row["target_cents"] = round(target * 100, 2)
+                best_my = max((o["price"] for o in mine), default=None)
+                good = (best_my is not None
+                        and covered >= min(mag, 20000) - 1e-9
+                        and (not others or best_my >= others[0][0] + 1e-9))
+                blocked = (others and ba is not None and target >= ba - 1e-9)
+            else:
+                target = round((others[0][0] - tick) if others else 0.99, 4)
+                target = min(max(target, tick), 0.999)
+                row["target_cents"] = round(target * 100, 2)
+                best_my = min((o["price"] for o in mine), default=None)
+                bids_b = book.get("bids") or []
+                bb = bids_b[0][0] if bids_b else None
+                good = (best_my is not None
+                        and covered >= min(mag, 20000) - 1e-9
+                        and (not others or best_my <= others[0][0] - 1e-9))
+                blocked = (others and bb is not None and target <= bb + 1e-9)
             if good:
                 row["status"] = "good"
-            elif others and bb is not None and target <= bb + 1e-9:
-                # best bid sits right under the best ask — no room to undercut
-                # inside the spread; nothing to do but wait for it to widen
+            elif blocked:
+                # the spread leaves no room to stand inside — wait for it to widen
                 row["status"] = "wait"
             else:
                 row["status"] = "fix"
@@ -1811,7 +1839,7 @@ def seats_overview() -> dict:
             rows.append({
                 "label": label, "market": slug,
                 "net": int(net) if net else 0,
-                "avg_cents": round(cost / net * 100, 1) if net else None,
+                "avg_cents": round(cost / abs(net) * 100, 1) if net else None,
                 "orders": [{"side": o["side"],
                             "price_cents": round(o["price"] * 100, 1),
                             "size": o.get("size"),
@@ -1898,7 +1926,8 @@ def do_cancel_order(order_id: str) -> tuple[int, dict]:
         return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
 
 
-def manual_place(slug: str, side: str, price_cents: float, size: int) -> tuple[int, dict]:
+def manual_place(slug: str, side: str, price_cents: float, size: int,
+                 close_short: bool = False) -> tuple[int, dict]:
     """Place ONE post-only order from the market sheet. Same protections as
     the batch placer minus the plan checks: known market, sane price, post-
     only (rests or rejects — can never cross and fill on arrival)."""
@@ -1916,6 +1945,11 @@ def manual_place(slug: str, side: str, price_cents: float, size: int) -> tuple[i
         # BUY_SHORT opens a short and rests as an ASK; SELL_SHORT would
         # rest as a BID (it CLOSES a short) — the bidding-against-yourself bug
         intent = "ORDER_INTENT_SELL_LONG" if net >= size else "ORDER_INTENT_BUY_SHORT"
+    elif close_short:  # buy back a short: SELL_SHORT rests as a BID
+        net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
+        if net >= 0:
+            return 400, {"ok": False, "error": "no short position to buy back here"}
+        intent = "ORDER_INTENT_SELL_SHORT"
     path = "/v1/orders"
     value = f"{price_cents / 100:.3f}".rstrip("0").rstrip(".")
     try:
@@ -1956,7 +1990,8 @@ def do_maction(body: dict) -> tuple[int, dict]:
     if op == "place":
         try:
             return manual_place(str(body["market"]), str(body.get("side") or "BUY"),
-                                float(body["price_cents"]), int(body["size"]))
+                                float(body["price_cents"]), int(body["size"]),
+                                close_short=bool(body.get("close_short")))
         except (KeyError, TypeError, ValueError):
             return 400, {"ok": False, "error": "bad request"}
     return 400, {"ok": False, "error": "op must be place, modify or cancel"}
@@ -2075,15 +2110,16 @@ the position. Markets whose spread has closed below 3 ticks are skipped.</div>
 <h3>Race risk <span class="sub">(worst / best case per race — negative-risk check)</span></h3>
 <table id="raceList"></table>
 <div class="mkt">A race = sibling markets where ONE outcome resolves YES (a seat ladder, a
-candidate field). Worst case assumes the outcome you're lightest in — or one you don't hold
-at all — wins. 🔒 = you hold every outcome and even the worst one beats your total cost:
-guaranteed profit whoever wins. Longs only; assumes one winner per race.</div>
-<div class="mkt" style="margin-top:8px">Green: the whole position is covered by a resting
-sell that IS the best ask — nothing to worry about. Red: no sell resting, only partial
-coverage, or your ask is behind someone else's — the button places (or reprices) a
-post-only sell of your full position one tick inside the current best ask. Gray: the best
-bid sits right under the best ask, so there's no room to price inside — nothing to do but
-wait for the spread to widen. Selling inventory locks no new capital.</div>
+candidate field). Yes positions pay when their outcome wins; No positions pay in every
+scenario EXCEPT their outcome winning. Worst case = the least favorable winner (including
+outcomes you don't hold). 🔒 = even the worst case beats your total cost: guaranteed profit
+whoever wins. Assumes one winner per race.</div>
+<div class="mkt" style="margin-top:8px">Green: the whole position has a resting exit that IS
+the best price on its side — nothing to worry about. Red: no exit resting, partial coverage,
+or you've been undercut — the button places (or reprices) a post-only exit of the full
+position one tick inside the touch: a SELL for longs, a BUY-BACK for shorts (No positions,
+shown in orange). Gray: the spread leaves no room to price inside — wait for it to widen.
+Exiting inventory locks no new capital.</div>
 </div>
 <div id="viewL" style="display:none">
 <div class="sub">Passive placement plan <span id="planGen"></span></div>
@@ -2165,7 +2201,9 @@ function renderSeats(){
     '<table><tr><th>Seats</th><th class="r">Own</th><th class="r">My orders</th><th class="r">Spread</th></tr>'+
     f.rows.map(r => {
       const own = r.net
-        ? '<b class="pos">'+r.net.toLocaleString()+'</b>'+
+        ? (r.net > 0
+            ? '<b class="pos">'+r.net.toLocaleString()+'</b>'
+            : '<b style="color:#f0883e">No '+Math.abs(r.net).toLocaleString()+'</b>')+
           (r.avg_cents != null ? '<br><span class="sub" style="font-size:10px">@ '+r.avg_cents.toFixed(1)+'¢</span>' : '')
         : '<span class="sub">—</span>';
       const ords = (r.orders || []).map(o =>
@@ -2702,13 +2740,17 @@ function renderPositions(){
         s.size.toLocaleString() + ' @ ' + s.price_cents.toFixed(1) + '¢').join(', ');
       const btn = (r.status === 'fix' && r.target_cents)
         ? '<button style="background:#238636;color:#fff;border:none;border-radius:6px;padding:6px 10px" '+
-          'onclick="event.stopPropagation();posFix('+i+', true)">Sell @ '+r.target_cents.toFixed(1)+'¢</button>'
+          'onclick="event.stopPropagation();posFix('+i+', true)">'+
+          (r.short ? 'Buy back' : 'Sell')+' @ '+r.target_cents.toFixed(1)+'¢</button>'
         : (r.status === 'good' ? '✓'
           : r.status === 'wait' ? '<span class="sub" style="font-size:10px">tight spread —<br>wait</span>'
           : '<span class="sub" style="font-size:10px">book pending<br>↻ refresh</span>');
+      const ownTxt = r.short
+        ? '<b style="color:#f0883e">No '+Math.abs(r.net).toLocaleString()+'</b>'
+        : r.net.toLocaleString();
       return '<tr style="'+bg+'" onclick="openMkt(\\''+esc(r.market)+'\\')">'+
         '<td class="mkt">'+esc(r.market)+'</td>'+
-        '<td class="r">'+r.net.toLocaleString()+
+        '<td class="r">'+ownTxt+
         (r.avg_cents != null ? '<br><span class="sub" style="font-size:10px">@ '+r.avg_cents.toFixed(1)+'¢ avg</span>' : '')+'</td>'+
         '<td class="r" style="font-size:11px">'+(sells ? esc(sells) : '<span class="sub">no sell resting</span>')+'</td>'+
         '<td class="r">'+btn+'</td></tr>';
@@ -2717,11 +2759,15 @@ function renderPositions(){
 async function posFix(i, ask){
   const r = POSD[i];
   if(!r || !r.target_cents) return false;
-  const q = Math.min(Math.round(r.net), 20000);
-  if(ask && !confirm('Sell '+q.toLocaleString()+' '+r.market+' @ '+r.target_cents.toFixed(1)+'¢ (post-only, one tick inside the best ask)?')) return false;
+  const q = Math.min(Math.abs(Math.round(r.net)), 20000);
+  const verb = r.short ? 'Buy back' : 'Sell';
+  if(ask && !confirm(verb+' '+q.toLocaleString()+' '+r.market+' @ '+r.target_cents.toFixed(1)+
+                     '¢ (post-only, one tick inside)?')) return false;
   const body = (r.sells && r.sells.length)
     ? {op:'modify', order_id: r.sells[0].id, price_cents: r.target_cents, size: q}
-    : {op:'place', market: r.market, side: 'SELL', price_cents: r.target_cents, size: q};
+    : (r.short
+        ? {op:'place', market: r.market, side: 'BUY', price_cents: r.target_cents, size: q, close_short: true}
+        : {op:'place', market: r.market, side: 'SELL', price_cents: r.target_cents, size: q});
   try{
     const resp = await fetch('maction', {method:'POST',
       headers:{'Content-Type':'application/json','X-Reprice':'1'},

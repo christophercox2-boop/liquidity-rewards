@@ -776,6 +776,7 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                 "side": "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL",
                 "price": _num(o.get("price")),
                 "size": size,
+                "intent": str(o.get("intent") or ""),
             }
         )
 
