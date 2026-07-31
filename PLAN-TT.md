@@ -1,106 +1,106 @@
 # Table tennis plan — 1 share at the touch, both sides
 
-_50 table-tennis markets found; 0 skipped as already started; 0 without books; 100 orders across 50 markets. ~$29 locked if all rest, ~$15.55/day at current books. Generated 2026-07-29 9:39 PM ET._
+_50 table-tennis markets found; 0 skipped as already started; 0 without books; 100 orders across 50 markets. ~$22 locked if all rest, ~$26.49/day at current books. Generated 2026-07-30 10:00 PM ET._
 
 | Market | Side | @ | Note |
 |---|---|--:|---|
-| `aec-setkamecz-debrad-kadond-2026-07-30` | BUY | 17¢ | starts 2026-07-30 14:45 UTC |
-| `aec-setkamecz-debrad-kadond-2026-07-30` | SELL | 67¢ | starts 2026-07-30 14:45 UTC |
-| `aec-setkamecz-simjan-rucpre-2026-07-30` | BUY | 24¢ | starts 2026-07-30 20:00 UTC |
-| `aec-setkamecz-simjan-rucpre-2026-07-30` | SELL | 73¢ | starts 2026-07-30 20:00 UTC |
-| `aec-setkamecz-skyant-akoart-2026-07-30` | BUY | 47¢ | starts 2026-07-30 05:30 UTC |
-| `aec-setkamecz-skyant-akoart-2026-07-30` | SELL | 48¢ | starts 2026-07-30 05:30 UTC |
-| `aec-setkamecz-skyant-holmar-2026-07-30` | BUY | 29¢ | starts 2026-07-30 06:30 UTC |
-| `aec-setkamecz-skyant-holmar-2026-07-30` | SELL | 30¢ | starts 2026-07-30 06:30 UTC |
-| `aec-setkamecz-skyant-vrnjan-2026-07-30` | BUY | 37¢ | starts 2026-07-30 07:30 UTC |
-| `aec-setkamecz-skyant-vrnjan-2026-07-30` | SELL | 38¢ | starts 2026-07-30 07:30 UTC |
-| `aec-setkamecz-vrnjan-akoart-2026-07-30` | BUY | 41¢ | starts 2026-07-30 07:00 UTC |
-| `aec-setkamecz-vrnjan-akoart-2026-07-30` | SELL | 42¢ | starts 2026-07-30 07:00 UTC |
-| `aec-setkamecz-vrnjan-holmar-2026-07-30` | BUY | 39¢ | starts 2026-07-30 06:00 UTC |
-| `aec-setkamecz-vrnjan-holmar-2026-07-30` | SELL | 40¢ | starts 2026-07-30 06:00 UTC |
-| `aec-setkamemd-butdum-turmax-2026-07-30` | BUY | 40¢ | starts 2026-07-30 21:15 UTC |
-| `aec-setkamemd-butdum-turmax-2026-07-30` | SELL | 90¢ | starts 2026-07-30 21:15 UTC |
-| `aec-setkamemd-culdmi-salnic-2026-07-31` | BUY | 26¢ | starts 2026-07-31 00:00 UTC |
-| `aec-setkamemd-culdmi-salnic-2026-07-31` | SELL | 76¢ | starts 2026-07-31 00:00 UTC |
-| `aec-setkamemd-panhen-iskchr-2026-07-30` | BUY | 23¢ | starts 2026-07-30 21:30 UTC |
-| `aec-setkamemd-panhen-iskchr-2026-07-30` | SELL | 69¢ | starts 2026-07-30 21:30 UTC |
-| `aec-setkamemd-salvea-gridmi-2026-07-30` | BUY | 25¢ | starts 2026-07-30 21:45 UTC |
-| `aec-setkamemd-salvea-gridmi-2026-07-30` | SELL | 75¢ | starts 2026-07-30 21:45 UTC |
-| `aec-setkamemd-turmax-gridmi-2026-07-30` | BUY | 22¢ | starts 2026-07-30 20:45 UTC |
-| `aec-setkamemd-turmax-gridmi-2026-07-30` | SELL | 72¢ | starts 2026-07-30 20:45 UTC |
-| `aec-setkamemd-urevad-ghifio-2026-07-31` | BUY | 33¢ | starts 2026-07-31 00:30 UTC |
-| `aec-setkamemd-urevad-ghifio-2026-07-31` | SELL | 84¢ | starts 2026-07-31 00:30 UTC |
-| `aec-setkamemd-ursser-iskchr-2026-07-30` | BUY | 22¢ | starts 2026-07-30 22:30 UTC |
-| `aec-setkamemd-ursser-iskchr-2026-07-30` | SELL | 70¢ | starts 2026-07-30 22:30 UTC |
-| `aec-setkamemd-yavole-panhen-2026-07-30` | BUY | 22¢ | starts 2026-07-30 22:00 UTC |
-| `aec-setkamemd-yavole-panhen-2026-07-30` | SELL | 72¢ | starts 2026-07-30 22:00 UTC |
-| `aec-setkamemd-yavole-ursser-2026-07-30` | BUY | 28¢ | starts 2026-07-30 21:00 UTC |
-| `aec-setkamemd-yavole-ursser-2026-07-30` | SELL | 78¢ | starts 2026-07-30 21:00 UTC |
-| `aec-setkameua-abaspa-hnorom-2026-07-30` | BUY | 17¢ | starts 2026-07-30 23:25 UTC |
-| `aec-setkameua-abaspa-hnorom-2026-07-30` | SELL | 67¢ | starts 2026-07-30 23:25 UTC |
-| `aec-setkameua-chuser-kulhry-2026-07-31` | BUY | 35¢ | starts 2026-07-31 00:35 UTC |
-| `aec-setkameua-chuser-kulhry-2026-07-31` | SELL | 85¢ | starts 2026-07-31 00:35 UTC |
-| `aec-setkameua-chuser-pitser-2026-07-30` | BUY | 26¢ | starts 2026-07-30 22:05 UTC |
-| `aec-setkameua-chuser-pitser-2026-07-30` | SELL | 75¢ | starts 2026-07-30 22:05 UTC |
-| `aec-setkameua-khavit-abaspa-2026-07-31` | BUY | 9¢ | starts 2026-07-31 00:25 UTC |
-| `aec-setkameua-khavit-abaspa-2026-07-31` | SELL | 58¢ | starts 2026-07-31 00:25 UTC |
-| `aec-setkameua-khavit-hnorom-2026-07-30` | BUY | 24¢ | starts 2026-07-30 21:25 UTC |
-| `aec-setkameua-khavit-hnorom-2026-07-30` | SELL | 73¢ | starts 2026-07-30 21:25 UTC |
-| `aec-setkameua-khavit-skaser-2026-07-30` | BUY | 27¢ | starts 2026-07-30 22:55 UTC |
-| `aec-setkameua-khavit-skaser-2026-07-30` | SELL | 76¢ | starts 2026-07-30 22:55 UTC |
-| `aec-setkameua-kimdmy-fommyk-2026-07-30` | BUY | 37¢ | starts 2026-07-30 21:05 UTC |
-| `aec-setkameua-kimdmy-fommyk-2026-07-30` | SELL | 87¢ | starts 2026-07-30 21:05 UTC |
-| `aec-setkameua-kimdmy-pitser-2026-07-31` | BUY | 16¢ | starts 2026-07-31 00:05 UTC |
-| `aec-setkameua-kimdmy-pitser-2026-07-31` | SELL | 65¢ | starts 2026-07-31 00:05 UTC |
-| `aec-setkameua-koziva-pesden-2026-07-30` | BUY | 20¢ | starts 2026-07-30 22:30 UTC |
-| `aec-setkameua-koziva-pesden-2026-07-30` | SELL | 70¢ | starts 2026-07-30 22:30 UTC |
-| `aec-setkameua-koziva-shcden-2026-07-31` | BUY | 15¢ | starts 2026-07-31 00:00 UTC |
-| `aec-setkameua-koziva-shcden-2026-07-31` | SELL | 64¢ | starts 2026-07-31 00:00 UTC |
-| `aec-setkameua-mitole-kalser-2026-07-30` | BUY | 25¢ | starts 2026-07-30 22:15 UTC |
-| `aec-setkameua-mitole-kalser-2026-07-30` | SELL | 67¢ | starts 2026-07-30 22:15 UTC |
-| `aec-setkameua-naiole-abaspa-2026-07-30` | BUY | 25¢ | starts 2026-07-30 22:25 UTC |
-| `aec-setkameua-naiole-abaspa-2026-07-30` | SELL | 73¢ | starts 2026-07-30 22:25 UTC |
-| `aec-setkameua-napole-kalser-2026-07-31` | BUY | 33¢ | starts 2026-07-31 00:15 UTC |
-| `aec-setkameua-napole-kalser-2026-07-31` | SELL | 83¢ | starts 2026-07-31 00:15 UTC |
-| `aec-setkameua-napole-shyant-2026-07-30` | BUY | 33¢ | starts 2026-07-30 22:45 UTC |
-| `aec-setkameua-napole-shyant-2026-07-30` | SELL | 75¢ | starts 2026-07-30 22:45 UTC |
-| `aec-setkameua-napole-smymyk-2026-07-30` | BUY | 26¢ | starts 2026-07-30 20:45 UTC |
-| `aec-setkameua-napole-smymyk-2026-07-30` | SELL | 72¢ | starts 2026-07-30 20:45 UTC |
-| `aec-setkameua-panvol-naiole-2026-07-30` | BUY | 41¢ | starts 2026-07-30 23:55 UTC |
-| `aec-setkameua-panvol-naiole-2026-07-30` | SELL | 90¢ | starts 2026-07-30 23:55 UTC |
-| `aec-setkameua-panvol-skaser-2026-07-30` | BUY | 28¢ | starts 2026-07-30 21:55 UTC |
-| `aec-setkameua-panvol-skaser-2026-07-30` | SELL | 75¢ | starts 2026-07-30 21:55 UTC |
-| `aec-setkameua-perand-chuser-2026-07-30` | BUY | 25¢ | starts 2026-07-30 23:35 UTC |
-| `aec-setkameua-perand-chuser-2026-07-30` | SELL | 70¢ | starts 2026-07-30 23:35 UTC |
-| `aec-setkameua-perand-kulhry-2026-07-30` | BUY | 25¢ | starts 2026-07-30 21:35 UTC |
-| `aec-setkameua-perand-kulhry-2026-07-30` | SELL | 74¢ | starts 2026-07-30 21:35 UTC |
-| `aec-setkameua-pesden-hairus-2026-07-30` | BUY | 31¢ | starts 2026-07-30 23:30 UTC |
-| `aec-setkameua-pesden-hairus-2026-07-30` | SELL | 81¢ | starts 2026-07-30 23:30 UTC |
-| `aec-setkameua-pesden-plivol-2026-07-30` | BUY | 31¢ | starts 2026-07-30 21:00 UTC |
-| `aec-setkameua-pesden-plivol-2026-07-30` | SELL | 75¢ | starts 2026-07-30 21:00 UTC |
-| `aec-setkameua-pitser-fommyk-2026-07-30` | BUY | 36¢ | starts 2026-07-30 23:05 UTC |
-| `aec-setkameua-pitser-fommyk-2026-07-30` | SELL | 86¢ | starts 2026-07-30 23:05 UTC |
-| `aec-setkameua-plivol-shcden-2026-07-30` | BUY | 28¢ | starts 2026-07-30 22:00 UTC |
-| `aec-setkameua-plivol-shcden-2026-07-30` | SELL | 86¢ | starts 2026-07-30 22:00 UTC |
-| `aec-setkameua-shyant-mitole-2026-07-30` | BUY | 26¢ | starts 2026-07-30 21:15 UTC |
-| `aec-setkameua-shyant-mitole-2026-07-30` | SELL | 74¢ | starts 2026-07-30 21:15 UTC |
-| `aec-setkameua-shyant-smymyk-2026-07-30` | BUY | 18¢ | starts 2026-07-30 23:45 UTC |
-| `aec-setkameua-shyant-smymyk-2026-07-30` | SELL | 67¢ | starts 2026-07-30 23:45 UTC |
-| `aec-setkameua-vlaval-mitole-2026-07-30` | BUY | 26¢ | starts 2026-07-30 23:15 UTC |
-| `aec-setkameua-vlaval-mitole-2026-07-30` | SELL | 74¢ | starts 2026-07-30 23:15 UTC |
-| `aec-setkameua-zendmy-hairus-2026-07-30` | BUY | 34¢ | starts 2026-07-30 21:30 UTC |
-| `aec-setkameua-zendmy-hairus-2026-07-30` | SELL | 84¢ | starts 2026-07-30 21:30 UTC |
-| `aec-setkameua-zendmy-pesden-2026-07-31` | BUY | 7¢ | starts 2026-07-31 00:30 UTC |
-| `aec-setkameua-zendmy-pesden-2026-07-31` | SELL | 57¢ | starts 2026-07-31 00:30 UTC |
-| `aec-setkameua-zendmy-plivol-2026-07-30` | BUY | 19¢ | starts 2026-07-30 23:00 UTC |
-| `aec-setkameua-zendmy-plivol-2026-07-30` | SELL | 67¢ | starts 2026-07-30 23:00 UTC |
-| `aec-setkawoua-andver-kurali-2026-07-30` | BUY | 39¢ | starts 2026-07-30 06:00 UTC |
-| `aec-setkawoua-andver-kurali-2026-07-30` | SELL | 41¢ | starts 2026-07-30 06:00 UTC |
-| `aec-setkawoua-andver-kurvik-2026-07-30` | BUY | 28¢ | starts 2026-07-30 10:30 UTC |
-| `aec-setkawoua-andver-kurvik-2026-07-30` | SELL | 77¢ | starts 2026-07-30 10:30 UTC |
-| `aec-setkawoua-andver-paspol-2026-07-30` | BUY | 25¢ | starts 2026-07-30 09:00 UTC |
-| `aec-setkawoua-andver-paspol-2026-07-30` | SELL | 74¢ | starts 2026-07-30 09:00 UTC |
-| `aec-setkawoua-andver-rzhann-2026-07-30` | BUY | 32¢ | starts 2026-07-30 04:30 UTC |
-| `aec-setkawoua-andver-rzhann-2026-07-30` | SELL | 65¢ | starts 2026-07-30 04:30 UTC |
-| `aec-setkawoua-andver-yursvi-2026-07-30` | BUY | 42¢ | starts 2026-07-30 07:30 UTC |
-| `aec-setkawoua-andver-yursvi-2026-07-30` | SELL | 72¢ | starts 2026-07-30 07:30 UTC |
+| `aec-setkamemd-angvit-orbale-2026-07-31` | BUY | 25¢ | starts 2026-07-31 21:45 UTC |
+| `aec-setkamemd-angvit-orbale-2026-07-31` | SELL | 75¢ | starts 2026-07-31 21:45 UTC |
+| `aec-setkamemd-bulale-orbale-2026-07-31` | BUY | 26¢ | starts 2026-07-31 20:45 UTC |
+| `aec-setkamemd-bulale-orbale-2026-07-31` | SELL | 75¢ | starts 2026-07-31 20:45 UTC |
+| `aec-setkamemd-filmih-cappet-2026-08-01` | BUY | 4¢ |  |
+| `aec-setkamemd-filmih-cappet-2026-08-01` | SELL | 96¢ |  |
+| `aec-setkamemd-filmih-copmih-2026-08-01` | BUY | 25¢ | starts 2026-08-01 00:30 UTC |
+| `aec-setkamemd-filmih-copmih-2026-08-01` | SELL | 75¢ | starts 2026-08-01 00:30 UTC |
+| `aec-setkamemd-gridmi-cappet-2026-08-01` | BUY | 25¢ | starts 2026-08-01 00:00 UTC |
+| `aec-setkamemd-gridmi-cappet-2026-08-01` | SELL | 75¢ | starts 2026-08-01 00:00 UTC |
+| `aec-setkamemd-gridmi-copmih-2026-08-01` | BUY | 4¢ |  |
+| `aec-setkamemd-gridmi-copmih-2026-08-01` | SELL | 96¢ |  |
+| `aec-setkamemd-scovla-urevad-2026-07-31` | BUY | 31¢ | starts 2026-07-31 22:30 UTC |
+| `aec-setkamemd-scovla-urevad-2026-07-31` | SELL | 75¢ | starts 2026-07-31 22:30 UTC |
+| `aec-setkamemd-todion-scovla-2026-07-31` | BUY | 25¢ | starts 2026-07-31 21:00 UTC |
+| `aec-setkamemd-todion-scovla-2026-07-31` | SELL | 73¢ | starts 2026-07-31 21:00 UTC |
+| `aec-setkamemd-todion-turmax-2026-07-31` | BUY | 25¢ | starts 2026-07-31 22:00 UTC |
+| `aec-setkamemd-todion-turmax-2026-07-31` | SELL | 75¢ | starts 2026-07-31 22:00 UTC |
+| `aec-setkamemd-turmax-urevad-2026-07-31` | BUY | 25¢ | starts 2026-07-31 21:30 UTC |
+| `aec-setkamemd-turmax-urevad-2026-07-31` | SELL | 73¢ | starts 2026-07-31 21:30 UTC |
+| `aec-setkamemd-uzuale-bulale-2026-07-31` | BUY | 25¢ | starts 2026-07-31 21:15 UTC |
+| `aec-setkamemd-uzuale-bulale-2026-07-31` | SELL | 70¢ | starts 2026-07-31 21:15 UTC |
+| `aec-setkameua-boyvit-lazrus-2026-07-31` | BUY | 25¢ | starts 2026-07-31 22:00 UTC |
+| `aec-setkameua-boyvit-lazrus-2026-07-31` | SELL | 69¢ | starts 2026-07-31 22:00 UTC |
+| `aec-setkameua-cherom-masyev-2026-07-31` | BUY | 25¢ | starts 2026-07-31 21:25 UTC |
+| `aec-setkameua-cherom-masyev-2026-07-31` | SELL | 75¢ | starts 2026-07-31 21:25 UTC |
+| `aec-setkameua-cherom-pysyev-2026-08-01` | BUY | 40¢ | starts 2026-08-01 00:25 UTC |
+| `aec-setkameua-cherom-pysyev-2026-08-01` | SELL | 89¢ | starts 2026-08-01 00:25 UTC |
+| `aec-setkameua-cherom-rezrom-2026-07-31` | BUY | 25¢ | starts 2026-07-31 22:55 UTC |
+| `aec-setkameua-cherom-rezrom-2026-07-31` | SELL | 74¢ | starts 2026-07-31 22:55 UTC |
+| `aec-setkameua-derdmy-gomole-2026-08-01` | BUY | 23¢ | starts 2026-08-01 00:35 UTC |
+| `aec-setkameua-derdmy-gomole-2026-08-01` | SELL | 72¢ | starts 2026-08-01 00:35 UTC |
+| `aec-setkameua-derdmy-lobval-2026-07-31` | BUY | 25¢ | starts 2026-07-31 22:05 UTC |
+| `aec-setkameua-derdmy-lobval-2026-07-31` | SELL | 75¢ | starts 2026-07-31 22:05 UTC |
+| `aec-setkameua-hurore-boyvit-2026-08-01` | BUY | 4¢ |  |
+| `aec-setkameua-hurore-boyvit-2026-08-01` | SELL | 96¢ |  |
+| `aec-setkameua-hurore-kovnaz-2026-07-31` | BUY | 26¢ | starts 2026-07-31 22:30 UTC |
+| `aec-setkameua-hurore-kovnaz-2026-07-31` | SELL | 74¢ | starts 2026-07-31 22:30 UTC |
+| `aec-setkameua-hurore-lazrus-2026-08-01` | BUY | 28¢ | starts 2026-08-01 00:00 UTC |
+| `aec-setkameua-hurore-lazrus-2026-08-01` | SELL | 77¢ | starts 2026-08-01 00:00 UTC |
+| `aec-setkameua-kovnaz-boyvit-2026-07-31` | BUY | 26¢ | starts 2026-07-31 21:00 UTC |
+| `aec-setkameua-kovnaz-boyvit-2026-07-31` | SELL | 74¢ | starts 2026-07-31 21:00 UTC |
+| `aec-setkameua-kovnaz-mitole-2026-07-31` | BUY | 36¢ | starts 2026-07-31 23:30 UTC |
+| `aec-setkameua-kovnaz-mitole-2026-07-31` | SELL | 83¢ | starts 2026-07-31 23:30 UTC |
+| `aec-setkameua-kroyan-derdmy-2026-08-01` | BUY | 4¢ |  |
+| `aec-setkameua-kroyan-derdmy-2026-08-01` | SELL | 96¢ |  |
+| `aec-setkameua-kroyan-gomole-2026-07-31` | BUY | 41¢ | starts 2026-07-31 22:35 UTC |
+| `aec-setkameua-kroyan-gomole-2026-07-31` | SELL | 81¢ | starts 2026-07-31 22:35 UTC |
+| `aec-setkameua-kroyan-khavit-2026-07-31` | BUY | 4¢ | starts 2026-07-31 21:05 UTC |
+| `aec-setkameua-kroyan-khavit-2026-07-31` | SELL | 54¢ | starts 2026-07-31 21:05 UTC |
+| `aec-setkameua-kroyan-lobval-2026-08-01` | BUY | 14¢ | starts 2026-08-01 00:05 UTC |
+| `aec-setkameua-kroyan-lobval-2026-08-01` | SELL | 63¢ | starts 2026-08-01 00:05 UTC |
+| `aec-setkameua-kuraole-boyvit-2026-07-31` | BUY | 25¢ | starts 2026-07-31 23:00 UTC |
+| `aec-setkameua-kuraole-boyvit-2026-07-31` | SELL | 75¢ | starts 2026-07-31 23:00 UTC |
+| `aec-setkameua-kuraole-kovnaz-2026-08-01` | BUY | 20¢ | starts 2026-08-01 00:30 UTC |
+| `aec-setkameua-kuraole-kovnaz-2026-08-01` | SELL | 69¢ | starts 2026-08-01 00:30 UTC |
+| `aec-setkameua-kuraole-mitole-2026-07-31` | BUY | 25¢ | starts 2026-07-31 21:30 UTC |
+| `aec-setkameua-kuraole-mitole-2026-07-31` | SELL | 72¢ | starts 2026-07-31 21:30 UTC |
+| `aec-setkameua-lobval-khavit-2026-07-31` | BUY | 26¢ | starts 2026-07-31 23:05 UTC |
+| `aec-setkameua-lobval-khavit-2026-07-31` | SELL | 76¢ | starts 2026-07-31 23:05 UTC |
+| `aec-setkameua-melval-pysyev-2026-07-31` | BUY | 45¢ | starts 2026-07-31 22:25 UTC |
+| `aec-setkameua-melval-pysyev-2026-07-31` | SELL | 95¢ | starts 2026-07-31 22:25 UTC |
+| `aec-setkameua-melval-rezrom-2026-08-01` | BUY | 4¢ |  |
+| `aec-setkameua-melval-rezrom-2026-08-01` | SELL | 96¢ |  |
+| `aec-setkameua-mitole-lazrus-2026-08-01` | BUY | 4¢ |  |
+| `aec-setkameua-mitole-lazrus-2026-08-01` | SELL | 96¢ |  |
+| `aec-setkameua-pruser-dobvol-2026-07-31` | BUY | 47¢ | starts 2026-07-31 21:45 UTC |
+| `aec-setkameua-pruser-dobvol-2026-07-31` | SELL | 98¢ | starts 2026-07-31 21:45 UTC |
+| `aec-setkameua-pruser-savole-2026-08-01` | BUY | 4¢ |  |
+| `aec-setkameua-pruser-savole-2026-08-01` | SELL | 96¢ |  |
+| `aec-setkameua-pruser-slomyk-2026-07-31` | BUY | 26¢ | starts 2026-07-31 23:15 UTC |
+| `aec-setkameua-pruser-slomyk-2026-07-31` | SELL | 74¢ | starts 2026-07-31 23:15 UTC |
+| `aec-setkameua-pysyev-masyev-2026-07-31` | BUY | 25¢ | starts 2026-07-31 23:25 UTC |
+| `aec-setkameua-pysyev-masyev-2026-07-31` | SELL | 70¢ | starts 2026-07-31 23:25 UTC |
+| `aec-setkameua-savole-dobvol-2026-07-31` | BUY | 29¢ | starts 2026-07-31 23:45 UTC |
+| `aec-setkameua-savole-dobvol-2026-07-31` | SELL | 78¢ | starts 2026-07-31 23:45 UTC |
+| `aec-setkameua-savole-slomyk-2026-07-31` | BUY | 25¢ | starts 2026-07-31 21:15 UTC |
+| `aec-setkameua-savole-slomyk-2026-07-31` | SELL | 75¢ | starts 2026-07-31 21:15 UTC |
+| `aec-setkameua-skaser-derdmy-2026-07-31` | BUY | 25¢ | starts 2026-07-31 23:35 UTC |
+| `aec-setkameua-skaser-derdmy-2026-07-31` | SELL | 69¢ | starts 2026-07-31 23:35 UTC |
+| `aec-setkameua-skaser-gomole-2026-07-31` | BUY | 26¢ | starts 2026-07-31 21:35 UTC |
+| `aec-setkameua-skaser-gomole-2026-07-31` | SELL | 74¢ | starts 2026-07-31 21:35 UTC |
+| `aec-setkameua-skaser-khavit-2026-08-01` | BUY | 4¢ |  |
+| `aec-setkameua-skaser-khavit-2026-08-01` | SELL | 96¢ |  |
+| `aec-setkameua-slomyk-stymyh-2026-07-31` | BUY | 25¢ | starts 2026-07-31 22:15 UTC |
+| `aec-setkameua-slomyk-stymyh-2026-07-31` | SELL | 70¢ | starts 2026-07-31 22:15 UTC |
+| `aec-setkameua-sydole-dobvol-2026-07-31` | BUY | 46¢ | starts 2026-07-31 20:45 UTC |
+| `aec-setkameua-sydole-dobvol-2026-07-31` | SELL | 97¢ | starts 2026-07-31 20:45 UTC |
+| `aec-setkameua-sydole-savole-2026-07-31` | BUY | 25¢ | starts 2026-07-31 22:45 UTC |
+| `aec-setkameua-sydole-savole-2026-07-31` | SELL | 69¢ | starts 2026-07-31 22:45 UTC |
+| `aec-setkameua-sydole-slomyk-2026-08-01` | BUY | 4¢ |  |
+| `aec-setkameua-sydole-slomyk-2026-08-01` | SELL | 96¢ |  |
+| `aec-setkameua-sydole-stymyh-2026-08-01` | BUY | 27¢ | starts 2026-08-01 00:15 UTC |
+| `aec-setkameua-sydole-stymyh-2026-08-01` | SELL | 76¢ | starts 2026-08-01 00:15 UTC |
+| `aec-setkameua-tuzole-masyev-2026-08-01` | BUY | 4¢ |  |
+| `aec-setkameua-tuzole-masyev-2026-08-01` | SELL | 96¢ |  |
+| `aec-setkameua-tuzole-melval-2026-07-31` | BUY | 36¢ | starts 2026-07-31 23:55 UTC |
+| `aec-setkameua-tuzole-melval-2026-07-31` | SELL | 85¢ | starts 2026-07-31 23:55 UTC |
+| `aec-setkameua-tuzole-rezrom-2026-07-31` | BUY | 46¢ | starts 2026-07-31 21:55 UTC |
+| `aec-setkameua-tuzole-rezrom-2026-07-31` | SELL | 97¢ | starts 2026-07-31 21:55 UTC |
