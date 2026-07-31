@@ -1845,17 +1845,28 @@ def seats_overview() -> dict:
                 except Exception:  # noqa: BLE001
                     book = None
             bb = ba = None
+            tick = 0.01
             if book:
+                tick = book.get("tick") or 0.01
                 bids_, asks_ = book.get("bids") or [], book.get("asks") or []
                 bb = bids_[0][0] if bids_ else None
                 ba = asks_[0][0] if asks_ else None
+
+            def _deep(o) -> bool:  # the floor bid / ceiling ask qualifiers
+                return bool((o["side"] == "BUY" and o["price"] <= tick + 1e-9)
+                            or (o["side"] == "SELL" and o["price"] >= 1 - tick - 1e-9))
+
             rows.append({
                 "label": label, "market": slug,
                 "net": int(net) if net else 0,
                 "avg_cents": round(cost / abs(net) * 100, 1) if net else None,
+                "tick_cents": round(tick * 100, 1),
+                "has_deep_bid": any(_deep(o) and o["side"] == "BUY" for o in mine),
+                "has_deep_ask": any(_deep(o) and o["side"] == "SELL" for o in mine),
                 "orders": [{"side": o["side"],
                             "price_cents": round(o["price"] * 100, 1),
                             "size": o.get("size"),
+                            "deep": _deep(o),
                             "best": bool(
                                 (o["side"] == "BUY" and bb is not None
                                  and o["price"] >= bb - 1e-9)
@@ -2053,8 +2064,11 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div class="err" id="seatErr"></div>
 <div id="seatWrap"></div>
 <div class="mkt" style="margin-top:8px">★ = that order is the best price on its side right
-now; "behind" means someone is ahead of you. Own = contracts held @ average cost. Tap any
-row to place, modify or cancel. Books load in batches — if a row shows "…", refresh once.</div>
+now; "behind" means someone is ahead of you. Own = contracts held @ average cost. Your
+qualifier quotes (the floor bid and ceiling ask) are hidden from the order list — ⚓ appears
+wherever they're missing and places them post-only (~$1 locked per side) in one tap;
+"Qualify all missing" does a whole ladder. Tap any row to place, modify or cancel. Books
+load in batches — if a row shows "…", refresh once.</div>
 </div>
 <div id="viewS" style="display:none">
 <div class="sub">Widest politics spreads — enter ONE tick inside both sides <span id="spGen"></span></div>
@@ -2208,22 +2222,68 @@ async function loadSeats(){
     err.textContent = 'seats load failed: ' + e; err.style.display = 'block';
   }
 }
+function qualSpec(r){
+  // the minimal qualifier quotes: floor bid + ceiling ask, ~$1 locked each
+  const tc = r.tick_cents || 1.0;
+  const q = Math.min(20000, Math.round(100 / tc));
+  return {bid_c: tc, ask_c: +(100 - tc).toFixed(1), size: q};
+}
+async function seatQualify(fi, ri, ask){
+  const r = SEATSD[fi].rows[ri];
+  const s = qualSpec(r);
+  const jobs = [];
+  if(!r.has_deep_bid) jobs.push({op:'place', market: r.market, side:'BUY', price_cents: s.bid_c, size: s.size});
+  if(!r.has_deep_ask) jobs.push({op:'place', market: r.market, side:'SELL', price_cents: s.ask_c, size: s.size});
+  if(!jobs.length) return true;
+  if(ask && !confirm('Place qualifier quotes on '+r.market+'?\\n'+
+      jobs.map(j => j.side+' '+j.price_cents+'¢ × '+j.size.toLocaleString()).join(' + ')+
+      ' — about $1 locked per side, post-only.')) return false;
+  for(const j of jobs){
+    try{
+      const resp = await fetch('maction', {method:'POST',
+        headers:{'Content-Type':'application/json','X-Reprice':'1'},
+        body: JSON.stringify(j)});
+      const d = await resp.json().catch(() => ({ok:false, error:'HTTP '+resp.status}));
+      if(!d.ok){ alert(r.market+' '+j.side+' failed: '+(d.detail || d.error || '')); return false; }
+    }catch(e){ alert('Failed: '+e); return false; }
+    await new Promise(res => setTimeout(res, 1500));
+  }
+  if(ask){ SEATSD = null; setTimeout(loadSeats, 1200); }
+  return true;
+}
+async function seatQualifyAll(fi){
+  const rows = SEATSD[fi].rows.map((r, i) => [r, i])
+    .filter(([r]) => !r.has_deep_bid || !r.has_deep_ask);
+  if(!rows.length){ alert('Every market here already has its qualifier quotes.'); return; }
+  if(!confirm('Place the missing qualifier quotes on '+rows.length+' markets (~$1 per side, post-only)?')) return;
+  let done = 0;
+  for(const [r, i] of rows){
+    if(await seatQualify(fi, i, false)) done++;
+  }
+  alert('Qualifiers placed on '+done+'/'+rows.length+' markets.');
+  SEATSD = null; loadSeats();
+}
 function renderSeats(){
-  document.getElementById('seatWrap').innerHTML = (SEATSD || []).map(f =>
-    '<h3>'+esc(f.title)+' <span class="sub" style="font-size:11px">'+f.rows.length+' markets</span></h3>'+
+  document.getElementById('seatWrap').innerHTML = (SEATSD || []).map((f, fi) =>
+    '<h3>'+esc(f.title)+' <span class="sub" style="font-size:11px">'+f.rows.length+' markets</span> '+
+    '<button class="tab" style="font-size:11px;padding:4px 10px" onclick="seatQualifyAll('+fi+')">⚓ Qualify all missing</button></h3>'+
     '<table><tr><th>Seats</th><th class="r">Own</th><th class="r">My orders</th><th class="r">Spread</th></tr>'+
-    f.rows.map(r => {
+    f.rows.map((r, ri) => {
       const own = r.net
         ? (r.net > 0
             ? '<b class="pos">'+r.net.toLocaleString()+'</b>'
             : '<b style="color:#f0883e">No '+Math.abs(r.net).toLocaleString()+'</b>')+
           (r.avg_cents != null ? '<br><span class="sub" style="font-size:10px">@ '+r.avg_cents.toFixed(1)+'¢</span>' : '')
         : '<span class="sub">—</span>';
-      const ords = (r.orders || []).map(o =>
+      const shown = (r.orders || []).filter(o => !o.deep);  // qualifier quotes stay out of the way
+      const missing = !r.has_deep_bid || !r.has_deep_ask;
+      const ords = (shown.map(o =>
         '<span'+(o.side === 'SELL' ? ' style="color:#f0883e"' : '')+'>'+
         (o.side === 'SELL' ? 'S' : 'B')+' '+o.price_cents.toFixed(1)+'¢×'+(o.size||0).toLocaleString()+'</span>'+
         (o.best ? ' <b class="pos">★</b>' : ' <span class="sub" style="font-size:10px">behind</span>'))
-        .join('<br>') || '<span class="sub">—</span>';
+        .join('<br>') || '<span class="sub">—</span>') +
+        (missing ? '<br><button class="alt" style="border:none;border-radius:6px;padding:3px 8px;background:#1f3a5f;color:#79b8ff;font-size:10px" '+
+          'onclick="event.stopPropagation();seatQualify('+fi+','+ri+', true)">⚓ qualify</button>' : '');
       const sp = (r.best_bid_cents != null && r.best_ask_cents != null)
         ? r.best_bid_cents.toFixed(0)+'⇄'+r.best_ask_cents.toFixed(0)+
           '<br><span class="sub" style="font-size:10px">'+r.spread_cents.toFixed(1)+'¢ wide</span>'
