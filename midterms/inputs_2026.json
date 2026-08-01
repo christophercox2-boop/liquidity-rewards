@@ -1,0 +1,16 @@
+{
+  "_comment": "Edit these before each run. Sources: Gallup (approval), RCP/538/Silver Bulletin generic-ballot averages. Margins are Dem-minus-Rep in points.",
+  "election_year": 2026,
+  "president": "Trump",
+  "president_party": "R",
+  "approval": 39,
+  "generic_ballot_dem_margin": 6.0,
+  "_map_comment": "map_shift_dem_seats: expected net Dem seat change from 2025-26 mid-decade redistricting vs the old maps (negative = helps GOP). As of mid-2026: TX -5, MO -1, NC -1, OH -2 vs CA +5, UT +1 => about -3. map_shift_sd is the 1-sigma uncertainty on that number (court fights, maps performing differently than drawn).",
+  "map_shift_dem_seats": -3.0,
+  "map_shift_sd": 2.0,
+  "days_to_election": null,
+  "pres_party_seats_now": 220,
+  "dem_seats_now": 215,
+  "total_seats": 435,
+  "as_of": "2026-07-31 (approval ~39 per Silver Bulletin/AP-NORC; generic ballot D+6 per RCP/USPollingData/FiftyPlusOne averages)"
+}
