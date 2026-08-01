@@ -1254,9 +1254,15 @@ def _collect_fills(t: dict, fills_by_order: dict[str, dict]) -> None:
                                 if t.get("price") is not None else None),
                 "ts_s": ts_s, "when": when, "pnl": 0.0}
             rows_this.append(row)
+    # realizedPnl is the ORDER's running total, restated on every execution —
+    # summing it across 50 one-share fills inflates ~25x (triangular numbers).
+    # Activities arrive newest first: the first NONZERO value seen per row IS
+    # the order's total realized.
     pnl = tr._num(t.get("realizedPnl"))
-    if rows_this and pnl:
-        rows_this[0]["pnl"] += pnl
+    for row in rows_this:
+        if pnl and not row.get("_pnl_locked"):
+            row["pnl"] = pnl
+            row["_pnl_locked"] = True
 
 
 def fetch_recent_fills(key_id: str, secret_key: str) -> list[dict]:
@@ -1278,6 +1284,7 @@ def fetch_recent_fills(key_id: str, secret_key: str) -> list[dict]:
     for row in out:
         row["pnl"] = round(row["pnl"], 2) or None
         row.pop("_val", None)
+        row.pop("_pnl_locked", None)
     return out
 
 
@@ -1308,8 +1315,20 @@ def fetch_activity_pnl(key_id: str, secret_key: str) -> tuple[dict[str, dict], l
                 _collect_fills(t, fills_by_order)
             if t.get("marketSlug"):
                 e = agg.setdefault(t["marketSlug"],
-                                   {"realized": 0.0, "ts": "", "resolved": False, "final": None})
-                e["realized"] += tr._num(t.get("realizedPnl"))
+                                   {"realized": 0.0, "ts": "", "resolved": False,
+                                    "final": None, "_ord": {}})
+                pnl_t = tr._num(t.get("realizedPnl"))
+                oid = None
+                for exk in ("aggressorExecution", "passiveExecution"):
+                    o_ = (t.get(exk) or {}).get("order") or {}
+                    if o_.get("id"):
+                        oid = str(o_["id"])
+                        break
+                if oid:  # running total per order: newest-first, first one wins
+                    if pnl_t and oid not in e.setdefault("_ord", {}):
+                        e["_ord"][oid] = pnl_t
+                else:  # legacy flat rows carried per-trade values
+                    e["realized"] += pnl_t
                 e["ts"] = max(e["ts"], str(t.get("updateTime") or t.get("createTime") or ""))
             elif pr.get("marketSlug"):
                 e = agg.setdefault(pr["marketSlug"],
@@ -1326,7 +1345,10 @@ def fetch_activity_pnl(key_id: str, secret_key: str) -> tuple[dict[str, dict], l
     for row in fills_by_order.values():
         row["pnl"] = round(row["pnl"], 2) or None
         row.pop("_val", None)
+        row.pop("_pnl_locked", None)
         trades.append(row)
+    for e in agg.values():  # per-order running totals -> per-market realized
+        e["realized"] += sum(e.pop("_ord", {}).values())
     return agg, trades
 
 
