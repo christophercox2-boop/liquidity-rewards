@@ -9,18 +9,18 @@ at the current market price:
 
 | Market | Your stance (avg px) | Mkt mid | Model P(Yes) | $ edge |
 |---|---|---|---|---|
-| `scc-hrep-rep-2026-11-03-gte200` | long 50 Yes @ 0.89 | 0.81 | 53% | -13.86 |
-| `scc-hrep-rep-2026-11-03-gte205` | long 19.75 Yes @ 0.55 | 0.62 | 45% | -3.52 |
-| `scc-hrep-rep-2026-11-03-gte210` | long 13.45 Yes @ 0.36 | 0.44 | 36% | -1.11 |
-| `scc-hrep-rep-2026-11-03-gte195` | long 1 Yes @ 0.78 | 0.86 | 61% | -0.25 |
-| `scc-hrep-rep-2026-11-03-gte190` | long 1 Yes @ 0.86 | 0.88 | 68% | -0.19 |
-| `scc-hrep-rep-2026-11-03-gte220` | long 10 No @ 0.82 | 0.18 | 19% | -0.14 |
+| `scc-hrep-rep-2026-11-03-gte200` | long 50 Yes @ 0.89 | 0.81 | 57% | -12.12 |
+| `scc-hrep-rep-2026-11-03-gte205` | long 19.75 Yes @ 0.55 | 0.62 | 49% | -2.63 |
+| `scc-hrep-rep-2026-11-03-gte220` | long 10 No @ 0.82 | 0.18 | 25% | -0.67 |
+| `scc-hrep-rep-2026-11-03-gte210` | long 13.45 Yes @ 0.36 | 0.44 | 41% | -0.38 |
+| `scc-hrep-rep-2026-11-03-gte195` | long 1 Yes @ 0.78 | 0.86 | 64% | -0.22 |
+| `scc-hrep-rep-2026-11-03-gte190` | long 1 Yes @ 0.86 | 0.88 | 70% | -0.18 |
 
 Reading the worst offenders:
 
-- **`scc-hrep-rep-2026-11-03-gte200`** — you hold 50 Yes shares with the market at 0.81, but the model puts P(Yes) at only 53%
-- **`scc-hrep-rep-2026-11-03-gte205`** — you hold 19.75 Yes shares with the market at 0.62, but the model puts P(Yes) at only 45%
-- **`scc-hrep-rep-2026-11-03-gte210`** — you hold 13.45 Yes shares with the market at 0.44, but the model puts P(Yes) at only 36%
+- **`scc-hrep-rep-2026-11-03-gte200`** — you hold 50 Yes shares with the market at 0.81, but the model puts P(Yes) at only 57%
+- **`scc-hrep-rep-2026-11-03-gte205`** — you hold 19.75 Yes shares with the market at 0.62, but the model puts P(Yes) at only 49%
+- **`scc-hrep-rep-2026-11-03-gte220`** — you hold 10 No shares with the market at 0.18, but the model puts P(Yes) at 25%, higher than the market implies
 
 ## Your resting orders, if they fill
 
@@ -31,39 +31,41 @@ resolution.
 
 | Market | Order | Model P(Yes) | EV/share | EV total |
 |---|---|---|---|---|
-| `scc-hrep-rep-2026-11-03-gte185` | BUY 50 @ 0.90 | 74% | -0.16 | -7.77 |
-| `scc-hrep-rep-2026-11-03-gte200` | BUY 30 @ 0.60 | 53% | -0.07 | -2.01 |
-| `scc-hrep-rep-2026-11-03-gte185` | BUY 4 @ 0.90 | 74% | -0.16 | -0.62 |
-| `scc-hrep-rep-2026-11-03-gte230` | SELL 30 @ 0.07 | 8% | -0.01 | -0.34 |
-| `scc-hrep-rep-2026-11-03-gte215` | BUY 10 @ 0.22 | 27% | +0.05 | +0.51 |
-| `scc-hrep-rep-2026-11-03-gte235` | SELL 50 @ 0.07 | 5% | +0.02 | +1.04 |
-| `scc-hrep-rep-2026-11-03-gte220` | SELL 20 @ 0.35 | 19% | +0.16 | +3.12 |
-| `scc-hrep-rep-2026-11-03-gte210` | SELL 53 @ 0.42 | 36% | +0.06 | +3.33 |
-| `scc-hrep-rep-2026-11-03-gte215` | BUY 50 @ 0.17 | 27% | +0.10 | +5.07 |
-| `scc-hrep-rep-2026-11-03-gte205` | SELL 30 @ 0.62 | 45% | +0.17 | +5.19 |
-| `scc-hrep-rep-2026-11-03-gte200` | SELL 33 @ 0.70 | 53% | +0.17 | +5.52 |
-| `scc-hrep-rep-2026-11-03-gte195` | SELL 49 @ 0.77 | 61% | +0.16 | +7.79 |
-| `scc-hrep-rep-2026-11-03-gte195` | SELL 50 @ 0.80 | 61% | +0.19 | +9.45 |
-| `scc-hrep-rep-2026-11-03-gte190` | SELL 50 @ 0.95 | 68% | +0.27 | +13.44 |
-| `scc-hrep-rep-2026-11-03-gte230` | BUY 250 @ 0.02 | 8% | +0.06 | +15.34 |
-| `scc-hrep-rep-2026-11-03-gte180` | SELL 100 @ 0.96 | 80% | +0.16 | +15.66 |
-| `scc-hrep-rep-2026-11-03-gte200` | SELL 85 @ 0.74 | 53% | +0.21 | +17.61 |
-| `scc-hrep-rep-2026-11-03-gte190` | SELL 80.77 @ 0.99 | 68% | +0.31 | +24.94 |
-| `scc-hrep-rep-2026-11-03-gte185` | SELL 160.67 @ 0.99 | 74% | +0.25 | +39.42 |
-| `scc-hrep-rep-2026-11-03-gte195` | SELL 160.65 @ 0.99 | 61% | +0.38 | +60.89 |
-| `scc-hrep-rep-2026-11-03-gte200` | SELL 186.53 @ 0.99 | 53% | +0.46 | +85.27 |
-| `scc-hrep-rep-2026-11-03-gte205` | SELL 186.58 @ 0.99 | 45% | +0.54 | +101.32 |
-| `scc-hrep-rep-2026-11-03-gte210` | SELL 186.53 @ 0.99 | 36% | +0.63 | +118.03 |
-| `scc-hrep-rep-2026-11-03-gte215` | SELL 173.76 @ 0.99 | 27% | +0.72 | +124.86 |
-| `scc-hrep-rep-2026-11-03-gte215` | SELL 178.1 @ 0.99 | 27% | +0.72 | +127.98 |
-| `scc-hrep-rep-2026-11-03-gte215` | SELL 178.12 @ 0.99 | 27% | +0.72 | +128.00 |
-| `scc-hrep-rep-2026-11-03-gte220` | SELL 178.12 @ 0.99 | 19% | +0.80 | +141.76 |
-| `scc-hrep-rep-2026-11-03-gte225` | SELL 177.95 @ 0.99 | 13% | +0.86 | +153.08 |
-| `scc-hrep-rep-2026-11-03-gte230` | SELL 178.12 @ 0.99 | 8% | +0.91 | +161.84 |
-| `scc-hrep-rep-2026-11-03-gte230` | BUY 5000 @ 0.01 | 8% | +0.07 | +356.90 |
-| `scc-hrep-rep-2026-11-03-gte225` | BUY 5000 @ 0.01 | 13% | +0.12 | +598.90 |
-| `scc-hrep-rep-2026-11-03-gte220` | BUY 5000 @ 0.01 | 19% | +0.18 | +920.80 |
-| `scc-hrep-rep-2026-11-03-gte205` | BUY 5000 @ 0.01 | 45% | +0.44 | +2184.70 |
+| `scc-hrep-rep-2026-11-03-gte230` | SELL 71 @ 0.05 | 11% | -0.06 | -4.60 |
+| `scc-hrep-rep-2026-11-03-gte195` | BUY 40 @ 0.74 | 64% | -0.10 | -4.18 |
+| `scc-hrep-rep-2026-11-03-gte220` | BUY 50 @ 0.30 | 25% | -0.05 | -2.67 |
+| `scc-hrep-rep-2026-11-03-gte200` | BUY 30 @ 0.65 | 57% | -0.08 | -2.47 |
+| `scc-hrep-rep-2026-11-03-gte190` | BUY 30 @ 0.78 | 70% | -0.08 | -2.45 |
+| `scc-hrep-rep-2026-11-03-gte215` | SELL 20 @ 0.23 | 33% | -0.10 | -1.92 |
+| `scc-hrep-rep-2026-11-03-gte185` | BUY 4 @ 0.90 | 76% | -0.14 | -0.57 |
+| `scc-hrep-rep-2026-11-03-gte235` | SELL 50 @ 0.07 | 7% | -0.00 | -0.07 |
+| `scc-hrep-rep-2026-11-03-gte190` | SELL 1 @ 0.80 | 70% | +0.10 | +0.10 |
+| `scc-hrep-rep-2026-11-03-gte210` | SELL 53 @ 0.42 | 41% | +0.01 | +0.42 |
+| `scc-hrep-rep-2026-11-03-gte215` | BUY 10 @ 0.22 | 33% | +0.11 | +1.06 |
+| `scc-hrep-rep-2026-11-03-gte220` | SELL 25 @ 0.32 | 25% | +0.07 | +1.84 |
+| `scc-hrep-rep-2026-11-03-gte205` | SELL 30 @ 0.62 | 49% | +0.13 | +3.85 |
+| `scc-hrep-rep-2026-11-03-gte200` | SELL 33 @ 0.69 | 57% | +0.12 | +4.04 |
+| `scc-hrep-rep-2026-11-03-gte195` | SELL 49 @ 0.76 | 64% | +0.12 | +6.10 |
+| `scc-hrep-rep-2026-11-03-gte215` | BUY 50 @ 0.17 | 33% | +0.16 | +7.79 |
+| `scc-hrep-rep-2026-11-03-gte195` | SELL 50 @ 0.80 | 64% | +0.16 | +8.22 |
+| `scc-hrep-rep-2026-11-03-gte180` | BUY 50 @ 0.60 | 81% | +0.21 | +10.62 |
+| `scc-hrep-rep-2026-11-03-gte190` | SELL 50 @ 0.95 | 70% | +0.25 | +12.58 |
+| `scc-hrep-rep-2026-11-03-gte200` | SELL 85 @ 0.74 | 57% | +0.17 | +14.66 |
+| `scc-hrep-rep-2026-11-03-gte180` | SELL 100 @ 0.96 | 81% | +0.15 | +14.75 |
+| `scc-hrep-rep-2026-11-03-gte190` | SELL 80.77 @ 0.99 | 70% | +0.29 | +23.56 |
+| `scc-hrep-rep-2026-11-03-gte230` | BUY 250 @ 0.02 | 11% | +0.09 | +23.70 |
+| `scc-hrep-rep-2026-11-03-gte185` | SELL 160.67 @ 0.99 | 76% | +0.23 | +37.39 |
+| `scc-hrep-rep-2026-11-03-gte210` | SELL 71.2 @ 0.99 | 41% | +0.58 | +41.15 |
+| `scc-hrep-rep-2026-11-03-gte195` | SELL 160.65 @ 0.99 | 64% | +0.35 | +56.94 |
+| `scc-hrep-rep-2026-11-03-gte225` | SELL 71.2 @ 0.99 | 17% | +0.82 | +58.12 |
+| `scc-hrep-rep-2026-11-03-gte200` | SELL 186.53 @ 0.99 | 57% | +0.42 | +78.79 |
+| `scc-hrep-rep-2026-11-03-gte215` | SELL 173.76 @ 0.99 | 33% | +0.66 | +115.40 |
+| `scc-hrep-rep-2026-11-03-gte215` | SELL 178.1 @ 0.99 | 33% | +0.66 | +118.29 |
+| `scc-hrep-rep-2026-11-03-gte215` | SELL 178.12 @ 0.99 | 33% | +0.66 | +118.30 |
+| `scc-hrep-rep-2026-11-03-gte220` | SELL 178.12 @ 0.99 | 25% | +0.74 | +132.42 |
+| `scc-hrep-rep-2026-11-03-gte225` | BUY 5000 @ 0.01 | 17% | +0.16 | +818.60 |
+| `scc-hrep-rep-2026-11-03-gte220` | BUY 5000 @ 0.01 | 25% | +0.24 | +1182.80 |
+| `scc-hrep-rep-2026-11-03-gte200` | BUY 5000 @ 0.01 | 57% | +0.56 | +2787.90 |
 
 ## Full ladder: market vs. model
 
@@ -73,19 +75,19 @@ disagree hardest, trust the gap least.
 
 | Market | Mkt mid | Model P(Yes) | Gap | Model A | Model B | Price src |
 |---|---|---|---|---|---|---|
-| `scc-hrep-rep-2026-11-03-gte180` | 0.74 | 80% | +6% | 63% | 98% | 2026-07-30 9:58 PM ET |
-| `scc-hrep-rep-2026-11-03-gte185` | 0.92 | 74% | -17% | 53% | 96% | 2026-07-30 9:58 PM ET |
-| `scc-hrep-rep-2026-11-03-gte190` | 0.88 | 68% | -19% | 43% | 93% | 2026-07-30 9:58 PM ET |
-| `scc-hrep-rep-2026-11-03-gte195` | 0.86 | 61% | -25% | 34% | 89% | 2026-07-30 9:58 PM ET |
-| `scc-hrep-rep-2026-11-03-gte200` | 0.81 | 53% | -28% | 25% | 82% | 2026-07-30 9:58 PM ET |
-| `scc-hrep-rep-2026-11-03-gte205` | 0.62 | 45% | -18% | 18% | 72% | 2026-07-30 9:58 PM ET |
-| `scc-hrep-rep-2026-11-03-gte210` | 0.44 | 36% | -8% | 12% | 59% | 2026-07-30 9:58 PM ET |
-| `scc-hrep-rep-2026-11-03-gte215` | 0.30 | 27% | -3% | 8% | 46% | 2026-07-30 9:58 PM ET |
-| `scc-hrep-rep-2026-11-03-gte220` | 0.18 | 19% | +1% | 5% | 33% | 2026-07-30 9:58 PM ET |
-| `scc-hrep-rep-2026-11-03-gte225` | 0.15 | 13% | -3% | 3% | 22% | 2026-07-30 9:58 PM ET |
-| `scc-hrep-rep-2026-11-03-gte230` | 0.11 | 8% | -3% | 2% | 14% | 2026-07-30 9:58 PM ET |
-| `scc-hrep-rep-2026-11-03-gte235` | 0.08 | 5% | -4% | 1% | 8% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte180` | 0.74 | 81% | +7% | 64% | 99% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte185` | 0.92 | 76% | -16% | 54% | 98% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte190` | 0.88 | 70% | -18% | 44% | 96% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte195` | 0.86 | 64% | -22% | 35% | 93% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte200` | 0.81 | 57% | -24% | 26% | 88% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte205` | 0.62 | 49% | -13% | 18% | 80% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte210` | 0.44 | 41% | -3% | 13% | 70% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte215` | 0.30 | 33% | +2% | 9% | 57% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte220` | 0.18 | 25% | +7% | 6% | 44% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte225` | 0.15 | 17% | +2% | 4% | 31% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte230` | 0.11 | 11% | +0% | 2% | 21% | 2026-07-30 9:58 PM ET |
+| `scc-hrep-rep-2026-11-03-gte235` | 0.08 | 7% | -1% | 1% | 13% | 2026-07-30 9:58 PM ET |
 
 ## Model inputs behind these numbers
 
-Approval 39%, generic ballot D+6.0, map shift -3.0 seats (as of: 2026-07-31 (approval ~39 per Silver Bulletin/AP-NORC; generic ballot D+6 per RCP/USPollingData/FiftyPlusOne averages)). Re-run `model.py` inputs first if these look stale. The model's seat distribution is wide — single-market gaps under ~10 points are noise, not signal.
+Approval 39.5%, generic ballot D+4.5, map shift -3.0 seats (as of: 2026-08-01 (auto: median of 18 approval / 10 generic-ballot polls, VoteHub polling API)). Re-run `model.py` inputs first if these look stale. The model's seat distribution is wide — single-market gaps under ~10 points are noise, not signal.
