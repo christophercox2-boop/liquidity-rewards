@@ -112,6 +112,8 @@ def load_inputs(args):
         inp["approval"] = args.approval
     if args.generic_ballot is not None:
         inp["generic_ballot_dem_margin"] = args.generic_ballot
+    if args.map_shift is not None:
+        inp["map_shift_dem_seats"] = args.map_shift
     if inp.get("days_to_election") is None:
         inp["days_to_election"] = max((ELECTION_DAY - date.today()).days, 0)
     return inp
@@ -178,20 +180,28 @@ def simulate(ma, mb, inp, sims, seed):
     drift_sd = min(0.25 * math.sqrt(days), 4.0)
     b0, b1 = mb["sv_coefs"]
 
+    # Mid-decade redistricting: both models are fit on stable-map eras, so a
+    # net map shift (in Dem seats, negative = helps GOP) is applied on top.
+    map_mu = inp.get("map_shift_dem_seats", 0.0)
+    map_sd = inp.get("map_shift_sd", 0.0)
+
     total = inp["total_seats"]
     dem_seats_a, dem_seats_b, combined = [], [], []
     for _ in range(sims):
+        map_shift = rng.gauss(map_mu, map_sd) if map_sd > 0 else map_mu
+
         # Model A draw: president's-party seat change with t-distributed error
         change = mean_change + student_t(rng, ma["df"]) * scale_a
-        pp_after = min(max(inp["pres_party_seats_now"] + change, 0), total)
+        pp_after = inp["pres_party_seats_now"] + change
         dem_a = total - pp_after if pres_r else pp_after
+        dem_a = min(max(dem_a + map_shift, 0), total)
 
         # Model B draw: poll -> vote margin -> seats
         margin = (gb + mb["err_mean"]
                   + student_t(rng, mb["n"] - 1) * mb["err_sd"]
                   + rng.gauss(0, drift_sd))
         dem_b = b0 + b1 * margin + student_t(rng, mb["sv_df"]) * mb["sv_se"]
-        dem_b = min(max(dem_b, 0), total)
+        dem_b = min(max(dem_b + map_shift, 0), total)
 
         dem_seats_a.append(dem_a)
         dem_seats_b.append(dem_b)
@@ -239,7 +249,31 @@ def histogram(draws, lo=175, hi=280, bin_w=5, width=40):
     return "\n".join(lines)
 
 
-def write_report(path, inp, ma, mb, diag, sa, sb, sc, combined, sims):
+def sensitivity_grid(ma, mb, inp, seed, sims=8000):
+    """P(Dem majority) across an approval x generic-ballot grid."""
+    approvals = [35, 39, 43, 47]
+    margins = [0, 3, 6, 9]
+    rows = []
+    for ap in approvals:
+        cells = []
+        for gb in margins:
+            scenario = dict(inp)
+            scenario["approval"] = ap
+            scenario["generic_ballot_dem_margin"] = gb
+            _, _, comb, _ = simulate(ma, mb, scenario, sims, seed + ap * 100 + gb)
+            cells.append(sum(1 for d in comb if d >= MAJORITY) / len(comb))
+        rows.append((ap, cells))
+    lines = ["| Approval \\ Generic ballot | "
+             + " | ".join(f"D+{m}" for m in margins) + " |",
+             "|---|" + "---|" * len(margins)]
+    for ap, cells in rows:
+        mark = " (now)" if ap == round(inp["approval"]) else ""
+        lines.append(f"| **{ap}%**{mark} | "
+                     + " | ".join(f"{c:.0%}" for c in cells) + " |")
+    return "\n".join(lines)
+
+
+def write_report(path, inp, ma, mb, diag, sa, sb, sc, combined, sims, grid):
     p_dem = sc["p_dem"]
     fav = "Democrats" if p_dem >= 0.5 else "Republicans"
     fav_p = max(p_dem, 1 - p_dem)
@@ -270,12 +304,22 @@ def write_report(path, inp, ma, mb, diag, sa, sb, sc, combined, sims):
         histogram(combined),
         "```",
         "",
+        "## What moves the needle",
+        "",
+        "P(Dem majority) under alternative inputs, everything else held at",
+        "current values:",
+        "",
+        grid,
+        "",
         "## Inputs used",
         "",
         f"- Presidential approval ({inp['president']}): **{inp['approval']}%**",
         f"- Generic ballot (Dem − Rep): **{inp['generic_ballot_dem_margin']:+.1f}**",
         f"- Days to election: {inp['days_to_election']} "
         f"(poll-drift σ ±{diag['drift_sd']:.1f} pts)",
+        f"- Redistricting shift: **{inp.get('map_shift_dem_seats', 0):+.1f} Dem "
+        f"seats** (σ ±{inp.get('map_shift_sd', 0):.1f}) vs the 2022 maps, from "
+        "the 2025–26 mid-decade re-maps",
         f"- Current House: {inp['dem_seats_now']} D / "
         f"{inp['total_seats'] - inp['dem_seats_now']} R",
         f"- Inputs as of: {inp.get('as_of', 'n/a')}",
@@ -306,13 +350,14 @@ def write_report(path, inp, ma, mb, diag, sa, sb, sc, combined, sims):
         "## Caveats",
         "",
         "- Fundamentals only — no district-level data, candidate quality,",
-        "  redistricting/mid-decade map changes, or incumbency effects.",
+        "  or incumbency effects.",
         "- Tiny samples (20 and 6 elections). Uncertainty is wide on purpose;",
         "  t-distributed errors give fat tails.",
-        "- The seats-votes curve is fit on post-2000 maps and shifts whenever",
-        "  maps are redrawn.",
-        "- Update `inputs_2026.json` (approval, generic ballot) before relying",
-        "  on any number here.",
+        "- Mid-decade redistricting enters only as the single net-shift input",
+        "  above — a crude summary of a fight still moving through courts and",
+        "  legislatures. Revisit `map_shift_dem_seats` as maps settle.",
+        "- Update `inputs_2026.json` before relying on any number here",
+        "  (`fetch_inputs.py` can do the polling inputs automatically).",
     ]
     path.write_text("\n".join(lines) + "\n")
 
@@ -322,6 +367,8 @@ def main():
     ap.add_argument("--approval", type=float, help="presidential approval %%")
     ap.add_argument("--generic-ballot", type=float,
                     help="generic ballot margin, Dem minus Rep")
+    ap.add_argument("--map-shift", type=float,
+                    help="net redistricting shift in Dem seats (neg = helps GOP)")
     ap.add_argument("--sims", type=int, default=50000)
     ap.add_argument("--seed", type=int, default=2026)
     args = ap.parse_args()
@@ -331,9 +378,10 @@ def main():
     mb = fit_model_b(load_csv("generic_ballot_history.csv"))
     a, b, comb, diag = simulate(ma, mb, inp, args.sims, args.seed)
     sa, sb, sc = summarize(a), summarize(b), summarize(comb)
+    grid = sensitivity_grid(ma, mb, inp, args.seed)
 
     report = HERE / "FORECAST.md"
-    write_report(report, inp, ma, mb, diag, sa, sb, sc, comb, args.sims)
+    write_report(report, inp, ma, mb, diag, sa, sb, sc, comb, args.sims, grid)
 
     fav = "Democrats" if sc["p_dem"] >= 0.5 else "Republicans"
     print(f"P(Democratic House majority): {sc['p_dem']:.1%}  "

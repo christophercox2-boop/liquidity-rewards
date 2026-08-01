@@ -19,19 +19,35 @@ Override inputs from the command line without editing the file:
 
 ```bash
 python3 midterms/model.py --approval 43 --generic-ballot 2.5
+python3 midterms/model.py --map-shift -5     # bearish redistricting scenario
 python3 midterms/model.py --sims 200000 --seed 7
 ```
 
 ## Keeping it fresh
 
-The forecast is only as good as two numbers in `inputs_2026.json`:
+The forecast is driven by three numbers in `inputs_2026.json`:
 
 | Field | What it is | Where to get it |
 |---|---|---|
 | `approval` | Presidential approval % | Gallup, Silver Bulletin average |
 | `generic_ballot_dem_margin` | Generic ballot, Dem − Rep, in points | RealClearPolling / Silver Bulletin averages |
+| `map_shift_dem_seats` | Net Dem seat change from the 2025–26 mid-decade re-maps (negative = helps GOP) | Ballotpedia / news redistricting trackers |
 
-Update those (and `as_of`), re-run, commit.
+**Automatic:** the [`midterm-forecast.yml`](../.github/workflows/midterm-forecast.yml)
+workflow refreshes the polling inputs and regenerates `FORECAST.md` every
+Tuesday (and whenever anything in `midterms/` is pushed to `main`).
+`fetch_inputs.py` pulls recent polls from the VoteHub API and takes a
+45-day median; if the fetch fails for any reason it leaves the committed
+inputs untouched, so a flaky source can never corrupt the forecast. Test
+the parser offline with:
+
+```bash
+python3 midterms/fetch_inputs.py --fixture data/votehub_fixture.json --dry-run
+```
+
+**Manual:** edit the fields (and `as_of`), re-run, commit. The
+redistricting number is the one that always needs a human — court rulings
+don't show up in polling averages.
 
 ## How it works
 
@@ -48,9 +64,18 @@ Two independent models, each contributing half the simulation draws:
   to seats with a seats-votes regression fit on the 2002–2022 midterms.
   Captures the map's structural bias, which Model A misses.
 
+On top of both models, each simulation draws a **redistricting shift**
+(`map_shift_dem_seats` ± `map_shift_sd`): both models are fit on
+stable-map eras, and the 2025–26 mid-decade re-map fight (Texas,
+California, Missouri, North Carolina, Ohio, Utah, …) moves seats in a way
+no historical regression can see. The default (net R+3, σ 2) reflects the
+state of play as of mid-2026 — revisit it as court rulings land.
+
 Errors are drawn from Student's t distributions (fat tails — 20 and 6
 data points do not justify thin ones). Combined P(majority) comes from
-mixing both models' draws 50/50.
+mixing both models' draws 50/50. The report also includes a sensitivity
+grid showing P(Dem majority) across approval × generic-ballot scenarios,
+so you can see instantly what a polling move does to the bottom line.
 
 Historical data lives in [`data/`](data/) as plain CSV: seat changes and
 Gallup approval for every midterm 1946–2022, and final generic-ballot
@@ -62,9 +87,8 @@ materially.
 ## Honest limitations
 
 - Pure fundamentals: no district-level polling, candidate quality,
-  incumbency, retirements, or the 2025–26 mid-decade redistricting wars.
-  The seats-votes curve assumes a map resembling 2002–2022; aggressive
-  re-maps shift it in ways this model cannot see.
+  incumbency, or retirements. Redistricting enters only as one net-shift
+  number — a crude summary of dozens of maps and lawsuits still in motion.
 - 20 elections (Model A) and 6 (Model B) are tiny samples. The wide
   intervals are the honest part of the output — treat the point estimates
   with suspicion and the intervals with respect.

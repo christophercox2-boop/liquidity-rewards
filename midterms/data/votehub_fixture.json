@@ -1,0 +1,25 @@
+{
+  "_comment": "Test fixture for fetch_inputs.py --fixture. Mimics VoteHub API payloads: approval wrapped in {data:[...]}, generic ballot as a bare list. Includes stale and malformed polls that the parser must skip.",
+  "approval": {
+    "data": [
+      {"pollster": "A", "subject": "Trump", "end_date": "2026-07-30", "answers": [{"choice": "Approve", "pct": 38.0}, {"choice": "Disapprove", "pct": 59.0}]},
+      {"pollster": "B", "subject": "Trump", "end_date": "2026-07-28", "answers": [{"choice": "approve", "pct": 39.5}, {"choice": "disapprove", "pct": 57.0}]},
+      {"pollster": "C", "subject": "Trump", "end_date": "2026-07-25", "answers": [{"choice": "Approve", "pct": 40.0}, {"choice": "Disapprove", "pct": 56.5}]},
+      {"pollster": "D", "subject": "Trump", "end_date": "2026-07-21", "answers": [{"choice": "Approve", "pct": 37.0}, {"choice": "Disapprove", "pct": 60.0}]},
+      {"pollster": "E", "subject": "Trump", "end_date": "2026-07-15", "answers": [{"choice": "Approve", "pct": 41.0}, {"choice": "Disapprove", "pct": 55.0}]},
+      {"pollster": "F", "subject": "Trump", "end_date": "2026-07-10", "answers": [{"choice": "Approve", "pct": 39.0}, {"choice": "Disapprove", "pct": 58.0}]},
+      {"pollster": "stale", "subject": "Trump", "end_date": "2026-03-01", "answers": [{"choice": "Approve", "pct": 47.0}]},
+      {"pollster": "malformed", "subject": "Trump", "end_date": "2026-07-29", "answers": [{"choice": "Approve", "pct": null}]},
+      {"pollster": "wrong-subject", "subject": "Congress", "end_date": "2026-07-29", "answers": [{"choice": "Approve", "pct": 20.0}]}
+    ]
+  },
+  "generic_ballot": [
+    {"pollster": "A", "end_date": "2026-07-31", "answers": [{"choice": "Democrats", "pct": 48.5}, {"choice": "Republicans", "pct": 42.0}]},
+    {"pollster": "B", "end_date": "2026-07-29", "answers": [{"choice": "Dem", "pct": 49.0}, {"choice": "Rep", "pct": 43.5}]},
+    {"pollster": "C", "end_date": "2026-07-26", "answers": [{"choice": "Democratic", "pct": 47.0}, {"choice": "GOP", "pct": 42.5}]},
+    {"pollster": "D", "end_date": "2026-07-20", "answers": [{"choice": "Democrats", "pct": 50.0}, {"choice": "Republicans", "pct": 41.0}]},
+    {"pollster": "E", "end_date": "2026-07-14", "answers": [{"choice": "Democrats", "pct": 46.5}, {"choice": "Republicans", "pct": 43.0}]},
+    {"pollster": "stale", "end_date": "2026-01-05", "answers": [{"choice": "Democrats", "pct": 45.0}, {"choice": "Republicans", "pct": 45.0}]},
+    {"pollster": "missing-rep", "end_date": "2026-07-30", "answers": [{"choice": "Democrats", "pct": 55.0}]}
+  ]
+}
