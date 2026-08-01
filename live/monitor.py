@@ -354,11 +354,16 @@ class Monitor:
             self.state["fill_seen_ts"] = max(newest, seen)
             lines = []
             for t in fresh[:4]:
-                qty = f"{t['filled']:g}" if t.get("filled") else "?"
-                if t.get("qty") and t.get("filled") and t["qty"] > t["filled"]:
-                    qty += f" of {t['qty']:g}"
-                px = f" @ {t['price_cents']:g}¢" if t.get("price_cents") is not None else ""
-                lines.append(f"{t.get('side') or ''} {qty}{px} — {t.get('market', '')}")
+                px = f" at {t['price_cents']:g}¢" if t.get("price_cents") is not None else ""
+                n = f"{t.get('filled') or 0:g}"
+                if t.get("kind") == "self":
+                    lines.append(f"Your own orders crossed — {n} shares{px} — {t.get('market', '')}")
+                else:
+                    pnl = t.get("pnl")
+                    ptxt = (f" ({'profit +' if pnl > 0 else 'loss -'}${abs(pnl):.2f})"
+                            if pnl else "")
+                    lines.append(f"{t.get('verb', 'Traded')} {n} {t.get('yesno', '')}"
+                                 f"{px}{ptxt} — {t.get('market', '')}")
             if len(fresh) > 4:
                 lines.append(f"+{len(fresh) - 4} more")
             title = "Order filled" if len(fresh) == 1 else f"{len(fresh)} orders filled"
@@ -1192,45 +1197,79 @@ def _fill_ts(iso: str) -> tuple[float, str]:
         return 0.0, ""
 
 
+_INTENT_WORDS = {  # intent -> (verb, Yes/No, price is in NO terms?)
+    "ORDER_INTENT_BUY_LONG": ("Bought", "Yes", False),
+    "ORDER_INTENT_SELL_LONG": ("Sold", "Yes", False),
+    "ORDER_INTENT_BUY_SHORT": ("Bought", "No", True),
+    "ORDER_INTENT_SELL_SHORT": ("Sold", "No", True),
+}
+
+
 def _collect_fills(t: dict, fills_by_order: dict[str, dict]) -> None:
-    """One trade activity = one (often 1-share) execution. Keep only real
-    executions — shares actually traded, never mere order placements — and
-    collapse them to one row per ORDER. Activities arrive newest first, so
-    the first sighting of an order carries its latest cumulative fill,
-    average price and state."""
-    rows_this = []
+    """One trade activity = one (often 1-share) execution. Real executions
+    only (shares traded, never placements), collapsed to one row per ORDER
+    — except when BOTH sides of the trade are ours (our bid and our ask
+    crossing each other): that is ONE event, shown as a single 'own orders
+    crossed' row instead of a buy plus a sell."""
+    execs = []
     for ex in (t.get("aggressorExecution") or {}, t.get("passiveExecution") or {}):
         o = ex.get("order") or {}
-        oid = o.get("id")
-        if not oid or tr._num(ex.get("lastShares")) <= 0:
-            continue  # not an accepted execution of one of our orders
-        row = fills_by_order.get(oid)
-        if row is None:
-            if len(fills_by_order) >= 80:
-                continue
+        if o.get("id") and tr._num(ex.get("lastShares")) > 0:
+            execs.append((ex, o))
+    rows_this = []
+    if len(execs) == 2:  # self-cross: our own orders traded with each other
+        ex, o = execs[0]
+        key = "self:" + str(o.get("id"))
+        shares = tr._num(ex.get("lastShares"))
+        px = tr._num(ex.get("lastPx") or o.get("avgPx") or o.get("price"))
+        row = fills_by_order.get(key)
+        if row is None and len(fills_by_order) < 80:
             ts_s, when = _fill_ts(str(ex.get("transactTime") or ""))
-            state = str(o.get("state") or "")
-            fills_by_order[oid] = row = {
-                "oid": oid,
+            fills_by_order[key] = row = {
+                "oid": key, "kind": "self",
                 "market": o.get("marketSlug") or t.get("marketSlug") or "",
-                "side": "SELL" if "SELL" in str(o.get("side") or "") else "BUY",
-                "qty": tr._num(o.get("quantity")) or None,
-                "filled": tr._num(o.get("cumQuantity")) or None,
-                "price_cents": round(tr._num(o.get("avgPx") or o.get("price")) * 100, 2),
-                "done": state == "ORDER_STATE_FILLED",
+                "filled": 0.0, "_val": 0.0, "price_cents": None,
                 "ts_s": ts_s, "when": when, "pnl": 0.0}
-        rows_this.append(row)
+        if row is not None:
+            row["filled"] += shares
+            row["_val"] += shares * px
+            row["price_cents"] = round(row["_val"] / row["filled"] * 100, 2)
+            rows_this.append(row)
+    else:
+        for ex, o in execs:
+            oid = str(o.get("id"))
+            shares = tr._num(ex.get("lastShares"))
+            verb, yesno, no_terms = _INTENT_WORDS.get(
+                str(o.get("intent") or ""), ("Bought" if str(o.get("side") or "").endswith("BUY")
+                                             else "Sold", "Yes", False))
+            px = tr._num(ex.get("lastPx") or o.get("avgPx") or o.get("price"))
+            if no_terms:
+                px = 1.0 - px  # show No fills at the No price, like the app
+            row = fills_by_order.get(oid)
+            if row is None:
+                if len(fills_by_order) >= 80:
+                    continue
+                ts_s, when = _fill_ts(str(ex.get("transactTime") or ""))
+                fills_by_order[oid] = row = {
+                    "oid": oid, "kind": "fill", "verb": verb, "yesno": yesno,
+                    "market": o.get("marketSlug") or t.get("marketSlug") or "",
+                    "filled": 0.0, "_val": 0.0, "price_cents": None,
+                    "ts_s": ts_s, "when": when, "pnl": 0.0}
+            row["filled"] += shares
+            row["_val"] += shares * px
+            row["price_cents"] = round(row["_val"] / row["filled"] * 100, 2)
+            rows_this.append(row)
     if not rows_this and t.get("marketSlug"):  # older flat shape (qty/price)
         qty = tr._num(t.get("qty"))
         if qty > 0:
             key = str(t.get("id") or len(fills_by_order))
             ts_s, when = _fill_ts(str(t.get("updateTime") or t.get("createTime") or ""))
             fills_by_order[key] = row = {
-                "oid": key,
-                "market": t["marketSlug"], "side": None, "qty": qty, "filled": qty,
+                "oid": key, "kind": "fill", "verb": "Traded", "yesno": "Yes",
+                "market": t["marketSlug"], "filled": qty, "_val": 0.0,
                 "price_cents": (round(tr._num(t.get("price")) * 100, 2)
                                 if t.get("price") is not None else None),
-                "done": True, "ts_s": ts_s, "when": when, "pnl": 0.0}
+                "ts_s": ts_s, "when": when, "pnl": 0.0}
             rows_this.append(row)
     pnl = tr._num(t.get("realizedPnl"))
     if rows_this and pnl:
@@ -1255,6 +1294,7 @@ def fetch_recent_fills(key_id: str, secret_key: str) -> list[dict]:
     out = list(fills.values())
     for row in out:
         row["pnl"] = round(row["pnl"], 2) or None
+        row.pop("_val", None)
     return out
 
 
@@ -1302,6 +1342,7 @@ def fetch_activity_pnl(key_id: str, secret_key: str) -> tuple[dict[str, dict], l
     trades = []
     for row in fills_by_order.values():
         row["pnl"] = round(row["pnl"], 2) or None
+        row.pop("_val", None)
         trades.append(row)
     return agg, trades
 
@@ -3072,16 +3113,21 @@ function renderHome(d){
   const seen = txnSeen();
   const tx = (d.trades || []).filter(t => t.ts_s > seen);
   document.getElementById('txns').innerHTML = tx.length ? tx.slice(0, 25).map(t => {
-      const f = t.filled != null ? (+t.filled).toLocaleString() : '';
-      const part = (t.qty != null && t.filled != null && t.qty > t.filled)
-        ? ' of ' + (+t.qty).toLocaleString() : '';
+      const n = t.filled != null ? (+t.filled).toLocaleString() : '?';
+      const px = t.price_cents != null ? ' at ' + (+t.price_cents).toFixed(1) + '¢' : '';
+      let line;
+      if(t.kind === 'self'){
+        line = '<span class="sub">Your own orders crossed</span> — '+n+' shares'+px+
+               '<br><span class="sub" style="font-size:10px">moved between your positions, no real trade</span>';
+      } else {
+        const sold = t.verb === 'Sold';
+        line = '<span'+(sold ? ' style="color:#f0883e"' : '')+'>'+esc(t.verb || 'Traded')+'</span> '+
+               n+' <b>'+esc(t.yesno || '')+'</b>'+px+
+               (t.pnl ? '<br><span class="'+(t.pnl > 0 ? 'pos' : 'neg')+'">'+
+                 (t.pnl > 0 ? 'profit +$' : 'loss −$')+Math.abs(t.pnl).toFixed(2)+'</span>' : '');
+      }
       return mrow(t.market,
-        '<td class="r" style="white-space:nowrap">'+
-        (t.side ? '<span'+(t.side === 'SELL' ? ' style="color:#f0883e"' : '')+'>'+t.side+'</span> ' : '')+
-        f + part +
-        (t.price_cents != null ? ' @ ' + (+t.price_cents).toFixed(2) + '¢' : '')+
-        (t.pnl ? '<br><span class="'+(t.pnl > 0 ? 'pos' : 'neg')+'">'+(t.pnl > 0 ? '+' : '')+
-                 t.pnl.toFixed(2)+'</span>' : '')+'</td>',
+        '<td class="r" style="white-space:nowrap">'+line+'</td>',
         '<span class="sub" style="font-size:11px">'+esc(t.when || '')+'</span>');
     }).join('') + (tx.length > 25 ? '<tr><td class="sub">+' + (tx.length - 25) + ' more</td></tr>' : '')
     : '<tr><td class="sub">no fills since you last cleared ✓</td></tr>';
