@@ -356,14 +356,11 @@ class Monitor:
             for t in fresh[:4]:
                 px = f" at {t['price_cents']:g}¢" if t.get("price_cents") is not None else ""
                 n = f"{t.get('filled') or 0:g}"
-                if t.get("kind") == "self":
-                    lines.append(f"Your own orders crossed — {n} shares{px} — {t.get('market', '')}")
-                else:
-                    pnl = t.get("pnl")
-                    ptxt = (f" ({'profit +' if pnl > 0 else 'loss -'}${abs(pnl):.2f})"
-                            if pnl else "")
-                    lines.append(f"{t.get('verb', 'Traded')} {n} {t.get('yesno', '')}"
-                                 f"{px}{ptxt} — {t.get('market', '')}")
+                pnl = t.get("pnl")
+                ptxt = (f" ({'profit +' if pnl > 0 else 'loss -'}${abs(pnl):.2f})"
+                        if pnl else "")
+                lines.append(f"{t.get('verb', 'Traded')} {n} {t.get('yesno', '')}"
+                             f"{px}{ptxt} — {t.get('market', '')}")
             if len(fresh) > 4:
                 lines.append(f"+{len(fresh) - 4} more")
             title = "Order filled" if len(fresh) == 1 else f"{len(fresh)} orders filled"
@@ -1217,24 +1214,10 @@ def _collect_fills(t: dict, fills_by_order: dict[str, dict]) -> None:
         if o.get("id") and tr._num(ex.get("lastShares")) > 0:
             execs.append((ex, o))
     rows_this = []
-    if len(execs) == 2:  # self-cross: our own orders traded with each other
-        ex, o = execs[0]
-        key = "self:" + str(o.get("id"))
-        shares = tr._num(ex.get("lastShares"))
-        px = tr._num(ex.get("lastPx") or o.get("avgPx") or o.get("price"))
-        row = fills_by_order.get(key)
-        if row is None and len(fills_by_order) < 80:
-            ts_s, when = _fill_ts(str(ex.get("transactTime") or ""))
-            fills_by_order[key] = row = {
-                "oid": key, "kind": "self",
-                "market": o.get("marketSlug") or t.get("marketSlug") or "",
-                "filled": 0.0, "_val": 0.0, "price_cents": None,
-                "ts_s": ts_s, "when": when, "pnl": 0.0}
-        if row is not None:
-            row["filled"] += shares
-            row["_val"] += shares * px
-            row["price_cents"] = round(row["_val"] / row["filled"] * 100, 2)
-            rows_this.append(row)
+    if len(execs) == 2:
+        # self-cross: our own bid and ask traded with each other — shares just
+        # moved between our positions. Not worth listing or alerting at all.
+        return
     else:
         for ex, o in execs:
             oid = str(o.get("id"))
@@ -3115,19 +3098,13 @@ function renderHome(d){
   document.getElementById('txns').innerHTML = tx.length ? tx.slice(0, 25).map(t => {
       const n = t.filled != null ? (+t.filled).toLocaleString() : '?';
       const px = t.price_cents != null ? ' at ' + (+t.price_cents).toFixed(1) + '¢' : '';
-      let line;
-      if(t.kind === 'self'){
-        line = '<span class="sub">Your own orders crossed</span> — '+n+' shares'+px+
-               '<br><span class="sub" style="font-size:10px">moved between your positions, no real trade</span>';
-      } else {
-        const sold = t.verb === 'Sold';
-        line = '<span'+(sold ? ' style="color:#f0883e"' : '')+'>'+esc(t.verb || 'Traded')+'</span> '+
-               n+' <b>'+esc(t.yesno || '')+'</b>'+px+
-               (t.pnl ? '<br><span class="'+(t.pnl > 0 ? 'pos' : 'neg')+'">'+
-                 (t.pnl > 0 ? 'profit +$' : 'loss −$')+Math.abs(t.pnl).toFixed(2)+'</span>' : '');
-      }
+      const sold = t.verb === 'Sold';
+      const line = '<span'+(sold ? ' style="color:#f0883e"' : '')+'>'+esc(t.verb || 'Traded')+'</span> '+
+             n+' <b>'+esc(t.yesno || '')+'</b>'+px+
+             (t.pnl ? '<br><span class="'+(t.pnl > 0 ? 'pos' : 'neg')+'">'+
+               (t.pnl > 0 ? 'profit +$' : 'loss −$')+Math.abs(t.pnl).toFixed(2)+'</span>' : '');
       return mrow(t.market,
-        '<td class="r" style="white-space:nowrap">'+line+'</td>',
+        '<td class="r">'+line+'</td>',
         '<span class="sub" style="font-size:11px">'+esc(t.when || '')+'</span>');
     }).join('') + (tx.length > 25 ? '<tr><td class="sub">+' + (tx.length - 25) + ' more</td></tr>' : '')
     : '<tr><td class="sub">no fills since you last cleared ✓</td></tr>';
