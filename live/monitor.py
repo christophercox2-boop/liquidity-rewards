@@ -315,6 +315,8 @@ class Monitor:
         self.positions: dict[str, dict] = {}  # raw /v1/portfolio/positions, for the P/L tab
         self.activity_pnl: dict[str, dict] = {}  # closed/settled markets, from activities
         self.trades: list[dict] = []  # recent fills, for the landing page
+        self.order_snaps: list[dict] = []  # rolling 2-min order snapshots (24h, memory-only)
+        self._last_snap = 0.0
         self.pnl_updated: dt.datetime | None = None
         self.pnl_error: str | None = None
         self.buying_power: float | None = None  # available cash, for the Plan tab
@@ -584,6 +586,14 @@ class Monitor:
             del rs[:-1500]
             self.last_ts = now_utc
             self.orders = orders
+            # Rolling restore snapshots: what was resting, every ~2 minutes.
+            if now_utc.timestamp() - self._last_snap >= 120:
+                self._last_snap = now_utc.timestamp()
+                self.order_snaps.append({"ts": self._last_snap, "orders": [
+                    {"id": o.get("id"), "market": o.get("market"), "side": o.get("side"),
+                     "price": o.get("price"), "size": o.get("size"),
+                     "intent": o.get("intent")} for o in orders if o.get("id")]})
+                del self.order_snaps[:-720]  # ~24h
             self.updated = now_utc
             self.state["saved_at"] = now_utc.timestamp()
             self.state["rate"] = self.rate
@@ -749,9 +759,49 @@ def _verify_resting(market: str, side: str, price_value: str) -> tuple[bool, str
 
 
 PLAN_CACHE: dict = {"politics": {"ts": 0.0, "data": None}, "golf": {"ts": 0.0, "data": None},
-                    "tt": {"ts": 0.0, "data": None}, "restore": {"ts": 0.0, "data": None}}
+                    "tt": {"ts": 0.0, "data": None}}
 PLAN_FILES = {"politics": "data/scan.json", "golf": "data/scan_golf.json",
-              "tt": "data/scan_tt.json", "restore": "data/scan_restore.json"}
+              "tt": "data/scan_tt.json"}
+RESTORE_LAST: dict = {"ts": 0.0, "data": None}
+
+
+def _restore_plan(ago: float) -> dict:
+    """What was resting ~`ago` seconds back that is neither resting nor
+    filled now — rebuilt from the monitor's own rolling snapshots, no
+    outside help needed."""
+    ago = max(120.0, min(float(ago or 1800), 24 * 3600.0))
+    now = time.time()
+    with MONITOR.lock:
+        snaps = list(MONITOR.order_snaps)
+        cur_ids = {o.get("id") for o in MONITOR.orders if o.get("id")}
+    target = now - ago
+    if not snaps:
+        return {"generated": "no snapshots yet since the last deploy — ask the assistant "
+                             "to rebuild from the hourly archive instead", "results": []}
+    snap = min(snaps, key=lambda s: abs(s["ts"] - target))
+    filled = {t.get("oid") for t in MONITOR.trades if (t.get("ts_s") or 0) >= snap["ts"]}
+    rows = []
+    when = dt.datetime.fromtimestamp(snap["ts"], ET).strftime("%I:%M %p ET")
+    for o in snap["orders"]:
+        if o["id"] in cur_ids or o["id"] in filled:
+            continue  # still resting, or it FILLED (do not re-place a filled order)
+        price, size = o.get("price") or 0.0, int(o.get("size") or 0)
+        if not (0.001 <= price <= 0.999) or size < 1:
+            continue
+        side = o.get("side") or "BUY"
+        row = {"market": o["market"], "side": side, "restore_ok": True,
+               "pick": {"side": side, "price": price, "size": size,
+                        "capital": round((price if side == "BUY" else 1 - price) * size, 2),
+                        "covered": False, "est_day": 0.0, "share": 0.0},
+               "max": None, "risk": None,
+               "note": f"was resting at {when}"}
+        if "SELL_SHORT" in str(o.get("intent") or ""):
+            row["close_short"] = True
+        rows.append(row)
+    rows.sort(key=lambda r: -r["pick"]["capital"])
+    plan = {"generated": f"snapshot {when} — {len(rows)} orders missing", "results": rows}
+    RESTORE_LAST.update(ts=now, data=plan)
+    return plan
 
 
 def _spread_plan(pol: dict) -> dict:
@@ -797,6 +847,11 @@ def fetch_plan(which: str = "politics") -> dict:
     """A scan plan file from the repo's main branch (via GITHUB_TOKEN)."""
     if which == "spread":
         return _spread_plan(fetch_plan("politics"))
+    if which == "restore":
+        # placement validates against the SAME plan the user just viewed
+        if RESTORE_LAST["data"] and time.time() - RESTORE_LAST["ts"] < 600:
+            return RESTORE_LAST["data"]
+        return _restore_plan(1800)
     which = which if which in PLAN_FILES else "politics"
     slot = PLAN_CACHE[which]
     if slot["data"] and time.time() - slot["ts"] < 300:
@@ -2258,6 +2313,12 @@ Exiting inventory locks no new capital.</div>
  <label class="sub"><input type="radio" name="pwhich" value="golf" onchange="switchPlan()"> Golf (cheap YES)</label>
  <label class="sub"><input type="radio" name="pwhich" value="tt" onchange="switchPlan()"> Table tennis (1@touch)</label>
  <label class="sub"><input type="radio" name="pwhich" value="restore" onchange="switchPlan()"> Restore</label></div>
+<div style="margin:10px 0;display:none" id="restoreRow">Restore what was resting:
+ <button class="tab" onclick="setRago(900)">15m</button>
+ <button class="tab" onclick="setRago(1800)">30m</button>
+ <button class="tab" onclick="setRago(3600)">1h</button>
+ <button class="tab" onclick="setRago(7200)">2h</button>
+ <button class="tab" onclick="setRago(14400)">4h</button> ago</div>
 <div class="sub" id="planBP"></div>
 <div style="margin:10px 0">Max buy price: <b id="capLbl">10¢</b>
  <input type="range" id="capSlider" min="1" max="99" value="10" style="width:55%;vertical-align:middle"
@@ -2402,9 +2463,12 @@ function renderSeats(){
 }
 let PLAN = null, PSEL = {}, BP = null, OLOCK = {};
 function pwhich(){ const el = document.querySelector('input[name="pwhich"]:checked'); return el ? el.value : 'politics'; }
+let RAGO = 1800;
+function setRago(v){ RAGO = v; PLAN = null; PSEL = {}; loadPlan(); }
 function switchPlan(){ PLAN = null; PSEL = {};
   document.getElementById('golfCapRow').style.display = pwhich() === 'golf' ? '' : 'none';
   document.getElementById('polCapRow').style.display = pwhich() === 'politics' ? '' : 'none';
+  document.getElementById('restoreRow').style.display = pwhich() === 'restore' ? '' : 'none';
   loadPlan(); }
 function polCap(){  // user cap on locked capital per market, null = off
   const v = +document.getElementById('polCapSlider').value;
@@ -2430,7 +2494,8 @@ function mroom(m){  // per-market budget left after existing resting orders
 async function loadPlan(){
   if(PLAN) return;
   try{
-    const d = await (await fetch('plan.json?which=' + pwhich())).json();
+    const d = await (await fetch('plan.json?which=' + pwhich() +
+      (pwhich() === 'restore' ? '&ago=' + RAGO : ''))).json();
     const err = document.getElementById('planErr');
     if(d.error){ err.textContent = d.error; err.style.display = 'block'; return; }
     PLAN = d; renderPlan();
@@ -3441,8 +3506,12 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path.startswith("/plan.json"):
             try:
                 from urllib.parse import parse_qs, urlparse
-                which = (parse_qs(urlparse(self.path).query).get("which") or ["politics"])[0]
-                plan = fetch_plan(which)
+                q = parse_qs(urlparse(self.path).query)
+                which = (q.get("which") or ["politics"])[0]
+                if which == "restore":
+                    plan = _restore_plan(float((q.get("ago") or ["1800"])[0]))
+                else:
+                    plan = fetch_plan(which)
                 mine = sorted({o.get("market") for o in MONITOR.orders if o.get("market")})
                 self._send(200, "application/json",
                            json.dumps({"plan": plan, "mine": mine}).encode())
