@@ -49,6 +49,27 @@ python3 midterms/fetch_inputs.py --fixture data/votehub_fixture.json --dry-run
 redistricting number is the one that always needs a human — court rulings
 don't show up in polling averages.
 
+## Your positions vs. the model
+
+```bash
+python3 midterms/edge_check.py             # live prices/positions where possible
+python3 midterms/edge_check.py --offline   # cached repo data only
+```
+
+Prices every House market it recognizes (`hrep-…` control,
+`scc-hrep-…-gteNNN` seat thresholds) straight off the model's simulated
+seat distribution, matches that against the market price and your actual
+Polymarket positions and resting orders, and writes **[EDGE.md](EDGE.md)**
+ranking where the model thinks you're most off base — in dollars, worst
+first. Live fetching reuses the tracker's API auth (same
+`POLYMARKET_KEY_ID` / `POLYMARKET_SECRET_KEY` env vars); anything it can't
+fetch falls back to the repo's cached `data/` files. The weekly workflow
+refreshes EDGE.md too.
+
+Grain of salt: where Model A and Model B disagree hardest (the mid-ladder
+thresholds), the gap column is more model uncertainty than market
+inefficiency — EDGE.md prints both models per market so you can see it.
+
 ## How it works
 
 Two independent models, each contributing half the simulation draws:
