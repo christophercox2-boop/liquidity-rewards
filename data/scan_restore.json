@@ -1,112 +1,8 @@
 {
- "generated": "2026-07-31 4:37 PM ET snapshot",
+ "generated": "2026-08-01 11:30 AM ET snapshot (low-cash cancels)",
  "results": [
   {
-   "market": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.01,
-    "size": 100,
-    "capital": 99.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "ewc-pres-arg-2027-10-24-javmil",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.59,
-    "size": 1,
-    "capital": 0.59,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot",
-   "close_short": true
-  },
-  {
-   "market": "mlaec-swepm-2026-09-13-magand",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.68,
-    "size": 3,
-    "capital": 2.04,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "mlaec-swepm-2026-09-13-magand",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.91,
-    "size": 27,
-    "capital": 2.43,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "pintc-meet-trump-2026-12-31-kimjon",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.04,
-    "size": 2,
-    "capital": 0.08,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot",
-   "close_short": true
-  },
-  {
-   "market": "pvwc-housepopw-2026-11-03-rep",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.1,
-    "size": 60,
-    "capital": 54.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte180",
+   "market": "enwc-ussep-nh-2026-09-01-rep-scobro",
    "side": "BUY",
    "restore_ok": true,
    "pick": {
@@ -120,399 +16,7 @@
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte180",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.85,
-    "size": 60,
-    "capital": 51.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte180",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.96,
-    "size": 100,
-    "capital": 4.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte185",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.89,
-    "size": 50,
-    "capital": 44.5,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte185",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.95,
-    "size": 50,
-    "capital": 2.5,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte190",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.8,
-    "size": 50,
-    "capital": 40.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte190",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.88,
-    "size": 47,
-    "capital": 41.36,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte190",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.91,
-    "size": 1,
-    "capital": 0.09,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte190",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.95,
-    "size": 50,
-    "capital": 2.5,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte195",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.8,
-    "size": 50,
-    "capital": 10.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte195",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.79,
-    "size": 48,
-    "capital": 37.92,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte200",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.86,
-    "size": 50,
-    "capital": 7.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte200",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.85,
-    "size": 50,
-    "capital": 42.5,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte205",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.61,
-    "size": 40,
-    "capital": 24.4,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte205",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.62,
-    "size": 20,
-    "capital": 7.6,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte205",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 5000,
-    "capital": 50.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte210",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.41,
-    "size": 50,
-    "capital": 20.5,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte210",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.42,
-    "size": 53,
-    "capital": 30.74,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte215",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.17,
-    "size": 50,
-    "capital": 8.5,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte215",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.18,
-    "size": 10,
-    "capital": 8.2,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte220",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 5000,
-    "capital": 50.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte220",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.09,
-    "size": 100,
-    "capital": 9.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot",
-   "close_short": true
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte220",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.12,
-    "size": 20,
-    "capital": 17.6,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte225",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.11,
-    "size": 30,
-    "capital": 26.7,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte225",
@@ -520,101 +24,67 @@
    "restore_ok": true,
    "pick": {
     "side": "BUY",
+    "price": 0.01,
+    "size": 5000,
+    "capital": 50.0,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte230",
+   "side": "BUY",
+   "restore_ok": true,
+   "pick": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 5000,
+    "capital": 50.0,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-56",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.05,
+    "size": 50,
+    "capital": 47.5,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "enwc-ussep-nh-2026-09-01-rep-scobro",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
     "price": 0.06,
-    "size": 150,
-    "capital": 9.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte225",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 5000,
-    "capital": 50.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte230",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 5000,
-    "capital": 50.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte230",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.08,
-    "size": 100,
-    "capital": 92.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte230",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.02,
-    "size": 250,
-    "capital": 5.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte235",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.08,
     "size": 50,
-    "capital": 46.0,
+    "capital": 47.0,
     "covered": false,
     "est_day": 0.0,
     "share": 0.0
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte235",
@@ -631,27 +101,27 @@
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
-   "market": "scc-hrep-rep-2026-11-03-gte235",
+   "market": "scc-hrep-rep-2026-11-03-gte185",
    "side": "BUY",
    "restore_ok": true,
    "pick": {
     "side": "BUY",
-    "price": 0.03,
-    "size": 500,
-    "capital": 15.0,
+    "price": 0.9,
+    "size": 50,
+    "capital": 45.0,
     "covered": false,
     "est_day": 0.0,
     "share": 0.0
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-46",
+   "market": "scc-senate-gop-2026-11-03-53",
    "side": "SELL",
    "restore_ok": true,
    "pick": {
@@ -665,58 +135,7 @@
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-46",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.1,
-    "size": 46,
-    "capital": 41.4,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-46",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.03,
-    "size": 500,
-    "capital": 15.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-46",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.03,
-    "size": 45,
-    "capital": 1.35,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
    "market": "scc-senate-gop-2026-11-03-47",
@@ -733,127 +152,41 @@
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-48",
+   "market": "scc-senate-gop-2026-11-03-46",
    "side": "SELL",
    "restore_ok": true,
    "pick": {
     "side": "SELL",
-    "price": 0.15,
-    "size": 17,
-    "capital": 14.45,
+    "price": 0.1,
+    "size": 46,
+    "capital": 41.4,
     "covered": false,
     "est_day": 0.0,
     "share": 0.0
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-48",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.07,
-    "size": 85,
-    "capital": 5.95,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot",
-   "close_short": true
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-49",
+   "market": "scc-senate-gop-2026-11-03-gte57",
    "side": "SELL",
    "restore_ok": true,
    "pick": {
     "side": "SELL",
-    "price": 0.25,
-    "size": 7,
-    "capital": 5.25,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-49",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.22,
-    "size": 44,
-    "capital": 9.68,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-49",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.25,
-    "size": 40,
-    "capital": 30.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-50",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.28,
+    "price": 0.2,
     "size": 50,
-    "capital": 14.0,
+    "capital": 40.0,
     "covered": false,
     "est_day": 0.0,
     "share": 0.0
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-50",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.37,
-    "size": 43,
-    "capital": 27.09,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
    "market": "scc-senate-gop-2026-11-03-51",
@@ -862,355 +195,425 @@
    "pick": {
     "side": "SELL",
     "price": 0.21,
-    "size": 42,
-    "capital": 33.18,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-51",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.2,
     "size": 50,
-    "capital": 10.0,
+    "capital": 39.5,
     "covered": false,
     "est_day": 0.0,
     "share": 0.0
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-52",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.05,
-    "size": 60,
-    "capital": 3.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-52",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.19,
-    "size": 17,
-    "capital": 3.23,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-52",
+   "market": "scc-hrep-rep-2026-11-03-gte210",
    "side": "SELL",
    "restore_ok": true,
    "pick": {
     "side": "SELL",
-    "price": 0.39,
-    "size": 40,
-    "capital": 24.4,
+    "price": 0.42,
+    "size": 53,
+    "capital": 30.74,
     "covered": false,
     "est_day": 0.0,
     "share": 0.0
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-52",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.2,
-    "size": 22,
-    "capital": 17.6,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-53",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.05,
-    "size": 100,
-    "capital": 5.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-53",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.1,
-    "size": 50,
-    "capital": 45.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-54",
+   "market": "vmc-ussep-misen-2026-08-04-ste0-5",
    "side": "SELL",
    "restore_ok": true,
    "pick": {
     "side": "SELL",
     "price": 0.07,
+    "size": 33,
+    "capital": 30.69,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte180",
+   "side": "BUY",
+   "restore_ok": true,
+   "pick": {
+    "side": "BUY",
+    "price": 0.6,
     "size": 50,
-    "capital": 46.5,
+    "capital": 30.0,
     "covered": false,
     "est_day": 0.0,
     "share": 0.0
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-54",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 5000,
-    "capital": 50.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-54",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.06,
-    "size": 49,
-    "capital": 2.94,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-55",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.05,
-    "size": 23,
-    "capital": 1.15,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-55",
+   "market": "vmc-ussep-misen-2026-08-04-ste05-10",
    "side": "SELL",
    "restore_ok": true,
    "pick": {
     "side": "SELL",
-    "price": 0.06,
-    "size": 100,
-    "capital": 94.0,
+    "price": 0.03,
+    "size": 30,
+    "capital": 29.1,
     "covered": false,
     "est_day": 0.0,
     "share": 0.0
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-56",
+   "market": "scc-senate-gop-2026-11-03-48",
    "side": "SELL",
    "restore_ok": true,
    "pick": {
     "side": "SELL",
-    "price": 0.06,
-    "size": 50,
-    "capital": 47.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-56",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.04,
-    "size": 48,
-    "capital": 1.92,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-lte45",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.02,
-    "size": 5000,
-    "capital": 100.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-lte45",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.05,
-    "size": 70,
-    "capital": 66.5,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "vmc-ussep-misen-2026-08-04-els10-15",
-   "side": "SELL",
-   "restore_ok": true,
-   "pick": {
-    "side": "SELL",
-    "price": 0.31,
-    "size": 20,
-    "capital": 13.8,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "vmc-ussep-misen-2026-08-04-els10-15",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 5000,
-    "capital": 50.0,
-    "covered": false,
-    "est_day": 0.0,
-    "share": 0.0
-   },
-   "max": null,
-   "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
-  },
-  {
-   "market": "vmc-ussep-misen-2026-08-04-els10-15",
-   "side": "BUY",
-   "restore_ok": true,
-   "pick": {
-    "side": "BUY",
     "price": 0.13,
-    "size": 50,
-    "capital": 6.5,
+    "size": 30,
+    "capital": 26.1,
     "covered": false,
     "est_day": 0.0,
     "share": 0.0
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   },
   {
-   "market": "vmc-ussep-misen-2026-08-04-elsgte20",
+   "market": "scc-senate-gop-2026-11-03-49",
+   "side": "BUY",
+   "restore_ok": true,
+   "pick": {
+    "side": "BUY",
+    "price": 0.22,
+    "size": 100,
+    "capital": 22.0,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte220",
+   "side": "BUY",
+   "restore_ok": true,
+   "pick": {
+    "side": "BUY",
+    "price": 0.33,
+    "size": 20,
+    "capital": 6.6,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot",
+   "close_short": true
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-gte57",
+   "side": "BUY",
+   "restore_ok": true,
+   "pick": {
+    "side": "BUY",
+    "price": 0.07,
+    "size": 93,
+    "capital": 6.51,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot",
+   "close_short": true
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-47",
+   "side": "BUY",
+   "restore_ok": true,
+   "pick": {
+    "side": "BUY",
+    "price": 0.09,
+    "size": 50,
+    "capital": 4.5,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-48",
+   "side": "BUY",
+   "restore_ok": true,
+   "pick": {
+    "side": "BUY",
+    "price": 0.09,
+    "size": 49,
+    "capital": 4.41,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte210",
    "side": "SELL",
    "restore_ok": true,
    "pick": {
     "side": "SELL",
-    "price": 0.32,
-    "size": 10,
-    "capital": 6.8,
+    "price": 0.99,
+    "size": 186,
+    "capital": 1.86,
     "covered": false,
     "est_day": 0.0,
     "share": 0.0
    },
    "max": null,
    "risk": null,
-   "note": "expired 5:00 PM ET (day order) \u2014 from the 4:37 PM snapshot"
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte210",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 186,
+    "capital": 1.86,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte210",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 186,
+    "capital": 1.86,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte210",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 186,
+    "capital": 1.86,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte210",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 186,
+    "capital": 1.86,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte210",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 186,
+    "capital": 1.86,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte210",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 186,
+    "capital": 1.86,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte215",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 178,
+    "capital": 1.78,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte215",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 178,
+    "capital": 1.78,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte230",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 178,
+    "capital": 1.78,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte225",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 177,
+    "capital": 1.77,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte225",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 177,
+    "capital": 1.77,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte225",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 177,
+    "capital": 1.77,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte195",
+   "side": "SELL",
+   "restore_ok": true,
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 160,
+    "capital": 1.6,
+    "covered": false,
+    "est_day": 0.0,
+    "share": 0.0
+   },
+   "max": null,
+   "risk": null,
+   "note": "auto-cancelled ~11:30-12:06 ET (low cash) \u2014 from the 11:30 snapshot"
   }
  ]
 }
