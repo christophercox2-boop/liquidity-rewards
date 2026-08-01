@@ -1,5 +1,9 @@
 # Polymarket Liquidity Rewards Tracker
 
+> **Side project:** a [2026 House midterm prediction model](midterms/README.md)
+> lives in [`midterms/`](midterms/) — current forecast in
+> [`midterms/FORECAST.md`](midterms/FORECAST.md).
+
 Automatically records your [Polymarket US liquidity rewards](https://docs.polymarket.us/incentives/liquidity)
 every hour and keeps a running history in this private repo.
 
