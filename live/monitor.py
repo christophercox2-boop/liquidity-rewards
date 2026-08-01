@@ -2004,21 +2004,44 @@ def seats_overview() -> dict:
                     book = None
             bb = ba = None
             tick = 0.01
+            bid_total = ask_total = None
             if book:
                 tick = book.get("tick") or 0.01
                 bids_, asks_ = book.get("bids") or [], book.get("asks") or []
                 bb = bids_[0][0] if bids_ else None
                 ba = asks_[0][0] if asks_ else None
+                bid_total = sum(q for _, q in bids_)
+                ask_total = sum(q for _, q in asks_)
 
             def _deep(o) -> bool:  # the floor bid / ceiling ask qualifiers
                 return bool((o["side"] == "BUY" and o["price"] <= tick + 1e-9)
                             or (o["side"] == "SELL" and o["price"] >= 1 - tick - 1e-9))
 
+            # A side pays NOBODY until it holds Target Size — the qualify
+            # button fills the gap with the cheapest possible order.
+            prog_s = (tr._PROG_CACHE.get("progs") or {}).get(slug) or {}
+            target_s = int(prog_s.get("target") or 0)
+            need_bid = need_ask = None
+            if book and target_s:
+                gap_b = max(0, target_s - int(bid_total or 0))
+                gap_a = max(0, target_s - int(ask_total or 0))
+                if gap_b:
+                    need_bid = {"price_cents": round(tick * 100, 1),
+                                "size": min(gap_b, 20000),
+                                "capital": round(tick * min(gap_b, 20000), 2)}
+                if gap_a:
+                    need_ask = {"price_cents": round((1 - tick) * 100, 1),
+                                "size": min(gap_a, 20000),
+                                "capital": round(tick * min(gap_a, 20000), 2)}
             rows.append({
                 "label": label, "market": slug,
                 "net": int(net) if net else 0,
                 "avg_cents": round(cost / abs(net) * 100, 1) if net else None,
                 "tick_cents": round(tick * 100, 1),
+                "target": target_s or None,
+                "bid_total": int(bid_total) if bid_total is not None else None,
+                "ask_total": int(ask_total) if ask_total is not None else None,
+                "need_bid": need_bid, "need_ask": need_ask,
                 "has_deep_bid": any(_deep(o) and o["side"] == "BUY" for o in mine),
                 "has_deep_ask": any(_deep(o) and o["side"] == "SELL" for o in mine),
                 "orders": [{"side": o["side"],
@@ -2223,8 +2246,9 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <div id="seatWrap"></div>
 <div class="mkt" style="margin-top:8px">★ = that order is the best price on its side right
 now; "behind" means someone is ahead of you. Own = contracts held @ average cost. Your
-qualifier quotes (the floor bid and ceiling ask) are hidden from the order list — ⚓ appears
-wherever they're missing and places them post-only (~$1 locked per side) in one tap;
+qualifier quotes (the floor bid and ceiling ask) are hidden from the order list. A side pays
+NOBODY until it holds Target Size — each row shows bid/ask depth vs target, and ⚓ places the
+cheapest possible orders (floor bid / ceiling ask) sized to exactly close the gap;
 "Qualify all missing" does a whole ladder. Tap any row to place, modify or cancel. Books
 load in batches — if a row shows "…", refresh once.</div>
 </div>
@@ -2387,22 +2411,21 @@ async function loadSeats(){
     err.textContent = 'seats load failed: ' + e; err.style.display = 'block';
   }
 }
-function qualSpec(r){
-  // the minimal qualifier quotes: floor bid + ceiling ask, ~$1 locked each
-  const tc = r.tick_cents || 1.0;
-  const q = Math.min(20000, Math.round(100 / tc));
-  return {bid_c: tc, ask_c: +(100 - tc).toFixed(1), size: q};
-}
 async function seatQualify(fi, ri, ask){
   const r = SEATSD[fi].rows[ri];
-  const s = qualSpec(r);
   const jobs = [];
-  if(!r.has_deep_bid) jobs.push({op:'place', market: r.market, side:'BUY', price_cents: s.bid_c, size: s.size});
-  if(!r.has_deep_ask) jobs.push({op:'place', market: r.market, side:'SELL', price_cents: s.ask_c, size: s.size});
+  if(r.need_bid) jobs.push({op:'place', market: r.market, side:'BUY',
+    price_cents: r.need_bid.price_cents, size: r.need_bid.size, cap: r.need_bid.capital});
+  if(r.need_ask) jobs.push({op:'place', market: r.market, side:'SELL',
+    price_cents: r.need_ask.price_cents, size: r.need_ask.size, cap: r.need_ask.capital});
   if(!jobs.length) return true;
-  if(ask && !confirm('Place qualifier quotes on '+r.market+'?\\n'+
+  const capT = jobs.reduce((s, j) => s + (j.cap || 0), 0);
+  if(ask && !confirm('Fill '+r.market+' to Target Size ('+
+      (r.target || 0).toLocaleString()+')?\\n'+
       jobs.map(j => j.side+' '+j.price_cents+'¢ × '+j.size.toLocaleString()).join(' + ')+
-      ' — about $1 locked per side, post-only.')) return false;
+      ' — the cheapest orders that qualify the side'+(jobs.length > 1 ? 's' : '')+
+      ', ~$'+capT.toFixed(2)+' locked, post-only.')) return false;
+  jobs.forEach(j => { delete j.cap; });
   for(const j of jobs){
     try{
       const resp = await fetch('maction', {method:'POST',
@@ -2418,9 +2441,12 @@ async function seatQualify(fi, ri, ask){
 }
 async function seatQualifyAll(fi){
   const rows = SEATSD[fi].rows.map((r, i) => [r, i])
-    .filter(([r]) => !r.has_deep_bid || !r.has_deep_ask);
-  if(!rows.length){ alert('Every market here already has its qualifier quotes.'); return; }
-  if(!confirm('Place the missing qualifier quotes on '+rows.length+' markets (~$1 per side, post-only)?')) return;
+    .filter(([r]) => r.need_bid || r.need_ask);
+  if(!rows.length){ alert('Every market here already holds Target Size on both sides.'); return; }
+  const capT = rows.reduce((s, [r]) => s +
+    ((r.need_bid && r.need_bid.capital) || 0) + ((r.need_ask && r.need_ask.capital) || 0), 0);
+  if(!confirm('Fill '+rows.length+' markets to Target Size with the cheapest possible orders (~$'+
+      capT.toFixed(2)+' locked in total, post-only)?')) return;
   let done = 0;
   for(const [r, i] of rows){
     if(await seatQualify(fi, i, false)) done++;
@@ -2441,14 +2467,18 @@ function renderSeats(){
           (r.avg_cents != null ? '<br><span class="sub" style="font-size:10px">@ '+r.avg_cents.toFixed(1)+'¢</span>' : '')
         : '<span class="sub">—</span>';
       const shown = (r.orders || []).filter(o => !o.deep);  // qualifier quotes stay out of the way
-      const missing = !r.has_deep_bid || !r.has_deep_ask;
+      const missing = r.need_bid || r.need_ask;
+      const qual = (r.target && r.bid_total != null)
+        ? '<br><span class="sub" style="font-size:9px">bid '+r.bid_total.toLocaleString()+
+          ' / ask '+r.ask_total.toLocaleString()+' of '+r.target.toLocaleString()+'</span>' : '';
       const ords = (shown.map(o =>
         '<span'+(o.side === 'SELL' ? ' style="color:#f0883e"' : '')+'>'+
         (o.side === 'SELL' ? 'S' : 'B')+' '+o.price_cents.toFixed(1)+'¢×'+(o.size||0).toLocaleString()+'</span>'+
         (o.best ? ' <b class="pos">★</b>' : ' <span class="sub" style="font-size:10px">behind</span>'))
         .join('<br>') || '<span class="sub">—</span>') +
+        qual +
         (missing ? '<br><button class="alt" style="border:none;border-radius:6px;padding:3px 8px;background:#1f3a5f;color:#79b8ff;font-size:10px" '+
-          'onclick="event.stopPropagation();seatQualify('+fi+','+ri+', true)">⚓ qualify</button>' : '');
+          'onclick="event.stopPropagation();seatQualify('+fi+','+ri+', true)">⚓ fill to target</button>' : '');
       const sp = (r.best_bid_cents != null && r.best_ask_cents != null)
         ? r.best_bid_cents.toFixed(0)+'⇄'+r.best_ask_cents.toFixed(0)+
           '<br><span class="sub" style="font-size:10px">'+r.spread_cents.toFixed(1)+'¢ wide</span>'
