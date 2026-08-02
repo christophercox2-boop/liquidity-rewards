@@ -199,7 +199,7 @@ def tracker_day_integral(day_et: str) -> tuple[float, dict[str, float]] | None:
         return None
 
 
-def load_winners() -> tuple[list[dict], float]:
+def load_winners() -> tuple[list[dict], float, dict]:
     """Career paid rewards per market from data/rewards.csv — fresh copy from
     GitHub when a token is available, else the file shipped with the deploy.
     Returns (winners, lifetime total credited): winners drop markets not
@@ -223,7 +223,7 @@ def load_winners() -> tuple[list[dict], float]:
         try:
             text = (Path(__file__).resolve().parent.parent / "data" / "rewards.csv").read_text()
         except Exception:  # noqa: BLE001
-            return [], 0.0
+            return [], 0.0, {}
     try:
         import csv as _csv
         import io as _io
@@ -241,9 +241,22 @@ def load_winners() -> tuple[list[dict], float]:
             [{"market": m, "total": round(v, 2), "last": last[m]}
              for m, v in tot.items() if m and v >= 2.0 and last[m] >= cutoff],
             key=lambda w: -w["total"])
-        return winners, round(sum(tot.values()), 2)
+        days: dict[str, dict] = {}
+        for row in _csv.DictReader(_io.StringIO(text)):
+            d = row.get("date") or ""
+            try:
+                v = float(row.get("reward_usd") or 0)
+            except ValueError:
+                continue
+            e = days.setdefault(d, {"paid": 0.0, "pending": False})
+            e["paid"] += v
+            if str(row.get("status", "")).upper() == "PENDING":
+                e["pending"] = True
+        for e in days.values():
+            e["paid"] = round(e["paid"], 2)
+        return winners, round(sum(tot.values()), 2), days
     except Exception:  # noqa: BLE001
-        return [], 0.0
+        return [], 0.0, {}
 
 
 WINNERS: list[dict] = []
@@ -316,6 +329,7 @@ class Monitor:
         self.activity_pnl: dict[str, dict] = {}  # closed/settled markets, from activities
         self.trades: list[dict] = []  # recent fills, for the landing page
         self.order_snaps: list[dict] = []  # rolling 2-min order snapshots (24h, memory-only)
+        self.day_paid: dict = {}  # date -> {paid, pending} from the rewards history
         self._last_snap = 0.0
         self.pnl_updated: dt.datetime | None = None
         self.pnl_error: str | None = None
@@ -640,7 +654,11 @@ class Monitor:
                      "batch": o.get("id") in batch_ids}
                     for o in self.orders
                 ],
-                "history": self.state["history"][-7:][::-1],
+                "history": [
+                    {**h, **({"paid": self.day_paid[h["day"]]["paid"],
+                              "pending": self.day_paid[h["day"]]["pending"]}
+                             if h.get("day") in self.day_paid else {"paid": None})}
+                    for h in self.state["history"][-7:][::-1]],
                 "updated": (
                     self.updated.astimezone(ET).strftime("%Y-%m-%d %I:%M:%S %p ET")
                     if self.updated else None
@@ -3476,7 +3494,11 @@ async function refresh(){
           'style="background:#161b22">'+detail+'</td></tr>';
       }).join('') || '<tr><td>nothing yet today</td></tr>';
     document.getElementById('history').innerHTML =
-      d.history.map(h => '<tr><td>'+h.day+'</td><td class="r">$'+h.earned.toFixed(2)+'</td></tr>').join('')
+      '<tr><th>Day</th><th class="r">Tracked</th><th class="r">Polymarket paid</th></tr>' +
+      d.history.map(h => '<tr><td>'+h.day+'</td><td class="r">$'+h.earned.toFixed(2)+'</td>'+
+        '<td class="r">'+(h.paid == null ? '<span class="sub">not posted yet</span>'
+          : '<b>$'+h.paid.toFixed(2)+'</b>'+(h.pending ? ' <span class="sub">(pending)</span>' : ''))+
+        '</td></tr>').join('')
       || '<tr><td>collecting…</td></tr>';
     document.getElementById('acts').innerHTML = (d.actions && d.actions.length) ?
       '<h3>Recent actions</h3>' + d.actions.map(a =>
@@ -3680,9 +3702,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             if time.time() - winners_refreshed > 3600:  # career totals + payout alert
                 winners_refreshed = time.time()
                 try:
-                    winners, rew_total = load_winners()
+                    winners, rew_total, day_paid = load_winners()
                     if winners:
                         WINNERS = winners
+                    MONITOR.day_paid = day_paid
                     if rew_total:
                         MONITOR.note_rewards_total(rew_total)
                 except Exception:  # noqa: BLE001
