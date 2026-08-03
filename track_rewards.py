@@ -130,9 +130,13 @@ def fetch_all_rewards(key_id: str, secret_key: str) -> tuple[list[dict], dict]:
 
 def _fetch_from_host(host: str, key_id: str, secret_key: str) -> tuple[list[dict], dict]:
     rows: list[dict] = []
-    params: dict = {"startDate": START_DATE}
+    # Explicit big pages: the server default (~31/page) times the old 50-page
+    # bound silently CAPPED history at ~1,532 rows — newest days truncated
+    # while the heartbeat stayed green.
+    params: dict = {"startDate": START_DATE, "pageSize": 500}
     raw: dict = {}
-    for _ in range(50):  # bounded pagination
+    token = None
+    for _ in range(200):  # bounded pagination
         resp = requests.get(
             host + EARNINGS_PATH,
             params=params,
@@ -157,6 +161,11 @@ def _fetch_from_host(host: str, key_id: str, secret_key: str) -> tuple[list[dict
         if not token:
             break
         params["pageToken"] = token
+    else:
+        if token:  # never truncate silently — a red run beats quietly losing days
+            raise RuntimeError(
+                f"{host}{EARNINGS_PATH}: still more pages after the bound "
+                f"({len(rows)} rows) — history too large, raise the limit")
     rows.sort(key=lambda r: (r["date"], r["market"], r["program_type"]))
     return rows, raw
 
