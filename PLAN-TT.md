@@ -1,6 +1,6 @@
 # Table tennis plan — 1 share at the touch, both sides
 
-_50 table-tennis markets found; 0 skipped as already started; 0 without books; 100 orders across 50 markets. ~$28 locked if all rest, ~$20,950.21/day at current books. Generated 2026-08-03 8:17 AM ET._
+_50 table-tennis markets found; 0 skipped as already started; 0 without books; 100 orders across 50 markets. ~$28 locked if all rest, ~$23.52/day at current books. Generated 2026-08-03 8:35 AM ET._
 
 | Market | Side | @ | Note |
 |---|---|--:|---|
@@ -9,7 +9,7 @@ _50 table-tennis markets found; 0 skipped as already started; 0 without books; 1
 | `aec-setkamemd-barser-ghifio-2026-08-04` | BUY | 25¢ | starts 2026-08-04 00:30 UTC |
 | `aec-setkamemd-barser-ghifio-2026-08-04` | SELL | 75¢ | starts 2026-08-04 00:30 UTC |
 | `aec-setkamemd-butdum-barser-2026-08-04` | BUY | 36¢ | starts 2026-08-04 02:00 UTC |
-| `aec-setkamemd-butdum-barser-2026-08-04` | SELL | 80¢ | starts 2026-08-04 02:00 UTC |
+| `aec-setkamemd-butdum-barser-2026-08-04` | SELL | 75¢ | starts 2026-08-04 02:00 UTC |
 | `aec-setkamemd-butdum-cappet-2026-08-04` | BUY | 25¢ | starts 2026-08-04 00:00 UTC |
 | `aec-setkamemd-butdum-cappet-2026-08-04` | SELL | 67¢ | starts 2026-08-04 00:00 UTC |
 | `aec-setkamemd-butdum-ghifio-2026-08-04` | BUY | 25¢ | starts 2026-08-04 01:00 UTC |
@@ -41,12 +41,12 @@ _50 table-tennis markets found; 0 skipped as already started; 0 without books; 1
 | `aec-setkameua-kimdmy-perand-2026-08-03` | BUY | 48¢ | starts 2026-08-03 23:05 UTC |
 | `aec-setkameua-kimdmy-perand-2026-08-03` | SELL | 97¢ | starts 2026-08-03 23:05 UTC |
 | `aec-setkameua-kimdmy-steyar-2026-08-04` | BUY | 41¢ | starts 2026-08-04 04:05 UTC |
-| `aec-setkameua-kimdmy-steyar-2026-08-04` | SELL | 81¢ | starts 2026-08-04 04:05 UTC |
+| `aec-setkameua-kimdmy-steyar-2026-08-04` | SELL | 75¢ | starts 2026-08-04 04:05 UTC |
 | `aec-setkameua-korvol-kovvla-2026-08-04` | BUY | 26¢ | starts 2026-08-04 00:00 UTC |
 | `aec-setkameua-korvol-kovvla-2026-08-04` | SELL | 74¢ | starts 2026-08-04 00:00 UTC |
 | `aec-setkameua-korvol-malden-2026-08-04` | BUY | 27¢ | starts 2026-08-04 01:00 UTC |
 | `aec-setkameua-korvol-malden-2026-08-04` | SELL | 73¢ | starts 2026-08-04 01:00 UTC |
-| `aec-setkameua-kulhry-fommyk-2026-08-04` | BUY | 28¢ | starts 2026-08-04 01:35 UTC |
+| `aec-setkameua-kulhry-fommyk-2026-08-04` | BUY | 27¢ | starts 2026-08-04 01:35 UTC |
 | `aec-setkameua-kulhry-fommyk-2026-08-04` | SELL | 74¢ | starts 2026-08-04 01:35 UTC |
 | `aec-setkameua-kulhry-kimdmy-2026-08-04` | BUY | 25¢ | starts 2026-08-04 00:05 UTC |
 | `aec-setkameua-kulhry-kimdmy-2026-08-04` | SELL | 63¢ | starts 2026-08-04 00:05 UTC |
@@ -70,10 +70,10 @@ _50 table-tennis markets found; 0 skipped as already started; 0 without books; 1
 | `aec-setkameua-naiole-skaser-2026-08-04` | SELL | 73¢ | starts 2026-08-04 00:25 UTC |
 | `aec-setkameua-napole-mitole-2026-08-04` | BUY | 47¢ | starts 2026-08-04 00:15 UTC |
 | `aec-setkameua-napole-mitole-2026-08-04` | SELL | 90¢ | starts 2026-08-04 00:15 UTC |
-| `aec-setkameua-napole-shyant-2026-08-03` | BUY | 28¢ | starts 2026-08-03 22:45 UTC |
+| `aec-setkameua-napole-shyant-2026-08-03` | BUY | 27¢ | starts 2026-08-03 22:45 UTC |
 | `aec-setkameua-napole-shyant-2026-08-03` | SELL | 73¢ | starts 2026-08-03 22:45 UTC |
 | `aec-setkameua-napole-smymyk-2026-08-04` | BUY | 51¢ | starts 2026-08-04 01:15 UTC |
-| `aec-setkameua-napole-smymyk-2026-08-04` | SELL | 87¢ | starts 2026-08-04 01:15 UTC |
+| `aec-setkameua-napole-smymyk-2026-08-04` | SELL | 80¢ | starts 2026-08-04 01:15 UTC |
 | `aec-setkameua-paryur-kovvla-2026-08-04` | BUY | 33¢ | starts 2026-08-04 01:30 UTC |
 | `aec-setkameua-paryur-kovvla-2026-08-04` | SELL | 66¢ | starts 2026-08-04 01:30 UTC |
 | `aec-setkameua-shyant-kalser-2026-08-03` | BUY | 26¢ | starts 2026-08-03 23:45 UTC |

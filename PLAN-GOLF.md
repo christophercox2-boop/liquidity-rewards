@@ -1,6 +1,6 @@
 # Golf plan — cheap YES bids at the price floor
 
-_807 golf markets found; 807 carry reward programs (0 without pools); 351 excluded as not in the field; 2 placeable. Field source: pgatour.com field page (157 players). Max $1 at risk per GOLFER across all their markets. Generated 2026-08-03 8:16 AM ET._
+_807 golf markets found; 567 carry reward programs (0 without pools); 111 excluded as not in the field; 2 placeable. Field source: pgatour.com field page (157 players). Max $1 at risk per GOLFER across all their markets. Generated 2026-08-03 8:34 AM ET._
 
 **Everything below:** ~$0.00/day for ~$2 at risk if every bid filled.
 
