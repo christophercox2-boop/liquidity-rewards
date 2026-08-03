@@ -1,0 +1,43 @@
+{
+ "current": {
+  "params": {
+   "startDate": "2026-07-28"
+  },
+  "status": 401,
+  "keys": [
+   "body",
+   "error"
+  ],
+  "n": 0,
+  "sample": null,
+  "cats": {},
+  "dates": {}
+ },
+ "noparams": {
+  "params": {},
+  "status": 401,
+  "keys": [
+   "body",
+   "error"
+  ],
+  "n": 0,
+  "sample": null,
+  "cats": {},
+  "dates": {}
+ },
+ "bigpage": {
+  "params": {
+   "startDate": "2026-07-28",
+   "pageSize": 500
+  },
+  "status": 401,
+  "keys": [
+   "body",
+   "error"
+  ],
+  "n": 0,
+  "sample": null,
+  "cats": {},
+  "dates": {}
+ }
+}

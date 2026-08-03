@@ -4,18 +4,6 @@
             "marketSlug": "apdc-kashpatel-2026-08-31",
             "timePeriods": [
                 {
-                    "programId": "politics_futures_v2",
-                    "programType": "liquidityProgram",
-                    "start": "2026-06-27T00:00:00Z",
-                    "end": "2026-07-03T00:00:00Z",
-                    "rewardPool": 500,
-                    "status": "closed",
-                    "discountFactor": 0.3,
-                    "targetSize": 10000,
-                    "period": "daily_event",
-                    "createdAt": "2026-06-26T22:11:57Z"
-                },
-                {
                     "programId": "politics_futures_v3",
                     "programType": "liquidityProgram",
                     "start": "2026-07-03T00:00:00Z",
@@ -73,6 +61,42 @@
                     "targetSize": 2000,
                     "period": "daily_event",
                     "createdAt": "2026-07-27T22:53:46Z"
+                },
+                {
+                    "programId": "march_madness_futures",
+                    "programType": "liquidityProgram",
+                    "start": "2026-08-01T00:00:00Z",
+                    "end": "2026-08-31T00:00:00Z",
+                    "rewardPool": 5000,
+                    "status": "active",
+                    "discountFactor": 0.9,
+                    "targetSize": 1000,
+                    "period": "daily",
+                    "createdAt": "2026-05-21T18:00:15Z"
+                },
+                {
+                    "programId": "mlb_futures",
+                    "programType": "liquidityProgram",
+                    "start": "2026-08-01T00:00:00Z",
+                    "end": "2026-08-31T00:00:00Z",
+                    "rewardPool": 5000,
+                    "status": "active",
+                    "discountFactor": 0.9,
+                    "targetSize": 2500,
+                    "period": "daily",
+                    "createdAt": "2026-05-21T18:00:15Z"
+                },
+                {
+                    "programId": "mlb_games_ml_live",
+                    "programType": "liquidityProgram",
+                    "start": "2026-08-01T00:00:00Z",
+                    "end": "2026-12-31T00:00:00Z",
+                    "rewardPool": 99999,
+                    "status": "active",
+                    "discountFactor": 0.3,
+                    "targetSize": 10000,
+                    "period": "live",
+                    "createdAt": "2026-05-21T18:00:15Z"
                 }
             ],
             "instrumentState": "INSTRUMENT_STATE_OPEN",
@@ -84,18 +108,6 @@
         {
             "marketSlug": "cranc-uspres28-12-31-2026-elomus",
             "timePeriods": [
-                {
-                    "programId": "politics_futures_v2",
-                    "programType": "liquidityProgram",
-                    "start": "2026-06-27T00:00:00Z",
-                    "end": "2026-07-03T00:00:00Z",
-                    "rewardPool": 500,
-                    "status": "closed",
-                    "discountFactor": 0.3,
-                    "targetSize": 10000,
-                    "period": "daily_event",
-                    "createdAt": "2026-06-26T22:11:57Z"
-                },
                 {
                     "programId": "politics_futures_v3",
                     "programType": "liquidityProgram",
@@ -154,6 +166,42 @@
                     "targetSize": 5000,
                     "period": "daily_event",
                     "createdAt": "2026-07-27T22:49:04Z"
+                },
+                {
+                    "programId": "march_madness_futures",
+                    "programType": "liquidityProgram",
+                    "start": "2026-08-01T00:00:00Z",
+                    "end": "2026-08-31T00:00:00Z",
+                    "rewardPool": 5000,
+                    "status": "active",
+                    "discountFactor": 0.9,
+                    "targetSize": 1000,
+                    "period": "daily",
+                    "createdAt": "2026-05-21T18:00:15Z"
+                },
+                {
+                    "programId": "mlb_futures",
+                    "programType": "liquidityProgram",
+                    "start": "2026-08-01T00:00:00Z",
+                    "end": "2026-08-31T00:00:00Z",
+                    "rewardPool": 5000,
+                    "status": "active",
+                    "discountFactor": 0.9,
+                    "targetSize": 2500,
+                    "period": "daily",
+                    "createdAt": "2026-05-21T18:00:15Z"
+                },
+                {
+                    "programId": "mlb_games_ml_live",
+                    "programType": "liquidityProgram",
+                    "start": "2026-08-01T00:00:00Z",
+                    "end": "2026-12-31T00:00:00Z",
+                    "rewardPool": 99999,
+                    "status": "active",
+                    "discountFactor": 0.3,
+                    "targetSize": 10000,
+                    "period": "live",
+                    "createdAt": "2026-05-21T18:00:15Z"
                 }
             ],
             "instrumentState": "INSTRUMENT_STATE_OPEN",
@@ -199,6 +247,42 @@
                     "targetSize": 2000,
                     "period": "daily_event",
                     "createdAt": "2026-07-27T22:53:46Z"
+                },
+                {
+                    "programId": "march_madness_futures",
+                    "programType": "liquidityProgram",
+                    "start": "2026-08-01T00:00:00Z",
+                    "end": "2026-08-31T00:00:00Z",
+                    "rewardPool": 5000,
+                    "status": "active",
+                    "discountFactor": 0.9,
+                    "targetSize": 1000,
+                    "period": "daily",
+                    "createdAt": "2026-05-21T18:00:15Z"
+                },
+                {
+                    "programId": "mlb_futures",
+                    "programType": "liquidityProgram",
+                    "start": "2026-08-01T00:00:00Z",
+                    "end": "2026-08-31T00:00:00Z",
+                    "rewardPool": 5000,
+                    "status": "active",
+                    "discountFactor": 0.9,
+                    "targetSize": 2500,
+                    "period": "daily",
+                    "createdAt": "2026-05-21T18:00:15Z"
+                },
+                {
+                    "programId": "mlb_games_ml_live",
+                    "programType": "liquidityProgram",
+                    "start": "2026-08-01T00:00:00Z",
+                    "end": "2026-12-31T00:00:00Z",
+                    "rewardPool": 99999,
+                    "status": "active",
+                    "discountFactor": 0.3,
+                    "targetSize": 10000,
+                    "period": "live",
+                    "createdAt": "2026-05-21T18:00:15Z"
                 }
             ],
             "instrumentState": "INSTRUMENT_STATE_OPEN",
@@ -275,7 +359,7 @@
                     "programType": "liquidityProgram",
                     "start": "2026-07-13T00:00:00Z",
                     "rewardPool": 5000,
-                    "status": "active",
+                    "status": "closed",
                     "discountFactor": 0.9,
                     "targetSize": 10000,
                     "period": "tournament_with_cutoff",
@@ -286,7 +370,7 @@
                     "programType": "liquidityProgram",
                     "start": "2026-07-13T00:00:00Z",
                     "rewardPool": 15000,
-                    "status": "active",
+                    "status": "closed",
                     "discountFactor": 0.4,
                     "targetSize": 10000,
                     "period": "tournament_with_cutoff",
@@ -297,7 +381,7 @@
                     "programType": "liquidityProgram",
                     "start": "2026-07-13T00:00:00Z",
                     "rewardPool": 10000,
-                    "status": "active",
+                    "status": "closed",
                     "discountFactor": 0.4,
                     "targetSize": 10000,
                     "period": "tournament_with_cutoff",
@@ -308,7 +392,7 @@
                     "programType": "liquidityProgram",
                     "start": "2026-07-13T00:00:00Z",
                     "rewardPool": 10000,
-                    "status": "active",
+                    "status": "closed",
                     "discountFactor": 0.35,
                     "targetSize": 10000,
                     "period": "tournament_with_cutoff",
@@ -319,14 +403,14 @@
                     "programType": "liquidityProgram",
                     "start": "2026-07-13T00:00:00Z",
                     "rewardPool": 10000,
-                    "status": "active",
+                    "status": "closed",
                     "discountFactor": 0.35,
                     "targetSize": 10000,
                     "period": "tournament_with_cutoff",
                     "createdAt": "2026-07-12T22:15:02Z"
                 }
             ],
-            "instrumentState": "INSTRUMENT_STATE_OPEN",
+            "instrumentState": "INSTRUMENT_STATE_EXPIRED",
             "category": "SPR",
             "subcategory": "GOLF",
             "eventStartTime": "2026-07-30 07:00:00+00",
