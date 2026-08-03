@@ -328,15 +328,64 @@ def _slug_event_date(slug: str | None) -> "dt.date | None":
     return None
 
 
+def _family_keywords(slug: str | None) -> tuple[str, ...] | None:
+    """programId tokens that identify the market's own reward family, or
+    None when the family is unknown (keep legacy pick behavior)."""
+    s = slug or ""
+    if s.startswith(PRETOURNAMENT_PREFIXES):
+        return ("pga", "golf", "liv")
+    if s.startswith("tec-nba-"):
+        return ("nba",)
+    if s.startswith("tec-cbb-"):
+        return ("cbb", "ncaa", "college", "march")
+    if s.startswith("aec-"):
+        return ("table", "tennis", "tt", "ping")
+    if s.startswith("tec-"):
+        return None
+    return ("politics",)
+
+
+def _pid_matches(pid, keywords: tuple[str, ...]) -> bool:
+    toks = set(str(pid or "").lower().replace("-", "_").split("_"))
+    return bool(toks & set(keywords))
+
+
+# Programs the API spills onto every market regardless of category.
+SPILL_PIDS = ("mlb_futures", "mlb_games_ml_live", "march_madness_futures")
+
+
+def _is_spill(tp: dict) -> bool:
+    """A global program spilled onto an unrelated market: a live-game pool
+    (resting LP orders on a non-live market can't earn from one), the
+    $99,999 sentinel, or a known spilled programId."""
+    if str(tp.get("period") or "").lower() == "live":
+        return True
+    if _num(tp.get("rewardPool")) >= 99998:
+        return True
+    return str(tp.get("programId") or "") in SPILL_PIDS
+
+
 def _pick_period(periods: list[dict], slug: str = "") -> dict | None:
     """The time period that pays TODAY. Politics markets carry one active
     tier program (low/mid/high, since 2026-07-28). Golf markets carry
     SEVERAL concurrently-active programs — pretournament plus one per round
     — so pick by where today falls relative to the tournament (round 1 =
-    slug event date minus 3, the Thursday)."""
+    slug event date minus 3, the Thursday).
+
+    Since 2026-08-03 the incentives API also spills GLOBAL sports programs
+    (mlb_futures, march_madness_futures, mlb_games_ml_live with a $99,999
+    "live" pool) onto EVERY market's timePeriods regardless of category —
+    picking one of those inflated politics estimates ~1,000×. Prefer
+    periods whose programId matches the market's own family; failing that,
+    anything that isn't a known spill. A market whose own programs have
+    all closed has NO paying program."""
     active = [tp for tp in (periods or [])
               if str(tp.get("status", "")).upper() in ("LIVE", "ACTIVE", "STATUS_LIVE")
               ] or list(periods or [])
+    kw = _family_keywords(slug)
+    matched = ([tp for tp in active if _pid_matches(tp.get("programId"), kw)]
+               if kw is not None else [])
+    active = matched or [tp for tp in active if not _is_spill(tp)]
     if not active:
         return None
     if len(active) > 1:
