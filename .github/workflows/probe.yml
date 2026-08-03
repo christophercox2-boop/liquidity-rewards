@@ -51,6 +51,43 @@ jobs:
               json.dump(r.json(), f, indent=1)
           EOF
 
+      - name: Earnings endpoint variations
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, requests, collections
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          host = tr.HOSTS[0]
+          out = {}
+          def page(tag, params):
+              r = requests.get(host + tr.EARNINGS_PATH, params=params,
+                               headers=tr.auth_headers(kid, sec, "GET", tr.EARNINGS_PATH),
+                               timeout=30)
+              j = r.json() if r.status_code < 400 else {"error": r.status_code, "body": r.text[:300]}
+              out[tag] = {"params": params, "status": r.status_code,
+                          "keys": sorted(j.keys()) if isinstance(j, dict) else None,
+                          "n": len(j.get("rewards") or []) if isinstance(j, dict) else 0,
+                          "sample": (j.get("rewards") or [None])[0] if isinstance(j, dict) else None}
+              cats = collections.Counter()
+              dates = collections.Counter()
+              for row in (j.get("rewards") or []):
+                  cats[(row.get("marketSlug") or "").split("-")[0]] += 1
+                  dates[str(row.get("date", ""))[:10]] += 1
+              out[tag]["cats"] = dict(cats)
+              out[tag]["dates"] = dict(sorted(dates.items())[-6:])
+              return j
+          page("current", {"startDate": "2026-07-28"})
+          page("noparams", {})
+          page("bigpage", {"startDate": "2026-07-28", "pageSize": 500})
+          with open("data/probe_earnings.json", "w") as f:
+              json.dump(out, f, indent=1, default=str)
+          for k, v in out.items():
+              print(k, v["status"], "rows:", v["n"], "cats:", v["cats"], "dates:", v["dates"])
+          EOF
+
       - name: Open orders payload
         env:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
@@ -103,7 +140,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/probe_incentives.json data/probe_activities.json data/probe_positions.json data/probe_orders.json
+          git add data/probe_incentives.json data/probe_activities.json data/probe_positions.json data/probe_orders.json data/probe_earnings.json
           if git diff --cached --quiet; then
             echo "No changes"
           else
