@@ -149,11 +149,8 @@ def save_remote_state(state: dict) -> bool:
         return False
 
 
-def tracker_day_integral(day_et: str) -> tuple[float, dict[str, float]] | None:
-    """Rebuild 'earned so far today' from the hourly tracker's estimate
-    snapshots (data/estimates.csv on main) — piecewise-constant integration
-    from midnight ET to now. Independent of this process, so it survives any
-    monitor outage or state loss."""
+def _estimates_csv_text() -> str | None:
+    """data/estimates.csv from main, or None."""
     if not GITHUB_TOKEN:
         return None
     try:
@@ -164,12 +161,27 @@ def tracker_day_integral(day_et: str) -> tuple[float, dict[str, float]] | None:
                      "Accept": "application/vnd.github.raw+json"},
             timeout=30,
         )
-        if r.status_code != 200:
-            return None
+        return r.text if r.status_code == 200 else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def tracker_day_integral(day_et: str,
+                         text: str | None = None) -> tuple[float, dict[str, float]] | None:
+    """Rebuild a day's earnings from the hourly tracker's estimate snapshots
+    (data/estimates.csv on main) — piecewise-constant integration from
+    midnight ET to now, capped at the day's end for finished days.
+    Independent of this process, so it survives any monitor outage or state
+    loss. Pass `text` to reuse one fetched copy across several days."""
+    if text is None:
+        text = _estimates_csv_text()
+    if not text:
+        return None
+    try:
         import csv as _csv
         import io as _io
         runs: dict[str, dict[str, float]] = {}  # utc run ts -> market -> est $/day
-        for row in _csv.DictReader(_io.StringIO(r.text)):
+        for row in _csv.DictReader(_io.StringIO(text)):
             try:
                 if tr._et_day(row["checked_at_utc"]) != day_et:
                     continue
@@ -181,7 +193,9 @@ def tracker_day_integral(day_et: str) -> tuple[float, dict[str, float]] | None:
             return None
         times = sorted(runs)
         midnight = dt.datetime.strptime(day_et, "%Y-%m-%d").replace(tzinfo=ET)
-        now = dt.datetime.now(dt.timezone.utc)
+        # for a finished day the last snapshot's rate holds only to midnight
+        now = min(dt.datetime.now(dt.timezone.utc),
+                  (midnight + dt.timedelta(days=1)).astimezone(dt.timezone.utc))
 
         def _utc(ts: str) -> dt.datetime:
             return dt.datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").replace(tzinfo=dt.timezone.utc)
@@ -310,6 +324,21 @@ class Monitor:
                         self.state[key] = [[t, round(v * scale, 4)]
                                            for t, v in self.state.get(key) or []]
                     self.backfilled = rebuilt[0]
+            # Finished days in the history table get the same treatment:
+            # adopt the tracker-data rebuild when it materially disagrees
+            # with the live accrual (deploy gaps and stale books inflate
+            # the accrual; the rebuild is what payments reconcile against).
+            hist = self.state.get("history") or []
+            if hist:
+                text = _estimates_csv_text()
+                if text:
+                    for h in hist[-7:]:
+                        reb = tracker_day_integral(h.get("day") or "", text=text)
+                        if reb is None:
+                            continue
+                        cur_h = h.get("earned") or 0.0
+                        if abs(reb[0] - cur_h) > max(1.0, 0.15 * reb[0]):
+                            h["earned"] = reb[0]
         except Exception:  # noqa: BLE001 — backfill is best-effort
             pass
         self.last_ts: dt.datetime | None = None
@@ -536,6 +565,13 @@ class Monitor:
             if self.state["day"] != day:
                 if self.state["day"]:
                     old_day_earned = round(self.state["earned"], 2)
+                    # Close the day on the tracker-data rebuild when we have
+                    # one: the live accrual double-counts deploy gaps and
+                    # stale books, and it's the rebuild that reconciliation
+                    # against Polymarket's actual payments is judged on.
+                    reb = tracker_day_integral(self.state["day"])
+                    if reb is not None:
+                        old_day_earned = reb[0]
                     self.state["history"] = (self.state["history"] + [
                         {"day": self.state["day"], "earned": old_day_earned}
                     ])[-30:]
