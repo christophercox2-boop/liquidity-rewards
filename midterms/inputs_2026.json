@@ -4,7 +4,7 @@
   "president": "Trump",
   "president_party": "R",
   "approval": 39.5,
-  "generic_ballot_dem_margin": 4.5,
+  "generic_ballot_dem_margin": 5.0,
   "_map_comment": "map_shift_dem_seats: expected net Dem seat change from 2025-26 mid-decade redistricting vs the old maps (negative = helps GOP). As of mid-2026: TX -5, MO -1, NC -1, OH -2 vs CA +5, UT +1 => about -3. map_shift_sd is the 1-sigma uncertainty on that number (court fights, maps performing differently than drawn).",
   "map_shift_dem_seats": -3.0,
   "map_shift_sd": 2.0,
@@ -12,5 +12,5 @@
   "pres_party_seats_now": 220,
   "dem_seats_now": 215,
   "total_seats": 435,
-  "as_of": "2026-08-01 (auto: median of 18 approval / 10 generic-ballot polls, VoteHub polling API)"
+  "as_of": "2026-08-04 (auto: median of 14 approval / 9 generic-ballot polls, VoteHub polling API)"
 }
