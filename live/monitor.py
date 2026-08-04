@@ -324,21 +324,6 @@ class Monitor:
                         self.state[key] = [[t, round(v * scale, 4)]
                                            for t, v in self.state.get(key) or []]
                     self.backfilled = rebuilt[0]
-            # Finished days in the history table get the same treatment:
-            # adopt the tracker-data rebuild when it materially disagrees
-            # with the live accrual (deploy gaps and stale books inflate
-            # the accrual; the rebuild is what payments reconcile against).
-            hist = self.state.get("history") or []
-            if hist:
-                text = _estimates_csv_text()
-                if text:
-                    for h in hist[-7:]:
-                        reb = tracker_day_integral(h.get("day") or "", text=text)
-                        if reb is None:
-                            continue
-                        cur_h = h.get("earned") or 0.0
-                        if abs(reb[0] - cur_h) > max(1.0, 0.15 * reb[0]):
-                            h["earned"] = reb[0]
         except Exception:  # noqa: BLE001 — backfill is best-effort
             pass
         self.last_ts: dt.datetime | None = None
@@ -564,14 +549,10 @@ class Monitor:
             old_day_earned = None
             if self.state["day"] != day:
                 if self.state["day"]:
+                    # Days close on the ACCUMULATED fine-grained samples (the
+                    # same accrual the graph shows) — the hourly tracker's
+                    # snapshots are backup for outages, not the record.
                     old_day_earned = round(self.state["earned"], 2)
-                    # Close the day on the tracker-data rebuild when we have
-                    # one: the live accrual double-counts deploy gaps and
-                    # stale books, and it's the rebuild that reconciliation
-                    # against Polymarket's actual payments is judged on.
-                    reb = tracker_day_integral(self.state["day"])
-                    if reb is not None:
-                        old_day_earned = reb[0]
                     self.state["history"] = (self.state["history"] + [
                         {"day": self.state["day"], "earned": old_day_earned}
                     ])[-30:]
