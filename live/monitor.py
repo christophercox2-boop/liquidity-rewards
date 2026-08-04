@@ -355,6 +355,11 @@ class Monitor:
         self._boot_ts: float = time.time()
         self.warming: int = 0
         self.pending_alerts: list[tuple[str, str, str]] = []
+        # Auto-defend config survives deploys with the rest of the state.
+        self.state.setdefault("defend", {})
+        tr.PRIORITY_SLUGS = set(self.state["defend"])
+        self._prev_rates: dict[str, float] = {}
+        self._drop_alerted: dict[str, float] = {}
 
     def merge_fills(self, rows: list[dict]) -> None:
         """Merge a quick fills page (newest first) into the fills list —
@@ -581,6 +586,25 @@ class Monitor:
             for m, r in warming.items():
                 self.market_rates[m] = r
                 self.rate += r
+            # Opportunity alert: a market's earning rate collapsed since the
+            # last poll — usually outbid — and Defend isn't running there.
+            defended = self.state.get("defend") or {}
+            now_mono = time.time()
+            drop_seen = getattr(self, "_drop_alerted", None)
+            if drop_seen is None:
+                drop_seen = self._drop_alerted = {}
+            for m, was in (getattr(self, "_prev_rates", None) or {}).items():
+                cur = self.market_rates.get(m, 0.0)
+                if (was >= 1.5 and cur < 0.5 * was and m not in defended
+                        and now_mono - drop_seen.get(m, 0.0) > 4 * 3600):
+                    drop_seen[m] = now_mono
+                    self.pending_alerts.append((
+                        "Earning rate dropped",
+                        f"{m} fell from ${was:.2f}/day to ${cur:.2f}/day — probably "
+                        "outbid. Tap the market in the app to retake the best "
+                        "price, or turn on Defend there.",
+                        "default"))
+            self._prev_rates = dict(self.market_rates)
             # Per-market rate history for the graphs: 1-minute buckets, ~8h,
             # including zero-rate markets so dead orders chart their flatline.
             rates_all: dict[str, float] = {}
@@ -699,6 +723,7 @@ class Monitor:
                 "drops": self._drops(),
                 "winners": self._missed_winners(),
                 "new_mkts": (self.state.get("new_mkts") or [])[::-1],
+                "defend": sorted(self.state.get("defend") or {}),
             }
 
     def _drops(self) -> list[dict]:
@@ -1761,6 +1786,103 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
         ACTIONS.append(record)
         del ACTIONS[:-20]
 
+# ---- Auto-defend: keep price-setting orders at the front of thin books -----
+# The whole reward edge in a df-0.2 book is being the SOLE best price: everyone
+# a tick behind scores at 20%. Defend watches a market's book every poll and,
+# when someone matches or beats our best order, moves that order one tick back
+# in front — never past the user's cap, never into a tight spread, and only by
+# repricing an EXISTING order (it can never place a new one or add size).
+DEFEND_MAX_MARKETS = 10          # each defended book is refreshed every poll
+DEFEND_COOLDOWN_SECONDS = 90.0   # per market+side between improvements
+DEFEND_MAX_PER_POLL = 6          # request-budget bound on a busy poll
+DEFEND_ALERT_SECONDS = 3600.0    # cap-blocked phone alert at most hourly
+DEFEND_MOVED: dict[str, float] = {}
+DEFEND_ALERTED: dict[str, float] = {}
+
+
+def _others_best(levels: list, mine_sz: dict) -> float | None:
+    """Best price on a book side that isn't just our own resting size."""
+    for lvl in levels or []:
+        p, q = float(lvl[0]), float(lvl[1])
+        if q - mine_sz.get(round(p, 4), 0.0) > 0.5:
+            return p
+    return None
+
+
+def auto_defend() -> None:
+    """One pass over the defended markets after each poll."""
+    cfg = dict(MONITOR.state.get("defend") or {})
+    if not cfg or not KEY_ID:
+        return
+    now = time.time()
+    moves = 0
+    for m, sides in cfg.items():
+        ent = tr._BOOK_CACHE.get(m)
+        if not ent or now - ent[0] > 300:
+            continue  # stale book — never act on old prices
+        book = ent[1]
+        tick = book.get("tick") or 0.01
+        bids = book.get("bids") or []
+        asks = book.get("asks") or []
+        bb = float(bids[0][0]) if bids else None
+        ba = float(asks[0][0]) if asks else None
+        mine_all = [o for o in MONITOR.orders if o.get("market") == m]
+        for side, scfg in (sides or {}).items():
+            if moves >= DEFEND_MAX_PER_POLL:
+                return
+            try:
+                cap = float(scfg.get("cap")) / 100.0
+            except (TypeError, ValueError):
+                continue
+            side_orders = [o for o in mine_all if o.get("side") == side and o.get("id")]
+            if not side_orders:
+                continue
+            best_mine = (max if side == "BUY" else min)(side_orders,
+                                                        key=lambda o: o["price"])
+            mine_sz: dict[float, float] = {}
+            for o in side_orders:
+                k = round(float(o["price"]), 4)
+                mine_sz[k] = mine_sz.get(k, 0.0) + float(o.get("size") or 0)
+            others = _others_best(bids if side == "BUY" else asks, mine_sz)
+            if others is None:
+                continue  # alone on this side — nothing to defend against
+            if side == "BUY":
+                if best_mine["price"] > others + 1e-9:
+                    continue  # already the sole best
+                target = round(others + tick, 4)
+                blocked = target > cap + 1e-9
+                squeezed = ba is not None and target > ba - 2 * tick + 1e-9
+            else:
+                if best_mine["price"] < others - 1e-9:
+                    continue
+                target = round(others - tick, 4)
+                blocked = target < cap - 1e-9
+                squeezed = bb is not None and target < bb + 2 * tick - 1e-9
+            if not 0.001 <= target <= 0.999:
+                continue
+            if blocked:
+                ak = f"{m}|{side}"
+                if now - DEFEND_ALERTED.get(ak, 0.0) > DEFEND_ALERT_SECONDS:
+                    DEFEND_ALERTED[ak] = now
+                    word = "bid" if side == "BUY" else "ask"
+                    with MONITOR.lock:
+                        MONITOR.pending_alerts.append((
+                            "Outbid past your Defend limit",
+                            f"{m}: the {word} moved to {others * 100:g}¢ and your "
+                            f"limit is {cap * 100:g}¢. Open the app to raise it "
+                            "or let this one go.",
+                            "high"))
+                continue
+            if squeezed:
+                continue  # spread too tight to step in front — wait it out
+            key = f"{m}|{side}"
+            if now - DEFEND_MOVED.get(key, 0.0) < DEFEND_COOLDOWN_SECONDS:
+                continue
+            DEFEND_MOVED[key] = now
+            do_reprice(best_mine["id"], round(target * 100, 2), verify=False)
+            moves += 1
+
+
 def _race_prefix(slug: str) -> str:
     """Sibling-group key: seat ladders group by their ladder prefix, everything
     else by the slug minus its last token (the candidate/outcome)."""
@@ -2136,7 +2258,8 @@ def market_info(slug: str) -> tuple[int, dict]:
     return 200, {"market": slug, "tick": book.get("tick") or 0.01,
                  "bids": [[p, q] for p, q in (book.get("bids") or [])[:6]],
                  "asks": [[p, q] for p, q in (book.get("asks") or [])[:6]],
-                 "orders": mine, "net": net, "buying_power": MONITOR.buying_power}
+                 "orders": mine, "net": net, "buying_power": MONITOR.buying_power,
+                 "defend": (MONITOR.state.get("defend") or {}).get(slug)}
 
 
 def do_cancel_order(order_id: str) -> tuple[int, dict]:
@@ -2234,7 +2357,42 @@ def do_maction(body: dict) -> tuple[int, dict]:
                                 close_short=bool(body.get("close_short")))
         except (KeyError, TypeError, ValueError):
             return 400, {"ok": False, "error": "bad request"}
-    return 400, {"ok": False, "error": "op must be place, modify or cancel"}
+    if op == "defend":
+        slug = str(body.get("market") or "")
+        if not _slug_known(slug):
+            return 400, {"ok": False, "error": "unknown market"}
+        sides: dict = {}
+        for side, k in (("BUY", "bid_cap_c"), ("SELL", "ask_floor_c")):
+            v = body.get(k)
+            if v in (None, "", False):
+                continue
+            try:
+                c = float(v)
+            except (TypeError, ValueError):
+                return 400, {"ok": False, "error": "bad cap"}
+            if not (0.1 <= c <= 99.9):
+                return 400, {"ok": False, "error": "cap out of range (0.1–99.9¢)"}
+            sides[side] = {"cap": c}
+        if not sides:
+            return 400, {"ok": False, "error": "set a bid cap, an ask floor, or both"}
+        with MONITOR.lock:
+            d = MONITOR.state.setdefault("defend", {})
+            if slug not in d and len(d) >= DEFEND_MAX_MARKETS:
+                return 400, {"ok": False,
+                             "error": f"already defending {DEFEND_MAX_MARKETS} markets "
+                                      "— stop one first"}
+            d[slug] = sides
+            tr.PRIORITY_SLUGS = set(d)
+        POLL_KICK.set()
+        return 200, {"ok": True, "defend": sides}
+    if op == "undefend":
+        slug = str(body.get("market") or "")
+        with MONITOR.lock:
+            d = MONITOR.state.setdefault("defend", {})
+            d.pop(slug, None)
+            tr.PRIORITY_SLUGS = set(d)
+        return 200, {"ok": True}
+    return 400, {"ok": False, "error": "op must be place, modify, cancel, defend or undefend"}
 
 
 DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
@@ -3354,7 +3512,47 @@ function renderSheet(d){
     '<input id="qStepIn" type="number" step="1" min="1" max="20000" value="'+qStep()+'" '+
     'style="width:60px" oninput="qStepSet(this.value)"></div>'+
     '<div class="mkt">post-only — the order rests or is rejected; it can never cross the spread and fill on arrival</div>'+
+    defendBlock(d)+
     '<div class="rp" style="margin-top:12px"><button class="alt" onclick="closeSheet()">Close</button></div>';
+}
+function defendBlock(d){
+  const m = d.market;
+  const df = d.defend || null;
+  const tick = (d.tick || 0.01) * 100;
+  const bb = (d.bids && d.bids.length) ? d.bids[0][0]*100 : null;
+  const ba = (d.asks && d.asks.length) ? d.asks[0][0]*100 : null;
+  const dfb = df && df.BUY ? df.BUY.cap : (bb != null ? +(bb + 3*tick).toFixed(2) : '');
+  const dfa = df && df.SELL ? df.SELL.cap : (ba != null ? +(ba - 3*tick).toFixed(2) : '');
+  return '<h3>Defend'+(df ? ' — <span style="color:#3fb950">on 🛡</span>' : '')+'</h3>'+
+    '<div class="mkt">Keeps your best order alone in front: whenever someone matches or beats it, '+
+    'it moves one tick back ahead automatically. It only reprices your existing order (same size, '+
+    'never a new one), stops at your limits below, and stands down when the spread gets tight.</div>'+
+    '<div class="rp">bid up to <input id="dfBid" type="number" step="0.1" min="0.1" max="99.9" '+
+    'value="'+dfb+'" style="width:72px">¢ · ask down to <input id="dfAsk" type="number" step="0.1" '+
+    'min="0.1" max="99.9" value="'+dfa+'" style="width:72px">¢ '+
+    '<button onclick="mDefend(\\''+esc(m)+'\\')">'+(df ? 'Update' : 'Defend')+'</button>'+
+    (df ? '<button class="alt" style="background:#8b1a1a;color:#fff" onclick="mUndefend(\\''+esc(m)+'\\')">Stop</button>' : '')+
+    '</div>'+
+    '<div class="mkt">clear a box to leave that side undefended · you\\'ll get a phone alert if the price runs past your limit</div>';
+}
+function mDefend(m){
+  const b = document.getElementById('dfBid').value;
+  const a = document.getElementById('dfAsk').value;
+  const body = {op:'defend', market:m};
+  if(b !== '') body.bid_cap_c = parseFloat(b);
+  if(a !== '') body.ask_floor_c = parseFloat(a);
+  if(body.bid_cap_c === undefined && body.ask_floor_c === undefined){
+    alert('Enter a bid cap, an ask floor, or both.'); return;
+  }
+  const parts = [];
+  if(body.bid_cap_c !== undefined) parts.push('defend the bid up to '+body.bid_cap_c+'¢');
+  if(body.ask_floor_c !== undefined) parts.push('defend the ask down to '+body.ask_floor_c+'¢');
+  if(!confirm('Auto-'+parts.join(' and ')+'?')) return;
+  mact(body, m);
+}
+function mUndefend(m){
+  if(!confirm('Stop defending this market?')) return;
+  mact({op:'undefend', market:m}, m);
 }
 async function mact(body, m){
   try{
@@ -3436,6 +3634,7 @@ async function refresh(){
     const cats = {};
     Object.keys(allMarkets).forEach(mm => { const c = mcat(mm); cats[c] = (cats[c]||0)+1; });
     const hc = hidCats();
+    const DEFENDED = new Set(d.defend || []);
     document.getElementById('catBar').innerHTML =
       '<label class="sub" style="margin-right:8px"><input type="checkbox" '+(pctMode()?'checked':'')+
       ' onchange="tglPct()"> % of rewards</label>' +
@@ -3500,6 +3699,7 @@ async function refresh(){
         const hasBatch = d.orders.some(o => o.market === m && o.batch);
         return '<tr id="r'+i+'" onclick="tgl('+i+',\\''+esc(m)+'\\')" style="'+tint(m, rate)+'">'+
           '<td class="mkt">'+m+(hasBatch?' <span class="bdg">batch</span>':'')+
+          (DEFENDED.has(m)?' 🛡':'')+
           '</td><td class="r" style="white-space:nowrap">'+rateTxt+
           '<br><span class="sub" style="font-size:11px">$'+v.toFixed(2)+' today</span>'+
           ' <button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
@@ -3732,6 +3932,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             MONITOR.error = None
             err_streak = 0
             last_ok = time.time()
+            try:
+                auto_defend()
+            except Exception as e:  # noqa: BLE001 — defense never kills the poll
+                MONITOR.error = f"defend: {type(e).__name__}: {e}"[:150]
             MONITOR.maybe_save_remote()
             if time.time() - pos_refreshed > POS_REFRESH_SECONDS:  # P/L + Plan tab data
                 pos_refreshed = time.time()

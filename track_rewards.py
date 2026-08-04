@@ -796,6 +796,7 @@ LAST_DEBUG: dict[str, str] = {}  # diagnostics from the most recent fetch, for t
 BOOK_REFRESH_PER_CALL = 20
 BOOK_COLD_FETCH_ALL = True  # one-shot runs sweep every book; the monitor sets False
 _BOOK_CACHE: dict[str, tuple[float, dict]] = {}  # slug -> (fetched_at, book)
+PRIORITY_SLUGS: set[str] = set()  # defended markets: their books refresh every call
 
 
 def _http_err(resp) -> str:
@@ -855,7 +856,14 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
         del _BOOK_CACHE[gone]
     oldest_first = sorted(slugs, key=lambda s: _BOOK_CACHE.get(s, (0.0,))[0])
     cold_all = not _BOOK_CACHE and BOOK_COLD_FETCH_ALL
-    to_fetch = set(oldest_first) if cold_all else set(oldest_first[:BOOK_REFRESH_PER_CALL])
+    # Defended markets refresh every call (they come out of the rotation's
+    # allowance so the request budget stays flat); the rest rotate oldest-first.
+    prio = PRIORITY_SLUGS & set(slugs)
+    if cold_all:
+        to_fetch = set(oldest_first)
+    else:
+        rot = [s for s in oldest_first if s not in prio]
+        to_fetch = prio | set(rot[:max(0, BOOK_REFRESH_PER_CALL - len(prio))])
     for slug in slugs:
         if slug in to_fetch:
             try:
