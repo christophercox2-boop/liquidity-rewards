@@ -3,6 +3,1949 @@
   {
    "type": "ACTIVITY_TYPE_TRADE",
    "trade": {
+    "id": "BP1XQ3YD89QP",
+    "aggressorExecution": {
+     "id": "BP1XQ3YDA9QP",
+     "order": {
+      "id": "BNZHCXJS2B9H",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-els0-5",
+      "side": "ORDER_SIDE_SELL",
+      "type": "ORDER_TYPE_LIMIT",
+      "price": {
+       "value": "0.08",
+       "currency": "USD"
+      },
+      "quantity": 20,
+      "cumQuantity": 20,
+      "leavesQuantity": 0,
+      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+      "goodTillTime": null,
+      "intent": "ORDER_INTENT_BUY_SHORT",
+      "marketMetadata": {
+       "slug": "vmc-ussep-misen-2026-08-04-els0-5",
+       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
+       "title": "Michigan Senate Democratic Primary Margin of Victory?",
+       "outcome": "No",
+       "eventSlug": "ussep-misen-2026-08-04",
+       "subject": {
+        "id": 0,
+        "name": "El-Sayed 0-5",
+        "subjectType": "",
+        "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/els20-f5bde389bb.jpg"
+       },
+       "eventId": "53743"
+      },
+      "state": "ORDER_STATE_FILLED",
+      "commissionNotionalTotalCollected": {
+       "value": "0.0900",
+       "currency": "USD"
+      },
+      "commissionsBasisPoints": "0",
+      "makerCommissionsBasisPoints": "0",
+      "avgPx": {
+       "value": "0.0800",
+       "currency": "USD"
+      },
+      "cashOrderQty": {
+       "value": "0.0000",
+       "currency": "USD"
+      },
+      "insertTime": "2026-08-05T01:59:25.588633156Z",
+      "createTime": "2026-08-05T01:59:25.586703056Z",
+      "outcomeSide": "OUTCOME_SIDE_NO",
+      "action": "ORDER_ACTION_BUY",
+      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+      "lastTransactTime": "2026-08-05T01:59:25.588633156Z"
+     },
+     "lastShares": "20.0000",
+     "lastPx": {
+      "value": "0.0800",
+      "currency": "USD"
+     },
+     "type": "EXECUTION_TYPE_FILL",
+     "text": "",
+     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
+     "transactTime": "2026-08-05T01:59:25.588633156Z",
+     "legPrices": [],
+     "tradeId": "BP1XQ3YD89QP",
+     "aggressor": true,
+     "commissionNotionalCollected": {
+      "value": "0.0900",
+      "currency": "USD"
+     },
+     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
+     "traceId": "",
+     "commissionSpreadPx": {
+      "value": "0.9200",
+      "currency": "USD"
+     },
+     "transactTradeDate": "2026-08-05T00:00:00Z"
+    },
+    "passiveExecution": {
+     "id": "BP1XQ3YDC9QP",
+     "order": {
+      "id": "BNZG020D2BA4",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-els0-5",
+      "side": "ORDER_SIDE_BUY",
+      "type": "ORDER_TYPE_LIMIT",
+      "price": {
+       "value": "0.08",
+       "currency": "USD"
+      },
+      "quantity": 500,
+      "cumQuantity": 72.66,
+      "leavesQuantity": 427.34,
+      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+      "goodTillTime": null,
+      "intent": "ORDER_INTENT_BUY_LONG",
+      "marketMetadata": {
+       "slug": "vmc-ussep-misen-2026-08-04-els0-5",
+       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
+       "title": "Michigan Senate Democratic Primary Margin of Victory?",
+       "outcome": "Yes",
+       "eventSlug": "ussep-misen-2026-08-04",
+       "subject": {
+        "id": 0,
+        "name": "El-Sayed 0-5",
+        "subjectType": "",
+        "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/els20-f5bde389bb.jpg"
+       },
+       "eventId": "53743"
+      },
+      "state": "ORDER_STATE_PARTIALLY_FILLED",
+      "commissionNotionalTotalCollected": {
+       "value": "-0.0700",
+       "currency": "USD"
+      },
+      "commissionsBasisPoints": "0",
+      "makerCommissionsBasisPoints": "0",
+      "avgPx": {
+       "value": "0.0800",
+       "currency": "USD"
+      },
+      "cashOrderQty": {
+       "value": "0.0000",
+       "currency": "USD"
+      },
+      "insertTime": "2026-08-05T01:52:20.583018241Z",
+      "createTime": "2026-08-05T01:52:20.581627406Z",
+      "outcomeSide": "OUTCOME_SIDE_YES",
+      "action": "ORDER_ACTION_BUY",
+      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+      "lastTransactTime": "2026-08-05T01:59:25.588633156Z"
+     },
+     "lastShares": "20.0000",
+     "lastPx": {
+      "value": "0.0800",
+      "currency": "USD"
+     },
+     "type": "EXECUTION_TYPE_PARTIAL_FILL",
+     "text": "",
+     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
+     "transactTime": "2026-08-05T01:59:25.588633156Z",
+     "legPrices": [],
+     "tradeId": "BP1XQ3YD89QP",
+     "aggressor": false,
+     "commissionNotionalCollected": {
+      "value": "-0.0200",
+      "currency": "USD"
+     },
+     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
+     "traceId": "",
+     "commissionSpreadPx": {
+      "value": "0.0800",
+      "currency": "USD"
+     },
+     "transactTradeDate": "2026-08-05T00:00:00Z"
+    },
+    "marketSlug": "vmc-ussep-misen-2026-08-04-els0-5",
+    "state": "TRADE_STATE_NEW",
+    "createTime": "2026-08-05T01:59:25.588633156Z",
+    "updateTime": "2026-08-05T01:59:25.588633156Z",
+    "price": {
+     "value": "0.0800",
+     "currency": "USD"
+    },
+    "qty": "20",
+    "cost": {
+     "value": "18.49",
+     "currency": "USD"
+    },
+    "aggressor": {
+     "id": "BNZHCXJS2B9H",
+     "marketSlug": "vmc-ussep-misen-2026-08-04-els0-5",
+     "side": "ORDER_SIDE_SELL",
+     "type": "ORDER_TYPE_LIMIT",
+     "price": {
+      "value": "0.08",
+      "currency": "USD"
+     },
+     "quantity": 20,
+     "cumQuantity": 20,
+     "leavesQuantity": 0,
+     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+     "goodTillTime": null,
+     "intent": "ORDER_INTENT_BUY_SHORT",
+     "marketMetadata": {
+      "slug": "vmc-ussep-misen-2026-08-04-els0-5",
+      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
+      "title": "Michigan Senate Democratic Primary Margin of Victory?",
+      "outcome": "No",
+      "eventSlug": "ussep-misen-2026-08-04",
+      "subject": {
+       "id": 0,
+       "name": "El-Sayed 0-5",
+       "subjectType": "",
+       "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/els20-f5bde389bb.jpg"
+      },
+      "eventId": "53743"
+     },
+     "state": "ORDER_STATE_FILLED",
+     "commissionNotionalTotalCollected": {
+      "value": "0.0900",
+      "currency": "USD"
+     },
+     "commissionsBasisPoints": "0",
+     "makerCommissionsBasisPoints": "0",
+     "avgPx": {
+      "value": "0.0800",
+      "currency": "USD"
+     },
+     "cashOrderQty": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "insertTime": "2026-08-05T01:59:25.588633156Z",
+     "createTime": "2026-08-05T01:59:25.586703056Z",
+     "outcomeSide": "OUTCOME_SIDE_NO",
+     "action": "ORDER_ACTION_BUY",
+     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+     "lastTransactTime": "2026-08-05T01:59:25.588633156Z"
+    },
+    "passive": {
+     "id": "BNZG020D2BA4",
+     "marketSlug": "vmc-ussep-misen-2026-08-04-els0-5",
+     "side": "ORDER_SIDE_BUY",
+     "type": "ORDER_TYPE_LIMIT",
+     "price": {
+      "value": "0.08",
+      "currency": "USD"
+     },
+     "quantity": 500,
+     "cumQuantity": 72.66,
+     "leavesQuantity": 427.34,
+     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+     "goodTillTime": null,
+     "intent": "ORDER_INTENT_BUY_LONG",
+     "marketMetadata": {
+      "slug": "vmc-ussep-misen-2026-08-04-els0-5",
+      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/michigan-democratic-senate-primary-winner-uPezQW2QcX0-.png",
+      "title": "Michigan Senate Democratic Primary Margin of Victory?",
+      "outcome": "Yes",
+      "eventSlug": "ussep-misen-2026-08-04",
+      "subject": {
+       "id": 0,
+       "name": "El-Sayed 0-5",
+       "subjectType": "",
+       "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/els20-f5bde389bb.jpg"
+      },
+      "eventId": "53743"
+     },
+     "state": "ORDER_STATE_PARTIALLY_FILLED",
+     "commissionNotionalTotalCollected": {
+      "value": "-0.0700",
+      "currency": "USD"
+     },
+     "commissionsBasisPoints": "0",
+     "makerCommissionsBasisPoints": "0",
+     "avgPx": {
+      "value": "0.0800",
+      "currency": "USD"
+     },
+     "cashOrderQty": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "insertTime": "2026-08-05T01:52:20.583018241Z",
+     "createTime": "2026-08-05T01:52:20.581627406Z",
+     "outcomeSide": "OUTCOME_SIDE_YES",
+     "action": "ORDER_ACTION_BUY",
+     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+     "lastTransactTime": "2026-08-05T01:59:25.588633156Z"
+    },
+    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
+    "createTradeDate": "2026-08-05T00:00:00Z",
+    "updateTradeDate": "2026-08-05T00:00:00Z",
+    "tradeLinkId": "BNRH79WTC9PY",
+    "isAggressor": true,
+    "market": {
+     "id": "234620",
+     "question": "Michigan Senate Democratic Primary Margin of Victory?",
+     "slug": "vmc-ussep-misen-2026-08-04-els0-5",
+     "endDate": "2026-08-18T23:00:00Z",
+     "category": "politics",
+     "startDate": "2026-07-16T20:40:09Z",
+     "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/els20-f5bde389bb.jpg",
+     "description": "This market will settle to Yes if Abdul El-Sayed's margin of victory in the Michigan Senate Democratic Primary is between 0% and 5%. Outcome sourced from relevant state authorities.\n\nThe margin of victory is calculated as the absolute difference in vote share percentages between the candidate that receives the most valid votes in the specified election and the candidate that receives the second-most valid votes in the specified election. A candidate's vote share percentage will be calculated by dividing the total number of valid votes received by the candidate by the total number of valid votes cast in the election.\n\nIf the specified candidate does not receive the most valid votes in the specified election, this market will settle to No. If the margin falls exactly on the boundary between two ranges, the Contract will settle in favor of the range for which that value is the inclusive lower boundary. If multiple candidates tie for the most votes in this election, Yes contract holders of the lowest bracket contract for each tied candidate receive $1.00 divided by the number of tied candidates, rounded down to the nearest tick, per contract.",
+     "active": true,
+     "marketType": "futures",
+     "closed": false,
+     "createdAt": "2026-07-16T20:40:09Z",
+     "updatedAt": "2026-08-05T02:01:51Z",
+     "archived": false,
+     "orderPriceMinTickSize": 0.01,
+     "gameStartTime": "2026-08-04T16:00:00Z",
+     "manualActivation": false,
+     "sportsMarketType": "futures",
+     "marketSides": [
+      {
+       "id": "468804",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "vmc-ussep-misen-2026-08-04-els0-5",
+       "createdAt": "2026-07-16T20:40:09Z",
+       "updatedAt": "2026-07-16T20:40:09Z",
+       "description": "Yes",
+       "marketId": 234620,
+       "long": true,
+       "tradable": true
+      },
+      {
+       "id": "468805",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "vmc-ussep-misen-2026-08-04-els0-5",
+       "createdAt": "2026-07-16T20:40:09Z",
+       "updatedAt": "2026-07-16T20:40:09Z",
+       "description": "No",
+       "marketId": 234620,
+       "long": false,
+       "tradable": true
+      }
+     ],
+     "outcomes": "[\"Yes\",\"No\"]",
+     "outcomePrices": "[\"0\",\"0\"]",
+     "ep3Status": "OPEN",
+     "status": "MARKET_STATUS_OPEN",
+     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
+     "hidden": false,
+     "tags": [],
+     "title": "El-Sayed 0-5",
+     "feeCoefficient": 0.06,
+     "sortOrder": 5,
+     "titleShort": "El-Sayed 0-5",
+     "ep3SyncedAt": "2026-08-05T01:18:29Z",
+     "minimumTradeQty": 0.01,
+     "comboEnabled": false
+    },
+    "qtyDecimal": "20.0000",
+    "comboLegDetails": []
+   }
+  },
+  {
+   "type": "ACTIVITY_TYPE_TRADE",
+   "trade": {
+    "id": "BP1SSFPJE9QP",
+    "aggressorExecution": null,
+    "passiveExecution": {
+     "id": "BP1SSFPJJ9QP",
+     "order": {
+      "id": "BNYJ8HQ9PB9Q",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte195",
+      "side": "ORDER_SIDE_BUY",
+      "type": "ORDER_TYPE_LIMIT",
+      "price": {
+       "value": "0.78",
+       "currency": "USD"
+      },
+      "quantity": 10,
+      "cumQuantity": 4,
+      "leavesQuantity": 6,
+      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+      "goodTillTime": null,
+      "intent": "ORDER_INTENT_BUY_LONG",
+      "marketMetadata": {
+       "slug": "scc-hrep-rep-2026-11-03-gte195",
+       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+       "title": "2026 Midterms: Republican House Seats?",
+       "outcome": "Yes",
+       "eventSlug": "hrep-rep-2026-11-03",
+       "subject": {
+        "id": 0,
+        "name": "195+",
+        "subjectType": ""
+       },
+       "eventId": "59841"
+      },
+      "state": "ORDER_STATE_PARTIALLY_FILLED",
+      "commissionNotionalTotalCollected": {
+       "value": "-0.0100",
+       "currency": "USD"
+      },
+      "commissionsBasisPoints": "0",
+      "makerCommissionsBasisPoints": "0",
+      "avgPx": {
+       "value": "0.7800",
+       "currency": "USD"
+      },
+      "cashOrderQty": {
+       "value": "0.0000",
+       "currency": "USD"
+      },
+      "insertTime": "2026-08-05T00:58:09.810795052Z",
+      "createTime": "2026-08-05T00:58:09.809135298Z",
+      "outcomeSide": "OUTCOME_SIDE_YES",
+      "action": "ORDER_ACTION_BUY",
+      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
+      "lastTransactTime": "2026-08-05T01:50:51.218412861Z"
+     },
+     "lastShares": "4.0000",
+     "lastPx": {
+      "value": "0.7800",
+      "currency": "USD"
+     },
+     "type": "EXECUTION_TYPE_PARTIAL_FILL",
+     "text": "",
+     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
+     "transactTime": "2026-08-05T01:50:51.218412861Z",
+     "legPrices": [],
+     "tradeId": "BP1SSFPJE9QP",
+     "aggressor": false,
+     "commissionNotionalCollected": {
+      "value": "-0.0100",
+      "currency": "USD"
+     },
+     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
+     "traceId": "",
+     "commissionSpreadPx": {
+      "value": "0.7800",
+      "currency": "USD"
+     },
+     "transactTradeDate": "2026-08-05T00:00:00Z"
+    },
+    "marketSlug": "scc-hrep-rep-2026-11-03-gte195",
+    "state": "TRADE_STATE_NEW",
+    "createTime": "2026-08-05T01:50:51.218412861Z",
+    "updateTime": "2026-08-05T01:50:51.218412861Z",
+    "price": {
+     "value": "0.7800",
+     "currency": "USD"
+    },
+    "qty": "4",
+    "cost": {
+     "value": "3.11",
+     "currency": "USD"
+    },
+    "aggressor": null,
+    "passive": {
+     "id": "BNYJ8HQ9PB9Q",
+     "marketSlug": "scc-hrep-rep-2026-11-03-gte195",
+     "side": "ORDER_SIDE_BUY",
+     "type": "ORDER_TYPE_LIMIT",
+     "price": {
+      "value": "0.78",
+      "currency": "USD"
+     },
+     "quantity": 10,
+     "cumQuantity": 4,
+     "leavesQuantity": 6,
+     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+     "goodTillTime": null,
+     "intent": "ORDER_INTENT_BUY_LONG",
+     "marketMetadata": {
+      "slug": "scc-hrep-rep-2026-11-03-gte195",
+      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+      "title": "2026 Midterms: Republican House Seats?",
+      "outcome": "Yes",
+      "eventSlug": "hrep-rep-2026-11-03",
+      "subject": {
+       "id": 0,
+       "name": "195+",
+       "subjectType": ""
+      },
+      "eventId": "59841"
+     },
+     "state": "ORDER_STATE_PARTIALLY_FILLED",
+     "commissionNotionalTotalCollected": {
+      "value": "-0.0100",
+      "currency": "USD"
+     },
+     "commissionsBasisPoints": "0",
+     "makerCommissionsBasisPoints": "0",
+     "avgPx": {
+      "value": "0.7800",
+      "currency": "USD"
+     },
+     "cashOrderQty": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "insertTime": "2026-08-05T00:58:09.810795052Z",
+     "createTime": "2026-08-05T00:58:09.809135298Z",
+     "outcomeSide": "OUTCOME_SIDE_YES",
+     "action": "ORDER_ACTION_BUY",
+     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
+     "lastTransactTime": "2026-08-05T01:50:51.218412861Z"
+    },
+    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
+    "createTradeDate": "2026-08-05T00:00:00Z",
+    "updateTradeDate": "2026-08-05T00:00:00Z",
+    "tradeLinkId": "BNVPQ33GC9PH",
+    "isAggressor": false,
+    "market": {
+     "id": "278444",
+     "question": "2026 Midterms: Republican House Seats?",
+     "slug": "scc-hrep-rep-2026-11-03-gte195",
+     "endDate": "2026-11-17T23:00:00Z",
+     "category": "politics",
+     "startDate": "2026-07-22T22:24:04Z",
+     "description": "This market will settle to Yes if the Republican Partys seat count in the U.S. House of Representatives is greater than or equal to 195 as a result of the 2026 United States midterm election scheduled for November 3, 2026. Outcome sourced from relevant state electoral authorities, and the United States House of Representatives.\n\nThe seat count includes all House elections in the 2026 United States midterm election that elect voting members and determine representation in the upcoming 120th Congress. Where a seat is decided by a runoff, the runoff result will determine attribution of that seat.\n\nSeats are attributed to the party under which the member was elected. If a member-elect changes party affiliation, or vacates their seat, between election day and the formal organization of Congress, the seat is attributed to the party under which the member was elected.\n\nHouse members elected as independents who formally caucus with, or, for newly elected members, who announce their intent to caucus with, the Republican party are included in the count. If the caucus decisions of members of the House elected as independents cannot be determined on the date of the election, this market may remain open until the earlier of (i) an announcement from the relevant members of their intents to caucus, or (ii) January 4th, 11:59 PM ET of the following calendar year. If no such announcement is made by January 4th, 11:59 PM ET of the following calendar year, the member will not count towards the seat count of any party.",
+     "active": true,
+     "marketType": "futures",
+     "closed": false,
+     "createdAt": "2026-07-22T22:24:04Z",
+     "updatedAt": "2026-08-05T01:51:43Z",
+     "archived": false,
+     "orderPriceMinTickSize": 0.01,
+     "gameStartTime": "2026-11-03T17:00:00Z",
+     "manualActivation": false,
+     "sportsMarketType": "futures",
+     "marketSides": [
+      {
+       "id": "556450",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "scc-hrep-rep-2026-11-03-gte195",
+       "createdAt": "2026-07-22T22:24:04Z",
+       "updatedAt": "2026-07-22T22:24:04Z",
+       "description": "Yes",
+       "marketId": 278444,
+       "long": true,
+       "tradable": true
+      },
+      {
+       "id": "556451",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "scc-hrep-rep-2026-11-03-gte195",
+       "createdAt": "2026-07-22T22:24:04Z",
+       "updatedAt": "2026-07-22T22:24:04Z",
+       "description": "No",
+       "marketId": 278444,
+       "long": false,
+       "tradable": true
+      }
+     ],
+     "outcomes": "[\"Yes\",\"No\"]",
+     "outcomePrices": "[\"0\",\"0\"]",
+     "ep3Status": "OPEN",
+     "status": "MARKET_STATUS_OPEN",
+     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
+     "hidden": false,
+     "tags": [],
+     "title": "195+",
+     "feeCoefficient": 0.06,
+     "sortOrder": 4,
+     "titleShort": "195+",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
+     "minimumTradeQty": 0.01,
+     "comboEnabled": false
+    },
+    "qtyDecimal": "4.0000",
+    "comboLegDetails": []
+   }
+  },
+  {
+   "type": "ACTIVITY_TYPE_TRADE",
+   "trade": {
+    "id": "BP1REE9JP9QP",
+    "aggressorExecution": {
+     "id": "BP1REE9JR9QP",
+     "order": {
+      "id": "BNZCMTWWGB9P",
+      "marketSlug": "scc-senate-gop-2026-11-03-51",
+      "side": "ORDER_SIDE_BUY",
+      "type": "ORDER_TYPE_LIMIT",
+      "price": {
+       "value": "0.28",
+       "currency": "USD"
+      },
+      "quantity": 26.33,
+      "cumQuantity": 15,
+      "leavesQuantity": 11.33,
+      "tif": "TIME_IN_FORCE_DAY",
+      "goodTillTime": null,
+      "intent": "ORDER_INTENT_BUY_LONG",
+      "marketMetadata": {
+       "slug": "scc-senate-gop-2026-11-03-51",
+       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+       "title": "2026 Midterms: Republican Senate Seats?",
+       "outcome": "Yes",
+       "eventSlug": "senate-gop-2026-11-03",
+       "subject": {
+        "id": 0,
+        "name": "51",
+        "subjectType": ""
+       },
+       "eventId": "59842"
+      },
+      "state": "ORDER_STATE_PARTIALLY_FILLED",
+      "commissionNotionalTotalCollected": {
+       "value": "0.1300",
+       "currency": "USD"
+      },
+      "commissionsBasisPoints": "0",
+      "makerCommissionsBasisPoints": "0",
+      "avgPx": {
+       "value": "0.1800",
+       "currency": "USD"
+      },
+      "cashOrderQty": {
+       "value": "4.7660",
+       "currency": "USD"
+      },
+      "insertTime": "2026-08-05T01:47:49.408592979Z",
+      "createTime": "2026-08-05T01:47:49.406172553Z",
+      "outcomeSide": "OUTCOME_SIDE_YES",
+      "action": "ORDER_ACTION_BUY",
+      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+      "lastTransactTime": "2026-08-05T01:47:49.408592979Z"
+     },
+     "lastShares": "15.0000",
+     "lastPx": {
+      "value": "0.1800",
+      "currency": "USD"
+     },
+     "type": "EXECUTION_TYPE_PARTIAL_FILL",
+     "text": "",
+     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
+     "transactTime": "2026-08-05T01:47:49.408592979Z",
+     "legPrices": [],
+     "tradeId": "BP1REE9JP9QP",
+     "aggressor": true,
+     "commissionNotionalCollected": {
+      "value": "0.1300",
+      "currency": "USD"
+     },
+     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
+     "traceId": "",
+     "commissionSpreadPx": {
+      "value": "0.1800",
+      "currency": "USD"
+     },
+     "transactTradeDate": "2026-08-05T00:00:00Z"
+    },
+    "passiveExecution": {
+     "id": "BP1REE9JT9QP",
+     "order": {
+      "id": "BNAN289C0B9G",
+      "marketSlug": "scc-senate-gop-2026-11-03-51",
+      "side": "ORDER_SIDE_SELL",
+      "type": "ORDER_TYPE_LIMIT",
+      "price": {
+       "value": "0.18",
+       "currency": "USD"
+      },
+      "quantity": 15,
+      "cumQuantity": 15,
+      "leavesQuantity": 0,
+      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+      "goodTillTime": null,
+      "intent": "ORDER_INTENT_BUY_SHORT",
+      "marketMetadata": {
+       "slug": "scc-senate-gop-2026-11-03-51",
+       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+       "title": "2026 Midterms: Republican Senate Seats?",
+       "outcome": "No",
+       "eventSlug": "senate-gop-2026-11-03",
+       "subject": {
+        "id": 0,
+        "name": "51",
+        "subjectType": ""
+       },
+       "eventId": "59842"
+      },
+      "state": "ORDER_STATE_FILLED",
+      "commissionNotionalTotalCollected": {
+       "value": "-0.0300",
+       "currency": "USD"
+      },
+      "commissionsBasisPoints": "0",
+      "makerCommissionsBasisPoints": "0",
+      "avgPx": {
+       "value": "0.1800",
+       "currency": "USD"
+      },
+      "cashOrderQty": {
+       "value": "0.0000",
+       "currency": "USD"
+      },
+      "insertTime": "2026-08-04T01:56:54.993890566Z",
+      "createTime": "2026-08-04T01:56:54.992585119Z",
+      "outcomeSide": "OUTCOME_SIDE_NO",
+      "action": "ORDER_ACTION_BUY",
+      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
+      "lastTransactTime": "2026-08-05T01:47:49.408592979Z"
+     },
+     "lastShares": "15.0000",
+     "lastPx": {
+      "value": "0.1800",
+      "currency": "USD"
+     },
+     "type": "EXECUTION_TYPE_FILL",
+     "text": "",
+     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
+     "transactTime": "2026-08-05T01:47:49.408592979Z",
+     "legPrices": [],
+     "tradeId": "BP1REE9JP9QP",
+     "aggressor": false,
+     "commissionNotionalCollected": {
+      "value": "-0.0300",
+      "currency": "USD"
+     },
+     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
+     "traceId": "",
+     "commissionSpreadPx": {
+      "value": "0.8200",
+      "currency": "USD"
+     },
+     "transactTradeDate": "2026-08-05T00:00:00Z"
+    },
+    "marketSlug": "scc-senate-gop-2026-11-03-51",
+    "state": "TRADE_STATE_NEW",
+    "createTime": "2026-08-05T01:47:49.408592979Z",
+    "updateTime": "2026-08-05T01:47:49.408592979Z",
+    "price": {
+     "value": "0.1800",
+     "currency": "USD"
+    },
+    "qty": "15",
+    "cost": {
+     "value": "12.27",
+     "currency": "USD"
+    },
+    "aggressor": {
+     "id": "BNZCMTWWGB9P",
+     "marketSlug": "scc-senate-gop-2026-11-03-51",
+     "side": "ORDER_SIDE_BUY",
+     "type": "ORDER_TYPE_LIMIT",
+     "price": {
+      "value": "0.28",
+      "currency": "USD"
+     },
+     "quantity": 26.33,
+     "cumQuantity": 15,
+     "leavesQuantity": 11.33,
+     "tif": "TIME_IN_FORCE_DAY",
+     "goodTillTime": null,
+     "intent": "ORDER_INTENT_BUY_LONG",
+     "marketMetadata": {
+      "slug": "scc-senate-gop-2026-11-03-51",
+      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+      "title": "2026 Midterms: Republican Senate Seats?",
+      "outcome": "Yes",
+      "eventSlug": "senate-gop-2026-11-03",
+      "subject": {
+       "id": 0,
+       "name": "51",
+       "subjectType": ""
+      },
+      "eventId": "59842"
+     },
+     "state": "ORDER_STATE_PARTIALLY_FILLED",
+     "commissionNotionalTotalCollected": {
+      "value": "0.1300",
+      "currency": "USD"
+     },
+     "commissionsBasisPoints": "0",
+     "makerCommissionsBasisPoints": "0",
+     "avgPx": {
+      "value": "0.1800",
+      "currency": "USD"
+     },
+     "cashOrderQty": {
+      "value": "4.7660",
+      "currency": "USD"
+     },
+     "insertTime": "2026-08-05T01:47:49.408592979Z",
+     "createTime": "2026-08-05T01:47:49.406172553Z",
+     "outcomeSide": "OUTCOME_SIDE_YES",
+     "action": "ORDER_ACTION_BUY",
+     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+     "lastTransactTime": "2026-08-05T01:47:49.408592979Z"
+    },
+    "passive": {
+     "id": "BNAN289C0B9G",
+     "marketSlug": "scc-senate-gop-2026-11-03-51",
+     "side": "ORDER_SIDE_SELL",
+     "type": "ORDER_TYPE_LIMIT",
+     "price": {
+      "value": "0.18",
+      "currency": "USD"
+     },
+     "quantity": 15,
+     "cumQuantity": 15,
+     "leavesQuantity": 0,
+     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+     "goodTillTime": null,
+     "intent": "ORDER_INTENT_BUY_SHORT",
+     "marketMetadata": {
+      "slug": "scc-senate-gop-2026-11-03-51",
+      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+      "title": "2026 Midterms: Republican Senate Seats?",
+      "outcome": "No",
+      "eventSlug": "senate-gop-2026-11-03",
+      "subject": {
+       "id": 0,
+       "name": "51",
+       "subjectType": ""
+      },
+      "eventId": "59842"
+     },
+     "state": "ORDER_STATE_FILLED",
+     "commissionNotionalTotalCollected": {
+      "value": "-0.0300",
+      "currency": "USD"
+     },
+     "commissionsBasisPoints": "0",
+     "makerCommissionsBasisPoints": "0",
+     "avgPx": {
+      "value": "0.1800",
+      "currency": "USD"
+     },
+     "cashOrderQty": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "insertTime": "2026-08-04T01:56:54.993890566Z",
+     "createTime": "2026-08-04T01:56:54.992585119Z",
+     "outcomeSide": "OUTCOME_SIDE_NO",
+     "action": "ORDER_ACTION_BUY",
+     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
+     "lastTransactTime": "2026-08-05T01:47:49.408592979Z"
+    },
+    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
+    "createTradeDate": "2026-08-05T00:00:00Z",
+    "updateTradeDate": "2026-08-05T00:00:00Z",
+    "tradeLinkId": "BNQRCSZVC9PY",
+    "isAggressor": false,
+    "market": {
+     "id": "278459",
+     "question": "2026 Midterms: Republican Senate Seats?",
+     "slug": "scc-senate-gop-2026-11-03-51",
+     "endDate": "2026-11-17T23:00:00Z",
+     "category": "politics",
+     "startDate": "2026-07-22T22:24:53Z",
+     "description": "This market will settle to Yes if the Republican Partys seat count in the United States Senate is exactly 51 as a result of the 2026 United States midterm election scheduled for November 3, 2026. Outcome sourced from relevant state electoral authorities, and the United States Senate.\n\nThe seat count includes all regular and special Senate elections that determine representation in the upcoming 120th Congress and are scheduled to take place in November 2026 as of October 31, 2026 (ET). Runoffs for qualifying elections will determine attribution of the relevant seat, even if they take place after November 2026. Vacant seats for which no election or special election to fill the seat is scheduled to take place in November 2026 as of October 31, 2026 will be treated as held by the party affiliation of the most recent member to hold that seat.\n\nFor seats contested in the specified election, seats are attributed to the party under which the member was elected. If a member-elect changes party affiliation, or vacates their seat, between election day and the formal organization of Congress, the seat is attributed to the party under which the member was elected. \n\nFor seats not contested in the specified election, seats are attributed to the party that holds the seat as of the date of the election. If a current sitting member of the U.S. Senate who is not up for election changes party affiliation or vacates their seat after the date of the election, the seat is attributed to the party under which the member was affiliated at the time of the election.\n\nSenate members elected as independents who formally caucus with, or, for newly elected members, who announce their intent to caucus with, the Republican party are included in the count. If the caucus decisions of members of the Senate elected as independents cannot be determined on the date of the election, settlement may be postponed until the earlier of (i) an announcement from the relevant members of their intents to caucus, or (ii) January 4th, 11:59 PM ET of the following calendar year. If no such announcement is made by January 4th, 11:59 PM ET of the following calendar year, the member will not count towards the seat count of any party.",
+     "active": true,
+     "marketType": "futures",
+     "closed": false,
+     "createdAt": "2026-07-22T22:24:53Z",
+     "updatedAt": "2026-08-05T01:51:43Z",
+     "archived": false,
+     "orderPriceMinTickSize": 0.01,
+     "gameStartTime": "2026-11-03T17:00:00Z",
+     "manualActivation": false,
+     "sportsMarketType": "futures",
+     "marketSides": [
+      {
+       "id": "556480",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "scc-senate-gop-2026-11-03-51",
+       "createdAt": "2026-07-22T22:24:53Z",
+       "updatedAt": "2026-07-22T22:24:53Z",
+       "description": "Yes",
+       "marketId": 278459,
+       "long": true,
+       "tradable": true
+      },
+      {
+       "id": "556481",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "scc-senate-gop-2026-11-03-51",
+       "createdAt": "2026-07-22T22:24:53Z",
+       "updatedAt": "2026-07-22T22:24:53Z",
+       "description": "No",
+       "marketId": 278459,
+       "long": false,
+       "tradable": true
+      }
+     ],
+     "outcomes": "[\"Yes\",\"No\"]",
+     "outcomePrices": "[\"0\",\"0\"]",
+     "ep3Status": "OPEN",
+     "status": "MARKET_STATUS_OPEN",
+     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
+     "hidden": false,
+     "tags": [],
+     "title": "51",
+     "feeCoefficient": 0.06,
+     "sortOrder": 7,
+     "titleShort": "51",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
+     "minimumTradeQty": 0.01,
+     "comboEnabled": false
+    },
+    "qtyDecimal": "15.0000",
+    "comboLegDetails": []
+   }
+  },
+  {
+   "type": "ACTIVITY_TYPE_TRADE",
+   "trade": {
+    "id": "BP1QTSMBR9QP",
+    "aggressorExecution": {
+     "id": "BP1QTSMBT9QP",
+     "order": {
+      "id": "BNZC573KPB9W",
+      "marketSlug": "ewc-pres-arg-2027-10-24-javmil",
+      "side": "ORDER_SIDE_BUY",
+      "type": "ORDER_TYPE_LIMIT",
+      "price": {
+       "value": "0.81",
+       "currency": "USD"
+      },
+      "quantity": 1.36,
+      "cumQuantity": 0.05,
+      "leavesQuantity": 1.31,
+      "tif": "TIME_IN_FORCE_DAY",
+      "goodTillTime": null,
+      "intent": "ORDER_INTENT_BUY_LONG",
+      "marketMetadata": {
+       "slug": "ewc-pres-arg-2027-10-24-javmil",
+       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/us-countries/ARG.png",
+       "title": "Argentina Presidential Election Winner",
+       "outcome": "Yes",
+       "eventSlug": "pres-arg-2027-10-24",
+       "subject": {
+        "id": 0,
+        "name": "Javier Milei",
+        "subjectType": "",
+        "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/javmil-d6d5cff732.jpg"
+       },
+       "eventId": "50265"
+      },
+      "state": "ORDER_STATE_PARTIALLY_FILLED",
+      "commissionNotionalTotalCollected": {
+       "value": "0.0000",
+       "currency": "USD"
+      },
+      "commissionsBasisPoints": "0",
+      "makerCommissionsBasisPoints": "0",
+      "avgPx": {
+       "value": "0.6500",
+       "currency": "USD"
+      },
+      "cashOrderQty": {
+       "value": "0.9757",
+       "currency": "USD"
+      },
+      "insertTime": "2026-08-05T01:46:31.933002457Z",
+      "createTime": "2026-08-05T01:46:31.931666934Z",
+      "outcomeSide": "OUTCOME_SIDE_YES",
+      "action": "ORDER_ACTION_BUY",
+      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+      "lastTransactTime": "2026-08-05T01:46:31.933002457Z"
+     },
+     "lastShares": "0.0500",
+     "lastPx": {
+      "value": "0.6500",
+      "currency": "USD"
+     },
+     "type": "EXECUTION_TYPE_PARTIAL_FILL",
+     "text": "",
+     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
+     "transactTime": "2026-08-05T01:46:31.933002457Z",
+     "legPrices": [],
+     "tradeId": "BP1QTSMBR9QP",
+     "aggressor": true,
+     "commissionNotionalCollected": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
+     "traceId": "",
+     "commissionSpreadPx": {
+      "value": "0.6500",
+      "currency": "USD"
+     },
+     "transactTradeDate": "2026-08-05T00:00:00Z"
+    },
+    "passiveExecution": {
+     "id": "BP1QTSMBW9QP",
+     "order": {
+      "id": "BNXNPFWZ2BA2",
+      "marketSlug": "ewc-pres-arg-2027-10-24-javmil",
+      "side": "ORDER_SIDE_SELL",
+      "type": "ORDER_TYPE_LIMIT",
+      "price": {
+       "value": "0.65",
+       "currency": "USD"
+      },
+      "quantity": 0.05,
+      "cumQuantity": 0.05,
+      "leavesQuantity": 0,
+      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+      "goodTillTime": null,
+      "intent": "ORDER_INTENT_SELL_LONG",
+      "marketMetadata": {
+       "slug": "ewc-pres-arg-2027-10-24-javmil",
+       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/us-countries/ARG.png",
+       "title": "Argentina Presidential Election Winner",
+       "outcome": "Yes",
+       "eventSlug": "pres-arg-2027-10-24",
+       "subject": {
+        "id": 0,
+        "name": "Javier Milei",
+        "subjectType": "",
+        "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/javmil-d6d5cff732.jpg"
+       },
+       "eventId": "50265"
+      },
+      "state": "ORDER_STATE_FILLED",
+      "commissionNotionalTotalCollected": {
+       "value": "0.0000",
+       "currency": "USD"
+      },
+      "commissionsBasisPoints": "0",
+      "makerCommissionsBasisPoints": "0",
+      "avgPx": {
+       "value": "0.6500",
+       "currency": "USD"
+      },
+      "cashOrderQty": {
+       "value": "0.0000",
+       "currency": "USD"
+      },
+      "insertTime": "2026-08-04T23:58:43.581524674Z",
+      "createTime": "2026-08-04T23:58:43.580053468Z",
+      "outcomeSide": "OUTCOME_SIDE_YES",
+      "action": "ORDER_ACTION_SELL",
+      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+      "lastTransactTime": "2026-08-05T01:46:31.933002457Z"
+     },
+     "lastShares": "0.0500",
+     "lastPx": {
+      "value": "0.6500",
+      "currency": "USD"
+     },
+     "type": "EXECUTION_TYPE_FILL",
+     "text": "",
+     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
+     "transactTime": "2026-08-05T01:46:31.933002457Z",
+     "legPrices": [],
+     "tradeId": "BP1QTSMBR9QP",
+     "aggressor": false,
+     "commissionNotionalCollected": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
+     "traceId": "",
+     "commissionSpreadPx": {
+      "value": "0.3500",
+      "currency": "USD"
+     },
+     "transactTradeDate": "2026-08-05T00:00:00Z"
+    },
+    "marketSlug": "ewc-pres-arg-2027-10-24-javmil",
+    "state": "TRADE_STATE_NEW",
+    "createTime": "2026-08-05T01:46:31.933002457Z",
+    "updateTime": "2026-08-05T01:46:31.933002457Z",
+    "price": {
+     "value": "0.6500",
+     "currency": "USD"
+    },
+    "qty": "0",
+    "cost": {
+     "value": "0.0325",
+     "currency": "USD"
+    },
+    "aggressor": {
+     "id": "BNZC573KPB9W",
+     "marketSlug": "ewc-pres-arg-2027-10-24-javmil",
+     "side": "ORDER_SIDE_BUY",
+     "type": "ORDER_TYPE_LIMIT",
+     "price": {
+      "value": "0.81",
+      "currency": "USD"
+     },
+     "quantity": 1.36,
+     "cumQuantity": 0.05,
+     "leavesQuantity": 1.31,
+     "tif": "TIME_IN_FORCE_DAY",
+     "goodTillTime": null,
+     "intent": "ORDER_INTENT_BUY_LONG",
+     "marketMetadata": {
+      "slug": "ewc-pres-arg-2027-10-24-javmil",
+      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/us-countries/ARG.png",
+      "title": "Argentina Presidential Election Winner",
+      "outcome": "Yes",
+      "eventSlug": "pres-arg-2027-10-24",
+      "subject": {
+       "id": 0,
+       "name": "Javier Milei",
+       "subjectType": "",
+       "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/javmil-d6d5cff732.jpg"
+      },
+      "eventId": "50265"
+     },
+     "state": "ORDER_STATE_PARTIALLY_FILLED",
+     "commissionNotionalTotalCollected": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "commissionsBasisPoints": "0",
+     "makerCommissionsBasisPoints": "0",
+     "avgPx": {
+      "value": "0.6500",
+      "currency": "USD"
+     },
+     "cashOrderQty": {
+      "value": "0.9757",
+      "currency": "USD"
+     },
+     "insertTime": "2026-08-05T01:46:31.933002457Z",
+     "createTime": "2026-08-05T01:46:31.931666934Z",
+     "outcomeSide": "OUTCOME_SIDE_YES",
+     "action": "ORDER_ACTION_BUY",
+     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+     "lastTransactTime": "2026-08-05T01:46:31.933002457Z"
+    },
+    "passive": {
+     "id": "BNXNPFWZ2BA2",
+     "marketSlug": "ewc-pres-arg-2027-10-24-javmil",
+     "side": "ORDER_SIDE_SELL",
+     "type": "ORDER_TYPE_LIMIT",
+     "price": {
+      "value": "0.65",
+      "currency": "USD"
+     },
+     "quantity": 0.05,
+     "cumQuantity": 0.05,
+     "leavesQuantity": 0,
+     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+     "goodTillTime": null,
+     "intent": "ORDER_INTENT_SELL_LONG",
+     "marketMetadata": {
+      "slug": "ewc-pres-arg-2027-10-24-javmil",
+      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/us-countries/ARG.png",
+      "title": "Argentina Presidential Election Winner",
+      "outcome": "Yes",
+      "eventSlug": "pres-arg-2027-10-24",
+      "subject": {
+       "id": 0,
+       "name": "Javier Milei",
+       "subjectType": "",
+       "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/javmil-d6d5cff732.jpg"
+      },
+      "eventId": "50265"
+     },
+     "state": "ORDER_STATE_FILLED",
+     "commissionNotionalTotalCollected": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "commissionsBasisPoints": "0",
+     "makerCommissionsBasisPoints": "0",
+     "avgPx": {
+      "value": "0.6500",
+      "currency": "USD"
+     },
+     "cashOrderQty": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "insertTime": "2026-08-04T23:58:43.581524674Z",
+     "createTime": "2026-08-04T23:58:43.580053468Z",
+     "outcomeSide": "OUTCOME_SIDE_YES",
+     "action": "ORDER_ACTION_SELL",
+     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+     "lastTransactTime": "2026-08-05T01:46:31.933002457Z"
+    },
+    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
+    "createTradeDate": "2026-08-05T00:00:00Z",
+    "updateTradeDate": "2026-08-05T00:00:00Z",
+    "tradeLinkId": "BNX1SXEKE9PT",
+    "isAggressor": false,
+    "costBasis": {
+     "value": "0.05",
+     "currency": "USD"
+    },
+    "originalPrice": {
+     "value": "0.98",
+     "currency": "USD"
+    },
+    "realizedPnl": {
+     "value": "-0.02",
+     "currency": "USD"
+    },
+    "effectiveOriginalPrice": {
+     "value": "0.98",
+     "currency": "USD"
+    },
+    "effectiveCostBasis": {
+     "value": "0.05",
+     "currency": "USD"
+    },
+    "effectiveRealizedPnl": {
+     "value": "-0.02",
+     "currency": "USD"
+    },
+    "market": {
+     "id": "224675",
+     "question": "Argentina Presidential Election Winner",
+     "slug": "ewc-pres-arg-2027-10-24-javmil",
+     "endDate": "2027-11-07T23:00:00Z",
+     "category": "politics",
+     "startDate": "2026-07-13T22:11:14Z",
+     "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/javmil-d6d5cff732.jpg",
+     "description": "This market will settle to Yes if Javier Milei wins the 2027 Argentina Presidential Election, including any potential runoff. Outcome sourced from relevant government authorities.\n\nIn the event that the 2027 Argentina Presidential Election is rescheduled, this market will settle based on the results of the next Argentina Presidential Election to be held within two years of October 24, 2027.",
+     "active": true,
+     "marketType": "futures",
+     "closed": false,
+     "createdAt": "2026-07-13T22:11:15Z",
+     "updatedAt": "2026-08-05T01:51:42Z",
+     "archived": false,
+     "orderPriceMinTickSize": 0.01,
+     "gameStartTime": "2027-10-25T03:59:00Z",
+     "manualActivation": false,
+     "sportsMarketType": "futures",
+     "marketSides": [
+      {
+       "id": "448982",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "ewc-pres-arg-2027-10-24-javmil",
+       "createdAt": "2026-07-13T22:11:15Z",
+       "updatedAt": "2026-07-13T22:11:15Z",
+       "description": "Yes",
+       "marketId": 224675,
+       "long": true,
+       "tradable": true
+      },
+      {
+       "id": "448983",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "ewc-pres-arg-2027-10-24-javmil",
+       "createdAt": "2026-07-13T22:11:15Z",
+       "updatedAt": "2026-07-13T22:11:15Z",
+       "description": "No",
+       "marketId": 224675,
+       "long": false,
+       "tradable": true
+      }
+     ],
+     "outcomes": "[\"Yes\",\"No\"]",
+     "outcomePrices": "[\"0\",\"0\"]",
+     "ep3Status": "OPEN",
+     "status": "MARKET_STATUS_OPEN",
+     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
+     "hidden": false,
+     "tags": [],
+     "title": "Javier Milei",
+     "feeCoefficient": 0.06,
+     "titleShort": "Javier Milei",
+     "ep3SyncedAt": "2026-08-05T01:15:37Z",
+     "minimumTradeQty": 0.01,
+     "comboEnabled": false
+    },
+    "qtyDecimal": "0.0500",
+    "comboLegDetails": []
+   }
+  },
+  {
+   "type": "ACTIVITY_TYPE_TRADE",
+   "trade": {
+    "id": "BP1F7Y2989QP",
+    "aggressorExecution": {
+     "id": "BP1F7Y29A9QP",
+     "order": {
+      "id": "BNZ14EEEJB9G",
+      "marketSlug": "scc-senate-gop-2026-11-03-48",
+      "side": "ORDER_SIDE_SELL",
+      "type": "ORDER_TYPE_LIMIT",
+      "price": {
+       "value": "0.21",
+       "currency": "USD"
+      },
+      "quantity": 14,
+      "cumQuantity": 14,
+      "leavesQuantity": 0,
+      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+      "goodTillTime": null,
+      "intent": "ORDER_INTENT_BUY_SHORT",
+      "marketMetadata": {
+       "slug": "scc-senate-gop-2026-11-03-48",
+       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+       "title": "2026 Midterms: Republican Senate Seats?",
+       "outcome": "No",
+       "eventSlug": "senate-gop-2026-11-03",
+       "subject": {
+        "id": 0,
+        "name": "48",
+        "subjectType": ""
+       },
+       "eventId": "59842"
+      },
+      "state": "ORDER_STATE_FILLED",
+      "commissionNotionalTotalCollected": {
+       "value": "0.1400",
+       "currency": "USD"
+      },
+      "commissionsBasisPoints": "0",
+      "makerCommissionsBasisPoints": "0",
+      "avgPx": {
+       "value": "0.2100",
+       "currency": "USD"
+      },
+      "cashOrderQty": {
+       "value": "0.0000",
+       "currency": "USD"
+      },
+      "insertTime": "2026-08-05T01:27:50.306611510Z",
+      "createTime": "2026-08-05T01:27:50.305134561Z",
+      "outcomeSide": "OUTCOME_SIDE_NO",
+      "action": "ORDER_ACTION_BUY",
+      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+      "lastTransactTime": "2026-08-05T01:27:50.306611510Z"
+     },
+     "lastShares": "14.0000",
+     "lastPx": {
+      "value": "0.2100",
+      "currency": "USD"
+     },
+     "type": "EXECUTION_TYPE_FILL",
+     "text": "",
+     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
+     "transactTime": "2026-08-05T01:27:50.306611510Z",
+     "legPrices": [],
+     "tradeId": "BP1F7Y2989QP",
+     "aggressor": true,
+     "commissionNotionalCollected": {
+      "value": "0.1400",
+      "currency": "USD"
+     },
+     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
+     "traceId": "",
+     "commissionSpreadPx": {
+      "value": "0.7900",
+      "currency": "USD"
+     },
+     "transactTradeDate": "2026-08-05T00:00:00Z"
+    },
+    "passiveExecution": {
+     "id": "BP1F7Y29C9QP",
+     "order": {
+      "id": "BNXMNJ0WEB9J",
+      "marketSlug": "scc-senate-gop-2026-11-03-48",
+      "side": "ORDER_SIDE_BUY",
+      "type": "ORDER_TYPE_LIMIT",
+      "price": {
+       "value": "0.21",
+       "currency": "USD"
+      },
+      "quantity": 14,
+      "cumQuantity": 14,
+      "leavesQuantity": 0,
+      "tif": "TIME_IN_FORCE_DAY",
+      "goodTillTime": null,
+      "intent": "ORDER_INTENT_SELL_SHORT",
+      "marketMetadata": {
+       "slug": "scc-senate-gop-2026-11-03-48",
+       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+       "title": "2026 Midterms: Republican Senate Seats?",
+       "outcome": "No",
+       "eventSlug": "senate-gop-2026-11-03",
+       "subject": {
+        "id": 0,
+        "name": "48",
+        "subjectType": ""
+       },
+       "eventId": "59842"
+      },
+      "state": "ORDER_STATE_FILLED",
+      "commissionNotionalTotalCollected": {
+       "value": "-0.0300",
+       "currency": "USD"
+      },
+      "commissionsBasisPoints": "0",
+      "makerCommissionsBasisPoints": "0",
+      "avgPx": {
+       "value": "0.2100",
+       "currency": "USD"
+      },
+      "cashOrderQty": {
+       "value": "0.0000",
+       "currency": "USD"
+      },
+      "insertTime": "2026-08-05T01:10:14.936047163Z",
+      "createTime": "2026-08-04T23:56:40.562737422Z",
+      "outcomeSide": "OUTCOME_SIDE_NO",
+      "action": "ORDER_ACTION_SELL",
+      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+      "lastTransactTime": "2026-08-05T01:27:50.306611510Z"
+     },
+     "lastShares": "14.0000",
+     "lastPx": {
+      "value": "0.2100",
+      "currency": "USD"
+     },
+     "type": "EXECUTION_TYPE_FILL",
+     "text": "",
+     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
+     "transactTime": "2026-08-05T01:27:50.306611510Z",
+     "legPrices": [],
+     "tradeId": "BP1F7Y2989QP",
+     "aggressor": false,
+     "commissionNotionalCollected": {
+      "value": "-0.0300",
+      "currency": "USD"
+     },
+     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
+     "traceId": "",
+     "commissionSpreadPx": {
+      "value": "0.2100",
+      "currency": "USD"
+     },
+     "transactTradeDate": "2026-08-05T00:00:00Z"
+    },
+    "marketSlug": "scc-senate-gop-2026-11-03-48",
+    "state": "TRADE_STATE_NEW",
+    "createTime": "2026-08-05T01:27:50.306611510Z",
+    "updateTime": "2026-08-05T01:27:50.306611510Z",
+    "price": {
+     "value": "0.2100",
+     "currency": "USD"
+    },
+    "qty": "14",
+    "cost": {
+     "value": "11.09",
+     "currency": "USD"
+    },
+    "aggressor": {
+     "id": "BNZ14EEEJB9G",
+     "marketSlug": "scc-senate-gop-2026-11-03-48",
+     "side": "ORDER_SIDE_SELL",
+     "type": "ORDER_TYPE_LIMIT",
+     "price": {
+      "value": "0.21",
+      "currency": "USD"
+     },
+     "quantity": 14,
+     "cumQuantity": 14,
+     "leavesQuantity": 0,
+     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+     "goodTillTime": null,
+     "intent": "ORDER_INTENT_BUY_SHORT",
+     "marketMetadata": {
+      "slug": "scc-senate-gop-2026-11-03-48",
+      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+      "title": "2026 Midterms: Republican Senate Seats?",
+      "outcome": "No",
+      "eventSlug": "senate-gop-2026-11-03",
+      "subject": {
+       "id": 0,
+       "name": "48",
+       "subjectType": ""
+      },
+      "eventId": "59842"
+     },
+     "state": "ORDER_STATE_FILLED",
+     "commissionNotionalTotalCollected": {
+      "value": "0.1400",
+      "currency": "USD"
+     },
+     "commissionsBasisPoints": "0",
+     "makerCommissionsBasisPoints": "0",
+     "avgPx": {
+      "value": "0.2100",
+      "currency": "USD"
+     },
+     "cashOrderQty": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "insertTime": "2026-08-05T01:27:50.306611510Z",
+     "createTime": "2026-08-05T01:27:50.305134561Z",
+     "outcomeSide": "OUTCOME_SIDE_NO",
+     "action": "ORDER_ACTION_BUY",
+     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+     "lastTransactTime": "2026-08-05T01:27:50.306611510Z"
+    },
+    "passive": {
+     "id": "BNXMNJ0WEB9J",
+     "marketSlug": "scc-senate-gop-2026-11-03-48",
+     "side": "ORDER_SIDE_BUY",
+     "type": "ORDER_TYPE_LIMIT",
+     "price": {
+      "value": "0.21",
+      "currency": "USD"
+     },
+     "quantity": 14,
+     "cumQuantity": 14,
+     "leavesQuantity": 0,
+     "tif": "TIME_IN_FORCE_DAY",
+     "goodTillTime": null,
+     "intent": "ORDER_INTENT_SELL_SHORT",
+     "marketMetadata": {
+      "slug": "scc-senate-gop-2026-11-03-48",
+      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+      "title": "2026 Midterms: Republican Senate Seats?",
+      "outcome": "No",
+      "eventSlug": "senate-gop-2026-11-03",
+      "subject": {
+       "id": 0,
+       "name": "48",
+       "subjectType": ""
+      },
+      "eventId": "59842"
+     },
+     "state": "ORDER_STATE_FILLED",
+     "commissionNotionalTotalCollected": {
+      "value": "-0.0300",
+      "currency": "USD"
+     },
+     "commissionsBasisPoints": "0",
+     "makerCommissionsBasisPoints": "0",
+     "avgPx": {
+      "value": "0.2100",
+      "currency": "USD"
+     },
+     "cashOrderQty": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "insertTime": "2026-08-05T01:10:14.936047163Z",
+     "createTime": "2026-08-04T23:56:40.562737422Z",
+     "outcomeSide": "OUTCOME_SIDE_NO",
+     "action": "ORDER_ACTION_SELL",
+     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+     "lastTransactTime": "2026-08-05T01:27:50.306611510Z"
+    },
+    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
+    "createTradeDate": "2026-08-05T00:00:00Z",
+    "updateTradeDate": "2026-08-05T00:00:00Z",
+    "tradeLinkId": "BNWRDF9929PT",
+    "isAggressor": false,
+    "costBasis": {
+     "value": "11.20",
+     "currency": "USD"
+    },
+    "originalPrice": {
+     "value": "0.80",
+     "currency": "USD"
+    },
+    "realizedPnl": {
+     "value": "-8.23",
+     "currency": "USD"
+    },
+    "effectiveOriginalPrice": {
+     "value": "0.80",
+     "currency": "USD"
+    },
+    "effectiveCostBasis": {
+     "value": "11.20",
+     "currency": "USD"
+    },
+    "effectiveRealizedPnl": {
+     "value": "-0.11",
+     "currency": "USD"
+    },
+    "market": {
+     "id": "278462",
+     "question": "2026 Midterms: Republican Senate Seats?",
+     "slug": "scc-senate-gop-2026-11-03-48",
+     "endDate": "2026-11-17T23:00:00Z",
+     "category": "politics",
+     "startDate": "2026-07-22T22:24:57Z",
+     "description": "This market will settle to Yes if the Republican Partys seat count in the United States Senate is exactly 48 as a result of the 2026 United States midterm election scheduled for November 3, 2026. Outcome sourced from relevant state electoral authorities, and the United States Senate.\n\nThe seat count includes all regular and special Senate elections that determine representation in the upcoming 120th Congress and are scheduled to take place in November 2026 as of October 31, 2026 (ET). Runoffs for qualifying elections will determine attribution of the relevant seat, even if they take place after November 2026. Vacant seats for which no election or special election to fill the seat is scheduled to take place in November 2026 as of October 31, 2026 will be treated as held by the party affiliation of the most recent member to hold that seat.\n\nFor seats contested in the specified election, seats are attributed to the party under which the member was elected. If a member-elect changes party affiliation, or vacates their seat, between election day and the formal organization of Congress, the seat is attributed to the party under which the member was elected. \n\nFor seats not contested in the specified election, seats are attributed to the party that holds the seat as of the date of the election. If a current sitting member of the U.S. Senate who is not up for election changes party affiliation or vacates their seat after the date of the election, the seat is attributed to the party under which the member was affiliated at the time of the election.\n\nSenate members elected as independents who formally caucus with, or, for newly elected members, who announce their intent to caucus with, the Republican party are included in the count. If the caucus decisions of members of the Senate elected as independents cannot be determined on the date of the election, settlement may be postponed until the earlier of (i) an announcement from the relevant members of their intents to caucus, or (ii) January 4th, 11:59 PM ET of the following calendar year. If no such announcement is made by January 4th, 11:59 PM ET of the following calendar year, the member will not count towards the seat count of any party.",
+     "active": true,
+     "marketType": "futures",
+     "closed": false,
+     "createdAt": "2026-07-22T22:24:57Z",
+     "updatedAt": "2026-08-05T01:36:43Z",
+     "archived": false,
+     "orderPriceMinTickSize": 0.01,
+     "gameStartTime": "2026-11-03T17:00:00Z",
+     "manualActivation": false,
+     "sportsMarketType": "futures",
+     "marketSides": [
+      {
+       "id": "556486",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "scc-senate-gop-2026-11-03-48",
+       "createdAt": "2026-07-22T22:24:57Z",
+       "updatedAt": "2026-07-22T22:24:57Z",
+       "description": "Yes",
+       "marketId": 278462,
+       "long": true,
+       "tradable": true
+      },
+      {
+       "id": "556487",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "scc-senate-gop-2026-11-03-48",
+       "createdAt": "2026-07-22T22:24:57Z",
+       "updatedAt": "2026-07-22T22:24:57Z",
+       "description": "No",
+       "marketId": 278462,
+       "long": false,
+       "tradable": true
+      }
+     ],
+     "outcomes": "[\"No\",\"Yes\"]",
+     "outcomePrices": "[\"0\",\"0\"]",
+     "ep3Status": "OPEN",
+     "status": "MARKET_STATUS_OPEN",
+     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
+     "hidden": false,
+     "tags": [],
+     "title": "48",
+     "feeCoefficient": 0.06,
+     "sortOrder": 4,
+     "titleShort": "48",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
+     "minimumTradeQty": 0.01,
+     "comboEnabled": false
+    },
+    "qtyDecimal": "14.0000",
+    "comboLegDetails": []
+   }
+  },
+  {
+   "type": "ACTIVITY_TYPE_TRADE",
+   "trade": {
+    "id": "BP1CT9SV69QP",
+    "aggressorExecution": {
+     "id": "BP1CT9SV89QP",
+     "order": {
+      "id": "BNZ2CRBEYBA6",
+      "marketSlug": "opdc-mcconnell-resign-2026-11-02",
+      "side": "ORDER_SIDE_SELL",
+      "type": "ORDER_TYPE_LIMIT",
+      "price": {
+       "value": "0.01",
+       "currency": "USD"
+      },
+      "quantity": 19.09,
+      "cumQuantity": 19.09,
+      "leavesQuantity": 0,
+      "tif": "TIME_IN_FORCE_IMMEDIATE_OR_CANCEL",
+      "goodTillTime": null,
+      "intent": "ORDER_INTENT_SELL_LONG",
+      "marketMetadata": {
+       "slug": "opdc-mcconnell-resign-2026-11-02",
+       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mcconnell-resign-e14ef4f374.jpg",
+       "title": "Mitch McConnell Resigns?",
+       "outcome": "Yes",
+       "eventSlug": "mcconnell-resign",
+       "subject": {
+        "id": 0,
+        "name": "Before the Midterms",
+        "subjectType": ""
+       },
+       "eventId": "53723"
+      },
+      "state": "ORDER_STATE_FILLED",
+      "commissionNotionalTotalCollected": {
+       "value": "0.0900",
+       "currency": "USD"
+      },
+      "commissionsBasisPoints": "0",
+      "makerCommissionsBasisPoints": "0",
+      "avgPx": {
+       "value": "0.0900",
+       "currency": "USD"
+      },
+      "cashOrderQty": {
+       "value": "0.0000",
+       "currency": "USD"
+      },
+      "insertTime": "2026-08-05T01:22:26.932503101Z",
+      "createTime": "2026-08-05T01:22:26.930541265Z",
+      "outcomeSide": "OUTCOME_SIDE_YES",
+      "action": "ORDER_ACTION_SELL",
+      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+      "lastTransactTime": "2026-08-05T01:22:26.932503101Z"
+     },
+     "lastShares": "19.0900",
+     "lastPx": {
+      "value": "0.0900",
+      "currency": "USD"
+     },
+     "type": "EXECUTION_TYPE_FILL",
+     "text": "",
+     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
+     "transactTime": "2026-08-05T01:22:26.932503101Z",
+     "legPrices": [],
+     "tradeId": "BP1CT9SV69QP",
+     "aggressor": true,
+     "commissionNotionalCollected": {
+      "value": "0.0900",
+      "currency": "USD"
+     },
+     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
+     "traceId": "",
+     "commissionSpreadPx": {
+      "value": "0.9100",
+      "currency": "USD"
+     },
+     "transactTradeDate": "2026-08-05T00:00:00Z"
+    },
+    "passiveExecution": {
+     "id": "BP1CT9SVA9QP",
+     "order": {
+      "id": "BNYNVJRNCB9H",
+      "marketSlug": "opdc-mcconnell-resign-2026-11-02",
+      "side": "ORDER_SIDE_BUY",
+      "type": "ORDER_TYPE_LIMIT",
+      "price": {
+       "value": "0.09",
+       "currency": "USD"
+      },
+      "quantity": 25,
+      "cumQuantity": 19.09,
+      "leavesQuantity": 5.91,
+      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+      "goodTillTime": null,
+      "intent": "ORDER_INTENT_BUY_LONG",
+      "marketMetadata": {
+       "slug": "opdc-mcconnell-resign-2026-11-02",
+       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mcconnell-resign-e14ef4f374.jpg",
+       "title": "Mitch McConnell Resigns?",
+       "outcome": "Yes",
+       "eventSlug": "mcconnell-resign",
+       "subject": {
+        "id": 0,
+        "name": "Before the Midterms",
+        "subjectType": ""
+       },
+       "eventId": "53723"
+      },
+      "state": "ORDER_STATE_PARTIALLY_FILLED",
+      "commissionNotionalTotalCollected": {
+       "value": "-0.0200",
+       "currency": "USD"
+      },
+      "commissionsBasisPoints": "0",
+      "makerCommissionsBasisPoints": "0",
+      "avgPx": {
+       "value": "0.0900",
+       "currency": "USD"
+      },
+      "cashOrderQty": {
+       "value": "0.0000",
+       "currency": "USD"
+      },
+      "insertTime": "2026-08-05T01:05:42.221561542Z",
+      "createTime": "2026-08-05T01:05:42.219143338Z",
+      "outcomeSide": "OUTCOME_SIDE_YES",
+      "action": "ORDER_ACTION_BUY",
+      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
+      "lastTransactTime": "2026-08-05T01:22:26.932503101Z"
+     },
+     "lastShares": "19.0900",
+     "lastPx": {
+      "value": "0.0900",
+      "currency": "USD"
+     },
+     "type": "EXECUTION_TYPE_PARTIAL_FILL",
+     "text": "",
+     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
+     "transactTime": "2026-08-05T01:22:26.932503101Z",
+     "legPrices": [],
+     "tradeId": "BP1CT9SV69QP",
+     "aggressor": false,
+     "commissionNotionalCollected": {
+      "value": "-0.0200",
+      "currency": "USD"
+     },
+     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
+     "traceId": "",
+     "commissionSpreadPx": {
+      "value": "0.0900",
+      "currency": "USD"
+     },
+     "transactTradeDate": "2026-08-05T00:00:00Z"
+    },
+    "marketSlug": "opdc-mcconnell-resign-2026-11-02",
+    "state": "TRADE_STATE_NEW",
+    "createTime": "2026-08-05T01:22:26.932503101Z",
+    "updateTime": "2026-08-05T01:22:26.932503101Z",
+    "price": {
+     "value": "0.0900",
+     "currency": "USD"
+    },
+    "qty": "19",
+    "cost": {
+     "value": "1.6981",
+     "currency": "USD"
+    },
+    "aggressor": {
+     "id": "BNZ2CRBEYBA6",
+     "marketSlug": "opdc-mcconnell-resign-2026-11-02",
+     "side": "ORDER_SIDE_SELL",
+     "type": "ORDER_TYPE_LIMIT",
+     "price": {
+      "value": "0.01",
+      "currency": "USD"
+     },
+     "quantity": 19.09,
+     "cumQuantity": 19.09,
+     "leavesQuantity": 0,
+     "tif": "TIME_IN_FORCE_IMMEDIATE_OR_CANCEL",
+     "goodTillTime": null,
+     "intent": "ORDER_INTENT_SELL_LONG",
+     "marketMetadata": {
+      "slug": "opdc-mcconnell-resign-2026-11-02",
+      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mcconnell-resign-e14ef4f374.jpg",
+      "title": "Mitch McConnell Resigns?",
+      "outcome": "Yes",
+      "eventSlug": "mcconnell-resign",
+      "subject": {
+       "id": 0,
+       "name": "Before the Midterms",
+       "subjectType": ""
+      },
+      "eventId": "53723"
+     },
+     "state": "ORDER_STATE_FILLED",
+     "commissionNotionalTotalCollected": {
+      "value": "0.0900",
+      "currency": "USD"
+     },
+     "commissionsBasisPoints": "0",
+     "makerCommissionsBasisPoints": "0",
+     "avgPx": {
+      "value": "0.0900",
+      "currency": "USD"
+     },
+     "cashOrderQty": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "insertTime": "2026-08-05T01:22:26.932503101Z",
+     "createTime": "2026-08-05T01:22:26.930541265Z",
+     "outcomeSide": "OUTCOME_SIDE_YES",
+     "action": "ORDER_ACTION_SELL",
+     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+     "lastTransactTime": "2026-08-05T01:22:26.932503101Z"
+    },
+    "passive": {
+     "id": "BNYNVJRNCB9H",
+     "marketSlug": "opdc-mcconnell-resign-2026-11-02",
+     "side": "ORDER_SIDE_BUY",
+     "type": "ORDER_TYPE_LIMIT",
+     "price": {
+      "value": "0.09",
+      "currency": "USD"
+     },
+     "quantity": 25,
+     "cumQuantity": 19.09,
+     "leavesQuantity": 5.91,
+     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+     "goodTillTime": null,
+     "intent": "ORDER_INTENT_BUY_LONG",
+     "marketMetadata": {
+      "slug": "opdc-mcconnell-resign-2026-11-02",
+      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mcconnell-resign-e14ef4f374.jpg",
+      "title": "Mitch McConnell Resigns?",
+      "outcome": "Yes",
+      "eventSlug": "mcconnell-resign",
+      "subject": {
+       "id": 0,
+       "name": "Before the Midterms",
+       "subjectType": ""
+      },
+      "eventId": "53723"
+     },
+     "state": "ORDER_STATE_PARTIALLY_FILLED",
+     "commissionNotionalTotalCollected": {
+      "value": "-0.0200",
+      "currency": "USD"
+     },
+     "commissionsBasisPoints": "0",
+     "makerCommissionsBasisPoints": "0",
+     "avgPx": {
+      "value": "0.0900",
+      "currency": "USD"
+     },
+     "cashOrderQty": {
+      "value": "0.0000",
+      "currency": "USD"
+     },
+     "insertTime": "2026-08-05T01:05:42.221561542Z",
+     "createTime": "2026-08-05T01:05:42.219143338Z",
+     "outcomeSide": "OUTCOME_SIDE_YES",
+     "action": "ORDER_ACTION_BUY",
+     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
+     "lastTransactTime": "2026-08-05T01:22:26.932503101Z"
+    },
+    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
+    "createTradeDate": "2026-08-05T00:00:00Z",
+    "updateTradeDate": "2026-08-05T00:00:00Z",
+    "tradeLinkId": "BNV5FB2FY9PH",
+    "isAggressor": false,
+    "market": {
+     "id": "234507",
+     "question": "Mitch McConnell Resigns?",
+     "slug": "opdc-mcconnell-resign-2026-11-02",
+     "endDate": "2026-11-16T23:00:00Z",
+     "category": "politics",
+     "startDate": "2026-07-16T20:39:10Z",
+     "description": "This market will settle to Yes if Mitch McConnell resigns as United States Senator from Kentucky by November 2, 2026, 11:59 PM ET. Outcome sourced from Mitch McConnell and the United States Senate.\n\nResignation refers to Mitch McConnell formally ceasing to hold the position of United States Senator from Kentucky through self-initiated means, including, but not limited to, resignation and retirement. Externally-imposed departures and announcements of future resignations do not qualify.\n\nTemporary leaves of absence, dated suspensions, indefinite suspensions, administrative leaves, or other temporary changes to the specified person's duties in the specified position do not qualify. Ceasing to hold the specified position through non-self-initiated means does not qualify.",
+     "active": true,
+     "marketType": "futures",
+     "closed": false,
+     "createdAt": "2026-07-16T20:39:10Z",
+     "updatedAt": "2026-08-05T01:26:45Z",
+     "archived": false,
+     "orderPriceMinTickSize": 0.01,
+     "gameStartTime": "2026-11-03T04:59:00Z",
+     "manualActivation": false,
+     "sportsMarketType": "futures",
+     "marketSides": [
+      {
+       "id": "468578",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "opdc-mcconnell-resign-2026-11-02",
+       "createdAt": "2026-07-16T20:39:10Z",
+       "updatedAt": "2026-07-16T20:39:10Z",
+       "description": "Yes",
+       "marketId": 234507,
+       "long": true,
+       "tradable": true
+      },
+      {
+       "id": "468579",
+       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
+       "identifier": "opdc-mcconnell-resign-2026-11-02",
+       "createdAt": "2026-07-16T20:39:10Z",
+       "updatedAt": "2026-07-16T20:39:10Z",
+       "description": "No",
+       "marketId": 234507,
+       "long": false,
+       "tradable": true
+      }
+     ],
+     "outcomes": "[\"Yes\",\"No\"]",
+     "outcomePrices": "[\"0\",\"0\"]",
+     "ep3Status": "OPEN",
+     "status": "MARKET_STATUS_OPEN",
+     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
+     "hidden": false,
+     "tags": [],
+     "title": "Before the Midterms",
+     "feeCoefficient": 0.06,
+     "sortOrder": 1,
+     "titleShort": "Before the Midterms",
+     "ep3SyncedAt": "2026-08-05T01:18:27Z",
+     "minimumTradeQty": 0.01,
+     "comboEnabled": false
+    },
+    "qtyDecimal": "19.0900",
+    "comboLegDetails": []
+   }
+  },
+  {
+   "type": "ACTIVITY_TYPE_TRADE",
+   "trade": {
     "id": "BP14WQJVW9QP",
     "aggressorExecution": {
      "id": "BP14WQJVY9QP",
@@ -310,7 +2253,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-06-30T23:20:55Z",
-     "updatedAt": "2026-08-05T01:06:30Z",
+     "updatedAt": "2026-08-05T01:16:23Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2027-01-01T04:59:00Z",
@@ -548,7 +2491,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:09Z",
-     "updatedAt": "2026-08-05T01:11:51Z",
+     "updatedAt": "2026-08-05T02:01:51Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -589,7 +2532,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 5,
      "titleShort": "El-Sayed 0-5",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:29Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -912,7 +2855,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-13T22:09:52Z",
-     "updatedAt": "2026-08-05T00:01:37Z",
+     "updatedAt": "2026-08-05T01:15:36Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2027-01-01T04:59:00Z",
@@ -952,7 +2895,7 @@
      "title": "Kim Jong Un",
      "feeCoefficient": 0.06,
      "titleShort": "Kim Jong Un",
-     "ep3SyncedAt": "2026-08-04T23:14:21Z",
+     "ep3SyncedAt": "2026-08-05T01:15:36Z",
      "minimumTradeQty": 1,
      "comboEnabled": false
     },
@@ -1270,7 +3213,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:04Z",
-     "updatedAt": "2026-08-04T23:56:56Z",
+     "updatedAt": "2026-08-05T01:51:43Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -1311,7 +3254,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 4,
      "titleShort": "195+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -1610,7 +3553,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:08Z",
-     "updatedAt": "2026-08-05T01:11:51Z",
+     "updatedAt": "2026-08-05T02:06:53Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -1651,7 +3594,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 4,
      "titleShort": "El-Sayed 5-10",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:28Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -1824,7 +3767,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:06Z",
-     "updatedAt": "2026-08-05T01:01:46Z",
+     "updatedAt": "2026-08-05T01:57:00Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -1865,7 +3808,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 2,
      "titleShort": "El-Sayed 15-20",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:28Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -2164,7 +4107,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:05Z",
-     "updatedAt": "2026-08-05T01:06:43Z",
+     "updatedAt": "2026-08-05T02:11:47Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -2205,7 +4148,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "El-Sayed 20+",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:28Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -2504,7 +4447,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:08Z",
-     "updatedAt": "2026-08-05T01:11:51Z",
+     "updatedAt": "2026-08-05T02:06:53Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -2545,7 +4488,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 4,
      "titleShort": "El-Sayed 5-10",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:28Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -2844,7 +4787,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:09Z",
-     "updatedAt": "2026-08-05T01:11:51Z",
+     "updatedAt": "2026-08-05T02:01:51Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -2885,7 +4828,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 5,
      "titleShort": "El-Sayed 0-5",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:29Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -3184,7 +5127,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:07Z",
-     "updatedAt": "2026-08-05T00:46:46Z",
+     "updatedAt": "2026-08-05T01:18:28Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -3225,7 +5168,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 3,
      "titleShort": "El-Sayed 10-15",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:28Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -3519,7 +5462,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:39:10Z",
-     "updatedAt": "2026-08-05T00:51:39Z",
+     "updatedAt": "2026-08-05T01:26:45Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T04:59:00Z",
@@ -3560,7 +5503,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "Before the Midterms",
-     "ep3SyncedAt": "2026-08-04T23:17:07Z",
+     "ep3SyncedAt": "2026-08-05T01:18:27Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -3878,7 +5821,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:39:10Z",
-     "updatedAt": "2026-08-05T00:51:39Z",
+     "updatedAt": "2026-08-05T01:26:45Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T04:59:00Z",
@@ -3919,7 +5862,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "Before the Midterms",
-     "ep3SyncedAt": "2026-08-04T23:17:07Z",
+     "ep3SyncedAt": "2026-08-05T01:18:27Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -4218,7 +6161,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:08Z",
-     "updatedAt": "2026-08-05T01:11:51Z",
+     "updatedAt": "2026-08-05T02:06:53Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -4259,7 +6202,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 4,
      "titleShort": "El-Sayed 5-10",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:28Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -4558,7 +6501,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:09Z",
-     "updatedAt": "2026-08-05T01:11:51Z",
+     "updatedAt": "2026-08-05T02:01:51Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -4599,7 +6542,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 5,
      "titleShort": "El-Sayed 0-5",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:29Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -4898,7 +6841,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:06Z",
-     "updatedAt": "2026-08-05T01:01:46Z",
+     "updatedAt": "2026-08-05T01:57:00Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -4939,7 +6882,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 2,
      "titleShort": "El-Sayed 15-20",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:28Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -5238,7 +7181,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:07Z",
-     "updatedAt": "2026-08-05T00:46:46Z",
+     "updatedAt": "2026-08-05T01:18:28Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -5279,7 +7222,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 3,
      "titleShort": "El-Sayed 10-15",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:28Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -5597,7 +7540,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:39:10Z",
-     "updatedAt": "2026-08-05T00:51:39Z",
+     "updatedAt": "2026-08-05T01:26:45Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T04:59:00Z",
@@ -5638,7 +7581,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "Before the Midterms",
-     "ep3SyncedAt": "2026-08-04T23:17:07Z",
+     "ep3SyncedAt": "2026-08-05T01:18:27Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -5932,7 +7875,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-06-30T23:20:55Z",
-     "updatedAt": "2026-08-05T01:06:30Z",
+     "updatedAt": "2026-08-05T01:16:23Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2027-01-01T04:59:00Z",
@@ -6146,7 +8089,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:40:05Z",
-     "updatedAt": "2026-08-05T01:06:43Z",
+     "updatedAt": "2026-08-05T02:11:47Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-08-04T16:00:00Z",
@@ -6187,7 +8130,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "El-Sayed 20+",
-     "ep3SyncedAt": "2026-08-04T23:17:08Z",
+     "ep3SyncedAt": "2026-08-05T01:18:28Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -6381,7 +8324,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:02Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -6422,7 +8365,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "180+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -6740,7 +8683,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:11Z",
-     "updatedAt": "2026-08-05T00:41:25Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -6781,7 +8724,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 8,
      "titleShort": "215+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -7099,7 +9042,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:59Z",
-     "updatedAt": "2026-08-05T00:41:25Z",
+     "updatedAt": "2026-08-05T01:29:58Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -7140,7 +9083,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 3,
      "titleShort": "47",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -7434,7 +9377,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:25:05Z",
-     "updatedAt": "2026-08-04T23:28:31Z",
+     "updatedAt": "2026-08-05T01:29:58Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -7464,7 +9407,7 @@
        "tradable": true
       }
      ],
-     "outcomes": "[\"Yes\",\"No\"]",
+     "outcomes": "[\"No\",\"Yes\"]",
      "outcomePrices": "[\"0\",\"0\"]",
      "ep3Status": "OPEN",
      "status": "MARKET_STATUS_OPEN",
@@ -7475,7 +9418,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 13,
      "titleShort": "57+",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -7645,7 +9588,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:07Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -7686,7 +9629,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 6,
      "titleShort": "205+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -7980,7 +9923,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:39:10Z",
-     "updatedAt": "2026-08-05T00:51:39Z",
+     "updatedAt": "2026-08-05T01:26:45Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T04:59:00Z",
@@ -8021,7 +9964,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "Before the Midterms",
-     "ep3SyncedAt": "2026-08-04T23:17:07Z",
+     "ep3SyncedAt": "2026-08-05T01:18:27Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -8315,7 +10258,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:11Z",
-     "updatedAt": "2026-08-05T00:41:25Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -8356,7 +10299,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 8,
      "titleShort": "215+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -8674,7 +10617,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:51Z",
-     "updatedAt": "2026-08-04T23:28:31Z",
+     "updatedAt": "2026-08-05T01:29:58Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -8715,7 +10658,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 8,
      "titleShort": "52",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -8885,7 +10828,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:02Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -8926,7 +10869,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "180+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -9244,7 +11187,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:56Z",
-     "updatedAt": "2026-08-04T23:28:31Z",
+     "updatedAt": "2026-08-05T01:29:58Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -9285,7 +11228,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 5,
      "titleShort": "49",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -9579,7 +11522,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:57Z",
-     "updatedAt": "2026-08-05T01:01:42Z",
+     "updatedAt": "2026-08-05T01:36:43Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -9609,7 +11552,7 @@
        "tradable": true
       }
      ],
-     "outcomes": "[\"Yes\",\"No\"]",
+     "outcomes": "[\"No\",\"Yes\"]",
      "outcomePrices": "[\"0\",\"0\"]",
      "ep3Status": "OPEN",
      "status": "MARKET_STATUS_OPEN",
@@ -9620,7 +11563,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 4,
      "titleShort": "48",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -9790,7 +11733,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:02Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -9831,7 +11774,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "180+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -10001,7 +11944,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:02Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -10042,7 +11985,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "180+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -10236,7 +12179,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:02Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -10277,7 +12220,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "180+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -10595,7 +12538,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:39:10Z",
-     "updatedAt": "2026-08-05T00:51:39Z",
+     "updatedAt": "2026-08-05T01:26:45Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T04:59:00Z",
@@ -10636,7 +12579,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "Before the Midterms",
-     "ep3SyncedAt": "2026-08-04T23:17:07Z",
+     "ep3SyncedAt": "2026-08-05T01:18:27Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -10830,7 +12773,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:06Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -10860,7 +12803,7 @@
        "tradable": true
       }
      ],
-     "outcomes": "[\"No\",\"Yes\"]",
+     "outcomes": "[\"Yes\",\"No\"]",
      "outcomePrices": "[\"0\",\"0\"]",
      "ep3Status": "OPEN",
      "status": "MARKET_STATUS_OPEN",
@@ -10871,7 +12814,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 5,
      "titleShort": "200+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -11041,7 +12984,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:02Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -11082,7 +13025,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "180+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -11400,7 +13343,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:50Z",
-     "updatedAt": "2026-08-04T23:28:31Z",
+     "updatedAt": "2026-08-05T01:29:58Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -11441,7 +13384,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 9,
      "titleShort": "53",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -11735,7 +13678,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:39:10Z",
-     "updatedAt": "2026-08-05T00:51:39Z",
+     "updatedAt": "2026-08-05T01:26:45Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T04:59:00Z",
@@ -11776,7 +13719,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "Before the Midterms",
-     "ep3SyncedAt": "2026-08-04T23:17:07Z",
+     "ep3SyncedAt": "2026-08-05T01:18:27Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -12070,7 +14013,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:50Z",
-     "updatedAt": "2026-08-04T23:28:31Z",
+     "updatedAt": "2026-08-05T01:29:58Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -12111,7 +14054,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 9,
      "titleShort": "53",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -12405,7 +14348,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:50Z",
-     "updatedAt": "2026-08-04T23:28:31Z",
+     "updatedAt": "2026-08-05T01:29:58Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -12446,7 +14389,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 9,
      "titleShort": "53",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -12616,7 +14559,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:04Z",
-     "updatedAt": "2026-08-04T23:56:56Z",
+     "updatedAt": "2026-08-05T01:51:43Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -12657,7 +14600,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 4,
      "titleShort": "195+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -12827,7 +14770,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:56Z",
-     "updatedAt": "2026-08-04T23:28:31Z",
+     "updatedAt": "2026-08-05T01:29:58Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -12868,7 +14811,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 5,
      "titleShort": "49",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -13186,7 +15129,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:39:10Z",
-     "updatedAt": "2026-08-05T00:51:39Z",
+     "updatedAt": "2026-08-05T01:26:45Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T04:59:00Z",
@@ -13227,7 +15170,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "Before the Midterms",
-     "ep3SyncedAt": "2026-08-04T23:17:07Z",
+     "ep3SyncedAt": "2026-08-05T01:18:27Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -13521,7 +15464,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:56Z",
-     "updatedAt": "2026-08-04T23:28:31Z",
+     "updatedAt": "2026-08-05T01:29:58Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -13562,7 +15505,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 5,
      "titleShort": "49",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -13880,7 +15823,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:54Z",
-     "updatedAt": "2026-08-04T23:28:31Z",
+     "updatedAt": "2026-08-05T01:29:58Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -13921,7 +15864,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 6,
      "titleShort": "50",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
+     "ep3SyncedAt": "2026-08-05T01:29:58Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -14215,7 +16158,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:39:10Z",
-     "updatedAt": "2026-08-05T00:51:39Z",
+     "updatedAt": "2026-08-05T01:26:45Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T04:59:00Z",
@@ -14256,7 +16199,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "Before the Midterms",
-     "ep3SyncedAt": "2026-08-04T23:17:07Z",
+     "ep3SyncedAt": "2026-08-05T01:18:27Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -14687,7 +16630,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-21T23:30:06Z",
-     "updatedAt": "2026-08-04T23:26:54Z",
+     "updatedAt": "2026-08-05T01:28:21Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2027-03-19T16:00:00Z",
@@ -14799,7 +16742,7 @@
      "color": "#990000",
      "feeCoefficient": 0.06,
      "titleShort": "Indiana Hoosiers",
-     "ep3SyncedAt": "2026-08-04T23:26:54Z",
+     "ep3SyncedAt": "2026-08-05T01:28:21Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -15093,7 +17036,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:02Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -15134,7 +17077,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "180+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -15428,7 +17371,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:02Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -15469,7 +17412,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "180+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -15787,7 +17730,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:02Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -15828,7 +17771,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "180+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -16122,7 +18065,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:14Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:36:43Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -16163,7 +18106,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 10,
      "titleShort": "225+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -16457,7 +18400,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-06-30T23:20:55Z",
-     "updatedAt": "2026-08-05T01:06:30Z",
+     "updatedAt": "2026-08-05T01:16:23Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2027-01-01T04:59:00Z",
@@ -16792,7 +18735,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-16T20:39:10Z",
-     "updatedAt": "2026-08-05T00:51:39Z",
+     "updatedAt": "2026-08-05T01:26:45Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T04:59:00Z",
@@ -16833,7 +18776,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 1,
      "titleShort": "Before the Midterms",
-     "ep3SyncedAt": "2026-08-04T23:17:07Z",
+     "ep3SyncedAt": "2026-08-05T01:18:27Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
@@ -17003,7 +18946,7 @@
      "marketType": "futures",
      "closed": false,
      "createdAt": "2026-07-22T22:24:12Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
+     "updatedAt": "2026-08-05T01:29:57Z",
      "archived": false,
      "orderPriceMinTickSize": 0.01,
      "gameStartTime": "2026-11-03T17:00:00Z",
@@ -17044,2065 +18987,7 @@
      "feeCoefficient": 0.06,
      "sortOrder": 9,
      "titleShort": "220+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
-     "minimumTradeQty": 0.01,
-     "comboEnabled": false
-    },
-    "qtyDecimal": "10.0000",
-    "comboLegDetails": []
-   }
-  },
-  {
-   "type": "ACTIVITY_TYPE_TRADE",
-   "trade": {
-    "id": "BNEHQ75TG9QP",
-    "aggressorExecution": {
-     "id": "BNEHQ75TJ9QP",
-     "order": {
-      "id": "BNBR8M4ZGB9X",
-      "marketSlug": "opdc-mcconnell-resign-2026-11-02",
-      "side": "ORDER_SIDE_SELL",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.06",
-       "currency": "USD"
-      },
-      "quantity": 23.85,
-      "cumQuantity": 20,
-      "leavesQuantity": 3.85,
-      "tif": "TIME_IN_FORCE_IMMEDIATE_OR_CANCEL",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_SELL_LONG",
-      "marketMetadata": {
-       "slug": "opdc-mcconnell-resign-2026-11-02",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mcconnell-resign-e14ef4f374.jpg",
-       "title": "Mitch McConnell Resigns?",
-       "outcome": "Yes",
-       "eventSlug": "mcconnell-resign",
-       "subject": {
-        "id": 0,
-        "name": "Before the Midterms",
-        "subjectType": ""
-       },
-       "eventId": "53723"
-      },
-      "state": "ORDER_STATE_PARTIALLY_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "0.1700",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.1700",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T03:25:30.768776581Z",
-      "createTime": "2026-08-04T03:25:30.766087481Z",
-      "outcomeSide": "OUTCOME_SIDE_YES",
-      "action": "ORDER_ACTION_SELL",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-      "lastTransactTime": "2026-08-04T03:25:30.768776581Z"
-     },
-     "lastShares": "20.0000",
-     "lastPx": {
-      "value": "0.1700",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_PARTIAL_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T03:25:30.768776581Z",
-     "legPrices": [],
-     "tradeId": "BNEHQ75TG9QP",
-     "aggressor": true,
-     "commissionNotionalCollected": {
-      "value": "0.1700",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.8300",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "passiveExecution": {
-     "id": "BNEHQ75TM9QP",
-     "order": {
-      "id": "BN8ENSFJEB9H",
-      "marketSlug": "opdc-mcconnell-resign-2026-11-02",
-      "side": "ORDER_SIDE_BUY",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.17",
-       "currency": "USD"
-      },
-      "quantity": 20,
-      "cumQuantity": 20,
-      "leavesQuantity": 0,
-      "tif": "TIME_IN_FORCE_DAY",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_BUY_LONG",
-      "marketMetadata": {
-       "slug": "opdc-mcconnell-resign-2026-11-02",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mcconnell-resign-e14ef4f374.jpg",
-       "title": "Mitch McConnell Resigns?",
-       "outcome": "Yes",
-       "eventSlug": "mcconnell-resign",
-       "subject": {
-        "id": 0,
-        "name": "Before the Midterms",
-        "subjectType": ""
-       },
-       "eventId": "53723"
-      },
-      "state": "ORDER_STATE_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "-0.0400",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.1700",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T02:52:52.399235539Z",
-      "createTime": "2026-08-03T23:45:11.734967312Z",
-      "outcomeSide": "OUTCOME_SIDE_YES",
-      "action": "ORDER_ACTION_BUY",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
-      "lastTransactTime": "2026-08-04T03:25:30.768776581Z"
-     },
-     "lastShares": "20.0000",
-     "lastPx": {
-      "value": "0.1700",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T03:25:30.768776581Z",
-     "legPrices": [],
-     "tradeId": "BNEHQ75TG9QP",
-     "aggressor": false,
-     "commissionNotionalCollected": {
-      "value": "-0.0400",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.1700",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "marketSlug": "opdc-mcconnell-resign-2026-11-02",
-    "state": "TRADE_STATE_NEW",
-    "createTime": "2026-08-04T03:25:30.768776581Z",
-    "updateTime": "2026-08-04T03:25:30.768776581Z",
-    "price": {
-     "value": "0.1700",
-     "currency": "USD"
-    },
-    "qty": "20",
-    "cost": {
-     "value": "3.36",
-     "currency": "USD"
-    },
-    "aggressor": {
-     "id": "BNBR8M4ZGB9X",
-     "marketSlug": "opdc-mcconnell-resign-2026-11-02",
-     "side": "ORDER_SIDE_SELL",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.06",
-      "currency": "USD"
-     },
-     "quantity": 23.85,
-     "cumQuantity": 20,
-     "leavesQuantity": 3.85,
-     "tif": "TIME_IN_FORCE_IMMEDIATE_OR_CANCEL",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_SELL_LONG",
-     "marketMetadata": {
-      "slug": "opdc-mcconnell-resign-2026-11-02",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mcconnell-resign-e14ef4f374.jpg",
-      "title": "Mitch McConnell Resigns?",
-      "outcome": "Yes",
-      "eventSlug": "mcconnell-resign",
-      "subject": {
-       "id": 0,
-       "name": "Before the Midterms",
-       "subjectType": ""
-      },
-      "eventId": "53723"
-     },
-     "state": "ORDER_STATE_PARTIALLY_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "0.1700",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.1700",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T03:25:30.768776581Z",
-     "createTime": "2026-08-04T03:25:30.766087481Z",
-     "outcomeSide": "OUTCOME_SIDE_YES",
-     "action": "ORDER_ACTION_SELL",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-     "lastTransactTime": "2026-08-04T03:25:30.768776581Z"
-    },
-    "passive": {
-     "id": "BN8ENSFJEB9H",
-     "marketSlug": "opdc-mcconnell-resign-2026-11-02",
-     "side": "ORDER_SIDE_BUY",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.17",
-      "currency": "USD"
-     },
-     "quantity": 20,
-     "cumQuantity": 20,
-     "leavesQuantity": 0,
-     "tif": "TIME_IN_FORCE_DAY",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_BUY_LONG",
-     "marketMetadata": {
-      "slug": "opdc-mcconnell-resign-2026-11-02",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mcconnell-resign-e14ef4f374.jpg",
-      "title": "Mitch McConnell Resigns?",
-      "outcome": "Yes",
-      "eventSlug": "mcconnell-resign",
-      "subject": {
-       "id": 0,
-       "name": "Before the Midterms",
-       "subjectType": ""
-      },
-      "eventId": "53723"
-     },
-     "state": "ORDER_STATE_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "-0.0400",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.1700",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T02:52:52.399235539Z",
-     "createTime": "2026-08-03T23:45:11.734967312Z",
-     "outcomeSide": "OUTCOME_SIDE_YES",
-     "action": "ORDER_ACTION_BUY",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
-     "lastTransactTime": "2026-08-04T03:25:30.768776581Z"
-    },
-    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
-    "createTradeDate": "2026-08-04T00:00:00Z",
-    "updateTradeDate": "2026-08-04T00:00:00Z",
-    "tradeLinkId": "BN7FP89FW9PH",
-    "isAggressor": false,
-    "market": {
-     "id": "234507",
-     "question": "Mitch McConnell Resigns?",
-     "slug": "opdc-mcconnell-resign-2026-11-02",
-     "endDate": "2026-11-16T23:00:00Z",
-     "category": "politics",
-     "startDate": "2026-07-16T20:39:10Z",
-     "description": "This market will settle to Yes if Mitch McConnell resigns as United States Senator from Kentucky by November 2, 2026, 11:59 PM ET. Outcome sourced from Mitch McConnell and the United States Senate.\n\nResignation refers to Mitch McConnell formally ceasing to hold the position of United States Senator from Kentucky through self-initiated means, including, but not limited to, resignation and retirement. Externally-imposed departures and announcements of future resignations do not qualify.\n\nTemporary leaves of absence, dated suspensions, indefinite suspensions, administrative leaves, or other temporary changes to the specified person's duties in the specified position do not qualify. Ceasing to hold the specified position through non-self-initiated means does not qualify.",
-     "active": true,
-     "marketType": "futures",
-     "closed": false,
-     "createdAt": "2026-07-16T20:39:10Z",
-     "updatedAt": "2026-08-05T00:51:39Z",
-     "archived": false,
-     "orderPriceMinTickSize": 0.01,
-     "gameStartTime": "2026-11-03T04:59:00Z",
-     "manualActivation": false,
-     "sportsMarketType": "futures",
-     "marketSides": [
-      {
-       "id": "468578",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "opdc-mcconnell-resign-2026-11-02",
-       "createdAt": "2026-07-16T20:39:10Z",
-       "updatedAt": "2026-07-16T20:39:10Z",
-       "description": "Yes",
-       "marketId": 234507,
-       "long": true,
-       "tradable": true
-      },
-      {
-       "id": "468579",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "opdc-mcconnell-resign-2026-11-02",
-       "createdAt": "2026-07-16T20:39:10Z",
-       "updatedAt": "2026-07-16T20:39:10Z",
-       "description": "No",
-       "marketId": 234507,
-       "long": false,
-       "tradable": true
-      }
-     ],
-     "outcomes": "[\"Yes\",\"No\"]",
-     "outcomePrices": "[\"0\",\"0\"]",
-     "ep3Status": "OPEN",
-     "status": "MARKET_STATUS_OPEN",
-     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
-     "hidden": false,
-     "tags": [],
-     "title": "Before the Midterms",
-     "feeCoefficient": 0.06,
-     "sortOrder": 1,
-     "titleShort": "Before the Midterms",
-     "ep3SyncedAt": "2026-08-04T23:17:07Z",
-     "minimumTradeQty": 0.01,
-     "comboEnabled": false
-    },
-    "qtyDecimal": "20.0000",
-    "comboLegDetails": []
-   }
-  },
-  {
-   "type": "ACTIVITY_TYPE_TRADE",
-   "trade": {
-    "id": "BNE7247MA9QP",
-    "aggressorExecution": {
-     "id": "BNE7247MC9QP",
-     "order": {
-      "id": "BNBGXA990BAF",
-      "marketSlug": "scc-senate-gop-2026-11-03-48",
-      "side": "ORDER_SIDE_SELL",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.34",
-       "currency": "USD"
-      },
-      "quantity": 30,
-      "cumQuantity": 30,
-      "leavesQuantity": 0,
-      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_BUY_SHORT",
-      "marketMetadata": {
-       "slug": "scc-senate-gop-2026-11-03-48",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-       "title": "2026 Midterms: Republican Senate Seats?",
-       "outcome": "No",
-       "eventSlug": "senate-gop-2026-11-03",
-       "subject": {
-        "id": 0,
-        "name": "48",
-        "subjectType": ""
-       },
-       "eventId": "59842"
-      },
-      "state": "ORDER_STATE_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "0.4000",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.3400",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T03:02:04.601342997Z",
-      "createTime": "2026-08-04T03:02:04.599803766Z",
-      "outcomeSide": "OUTCOME_SIDE_NO",
-      "action": "ORDER_ACTION_BUY",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-      "lastTransactTime": "2026-08-04T03:02:04.601342997Z"
-     },
-     "lastShares": "30.0000",
-     "lastPx": {
-      "value": "0.3400",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T03:02:04.601342997Z",
-     "legPrices": [],
-     "tradeId": "BNE7247MA9QP",
-     "aggressor": true,
-     "commissionNotionalCollected": {
-      "value": "0.4000",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.6600",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "passiveExecution": {
-     "id": "BNE7247ME9QP",
-     "order": {
-      "id": "BMX1F0CD6B9M",
-      "marketSlug": "scc-senate-gop-2026-11-03-48",
-      "side": "ORDER_SIDE_BUY",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.34",
-       "currency": "USD"
-      },
-      "quantity": 30,
-      "cumQuantity": 30,
-      "leavesQuantity": 0,
-      "tif": "TIME_IN_FORCE_DAY",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_BUY_LONG",
-      "marketMetadata": {
-       "slug": "scc-senate-gop-2026-11-03-48",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-       "title": "2026 Midterms: Republican Senate Seats?",
-       "outcome": "Yes",
-       "eventSlug": "senate-gop-2026-11-03",
-       "subject": {
-        "id": 0,
-        "name": "48",
-        "subjectType": ""
-       },
-       "eventId": "59842"
-      },
-      "state": "ORDER_STATE_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "-0.0800",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.3400",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T02:59:52.740498461Z",
-      "createTime": "2026-08-03T10:56:28.432177767Z",
-      "outcomeSide": "OUTCOME_SIDE_YES",
-      "action": "ORDER_ACTION_BUY",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
-      "lastTransactTime": "2026-08-04T03:02:04.601342997Z"
-     },
-     "lastShares": "30.0000",
-     "lastPx": {
-      "value": "0.3400",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T03:02:04.601342997Z",
-     "legPrices": [],
-     "tradeId": "BNE7247MA9QP",
-     "aggressor": false,
-     "commissionNotionalCollected": {
-      "value": "-0.0800",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.3400",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "marketSlug": "scc-senate-gop-2026-11-03-48",
-    "state": "TRADE_STATE_NEW",
-    "createTime": "2026-08-04T03:02:04.601342997Z",
-    "updateTime": "2026-08-04T03:02:04.601342997Z",
-    "price": {
-     "value": "0.3400",
-     "currency": "USD"
-    },
-    "qty": "30",
-    "cost": {
-     "value": "10.12",
-     "currency": "USD"
-    },
-    "aggressor": {
-     "id": "BNBGXA990BAF",
-     "marketSlug": "scc-senate-gop-2026-11-03-48",
-     "side": "ORDER_SIDE_SELL",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.34",
-      "currency": "USD"
-     },
-     "quantity": 30,
-     "cumQuantity": 30,
-     "leavesQuantity": 0,
-     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_BUY_SHORT",
-     "marketMetadata": {
-      "slug": "scc-senate-gop-2026-11-03-48",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-      "title": "2026 Midterms: Republican Senate Seats?",
-      "outcome": "No",
-      "eventSlug": "senate-gop-2026-11-03",
-      "subject": {
-       "id": 0,
-       "name": "48",
-       "subjectType": ""
-      },
-      "eventId": "59842"
-     },
-     "state": "ORDER_STATE_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "0.4000",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.3400",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T03:02:04.601342997Z",
-     "createTime": "2026-08-04T03:02:04.599803766Z",
-     "outcomeSide": "OUTCOME_SIDE_NO",
-     "action": "ORDER_ACTION_BUY",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-     "lastTransactTime": "2026-08-04T03:02:04.601342997Z"
-    },
-    "passive": {
-     "id": "BMX1F0CD6B9M",
-     "marketSlug": "scc-senate-gop-2026-11-03-48",
-     "side": "ORDER_SIDE_BUY",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.34",
-      "currency": "USD"
-     },
-     "quantity": 30,
-     "cumQuantity": 30,
-     "leavesQuantity": 0,
-     "tif": "TIME_IN_FORCE_DAY",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_BUY_LONG",
-     "marketMetadata": {
-      "slug": "scc-senate-gop-2026-11-03-48",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-      "title": "2026 Midterms: Republican Senate Seats?",
-      "outcome": "Yes",
-      "eventSlug": "senate-gop-2026-11-03",
-      "subject": {
-       "id": 0,
-       "name": "48",
-       "subjectType": ""
-      },
-      "eventId": "59842"
-     },
-     "state": "ORDER_STATE_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "-0.0800",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.3400",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T02:59:52.740498461Z",
-     "createTime": "2026-08-03T10:56:28.432177767Z",
-     "outcomeSide": "OUTCOME_SIDE_YES",
-     "action": "ORDER_ACTION_BUY",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
-     "lastTransactTime": "2026-08-04T03:02:04.601342997Z"
-    },
-    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
-    "createTradeDate": "2026-08-04T00:00:00Z",
-    "updateTradeDate": "2026-08-04T00:00:00Z",
-    "tradeLinkId": "BNAA8B66E9PT",
-    "isAggressor": false,
-    "market": {
-     "id": "278462",
-     "question": "2026 Midterms: Republican Senate Seats?",
-     "slug": "scc-senate-gop-2026-11-03-48",
-     "endDate": "2026-11-17T23:00:00Z",
-     "category": "politics",
-     "startDate": "2026-07-22T22:24:57Z",
-     "description": "This market will settle to Yes if the Republican Partys seat count in the United States Senate is exactly 48 as a result of the 2026 United States midterm election scheduled for November 3, 2026. Outcome sourced from relevant state electoral authorities, and the United States Senate.\n\nThe seat count includes all regular and special Senate elections that determine representation in the upcoming 120th Congress and are scheduled to take place in November 2026 as of October 31, 2026 (ET). Runoffs for qualifying elections will determine attribution of the relevant seat, even if they take place after November 2026. Vacant seats for which no election or special election to fill the seat is scheduled to take place in November 2026 as of October 31, 2026 will be treated as held by the party affiliation of the most recent member to hold that seat.\n\nFor seats contested in the specified election, seats are attributed to the party under which the member was elected. If a member-elect changes party affiliation, or vacates their seat, between election day and the formal organization of Congress, the seat is attributed to the party under which the member was elected. \n\nFor seats not contested in the specified election, seats are attributed to the party that holds the seat as of the date of the election. If a current sitting member of the U.S. Senate who is not up for election changes party affiliation or vacates their seat after the date of the election, the seat is attributed to the party under which the member was affiliated at the time of the election.\n\nSenate members elected as independents who formally caucus with, or, for newly elected members, who announce their intent to caucus with, the Republican party are included in the count. If the caucus decisions of members of the Senate elected as independents cannot be determined on the date of the election, settlement may be postponed until the earlier of (i) an announcement from the relevant members of their intents to caucus, or (ii) January 4th, 11:59 PM ET of the following calendar year. If no such announcement is made by January 4th, 11:59 PM ET of the following calendar year, the member will not count towards the seat count of any party.",
-     "active": true,
-     "marketType": "futures",
-     "closed": false,
-     "createdAt": "2026-07-22T22:24:57Z",
-     "updatedAt": "2026-08-05T01:01:42Z",
-     "archived": false,
-     "orderPriceMinTickSize": 0.01,
-     "gameStartTime": "2026-11-03T17:00:00Z",
-     "manualActivation": false,
-     "sportsMarketType": "futures",
-     "marketSides": [
-      {
-       "id": "556486",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "scc-senate-gop-2026-11-03-48",
-       "createdAt": "2026-07-22T22:24:57Z",
-       "updatedAt": "2026-07-22T22:24:57Z",
-       "description": "Yes",
-       "marketId": 278462,
-       "long": true,
-       "tradable": true
-      },
-      {
-       "id": "556487",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "scc-senate-gop-2026-11-03-48",
-       "createdAt": "2026-07-22T22:24:57Z",
-       "updatedAt": "2026-07-22T22:24:57Z",
-       "description": "No",
-       "marketId": 278462,
-       "long": false,
-       "tradable": true
-      }
-     ],
-     "outcomes": "[\"Yes\",\"No\"]",
-     "outcomePrices": "[\"0\",\"0\"]",
-     "ep3Status": "OPEN",
-     "status": "MARKET_STATUS_OPEN",
-     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
-     "hidden": false,
-     "tags": [],
-     "title": "48",
-     "feeCoefficient": 0.06,
-     "sortOrder": 4,
-     "titleShort": "48",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
-     "minimumTradeQty": 0.01,
-     "comboEnabled": false
-    },
-    "qtyDecimal": "30.0000",
-    "comboLegDetails": []
-   }
-  },
-  {
-   "type": "ACTIVITY_TYPE_TRADE",
-   "trade": {
-    "id": "BNE4GK6MA9QP",
-    "aggressorExecution": {
-     "id": "BNE4GK6MC9QP",
-     "order": {
-      "id": "BNBJ18860BA5",
-      "marketSlug": "scc-senate-gop-2026-11-03-48",
-      "side": "ORDER_SIDE_SELL",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.31",
-       "currency": "USD"
-      },
-      "quantity": 5,
-      "cumQuantity": 5,
-      "leavesQuantity": 0,
-      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_BUY_SHORT",
-      "marketMetadata": {
-       "slug": "scc-senate-gop-2026-11-03-48",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-       "title": "2026 Midterms: Republican Senate Seats?",
-       "outcome": "No",
-       "eventSlug": "senate-gop-2026-11-03",
-       "subject": {
-        "id": 0,
-        "name": "48",
-        "subjectType": ""
-       },
-       "eventId": "59842"
-      },
-      "state": "ORDER_STATE_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "0.0600",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.3100",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T02:56:23.960989624Z",
-      "createTime": "2026-08-04T02:56:23.959110203Z",
-      "outcomeSide": "OUTCOME_SIDE_NO",
-      "action": "ORDER_ACTION_BUY",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-      "lastTransactTime": "2026-08-04T02:56:23.960989624Z"
-     },
-     "lastShares": "5.0000",
-     "lastPx": {
-      "value": "0.3100",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T02:56:23.960989624Z",
-     "legPrices": [],
-     "tradeId": "BNE4GK6MA9QP",
-     "aggressor": true,
-     "commissionNotionalCollected": {
-      "value": "0.0600",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.6900",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "passiveExecution": {
-     "id": "BNE4GK6ME9QP",
-     "order": {
-      "id": "BN9DSE4NTBA7",
-      "marketSlug": "scc-senate-gop-2026-11-03-48",
-      "side": "ORDER_SIDE_BUY",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.31",
-       "currency": "USD"
-      },
-      "quantity": 5,
-      "cumQuantity": 5,
-      "leavesQuantity": 0,
-      "tif": "TIME_IN_FORCE_DAY",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_SELL_SHORT",
-      "marketMetadata": {
-       "slug": "scc-senate-gop-2026-11-03-48",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-       "title": "2026 Midterms: Republican Senate Seats?",
-       "outcome": "No",
-       "eventSlug": "senate-gop-2026-11-03",
-       "subject": {
-        "id": 0,
-        "name": "48",
-        "subjectType": ""
-       },
-       "eventId": "59842"
-      },
-      "state": "ORDER_STATE_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "-0.0100",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.3100",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T02:38:45.304577285Z",
-      "createTime": "2026-08-04T00:39:00.902329176Z",
-      "outcomeSide": "OUTCOME_SIDE_NO",
-      "action": "ORDER_ACTION_SELL",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-      "lastTransactTime": "2026-08-04T02:56:23.960989624Z"
-     },
-     "lastShares": "5.0000",
-     "lastPx": {
-      "value": "0.3100",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T02:56:23.960989624Z",
-     "legPrices": [],
-     "tradeId": "BNE4GK6MA9QP",
-     "aggressor": false,
-     "commissionNotionalCollected": {
-      "value": "-0.0100",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.3100",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "marketSlug": "scc-senate-gop-2026-11-03-48",
-    "state": "TRADE_STATE_NEW",
-    "createTime": "2026-08-04T02:56:23.960989624Z",
-    "updateTime": "2026-08-04T02:56:23.960989624Z",
-    "price": {
-     "value": "0.3100",
-     "currency": "USD"
-    },
-    "qty": "5",
-    "cost": {
-     "value": "3.46",
-     "currency": "USD"
-    },
-    "aggressor": {
-     "id": "BNBJ18860BA5",
-     "marketSlug": "scc-senate-gop-2026-11-03-48",
-     "side": "ORDER_SIDE_SELL",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.31",
-      "currency": "USD"
-     },
-     "quantity": 5,
-     "cumQuantity": 5,
-     "leavesQuantity": 0,
-     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_BUY_SHORT",
-     "marketMetadata": {
-      "slug": "scc-senate-gop-2026-11-03-48",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-      "title": "2026 Midterms: Republican Senate Seats?",
-      "outcome": "No",
-      "eventSlug": "senate-gop-2026-11-03",
-      "subject": {
-       "id": 0,
-       "name": "48",
-       "subjectType": ""
-      },
-      "eventId": "59842"
-     },
-     "state": "ORDER_STATE_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "0.0600",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.3100",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T02:56:23.960989624Z",
-     "createTime": "2026-08-04T02:56:23.959110203Z",
-     "outcomeSide": "OUTCOME_SIDE_NO",
-     "action": "ORDER_ACTION_BUY",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-     "lastTransactTime": "2026-08-04T02:56:23.960989624Z"
-    },
-    "passive": {
-     "id": "BN9DSE4NTBA7",
-     "marketSlug": "scc-senate-gop-2026-11-03-48",
-     "side": "ORDER_SIDE_BUY",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.31",
-      "currency": "USD"
-     },
-     "quantity": 5,
-     "cumQuantity": 5,
-     "leavesQuantity": 0,
-     "tif": "TIME_IN_FORCE_DAY",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_SELL_SHORT",
-     "marketMetadata": {
-      "slug": "scc-senate-gop-2026-11-03-48",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-      "title": "2026 Midterms: Republican Senate Seats?",
-      "outcome": "No",
-      "eventSlug": "senate-gop-2026-11-03",
-      "subject": {
-       "id": 0,
-       "name": "48",
-       "subjectType": ""
-      },
-      "eventId": "59842"
-     },
-     "state": "ORDER_STATE_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "-0.0100",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.3100",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T02:38:45.304577285Z",
-     "createTime": "2026-08-04T00:39:00.902329176Z",
-     "outcomeSide": "OUTCOME_SIDE_NO",
-     "action": "ORDER_ACTION_SELL",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-     "lastTransactTime": "2026-08-04T02:56:23.960989624Z"
-    },
-    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
-    "createTradeDate": "2026-08-04T00:00:00Z",
-    "updateTradeDate": "2026-08-04T00:00:00Z",
-    "tradeLinkId": "BNA1XKH6W9PT",
-    "isAggressor": false,
-    "costBasis": {
-     "value": "4.30",
-     "currency": "USD"
-    },
-    "originalPrice": {
-     "value": "0.86",
-     "currency": "USD"
-    },
-    "realizedPnl": {
-     "value": "-2.74",
-     "currency": "USD"
-    },
-    "effectiveOriginalPrice": {
-     "value": "0.86",
-     "currency": "USD"
-    },
-    "effectiveCostBasis": {
-     "value": "4.30",
-     "currency": "USD"
-    },
-    "effectiveRealizedPnl": {
-     "value": "-0.84",
-     "currency": "USD"
-    },
-    "market": {
-     "id": "278462",
-     "question": "2026 Midterms: Republican Senate Seats?",
-     "slug": "scc-senate-gop-2026-11-03-48",
-     "endDate": "2026-11-17T23:00:00Z",
-     "category": "politics",
-     "startDate": "2026-07-22T22:24:57Z",
-     "description": "This market will settle to Yes if the Republican Partys seat count in the United States Senate is exactly 48 as a result of the 2026 United States midterm election scheduled for November 3, 2026. Outcome sourced from relevant state electoral authorities, and the United States Senate.\n\nThe seat count includes all regular and special Senate elections that determine representation in the upcoming 120th Congress and are scheduled to take place in November 2026 as of October 31, 2026 (ET). Runoffs for qualifying elections will determine attribution of the relevant seat, even if they take place after November 2026. Vacant seats for which no election or special election to fill the seat is scheduled to take place in November 2026 as of October 31, 2026 will be treated as held by the party affiliation of the most recent member to hold that seat.\n\nFor seats contested in the specified election, seats are attributed to the party under which the member was elected. If a member-elect changes party affiliation, or vacates their seat, between election day and the formal organization of Congress, the seat is attributed to the party under which the member was elected. \n\nFor seats not contested in the specified election, seats are attributed to the party that holds the seat as of the date of the election. If a current sitting member of the U.S. Senate who is not up for election changes party affiliation or vacates their seat after the date of the election, the seat is attributed to the party under which the member was affiliated at the time of the election.\n\nSenate members elected as independents who formally caucus with, or, for newly elected members, who announce their intent to caucus with, the Republican party are included in the count. If the caucus decisions of members of the Senate elected as independents cannot be determined on the date of the election, settlement may be postponed until the earlier of (i) an announcement from the relevant members of their intents to caucus, or (ii) January 4th, 11:59 PM ET of the following calendar year. If no such announcement is made by January 4th, 11:59 PM ET of the following calendar year, the member will not count towards the seat count of any party.",
-     "active": true,
-     "marketType": "futures",
-     "closed": false,
-     "createdAt": "2026-07-22T22:24:57Z",
-     "updatedAt": "2026-08-05T01:01:42Z",
-     "archived": false,
-     "orderPriceMinTickSize": 0.01,
-     "gameStartTime": "2026-11-03T17:00:00Z",
-     "manualActivation": false,
-     "sportsMarketType": "futures",
-     "marketSides": [
-      {
-       "id": "556486",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "scc-senate-gop-2026-11-03-48",
-       "createdAt": "2026-07-22T22:24:57Z",
-       "updatedAt": "2026-07-22T22:24:57Z",
-       "description": "Yes",
-       "marketId": 278462,
-       "long": true,
-       "tradable": true
-      },
-      {
-       "id": "556487",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "scc-senate-gop-2026-11-03-48",
-       "createdAt": "2026-07-22T22:24:57Z",
-       "updatedAt": "2026-07-22T22:24:57Z",
-       "description": "No",
-       "marketId": 278462,
-       "long": false,
-       "tradable": true
-      }
-     ],
-     "outcomes": "[\"Yes\",\"No\"]",
-     "outcomePrices": "[\"0\",\"0\"]",
-     "ep3Status": "OPEN",
-     "status": "MARKET_STATUS_OPEN",
-     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
-     "hidden": false,
-     "tags": [],
-     "title": "48",
-     "feeCoefficient": 0.06,
-     "sortOrder": 4,
-     "titleShort": "48",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
-     "minimumTradeQty": 0.01,
-     "comboEnabled": false
-    },
-    "qtyDecimal": "5.0000",
-    "comboLegDetails": []
-   }
-  },
-  {
-   "type": "ACTIVITY_TYPE_TRADE",
-   "trade": {
-    "id": "BNE338JZ49QP",
-    "aggressorExecution": {
-     "id": "BNE338JZ69QP",
-     "order": {
-      "id": "BNBEGTK4CBA9",
-      "marketSlug": "scc-senate-gop-2026-11-03-48",
-      "side": "ORDER_SIDE_SELL",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.38",
-       "currency": "USD"
-      },
-      "quantity": 15,
-      "cumQuantity": 15,
-      "leavesQuantity": 0,
-      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_BUY_SHORT",
-      "marketMetadata": {
-       "slug": "scc-senate-gop-2026-11-03-48",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-       "title": "2026 Midterms: Republican Senate Seats?",
-       "outcome": "No",
-       "eventSlug": "senate-gop-2026-11-03",
-       "subject": {
-        "id": 0,
-        "name": "48",
-        "subjectType": ""
-       },
-       "eventId": "59842"
-      },
-      "state": "ORDER_STATE_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "0.2100",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.3800",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T02:53:22.572993186Z",
-      "createTime": "2026-08-04T02:53:22.571177951Z",
-      "outcomeSide": "OUTCOME_SIDE_NO",
-      "action": "ORDER_ACTION_BUY",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-      "lastTransactTime": "2026-08-04T02:53:22.572993186Z"
-     },
-     "lastShares": "15.0000",
-     "lastPx": {
-      "value": "0.3800",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T02:53:22.572993186Z",
-     "legPrices": [],
-     "tradeId": "BNE338JZ49QP",
-     "aggressor": true,
-     "commissionNotionalCollected": {
-      "value": "0.2100",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.6200",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "passiveExecution": {
-     "id": "BNE338JZ89QP",
-     "order": {
-      "id": "BMZVZG430BAA",
-      "marketSlug": "scc-senate-gop-2026-11-03-48",
-      "side": "ORDER_SIDE_BUY",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.38",
-       "currency": "USD"
-      },
-      "quantity": 15,
-      "cumQuantity": 15,
-      "leavesQuantity": 0,
-      "tif": "TIME_IN_FORCE_DAY",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_SELL_SHORT",
-      "marketMetadata": {
-       "slug": "scc-senate-gop-2026-11-03-48",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-       "title": "2026 Midterms: Republican Senate Seats?",
-       "outcome": "No",
-       "eventSlug": "senate-gop-2026-11-03",
-       "subject": {
-        "id": 0,
-        "name": "48",
-        "subjectType": ""
-       },
-       "eventId": "59842"
-      },
-      "state": "ORDER_STATE_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "-0.0400",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.3800",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T02:47:52.138260631Z",
-      "createTime": "2026-08-03T14:05:51.698131423Z",
-      "outcomeSide": "OUTCOME_SIDE_NO",
-      "action": "ORDER_ACTION_SELL",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-      "lastTransactTime": "2026-08-04T02:53:22.572993186Z"
-     },
-     "lastShares": "15.0000",
-     "lastPx": {
-      "value": "0.3800",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T02:53:22.572993186Z",
-     "legPrices": [],
-     "tradeId": "BNE338JZ49QP",
-     "aggressor": false,
-     "commissionNotionalCollected": {
-      "value": "-0.0400",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.3800",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "marketSlug": "scc-senate-gop-2026-11-03-48",
-    "state": "TRADE_STATE_NEW",
-    "createTime": "2026-08-04T02:53:22.572993186Z",
-    "updateTime": "2026-08-04T02:53:22.572993186Z",
-    "price": {
-     "value": "0.3800",
-     "currency": "USD"
-    },
-    "qty": "15",
-    "cost": {
-     "value": "9.34",
-     "currency": "USD"
-    },
-    "aggressor": {
-     "id": "BNBEGTK4CBA9",
-     "marketSlug": "scc-senate-gop-2026-11-03-48",
-     "side": "ORDER_SIDE_SELL",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.38",
-      "currency": "USD"
-     },
-     "quantity": 15,
-     "cumQuantity": 15,
-     "leavesQuantity": 0,
-     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_BUY_SHORT",
-     "marketMetadata": {
-      "slug": "scc-senate-gop-2026-11-03-48",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-      "title": "2026 Midterms: Republican Senate Seats?",
-      "outcome": "No",
-      "eventSlug": "senate-gop-2026-11-03",
-      "subject": {
-       "id": 0,
-       "name": "48",
-       "subjectType": ""
-      },
-      "eventId": "59842"
-     },
-     "state": "ORDER_STATE_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "0.2100",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.3800",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T02:53:22.572993186Z",
-     "createTime": "2026-08-04T02:53:22.571177951Z",
-     "outcomeSide": "OUTCOME_SIDE_NO",
-     "action": "ORDER_ACTION_BUY",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-     "lastTransactTime": "2026-08-04T02:53:22.572993186Z"
-    },
-    "passive": {
-     "id": "BMZVZG430BAA",
-     "marketSlug": "scc-senate-gop-2026-11-03-48",
-     "side": "ORDER_SIDE_BUY",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.38",
-      "currency": "USD"
-     },
-     "quantity": 15,
-     "cumQuantity": 15,
-     "leavesQuantity": 0,
-     "tif": "TIME_IN_FORCE_DAY",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_SELL_SHORT",
-     "marketMetadata": {
-      "slug": "scc-senate-gop-2026-11-03-48",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-      "title": "2026 Midterms: Republican Senate Seats?",
-      "outcome": "No",
-      "eventSlug": "senate-gop-2026-11-03",
-      "subject": {
-       "id": 0,
-       "name": "48",
-       "subjectType": ""
-      },
-      "eventId": "59842"
-     },
-     "state": "ORDER_STATE_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "-0.0400",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.3800",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T02:47:52.138260631Z",
-     "createTime": "2026-08-03T14:05:51.698131423Z",
-     "outcomeSide": "OUTCOME_SIDE_NO",
-     "action": "ORDER_ACTION_SELL",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-     "lastTransactTime": "2026-08-04T02:53:22.572993186Z"
-    },
-    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
-    "createTradeDate": "2026-08-04T00:00:00Z",
-    "updateTradeDate": "2026-08-04T00:00:00Z",
-    "tradeLinkId": "BNA1XKDXT9PT",
-    "isAggressor": false,
-    "costBasis": {
-     "value": "12.96",
-     "currency": "USD"
-    },
-    "originalPrice": {
-     "value": "0.86",
-     "currency": "USD"
-    },
-    "realizedPnl": {
-     "value": "-7.22",
-     "currency": "USD"
-    },
-    "effectiveOriginalPrice": {
-     "value": "0.86",
-     "currency": "USD"
-    },
-    "effectiveCostBasis": {
-     "value": "12.96",
-     "currency": "USD"
-    },
-    "effectiveRealizedPnl": {
-     "value": "-3.62",
-     "currency": "USD"
-    },
-    "market": {
-     "id": "278462",
-     "question": "2026 Midterms: Republican Senate Seats?",
-     "slug": "scc-senate-gop-2026-11-03-48",
-     "endDate": "2026-11-17T23:00:00Z",
-     "category": "politics",
-     "startDate": "2026-07-22T22:24:57Z",
-     "description": "This market will settle to Yes if the Republican Partys seat count in the United States Senate is exactly 48 as a result of the 2026 United States midterm election scheduled for November 3, 2026. Outcome sourced from relevant state electoral authorities, and the United States Senate.\n\nThe seat count includes all regular and special Senate elections that determine representation in the upcoming 120th Congress and are scheduled to take place in November 2026 as of October 31, 2026 (ET). Runoffs for qualifying elections will determine attribution of the relevant seat, even if they take place after November 2026. Vacant seats for which no election or special election to fill the seat is scheduled to take place in November 2026 as of October 31, 2026 will be treated as held by the party affiliation of the most recent member to hold that seat.\n\nFor seats contested in the specified election, seats are attributed to the party under which the member was elected. If a member-elect changes party affiliation, or vacates their seat, between election day and the formal organization of Congress, the seat is attributed to the party under which the member was elected. \n\nFor seats not contested in the specified election, seats are attributed to the party that holds the seat as of the date of the election. If a current sitting member of the U.S. Senate who is not up for election changes party affiliation or vacates their seat after the date of the election, the seat is attributed to the party under which the member was affiliated at the time of the election.\n\nSenate members elected as independents who formally caucus with, or, for newly elected members, who announce their intent to caucus with, the Republican party are included in the count. If the caucus decisions of members of the Senate elected as independents cannot be determined on the date of the election, settlement may be postponed until the earlier of (i) an announcement from the relevant members of their intents to caucus, or (ii) January 4th, 11:59 PM ET of the following calendar year. If no such announcement is made by January 4th, 11:59 PM ET of the following calendar year, the member will not count towards the seat count of any party.",
-     "active": true,
-     "marketType": "futures",
-     "closed": false,
-     "createdAt": "2026-07-22T22:24:57Z",
-     "updatedAt": "2026-08-05T01:01:42Z",
-     "archived": false,
-     "orderPriceMinTickSize": 0.01,
-     "gameStartTime": "2026-11-03T17:00:00Z",
-     "manualActivation": false,
-     "sportsMarketType": "futures",
-     "marketSides": [
-      {
-       "id": "556486",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "scc-senate-gop-2026-11-03-48",
-       "createdAt": "2026-07-22T22:24:57Z",
-       "updatedAt": "2026-07-22T22:24:57Z",
-       "description": "Yes",
-       "marketId": 278462,
-       "long": true,
-       "tradable": true
-      },
-      {
-       "id": "556487",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "scc-senate-gop-2026-11-03-48",
-       "createdAt": "2026-07-22T22:24:57Z",
-       "updatedAt": "2026-07-22T22:24:57Z",
-       "description": "No",
-       "marketId": 278462,
-       "long": false,
-       "tradable": true
-      }
-     ],
-     "outcomes": "[\"Yes\",\"No\"]",
-     "outcomePrices": "[\"0\",\"0\"]",
-     "ep3Status": "OPEN",
-     "status": "MARKET_STATUS_OPEN",
-     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
-     "hidden": false,
-     "tags": [],
-     "title": "48",
-     "feeCoefficient": 0.06,
-     "sortOrder": 4,
-     "titleShort": "48",
-     "ep3SyncedAt": "2026-08-04T23:28:31Z",
-     "minimumTradeQty": 0.01,
-     "comboEnabled": false
-    },
-    "qtyDecimal": "15.0000",
-    "comboLegDetails": []
-   }
-  },
-  {
-   "type": "ACTIVITY_TYPE_TRADE",
-   "trade": {
-    "id": "BNDZ4XQ9A9QP",
-    "aggressorExecution": {
-     "id": "BNDZ4XQ9C9QP",
-     "order": {
-      "id": "BNBD32ADEB9R",
-      "marketSlug": "scc-hrep-rep-2026-11-03-gte220",
-      "side": "ORDER_SIDE_BUY",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.08",
-       "currency": "USD"
-      },
-      "quantity": 194,
-      "cumQuantity": 171,
-      "leavesQuantity": 23,
-      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_BUY_LONG",
-      "marketMetadata": {
-       "slug": "scc-hrep-rep-2026-11-03-gte220",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-       "title": "2026 Midterms: Republican House Seats?",
-       "outcome": "Yes",
-       "eventSlug": "hrep-rep-2026-11-03",
-       "subject": {
-        "id": 0,
-        "name": "220+",
-        "subjectType": ""
-       },
-       "eventId": "59841"
-      },
-      "state": "ORDER_STATE_PARTIALLY_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "0.7600",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.0800",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T02:44:40.927030509Z",
-      "createTime": "2026-08-04T02:44:40.924390928Z",
-      "outcomeSide": "OUTCOME_SIDE_YES",
-      "action": "ORDER_ACTION_BUY",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-      "lastTransactTime": "2026-08-04T02:44:40.927030509Z"
-     },
-     "lastShares": "2.0000",
-     "lastPx": {
-      "value": "0.0800",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_PARTIAL_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T02:44:40.927030509Z",
-     "legPrices": [],
-     "tradeId": "BNDZ4XQ9A9QP",
-     "aggressor": true,
-     "commissionNotionalCollected": {
-      "value": "0.0100",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.0800",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "passiveExecution": {
-     "id": "BNDZ4XQ9E9QP",
-     "order": {
-      "id": "BMNQ2GAAEB9T",
-      "marketSlug": "scc-hrep-rep-2026-11-03-gte220",
-      "side": "ORDER_SIDE_SELL",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.08",
-       "currency": "USD"
-      },
-      "quantity": 2,
-      "cumQuantity": 2,
-      "leavesQuantity": 0,
-      "tif": "TIME_IN_FORCE_DAY",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_BUY_SHORT",
-      "marketMetadata": {
-       "slug": "scc-hrep-rep-2026-11-03-gte220",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-       "title": "2026 Midterms: Republican House Seats?",
-       "outcome": "No",
-       "eventSlug": "hrep-rep-2026-11-03",
-       "subject": {
-        "id": 0,
-        "name": "220+",
-        "subjectType": ""
-       },
-       "eventId": "59841"
-      },
-      "state": "ORDER_STATE_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.0800",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T02:42:25.547106913Z",
-      "createTime": "2026-08-03T02:19:38.181727729Z",
-      "outcomeSide": "OUTCOME_SIDE_NO",
-      "action": "ORDER_ACTION_BUY",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
-      "lastTransactTime": "2026-08-04T02:44:40.927030509Z"
-     },
-     "lastShares": "2.0000",
-     "lastPx": {
-      "value": "0.0800",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T02:44:40.927030509Z",
-     "legPrices": [],
-     "tradeId": "BNDZ4XQ9A9QP",
-     "aggressor": false,
-     "commissionNotionalCollected": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.9200",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "marketSlug": "scc-hrep-rep-2026-11-03-gte220",
-    "state": "TRADE_STATE_NEW",
-    "createTime": "2026-08-04T02:44:40.927030509Z",
-    "updateTime": "2026-08-04T02:44:40.927030509Z",
-    "price": {
-     "value": "0.0800",
-     "currency": "USD"
-    },
-    "qty": "2",
-    "cost": {
-     "value": "1.84",
-     "currency": "USD"
-    },
-    "aggressor": {
-     "id": "BNBD32ADEB9R",
-     "marketSlug": "scc-hrep-rep-2026-11-03-gte220",
-     "side": "ORDER_SIDE_BUY",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.08",
-      "currency": "USD"
-     },
-     "quantity": 194,
-     "cumQuantity": 171,
-     "leavesQuantity": 23,
-     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_BUY_LONG",
-     "marketMetadata": {
-      "slug": "scc-hrep-rep-2026-11-03-gte220",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-      "title": "2026 Midterms: Republican House Seats?",
-      "outcome": "Yes",
-      "eventSlug": "hrep-rep-2026-11-03",
-      "subject": {
-       "id": 0,
-       "name": "220+",
-       "subjectType": ""
-      },
-      "eventId": "59841"
-     },
-     "state": "ORDER_STATE_PARTIALLY_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "0.7600",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.0800",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T02:44:40.927030509Z",
-     "createTime": "2026-08-04T02:44:40.924390928Z",
-     "outcomeSide": "OUTCOME_SIDE_YES",
-     "action": "ORDER_ACTION_BUY",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-     "lastTransactTime": "2026-08-04T02:44:40.927030509Z"
-    },
-    "passive": {
-     "id": "BMNQ2GAAEB9T",
-     "marketSlug": "scc-hrep-rep-2026-11-03-gte220",
-     "side": "ORDER_SIDE_SELL",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.08",
-      "currency": "USD"
-     },
-     "quantity": 2,
-     "cumQuantity": 2,
-     "leavesQuantity": 0,
-     "tif": "TIME_IN_FORCE_DAY",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_BUY_SHORT",
-     "marketMetadata": {
-      "slug": "scc-hrep-rep-2026-11-03-gte220",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-      "title": "2026 Midterms: Republican House Seats?",
-      "outcome": "No",
-      "eventSlug": "hrep-rep-2026-11-03",
-      "subject": {
-       "id": 0,
-       "name": "220+",
-       "subjectType": ""
-      },
-      "eventId": "59841"
-     },
-     "state": "ORDER_STATE_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.0800",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T02:42:25.547106913Z",
-     "createTime": "2026-08-03T02:19:38.181727729Z",
-     "outcomeSide": "OUTCOME_SIDE_NO",
-     "action": "ORDER_ACTION_BUY",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
-     "lastTransactTime": "2026-08-04T02:44:40.927030509Z"
-    },
-    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
-    "createTradeDate": "2026-08-04T00:00:00Z",
-    "updateTradeDate": "2026-08-04T00:00:00Z",
-    "tradeLinkId": "BNA1XK5VT9PT",
-    "isAggressor": false,
-    "market": {
-     "id": "278449",
-     "question": "2026 Midterms: Republican House Seats?",
-     "slug": "scc-hrep-rep-2026-11-03-gte220",
-     "endDate": "2026-11-17T23:00:00Z",
-     "category": "politics",
-     "startDate": "2026-07-22T22:24:12Z",
-     "description": "This market will settle to Yes if the Republican Partys seat count in the U.S. House of Representatives is greater than or equal to 220 as a result of the 2026 United States midterm election scheduled for November 3, 2026. Outcome sourced from relevant state electoral authorities, and the United States House of Representatives.\n\nThe seat count includes all House elections in the 2026 United States midterm election that elect voting members and determine representation in the upcoming 120th Congress. Where a seat is decided by a runoff, the runoff result will determine attribution of that seat.\n\nSeats are attributed to the party under which the member was elected. If a member-elect changes party affiliation, or vacates their seat, between election day and the formal organization of Congress, the seat is attributed to the party under which the member was elected.\n\nHouse members elected as independents who formally caucus with, or, for newly elected members, who announce their intent to caucus with, the Republican party are included in the count. If the caucus decisions of members of the House elected as independents cannot be determined on the date of the election, this market may remain open until the earlier of (i) an announcement from the relevant members of their intents to caucus, or (ii) January 4th, 11:59 PM ET of the following calendar year. If no such announcement is made by January 4th, 11:59 PM ET of the following calendar year, the member will not count towards the seat count of any party.",
-     "active": true,
-     "marketType": "futures",
-     "closed": false,
-     "createdAt": "2026-07-22T22:24:12Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
-     "archived": false,
-     "orderPriceMinTickSize": 0.01,
-     "gameStartTime": "2026-11-03T17:00:00Z",
-     "manualActivation": false,
-     "sportsMarketType": "futures",
-     "marketSides": [
-      {
-       "id": "556460",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "scc-hrep-rep-2026-11-03-gte220",
-       "createdAt": "2026-07-22T22:24:12Z",
-       "updatedAt": "2026-07-22T22:24:12Z",
-       "description": "Yes",
-       "marketId": 278449,
-       "long": true,
-       "tradable": true
-      },
-      {
-       "id": "556461",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "scc-hrep-rep-2026-11-03-gte220",
-       "createdAt": "2026-07-22T22:24:12Z",
-       "updatedAt": "2026-07-22T22:24:12Z",
-       "description": "No",
-       "marketId": 278449,
-       "long": false,
-       "tradable": true
-      }
-     ],
-     "outcomes": "[\"Yes\",\"No\"]",
-     "outcomePrices": "[\"0\",\"0\"]",
-     "ep3Status": "OPEN",
-     "status": "MARKET_STATUS_OPEN",
-     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
-     "hidden": false,
-     "tags": [],
-     "title": "220+",
-     "feeCoefficient": 0.06,
-     "sortOrder": 9,
-     "titleShort": "220+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
-     "minimumTradeQty": 0.01,
-     "comboEnabled": false
-    },
-    "qtyDecimal": "2.0000",
-    "comboLegDetails": []
-   }
-  },
-  {
-   "type": "ACTIVITY_TYPE_TRADE",
-   "trade": {
-    "id": "BNDYRZSNG9QP",
-    "aggressorExecution": {
-     "id": "BNDYRZSNJ9QP",
-     "order": {
-      "id": "BNB9SRZFEB9K",
-      "marketSlug": "scc-hrep-rep-2026-11-03-gte180",
-      "side": "ORDER_SIDE_BUY",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.86",
-       "currency": "USD"
-      },
-      "quantity": 13,
-      "cumQuantity": 11.65,
-      "leavesQuantity": 1.35,
-      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_BUY_LONG",
-      "marketMetadata": {
-       "slug": "scc-hrep-rep-2026-11-03-gte180",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-       "title": "2026 Midterms: Republican House Seats?",
-       "outcome": "Yes",
-       "eventSlug": "hrep-rep-2026-11-03",
-       "subject": {
-        "id": 0,
-        "name": "180+",
-        "subjectType": ""
-       },
-       "eventId": "59841"
-      },
-      "state": "ORDER_STATE_PARTIALLY_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "0.0800",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.8600",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T02:43:53.749545828Z",
-      "createTime": "2026-08-04T02:43:53.748081034Z",
-      "outcomeSide": "OUTCOME_SIDE_YES",
-      "action": "ORDER_ACTION_BUY",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-      "lastTransactTime": "2026-08-04T02:43:53.749545828Z"
-     },
-     "lastShares": "10.0000",
-     "lastPx": {
-      "value": "0.8600",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_PARTIAL_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T02:43:53.749545828Z",
-     "legPrices": [],
-     "tradeId": "BNDYRZSNG9QP",
-     "aggressor": true,
-     "commissionNotionalCollected": {
-      "value": "0.0700",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.8600",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "passiveExecution": {
-     "id": "BNDYRZSNM9QP",
-     "order": {
-      "id": "BNBA0H57JB9M",
-      "marketSlug": "scc-hrep-rep-2026-11-03-gte180",
-      "side": "ORDER_SIDE_SELL",
-      "type": "ORDER_TYPE_LIMIT",
-      "price": {
-       "value": "0.86",
-       "currency": "USD"
-      },
-      "quantity": 10,
-      "cumQuantity": 10,
-      "leavesQuantity": 0,
-      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-      "goodTillTime": null,
-      "intent": "ORDER_INTENT_SELL_LONG",
-      "marketMetadata": {
-       "slug": "scc-hrep-rep-2026-11-03-gte180",
-       "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-       "title": "2026 Midterms: Republican House Seats?",
-       "outcome": "Yes",
-       "eventSlug": "hrep-rep-2026-11-03",
-       "subject": {
-        "id": 0,
-        "name": "180+",
-        "subjectType": ""
-       },
-       "eventId": "59841"
-      },
-      "state": "ORDER_STATE_FILLED",
-      "commissionNotionalTotalCollected": {
-       "value": "-0.0200",
-       "currency": "USD"
-      },
-      "commissionsBasisPoints": "0",
-      "makerCommissionsBasisPoints": "0",
-      "avgPx": {
-       "value": "0.8600",
-       "currency": "USD"
-      },
-      "cashOrderQty": {
-       "value": "0.0000",
-       "currency": "USD"
-      },
-      "insertTime": "2026-08-04T02:43:22.431423710Z",
-      "createTime": "2026-08-04T02:43:22.429856440Z",
-      "outcomeSide": "OUTCOME_SIDE_YES",
-      "action": "ORDER_ACTION_SELL",
-      "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
-      "lastTransactTime": "2026-08-04T02:43:53.749545828Z"
-     },
-     "lastShares": "10.0000",
-     "lastPx": {
-      "value": "0.8600",
-      "currency": "USD"
-     },
-     "type": "EXECUTION_TYPE_FILL",
-     "text": "",
-     "orderRejectReason": "ORD_REJECT_REASON_EXCHANGE_OPTION",
-     "transactTime": "2026-08-04T02:43:53.749545828Z",
-     "legPrices": [],
-     "tradeId": "BNDYRZSNG9QP",
-     "aggressor": false,
-     "commissionNotionalCollected": {
-      "value": "-0.0200",
-      "currency": "USD"
-     },
-     "unsolicitedCancelReason": "UNSOLICITED_CXL_REASON_UNDEFINED",
-     "traceId": "",
-     "commissionSpreadPx": {
-      "value": "0.1400",
-      "currency": "USD"
-     },
-     "transactTradeDate": "2026-08-04T00:00:00Z"
-    },
-    "marketSlug": "scc-hrep-rep-2026-11-03-gte180",
-    "state": "TRADE_STATE_NEW",
-    "createTime": "2026-08-04T02:43:53.749545828Z",
-    "updateTime": "2026-08-04T02:43:53.749545828Z",
-    "price": {
-     "value": "0.8600",
-     "currency": "USD"
-    },
-    "qty": "10",
-    "cost": {
-     "value": "8.67",
-     "currency": "USD"
-    },
-    "aggressor": {
-     "id": "BNB9SRZFEB9K",
-     "marketSlug": "scc-hrep-rep-2026-11-03-gte180",
-     "side": "ORDER_SIDE_BUY",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.86",
-      "currency": "USD"
-     },
-     "quantity": 13,
-     "cumQuantity": 11.65,
-     "leavesQuantity": 1.35,
-     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_BUY_LONG",
-     "marketMetadata": {
-      "slug": "scc-hrep-rep-2026-11-03-gte180",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-      "title": "2026 Midterms: Republican House Seats?",
-      "outcome": "Yes",
-      "eventSlug": "hrep-rep-2026-11-03",
-      "subject": {
-       "id": 0,
-       "name": "180+",
-       "subjectType": ""
-      },
-      "eventId": "59841"
-     },
-     "state": "ORDER_STATE_PARTIALLY_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "0.0800",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.8600",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T02:43:53.749545828Z",
-     "createTime": "2026-08-04T02:43:53.748081034Z",
-     "outcomeSide": "OUTCOME_SIDE_YES",
-     "action": "ORDER_ACTION_BUY",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
-     "lastTransactTime": "2026-08-04T02:43:53.749545828Z"
-    },
-    "passive": {
-     "id": "BNBA0H57JB9M",
-     "marketSlug": "scc-hrep-rep-2026-11-03-gte180",
-     "side": "ORDER_SIDE_SELL",
-     "type": "ORDER_TYPE_LIMIT",
-     "price": {
-      "value": "0.86",
-      "currency": "USD"
-     },
-     "quantity": 10,
-     "cumQuantity": 10,
-     "leavesQuantity": 0,
-     "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-     "goodTillTime": null,
-     "intent": "ORDER_INTENT_SELL_LONG",
-     "marketMetadata": {
-      "slug": "scc-hrep-rep-2026-11-03-gte180",
-      "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-      "title": "2026 Midterms: Republican House Seats?",
-      "outcome": "Yes",
-      "eventSlug": "hrep-rep-2026-11-03",
-      "subject": {
-       "id": 0,
-       "name": "180+",
-       "subjectType": ""
-      },
-      "eventId": "59841"
-     },
-     "state": "ORDER_STATE_FILLED",
-     "commissionNotionalTotalCollected": {
-      "value": "-0.0200",
-      "currency": "USD"
-     },
-     "commissionsBasisPoints": "0",
-     "makerCommissionsBasisPoints": "0",
-     "avgPx": {
-      "value": "0.8600",
-      "currency": "USD"
-     },
-     "cashOrderQty": {
-      "value": "0.0000",
-      "currency": "USD"
-     },
-     "insertTime": "2026-08-04T02:43:22.431423710Z",
-     "createTime": "2026-08-04T02:43:22.429856440Z",
-     "outcomeSide": "OUTCOME_SIDE_YES",
-     "action": "ORDER_ACTION_SELL",
-     "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_AUTOMATIC",
-     "lastTransactTime": "2026-08-04T02:43:53.749545828Z"
-    },
-    "reportingCounterparty": "ORDER_SIDE_UNDEFINED",
-    "createTradeDate": "2026-08-04T00:00:00Z",
-    "updateTradeDate": "2026-08-04T00:00:00Z",
-    "tradeLinkId": "BN5YKCMM69PH",
-    "isAggressor": true,
-    "market": {
-     "id": "278443",
-     "question": "2026 Midterms: Republican House Seats?",
-     "slug": "scc-hrep-rep-2026-11-03-gte180",
-     "endDate": "2026-11-17T23:00:00Z",
-     "category": "politics",
-     "startDate": "2026-07-22T22:24:02Z",
-     "description": "This market will settle to Yes if the Republican Partys seat count in the U.S. House of Representatives is greater than or equal to 180 as a result of the 2026 United States midterm election scheduled for November 3, 2026. Outcome sourced from relevant state electoral authorities, and the United States House of Representatives.\n\nThe seat count includes all House elections in the 2026 United States midterm election that elect voting members and determine representation in the upcoming 120th Congress. Where a seat is decided by a runoff, the runoff result will determine attribution of that seat.\n\nSeats are attributed to the party under which the member was elected. If a member-elect changes party affiliation, or vacates their seat, between election day and the formal organization of Congress, the seat is attributed to the party under which the member was elected.\n\nHouse members elected as independents who formally caucus with, or, for newly elected members, who announce their intent to caucus with, the Republican party are included in the count. If the caucus decisions of members of the House elected as independents cannot be determined on the date of the election, this market may remain open until the earlier of (i) an announcement from the relevant members of their intents to caucus, or (ii) January 4th, 11:59 PM ET of the following calendar year. If no such announcement is made by January 4th, 11:59 PM ET of the following calendar year, the member will not count towards the seat count of any party.",
-     "active": true,
-     "marketType": "futures",
-     "closed": false,
-     "createdAt": "2026-07-22T22:24:02Z",
-     "updatedAt": "2026-08-04T23:28:30Z",
-     "archived": false,
-     "orderPriceMinTickSize": 0.01,
-     "gameStartTime": "2026-11-03T17:00:00Z",
-     "manualActivation": false,
-     "sportsMarketType": "futures",
-     "marketSides": [
-      {
-       "id": "556448",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "scc-hrep-rep-2026-11-03-gte180",
-       "createdAt": "2026-07-22T22:24:02Z",
-       "updatedAt": "2026-07-22T22:24:02Z",
-       "description": "Yes",
-       "marketId": 278443,
-       "long": true,
-       "tradable": true
-      },
-      {
-       "id": "556449",
-       "marketSideType": "MARKET_SIDE_TYPE_INSTRUMENT",
-       "identifier": "scc-hrep-rep-2026-11-03-gte180",
-       "createdAt": "2026-07-22T22:24:02Z",
-       "updatedAt": "2026-07-22T22:24:02Z",
-       "description": "No",
-       "marketId": 278443,
-       "long": false,
-       "tradable": true
-      }
-     ],
-     "outcomes": "[\"No\",\"Yes\"]",
-     "outcomePrices": "[\"0\",\"0\"]",
-     "ep3Status": "OPEN",
-     "status": "MARKET_STATUS_OPEN",
-     "sportsMarketTypeV2": "SPORTS_MARKET_TYPE_FUTURE",
-     "hidden": false,
-     "tags": [],
-     "title": "180+",
-     "feeCoefficient": 0.06,
-     "sortOrder": 1,
-     "titleShort": "180+",
-     "ep3SyncedAt": "2026-08-04T23:28:30Z",
+     "ep3SyncedAt": "2026-08-05T01:29:57Z",
      "minimumTradeQty": 0.01,
      "comboEnabled": false
     },
