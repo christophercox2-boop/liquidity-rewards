@@ -136,11 +136,67 @@ jobs:
           print("positions:", len(out), "| net-negative:", len(neg), list(neg)[:5])
           EOF
 
+      - name: Book presence — is every open order visible on the public book?
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, time, requests
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          path = "/v1/orders/open"
+          r = requests.get(tr.TRADE_API + path,
+                           headers=tr.auth_headers(kid, sec, "GET", path), timeout=30)
+          r.raise_for_status()
+          orders = []
+          for o in r.json().get("orders") or []:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              size = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity"))
+              side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+              orders.append({"market": slug, "side": side, "intent": str(o.get("intent") or ""),
+                             "price": tr._num(o.get("price")), "size": size})
+          by = {}
+          for o in orders:
+              by.setdefault(o["market"], []).append(o)
+          out = {"checked": 0, "present": 0, "short": [], "missing": []}
+          for slug, os_ in sorted(by.items()):
+              try:
+                  book = tr._fetch_book(slug)
+              except Exception as e:
+                  out["missing"].append({"market": slug, "err": f"{type(e).__name__}: {e}"})
+                  continue
+              time.sleep(0.3)
+              # several orders can rest at one level — compare our TOTAL size
+              # there against the level's public depth
+              want = {}
+              for o in os_:
+                  want.setdefault((o["side"], round(o["price"], 4)), []).append(o)
+              for (side, px), grp in want.items():
+                  mine = sum(o["size"] for o in grp)
+                  lv = book.get("bids") if side == "BUY" else book.get("asks")
+                  depth = sum(q for p, q in (lv or []) if abs(p - px) < 1e-9)
+                  out["checked"] += 1
+                  if depth >= mine - 0.5:
+                      out["present"] += 1
+                  else:
+                      row = {"market": slug, "side": side, "price": px, "my_size": mine,
+                             "book_at_price": depth,
+                             "intents": sorted({o["intent"] for o in grp})}
+                      (out["short"] if depth > 0 else out["missing"]).append(row)
+          with open("data/probe_book_presence.json", "w") as f:
+              json.dump(out, f, indent=1)
+          print("levels checked:", out["checked"], "| fully present:", out["present"],
+                "| short:", len(out["short"]), "| missing:", len(out["missing"]))
+          for row in (out["short"] + out["missing"])[:10]:
+              print("  ", row)
+          EOF
+
       - name: Commit probe output
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/probe_incentives.json data/probe_activities.json data/probe_positions.json data/probe_orders.json data/probe_earnings.json
+          git add data/probe_incentives.json data/probe_activities.json data/probe_positions.json data/probe_orders.json data/probe_earnings.json data/probe_book_presence.json
           if git diff --cached --quiet; then
             echo "No changes"
           else

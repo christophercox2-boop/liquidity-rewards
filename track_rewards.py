@@ -864,11 +864,13 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     else:
         rot = [s for s in oldest_first if s not in prio]
         to_fetch = prio | set(rot[:max(0, BOOK_REFRESH_PER_CALL - len(prio))])
+    fresh: set[str] = set()  # fetched THIS call — an own order missing here is real
     for slug in slugs:
         if slug in to_fetch:
             try:
                 books[slug] = _fetch_book(slug)
                 _BOOK_CACHE[slug] = (now_books, books[slug])
+                fresh.add(slug)
                 if cold_all:
                     time.sleep(0.05)  # be gentle when sweeping every book
                 continue
@@ -993,6 +995,7 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     # best" while we ARE the best. Guarantee every own order's remaining
     # size is present at its price level before scoring.
     own_by_mkt: dict[str, list[dict]] = {}
+    ghosts: list[str] = []
     for o in orders:
         if o["market"]:
             own_by_mkt.setdefault(o["market"], []).append(o)
@@ -1015,10 +1018,21 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                     levels = [(lp, q) for lp, q in levels if abs(lp - px) >= 1e-9]
                     levels.append((px, sz))
                     changed = True
+                    if mkt in fresh:
+                        # The book was fetched moments AFTER the open-orders
+                        # list, yet our resting size isn't in it — the order
+                        # is "open" to us but invisible to the public book
+                        # (and likely to reward scoring). Surface it.
+                        ghosts.append(f"{mkt} {side} {px * 100:g}¢ "
+                                      f"({sz:g} open, {have:g} on book)")
             if changed:
                 book = dict(book)
                 book[key] = sorted(levels, key=lambda x: (-x[0] if key == "bids" else x[0]))
                 books[mkt] = book
+    if ghosts:
+        debug["_ghost_orders"] = f"{len(ghosts)} not visible on fresh books: " \
+                                 + "; ".join(ghosts[:5])
+        LAST_DEBUG.update(debug)
 
     for o in orders:
         prog = progs.get(o["market"])
