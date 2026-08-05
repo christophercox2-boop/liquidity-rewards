@@ -358,8 +358,6 @@ class Monitor:
         # Auto-defend config survives deploys with the rest of the state.
         self.state.setdefault("defend", {})
         tr.PRIORITY_SLUGS = set(self.state["defend"])
-        self._prev_rates: dict[str, float] = {}
-        self._drop_alerted: dict[str, float] = {}
 
     def merge_fills(self, rows: list[dict]) -> None:
         """Merge a quick fills page (newest first) into the fills list —
@@ -586,25 +584,6 @@ class Monitor:
             for m, r in warming.items():
                 self.market_rates[m] = r
                 self.rate += r
-            # Opportunity alert: a market's earning rate collapsed since the
-            # last poll — usually outbid — and Defend isn't running there.
-            defended = self.state.get("defend") or {}
-            now_mono = time.time()
-            drop_seen = getattr(self, "_drop_alerted", None)
-            if drop_seen is None:
-                drop_seen = self._drop_alerted = {}
-            for m, was in (getattr(self, "_prev_rates", None) or {}).items():
-                cur = self.market_rates.get(m, 0.0)
-                if (was >= 1.5 and cur < 0.5 * was and m not in defended
-                        and now_mono - drop_seen.get(m, 0.0) > 4 * 3600):
-                    drop_seen[m] = now_mono
-                    self.pending_alerts.append((
-                        "Earning rate dropped",
-                        f"{m} fell from ${was:.2f}/day to ${cur:.2f}/day — probably "
-                        "outbid. Tap the market in the app to retake the best "
-                        "price, or turn on Defend there.",
-                        "default"))
-            self._prev_rates = dict(self.market_rates)
             # Per-market rate history for the graphs: 1-minute buckets, ~8h,
             # including zero-rate markets so dead orders chart their flatline.
             rates_all: dict[str, float] = {}
@@ -1795,9 +1774,7 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
 DEFEND_MAX_MARKETS = 10          # each defended book is refreshed every poll
 DEFEND_COOLDOWN_SECONDS = 90.0   # per market+side between improvements
 DEFEND_MAX_PER_POLL = 6          # request-budget bound on a busy poll
-DEFEND_ALERT_SECONDS = 3600.0    # cap-blocked phone alert at most hourly
 DEFEND_MOVED: dict[str, float] = {}
-DEFEND_ALERTED: dict[str, float] = {}
 
 
 def _others_best(levels: list, mine_sz: dict) -> float | None:
@@ -1861,18 +1838,7 @@ def auto_defend() -> None:
             if not 0.001 <= target <= 0.999:
                 continue
             if blocked:
-                ak = f"{m}|{side}"
-                if now - DEFEND_ALERTED.get(ak, 0.0) > DEFEND_ALERT_SECONDS:
-                    DEFEND_ALERTED[ak] = now
-                    word = "bid" if side == "BUY" else "ask"
-                    with MONITOR.lock:
-                        MONITOR.pending_alerts.append((
-                            "Outbid past your Defend limit",
-                            f"{m}: the {word} moved to {others * 100:g}¢ and your "
-                            f"limit is {cap * 100:g}¢. Open the app to raise it "
-                            "or let this one go.",
-                            "high"))
-                continue
+                continue  # price ran past the user's limit — never chase it
             if squeezed:
                 continue  # spread too tight to step in front — wait it out
             key = f"{m}|{side}"
@@ -3533,7 +3499,7 @@ function defendBlock(d){
     '<button onclick="mDefend(\\''+esc(m)+'\\')">'+(df ? 'Update' : 'Defend')+'</button>'+
     (df ? '<button class="alt" style="background:#8b1a1a;color:#fff" onclick="mUndefend(\\''+esc(m)+'\\')">Stop</button>' : '')+
     '</div>'+
-    '<div class="mkt">clear a box to leave that side undefended · you\\'ll get a phone alert if the price runs past your limit</div>';
+    '<div class="mkt">clear a box to leave that side undefended · if the price runs past your limit it simply stops following</div>';
 }
 function mDefend(m){
   const b = document.getElementById('dfBid').value;
