@@ -192,11 +192,30 @@ jobs:
               print("  ", row)
           EOF
 
+      - name: Official liquidity-program docs (full rules text)
+        run: |
+          curl -sSL -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36" \
+            "https://docs.polymarket.us/incentives/liquidity" -o /tmp/liq.html || true
+          python3 - <<'EOF'
+          import html, re
+          try:
+              raw = open("/tmp/liq.html", encoding="utf-8", errors="replace").read()
+          except FileNotFoundError:
+              raw = ""
+          text = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", raw, flags=re.S | re.I)
+          text = re.sub(r"<[^>]+>", "\n", text)
+          text = html.unescape(text)
+          text = re.sub(r"\n{3,}", "\n\n", re.sub(r"[ \t]+", " ", text)).strip()
+          with open("data/probe_liquidity_docs.txt", "w") as f:
+              f.write(text[:60000] or "FETCH FAILED")
+          print(len(text), "chars;", text[:400].replace("\n", " | "))
+          EOF
+
       - name: Commit probe output
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/probe_incentives.json data/probe_activities.json data/probe_positions.json data/probe_orders.json data/probe_earnings.json data/probe_book_presence.json
+          git add data/probe_incentives.json data/probe_activities.json data/probe_positions.json data/probe_orders.json data/probe_earnings.json data/probe_book_presence.json data/probe_liquidity_docs.txt
           if git diff --cached --quiet; then
             echo "No changes"
           else

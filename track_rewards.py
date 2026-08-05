@@ -986,6 +986,23 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
             indent=2,
         )
     )
+    try:
+        # Rolling book+order log (raw PUBLIC books, before own-order top-up):
+        # lets payout models be re-fit against what Polymarket's scorer saw
+        # once actual per-market payments post. ~48 entries ≈ 2 days hourly.
+        entry = {"ts": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+                 "orders": [[o["market"], o["side"], o["price"], o["size"], o["intent"]]
+                            for o in orders],
+                 "books": {s: {"tick": b.get("tick"),
+                               "bids": [[p, q] for p, q in (b.get("bids") or [])[:12]],
+                               "asks": [[p, q] for p, q in (b.get("asks") or [])[:12]]}
+                           for s, b in books.items()}}
+        log = DATA / "books_log.jsonl"
+        lines = log.read_text().splitlines() if log.exists() else []
+        lines.append(json.dumps(entry))
+        log.write_text("\n".join(lines[-48:]) + "\n")
+    except Exception:  # noqa: BLE001 — the log is diagnostics, never fatal
+        pass
     LAST_DEBUG.clear()
     LAST_DEBUG.update(debug)
 
