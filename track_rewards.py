@@ -856,14 +856,19 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
         del _BOOK_CACHE[gone]
     oldest_first = sorted(slugs, key=lambda s: _BOOK_CACHE.get(s, (0.0,))[0])
     cold_all = not _BOOK_CACHE and BOOK_COLD_FETCH_ALL
-    # Defended markets refresh every call (they come out of the rotation's
-    # allowance so the request budget stays flat); the rest rotate oldest-first.
+    # Defended markets come first, oldest book first, taking up to all but 6
+    # of the per-call allowance — with 20 defended that refreshes each of
+    # their books every ~45-60s (fresh enough for Defend's 90s cooldown)
+    # while the general rotation keeps a guaranteed 6 slots and the total
+    # request budget stays flat.
     prio = PRIORITY_SLUGS & set(slugs)
     if cold_all:
         to_fetch = set(oldest_first)
     else:
+        prio_oldest = [s for s in oldest_first if s in prio]
         rot = [s for s in oldest_first if s not in prio]
-        to_fetch = prio | set(rot[:max(0, BOOK_REFRESH_PER_CALL - len(prio))])
+        take = prio_oldest[:max(0, BOOK_REFRESH_PER_CALL - 6)]
+        to_fetch = set(take) | set(rot[:BOOK_REFRESH_PER_CALL - len(take)])
     fresh: set[str] = set()  # fetched THIS call — an own order missing here is real
     for slug in slugs:
         if slug in to_fetch:

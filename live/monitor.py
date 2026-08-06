@@ -1767,13 +1767,20 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
 
 # ---- Auto-defend: keep price-setting orders at the front of thin books -----
 # The whole reward edge in a df-0.2 book is being the SOLE best price: everyone
-# a tick behind scores at 20%. Defend watches a market's book every poll and,
-# when someone matches or beats our best order, moves that order one tick back
-# in front — never past the user's cap, never into a tight spread, and only by
-# repricing an EXISTING order (it can never place a new one or add size).
-DEFEND_MAX_MARKETS = 10          # each defended book is refreshed every poll
+# a tick behind scores at 20%. Defend watches a defended market's book and
+# moves our best order one tick forward whenever our share of that side's
+# rewards falls under DEFEND_SHARE_FLOOR — because someone outbid us, matched
+# us with real size, or parked a massive order right behind us. Sharing the
+# front with a reasonably sized order (share still healthy) is left alone.
+# Hard rails: the user's cap, a 2-tick gap to the opposite touch, a cooldown,
+# fresh books only, reprice-only (never places orders or adds size), and
+# floor/ceiling qualifier blocks are never touched.
+DEFEND_MAX_MARKETS = 20          # defended books refresh every ~45-60s
+DEFEND_SHARE_FLOOR = 0.25        # act only under 25% of the side's rewards
 DEFEND_COOLDOWN_SECONDS = 90.0   # per market+side between improvements
 DEFEND_MAX_PER_POLL = 6          # request-budget bound on a busy poll
+DEFEND_DEEP_BUY = 0.011          # floor-bid qualifiers: never repriced
+DEFEND_DEEP_SELL = 0.989         # ceiling-ask qualifiers: never repriced
 DEFEND_MOVED: dict[str, float] = {}
 
 
@@ -1811,28 +1818,54 @@ def auto_defend() -> None:
                 cap = float(scfg.get("cap")) / 100.0
             except (TypeError, ValueError):
                 continue
-            side_orders = [o for o in mine_all if o.get("side") == side and o.get("id")]
+            all_side = [o for o in mine_all if o.get("side") == side]
+            # Floor/ceiling qualifier blocks hold the side's Target Size —
+            # Defend must never move them, up or down.
+            side_orders = [o for o in all_side if o.get("id")
+                           and not (o["price"] <= DEFEND_DEEP_BUY if side == "BUY"
+                                    else o["price"] >= DEFEND_DEEP_SELL)]
             if not side_orders:
                 continue
             best_mine = (max if side == "BUY" else min)(side_orders,
                                                         key=lambda o: o["price"])
             mine_sz: dict[float, float] = {}
-            for o in side_orders:
+            for o in all_side:
                 k = round(float(o["price"]), 4)
                 mine_sz[k] = mine_sz.get(k, 0.0) + float(o.get("size") or 0)
             others = _others_best(bids if side == "BUY" else asks, mine_sz)
             if others is None:
                 continue  # alone on this side — nothing to defend against
+            # Our scored share of this side (computed by the last poll's
+            # scoring pass against the same fresh book).
+            shares = [o.get("share") for o in all_side]
+            share_known = any(s is not None for s in shares)
+            my_share = sum(s or 0.0 for s in shares)
             if side == "BUY":
-                if best_mine["price"] > others + 1e-9:
-                    continue  # already the sole best
-                target = round(others + tick, 4)
+                in_front = best_mine["price"] > others + 1e-9
+                if share_known:
+                    # Healthy share → stay put, whether we're alone in front
+                    # or sharing the level with a reasonably sized order.
+                    if my_share >= DEFEND_SHARE_FLOOR:
+                        continue
+                    base = max(best_mine["price"], others)
+                elif in_front:
+                    continue  # share unknown: only retake when matched/beaten
+                else:
+                    base = others
+                target = round(base + tick, 4)
                 blocked = target > cap + 1e-9
                 squeezed = ba is not None and target > ba - 2 * tick + 1e-9
             else:
-                if best_mine["price"] < others - 1e-9:
+                in_front = best_mine["price"] < others - 1e-9
+                if share_known:
+                    if my_share >= DEFEND_SHARE_FLOOR:
+                        continue
+                    base = min(best_mine["price"], others)
+                elif in_front:
                     continue
-                target = round(others - tick, 4)
+                else:
+                    base = others
+                target = round(base - tick, 4)
                 blocked = target < cap - 1e-9
                 squeezed = bb is not None and target < bb + 2 * tick - 1e-9
             if not 0.001 <= target <= 0.999:
@@ -3490,9 +3523,10 @@ function defendBlock(d){
   const dfb = df && df.BUY ? df.BUY.cap : (bb != null ? +(bb + 3*tick).toFixed(2) : '');
   const dfa = df && df.SELL ? df.SELL.cap : (ba != null ? +(ba - 3*tick).toFixed(2) : '');
   return '<h3>Defend'+(df ? ' — <span style="color:#3fb950">on 🛡</span>' : '')+'</h3>'+
-    '<div class="mkt">Keeps your best order alone in front: whenever someone matches or beats it, '+
-    'it moves one tick back ahead automatically. It only reprices your existing order (same size, '+
-    'never a new one), stops at your limits below, and stands down when the spread gets tight.</div>'+
+    '<div class="mkt">Moves your best order one tick forward whenever it\\'s earning under 25% of '+
+    'this side\\'s rewards — outbid, matched by real size, or a big order parked right behind you. '+
+    'A healthy share is left alone. Same size, never a new order; stops at your limits below; '+
+    'stands down when the spread gets tight; floor/ceiling qualifier orders are never touched.</div>'+
     '<div class="rp">bid up to <input id="dfBid" type="number" step="0.1" min="0.1" max="99.9" '+
     'value="'+dfb+'" style="width:72px">¢ · ask down to <input id="dfAsk" type="number" step="0.1" '+
     'min="0.1" max="99.9" value="'+dfa+'" style="width:72px">¢ '+
