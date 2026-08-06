@@ -471,7 +471,24 @@ def _note_members(slug: str, members: list[str]) -> None:
         RACE_MEMBERS[slug] = sorted(members)
 
 
+# Event/race sizes change ~never intraday; cache them so the monitor's every
+# poll and the hourly tracker resolve the SAME divisor for the same market
+# instead of depending on which bounded lookups a given call happened to make.
+_EVENT_SIZE_CACHE: dict[str, tuple[float, int | None]] = {}
+_RACE_SIZE_CACHE: dict[str, tuple[float, int | None]] = {}
+SIZE_CACHE_TTL = 900.0
+
+
 def _event_size(slug: str) -> int | None:
+    hit = _EVENT_SIZE_CACHE.get(slug)
+    if hit and time.time() - hit[0] < SIZE_CACHE_TTL:
+        return hit[1]
+    n = _event_size_uncached(slug)
+    _EVENT_SIZE_CACHE[slug] = (time.time(), n)
+    return n
+
+
+def _event_size_uncached(slug: str) -> int | None:
     """Number of open markets in the event this market belongs to."""
     try:
         r = requests.get(f"{GATEWAY}/v1/market/slug/{slug}", timeout=15)
@@ -604,6 +621,15 @@ def fetch_politics_events() -> tuple[list[str], dict[str, int]]:
 
 
 def _race_size(race_key: str) -> int | None:
+    hit = _RACE_SIZE_CACHE.get(race_key)
+    if hit and time.time() - hit[0] < SIZE_CACHE_TTL:
+        return hit[1]
+    n = _race_size_uncached(race_key)
+    _RACE_SIZE_CACHE[race_key] = (time.time(), n)
+    return n
+
+
+def _race_size_uncached(race_key: str) -> int | None:
     """Count open markets whose slug starts with the race prefix, via search.
     Slugs follow a naming convention: everything before the final token names
     the race, so this finds all sibling markets sharing one reward pool."""
@@ -954,12 +980,18 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     # politics-tag map doesn't cover (bounded).
     event_sizes = dict(event_sizes or {})
     lookups = 0
-    for slug in progs:
-        if slug not in event_sizes and lookups < 20:
-            lookups += 1
-            n = _event_size(slug)
-            if n:
-                event_sizes[slug] = n
+    # sorted + cache-aware bound: the lookups must resolve the SAME markets on
+    # every call — the monitor and the hourly tracker have to agree on
+    # divisors. Cached answers are free; only network lookups count.
+    for slug in sorted(progs):
+        if slug not in event_sizes:
+            hit = _EVENT_SIZE_CACHE.get(slug)
+            if (hit and time.time() - hit[0] < SIZE_CACHE_TTL) or lookups < 20:
+                if not (hit and time.time() - hit[0] < SIZE_CACHE_TTL):
+                    lookups += 1
+                n = _event_size(slug)
+                if n:
+                    event_sizes[slug] = n
     # Race grouping across everything known (tag map + our own markets):
     # candidate markets of one race share the pool even when modeled as
     # separate single-market events the tag map missed.
@@ -973,11 +1005,21 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
             _note_members(slug, group)
     # Definitive pass: search the race prefix to find ALL sibling markets,
     # including ones neither the tag map nor our portfolio knows about.
+    # sorted + cache-aware bound: same searched keys on every call; cached
+    # answers are free so within a couple of calls every key is covered.
     race_search: dict[str, int | None] = {}
-    for slug in progs:
+    searches = 0
+    for slug in sorted(progs):
         key = slug.rsplit("-", 1)[0]
         if key not in race_search:
-            race_search[key] = _race_size(key) if len(race_search) < 10 else None
+            hit = _RACE_SIZE_CACHE.get(key)
+            cached = bool(hit and time.time() - hit[0] < SIZE_CACHE_TTL)
+            if cached or searches < 10:
+                if not cached:
+                    searches += 1
+                race_search[key] = _race_size(key)
+            else:
+                race_search[key] = None
         if race_search[key]:
             progs[slug]["event_n"] = max(progs[slug]["event_n"], race_search[key])
             _note_members(slug, SEARCH_KEY_MEMBERS.get(key, []))
