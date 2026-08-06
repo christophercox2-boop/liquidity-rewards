@@ -1,0 +1,110 @@
+name: High-frequency sampling probe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/hf_probe.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hf-probe
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Record one contested market at 10s resolution for 25 min
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import csv, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+
+          # Target: the highest-earning contested ladder rung right now —
+          # where the est-vs-paid gap lives. Falls back to rung 52.
+          slug = "scc-senate-gop-2026-11-03-52"
+          try:
+              best = 0.0
+              with open("data/live_orders.csv") as f:
+                  for row in csv.DictReader(f):
+                      m = row["market"]
+                      e = float(row["est_day"] or 0)
+                      if m.startswith(("scc-senate-gop", "scc-hrep-rep")) and e > best:
+                          best, slug = e, m
+          except Exception as e:
+              print("target pick failed, using fallback:", e)
+          print("recording:", slug)
+
+          def my_orders():
+              path = "/v1/orders/open"
+              r = requests.get(tr.TRADE_API + path,
+                               headers=tr.auth_headers(kid, sec, "GET", path), timeout=20)
+              r.raise_for_status()
+              out = []
+              for o in r.json().get("orders") or []:
+                  if (o.get("marketSlug") or "") != slug:
+                      continue
+                  out.append({"id": o.get("id"),
+                              "side": "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL",
+                              "price": tr._num(o.get("price")),
+                              "size": tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")),
+                              "intent": o.get("intent")})
+              return out
+
+          t_end = time.time() + 1500  # 25 minutes
+          last_orders = -1e9
+          n_books = n_orders = 0
+          with open("data/probe_hf.jsonl", "w") as f:
+              f.write(json.dumps({"kind": "meta", "market": slug,
+                                  "started": time.time()}) + "\n")
+              while time.time() < t_end:
+                  t0 = time.time()
+                  if t0 - last_orders >= 60:
+                      last_orders = t0
+                      try:
+                          f.write(json.dumps({"kind": "orders", "t": round(t0, 1),
+                                              "orders": my_orders()}) + "\n")
+                          n_orders += 1
+                      except Exception as e:
+                          f.write(json.dumps({"kind": "orders_err", "t": round(t0, 1),
+                                              "err": str(e)[:120]}) + "\n")
+                  try:
+                      b = tr._fetch_book(slug)
+                      f.write(json.dumps({"kind": "book", "t": round(t0, 1),
+                                          "tick": b["tick"],
+                                          "bids": b["bids"][:12],
+                                          "asks": b["asks"][:12]}) + "\n")
+                      n_books += 1
+                  except Exception as e:
+                      f.write(json.dumps({"kind": "book_err", "t": round(t0, 1),
+                                          "err": str(e)[:120]}) + "\n")
+                  f.flush()
+                  time.sleep(max(0.0, 10.0 - (time.time() - t0)))
+          print(f"recorded {n_books} book samples, {n_orders} order snapshots")
+          EOF
+
+      - name: Commit recording
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/probe_hf.jsonl
+          git commit -m "High-frequency sampling probe [skip ci]"
+          git pull --rebase origin main
+          git push
