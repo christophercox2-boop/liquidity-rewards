@@ -1617,6 +1617,7 @@ date,market,program_type,reward_usd,status
 2026-08-04,ewc-usse-tx-2026-11-03-dem,liquidityProgram,0.6,PENDING
 2026-08-04,opdc-mcconnell-resign-2026-11-02,liquidityProgram,4.37,PENDING
 2026-08-04,pintc-meet-trump-2026-12-31-kimjon,liquidityProgram,0.04,PENDING
+2026-08-04,scc-hrep-rep-2026-11-03-gte180,liquidityProgram,2.88,PENDING
 2026-08-04,scc-hrep-rep-2026-11-03-gte185,liquidityProgram,0.51,PENDING
 2026-08-04,scc-hrep-rep-2026-11-03-gte190,liquidityProgram,0.89,PENDING
 2026-08-04,scc-hrep-rep-2026-11-03-gte195,liquidityProgram,1.09,PENDING
@@ -1636,6 +1637,13 @@ date,market,program_type,reward_usd,status
 2026-08-04,scc-senate-gop-2026-11-03-51,liquidityProgram,0.33,PENDING
 2026-08-04,scc-senate-gop-2026-11-03-52,liquidityProgram,0.36,PENDING
 2026-08-04,scc-senate-gop-2026-11-03-53,liquidityProgram,0.7,PENDING
+2026-08-04,scc-senate-gop-2026-11-03-54,liquidityProgram,0.2,PENDING
 2026-08-04,scc-senate-gop-2026-11-03-56,liquidityProgram,0.35,PENDING
 2026-08-04,scc-senate-gop-2026-11-03-gte57,liquidityProgram,1.13,PENDING
 2026-08-04,scc-senate-gop-2026-11-03-lte45,liquidityProgram,0.1,PENDING
+2026-08-04,tec-cbb-champ-2027-04-05-w-ind,liquidityProgram,0.08,PENDING
+2026-08-04,tec-cbb-champ-2027-04-05-w-mst,liquidityProgram,0.05,PENDING
+2026-08-04,tec-cbb-champ-2027-04-05-w-nebr,liquidityProgram,0.71,PENDING
+2026-08-04,vmc-ussep-misen-2026-08-04-els10-15,liquidityProgram,0.01,PENDING
+2026-08-04,vmc-ussep-misen-2026-08-04-els15-20,liquidityProgram,0.01,PENDING
+2026-08-04,vmc-ussep-misen-2026-08-04-els5-10,liquidityProgram,0.04,PENDING

@@ -36,6 +36,13 @@
       "status": "PENDING"
     },
     {
+      "reward": 2.88,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-hrep-rep-2026-11-03-gte180",
+      "date": "2026-08-04",
+      "status": "PENDING"
+    },
+    {
       "reward": 0.51,
       "programType": "liquidityProgram",
       "marketSlug": "scc-hrep-rep-2026-11-03-gte185",
@@ -169,6 +176,13 @@
       "status": "PENDING"
     },
     {
+      "reward": 0.2,
+      "programType": "liquidityProgram",
+      "marketSlug": "scc-senate-gop-2026-11-03-54",
+      "date": "2026-08-04",
+      "status": "PENDING"
+    },
+    {
       "reward": 0.35,
       "programType": "liquidityProgram",
       "marketSlug": "scc-senate-gop-2026-11-03-56",
@@ -186,6 +200,48 @@
       "reward": 0.1,
       "programType": "liquidityProgram",
       "marketSlug": "scc-senate-gop-2026-11-03-lte45",
+      "date": "2026-08-04",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.08,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-cbb-champ-2027-04-05-w-ind",
+      "date": "2026-08-04",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.05,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-cbb-champ-2027-04-05-w-mst",
+      "date": "2026-08-04",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.71,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-cbb-champ-2027-04-05-w-nebr",
+      "date": "2026-08-04",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-els10-15",
+      "date": "2026-08-04",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-els15-20",
+      "date": "2026-08-04",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-els5-10",
       "date": "2026-08-04",
       "status": "PENDING"
     },
