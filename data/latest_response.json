@@ -1205,6 +1205,13 @@
       "status": "PAID"
     },
     {
+      "reward": 0.19,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-ref-fl-tax-2026-11-03-pass",
+      "date": "2026-07-30",
+      "status": "PENDING"
+    },
+    {
       "reward": 0.04,
       "programType": "liquidityProgram",
       "marketSlug": "ewc-usse-mi-2026-11-03-rep",
@@ -1658,6 +1665,13 @@
       "marketSlug": "ewc-ref-fl-tax-2026-11-03-pass",
       "date": "2026-07-29",
       "status": "PAID"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-ref-fl-tax-2026-11-03-pass",
+      "date": "2026-07-29",
+      "status": "PENDING"
     },
     {
       "reward": 0.78,

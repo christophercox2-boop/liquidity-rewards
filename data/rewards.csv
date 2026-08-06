@@ -1278,6 +1278,7 @@ date,market,program_type,reward_usd,status
 2026-07-29,ewc-pres-fra-2027-04-11-sarkna,liquidityProgram,0.04,PAID
 2026-07-29,ewc-ref-ca-blntax-2026-11-03-pass,liquidityProgram,0.02,PAID
 2026-07-29,ewc-ref-fl-tax-2026-11-03-pass,liquidityProgram,0.03,PAID
+2026-07-29,ewc-ref-fl-tax-2026-11-03-pass,liquidityProgram,0.01,PENDING
 2026-07-29,ewc-ukpol-leg-clacton-2026-08-13-coubin,liquidityProgram,0.78,PAID
 2026-07-29,ewc-usgub-az-2026-11-03-rep,liquidityProgram,0.01,PAID
 2026-07-29,ewc-usgub-ca-2026-11-03-xavbec,liquidityProgram,0.42,PAID
@@ -1412,6 +1413,7 @@ date,market,program_type,reward_usd,status
 2026-07-30,enwc-ussep-mi-2026-08-04-dem-halste,liquidityProgram,0.54,PAID
 2026-07-30,ewc-pres-bra-2026-10-04-roncai,liquidityProgram,0.19,PAID
 2026-07-30,ewc-ref-fl-tax-2026-11-03-pass,liquidityProgram,2.07,PAID
+2026-07-30,ewc-ref-fl-tax-2026-11-03-pass,liquidityProgram,0.19,PENDING
 2026-07-30,ewc-usse-mi-2026-11-03-rep,liquidityProgram,0.04,PAID
 2026-07-30,opdc-trump-resig-2026-12-31,liquidityProgram,0.09,PAID
 2026-07-30,pvwc-housepopw-2026-11-03-dem,liquidityProgram,0.03,PAID
