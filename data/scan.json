@@ -1,34 +1,34 @@
 {
- "generated": "2026-08-06 9:36 PM ET",
+ "generated": "2026-08-06 9:45 PM ET",
  "results": [
   {
-   "market": "ewc-ukpol-leg-clacton-2026-08-13-coubin",
-   "side": "BUY",
+   "market": "ewc-usgub-ca-2026-11-03-xavbec",
+   "side": "SELL",
    "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 10000,
-    "capital": 100.0,
+    "side": "SELL",
+    "price": 0.97,
+    "size": 100,
+    "capital": 3.0,
     "covered": false,
-    "est_day": 67.006,
-    "share": 89.3,
-    "ticks": 0
+    "est_day": 0.211,
+    "share": 0.3,
+    "ticks": 2
    },
    "max": {
-    "side": "BUY",
-    "price": 0.01,
+    "side": "SELL",
+    "price": 0.96,
     "size": 20000,
-    "capital": 200.0,
+    "capital": 800.0,
     "covered": false,
-    "est_day": 70.778,
-    "share": 94.4
+    "est_day": 72.687,
+    "share": 96.9
    },
    "side_pool": 75.0,
    "tick": 0.01,
-   "best_bid": 0.01,
-   "best_ask": 0.02,
+   "best_bid": 0.94,
+   "best_ask": 0.95,
    "held": 0.0,
-   "risk": "resolves ~2026-08-13 (6d); market priced near 0 \u2014 deep bid sits in the exit path (snipe risk)",
+   "risk": null,
    "event_n": 2,
    "already_in": false,
    "prog": {
@@ -42,33 +42,33 @@
    }
   },
   {
-   "market": "ewc-usgub-ca-2026-11-03-xavbec",
-   "side": "SELL",
+   "market": "ewc-ukpol-leg-clacton-2026-08-13-coubin",
+   "side": "BUY",
    "pick": {
-    "side": "SELL",
-    "price": 0.97,
-    "size": 100,
-    "capital": 3.0,
+    "side": "BUY",
+    "price": 0.01,
+    "size": 10000,
+    "capital": 100.0,
     "covered": false,
-    "est_day": 0.206,
-    "share": 0.3,
-    "ticks": 2
+    "est_day": 69.233,
+    "share": 92.3,
+    "ticks": 0
    },
    "max": {
-    "side": "SELL",
-    "price": 0.96,
+    "side": "BUY",
+    "price": 0.01,
     "size": 20000,
-    "capital": 800.0,
+    "capital": 200.0,
     "covered": false,
-    "est_day": 70.575,
-    "share": 94.1
+    "est_day": 72.001,
+    "share": 96.0
    },
    "side_pool": 75.0,
    "tick": 0.01,
-   "best_bid": 0.94,
-   "best_ask": 0.95,
+   "best_bid": 0.01,
+   "best_ask": 0.02,
    "held": 0.0,
-   "risk": null,
+   "risk": "resolves ~2026-08-13 (6d); market priced near 0 \u2014 deep bid sits in the exit path (snipe risk)",
    "event_n": 2,
    "already_in": false,
    "prog": {
@@ -90,8 +90,8 @@
     "size": 100,
     "capital": 54.1,
     "covered": false,
-    "est_day": 0.576,
-    "share": 0.8,
+    "est_day": 0.697,
+    "share": 0.9,
     "ticks": 2
    },
    "max": {
@@ -100,8 +100,8 @@
     "size": 20000,
     "capital": 10840.0,
     "covered": false,
-    "est_day": 66.419,
-    "share": 88.6
+    "est_day": 67.781,
+    "share": 90.4
    },
    "side_pool": 75.0,
    "tick": 0.001,
@@ -180,53 +180,13 @@
     "size": 20000,
     "capital": 9180.0,
     "covered": false,
-    "est_day": 62.396,
+    "est_day": 62.37,
     "share": 83.2
    },
    "side_pool": 75.0,
    "tick": 0.001,
    "best_bid": 0.46,
    "best_ask": 0.461,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 10000.0,
-    "pool": 300.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_high_20260727",
-    "tier": "high"
-   }
-  },
-  {
-   "market": "ewc-usgub-oh-2026-11-03-dem",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.5,
-    "size": 100,
-    "capital": 50.0,
-    "covered": false,
-    "est_day": 0.678,
-    "share": 0.9,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.5,
-    "size": 20000,
-    "capital": 10000.0,
-    "covered": false,
-    "est_day": 52.096,
-    "share": 69.5
-   },
-   "side_pool": 75.0,
-   "tick": 0.01,
-   "best_bid": 0.51,
-   "best_ask": 0.52,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -266,7 +226,7 @@
    "side_pool": 75.0,
    "tick": 0.01,
    "best_bid": 0.11,
-   "best_ask": 0.12,
+   "best_ask": 0.13,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -322,7 +282,47 @@
    }
   },
   {
-   "market": "ewc-usgub-oh-2026-11-03-rep",
+   "market": "ewc-usgub-ga-2026-11-03-rep",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.42,
+    "size": 100,
+    "capital": 58.0,
+    "covered": false,
+    "est_day": 0.489,
+    "share": 0.7,
+    "ticks": 0
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.42,
+    "size": 20000,
+    "capital": 11600.0,
+    "covered": false,
+    "est_day": 42.557,
+    "share": 56.7
+   },
+   "side_pool": 75.0,
+   "tick": 0.01,
+   "best_bid": 0.41,
+   "best_ask": 0.42,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 10000.0,
+    "pool": 300.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_high_20260727",
+    "tier": "high"
+   }
+  },
+  {
+   "market": "ewc-usgub-oh-2026-11-03-dem",
    "side": "BUY",
    "pick": {
     "side": "BUY",
@@ -330,8 +330,8 @@
     "size": 100,
     "capital": 50.0,
     "covered": false,
-    "est_day": 0.458,
-    "share": 0.6,
+    "est_day": 0.406,
+    "share": 0.5,
     "ticks": 1
    },
    "max": {
@@ -340,8 +340,8 @@
     "size": 20000,
     "capital": 10000.0,
     "covered": false,
-    "est_day": 44.401,
-    "share": 59.2
+    "est_day": 41.411,
+    "share": 55.2
    },
    "side_pool": 75.0,
    "tick": 0.01,
@@ -370,7 +370,7 @@
     "size": 100,
     "capital": 94.0,
     "covered": false,
-    "est_day": 0.463,
+    "est_day": 0.454,
     "share": 0.6,
     "ticks": 0
    },
@@ -380,8 +380,8 @@
     "size": 20000,
     "capital": 18800.0,
     "covered": false,
-    "est_day": 41.561,
-    "share": 55.4
+    "est_day": 41.18,
+    "share": 54.9
    },
    "side_pool": 75.0,
    "tick": 0.01,
@@ -402,111 +402,31 @@
    }
   },
   {
-   "market": "ewc-usgub-ga-2026-11-03-rep",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.42,
-    "size": 100,
-    "capital": 58.0,
-    "covered": false,
-    "est_day": 0.459,
-    "share": 0.6,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.42,
-    "size": 20000,
-    "capital": 11600.0,
-    "covered": false,
-    "est_day": 41.385,
-    "share": 55.2
-   },
-   "side_pool": 75.0,
-   "tick": 0.01,
-   "best_bid": 0.41,
-   "best_ask": 0.42,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 10000.0,
-    "pool": 300.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_high_20260727",
-    "tier": "high"
-   }
-  },
-  {
-   "market": "ewc-usgub-ca-2026-11-03-stehil",
+   "market": "ewc-usgub-oh-2026-11-03-rep",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.04,
+    "price": 0.5,
     "size": 100,
-    "capital": 4.0,
+    "capital": 50.0,
     "covered": false,
-    "est_day": 0.418,
-    "share": 0.6,
-    "ticks": 0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.04,
-    "size": 20000,
-    "capital": 800.0,
-    "covered": false,
-    "est_day": 39.65,
-    "share": 52.9
-   },
-   "side_pool": 75.0,
-   "tick": 0.01,
-   "best_bid": 0.04,
-   "best_ask": 0.05,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 10000.0,
-    "pool": 300.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_high_20260727",
-    "tier": "high"
-   }
-  },
-  {
-   "market": "ewc-usse-me-2026-11-03-rep",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.36,
-    "size": 100,
-    "capital": 36.0,
-    "covered": false,
-    "est_day": 0.337,
-    "share": 0.4,
+    "est_day": 0.378,
+    "share": 0.5,
     "ticks": 1
    },
    "max": {
     "side": "BUY",
-    "price": 0.36,
+    "price": 0.5,
     "size": 20000,
-    "capital": 7200.0,
+    "capital": 10000.0,
     "covered": false,
-    "est_day": 35.576,
-    "share": 47.4
+    "est_day": 40.166,
+    "share": 53.6
    },
    "side_pool": 75.0,
    "tick": 0.01,
-   "best_bid": 0.37,
-   "best_ask": 0.38,
+   "best_bid": 0.51,
+   "best_ask": 0.52,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -530,7 +450,7 @@
     "size": 100,
     "capital": 64.0,
     "covered": false,
-    "est_day": 0.273,
+    "est_day": 0.319,
     "share": 0.4,
     "ticks": 1
    },
@@ -540,8 +460,8 @@
     "size": 20000,
     "capital": 12800.0,
     "covered": false,
-    "est_day": 31.663,
-    "share": 42.2
+    "est_day": 34.581,
+    "share": 46.1
    },
    "side_pool": 75.0,
    "tick": 0.01,
@@ -580,13 +500,53 @@
     "size": 20000,
     "capital": 18200.0,
     "covered": false,
-    "est_day": 30.315,
+    "est_day": 30.313,
     "share": 40.4
    },
    "side_pool": 75.0,
    "tick": 0.01,
    "best_bid": 0.08,
    "best_ask": 0.09,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 10000.0,
+    "pool": 300.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_high_20260727",
+    "tier": "high"
+   }
+  },
+  {
+   "market": "ewc-usse-ga-2026-11-03-dem",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.9,
+    "size": 100,
+    "capital": 90.0,
+    "covered": false,
+    "est_day": 0.248,
+    "share": 0.3,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.9,
+    "size": 20000,
+    "capital": 18000.0,
+    "covered": false,
+    "est_day": 29.937,
+    "share": 39.9
+   },
+   "side_pool": 75.0,
+   "tick": 0.01,
+   "best_bid": 0.91,
+   "best_ask": 0.92,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -627,46 +587,6 @@
    "tick": 0.01,
    "best_bid": 0.61,
    "best_ask": 0.62,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 10000.0,
-    "pool": 300.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_high_20260727",
-    "tier": "high"
-   }
-  },
-  {
-   "market": "ewc-usse-ga-2026-11-03-dem",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.9,
-    "size": 100,
-    "capital": 90.0,
-    "covered": false,
-    "est_day": 0.222,
-    "share": 0.3,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.9,
-    "size": 20000,
-    "capital": 18000.0,
-    "covered": false,
-    "est_day": 27.92,
-    "share": 37.2
-   },
-   "side_pool": 75.0,
-   "tick": 0.01,
-   "best_bid": 0.91,
-   "best_ask": 0.92,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -730,9 +650,9 @@
     "size": 100,
     "capital": 87.0,
     "covered": false,
-    "est_day": 0.195,
+    "est_day": 0.196,
     "share": 0.3,
-    "ticks": 1
+    "ticks": 0
    },
    "max": {
     "side": "SELL",
@@ -740,53 +660,13 @@
     "size": 20000,
     "capital": 17400.0,
     "covered": false,
-    "est_day": 25.745,
-    "share": 34.3
+    "est_day": 25.82,
+    "share": 34.4
    },
    "side_pool": 75.0,
    "tick": 0.01,
    "best_bid": 0.11,
-   "best_ask": 0.12,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 10000.0,
-    "pool": 300.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_high_20260727",
-    "tier": "high"
-   }
-  },
-  {
-   "market": "paccc-usse-midterms-2026-11-03-rep",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.544,
-    "size": 100,
-    "capital": 45.6,
-    "covered": false,
-    "est_day": 0.188,
-    "share": 0.3,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.544,
-    "size": 20000,
-    "capital": 9120.0,
-    "covered": false,
-    "est_day": 25.129,
-    "share": 33.5
-   },
-   "side_pool": 75.0,
-   "tick": 0.001,
-   "best_bid": 0.543,
-   "best_ask": 0.544,
+   "best_ask": 0.13,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -842,86 +722,6 @@
    }
   },
   {
-   "market": "apdc-petehegseth-2026-08-31",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 5000,
-    "capital": 50.0,
-    "covered": false,
-    "est_day": 22.957,
-    "share": 91.8,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 20000,
-    "capital": 200.0,
-    "covered": false,
-    "est_day": 24.456,
-    "share": 97.8
-   },
-   "side_pool": 25.0,
-   "tick": 0.01,
-   "best_bid": 0.02,
-   "best_ask": 0.18,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
-   "market": "apdc-petehegseth-2026-08-31",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.21,
-    "size": 5000,
-    "capital": 3950.0,
-    "covered": false,
-    "est_day": 10.563,
-    "share": 42.3,
-    "ticks": 3
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.2,
-    "size": 20000,
-    "capital": 16000.0,
-    "covered": false,
-    "est_day": 23.401,
-    "share": 93.6
-   },
-   "side_pool": 25.0,
-   "tick": 0.01,
-   "best_bid": 0.02,
-   "best_ask": 0.18,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
    "market": "enwc-usgubp-ok-2026-06-16-rep-mikmaz",
    "side": "BUY",
    "pick": {
@@ -930,7 +730,7 @@
     "size": 100,
     "capital": 70.0,
     "covered": false,
-    "est_day": 0.356,
+    "est_day": 0.354,
     "share": 1.4,
     "ticks": 2
    },
@@ -940,7 +740,7 @@
     "size": 20000,
     "capital": 14200.0,
     "covered": false,
-    "est_day": 23.381,
+    "est_day": 23.375,
     "share": 93.5
    },
    "side_pool": 25.0,
@@ -959,6 +759,46 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
+   }
+  },
+  {
+   "market": "paccc-usse-midterms-2026-11-03-rep",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.544,
+    "size": 100,
+    "capital": 45.6,
+    "covered": false,
+    "est_day": 0.169,
+    "share": 0.2,
+    "ticks": 0
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.544,
+    "size": 20000,
+    "capital": 9120.0,
+    "covered": false,
+    "est_day": 23.366,
+    "share": 31.2
+   },
+   "side_pool": 75.0,
+   "tick": 0.001,
+   "best_bid": 0.543,
+   "best_ask": 0.544,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 10000.0,
+    "pool": 300.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_high_20260727",
+    "tier": "high"
    }
   },
   {
@@ -1002,6 +842,46 @@
    }
   },
   {
+   "market": "apdc-petehegseth-2026-08-31",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.22,
+    "size": 100,
+    "capital": 78.0,
+    "covered": false,
+    "est_day": 0.26,
+    "share": 1.0,
+    "ticks": 3
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.21,
+    "size": 20000,
+    "capital": 15800.0,
+    "covered": false,
+    "est_day": 22.852,
+    "share": 91.4
+   },
+   "side_pool": 25.0,
+   "tick": 0.01,
+   "best_bid": 0.01,
+   "best_ask": 0.19,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
    "market": "apdc-alito-2026-08-31",
    "side": "BUY",
    "pick": {
@@ -1010,8 +890,8 @@
     "size": 5000,
     "capital": 50.0,
     "covered": false,
-    "est_day": 17.895,
-    "share": 71.6,
+    "est_day": 17.633,
+    "share": 70.5,
     "ticks": 1
    },
    "max": {
@@ -1020,8 +900,8 @@
     "size": 20000,
     "capital": 200.0,
     "covered": false,
-    "est_day": 22.743,
-    "share": 91.0
+    "est_day": 22.636,
+    "share": 90.5
    },
    "side_pool": 25.0,
    "tick": 0.01,
@@ -1082,6 +962,46 @@
    }
   },
   {
+   "market": "enwc-ussep-mn-2026-08-11-dem-pegfla",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.69,
+    "size": 100,
+    "capital": 69.0,
+    "covered": false,
+    "est_day": 0.217,
+    "share": 0.9,
+    "ticks": 3
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.7,
+    "size": 20000,
+    "capital": 14000.0,
+    "covered": false,
+    "est_day": 22.437,
+    "share": 89.7
+   },
+   "side_pool": 25.0,
+   "tick": 0.01,
+   "best_bid": 0.72,
+   "best_ask": 0.73,
+   "held": 0.0,
+   "risk": "resolves ~2026-08-11 (4d)",
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
    "market": "apdc-jerpowgov-2026-12-31",
    "side": "SELL",
    "pick": {
@@ -1122,86 +1042,6 @@
    }
   },
   {
-   "market": "ewc-usgub-ga-2026-11-03-rep",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.41,
-    "size": 100,
-    "capital": 41.0,
-    "covered": false,
-    "est_day": 0.159,
-    "share": 0.2,
-    "ticks": 0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.41,
-    "size": 20000,
-    "capital": 8200.0,
-    "covered": false,
-    "est_day": 22.381,
-    "share": 29.8
-   },
-   "side_pool": 75.0,
-   "tick": 0.01,
-   "best_bid": 0.41,
-   "best_ask": 0.42,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 10000.0,
-    "pool": 300.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_high_20260727",
-    "tier": "high"
-   }
-  },
-  {
-   "market": "enwc-ussep-mn-2026-08-11-dem-pegfla",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.69,
-    "size": 100,
-    "capital": 69.0,
-    "covered": false,
-    "est_day": 0.2,
-    "share": 0.8,
-    "ticks": 3
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.7,
-    "size": 20000,
-    "capital": 14000.0,
-    "covered": false,
-    "est_day": 22.242,
-    "share": 89.0
-   },
-   "side_pool": 25.0,
-   "tick": 0.01,
-   "best_bid": 0.72,
-   "best_ask": 0.73,
-   "held": 0.0,
-   "risk": "resolves ~2026-08-11 (4d)",
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
    "market": "ewc-usse-tx-2026-11-03-rep",
    "side": "BUY",
    "pick": {
@@ -1210,7 +1050,7 @@
     "size": 100,
     "capital": 51.0,
     "covered": false,
-    "est_day": 0.158,
+    "est_day": 0.154,
     "share": 0.2,
     "ticks": 1
    },
@@ -1220,8 +1060,8 @@
     "size": 20000,
     "capital": 10200.0,
     "covered": false,
-    "est_day": 22.24,
-    "share": 29.7
+    "est_day": 21.912,
+    "share": 29.2
    },
    "side_pool": 75.0,
    "tick": 0.01,
@@ -1279,6 +1119,46 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
+   }
+  },
+  {
+   "market": "ewc-usse-me-2026-11-03-rep",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.36,
+    "size": 100,
+    "capital": 36.0,
+    "covered": false,
+    "est_day": 0.153,
+    "share": 0.2,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.36,
+    "size": 20000,
+    "capital": 7200.0,
+    "covered": false,
+    "est_day": 21.802,
+    "share": 29.1
+   },
+   "side_pool": 75.0,
+   "tick": 0.01,
+   "best_bid": 0.37,
+   "best_ask": 0.38,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 10000.0,
+    "pool": 300.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_high_20260727",
+    "tier": "high"
    }
   },
   {
@@ -1447,11 +1327,11 @@
    "pick": {
     "side": "SELL",
     "price": 0.33,
-    "size": 100,
-    "capital": 67.0,
+    "size": 5000,
+    "capital": 3350.0,
     "covered": false,
-    "est_day": 0.524,
-    "share": 2.1,
+    "est_day": 12.925,
+    "share": 51.7,
     "ticks": 3
    },
    "max": {
@@ -1482,6 +1362,46 @@
    }
   },
   {
+   "market": "ewc-usgub-ga-2026-11-03-rep",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.4,
+    "size": 200,
+    "capital": 80.0,
+    "covered": false,
+    "est_day": 0.275,
+    "share": 0.4,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.4,
+    "size": 20000,
+    "capital": 8000.0,
+    "covered": false,
+    "est_day": 20.156,
+    "share": 26.9
+   },
+   "side_pool": 75.0,
+   "tick": 0.01,
+   "best_bid": 0.41,
+   "best_ask": 0.42,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 10000.0,
+    "pool": 300.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_high_20260727",
+    "tier": "high"
+   }
+  },
+  {
    "market": "enwc-usgubp-ok-2026-06-16-rep-mikmaz",
    "side": "SELL",
    "pick": {
@@ -1490,7 +1410,7 @@
     "size": 100,
     "capital": 26.0,
     "covered": false,
-    "est_day": 0.466,
+    "est_day": 0.465,
     "share": 1.9,
     "ticks": 1
    },
@@ -1500,7 +1420,7 @@
     "size": 20000,
     "capital": 5200.0,
     "covered": false,
-    "est_day": 19.786,
+    "est_day": 19.778,
     "share": 79.1
    },
    "side_pool": 25.0,
@@ -1530,7 +1450,7 @@
     "size": 100,
     "capital": 70.0,
     "covered": false,
-    "est_day": 0.448,
+    "est_day": 0.447,
     "share": 1.8,
     "ticks": 1
    },
@@ -1540,7 +1460,7 @@
     "size": 20000,
     "capital": 14000.0,
     "covered": false,
-    "est_day": 19.625,
+    "est_day": 19.616,
     "share": 78.5
    },
    "side_pool": 25.0,
@@ -1549,6 +1469,46 @@
    "best_ask": 0.29,
    "held": 0.0,
    "risk": "resolves ~2026-06-16 (0d)",
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
+   "market": "enwc-ussep-mn-2026-08-11-dem-angcra",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.26,
+    "size": 100,
+    "capital": 26.0,
+    "covered": false,
+    "est_day": 0.444,
+    "share": 1.8,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.26,
+    "size": 20000,
+    "capital": 5200.0,
+    "covered": false,
+    "est_day": 19.585,
+    "share": 78.3
+   },
+   "side_pool": 25.0,
+   "tick": 0.01,
+   "best_bid": 0.27,
+   "best_ask": 0.31,
+   "held": 0.0,
+   "risk": "resolves ~2026-08-11 (4d)",
    "event_n": 2,
    "already_in": false,
    "prog": {
@@ -1587,6 +1547,46 @@
    "tick": 0.01,
    "best_bid": 0.25,
    "best_ask": 0.3,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
+   "market": "apdc-petehegseth-2026-08-31",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 100,
+    "capital": 1.0,
+    "covered": false,
+    "est_day": 0.398,
+    "share": 1.6,
+    "ticks": 0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 20000,
+    "capital": 200.0,
+    "covered": false,
+    "est_day": 19.1,
+    "share": 76.4
+   },
+   "side_pool": 25.0,
+   "tick": 0.01,
+   "best_bid": 0.01,
+   "best_ask": 0.19,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -1646,13 +1646,13 @@
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.21,
-    "size": 1000,
-    "capital": 210.0,
+    "price": 0.22,
+    "size": 100,
+    "capital": 22.0,
     "covered": false,
-    "est_day": 0.768,
-    "share": 3.1,
-    "ticks": 3
+    "est_day": 0.384,
+    "share": 1.5,
+    "ticks": 2
    },
    "max": {
     "side": "BUY",
@@ -1660,8 +1660,8 @@
     "size": 20000,
     "capital": 4400.0,
     "covered": false,
-    "est_day": 19.049,
-    "share": 76.2
+    "est_day": 18.977,
+    "share": 75.9
    },
    "side_pool": 25.0,
    "tick": 0.01,
@@ -1716,46 +1716,6 @@
     "target": 5000.0,
     "pool": 100.0,
     "event_n": 1,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
-   "market": "enwc-ussep-mn-2026-08-11-dem-pegfla",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.73,
-    "size": 100,
-    "capital": 27.0,
-    "covered": false,
-    "est_day": 0.329,
-    "share": 1.3,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.73,
-    "size": 20000,
-    "capital": 5400.0,
-    "covered": false,
-    "est_day": 18.188,
-    "share": 72.8
-   },
-   "side_pool": 25.0,
-   "tick": 0.01,
-   "best_bid": 0.72,
-   "best_ask": 0.73,
-   "held": 0.0,
-   "risk": "resolves ~2026-08-11 (4d)",
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 2,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
@@ -1922,6 +1882,86 @@
    }
   },
   {
+   "market": "enwc-ussep-mn-2026-08-11-dem-angcra",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.32,
+    "size": 100,
+    "capital": 68.0,
+    "covered": false,
+    "est_day": 0.231,
+    "share": 0.9,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.32,
+    "size": 20000,
+    "capital": 13600.0,
+    "covered": false,
+    "est_day": 16.287,
+    "share": 65.1
+   },
+   "side_pool": 25.0,
+   "tick": 0.01,
+   "best_bid": 0.27,
+   "best_ask": 0.31,
+   "held": 0.0,
+   "risk": "resolves ~2026-08-11 (4d)",
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
+   "market": "enwc-ussep-mn-2026-08-11-dem-pegfla",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.73,
+    "size": 100,
+    "capital": 27.0,
+    "covered": false,
+    "est_day": 0.228,
+    "share": 0.9,
+    "ticks": 0
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.73,
+    "size": 20000,
+    "capital": 5400.0,
+    "covered": false,
+    "est_day": 16.196,
+    "share": 64.8
+   },
+   "side_pool": 25.0,
+   "tick": 0.01,
+   "best_bid": 0.72,
+   "best_ask": 0.73,
+   "held": 0.0,
+   "risk": "resolves ~2026-08-11 (4d)",
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
    "market": "enwc-usgubp-fl-2026-08-18-rep-jaycol",
    "side": "BUY",
    "pick": {
@@ -1956,46 +1996,6 @@
     "target": 5000.0,
     "pool": 100.0,
     "event_n": 3,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
-   "market": "enwc-ussep-mn-2026-08-11-dem-angcra",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.26,
-    "size": 100,
-    "capital": 26.0,
-    "covered": false,
-    "est_day": 0.22,
-    "share": 0.9,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.26,
-    "size": 20000,
-    "capital": 5200.0,
-    "covered": false,
-    "est_day": 16.0,
-    "share": 64.0
-   },
-   "side_pool": 25.0,
-   "tick": 0.01,
-   "best_bid": 0.27,
-   "best_ask": 0.31,
-   "held": 0.0,
-   "risk": "resolves ~2026-08-11 (4d)",
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 2,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
@@ -2060,7 +2060,7 @@
     "size": 20000,
     "capital": 16440.0,
     "covered": false,
-    "est_day": 15.469,
+    "est_day": 15.468,
     "share": 20.6
    },
    "side_pool": 75.0,
@@ -2079,46 +2079,6 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_high_20260727",
     "tier": "high"
-   }
-  },
-  {
-   "market": "enwc-ussep-mn-2026-08-11-dem-angcra",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.32,
-    "size": 100,
-    "capital": 68.0,
-    "covered": false,
-    "est_day": 0.197,
-    "share": 0.8,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.32,
-    "size": 20000,
-    "capital": 13600.0,
-    "covered": false,
-    "est_day": 15.413,
-    "share": 61.7
-   },
-   "side_pool": 25.0,
-   "tick": 0.01,
-   "best_bid": 0.27,
-   "best_ask": 0.31,
-   "held": 0.0,
-   "risk": "resolves ~2026-08-11 (4d)",
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
    }
   },
   {
@@ -2162,33 +2122,33 @@
    }
   },
   {
-   "market": "ewc-usse-nc-2026-11-03-dem",
+   "market": "lawec-saveact-2026-08-31",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.91,
+    "price": 0.01,
     "size": 100,
-    "capital": 91.0,
+    "capital": 1.0,
     "covered": false,
-    "est_day": 0.173,
+    "est_day": 0.165,
     "share": 0.7,
     "ticks": 0
    },
    "max": {
     "side": "BUY",
-    "price": 0.91,
+    "price": 0.01,
     "size": 20000,
-    "capital": 18200.0,
+    "capital": 200.0,
     "covered": false,
-    "est_day": 14.552,
-    "share": 58.2
+    "est_day": 14.272,
+    "share": 57.1
    },
    "side_pool": 25.0,
    "tick": 0.01,
-   "best_bid": 0.91,
-   "best_ask": 0.92,
+   "best_bid": 0.01,
+   "best_ask": 0.02,
    "held": 0.0,
-   "risk": null,
+   "risk": "market priced near 0 \u2014 deep bid sits in the exit path (snipe risk)",
    "event_n": 2,
    "already_in": false,
    "prog": {
@@ -2202,33 +2162,33 @@
    }
   },
   {
-   "market": "lawec-saveact-2026-08-31",
+   "market": "ewc-usse-nc-2026-11-03-dem",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.01,
+    "price": 0.91,
     "size": 100,
-    "capital": 1.0,
+    "capital": 91.0,
     "covered": false,
-    "est_day": 0.166,
-    "share": 0.7,
+    "est_day": 0.162,
+    "share": 0.6,
     "ticks": 0
    },
    "max": {
     "side": "BUY",
-    "price": 0.01,
+    "price": 0.91,
     "size": 20000,
-    "capital": 200.0,
+    "capital": 18200.0,
     "covered": false,
-    "est_day": 14.29,
-    "share": 57.2
+    "est_day": 14.139,
+    "share": 56.6
    },
    "side_pool": 25.0,
    "tick": 0.01,
-   "best_bid": 0.01,
-   "best_ask": 0.02,
+   "best_bid": 0.91,
+   "best_ask": 0.92,
    "held": 0.0,
-   "risk": "market priced near 0 \u2014 deep bid sits in the exit path (snipe risk)",
+   "risk": null,
    "event_n": 2,
    "already_in": false,
    "prog": {
@@ -2300,7 +2260,7 @@
     "size": 20000,
     "capital": 9400.0,
     "covered": false,
-    "est_day": 13.907,
+    "est_day": 13.909,
     "share": 55.6
    },
    "side_pool": 25.0,
@@ -2340,13 +2300,53 @@
     "size": 20000,
     "capital": 10780.0,
     "covered": false,
-    "est_day": 13.845,
+    "est_day": 13.847,
     "share": 18.5
    },
    "side_pool": 75.0,
    "tick": 0.001,
    "best_bid": 0.46,
    "best_ask": 0.461,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 10000.0,
+    "pool": 300.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_high_20260727",
+    "tier": "high"
+   }
+  },
+  {
+   "market": "ewc-usse-ga-2026-11-03-rep",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.08,
+    "size": 200,
+    "capital": 16.0,
+    "covered": false,
+    "est_day": 0.166,
+    "share": 0.2,
+    "ticks": 0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.08,
+    "size": 20000,
+    "capital": 1600.0,
+    "covered": false,
+    "est_day": 13.64,
+    "share": 18.2
+   },
+   "side_pool": 75.0,
+   "tick": 0.01,
+   "best_bid": 0.08,
+   "best_ask": 0.09,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -2482,13 +2482,53 @@
    }
   },
   {
+   "market": "opdc-mcconnell-resign-2026-11-02",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.2,
+    "size": 100,
+    "capital": 80.0,
+    "covered": false,
+    "est_day": 0.21,
+    "share": 1.7,
+    "ticks": 2
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.19,
+    "size": 20000,
+    "capital": 16200.0,
+    "covered": false,
+    "est_day": 12.145,
+    "share": 97.2
+   },
+   "side_pool": 12.5,
+   "tick": 0.01,
+   "best_bid": 0.16,
+   "best_ask": 0.18,
+   "held": 1.0,
+   "risk": null,
+   "event_n": 1,
+   "already_in": true,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 1,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "gsc-usfedgvmt-by-2026-10-01",
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.41,
+    "price": 0.39,
     "size": 100,
-    "capital": 59.0,
+    "capital": 61.0,
     "covered": false,
     "est_day": 0.205,
     "share": 1.6,
@@ -2496,9 +2536,9 @@
    },
    "max": {
     "side": "SELL",
-    "price": 0.4,
+    "price": 0.38,
     "size": 20000,
-    "capital": 12000.0,
+    "capital": 12400.0,
     "covered": false,
     "est_day": 12.136,
     "share": 97.1
@@ -2506,7 +2546,7 @@
    "side_pool": 12.5,
    "tick": 0.01,
    "best_bid": 0.27,
-   "best_ask": 0.39,
+   "best_ask": 0.37,
    "held": 0.0,
    "risk": null,
    "event_n": 1,
@@ -2682,43 +2722,43 @@
    }
   },
   {
-   "market": "opdc-mcconnell-resign-2026-11-02",
+   "market": "apdc-alito-2026-08-31",
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.2,
-    "size": 100,
-    "capital": 80.0,
+    "price": 0.03,
+    "size": 200,
+    "capital": 194.0,
     "covered": false,
-    "est_day": 0.625,
-    "share": 5.0,
-    "ticks": 2
+    "est_day": 0.209,
+    "share": 0.8,
+    "ticks": 0
    },
    "max": {
     "side": "SELL",
-    "price": 0.2,
+    "price": 0.03,
     "size": 20000,
-    "capital": 16000.0,
+    "capital": 19400.0,
     "covered": false,
-    "est_day": 11.416,
-    "share": 91.3
+    "est_day": 11.443,
+    "share": 45.8
    },
-   "side_pool": 12.5,
+   "side_pool": 25.0,
    "tick": 0.01,
-   "best_bid": 0.16,
-   "best_ask": 0.18,
-   "held": 1.0,
+   "best_bid": 0.02,
+   "best_ask": 0.03,
+   "held": 0.0,
    "risk": null,
-   "event_n": 1,
-   "already_in": true,
+   "event_n": 2,
+   "already_in": false,
    "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 1,
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 2,
     "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
    }
   },
   {
@@ -2762,31 +2802,31 @@
    }
   },
   {
-   "market": "ewc-usse-ga-2026-11-03-rep",
+   "market": "ewc-usgub-ca-2026-11-03-stehil",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.08,
+    "price": 0.04,
     "size": 500,
-    "capital": 40.0,
+    "capital": 20.0,
     "covered": false,
-    "est_day": 0.329,
+    "est_day": 0.326,
     "share": 0.4,
     "ticks": 0
    },
    "max": {
     "side": "BUY",
-    "price": 0.08,
+    "price": 0.04,
     "size": 20000,
-    "capital": 1600.0,
+    "capital": 800.0,
     "covered": false,
-    "est_day": 11.229,
-    "share": 15.0
+    "est_day": 11.138,
+    "share": 14.9
    },
    "side_pool": 75.0,
    "tick": 0.01,
-   "best_bid": 0.08,
-   "best_ask": 0.09,
+   "best_bid": 0.04,
+   "best_ask": 0.05,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -2810,7 +2850,7 @@
     "size": 100,
     "capital": 46.0,
     "covered": false,
-    "est_day": 0.369,
+    "est_day": 0.377,
     "share": 3.0,
     "ticks": 3
    },
@@ -2820,8 +2860,8 @@
     "size": 20000,
     "capital": 9200.0,
     "covered": false,
-    "est_day": 10.736,
-    "share": 85.9
+    "est_day": 10.768,
+    "share": 86.1
    },
    "side_pool": 12.5,
    "tick": 0.01,
@@ -2946,7 +2986,7 @@
    "side_pool": 12.5,
    "tick": 0.01,
    "best_bid": 0.27,
-   "best_ask": 0.39,
+   "best_ask": 0.37,
    "held": 0.0,
    "risk": null,
    "event_n": 1,
@@ -2970,7 +3010,7 @@
     "size": 100,
     "capital": 36.0,
     "covered": false,
-    "est_day": 0.244,
+    "est_day": 0.243,
     "share": 1.9,
     "ticks": 3
    },
@@ -2980,7 +3020,7 @@
     "size": 20000,
     "capital": 7200.0,
     "covered": false,
-    "est_day": 9.988,
+    "est_day": 9.984,
     "share": 79.9
    },
    "side_pool": 12.5,
@@ -3060,7 +3100,7 @@
     "size": 20000,
     "capital": 11600.0,
     "covered": false,
-    "est_day": 9.611,
+    "est_day": 9.61,
     "share": 76.9
    },
    "side_pool": 12.5,
@@ -3130,8 +3170,8 @@
     "size": 200,
     "capital": 4.0,
     "covered": false,
-    "est_day": 0.169,
-    "share": 1.0,
+    "est_day": 0.156,
+    "share": 0.9,
     "ticks": 1
    },
    "max": {
@@ -3140,8 +3180,8 @@
     "size": 20000,
     "capital": 400.0,
     "covered": false,
-    "est_day": 8.427,
-    "share": 50.6
+    "est_day": 8.107,
+    "share": 48.6
    },
    "side_pool": 16.67,
    "tick": 0.01,
@@ -3156,46 +3196,6 @@
     "target": 5000.0,
     "pool": 100.0,
     "event_n": 3,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
-   "market": "apdc-alito-2026-08-31",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.03,
-    "size": 500,
-    "capital": 485.0,
-    "covered": false,
-    "est_day": 0.298,
-    "share": 1.2,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.03,
-    "size": 20000,
-    "capital": 19400.0,
-    "covered": false,
-    "est_day": 8.138,
-    "share": 32.6
-   },
-   "side_pool": 25.0,
-   "tick": 0.01,
-   "best_bid": 0.02,
-   "best_ask": 0.03,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 2,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
@@ -3220,8 +3220,48 @@
     "size": 20000,
     "capital": 1200.0,
     "covered": false,
-    "est_day": 6.943,
+    "est_day": 6.934,
     "share": 55.5
+   },
+   "side_pool": 12.5,
+   "tick": 0.01,
+   "best_bid": 0.06,
+   "best_ask": 0.07,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 1,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 1,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "usgcc-aliens-12-31-2026",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.08,
+    "size": 500,
+    "capital": 460.0,
+    "covered": false,
+    "est_day": 0.349,
+    "share": 2.8,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.08,
+    "size": 20000,
+    "capital": 18400.0,
+    "covered": false,
+    "est_day": 6.68,
+    "share": 53.4
    },
    "side_pool": 12.5,
    "tick": 0.01,
@@ -3250,8 +3290,8 @@
     "size": 500,
     "capital": 5.0,
     "covered": false,
-    "est_day": 0.234,
-    "share": 0.9,
+    "est_day": 0.207,
+    "share": 0.8,
     "ticks": 0
    },
    "max": {
@@ -3260,8 +3300,8 @@
     "size": 20000,
     "capital": 200.0,
     "covered": false,
-    "est_day": 6.851,
-    "share": 27.4
+    "est_day": 6.249,
+    "share": 25.0
    },
    "side_pool": 25.0,
    "tick": 0.01,
@@ -3279,46 +3319,6 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
-   }
-  },
-  {
-   "market": "usgcc-aliens-12-31-2026",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.08,
-    "size": 500,
-    "capital": 460.0,
-    "covered": false,
-    "est_day": 0.349,
-    "share": 2.8,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.08,
-    "size": 20000,
-    "capital": 18400.0,
-    "covered": false,
-    "est_day": 6.684,
-    "share": 53.5
-   },
-   "side_pool": 12.5,
-   "tick": 0.01,
-   "best_bid": 0.06,
-   "best_ask": 0.07,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 1,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 1,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
    }
   },
   {
@@ -3482,46 +3482,6 @@
    }
   },
   {
-   "market": "opdc-delrod-venpres-2027-06-30",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.99,
-    "size": 2000,
-    "capital": 20.0,
-    "covered": false,
-    "est_day": 0.184,
-    "share": 2.9,
-    "ticks": 3
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.97,
-    "size": 20000,
-    "capital": 600.0,
-    "covered": false,
-    "est_day": 6.054,
-    "share": 96.9
-   },
-   "side_pool": 6.25,
-   "tick": 0.01,
-   "best_bid": 0.09,
-   "best_ask": 0.96,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
    "market": "apdc-kashpatel-2026-12-31",
    "side": "BUY",
    "pick": {
@@ -3642,31 +3602,31 @@
    }
   },
   {
-   "market": "opdc-trump-resig-2027-12-31",
+   "market": "opdc-delrod-venpres-2027-06-30",
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.34,
+    "price": 0.98,
     "size": 100,
-    "capital": 66.0,
+    "capital": 2.0,
     "covered": false,
-    "est_day": 0.57,
-    "share": 9.1,
+    "est_day": 0.324,
+    "share": 5.2,
     "ticks": 1
    },
    "max": {
     "side": "SELL",
-    "price": 0.34,
+    "price": 0.98,
     "size": 20000,
-    "capital": 13200.0,
+    "capital": 400.0,
     "covered": false,
-    "est_day": 5.954,
-    "share": 95.3
+    "est_day": 5.924,
+    "share": 94.8
    },
    "side_pool": 6.25,
    "tick": 0.01,
    "best_bid": 0.1,
-   "best_ask": 0.33,
+   "best_ask": 0.97,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -3706,7 +3666,7 @@
    "side_pool": 6.25,
    "tick": 0.01,
    "best_bid": 0.1,
-   "best_ask": 0.33,
+   "best_ask": 0.41,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -3802,73 +3762,33 @@
    }
   },
   {
-   "market": "ewc-usse-mi-2026-11-03-rep",
+   "market": "opdc-trump-resig-2027-12-31",
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.44,
+    "price": 0.42,
     "size": 100,
-    "capital": 56.0,
+    "capital": 58.0,
     "covered": false,
-    "est_day": 0.25,
-    "share": 4.0,
+    "est_day": 0.302,
+    "share": 4.8,
     "ticks": 1
    },
    "max": {
     "side": "SELL",
-    "price": 0.44,
+    "price": 0.42,
     "size": 20000,
-    "capital": 11200.0,
+    "capital": 11600.0,
     "covered": false,
-    "est_day": 5.679,
-    "share": 90.9
+    "est_day": 5.689,
+    "share": 91.0
    },
    "side_pool": 6.25,
    "tick": 0.01,
-   "best_bid": 0.42,
-   "best_ask": 0.43,
+   "best_bid": 0.1,
+   "best_ask": 0.41,
    "held": 0.0,
    "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "enwc-ussep-nh-2026-09-08-dem-karman",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "covered": false,
-    "est_day": 0.533,
-    "share": 8.5,
-    "ticks": 2
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.02,
-    "size": 20000,
-    "capital": 400.0,
-    "covered": false,
-    "est_day": 5.664,
-    "share": 90.6
-   },
-   "side_pool": 6.25,
-   "tick": 0.01,
-   "best_bid": 0.03,
-   "best_ask": 0.04,
-   "held": 0.0,
-   "risk": "market priced near 0 \u2014 deep bid sits in the exit path (snipe risk)",
    "event_n": 2,
    "already_in": false,
    "prog": {
@@ -3922,6 +3842,46 @@
    }
   },
   {
+   "market": "ewc-usgub-ks-2026-11-03-dem",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.23,
+    "size": 100,
+    "capital": 23.0,
+    "covered": false,
+    "est_day": 0.275,
+    "share": 4.4,
+    "ticks": 0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.23,
+    "size": 20000,
+    "capital": 4600.0,
+    "covered": false,
+    "est_day": 5.637,
+    "share": 90.2
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.23,
+   "best_ask": 0.24,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "pvwc-housepopw-2026-11-03-dem",
    "side": "BUY",
    "pick": {
@@ -3947,46 +3907,6 @@
    "tick": 0.01,
    "best_bid": 0.61,
    "best_ask": 0.83,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "ewc-usgub-ks-2026-11-03-rep",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.77,
-    "size": 100,
-    "capital": 23.0,
-    "covered": false,
-    "est_day": 0.268,
-    "share": 4.3,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.77,
-    "size": 20000,
-    "capital": 4600.0,
-    "covered": false,
-    "est_day": 5.624,
-    "share": 90.0
-   },
-   "side_pool": 6.25,
-   "tick": 0.01,
-   "best_bid": 0.76,
-   "best_ask": 0.77,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -4060,7 +3980,7 @@
     "size": 20000,
     "capital": 7400.0,
     "covered": false,
-    "est_day": 5.596,
+    "est_day": 5.595,
     "share": 89.5
    },
    "side_pool": 6.25,
@@ -4122,46 +4042,6 @@
    }
   },
   {
-   "market": "enwc-ussep-nh-2026-09-08-dem-karman",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.05,
-    "size": 100,
-    "capital": 95.0,
-    "covered": false,
-    "est_day": 0.23,
-    "share": 3.7,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.05,
-    "size": 20000,
-    "capital": 19000.0,
-    "covered": false,
-    "est_day": 5.531,
-    "share": 88.5
-   },
-   "side_pool": 6.25,
-   "tick": 0.01,
-   "best_bid": 0.03,
-   "best_ask": 0.04,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
    "market": "ewc-ukpol-leg-clacton-2026-08-13-coubin",
    "side": "SELL",
    "pick": {
@@ -4180,7 +4060,7 @@
     "size": 20000,
     "capital": 19600.0,
     "covered": false,
-    "est_day": 5.51,
+    "est_day": 5.511,
     "share": 7.3
    },
    "side_pool": 75.0,
@@ -4202,6 +4082,46 @@
    }
   },
   {
+   "market": "ewc-usse-ia-2026-11-03-dem",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.41,
+    "size": 100,
+    "capital": 41.0,
+    "covered": false,
+    "est_day": 0.221,
+    "share": 3.5,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.41,
+    "size": 20000,
+    "capital": 8200.0,
+    "covered": false,
+    "est_day": 5.507,
+    "share": 88.1
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.42,
+   "best_ask": 0.43,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "ewc-usse-ak-2026-11-03-rep",
    "side": "BUY",
    "pick": {
@@ -4220,7 +4140,7 @@
     "size": 20000,
     "capital": 9200.0,
     "covered": false,
-    "est_day": 5.438,
+    "est_day": 5.437,
     "share": 87.0
    },
    "side_pool": 6.25,
@@ -4242,43 +4162,43 @@
    }
   },
   {
-   "market": "ewc-usse-ia-2026-11-03-dem",
-   "side": "BUY",
+   "market": "enwc-usgubp-fl-2026-08-18-rep-byrdon",
+   "side": "SELL",
    "pick": {
-    "side": "BUY",
-    "price": 0.41,
-    "size": 100,
-    "capital": 41.0,
+    "side": "SELL",
+    "price": 0.97,
+    "size": 500,
+    "capital": 15.0,
     "covered": false,
-    "est_day": 0.2,
-    "share": 3.2,
+    "est_day": 0.199,
+    "share": 1.2,
     "ticks": 1
    },
    "max": {
-    "side": "BUY",
-    "price": 0.41,
+    "side": "SELL",
+    "price": 0.97,
     "size": 20000,
-    "capital": 8200.0,
+    "capital": 600.0,
     "covered": false,
-    "est_day": 5.437,
-    "share": 87.0
+    "est_day": 5.436,
+    "share": 32.6
    },
-   "side_pool": 6.25,
+   "side_pool": 16.67,
    "tick": 0.01,
-   "best_bid": 0.42,
-   "best_ask": 0.43,
+   "best_bid": 0.95,
+   "best_ask": 0.96,
    "held": 0.0,
-   "risk": null,
-   "event_n": 2,
+   "risk": "resolves ~2026-08-18 (11d); near-certain outcome \u2014 a resting ask will get lifted",
+   "event_n": 3,
    "already_in": false,
    "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 3,
     "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
    }
   },
   {
@@ -4402,33 +4322,33 @@
    }
   },
   {
-   "market": "lawec-cryptoleg-2026-12-31",
-   "side": "SELL",
+   "market": "enwc-ussep-nh-2026-09-08-dem-karman",
+   "side": "BUY",
    "pick": {
-    "side": "SELL",
-    "price": 0.53,
-    "size": 100,
-    "capital": 47.0,
+    "side": "BUY",
+    "price": 0.01,
+    "size": 2000,
+    "capital": 20.0,
     "covered": false,
-    "est_day": 0.19,
-    "share": 3.0,
-    "ticks": 0
+    "est_day": 2.383,
+    "share": 38.1,
+    "ticks": 2
    },
    "max": {
-    "side": "SELL",
-    "price": 0.53,
+    "side": "BUY",
+    "price": 0.01,
     "size": 20000,
-    "capital": 9400.0,
+    "capital": 200.0,
     "covered": false,
-    "est_day": 5.392,
-    "share": 86.3
+    "est_day": 5.378,
+    "share": 86.0
    },
    "side_pool": 6.25,
    "tick": 0.01,
-   "best_bid": 0.25,
-   "best_ask": 0.53,
+   "best_bid": 0.03,
+   "best_ask": 0.04,
    "held": 0.0,
-   "risk": null,
+   "risk": "market priced near 0 \u2014 deep bid sits in the exit path (snipe risk)",
    "event_n": 2,
    "already_in": false,
    "prog": {
@@ -4602,6 +4522,46 @@
    }
   },
   {
+   "market": "ewc-usgub-nv-2026-11-03-rep",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.44,
+    "size": 100,
+    "capital": 56.0,
+    "covered": false,
+    "est_day": 0.177,
+    "share": 2.8,
+    "ticks": 0
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.44,
+    "size": 20000,
+    "capital": 11200.0,
+    "covered": false,
+    "est_day": 5.334,
+    "share": 85.3
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.43,
+   "best_ask": 0.44,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "opdc-zelenskyy-presuk-2026-12-31",
    "side": "BUY",
    "pick": {
@@ -4642,6 +4602,46 @@
    }
   },
   {
+   "market": "lawec-cryptoleg-2026-12-31",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.53,
+    "size": 100,
+    "capital": 47.0,
+    "covered": false,
+    "est_day": 0.173,
+    "share": 2.8,
+    "ticks": 0
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.53,
+    "size": 20000,
+    "capital": 9400.0,
+    "covered": false,
+    "est_day": 5.318,
+    "share": 85.1
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.25,
+   "best_ask": 0.53,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "dipcc-us-iran-contnts-2026--enrmor",
    "side": "BUY",
    "pick": {
@@ -4660,7 +4660,7 @@
     "size": 20000,
     "capital": 4800.0,
     "covered": false,
-    "est_day": 5.306,
+    "est_day": 5.305,
     "share": 84.9
    },
    "side_pool": 6.25,
@@ -4740,7 +4740,7 @@
     "size": 20000,
     "capital": 4000.0,
     "covered": false,
-    "est_day": 5.272,
+    "est_day": 5.27,
     "share": 84.3
    },
    "side_pool": 6.25,
@@ -4759,46 +4759,6 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
-   }
-  },
-  {
-   "market": "enwc-usgubp-fl-2026-08-18-rep-byrdon",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.97,
-    "size": 500,
-    "capital": 15.0,
-    "covered": false,
-    "est_day": 0.189,
-    "share": 1.1,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.97,
-    "size": 20000,
-    "capital": 600.0,
-    "covered": false,
-    "est_day": 5.24,
-    "share": 31.4
-   },
-   "side_pool": 16.67,
-   "tick": 0.01,
-   "best_bid": 0.95,
-   "best_ask": 0.96,
-   "held": 0.0,
-   "risk": "resolves ~2026-08-18 (11d); near-certain outcome \u2014 a resting ask will get lifted",
-   "event_n": 3,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 3,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
    }
   },
   {
@@ -4850,7 +4810,7 @@
     "size": 100,
     "capital": 63.0,
     "covered": false,
-    "est_day": 0.152,
+    "est_day": 0.151,
     "share": 2.4,
     "ticks": 0
    },
@@ -4860,7 +4820,7 @@
     "size": 20000,
     "capital": 12600.0,
     "covered": false,
-    "est_day": 5.203,
+    "est_day": 5.202,
     "share": 83.2
    },
    "side_pool": 6.25,
@@ -4930,8 +4890,8 @@
     "size": 100,
     "capital": 74.0,
     "covered": false,
-    "est_day": 0.516,
-    "share": 8.3,
+    "est_day": 0.509,
+    "share": 8.1,
     "ticks": 1
    },
    "max": {
@@ -4940,8 +4900,8 @@
     "size": 20000,
     "capital": 14600.0,
     "covered": false,
-    "est_day": 5.113,
-    "share": 81.8
+    "est_day": 5.1,
+    "share": 81.6
    },
    "side_pool": 6.25,
    "tick": 0.01,
@@ -5002,46 +4962,6 @@
    }
   },
   {
-   "market": "enwc-ussep-ma-2026-09-01-dem-setmou",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.14,
-    "size": 200,
-    "capital": 28.0,
-    "covered": false,
-    "est_day": 0.261,
-    "share": 4.2,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.14,
-    "size": 20000,
-    "capital": 2800.0,
-    "covered": false,
-    "est_day": 5.085,
-    "share": 81.4
-   },
-   "side_pool": 6.25,
-   "tick": 0.01,
-   "best_bid": 0.15,
-   "best_ask": 0.24,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
    "market": "enwc-ussep-nh-2026-09-01-rep-johsun",
    "side": "BUY",
    "pick": {
@@ -5061,12 +4981,12 @@
     "capital": 19000.0,
     "covered": false,
     "est_day": 5.059,
-    "share": 81.0
+    "share": 80.9
    },
    "side_pool": 6.25,
    "tick": 0.01,
    "best_bid": 0.95,
-   "best_ask": 0.98,
+   "best_ask": 0.99,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -5082,31 +5002,31 @@
    }
   },
   {
-   "market": "ewc-usse-ia-2026-11-03-rep",
+   "market": "enwc-ussep-nh-2026-09-08-dem-chrpap",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.59,
+    "price": 0.94,
     "size": 200,
-    "capital": 118.0,
+    "capital": 188.0,
     "covered": false,
-    "est_day": 0.254,
-    "share": 4.1,
-    "ticks": 0
+    "est_day": 0.25,
+    "share": 4.0,
+    "ticks": 1
    },
    "max": {
     "side": "BUY",
-    "price": 0.59,
+    "price": 0.94,
     "size": 20000,
-    "capital": 11800.0,
+    "capital": 18800.0,
     "covered": false,
-    "est_day": 5.057,
-    "share": 80.9
+    "est_day": 5.04,
+    "share": 80.6
    },
    "side_pool": 6.25,
    "tick": 0.01,
-   "best_bid": 0.59,
-   "best_ask": 0.6,
+   "best_bid": 0.95,
+   "best_ask": 0.96,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -5166,9 +5086,9 @@
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.08,
+    "price": 0.09,
     "size": 100,
-    "capital": 8.0,
+    "capital": 9.0,
     "covered": false,
     "est_day": 1.025,
     "share": 16.4,
@@ -5176,17 +5096,17 @@
    },
    "max": {
     "side": "BUY",
-    "price": 0.07,
+    "price": 0.08,
     "size": 20000,
-    "capital": 1400.0,
+    "capital": 1600.0,
     "covered": false,
     "est_day": 4.98,
     "share": 79.7
    },
    "side_pool": 6.25,
    "tick": 0.01,
-   "best_bid": 0.09,
-   "best_ask": 0.96,
+   "best_bid": 0.1,
+   "best_ask": 0.97,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -5282,86 +5202,6 @@
    }
   },
   {
-   "market": "enwc-ussep-nh-2026-09-08-dem-chrpap",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.94,
-    "size": 200,
-    "capital": 188.0,
-    "covered": false,
-    "est_day": 0.213,
-    "share": 3.4,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.94,
-    "size": 20000,
-    "capital": 18800.0,
-    "covered": false,
-    "est_day": 4.871,
-    "share": 77.9
-   },
-   "side_pool": 6.25,
-   "tick": 0.01,
-   "best_bid": 0.95,
-   "best_ask": 0.96,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "ewc-usgub-nv-2026-11-03-rep",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.44,
-    "size": 200,
-    "capital": 112.0,
-    "covered": false,
-    "est_day": 0.203,
-    "share": 3.2,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.44,
-    "size": 20000,
-    "capital": 11200.0,
-    "covered": false,
-    "est_day": 4.816,
-    "share": 77.1
-   },
-   "side_pool": 6.25,
-   "tick": 0.01,
-   "best_bid": 0.43,
-   "best_ask": 0.44,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
    "market": "ewc-usgub-ks-2026-11-03-dem",
    "side": "SELL",
    "pick": {
@@ -5371,7 +5211,7 @@
     "capital": 152.0,
     "covered": false,
     "est_day": 0.197,
-    "share": 3.2,
+    "share": 3.1,
     "ticks": 0
    },
    "max": {
@@ -5402,6 +5242,46 @@
    }
   },
   {
+   "market": "ewc-usgub-wi-2026-11-03-rep",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.6,
+    "size": 200,
+    "capital": 80.0,
+    "covered": false,
+    "est_day": 0.196,
+    "share": 3.1,
+    "ticks": 0
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.6,
+    "size": 20000,
+    "capital": 8000.0,
+    "covered": false,
+    "est_day": 4.774,
+    "share": 76.4
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.59,
+   "best_ask": 0.6,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "ewc-usgub-wi-2026-11-03-dem",
    "side": "BUY",
    "pick": {
@@ -5410,7 +5290,7 @@
     "size": 200,
     "capital": 78.0,
     "covered": false,
-    "est_day": 0.195,
+    "est_day": 0.194,
     "share": 3.1,
     "ticks": 1
    },
@@ -5420,13 +5300,93 @@
     "size": 20000,
     "capital": 7800.0,
     "covered": false,
-    "est_day": 4.768,
-    "share": 76.3
+    "est_day": 4.764,
+    "share": 76.2
    },
    "side_pool": 6.25,
    "tick": 0.01,
    "best_bid": 0.4,
    "best_ask": 0.41,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "ewc-usse-ia-2026-11-03-rep",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.59,
+    "size": 200,
+    "capital": 118.0,
+    "covered": false,
+    "est_day": 0.191,
+    "share": 3.1,
+    "ticks": 0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.59,
+    "size": 20000,
+    "capital": 11800.0,
+    "covered": false,
+    "est_day": 4.745,
+    "share": 75.9
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.59,
+   "best_ask": 0.6,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "enwc-ussep-nh-2026-09-01-rep-scobro",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.05,
+    "size": 1000,
+    "capital": 50.0,
+    "covered": false,
+    "est_day": 0.82,
+    "share": 13.1,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.05,
+    "size": 20000,
+    "capital": 1000.0,
+    "covered": false,
+    "est_day": 4.696,
+    "share": 75.1
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.06,
+   "best_ask": 0.07,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -5482,71 +5442,31 @@
    }
   },
   {
-   "market": "ewc-usgub-wi-2026-11-03-rep",
+   "market": "ewc-usgub-ks-2026-11-03-rep",
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.6,
+    "price": 0.78,
     "size": 200,
-    "capital": 80.0,
+    "capital": 44.0,
     "covered": false,
-    "est_day": 0.176,
-    "share": 2.8,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.6,
-    "size": 20000,
-    "capital": 8000.0,
-    "covered": false,
-    "est_day": 4.649,
-    "share": 74.4
-   },
-   "side_pool": 6.25,
-   "tick": 0.01,
-   "best_bid": 0.59,
-   "best_ask": 0.6,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "ewc-usse-nh-2026-11-03-dem",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.88,
-    "size": 200,
-    "capital": 24.0,
-    "covered": false,
-    "est_day": 0.159,
-    "share": 2.5,
+    "est_day": 0.18,
+    "share": 2.9,
     "ticks": 1
    },
    "max": {
     "side": "SELL",
-    "price": 0.88,
+    "price": 0.78,
     "size": 20000,
-    "capital": 2400.0,
+    "capital": 4400.0,
     "covered": false,
-    "est_day": 4.516,
-    "share": 72.3
+    "est_day": 4.671,
+    "share": 74.7
    },
    "side_pool": 6.25,
    "tick": 0.01,
-   "best_bid": 0.86,
-   "best_ask": 0.87,
+   "best_bid": 0.76,
+   "best_ask": 0.77,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -5570,8 +5490,8 @@
     "size": 200,
     "capital": 70.0,
     "covered": false,
-    "est_day": 0.157,
-    "share": 2.5,
+    "est_day": 0.173,
+    "share": 2.8,
     "ticks": 0
    },
    "max": {
@@ -5580,8 +5500,8 @@
     "size": 20000,
     "capital": 7000.0,
     "covered": false,
-    "est_day": 4.507,
-    "share": 72.1
+    "est_day": 4.622,
+    "share": 74.0
    },
    "side_pool": 6.25,
    "tick": 0.01,
@@ -5610,8 +5530,8 @@
     "size": 200,
     "capital": 110.0,
     "covered": false,
-    "est_day": 0.152,
-    "share": 2.4,
+    "est_day": 0.172,
+    "share": 2.8,
     "ticks": 1
    },
    "max": {
@@ -5620,13 +5540,93 @@
     "size": 20000,
     "capital": 11000.0,
     "covered": false,
-    "est_day": 4.456,
-    "share": 71.3
+    "est_day": 4.621,
+    "share": 73.9
    },
    "side_pool": 6.25,
    "tick": 0.01,
    "best_bid": 0.56,
    "best_ask": 0.57,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "ewc-usse-nh-2026-11-03-dem",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.88,
+    "size": 200,
+    "capital": 24.0,
+    "covered": false,
+    "est_day": 0.167,
+    "share": 2.7,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.88,
+    "size": 20000,
+    "capital": 2400.0,
+    "covered": false,
+    "est_day": 4.579,
+    "share": 73.3
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.86,
+   "best_ask": 0.87,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "enwc-ussep-nh-2026-09-08-dem-karman",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.05,
+    "size": 200,
+    "capital": 190.0,
+    "covered": false,
+    "est_day": 0.15,
+    "share": 2.4,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.05,
+    "size": 20000,
+    "capital": 19000.0,
+    "covered": false,
+    "est_day": 4.447,
+    "share": 71.1
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.03,
+   "best_ask": 0.04,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -5762,6 +5762,46 @@
    }
   },
   {
+   "market": "ewc-usse-mn-2026-11-03-rep",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.06,
+    "size": 500,
+    "capital": 30.0,
+    "covered": false,
+    "est_day": 0.274,
+    "share": 4.4,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.06,
+    "size": 20000,
+    "capital": 1200.0,
+    "covered": false,
+    "est_day": 4.294,
+    "share": 68.7
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.07,
+   "best_ask": 0.08,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "pic-congress-trump-2026-12-31",
    "side": "SELL",
    "pick": {
@@ -5780,7 +5820,7 @@
     "size": 20000,
     "capital": 18600.0,
     "covered": false,
-    "est_day": 4.231,
+    "est_day": 4.232,
     "share": 33.9
    },
    "side_pool": 12.5,
@@ -5802,31 +5842,71 @@
    }
   },
   {
-   "market": "enwc-ussep-nh-2026-09-01-rep-scobro",
+   "market": "enwc-ussep-ma-2026-09-01-dem-edmark",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.05,
+    "price": 0.75,
     "size": 500,
-    "capital": 25.0,
+    "capital": 375.0,
     "covered": false,
-    "est_day": 0.302,
-    "share": 4.8,
+    "est_day": 0.31,
+    "share": 5.0,
     "ticks": 1
    },
    "max": {
     "side": "BUY",
-    "price": 0.05,
+    "price": 0.75,
     "size": 20000,
-    "capital": 1000.0,
+    "capital": 15000.0,
     "covered": false,
-    "est_day": 4.187,
-    "share": 67.0
+    "est_day": 4.227,
+    "share": 67.6
    },
    "side_pool": 6.25,
    "tick": 0.01,
-   "best_bid": 0.06,
-   "best_ask": 0.07,
+   "best_bid": 0.76,
+   "best_ask": 0.79,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "enwc-ussep-ma-2026-09-01-dem-setmou",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.25,
+    "size": 500,
+    "capital": 375.0,
+    "covered": false,
+    "est_day": 0.298,
+    "share": 4.8,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.25,
+    "size": 20000,
+    "capital": 15000.0,
+    "covered": false,
+    "est_day": 4.168,
+    "share": 66.7
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.15,
+   "best_ask": 0.24,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -5882,31 +5962,31 @@
    }
   },
   {
-   "market": "enwc-ussep-ma-2026-09-01-dem-edmark",
+   "market": "enwc-ussep-ma-2026-09-01-dem-setmou",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.75,
+    "price": 0.14,
     "size": 500,
-    "capital": 375.0,
+    "capital": 70.0,
     "covered": false,
-    "est_day": 0.28,
+    "est_day": 0.284,
     "share": 4.5,
     "ticks": 1
    },
    "max": {
     "side": "BUY",
-    "price": 0.75,
+    "price": 0.14,
     "size": 20000,
-    "capital": 15000.0,
+    "capital": 2800.0,
     "covered": false,
-    "est_day": 4.081,
-    "share": 65.3
+    "est_day": 4.1,
+    "share": 65.6
    },
    "side_pool": 6.25,
    "tick": 0.01,
-   "best_bid": 0.76,
-   "best_ask": 0.79,
+   "best_bid": 0.15,
+   "best_ask": 0.24,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -5947,46 +6027,6 @@
    "tick": 0.01,
    "best_bid": 0.15,
    "best_ask": 0.16,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "ewc-usse-mn-2026-11-03-rep",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.06,
-    "size": 500,
-    "capital": 30.0,
-    "covered": false,
-    "est_day": 0.274,
-    "share": 4.4,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.06,
-    "size": 20000,
-    "capital": 1200.0,
-    "covered": false,
-    "est_day": 4.046,
-    "share": 64.7
-   },
-   "side_pool": 6.25,
-   "tick": 0.01,
-   "best_bid": 0.07,
-   "best_ask": 0.08,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -6050,7 +6090,7 @@
     "size": 500,
     "capital": 90.0,
     "covered": false,
-    "est_day": 0.268,
+    "est_day": 0.271,
     "share": 4.3,
     "ticks": 1
    },
@@ -6060,8 +6100,8 @@
     "size": 20000,
     "capital": 3600.0,
     "covered": false,
-    "est_day": 4.011,
-    "share": 64.2
+    "est_day": 4.026,
+    "share": 64.4
    },
    "side_pool": 6.25,
    "tick": 0.01,
@@ -6162,46 +6202,6 @@
    }
   },
   {
-   "market": "scc-hrep-rep-2026-11-03-gte210",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.5,
-    "size": 100,
-    "capital": 50.0,
-    "covered": false,
-    "est_day": 0.333,
-    "share": 8.0,
-    "ticks": 2
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.5,
-    "size": 20000,
-    "capital": 10000.0,
-    "covered": false,
-    "est_day": 3.94,
-    "share": 94.6
-   },
-   "side_pool": 4.17,
-   "tick": 0.01,
-   "best_bid": 0.37,
-   "best_ask": 0.48,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 12,
-   "already_in": true,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 12,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
    "market": "scc-hrep-rep-2026-11-03-gte225",
    "side": "SELL",
    "pick": {
@@ -6225,48 +6225,8 @@
    },
    "side_pool": 4.17,
    "tick": 0.01,
-   "best_bid": 0.09,
+   "best_bid": 0.1,
    "best_ask": 0.13,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 12,
-   "already_in": true,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 12,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte210",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.34,
-    "size": 100,
-    "capital": 34.0,
-    "covered": false,
-    "est_day": 0.309,
-    "share": 7.4,
-    "ticks": 3
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.34,
-    "size": 20000,
-    "capital": 6800.0,
-    "covered": false,
-    "est_day": 3.922,
-    "share": 94.1
-   },
-   "side_pool": 4.17,
-   "tick": 0.01,
-   "best_bid": 0.37,
-   "best_ask": 0.48,
    "held": 0.0,
    "risk": null,
    "event_n": 12,
@@ -6322,31 +6282,31 @@
    }
   },
   {
-   "market": "scc-hrep-rep-2026-11-03-gte195",
-   "side": "SELL",
+   "market": "scc-hrep-rep-2026-11-03-gte225",
+   "side": "BUY",
    "pick": {
-    "side": "SELL",
-    "price": 0.77,
+    "side": "BUY",
+    "price": 0.08,
     "size": 100,
-    "capital": 23.0,
+    "capital": 8.0,
     "covered": false,
-    "est_day": 0.283,
-    "share": 6.8,
+    "est_day": 0.291,
+    "share": 7.0,
     "ticks": 2
    },
    "max": {
-    "side": "SELL",
-    "price": 0.77,
+    "side": "BUY",
+    "price": 0.08,
     "size": 20000,
-    "capital": 4600.0,
+    "capital": 1600.0,
     "covered": false,
-    "est_day": 3.9,
-    "share": 93.6
+    "est_day": 3.907,
+    "share": 93.8
    },
    "side_pool": 4.17,
    "tick": 0.01,
-   "best_bid": 0.22,
-   "best_ask": 0.75,
+   "best_bid": 0.1,
+   "best_ask": 0.13,
    "held": 0.0,
    "risk": null,
    "event_n": 12,
@@ -6399,86 +6359,6 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
-   }
-  },
-  {
-   "market": "ewc-usse-nc-2026-11-03-rep",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.1,
-    "size": 1000,
-    "capital": 900.0,
-    "covered": false,
-    "est_day": 0.227,
-    "share": 0.9,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.1,
-    "size": 20000,
-    "capital": 18000.0,
-    "covered": false,
-    "est_day": 3.871,
-    "share": 15.5
-   },
-   "side_pool": 25.0,
-   "tick": 0.01,
-   "best_bid": 0.08,
-   "best_ask": 0.09,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
-   "market": "ewc-usgub-ks-2026-11-03-dem",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.22,
-    "size": 500,
-    "capital": 110.0,
-    "covered": false,
-    "est_day": 0.238,
-    "share": 3.8,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.22,
-    "size": 20000,
-    "capital": 4400.0,
-    "covered": false,
-    "est_day": 3.829,
-    "share": 61.3
-   },
-   "side_pool": 6.25,
-   "tick": 0.01,
-   "best_bid": 0.23,
-   "best_ask": 0.24,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
    }
   },
   {
@@ -6562,13 +6442,93 @@
    }
   },
   {
+   "market": "scc-hrep-rep-2026-11-03-gte210",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.34,
+    "size": 100,
+    "capital": 34.0,
+    "covered": false,
+    "est_day": 0.211,
+    "share": 5.1,
+    "ticks": 3
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.34,
+    "size": 20000,
+    "capital": 6800.0,
+    "covered": false,
+    "est_day": 3.81,
+    "share": 91.4
+   },
+   "side_pool": 4.17,
+   "tick": 0.01,
+   "best_bid": 0.37,
+   "best_ask": 0.48,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 12,
+   "already_in": true,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 12,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte190",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.63,
+    "size": 100,
+    "capital": 63.0,
+    "covered": false,
+    "est_day": 0.21,
+    "share": 5.0,
+    "ticks": 3
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.63,
+    "size": 20000,
+    "capital": 12600.0,
+    "covered": false,
+    "est_day": 3.807,
+    "share": 91.4
+   },
+   "side_pool": 4.17,
+   "tick": 0.01,
+   "best_bid": 0.66,
+   "best_ask": 0.75,
+   "held": 20.0,
+   "risk": null,
+   "event_n": 12,
+   "already_in": true,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 12,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
    "market": "scc-hrep-rep-2026-11-03-gte195",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.2,
+    "price": 0.22,
     "size": 100,
-    "capital": 20.0,
+    "capital": 22.0,
     "covered": false,
     "est_day": 0.198,
     "share": 4.8,
@@ -6576,16 +6536,16 @@
    },
    "max": {
     "side": "BUY",
-    "price": 0.2,
+    "price": 0.22,
     "size": 20000,
-    "capital": 4000.0,
+    "capital": 4400.0,
     "covered": false,
     "est_day": 3.788,
     "share": 90.9
    },
    "side_pool": 4.17,
    "tick": 0.01,
-   "best_bid": 0.22,
+   "best_bid": 0.24,
    "best_ask": 0.75,
    "held": 0.0,
    "risk": null,
@@ -6646,13 +6606,13 @@
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.18,
-    "size": 100,
-    "capital": 18.0,
+    "price": 0.17,
+    "size": 2000,
+    "capital": 340.0,
     "covered": false,
-    "est_day": 0.186,
-    "share": 4.5,
-    "ticks": 1
+    "est_day": 0.353,
+    "share": 8.5,
+    "ticks": 2
    },
    "max": {
     "side": "BUY",
@@ -6660,8 +6620,8 @@
     "size": 20000,
     "capital": 3600.0,
     "covered": false,
-    "est_day": 3.782,
-    "share": 90.8
+    "est_day": 3.761,
+    "share": 90.3
    },
    "side_pool": 4.17,
    "tick": 0.01,
@@ -6679,6 +6639,46 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
+   }
+  },
+  {
+   "market": "ewc-usse-nc-2026-11-03-rep",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.1,
+    "size": 1000,
+    "capital": 900.0,
+    "covered": false,
+    "est_day": 0.217,
+    "share": 0.9,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.1,
+    "size": 20000,
+    "capital": 18000.0,
+    "covered": false,
+    "est_day": 3.726,
+    "share": 14.9
+   },
+   "side_pool": 25.0,
+   "tick": 0.01,
+   "best_bid": 0.08,
+   "best_ask": 0.09,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
    }
   },
   {
@@ -6842,31 +6842,31 @@
    }
   },
   {
-   "market": "enwc-ussep-ma-2026-09-01-dem-setmou",
+   "market": "ewc-usse-mi-2026-11-03-rep",
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.25,
+    "price": 0.44,
     "size": 500,
-    "capital": 375.0,
+    "capital": 280.0,
     "covered": false,
-    "est_day": 0.216,
+    "est_day": 0.217,
     "share": 3.5,
     "ticks": 1
    },
    "max": {
     "side": "SELL",
-    "price": 0.25,
+    "price": 0.44,
     "size": 20000,
-    "capital": 15000.0,
+    "capital": 11200.0,
     "covered": false,
-    "est_day": 3.682,
-    "share": 58.9
+    "est_day": 3.69,
+    "share": 59.0
    },
    "side_pool": 6.25,
    "tick": 0.01,
-   "best_bid": 0.15,
-   "best_ask": 0.24,
+   "best_bid": 0.42,
+   "best_ask": 0.43,
    "held": 0.0,
    "risk": null,
    "event_n": 2,
@@ -6879,126 +6879,6 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
-   }
-  },
-  {
-   "market": "ewc-usse-ne-2026-11-03-danosb",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.28,
-    "size": 200,
-    "capital": 144.0,
-    "covered": false,
-    "est_day": 0.288,
-    "share": 6.9,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.28,
-    "size": 20000,
-    "capital": 14400.0,
-    "covered": false,
-    "est_day": 3.672,
-    "share": 88.1
-   },
-   "side_pool": 4.17,
-   "tick": 0.01,
-   "best_bid": 0.27,
-   "best_ask": 0.28,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 3,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 3,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "pvwc-housepopw-2026-11-03-rep",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.09,
-    "size": 500,
-    "capital": 45.0,
-    "covered": false,
-    "est_day": 0.211,
-    "share": 3.4,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.09,
-    "size": 20000,
-    "capital": 1800.0,
-    "covered": false,
-    "est_day": 3.646,
-    "share": 58.3
-   },
-   "side_pool": 6.25,
-   "tick": 0.01,
-   "best_bid": 0.1,
-   "best_ask": 0.11,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 2,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte225",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.07,
-    "size": 100,
-    "capital": 7.0,
-    "covered": false,
-    "est_day": 0.611,
-    "share": 14.7,
-    "ticks": 2
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.06,
-    "size": 20000,
-    "capital": 1200.0,
-    "covered": false,
-    "est_day": 3.643,
-    "share": 87.4
-   },
-   "side_pool": 4.17,
-   "tick": 0.01,
-   "best_bid": 0.09,
-   "best_ask": 0.13,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 12,
-   "already_in": true,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 12,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
    }
   },
   {
@@ -7036,46 +6916,6 @@
     "target": 5000.0,
     "pool": 100.0,
     "event_n": 12,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-53",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.29,
-    "size": 100,
-    "capital": 71.0,
-    "covered": false,
-    "est_day": 0.301,
-    "share": 7.8,
-    "ticks": 2
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.29,
-    "size": 20000,
-    "capital": 14200.0,
-    "covered": false,
-    "est_day": 3.637,
-    "share": 94.6
-   },
-   "side_pool": 3.85,
-   "tick": 0.01,
-   "best_bid": 0.09,
-   "best_ask": 0.27,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 13,
-   "already_in": true,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 13,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
@@ -7330,8 +7170,8 @@
     "size": 200,
     "capital": 38.0,
     "covered": false,
-    "est_day": 0.231,
-    "share": 5.5,
+    "est_day": 0.236,
+    "share": 5.7,
     "ticks": 0
    },
    "max": {
@@ -7340,8 +7180,8 @@
     "size": 20000,
     "capital": 3800.0,
     "covered": false,
-    "est_day": 3.559,
-    "share": 85.4
+    "est_day": 3.572,
+    "share": 85.7
    },
    "side_pool": 4.17,
    "tick": 0.01,
@@ -7420,7 +7260,7 @@
     "size": 20000,
     "capital": 14200.0,
     "covered": false,
-    "est_day": 3.524,
+    "est_day": 3.523,
     "share": 84.6
    },
    "side_pool": 4.17,
@@ -7442,13 +7282,13 @@
    }
   },
   {
-   "market": "enwc-usgubp-mn-2026-08-11-rep-kenqua",
+   "market": "ewc-usse-ne-2026-11-03-danosb",
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.03,
+    "price": 0.28,
     "size": 200,
-    "capital": 194.0,
+    "capital": 144.0,
     "covered": false,
     "est_day": 0.214,
     "share": 5.1,
@@ -7456,19 +7296,19 @@
    },
    "max": {
     "side": "SELL",
-    "price": 0.03,
+    "price": 0.28,
     "size": 20000,
-    "capital": 19400.0,
+    "capital": 14400.0,
     "covered": false,
-    "est_day": 3.516,
+    "est_day": 3.517,
     "share": 84.4
    },
    "side_pool": 4.17,
    "tick": 0.01,
-   "best_bid": 0.01,
-   "best_ask": 0.03,
+   "best_bid": 0.27,
+   "best_ask": 0.28,
    "held": 0.0,
-   "risk": "resolves ~2026-08-11 (4d)",
+   "risk": null,
    "event_n": 3,
    "already_in": false,
    "prog": {
@@ -7596,6 +7436,126 @@
     "target": 5000.0,
     "pool": 100.0,
     "event_n": 12,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte195",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.77,
+    "size": 100,
+    "capital": 23.0,
+    "covered": false,
+    "est_day": 0.49,
+    "share": 11.8,
+    "ticks": 2
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.78,
+    "size": 20000,
+    "capital": 4400.0,
+    "covered": false,
+    "est_day": 3.509,
+    "share": 84.2
+   },
+   "side_pool": 4.17,
+   "tick": 0.01,
+   "best_bid": 0.24,
+   "best_ask": 0.75,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 12,
+   "already_in": true,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 12,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
+   "market": "enwc-usgubp-mn-2026-08-11-rep-kenqua",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.03,
+    "size": 200,
+    "capital": 194.0,
+    "covered": false,
+    "est_day": 0.211,
+    "share": 5.1,
+    "ticks": 0
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.03,
+    "size": 20000,
+    "capital": 19400.0,
+    "covered": false,
+    "est_day": 3.508,
+    "share": 84.2
+   },
+   "side_pool": 4.17,
+   "tick": 0.01,
+   "best_bid": 0.01,
+   "best_ask": 0.03,
+   "held": 0.0,
+   "risk": "resolves ~2026-08-11 (4d)",
+   "event_n": 3,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 3,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-53",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.29,
+    "size": 100,
+    "capital": 71.0,
+    "covered": false,
+    "est_day": 0.189,
+    "share": 4.9,
+    "ticks": 2
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.29,
+    "size": 20000,
+    "capital": 14200.0,
+    "covered": false,
+    "est_day": 3.507,
+    "share": 91.2
+   },
+   "side_pool": 3.85,
+   "tick": 0.01,
+   "best_bid": 0.09,
+   "best_ask": 0.27,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 13,
+   "already_in": true,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 13,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
@@ -7740,8 +7700,8 @@
     "size": 20000,
     "capital": 200.0,
     "covered": false,
-    "est_day": 3.461,
-    "share": 83.1
+    "est_day": 3.46,
+    "share": 83.0
    },
    "side_pool": 4.17,
    "tick": 0.01,
@@ -7836,46 +7796,6 @@
     "target": 5000.0,
     "pool": 100.0,
     "event_n": 13,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte190",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.64,
-    "size": 100,
-    "capital": 64.0,
-    "covered": false,
-    "est_day": 0.427,
-    "share": 10.3,
-    "ticks": 2
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.63,
-    "size": 20000,
-    "capital": 12600.0,
-    "covered": false,
-    "est_day": 3.419,
-    "share": 82.1
-   },
-   "side_pool": 4.17,
-   "tick": 0.01,
-   "best_bid": 0.66,
-   "best_ask": 0.75,
-   "held": 20.0,
-   "risk": null,
-   "event_n": 12,
-   "already_in": true,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 12,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
@@ -8002,6 +7922,46 @@
    }
   },
   {
+   "market": "enwc-ussep-nh-2026-09-01-rep-johsun",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 500,
+    "capital": 5.0,
+    "covered": false,
+    "est_day": 0.181,
+    "share": 2.9,
+    "ticks": 0
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 20000,
+    "capital": 200.0,
+    "covered": false,
+    "est_day": 3.4,
+    "share": 54.4
+   },
+   "side_pool": 6.25,
+   "tick": 0.01,
+   "best_bid": 0.95,
+   "best_ask": 0.99,
+   "held": 0.0,
+   "risk": "near-certain outcome \u2014 a resting ask will get lifted",
+   "event_n": 2,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 2,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "ewc-usse-mn-2026-11-03-dem",
    "side": "BUY",
    "pick": {
@@ -8046,13 +8006,13 @@
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.86,
-    "size": 100,
-    "capital": 14.0,
+    "price": 0.88,
+    "size": 2000,
+    "capital": 240.0,
     "covered": false,
-    "est_day": 0.385,
-    "share": 9.2,
-    "ticks": 1
+    "est_day": 0.314,
+    "share": 7.5,
+    "ticks": 3
    },
    "max": {
     "side": "SELL",
@@ -8140,7 +8100,7 @@
     "size": 20000,
     "capital": 11800.0,
     "covered": false,
-    "est_day": 3.343,
+    "est_day": 3.342,
     "share": 53.5
    },
    "side_pool": 6.25,
@@ -8159,6 +8119,86 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
+   }
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte220",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.16,
+    "size": 100,
+    "capital": 84.0,
+    "covered": false,
+    "est_day": 0.378,
+    "share": 9.1,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.17,
+    "size": 20000,
+    "capital": 16600.0,
+    "covered": false,
+    "est_day": 3.333,
+    "share": 80.0
+   },
+   "side_pool": 4.17,
+   "tick": 0.01,
+   "best_bid": 0.12,
+   "best_ask": 0.15,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 12,
+   "already_in": true,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 12,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte210",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.5,
+    "size": 100,
+    "capital": 50.0,
+    "covered": false,
+    "est_day": 0.378,
+    "share": 9.1,
+    "ticks": 2
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.51,
+    "size": 20000,
+    "capital": 9800.0,
+    "covered": false,
+    "est_day": 3.332,
+    "share": 80.0
+   },
+   "side_pool": 4.17,
+   "tick": 0.01,
+   "best_bid": 0.37,
+   "best_ask": 0.48,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 12,
+   "already_in": true,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 12,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
    }
   },
   {
@@ -8202,73 +8242,33 @@
    }
   },
   {
-   "market": "scc-hrep-rep-2026-11-03-gte220",
-   "side": "SELL",
+   "market": "pvwc-housepopw-2026-11-03-rep",
+   "side": "BUY",
    "pick": {
-    "side": "SELL",
-    "price": 0.16,
-    "size": 100,
-    "capital": 84.0,
-    "covered": false,
-    "est_day": 0.375,
-    "share": 9.0,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.17,
-    "size": 20000,
-    "capital": 16600.0,
-    "covered": false,
-    "est_day": 3.326,
-    "share": 79.8
-   },
-   "side_pool": 4.17,
-   "tick": 0.01,
-   "best_bid": 0.12,
-   "best_ask": 0.15,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 12,
-   "already_in": true,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 12,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
-   "market": "enwc-ussep-nh-2026-09-01-rep-johsun",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.99,
+    "side": "BUY",
+    "price": 0.09,
     "size": 500,
-    "capital": 5.0,
+    "capital": 45.0,
     "covered": false,
-    "est_day": 0.172,
+    "est_day": 0.173,
     "share": 2.8,
     "ticks": 1
    },
    "max": {
-    "side": "SELL",
-    "price": 0.99,
+    "side": "BUY",
+    "price": 0.09,
     "size": 20000,
-    "capital": 200.0,
+    "capital": 1800.0,
     "covered": false,
-    "est_day": 3.319,
-    "share": 53.1
+    "est_day": 3.325,
+    "share": 53.2
    },
    "side_pool": 6.25,
    "tick": 0.01,
-   "best_bid": 0.95,
-   "best_ask": 0.98,
+   "best_bid": 0.1,
+   "best_ask": 0.11,
    "held": 0.0,
-   "risk": "near-certain outcome \u2014 a resting ask will get lifted",
+   "risk": null,
    "event_n": 2,
    "already_in": false,
    "prog": {
@@ -8319,6 +8319,46 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
+   }
+  },
+  {
+   "market": "enwc-usgubp-fl-2026-08-18-rep-byrdon",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.95,
+    "size": 1000,
+    "capital": 950.0,
+    "covered": false,
+    "est_day": 0.204,
+    "share": 1.2,
+    "ticks": 0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.95,
+    "size": 20000,
+    "capital": 19000.0,
+    "covered": false,
+    "est_day": 3.304,
+    "share": 19.8
+   },
+   "side_pool": 16.67,
+   "tick": 0.01,
+   "best_bid": 0.95,
+   "best_ask": 0.96,
+   "held": 0.0,
+   "risk": "resolves ~2026-08-18 (11d)",
+   "event_n": 3,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 3,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
    }
   },
   {
@@ -8402,46 +8442,6 @@
    }
   },
   {
-   "market": "enwc-usgubp-fl-2026-08-18-rep-byrdon",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.95,
-    "size": 1000,
-    "capital": 950.0,
-    "covered": false,
-    "est_day": 0.202,
-    "share": 1.2,
-    "ticks": 0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.95,
-    "size": 20000,
-    "capital": 19000.0,
-    "covered": false,
-    "est_day": 3.281,
-    "share": 19.7
-   },
-   "side_pool": 16.67,
-   "tick": 0.01,
-   "best_bid": 0.95,
-   "best_ask": 0.96,
-   "held": 0.0,
-   "risk": "resolves ~2026-08-18 (11d)",
-   "event_n": 3,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 3,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
    "market": "ewc-usmayor-losang-2026-11-03-karbas",
    "side": "BUY",
    "pick": {
@@ -8460,8 +8460,8 @@
     "size": 20000,
     "capital": 12600.0,
     "covered": false,
-    "est_day": 3.236,
-    "share": 51.8
+    "est_day": 3.234,
+    "share": 51.7
    },
    "side_pool": 6.25,
    "tick": 0.01,
@@ -8490,7 +8490,7 @@
     "size": 500,
     "capital": 135.0,
     "covered": false,
-    "est_day": 0.156,
+    "est_day": 0.155,
     "share": 2.5,
     "ticks": 1
    },
@@ -8500,7 +8500,7 @@
     "size": 20000,
     "capital": 5400.0,
     "covered": false,
-    "est_day": 3.158,
+    "est_day": 3.156,
     "share": 50.5
    },
    "side_pool": 6.25,
@@ -8596,46 +8596,6 @@
     "target": 2000.0,
     "pool": 25.0,
     "event_n": 2,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "usgcc-aliens-12-31-2026",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.06,
-    "size": 1000,
-    "capital": 60.0,
-    "covered": false,
-    "est_day": 0.197,
-    "share": 1.6,
-    "ticks": 0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.06,
-    "size": 20000,
-    "capital": 1200.0,
-    "covered": false,
-    "est_day": 3.034,
-    "share": 24.3
-   },
-   "side_pool": 12.5,
-   "tick": 0.01,
-   "best_bid": 0.06,
-   "best_ask": 0.07,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 1,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 1,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
@@ -8820,8 +8780,8 @@
     "size": 20000,
     "capital": 11200.0,
     "covered": false,
-    "est_day": 2.931,
-    "share": 46.9
+    "est_day": 2.927,
+    "share": 46.8
    },
    "side_pool": 6.25,
    "tick": 0.01,
@@ -8900,7 +8860,7 @@
     "size": 20000,
     "capital": 8400.0,
     "covered": false,
-    "est_day": 2.917,
+    "est_day": 2.916,
     "share": 46.7
    },
    "side_pool": 6.25,
@@ -8919,6 +8879,46 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
+   }
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte230",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.05,
+    "size": 500,
+    "capital": 25.0,
+    "covered": false,
+    "est_day": 0.22,
+    "share": 5.3,
+    "ticks": 0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.05,
+    "size": 20000,
+    "capital": 1000.0,
+    "covered": false,
+    "est_day": 2.875,
+    "share": 69.0
+   },
+   "side_pool": 4.17,
+   "tick": 0.01,
+   "best_bid": 0.05,
+   "best_ask": 0.07,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 12,
+   "already_in": true,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 12,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
    }
   },
   {
@@ -8956,46 +8956,6 @@
     "target": 5000.0,
     "pool": 100.0,
     "event_n": 13,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte230",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.05,
-    "size": 500,
-    "capital": 25.0,
-    "covered": false,
-    "est_day": 0.21,
-    "share": 5.0,
-    "ticks": 0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.05,
-    "size": 20000,
-    "capital": 1000.0,
-    "covered": false,
-    "est_day": 2.833,
-    "share": 68.0
-   },
-   "side_pool": 4.17,
-   "tick": 0.01,
-   "best_bid": 0.05,
-   "best_ask": 0.07,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 12,
-   "already_in": true,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 12,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
@@ -9042,6 +9002,86 @@
    }
   },
   {
+   "market": "usgcc-aliens-12-31-2026",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.06,
+    "size": 1000,
+    "capital": 60.0,
+    "covered": false,
+    "est_day": 0.174,
+    "share": 1.4,
+    "ticks": 0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.06,
+    "size": 20000,
+    "capital": 1200.0,
+    "covered": false,
+    "est_day": 2.757,
+    "share": 22.1
+   },
+   "side_pool": 12.5,
+   "tick": 0.01,
+   "best_bid": 0.06,
+   "best_ask": 0.07,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 1,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 1,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-47",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.16,
+    "size": 500,
+    "capital": 420.0,
+    "covered": false,
+    "est_day": 0.224,
+    "share": 5.8,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.16,
+    "size": 20000,
+    "capital": 16800.0,
+    "covered": false,
+    "est_day": 2.739,
+    "share": 71.2
+   },
+   "side_pool": 3.85,
+   "tick": 0.01,
+   "best_bid": 0.13,
+   "best_ask": 0.15,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 13,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 13,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
    "market": "scc-senate-gop-2026-11-03-55",
    "side": "SELL",
    "pick": {
@@ -9067,46 +9107,6 @@
    "tick": 0.01,
    "best_bid": 0.01,
    "best_ask": 0.05,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 13,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 13,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-47",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.16,
-    "size": 500,
-    "capital": 420.0,
-    "covered": false,
-    "est_day": 0.2,
-    "share": 5.2,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.16,
-    "size": 20000,
-    "capital": 16800.0,
-    "covered": false,
-    "est_day": 2.64,
-    "share": 68.7
-   },
-   "side_pool": 3.85,
-   "tick": 0.01,
-   "best_bid": 0.13,
-   "best_ask": 0.15,
    "held": 0.0,
    "risk": null,
    "event_n": 13,
@@ -9242,6 +9242,46 @@
    }
   },
   {
+   "market": "scc-senate-gop-2026-11-03-54",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.04,
+    "size": 500,
+    "capital": 20.0,
+    "covered": false,
+    "est_day": 0.179,
+    "share": 4.7,
+    "ticks": 0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.04,
+    "size": 20000,
+    "capital": 800.0,
+    "covered": false,
+    "est_day": 2.543,
+    "share": 66.1
+   },
+   "side_pool": 3.85,
+   "tick": 0.01,
+   "best_bid": 0.04,
+   "best_ask": 0.08,
+   "held": 1.0,
+   "risk": null,
+   "event_n": 13,
+   "already_in": true,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 13,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
    "market": "dipcc-us-iran-contnts-2026--enrcap",
    "side": "BUY",
    "pick": {
@@ -9300,7 +9340,7 @@
     "size": 20000,
     "capital": 3200.0,
     "covered": false,
-    "est_day": 2.536,
+    "est_day": 2.535,
     "share": 40.6
    },
    "side_pool": 6.25,
@@ -9439,46 +9479,6 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
-   }
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-gte57",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.1,
-    "size": 500,
-    "capital": 450.0,
-    "covered": false,
-    "est_day": 0.16,
-    "share": 4.2,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.1,
-    "size": 20000,
-    "capital": 18000.0,
-    "covered": false,
-    "est_day": 2.442,
-    "share": 63.5
-   },
-   "side_pool": 3.85,
-   "tick": 0.01,
-   "best_bid": 0.08,
-   "best_ask": 0.09,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 13,
-   "already_in": true,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 13,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
    }
   },
   {
@@ -9682,6 +9682,46 @@
    }
   },
   {
+   "market": "scc-senate-gop-2026-11-03-gte57",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.1,
+    "size": 1000,
+    "capital": 900.0,
+    "covered": false,
+    "est_day": 0.275,
+    "share": 7.1,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.1,
+    "size": 20000,
+    "capital": 18000.0,
+    "covered": false,
+    "est_day": 2.332,
+    "share": 60.6
+   },
+   "side_pool": 3.85,
+   "tick": 0.01,
+   "best_bid": 0.08,
+   "best_ask": 0.09,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 13,
+   "already_in": true,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 13,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
    "market": "lawec-saveact-2026-12-31",
    "side": "SELL",
    "pick": {
@@ -9759,46 +9799,6 @@
     "start": "2026-08-05T00:00:00Z",
     "pid": "geopolitics_20260804",
     "tier": null
-   }
-  },
-  {
-   "market": "ewc-usgub-mi-2026-11-03-dem",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.84,
-    "size": 1000,
-    "capital": 160.0,
-    "covered": false,
-    "est_day": 0.236,
-    "share": 5.7,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.84,
-    "size": 20000,
-    "capital": 3200.0,
-    "covered": false,
-    "est_day": 2.276,
-    "share": 54.6
-   },
-   "side_pool": 4.17,
-   "tick": 0.01,
-   "best_bid": 0.83,
-   "best_ask": 0.84,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 3,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 3,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
    }
   },
   {
@@ -9962,31 +9962,71 @@
    }
   },
   {
-   "market": "mlaec-swepm-2026-09-13-magand",
-   "side": "BUY",
+   "market": "ewc-usgub-mi-2026-11-03-dem",
+   "side": "SELL",
    "pick": {
-    "side": "BUY",
-    "price": 0.47,
-    "size": 200,
-    "capital": 94.0,
+    "side": "SELL",
+    "price": 0.84,
+    "size": 1000,
+    "capital": 160.0,
     "covered": false,
-    "est_day": 0.186,
-    "share": 7.4,
+    "est_day": 0.224,
+    "share": 5.4,
     "ticks": 0
    },
    "max": {
-    "side": "BUY",
-    "price": 0.47,
+    "side": "SELL",
+    "price": 0.84,
     "size": 20000,
-    "capital": 9400.0,
+    "capital": 3200.0,
     "covered": false,
-    "est_day": 2.223,
-    "share": 88.9
+    "est_day": 2.215,
+    "share": 53.2
+   },
+   "side_pool": 4.17,
+   "tick": 0.01,
+   "best_bid": 0.83,
+   "best_ask": 0.84,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 3,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 3,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "mlaec-swepm-2026-09-13-noodad",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 2000,
+    "capital": 20.0,
+    "covered": false,
+    "est_day": 0.84,
+    "share": 33.6,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 20000,
+    "capital": 200.0,
+    "covered": false,
+    "est_day": 2.088,
+    "share": 83.5
    },
    "side_pool": 2.5,
    "tick": 0.01,
-   "best_bid": 0.47,
-   "best_ask": 0.81,
+   "best_bid": 0.02,
+   "best_ask": 0.39,
    "held": 0.0,
    "risk": null,
    "event_n": 5,
@@ -10060,7 +10100,7 @@
     "size": 20000,
     "capital": 5600.0,
     "covered": false,
-    "est_day": 1.959,
+    "est_day": 1.958,
     "share": 47.0
    },
    "side_pool": 4.17,
@@ -10163,46 +10203,6 @@
   },
   {
    "market": "enwc-usgubp-wi-2026-08-11-dem-davcro",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.1,
-    "size": 200,
-    "capital": 20.0,
-    "covered": false,
-    "est_day": 0.188,
-    "share": 9.0,
-    "ticks": 0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.1,
-    "size": 20000,
-    "capital": 2000.0,
-    "covered": false,
-    "est_day": 1.893,
-    "share": 90.9
-   },
-   "side_pool": 2.08,
-   "tick": 0.01,
-   "best_bid": 0.1,
-   "best_ask": 0.11,
-   "held": 0.0,
-   "risk": "resolves ~2026-08-11 (4d)",
-   "event_n": 6,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 6,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "enwc-usgubp-wi-2026-08-11-dem-davcro",
    "side": "SELL",
    "pick": {
     "side": "SELL",
@@ -10242,71 +10242,111 @@
    }
   },
   {
-   "market": "scc-senate-gop-2026-11-03-54",
+   "market": "mlaec-swepm-2026-09-13-ulfkri",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.04,
-    "size": 1000,
-    "capital": 40.0,
+    "price": 0.06,
+    "size": 500,
+    "capital": 30.0,
     "covered": false,
-    "est_day": 0.173,
-    "share": 4.5,
+    "est_day": 0.159,
+    "share": 6.3,
     "ticks": 0
    },
    "max": {
     "side": "BUY",
-    "price": 0.04,
+    "price": 0.06,
     "size": 20000,
-    "capital": 800.0,
+    "capital": 1200.0,
     "covered": false,
-    "est_day": 1.866,
-    "share": 48.5
+    "est_day": 1.826,
+    "share": 73.0
    },
-   "side_pool": 3.85,
+   "side_pool": 2.5,
    "tick": 0.01,
-   "best_bid": 0.04,
-   "best_ask": 0.08,
-   "held": 1.0,
+   "best_bid": 0.06,
+   "best_ask": 0.19,
+   "held": 0.0,
    "risk": null,
-   "event_n": 13,
-   "already_in": true,
+   "event_n": 5,
+   "already_in": false,
    "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 13,
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 5,
     "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
+    "pid": "politics_low_20260727",
+    "tier": "low"
    }
   },
   {
-   "market": "mlaec-swepm-2026-09-13-noodad",
+   "market": "enwc-usgubp-wi-2026-08-11-dem-davcro",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.01,
-    "size": 1000,
-    "capital": 10.0,
+    "price": 0.09,
+    "size": 500,
+    "capital": 45.0,
     "covered": false,
-    "est_day": 0.267,
-    "share": 10.7,
+    "est_day": 0.282,
+    "share": 13.5,
     "ticks": 1
    },
    "max": {
     "side": "BUY",
-    "price": 0.01,
+    "price": 0.09,
     "size": 20000,
-    "capital": 200.0,
+    "capital": 1800.0,
     "covered": false,
-    "est_day": 1.762,
-    "share": 70.5
+    "est_day": 1.796,
+    "share": 86.2
+   },
+   "side_pool": 2.08,
+   "tick": 0.01,
+   "best_bid": 0.1,
+   "best_ask": 0.11,
+   "held": 0.0,
+   "risk": "resolves ~2026-08-11 (4d)",
+   "event_n": 6,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 6,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "mlaec-swepm-2026-09-13-magand",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.47,
+    "size": 1000,
+    "capital": 470.0,
+    "covered": false,
+    "est_day": 0.274,
+    "share": 11.0,
+    "ticks": 0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.47,
+    "size": 20000,
+    "capital": 9400.0,
+    "covered": false,
+    "est_day": 1.779,
+    "share": 71.1
    },
    "side_pool": 2.5,
    "tick": 0.01,
-   "best_bid": 0.02,
-   "best_ask": 0.39,
+   "best_bid": 0.47,
+   "best_ask": 0.81,
    "held": 0.0,
    "risk": null,
    "event_n": 5,
@@ -10340,7 +10380,7 @@
     "size": 20000,
     "capital": 18600.0,
     "covered": false,
-    "est_day": 1.749,
+    "est_day": 1.748,
     "share": 28.0
    },
    "side_pool": 6.25,
@@ -10450,7 +10490,7 @@
     "size": 2000,
     "capital": 280.0,
     "covered": false,
-    "est_day": 0.274,
+    "est_day": 0.275,
     "share": 6.6,
     "ticks": 1
    },
@@ -10490,8 +10530,8 @@
     "size": 500,
     "capital": 445.0,
     "covered": false,
-    "est_day": 0.201,
-    "share": 9.7,
+    "est_day": 0.204,
+    "share": 9.8,
     "ticks": 1
    },
    "max": {
@@ -10500,7 +10540,7 @@
     "size": 20000,
     "capital": 17800.0,
     "covered": false,
-    "est_day": 1.693,
+    "est_day": 1.694,
     "share": 81.3
    },
    "side_pool": 2.08,
@@ -10570,7 +10610,7 @@
     "size": 2000,
     "capital": 1920.0,
     "covered": false,
-    "est_day": 0.176,
+    "est_day": 0.177,
     "share": 1.1,
     "ticks": 0
    },
@@ -10580,8 +10620,8 @@
     "size": 20000,
     "capital": 19200.0,
     "covered": false,
-    "est_day": 1.607,
-    "share": 9.6
+    "est_day": 1.613,
+    "share": 9.7
    },
    "side_pool": 16.67,
    "tick": 0.01,
@@ -10882,46 +10922,6 @@
    }
   },
   {
-   "market": "cranc-uspres28-12-31-2026-jonoss",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.39,
-    "size": 200,
-    "capital": 122.0,
-    "covered": false,
-    "est_day": 0.168,
-    "share": 11.1,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.39,
-    "size": 20000,
-    "capital": 12200.0,
-    "covered": false,
-    "est_day": 1.424,
-    "share": 94.0
-   },
-   "side_pool": 1.52,
-   "tick": 0.01,
-   "best_bid": 0.15,
-   "best_ask": 0.38,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 33,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 33,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
-   }
-  },
-  {
    "market": "cranc-uspres28-12-31-2026-krinoe",
    "side": "BUY",
    "pick": {
@@ -10966,13 +10966,13 @@
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.07,
-    "size": 2000,
-    "capital": 1860.0,
+    "price": 0.05,
+    "size": 100,
+    "capital": 95.0,
     "covered": false,
-    "est_day": 0.346,
-    "share": 22.8,
-    "ticks": 3
+    "est_day": 0.409,
+    "share": 27.0,
+    "ticks": 1
    },
    "max": {
     "side": "SELL",
@@ -11246,13 +11246,13 @@
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.16,
-    "size": 2000,
-    "capital": 1680.0,
+    "price": 0.14,
+    "size": 100,
+    "capital": 86.0,
     "covered": false,
-    "est_day": 0.295,
-    "share": 19.5,
-    "ticks": 3
+    "est_day": 0.352,
+    "share": 23.2,
+    "ticks": 1
    },
    "max": {
     "side": "SELL",
@@ -12002,6 +12002,46 @@
    }
   },
   {
+   "market": "cranc-uspres28-12-31-2026-jonoss",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.14,
+    "size": 100,
+    "capital": 14.0,
+    "covered": false,
+    "est_day": 0.215,
+    "share": 14.2,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.13,
+    "size": 20000,
+    "capital": 2600.0,
+    "covered": false,
+    "est_day": 1.325,
+    "share": 87.4
+   },
+   "side_pool": 1.52,
+   "tick": 0.01,
+   "best_bid": 0.15,
+   "best_ask": 0.36,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 33,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 33,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
    "market": "cranc-uspres28-12-31-2026-jdvan",
    "side": "SELL",
    "pick": {
@@ -12282,6 +12322,46 @@
    }
   },
   {
+   "market": "cranc-uspres28-12-31-2026-jonoss",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.39,
+    "size": 5000,
+    "capital": 3050.0,
+    "covered": false,
+    "est_day": 0.359,
+    "share": 23.7,
+    "ticks": 3
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.38,
+    "size": 20000,
+    "capital": 12400.0,
+    "covered": false,
+    "est_day": 1.306,
+    "share": 86.2
+   },
+   "side_pool": 1.52,
+   "tick": 0.01,
+   "best_bid": 0.15,
+   "best_ask": 0.36,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 33,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 33,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
    "market": "cranc-uspres28-12-31-2026-zohmam",
    "side": "SELL",
    "pick": {
@@ -12399,46 +12479,6 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
-   }
-  },
-  {
-   "market": "cranc-uspres28-12-31-2026-jonoss",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.14,
-    "size": 100,
-    "capital": 14.0,
-    "covered": false,
-    "est_day": 0.183,
-    "share": 12.1,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.13,
-    "size": 20000,
-    "capital": 2600.0,
-    "covered": false,
-    "est_day": 1.289,
-    "share": 85.1
-   },
-   "side_pool": 1.52,
-   "tick": 0.01,
-   "best_bid": 0.15,
-   "best_ask": 0.38,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 33,
-   "already_in": false,
-   "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 33,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
    }
   },
   {
@@ -13122,46 +13162,6 @@
    }
   },
   {
-   "market": "mlaec-swepm-2026-09-13-ulfkri",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.06,
-    "size": 2000,
-    "capital": 120.0,
-    "covered": false,
-    "est_day": 0.205,
-    "share": 8.2,
-    "ticks": 0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.06,
-    "size": 20000,
-    "capital": 1200.0,
-    "covered": false,
-    "est_day": 1.179,
-    "share": 47.2
-   },
-   "side_pool": 2.5,
-   "tick": 0.01,
-   "best_bid": 0.06,
-   "best_ask": 0.19,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 5,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 5,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
    "market": "cranc-uspres28-12-31-2026-dontru",
    "side": "BUY",
    "pick": {
@@ -13410,7 +13410,7 @@
     "size": 500,
     "capital": 410.0,
     "covered": false,
-    "est_day": 0.242,
+    "est_day": 0.241,
     "share": 19.3,
     "ticks": 0
    },
@@ -13421,7 +13421,7 @@
     "capital": 16400.0,
     "covered": false,
     "est_day": 1.132,
-    "share": 90.6
+    "share": 90.5
    },
    "side_pool": 1.25,
    "tick": 0.01,
@@ -13476,6 +13476,46 @@
     "target": 2000.0,
     "pool": 25.0,
     "event_n": 10,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "ewc-pres-bra-2026-10-04-roncai",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 2000,
+    "capital": 20.0,
+    "covered": false,
+    "est_day": 0.256,
+    "share": 14.4,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 20000,
+    "capital": 200.0,
+    "covered": false,
+    "est_day": 1.119,
+    "share": 62.6
+   },
+   "side_pool": 1.79,
+   "tick": 0.01,
+   "best_bid": 0.02,
+   "best_ask": 0.03,
+   "held": 0.0,
+   "risk": "market priced near 0 \u2014 deep bid sits in the exit path (snipe risk)",
+   "event_n": 7,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 7,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
@@ -13556,46 +13596,6 @@
     "target": 2000.0,
     "pool": 25.0,
     "event_n": 11,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "ewc-pres-bra-2026-10-04-roncai",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "covered": false,
-    "est_day": 0.255,
-    "share": 14.3,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 20000,
-    "capital": 200.0,
-    "covered": false,
-    "est_day": 1.115,
-    "share": 62.4
-   },
-   "side_pool": 1.79,
-   "tick": 0.01,
-   "best_bid": 0.02,
-   "best_ask": 0.03,
-   "held": 0.0,
-   "risk": "market priced near 0 \u2014 deep bid sits in the exit path (snipe risk)",
-   "event_n": 7,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 7,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
@@ -14362,71 +14362,31 @@
    }
   },
   {
-   "market": "mlaec-isrpol-pm-2026-10-27-gadeiz",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.53,
-    "size": 500,
-    "capital": 235.0,
-    "covered": false,
-    "est_day": 0.157,
-    "share": 12.6,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.53,
-    "size": 20000,
-    "capital": 9400.0,
-    "covered": false,
-    "est_day": 1.065,
-    "share": 85.2
-   },
-   "side_pool": 1.25,
-   "tick": 0.01,
-   "best_bid": 0.52,
-   "best_ask": 0.53,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 10,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 10,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "mlaec-isrpol-pm-2026-10-27-nafben",
+   "market": "vtc-hrep-to-2026-11-03-95-100m",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.03,
-    "size": 1000,
-    "capital": 30.0,
+    "price": 0.04,
+    "size": 500,
+    "capital": 20.0,
     "covered": false,
-    "est_day": 0.266,
-    "share": 21.3,
-    "ticks": 0
+    "est_day": 0.15,
+    "share": 12.0,
+    "ticks": 1
    },
    "max": {
     "side": "BUY",
-    "price": 0.03,
+    "price": 0.04,
     "size": 20000,
-    "capital": 600.0,
+    "capital": 800.0,
     "covered": false,
-    "est_day": 1.055,
-    "share": 84.4
+    "est_day": 1.057,
+    "share": 84.6
    },
    "side_pool": 1.25,
    "tick": 0.01,
-   "best_bid": 0.03,
-   "best_ask": 0.04,
+   "best_bid": 0.05,
+   "best_ask": 0.06,
    "held": 0.0,
    "risk": null,
    "event_n": 10,
@@ -14602,83 +14562,123 @@
    }
   },
   {
-   "market": "ewc-pres-arg-2027-10-24-facman",
-   "side": "SELL",
+   "market": "mlaec-isrpol-pm-2026-10-27-nafben",
+   "side": "BUY",
    "pick": {
-    "side": "SELL",
-    "price": 0.2,
-    "size": 100,
-    "capital": 80.0,
+    "side": "BUY",
+    "price": 0.03,
+    "size": 1000,
+    "capital": 30.0,
     "covered": false,
-    "est_day": 0.379,
-    "share": 33.3,
-    "ticks": 1
+    "est_day": 0.243,
+    "share": 19.5,
+    "ticks": 0
    },
    "max": {
-    "side": "SELL",
-    "price": 0.21,
+    "side": "BUY",
+    "price": 0.03,
     "size": 20000,
-    "capital": 15800.0,
+    "capital": 600.0,
     "covered": false,
-    "est_day": 1.033,
-    "share": 90.9
+    "est_day": 1.036,
+    "share": 82.9
    },
-   "side_pool": 1.14,
+   "side_pool": 1.25,
    "tick": 0.01,
-   "best_bid": 0.01,
-   "best_ask": 0.19,
+   "best_bid": 0.03,
+   "best_ask": 0.04,
    "held": 0.0,
    "risk": null,
-   "event_n": 11,
+   "event_n": 10,
    "already_in": false,
    "prog": {
     "df": 0.1,
     "target": 2000.0,
     "pool": 25.0,
-    "event_n": 11,
+    "event_n": 10,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
    }
   },
   {
-   "market": "scc-senate-gop-2026-11-03-55",
+   "market": "vtc-hrep-to-2026-11-03-110-115m",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.01,
-    "size": 5000,
-    "capital": 50.0,
+    "price": 0.16,
+    "size": 1000,
+    "capital": 160.0,
     "covered": false,
-    "est_day": 0.322,
-    "share": 8.4,
-    "ticks": 0
+    "est_day": 0.235,
+    "share": 18.8,
+    "ticks": 1
    },
    "max": {
     "side": "BUY",
-    "price": 0.01,
+    "price": 0.16,
     "size": 20000,
-    "capital": 200.0,
+    "capital": 3200.0,
     "covered": false,
-    "est_day": 1.029,
-    "share": 26.7
+    "est_day": 1.028,
+    "share": 82.2
    },
-   "side_pool": 3.85,
+   "side_pool": 1.25,
    "tick": 0.01,
-   "best_bid": 0.01,
-   "best_ask": 0.05,
+   "best_bid": 0.17,
+   "best_ask": 0.18,
    "held": 0.0,
-   "risk": "market priced near 0 \u2014 deep bid sits in the exit path (snipe risk)",
-   "event_n": 13,
+   "risk": null,
+   "event_n": 10,
    "already_in": false,
    "prog": {
-    "df": 0.2,
-    "target": 5000.0,
-    "pool": 100.0,
-    "event_n": 13,
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 10,
     "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_mid_20260727",
-    "tier": "mid"
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "mlaec-isrpol-pm-2026-10-27-gadeiz",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.51,
+    "size": 1000,
+    "capital": 510.0,
+    "covered": false,
+    "est_day": 0.229,
+    "share": 18.3,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.51,
+    "size": 20000,
+    "capital": 10200.0,
+    "covered": false,
+    "est_day": 1.022,
+    "share": 81.7
+   },
+   "side_pool": 1.25,
+   "tick": 0.01,
+   "best_bid": 0.52,
+   "best_ask": 0.53,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 10,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 10,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
    }
   },
   {
@@ -14722,46 +14722,6 @@
    }
   },
   {
-   "market": "mlaec-isrpol-pm-2026-10-27-gadeiz",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.51,
-    "size": 1000,
-    "capital": 510.0,
-    "covered": false,
-    "est_day": 0.228,
-    "share": 18.2,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.51,
-    "size": 20000,
-    "capital": 10200.0,
-    "covered": false,
-    "est_day": 1.021,
-    "share": 81.7
-   },
-   "side_pool": 1.25,
-   "tick": 0.01,
-   "best_bid": 0.52,
-   "best_ask": 0.53,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 10,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 10,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
    "market": "enwc-ussep-sc-2026-08-11-rep-tregow",
    "side": "BUY",
    "pick": {
@@ -14796,46 +14756,6 @@
     "target": 2000.0,
     "pool": 25.0,
     "event_n": 12,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "vtc-hrep-to-2026-11-03-95-100m",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.04,
-    "size": 1000,
-    "capital": 40.0,
-    "covered": false,
-    "est_day": 0.227,
-    "share": 18.2,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.04,
-    "size": 20000,
-    "capital": 800.0,
-    "covered": false,
-    "est_day": 1.02,
-    "share": 81.6
-   },
-   "side_pool": 1.25,
-   "tick": 0.01,
-   "best_bid": 0.05,
-   "best_ask": 0.06,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 10,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 10,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
@@ -14907,46 +14827,6 @@
    "tick": 0.01,
    "best_bid": 0.05,
    "best_ask": 0.38,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 10,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 10,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "vtc-hrep-to-2026-11-03-110-115m",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.16,
-    "size": 1000,
-    "capital": 160.0,
-    "covered": false,
-    "est_day": 0.221,
-    "share": 17.7,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.16,
-    "size": 20000,
-    "capital": 3200.0,
-    "covered": false,
-    "est_day": 1.014,
-    "share": 81.1
-   },
-   "side_pool": 1.25,
-   "tick": 0.01,
-   "best_bid": 0.17,
-   "best_ask": 0.18,
    "held": 0.0,
    "risk": null,
    "event_n": 10,
@@ -15126,27 +15006,27 @@
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.25,
-    "size": 1000,
-    "capital": 750.0,
+    "price": 0.24,
+    "size": 200,
+    "capital": 152.0,
     "covered": false,
-    "est_day": 0.499,
-    "share": 47.9,
+    "est_day": 0.178,
+    "share": 17.1,
     "ticks": 1
    },
    "max": {
     "side": "SELL",
-    "price": 0.25,
+    "price": 0.24,
     "size": 20000,
-    "capital": 15000.0,
+    "capital": 15200.0,
     "covered": false,
-    "est_day": 0.988,
-    "share": 94.8
+    "est_day": 0.993,
+    "share": 95.4
    },
    "side_pool": 1.04,
    "tick": 0.01,
    "best_bid": 0.02,
-   "best_ask": 0.24,
+   "best_ask": 0.23,
    "held": 0.0,
    "risk": "resolves ~2026-08-11 (4d)",
    "event_n": 12,
@@ -15682,6 +15562,46 @@
    }
   },
   {
+   "market": "enwc-ussep-sc-2026-08-11-rep-rusfry",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.29,
+    "size": 500,
+    "capital": 355.0,
+    "covered": false,
+    "est_day": 0.23,
+    "share": 22.1,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.29,
+    "size": 20000,
+    "capital": 14200.0,
+    "covered": false,
+    "est_day": 0.957,
+    "share": 91.9
+   },
+   "side_pool": 1.04,
+   "tick": 0.01,
+   "best_bid": 0.23,
+   "best_ask": 0.28,
+   "held": 0.0,
+   "risk": "resolves ~2026-08-11 (4d)",
+   "event_n": 12,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 12,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "vtc-hrep-to-2026-11-03-120-125m",
    "side": "BUY",
    "pick": {
@@ -15691,7 +15611,7 @@
     "capital": 210.0,
     "covered": false,
     "est_day": 0.173,
-    "share": 13.9,
+    "share": 13.8,
     "ticks": 1
    },
    "max": {
@@ -15700,7 +15620,7 @@
     "size": 20000,
     "capital": 4200.0,
     "covered": false,
-    "est_day": 0.954,
+    "est_day": 0.953,
     "share": 76.3
    },
    "side_pool": 1.25,
@@ -16220,7 +16140,7 @@
     "size": 20000,
     "capital": 18600.0,
     "covered": false,
-    "est_day": 0.926,
+    "est_day": 0.925,
     "share": 74.0
    },
    "side_pool": 1.25,
@@ -16682,6 +16602,46 @@
    }
   },
   {
+   "market": "mlaec-isrpol-pm-2026-10-27-yailap",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.05,
+    "size": 2000,
+    "capital": 1900.0,
+    "covered": false,
+    "est_day": 0.266,
+    "share": 21.3,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.05,
+    "size": 20000,
+    "capital": 19000.0,
+    "covered": false,
+    "est_day": 0.913,
+    "share": 73.0
+   },
+   "side_pool": 1.25,
+   "tick": 0.01,
+   "best_bid": 0.01,
+   "best_ask": 0.04,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 10,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 10,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "ewc-pres-fra-2027-04-11-bruret",
    "side": "BUY",
    "pick": {
@@ -16722,40 +16682,80 @@
    }
   },
   {
-   "market": "mlaec-isrpol-pm-2026-10-27-yailap",
+   "market": "scc-senate-gop-2026-11-03-55",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 5000,
+    "capital": 50.0,
+    "covered": false,
+    "est_day": 0.277,
+    "share": 7.2,
+    "ticks": 0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 20000,
+    "capital": 200.0,
+    "covered": false,
+    "est_day": 0.912,
+    "share": 23.7
+   },
+   "side_pool": 3.85,
+   "tick": 0.01,
+   "best_bid": 0.01,
+   "best_ask": 0.05,
+   "held": 0.0,
+   "risk": "market priced near 0 \u2014 deep bid sits in the exit path (snipe risk)",
+   "event_n": 13,
+   "already_in": false,
+   "prog": {
+    "df": 0.2,
+    "target": 5000.0,
+    "pool": 100.0,
+    "event_n": 13,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_mid_20260727",
+    "tier": "mid"
+   }
+  },
+  {
+   "market": "ewc-pres-arg-2027-10-24-facman",
    "side": "SELL",
    "pick": {
     "side": "SELL",
-    "price": 0.05,
-    "size": 2000,
-    "capital": 1900.0,
+    "price": 0.21,
+    "size": 100,
+    "capital": 79.0,
     "covered": false,
-    "est_day": 0.266,
-    "share": 21.2,
-    "ticks": 1
+    "est_day": 0.189,
+    "share": 16.7,
+    "ticks": 2
    },
    "max": {
     "side": "SELL",
-    "price": 0.05,
+    "price": 0.22,
     "size": 20000,
-    "capital": 19000.0,
+    "capital": 15600.0,
     "covered": false,
-    "est_day": 0.912,
-    "share": 73.0
+    "est_day": 0.909,
+    "share": 80.0
    },
-   "side_pool": 1.25,
+   "side_pool": 1.14,
    "tick": 0.01,
    "best_bid": 0.01,
-   "best_ask": 0.04,
+   "best_ask": 0.19,
    "held": 0.0,
    "risk": null,
-   "event_n": 10,
+   "event_n": 11,
    "already_in": false,
    "prog": {
     "df": 0.1,
     "target": 2000.0,
     "pool": 25.0,
-    "event_n": 10,
+    "event_n": 11,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
@@ -16796,46 +16796,6 @@
     "target": 2000.0,
     "pool": 25.0,
     "event_n": 13,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "enwc-ussep-sc-2026-08-11-rep-rusfry",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.28,
-    "size": 1000,
-    "capital": 720.0,
-    "covered": false,
-    "est_day": 0.259,
-    "share": 24.9,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.28,
-    "size": 20000,
-    "capital": 14400.0,
-    "covered": false,
-    "est_day": 0.905,
-    "share": 86.9
-   },
-   "side_pool": 1.04,
-   "tick": 0.01,
-   "best_bid": 0.23,
-   "best_ask": 0.28,
-   "held": 0.0,
-   "risk": "resolves ~2026-08-11 (4d)",
-   "event_n": 12,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 12,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
@@ -16907,46 +16867,6 @@
    "tick": 0.01,
    "best_bid": 0.39,
    "best_ask": 0.88,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 13,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 13,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "pintc-meet-trump-2026-12-31-delrod",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "covered": false,
-    "est_day": 0.557,
-    "share": 58.0,
-    "ticks": 1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 20000,
-    "capital": 200.0,
-    "covered": false,
-    "est_day": 0.897,
-    "share": 93.2
-   },
-   "side_pool": 0.96,
-   "tick": 0.01,
-   "best_bid": 0.02,
-   "best_ask": 0.44,
    "held": 0.0,
    "risk": null,
    "event_n": 13,
@@ -17101,7 +17021,7 @@
     "capital": 15000.0,
     "covered": false,
     "est_day": 0.891,
-    "share": 71.3
+    "share": 71.2
    },
    "side_pool": 1.25,
    "tick": 0.01,
@@ -17170,8 +17090,8 @@
     "size": 1000,
     "capital": 980.0,
     "covered": false,
-    "est_day": 0.226,
-    "share": 21.7,
+    "est_day": 0.227,
+    "share": 21.8,
     "ticks": 0
    },
    "max": {
@@ -17181,7 +17101,7 @@
     "capital": 19600.0,
     "covered": false,
     "est_day": 0.883,
-    "share": 84.7
+    "share": 84.8
    },
    "side_pool": 1.04,
    "tick": 0.01,
@@ -17370,7 +17290,7 @@
     "size": 2000,
     "capital": 380.0,
     "covered": false,
-    "est_day": 0.225,
+    "est_day": 0.224,
     "share": 18.0,
     "ticks": 1
    },
@@ -17380,8 +17300,8 @@
     "size": 20000,
     "capital": 3800.0,
     "covered": false,
-    "est_day": 0.859,
-    "share": 68.7
+    "est_day": 0.858,
+    "share": 68.6
    },
    "side_pool": 1.25,
    "tick": 0.01,
@@ -17700,53 +17620,13 @@
     "size": 20000,
     "capital": 17400.0,
     "covered": false,
-    "est_day": 0.818,
+    "est_day": 0.817,
     "share": 65.4
    },
    "side_pool": 1.25,
    "tick": 0.01,
    "best_bid": 0.1,
    "best_ask": 0.12,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 10,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 10,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "mlaec-isrpol-pm-2026-10-27-ayesha",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.04,
-    "size": 2000,
-    "capital": 1920.0,
-    "covered": false,
-    "est_day": 0.198,
-    "share": 15.8,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.04,
-    "size": 20000,
-    "capital": 19200.0,
-    "covered": false,
-    "est_day": 0.816,
-    "share": 65.3
-   },
-   "side_pool": 1.25,
-   "tick": 0.01,
-   "best_bid": 0.01,
-   "best_ask": 0.03,
    "held": 0.0,
    "risk": null,
    "event_n": 10,
@@ -17842,6 +17722,46 @@
    }
   },
   {
+   "market": "mlaec-isrpol-pm-2026-10-27-ayesha",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.04,
+    "size": 2000,
+    "capital": 1920.0,
+    "covered": false,
+    "est_day": 0.197,
+    "share": 15.8,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.04,
+    "size": 20000,
+    "capital": 19200.0,
+    "covered": false,
+    "est_day": 0.815,
+    "share": 65.2
+   },
+   "side_pool": 1.25,
+   "tick": 0.01,
+   "best_bid": 0.01,
+   "best_ask": 0.03,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 10,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 10,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "pintc-meet-trump-2026-12-31-joerog",
    "side": "SELL",
    "pick": {
@@ -17890,7 +17810,7 @@
     "size": 2000,
     "capital": 1860.0,
     "covered": false,
-    "est_day": 0.197,
+    "est_day": 0.196,
     "share": 15.7,
     "ticks": 1
    },
@@ -18010,7 +17930,7 @@
     "size": 2000,
     "capital": 1460.0,
     "covered": false,
-    "est_day": 0.254,
+    "est_day": 0.255,
     "share": 24.4,
     "ticks": 0
    },
@@ -18171,7 +18091,7 @@
     "capital": 1880.0,
     "covered": false,
     "est_day": 0.179,
-    "share": 14.4,
+    "share": 14.3,
     "ticks": 1
    },
    "max": {
@@ -18522,6 +18442,46 @@
    }
   },
   {
+   "market": "mlaec-isrpol-pm-2026-10-27-gadeiz",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.54,
+    "size": 2000,
+    "capital": 920.0,
+    "covered": false,
+    "est_day": 0.17,
+    "share": 13.6,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.54,
+    "size": 20000,
+    "capital": 9200.0,
+    "covered": false,
+    "est_day": 0.764,
+    "share": 61.1
+   },
+   "side_pool": 1.25,
+   "tick": 0.01,
+   "best_bid": 0.52,
+   "best_ask": 0.53,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 10,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 10,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "nphc-attgen-jeapir",
    "side": "BUY",
    "pick": {
@@ -18719,6 +18679,46 @@
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_mid_20260727",
     "tier": "mid"
+   }
+  },
+  {
+   "market": "mlaec-isrpol-pm-2026-10-27-bennet",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.41,
+    "size": 2000,
+    "capital": 1180.0,
+    "covered": false,
+    "est_day": 0.164,
+    "share": 13.1,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.41,
+    "size": 20000,
+    "capital": 11800.0,
+    "covered": false,
+    "est_day": 0.753,
+    "share": 60.2
+   },
+   "side_pool": 1.25,
+   "tick": 0.01,
+   "best_bid": 0.39,
+   "best_ask": 0.4,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 10,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 10,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
    }
   },
   {
@@ -18922,6 +18922,46 @@
    }
   },
   {
+   "market": "pintc-meet-trump-2026-12-31-delrod",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 2000,
+    "capital": 20.0,
+    "covered": false,
+    "est_day": 0.243,
+    "share": 25.3,
+    "ticks": 1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 20000,
+    "capital": 200.0,
+    "covered": false,
+    "est_day": 0.743,
+    "share": 77.2
+   },
+   "side_pool": 0.96,
+   "tick": 0.01,
+   "best_bid": 0.02,
+   "best_ask": 0.44,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 13,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 13,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "enwc-ussep-sc-2026-08-11-rep-andbau",
    "side": "BUY",
    "pick": {
@@ -18970,8 +19010,8 @@
     "size": 5000,
     "capital": 4950.0,
     "covered": false,
-    "est_day": 0.212,
-    "share": 5.1,
+    "est_day": 0.21,
+    "share": 5.0,
     "ticks": 0
    },
    "max": {
@@ -18980,8 +19020,8 @@
     "size": 20000,
     "capital": 19800.0,
     "covered": false,
-    "est_day": 0.737,
-    "share": 17.7
+    "est_day": 0.73,
+    "share": 17.5
    },
    "side_pool": 4.17,
    "tick": 0.01,
@@ -19021,7 +19061,7 @@
     "capital": 4000.0,
     "covered": false,
     "est_day": 0.727,
-    "share": 64.0
+    "share": 63.9
    },
    "side_pool": 1.14,
    "tick": 0.01,
@@ -19130,7 +19170,7 @@
     "size": 5000,
     "capital": 4600.0,
     "covered": false,
-    "est_day": 0.315,
+    "est_day": 0.314,
     "share": 25.2,
     "ticks": 1
    },
@@ -19141,7 +19181,7 @@
     "capital": 18400.0,
     "covered": false,
     "est_day": 0.717,
-    "share": 57.4
+    "share": 57.3
    },
    "side_pool": 1.25,
    "tick": 0.01,
@@ -19362,46 +19402,6 @@
    }
   },
   {
-   "market": "mlaec-isrpol-pm-2026-10-27-bennet",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.41,
-    "size": 5000,
-    "capital": 2950.0,
-    "covered": false,
-    "est_day": 0.309,
-    "share": 24.8,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.41,
-    "size": 20000,
-    "capital": 11800.0,
-    "covered": false,
-    "est_day": 0.71,
-    "share": 56.8
-   },
-   "side_pool": 1.25,
-   "tick": 0.01,
-   "best_bid": 0.39,
-   "best_ask": 0.4,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 10,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 10,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
    "market": "pintc-meet-trump-2026-12-31-volzel",
    "side": "BUY",
    "pick": {
@@ -19482,6 +19482,46 @@
    }
   },
   {
+   "market": "apdc-trumpadmin-2026-scobes",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.15,
+    "size": 500,
+    "capital": 425.0,
+    "covered": false,
+    "est_day": 0.268,
+    "share": 36.4,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.15,
+    "size": 20000,
+    "capital": 17000.0,
+    "covered": false,
+    "est_day": 0.705,
+    "share": 95.8
+   },
+   "side_pool": 0.74,
+   "tick": 0.01,
+   "best_bid": 0.03,
+   "best_ask": 0.14,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 17,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 17,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "enwc-usgubp-wi-2026-08-11-dem-joebre",
    "side": "SELL",
    "pick": {
@@ -19516,46 +19556,6 @@
     "target": 2000.0,
     "pool": 25.0,
     "event_n": 6,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "apdc-trumpadmin-2026-scobes",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.15,
-    "size": 500,
-    "capital": 425.0,
-    "covered": false,
-    "est_day": 0.266,
-    "share": 36.2,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.15,
-    "size": 20000,
-    "capital": 17000.0,
-    "covered": false,
-    "est_day": 0.704,
-    "share": 95.8
-   },
-   "side_pool": 0.74,
-   "tick": 0.01,
-   "best_bid": 0.03,
-   "best_ask": 0.14,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 17,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 17,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
@@ -19770,8 +19770,8 @@
     "size": 100,
     "capital": 26.0,
     "covered": false,
-    "est_day": 0.353,
-    "share": 48.0,
+    "est_day": 0.352,
+    "share": 47.9,
     "ticks": 1
    },
    "max": {
@@ -19847,21 +19847,21 @@
    "pick": {
     "side": "SELL",
     "price": 0.26,
-    "size": 100,
-    "capital": 74.0,
+    "size": 500,
+    "capital": 370.0,
     "covered": false,
-    "est_day": 0.292,
-    "share": 39.7,
+    "est_day": 0.2,
+    "share": 27.2,
     "ticks": 1
    },
    "max": {
     "side": "SELL",
-    "price": 0.27,
+    "price": 0.26,
     "size": 20000,
-    "capital": 14600.0,
+    "capital": 14800.0,
     "covered": false,
-    "est_day": 0.683,
-    "share": 92.9
+    "est_day": 0.689,
+    "share": 93.7
    },
    "side_pool": 0.74,
    "tick": 0.01,
@@ -19970,7 +19970,7 @@
     "size": 5000,
     "capital": 4650.0,
     "covered": false,
-    "est_day": 0.282,
+    "est_day": 0.283,
     "share": 22.6,
     "ticks": 1
    },
@@ -20130,8 +20130,8 @@
     "size": 1000,
     "capital": 850.0,
     "covered": false,
-    "est_day": 0.164,
-    "share": 21.0,
+    "est_day": 0.165,
+    "share": 21.1,
     "ticks": 1
    },
    "max": {
@@ -20290,8 +20290,8 @@
     "size": 1000,
     "capital": 570.0,
     "covered": false,
-    "est_day": 0.152,
-    "share": 19.5,
+    "est_day": 0.153,
+    "share": 19.6,
     "ticks": 1
    },
    "max": {
@@ -20301,7 +20301,7 @@
     "capital": 11400.0,
     "covered": false,
     "est_day": 0.648,
-    "share": 82.9
+    "share": 83.0
    },
    "side_pool": 0.78,
    "tick": 0.01,
@@ -20482,46 +20482,6 @@
    }
   },
   {
-   "market": "enwc-ussep-sc-2026-08-11-rep-darnor",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.51,
-    "size": 5000,
-    "capital": 2450.0,
-    "covered": false,
-    "est_day": 0.287,
-    "share": 27.6,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.51,
-    "size": 20000,
-    "capital": 9800.0,
-    "covered": false,
-    "est_day": 0.629,
-    "share": 60.3
-   },
-   "side_pool": 1.04,
-   "tick": 0.01,
-   "best_bid": 0.47,
-   "best_ask": 0.5,
-   "held": 0.0,
-   "risk": "resolves ~2026-08-11 (4d)",
-   "event_n": 12,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 12,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
    "market": "nphc-attgen-edmar",
    "side": "SELL",
    "pick": {
@@ -20530,8 +20490,8 @@
     "size": 2000,
     "capital": 1700.0,
     "covered": false,
-    "est_day": 0.226,
-    "share": 28.9,
+    "est_day": 0.227,
+    "share": 29.0,
     "ticks": 1
    },
    "max": {
@@ -20540,8 +20500,8 @@
     "size": 20000,
     "capital": 17000.0,
     "covered": false,
-    "est_day": 0.627,
-    "share": 80.3
+    "est_day": 0.628,
+    "share": 80.4
    },
    "side_pool": 0.78,
    "tick": 0.01,
@@ -20610,8 +20570,8 @@
     "size": 2000,
     "capital": 1700.0,
     "covered": false,
-    "est_day": 0.224,
-    "share": 28.7,
+    "est_day": 0.225,
+    "share": 28.8,
     "ticks": 1
    },
    "max": {
@@ -20621,7 +20581,7 @@
     "capital": 17000.0,
     "covered": false,
     "est_day": 0.626,
-    "share": 80.1
+    "share": 80.2
    },
    "side_pool": 0.78,
    "tick": 0.01,
@@ -20650,8 +20610,8 @@
     "size": 2000,
     "capital": 1700.0,
     "covered": false,
-    "est_day": 0.224,
-    "share": 28.7,
+    "est_day": 0.225,
+    "share": 28.8,
     "ticks": 1
    },
    "max": {
@@ -20661,7 +20621,7 @@
     "capital": 17000.0,
     "covered": false,
     "est_day": 0.626,
-    "share": 80.1
+    "share": 80.2
    },
    "side_pool": 0.78,
    "tick": 0.01,
@@ -20690,8 +20650,8 @@
     "size": 2000,
     "capital": 1700.0,
     "covered": false,
-    "est_day": 0.225,
-    "share": 28.8,
+    "est_day": 0.224,
+    "share": 28.7,
     "ticks": 1
    },
    "max": {
@@ -20701,7 +20661,7 @@
     "capital": 17000.0,
     "covered": false,
     "est_day": 0.626,
-    "share": 80.2
+    "share": 80.1
    },
    "side_pool": 0.78,
    "tick": 0.01,
@@ -20922,86 +20882,6 @@
    }
   },
   {
-   "market": "ewc-pres-arg-2027-10-24-maumac",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.5,
-    "size": 5000,
-    "capital": 2500.0,
-    "covered": false,
-    "est_day": 0.257,
-    "share": 22.6,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.5,
-    "size": 20000,
-    "capital": 10000.0,
-    "covered": false,
-    "est_day": 0.613,
-    "share": 53.9
-   },
-   "side_pool": 1.14,
-   "tick": 0.01,
-   "best_bid": 0.01,
-   "best_ask": 0.49,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 11,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 11,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "nphc-attgen-jefjen",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 2000,
-    "capital": 20.0,
-    "covered": false,
-    "est_day": 0.209,
-    "share": 26.8,
-    "ticks": 0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 20000,
-    "capital": 200.0,
-    "covered": false,
-    "est_day": 0.613,
-    "share": 78.5
-   },
-   "side_pool": 0.78,
-   "tick": 0.01,
-   "best_bid": 0.01,
-   "best_ask": 0.14,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 16,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 16,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
    "market": "nphc-attgen-rondes",
    "side": "BUY",
    "pick": {
@@ -21036,6 +20916,46 @@
     "target": 2000.0,
     "pool": 25.0,
     "event_n": 16,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "ewc-pres-arg-2027-10-24-maumac",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.5,
+    "size": 5000,
+    "capital": 2500.0,
+    "covered": false,
+    "est_day": 0.257,
+    "share": 22.6,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.5,
+    "size": 20000,
+    "capital": 10000.0,
+    "covered": false,
+    "est_day": 0.612,
+    "share": 53.9
+   },
+   "side_pool": 1.14,
+   "tick": 0.01,
+   "best_bid": 0.01,
+   "best_ask": 0.49,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 11,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 11,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
@@ -21122,6 +21042,46 @@
    }
   },
   {
+   "market": "enwc-ussep-sc-2026-08-11-rep-darnor",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.51,
+    "size": 5000,
+    "capital": 2450.0,
+    "covered": false,
+    "est_day": 0.27,
+    "share": 26.0,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.51,
+    "size": 20000,
+    "capital": 9800.0,
+    "covered": false,
+    "est_day": 0.608,
+    "share": 58.4
+   },
+   "side_pool": 1.04,
+   "tick": 0.01,
+   "best_bid": 0.47,
+   "best_ask": 0.5,
+   "held": 0.0,
+   "risk": "resolves ~2026-08-11 (4d)",
+   "event_n": 12,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 12,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "nphc-attgen-alihab",
    "side": "SELL",
    "pick": {
@@ -21131,7 +21091,7 @@
     "capital": 1940.0,
     "covered": false,
     "est_day": 0.203,
-    "share": 26.0,
+    "share": 25.9,
     "ticks": 1
    },
    "max": {
@@ -21141,7 +21101,7 @@
     "capital": 19400.0,
     "covered": false,
     "est_day": 0.608,
-    "share": 77.9
+    "share": 77.8
    },
    "side_pool": 0.78,
    "tick": 0.01,
@@ -21242,6 +21202,46 @@
    }
   },
   {
+   "market": "nphc-attgen-rondes",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.2,
+    "size": 2000,
+    "capital": 1600.0,
+    "covered": false,
+    "est_day": 0.185,
+    "share": 23.7,
+    "ticks": 1
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.2,
+    "size": 20000,
+    "capital": 16000.0,
+    "covered": false,
+    "est_day": 0.591,
+    "share": 75.6
+   },
+   "side_pool": 0.78,
+   "tick": 0.01,
+   "best_bid": 0.02,
+   "best_ask": 0.19,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 16,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 16,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "cranc-uspres28-12-31-2026-hilcli",
    "side": "BUY",
    "pick": {
@@ -21291,7 +21291,7 @@
     "capital": 50.0,
     "covered": false,
     "est_day": 0.256,
-    "share": 24.5,
+    "share": 24.6,
     "ticks": 1
    },
    "max": {
@@ -21301,12 +21301,12 @@
     "capital": 200.0,
     "covered": false,
     "est_day": 0.589,
-    "share": 56.5
+    "share": 56.6
    },
    "side_pool": 1.04,
    "tick": 0.01,
    "best_bid": 0.02,
-   "best_ask": 0.24,
+   "best_ask": 0.23,
    "held": 0.0,
    "risk": "resolves ~2026-08-11 (4d)",
    "event_n": 12,
@@ -21331,7 +21331,7 @@
     "capital": 1820.0,
     "covered": false,
     "est_day": 0.181,
-    "share": 23.2,
+    "share": 23.1,
     "ticks": 1
    },
    "max": {
@@ -21340,8 +21340,8 @@
     "size": 20000,
     "capital": 18200.0,
     "covered": false,
-    "est_day": 0.587,
-    "share": 75.1
+    "est_day": 0.586,
+    "share": 75.0
    },
    "side_pool": 0.78,
    "tick": 0.01,
@@ -21396,46 +21396,6 @@
     "target": 2000.0,
     "pool": 25.0,
     "event_n": 10,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "nphc-attgen-rondes",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.2,
-    "size": 2000,
-    "capital": 1600.0,
-    "covered": false,
-    "est_day": 0.176,
-    "share": 22.5,
-    "ticks": 1
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.2,
-    "size": 20000,
-    "capital": 16000.0,
-    "covered": false,
-    "est_day": 0.581,
-    "share": 74.4
-   },
-   "side_pool": 0.78,
-   "tick": 0.01,
-   "best_bid": 0.02,
-   "best_ask": 0.19,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 16,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 16,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
@@ -21531,7 +21491,7 @@
     "capital": 4850.0,
     "covered": false,
     "est_day": 0.19,
-    "share": 10.6,
+    "share": 10.7,
     "ticks": 0
    },
    "max": {
@@ -21741,7 +21701,7 @@
     "capital": 17800.0,
     "covered": false,
     "est_day": 0.553,
-    "share": 70.8
+    "share": 70.7
    },
    "side_pool": 0.78,
    "tick": 0.01,
@@ -21821,7 +21781,7 @@
     "capital": 17000.0,
     "covered": false,
     "est_day": 0.549,
-    "share": 70.3
+    "share": 70.2
    },
    "side_pool": 0.78,
    "tick": 0.01,
@@ -21927,11 +21887,11 @@
    "pick": {
     "side": "SELL",
     "price": 0.36,
-    "size": 5000,
-    "capital": 3200.0,
+    "size": 2000,
+    "capital": 1280.0,
     "covered": false,
-    "est_day": 0.277,
-    "share": 37.6,
+    "est_day": 0.15,
+    "share": 20.4,
     "ticks": 1
    },
    "max": {
@@ -21940,8 +21900,8 @@
     "size": 20000,
     "capital": 12800.0,
     "covered": false,
-    "est_day": 0.52,
-    "share": 70.7
+    "est_day": 0.529,
+    "share": 72.0
    },
    "side_pool": 0.74,
    "tick": 0.01,
@@ -22050,8 +22010,8 @@
     "size": 5000,
     "capital": 3300.0,
     "covered": false,
-    "est_day": 0.238,
-    "share": 32.4,
+    "est_day": 0.24,
+    "share": 32.6,
     "ticks": 1
    },
    "max": {
@@ -22060,8 +22020,8 @@
     "size": 20000,
     "capital": 13200.0,
     "covered": false,
-    "est_day": 0.483,
-    "share": 65.7
+    "est_day": 0.485,
+    "share": 66.0
    },
    "side_pool": 0.74,
    "tick": 0.01,
@@ -22211,7 +22171,7 @@
     "capital": 3200.0,
     "covered": false,
     "est_day": 0.23,
-    "share": 31.3,
+    "share": 31.2,
     "ticks": 1
    },
    "max": {
@@ -22220,7 +22180,7 @@
     "size": 20000,
     "capital": 12800.0,
     "covered": false,
-    "est_day": 0.475,
+    "est_day": 0.474,
     "share": 64.5
    },
    "side_pool": 0.74,
@@ -22251,7 +22211,7 @@
     "capital": 3350.0,
     "covered": false,
     "est_day": 0.225,
-    "share": 30.7,
+    "share": 30.6,
     "ticks": 1
    },
    "max": {
@@ -22260,8 +22220,8 @@
     "size": 20000,
     "capital": 13400.0,
     "covered": false,
-    "est_day": 0.47,
-    "share": 63.9
+    "est_day": 0.469,
+    "share": 63.8
    },
    "side_pool": 0.74,
    "tick": 0.01,
@@ -22402,7 +22362,7 @@
    }
   },
   {
-   "market": "nphc-attgen-matwhi",
+   "market": "nphc-attgen-jefjen",
    "side": "BUY",
    "pick": {
     "side": "BUY",
@@ -22410,8 +22370,8 @@
     "size": 5000,
     "capital": 50.0,
     "covered": false,
-    "est_day": 0.201,
-    "share": 25.7,
+    "est_day": 0.197,
+    "share": 25.2,
     "ticks": 0
    },
    "max": {
@@ -22420,8 +22380,48 @@
     "size": 20000,
     "capital": 200.0,
     "covered": false,
-    "est_day": 0.453,
-    "share": 58.0
+    "est_day": 0.448,
+    "share": 57.3
+   },
+   "side_pool": 0.78,
+   "tick": 0.01,
+   "best_bid": 0.01,
+   "best_ask": 0.14,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 16,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 16,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
+   "market": "nphc-attgen-matwhi",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 5000,
+    "capital": 50.0,
+    "covered": false,
+    "est_day": 0.197,
+    "share": 25.2,
+    "ticks": 0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 20000,
+    "capital": 200.0,
+    "covered": false,
+    "est_day": 0.448,
+    "share": 57.3
    },
    "side_pool": 0.78,
    "tick": 0.01,
@@ -23324,6 +23324,46 @@
    }
   },
   {
+   "market": "nphc-attgen-todbla",
+   "side": "SELL",
+   "pick": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 20000,
+    "capital": 200.0,
+    "covered": false,
+    "est_day": 0.197,
+    "share": 25.2,
+    "ticks": 0
+   },
+   "max": {
+    "side": "SELL",
+    "price": 0.99,
+    "size": 20000,
+    "capital": 200.0,
+    "covered": false,
+    "est_day": 0.197,
+    "share": 25.2
+   },
+   "side_pool": 0.78,
+   "tick": 0.01,
+   "best_bid": 0.58,
+   "best_ask": 0.99,
+   "held": 0.0,
+   "risk": null,
+   "event_n": 16,
+   "already_in": false,
+   "prog": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "event_n": 16,
+    "start": "2026-07-28T00:00:00Z",
+    "pid": "politics_low_20260727",
+    "tier": "low"
+   }
+  },
+  {
    "market": "vmc-ussep-misen-2026-08-04-ste15-20",
    "side": "SELL",
    "pick": {
@@ -23359,46 +23399,6 @@
     "target": 2000.0,
     "pool": 25.0,
     "event_n": 10,
-    "start": "2026-07-28T00:00:00Z",
-    "pid": "politics_low_20260727",
-    "tier": "low"
-   }
-  },
-  {
-   "market": "nphc-attgen-todbla",
-   "side": "SELL",
-   "pick": {
-    "side": "SELL",
-    "price": 0.99,
-    "size": 20000,
-    "capital": 200.0,
-    "covered": false,
-    "est_day": 0.173,
-    "share": 22.2,
-    "ticks": 0
-   },
-   "max": {
-    "side": "SELL",
-    "price": 0.99,
-    "size": 20000,
-    "capital": 200.0,
-    "covered": false,
-    "est_day": 0.173,
-    "share": 22.2
-   },
-   "side_pool": 0.78,
-   "tick": 0.01,
-   "best_bid": 0.58,
-   "best_ask": 0.99,
-   "held": 0.0,
-   "risk": null,
-   "event_n": 16,
-   "already_in": false,
-   "prog": {
-    "df": 0.1,
-    "target": 2000.0,
-    "pool": 25.0,
-    "event_n": 16,
     "start": "2026-07-28T00:00:00Z",
     "pid": "politics_low_20260727",
     "tier": "low"
