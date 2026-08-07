@@ -2725,7 +2725,8 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  .hero{margin:2px 0 0}
  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
  .chip{background:var(--surface2);border:1px solid var(--line);color:var(--ink2);
-  border-radius:99px;padding:5px 11px;font-size:12px}
+  border-radius:99px;padding:6px 12px;font-size:12px;min-height:0}
+ .chipon{border-color:var(--good);color:var(--good)}
 </style></head><body>
 <div id="login">
  <div class="big">Liquidity rewards</div>
@@ -3772,10 +3773,47 @@ function spark(pts){
   const dpath = pts.map((q,i)=>(i?'L':'M')+X(q[0]).toFixed(1)+' '+Y(q[1]).toFixed(1)).join(' ');
   const hrs = ((t1-t0)/3600).toFixed(1);
   return '<svg width="'+w+'" height="'+h+'" style="background:#141a23;border-radius:12px;max-width:100%">'+
-    '<path d="'+dpath+'" fill="none" stroke="#58a6ff" stroke-width="2"/></svg>'+
+    '<path d="'+dpath+'" fill="none" stroke="var(--accent)" stroke-width="2"/></svg>'+
     '<div class="mkt">$/day over last '+hrs+'h · min $'+r0.toFixed(2)+' · max $'+r1.toFixed(2)+
     ' · now $'+rs[rs.length-1].toFixed(2)+'</div>';
 }
+function cumAt(cf, hf){
+  if(!(cf && cf.length === 25)) return hf / 24;
+  const i = Math.floor(hf);
+  return cf[i] + (cf[Math.min(i + 1, 24)] - cf[i]) * (hf - i);
+}
+function dayGraph(d){
+  const pts = d.earned_series || [];
+  if(pts.length < 3) return '<div class="mkt">collecting today’s curve — back in a few minutes…</div>';
+  const w = 360, h = 110, p = 10;
+  const et = new Date(new Date().toLocaleString('en-US', {timeZone: 'America/New_York'}));
+  const hf = et.getHours() + et.getMinutes() / 60;
+  const midMs = Date.now() - hf * 3600000;
+  const eNow = pts[pts.length - 1][1];
+  const fNow = cumAt(d.pace_cum, hf);
+  const proj = [];
+  if(fNow > 0.02){
+    const scale = eNow / fNow;
+    for(let x = hf; x <= 24.001; x += 0.25) proj.push([Math.min(x, 24), scale * cumAt(d.pace_cum, Math.min(x, 24))]);
+  }
+  const end = proj.length ? proj[proj.length - 1][1] : eNow;
+  const ymax = Math.max(end, eNow, 0.5) * 1.08;
+  const X = x => p + (w - 2 * p) * x / 24;
+  const Y = v => h - p - (h - 2 * p) * v / ymax;
+  const hx = ts => Math.min(Math.max((ts * 1000 - midMs) / 3600000, 0), 24);
+  const curve = pts.map((q, i) => (i ? 'L' : 'M') + X(hx(q[0])).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ');
+  const pcurve = proj.map((q, i) => (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ');
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;background:#141a23;border-radius:12px">' +
+    '<line x1="' + X(hf).toFixed(1) + '" y1="' + p + '" x2="' + X(hf).toFixed(1) + '" y2="' + (h - p) +
+    '" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="2,4"/>' +
+    (pcurve ? '<path d="' + pcurve + '" fill="none" stroke="var(--good)" stroke-width="2" stroke-dasharray="4,5" opacity=".9"/>' : '') +
+    '<path d="' + curve + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' +
+    '</svg>' +
+    '<div class="mkt">midnight → midnight ET · solid: earned so far' +
+    (proj.length ? ' · dotted: your last-10-days shape → <b style="color:var(--good)">≈ $' + end.toFixed(2) + '</b> by midnight' : '') + '</div>';
+}
+function heroMode(){ return localStorage.getItem('heroG') || 'day'; }
+function setHeroMode(m){ localStorage.setItem('heroG', m); refresh(); }
 function bigSpark(pts){
   if(!pts || pts.length < 3) return '<div class="mkt">collecting today’s rate curve — one point per minute…</div>';
   const w = 360, h = 110, p = 10;
@@ -3799,9 +3837,9 @@ function bigSpark(pts){
   const now = pts[pts.length-1][1];
   const avg = sy / n;
   const hrs = ((t1-t0)/3600).toFixed(1);
-  return '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;background:#010409;border-radius:8px">'+
-    '<path d="'+trend+'" fill="none" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="5,4"/>'+
-    '<path d="'+curve+'" fill="none" stroke="#58a6ff" stroke-width="2.5"/></svg>'+
+  return '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;background:#141a23;border-radius:12px">'+
+    '<path d="'+trend+'" fill="none" stroke="var(--good)" stroke-width="1.5" stroke-dasharray="5,4"/>'+
+    '<path d="'+curve+'" fill="none" stroke="var(--accent)" stroke-width="2.5"/></svg>'+
     '<div class="mkt">rate, last '+hrs+'h: now <b style="color:var(--accent)">$'+now.toFixed(2)+'/day</b>'+
     ' · avg $'+avg.toFixed(2)+'/day · range $'+ymin.toFixed(2)+'–$'+ymax.toFixed(2)+'</div>';
 }
@@ -4127,7 +4165,11 @@ async function renderAll(d){
     const diag = Object.entries(d.diag || {}).map(([k,v]) => k.replace(/^_/,'') + ': ' + v).join(' · ');
     const msg = [d.error, diag].filter(Boolean).join(' · ');
     err.style.display = msg ? 'block' : 'none'; err.textContent = msg;
-    document.getElementById('ovg').innerHTML = bigSpark(d.rate_series);
+    document.getElementById('ovg').innerHTML =
+      '<div class="chips" style="margin:2px 0 6px">'+
+      '<button class="chip'+(heroMode()==='day' ? ' chipon' : '')+'" onclick="setHeroMode(\\'day\\')">today + projection</button>'+
+      '<button class="chip'+(heroMode()==='rate' ? ' chipon' : '')+'" onclick="setHeroMode(\\'rate\\')">rate (2h)</button></div>'+
+      (heroMode() === 'day' ? dayGraph(d) : bigSpark(d.rate_series));
     renderHome(d);
     BP = d.buying_power;
     document.getElementById('planBP').textContent =
