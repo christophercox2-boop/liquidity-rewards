@@ -3,7 +3,7 @@ the tracker run immediately and refresh STATUS.md with your current orders.
 
 ----
 poke #1
-poki
+v
 ndj
 q
 nn2026-07-23T19:01:46u
