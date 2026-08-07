@@ -2913,18 +2913,22 @@ document.addEventListener('touchend', e => {
   if(PSY != null && e.changedTouches[0].clientY - PSY > 90){ refresh(); toast('Refreshed'); }
   PSY = null;
 }, {passive: true});
-let EARN_CUR = null;
-function setEarned(v){
-  const el = document.getElementById('earned');
-  if(EARN_CUR == null || Math.abs(v - EARN_CUR) < 0.005){ EARN_CUR = v; el.textContent = '$' + v.toFixed(2); return; }
-  const from = EARN_CUR, t0 = performance.now();
-  EARN_CUR = v;
-  (function step(t){
-    const k = Math.min((t - t0) / 700, 1), e = 1 - Math.pow(1 - k, 3);
-    el.textContent = '$' + (from + (v - from) * e).toFixed(2);
-    if(k < 1) requestAnimationFrame(step);
-  })(performance.now());
+// The big number ticks LIVE: between server updates it advances at the
+// current earning rate (re-anchored to the real figure every refresh).
+// The last two decimals render smaller — motion you can watch.
+let SRV_E = null, SRV_R = 0, SRV_TS = 0;
+function setEarned(v, rate){
+  SRV_E = v; SRV_R = rate || 0; SRV_TS = Date.now();
 }
+setInterval(function(){
+  if(SRV_E == null) return;
+  const el = document.getElementById('earned');
+  if(!el) return;
+  const v = SRV_E + SRV_R * (Date.now() - SRV_TS) / 86400000;
+  const s = Math.max(v, 0).toFixed(4);
+  el.innerHTML = '$' + s.slice(0, -2) +
+    '<span style="font-size:.45em;color:var(--ink2);font-weight:600">' + s.slice(-2) + '</span>';
+}, 150);
 setInterval(function(){
   const el = document.getElementById('fresh');
   if(!el || !LAST_OK) return;
@@ -4029,7 +4033,7 @@ function mPlace(m){
 }
 async function renderAll(d){
   try{
-    setEarned(d.earned_today);
+    setEarned(d.earned_today, d.rate_per_day);
     try{
       const et = new Date(new Date().toLocaleString('en-US', {timeZone: 'America/New_York'}));
       const frac = (et.getHours() * 60 + et.getMinutes()) / 1440;
