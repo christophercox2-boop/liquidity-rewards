@@ -2580,12 +2580,18 @@ def do_maction(body: dict) -> tuple[int, dict]:
 
 DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Liquidity rewards — live</title>
+<title>Rewards</title>
+<meta name="theme-color" content="#1a202b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rewards">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon.png">
 <style>
  :root{
-  --bg:#0b0e13; --surface:#151a22; --surface2:#1c232e; --line:#252d3a;
-  --ink:#e8edf4; --ink2:#98a3b3; --ink3:#5d6a7d;
-  --good:#3fb950; --bad:#f85149; --warn:#d9a132; --accent:#4a9eff;
+  --bg:#1a202b; --surface:#232b38; --surface2:#2c3543; --line:#3a4454;
+  --ink:#eef2f7; --ink2:#a7b1c2; --ink3:#707d92;
+  --good:#34c07c; --bad:#e5645f; --warn:#d9a132; --accent:#5aa2ff;
   --r:14px;
  }
  *{box-sizing:border-box}
@@ -2596,7 +2602,7 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  .big{font-size:52px;font-weight:800;letter-spacing:-1px;margin:2px 0;
   font-variant-numeric:tabular-nums}
  .sub{color:var(--ink2);font-size:13px;line-height:1.45}
- .err{background:#31171b;color:#ffa198;padding:10px 14px;border-radius:12px;margin:10px 0;display:none;font-size:13px}
+ .err{background:rgba(229,100,95,.14);color:#ffb3af;padding:10px 14px;border-radius:12px;margin:10px 0;display:none;font-size:13px}
  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
   padding:12px 14px;margin:12px 0}
  .card h3{margin:0 0 6px}
@@ -2620,24 +2626,24 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
   border-radius:10px;padding:9px 10px;font-size:15px;min-height:40px}
  .rp input{width:76px}
  button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
- .rp button{background:var(--good);color:#04120a;font-weight:600;border:none;
+ .rp button{background:var(--good);color:#0b2417;font-weight:600;border:none;
   border-radius:10px;padding:10px 14px;font-size:14px;min-height:40px}
  .rp button.alt{background:var(--surface2);color:var(--ink2);font-weight:500}
  .tab{background:var(--surface2);color:var(--ink2);border:1px solid var(--line);
   border-radius:10px;padding:9px 14px;font-size:13px;min-height:38px}
- .tab.on{background:var(--good);border-color:var(--good);color:#04120a;font-weight:600}
+ .tab.on{background:var(--good);border-color:var(--good);color:#0b2417;font-weight:600}
  .pos{color:var(--good)} .neg{color:var(--bad)}
  .bdg{background:#1c3252;color:#79b8ff;border-radius:6px;padding:2px 7px;font-size:10px;vertical-align:middle}
  input[type=range]{accent-color:var(--good)}
  /* bottom navigation */
  .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;
-  background:rgba(15,19,26,.96);backdrop-filter:blur(12px);
+  background:rgba(26,32,43,.96);backdrop-filter:blur(12px);
   border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
  .nb{flex:1;background:none;border:none;color:var(--ink3);font-size:11px;
   padding:7px 0 5px;border-radius:12px;display:flex;flex-direction:column;
   align-items:center;gap:2px;min-height:48px}
  .nb span{font-size:21px;line-height:1}
- .nb.on{color:var(--good);background:rgba(63,185,80,.1)}
+ .nb.on{color:var(--good);background:rgba(52,192,124,.12)}
  #moreMenu{position:fixed;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));
   z-index:21;background:var(--surface);border:1px solid var(--line);border-radius:14px;
   padding:6px;box-shadow:0 12px 40px rgba(0,0,0,.5);min-width:170px}
@@ -2649,8 +2655,14 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
   align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:24px}
  #login .big{font-size:26px}
  #login input{width:min(320px,80vw);text-align:center;font-size:18px}
- #login button{background:var(--good);color:#04120a;font-weight:700;border:none;
+ #login button{background:var(--good);color:#0b2417;font-weight:700;border:none;
   border-radius:12px;padding:13px 34px;font-size:16px}
+ #toast{position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(86px + env(safe-area-inset-bottom));background:var(--surface2);
+  color:var(--ink);padding:11px 18px;border-radius:99px;border:1px solid var(--line);
+  box-shadow:0 8px 30px rgba(0,0,0,.35);opacity:0;transition:opacity .25s;
+  z-index:50;pointer-events:none;max-width:86vw;font-size:14px}
+ #toast.show{opacity:1}
  .hero{margin:2px 0 0}
  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
  .chip{background:var(--surface2);border:1px solid var(--line);color:var(--ink2);
@@ -2715,6 +2727,7 @@ the position. Markets whose spread has closed below 3 ticks are skipped.</div>
 <div class="sub">Earned today</div>
 <div class="big" id="earned">…</div>
 <div class="sub" id="rate"></div>
+<div class="sub" id="pace" style="margin-top:2px"></div>
 <div class="sub" id="fresh" style="margin-top:2px"></div>
 <div class="err" id="err"></div>
 <div id="ovg" style="margin:10px 0"></div>
@@ -2828,11 +2841,11 @@ never doubled up (✔ = market you're already in). Capital = price for buys, max
 sell-your-position, doubling as a take-profit). Sells you aren't covered for are shorts:
 they win if the outcome doesn't happen and lose up to 100¢ − price per contract if it
 does.</div>
-<div style="margin-top:26px;border-top:1px solid #30363d;padding-top:12px">
- <button class="tab" style="background:#8b1a1a;color:#fff" onclick="cancelAll()">⚠ Cancel ALL open orders</button>
+<div style="margin-top:26px;border-top:1px solid var(--line);padding-top:12px">
+ <button class="tab" style="background:rgba(229,100,95,.18);color:#ff9d99" onclick="cancelAll()">⚠ Cancel ALL open orders</button>
 </div>
 </div>
-<div id="sheet" style="display:none;position:fixed;inset:0;background:rgba(2,5,10,.9);overflow:auto;z-index:30" onclick="closeSheet()">
+<div id="sheet" style="display:none;position:fixed;inset:0;background:rgba(9,12,18,.88);overflow:auto;z-index:30" onclick="closeSheet()">
  <div id="sheetIn" style="max-width:560px;margin:18px auto calc(90px + env(safe-area-inset-bottom));background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px" onclick="event.stopPropagation()"></div>
 </div>
 <script>
@@ -2858,6 +2871,38 @@ function doLogin(){
 }
 let OPEN = {}, GOPEN = {}, SERIES = null, RATES = {};
 let LAST_OK = 0;
+function toast(msg){
+  let t = document.getElementById('toast');
+  if(!t){ t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
+  t.textContent = String(msg); t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2600);
+}
+// two-tap confirm: first tap arms (toast explains), second within 4s executes
+let ARMK = '', ARMT = 0;
+function arm(key, msg){
+  if(ARMK === key && Date.now() - ARMT < 4000){ ARMK = ''; return true; }
+  ARMK = key; ARMT = Date.now();
+  toast((msg || 'Sure?') + ' — tap again to confirm');
+  return false;
+}
+let PSY = null;
+document.addEventListener('touchstart', e => { PSY = (window.scrollY <= 0) ? e.touches[0].clientY : null; }, {passive: true});
+document.addEventListener('touchend', e => {
+  if(PSY != null && e.changedTouches[0].clientY - PSY > 90){ refresh(); toast('Refreshed'); }
+  PSY = null;
+}, {passive: true});
+let EARN_CUR = null;
+function setEarned(v){
+  const el = document.getElementById('earned');
+  if(EARN_CUR == null || Math.abs(v - EARN_CUR) < 0.005){ EARN_CUR = v; el.textContent = '$' + v.toFixed(2); return; }
+  const from = EARN_CUR, t0 = performance.now();
+  EARN_CUR = v;
+  (function step(t){
+    const k = Math.min((t - t0) / 700, 1), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = '$' + (from + (v - from) * e).toFixed(2);
+    if(k < 1) requestAnimationFrame(step);
+  })(performance.now());
+}
 setInterval(function(){
   const el = document.getElementById('fresh');
   if(!el || !LAST_OK) return;
@@ -2922,8 +2967,8 @@ async function seatQualify(fi, ri, ask){
         headers:{'Content-Type':'application/json','X-Reprice':'1'},
         body: JSON.stringify(j)});
       const d = await resp.json().catch(() => ({ok:false, error:'HTTP '+resp.status}));
-      if(!d.ok){ alert(r.market+' '+j.side+' failed: '+(d.detail || d.error || '')); return false; }
-    }catch(e){ alert('Failed: '+e); return false; }
+      if(!d.ok){ toast(r.market+' '+j.side+' failed: '+(d.detail || d.error || '')); return false; }
+    }catch(e){ toast('Failed: '+e); return false; }
     await new Promise(res => setTimeout(res, 1500));
   }
   if(ask){ SEATSD = null; setTimeout(loadSeats, 1200); }
@@ -2932,7 +2977,7 @@ async function seatQualify(fi, ri, ask){
 async function seatQualifyAll(fi){
   const rows = SEATSD[fi].rows.map((r, i) => [r, i])
     .filter(([r]) => r.need_bid || r.need_ask);
-  if(!rows.length){ alert('Every market here already holds Target Size on both sides.'); return; }
+  if(!rows.length){ toast('Every market here already holds Target Size on both sides.'); return; }
   const capT = rows.reduce((s, [r]) => s +
     ((r.need_bid && r.need_bid.capital) || 0) + ((r.need_ask && r.need_ask.capital) || 0), 0);
   if(!confirm('Fill '+rows.length+' markets to Target Size with the cheapest possible orders (~$'+
@@ -2941,7 +2986,7 @@ async function seatQualifyAll(fi){
   for(const [r, i] of rows){
     if(await seatQualify(fi, i, false)) done++;
   }
-  alert('Qualifiers placed on '+done+'/'+rows.length+' markets.');
+  toast('Qualifiers placed on '+done+'/'+rows.length+' markets.');
   SEATSD = null; loadSeats();
 }
 function renderSeats(){
@@ -3145,7 +3190,7 @@ async function placeBatch(){
   const capC = tt ? 99.9 : +document.getElementById('capSlider').value;
   const sMin = tt ? 0.1 : +document.getElementById('sellSlider').value;
   const sel = planRows().filter(r => PSEL[pkey(r)]);
-  if(!sel.length){ alert('Nothing selected'); return; }
+  if(!sel.length){ toast('Nothing selected'); return; }
   const est = sel.reduce((s,r)=>s+ord(r).est_day,0);
   const worst = Math.max(0, ...Object.values(perMktCap(sel)));
   const nS = sel.filter(r=>r.side==='SELL').length;
@@ -3178,12 +3223,12 @@ async function placeBatch(){
         orders: sel.map(r => ({market: r.market, side: r.side || 'BUY',
           price_cents: +(ord(r).price*100).toFixed(1), size: ord(r).size}))})});
     const d = await r.json();
-    if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
+    if(!d.ok){ toast('Failed: ' + (d.error || '')); return; }
     if(d.precheck_skipped && d.precheck_skipped.length)
-      alert(d.precheck_skipped.length + ' order(s) skipped by the sliders:\\n' +
+      toast(d.precheck_skipped.length + ' order(s) skipped by the sliders:\\n' +
             d.precheck_skipped.slice(0,5).join('\\n'));
     pollPlace();
-  }catch(e){ alert('Failed: ' + e); }
+  }catch(e){ toast('Failed: ' + e); }
 }
 async function pollPlace(){
   try{
@@ -3293,7 +3338,7 @@ async function spPlace(){
     if(s){ orders.push({market: x.market, side: 'SELL',
                         price_cents: +(x.SELL.pick.price*100).toFixed(1), size: s.size}); cap += s.capital; }
   });
-  if(!orders.length){ alert('Nothing selected'); return; }
+  if(!orders.length){ toast('Nothing selected'); return; }
   if(!confirm('Enter ' + orders.length + ' post-only orders one tick inside the spread?\\n~$' +
               cap.toFixed(0) + ' locked while they rest. You will be BEST PRICE on both sides — ' +
               'first to earn, first to fill.')) return;
@@ -3303,9 +3348,9 @@ async function spPlace(){
       body: JSON.stringify({max_price_cents: 99.9, min_sell_cents: 0.1, which: 'spread',
                             orders: orders})});
     const d = await r.json();
-    if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
+    if(!d.ok){ toast('Failed: ' + (d.error || '')); return; }
     spPoll();
-  }catch(e){ alert('Failed: ' + e); }
+  }catch(e){ toast('Failed: ' + e); }
 }
 async function spPoll(){
   try{
@@ -3359,7 +3404,7 @@ function renderRpl(){
 }
 async function goReprice(){
   const sel = RPLAN.filter(r => RSEL[r.id]);
-  if(!sel.length){ alert('Nothing selected'); return; }
+  if(!sel.length){ toast('Nothing selected'); return; }
   const gain = sel.reduce((s,r)=>s+(r.est_after-r.est_now),0);
   if(!confirm('Reprice ' + sel.length + ' orders to their optimal prices?\\nEstimated gain ~$' +
               gain.toFixed(2) + '/day. Each move is checked against the live book first.')) return;
@@ -3368,10 +3413,10 @@ async function goReprice(){
       headers:{'Content-Type':'application/json','X-Reprice':'1'},
       body: JSON.stringify({orders: sel.map(r => ({id: r.id, to_cents: r.to_cents, to_size: r.to_size}))})});
     const d = await r.json();
-    if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
+    if(!d.ok){ toast('Failed: ' + (d.error || '')); return; }
     RPLAN = null; document.getElementById('rpl').innerHTML = '';
     pollReprice();
-  }catch(e){ alert('Failed: ' + e); }
+  }catch(e){ toast('Failed: ' + e); }
 }
 async function pollReprice(){
   try{
@@ -3420,7 +3465,7 @@ function renderDead(){
 }
 async function goCancelDead(){
   const sel = DPLAN.filter(r => DSEL[r.id]);
-  if(!sel.length){ alert('Nothing selected'); return; }
+  if(!sel.length){ toast('Nothing selected'); return; }
   const freed = sel.reduce((s,r)=>s+r.locked,0);
   if(!confirm('Cancel ' + sel.length + ' resting orders earning ~$0/day?\\nFrees ~$' +
               freed.toFixed(0) + ' of locked collateral. Positions are untouched — this only ' +
@@ -3430,10 +3475,10 @@ async function goCancelDead(){
       headers:{'Content-Type':'application/json','X-Reprice':'1'},
       body: JSON.stringify({orders: sel.map(r => ({id: r.id}))})});
     const d = await r.json();
-    if(!d.ok){ alert('Failed: ' + (d.error || '')); return; }
+    if(!d.ok){ toast('Failed: ' + (d.error || '')); return; }
     DPLAN = null; document.getElementById('rpl').innerHTML = '';
     pollCancelDead();
-  }catch(e){ alert('Failed: ' + e); }
+  }catch(e){ toast('Failed: ' + e); }
 }
 async function pollCancelDead(){
   try{
@@ -3452,8 +3497,8 @@ async function cancelAll(){
   try{
     const r = await fetch('cancel_all', {method:'POST', headers:{'X-Reprice':'1'}});
     const d = await r.json().catch(()=>({}));
-    alert(d.ok ? 'All orders cancelled' : 'Failed: ' + (d.error || ('HTTP ' + r.status)));
-  }catch(e){ alert('Failed: ' + e); }
+    toast(d.ok ? 'All orders cancelled' : 'Failed: ' + (d.error || ('HTTP ' + r.status)));
+  }catch(e){ toast('Failed: ' + e); }
   setTimeout(refresh, 1500);
 }
 function usd(v){ return (v<0?'-$':'$') + Math.abs(v||0).toFixed(2); }
@@ -3503,7 +3548,7 @@ function renderRaces(){
         '<td class="r">$'+rc.cost.toFixed(2)+'</td>'+
         '<td class="r '+(rc.worst >= 0 ? 'pos' : 'neg')+'"><b>'+(rc.worst >= 0 ? '+' : '')+rc.worst.toFixed(2)+'</b></td>'+
         '<td class="r '+(rc.best >= 0 ? 'pos' : 'neg')+'">'+(rc.best >= 0 ? '+' : '')+rc.best.toFixed(2)+'</td></tr>'+
-        '<tr style="display:'+(RCOPEN[i] ? '' : 'none')+'"><td colspan="5" style="background:#161b22">'+
+        '<tr style="display:'+(RCOPEN[i] ? '' : 'none')+'"><td colspan="5" style="background:var(--surface2)">'+
         '<table class="bk" style="width:100%">'+scen+'</table></td></tr>';
     }).join('')
     : '<tr><td class="sub">no race with positions in 2+ outcomes</td></tr>';
@@ -3538,8 +3583,8 @@ function renderPositions(){
         : '';
       const btn = (r.target_cents && r.status !== 'wait')
         ? qty +
-          '<button style="background:'+(r.status === 'fix' ? '#238636' : '#21262d')+
-          ';color:'+(r.status === 'fix' ? '#fff' : '#8b949e')+
+          '<button style="background:'+(r.status === 'fix' ? 'var(--good)' : 'var(--surface2)')+
+          ';color:'+(r.status === 'fix' ? '#0b2417' : 'var(--ink2)')+
           ';border:none;border-radius:6px;padding:6px 10px" '+
           'onclick="event.stopPropagation();posFix('+i+', true)">'+
           (r.short ? 'Buy back' : 'Sell')+' @ '+r.target_cents.toFixed(1)+'¢</button>'+
@@ -3567,9 +3612,7 @@ async function posFix(i, ask){
   if(!(q >= 1)) q = mag;
   q = Math.min(q, mag);  // never sell more than held / buy back more than short
   const verb = r.short ? 'Buy back' : 'Sell';
-  if(ask && !confirm(verb+' '+q.toLocaleString()+' of '+Math.abs(Math.round(r.net)).toLocaleString()+
-                     ' — '+r.market+' @ '+r.target_cents.toFixed(1)+
-                     '¢ (post-only, one tick inside)?')) return false;
+  if(ask && !arm('fix'+i, verb+' '+q.toLocaleString()+' @ '+r.target_cents.toFixed(1)+'¢, resting order')) return false;
   const body = (r.sells && r.sells.length)
     ? {op:'modify', order_id: r.sells[0].id, price_cents: r.target_cents, size: q}
     : (r.short
@@ -3580,10 +3623,10 @@ async function posFix(i, ask){
       headers:{'Content-Type':'application/json','X-Reprice':'1'},
       body: JSON.stringify(body)});
     const d = await resp.json().catch(() => ({ok:false, error:'HTTP '+resp.status}));
-    if(!d.ok){ alert(r.market+' failed: '+(d.detail || d.error || '')); return false; }
+    if(!d.ok){ toast(r.market+' failed: '+(d.detail || d.error || '')); return false; }
     if(ask){ setTimeout(loadPositions, 1200); }
     return true;
-  }catch(e){ alert('Failed: '+e); return false; }
+  }catch(e){ toast('Failed: '+e); return false; }
 }
 async function posTake(i){
   const r = POSD[i];
@@ -3595,26 +3638,20 @@ async function posTake(i){
   q = Math.min(q, mag);
   const verb = r.short ? 'Buy back' : 'Sell';
   const cash = (r.hit_cents/100*q).toFixed(2);
-  let msg = verb+' '+q.toLocaleString()+' NOW at the '+r.hit_cents.toFixed(1)+'¢ '+
-    (r.short ? 'ask' : 'bid')+' (≈ $'+cash+')?\\n\\nThis TAKES the standing '+
-    (r.short ? 'offer' : 'bid')+' and fills immediately — not a resting order. '+
-    (q > r.hit_size ? 'Only '+r.hit_size.toLocaleString()+' rests at that price; the remainder '+
-      'stays as an order there. ' : '')+
-    'Any of your own resting orders at that price are canceled first so you don\\'t trade with yourself.';
-  if(!confirm(msg)) return;
+  if(!arm('take'+i, verb+' '+q.toLocaleString()+' NOW at '+r.hit_cents.toFixed(1)+'¢ (≈ $'+cash+', fills instantly)')) return;
   try{
     const resp = await fetch('maction', {method:'POST',
       headers:{'Content-Type':'application/json','X-Reprice':'1'},
       body: JSON.stringify({op:'take', market:r.market, size:q, close_short:!!r.short})});
     const d = await resp.json().catch(() => ({ok:false, error:'HTTP '+resp.status}));
-    alert(d.ok ? 'Done ✓'+(d.canceled_first ? ' ('+d.canceled_first+' of your resting orders canceled first)' : '')
+    toast(d.ok ? 'Done ✓'+(d.canceled_first ? ' ('+d.canceled_first+' of your resting orders canceled first)' : '')
                : 'Failed: '+(d.detail || d.error || ''));
-  }catch(e){ alert('Failed: '+e); }
+  }catch(e){ toast('Failed: '+e); }
   setTimeout(loadPositions, 1500);
 }
 async function posFixAll(){
   const flagged = POSD.map((r, i) => i).filter(i => POSD[i].status === 'fix' && POSD[i].target_cents);
-  if(!flagged.length){ alert('Nothing flagged — everything is already priced to sell.'); return; }
+  if(!flagged.length){ toast('Nothing flagged — everything is already priced to sell.'); return; }
   if(!confirm('Price '+flagged.length+' positions to sell, each one tick inside its best ask?')) return;
   let done = 0;
   for(const i of flagged){
@@ -3644,7 +3681,7 @@ function spark(pts){
   const Y = r => h-p - (h-2*p)*(r-r0)/Math.max(r1-r0,1e-9);
   const dpath = pts.map((q,i)=>(i?'L':'M')+X(q[0]).toFixed(1)+' '+Y(q[1]).toFixed(1)).join(' ');
   const hrs = ((t1-t0)/3600).toFixed(1);
-  return '<svg width="'+w+'" height="'+h+'" style="background:#010409;border-radius:8px;max-width:100%">'+
+  return '<svg width="'+w+'" height="'+h+'" style="background:#141a23;border-radius:12px;max-width:100%">'+
     '<path d="'+dpath+'" fill="none" stroke="#58a6ff" stroke-width="2"/></svg>'+
     '<div class="mkt">$/day over last '+hrs+'h · min $'+r0.toFixed(2)+' · max $'+r1.toFixed(2)+
     ' · now $'+rs[rs.length-1].toFixed(2)+'</div>';
@@ -3675,7 +3712,7 @@ function bigSpark(pts){
   return '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;background:#010409;border-radius:8px">'+
     '<path d="'+trend+'" fill="none" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="5,4"/>'+
     '<path d="'+curve+'" fill="none" stroke="#58a6ff" stroke-width="2.5"/></svg>'+
-    '<div class="mkt">rate, last '+hrs+'h: now <b style="color:#58a6ff">$'+now.toFixed(2)+'/day</b>'+
+    '<div class="mkt">rate, last '+hrs+'h: now <b style="color:var(--accent)">$'+now.toFixed(2)+'/day</b>'+
     ' · avg $'+avg.toFixed(2)+'/day · range $'+ymin.toFixed(2)+'–$'+ymax.toFixed(2)+'</div>';
 }
 function tint(m, cur){
@@ -3683,7 +3720,7 @@ function tint(m, cur){
   if(seen === undefined) return '';
   const delta = cur - seen;
   if(Math.abs(delta) < Math.max(0.5, 0.25*Math.max(seen, 0.01))) return '';
-  return delta < 0 ? 'background:#3d1418' : 'background:#12341c';
+  return delta < 0 ? 'background:rgba(229,100,95,.10)' : 'background:rgba(52,192,124,.10)';
 }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 function mcat(m){
@@ -3722,15 +3759,15 @@ function pctArrow(m){
 async function reprice(id, label){
   const inp = document.getElementById('p'+id);
   const cents = parseFloat(inp.value);
-  if(!(cents >= 0.1 && cents <= 99.9)){ alert('Price out of range (0.1–99.9¢)'); return; }
+  if(!(cents >= 0.1 && cents <= 99.9)){ toast('Price out of range (0.1–99.9¢)'); return; }
   if(!confirm('Reprice ' + label + ' to ' + cents + '¢?')) return;
   try{
     const r = await fetch('reprice', {method:'POST',
       headers:{'Content-Type':'application/json','X-Reprice':'1'},
       body: JSON.stringify({order_id:id, price_cents:cents})});
     const d = await r.json().catch(()=>({ok:false,error:'HTTP '+r.status}));
-    alert(d.ok ? 'Repriced ✓' : 'Failed: ' + (d.detail || d.error || ('HTTP '+r.status)));
-  }catch(e){ alert('Failed: '+e); }
+    toast(d.ok ? 'Repriced ✓' : 'Failed: ' + (d.detail || d.error || ('HTTP '+r.status)));
+  }catch(e){ toast('Failed: '+e); }
   setTimeout(refresh, 1500);
 }
 let LASTD = null;
@@ -3805,11 +3842,11 @@ function renderHome(d){
       '<tr><td class="mkt" onclick="openMkt(\\''+esc(w.market)+'\\')"><b style="color:var(--ink);font-size:12px">'+esc(mname(w.market))+'</b></td>'+
       '<td class="r" style="white-space:nowrap" onclick="openMkt(\\''+esc(w.market)+'\\')">'+
       '<b class="pos">$'+w.total.toFixed(2)+'</b><br><span class="sub" style="font-size:11px">last paid '+esc(w.last)+'</span></td>'+
-      '<td class="r" style="width:30px"><button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
+      '<td class="r" style="width:30px"><button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:var(--surface2);color:var(--ink2)" '+
       'onclick="hideWinner(\\''+esc(w.market)+'\\')">✕</button></td></tr>').join('')
     : '<tr><td class="sub">you have orders everywhere you have earned lately</td></tr>') +
     (nHid ? '<tr><td colspan="3" class="sub" style="font-size:11px">'+nHid+
-            ' dismissed · <a href="#" style="color:#58a6ff" onclick="unhideWinners();return false">unhide all</a></td></tr>' : '');
+            ' dismissed · <a href="#" style="color:var(--accent)" onclick="unhideWinners();return false">unhide all</a></td></tr>' : '');
   document.getElementById('newm').innerHTML = (d.new_mkts || []).length ?
     d.new_mkts.map(e => {
       const click = e.kind === 'politics' ? ' onclick="openMkt(\\''+esc(e.label)+'\\')"' : '';
@@ -3831,7 +3868,7 @@ function mBest(){
   if(!MSHEET) return;
   const side = document.getElementById('mSide').value;
   const lv = side === 'BUY' ? (MSHEET.bids || []) : (MSHEET.asks || []);
-  if(!lv.length){ alert('That side of the book is empty — no best price to match.'); return; }
+  if(!lv.length){ toast('That side of the book is empty — no best price to match.'); return; }
   document.getElementById('mPrice').value = +(lv[0][0]*100).toFixed(2);
 }
 async function openMkt(m){
@@ -3864,7 +3901,7 @@ function renderSheet(d){
     '<input id="mq'+o.id+'" type="number" step="1" min="1" max="20000" value="'+Math.round(o.size)+'">'+
     '<button class="alt" onclick="qBump(\\'mq'+o.id+'\\',1)">+</button>'+
     '<button onclick="mModify(\\''+o.id+'\\',\\''+esc(m)+'\\')">Modify</button>'+
-    '<button class="alt" style="background:#8b1a1a;color:#fff" onclick="mCancel(\\''+o.id+'\\',\\''+esc(m)+'\\')">Cancel</button>'+
+    '<button class="alt" style="background:rgba(229,100,95,.18);color:#ff9d99" onclick="mCancel(\\''+o.id+'\\',\\''+esc(m)+'\\')">Cancel</button>'+
     '</div>').join('') || '<div class="sub">no resting orders here</div>';
   document.getElementById('sheetIn').innerHTML =
     '<div style="font-size:17px;font-weight:700">'+esc(mname(m))+'</div>'+
@@ -3875,7 +3912,7 @@ function renderSheet(d){
     '<div style="flex:1"><div class="sub">Asks</div><table class="bk">'+lv(d.asks)+'</table></div></div>'+
     '<h3>Your orders</h3>'+ords+
     '<h3>Place new</h3><div class="rp">'+
-    '<select id="mSide" style="background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:5px">'+
+    '<select id="mSide" style="background:var(--surface2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px">'+
     '<option>BUY</option><option>SELL</option></select> '+
     '<input id="mPrice" type="number" step="0.1" min="0.1" max="99.9" placeholder="price ¢"> '+
     '<button class="alt" onclick="qBump(\\'mSize\\',-1)">−</button>'+
@@ -3907,7 +3944,7 @@ function defendBlock(d){
     'value="'+dfb+'" style="width:72px">¢ · ask down to <input id="dfAsk" type="number" step="0.1" '+
     'min="0.1" max="99.9" value="'+dfa+'" style="width:72px">¢ '+
     '<button onclick="mDefend(\\''+esc(m)+'\\')">'+(df ? 'Update' : 'Defend')+'</button>'+
-    (df ? '<button class="alt" style="background:#8b1a1a;color:#fff" onclick="mUndefend(\\''+esc(m)+'\\')">Stop</button>' : '')+
+    (df ? '<button class="alt" style="background:rgba(229,100,95,.18);color:#ff9d99" onclick="mUndefend(\\''+esc(m)+'\\')">Stop</button>' : '')+
     '</div>'+
     '<div class="mkt">clear a box to leave that side undefended · if the price runs past your limit it simply stops following</div>';
 }
@@ -3918,16 +3955,16 @@ function mDefend(m){
   if(b !== '') body.bid_cap_c = parseFloat(b);
   if(a !== '') body.ask_floor_c = parseFloat(a);
   if(body.bid_cap_c === undefined && body.ask_floor_c === undefined){
-    alert('Enter a bid cap, an ask floor, or both.'); return;
+    toast('Enter a bid cap, an ask floor, or both.'); return;
   }
   const parts = [];
-  if(body.bid_cap_c !== undefined) parts.push('defend the bid up to '+body.bid_cap_c+'¢');
-  if(body.ask_floor_c !== undefined) parts.push('defend the ask down to '+body.ask_floor_c+'¢');
-  if(!confirm('Auto-'+parts.join(' and ')+'?')) return;
+  if(body.bid_cap_c !== undefined) parts.push('bid to '+body.bid_cap_c+'¢');
+  if(body.ask_floor_c !== undefined) parts.push('ask to '+body.ask_floor_c+'¢');
+  if(!arm('df'+m, 'Defend '+parts.join(' + '))) return;
   mact(body, m);
 }
 function mUndefend(m){
-  if(!confirm('Stop defending this market?')) return;
+  if(!arm('udf'+m, 'Stop defending this market')) return;
   mact({op:'undefend', market:m}, m);
 }
 async function mact(body, m){
@@ -3936,35 +3973,45 @@ async function mact(body, m){
       headers:{'Content-Type':'application/json','X-Reprice':'1'},
       body: JSON.stringify(body)});
     const d = await r.json().catch(() => ({ok:false, error:'HTTP '+r.status}));
-    alert(d.ok ? 'Done ✓' : 'Failed: ' + (d.detail || d.error || ('HTTP '+r.status)));
-  }catch(e){ alert('Failed: '+e); }
+    toast(d.ok ? 'Done ✓' : 'Failed: ' + (d.detail || d.error || ('HTTP '+r.status)));
+  }catch(e){ toast('Failed: '+e); }
   setTimeout(function(){ openMkt(m); refresh(); }, 1200);
 }
 function mModify(id, m){
   const c = parseFloat(document.getElementById('mp'+id).value);
   const q = parseInt(document.getElementById('mq'+id).value, 10);
-  if(!(c >= 0.1 && c <= 99.9)){ alert('Price out of range (0.1–99.9¢)'); return; }
-  if(!(q >= 1 && q <= 20000)){ alert('Size out of range (1–20,000)'); return; }
-  if(!confirm('Modify this order to '+q.toLocaleString()+' @ '+c+'¢?')) return;
+  if(!(c >= 0.1 && c <= 99.9)){ toast('Price out of range (0.1–99.9¢)'); return; }
+  if(!(q >= 1 && q <= 20000)){ toast('Size out of range (1–20,000)'); return; }
+  if(!arm('mod'+id, 'Modify to '+q.toLocaleString()+' @ '+c+'¢')) return;
   mact({op:'modify', order_id:id, price_cents:c, size:q}, m);
 }
 function mCancel(id, m){
-  if(!confirm('Cancel this order?')) return;
+  if(!arm('can'+id, 'Cancel this order')) return;
   mact({op:'cancel', order_id:id}, m);
 }
 function mPlace(m){
   const side = document.getElementById('mSide').value;
   const c = parseFloat(document.getElementById('mPrice').value);
   const q = parseInt(document.getElementById('mSize').value, 10);
-  if(!(c >= 0.1 && c <= 99.9)){ alert('Price out of range (0.1–99.9¢)'); return; }
-  if(!(q >= 1 && q <= 20000)){ alert('Size out of range (1–20,000)'); return; }
+  if(!(c >= 0.1 && c <= 99.9)){ toast('Price out of range (0.1–99.9¢)'); return; }
+  if(!(q >= 1 && q <= 20000)){ toast('Size out of range (1–20,000)'); return; }
   const cap = side === 'BUY' ? c/100*q : (1 - c/100)*q;
-  if(!confirm('Place post-only '+side+' '+q.toLocaleString()+' @ '+c+'¢? Locks ~$'+cap.toFixed(2)+'.')) return;
+  if(!arm('pl'+m, side+' '+q.toLocaleString()+' @ '+c+'¢, locks ~$'+cap.toFixed(2))) return;
   mact({op:'place', market:m, side:side, price_cents:c, size:q}, m);
 }
 async function renderAll(d){
   try{
-    document.getElementById('earned').textContent = '$' + d.earned_today.toFixed(2);
+    setEarned(d.earned_today);
+    try{
+      const et = new Date(new Date().toLocaleString('en-US', {timeZone: 'America/New_York'}));
+      const frac = (et.getHours() * 60 + et.getMinutes()) / 1440;
+      const pace = frac > 0.05 ? d.earned_today / frac : null;
+      const y = (d.history || [])[0];
+      document.getElementById('pace').textContent =
+        (pace ? 'on pace for ~$' + pace.toFixed(0) + ' today' : '') +
+        (y ? (pace ? '  ·  ' : '') + 'yesterday $' + y.earned.toFixed(2) +
+             (y.paid != null ? ' (paid $' + y.paid.toFixed(2) + ')' : '') : '');
+    }catch(_){}
     const nMkts = new Set(d.orders.map(o => o.market).filter(Boolean)).size;
     document.getElementById('rate').textContent =
       'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + nMkts +
@@ -4015,8 +4062,8 @@ async function renderAll(d){
     document.getElementById('catBar').innerHTML =
       '<label class="sub" style="margin-right:8px"><input type="checkbox" '+(pctMode()?'checked':'')+
       ' onchange="tglPct()"> % of rewards</label>' +
-      '<select onchange="setMSort(this.value)" style="background:#0d1117;color:#8b949e;'+
-      'border:1px solid #30363d;border-radius:6px;padding:3px;font-size:11px;margin-right:8px">'+
+      '<select onchange="setMSort(this.value)" style="background:var(--surface2);color:var(--ink2);'+
+      'border:1px solid var(--line);border-radius:8px;padding:6px;font-size:11px;margin-right:8px">'+
       '<option value="rate"'+(mSort()==='rate'?' selected':'')+'>sort: rate</option>'+
       '<option value="chg-desc"'+(mSort()==='chg-desc'?' selected':'')+'>sort: biggest % gain</option>'+
       '<option value="chg-asc"'+(mSort()==='chg-asc'?' selected':'')+'>sort: biggest % drop</option></select>'+
@@ -4079,13 +4126,13 @@ async function renderAll(d){
           (DEFENDED.has(m)?' 🛡':'')+'<div style="font-size:9px">'+m+'</div>'+
           '</td><td class="r" style="white-space:nowrap">'+rateTxt+
           '<br><span class="sub" style="font-size:11px">$'+v.toFixed(2)+' today</span>'+
-          ' <button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
+          ' <button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:var(--surface2);color:var(--ink2)" '+
           'onclick="event.stopPropagation();tglGraph('+i+',\\''+esc(m)+'\\')">📈</button>'+
-          ' <button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
+          ' <button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:var(--surface2);color:var(--ink2)" '+
           'onclick="event.stopPropagation();openMkt(\\''+esc(m)+'\\')">⚙</button></td></tr>' +
-          '<tr id="g'+i+'" style="display:'+(GOPEN[m]?'':'none')+'"><td colspan="2" style="background:#161b22">'+gcell+'</td></tr>' +
+          '<tr id="g'+i+'" style="display:'+(GOPEN[m]?'':'none')+'"><td colspan="2" style="background:var(--surface2)">'+gcell+'</td></tr>' +
           '<tr id="d'+i+'" style="display:'+(OPEN[m]?'':'none')+'"><td colspan="2" ' +
-          'style="background:#161b22">'+detail+'</td></tr>';
+          'style="background:var(--surface2)">'+detail+'</td></tr>';
       }).join('') || '<tr><td>nothing yet today</td></tr>';
     document.getElementById('history').innerHTML =
       '<tr><th>Day</th><th class="r">Tracked</th><th class="r">Polymarket paid</th></tr>' +
@@ -4124,6 +4171,38 @@ refresh(); setInterval(refresh, 15000);
 </script></body></html>"""
 
 
+_ICON_CACHE: bytes | None = None
+
+
+def _icon_png() -> bytes:
+    """The home-screen icon, drawn in code (no image libs): four rising
+    emerald bars on the app's slate background — 180×180 truecolor PNG."""
+    global _ICON_CACHE
+    if _ICON_CACHE is not None:
+        return _ICON_CACHE
+    import struct
+    import zlib
+    w = h = 180
+    bg, bar, bar_hi = (23, 28, 38), (52, 192, 124), (90, 162, 255)
+    px = [[bg] * w for _ in range(h)]
+    base = 146
+    for x0, top, col in ((26, 104, bar), (64, 84, bar), (102, 62, bar_hi), (140, 38, bar)):
+        for y in range(top, base):
+            for x in range(x0, x0 + 22):
+                px[y][x] = col
+    raw = b"".join(b"\x00" + bytes(c for p in row for c in p) for row in px)
+
+    def chunk(tag: bytes, data: bytes) -> bytes:
+        return (struct.pack(">I", len(data)) + tag + data
+                + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF))
+
+    _ICON_CACHE = (b"\x89PNG\r\n\x1a\n"
+                   + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
+                   + chunk(b"IDAT", zlib.compress(raw, 9))
+                   + chunk(b"IEND", b""))
+    return _ICON_CACHE
+
+
 class Handler(BaseHTTPRequestHandler):
     def _authed(self) -> bool:
         """The page remembers the password once (X-Dash-Key header from
@@ -4153,6 +4232,17 @@ class Handler(BaseHTTPRequestHandler):
             # The shell holds no data — serve it instantly, unauthenticated.
             # The page's own login card gates the data underneath.
             self._send(200, "text/html; charset=utf-8", DASH_HTML.encode())
+            return
+        if self.path.startswith("/manifest.json"):
+            self._send(200, "application/json", json.dumps({
+                "name": "Liquidity Rewards", "short_name": "Rewards",
+                "display": "standalone", "start_url": "/",
+                "background_color": "#1a202b", "theme_color": "#1a202b",
+                "icons": [{"src": "/icon.png", "sizes": "180x180",
+                           "type": "image/png"}]}).encode())
+            return
+        if self.path.startswith("/icon.png"):
+            self._send(200, "image/png", _icon_png())
             return
         if self.path.startswith("/widget.json"):
             if not self._authed():
