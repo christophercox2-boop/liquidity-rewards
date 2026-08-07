@@ -698,8 +698,10 @@ class Monitor:
                 ),
                 "alerts": "ntfy" if NTFY_TOPIC else "off",
                 "ws": {"live": (WS_STATUS["state"] == "live"
-                                and time.time() - WS_STATUS["last_msg"] < 120),
-                       "markets": WS_STATUS["markets"]},
+                                and time.time() - WS_STATUS["last_msg"] < 300),
+                       "markets": WS_STATUS["markets"],
+                       "state": WS_STATUS["state"],
+                       "err": WS_STATUS["err"]},
                 "actions": ACTIONS[-10:][::-1],
                 "trades": self.trades[:60],
                 "drops": self._drops(),
@@ -1817,9 +1819,14 @@ def ws_stream_loop(key_id: str, secret_key: str) -> None:
                 continue
             try:
                 headers = tr.auth_headers(key_id, secret_key, "GET", WS_PATH)
-                async with websockets.connect(WS_URL, additional_headers=headers,
-                                              open_timeout=15, close_timeout=3,
-                                              ping_interval=20) as ws:
+                kw = {"open_timeout": 15, "close_timeout": 3, "ping_interval": 20}
+                # websockets renamed extra_headers -> additional_headers in v14
+                try:
+                    major = int(websockets.__version__.split(".")[0])
+                except Exception:  # noqa: BLE001
+                    major = 14
+                kw["additional_headers" if major >= 14 else "extra_headers"] = headers
+                async with websockets.connect(WS_URL, **kw) as ws:
                     await ws.send(json.dumps({"subscribe": {
                         "requestId": "books",
                         "subscriptionType": "SUBSCRIPTION_TYPE_MARKET_DATA",
@@ -3824,7 +3831,8 @@ async function refresh(){
       'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + nMkts +
       ' markets (' + d.orders.length + ' orders)';
     document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence + ' · alerts: ' + d.alerts +
-      ' · books: ' + (d.ws && d.ws.live ? '⚡ streaming ('+d.ws.markets+')' : 'polling') +
+      ' · books: ' + (d.ws && d.ws.live ? '⚡ streaming ('+d.ws.markets+')'
+                      : 'polling' + (d.ws && d.ws.err ? ' — stream ' + d.ws.state + ': ' + d.ws.err : '')) +
       (d.warming ? ' · ⏳ warming up: ' + d.warming + ' markets on saved rates' : '') +
       (d.backfilled ? ' · ♻️ counter rebuilt from tracker data ($' + d.backfilled.toFixed(2) + ' at boot)' : '');
     const err = document.getElementById('err');
