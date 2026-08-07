@@ -697,6 +697,9 @@ class Monitor:
                     else self.persistence
                 ),
                 "alerts": "ntfy" if NTFY_TOPIC else "off",
+                "ws": {"live": (WS_STATUS["state"] == "live"
+                                and time.time() - WS_STATUS["last_msg"] < 120),
+                       "markets": WS_STATUS["markets"]},
                 "actions": ACTIONS[-10:][::-1],
                 "trades": self.trades[:60],
                 "drops": self._drops(),
@@ -1764,6 +1767,84 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
     finally:
         ACTIONS.append(record)
         del ACTIONS[:-20]
+
+# ---- Live book stream: the exchange's markets WebSocket ---------------------
+# One authenticated connection replaces minutes-stale polled books with
+# push updates for every market we quote. Strictly additive: the stream only
+# writes fresher entries into the shared book cache; if it drops, cache ages
+# grow past the REST rotation's 15s threshold and polling resumes untouched.
+WS_URL = "wss://api.polymarket.us/v1/ws/markets"
+WS_PATH = "/v1/ws/markets"
+WS_STATUS: dict = {"state": "off", "markets": 0, "last_msg": 0.0, "err": ""}
+
+
+def _ws_apply(text: str) -> str | None:
+    """Apply one stream message to the shared book cache; returns the slug."""
+    try:
+        md = (json.loads(text) or {}).get("marketData") or {}
+        slug = md.get("marketSlug")
+        if not slug:
+            return None
+        bids = [(tr._num((l.get("px") or {}).get("value")), tr._num(l.get("qty")))
+                for l in md.get("bids") or []]
+        asks = [(tr._num((l.get("px") or {}).get("value")), tr._num(l.get("qty")))
+                for l in md.get("offers") or md.get("asks") or []]
+        tr._BOOK_CACHE[slug] = (time.time(), tr._normalize_book(bids, asks))
+        WS_STATUS["last_msg"] = time.time()
+        return slug
+    except Exception:  # noqa: BLE001 — one bad frame never kills the stream
+        return None
+
+
+def _ws_slugs() -> set[str]:
+    return ({o.get("market") for o in MONITOR.orders if o.get("market")}
+            | set(MONITOR.state.get("defend") or {}))
+
+
+def ws_stream_loop(key_id: str, secret_key: str) -> None:
+    try:
+        import asyncio
+        import websockets
+    except Exception as e:  # noqa: BLE001 — no lib: polling carries on alone
+        WS_STATUS.update(state="unavailable", err=str(e)[:80])
+        return
+
+    async def run() -> None:
+        while True:
+            slugs = sorted(_ws_slugs())
+            if not slugs:
+                await asyncio.sleep(30)
+                continue
+            try:
+                headers = tr.auth_headers(key_id, secret_key, "GET", WS_PATH)
+                async with websockets.connect(WS_URL, additional_headers=headers,
+                                              open_timeout=15, close_timeout=3,
+                                              ping_interval=20) as ws:
+                    await ws.send(json.dumps({"subscribe": {
+                        "requestId": "books",
+                        "subscriptionType": "SUBSCRIPTION_TYPE_MARKET_DATA",
+                        "marketSlugs": slugs[:200]}}))
+                    WS_STATUS.update(state="live", markets=len(slugs), err="")
+                    sub_set, last_check = set(slugs), time.time()
+                    while True:
+                        try:
+                            _ws_apply(await asyncio.wait_for(ws.recv(), timeout=60))
+                        except asyncio.TimeoutError:
+                            pass  # quiet books — pings keep the socket alive
+                        if time.time() - last_check > 60:
+                            last_check = time.time()
+                            if _ws_slugs() - sub_set:
+                                break  # new markets: reconnect to resubscribe
+            except Exception as e:  # noqa: BLE001 — reconnect with backoff
+                WS_STATUS.update(state="reconnecting",
+                                 err=f"{type(e).__name__}: {e}"[:100])
+                await asyncio.sleep(15)
+
+    try:
+        asyncio.run(run())
+    except Exception as e:  # noqa: BLE001
+        WS_STATUS.update(state="dead", err=str(e)[:100])
+
 
 # ---- Auto-defend: keep price-setting orders at the front of thin books -----
 # The whole reward edge in a df-0.2 book is being the SOLE best price: everyone
@@ -3743,6 +3824,7 @@ async function refresh(){
       'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + nMkts +
       ' markets (' + d.orders.length + ' orders)';
     document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence + ' · alerts: ' + d.alerts +
+      ' · books: ' + (d.ws && d.ws.live ? '⚡ streaming ('+d.ws.markets+')' : 'polling') +
       (d.warming ? ' · ⏳ warming up: ' + d.warming + ' markets on saved rates' : '') +
       (d.backfilled ? ' · ♻️ counter rebuilt from tracker data ($' + d.backfilled.toFixed(2) + ' at boot)' : '');
     const err = document.getElementById('err');
@@ -4138,6 +4220,7 @@ def main() -> None:
     # let the 15-per-poll rotation fill the cache instead (full in ~10 min).
     tr.BOOK_COLD_FETCH_ALL = False
     threading.Thread(target=poll_loop, args=(key_id, secret_key), daemon=True).start()
+    threading.Thread(target=ws_stream_loop, args=(key_id, secret_key), daemon=True).start()
     server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
     print(f"live monitor on :{PORT}, polling every {POLL_SECONDS}s")
     server.serve_forever()

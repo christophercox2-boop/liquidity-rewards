@@ -651,6 +651,16 @@ def _race_size_uncached(race_key: str) -> int | None:
         return None
 
 
+def _normalize_book(bids_raw, asks_raw) -> dict:
+    """Sorted (price, qty) tuples + tick size from raw level lists — shared
+    by the REST fetch and the WebSocket stream so both feed identical books."""
+    bids = sorted([(p, q) for p, q in bids_raw if p > 0 and q > 0], key=lambda x: -x[0])
+    asks = sorted([(p, q) for p, q in asks_raw if p > 0 and q > 0], key=lambda x: x[0])
+    all_px = [p for p, _ in bids + asks]
+    tick = 0.001 if any(round(p * 1000) % 10 for p in all_px) else 0.01
+    return {"bids": bids, "asks": asks, "tick": tick}
+
+
 def _fetch_book(slug: str) -> dict:
     """Fetch a market's order book: sorted (price, qty) levels + tick size."""
     r = requests.get(f"{GATEWAY}/v1/markets/{slug}/book", timeout=15)
@@ -660,11 +670,7 @@ def _fetch_book(slug: str) -> dict:
     md = b.get("book") or b.get("marketData") or b  # tolerate wrappers
     bids = [(_num(l.get("px")), _num(l.get("qty"))) for l in md.get("bids") or []]
     asks = [(_num(l.get("px")), _num(l.get("qty"))) for l in md.get("offers") or md.get("asks") or []]
-    bids = sorted([(p, q) for p, q in bids if p > 0 and q > 0], key=lambda x: -x[0])
-    asks = sorted([(p, q) for p, q in asks if p > 0 and q > 0], key=lambda x: x[0])
-    all_px = [p for p, _ in bids + asks]
-    tick = 0.001 if any(round(p * 1000) % 10 for p in all_px) else 0.01
-    return {"bids": bids, "asks": asks, "tick": tick}
+    return _normalize_book(bids, asks)
 
 
 def _probe_share(levels: list[tuple[float, float]], tick: float, df: float,
@@ -896,8 +902,15 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     if cold_all:
         to_fetch = set(stalest_first)
     else:
-        prio_oldest = sorted(prio, key=lambda s: _BOOK_CACHE.get(s, (0.0,))[0])
-        rot = [s for s in stalest_first if s not in prio]
+        # Books under 15s old (the WebSocket stream keeps its markets that
+        # fresh) don't need a REST refresh — the saved budget flows to
+        # whatever the stream doesn't cover, and if the stream dies, ages
+        # grow past 15s and polling resumes by itself.
+        def _needs(s: str) -> bool:
+            return now_books - _BOOK_CACHE.get(s, (0.0,))[0] > 15
+        prio_oldest = sorted((s for s in prio if _needs(s)),
+                             key=lambda s: _BOOK_CACHE.get(s, (0.0,))[0])
+        rot = [s for s in stalest_first if s not in prio and _needs(s)]
         take = prio_oldest[:max(0, BOOK_REFRESH_PER_CALL - 6)]
         to_fetch = set(take) | set(rot[:BOOK_REFRESH_PER_CALL - len(take)])
     fresh: set[str] = set()  # fetched THIS call — an own order missing here is real
