@@ -2626,9 +2626,11 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
   border-radius:10px;padding:9px 10px;font-size:15px;min-height:40px}
  .rp input{width:76px}
  button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
- .rp button{background:var(--good);color:#0b2417;font-weight:600;border:none;
+ .rp button, .ctlrow button{background:var(--good);color:#0b2417;font-weight:600;border:none;
   border-radius:10px;padding:10px 14px;font-size:14px;min-height:40px}
- .rp button.alt{background:var(--surface2);color:var(--ink2);font-weight:500}
+ button.alt{background:rgba(10,14,20,.45);color:var(--ink2);font-weight:500;
+  border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-size:14px;min-height:40px}
+ button.armed{background:var(--warn) !important;color:#241a05 !important}
  .tab{background:var(--surface2);color:var(--ink2);border:1px solid var(--line);
   border-radius:10px;padding:9px 14px;font-size:13px;min-height:38px}
  .tab.on{background:var(--good);border-color:var(--good);color:#0b2417;font-weight:600}
@@ -2657,6 +2659,13 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  #login input{width:min(320px,80vw);text-align:center;font-size:18px}
  #login button{background:var(--good);color:#0b2417;font-weight:700;border:none;
   border-radius:12px;padding:13px 34px;font-size:16px}
+ button.armed{background:var(--warn) !important;color:#241a05 !important;font-weight:700}
+ .osub{background:var(--surface2);border-radius:12px;padding:10px 12px;margin:10px 0}
+ .ctlrow{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+ .ctl{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+ .ctl label{font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin-right:2px}
+ .ctl input{width:76px}
+ .bump{min-width:42px;padding:9px 0 !important;text-align:center}
  #toast{position:fixed;left:50%;transform:translateX(-50%);
   bottom:calc(86px + env(safe-area-inset-bottom));background:var(--surface2);
   color:var(--ink);padding:11px 18px;border-radius:99px;border:1px solid var(--line);
@@ -2877,12 +2886,25 @@ function toast(msg){
   t.textContent = String(msg); t.classList.add('show');
   clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2600);
 }
-// two-tap confirm: first tap arms (toast explains), second within 4s executes
-let ARMK = '', ARMT = 0;
+// two-tap confirm: first tap turns THE BUTTON into an amber 'Confirm?',
+// second tap on the same button within 5s executes; anything else disarms
+let ARMK = '', ARMT = 0, ARMBTN = null, ARMOLD = '';
+function disarm(){
+  if(ARMBTN){ ARMBTN.innerHTML = ARMOLD; ARMBTN.classList.remove('armed'); }
+  ARMBTN = null; ARMK = '';
+}
 function arm(key, msg){
-  if(ARMK === key && Date.now() - ARMT < 4000){ ARMK = ''; return true; }
+  if(ARMK === key && Date.now() - ARMT < 5000){ disarm(); return true; }
+  disarm();
   ARMK = key; ARMT = Date.now();
-  toast((msg || 'Sure?') + ' — tap again to confirm');
+  const ev = window.event;
+  const b = ev && ev.target && ev.target.closest ? ev.target.closest('button') : null;
+  if(b){
+    ARMBTN = b; ARMOLD = b.innerHTML;
+    b.innerHTML = 'Confirm?'; b.classList.add('armed');
+    setTimeout(() => { if(ARMK === key && Date.now() - ARMT >= 4900) disarm(); }, 5100);
+  }
+  if(msg) toast(msg);
   return false;
 }
 let PSY = null;
@@ -3894,15 +3916,19 @@ function renderSheet(d){
     '<tr><td>'+(+(x[0]*100).toFixed(2))+'¢</td><td class="r">'+x[1].toLocaleString()+'</td></tr>').join('')
     || '<tr><td class="sub">empty</td></tr>';
   const ords = (d.orders || []).map(o =>
-    '<div class="rp" style="margin:10px 0">'+o.side+' '+o.size.toLocaleString()+' @ '+
-    (+(o.price*100).toFixed(2))+'¢'+(o.est_day ? ' · $'+o.est_day.toFixed(2)+'/day' : ' · $0/day')+
-    '<br><input id="mp'+o.id+'" type="number" step="0.1" min="0.1" max="99.9" value="'+(o.price*100).toFixed(1)+'">¢ '+
-    '<button class="alt" onclick="qBump(\\'mq'+o.id+'\\',-1)">−</button>'+
+    '<div class="osub">'+
+    '<div style="font-size:14px;font-weight:600">'+o.side+' '+o.size.toLocaleString()+' @ '+
+    (+(o.price*100).toFixed(2))+'¢ <span class="sub" style="font-weight:400">· '+
+    (o.est_day ? '$'+o.est_day.toFixed(2)+'/day' : '$0/day')+'</span></div>'+
+    '<div class="ctlrow">'+
+    '<span class="ctl"><label>price</label><input id="mp'+o.id+'" type="number" step="0.1" min="0.1" max="99.9" value="'+(o.price*100).toFixed(1)+'"><span class="sub">¢</span></span>'+
+    '<span class="ctl"><label>qty</label><button class="alt bump" onclick="qBump(\\'mq'+o.id+'\\',-1)">−</button>'+
     '<input id="mq'+o.id+'" type="number" step="1" min="1" max="20000" value="'+Math.round(o.size)+'">'+
-    '<button class="alt" onclick="qBump(\\'mq'+o.id+'\\',1)">+</button>'+
+    '<button class="alt bump" onclick="qBump(\\'mq'+o.id+'\\',1)">+</button></span></div>'+
+    '<div class="ctlrow rp" style="margin-top:10px">'+
     '<button onclick="mModify(\\''+o.id+'\\',\\''+esc(m)+'\\')">Modify</button>'+
     '<button class="alt" style="background:rgba(229,100,95,.18);color:#ff9d99" onclick="mCancel(\\''+o.id+'\\',\\''+esc(m)+'\\')">Cancel</button>'+
-    '</div>').join('') || '<div class="sub">no resting orders here</div>';
+    '</div></div>').join('') || '<div class="sub">no resting orders here</div>';
   document.getElementById('sheetIn').innerHTML =
     '<div style="font-size:17px;font-weight:700">'+esc(mname(m))+'</div>'+
     '<div class="mkt">'+esc(m)+'</div>'+
@@ -3911,18 +3937,20 @@ function renderSheet(d){
     '<div style="flex:1"><div class="sub">Bids</div><table class="bk">'+lv(d.bids)+'</table></div>'+
     '<div style="flex:1"><div class="sub">Asks</div><table class="bk">'+lv(d.asks)+'</table></div></div>'+
     '<h3>Your orders</h3>'+ords+
-    '<h3>Place new</h3><div class="rp">'+
-    '<select id="mSide" style="background:var(--surface2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px">'+
-    '<option>BUY</option><option>SELL</option></select> '+
-    '<input id="mPrice" type="number" step="0.1" min="0.1" max="99.9" placeholder="price ¢"> '+
-    '<button class="alt" onclick="qBump(\\'mSize\\',-1)">−</button>'+
-    '<input id="mSize" type="number" step="1" min="1" max="20000" placeholder="qty">'+
-    '<button class="alt" onclick="qBump(\\'mSize\\',1)">+</button> '+
-    '<button class="alt" onclick="mBest()">match best</button> '+
-    '<button onclick="mPlace(\\''+esc(m)+'\\')">Place</button></div>'+
-    '<div class="rp" style="margin-top:4px"><span class="sub">± step:</span> '+
-    '<input id="qStepIn" type="number" step="1" min="1" max="20000" value="'+qStep()+'" '+
-    'style="width:60px" oninput="qStepSet(this.value)"></div>'+
+    '<h3>Place new</h3><div class="osub">'+
+    '<div class="ctlrow">'+
+    '<span class="ctl"><label>side</label><select id="mSide">'+
+    '<option>BUY</option><option>SELL</option></select></span>'+
+    '<span class="ctl"><label>price</label><input id="mPrice" type="number" step="0.1" min="0.1" max="99.9" placeholder="0.0"><span class="sub">¢</span></span>'+
+    '<button class="alt" style="min-height:40px" onclick="mBest()">match best</button></div>'+
+    '<div class="ctlrow">'+
+    '<span class="ctl"><label>qty</label><button class="alt bump" onclick="qBump(\\'mSize\\',-1)">−</button>'+
+    '<input id="mSize" type="number" step="1" min="1" max="20000" placeholder="0">'+
+    '<button class="alt bump" onclick="qBump(\\'mSize\\',1)">+</button></span>'+
+    '<span class="ctl"><label>± step</label><input id="qStepIn" type="number" step="1" min="1" max="20000" value="'+qStep()+'" '+
+    'style="width:58px" oninput="qStepSet(this.value)"></span></div>'+
+    '<div class="ctlrow rp" style="margin-top:10px"><button onclick="mPlace(\\''+esc(m)+'\\')">Place</button></div>'+
+    '</div>'+
     '<div class="mkt">post-only — the order rests or is rejected; it can never cross the spread and fill on arrival</div>'+
     defendBlock(d)+
     '<div class="rp" style="margin-top:12px"><button class="alt" onclick="closeSheet()">Close</button></div>';
