@@ -49,59 +49,55 @@ jobs:
           open("data/probe_ws_docs.txt", "w").write("".join(out) or idx[:20000] or "FETCH FAILED")
           EOF
 
-      - name: Try connecting to candidate websocket endpoints
+      - name: Authenticated connect to the markets stream
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
         run: |
-          pip install -q websockets
+          pip install -q -r requirements.txt websockets
           python3 - <<'EOF'
-          import asyncio, json, re, ssl
-          try:
-              docs = open("data/probe_ws_docs.txt", encoding="utf-8", errors="replace").read()
-          except FileNotFoundError:
-              docs = ""
-          found = re.findall(r"wss?://[^\s)\"'`<]+", docs)
-          candidates = list(dict.fromkeys(found)) + [
-              "wss://gateway.polymarket.us/ws",
-              "wss://gateway.polymarket.us/v1/ws",
-              "wss://api.polymarket.us/ws",
-              "wss://ws.polymarket.us",
-          ]
-          SLUG = "scc-senate-gop-2026-11-03-52"
-          subs = [
-              {"type": "subscribe", "channel": "book", "marketSlug": SLUG},
-              {"type": "subscribe", "channels": [{"name": "book", "marketSlugs": [SLUG]}]},
-              {"op": "subscribe", "topic": f"book.{SLUG}"},
-              {"action": "subscribe", "subscriptions": [{"topic": "book", "market": SLUG}]},
-          ]
-          results = []
+          import asyncio, csv, json, os, time
           import websockets
-          async def try_ep(url):
-              entry = {"url": url, "connected": False, "messages": []}
-              try:
-                  async with websockets.connect(url, open_timeout=8, close_timeout=3) as ws:
-                      entry["connected"] = True
-                      for s in subs:
-                          try:
-                              await ws.send(json.dumps(s))
-                          except Exception as e:
-                              entry["messages"].append(f"send err {e}")
-                              break
-                      try:
-                          for _ in range(6):
-                              m = await asyncio.wait_for(ws.recv(), timeout=6)
-                              entry["messages"].append(str(m)[:800])
-                      except asyncio.TimeoutError:
-                          entry["messages"].append("(recv timeout)")
-              except Exception as e:
-                  entry["error"] = f"{type(e).__name__}: {e}"[:200]
-              results.append(entry)
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          slugs = []
+          try:
+              with open("data/live_orders.csv") as f:
+                  for row in csv.DictReader(f):
+                      if row["market"] not in slugs:
+                          slugs.append(row["market"])
+          except Exception:
+              pass
+          slugs = slugs[:5] or ["scc-senate-gop-2026-11-03-52"]
+          URL = "wss://api.polymarket.us/v1/ws/markets"
+          PATH = "/v1/ws/markets"
+          out = {"url": URL, "slugs": slugs, "connected": False, "messages": []}
           async def main():
-              for u in candidates[:8]:
-                  await try_ep(u)
-          asyncio.run(main())
-          json.dump(results, open("data/probe_ws_connect.json", "w"), indent=1)
-          for r in results:
-              print(r["url"], "connected" if r.get("connected") else r.get("error", "?"),
-                    "| msgs:", len([m for m in r.get("messages", []) if not m.startswith("(")]))
+              headers = tr.auth_headers(kid, sec, "GET", PATH)
+              async with websockets.connect(URL, additional_headers=headers,
+                                            open_timeout=10, close_timeout=3) as ws:
+                  out["connected"] = True
+                  await ws.send(json.dumps({"subscribe": {
+                      "requestId": "md-1",
+                      "subscriptionType": "SUBSCRIPTION_TYPE_MARKET_DATA",
+                      "marketSlugs": slugs}}))
+                  t_end = time.time() + 30
+                  while time.time() < t_end and len(out["messages"]) < 40:
+                      try:
+                          m = await asyncio.wait_for(ws.recv(), timeout=8)
+                          out["messages"].append(str(m)[:1500])
+                      except asyncio.TimeoutError:
+                          out["messages"].append("(recv timeout)")
+                          break
+          try:
+              asyncio.run(main())
+          except Exception as e:
+              out["error"] = f"{type(e).__name__}: {e}"[:300]
+          json.dump(out, open("data/probe_ws_connect.json", "w"), indent=1)
+          print("connected:", out["connected"], "| messages:", len(out["messages"]),
+                "| error:", out.get("error", "-"))
+          for m in out["messages"][:3]:
+              print("  ", m[:200])
           EOF
 
       - name: Commit
