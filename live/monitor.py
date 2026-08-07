@@ -2715,6 +2715,7 @@ the position. Markets whose spread has closed below 3 ticks are skipped.</div>
 <div class="sub">Earned today</div>
 <div class="big" id="earned">…</div>
 <div class="sub" id="rate"></div>
+<div class="sub" id="fresh" style="margin-top:2px"></div>
 <div class="err" id="err"></div>
 <div id="ovg" style="margin:10px 0"></div>
 </div>
@@ -2856,6 +2857,15 @@ function doLogin(){
   refresh();
 }
 let OPEN = {}, GOPEN = {}, SERIES = null, RATES = {};
+let LAST_OK = 0;
+setInterval(function(){
+  const el = document.getElementById('fresh');
+  if(!el || !LAST_OK) return;
+  const s = Math.round((Date.now() - LAST_OK)/1000);
+  el.innerHTML = s < 45 ? '<span style="color:var(--good)">●</span> live · updated '+s+'s ago'
+    : s < 150 ? '<span style="color:var(--warn)">●</span> updating… last data '+s+'s ago'
+    : '<span style="color:var(--bad)">●</span> stale — last data '+Math.round(s/60)+'m ago';
+}, 1000);
 let SEEN = JSON.parse(localStorage.getItem('seenRates') || '{}');
 function showTab(t){
   ['H','R','P','L','S','E'].forEach(k => {
@@ -3505,9 +3515,9 @@ function renderPositions(){
   renderRaces();
   document.getElementById('posList').innerHTML =
     POSD.map((r, i) => {
-      const bg = r.status === 'good' ? 'background:#12341c'
-               : r.status === 'fix' ? 'background:#3d1418'
-               : r.status === 'wait' ? 'background:#2a2f36' : '';
+      const bg = r.status === 'good' ? 'background:rgba(63,185,80,.08)'
+               : r.status === 'fix' ? 'background:rgba(248,81,73,.09)'
+               : r.status === 'wait' ? 'background:rgba(152,163,179,.06)' : '';
       const sells = (r.sells || []).map(s =>
         s.size.toLocaleString() + ' @ ' + s.price_cents.toFixed(1) + '¢').join(', ');
       const mag = Math.min(Math.abs(Math.round(r.net)), 20000);
@@ -3541,7 +3551,7 @@ function renderPositions(){
         ? '<b style="color:#f0883e">No '+Math.abs(r.net).toLocaleString()+'</b>'
         : r.net.toLocaleString();
       return '<tr style="'+bg+'" onclick="openMkt(\\''+esc(r.market)+'\\')">'+
-        '<td class="mkt">'+esc(r.market)+'</td>'+
+        '<td class="mkt"><b style="color:var(--ink);font-size:12px">'+esc(mname(r.market))+'</b><div style="font-size:9px">'+esc(r.market)+'</div></td>'+
         '<td class="r">'+ownTxt+
         (r.avg_cents != null ? '<br><span class="sub" style="font-size:10px">@ '+r.avg_cents.toFixed(1)+'¢ avg</span>' : '')+'</td>'+
         '<td class="r" style="font-size:11px">'+(sells ? esc(sells) : '<span class="sub">no sell resting</span>')+'</td>'+
@@ -3736,8 +3746,33 @@ function hideWinner(m){
   if(LASTD) renderHome(LASTD);
 }
 function unhideWinners(){ localStorage.removeItem('hidWinners'); if(LASTD) renderHome(LASTD); }
+// Human names for market codes — the raw slug stays visible in the sheet.
+const MTOK = {usse:'Senate', ussep:'Senate primary', usgub:'Governor',
+  usgubp:'Governor primary', housepopw:'House popular vote', uspres28:'President 2028',
+  hrep:'House', ref:'Referendum', dem:'· Dem', rep:'· Rep', pass:'· passes'};
+function mname(m){
+  const s = String(m);
+  let mm = s.match(/^scc-senate-gop-.*?-(gte|lte)?(\d+)$/);
+  if(mm) return 'Senate GOP '+(mm[1]==='gte'?'≥':mm[1]==='lte'?'≤':'')+mm[2]+' seats';
+  mm = s.match(/^scc-hrep-rep-.*?-(gte|lte)?(\d+)$/);
+  if(mm) return 'House GOP '+(mm[1]==='gte'?'≥':mm[1]==='lte'?'≤':'')+mm[2]+' seats';
+  const parts = s.split('-');
+  const out = [];
+  for(let i = 1; i < parts.length; i++){
+    if(/^\d{4}$/.test(parts[i]) && /^\d{1,2}$/.test(parts[i+1]||'') && /^\d{1,2}$/.test(parts[i+2]||'')){
+      i += 2; continue;  // strip the embedded event date
+    }
+    const p = parts[i];
+    out.push(MTOK[p] || (p.length === 2 ? p.toUpperCase() : p));
+  }
+  const t = out.join(' ');
+  return t ? t.charAt(0).toUpperCase() + t.slice(1) : s;
+}
+function mcell(m){
+  return '<td class="mkt"><b style="color:var(--ink);font-size:12px">'+esc(mname(m))+'</b></td>';
+}
 function mrow(m, mid, right){
-  return '<tr onclick="openMkt(\\''+esc(m)+'\\')"><td class="mkt">'+esc(m)+'</td>'+
+  return '<tr onclick="openMkt(\\''+esc(m)+'\\')">'+mcell(m)+
          (mid||'')+'<td class="r" style="white-space:nowrap">'+right+'</td></tr>';
 }
 function renderHome(d){
@@ -3767,7 +3802,7 @@ function renderHome(d){
   const nHid = (d.winners || []).length - win.length;
   document.getElementById('winners').innerHTML = (win.length ?
     win.slice(0, 10).map(w =>
-      '<tr><td class="mkt" onclick="openMkt(\\''+esc(w.market)+'\\')">'+esc(w.market)+'</td>'+
+      '<tr><td class="mkt" onclick="openMkt(\\''+esc(w.market)+'\\')"><b style="color:var(--ink);font-size:12px">'+esc(mname(w.market))+'</b></td>'+
       '<td class="r" style="white-space:nowrap" onclick="openMkt(\\''+esc(w.market)+'\\')">'+
       '<b class="pos">$'+w.total.toFixed(2)+'</b><br><span class="sub" style="font-size:11px">last paid '+esc(w.last)+'</span></td>'+
       '<td class="r" style="width:30px"><button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
@@ -3832,7 +3867,8 @@ function renderSheet(d){
     '<button class="alt" style="background:#8b1a1a;color:#fff" onclick="mCancel(\\''+o.id+'\\',\\''+esc(m)+'\\')">Cancel</button>'+
     '</div>').join('') || '<div class="sub">no resting orders here</div>';
   document.getElementById('sheetIn').innerHTML =
-    '<div class="mkt" style="font-size:13px">'+esc(m)+'</div>'+
+    '<div style="font-size:17px;font-weight:700">'+esc(mname(m))+'</div>'+
+    '<div class="mkt">'+esc(m)+'</div>'+
     (d.net ? '<div class="sub">position: '+d.net.toLocaleString()+' contracts</div>' : '')+
     '<div style="display:flex;gap:18px;margin-top:8px">'+
     '<div style="flex:1"><div class="sub">Bids</div><table class="bk">'+lv(d.bids)+'</table></div>'+
@@ -4039,8 +4075,8 @@ async function renderAll(d){
                   : '<b>$'+rate.toFixed(2)+'/day</b>');
         const hasBatch = d.orders.some(o => o.market === m && o.batch);
         return '<tr id="r'+i+'" onclick="tgl('+i+',\\''+esc(m)+'\\')" style="'+tint(m, rate)+'">'+
-          '<td class="mkt">'+m+(hasBatch?' <span class="bdg">batch</span>':'')+
-          (DEFENDED.has(m)?' 🛡':'')+
+          '<td class="mkt"><b style="color:var(--ink);font-size:12px">'+esc(mname(m))+'</b>'+(hasBatch?' <span class="bdg">batch</span>':'')+
+          (DEFENDED.has(m)?' 🛡':'')+'<div style="font-size:9px">'+m+'</div>'+
           '</td><td class="r" style="white-space:nowrap">'+rateTxt+
           '<br><span class="sub" style="font-size:11px">$'+v.toFixed(2)+' today</span>'+
           ' <button class="alt" style="border:none;border-radius:6px;padding:4px 8px;background:#21262d;color:#8b949e" '+
@@ -4053,10 +4089,18 @@ async function renderAll(d){
       }).join('') || '<tr><td>nothing yet today</td></tr>';
     document.getElementById('history').innerHTML =
       '<tr><th>Day</th><th class="r">Tracked</th><th class="r">Polymarket paid</th></tr>' +
-      d.history.map(h => '<tr><td>'+h.day+'</td><td class="r">$'+h.earned.toFixed(2)+'</td>'+
-        '<td class="r">'+(h.paid == null ? '<span class="sub">not posted yet</span>'
-          : '<b>$'+h.paid.toFixed(2)+'</b>'+(h.pending ? ' <span class="sub">(pending)</span>' : ''))+
-        '</td></tr>').join('')
+      d.history.map(h => {
+        let cap = '';
+        if(h.paid != null && h.earned > 0){
+          const p = h.paid / h.earned * 100;
+          const c = p >= 85 ? 'var(--good)' : p >= 60 ? 'var(--warn)' : 'var(--bad)';
+          cap = ' <span style="color:'+c+';font-size:11px;font-weight:600">'+p.toFixed(0)+'%</span>';
+        }
+        return '<tr><td>'+h.day+'</td><td class="r">$'+h.earned.toFixed(2)+'</td>'+
+          '<td class="r">'+(h.paid == null ? '<span class="sub">not posted yet</span>'
+            : '<b>$'+h.paid.toFixed(2)+'</b>'+cap+(h.pending ? ' <span class="sub">(pending)</span>' : ''))+
+          '</td></tr>';
+      }).join('')
       || '<tr><td>collecting…</td></tr>';
     document.getElementById('acts').innerHTML = (d.actions && d.actions.length) ?
       '<h3>Recent actions</h3>' + d.actions.map(a =>
@@ -4070,6 +4114,7 @@ async function refresh(){
     if(!r.ok) return;
     const t = await r.text();
     try{ localStorage.setItem('lastData', t); }catch(_){}
+    LAST_OK = Date.now();
     renderAll(JSON.parse(t));
   }catch(e){}
 }
