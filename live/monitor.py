@@ -261,6 +261,92 @@ def intraday_profile(text: str | None = None, days: int = 10) -> list[float] | N
         return None
 
 
+def day_shape_digest(text: str | None = None) -> str | None:
+    """The morning report: how YESTERDAY's earnings distributed across the
+    day versus your typical shape, plus where today stands so far. Sent as
+    one compact phone notification at ~8:05am ET."""
+    if text is None:
+        text = _estimates_csv_text()
+    if not text:
+        return None
+    try:
+        import csv as _csv
+        import io as _io
+        now_et = dt.datetime.now(ET)
+        yday = (now_et - dt.timedelta(days=1)).strftime("%Y-%m-%d")
+        runs: dict[str, float] = {}  # snapshot ts -> total $/day (yesterday ET)
+        for row in _csv.DictReader(_io.StringIO(text)):
+            try:
+                if tr._et_day(row["checked_at_utc"]) == yday:
+                    runs[row["checked_at_utc"]] = (runs.get(row["checked_at_utc"], 0.0)
+                                                   + float(row["est_day"]))
+            except Exception:  # noqa: BLE001
+                continue
+        if len(runs) < 4:
+            return None
+        times = sorted(runs)
+        midnight = dt.datetime.strptime(yday, "%Y-%m-%d").replace(tzinfo=ET)
+        day_end = midnight + dt.timedelta(days=1)
+        hours = [0.0] * 24  # $ earned in each ET hour yesterday
+
+        def _utc(ts: str) -> dt.datetime:
+            return dt.datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").replace(tzinfo=dt.timezone.utc)
+
+        for i, ts in enumerate(times):
+            start = midnight if i == 0 else _utc(ts).astimezone(ET)
+            end = _utc(times[i + 1]).astimezone(ET) if i + 1 < len(times) else day_end
+            rate = runs[ts]
+            t = max(start, midnight)
+            while t < min(end, day_end):
+                nxt = min((t.replace(minute=0, second=0, microsecond=0)
+                           + dt.timedelta(hours=1)), end, day_end)
+                hours[t.hour] += rate * (nxt - t).total_seconds() / 86400.0
+                t = nxt
+        total = sum(hours)
+        if total <= 0:
+            return None
+        prof = MONITOR.day_profile if MONITOR else None
+        have_prof = bool(prof and len(prof) == 25)
+        best = max(range(24), key=lambda h: hours[h])
+        worst = min(range(24), key=lambda h: hours[h])
+
+        def h12(h: int) -> str:
+            return f"{(h % 12) or 12}{'am' if h < 12 else 'pm'}"
+
+        parts = [f"Yesterday {yday[5:]}: ${total:.2f} tracked."]
+        segs = [("overnight", 0, 6), ("morning", 6, 12),
+                ("afternoon", 12, 18), ("evening", 18, 24)]
+        bits = []
+        for name, a, b in segs:
+            s = sum(hours[a:b]) / total * 100
+            t_s = f" (typ {(prof[b] - prof[a]) * 100:.0f}%)" if have_prof else ""
+            bits.append(f"{name} {s:.0f}%{t_s}")
+        parts.append("Shape: " + ", ".join(bits) + ".")
+        parts.append(f"Best hour {h12(best)} ${hours[best]:.2f}; "
+                     f"slowest {h12(worst)} ${hours[worst]:.2f}.")
+        if MONITOR:
+            with MONITOR.lock:
+                earned = MONITOR.state.get("earned") or 0.0
+                hist = [x.get("earned") or 0.0
+                        for x in (MONITOR.state.get("history") or [])[-5:]]
+            hf = now_et.hour + now_et.minute / 60.0
+            if have_prof:
+                i = int(hf)
+                frac = prof[i] + (prof[min(i + 1, 24)] - prof[i]) * (hf - i)
+            else:
+                frac = hf / 24.0
+            if hist and frac > 0.03:
+                typical = sum(hist) / len(hist) * frac
+                if typical > 0.5:
+                    d = (earned / typical - 1) * 100
+                    parts.append(f"Today so far ${earned:.2f} — "
+                                 + (f"{d:+.0f}% vs your usual pace."
+                                    if abs(d) >= 1 else "right on your usual pace."))
+        return " ".join(parts)
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def load_winners() -> tuple[list[dict], float, dict]:
     """Career paid rewards per market from data/rewards.csv — fresh copy from
     GitHub when a token is available, else the file shipped with the deploy.
@@ -4604,6 +4690,16 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     tours = sorted({t for t in (_golf_tournament(s) for s in golf_slugs) if t})
                     MONITOR.note_markets(tours, "golf")
                 except Exception:  # noqa: BLE001 — discovery is best-effort
+                    pass
+            now_et_dig = dt.datetime.now(ET)
+            if (now_et_dig.hour * 60 + now_et_dig.minute >= 485  # 8:05am ET
+                    and MONITOR.state.get("digest_day") != now_et_dig.strftime("%Y-%m-%d")):
+                MONITOR.state["digest_day"] = now_et_dig.strftime("%Y-%m-%d")
+                try:
+                    digest = day_shape_digest()
+                    if digest:
+                        notify("Daily earnings shape", digest, "default")
+                except Exception:  # noqa: BLE001 — the report never breaks the loop
                     pass
             if time.time() - profile_refreshed > 6 * 3600:  # intraday pace curve
                 profile_refreshed = time.time()
