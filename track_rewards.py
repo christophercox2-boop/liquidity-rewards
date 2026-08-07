@@ -1140,22 +1140,35 @@ def append_estimates(live_orders: list[dict]) -> None:
 
 
 def _estimate_days() -> dict[str, dict]:
-    """Per day: time-averaged estimated $/day, total and per market."""
+    """Per day: TIME-WEIGHTED estimated earnings — each snapshot's rate
+    counts for exactly the time until the next snapshot (piecewise-constant
+    integral, midnight-to-midnight ET), which is how rewards actually
+    accrue. The old plain snapshot average over-weighted any hour that
+    happened to get extra tracker runs (every push triggers one)."""
     if not EST_CSV.exists():
         return {}
-    samples: dict[str, set[str]] = {}
-    sums: dict[str, dict[str, float]] = {}
+    runs: dict[str, dict[str, dict[str, float]]] = {}  # day -> ts -> market -> $/day
     with EST_CSV.open(newline="") as f:
         for r in csv.DictReader(f):
             day = _et_day(r["checked_at_utc"])  # reward days are Eastern Time
-            samples.setdefault(day, set()).add(r["checked_at_utc"])
-            sums.setdefault(day, {})
-            sums[day][r["market"]] = sums[day].get(r["market"], 0.0) + float(r["est_day"])
+            snap = runs.setdefault(day, {}).setdefault(r["checked_at_utc"], {})
+            snap[r["market"]] = snap.get(r["market"], 0.0) + float(r["est_day"])
     out: dict[str, dict] = {}
-    for day, per_market in sums.items():
-        n = max(len(samples[day]), 1)
-        avg = {m: v / n for m, v in per_market.items()}
-        out[day] = {"per_market": avg, "total": sum(avg.values()), "samples": n}
+    now = dt.datetime.now(dt.timezone.utc)
+    for day, snaps in runs.items():
+        times = sorted(snaps)
+        midnight = dt.datetime.strptime(day, "%Y-%m-%d").replace(tzinfo=ET)
+        end_cap = min(now, (midnight + dt.timedelta(days=1)).astimezone(dt.timezone.utc))
+        per: dict[str, float] = {}
+        for i, ts in enumerate(times):
+            start = (midnight.astimezone(dt.timezone.utc) if i == 0
+                     else dt.datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").replace(tzinfo=dt.timezone.utc))
+            end = (dt.datetime.strptime(times[i + 1], "%Y-%m-%d %H:%M:%S").replace(tzinfo=dt.timezone.utc)
+                   if i + 1 < len(times) else end_cap)
+            frac = max((end - start).total_seconds(), 0.0) / 86400.0
+            for m, rate in snaps[ts].items():
+                per[m] = per.get(m, 0.0) + rate * frac
+        out[day] = {"per_market": per, "total": sum(per.values()), "samples": len(times)}
     return out
 
 
@@ -1396,10 +1409,12 @@ def write_status(
     reconciled = sorted((set(est_days) & set(by_day)) - {accum_day})[-3:]
     if reconciled:
         lines.append(
-            "Time-averaged estimate for each day (across that day's hourly snapshots) "
-            "vs. what Polymarket actually recorded. Days run midnight-to-midnight Eastern, "
-            "matching the reward day. Low capture = your position decayed between snapshots "
-            "(competition joining the best price, prices moving away, fills)."
+            "Time-weighted estimate for each day (each hourly snapshot's rate counts for "
+            "the time until the next one) vs. what Polymarket actually recorded. Days run "
+            "midnight-to-midnight Eastern, matching the reward day. The dashboard's "
+            "Tracked column is the finer-grained official figure and can differ a little "
+            "— it samples every 30 seconds. Low capture = your position decayed between "
+            "snapshots (competition joining the best price, prices moving away, fills)."
         )
         lines.append("")
         lines.append("| Day | Estimated | Recorded | Captured |")
