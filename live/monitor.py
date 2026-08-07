@@ -213,6 +213,54 @@ def tracker_day_integral(day_et: str,
         return None
 
 
+def intraday_profile(text: str | None = None, days: int = 10) -> list[float] | None:
+    """How this account's earnings actually distribute across the ET day,
+    from the last `days` of tracker snapshots: returns a 25-point cumulative
+    curve (0.0 at midnight → 1.0 at midnight) used to project 'on pace'
+    honestly — competitive US afternoons and rich overnight hours weigh in
+    as they really are, instead of assuming every hour earns the same."""
+    if text is None:
+        text = _estimates_csv_text()
+    if not text:
+        return None
+    try:
+        import csv as _csv
+        import io as _io
+        totals: dict[str, float] = {}  # snapshot ts -> total $/day
+        for row in _csv.DictReader(_io.StringIO(text)):
+            try:
+                totals[row["checked_at_utc"]] = (totals.get(row["checked_at_utc"], 0.0)
+                                                 + float(row["est_day"]))
+            except Exception:  # noqa: BLE001
+                continue
+        if not totals:
+            return None
+        cutoff = (dt.datetime.now(dt.timezone.utc)
+                  - dt.timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
+        buckets: list[list[float]] = [[] for _ in range(24)]
+        for ts, tot in totals.items():
+            if ts < cutoff:
+                continue
+            t = dt.datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").replace(
+                tzinfo=dt.timezone.utc).astimezone(ET)
+            buckets[t.hour].append(tot)
+        filled = [sum(b) / len(b) for b in buckets if b]
+        if len(filled) < 6:  # not enough coverage to be better than flat
+            return None
+        overall = sum(filled) / len(filled)
+        w = [(sum(b) / len(b)) if b else overall for b in buckets]
+        s = sum(w)
+        if s <= 0:
+            return None
+        cum = [0.0]
+        for h in range(24):
+            cum.append(cum[-1] + w[h] / s)
+        cum[-1] = 1.0
+        return [round(c, 4) for c in cum]
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def load_winners() -> tuple[list[dict], float, dict]:
     """Career paid rewards per market from data/rewards.csv — fresh copy from
     GitHub when a token is available, else the file shipped with the deploy.
@@ -344,6 +392,7 @@ class Monitor:
         self.trades: list[dict] = []  # recent fills, for the landing page
         self.order_snaps: list[dict] = []  # rolling 2-min order snapshots (24h, memory-only)
         self.day_paid: dict = {}  # date -> {paid, pending} from the rewards history
+        self.day_profile: list[float] | None = None  # 25-pt cumulative ET curve
         self._last_snap = 0.0
         self.pnl_updated: dt.datetime | None = None
         self.pnl_error: str | None = None
@@ -697,6 +746,7 @@ class Monitor:
                     else self.persistence
                 ),
                 "alerts": "ntfy" if NTFY_TOPIC else "off",
+                "pace_cum": getattr(self, "day_profile", None),
                 "ws": {"live": (WS_STATUS["state"] == "live"
                                 and time.time() - WS_STATUS["last_msg"] < 300),
                        "markets": WS_STATUS["markets"],
@@ -4050,8 +4100,14 @@ async function renderAll(d){
     setEarned(d.earned_today, d.rate_per_day);
     try{
       const et = new Date(new Date().toLocaleString('en-US', {timeZone: 'America/New_York'}));
-      const frac = (et.getHours() * 60 + et.getMinutes()) / 1440;
-      const pace = frac > 0.05 ? d.earned_today / frac : null;
+      const hf = et.getHours() + et.getMinutes() / 60;
+      let frac = hf / 24;
+      const cf = d.pace_cum;
+      if(cf && cf.length === 25){
+        const i = Math.floor(hf);
+        frac = cf[i] + (cf[Math.min(i + 1, 24)] - cf[i]) * (hf - i);
+      }
+      const pace = frac > 0.03 ? d.earned_today / frac : null;
       const y = (d.history || [])[0];
       document.getElementById('pace').textContent =
         (pace ? 'on pace for ~$' + pace.toFixed(0) + ' today' : '') +
@@ -4434,6 +4490,7 @@ def poll_loop(key_id: str, secret_key: str) -> None:
     act_quick = 0.0
     golf_refreshed = 0.0
     winners_refreshed = 0.0
+    profile_refreshed = 0.0
     last_ok = time.time()
     err_notified = 0.0
     err_streak = 0
@@ -4458,6 +4515,12 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     tours = sorted({t for t in (_golf_tournament(s) for s in golf_slugs) if t})
                     MONITOR.note_markets(tours, "golf")
                 except Exception:  # noqa: BLE001 — discovery is best-effort
+                    pass
+            if time.time() - profile_refreshed > 6 * 3600:  # intraday pace curve
+                profile_refreshed = time.time()
+                try:
+                    MONITOR.day_profile = intraday_profile() or MONITOR.day_profile
+                except Exception:  # noqa: BLE001 — pace falls back to flat
                     pass
             if time.time() - winners_refreshed > 3600:  # career totals + payout alert
                 winners_refreshed = time.time()
