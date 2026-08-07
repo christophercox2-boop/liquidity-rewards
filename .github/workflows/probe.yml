@@ -21,6 +21,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Raw incentives payload (politics + golf samples)
+        continue-on-error: true
         run: |
           mkdir -p data
           curl -sS "https://api.prod.polymarketexchange.com/v1/incentives?symbols=apdc-kashpatel-2026-08-31&symbols=cranc-uspres28-12-31-2026-elomus&symbols=opdc-mcconnell-resign-2026-11-02&symbols=tec-pga-rockclas-2026-08-02-r3l-joedah&pageSize=20" \
@@ -32,6 +33,7 @@ jobs:
           python-version: "3.12"
 
       - name: Recent activity payload (trade states)
+        continue-on-error: true
         env:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
           POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
@@ -52,6 +54,7 @@ jobs:
           EOF
 
       - name: Earnings endpoint variations
+        continue-on-error: true
         env:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
           POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
@@ -89,6 +92,7 @@ jobs:
           EOF
 
       - name: Open orders payload
+        continue-on-error: true
         env:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
           POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
@@ -107,6 +111,7 @@ jobs:
           EOF
 
       - name: Positions payload (short-position shape)
+        continue-on-error: true
         env:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
           POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
@@ -137,6 +142,7 @@ jobs:
           EOF
 
       - name: Book presence — is every open order visible on the public book?
+        continue-on-error: true
         env:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
           POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
@@ -193,6 +199,7 @@ jobs:
           EOF
 
       - name: Official liquidity-program docs (full rules text)
+        continue-on-error: true
         run: |
           curl -sSL -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36" \
             "https://docs.polymarket.us/incentives/liquidity" -o /tmp/liq.html || true
