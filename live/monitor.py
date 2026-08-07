@@ -2582,38 +2582,97 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Liquidity rewards — live</title>
 <style>
- body{font-family:-apple-system,system-ui,sans-serif;margin:0;padding:16px;background:#0d1117;color:#e6edf3}
- .big{font-size:56px;font-weight:700;margin:8px 0}
- .sub{color:#8b949e;font-size:14px}
- .err{background:#3d1418;color:#ffa198;padding:8px 12px;border-radius:8px;margin:10px 0;display:none}
- table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px}
- td,th{padding:6px 4px;text-align:left;border-bottom:1px solid #21262d}
+ :root{
+  --bg:#0b0e13; --surface:#151a22; --surface2:#1c232e; --line:#252d3a;
+  --ink:#e8edf4; --ink2:#98a3b3; --ink3:#5d6a7d;
+  --good:#3fb950; --bad:#f85149; --warn:#d9a132; --accent:#4a9eff;
+  --r:14px;
+ }
+ *{box-sizing:border-box}
+ html{-webkit-text-size-adjust:100%}
+ body{font-family:-apple-system,system-ui,'Segoe UI',sans-serif;margin:0;
+  padding:14px 14px calc(76px + env(safe-area-inset-bottom));
+  background:var(--bg);color:var(--ink)}
+ .big{font-size:52px;font-weight:800;letter-spacing:-1px;margin:2px 0;
+  font-variant-numeric:tabular-nums}
+ .sub{color:var(--ink2);font-size:13px;line-height:1.45}
+ .err{background:#31171b;color:#ffa198;padding:10px 14px;border-radius:12px;margin:10px 0;display:none;font-size:13px}
+ .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:12px 14px;margin:12px 0}
+ .card h3{margin:0 0 6px}
+ table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+ td,th{padding:8px 4px;text-align:left;border-bottom:1px solid var(--line)}
+ tr:last-child td{border-bottom:none}
+ th{color:var(--ink2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
  td.r,th.r{text-align:right}
- .mkt{color:#8b949e;font-size:11px;word-break:break-all}
- h3{margin:18px 0 4px;font-size:15px}
- .bk{width:auto;min-width:60%;margin:6px 0;font-family:ui-monospace,monospace;font-size:12px}
- .bk td{padding:2px 10px 2px 0;border-bottom:none;color:#8b949e}
- .bk tr.me td{color:#58a6ff;font-weight:600}
- .calc{font-family:ui-monospace,monospace;font-size:12px;color:#e6edf3;margin:2px 0}
+ .mkt{color:var(--ink2);font-size:11px;word-break:break-all;line-height:1.5}
+ h3{margin:20px 0 4px;font-size:15px;font-weight:700}
+ h3 .sub{font-weight:400}
+ .bk{width:auto;min-width:60%;margin:6px 0;font-family:ui-monospace,SFMono-Regular,monospace;font-size:12px}
+ .bk td{padding:2px 10px 2px 0;border-bottom:none;color:var(--ink2)}
+ .bk tr.me td{color:var(--accent);font-weight:600}
+ .calc{font-family:ui-monospace,SFMono-Regular,monospace;font-size:12px;color:var(--ink);margin:2px 0}
  .ord{margin:8px 0 14px}
- .oh{font-size:12px;color:#e6edf3;margin-bottom:2px}
- .rp{margin:6px 0}
- .rp input{width:70px;background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:5px;font-size:14px}
- .rp button{background:#238636;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;margin-left:6px}
- .rp button.alt{background:#21262d;color:#8b949e}
- .tab{background:#21262d;color:#8b949e;border:none;border-radius:8px;padding:8px 16px;font-size:14px}
- .tab.on{background:#238636;color:#fff}
- .pos{color:#3fb950}
- .neg{color:#f85149}
- .bdg{background:#1f3a5f;color:#79b8ff;border-radius:5px;padding:1px 6px;font-size:10px;vertical-align:middle}
+ .oh{font-size:12px;color:var(--ink);margin-bottom:2px}
+ .rp{margin:8px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+ input[type=number],input[type=password],input[type=text],select{
+  background:var(--surface2);color:var(--ink);border:1px solid var(--line);
+  border-radius:10px;padding:9px 10px;font-size:15px;min-height:40px}
+ .rp input{width:76px}
+ button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+ .rp button{background:var(--good);color:#04120a;font-weight:600;border:none;
+  border-radius:10px;padding:10px 14px;font-size:14px;min-height:40px}
+ .rp button.alt{background:var(--surface2);color:var(--ink2);font-weight:500}
+ .tab{background:var(--surface2);color:var(--ink2);border:1px solid var(--line);
+  border-radius:10px;padding:9px 14px;font-size:13px;min-height:38px}
+ .tab.on{background:var(--good);border-color:var(--good);color:#04120a;font-weight:600}
+ .pos{color:var(--good)} .neg{color:var(--bad)}
+ .bdg{background:#1c3252;color:#79b8ff;border-radius:6px;padding:2px 7px;font-size:10px;vertical-align:middle}
+ input[type=range]{accent-color:var(--good)}
+ /* bottom navigation */
+ .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;
+  background:rgba(15,19,26,.96);backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+ .nb{flex:1;background:none;border:none;color:var(--ink3);font-size:11px;
+  padding:7px 0 5px;border-radius:12px;display:flex;flex-direction:column;
+  align-items:center;gap:2px;min-height:48px}
+ .nb span{font-size:21px;line-height:1}
+ .nb.on{color:var(--good);background:rgba(63,185,80,.1)}
+ #moreMenu{position:fixed;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));
+  z-index:21;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:6px;box-shadow:0 12px 40px rgba(0,0,0,.5);min-width:170px}
+ #moreMenu button{display:flex;width:100%;background:none;border:none;color:var(--ink);
+  font-size:15px;padding:12px 14px;border-radius:10px;gap:10px;align-items:center}
+ #moreMenu button:active{background:var(--surface2)}
+ /* one-time login */
+ #login{position:fixed;inset:0;z-index:40;background:var(--bg);display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:24px}
+ #login .big{font-size:26px}
+ #login input{width:min(320px,80vw);text-align:center;font-size:18px}
+ #login button{background:var(--good);color:#04120a;font-weight:700;border:none;
+  border-radius:12px;padding:13px 34px;font-size:16px}
+ .hero{margin:2px 0 0}
+ .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+ .chip{background:var(--surface2);border:1px solid var(--line);color:var(--ink2);
+  border-radius:99px;padding:5px 11px;font-size:12px}
 </style></head><body>
-<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
- <button class="tab on" id="tabH" onclick="showTab('H')">Home</button>
- <button class="tab" id="tabR" onclick="showTab('R')">Markets</button>
- <button class="tab" id="tabP" onclick="showTab('P')">Positions</button>
- <button class="tab" id="tabL" onclick="showTab('L')">Plan</button>
- <button class="tab" id="tabS" onclick="showTab('S')">Spreads</button>
- <button class="tab" id="tabE" onclick="showTab('E')">Seats</button>
+<div id="login">
+ <div class="big">Liquidity rewards</div>
+ <div class="sub">Enter your dashboard password once — this device remembers it.</div>
+ <input id="loginKey" type="password" placeholder="password" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()">
+ <button onclick="doLogin()">Open dashboard</button>
+</div>
+<nav class="nav">
+ <button class="nb on" id="tabH" onclick="showTab('H')"><span>⌂</span>Home</button>
+ <button class="nb" id="tabR" onclick="showTab('R')"><span>▤</span>Markets</button>
+ <button class="nb" id="tabP" onclick="showTab('P')"><span>◆</span>Positions</button>
+ <button class="nb" id="tabM" onclick="toggleMore()"><span>⋯</span>More</button>
+</nav>
+<div id="moreMenu" style="display:none">
+ <button onclick="showTab('L')">🧭 Plan &amp; Restore</button>
+ <button onclick="showTab('S')">↔️ Spreads</button>
+ <button onclick="showTab('E')">🏛 Seats</button>
 </div>
 <div id="viewE" style="display:none">
 <div class="sub">Seat-count ladders — House &amp; Senate, in seat order</div>
@@ -2652,21 +2711,31 @@ the touch means you can FILL: if both sides fill you pocket the spread; if one f
 the position. Markets whose spread has closed below 3 ticks are skipped.</div>
 </div>
 <div id="viewH">
-<div class="sub">Earned today (ET) — live estimate</div>
+<div class="hero">
+<div class="sub">Earned today</div>
 <div class="big" id="earned">…</div>
 <div class="sub" id="rate"></div>
-<div class="sub" id="updated"></div>
 <div class="err" id="err"></div>
 <div id="ovg" style="margin:10px 0"></div>
-<h3>Since you last checked <button class="tab" style="font-size:11px;padding:4px 10px" onclick="clearTxns()">Clear</button></h3>
+</div>
+<div class="card">
+<h3>Since you last checked <button class="tab" style="font-size:11px;padding:5px 12px;min-height:0" onclick="clearTxns()">Clear</button></h3>
 <table id="txns"></table>
-<h3>Biggest drops <span class="sub">(vs their peak over the last ~8h)</span></h3>
+</div>
+<div class="card">
+<h3>Biggest drops <span class="sub">(vs their ~8h peak)</span></h3>
 <table id="drops"></table>
-<h3>Earners you're not in <span class="sub">(paid you before · no order resting now)</span></h3>
+</div>
+<div class="card">
+<h3>Earners you're not in <span class="sub">(paid you before · nothing resting now)</span></h3>
 <table id="winners"></table>
+</div>
+<div class="card">
 <h3>New markets <span class="sub">(golf shown per tournament)</span></h3>
 <table id="newm"></table>
+</div>
 <div class="mkt" style="margin-top:8px">Tap any market to place, modify or cancel an order there.</div>
+<div class="mkt" id="updated" style="margin-top:6px"></div>
 </div>
 <div id="viewR" style="display:none">
 <div style="margin:8px 0"><button class="tab" onclick="loadReprice()">⚡ Optimize prices</button>
@@ -2677,10 +2746,14 @@ the position. Markets whose spread has closed below 3 ticks are skipped.</div>
   <label><input type="radio" name="qdist" value="2"> 2 back</label></span></div>
 <div id="rpl"></div>
 <div id="rpProg" class="mkt"></div>
+<div class="card">
 <h3>By market <span class="sub">(tap a row for the math)</span></h3>
 <div id="catBar" style="margin:4px 0"></div>
 <table id="markets"></table>
+</div>
+<div class="card">
 <h3>Previous days</h3><table id="history"></table>
+</div>
 <div id="acts"></div>
 </div>
 <div id="viewP" style="display:none">
@@ -2758,21 +2831,52 @@ does.</div>
  <button class="tab" style="background:#8b1a1a;color:#fff" onclick="cancelAll()">⚠ Cancel ALL open orders</button>
 </div>
 </div>
-<div id="sheet" style="display:none;position:fixed;inset:0;background:rgba(1,4,9,.88);overflow:auto;z-index:10" onclick="closeSheet()">
- <div id="sheetIn" style="max-width:560px;margin:24px auto;background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px" onclick="event.stopPropagation()"></div>
+<div id="sheet" style="display:none;position:fixed;inset:0;background:rgba(2,5,10,.9);overflow:auto;z-index:30" onclick="closeSheet()">
+ <div id="sheetIn" style="max-width:560px;margin:18px auto calc(90px + env(safe-area-inset-bottom));background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px" onclick="event.stopPropagation()"></div>
 </div>
 <script>
+// Every request carries the remembered key — sign in once, never again.
+const _fetch = window.fetch.bind(window);
+window.fetch = function(url, opts){
+  opts = opts || {};
+  const h = new Headers(opts.headers || {});
+  h.set('X-Dash-Key', localStorage.getItem('dashKey') || '');
+  opts.headers = h;
+  return _fetch(url, opts).then(r => { if(r.status === 401) showLogin(); return r; });
+};
+function showLogin(){
+  document.getElementById('login').style.display = 'flex';
+  setTimeout(() => document.getElementById('loginKey').focus(), 50);
+}
+function doLogin(){
+  const v = document.getElementById('loginKey').value.trim();
+  if(!v) return;
+  localStorage.setItem('dashKey', v);
+  document.getElementById('login').style.display = 'none';
+  refresh();
+}
 let OPEN = {}, GOPEN = {}, SERIES = null, RATES = {};
 let SEEN = JSON.parse(localStorage.getItem('seenRates') || '{}');
 function showTab(t){
   ['H','R','P','L','S','E'].forEach(k => {
-    document.getElementById('view'+k).style.display = k===t ? '' : 'none';
-    document.getElementById('tab'+k).className = 'tab' + (k===t ? ' on' : '');
+    const v = document.getElementById('view'+k);
+    if(v) v.style.display = k===t ? '' : 'none';
+    const b = document.getElementById('tab'+k);
+    if(b) b.className = 'nb' + (k===t ? ' on' : '');
   });
+  const more = document.getElementById('tabM');
+  if(more) more.className = 'nb' + ('LSE'.indexOf(t) >= 0 ? ' on' : '');
+  const mm = document.getElementById('moreMenu');
+  if(mm) mm.style.display = 'none';
+  window.scrollTo(0, 0);
   if(t==='L') loadPlan();
   if(t==='S') loadSpread();
   if(t==='P') loadPositions();
   if(t==='E') loadSeats();
+}
+function toggleMore(){
+  const mm = document.getElementById('moreMenu');
+  mm.style.display = mm.style.display === 'none' ? '' : 'none';
 }
 let SEATSD = null;
 async function loadSeats(){
@@ -3822,9 +3926,8 @@ function mPlace(m){
   if(!confirm('Place post-only '+side+' '+q.toLocaleString()+' @ '+c+'¢? Locks ~$'+cap.toFixed(2)+'.')) return;
   mact({op:'place', market:m, side:side, price_cents:c, size:q}, m);
 }
-async function refresh(){
+async function renderAll(d){
   try{
-    const r = await fetch('data.json'); const d = await r.json();
     document.getElementById('earned').textContent = '$' + d.earned_today.toFixed(2);
     const nMkts = new Set(d.orders.map(o => o.market).filter(Boolean)).size;
     document.getElementById('rate').textContent =
@@ -3961,14 +4064,33 @@ async function refresh(){
         ' '+a.from+'¢ → '+a.to+'¢ ('+a.size+') · HTTP '+a.status+' · '+esc(a.note||a.response||'')+'</div>').join('') : '';
   }catch(e){}
 }
+async function refresh(){
+  try{
+    const r = await fetch('data.json');
+    if(!r.ok) return;
+    const t = await r.text();
+    try{ localStorage.setItem('lastData', t); }catch(_){}
+    renderAll(JSON.parse(t));
+  }catch(e){}
+}
+// paint instantly from the last visit's data, then refresh live
+try{ const c = localStorage.getItem('lastData'); if(c) renderAll(JSON.parse(c)); }catch(_){}
 refresh(); setInterval(refresh, 15000);
 </script></body></html>"""
 
 
 class Handler(BaseHTTPRequestHandler):
     def _authed(self) -> bool:
+        """The page remembers the password once (X-Dash-Key header from
+        localStorage) — no more browser login popups. ?key= works for
+        widgets/Shortcuts, and legacy Basic auth still passes."""
         if not DASH_PASSWORD:
             return False
+        if self.headers.get("X-Dash-Key") == DASH_PASSWORD:
+            return True
+        from urllib.parse import parse_qs, urlparse
+        if (parse_qs(urlparse(self.path).query).get("key") or [""])[0] == DASH_PASSWORD:
+            return True
         header = self.headers.get("Authorization", "")
         if header.startswith("Basic "):
             try:
@@ -3982,15 +4104,14 @@ class Handler(BaseHTTPRequestHandler):
         if not DASH_PASSWORD:
             self._send(503, "text/plain", b"Set the DASH_PASSWORD environment variable to enable the dashboard.")
             return
+        if self.path == "/" or self.path.startswith("/index"):
+            # The shell holds no data — serve it instantly, unauthenticated.
+            # The page's own login card gates the data underneath.
+            self._send(200, "text/html; charset=utf-8", DASH_HTML.encode())
+            return
         if self.path.startswith("/widget.json"):
-            # The topline-only endpoint also accepts ?key=<password> — widget
-            # apps and Shortcuts often can't set an Authorization header.
-            from urllib.parse import parse_qs, urlparse
-            key = (parse_qs(urlparse(self.path).query).get("key") or [""])[0]
-            if not (self._authed() or key == DASH_PASSWORD):
-                self.send_response(401)
-                self.send_header("WWW-Authenticate", 'Basic realm="rewards"')
-                self.end_headers()
+            if not self._authed():
+                self._send(401, "application/json", b'{"error": "key required"}')
                 return
             with MONITOR.lock:
                 payload = {
@@ -4004,9 +4125,9 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, "application/json", json.dumps(payload).encode())
             return
         if not self._authed():
-            self.send_response(401)
-            self.send_header("WWW-Authenticate", 'Basic realm="rewards"')
-            self.end_headers()
+            # plain 401, no WWW-Authenticate: the page shows its own login
+            # card instead of the browser interrupting with a popup
+            self._send(401, "application/json", b'{"error": "key required"}')
             return
         if self.path.startswith("/data.json"):
             self._send(200, "application/json", json.dumps(MONITOR.snapshot()).encode())
@@ -4058,9 +4179,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802 — http.server API
         if not DASH_PASSWORD or not self._authed():
-            self.send_response(401)
-            self.send_header("WWW-Authenticate", 'Basic realm="rewards"')
-            self.end_headers()
+            self._send(401, "application/json", b'{"error": "key required"}')
             return
         if self.path not in ("/reprice", "/place", "/place_abort", "/cancel_all",
                              "/reprice_batch", "/cancel_batch", "/maction"):
@@ -4102,6 +4221,11 @@ class Handler(BaseHTTPRequestHandler):
     def _send(self, code: int, ctype: str, body: bytes) -> None:
         self.send_response(code)
         self.send_header("Content-Type", ctype)
+        # gzip everything sizeable — data.json shrinks ~10x, the single
+        # biggest first-load win on a phone connection
+        if len(body) > 500 and "gzip" in (self.headers.get("Accept-Encoding") or ""):
+            body = gzip.compress(body, 6)
+            self.send_header("Content-Encoding", "gzip")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
