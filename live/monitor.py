@@ -3812,6 +3812,55 @@ function dayGraph(d){
     '<div class="mkt">midnight → midnight ET · solid: earned so far' +
     (proj.length ? ' · dotted: your last-10-days shape → <b style="color:var(--good)">≈ $' + end.toFixed(2) + '</b> by midnight' : '') + '</div>';
 }
+function rateDayGraph(d){
+  const all = d.rate_series || [];
+  const et = new Date(new Date().toLocaleString('en-US', {timeZone: 'America/New_York'}));
+  const hf = et.getHours() + et.getMinutes() / 60;
+  const midMs = Date.now() - hf * 3600000;
+  const pts = all.filter(q => q[0] * 1000 >= midMs);
+  if(pts.length < 3) return '<div class="mkt">collecting today’s rate curve — back in a few minutes…</div>';
+  const w = 360, h = 110, p = 10;
+  // light smoothing so the solid line reads as a shape, not static
+  const sm = pts.map((q, i) => {
+    const a = Math.max(0, i - 7), win = pts.slice(a, i + 1);
+    return [q[0], win.reduce((s, x) => s + x[1], 0) / win.length];
+  });
+  // expected rate ahead: the profile's hourly weights, scaled so the area
+  // from now to midnight equals the same projected remainder as the
+  // cumulative view (identical midnight total, different lens)
+  const eNow = (d.earned_series && d.earned_series.length)
+    ? d.earned_series[d.earned_series.length - 1][1] : d.earned_today;
+  const fNow = cumAt(d.pace_cum, hf);
+  const proj = [];
+  if(d.pace_cum && d.pace_cum.length === 25 && fNow > 0.02){
+    const scale = eNow / fNow;
+    const hr = [];  // hourly rates, sampled at hour centers, linearly blended
+    for(let i = 0; i < 24; i++) hr.push(scale * (d.pace_cum[i + 1] - d.pace_cum[i]) * 24);
+    const rAt = x => {
+      const c = Math.min(Math.max(x - 0.5, 0), 23);
+      const i = Math.min(Math.floor(c), 22);
+      return hr[i] + (hr[i + 1] - hr[i]) * (c - i);
+    };
+    for(let x = hf; x <= 24.001; x += 0.25) proj.push([Math.min(x, 24), rAt(Math.min(x, 24))]);
+  }
+  const ys = sm.map(q => q[1]).concat(proj.map(q => q[1]));
+  const ymax = Math.max(...ys, 1) * 1.1;
+  const X = x => p + (w - 2 * p) * x / 24;
+  const Y = v => h - p - (h - 2 * p) * v / ymax;
+  const hx = ts => Math.min(Math.max((ts * 1000 - midMs) / 3600000, 0), 24);
+  const curve = sm.map((q, i) => (i ? 'L' : 'M') + X(hx(q[0])).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ');
+  const pcurve = proj.map((q, i) => (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ');
+  const nowR = sm[sm.length - 1][1];
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;background:#141a23;border-radius:12px">' +
+    '<line x1="' + X(hf).toFixed(1) + '" y1="' + p + '" x2="' + X(hf).toFixed(1) + '" y2="' + (h - p) +
+    '" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="2,4"/>' +
+    (pcurve ? '<path d="' + pcurve + '" fill="none" stroke="var(--good)" stroke-width="2" stroke-dasharray="4,5" opacity=".9"/>' : '') +
+    '<path d="' + curve + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' +
+    '</svg>' +
+    '<div class="mkt">earning rate, midnight → midnight ET · now <b style="color:var(--accent)">$' +
+    nowR.toFixed(2) + '/day</b>' +
+    (proj.length ? ' · dotted: your typical pattern ahead' : '') + '</div>';
+}
 function heroMode(){ return localStorage.getItem('heroG') || 'day'; }
 function setHeroMode(m){ localStorage.setItem('heroG', m); refresh(); }
 function bigSpark(pts){
@@ -4167,9 +4216,9 @@ async function renderAll(d){
     err.style.display = msg ? 'block' : 'none'; err.textContent = msg;
     document.getElementById('ovg').innerHTML =
       '<div class="chips" style="margin:2px 0 6px">'+
-      '<button class="chip'+(heroMode()==='day' ? ' chipon' : '')+'" onclick="setHeroMode(\\'day\\')">today + projection</button>'+
-      '<button class="chip'+(heroMode()==='rate' ? ' chipon' : '')+'" onclick="setHeroMode(\\'rate\\')">rate (2h)</button></div>'+
-      (heroMode() === 'day' ? dayGraph(d) : bigSpark(d.rate_series));
+      '<button class="chip'+(heroMode()==='day' ? ' chipon' : '')+'" onclick="setHeroMode(\\'day\\')">earnings</button>'+
+      '<button class="chip'+(heroMode()==='rate' ? ' chipon' : '')+'" onclick="setHeroMode(\\'rate\\')">rate</button></div>'+
+      (heroMode() === 'day' ? dayGraph(d) : rateDayGraph(d));
     renderHome(d);
     BP = d.buying_power;
     document.getElementById('planBP').textContent =
