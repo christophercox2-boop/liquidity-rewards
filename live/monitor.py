@@ -2913,10 +2913,14 @@ document.addEventListener('touchend', e => {
   if(PSY != null && e.changedTouches[0].clientY - PSY > 90){ refresh(); toast('Refreshed'); }
   PSY = null;
 }, {passive: true});
-// The big number ticks LIVE: between server updates it advances at the
-// current earning rate (re-anchored to the real figure every refresh).
-// The last two decimals render smaller — motion you can watch.
+// The big number ticks LIVE and SMOOTHLY: it advances at a displayed rate
+// that eases toward the real rate over ~10s, while a gentle rolling pull
+// keeps it converging on the server's figure — no visible jumps at
+// refresh, no jerks when the rate changes, and it never runs backward
+// (it just slows until reality catches up). Hard reset only on day
+// rollover or a large correction.
 let SRV_E = null, SRV_R = 0, SRV_TS = 0;
+let DISP = null, DR = 0, TICK_TS = 0;
 function setEarned(v, rate){
   SRV_E = v; SRV_R = rate || 0; SRV_TS = Date.now();
 }
@@ -2924,8 +2928,18 @@ setInterval(function(){
   if(SRV_E == null) return;
   const el = document.getElementById('earned');
   if(!el) return;
-  const v = SRV_E + SRV_R * (Date.now() - SRV_TS) / 86400000;
-  const s = Math.max(v, 0).toFixed(4);
+  const now = Date.now();
+  const dt = TICK_TS ? Math.min((now - TICK_TS) / 1000, 2) : 0.15;
+  TICK_TS = now;
+  const target = SRV_E + SRV_R * (now - SRV_TS) / 86400000;
+  if(DISP == null || Math.abs(target - DISP) > 2){
+    DISP = target; DR = SRV_R;           // rollover / big correction: snap
+  } else {
+    DR += (SRV_R - DR) * 0.02;           // rate eases in over ~10s
+    let next = DISP + DR * dt / 86400 + (target - DISP) * 0.006;
+    DISP = next < DISP ? DISP : next;    // never visibly run backward
+  }
+  const s = Math.max(DISP, 0).toFixed(4);
   el.innerHTML = '$' + s.slice(0, -2) +
     '<span style="font-size:.45em;color:var(--ink2);font-weight:600">' + s.slice(-2) + '</span>';
 }, 150);
