@@ -1,0 +1,114 @@
+name: WebSocket probe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/ws_probe.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ws-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docs index + websocket pages
+        run: |
+          mkdir -p data
+          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36"
+          curl -sSL -A "$UA" "https://docs.polymarket.us/llms.txt" -o /tmp/llms.txt || true
+          echo "== llms.txt head =="; head -50 /tmp/llms.txt || true
+          # pull every page that mentions websockets/streams, as markdown when possible
+          python3 - <<'EOF'
+          import re, subprocess
+          try:
+              idx = open("/tmp/llms.txt", encoding="utf-8", errors="replace").read()
+          except FileNotFoundError:
+              idx = ""
+          urls = re.findall(r"https?://docs\.polymarket\.us[^\s)\"]*", idx)
+          keep = [u for u in urls if re.search(r"websocket|stream|market-data|ws", u, re.I)]
+          print("candidate pages:", keep[:10])
+          out = []
+          UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36"
+          for u in list(dict.fromkeys(keep))[:6]:
+              for variant in (u + ".md", u):
+                  r = subprocess.run(["curl", "-sSL", "-A", UA, variant],
+                                     capture_output=True, text=True, timeout=30)
+                  if r.returncode == 0 and len(r.stdout) > 200:
+                      out.append(f"\n\n===== {variant} =====\n" + r.stdout[:20000])
+                      break
+          open("data/probe_ws_docs.txt", "w").write("".join(out) or idx[:20000] or "FETCH FAILED")
+          EOF
+
+      - name: Try connecting to candidate websocket endpoints
+        run: |
+          pip install -q websockets
+          python3 - <<'EOF'
+          import asyncio, json, re, ssl
+          try:
+              docs = open("data/probe_ws_docs.txt", encoding="utf-8", errors="replace").read()
+          except FileNotFoundError:
+              docs = ""
+          found = re.findall(r"wss?://[^\s)\"'`<]+", docs)
+          candidates = list(dict.fromkeys(found)) + [
+              "wss://gateway.polymarket.us/ws",
+              "wss://gateway.polymarket.us/v1/ws",
+              "wss://api.polymarket.us/ws",
+              "wss://ws.polymarket.us",
+          ]
+          SLUG = "scc-senate-gop-2026-11-03-52"
+          subs = [
+              {"type": "subscribe", "channel": "book", "marketSlug": SLUG},
+              {"type": "subscribe", "channels": [{"name": "book", "marketSlugs": [SLUG]}]},
+              {"op": "subscribe", "topic": f"book.{SLUG}"},
+              {"action": "subscribe", "subscriptions": [{"topic": "book", "market": SLUG}]},
+          ]
+          results = []
+          import websockets
+          async def try_ep(url):
+              entry = {"url": url, "connected": False, "messages": []}
+              try:
+                  async with websockets.connect(url, open_timeout=8, close_timeout=3) as ws:
+                      entry["connected"] = True
+                      for s in subs:
+                          try:
+                              await ws.send(json.dumps(s))
+                          except Exception as e:
+                              entry["messages"].append(f"send err {e}")
+                              break
+                      try:
+                          for _ in range(6):
+                              m = await asyncio.wait_for(ws.recv(), timeout=6)
+                              entry["messages"].append(str(m)[:800])
+                      except asyncio.TimeoutError:
+                          entry["messages"].append("(recv timeout)")
+              except Exception as e:
+                  entry["error"] = f"{type(e).__name__}: {e}"[:200]
+              results.append(entry)
+          async def main():
+              for u in candidates[:8]:
+                  await try_ep(u)
+          asyncio.run(main())
+          json.dump(results, open("data/probe_ws_connect.json", "w"), indent=1)
+          for r in results:
+              print(r["url"], "connected" if r.get("connected") else r.get("error", "?"),
+                    "| msgs:", len([m for m in r.get("messages", []) if not m.startswith("(")]))
+          EOF
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/probe_ws_docs.txt data/probe_ws_connect.json
+          git commit -m "WebSocket probe [skip ci]" || echo "no changes"
+          git pull --rebase origin main
+          git push

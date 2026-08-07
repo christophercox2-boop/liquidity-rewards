@@ -822,6 +822,7 @@ LAST_DEBUG: dict[str, str] = {}  # diagnostics from the most recent fetch, for t
 BOOK_REFRESH_PER_CALL = 20
 BOOK_COLD_FETCH_ALL = True  # one-shot runs sweep every book; the monitor sets False
 _BOOK_CACHE: dict[str, tuple[float, dict]] = {}  # slug -> (fetched_at, book)
+_BOOK_VOLATILITY: dict[str, float] = {}  # EWMA of "book changed since last refresh"
 PRIORITY_SLUGS: set[str] = set()  # defended markets: their books refresh every call
 
 
@@ -880,26 +881,37 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     now_books = time.time()
     for gone in set(_BOOK_CACHE) - set(slugs):
         del _BOOK_CACHE[gone]
-    oldest_first = sorted(slugs, key=lambda s: _BOOK_CACHE.get(s, (0.0,))[0])
     cold_all = not _BOOK_CACHE and BOOK_COLD_FETCH_ALL
-    # Defended markets come first, oldest book first, taking up to all but 6
-    # of the per-call allowance — with 20 defended that refreshes each of
-    # their books every ~45-60s (fresh enough for Defend's 90s cooldown)
-    # while the general rotation keeps a guaranteed 6 slots and the total
-    # request budget stays flat.
+    # Refresh priority: staleness × how much the book actually churns. A book
+    # that changed on recent refreshes ages ~4× faster than one that has sat
+    # still, so the fixed request budget concentrates on markets where the
+    # score is really moving — quiet books coast on their cache longer.
+    # Defended markets still come first (oldest book first, up to all but 6
+    # slots); the general rotation keeps a guaranteed 6 slots.
+    def _staleness(s: str) -> float:
+        age = now_books - _BOOK_CACHE.get(s, (0.0,))[0]
+        return age * (1.0 + 3.0 * _BOOK_VOLATILITY.get(s, 0.5))
+    stalest_first = sorted(slugs, key=_staleness, reverse=True)
     prio = PRIORITY_SLUGS & set(slugs)
     if cold_all:
-        to_fetch = set(oldest_first)
+        to_fetch = set(stalest_first)
     else:
-        prio_oldest = [s for s in oldest_first if s in prio]
-        rot = [s for s in oldest_first if s not in prio]
+        prio_oldest = sorted(prio, key=lambda s: _BOOK_CACHE.get(s, (0.0,))[0])
+        rot = [s for s in stalest_first if s not in prio]
         take = prio_oldest[:max(0, BOOK_REFRESH_PER_CALL - 6)]
         to_fetch = set(take) | set(rot[:BOOK_REFRESH_PER_CALL - len(take)])
     fresh: set[str] = set()  # fetched THIS call — an own order missing here is real
     for slug in slugs:
         if slug in to_fetch:
             try:
-                books[slug] = _fetch_book(slug)
+                new_book = _fetch_book(slug)
+                old = _BOOK_CACHE.get(slug)
+                if old:  # learn how lively this book is (top 3 levels per side)
+                    changed = (list(old[1].get("bids") or [])[:3] != list(new_book.get("bids") or [])[:3]
+                               or list(old[1].get("asks") or [])[:3] != list(new_book.get("asks") or [])[:3])
+                    v = _BOOK_VOLATILITY.get(slug, 0.5)
+                    _BOOK_VOLATILITY[slug] = round(0.7 * v + (0.3 if changed else 0.0), 4)
+                books[slug] = new_book
                 _BOOK_CACHE[slug] = (now_books, books[slug])
                 fresh.add(slug)
                 if cold_all:
