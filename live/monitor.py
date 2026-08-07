@@ -2026,6 +2026,19 @@ def positions_overview() -> dict:
                "avg_cents": round(cost / mag * 100, 2) if mag else None,
                "sells": [{"id": o.get("id"), "price_cents": round(o["price"] * 100, 2),
                           "size": o.get("size")} for o in mine]}
+        if book is not None:
+            # What a TAKER exit would fill against right now: the best level
+            # on the opposite side that isn't our own resting size.
+            hit_key = "asks" if short else "bids"
+            my_hit = [o for o in orders
+                      if o.get("market") == slug and o.get("price")
+                      and o.get("side") == ("SELL" if short else "BUY")]
+            for px, q in book.get(hit_key) or []:
+                q -= sum(o["size"] for o in my_hit if abs(px - o["price"]) < 1e-9)
+                if q > 1e-9:
+                    row["hit_cents"] = round(px * 100, 2)
+                    row["hit_size"] = int(q)
+                    break
         if book is None:
             row["status"] = "unknown"
         else:
@@ -2338,6 +2351,83 @@ def manual_place(slug: str, side: str, price_cents: float, size: int,
         return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
 
 
+def take_close(slug: str, size: int, close_short: bool = False) -> tuple[int, dict]:
+    """CLOSE part of a position by TAKING the standing touch — the one action
+    that is not post-only, so it fills immediately against resting orders.
+    Only ever reduces exposure: a sell is capped at the long position, a
+    buy-back at the short. Our own resting orders at or better than the take
+    price are canceled first so we never trade with ourselves; any unfilled
+    remainder rests at the touch price (visible in open orders)."""
+    if not _slug_known(slug):
+        return 400, {"ok": False, "error": "unknown market"}
+    if not (1 <= size <= 20000):
+        return 400, {"ok": False, "error": "size out of range (1–20,000)"}
+    net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
+    if close_short:
+        if net >= 0:
+            return 400, {"ok": False, "error": "no short position to buy back here"}
+        if size > -net:
+            return 400, {"ok": False,
+                         "error": f"only short {-net:g} — can't buy back {size}"}
+    else:
+        if net <= 0:
+            return 400, {"ok": False, "error": "no long position to sell here"}
+        if size > net:
+            return 400, {"ok": False, "error": f"only hold {net:g} — can't sell {size}"}
+    try:
+        book = tr._fetch_book(slug)
+    except Exception as e:  # noqa: BLE001
+        return 502, {"ok": False, "error": f"book unavailable: {type(e).__name__}: {e}"[:200]}
+    hit_key = "asks" if close_short else "bids"
+    my_side = "SELL" if close_short else "BUY"
+    mine = [o for o in MONITOR.orders
+            if o.get("market") == slug and o.get("side") == my_side and o.get("id")]
+    price = None
+    for px, q in book.get(hit_key) or []:
+        q -= sum(o["size"] for o in mine if abs(px - o["price"]) < 1e-9)
+        if q > 1e-9:
+            price = px
+            break
+    if price is None:
+        word = "ask" if close_short else "bid"
+        return 400, {"ok": False, "error": f"no resting {word} to fill against"}
+    # cancel our own orders that sit at-or-better than the take price —
+    # otherwise the exchange would happily match us against ourselves
+    blockers = [o for o in mine
+                if (o["price"] <= price + 1e-9 if close_short
+                    else o["price"] >= price - 1e-9)]
+    for o in blockers[:5]:
+        do_cancel_order(o["id"])
+    intent = "ORDER_INTENT_SELL_SHORT" if close_short else "ORDER_INTENT_SELL_LONG"
+    path = "/v1/orders"
+    value = f"{price:.3f}".rstrip("0").rstrip(".")
+    try:
+        r = requests.request(
+            "POST", tr.TRADE_API + path,
+            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
+                     "Content-Type": "application/json"},
+            json={"marketSlug": slug, "intent": intent, "type": "ORDER_TYPE_LIMIT",
+                  "price": {"value": value, "currency": "USD"},
+                  "quantity": size, "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                  "participateDontInitiate": False},
+            timeout=20,
+        )
+        ok = r.status_code < 300
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": slug,
+                        "side": ("BUY BACK" if close_short else "SELL") + " (take)",
+                        "from": "—", "to": round(price * 100, 2), "size": size,
+                        "status": r.status_code,
+                        "response": " ".join(r.text.split())[:150], "verified": ok})
+        del ACTIONS[:-20]
+        POLL_KICK.set()
+        return (200 if ok else 502), {"ok": ok, "status": r.status_code,
+                                      "canceled_first": len(blockers[:5]),
+                                      "detail": "" if ok else tr._http_err(r)[:200]}
+    except Exception as e:  # noqa: BLE001
+        return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
+
+
 def do_maction(body: dict) -> tuple[int, dict]:
     """Single-order actions from the tap-a-market sheet."""
     op = body.get("op")
@@ -2354,6 +2444,12 @@ def do_maction(body: dict) -> tuple[int, dict]:
             return manual_place(str(body["market"]), str(body.get("side") or "BUY"),
                                 float(body["price_cents"]), int(body["size"]),
                                 close_short=bool(body.get("close_short")))
+        except (KeyError, TypeError, ValueError):
+            return 400, {"ok": False, "error": "bad request"}
+    if op == "take":
+        try:
+            return take_close(str(body["market"]), int(body["size"]),
+                              close_short=bool(body.get("close_short")))
         except (KeyError, TypeError, ValueError):
             return 400, {"ok": False, "error": "bad request"}
     if op == "defend":
@@ -3222,13 +3318,33 @@ function renderPositions(){
                : r.status === 'wait' ? 'background:#2a2f36' : '';
       const sells = (r.sells || []).map(s =>
         s.size.toLocaleString() + ' @ ' + s.price_cents.toFixed(1) + '¢').join(', ');
-      const btn = (r.status === 'fix' && r.target_cents)
-        ? '<button style="background:#238636;color:#fff;border:none;border-radius:6px;padding:6px 10px" '+
+      const mag = Math.min(Math.abs(Math.round(r.net)), 20000);
+      const qty = r.target_cents
+        ? '<div onclick="event.stopPropagation()" style="white-space:nowrap;margin-bottom:4px">'+
+          '<button class="alt" onclick="qBump(\\'pq'+i+'\\',-1)">−</button>'+
+          '<input id="pq'+i+'" type="number" step="1" min="1" max="'+mag+'" value="'+mag+'" '+
+          'style="width:64px">'+
+          '<button class="alt" onclick="qBump(\\'pq'+i+'\\',1)">+</button></div>'
+        : '';
+      const takeBtn = r.hit_cents
+        ? '<br><button style="background:#8b5a00;color:#fff;border:none;border-radius:6px;'+
+          'padding:6px 10px;margin-top:4px" '+
+          'onclick="event.stopPropagation();posTake('+i+')">'+
+          (r.short ? 'Buy back NOW' : 'Sell NOW')+' @ '+r.hit_cents.toFixed(1)+'¢</button>'+
+          '<br><span class="sub" style="font-size:10px">'+r.hit_size.toLocaleString()+
+          ' resting there</span>'
+        : '';
+      const btn = (r.target_cents && r.status !== 'wait')
+        ? qty +
+          '<button style="background:'+(r.status === 'fix' ? '#238636' : '#21262d')+
+          ';color:'+(r.status === 'fix' ? '#fff' : '#8b949e')+
+          ';border:none;border-radius:6px;padding:6px 10px" '+
           'onclick="event.stopPropagation();posFix('+i+', true)">'+
-          (r.short ? 'Buy back' : 'Sell')+' @ '+r.target_cents.toFixed(1)+'¢</button>'
+          (r.short ? 'Buy back' : 'Sell')+' @ '+r.target_cents.toFixed(1)+'¢</button>'+
+          (r.status === 'good' ? ' ✓' : '') + takeBtn
         : (r.status === 'good' ? '✓'
-          : r.status === 'wait' ? '<span class="sub" style="font-size:10px">tight spread —<br>wait</span>'
-          : '<span class="sub" style="font-size:10px">book pending<br>↻ refresh</span>');
+          : r.status === 'wait' ? qty + '<span class="sub" style="font-size:10px">tight spread —<br>wait</span>' + takeBtn
+          : '<span class="sub" style="font-size:10px">book pending<br>↻ refresh</span>' + takeBtn);
       const ownTxt = r.short
         ? '<b style="color:#f0883e">No '+Math.abs(r.net).toLocaleString()+'</b>'
         : r.net.toLocaleString();
@@ -3243,9 +3359,14 @@ function renderPositions(){
 async function posFix(i, ask){
   const r = POSD[i];
   if(!r || !r.target_cents) return false;
-  const q = Math.min(Math.abs(Math.round(r.net)), 20000);
+  const mag = Math.min(Math.abs(Math.round(r.net)), 20000);
+  const el = document.getElementById('pq'+i);
+  let q = el ? parseInt(el.value, 10) : mag;
+  if(!(q >= 1)) q = mag;
+  q = Math.min(q, mag);  // never sell more than held / buy back more than short
   const verb = r.short ? 'Buy back' : 'Sell';
-  if(ask && !confirm(verb+' '+q.toLocaleString()+' '+r.market+' @ '+r.target_cents.toFixed(1)+
+  if(ask && !confirm(verb+' '+q.toLocaleString()+' of '+Math.abs(Math.round(r.net)).toLocaleString()+
+                     ' — '+r.market+' @ '+r.target_cents.toFixed(1)+
                      '¢ (post-only, one tick inside)?')) return false;
   const body = (r.sells && r.sells.length)
     ? {op:'modify', order_id: r.sells[0].id, price_cents: r.target_cents, size: q}
@@ -3261,6 +3382,33 @@ async function posFix(i, ask){
     if(ask){ setTimeout(loadPositions, 1200); }
     return true;
   }catch(e){ alert('Failed: '+e); return false; }
+}
+async function posTake(i){
+  const r = POSD[i];
+  if(!r || !r.hit_cents) return;
+  const mag = Math.min(Math.abs(Math.round(r.net)), 20000);
+  const el = document.getElementById('pq'+i);
+  let q = el ? parseInt(el.value, 10) : mag;
+  if(!(q >= 1)) q = mag;
+  q = Math.min(q, mag);
+  const verb = r.short ? 'Buy back' : 'Sell';
+  const cash = (r.hit_cents/100*q).toFixed(2);
+  let msg = verb+' '+q.toLocaleString()+' NOW at the '+r.hit_cents.toFixed(1)+'¢ '+
+    (r.short ? 'ask' : 'bid')+' (≈ $'+cash+')?\\n\\nThis TAKES the standing '+
+    (r.short ? 'offer' : 'bid')+' and fills immediately — not a resting order. '+
+    (q > r.hit_size ? 'Only '+r.hit_size.toLocaleString()+' rests at that price; the remainder '+
+      'stays as an order there. ' : '')+
+    'Any of your own resting orders at that price are canceled first so you don\\'t trade with yourself.';
+  if(!confirm(msg)) return;
+  try{
+    const resp = await fetch('maction', {method:'POST',
+      headers:{'Content-Type':'application/json','X-Reprice':'1'},
+      body: JSON.stringify({op:'take', market:r.market, size:q, close_short:!!r.short})});
+    const d = await resp.json().catch(() => ({ok:false, error:'HTTP '+resp.status}));
+    alert(d.ok ? 'Done ✓'+(d.canceled_first ? ' ('+d.canceled_first+' of your resting orders canceled first)' : '')
+               : 'Failed: '+(d.detail || d.error || ''));
+  }catch(e){ alert('Failed: '+e); }
+  setTimeout(loadPositions, 1500);
 }
 async function posFixAll(){
   const flagged = POSD.map((r, i) => i).filter(i => POSD[i].status === 'fix' && POSD[i].target_cents);
