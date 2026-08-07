@@ -3794,7 +3794,7 @@ function dayGraph(d){
   const proj = [];
   if(fNow > 0.02){
     const scale = eNow / fNow;
-    for(let x = hf; x <= 24.001; x += 0.25) proj.push([Math.min(x, 24), scale * cumAt(d.pace_cum, Math.min(x, 24))]);
+    for(let x = 0; x <= 24.001; x += 0.25) proj.push([Math.min(x, 24), scale * cumAt(d.pace_cum, Math.min(x, 24))]);
   }
   const end = proj.length ? proj[proj.length - 1][1] : eNow;
   const ymax = Math.max(end, eNow, 0.5) * 1.08;
@@ -3810,7 +3810,7 @@ function dayGraph(d){
     '<path d="' + curve + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' +
     '</svg>' +
     '<div class="mkt">midnight → midnight ET · solid: earned so far' +
-    (proj.length ? ' · dotted: your last-10-days shape → <b style="color:var(--good)">≈ $' + end.toFixed(2) + '</b> by midnight' : '') + '</div>';
+    (proj.length ? ' · dotted: your typical day → <b style="color:var(--good)">≈ $' + end.toFixed(2) + '</b> by midnight' : '') + '</div>';
 }
 function rateDayGraph(d){
   const all = d.rate_series || [];
@@ -3841,7 +3841,7 @@ function rateDayGraph(d){
       const i = Math.min(Math.floor(c), 22);
       return hr[i] + (hr[i + 1] - hr[i]) * (c - i);
     };
-    for(let x = hf; x <= 24.001; x += 0.25) proj.push([Math.min(x, 24), rAt(Math.min(x, 24))]);
+    for(let x = 0; x <= 24.001; x += 0.25) proj.push([Math.min(x, 24), rAt(Math.min(x, 24))]);
   }
   const ys = sm.map(q => q[1]).concat(proj.map(q => q[1]));
   const ymax = Math.max(...ys, 1) * 1.1;
@@ -3859,7 +3859,7 @@ function rateDayGraph(d){
     '</svg>' +
     '<div class="mkt">earning rate, midnight → midnight ET · now <b style="color:var(--accent)">$' +
     nowR.toFixed(2) + '/day</b>' +
-    (proj.length ? ' · dotted: your typical pattern ahead' : '') + '</div>';
+    (proj.length ? ' · dotted: your typical pattern (above it = beating your usual hour)' : '') + '</div>';
 }
 function heroMode(){ return localStorage.getItem('heroG') || 'day'; }
 function setHeroMode(m){ localStorage.setItem('heroG', m); refresh(); }
