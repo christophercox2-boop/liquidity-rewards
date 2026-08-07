@@ -3850,15 +3850,13 @@ function rateDayGraph(d){
   const hx = ts => Math.min(Math.max((ts * 1000 - midMs) / 3600000, 0), 24);
   const curve = sm.map((q, i) => (i ? 'L' : 'M') + X(hx(q[0])).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ');
   const pcurve = proj.map((q, i) => (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ');
-  const nowR = sm[sm.length - 1][1];
   return '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;background:#141a23;border-radius:12px">' +
     '<line x1="' + X(hf).toFixed(1) + '" y1="' + p + '" x2="' + X(hf).toFixed(1) + '" y2="' + (h - p) +
     '" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="2,4"/>' +
     (pcurve ? '<path d="' + pcurve + '" fill="none" stroke="var(--good)" stroke-width="2" stroke-dasharray="4,5" opacity=".9"/>' : '') +
     '<path d="' + curve + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' +
     '</svg>' +
-    '<div class="mkt">earning rate, midnight → midnight ET · now <b style="color:var(--accent)">$' +
-    nowR.toFixed(2) + '/day</b>' +
+    '<div class="mkt">earning rate, midnight → midnight ET · solid: today, smoothed over ~8 min' +
     (proj.length ? ' · dotted: your typical pattern (above it = beating your usual hour)' : '') + '</div>';
 }
 function heroMode(){ return localStorage.getItem('heroG') || 'day'; }
