@@ -1,0 +1,38 @@
+[
+ {
+  "url": "wss://api.polymarket.us/v1/ws/private",
+  "connected": false,
+  "messages": [],
+  "error": "InvalidStatus: server rejected WebSocket connection: HTTP 401"
+ },
+ {
+  "url": "wss://api.polymarket.us/v1/ws/markets",
+  "connected": false,
+  "messages": [],
+  "error": "InvalidStatus: server rejected WebSocket connection: HTTP 401"
+ },
+ {
+  "url": "wss://gateway.polymarket.us/ws",
+  "connected": false,
+  "messages": [],
+  "error": "InvalidStatus: server rejected WebSocket connection: HTTP 404"
+ },
+ {
+  "url": "wss://gateway.polymarket.us/v1/ws",
+  "connected": false,
+  "messages": [],
+  "error": "InvalidStatus: server rejected WebSocket connection: HTTP 404"
+ },
+ {
+  "url": "wss://api.polymarket.us/ws",
+  "connected": false,
+  "messages": [],
+  "error": "InvalidStatus: server rejected WebSocket connection: HTTP 401"
+ },
+ {
+  "url": "wss://ws.polymarket.us",
+  "connected": false,
+  "messages": [],
+  "error": "InvalidStatus: server rejected WebSocket connection: HTTP 404"
+ }
+]
