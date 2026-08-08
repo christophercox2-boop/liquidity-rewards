@@ -231,6 +231,14 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         order["verdict"] = "❌ no active reward program on this market"
         calc.append("no reward program → $0")
         return
+    status = str(prog.get("status") or "").lower()
+    if status and status not in ("active", "live", "status_live"):
+        # the picker fell back to a CLOSED program (nothing active on this
+        # market) — it pays nothing, and pretending otherwise is exactly the
+        # phantom-estimate failure we guard against
+        order["verdict"] = f"❌ reward program ended ({prog.get('pid')}) — pays nothing"
+        calc.append("program closed → $0")
+        return
     if not prog.get("df"):
         order["verdict"] = "⚠️ program has no Discount Factor — can't score"
         return
