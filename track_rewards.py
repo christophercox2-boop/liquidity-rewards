@@ -407,7 +407,8 @@ def _prog_of(tp: dict) -> dict:
     tier = next((t for t in ("low", "mid", "high") if f"_{t}_" in pid), None)
     return {"df": _num(tp.get("discountFactor")), "target": _num(tp.get("targetSize")),
             "pool": _num(tp.get("rewardPool")), "start": tp.get("start"),
-            "end": tp.get("end"), "pid": pid or None, "tier": tier}
+            "end": tp.get("end"), "pid": pid or None, "tier": tier,
+            "status": str(tp.get("status") or "")}
 
 
 def _pool_days(prog: dict, slug: str | None = None) -> float:
