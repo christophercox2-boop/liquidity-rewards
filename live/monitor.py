@@ -687,10 +687,16 @@ class Monitor:
             old_day_earned = None
             if self.state["day"] != day:
                 if self.state["day"]:
-                    # Days close on the ACCUMULATED fine-grained samples (the
-                    # same accrual the graph shows) — the hourly tracker's
-                    # snapshots are backup for outages, not the record.
+                    # Days close on the HOURLY RECORD (it reconciles at ~98%
+                    # against actual payouts); the fine-grained accrual is the
+                    # live feel between anchors, not the official figure.
                     old_day_earned = round(self.state["earned"], 2)
+                    try:
+                        reb = tracker_day_integral(self.state["day"])
+                        if reb is not None:
+                            old_day_earned = reb[0]
+                    except Exception:  # noqa: BLE001 — fall back to accrual
+                        pass
                     self.state["history"] = (self.state["history"] + [
                         {"day": self.state["day"], "earned": old_day_earned}
                     ])[-30:]
@@ -3074,7 +3080,11 @@ setInterval(function(){
   } else {
     DR += (SRV_R - DR) * 0.02;           // rate eases in over ~10s
     let next = DISP + DR * dt / 86400 + (target - DISP) * 0.006;
-    DISP = next < DISP ? DISP : next;    // never visibly run backward
+    if(next < DISP){                     // anchor moved us down: sag gently
+      next = DISP + (target - DISP) * 0.001;
+      if(next > DISP) next = DISP;
+    }
+    DISP = next;
   }
   const s = Math.max(DISP, 0).toFixed(4);
   el.innerHTML = '$' + s.slice(0, -2) +
@@ -4666,6 +4676,7 @@ def poll_loop(key_id: str, secret_key: str) -> None:
     golf_refreshed = 0.0
     winners_refreshed = 0.0
     profile_refreshed = 0.0
+    anchor_refreshed = 0.0
     last_ok = time.time()
     err_notified = 0.0
     err_streak = 0
@@ -4690,6 +4701,18 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     tours = sorted({t for t in (_golf_tournament(s) for s in golf_slugs) if t})
                     MONITOR.note_markets(tours, "golf")
                 except Exception:  # noqa: BLE001 — discovery is best-effort
+                    pass
+            if time.time() - anchor_refreshed > 1800:  # hourly-record anchor
+                anchor_refreshed = time.time()
+                try:
+                    today_a = dt.datetime.now(ET).strftime("%Y-%m-%d")
+                    reb = tracker_day_integral(today_a)
+                    if reb is not None:
+                        with MONITOR.lock:
+                            if MONITOR.state.get("day") == today_a:
+                                MONITOR.state["earned"] = reb[0]
+                                MONITOR.state["per_market"] = reb[1]
+                except Exception:  # noqa: BLE001 — accrual carries on unanchored
                     pass
             now_et_dig = dt.datetime.now(ET)
             if (now_et_dig.hour * 60 + now_et_dig.minute >= 485  # 8:05am ET
