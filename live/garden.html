@@ -63,10 +63,10 @@
   .bkr.pend{outline:2px solid #FFD25A;outline-offset:-2px;background:rgba(255,210,90,.13)}
   .bkpx{width:40px;text-align:right}
   .bkpx.front{color:#FFE2AE}
-  .bkbar{flex:1;height:11px;background:#4E3018;border-radius:6px;position:relative;overflow:hidden}
-  .bkf{position:absolute;left:0;top:0;bottom:0;background:#C25A50;border-radius:6px 0 0 6px}
+  .bkbar{flex:1;height:11px;background:#4E3018;border-radius:6px;overflow:hidden;display:flex}
+  .bkf{background:#C25A50;flex:0 0 auto}
   .bkf.bid{background:#66A354}
-  .bkyou{position:absolute;top:0;bottom:0;background:#F2A93B}
+  .bkyou{background:#F2A93B;flex:0 0 auto}
   .bkq{width:46px;text-align:right;font-size:11px;color:#D9C49A}
   .bkchip{font-size:10px;background:#F2A93B;color:#2E2418;padding:1px 5px;font-weight:800;
     border-radius:6px}
@@ -95,6 +95,11 @@
   <button class="pb green" onclick="unlock()">open the gate</button></div></div>
 <script>
 'use strict';
+// safe-area probe: canvas-drawn chrome must clear the phone notch
+const _sp = document.createElement('div');
+_sp.style.cssText = 'position:fixed;top:env(safe-area-inset-top,0px);left:0;width:0;height:0;pointer-events:none';
+document.body.appendChild(_sp);
+function safeTop(){ return _sp.getBoundingClientRect().top || 0; }
 // ================================================================
 //  THE GARDEN — live. Every plant is one of your real markets;
 //  its health is your real standing in the book. Tending a row
@@ -1207,7 +1212,7 @@ function openBed(si){
 function layoutBed(){
   if(!BEDV) return;
   const cw = SW / 3, ch = cw * 1.06;
-  const top = 128;
+  const top = safeTop() + 118;
   BEDV.cw = cw; BEDV.ch = ch; BEDV.top = top;
   BEDV.cells = BEDV.sec.mkts.map((c, i) => ({c,
     x:cw * (i % 3) + cw / 2,
@@ -1306,13 +1311,13 @@ function bookHTML(){
   const row = (l, side) => {
     const isPend = pendPx(side) !== null && Math.abs(pendPx(side) * 10 - l.key) < .5;
     const isFront = l.key === Math.round(side === 'bid' ? bestBid : bestAsk);
-    const wYou = Math.max(l.mine > 0 ? 3 : 0, Math.round(l.mine / maxQ * 100));
-    const wOth = Math.min(100 - wYou, Math.round(l.oth / maxQ * 100));
+    const wYou = l.mine > 0 ? Math.max(3, l.mine / maxQ * 100) : 0;
+    const wOth = Math.min(100 - wYou, l.oth / maxQ * 100);
     return '<div class="bkr' + (isPend ? ' pend' : '') + '">' +
       '<span class="bkpx num' + (isFront ? ' front' : '') + '">' + fmtC(l.pc) + '</span>' +
       '<span class="bkbar">' +
-      (l.mine ? '<span class="bkyou" style="left:0;width:' + wYou + '%"></span>' : '') +
-      '<span class="bkf ' + side + '" style="left:' + wYou + '%;width:' + wOth + '%"></span>' +
+      (l.mine ? '<span class="bkyou" style="width:' + wYou.toFixed(2) + '%"></span>' : '') +
+      (l.oth > 0 ? '<span class="bkf ' + side + '" style="width:' + wOth.toFixed(2) + '%"></span>' : '') +
       '</span>' +
       '<span class="bkq num">' + (l.tot ? Math.round(l.tot) : '&middot;') + '</span>' +
       (l.mine ? '<span class="bkchip">you</span>' : (l.ghost ? '<span class="bkchip">&rarr;</span>' : '')) +
@@ -1970,25 +1975,26 @@ function drawBed(){
   ctx.strokeRect(5, 5, SW - 10, SH - 10);
   ctx.strokeStyle = 'rgba(169,116,63,.55)'; ctx.lineWidth = 5;
   ctx.strokeRect(5, 5, SW - 10, SH - 10);
-  // header board
-  const hb = 78;
+  // header board sits below the top buttons (which clear the notch)
+  const hy = safeTop() + 58;
+  const hh2 = 56;
   ctx.fillStyle = 'rgba(62,42,24,.95)';
-  ctx.beginPath(); ctx.roundRect(12, 46, SW - 24, hb - 18, 14); ctx.fill();
-  const hg = ctx.createLinearGradient(0, 48, 0, 46 + hb - 18);
+  ctx.beginPath(); ctx.roundRect(12, hy, SW - 24, hh2, 14); ctx.fill();
+  const hg = ctx.createLinearGradient(0, hy + 2, 0, hy + hh2);
   hg.addColorStop(0, 'rgba(125,80,48,.95)'); hg.addColorStop(1, 'rgba(94,61,36,.95)');
   ctx.fillStyle = hg;
-  ctx.beginPath(); ctx.roundRect(14, 48, SW - 28, hb - 22, 12); ctx.fill();
+  ctx.beginPath(); ctx.roundRect(14, hy + 2, SW - 28, hh2 - 4, 12); ctx.fill();
   ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
   ctx.font = '800 15px ui-rounded, "SF Pro Rounded", Comfortaa, sans-serif';
   ctx.fillStyle = '#FFE2AE';
-  ctx.fillText(sec.label, 26, 46 + (hb - 18) / 2 - 8, SW - 150);
+  ctx.fillText(sec.label, 26, hy + hh2 / 2 - 9, SW - 160);
   ctx.font = '600 11.5px ui-rounded, "SF Pro Rounded", Comfortaa, sans-serif';
   ctx.fillStyle = '#D9C49A';
-  ctx.fillText(sec.mkts.length + ' rows growing', 26, 46 + (hb - 18) / 2 + 11);
+  ctx.fillText(sec.mkts.length + ' rows growing', 26, hy + hh2 / 2 + 10);
   ctx.textAlign = 'right';
   ctx.font = '800 14px ui-monospace, Menlo, monospace';
   ctx.fillStyle = '#F6E3C1';
-  ctx.fillText('$' + sec.tot.toFixed(2) + ' today', SW - 26, 46 + (hb - 18) / 2);
+  ctx.fillText('$' + sec.tot.toFixed(2) + ' today', SW - 26, hy + hh2 / 2);
   ctx.textAlign = 'left';
 }
 function drawTool(){
