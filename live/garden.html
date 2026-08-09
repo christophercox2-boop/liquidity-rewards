@@ -1277,17 +1277,27 @@ function bookHTML(){
   });
   const pendPx = side => PEND && PEND[side] && PEND['o' + side]
     && PEND[side].px !== PEND['o' + side].px ? PEND[side].px : null;
-  // a rung for every shown book level PLUS every price where I rest,
-  // even when it sits outside the fetched book window
+  // Only the rungs that can actually score: with the program's steep
+  // discount factor, anything beyond ~2 ticks from the best earns
+  // nothing — distant walls would just crush the bar scale.
+  const tickM = Math.max(1, Math.round((MI.tick || .01) * 1000));
+  const FARNOTES = [];
   const rungs = side => {
     const api = side === 'bid' ? 'BUY' : 'SELL';
+    const best = ((side === 'bid' ? MI.bids : MI.asks) || [])[0];
+    const bestK = best ? Math.round(best[0] * 1000) : null;
+    const near = k => bestK === null || Math.abs(k - bestK) <= 2 * tickM;
     const map = new Map();
-    ((side === 'bid' ? MI.bids : MI.asks) || []).slice(0, 5).forEach(([p, q]) =>
-      map.set(Math.round(p * 1000), {tot:q, inBook:true}));
+    ((side === 'bid' ? MI.bids : MI.asks) || []).slice(0, 6).forEach(([p, q]) => {
+      const k = Math.round(p * 1000);
+      if(near(k)) map.set(k, {tot:q, inBook:true});
+    });
     (MI.orders || []).forEach(o => {
       if(o.side !== api || !o.price) return;
       const k = Math.round(o.price * 1000);
-      if(!map.has(k)) map.set(k, {tot:0, inBook:false});
+      if(near(k)){ if(!map.has(k)) map.set(k, {tot:0, inBook:false}); }
+      else FARNOTES.push((side === 'bid' ? 'bid ' : 'ask ') + fmtC(o.price * 100)
+        + ' ×' + Math.round(o.size));
     });
     const pp = pendPx(side);
     if(pp !== null){
@@ -1302,7 +1312,7 @@ function bookHTML(){
         inBook:v.inBook, ghost:v.ghost};
     });
     list.sort((a, b) => side === 'bid' ? b.key - a.key : a.key - b.key);
-    return list.slice(0, 6);
+    return list.slice(0, 5);
   };
   const bids = rungs('bid'), asks = rungs('ask');
   const bestBid = ((MI.bids || [])[0] || [0])[0] * 1000;
@@ -1323,10 +1333,12 @@ function bookHTML(){
       (l.mine ? '<span class="bkchip">you</span>' : (l.ghost ? '<span class="bkchip">&rarr;</span>' : '')) +
       '</div>';
   };
-  return '<div class="bk"><div class="bkh">THE ROW&rsquo;S BOOK &mdash; WHO&rsquo;S RESTING WHERE</div>' +
+  return '<div class="bk"><div class="bkh">THE ROW&rsquo;S BOOK &mdash; NEAR THE FRONT, WHERE IT SCORES</div>' +
     asks.slice().reverse().map(l => row(l, 'ask')).join('') +
     '<div class="bkmid">spread</div>' +
-    bids.map(l => row(l, 'bid')).join('') + '</div>';
+    bids.map(l => row(l, 'bid')).join('') + '</div>' +
+    (FARNOTES.length ? '<div class="pnote">also resting far from the action: ' +
+      FARNOTES.join(' &middot; ') + ' — too far back to score</div>' : '');
 }
 function panelShow(){
   if(!CLOSE || (MODE !== 'bed' && MODE !== 'fly')) return;
