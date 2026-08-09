@@ -4520,6 +4520,17 @@ class Handler(BaseHTTPRequestHandler):
             # The page's own login card gates the data underneath.
             self._send(200, "text/html; charset=utf-8", DASH_HTML.encode())
             return
+        if self.path.startswith("/garden"):
+            # The garden view: same shell pattern — the page itself is
+            # public, every data fetch inside it carries the key header.
+            try:
+                with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                       "garden.html"), "rb") as f:
+                    body = f.read()
+            except OSError:
+                body = b"garden view not deployed"
+            self._send(200, "text/html; charset=utf-8", body)
+            return
         if self.path.startswith("/manifest.json"):
             self._send(200, "application/json", json.dumps({
                 "name": "Liquidity Rewards", "short_name": "Rewards",
