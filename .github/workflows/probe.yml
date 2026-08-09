@@ -20,17 +20,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Raw incentives payload (politics + golf samples)
-        continue-on-error: true
-        run: |
-          mkdir -p data
-          curl -sS "https://api.prod.polymarketexchange.com/v1/incentives?symbols=apdc-kashpatel-2026-08-31&symbols=cranc-uspres28-12-31-2026-elomus&symbols=opdc-mcconnell-resign-2026-11-02&symbols=tec-pga-rockclas-2026-08-02-r3l-joedah&pageSize=20" \
-            | python3 -m json.tool > data/probe_incentives.json
-          head -c 2000 data/probe_incentives.json
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Raw incentives payload (zero-paying vs paying strikes)
+        continue-on-error: true
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          mkdir -p data
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, requests
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          syms = ["scc-senate-gop-2026-11-03-48", "scc-senate-gop-2026-11-03-51",
+                  "scc-senate-gop-2026-11-03-52", "scc-hrep-rep-2026-11-03-gte205",
+                  "scc-senate-gop-2026-11-03-49", "scc-senate-gop-2026-11-03-50",
+                  "scc-senate-gop-2026-11-03-53", "scc-hrep-rep-2026-11-03-gte200",
+                  "opdc-mcconnell-resign-2026-11-02", "apdc-jerpowgov-2026-12-31"]
+          path = "/v1/incentives"
+          r = requests.get(tr.TRADE_API + path,
+                           headers=tr.auth_headers(kid, sec, "GET", path),
+                           params={"symbols": syms, "pageSize": 50}, timeout=30)
+          r.raise_for_status()
+          with open("data/probe_incentives.json", "w") as f:
+              json.dump(r.json(), f, indent=1)
+          for m in r.json().get("programs") or []:
+              tps = m.get("timePeriods") or []
+              live = [tp for tp in tps if str(tp.get("status")) != "closed"]
+              print(m.get("marketSlug"), "| periods:", len(tps), "active:",
+                    [(tp.get("programId"), tp.get("period"), tp.get("rewardPool"),
+                      tp.get("status"), str(tp.get("end"))) for tp in live][:3])
+          EOF
 
       - name: Recent activity payload (trade states)
         continue-on-error: true
@@ -231,6 +255,6 @@ jobs:
             git push
           fi
 
-# probe trigger 1786125089
+# probe trigger 1786240185
 
 # rewards check 1786173232
