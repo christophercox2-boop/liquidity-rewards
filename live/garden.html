@@ -84,7 +84,7 @@
 </style></head>
 <body>
 <canvas id="g"></canvas>
-<div id="hint" class="wd">turn to look around &middot; tap a plant to tend it</div>
+<div id="hint" class="wd">turn to look around &middot; tap a bed to open it</div>
 <div id="cap" class="wd"></div>
 <div id="toast" class="wd"></div>
 <button id="back" class="wd">&larr; step back</button>
@@ -734,11 +734,162 @@ function drawTuftV(g, k, seed){
     g.beginPath(); g.arc(0, -k * .8, k * .07, 0, 7); g.fillStyle = '#F0C24E'; g.fill();
   }
 }
+// ---------------- top-down painters for the overhead bed view ----------------
+function topCorn(g, r, o){
+  const R = mulb(o.seed), dry = o.state === 'dry';
+  const C = dry ? TONES_DRY : TONES_OK;
+  g.lineCap = 'round';
+  // two layers of broad arching blades — dark under, light over
+  for(const [count, tones, scale] of [[7, [C[0], C[1]], 1.05], [6, [C[1], C[2]], .78]]){
+    for(let i = 0; i < count; i++){
+      const a = i * 2.399 + R() * .35 + (scale < 1 ? 1.2 : 0);
+      const L = r * (.78 + R() * .3) * scale * (dry ? .85 : 1);
+      const w = r * .3 * scale;
+      g.save(); g.rotate(a);
+      g.beginPath();
+      g.moveTo(0, r * .06);
+      g.bezierCurveTo(w, -L * .25, w * .55, -L * .78, 0, -L);
+      g.bezierCurveTo(-w * .55, -L * .78, -w, -L * .25, 0, r * .06);
+      g.closePath();
+      g.fillStyle = tones[i % 2]; g.fill();
+      g.strokeStyle = 'rgba(20,42,16,.35)'; g.lineWidth = r * .03;
+      g.beginPath(); g.moveTo(0, -L * .1); g.quadraticCurveTo(w * .12, -L * .5, 0, -L * .9);
+      g.stroke();
+      g.restore();
+    }
+  }
+  g.beginPath(); g.arc(0, 0, r * .16, 0, 7);
+  g.fillStyle = dry ? '#8E9450' : '#2F6B2C'; g.fill();
+  g.beginPath(); g.arc(0, 0, r * .08, 0, 7);
+  g.fillStyle = dry ? '#C6BA7E' : '#E9C64F'; g.fill();
+  const n = o.state === 'ok' ? Math.min(o.fruit, 5) : 0;
+  for(let i = 0; i < n; i++){
+    const a = i * 2.1 + .6;
+    g.save(); g.rotate(a); g.translate(0, -r * .48); g.rotate(.55);
+    const gr = g.createLinearGradient(-r * .12, 0, r * .12, 0);
+    gr.addColorStop(0, '#C6952C'); gr.addColorStop(.5, '#F0C24E'); gr.addColorStop(1, '#F8DC86');
+    g.beginPath(); g.ellipse(0, 0, r * .13, r * .28, 0, 0, 7);
+    g.fillStyle = gr; g.fill();
+    g.fillStyle = 'rgba(150,104,22,.4)';
+    for(let q = 0; q < 5; q++)
+      g.beginPath(), g.ellipse((q % 2 ? -1 : 1) * r * .05, -r * .16 + q * r * .08,
+        r * .035, r * .05, 0, 0, 7), g.fill();
+    g.fillStyle = C[1];
+    g.beginPath(); g.ellipse(-r * .08, r * .16, r * .09, r * .16, .5, 0, 7); g.fill();
+    g.restore();
+  }
+}
+function topTomato(g, r, o){
+  const R = mulb(o.seed), dry = o.state === 'dry';
+  const C = dry ? TONES_DRY : TONES_OK;
+  blobAt(g, 0, 0, r * .95, r * .9, R, 11, .3); g.fillStyle = C[0]; g.fill();
+  blobAt(g, -r * .12, -r * .1, r * .72, r * .66, R, 9, .32); g.fillStyle = C[1]; g.fill();
+  blobAt(g, r * .1, r * .08, r * .5, r * .46, R, 8, .35); g.fillStyle = C[2]; g.fill();
+  for(let i = 0; i < 12; i++){
+    const a = i / 12 * 6.28 + R() * .4, d = r * (.55 + R() * .35);
+    leafO(g, Math.cos(a) * d, Math.sin(a) * d, r * (.3 + R() * .15), a,
+      [C[1], C[2], C[3]][i % 3]);
+  }
+  if(o.state === 'ok') for(let i = 0; i < o.fruit; i++){
+    const a = i * 2.4 + 1.1, d = r * (.25 + (i % 3) * .18);
+    g.save(); g.translate(Math.cos(a) * d, Math.sin(a) * d);
+    tomatoFruit(g, r * .2); g.restore();
+  }
+}
+function topPumpkin(g, r, o){
+  const R = mulb(o.seed), dry = o.state === 'dry';
+  const C = dry ? TONES_DRY : TONES_OK;
+  g.strokeStyle = dry ? '#7E8148' : '#38762F'; g.lineWidth = r * .07; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(-r * .95, r * .3);
+  g.bezierCurveTo(-r * .4, -r * .3, r * .3, r * .5, r * .95, -r * .2); g.stroke();
+  [[-.7, -.1, .3], [.55, .45, -.4], [-.15, .6, .9]].forEach(([x, y, a], i) => {
+    g.save(); g.translate(x * r, y * r); g.rotate(a);
+    blobAt(g, 0, 0, r * .3, r * .24, R, 8, .3);
+    g.fillStyle = i % 2 ? C[1] : C[2]; g.fill();
+    g.strokeStyle = 'rgba(24,52,18,.4)'; g.lineWidth = r * .03;
+    g.beginPath(); g.moveTo(0, r * .12); g.lineTo(0, -r * .16); g.stroke();
+    g.restore();
+  });
+  const pr = r * .52;
+  g.save(); g.translate(r * .05, -r * .08);
+  const gr = g.createRadialGradient(-pr * .3, -pr * .3, pr * .1, 0, 0, pr * 1.2);
+  gr.addColorStop(0, '#F8A94E'); gr.addColorStop(.6, '#E8821E'); gr.addColorStop(1, '#B25A0C');
+  g.beginPath(); g.arc(0, 0, pr, 0, 7); g.fillStyle = gr; g.fill();
+  g.strokeStyle = 'rgba(150,74,8,.5)'; g.lineWidth = pr * .07;
+  for(let i = 0; i < 4; i++){
+    g.beginPath(); g.ellipse(0, 0, pr * (.35 + i * .2), pr, (i - 1.5) * .5, 0, 7); g.stroke();
+  }
+  g.strokeStyle = '#6E5024'; g.lineWidth = pr * .16;
+  g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(pr * .15, -pr * .1, pr * .25, -pr * .05);
+  g.stroke();
+  g.restore();
+  const n = o.state === 'ok' ? Math.max(0, o.fruit - 1) : 0;
+  for(let i = 0; i < n; i++){
+    const a = [-.85, .8, -.5, .95][i % 4];
+    g.save(); g.translate(a * r, r * (.35 - (i % 2) * .6));
+    const g2 = g.createRadialGradient(-r * .04, -r * .04, r * .01, 0, 0, r * .15);
+    g2.addColorStop(0, '#F8A94E'); g2.addColorStop(1, '#BE6410');
+    g.beginPath(); g.arc(0, 0, r * .13, 0, 7); g.fillStyle = g2; g.fill();
+    g.restore();
+  }
+}
+function topStraw(g, r, o){
+  const R = mulb(o.seed), dry = o.state === 'dry';
+  const C = dry ? TONES_DRY : TONES_OK;
+  for(let i = 0; i < 8; i++){
+    const a = i / 8 * 6.28 + R() * .25;
+    g.save(); g.rotate(a); g.translate(0, -r * .38);
+    strawTrio(g, r * .6, 0, i % 2 ? C[1] : C[0], 'rgba(18,38,14,.35)');
+    g.restore();
+  }
+  for(let i = 0; i < 5; i++){
+    const a = i / 5 * 6.28 + .5;
+    g.save(); g.rotate(a); g.translate(0, -r * .22);
+    strawTrio(g, r * .45, 0, C[2], 'rgba(24,52,18,.3)');
+    g.restore();
+  }
+  if(o.state === 'ok'){
+    for(let i = 0; i < o.fruit; i++){
+      const a = i * 2.4 + .9;
+      g.save(); g.translate(Math.cos(a) * r * .68, Math.sin(a) * r * .68);
+      g.rotate(a + Math.PI / 2);
+      strawBerryFruit(g, r * .17); g.restore();
+    }
+    g.save(); g.translate(r * .15, -r * .1);
+    for(let p = 0; p < 5; p++){
+      const a = p / 5 * 6.3;
+      g.beginPath(); g.ellipse(Math.cos(a) * r * .06, Math.sin(a) * r * .06,
+        r * .055, r * .04, a, 0, 7);
+      g.fillStyle = '#FDF7E8'; g.fill();
+    }
+    g.beginPath(); g.arc(0, 0, r * .035, 0, 7); g.fillStyle = '#F0C24E'; g.fill();
+    g.restore();
+  }
+}
+function topMound(g, r){
+  const R = mulb(431);
+  blobAt(g, 0, 0, r * .85, r * .6, R, 10, .2);
+  const gr = g.createRadialGradient(0, 0, r * .1, 0, 0, r * .85);
+  gr.addColorStop(0, '#8A5E3A'); gr.addColorStop(1, '#4E3521');
+  g.fillStyle = gr; g.fill();
+  g.strokeStyle = '#3E2A18'; g.lineWidth = r * .09; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(-r * .1, 0); g.lineTo(r * .08, -r * .18); g.stroke();
+  g.save(); g.translate(r * .45, r * .3); g.rotate(.7);
+  g.beginPath(); g.ellipse(0, 0, r * .09, r * .24, 0, 0, 7);
+  g.fillStyle = 'rgba(240,238,230,.9)'; g.fill(); g.restore();
+}
+function topSprout(g, r){
+  g.beginPath(); g.arc(0, 0, r * .3, 0, 7); g.fillStyle = 'rgba(60,42,26,.5)'; g.fill();
+  [[-1, '#86C46B'], [1, '#469140']].forEach(([s, col]) => {
+    g.beginPath(); g.ellipse(s * r * .2, 0, r * .24, r * .13, s * .5, 0, 7);
+    g.fillStyle = col; g.fill();
+  });
+}
 const KINDS = {
-  corn:   {h:1.7,  wf:1.0, draw:drawCorn},
-  tomato: {h:1.05, wf:1.3, draw:drawTomato},
-  pumpkin:{h:0.85, wf:2.1, draw:drawPumpkin},
-  straw:  {h:0.55, wf:2.1, draw:drawStraw},
+  corn:   {h:1.7,  wf:1.0, draw:drawCorn,   top:topCorn},
+  tomato: {h:1.05, wf:1.3, draw:drawTomato, top:topTomato},
+  pumpkin:{h:0.85, wf:2.1, draw:drawPumpkin,top:topPumpkin},
+  straw:  {h:0.55, wf:2.1, draw:drawStraw,  top:topStraw},
 };
 const KINDCYCLE = ['corn', 'tomato', 'pumpkin', 'straw'];
 const FAMKIND = {senate:'corn', house:'tomato', resign:'pumpkin', court:'straw'};
@@ -798,40 +949,49 @@ function buildWorld(d, positions){
     return 'steady';
   };
   const maxPm = Math.max(0.01, ...Object.values(pm));
-  // lay out ring
+  // lay out ring — every market becomes a crop; the ring shows the top
+  // rows per bed, the overhead bed view shows all of them
   SECTIONS = []; CROPS = []; SIGNS = [];
   const N = famList.length || 1;
   famList.forEach((fam, i) => {
     const az = i / N * Math.PI * 2;
     const kind = FAMKIND[fam.f] || KINDCYCLE[i % 4];
-    SECTIONS.push({az, kind, f:fam.f, label:FAMLBL[fam.f] || ('the ' + fam.f + ' bed'),
-      arc:Math.PI * 2 / N * .74});
-    const ms = fam.ms.slice().sort((a, b) => (pm[b] || 0) - (pm[a] || 0)).slice(0, 9);
+    const sec = {az, kind, f:fam.f, label:FAMLBL[fam.f] || ('the ' + fam.f + ' bed'),
+      arc:Math.PI * 2 / N * .74, mkts:[],
+      tot:fam.ms.reduce((s, m) => s + (pm[m] || 0), 0)};
+    SECTIONS.push(sec);
+    const ms = fam.ms.slice().sort((a, b) => (pm[b] || 0) - (pm[a] || 0));
     ms.forEach((m, j) => {
-      const front = j < Math.min(5, Math.ceil(ms.length / 2));
-      const row = front ? 0 : 1;
-      const idx = front ? j : j - Math.min(5, Math.ceil(ms.length / 2));
-      const rowN = front ? Math.min(5, Math.ceil(ms.length / 2))
-                         : ms.length - Math.min(5, Math.ceil(ms.length / 2));
-      const da = rowN > 1 ? (idx / (rowN - 1) - .5) * Math.PI * 2 / N * .6
-                          : (row ? .08 : 0);
-      const r = row ? 5.9 : 4.3;
       const orders = byMkt[m] || [];
       let state = orders.length ? classify(orders, 0) : 'eaten';
       if(SOWN.has(m)) state = orders.length ? state : 'sprout';
       const tier = orders.length ? tierOf(m) : 'steady';
-      CROPS.push({slug:m, kind, sec:i, az:az + da,
-        x:Math.sin(az + da) * r, z:Math.cos(az + da) * r,
+      const c = {slug:m, kind, sec:i, ring:j < 9,
         state, tier, sizeMul:TIERS[tier].mul,
         fruit:Math.max(1, Math.min(5, Math.round((pm[m] || 0) / maxPm * 5))),
         seed:hash(m), phase:(hash(m) % 97) / 9, wet:0,
         weeds:state === 'weedy' ? [{dx:-.42,dz:.25},{dx:.38,dz:.35},{dx:.02,dz:-.3}] : null,
         critter:state === 'eaten' ? {type:(hash(m) % 2) ? 'bird' : 'rabbit', frame:0} : null,
-        defended:(d.defend || []).includes(m)});
+        defended:(d.defend || []).includes(m)};
+      if(c.ring){
+        const shown = Math.min(9, ms.length);
+        const front = j < Math.min(5, Math.ceil(shown / 2));
+        const idx = front ? j : j - Math.min(5, Math.ceil(shown / 2));
+        const rowN = front ? Math.min(5, Math.ceil(shown / 2))
+                           : shown - Math.min(5, Math.ceil(shown / 2));
+        const da = rowN > 1 ? (idx / (rowN - 1) - .5) * Math.PI * 2 / N * .6
+                            : (front ? 0 : .08);
+        const r = front ? 4.3 : 5.9;
+        c.az = az + da;
+        c.x = Math.sin(az + da) * r; c.z = Math.cos(az + da) * r;
+      }else{ c.x = Math.sin(az) * 5; c.z = Math.cos(az) * 5; }
+      CROPS.push(c);
+      sec.mkts.push(c);
     });
     SIGNS.push({x:Math.sin(az + .38) * 3.4, z:Math.cos(az + .38) * 3.4, kind});
   });
   if(CLOSE){ const c2 = CROPS.find(c => c.slug === CLOSE.c.slug); if(c2) CLOSE.c = c2; }
+  if(BEDV){ const s2 = SECTIONS[Math.min(BEDV.si, SECTIONS.length - 1)]; BEDV.sec = s2; layoutBed(); }
 }
 // scenery
 for(let i = 0; i < 40; i++){
@@ -856,8 +1016,9 @@ for(let i = 0; i < 26; i++) TREES.push({az:i / 26 * Math.PI * 2 + Math.random() 
 // ---------------- state ----------------
 const P = {yaw:0, yawT:null, pitch:12};
 const EYE = 1.5;
-let MODE = 'pan';
+let MODE = 'pan';                 // pan | fly | bed | flyout
 let ZOOM = 0, CLOSE = null;
+let BEDV = null, BEDFADE = 0;     // overhead bed view
 let ACT = null, PARTS = [], SPARKS = [], FLEES = [];
 let T = 0, lastT = 0, fadeIn = 0, BUSY = false;
 // the day follows the real clock in New York
@@ -911,6 +1072,10 @@ cv.addEventListener('pointermove', e => {
     P.yaw -= dx * .0042; P.yawT = null;
     P.pitch = Math.max(-26, Math.min(56, P.pitch + dy * .1));
   }
+  if(pd.moved > 10 && MODE === 'bed' && BEDV){
+    BEDV.scroll = Math.max(0, Math.min(BEDV.maxScroll, BEDV.scroll - dy));
+    BEDV.scrollT = null;
+  }
   pd.x = e.clientX; pd.y = e.clientY;
 });
 cv.addEventListener('pointerup', e => {
@@ -922,43 +1087,86 @@ cv.addEventListener('pointerup', e => {
   if(MODE === 'pan'){
     const hits = CROPS.filter(c => c._r && sx >= c._r.x - 6 && sx <= c._r.x + c._r.w + 6
       && sy >= c._r.y - 6 && sy <= c._r.y + c._r.h + 6).sort((a, b) => a._r.zc - b._r.zc);
-    if(hits.length) openClose(hits[0]);
+    if(hits.length){ openBed(hits[0].sec); return; }
+    const sh = SECTIONS.find(s => s._r && sx >= s._r.x && sx <= s._r.x + s._r.w
+      && sy >= s._r.y && sy <= s._r.y + s._r.h);
+    if(sh) openBed(SECTIONS.indexOf(sh));
+  }else if(MODE === 'bed' && BEDV && !ACT && !BUSY){
+    const y = sy + BEDV.scroll;
+    const cell = BEDV.cells.find(cl => Math.hypot(sx - cl.x, y - cl.y) < cl.r * 1.45);
+    if(cell) openPlant(cell.c);
   }
 });
 window.addEventListener('contextmenu', e => e.preventDefault());
-document.getElementById('back').onclick = () => { if(MODE === 'close' && !ACT && !BUSY) exitClose(); };
+document.getElementById('back').onclick = () => {
+  if(ACT || BUSY) return;
+  if(MODE === 'bed' && CLOSE) closePlant();
+  else if(MODE === 'bed') closeBed();
+};
 
-// ---------------- close-up ----------------
-let MI = null;      // live market.json for the open close-up
+// ---------------- overhead bed view + plant panel ----------------
+let MI = null;      // live market.json for the selected plant
 let PEND = null;    // pending edits {bid:{id,px,qty}, ask:{id,px,qty}}
 let miTimer = null;
-function openClose(c){
-  MODE = 'zoomin'; ZOOM = 0; CLOSE = {c}; MI = null; PEND = null;
-  P.yawT = Math.atan2(c.x, c.z);
+function tagName(c){
+  const s = c.slug;
+  let mm = s.match(/^scc-senate-gop-.*?-(gte|lte)?(\d+)$/);
+  if(mm) return (mm[1] === 'gte' ? '≥' : mm[1] === 'lte' ? '≤' : '') + mm[2] + ' seats';
+  mm = s.match(/^scc-hrep-rep-.*?-(gte|lte)?(\d+)$/);
+  if(mm) return (mm[1] === 'gte' ? '≥' : mm[1] === 'lte' ? '≤' : '') + mm[2] + ' seats';
+  const n = mname(s);
+  return n.length > 17 ? n.slice(0, 16) + '…' : n;
+}
+function openBed(si){
+  if(MODE !== 'pan') return;
+  const sec = SECTIONS[si];
+  if(!sec) return;
+  MODE = 'fly'; ZOOM = 0; BEDFADE = 0;
+  BEDV = {si, sec, scroll:0, scrollT:null, cells:[], maxScroll:0};
+  layoutBed();
+  P.yawT = sec.az;
   hideHint();
+  document.getElementById('back').classList.add('show');
+}
+function layoutBed(){
+  if(!BEDV) return;
+  const cw = SW / 3, ch = cw * 1.06;
+  const top = 128;
+  BEDV.cw = cw; BEDV.ch = ch; BEDV.top = top;
+  BEDV.cells = BEDV.sec.mkts.map((c, i) => ({c,
+    x:cw * (i % 3) + cw / 2,
+    y:top + ch * Math.floor(i / 3) + ch * .5,
+    r:cw * .33}));
+  const rows = Math.ceil(BEDV.sec.mkts.length / 3);
+  BEDV.contentH = top + ch * rows + 30;
+  BEDV.maxScroll = Math.max(0, BEDV.contentH - SH * .55);
+}
+function closeBed(){
+  if(MODE !== 'bed') return;
+  closePlant();
+  MODE = 'flyout';
+  document.getElementById('back').classList.remove('show');
+}
+function openPlant(c){
+  CLOSE = {c}; MI = null; PEND = null;
   loadMI(c.slug);
+  panelShow();
   if(miTimer) clearInterval(miTimer);
-  miTimer = setInterval(() => { if(MODE === 'close' && !ACT && !BUSY) loadMI(c.slug); }, 20000);
+  miTimer = setInterval(() => { if(MODE === 'bed' && CLOSE && !ACT && !BUSY) loadMI(c.slug); }, 20000);
+  const cell = BEDV && BEDV.cells.find(cl => cl.c === c);
+  if(cell) BEDV.scrollT = Math.max(0, Math.min(BEDV.maxScroll, cell.y - SH * .26));
+}
+function closePlant(){
+  CLOSE = null; panelHide();
+  if(miTimer){ clearInterval(miTimer); miTimer = null; }
 }
 async function loadMI(slug){
   try{
     const j = await jget('/market.json?slug=' + encodeURIComponent(slug));
-    if(CLOSE && CLOSE.c.slug === slug){ MI = j; if(MODE === 'close') closeCap(); }
+    if(CLOSE && CLOSE.c.slug === slug){ MI = j; panelShow(); }
   }catch(e){ if(String(e.message) !== 'auth') toast('book unavailable — ' + e.message); }
 }
-function exitClose(){
-  MODE = 'zoomout'; cap(null); panelHide();
-  if(miTimer){ clearInterval(miTimer); miTimer = null; }
-  document.getElementById('back').classList.remove('show');
-}
-const CAPTIONS = {
-  healthy: c => TIERS[c.tier].word + ' — earning as we speak',
-  thirsty: () => 'gone dry — your price has slipped back from the front of the row',
-  weedy:   () => 'weeds crowding in — others are resting in front of your price',
-  eaten:   () => 'the row is bare — your orders filled and nothing is resting',
-  sprout:  () => 'freshly sown — waiting for the next refresh to see it rooted',
-};
-function closeCap(){ if(CLOSE){ cap(CAPTIONS[CLOSE.c.state](CLOSE.c)); panelShow(); } }
+function closeCap(){ if(CLOSE) panelShow(); }
 
 // ---------------- order panel (live) ----------------
 const pEl = document.getElementById('panel'), pBoard = document.getElementById('pboard');
@@ -1025,7 +1233,7 @@ function bookHTML(){
     bids.map((l, i) => row(l, 'bid', i === 0)).join('') + '</div>';
 }
 function panelShow(){
-  if(!CLOSE || MODE !== 'close') return;
+  if(!CLOSE || (MODE !== 'bed' && MODE !== 'fly')) return;
   const c = CLOSE.c;
   pEl.classList.add('show'); pEl.classList.remove('dip');
   const pm = (DATA && DATA.per_market_today) || {};
@@ -1182,33 +1390,44 @@ function update(dt){
     const da = angNorm(P.yawT - P.yaw);
     if(Math.abs(da) < .02) P.yawT = null; else P.yaw += da * Math.min(1, dt * 7);
   }
-  if(MODE === 'zoomin'){
-    ZOOM = Math.min(1, ZOOM + dt * 3.2);
-    if(ZOOM >= 1 && P.yawT === null){
-      MODE = 'close'; closeCap();
-      document.getElementById('back').classList.add('show');
+  if(MODE === 'fly'){
+    ZOOM = Math.min(1, ZOOM + dt * 3.0);
+    if(ZOOM >= 1 && P.yawT === null) MODE = 'bed';
+  }
+  if(MODE === 'bed'){
+    BEDFADE = Math.min(1, BEDFADE + dt * 4);
+    if(BEDV && BEDV.scrollT !== null && BEDV.scrollT !== undefined){
+      BEDV.scroll += (BEDV.scrollT - BEDV.scroll) * Math.min(1, dt * 8);
+      if(Math.abs(BEDV.scrollT - BEDV.scroll) < 1) BEDV.scrollT = null;
     }
   }
-  if(MODE === 'zoomout'){
-    ZOOM = Math.max(0, ZOOM - dt * 3.2);
-    if(ZOOM <= 0){ MODE = 'pan'; CLOSE = null; }
+  if(MODE === 'flyout'){
+    BEDFADE = Math.max(0, BEDFADE - dt * 4);
+    if(BEDFADE <= 0){
+      ZOOM = Math.max(0, ZOOM - dt * 3.0);
+      if(ZOOM <= 0){ MODE = 'pan'; BEDV = null; }
+    }
   }
   if(ACT){
     ACT.t += dt;
     const c = ACT.c;
+    const cell = BEDV && BEDV.cells.find(cl => cl.c === c);
+    const tx = cell ? cell.x : CX;
+    const ty = cell ? cell.y - (BEDV ? BEDV.scroll : 0) : SH * .4;
     if(ACT.kind === 'water' && ACT.t > .3 && ACT.t < ACT.dur - .4 && Math.random() < .9)
-      PARTS.push({kind:'drop', u:0, sx:CX + SW * .14, sy:SH * .33,
-        tx:CX + (Math.random() - .5) * SW * .13, ty:SH * .435, life:1});
+      PARTS.push({kind:'drop', u:0, sx:tx + SW * .16, sy:ty - SH * .07,
+        tx:tx + (Math.random() - .5) * SW * .14, ty:ty + 8, life:1});
     if(ACT.kind === 'plant' && ACT.t > .5 && ACT.t < ACT.dur - .6 && Math.random() < .8)
-      PARTS.push({kind:'seed', x:CX - 30 + Math.random() * 30, y:SH * .62,
-        vx:(Math.random() - .5) * 110, vy:-SH * .27 - Math.random() * 50, life:1});
+      PARTS.push({kind:'seed', x:tx - 30 + Math.random() * 60, y:ty + SH * .2,
+        vx:(Math.random() - .5) * 110, vy:-SH * .2 - Math.random() * 50, life:1});
     if(ACT.kind === 'weedall' && c.weeds){
       const due = c.weeds.filter((w, i) => ACT.t > .4 + i * .3 && !w._pulled);
-      due.forEach(w => { w._pulled = true;
-        PARTS.push({kind:'weedfly', x:w._sx || CX, y:w._sy || SH * .5,
+      due.forEach((w, i) => { w._pulled = true;
+        const wx = tx + (i - 1) * 30, wy = ty + 20;
+        PARTS.push({kind:'weedfly', x:wx, y:wy,
           vx:(Math.random() - .5) * 100 - 30, vy:-SH * .3, rot:0, life:1});
-        for(let i = 0; i < 7; i++) PARTS.push({kind:'crumb',
-          x:(w._sx || CX) + (Math.random() - .5) * 34, y:(w._sy || SH * .5),
+        for(let j = 0; j < 7; j++) PARTS.push({kind:'crumb',
+          x:wx + (Math.random() - .5) * 34, y:wy,
           vx:(Math.random() - .5) * 140, vy:-100 - Math.random() * 100, life:.8});
       });
     }
@@ -1434,11 +1653,36 @@ function drawPan(){
     for(let i = 0; i <= 6; i++) pts.push([sec.az - half + i * sec.arc / 6, 3.6]);
     for(let i = 6; i >= 0; i--) pts.push([sec.az - half + i * sec.arc / 6, 6.6]);
     const pp = pts.map(([a, r]) => proj(Math.sin(a) * r, Math.cos(a) * r, 0));
+    sec._r = null;
     if(pp.some(p => !p)) return;
     ctx.fillStyle = soil; ctx.beginPath();
     ctx.moveTo(pp[0].x, pp[0].y);
     pp.forEach(p => ctx.lineTo(p.x, p.y));
     ctx.closePath(); ctx.fill();
+    // plank edging + inner shadow give the beds real body
+    ctx.strokeStyle = 'rgba(62,42,24,.85)'; ctx.lineWidth = 4; ctx.lineJoin = 'round';
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(169,116,63,.5)'; ctx.lineWidth = 1.6;
+    ctx.stroke();
+    // tap target for the whole bed
+    const xs = pp.map(p => p.x), ys = pp.map(p => p.y);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs);
+    const y0 = Math.min(...ys), y1 = Math.max(...ys);
+    sec._r = {x:x0, y:y0, w:x1 - x0, h:y1 - y0};
+    // furrow arcs
+    ctx.strokeStyle = 'rgba(40,26,16,.3)'; ctx.lineWidth = 2;
+    for(const rr of [4.4, 5.3]){
+      ctx.beginPath();
+      let started = false;
+      for(let i = 0; i <= 8; i++){
+        const a = sec.az - half * .9 + i * sec.arc * .9 / 8;
+        const p = proj(Math.sin(a) * rr, Math.cos(a) * rr, 0);
+        if(!p){ started = false; continue; }
+        started ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+        started = true;
+      }
+      ctx.stroke();
+    }
   });
   CROPS.forEach(c => { if(c.wet > 0){
     const p = proj(c.x, c.z, 0); if(!p) return;
@@ -1510,96 +1754,166 @@ function drawPan(){
     ctx.restore();
   }
 }
-function drawClose(){
-  const c = CLOSE.c, kd = KINDS[c.kind];
-  const horC = SH * .15;
-  skyAndBodies(horC);
-  hillsAndTrees(horC);
+function drawBed(){
+  if(!BEDV) return;
   const L = daylight();
-  const [gFar] = grassCols();
-  ctx.fillStyle = rgb(gFar); ctx.fillRect(0, horC, SW, SH * .05);
-  const base = lerp3([40,30,20], [122,82,51], Math.max(.25, L));
-  const deep = lerp3([30,22,14], [94,61,36], Math.max(.25, L));
-  const sg = ctx.createLinearGradient(0, SH * .2, 0, SH * .7);
+  const sec = BEDV.sec, scroll = BEDV.scroll;
+  // rich soil ground with a plank frame
+  const base = lerp3([46,34,22], [128,88,55], Math.max(.28, L));
+  const deep = lerp3([32,23,15], [96,63,38], Math.max(.28, L));
+  const sg = ctx.createLinearGradient(0, 0, 0, SH);
   sg.addColorStop(0, rgb(base)); sg.addColorStop(1, rgb(deep));
-  ctx.fillStyle = sg; ctx.fillRect(0, SH * .2, SW, SH * .8);
-  ctx.strokeStyle = 'rgba(40,26,16,.4)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-  for(let i = 0; i < 3; i++){
-    const y = SH * .26 + i * SH * .11;
-    ctx.beginPath(); ctx.moveTo(0, y + Math.sin(i * 3) * 5);
-    ctx.quadraticCurveTo(CX, y - 8, SW, y + Math.sin(i) * 6); ctx.stroke();
+  ctx.fillStyle = sg; ctx.fillRect(0, 0, SW, SH);
+  // soil speckle
+  const R = mulb(77);
+  ctx.globalAlpha = .16;
+  for(let i = 0; i < 90; i++){
+    const x = R() * SW, y = (R() * (SH + 400) - scroll % 200);
+    ctx.fillStyle = i % 2 ? '#3E2A18' : '#A8825C';
+    ctx.beginPath(); ctx.arc(x, y, 1.2 + R() * 1.8, 0, 7); ctx.fill();
   }
-  const baseY = SH * .42;
-  if(c.wet > 0){
-    ctx.globalAlpha = c.wet * .55; ctx.fillStyle = '#2E1D10';
-    ctx.beginPath(); ctx.ellipse(CX, baseY + SH * .015, SW * .26, SH * .03, 0, 0, 7); ctx.fill();
-    ctx.globalAlpha = 1;
+  ctx.globalAlpha = 1;
+  ctx.save();
+  ctx.translate(0, -scroll);
+  // furrow bands per grid row
+  const rows = Math.ceil(sec.mkts.length / 3);
+  for(let r = 0; r < rows; r++){
+    const y = BEDV.top + r * BEDV.ch + BEDV.ch * .5;
+    ctx.strokeStyle = 'rgba(40,26,16,.35)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(14, y + BEDV.ch * .34);
+    ctx.quadraticCurveTo(CX, y + BEDV.ch * .34 - 8, SW - 14, y + BEDV.ch * .34);
+    ctx.stroke();
   }
-  if(c.state === 'thirsty'){
-    ctx.strokeStyle = '#A8825C'; ctx.lineWidth = 3; ctx.globalAlpha = .75; ctx.lineCap = 'round';
-    [[-.32,.05,-.16,.02],[-.1,.065,.08,.04],[.14,.03,.32,.055],[.02,.005,.18,-.01]].forEach(q => {
-      ctx.beginPath(); ctx.moveTo(CX + q[0] * SW, baseY + q[1] * SH);
-      ctx.lineTo(CX + q[2] * SW, baseY + q[3] * SH); ctx.stroke();
-    });
-    ctx.globalAlpha = 1;
-  }
-  ctx.save(); ctx.translate(CX, baseY);
-  if(c.state === 'eaten') drawMoundV(ctx, SH * .09);
-  else if(c.state === 'sprout') drawSproutV(ctx, SH * .11);
-  else{
-    const o = cropOpts(c);
-    const k = Math.min(SH * .3 * (c.sizeMul || 1), SW * .82 / kd.wf)
-      * (c.state === 'thirsty' ? .88 : 1);
-    kd.draw(ctx, k, o);
-  }
-  ctx.restore();
-  if(c.weeds) c.weeds.forEach((wd, i) => {
-    const wx = CX + wd.dx * SW * .5, wy = baseY + 14 + wd.dz * 36;
-    ctx.save(); ctx.translate(wx, wy);
-    drawWeedsV(ctx, SH * .05, c.seed + i * 31);
+  // cells
+  BEDV.cells.forEach(cell => {
+    const c = cell.c, kd = KINDS[c.kind];
+    const sel = CLOSE && CLOSE.c === c;
+    if(cell.y - scroll < -BEDV.ch || cell.y - scroll > SH + BEDV.ch) return;
+    if(sel){
+      const gr = ctx.createRadialGradient(cell.x, cell.y, cell.r * .2, cell.x, cell.y, cell.r * 1.5);
+      gr.addColorStop(0, 'rgba(255,214,120,.35)'); gr.addColorStop(1, 'rgba(255,214,120,0)');
+      ctx.fillStyle = gr;
+      ctx.fillRect(cell.x - cell.r * 1.6, cell.y - cell.r * 1.6, cell.r * 3.2, cell.r * 3.2);
+    }
+    if(c.wet > 0){
+      ctx.globalAlpha = c.wet * .5; ctx.fillStyle = '#2E1D10';
+      ctx.beginPath(); ctx.ellipse(cell.x, cell.y, cell.r * 1.15, cell.r * .95, 0, 0, 7);
+      ctx.fill(); ctx.globalAlpha = 1;
+    }
+    if(c.state === 'thirsty'){
+      ctx.globalAlpha = .28; ctx.fillStyle = '#8E6A44';
+      ctx.beginPath(); ctx.ellipse(cell.x, cell.y, cell.r * 1.05, cell.r * .9, 0, 0, 7); ctx.fill();
+      ctx.globalAlpha = .7; ctx.strokeStyle = '#A8825C'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+      for(let i = 0; i < 4; i++){
+        const a = i * 1.7 + .4;
+        ctx.beginPath();
+        ctx.moveTo(cell.x + Math.cos(a) * cell.r * .7, cell.y + Math.sin(a) * cell.r * .6);
+        ctx.lineTo(cell.x + Math.cos(a + .5) * cell.r * 1.15, cell.y + Math.sin(a + .5) * cell.r * .95);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+    ctx.save(); ctx.translate(cell.x, cell.y);
+    if(!RM && c.state === 'healthy') ctx.rotate(Math.sin(T * .0012 + c.phase) * .02);
+    if(c.state === 'eaten') topMound(ctx, cell.r);
+    else if(c.state === 'sprout') topSprout(ctx, cell.r * .5);
+    else (kd.top || topTomato)(ctx, cell.r * (c.sizeMul || 1) * 1.04, cropOpts(c));
     ctx.restore();
-    wd._sx = wx; wd._sy = wy - SH * .03;
+    if(c.weeds){
+      [[-.6, .4], [.65, .3], [.1, .75]].forEach(([dx, dy], i) => {
+        ctx.save(); ctx.translate(cell.x + dx * cell.r, cell.y + dy * cell.r);
+        drawWeedsV(ctx, cell.r * .34, c.seed + i * 31);
+        ctx.restore();
+      });
+    }
+    if(c.critter){
+      c.critter.frame = Math.floor(T / 380) % 2;
+      ctx.save(); ctx.translate(cell.x + cell.r * .8, cell.y + cell.r * .35);
+      (c.critter.type === 'bird' ? drawBirdV : drawRabbitV)(ctx, cell.r * .45, c.critter.frame);
+      ctx.restore();
+    }
+    if(c.defended){
+      ctx.save(); ctx.translate(cell.x + cell.r * .78, cell.y - cell.r * .82);
+      ctx.strokeStyle = '#8A5C2E'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(0, 12); ctx.lineTo(0, -8); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-8, -2); ctx.lineTo(8, -2); ctx.stroke();
+      ctx.fillStyle = '#E8821E';
+      ctx.beginPath(); ctx.arc(0, -12, 6, 0, 7); ctx.fill();
+      ctx.restore();
+    }
+    // name tag
+    const tag = tagName(c);
+    ctx.font = '700 12px ui-rounded, "SF Pro Rounded", Comfortaa, sans-serif';
+    const tw = Math.min(BEDV.cw - 10, ctx.measureText(tag).width + 16);
+    const ty = cell.y + cell.r + 14;
+    ctx.fillStyle = sel ? '#FFE2AE' : 'rgba(62,42,24,.85)';
+    ctx.beginPath(); ctx.roundRect(cell.x - tw / 2, ty - 10, tw, 20, 8); ctx.fill();
+    ctx.fillStyle = sel ? '#3E2A18' : '#F6E3C1';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(tag, cell.x, ty + 1, BEDV.cw - 24);
+    // sparkles for this crop
+    SPARKS.forEach(s => { if(s.c === c){
+      const x = cell.x + s.dx * cell.r * 1.2, y = cell.y - s.dy * cell.r * .8;
+      const k = 4;
+      ctx.globalAlpha = Math.min(1, s.life * 2); ctx.fillStyle = '#FFE9A0';
+      ctx.beginPath();
+      ctx.moveTo(x, y - k * 1.6); ctx.quadraticCurveTo(x + k * .3, y - k * .3, x + k * 1.6, y);
+      ctx.quadraticCurveTo(x + k * .3, y + k * .3, x, y + k * 1.6);
+      ctx.quadraticCurveTo(x - k * .3, y + k * .3, x - k * 1.6, y);
+      ctx.quadraticCurveTo(x - k * .3, y - k * .3, x, y - k * 1.6);
+      ctx.fill(); ctx.globalAlpha = 1;
+    }});
   });
-  if(c.critter){
-    c.critter.frame = Math.floor(T / 340) % 2;
-    ctx.save(); ctx.translate(CX + SW * .24, baseY + 10);
-    (c.critter.type === 'bird' ? drawBirdV : drawRabbitV)(ctx,
-      SH * (c.critter.type === 'bird' ? .06 : .075), c.critter.frame);
-    ctx.restore();
-  }
-  SPARKS.forEach(s => { if(s.c === c){
-    const x = CX + s.dx * SW * .3, y = baseY - s.dy / KINDS[c.kind].h * SH * .3;
-    const k = 5;
-    ctx.globalAlpha = Math.min(1, s.life * 2); ctx.fillStyle = '#FFE9A0';
-    ctx.beginPath();
-    ctx.moveTo(x, y - k * 1.6); ctx.quadraticCurveTo(x + k * .3, y - k * .3, x + k * 1.6, y);
-    ctx.quadraticCurveTo(x + k * .3, y + k * .3, x, y + k * 1.6);
-    ctx.quadraticCurveTo(x - k * .3, y + k * .3, x - k * 1.6, y);
-    ctx.quadraticCurveTo(x - k * .3, y - k * .3, x, y - k * 1.6);
-    ctx.fill(); ctx.globalAlpha = 1;
-  }});
+  ctx.restore();
+  // plank frame
+  ctx.strokeStyle = 'rgba(62,42,24,.9)'; ctx.lineWidth = 10;
+  ctx.strokeRect(5, 5, SW - 10, SH - 10);
+  ctx.strokeStyle = 'rgba(169,116,63,.55)'; ctx.lineWidth = 5;
+  ctx.strokeRect(5, 5, SW - 10, SH - 10);
+  // header board
+  const hb = 78;
+  ctx.fillStyle = 'rgba(62,42,24,.95)';
+  ctx.beginPath(); ctx.roundRect(12, 46, SW - 24, hb - 18, 14); ctx.fill();
+  const hg = ctx.createLinearGradient(0, 48, 0, 46 + hb - 18);
+  hg.addColorStop(0, 'rgba(125,80,48,.95)'); hg.addColorStop(1, 'rgba(94,61,36,.95)');
+  ctx.fillStyle = hg;
+  ctx.beginPath(); ctx.roundRect(14, 48, SW - 28, hb - 22, 12); ctx.fill();
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.font = '800 15px ui-rounded, "SF Pro Rounded", Comfortaa, sans-serif';
+  ctx.fillStyle = '#FFE2AE';
+  ctx.fillText(sec.label, 26, 46 + (hb - 18) / 2 - 8, SW - 150);
+  ctx.font = '600 11.5px ui-rounded, "SF Pro Rounded", Comfortaa, sans-serif';
+  ctx.fillStyle = '#D9C49A';
+  ctx.fillText(sec.mkts.length + ' rows growing', 26, 46 + (hb - 18) / 2 + 11);
+  ctx.textAlign = 'right';
+  ctx.font = '800 14px ui-monospace, Menlo, monospace';
+  ctx.fillStyle = '#F6E3C1';
+  ctx.fillText('$' + sec.tot.toFixed(2) + ' today', SW - 26, 46 + (hb - 18) / 2);
+  ctx.textAlign = 'left';
 }
 function drawTool(){
   if(!ACT || !ACT.close) return;
+  const cell = BEDV && BEDV.cells.find(cl => cl.c === ACT.c);
+  const tx = cell ? cell.x : CX;
+  const ty = cell ? cell.y - (BEDV ? BEDV.scroll : 0) : SH * .4;
   const u = ACT.t / ACT.dur;
   const rise = Math.sin(Math.min(1, u * 4) * Math.PI / 2);
   const fall = u > .85 && !ACT.hold ? (u - .85) / .15 : 0;
   const lift = rise * (1 - fall);
   if(ACT.kind === 'water'){
-    const k = SW * .26;
-    const kx = CX + SW * .3 + (1 - lift) * SW * .45;
-    const ky = SH * .4 + (1 - lift) * SH * .12;
+    const k = SW * .24;
+    const kx = tx + SW * .26 + (1 - lift) * SW * .5;
+    const ky = ty - SH * .04 + (1 - lift) * SH * .1;
     const tilt = -.5 * Math.sin(Math.min(1, u * 2.2) * Math.PI);
     ctx.save(); ctx.translate(kx, ky); ctx.rotate(tilt);
     drawCanV(ctx, k); ctx.restore();
   }else{
     const grab = (ACT.kind === 'weedall' || ACT.kind === 'trim') && u > .3 && u < .75;
     const open = !grab && ACT.kind !== 'plant';
-    const k = SW * .28;
+    const k = SW * .26;
     const wob = ACT.kind === 'weedall' ? Math.sin(u * 12) * SW * .1 : 0;
     ctx.save();
-    ctx.translate(CX + (ACT.kind === 'plant' ? SW * .08 : 0) + wob,
-      SH + k * .1 - lift * SH * .62);
+    ctx.translate(tx + wob, ty + SH * .3 + k * .1 - lift * SH * .3);
     drawHandV(ctx, k, open);
     ctx.restore();
   }
@@ -1628,8 +1942,13 @@ function drawParts(){
 function draw(){
   const zoomEase = ZOOM * ZOOM * (3 - 2 * ZOOM);
   Feff = F * (1 + zoomEase * 1.6);
-  if(MODE === 'close') drawClose();
-  else drawPan();
+  if((MODE === 'bed' || MODE === 'flyout') && BEDFADE > 0){
+    drawBed();
+    if(BEDFADE < 1){
+      ctx.fillStyle = 'rgba(16,12,8,' + ((1 - BEDFADE) * .9).toFixed(2) + ')';
+      ctx.fillRect(0, 0, SW, SH);
+    }
+  }else drawPan();
   drawParts();
   drawTool();
   const L = daylight(), t = tday();
@@ -1640,9 +1959,9 @@ function draw(){
   const vg = ctx.createRadialGradient(CX, SH * .48, SH * .4, CX, SH * .48, SH * .95);
   vg.addColorStop(0, 'rgba(24,16,8,0)'); vg.addColorStop(1, 'rgba(24,16,8,.3)');
   ctx.fillStyle = vg; ctx.fillRect(0, 0, SW, SH);
-  if(MODE === 'zoomin' || MODE === 'zoomout'){
-    const a = Math.max(0, ZOOM - .6) / .4;
-    if(a > 0){ ctx.fillStyle = 'rgba(16,12,8,' + (a * .9).toFixed(2) + ')'; ctx.fillRect(0, 0, SW, SH); }
+  if(MODE === 'fly' || (MODE === 'flyout' && BEDFADE <= 0)){
+    const a = Math.max(0, ZOOM - .55) / .45;
+    if(a > 0){ ctx.fillStyle = 'rgba(16,12,8,' + (a * .92).toFixed(2) + ')'; ctx.fillRect(0, 0, SW, SH); }
   }
   if(fadeIn < 1){ ctx.fillStyle = 'rgba(14,18,26,' + (1 - fadeIn) + ')'; ctx.fillRect(0, 0, SW, SH); }
 }
@@ -1675,6 +1994,7 @@ function resize(){
   cv.width = Math.round(SW * DPR); cv.height = Math.round(SH * DPR);
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   CX = SW / 2; F = SH * .5; HOR0 = SH * .40;
+  if(BEDV) layoutBed();
 }
 window.addEventListener('resize', resize);
 resize();
@@ -1684,7 +2004,8 @@ function frame(t){
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-window.DEBUG = {P, get CROPS(){ return CROPS; }, openClose, exitClose, refresh,
+window.DEBUG = {P, get CROPS(){ return CROPS; }, get SECTIONS(){ return SECTIONS; },
+  get BEDV(){ return BEDV; }, openBed, openPlant, closeBed, closePlant, refresh,
   setWorld(d, pos){ buildWorld(d, pos); }};
 </script>
 </body></html>
