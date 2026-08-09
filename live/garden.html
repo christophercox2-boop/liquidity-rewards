@@ -628,7 +628,13 @@ function drawSignV(g, k, kind){
   g.fillStyle = '#6E4426';
   g.beginPath(); g.arc(-w + k * .07, -h + k * .07, k * .022, 0, 7); g.fill();
   g.beginPath(); g.arc(w - k * .07, -h + k * .07, k * .022, 0, 7); g.fill();
-  g.save(); g.translate(0, k * .02); miniProduce(g, k * .2, kind); g.restore();
+  if(SHEETOK){
+    const pr = stageRect(kind, 0);
+    const ps = Math.max(2, Math.round(k * .55 / 16)) * 16;
+    g.imageSmoothingEnabled = false;
+    g.drawImage(SHEET, pr.sx, pr.sy, 16, 16, -ps / 2, -ps / 2 + k * .02, ps, ps);
+    g.imageSmoothingEnabled = true;
+  }
   g.restore();
 }
 function drawTreeV(g, k, type, tone, seed){
@@ -885,14 +891,84 @@ function topSprout(g, r){
     g.fillStyle = col; g.fill();
   });
 }
-const KINDS = {
-  corn:   {h:1.7,  wf:1.0, draw:drawCorn,   top:topCorn},
-  tomato: {h:1.05, wf:1.3, draw:drawTomato, top:topTomato},
-  pumpkin:{h:0.85, wf:2.1, draw:drawPumpkin,top:topPumpkin},
-  straw:  {h:0.55, wf:2.1, draw:drawStraw,  top:topStraw},
+// ---------------- pre-drawn sprites ----------------
+// "Farming Crops 16x16" by josehzz (CC0) — 20 crops, five growth
+// stages plus a portrait each. Sheet layout: two crops per row;
+// portrait at column 0/6, stages 5..1 in the following five columns.
+const SHEET = new Image();
+SHEET.src = '/assets/crops.png';
+let SHEETOK = false;
+SHEET.onload = () => { SHEETOK = true; };
+const CROPMAP = {   // name -> [half, row]
+  turnip:[0,0], rose:[1,0], cucumber:[0,1], tulip:[1,1], tomato:[0,2], melon:[1,2],
+  eggplant:[0,3], lemon:[1,3], pineapple:[0,4], rice:[1,4], wheat:[0,5], grapes:[1,5],
+  strawberry:[0,6], cassava:[1,6], potato:[0,7], coffee:[1,7], orange:[0,8], avocado:[1,8],
+  corn:[0,9], sunflower:[1,9],
 };
-const KINDCYCLE = ['corn', 'tomato', 'pumpkin', 'straw'];
-const FAMKIND = {senate:'corn', house:'tomato', resign:'pumpkin', court:'straw'};
+function stageRect(name, stage){          // stage 1..5, 0 = portrait
+  const m = CROPMAP[name] || CROPMAP.turnip;
+  const col = stage === 0 ? 0 : 6 - Math.max(1, Math.min(5, stage));
+  return {sx:m[0] * 96 + col * 16, sy:m[1] * 16};
+}
+// desaturated, warm-tinted variants for thirsty rows (cached)
+const TINTC = {};
+function drySprite(name, stage){
+  const key = name + '|' + stage;
+  if(TINTC[key]) return TINTC[key];
+  const c = document.createElement('canvas'); c.width = c.height = 16;
+  const g = c.getContext('2d');
+  const {sx, sy} = stageRect(name, stage);
+  g.drawImage(SHEET, sx, sy, 16, 16, 0, 0, 16, 16);
+  g.globalCompositeOperation = 'saturation'; g.fillStyle = '#808080'; g.fillRect(0, 0, 16, 16);
+  g.globalCompositeOperation = 'destination-in';
+  g.drawImage(SHEET, sx, sy, 16, 16, 0, 0, 16, 16);
+  g.globalCompositeOperation = 'source-atop';
+  g.globalAlpha = .38; g.fillStyle = '#C8A868'; g.fillRect(0, 0, 16, 16);
+  g.globalAlpha = 1;
+  TINTC[key] = c;
+  return c;
+}
+function drawCropSprite(g, cx, cy, size, name, stage, dry){
+  if(!SHEETOK) return;
+  const s = Math.max(2, Math.round(size / 16));   // integer scale keeps pixels crisp
+  const w = s * 16;
+  g.imageSmoothingEnabled = false;
+  if(dry){
+    g.drawImage(drySprite(name, stage), cx - w / 2, cy - w / 2, w, w);
+  }else{
+    const {sx, sy} = stageRect(name, stage);
+    g.drawImage(SHEET, sx, sy, 16, 16, cx - w / 2, cy - w / 2, w, w);
+  }
+  g.imageSmoothingEnabled = true;
+}
+function cropStage(c){
+  if(c.state === 'sprout') return 2;
+  if(c.state === 'thirsty') return 4;
+  return c.fruit >= 3 ? 5 : 4;
+}
+// pixelated renders of the procedural props so everything shares one look
+const PIXC = {};
+function pixSprite(key, size, drawFn){
+  if(PIXC[key]) return PIXC[key];
+  const c = document.createElement('canvas'); c.width = size; c.height = size;
+  const g = c.getContext('2d');
+  g.translate(size / 2, size * .96);
+  drawFn(g, size * .88);
+  PIXC[key] = c;
+  return c;
+}
+function drawPix(g, spr, cx, cyBase, h){
+  g.imageSmoothingEnabled = false;
+  g.drawImage(spr, cx - h / 2, cyBase - h, h, h);
+  g.imageSmoothingEnabled = true;
+}
+const KINDS = {};   // uniform metadata now that the art is sprite cells
+Object.keys(CROPMAP).forEach(k => { KINDS[k] = {h:0.95, wf:1.0}; });
+const KINDCYCLE = ['cucumber', 'lemon', 'coffee', 'cassava', 'pineapple', 'avocado',
+  'potato', 'orange'];
+const FAMKIND = {senate:'corn', house:'tomato', resign:'melon', court:'strawberry',
+  gym:'grapes', pandc:'sunflower', lawec:'wheat', dccc:'turnip', stsc:'rice',
+  pvwc:'tulip', vmc:'rose', enwc:'rose', ewc:'tulip', usgcc:'eggplant'};
 const TIERS = {
   prize: {mul:1.24, word:'one of your best earners'},
   steady:{mul:1.0,  word:'a steady earner'},
@@ -955,7 +1031,7 @@ function buildWorld(d, positions){
   const N = famList.length || 1;
   famList.forEach((fam, i) => {
     const az = i / N * Math.PI * 2;
-    const kind = FAMKIND[fam.f] || KINDCYCLE[i % 4];
+    const kind = FAMKIND[fam.f] || KINDCYCLE[i % KINDCYCLE.length];
     const sec = {az, kind, f:fam.f, label:FAMLBL[fam.f] || ('the ' + fam.f + ' bed'),
       arc:Math.PI * 2 / N * .74, mkts:[],
       tot:fam.ms.reduce((s, m) => s + (pm[m] || 0), 0)};
@@ -1603,13 +1679,15 @@ function cropOpts(c){
 function drawCropPan(c){
   const kd = KINDS[c.kind];
   let r;
-  if(c.state === 'eaten') r = ent(c.x, c.z, .3, 1.8, (g, k) => drawMoundV(g, k));
-  else if(c.state === 'sprout') r = ent(c.x, c.z, .34, 1, (g, k) => drawSproutV(g, k));
+  if(c.state === 'eaten') r = ent(c.x, c.z, .34, 1.4, (g, k) =>
+    drawPix(g, pixSprite('mound', 28, (gg, kk) => { gg.translate(0, -kk * .3); drawMoundV(gg, kk); }), 0, k * .1, k * 1.25));
+  else if(c.state === 'sprout') r = ent(c.x, c.z, 1.0, 1, (g, k) =>
+    drawCropSprite(g, 0, -k * .45, k, c.kind, 1, false));
   else{
-    const o = cropOpts(c);
     const alpha = c.tier === 'puny' && c.state === 'healthy' ? .92 : 1;
-    r = ent(c.x, c.z, kd.h * (c.sizeMul || 1) * (c.state === 'thirsty' ? .85 : 1), kd.wf,
-      (g, k, oo) => kd.draw(g, k, oo), {...o, alpha});
+    r = ent(c.x, c.z, kd.h * (c.sizeMul || 1) * (c.state === 'thirsty' ? .9 : 1), kd.wf,
+      (g, k) => drawCropSprite(g, 0, -k * .5, k, c.kind, cropStage(c),
+        c.state === 'thirsty'), {alpha});
   }
   c._r = r ? {x:r.x, y:r.y, w:r.w, h:r.h, zc:r.zc} : null;
   if(!r) return;
@@ -1624,7 +1702,9 @@ function drawCropPan(c){
   if(c.critter){
     c.critter.frame = Math.floor(T / 380) % 2;
     ent(c.x + .34, c.z - .3, c.critter.type === 'bird' ? .3 : .42, 1.4,
-      (g, k) => (c.critter.type === 'bird' ? drawBirdV : drawRabbitV)(g, k, c.critter.frame));
+      (g, k) => drawPix(g, pixSprite(c.critter.type + c.critter.frame, 26,
+        (gg, kk) => (c.critter.type === 'bird' ? drawBirdV : drawRabbitV)(gg, kk, c.critter.frame)),
+        0, 0, k));
   }
   if(c.defended) ent(c.x - .4, c.z - .25, .55, .6, (g, k) => {
     // a little scarecrow post marks Defend watching this row
@@ -1815,9 +1895,12 @@ function drawBed(){
     }
     ctx.save(); ctx.translate(cell.x, cell.y);
     if(!RM && c.state === 'healthy') ctx.rotate(Math.sin(T * .0012 + c.phase) * .02);
-    if(c.state === 'eaten') topMound(ctx, cell.r);
-    else if(c.state === 'sprout') topSprout(ctx, cell.r * .5);
-    else (kd.top || topTomato)(ctx, cell.r * (c.sizeMul || 1) * 1.04, cropOpts(c));
+    if(c.state === 'eaten')
+      drawPix(ctx, pixSprite('mound', 28, (gg, kk) => { gg.translate(0, -kk * .3); drawMoundV(gg, kk); }),
+        0, cell.r * .55, cell.r * 1.2);
+    else if(c.state === 'sprout') drawCropSprite(ctx, 0, 0, cell.r * 1.5, c.kind, 1, false);
+    else drawCropSprite(ctx, 0, 0, cell.r * 2.6 * (c.sizeMul || 1), c.kind,
+      cropStage(c), c.state === 'thirsty');
     ctx.restore();
     if(c.weeds){
       [[-.6, .4], [.65, .3], [.1, .75]].forEach(([dx, dy], i) => {
@@ -1829,11 +1912,13 @@ function drawBed(){
     if(c.critter){
       c.critter.frame = Math.floor(T / 380) % 2;
       ctx.save(); ctx.translate(cell.x + cell.r * .8, cell.y + cell.r * .35);
-      (c.critter.type === 'bird' ? drawBirdV : drawRabbitV)(ctx, cell.r * .45, c.critter.frame);
+      drawPix(ctx, pixSprite(c.critter.type + c.critter.frame, 26,
+        (gg, kk) => (c.critter.type === 'bird' ? drawBirdV : drawRabbitV)(gg, kk, c.critter.frame)),
+        0, cell.r * .35, cell.r * .95);
       ctx.restore();
     }
     if(c.defended){
-      ctx.save(); ctx.translate(cell.x + cell.r * .78, cell.y - cell.r * .82);
+      ctx.save(); ctx.translate(cell.x + cell.r * .72, cell.y - cell.r * .6);
       ctx.strokeStyle = '#8A5C2E'; ctx.lineWidth = 4; ctx.lineCap = 'round';
       ctx.beginPath(); ctx.moveTo(0, 12); ctx.lineTo(0, -8); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(-8, -2); ctx.lineTo(8, -2); ctx.stroke();
@@ -1906,7 +1991,8 @@ function drawTool(){
     const ky = ty - SH * .04 + (1 - lift) * SH * .1;
     const tilt = -.5 * Math.sin(Math.min(1, u * 2.2) * Math.PI);
     ctx.save(); ctx.translate(kx, ky); ctx.rotate(tilt);
-    drawCanV(ctx, k); ctx.restore();
+    drawPix(ctx, pixSprite('can', 36, (gg, kk) => drawCanV(gg, kk)), 0, k * .5, k * 1.15);
+    ctx.restore();
   }else{
     const grab = (ACT.kind === 'weedall' || ACT.kind === 'trim') && u > .3 && u < .75;
     const open = !grab && ACT.kind !== 'plant';
@@ -1914,7 +2000,8 @@ function drawTool(){
     const wob = ACT.kind === 'weedall' ? Math.sin(u * 12) * SW * .1 : 0;
     ctx.save();
     ctx.translate(tx + wob, ty + SH * .3 + k * .1 - lift * SH * .3);
-    drawHandV(ctx, k, open);
+    drawPix(ctx, pixSprite('hand' + (open ? 1 : 0), 32,
+      (gg, kk) => drawHandV(gg, kk, open)), 0, 0, k);
     ctx.restore();
   }
 }

@@ -4531,6 +4531,22 @@ class Handler(BaseHTTPRequestHandler):
                 body = b"garden view not deployed"
             self._send(200, "text/html; charset=utf-8", body)
             return
+        if self.path.startswith("/assets/"):
+            # Static sprite art for the garden (CC0, see ATTRIBUTION.txt).
+            name = os.path.basename(self.path.split("?")[0])
+            p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", name)
+            if name.endswith(".png") and os.path.isfile(p):
+                with open(p, "rb") as f:
+                    self.send_response(200)
+                    self.send_header("Content-Type", "image/png")
+                    self.send_header("Cache-Control", "public, max-age=86400")
+                    body = f.read()
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    self.wfile.write(body)
+            else:
+                self._send(404, "text/plain", b"not found")
+            return
         if self.path.startswith("/manifest.json"):
             self._send(200, "application/json", json.dumps({
                 "name": "Liquidity Rewards", "short_name": "Rewards",
