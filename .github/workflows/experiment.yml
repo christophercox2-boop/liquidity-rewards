@@ -1,0 +1,118 @@
+name: Order reset experiment
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/experiment.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: order-experiment
+  cancel-in-progress: false
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cancel all orders, refresh, re-place identically
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+
+          def api(method, path, **kw):
+              return requests.request(
+                  method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  timeout=30, **kw)
+
+          # ---- 1. snapshot everything as it rests right now ----
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          before = r.json().get("orders") or []
+          with open("data/experiment_before.json", "w") as f:
+              json.dump(before, f, indent=1)
+          plan = []
+          for o in before:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug")
+              qty = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity"))
+              px = (o.get("price") or {}).get("value")
+              intent = o.get("intent")
+              if not slug or not px or not intent or not qty or qty < 1:
+                  print("SKIP (unparseable):", json.dumps(o)[:160]); continue
+              plan.append({"marketSlug": slug, "intent": intent,
+                           "price": px, "quantity": int(round(qty))})
+          print(f"snapshot: {len(before)} open orders, {len(plan)} to re-place")
+
+          # ---- 2. cancel every resting order ----
+          r = api("POST", "/v1/orders/open/cancel", json={})
+          print("cancel-all:", r.status_code, r.text[:200])
+          r.raise_for_status()
+
+          # ---- 3. wait until the account shows no resting orders, then
+          #         let the books sit clean for a real refresh ----
+          for i in range(12):
+              time.sleep(5)
+              r = api("GET", "/v1/orders/open")
+              left = len(r.json().get("orders") or [])
+              print(f"  t+{(i+1)*5}s open orders: {left}")
+              if left == 0:
+                  break
+          time.sleep(120)
+
+          # ---- 4. re-place every order exactly as it was (post-only) ----
+          placed, rejected = [], []
+          for p in plan:
+              body = {"marketSlug": p["marketSlug"], "intent": p["intent"],
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": p["price"], "currency": "USD"},
+                      "quantity": p["quantity"],
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              r = api("POST", "/v1/orders", json=body)
+              (placed if r.status_code < 300 else rejected).append(
+                  {**p, "status": r.status_code,
+                   "resp": "" if r.status_code < 300 else " ".join(r.text.split())[:150]})
+              time.sleep(0.35)
+          print(f"re-placed: {len(placed)} | rejected: {len(rejected)}")
+          for x in rejected:
+              print("  REJECTED:", x["marketSlug"], x["intent"], "@", x["price"],
+                    "x", x["quantity"], "->", x["status"], x["resp"])
+
+          # ---- 5. final state ----
+          time.sleep(8)
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          after = r.json().get("orders") or []
+          with open("data/experiment_after.json", "w") as f:
+              json.dump(after, f, indent=1)
+          with open("data/experiment_summary.json", "w") as f:
+              json.dump({"before": len(before), "planned": len(plan),
+                         "placed": len(placed), "rejected": rejected,
+                         "after": len(after)}, f, indent=1)
+          print(f"final open orders: {len(after)} (was {len(before)})")
+          EOF
+
+      - name: Commit experiment record
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/experiment_before.json data/experiment_after.json data/experiment_summary.json
+          git commit -m "Order reset experiment [skip ci]" || echo "nothing to commit"
+          git pull --rebase origin main
+          git push
