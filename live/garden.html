@@ -1264,49 +1264,64 @@ function seedPend(){
 function fmtC(x){ return (Math.round(x * 10) / 10) + '¢'; }
 function bookHTML(){
   if(!MI) return '<div class="pnote">fetching the book…</div>';
-  const tick = (MI.tick || .01) * 100;
+  // milli-price keys keep float prices and 0.1-cent ticks exact
   const myAt = {};
   (MI.orders || []).forEach(o => {
     const k = o.side + Math.round(o.price * 1000);
     myAt[k] = (myAt[k] || 0) + o.size;
   });
-  const rows = (levels, side) => (levels || []).slice(0, 4).map(([p, q]) => {
-    const pc = p * 100;
-    const mine = myAt[(side === 'bid' ? 'BUY' : 'SELL') + Math.round(p * 1000)] || 0;
-    const oth = Math.max(0, q - mine);
-    return {pc, mine, oth, tot:q};
-  });
-  const bids = rows(MI.bids, 'bid'), asks = rows(MI.asks, 'ask');
-  const maxQ = Math.max(1, ...bids.map(l => l.tot), ...asks.map(l => l.tot));
   const pendPx = side => PEND && PEND[side] && PEND['o' + side]
     && PEND[side].px !== PEND['o' + side].px ? PEND[side].px : null;
-  const row = (l, side, isFront) => {
-    const isPend = pendPx(side) !== null && Math.abs(pendPx(side) - l.pc) < .01;
-    const wOth = Math.round(l.oth / maxQ * 100), wYou = Math.round(l.mine / maxQ * 100);
+  // a rung for every shown book level PLUS every price where I rest,
+  // even when it sits outside the fetched book window
+  const rungs = side => {
+    const api = side === 'bid' ? 'BUY' : 'SELL';
+    const map = new Map();
+    ((side === 'bid' ? MI.bids : MI.asks) || []).slice(0, 5).forEach(([p, q]) =>
+      map.set(Math.round(p * 1000), {tot:q, inBook:true}));
+    (MI.orders || []).forEach(o => {
+      if(o.side !== api || !o.price) return;
+      const k = Math.round(o.price * 1000);
+      if(!map.has(k)) map.set(k, {tot:0, inBook:false});
+    });
+    const pp = pendPx(side);
+    if(pp !== null){
+      const k = Math.round(pp * 10);
+      if(!map.has(k)) map.set(k, {tot:0, inBook:false, ghost:true});
+    }
+    let list = [...map.entries()].map(([k, v]) => {
+      const mine = myAt[api + k] || 0;
+      return {key:k, pc:k / 10, mine,
+        oth:Math.max(0, v.tot - mine),
+        tot:Math.max(v.tot, mine),
+        inBook:v.inBook, ghost:v.ghost};
+    });
+    list.sort((a, b) => side === 'bid' ? b.key - a.key : a.key - b.key);
+    return list.slice(0, 6);
+  };
+  const bids = rungs('bid'), asks = rungs('ask');
+  const bestBid = ((MI.bids || [])[0] || [0])[0] * 1000;
+  const bestAsk = ((MI.asks || [])[0] || [9])[0] * 1000;
+  const maxQ = Math.max(1, ...bids.map(l => l.tot), ...asks.map(l => l.tot));
+  const row = (l, side) => {
+    const isPend = pendPx(side) !== null && Math.abs(pendPx(side) * 10 - l.key) < .5;
+    const isFront = l.key === Math.round(side === 'bid' ? bestBid : bestAsk);
+    const wYou = Math.max(l.mine > 0 ? 3 : 0, Math.round(l.mine / maxQ * 100));
+    const wOth = Math.min(100 - wYou, Math.round(l.oth / maxQ * 100));
     return '<div class="bkr' + (isPend ? ' pend' : '') + '">' +
       '<span class="bkpx num' + (isFront ? ' front' : '') + '">' + fmtC(l.pc) + '</span>' +
-      '<span class="bkbar"><span class="bkf ' + side + '" style="width:' + wOth + '%"></span>' +
-      (l.mine ? '<span class="bkyou" style="left:' + wOth + '%;width:' + wYou + '%"></span>' : '') +
+      '<span class="bkbar">' +
+      (l.mine ? '<span class="bkyou" style="left:0;width:' + wYou + '%"></span>' : '') +
+      '<span class="bkf ' + side + '" style="left:' + wYou + '%;width:' + wOth + '%"></span>' +
       '</span>' +
-      '<span class="bkq num">' + Math.round(l.tot) + '</span>' +
-      (l.mine ? '<span class="bkchip">you</span>' : '') + '</div>';
-  };
-  // pending ghost rung if price stepped off the shown levels
-  const ghost = side => {
-    const px = pendPx(side);
-    if(px === null) return '';
-    const shown = (side === 'bid' ? bids : asks).some(l => Math.abs(l.pc - px) < .01);
-    if(shown) return '';
-    return '<div class="bkr pend"><span class="bkpx num">' + fmtC(px) + '</span>' +
-      '<span class="bkbar"></span><span class="bkq num">&middot;</span>' +
-      '<span class="bkchip">&rarr;</span></div>';
+      '<span class="bkq num">' + (l.tot ? Math.round(l.tot) : '&middot;') + '</span>' +
+      (l.mine ? '<span class="bkchip">you</span>' : (l.ghost ? '<span class="bkchip">&rarr;</span>' : '')) +
+      '</div>';
   };
   return '<div class="bk"><div class="bkh">THE ROW&rsquo;S BOOK &mdash; WHO&rsquo;S RESTING WHERE</div>' +
-    asks.slice().reverse().map((l, i, arr) => row(l, 'ask', i === arr.length - 1)).join('') +
-    ghost('ask') +
+    asks.slice().reverse().map(l => row(l, 'ask')).join('') +
     '<div class="bkmid">spread</div>' +
-    ghost('bid') +
-    bids.map((l, i) => row(l, 'bid', i === 0)).join('') + '</div>';
+    bids.map(l => row(l, 'bid')).join('') + '</div>';
 }
 function panelShow(){
   if(!CLOSE || (MODE !== 'bed' && MODE !== 'fly')) return;
