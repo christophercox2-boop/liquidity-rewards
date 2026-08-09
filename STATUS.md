@@ -2,17 +2,17 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-08-08 9:12 PM ET
+## ✅ Last successful check: 2026-08-08 9:13 PM ET
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
 ## 📌 Summary
 
-**Earning right now:** ~$140.43/day estimated (ceiling, not promise — details below)
+**Earning right now:** ~$141.55/day estimated (ceiling, not promise — details below)
 
 **Earned:** $1,772.42 lifetime ($1,627.01 paid). Last three recorded days — 2026-08-07: **$60.33** · 2026-08-06: **$52.21** · 2026-08-05: **$31.46** _(Polymarket reports ~1–2 days behind)_
 
-**What else to join:** `ewc-usse-oh-2026-11-03-dem` — BUY at the best price, ~$21.18/day for 200 contracts. Runners-up: `ewc-usgub-ca-2026-11-03-xavbec` (~$18.05/day), `ewc-usgub-ca-2026-11-03-stehil` (~$11.85/day)
+**What else to join:** `ewc-usse-oh-2026-11-03-dem` — BUY at the best price, ~$21.18/day for 200 contracts. Runners-up: `ewc-usgub-ca-2026-11-03-xavbec` (~$18.05/day), `enwc-ussep-mn-2026-08-11-dem-pegfla` (~$17.72/day)
 
 ---
 
@@ -20,7 +20,7 @@ This runs automatically every hour. **If the timestamp above is more than ~2 hou
 
 ## 📍 Right now — your resting orders
 
-### Estimated earning rate: ~$140.43/day (~$5.85/hour)
+### Estimated earning rate: ~$141.55/day (~$5.90/hour)
 
 Rough estimate — assumes the books, pools, and your orders stay as they are, both sides keep qualifying, each pool covers its whole event/race (so it's divided across that race's open markets), and splits evenly between bid and ask. Scored with the official formula: `DiscountFactor ^ (ticks from best price) × size`, counting only orders inside the Target Size window. Earning orders first.
 
@@ -33,13 +33,13 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 | `lawec-cryptoleg-2026-12-31` | BUY | 27.0¢ | 10 | 0 | $25.00 | ✅ scoring — ~99.7% of bid side (26,960 resting ≥ 2,000 ✓) ≈ $6.23/day (pool ÷ 2 markets) |
 | `scc-hrep-rep-2026-11-03-gte190` | BUY | 53.0¢ | 10 | 0 | $100.00 | ✅ scoring — ~99.4% of bid side (80,318 resting ≥ 5,000 ✓) ≈ $4.14/day (pool ÷ 12 markets) |
 | `scc-senate-gop-2026-11-03-51` | BUY | 19.0¢ | 2 | 0 | $100.00 | ✅ scoring — ~97.6% of bid side (200,553 resting ≥ 5,000 ✓) ≈ $3.75/day (pool ÷ 13 markets) |
+| `lawec-cryptoleg-2026-12-31` | SELL | 36.0¢ | 5 | 0 | $25.00 | ✅ scoring — ~96.4% of ask side (31,142 resting ≥ 2,000 ✓) ≈ $6.03/day (pool ÷ 2 markets) |
 | `scc-hrep-rep-2026-11-03-gte205` | SELL | 48.0¢ | 20 | 0 | $100.00 | ✅ scoring — ~95.2% of ask side (48,664 resting ≥ 5,000 ✓) ≈ $3.97/day (pool ÷ 12 markets) |
 | `scc-senate-gop-2026-11-03-50` | BUY | 25.0¢ | 1 | 0 | $100.00 | ✅ scoring — ~92.6% of bid side (100,616 resting ≥ 5,000 ✓) ≈ $3.56/day (pool ÷ 13 markets) |
 | `scc-hrep-rep-2026-11-03-gte230` | BUY | 9.0¢ | 20 | 0 | $100.00 | ✅ scoring — ~90.7% of bid side (5,594 resting ≥ 5,000 ✓) ≈ $3.78/day (pool ÷ 12 markets) |
 | `scc-senate-gop-2026-11-03-53` | BUY | 13.0¢ | 1 | 0 | $100.00 | ✅ scoring — ~86.7% of bid side (10,799 resting ≥ 5,000 ✓) ≈ $3.33/day (pool ÷ 13 markets) |
 | `scc-hrep-rep-2026-11-03-gte210` | SELL | 46.0¢ | 10 | 0 | $100.00 | ✅ scoring — ~85.2% of ask side (48,199 resting ≥ 5,000 ✓) ≈ $3.55/day (pool ÷ 12 markets) |
 | `pandc-anydis-2027-12-31` | SELL | 30.0¢ | 10 | 0 | $50.00 | ✅ scoring — ~83.5% of ask side (10,981 resting ≥ 10,000 ✓) ≈ $10.44/day (pool ÷ 2 markets) |
-| `lawec-cryptoleg-2026-12-31` | SELL | 39.0¢ | 5 | 0 | $25.00 | ✅ scoring — ~83.3% of ask side (31,119 resting ≥ 2,000 ✓) ≈ $5.21/day (pool ÷ 2 markets) |
 | `scc-hrep-rep-2026-11-03-gte220` | BUY | 22.0¢ | 7 | 3 | $100.00 | ✅ scoring — ~82.4% of bid side (85,488 resting ≥ 5,000 ✓) ≈ $3.43/day (pool ÷ 12 markets) |
 | `scc-hrep-rep-2026-11-03-gte180` | BUY | 65.0¢ | 10 | 0 | $100.00 | ✅ scoring — ~75.7% of bid side (50,540 resting ≥ 5,000 ✓) ≈ $3.15/day (pool ÷ 12 markets) |
 | `scc-hrep-rep-2026-11-03-gte200` | SELL | 59.0¢ | 7 | 0 | $100.00 | ✅ scoring — ~74.9% of ask side (63,044 resting ≥ 5,000 ✓) ≈ $3.12/day (pool ÷ 12 markets) |
@@ -267,6 +267,28 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
+<details><summary><code>lawec-cryptoleg-2026-12-31</code> SELL 5 @ 36¢ → $6.03/day</summary>
+
+| | Asks | Resting | Score |
+|---|---:|---:|---:|
+| ▶ | 36¢ | 5 (5 yours) | ×0.1^0 = 5.0 |
+|  | 38¢ | 18 | ×0.1^2 = 0.2 |
+|  | 39¢ | 6 | ×0.1^3 = 0.0 |
+|  | 47¢ | 29 | ×0.1^11 = 0.0 |
+|  | 52¢ | 5,772 | ×0.1^16 = 0.0 |
+| | | **Σ** | **5.2** |
+
+`yours 5.0 / Σ 5.2 = 96.4%`  
+`$25 ÷ 2 ÷ 2 = $6.25 × 96.4% = $6.03/day`  
+
+<details><summary>÷ 2 markets in this race — tap to list</summary>
+
+1. `lawec-cryptoleg-2026-08-10`
+2. `lawec-cryptoleg-2026-12-31` ← this one
+
+</details>
+
+</details>
 <details><summary><code>scc-hrep-rep-2026-11-03-gte205</code> SELL 20 @ 48¢ → $3.97/day</summary>
 
 | | Asks | Resting | Score |
@@ -442,26 +464,6 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 
 1. `pandc-anydis-2026-12-31`
 2. `pandc-anydis-2027-12-31` ← this one
-
-</details>
-
-</details>
-<details><summary><code>lawec-cryptoleg-2026-12-31</code> SELL 5 @ 39¢ → $5.21/day</summary>
-
-| | Asks | Resting | Score |
-|---|---:|---:|---:|
-| ▶ | 39¢ | 6 (5 yours) | ×0.1^0 = 6.0 |
-|  | 47¢ | 29 | ×0.1^8 = 0.0 |
-|  | 52¢ | 5,772 | ×0.1^13 = 0.0 |
-| | | **Σ** | **6.0** |
-
-`yours 5.0 / Σ 6.0 = 83.3%`  
-`$25 ÷ 2 ÷ 2 = $6.25 × 83.3% = $5.21/day`  
-
-<details><summary>÷ 2 markets in this race — tap to list</summary>
-
-1. `lawec-cryptoleg-2026-08-10`
-2. `lawec-cryptoleg-2026-12-31` ← this one
 
 </details>
 
@@ -950,13 +952,13 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 |---|---:|---:|---:|---|---:|---:|
 | `ewc-usse-oh-2026-11-03-dem` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (110,837 resting) | ~84.7% | ~$21.18 |
 | `ewc-usgub-ca-2026-11-03-xavbec` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (325,441 resting) | ~24.1% | ~$18.05 |
+| `enwc-ussep-mn-2026-08-11-dem-pegfla` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (44,131 resting) | ~70.9% | ~$17.72 |
+| `enwc-usgubp-ok-2026-06-16-rep-gendru` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (75,582 resting) | ~65.5% | ~$16.39 |
+| `apdc-jerpowgov-2026-08-31` | $100.00 ÷ 2 | 0.20 | 5,000 | SELL side (79,920 resting) | ~60.4% | ~$15.09 |
 | `ewc-usgub-ca-2026-11-03-stehil` | $300.00 ÷ 2 | 0.20 | 10,000 | SELL side (221,245 resting) | ~15.8% | ~$11.85 |
 | `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (77,395 resting) | ~42.2% | ~$10.55 |
-| `enwc-usgubp-ok-2026-06-16-rep-gendru` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (75,894 resting) | ~32.7% | ~$8.17 |
-| `enwc-ussep-mn-2026-08-11-dem-pegfla` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (44,516 resting) | ~30.0% | ~$7.49 |
 | `ewc-usgub-oh-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (48,717 resting) | ~9.1% | ~$6.85 |
-| `apdc-jerpowgov-2026-08-31` | $100.00 ÷ 2 | 0.20 | 5,000 | SELL side (79,950 resting) | ~22.6% | ~$5.65 |
-| `ewc-usse-me-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (172,317 resting) | ~6.5% | ~$4.86 |
+| `ewc-usse-me-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (172,282 resting) | ~7.7% | ~$5.81 |
 | `enwc-ussep-mn-2026-08-11-dem-angcra` | $100.00 ÷ 2 | 0.20 | 5,000 | SELL side (87,529 resting) | ~18.0% | ~$4.49 |
 | `ewc-usgub-ia-2026-11-03-rep` | $25.00 ÷ 2 | 0.10 | 2,000 | BUY side (56,176 resting) | ~63.0% | ~$3.94 |
 | `ewc-usse-ga-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (71,784 resting) | ~3.8% | ~$2.83 |
@@ -1022,6 +1024,7 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 
 | Checked (ET) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-08-08 9:13 PM ET | ✅ ok | 1749 | $1772.42 |
 | 2026-08-08 9:12 PM ET | ✅ ok | 1749 | $1772.42 |
 | 2026-08-08 9:06 PM ET | ✅ ok | 1704 | $1722.44 |
 | 2026-08-08 7:48 PM ET | ✅ ok | 1702 | $1712.09 |
@@ -1031,6 +1034,5 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 | 2026-08-08 3:47 PM ET | ✅ ok | 1702 | $1712.09 |
 | 2026-08-08 3:02 PM ET | ✅ ok | 1702 | $1712.09 |
 | 2026-08-08 1:50 PM ET | ✅ ok | 1702 | $1712.09 |
-| 2026-08-08 12:56 PM ET | ✅ ok | 1702 | $1712.09 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
