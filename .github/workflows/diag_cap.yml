@@ -6,10 +6,8 @@ name: Diagnose order cap
 # restores the cancelled one either way. Net position change: none.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/diag_cap.yml
+  # one-shot: run by hand only. The push trigger is deliberately removed so
+  # editing this file can never re-fire it against the live account.
   workflow_dispatch: {}
 
 permissions:

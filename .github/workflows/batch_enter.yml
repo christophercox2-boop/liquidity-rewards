@@ -10,10 +10,8 @@ name: Batch enter new market pairs
 # already resting at the same (market, side, price) is skipped, not duplicated.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/batch_enter.yml
+  # one-shot: run by hand only. The push trigger is deliberately removed so
+  # editing this file can never re-fire it against the live account.
   workflow_dispatch: {}
 
 permissions:

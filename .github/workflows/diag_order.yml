@@ -1,10 +1,8 @@
 name: Diagnose order rejection
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/diag_order.yml
+  # one-shot: run by hand only. The push trigger is deliberately removed so
+  # editing this file can never re-fire it against the live account.
   workflow_dispatch: {}
 
 permissions:
