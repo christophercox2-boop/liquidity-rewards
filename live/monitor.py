@@ -492,7 +492,53 @@ class Monitor:
         self.pending_alerts: list[tuple[str, str, str]] = []
         # Auto-defend config survives deploys with the rest of the state.
         self.state.setdefault("defend", {})
+        self._apply_defend_seed()
         tr.PRIORITY_SLUGS = set(self.state["defend"])
+
+    def _apply_defend_seed(self) -> None:
+        """Adopt live/defend_seed.json once, per version bump.
+
+        Lets a batch of markets be armed from a commit instead of seventeen
+        taps on a phone. Version-gated and additive: a market you have since
+        stopped defending is never resurrected, and caps you set by hand are
+        never overwritten.
+        """
+        path = Path(__file__).with_name("defend_seed.json")
+        if not path.exists():
+            return
+        try:
+            seed = json.loads(path.read_text())
+        except Exception as e:  # noqa: BLE001 — a bad seed must never block boot
+            print(f"[defend-seed] unreadable, ignored: {e}", flush=True)
+            return
+        version = int(seed.get("version") or 0)
+        if version <= int(self.state.get("defend_seed_v") or 0):
+            return
+        added = 0
+        for slug, sides in (seed.get("defend") or {}).items():
+            if slug in self.state["defend"]:
+                continue
+            if len(self.state["defend"]) >= DEFEND_MAX_MARKETS:
+                print(f"[defend-seed] cap {DEFEND_MAX_MARKETS} reached — "
+                      f"{slug} and any after it skipped", flush=True)
+                break
+            clean = {}
+            for side in ("BUY", "SELL"):
+                cap = ((sides or {}).get(side) or {}).get("cap")
+                if cap is None:
+                    continue
+                try:
+                    c = float(cap)
+                except (TypeError, ValueError):
+                    continue
+                if 0.1 <= c <= 99.9:
+                    clean[side] = {"cap": c}
+            if clean:
+                self.state["defend"][slug] = clean
+                added += 1
+        self.state["defend_seed_v"] = version
+        print(f"[defend-seed] v{version}: armed {added} market(s); "
+              f"now defending {len(self.state['defend'])}", flush=True)
 
     def merge_fills(self, rows: list[dict]) -> None:
         """Merge a quick fills page (newest first) into the fills list —
@@ -2005,7 +2051,7 @@ def ws_stream_loop(key_id: str, secret_key: str) -> None:
 # Hard rails: the user's cap, a 2-tick gap to the opposite touch, a cooldown,
 # fresh books only, reprice-only (never places orders or adds size), and
 # floor/ceiling qualifier blocks are never touched.
-DEFEND_MAX_MARKETS = 20          # defended books refresh every ~45-60s
+DEFEND_MAX_MARKETS = 80          # sanity bound only; books refresh proportionally slower
 DEFEND_SHARE_FLOOR = 0.25        # act only under 25% of the side's rewards
 DEFEND_COOLDOWN_SECONDS = 90.0   # per market+side between improvements
 DEFEND_MAX_PER_POLL = 6          # request-budget bound on a busy poll
