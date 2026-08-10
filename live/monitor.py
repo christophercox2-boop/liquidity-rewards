@@ -502,10 +502,15 @@ class Monitor:
     def _apply_defend_seed(self) -> None:
         """Adopt live/defend_seed.json once, per version bump.
 
-        Lets a batch of markets be armed from a commit instead of seventeen
-        taps on a phone. Version-gated and additive: a market you have since
-        stopped defending is never resurrected, and caps you set by hand are
-        never overwritten.
+        Lets a batch of markets be armed from a commit instead of twenty taps on
+        a phone. Version-gated — nothing happens until the file's version rises.
+
+        On a bump: markets not currently defended are armed, and caps the seed
+        itself last wrote are moved to the new value. A cap you changed by hand
+        is recognised (it no longer matches what the seed last wrote) and left
+        alone. Note a market you stopped defending IS re-armed by a bump, since
+        the seed is the declared intent for these markets — stop it again after,
+        or drop it from the file.
         """
         path = Path(__file__).with_name("defend_seed.json")
         if not path.exists():
@@ -518,14 +523,10 @@ class Monitor:
         version = int(seed.get("version") or 0)
         if version <= int(self.state.get("defend_seed_v") or 0):
             return
-        added = 0
+        # what this seed wrote last time, so hand edits can be told apart
+        prior = self.state.setdefault("defend_seed_caps", {})
+        added = updated = kept = 0
         for slug, sides in (seed.get("defend") or {}).items():
-            if slug in self.state["defend"]:
-                continue
-            if len(self.state["defend"]) >= DEFEND_MAX_MARKETS:
-                print(f"[defend-seed] cap {DEFEND_MAX_MARKETS} reached — "
-                      f"{slug} and any after it skipped", flush=True)
-                break
             clean = {}
             for side in ("BUY", "SELL"):
                 cap = ((sides or {}).get(side) or {}).get("cap")
@@ -537,12 +538,33 @@ class Monitor:
                     continue
                 if 0.1 <= c <= 99.9:
                     clean[side] = {"cap": c}
-            if clean:
+            if not clean:
+                continue
+            cur = self.state["defend"].get(slug)
+            if cur is None:
+                if len(self.state["defend"]) >= DEFEND_MAX_MARKETS:
+                    print(f"[defend-seed] cap {DEFEND_MAX_MARKETS} reached — "
+                          f"{slug} and any after it skipped", flush=True)
+                    break
                 self.state["defend"][slug] = clean
                 added += 1
+            else:
+                was = prior.get(slug) or {}
+                for side, cfg in clean.items():
+                    live_cap = (cur.get(side) or {}).get("cap")
+                    seeded_cap = (was.get(side) or {}).get("cap")
+                    if live_cap is None:
+                        cur[side] = dict(cfg); updated += 1
+                    elif seeded_cap is not None and abs(live_cap - seeded_cap) < 1e-9:
+                        if abs(live_cap - cfg["cap"]) > 1e-9:
+                            cur[side] = dict(cfg); updated += 1
+                    else:
+                        kept += 1   # set by hand — the seed does not touch it
+            prior[slug] = {s: dict(c) for s, c in clean.items()}
         self.state["defend_seed_v"] = version
-        print(f"[defend-seed] v{version}: armed {added} market(s); "
-              f"now defending {len(self.state['defend'])}", flush=True)
+        print(f"[defend-seed] v{version}: armed {added}, raised {updated}, "
+              f"left {kept} hand-set; now defending {len(self.state['defend'])}",
+              flush=True)
 
     def merge_fills(self, rows: list[dict]) -> None:
         """Merge a quick fills page (newest first) into the fills list —
@@ -2070,6 +2092,75 @@ def _others_best(levels: list, mine_sz: dict) -> float | None:
         if q - mine_sz.get(round(p, 4), 0.0) > 0.5:
             return p
     return None
+
+
+# ---- Watch for reward pools arriving on markets that had none -------------
+# A market can be listed days before its incentive program is attached: the
+# governor slate listed 2026-08-10 had live books and no pool. Entering one of
+# those early earns nothing, but the moment a pool appears the front of a thin
+# book is worth having, so this notices the transition and pushes a phone alert.
+PROGRAM_WATCH_BATCH = 25         # symbols per /v1/incentives call
+PROGRAM_WATCH_MAX = 300          # slugs examined per pass, keeps the poll cheap
+
+
+def watch_program_arrivals(pol_slugs: list[str]) -> None:
+    """Alert once when a US-politics market gains a reward pool it lacked.
+
+    The first pass over a market only records its state, so a fresh deploy does
+    not announce hundreds of pre-existing programs as if they were new.
+    """
+    if not pol_slugs:
+        return
+    cands = [s for s in pol_slugs
+             if tr._is_us_politics(s) and not tr._is_econ(s)][:PROGRAM_WATCH_MAX]
+    if not cands:
+        return
+    with MONITOR.lock:
+        known = dict(MONITOR.state.get("prog_seen") or {})
+    seeded = bool(known)
+    live: dict[str, dict] = {}
+    for i in range(0, len(cands), PROGRAM_WATCH_BATCH):
+        batch = cands[i:i + PROGRAM_WATCH_BATCH]
+        try:
+            r = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                             params={"symbols": batch, "pageSize": 100}, timeout=20)
+            if r.status_code >= 400:
+                continue
+            for p in r.json().get("programs") or []:
+                slug = p.get("marketSlug", "")
+                tp = tr._pick_period(p.get("timePeriods") or [], slug)
+                if slug and tp is not None:
+                    live[slug] = tr._prog_of(tp)
+        except Exception:  # noqa: BLE001 — best-effort, never break the poll
+            continue
+        time.sleep(0.05)
+
+    arrived = []
+    for slug in cands:
+        had = bool(known.get(slug))
+        has = slug in live
+        if has and not had and seeded:
+            arrived.append(slug)
+        known[slug] = bool(has)
+
+    with MONITOR.lock:
+        MONITOR.state["prog_seen"] = known
+    if not arrived:
+        return
+    arrived.sort()
+    for slug in arrived[:6]:
+        pr = live.get(slug) or {}
+        MONITOR.pending_alerts.append((
+            "Reward pool attached",
+            f"{slug} — ${pr.get('pool', 0):,.0f}/day pool, target "
+            f"{pr.get('target', 0):,.0f}, df {pr.get('df')}",
+            "high"))
+    if len(arrived) > 6:
+        MONITOR.pending_alerts.append((
+            "Reward pools attached",
+            f"…and {len(arrived) - 6} more markets gained a pool", "high"))
+    print(f"[prog-watch] {len(arrived)} market(s) gained a pool: "
+          f"{', '.join(arrived[:8])}", flush=True)
 
 
 def auto_defend() -> None:
@@ -4767,6 +4858,7 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                 try:
                     pol_slugs, event_sizes = tr.fetch_politics_events()
                     MONITOR.note_markets(list(pol_slugs), "politics")
+                    watch_program_arrivals(list(pol_slugs))
                 except Exception:  # noqa: BLE001 — keep last known map
                     pass
             if time.time() - golf_refreshed > 3600:  # new-tournament check hourly

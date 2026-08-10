@@ -1,105 +1,105 @@
 {
- "version": 2,
- "note": "Favourite (heavy partisan lean) side of every newly-listed senate/governor market: let the front bid chase up to 70c. Version-gated: bump the version to arm newly added markets.",
+ "version": 3,
+ "note": "Favourite (heavy partisan lean) side of every newly-listed senate/governor market: let the front bid chase up to 85c. Version-gated. A raise moves markets this seed armed; a cap changed by hand is left alone.",
  "defend": {
   "usgubewc-usgub-al-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-al-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-ar-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-co-2026-11-03-dem": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-fl-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-ky-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-la-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-ms-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-mt-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-nj-2026-11-03-dem": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-nm-2026-11-03-dem": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-ok-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-or-2026-11-03-dem": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-ri-2026-11-03-dem": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-sc-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-va-2026-11-03-dem": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-wv-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-tn-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-wy-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   },
   "ussewc-usse-sd-2026-11-03-rep": {
    "BUY": {
-    "cap": 70.0
+    "cap": 85.0
    }
   }
  }
