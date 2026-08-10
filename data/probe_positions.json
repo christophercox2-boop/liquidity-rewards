@@ -1,19 +1,19 @@
 {
  "apdc-alito-2026-12-31": {
-  "netPosition": "232",
-  "qtyBought": "424",
-  "qtySold": "192",
+  "netPosition": "261",
+  "qtyBought": "474",
+  "qtySold": "213",
   "cost": {
-   "value": "72.6660",
+   "value": "72.0800",
    "currency": "USD"
   },
   "realized": {
-   "value": "-5.6165",
+   "value": "-8.7800",
    "currency": "USD"
   },
   "bodPosition": "0",
   "expired": false,
-  "updateTime": "2026-08-09T01:06:12.441250759Z",
+  "updateTime": "2026-08-09T19:08:30.722636386Z",
   "marketMetadata": {
    "slug": "apdc-alito-2026-12-31",
    "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/alito-5ca00bd1e8.jpg",
@@ -28,31 +28,87 @@
    "eventId": "44390"
   },
   "cashValue": {
-   "value": "30.2016",
+   "value": "20.8984",
    "currency": "USD"
   },
-  "qtyAvailable": "232",
+  "qtyAvailable": "261",
   "avgPx": {
-   "value": "0.3130",
+   "value": "0.2760",
    "currency": "USD"
   },
   "fees": {
-   "value": "-0.4730",
+   "value": "-0.4970",
    "currency": "USD"
   },
   "baseCost": {
-   "value": "73.1392",
+   "value": "72.5776",
    "currency": "USD"
   },
   "costPerShare": {
-   "value": "0.3150",
+   "value": "0.2780",
    "currency": "USD"
   },
-  "netPositionDecimal": "232.3200",
-  "qtyBoughtDecimal": "424.1500",
-  "qtySoldDecimal": "191.8300",
+  "netPositionDecimal": "261.2300",
+  "qtyBoughtDecimal": "474.1500",
+  "qtySoldDecimal": "212.9200",
   "bodPositionDecimal": "0.0000",
-  "qtyAvailableDecimal": "232.3200",
+  "qtyAvailableDecimal": "261.2300",
+  "comboLegDetails": []
+ },
+ "apdc-jerpowgov-2026-12-31": {
+  "netPosition": "31",
+  "qtyBought": "162",
+  "qtySold": "131",
+  "cost": {
+   "value": "8.0670",
+   "currency": "USD"
+  },
+  "realized": {
+   "value": "-13.8400",
+   "currency": "USD"
+  },
+  "bodPosition": "0",
+  "expired": false,
+  "updateTime": "2026-08-10T02:12:20.573108382Z",
+  "marketMetadata": {
+   "slug": "apdc-jerpowgov-2026-12-31",
+   "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/jerpowgov-f178f30782.jpg",
+   "title": "Jerome Powell Announced Out as Fed Governor?",
+   "outcome": "Yes",
+   "eventSlug": "jerpowgov",
+   "subject": {
+    "id": 0,
+    "name": "By December 31, 2026",
+    "subjectType": ""
+   },
+   "eventId": "44389"
+  },
+  "cashValue": {
+   "value": "7.7500",
+   "currency": "USD"
+  },
+  "qtyAvailable": "31",
+  "avgPx": {
+   "value": "0.2600",
+   "currency": "USD"
+  },
+  "fees": {
+   "value": "-0.0730",
+   "currency": "USD"
+  },
+  "baseCost": {
+   "value": "8.1400",
+   "currency": "USD"
+  },
+  "costPerShare": {
+   "value": "0.2630",
+   "currency": "USD"
+  },
+  "netPositionDecimal": "31.0000",
+  "qtyBoughtDecimal": "162.0000",
+  "qtySoldDecimal": "131.0000",
+  "bodPositionDecimal": "0.0000",
+  "qtyAvailableDecimal": "31.0000",
   "comboLegDetails": []
  },
  "enwc-usgubp-wi-2026-08-11-dem-sarrod": {
@@ -112,125 +168,124 @@
   "qtyAvailableDecimal": "100.0000",
   "comboLegDetails": []
  },
- "lawec-cryptoleg-2026-12-31": {
-  "netPosition": "10",
-  "qtyBought": "37",
-  "qtySold": "27",
+ "opdc-mcconnell-resign-2026-11-02": {
+  "netPosition": "30",
+  "qtyBought": "703",
+  "qtySold": "673",
   "cost": {
-   "value": "2.3800",
+   "value": "4.6020",
    "currency": "USD"
   },
   "realized": {
-   "value": "-2.3848",
+   "value": "-8.2519",
    "currency": "USD"
   },
   "bodPosition": "0",
   "expired": false,
-  "updateTime": "2026-08-09T01:17:31.859956361Z",
+  "updateTime": "2026-08-10T02:31:26.117732257Z",
   "marketMetadata": {
-   "slug": "lawec-cryptoleg-2026-12-31",
-   "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/cryptobill-64080693c8.jpg",
-   "title": "Crypto Market Structure Legislation Becomes Law?",
+   "slug": "opdc-mcconnell-resign-2026-11-02",
+   "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/mcconnell-resign-e14ef4f374.jpg",
+   "title": "Mitch McConnell Resigns?",
    "outcome": "Yes",
-   "eventSlug": "cryptoleg",
+   "eventSlug": "mcconnell-resign",
+   "subject": {
+    "id": 0,
+    "name": "Before the Midterms",
+    "subjectType": ""
+   },
+   "eventId": "53723"
+  },
+  "cashValue": {
+   "value": "5.4702",
+   "currency": "USD"
+  },
+  "qtyAvailable": "30",
+  "avgPx": {
+   "value": "0.1510",
+   "currency": "USD"
+  },
+  "fees": {
+   "value": "-0.0450",
+   "currency": "USD"
+  },
+  "baseCost": {
+   "value": "4.6468",
+   "currency": "USD"
+  },
+  "costPerShare": {
+   "value": "0.1530",
+   "currency": "USD"
+  },
+  "netPositionDecimal": "30.3900",
+  "qtyBoughtDecimal": "703.4200",
+  "qtySoldDecimal": "673.0300",
+  "bodPositionDecimal": "0.0000",
+  "qtyAvailableDecimal": "30.3900",
+  "comboLegDetails": []
+ },
+ "pic-congress-trump-2026-12-31": {
+  "netPosition": "-10",
+  "qtyBought": "239",
+  "qtySold": "249",
+  "cost": {
+   "value": "9.9900",
+   "currency": "USD"
+  },
+  "realized": {
+   "value": "-1.1552",
+   "currency": "USD"
+  },
+  "bodPosition": "0",
+  "expired": false,
+  "updateTime": "2026-08-10T02:26:09.506052704Z",
+  "marketMetadata": {
+   "slug": "pic-congress-trump-2026-12-31",
+   "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/will-trump-be-impeached-in-2025-bm5xwPQil7AC.jpg",
+   "title": "Trump Impeached?",
+   "outcome": "No",
+   "eventSlug": "congress-trump",
    "subject": {
     "id": 0,
     "name": "By December 31, 2026",
     "subjectType": ""
    },
-   "eventId": "59388"
+   "eventId": "47821"
   },
   "cashValue": {
-   "value": "2.0000",
+   "value": "9.0000",
    "currency": "USD"
   },
-  "qtyAvailable": "10",
+  "qtyAvailable": "-10",
   "avgPx": {
-   "value": "0.2380",
+   "value": "0.9990",
    "currency": "USD"
   },
   "fees": {
-   "value": "-0.0200",
+   "value": "-0.0100",
    "currency": "USD"
   },
   "baseCost": {
-   "value": "2.4000",
+   "value": "10.0000",
    "currency": "USD"
   },
   "costPerShare": {
-   "value": "0.2400",
+   "value": "1.0000",
    "currency": "USD"
   },
-  "netPositionDecimal": "10.0000",
-  "qtyBoughtDecimal": "37.0000",
-  "qtySoldDecimal": "27.0000",
+  "netPositionDecimal": "-10.0000",
+  "qtyBoughtDecimal": "239.0200",
+  "qtySoldDecimal": "249.0200",
   "bodPositionDecimal": "0.0000",
-  "qtyAvailableDecimal": "10.0000",
-  "comboLegDetails": []
- },
- "pvwc-housepopw-2026-11-03-dem": {
-  "netPosition": "-21",
-  "qtyBought": "51",
-  "qtySold": "72",
-  "cost": {
-   "value": "4.3200",
-   "currency": "USD"
-  },
-  "realized": {
-   "value": "-3.8752",
-   "currency": "USD"
-  },
-  "bodPosition": "0",
-  "expired": false,
-  "updateTime": "2026-08-09T01:13:49.768292677Z",
-  "marketMetadata": {
-   "slug": "pvwc-housepopw-2026-11-03-dem",
-   "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/housepop-2026-11-03-cbc6fd1b51.png",
-   "title": "2026 Midterms: House Popular Vote Winner?",
-   "outcome": "No",
-   "eventSlug": "housepopw-2026-11-03",
-   "subject": {
-    "id": 0,
-    "name": "Democratic Party",
-    "subjectType": "",
-    "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/event-images/democratic.png"
-   },
-   "eventId": "51410"
-  },
-  "cashValue": {
-   "value": "2.9400",
-   "currency": "USD"
-  },
-  "qtyAvailable": "-21",
-  "avgPx": {
-   "value": "0.2060",
-   "currency": "USD"
-  },
-  "fees": {
-   "value": "-0.0500",
-   "currency": "USD"
-  },
-  "baseCost": {
-   "value": "4.3700",
-   "currency": "USD"
-  },
-  "costPerShare": {
-   "value": "0.2080",
-   "currency": "USD"
-  },
-  "netPositionDecimal": "-21.0000",
-  "qtyBoughtDecimal": "51.0000",
-  "qtySoldDecimal": "72.0000",
-  "bodPositionDecimal": "0.0000",
-  "qtyAvailableDecimal": "-21.0000",
+  "qtyAvailableDecimal": "-10.0000",
   "comboLegDetails": []
  },
  "scc-hrep-rep-2026-11-03-gte185": {
-  "netPosition": "-21",
+  "netPosition": "-23",
   "qtyBought": "78",
-  "qtySold": "99",
+  "qtySold": "101",
   "cost": {
-   "value": "5.1690",
+   "value": "5.6640",
    "currency": "USD"
   },
   "realized": {
@@ -239,7 +294,7 @@
   },
   "bodPosition": "0",
   "expired": false,
-  "updateTime": "2026-08-09T00:34:23.633272973Z",
+  "updateTime": "2026-08-09T04:31:42.541185541Z",
   "marketMetadata": {
    "slug": "scc-hrep-rep-2026-11-03-gte185",
    "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
@@ -254,31 +309,31 @@
    "eventId": "59841"
   },
   "cashValue": {
-   "value": "5.0400",
+   "value": "5.3498",
    "currency": "USD"
   },
-  "qtyAvailable": "-21",
+  "qtyAvailable": "-23",
   "avgPx": {
-   "value": "0.2460",
+   "value": "0.2440",
    "currency": "USD"
   },
   "fees": {
-   "value": "-0.0410",
+   "value": "-0.0430",
    "currency": "USD"
   },
   "baseCost": {
-   "value": "5.2100",
+   "value": "5.7072",
    "currency": "USD"
   },
   "costPerShare": {
-   "value": "0.2480",
+   "value": "0.2450",
    "currency": "USD"
   },
-  "netPositionDecimal": "-21.0000",
+  "netPositionDecimal": "-23.2600",
   "qtyBoughtDecimal": "78.0000",
-  "qtySoldDecimal": "99.0000",
+  "qtySoldDecimal": "101.2600",
   "bodPositionDecimal": "0.0000",
-  "qtyAvailableDecimal": "-21.0000",
+  "qtyAvailableDecimal": "-23.2600",
   "comboLegDetails": []
  },
  "scc-hrep-rep-2026-11-03-gte190": {
@@ -310,7 +365,7 @@
    "eventId": "59841"
   },
   "cashValue": {
-   "value": "2.1140",
+   "value": "2.3405",
    "currency": "USD"
   },
   "qtyAvailable": "-8",
@@ -338,11 +393,11 @@
   "comboLegDetails": []
  },
  "scc-hrep-rep-2026-11-03-gte195": {
-  "netPosition": "-115",
+  "netPosition": "-135",
   "qtyBought": "119",
-  "qtySold": "234",
+  "qtySold": "254",
   "cost": {
-   "value": "89.0180",
+   "value": "97.3580",
    "currency": "USD"
   },
   "realized": {
@@ -351,7 +406,7 @@
   },
   "bodPosition": "0",
   "expired": false,
-  "updateTime": "2026-08-08T23:36:49.341459173Z",
+  "updateTime": "2026-08-10T00:51:29.489102405Z",
   "marketMetadata": {
    "slug": "scc-hrep-rep-2026-11-03-gte195",
    "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
@@ -366,31 +421,31 @@
    "eventId": "59841"
   },
   "cashValue": {
-   "value": "55.2096",
+   "value": "51.3076",
    "currency": "USD"
   },
-  "qtyAvailable": "-115",
+  "qtyAvailable": "-135",
   "avgPx": {
-   "value": "0.7740",
+   "value": "0.7210",
    "currency": "USD"
   },
   "fees": {
-   "value": "-0.1990",
+   "value": "-0.2590",
    "currency": "USD"
   },
   "baseCost": {
-   "value": "89.2164",
+   "value": "97.6164",
    "currency": "USD"
   },
   "costPerShare": {
-   "value": "0.7760",
+   "value": "0.7230",
    "currency": "USD"
   },
-  "netPositionDecimal": "-115.0200",
+  "netPositionDecimal": "-135.0200",
   "qtyBoughtDecimal": "119.0100",
-  "qtySoldDecimal": "234.0300",
+  "qtySoldDecimal": "254.0300",
   "bodPositionDecimal": "0.0000",
-  "qtyAvailableDecimal": "-115.0200",
+  "qtyAvailableDecimal": "-135.0200",
   "comboLegDetails": []
  },
  "scc-hrep-rep-2026-11-03-gte200": {
@@ -422,7 +477,7 @@
    "eventId": "59841"
   },
   "cashValue": {
-   "value": "58.8500",
+   "value": "68.4800",
    "currency": "USD"
   },
   "qtyAvailable": "107",
@@ -450,20 +505,20 @@
   "comboLegDetails": []
  },
  "scc-hrep-rep-2026-11-03-gte220": {
-  "netPosition": "-7",
-  "qtyBought": "119",
+  "netPosition": "0",
+  "qtyBought": "126",
   "qtySold": "126",
   "cost": {
-   "value": "5.9040",
+   "value": "0.0340",
    "currency": "USD"
   },
   "realized": {
-   "value": "1.3121",
+   "value": "0.6821",
    "currency": "USD"
   },
   "bodPosition": "0",
   "expired": false,
-  "updateTime": "2026-08-08T15:31:27.166885935Z",
+  "updateTime": "2026-08-09T15:06:09.752953443Z",
   "marketMetadata": {
    "slug": "scc-hrep-rep-2026-11-03-gte220",
    "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
@@ -478,31 +533,31 @@
    "eventId": "59841"
   },
   "cashValue": {
-   "value": "5.0688",
+   "value": "0.0312",
    "currency": "USD"
   },
-  "qtyAvailable": "-7",
+  "qtyAvailable": "0",
   "avgPx": {
    "value": "0.8390",
    "currency": "USD"
   },
   "fees": {
-   "value": "-0.0100",
+   "value": "0.0000",
    "currency": "USD"
   },
   "baseCost": {
-   "value": "5.9136",
+   "value": "0.0336",
    "currency": "USD"
   },
   "costPerShare": {
    "value": "0.8400",
    "currency": "USD"
   },
-  "netPositionDecimal": "-7.0400",
-  "qtyBoughtDecimal": "118.7900",
+  "netPositionDecimal": "-0.0400",
+  "qtyBoughtDecimal": "125.7900",
   "qtySoldDecimal": "125.8300",
   "bodPositionDecimal": "0.0000",
-  "qtyAvailableDecimal": "-7.0400",
+  "qtyAvailableDecimal": "-0.0400",
   "comboLegDetails": []
  },
  "scc-hrep-rep-2026-11-03-gte225": {
@@ -534,7 +589,7 @@
    "eventId": "59841"
   },
   "cashValue": {
-   "value": "0.0784",
+   "value": "0.0672",
    "currency": "USD"
   },
   "qtyAvailable": "1",
@@ -550,62 +605,6 @@
   "qtySoldDecimal": "40.0000",
   "bodPositionDecimal": "0.0000",
   "qtyAvailableDecimal": "1.1200",
-  "comboLegDetails": []
- },
- "scc-hrep-rep-2026-11-03-gte230": {
-  "netPosition": "-20",
-  "qtyBought": "0",
-  "qtySold": "20",
-  "cost": {
-   "value": "18.5800",
-   "currency": "USD"
-  },
-  "realized": {
-   "value": "0.0000",
-   "currency": "USD"
-  },
-  "bodPosition": "0",
-  "expired": false,
-  "updateTime": "2026-08-08T15:31:47.378933023Z",
-  "marketMetadata": {
-   "slug": "scc-hrep-rep-2026-11-03-gte230",
-   "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
-   "title": "2026 Midterms: Republican House Seats?",
-   "outcome": "No",
-   "eventSlug": "hrep-rep-2026-11-03",
-   "subject": {
-    "id": 0,
-    "name": "230+",
-    "subjectType": ""
-   },
-   "eventId": "59841"
-  },
-  "cashValue": {
-   "value": "16.2000",
-   "currency": "USD"
-  },
-  "qtyAvailable": "-20",
-  "avgPx": {
-   "value": "0.9290",
-   "currency": "USD"
-  },
-  "fees": {
-   "value": "-0.0200",
-   "currency": "USD"
-  },
-  "baseCost": {
-   "value": "18.6000",
-   "currency": "USD"
-  },
-  "costPerShare": {
-   "value": "0.9300",
-   "currency": "USD"
-  },
-  "netPositionDecimal": "-20.0000",
-  "qtyBoughtDecimal": "0.0000",
-  "qtySoldDecimal": "20.0000",
-  "bodPositionDecimal": "0.0000",
-  "qtyAvailableDecimal": "-20.0000",
   "comboLegDetails": []
  },
  "scc-senate-gop-2026-11-03-46": {
@@ -655,21 +654,77 @@
   "qtyAvailableDecimal": "1.0000",
   "comboLegDetails": []
  },
- "scc-senate-gop-2026-11-03-49": {
-  "netPosition": "25",
-  "qtyBought": "79",
-  "qtySold": "54",
+ "scc-senate-gop-2026-11-03-48": {
+  "netPosition": "-7",
+  "qtyBought": "371",
+  "qtySold": "378",
   "cost": {
-   "value": "7.1740",
+   "value": "5.9820",
    "currency": "USD"
   },
   "realized": {
-   "value": "0.5076",
+   "value": "-76.3445",
    "currency": "USD"
   },
   "bodPosition": "0",
   "expired": false,
-  "updateTime": "2026-08-08T22:19:48.647353843Z",
+  "updateTime": "2026-08-09T14:13:56.088905321Z",
+  "marketMetadata": {
+   "slug": "scc-senate-gop-2026-11-03-48",
+   "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+   "title": "2026 Midterms: Republican Senate Seats?",
+   "outcome": "No",
+   "eventSlug": "senate-gop-2026-11-03",
+   "subject": {
+    "id": 0,
+    "name": "48",
+    "subjectType": ""
+   },
+   "eventId": "59842"
+  },
+  "cashValue": {
+   "value": "6.1418",
+   "currency": "USD"
+  },
+  "qtyAvailable": "-7",
+  "avgPx": {
+   "value": "0.7990",
+   "currency": "USD"
+  },
+  "fees": {
+   "value": "-0.0100",
+   "currency": "USD"
+  },
+  "baseCost": {
+   "value": "5.9920",
+   "currency": "USD"
+  },
+  "costPerShare": {
+   "value": "0.8000",
+   "currency": "USD"
+  },
+  "netPositionDecimal": "-7.4900",
+  "qtyBoughtDecimal": "370.9100",
+  "qtySoldDecimal": "378.4000",
+  "bodPositionDecimal": "0.0000",
+  "qtyAvailableDecimal": "-7.4900",
+  "comboLegDetails": []
+ },
+ "scc-senate-gop-2026-11-03-49": {
+  "netPosition": "5",
+  "qtyBought": "79",
+  "qtySold": "74",
+  "cost": {
+   "value": "1.4300",
+   "currency": "USD"
+  },
+  "realized": {
+   "value": "1.3076",
+   "currency": "USD"
+  },
+  "bodPosition": "0",
+  "expired": false,
+  "updateTime": "2026-08-09T07:50:51.542644317Z",
   "marketMetadata": {
    "slug": "scc-senate-gop-2026-11-03-49",
    "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
@@ -684,48 +739,48 @@
    "eventId": "59842"
   },
   "cashValue": {
-   "value": "7.4940",
+   "value": "1.0458",
    "currency": "USD"
   },
-  "qtyAvailable": "25",
+  "qtyAvailable": "5",
   "avgPx": {
    "value": "0.2870",
    "currency": "USD"
   },
   "fees": {
-   "value": "-0.0700",
+   "value": "-0.0140",
    "currency": "USD"
   },
   "baseCost": {
-   "value": "7.2442",
+   "value": "1.4442",
    "currency": "USD"
   },
   "costPerShare": {
    "value": "0.2900",
    "currency": "USD"
   },
-  "netPositionDecimal": "24.9800",
+  "netPositionDecimal": "4.9800",
   "qtyBoughtDecimal": "79.1100",
-  "qtySoldDecimal": "54.1300",
+  "qtySoldDecimal": "74.1300",
   "bodPositionDecimal": "0.0000",
-  "qtyAvailableDecimal": "24.9800",
+  "qtyAvailableDecimal": "4.9800",
   "comboLegDetails": []
  },
  "scc-senate-gop-2026-11-03-50": {
-  "netPosition": "42",
-  "qtyBought": "62",
-  "qtySold": "20",
+  "netPosition": "38",
+  "qtyBought": "68",
+  "qtySold": "30",
   "cost": {
-   "value": "12.1390",
+   "value": "9.8510",
    "currency": "USD"
   },
   "realized": {
-   "value": "-2.1143",
+   "value": "-3.7143",
    "currency": "USD"
   },
   "bodPosition": "0",
   "expired": false,
-  "updateTime": "2026-08-04T12:57:44.830093091Z",
+  "updateTime": "2026-08-09T21:34:29.564627805Z",
   "marketMetadata": {
    "slug": "scc-senate-gop-2026-11-03-50",
    "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
@@ -740,31 +795,31 @@
    "eventId": "59842"
   },
   "cashValue": {
-   "value": "10.8914",
+   "value": "7.1991",
    "currency": "USD"
   },
-  "qtyAvailable": "42",
+  "qtyAvailable": "38",
   "avgPx": {
-   "value": "0.2900",
+   "value": "0.2600",
    "currency": "USD"
   },
   "fees": {
-   "value": "-0.0990",
+   "value": "-0.0870",
    "currency": "USD"
   },
   "baseCost": {
-   "value": "12.2382",
+   "value": "9.9382",
    "currency": "USD"
   },
   "costPerShare": {
-   "value": "0.2920",
+   "value": "0.2620",
    "currency": "USD"
   },
-  "netPositionDecimal": "41.8900",
-  "qtyBoughtDecimal": "62.0000",
-  "qtySoldDecimal": "20.1100",
+  "netPositionDecimal": "37.8900",
+  "qtyBoughtDecimal": "68.0000",
+  "qtySoldDecimal": "30.1100",
   "bodPositionDecimal": "0.0000",
-  "qtyAvailableDecimal": "41.8900",
+  "qtyAvailableDecimal": "37.8900",
   "comboLegDetails": []
  },
  "scc-senate-gop-2026-11-03-51": {
@@ -772,7 +827,7 @@
   "qtyBought": "68",
   "qtySold": "68",
   "cost": {
-   "value": "0.0150",
+   "value": "0.2730",
    "currency": "USD"
   },
   "realized": {
@@ -781,7 +836,7 @@
   },
   "bodPosition": "0",
   "expired": false,
-  "updateTime": "2026-08-08T16:37:18.413404060Z",
+  "updateTime": "2026-08-09T02:36:25.500044049Z",
   "marketMetadata": {
    "slug": "scc-senate-gop-2026-11-03-51",
    "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
@@ -796,31 +851,31 @@
    "eventId": "59842"
   },
   "cashValue": {
-   "value": "0.0156",
+   "value": "0.2923",
    "currency": "USD"
   },
   "qtyAvailable": "0",
   "avgPx": {
-   "value": "0.7480",
+   "value": "0.7380",
    "currency": "USD"
   },
   "fees": {
-   "value": "0.0000",
+   "value": "-0.0010",
    "currency": "USD"
   },
   "baseCost": {
-   "value": "0.0150",
+   "value": "0.2740",
    "currency": "USD"
   },
   "costPerShare": {
-   "value": "0.7500",
+   "value": "0.7410",
    "currency": "USD"
   },
-  "netPositionDecimal": "-0.0200",
+  "netPositionDecimal": "-0.3700",
   "qtyBoughtDecimal": "67.9100",
-  "qtySoldDecimal": "67.9300",
+  "qtySoldDecimal": "68.2800",
   "bodPositionDecimal": "0.0000",
-  "qtyAvailableDecimal": "-0.0200",
+  "qtyAvailableDecimal": "-0.3700",
   "comboLegDetails": []
  },
  "scc-senate-gop-2026-11-03-52": {
@@ -852,7 +907,7 @@
    "eventId": "59842"
   },
   "cashValue": {
-   "value": "2.9750",
+   "value": "2.5500",
    "currency": "USD"
   },
   "qtyAvailable": "21",
@@ -877,6 +932,202 @@
   "qtySoldDecimal": "129.4900",
   "bodPositionDecimal": "0.0000",
   "qtyAvailableDecimal": "21.2500",
+  "comboLegDetails": []
+ },
+ "scc-senate-gop-2026-11-03-55": {
+  "netPosition": "14",
+  "qtyBought": "95",
+  "qtySold": "81",
+  "cost": {
+   "value": "0.5400",
+   "currency": "USD"
+  },
+  "realized": {
+   "value": "-1.1174",
+   "currency": "USD"
+  },
+  "bodPosition": "0",
+  "expired": false,
+  "updateTime": "2026-08-09T03:27:49.304698393Z",
+  "marketMetadata": {
+   "slug": "scc-senate-gop-2026-11-03-55",
+   "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+   "title": "2026 Midterms: Republican Senate Seats?",
+   "outcome": "Yes",
+   "eventSlug": "senate-gop-2026-11-03",
+   "subject": {
+    "id": 0,
+    "name": "55",
+    "subjectType": ""
+   },
+   "eventId": "59842"
+  },
+  "cashValue": {
+   "value": "0.4122",
+   "currency": "USD"
+  },
+  "qtyAvailable": "14",
+  "avgPx": {
+   "value": "0.0390",
+   "currency": "USD"
+  },
+  "fees": {
+   "value": "-0.0100",
+   "currency": "USD"
+  },
+  "baseCost": {
+   "value": "0.5496",
+   "currency": "USD"
+  },
+  "costPerShare": {
+   "value": "0.0400",
+   "currency": "USD"
+  },
+  "netPositionDecimal": "13.7400",
+  "qtyBoughtDecimal": "94.7400",
+  "qtySoldDecimal": "81.0000",
+  "bodPositionDecimal": "0.0000",
+  "qtyAvailableDecimal": "13.7400",
+  "comboLegDetails": []
+ },
+ "scc-senate-gop-2026-11-03-gte57": {
+  "netPosition": "10",
+  "qtyBought": "210",
+  "qtySold": "200",
+  "cost": {
+   "value": "0.7900",
+   "currency": "USD"
+  },
+  "realized": {
+   "value": "28.5153",
+   "currency": "USD"
+  },
+  "bodPosition": "0",
+  "expired": false,
+  "updateTime": "2026-08-09T15:04:10.024835154Z",
+  "marketMetadata": {
+   "slug": "scc-senate-gop-2026-11-03-gte57",
+   "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/republicans+2028.png",
+   "title": "2026 Midterms: Republican Senate Seats?",
+   "outcome": "Yes",
+   "eventSlug": "senate-gop-2026-11-03",
+   "subject": {
+    "id": 0,
+    "name": "57+",
+    "subjectType": ""
+   },
+   "eventId": "59842"
+  },
+  "cashValue": {
+   "value": "0.7000",
+   "currency": "USD"
+  },
+  "qtyAvailable": "10",
+  "avgPx": {
+   "value": "0.0790",
+   "currency": "USD"
+  },
+  "fees": {
+   "value": "-0.0100",
+   "currency": "USD"
+  },
+  "baseCost": {
+   "value": "0.8000",
+   "currency": "USD"
+  },
+  "costPerShare": {
+   "value": "0.0800",
+   "currency": "USD"
+  },
+  "netPositionDecimal": "10.0000",
+  "qtyBoughtDecimal": "210.0800",
+  "qtySoldDecimal": "200.0800",
+  "bodPositionDecimal": "0.0000",
+  "qtyAvailableDecimal": "10.0000",
+  "comboLegDetails": []
+ },
+ "tec-cbb-champ-2027-04-05-w-iowast": {
+  "netPosition": "5",
+  "qtyBought": "5",
+  "qtySold": "0",
+  "cost": {
+   "value": "0.4900",
+   "currency": "USD"
+  },
+  "realized": {
+   "value": "0.0000",
+   "currency": "USD"
+  },
+  "bodPosition": "0",
+  "expired": false,
+  "updateTime": "2026-08-09T22:40:19.791151597Z",
+  "marketMetadata": {
+   "slug": "tec-cbb-champ-2027-04-05-w-iowast",
+   "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/us-logos/CBB/Polymarket_NCAAMB_NCAR_L%40320x320.png",
+   "title": "2027 Men's College Basketball National Champion",
+   "outcome": "Yes",
+   "eventSlug": "cbb-champ-2027-04-05-w",
+   "teamId": 1769,
+   "team": {
+    "id": 1769,
+    "name": "Iowa State Cyclones",
+    "abbreviation": "iowast",
+    "league": "cbb",
+    "record": "27-7",
+    "logo": "",
+    "alias": "Cyclones",
+    "safeName": "Iowa State Cyclones",
+    "colorPrimary": "#C8102E",
+    "providerId": 110,
+    "ordering": "away",
+    "longIcon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/us-logos/CBB/Polymarket_NCAAMB_IOWAST_L%40320x320.png",
+    "shortIcon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/us-logos/CBB/Polymarket_NCAAMB_IOWAST_R%40320x320.png",
+    "displayAbbreviation": "ISU",
+    "ranking": "2",
+    "conference": "Big 12",
+    "providerIds": [
+     {
+      "provider": "PROVIDER_SPORTSDATAIO",
+      "providerId": "110"
+     },
+     {
+      "provider": "PROVIDER_SPORTRADAR",
+      "providerId": "0e4258fa-3154-4c16-b693-adecab184c6c"
+     }
+    ],
+    "color": {
+     "light": "#C8102E",
+     "dark": "#C8102E"
+    }
+   },
+   "eventId": "59129"
+  },
+  "cashValue": {
+   "value": "0.2500",
+   "currency": "USD"
+  },
+  "qtyAvailable": "5",
+  "avgPx": {
+   "value": "0.0980",
+   "currency": "USD"
+  },
+  "fees": {
+   "value": "-0.0100",
+   "currency": "USD"
+  },
+  "baseCost": {
+   "value": "0.5000",
+   "currency": "USD"
+  },
+  "costPerShare": {
+   "value": "0.1000",
+   "currency": "USD"
+  },
+  "netPositionDecimal": "5.0000",
+  "qtyBoughtDecimal": "5.0000",
+  "qtySoldDecimal": "0.0000",
+  "bodPositionDecimal": "0.0000",
+  "qtyAvailableDecimal": "5.0000",
   "comboLegDetails": []
  }
 }
