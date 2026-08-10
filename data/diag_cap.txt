@@ -1,0 +1,12 @@
+open orders now: 112
+borrowing: pandc-anydis-2027-12-31 SELL 0.99 x10000 intent=ORDER_INTENT_BUY_SHORT id=BRXKQDQNMBAN
+
+BEFORE cancel -> place: 400 {"code":3, "message":"The server was unable to process your request.", "details":[]}
+cancelled the parking order: 400
+open orders after cancel: 113
+AFTER cancel -> place: 400 {"code":3, "message":"The server was unable to process your request.", "details":[]}
+
+RESULT: not a cap — a freed slot still would not accept the order. Points at buying power or a market-level block.
+restored the parking order: 400 {"code":3, "message":"The server was unable to process your request.", "details":[]}
+
+final open orders: 114
