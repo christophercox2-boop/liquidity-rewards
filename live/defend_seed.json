@@ -1,6 +1,6 @@
 {
- "version": 1,
- "note": "Favourite side of the 17 newly-listed senate/governor pairs: let the 51c bid chase up to 70c. Applied once, by version.",
+ "version": 2,
+ "note": "Favourite (heavy partisan lean) side of every newly-listed senate/governor market: let the front bid chase up to 70c. Version-gated: bump the version to arm newly added markets.",
  "defend": {
   "usgubewc-usgub-al-2026-11-03-rep": {
    "BUY": {
@@ -83,6 +83,21 @@
    }
   },
   "ussewc-usse-wv-2026-11-03-rep": {
+   "BUY": {
+    "cap": 70.0
+   }
+  },
+  "ussewc-usse-tn-2026-11-03-rep": {
+   "BUY": {
+    "cap": 70.0
+   }
+  },
+  "ussewc-usse-wy-2026-11-03-rep": {
+   "BUY": {
+    "cap": 70.0
+   }
+  },
+  "ussewc-usse-sd-2026-11-03-rep": {
    "BUY": {
     "cap": 70.0
    }

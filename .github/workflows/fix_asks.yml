@@ -1,0 +1,144 @@
+name: Restore the qualifying asks to 2000
+
+# The 99c asks were placed at 2000 to push each ask side over its 2000-contract
+# target, but the exchange sized most of them down to ~177 (a short locks up far
+# more collateral than the 1c of headroom suggests). A side under target scores
+# nothing, which is why those legs read 0.0% share.
+#
+# For each market this modifies the LARGEST resting 99c ask back up to 2000 via
+# POST /v1/order/{id}/modify, then re-reads the book and reports what actually
+# stuck — so the real collateral ceiling is measured rather than guessed.
+# Nothing is cancelled and no new orders are created.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/fix_asks.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fix-asks
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Modify the asks
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, time, requests, collections, io
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          TARGET = 2000
+          BUF = io.StringIO()
+          _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          def api(method, path, **kw):
+              return requests.request(
+                  method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  timeout=30, **kw)
+
+          def fetch():
+              r = api("GET", "/v1/orders/open"); r.raise_for_status()
+              return r.json().get("orders") or []
+
+          orders = fetch()
+          # the 99c ask legs in the new families, biggest first per market
+          by_mkt = collections.defaultdict(list)
+          for o in orders:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              if not slug.startswith(("ussewc-", "usgubewc-")):
+                  continue
+              side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+              px = tr._num(o.get("price"))
+              if side != "SELL" or abs(px - 0.99) > 1e-9:
+                  continue
+              by_mkt[slug].append(o)
+          for v in by_mkt.values():
+              v.sort(key=lambda o: -(tr._num(o.get("leavesQuantity")) or 0))
+
+          todo = []
+          for slug, os_ in sorted(by_mkt.items()):
+              lead = os_[0]
+              lv = tr._num(lead.get("leavesQuantity")) or 0
+              if lv >= TARGET - 0.5:
+                  continue
+              todo.append((slug, lead["id"], lv))
+          print(f"markets whose lead 99c ask is under {TARGET}: {len(todo)}")
+
+          done, failed = [], []
+          consecutive_fail = 0
+          for slug, oid, lv in todo:
+              path = f"/v1/order/{oid}/modify"
+              body = {"marketSlug": slug,
+                      "price": {"value": "0.99", "currency": "USD"},
+                      "quantity": TARGET}
+              r = api("POST", path, json=body)
+              if r.status_code < 300:
+                  done.append([slug, lv]); consecutive_fail = 0
+                  print(f"  OK   {slug:40s} {lv:7.2f} -> requested {TARGET}")
+              else:
+                  msg = " ".join(r.text.split())[:160]
+                  failed.append([slug, lv, r.status_code, msg]); consecutive_fail += 1
+                  print(f"  FAIL {slug:40s} {r.status_code} {msg}")
+                  if consecutive_fail >= 5:
+                      print("  five failures in a row — stopping early")
+                      break
+              time.sleep(0.4)
+
+          time.sleep(6)
+          after = fetch()
+          got = collections.defaultdict(float)
+          for o in after:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+              if slug.startswith(("ussewc-", "usgubewc-")) and side == "SELL" \
+                 and abs(tr._num(o.get("price")) - 0.99) < 1e-9:
+                  got[slug] += tr._num(o.get("leavesQuantity")) or 0
+
+          print(f"\n{'market':42s} {'total 99c ask now':>18s} {'qualifies?':>11s}")
+          qual = 0
+          for slug in sorted(by_mkt):
+              tot = got.get(slug, 0.0)
+              ok = tot >= TARGET - 0.5
+              qual += ok
+              print(f"{slug:42s} {tot:18.2f} {'YES' if ok else 'no':>11s}")
+          print(f"\nask sides now at or above the {TARGET} target: {qual} of {len(by_mkt)}")
+          print(f"modify accepted: {len(done)} | rejected: {len(failed)}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/fix_asks.txt", "w") as f:
+              f.write(BUF.getvalue())
+          with open("data/fix_asks_result.json", "w") as f:
+              json.dump({"done": done, "failed": failed,
+                         "totals": {k: round(v, 2) for k, v in got.items()}}, f, indent=1)
+          EOF
+
+      - name: Commit result
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/fix_asks.txt data/fix_asks_result.json 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Ask restore result [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
