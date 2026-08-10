@@ -1,0 +1,8552 @@
+{
+ "rows": [
+  {
+   "market": "apdc-jerpowgov-2026-08-31",
+   "race": "apdc-jerpowgov-2026-08-31",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.02,
+   "mid": 0.015,
+   "bid_depth": 348.15,
+   "ask_depth": 5686.85,
+   "bids": [
+    [
+     0.01,
+     348.15
+    ]
+   ],
+   "asks": [
+    [
+     0.02,
+     119.0
+    ],
+    [
+     0.07,
+     1.0
+    ],
+    [
+     0.22,
+     100.85
+    ],
+    [
+     0.99,
+     5466.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "apdc-jerpowgov-2026-12-31",
+   "race": "apdc-jerpowgov-2026-12-31",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 2,
+   "best_bid": 0.25,
+   "best_ask": 0.26,
+   "mid": 0.255,
+   "bid_depth": 5533.35,
+   "ask_depth": 9130.29,
+   "bids": [
+    [
+     0.25,
+     121.56
+    ],
+    [
+     0.24,
+     12.29
+    ],
+    [
+     0.12,
+     99.5
+    ],
+    [
+     0.02,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.26,
+     164.03
+    ],
+    [
+     0.27,
+     31.0
+    ],
+    [
+     0.34,
+     5.0
+    ],
+    [
+     0.35,
+     11.76
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "SELL",
+     "price": 0.99,
+     "size": 5000.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    },
+    {
+     "side": "SELL",
+     "price": 0.27,
+     "size": 31.0,
+     "intent": "ORDER_INTENT_SELL_LONG"
+    },
+    {
+     "side": "BUY",
+     "price": 0.24,
+     "size": 5.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    },
+    {
+     "side": "SELL",
+     "price": 0.26,
+     "size": 31.0,
+     "intent": "ORDER_INTENT_SELL_LONG"
+    },
+    {
+     "side": "BUY",
+     "price": 0.01,
+     "size": 5000.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    },
+    {
+     "side": "SELL",
+     "price": 0.35,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    }
+   ]
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-aleoca",
+   "race": "cranc-uspres28-12-31-2026-aleoca",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.17,
+   "best_ask": 0.18,
+   "mid": 0.175,
+   "bid_depth": 50848.83,
+   "ask_depth": 2183.97,
+   "bids": [
+    [
+     0.17,
+     65.0
+    ],
+    [
+     0.12,
+     3.0
+    ],
+    [
+     0.09,
+     189.6
+    ],
+    [
+     0.07,
+     30.0
+    ]
+   ],
+   "asks": [
+    [
+     0.18,
+     88.77
+    ],
+    [
+     0.19,
+     166.2
+    ],
+    [
+     0.42,
+     100.0
+    ],
+    [
+     0.43,
+     1803.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-andyan",
+   "race": "cranc-uspres28-12-31-2026-andyan",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.09,
+   "best_ask": 0.12,
+   "mid": 0.105,
+   "bid_depth": 30552.27,
+   "ask_depth": 232.78,
+   "bids": [
+    [
+     0.09,
+     0.02
+    ],
+    [
+     0.05,
+     8.0
+    ],
+    [
+     0.02,
+     6.0
+    ],
+    [
+     0.01,
+     30538.25
+    ]
+   ],
+   "asks": [
+    [
+     0.12,
+     15.0
+    ],
+    [
+     0.13,
+     101.0
+    ],
+    [
+     0.2,
+     0.03
+    ],
+    [
+     0.23,
+     1.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-bersan",
+   "race": "cranc-uspres28-12-31-2026-bersan",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.12,
+   "best_ask": 0.43,
+   "mid": 0.275,
+   "bid_depth": 5581.5,
+   "ask_depth": 5575.53,
+   "bids": [
+    [
+     0.12,
+     0.01
+    ],
+    [
+     0.03,
+     27.01
+    ],
+    [
+     0.01,
+     5554.48
+    ]
+   ],
+   "asks": [
+    [
+     0.43,
+     457.52
+    ],
+    [
+     0.45,
+     0.01
+    ],
+    [
+     0.48,
+     200.0
+    ],
+    [
+     0.5,
+     25.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-betoro",
+   "race": "cranc-uspres28-12-31-2026-betoro",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.06,
+   "best_ask": 0.09,
+   "mid": 0.075,
+   "bid_depth": 31231.0,
+   "ask_depth": 5541.0,
+   "bids": [
+    [
+     0.06,
+     6.0
+    ],
+    [
+     0.05,
+     11000.0
+    ],
+    [
+     0.01,
+     20225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.09,
+     66.0
+    ],
+    [
+     0.16,
+     100.0
+    ],
+    [
+     0.44,
+     100.0
+    ],
+    [
+     0.48,
+     1836.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-corboo",
+   "race": "cranc-uspres28-12-31-2026-corboo",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.07,
+   "best_ask": 0.14,
+   "mid": 0.10500000000000001,
+   "bid_depth": 70506.02,
+   "ask_depth": 2150.2200000000003,
+   "bids": [
+    [
+     0.07,
+     74.71
+    ],
+    [
+     0.01,
+     70431.31
+    ]
+   ],
+   "asks": [
+    [
+     0.14,
+     74.0
+    ],
+    [
+     0.17,
+     35.0
+    ],
+    [
+     0.39,
+     100.0
+    ],
+    [
+     0.47,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-dontru",
+   "race": "cranc-uspres28-12-31-2026-dontru",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.12,
+   "best_ask": 0.15,
+   "mid": 0.135,
+   "bid_depth": 50309.01,
+   "ask_depth": 1500.01,
+   "bids": [
+    [
+     0.12,
+     0.01
+    ],
+    [
+     0.1,
+     9.0
+    ],
+    [
+     0.01,
+     50300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.15,
+     0.01
+    ],
+    [
+     0.17,
+     99.0
+    ],
+    [
+     0.33,
+     9.0
+    ],
+    [
+     0.35,
+     192.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-dontrujr",
+   "race": "cranc-uspres28-12-31-2026-dontrujr",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.02,
+   "best_ask": 0.14,
+   "mid": 0.08,
+   "bid_depth": 70555.6,
+   "ask_depth": 1536.4,
+   "bids": [
+    [
+     0.02,
+     6.0
+    ],
+    [
+     0.01,
+     70549.6
+    ]
+   ],
+   "asks": [
+    [
+     0.14,
+     6.0
+    ],
+    [
+     0.15,
+     100.4
+    ],
+    [
+     0.16,
+     100.0
+    ],
+    [
+     0.5,
+     25.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-dwajoh",
+   "race": "cranc-uspres28-12-31-2026-dwajoh",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.13,
+   "best_ask": 0.14,
+   "mid": 0.135,
+   "bid_depth": 50483.02,
+   "ask_depth": 570.67,
+   "bids": [
+    [
+     0.13,
+     0.01
+    ],
+    [
+     0.12,
+     0.01
+    ],
+    [
+     0.02,
+     8.0
+    ],
+    [
+     0.01,
+     50475.0
+    ]
+   ],
+   "asks": [
+    [
+     0.14,
+     244.66
+    ],
+    [
+     0.26,
+     0.01
+    ],
+    [
+     0.29,
+     1.0
+    ],
+    [
+     0.48,
+     200.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-elomus",
+   "race": "cranc-uspres28-12-31-2026-elomus",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.08,
+   "best_ask": 0.11,
+   "mid": 0.095,
+   "bid_depth": 30190.48,
+   "ask_depth": 5522.54,
+   "bids": [
+    [
+     0.08,
+     0.01
+    ],
+    [
+     0.01,
+     30190.47
+    ]
+   ],
+   "asks": [
+    [
+     0.11,
+     56.54
+    ],
+    [
+     0.18,
+     100.0
+    ],
+    [
+     0.5,
+     325.0
+    ],
+    [
+     0.63,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-erikir",
+   "race": "cranc-uspres28-12-31-2026-erikir",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.01,
+   "best_ask": 0.1,
+   "mid": 0.055,
+   "bid_depth": 30388.3,
+   "ask_depth": 5635.1,
+   "bids": [
+    [
+     0.01,
+     30388.3
+    ]
+   ],
+   "asks": [
+    [
+     0.1,
+     782.7
+    ],
+    [
+     0.12,
+     28.4
+    ],
+    [
+     0.16,
+     100.0
+    ],
+    [
+     0.5,
+     25.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-gavnew",
+   "race": "cranc-uspres28-12-31-2026-gavnew",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.21,
+   "best_ask": 0.22,
+   "mid": 0.215,
+   "bid_depth": 1617.85,
+   "ask_depth": 2745.5899999999997,
+   "bids": [
+    [
+     0.21,
+     33.0
+    ],
+    [
+     0.17,
+     7.0
+    ],
+    [
+     0.14,
+     2.0
+    ],
+    [
+     0.12,
+     1375.82
+    ]
+   ],
+   "asks": [
+    [
+     0.22,
+     49.97
+    ],
+    [
+     0.23,
+     1668.62
+    ],
+    [
+     0.5,
+     25.0
+    ],
+    [
+     0.51,
+     8.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-hilcli",
+   "race": "cranc-uspres28-12-31-2026-hilcli",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.1,
+   "best_ask": 0.12,
+   "mid": 0.11,
+   "bid_depth": 20390.0,
+   "ask_depth": 1250.92,
+   "bids": [
+    [
+     0.1,
+     93.9
+    ],
+    [
+     0.09,
+     0.01
+    ],
+    [
+     0.08,
+     75.0
+    ],
+    [
+     0.01,
+     20221.09
+    ]
+   ],
+   "asks": [
+    [
+     0.12,
+     3.92
+    ],
+    [
+     0.13,
+     6.0
+    ],
+    [
+     0.25,
+     116.0
+    ],
+    [
+     0.49,
+     400.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-hunbid",
+   "race": "cranc-uspres28-12-31-2026-hunbid",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.07,
+   "best_ask": 0.12,
+   "mid": 0.095,
+   "bid_depth": 30524.24,
+   "ask_depth": 606.06,
+   "bids": [
+    [
+     0.07,
+     162.6
+    ],
+    [
+     0.05,
+     11.32
+    ],
+    [
+     0.04,
+     125.32
+    ],
+    [
+     0.01,
+     30225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.12,
+     38.0
+    ],
+    [
+     0.13,
+     214.0
+    ],
+    [
+     0.14,
+     29.06
+    ],
+    [
+     0.37,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-jdvan",
+   "race": "cranc-uspres28-12-31-2026-jdvan",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.16,
+   "best_ask": 0.18,
+   "mid": 0.16999999999999998,
+   "bid_depth": 132.7,
+   "ask_depth": 3132.75,
+   "bids": [
+    [
+     0.16,
+     5.0
+    ],
+    [
+     0.13,
+     1.0
+    ],
+    [
+     0.1,
+     3.0
+    ],
+    [
+     0.09,
+     4.0
+    ]
+   ],
+   "asks": [
+    [
+     0.18,
+     228.01
+    ],
+    [
+     0.2,
+     62.25
+    ],
+    [
+     0.33,
+     1743.49
+    ],
+    [
+     0.34,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-jonoss",
+   "race": "cranc-uspres28-12-31-2026-jonoss",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.13,
+   "best_ask": 0.14,
+   "mid": 0.135,
+   "bid_depth": 51067.81,
+   "ask_depth": 5540.49,
+   "bids": [
+    [
+     0.13,
+     374.0
+    ],
+    [
+     0.12,
+     350.0
+    ],
+    [
+     0.08,
+     34.81
+    ],
+    [
+     0.06,
+     9.0
+    ]
+   ],
+   "asks": [
+    [
+     0.14,
+     668.0
+    ],
+    [
+     0.23,
+     30.0
+    ],
+    [
+     0.39,
+     75.26
+    ],
+    [
+     0.4,
+     946.24
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-jossha",
+   "race": "cranc-uspres28-12-31-2026-jossha",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.01,
+   "best_ask": 0.1,
+   "mid": 0.055,
+   "bid_depth": 120550.0,
+   "ask_depth": 5839.42,
+   "bids": [
+    [
+     0.01,
+     120550.0
+    ]
+   ],
+   "asks": [
+    [
+     0.1,
+     620.02
+    ],
+    [
+     0.12,
+     28.4
+    ],
+    [
+     0.17,
+     100.0
+    ],
+    [
+     0.5,
+     25.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-kamhar",
+   "race": "cranc-uspres28-12-31-2026-kamhar",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.19,
+   "best_ask": 0.2,
+   "mid": 0.195,
+   "bid_depth": 11073.279999999999,
+   "ask_depth": 5408.88,
+   "bids": [
+    [
+     0.19,
+     31.0
+    ],
+    [
+     0.03,
+     750.0
+    ],
+    [
+     0.02,
+     9990.31
+    ],
+    [
+     0.01,
+     301.97
+    ]
+   ],
+   "asks": [
+    [
+     0.2,
+     22.56
+    ],
+    [
+     0.22,
+     231.32
+    ],
+    [
+     0.5,
+     25.0
+    ],
+    [
+     0.99,
+     5130.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-krinoe",
+   "race": "cranc-uspres28-12-31-2026-krinoe",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.05,
+   "best_ask": 0.34,
+   "mid": 0.195,
+   "bid_depth": 60570.15,
+   "ask_depth": 2319.85,
+   "bids": [
+    [
+     0.05,
+     9.0
+    ],
+    [
+     0.01,
+     60561.15
+    ]
+   ],
+   "asks": [
+    [
+     0.34,
+     118.85
+    ],
+    [
+     0.35,
+     792.0
+    ],
+    [
+     0.41,
+     100.0
+    ],
+    [
+     0.43,
+     209.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-margre",
+   "race": "cranc-uspres28-12-31-2026-margre",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.13,
+   "best_ask": 0.14,
+   "mid": 0.135,
+   "bid_depth": 30550.46,
+   "ask_depth": 5602.03,
+   "bids": [
+    [
+     0.13,
+     250.0
+    ],
+    [
+     0.09,
+     75.46
+    ],
+    [
+     0.02,
+     30000.0
+    ],
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.14,
+     511.89
+    ],
+    [
+     0.2,
+     100.0
+    ],
+    [
+     0.22,
+     100.14
+    ],
+    [
+     0.5,
+     25.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-markel",
+   "race": "cranc-uspres28-12-31-2026-markel",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.04,
+   "best_ask": 0.11,
+   "mid": 0.075,
+   "bid_depth": 70612.2,
+   "ask_depth": 2202.14,
+   "bids": [
+    [
+     0.04,
+     6.0
+    ],
+    [
+     0.03,
+     50.0
+    ],
+    [
+     0.01,
+     70556.2
+    ]
+   ],
+   "asks": [
+    [
+     0.11,
+     69.53
+    ],
+    [
+     0.21,
+     100.0
+    ],
+    [
+     0.31,
+     47.62
+    ],
+    [
+     0.33,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-marrub",
+   "race": "cranc-uspres28-12-31-2026-marrub",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.16,
+   "best_ask": 0.17,
+   "mid": 0.165,
+   "bid_depth": 20714.42,
+   "ask_depth": 2155.4,
+   "bids": [
+    [
+     0.16,
+     51.0
+    ],
+    [
+     0.13,
+     198.05
+    ],
+    [
+     0.07,
+     15.37
+    ],
+    [
+     0.02,
+     20250.0
+    ]
+   ],
+   "asks": [
+    [
+     0.17,
+     1.95
+    ],
+    [
+     0.18,
+     208.0
+    ],
+    [
+     0.3,
+     33.45
+    ],
+    [
+     0.31,
+     1808.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-micoba",
+   "race": "cranc-uspres28-12-31-2026-micoba",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.02,
+   "best_ask": 0.12,
+   "mid": 0.06999999999999999,
+   "bid_depth": 60438.17,
+   "ask_depth": 9865.06,
+   "bids": [
+    [
+     0.02,
+     6.0
+    ],
+    [
+     0.01,
+     60432.17
+    ]
+   ],
+   "asks": [
+    [
+     0.12,
+     87.0
+    ],
+    [
+     0.13,
+     214.0
+    ],
+    [
+     0.14,
+     29.06
+    ],
+    [
+     0.5,
+     225.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-nikhal",
+   "race": "cranc-uspres28-12-31-2026-nikhal",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.02,
+   "best_ask": 0.14,
+   "mid": 0.08,
+   "bid_depth": 50501.71,
+   "ask_depth": 5717.77,
+   "bids": [
+    [
+     0.02,
+     6.0
+    ],
+    [
+     0.01,
+     50495.71
+    ]
+   ],
+   "asks": [
+    [
+     0.14,
+     29.0
+    ],
+    [
+     0.15,
+     485.01
+    ],
+    [
+     0.16,
+     129.76
+    ],
+    [
+     0.5,
+     25.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-oprwin",
+   "race": "cranc-uspres28-12-31-2026-oprwin",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.02,
+   "best_ask": 0.12,
+   "mid": 0.06999999999999999,
+   "bid_depth": 70481.0,
+   "ask_depth": 3581.0,
+   "bids": [
+    [
+     0.02,
+     6.0
+    ],
+    [
+     0.01,
+     70475.0
+    ]
+   ],
+   "asks": [
+    [
+     0.12,
+     132.0
+    ],
+    [
+     0.5,
+     25.0
+    ],
+    [
+     0.99,
+     3424.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-petbut",
+   "race": "cranc-uspres28-12-31-2026-petbut",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.12,
+   "best_ask": 0.15,
+   "mid": 0.135,
+   "bid_depth": 51567.21,
+   "ask_depth": 1925.24,
+   "bids": [
+    [
+     0.12,
+     2.01
+    ],
+    [
+     0.06,
+     25.0
+    ],
+    [
+     0.03,
+     1241.0
+    ],
+    [
+     0.01,
+     50299.2
+    ]
+   ],
+   "asks": [
+    [
+     0.15,
+     0.01
+    ],
+    [
+     0.19,
+     38.43
+    ],
+    [
+     0.21,
+     100.0
+    ],
+    [
+     0.26,
+     100.8
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-rahema",
+   "race": "cranc-uspres28-12-31-2026-rahema",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.21,
+   "best_ask": 0.22,
+   "mid": 0.215,
+   "bid_depth": 51067.88,
+   "ask_depth": 5602.59,
+   "bids": [
+    [
+     0.21,
+     46.0
+    ],
+    [
+     0.2,
+     479.84
+    ],
+    [
+     0.15,
+     244.47
+    ],
+    [
+     0.12,
+     47.57
+    ]
+   ],
+   "asks": [
+    [
+     0.22,
+     514.65
+    ],
+    [
+     0.35,
+     1000.0
+    ],
+    [
+     0.37,
+     3.95
+    ],
+    [
+     0.5,
+     24.99
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-robken",
+   "race": "cranc-uspres28-12-31-2026-robken",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.11,
+   "best_ask": 0.15,
+   "mid": 0.13,
+   "bid_depth": 40559.1,
+   "ask_depth": 2463.04,
+   "bids": [
+    [
+     0.11,
+     4.0
+    ],
+    [
+     0.1,
+     0.01
+    ],
+    [
+     0.07,
+     6.0
+    ],
+    [
+     0.02,
+     6.0
+    ]
+   ],
+   "asks": [
+    [
+     0.15,
+     29.0
+    ],
+    [
+     0.16,
+     219.01
+    ],
+    [
+     0.17,
+     30.12
+    ],
+    [
+     0.4,
+     106.91
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-steban",
+   "race": "cranc-uspres28-12-31-2026-steban",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.02,
+   "best_ask": 0.15,
+   "mid": 0.08499999999999999,
+   "bid_depth": 70534.0,
+   "ask_depth": 1169.0,
+   "bids": [
+    [
+     0.02,
+     6.0
+    ],
+    [
+     0.01,
+     70528.0
+    ]
+   ],
+   "asks": [
+    [
+     0.15,
+     122.0
+    ],
+    [
+     0.18,
+     100.0
+    ],
+    [
+     0.23,
+     100.0
+    ],
+    [
+     0.24,
+     122.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-stesmi",
+   "race": "cranc-uspres28-12-31-2026-stesmi",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.08,
+   "best_ask": 0.13,
+   "mid": 0.10500000000000001,
+   "bid_depth": 70550.25,
+   "ask_depth": 1230.99,
+   "bids": [
+    [
+     0.08,
+     0.01
+    ],
+    [
+     0.07,
+     0.01
+    ],
+    [
+     0.01,
+     70550.23
+    ]
+   ],
+   "asks": [
+    [
+     0.13,
+     49.0
+    ],
+    [
+     0.2,
+     98.99
+    ],
+    [
+     0.36,
+     1.0
+    ],
+    [
+     0.37,
+     3.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-tedcru",
+   "race": "cranc-uspres28-12-31-2026-tedcru",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.1,
+   "best_ask": 0.14,
+   "mid": 0.12000000000000001,
+   "bid_depth": 80385.33,
+   "ask_depth": 831.04,
+   "bids": [
+    [
+     0.1,
+     6.01
+    ],
+    [
+     0.01,
+     80379.32
+    ]
+   ],
+   "asks": [
+    [
+     0.14,
+     0.04
+    ],
+    [
+     0.17,
+     6.0
+    ],
+    [
+     0.2,
+     100.0
+    ],
+    [
+     0.5,
+     25.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-tuccar",
+   "race": "cranc-uspres28-12-31-2026-tuccar",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.17,
+   "best_ask": 0.19,
+   "mid": 0.18,
+   "bid_depth": 30576.93,
+   "ask_depth": 5500.09,
+   "bids": [
+    [
+     0.17,
+     29.0
+    ],
+    [
+     0.07,
+     30.0
+    ],
+    [
+     0.06,
+     9.89
+    ],
+    [
+     0.01,
+     30508.04
+    ]
+   ],
+   "asks": [
+    [
+     0.19,
+     720.96
+    ],
+    [
+     0.21,
+     31.64
+    ],
+    [
+     0.24,
+     100.0
+    ],
+    [
+     0.5,
+     10.49
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-vivram",
+   "race": "cranc-uspres28-12-31-2026-vivram",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.14,
+   "best_ask": 0.29,
+   "mid": 0.215,
+   "bid_depth": 50338.01,
+   "ask_depth": 524.0,
+   "bids": [
+    [
+     0.14,
+     0.01
+    ],
+    [
+     0.03,
+     113.0
+    ],
+    [
+     0.01,
+     50225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.29,
+     58.0
+    ],
+    [
+     0.34,
+     100.0
+    ],
+    [
+     0.38,
+     100.0
+    ],
+    [
+     0.39,
+     41.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "cranc-uspres28-12-31-2026-zohmam",
+   "race": "cranc-uspres28-12-31-2026-zohmam",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 33,
+   "best_bid": 0.11,
+   "best_ask": 0.12,
+   "mid": 0.11499999999999999,
+   "bid_depth": 20875.31,
+   "ask_depth": 6078.69,
+   "bids": [
+    [
+     0.11,
+     706.0
+    ],
+    [
+     0.01,
+     20169.31
+    ]
+   ],
+   "asks": [
+    [
+     0.12,
+     370.69
+    ],
+    [
+     0.18,
+     108.0
+    ],
+    [
+     0.19,
+     200.0
+    ],
+    [
+     0.25,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "dipcc-us-iran-contnts-2026--dilut",
+   "race": "dipcc-us-iran-contnts-2026--dilut",
+   "pool": 75.0,
+   "df": 0.25,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": 0.34,
+   "best_ask": 0.35,
+   "mid": 0.345,
+   "bid_depth": 21175.82,
+   "ask_depth": 2652.75,
+   "bids": [
+    [
+     0.34,
+     20406.75
+    ],
+    [
+     0.32,
+     469.0
+    ],
+    [
+     0.03,
+     100.07
+    ],
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.35,
+     1152.75
+    ],
+    [
+     0.4,
+     1.0
+    ],
+    [
+     0.49,
+     75.0
+    ],
+    [
+     0.99,
+     1424.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "dipcc-us-iran-contnts-2026--enrcap",
+   "race": "dipcc-us-iran-contnts-2026--enrcap",
+   "pool": 75.0,
+   "df": 0.25,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": 0.34,
+   "best_ask": 0.35,
+   "mid": 0.345,
+   "bid_depth": 5244.14,
+   "ask_depth": 78859.81,
+   "bids": [
+    [
+     0.34,
+     3056.23
+    ],
+    [
+     0.33,
+     1962.91
+    ],
+    [
+     0.04,
+     25.0
+    ],
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.35,
+     78084.81
+    ],
+    [
+     0.49,
+     75.0
+    ],
+    [
+     0.99,
+     700.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "dipcc-us-iran-contnts-2026--enrcaplte5",
+   "race": "dipcc-us-iran-contnts-2026--enrcaplte5",
+   "pool": 75.0,
+   "df": 0.25,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": 0.31,
+   "best_ask": 0.33,
+   "mid": 0.32,
+   "bid_depth": 33719.6,
+   "ask_depth": 860.4,
+   "bids": [
+    [
+     0.31,
+     31462.34
+    ],
+    [
+     0.3,
+     32.26
+    ],
+    [
+     0.29,
+     2000.0
+    ],
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.33,
+     75.0
+    ],
+    [
+     0.34,
+     410.0
+    ],
+    [
+     0.35,
+     139.4
+    ],
+    [
+     0.49,
+     75.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "dipcc-us-iran-contnts-2026--enrmor",
+   "race": "dipcc-us-iran-contnts-2026--enrmor",
+   "pool": 75.0,
+   "df": 0.25,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": 0.24,
+   "best_ask": 0.25,
+   "mid": 0.245,
+   "bid_depth": 3843.68,
+   "ask_depth": 2631.17,
+   "bids": [
+    [
+     0.24,
+     3618.68
+    ],
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.25,
+     425.0
+    ],
+    [
+     0.34,
+     8.0
+    ],
+    [
+     0.36,
+     100.17
+    ],
+    [
+     0.49,
+     75.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "dipcc-us-iran-contnts-2026--irnfnd",
+   "race": "dipcc-us-iran-contnts-2026--irnfnd",
+   "pool": 75.0,
+   "df": 0.25,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": 0.33,
+   "best_ask": 0.34,
+   "mid": 0.335,
+   "bid_depth": 845.92,
+   "ask_depth": 64144.12,
+   "bids": [
+    [
+     0.33,
+     29.0
+    ],
+    [
+     0.09,
+     84.78
+    ],
+    [
+     0.08,
+     30.0
+    ],
+    [
+     0.01,
+     702.14
+    ]
+   ],
+   "asks": [
+    [
+     0.34,
+     63267.26
+    ],
+    [
+     0.36,
+     100.86
+    ],
+    [
+     0.49,
+     75.0
+    ],
+    [
+     0.67,
+     1.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "dipcc-us-iran-contnts-2026--urnsur",
+   "race": "dipcc-us-iran-contnts-2026--urnsur",
+   "pool": 75.0,
+   "df": 0.25,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": 0.18,
+   "best_ask": 0.19,
+   "mid": 0.185,
+   "bid_depth": 5205.54,
+   "ask_depth": 83156.17,
+   "bids": [
+    [
+     0.18,
+     2980.54
+    ],
+    [
+     0.12,
+     2000.0
+    ],
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.19,
+     82381.17
+    ],
+    [
+     0.49,
+     75.0
+    ],
+    [
+     0.99,
+     700.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-fl-2026-08-18-rep-byrdon",
+   "race": "enwc-usgubp-fl-2026-08-18-rep-byrdon",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 3,
+   "best_bid": 0.97,
+   "best_ask": 0.98,
+   "mid": 0.975,
+   "bid_depth": 47010.83,
+   "ask_depth": 45548.16,
+   "bids": [
+    [
+     0.97,
+     2054.62
+    ],
+    [
+     0.96,
+     9000.0
+    ],
+    [
+     0.95,
+     15856.21
+    ],
+    [
+     0.92,
+     10000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.98,
+     4193.18
+    ],
+    [
+     0.99,
+     41354.98
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-fl-2026-08-18-rep-jamfis",
+   "race": "enwc-usgubp-fl-2026-08-18-rep-jamfis",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 3,
+   "best_bid": 0.01,
+   "best_ask": 0.02,
+   "mid": 0.015,
+   "bid_depth": 54425.54,
+   "ask_depth": 352046.42,
+   "bids": [
+    [
+     0.01,
+     54425.54
+    ]
+   ],
+   "asks": [
+    [
+     0.02,
+     10131.52
+    ],
+    [
+     0.03,
+     81410.05
+    ],
+    [
+     0.04,
+     79217.08
+    ],
+    [
+     0.05,
+     142117.05
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-fl-2026-08-18-rep-jaycol",
+   "race": "enwc-usgubp-fl-2026-08-18-rep-jaycol",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 3,
+   "best_bid": 0.01,
+   "best_ask": 0.02,
+   "mid": 0.015,
+   "bid_depth": 599.0,
+   "ask_depth": 451860.6,
+   "bids": [
+    [
+     0.01,
+     599.0
+    ]
+   ],
+   "asks": [
+    [
+     0.02,
+     250510.6
+    ],
+    [
+     0.12,
+     100.0
+    ],
+    [
+     0.5,
+     50.0
+    ],
+    [
+     0.99,
+     201200.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-mn-2026-08-11-rep-kenqua",
+   "race": "enwc-usgubp-mn-2026-08-11-rep-kenqua",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": 0.01,
+   "best_ask": 0.03,
+   "mid": 0.02,
+   "bid_depth": 1442.96,
+   "ask_depth": 91777.02,
+   "bids": [
+    [
+     0.01,
+     1442.96
+    ]
+   ],
+   "asks": [
+    [
+     0.03,
+     90534.0
+    ],
+    [
+     0.13,
+     100.0
+    ],
+    [
+     0.15,
+     38.98
+    ],
+    [
+     0.17,
+     104.04
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.01,
+     "size": 100.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    }
+   ]
+  },
+  {
+   "market": "enwc-usgubp-mn-2026-08-11-rep-lisdem",
+   "race": "enwc-usgubp-mn-2026-08-11-rep-lisdem",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": 0.6,
+   "best_ask": 0.63,
+   "mid": 0.615,
+   "bid_depth": 552.1,
+   "ask_depth": 2883.0,
+   "bids": [
+    [
+     0.6,
+     235.0
+    ],
+    [
+     0.59,
+     87.0
+    ],
+    [
+     0.58,
+     89.1
+    ],
+    [
+     0.57,
+     10.0
+    ]
+   ],
+   "asks": [
+    [
+     0.63,
+     1.0
+    ],
+    [
+     0.76,
+     100.0
+    ],
+    [
+     0.94,
+     1.0
+    ],
+    [
+     0.99,
+     2781.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.57,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    }
+   ]
+  },
+  {
+   "market": "enwc-usgubp-mn-2026-08-11-rep-miklin",
+   "race": "enwc-usgubp-mn-2026-08-11-rep-miklin",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": 0.38,
+   "best_ask": 0.4,
+   "mid": 0.39,
+   "bid_depth": 152.0,
+   "ask_depth": 2723.65,
+   "bids": [
+    [
+     0.38,
+     5.0
+    ],
+    [
+     0.33,
+     50.0
+    ],
+    [
+     0.32,
+     20.0
+    ],
+    [
+     0.3,
+     17.0
+    ]
+   ],
+   "asks": [
+    [
+     0.4,
+     2138.0
+    ],
+    [
+     0.41,
+     5.0
+    ],
+    [
+     0.47,
+     80.0
+    ],
+    [
+     0.48,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-ok-2026-06-16-rep-gendru",
+   "race": "enwc-usgubp-ok-2026-06-16-rep-gendru",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 2,
+   "best_bid": 0.27,
+   "best_ask": 0.28,
+   "mid": 0.275,
+   "bid_depth": 2217.0,
+   "ask_depth": 2023.0,
+   "bids": [
+    [
+     0.27,
+     92.0
+    ],
+    [
+     0.25,
+     918.0
+    ],
+    [
+     0.21,
+     437.0
+    ],
+    [
+     0.2,
+     45.0
+    ]
+   ],
+   "asks": [
+    [
+     0.28,
+     83.0
+    ],
+    [
+     0.29,
+     706.0
+    ],
+    [
+     0.3,
+     390.0
+    ],
+    [
+     0.37,
+     437.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-ok-2026-06-16-rep-mikmaz",
+   "race": "enwc-usgubp-ok-2026-06-16-rep-mikmaz",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 2,
+   "best_bid": 0.73,
+   "best_ask": 0.74,
+   "mid": 0.735,
+   "bid_depth": 2607.0,
+   "ask_depth": 3469.0,
+   "bids": [
+    [
+     0.73,
+     74.0
+    ],
+    [
+     0.72,
+     311.0
+    ],
+    [
+     0.68,
+     467.0
+    ],
+    [
+     0.63,
+     725.0
+    ]
+   ],
+   "asks": [
+    [
+     0.74,
+     1644.0
+    ],
+    [
+     0.76,
+     277.0
+    ],
+    [
+     0.78,
+     11.0
+    ],
+    [
+     0.87,
+     625.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-wi-2026-08-11-dem-davcro",
+   "race": "enwc-usgubp-wi-2026-08-11-dem-davcro",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": 0.03,
+   "best_ask": 0.05,
+   "mid": 0.04,
+   "bid_depth": 4345.0,
+   "ask_depth": 16489.18,
+   "bids": [
+    [
+     0.03,
+     4145.0
+    ],
+    [
+     0.02,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.05,
+     622.0
+    ],
+    [
+     0.06,
+     4639.68
+    ],
+    [
+     0.07,
+     10026.88
+    ],
+    [
+     0.16,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-wi-2026-08-11-dem-frahon",
+   "race": "enwc-usgubp-wi-2026-08-11-dem-frahon",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": 0.95,
+   "best_ask": 0.96,
+   "mid": 0.955,
+   "bid_depth": 16859.96,
+   "ask_depth": 2348.4399999999996,
+   "bids": [
+    [
+     0.95,
+     1637.6
+    ],
+    [
+     0.94,
+     4879.85
+    ],
+    [
+     0.93,
+     4926.68
+    ],
+    [
+     0.92,
+     5000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.96,
+     2306.99
+    ],
+    [
+     0.99,
+     41.45
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-wi-2026-08-11-dem-joebre",
+   "race": "enwc-usgubp-wi-2026-08-11-dem-joebre",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 39682.01,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     38193.01
+    ],
+    [
+     0.02,
+     5.0
+    ],
+    [
+     0.03,
+     259.0
+    ],
+    [
+     0.08,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
+   "race": "enwc-usgubp-wi-2026-08-11-dem-kelroy",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 10835.0,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     9100.0
+    ],
+    [
+     0.02,
+     480.0
+    ],
+    [
+     0.08,
+     125.0
+    ],
+    [
+     0.12,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-wi-2026-08-11-dem-manbar",
+   "race": "enwc-usgubp-wi-2026-08-11-dem-manbar",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 37772.92,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     34351.0
+    ],
+    [
+     0.03,
+     2000.0
+    ],
+    [
+     0.1,
+     313.0
+    ],
+    [
+     0.11,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
+   "race": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 6,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 8571.0,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     7346.0
+    ],
+    [
+     0.08,
+     125.0
+    ],
+    [
+     0.11,
+     100.0
+    ],
+    [
+     0.99,
+     1000.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "SELL",
+     "price": 0.01,
+     "size": 100.0,
+     "intent": "ORDER_INTENT_SELL_LONG"
+    }
+   ]
+  },
+  {
+   "market": "enwc-ussep-ma-2026-09-01-dem-edmark",
+   "race": "enwc-ussep-ma-2026-09-01-dem-edmark",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.81,
+   "best_ask": 0.82,
+   "mid": 0.815,
+   "bid_depth": 2201.97,
+   "ask_depth": 12357.0,
+   "bids": [
+    [
+     0.81,
+     438.87
+    ],
+    [
+     0.78,
+     118.0
+    ],
+    [
+     0.76,
+     0.3
+    ],
+    [
+     0.71,
+     200.8
+    ]
+   ],
+   "asks": [
+    [
+     0.82,
+     11150.0
+    ],
+    [
+     0.9,
+     7.0
+    ],
+    [
+     0.99,
+     1200.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-ma-2026-09-01-dem-setmou",
+   "race": "enwc-ussep-ma-2026-09-01-dem-setmou",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.11,
+   "best_ask": 0.28,
+   "mid": 0.195,
+   "bid_depth": 2599.0,
+   "ask_depth": 3153.77,
+   "bids": [
+    [
+     0.11,
+     1575.0
+    ],
+    [
+     0.01,
+     1024.0
+    ]
+   ],
+   "asks": [
+    [
+     0.28,
+     1026.0
+    ],
+    [
+     0.29,
+     101.76
+    ],
+    [
+     0.3,
+     100.0
+    ],
+    [
+     0.32,
+     0.01
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-mn-2026-08-11-dem-angcra",
+   "race": "enwc-ussep-mn-2026-08-11-dem-angcra",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 2,
+   "best_bid": 0.3,
+   "best_ask": 0.31,
+   "mid": 0.305,
+   "bid_depth": 39854.0,
+   "ask_depth": 46023.0,
+   "bids": [
+    [
+     0.3,
+     747.0
+    ],
+    [
+     0.28,
+     7.0
+    ],
+    [
+     0.23,
+     39000.0
+    ],
+    [
+     0.16,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.31,
+     4946.0
+    ],
+    [
+     0.36,
+     40000.0
+    ],
+    [
+     0.41,
+     77.0
+    ],
+    [
+     0.99,
+     1000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-mn-2026-08-11-dem-pegfla",
+   "race": "enwc-ussep-mn-2026-08-11-dem-pegfla",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 2,
+   "best_bid": 0.73,
+   "best_ask": 0.74,
+   "mid": 0.735,
+   "bid_depth": 5563.0,
+   "ask_depth": 14177.0,
+   "bids": [
+    [
+     0.73,
+     222.0
+    ],
+    [
+     0.72,
+     7.0
+    ],
+    [
+     0.71,
+     11.0
+    ],
+    [
+     0.64,
+     54.0
+    ]
+   ],
+   "asks": [
+    [
+     0.74,
+     12997.0
+    ],
+    [
+     0.82,
+     80.0
+    ],
+    [
+     0.83,
+     100.0
+    ],
+    [
+     0.99,
+     1000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-nh-2026-09-01-rep-johsun",
+   "race": "enwc-ussep-nh-2026-09-01-rep-johsun",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.95,
+   "best_ask": 0.99,
+   "mid": 0.97,
+   "bid_depth": 6617.26,
+   "ask_depth": 16705.66,
+   "bids": [
+    [
+     0.95,
+     4364.26
+    ],
+    [
+     0.9,
+     30.0
+    ],
+    [
+     0.89,
+     1923.0
+    ],
+    [
+     0.32,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     16705.66
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-nh-2026-09-01-rep-scobro",
+   "race": "enwc-ussep-nh-2026-09-01-rep-scobro",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.06,
+   "best_ask": 0.07,
+   "mid": 0.065,
+   "bid_depth": 2681.19,
+   "ask_depth": 52797.0,
+   "bids": [
+    [
+     0.06,
+     778.19
+    ],
+    [
+     0.01,
+     1903.0
+    ]
+   ],
+   "asks": [
+    [
+     0.07,
+     51497.0
+    ],
+    [
+     0.17,
+     100.0
+    ],
+    [
+     0.99,
+     1200.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-nh-2026-09-08-dem-chrpap",
+   "race": "enwc-ussep-nh-2026-09-08-dem-chrpap",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.91,
+   "best_ask": 0.99,
+   "mid": 0.95,
+   "bid_depth": 2600.39,
+   "ask_depth": 203.13,
+   "bids": [
+    [
+     0.91,
+     452.77
+    ],
+    [
+     0.89,
+     39.89
+    ],
+    [
+     0.88,
+     430.73
+    ],
+    [
+     0.87,
+     152.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     203.13
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-nh-2026-09-08-dem-karman",
+   "race": "enwc-ussep-nh-2026-09-08-dem-karman",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.02,
+   "best_ask": 0.12,
+   "mid": 0.06999999999999999,
+   "bid_depth": 6011.1,
+   "ask_depth": 2291.0,
+   "bids": [
+    [
+     0.02,
+     207.1
+    ],
+    [
+     0.01,
+     5804.0
+    ]
+   ],
+   "asks": [
+    [
+     0.12,
+     37.0
+    ],
+    [
+     0.13,
+     50.0
+    ],
+    [
+     0.14,
+     72.0
+    ],
+    [
+     0.99,
+     2132.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-alawil",
+   "race": "enwc-ussep-sc-2026-08-11-rep-alawil",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": 0.02,
+   "best_ask": 0.03,
+   "mid": 0.025,
+   "bid_depth": 525.0,
+   "ask_depth": 3745.0,
+   "bids": [
+    [
+     0.02,
+     500.0
+    ],
+    [
+     0.01,
+     25.0
+    ]
+   ],
+   "asks": [
+    [
+     0.03,
+     520.0
+    ],
+    [
+     0.1,
+     100.0
+    ],
+    [
+     0.11,
+     100.0
+    ],
+    [
+     0.12,
+     2000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-andbau",
+   "race": "enwc-ussep-sc-2026-08-11-rep-andbau",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": 0.01,
+   "best_ask": 0.07,
+   "mid": 0.04,
+   "bid_depth": 24.99,
+   "ask_depth": 2600.01,
+   "bids": [
+    [
+     0.01,
+     24.99
+    ]
+   ],
+   "asks": [
+    [
+     0.07,
+     33.0
+    ],
+    [
+     0.1,
+     100.0
+    ],
+    [
+     0.14,
+     2.0
+    ],
+    [
+     0.16,
+     100.01
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-darnor",
+   "race": "enwc-ussep-sc-2026-08-11-rep-darnor",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": 0.44,
+   "best_ask": 0.45,
+   "mid": 0.445,
+   "bid_depth": 1667.4,
+   "ask_depth": 7764.5199999999995,
+   "bids": [
+    [
+     0.44,
+     32.0
+    ],
+    [
+     0.43,
+     713.88
+    ],
+    [
+     0.42,
+     112.52
+    ],
+    [
+     0.4,
+     729.0
+    ]
+   ],
+   "asks": [
+    [
+     0.45,
+     6131.11
+    ],
+    [
+     0.55,
+     100.0
+    ],
+    [
+     0.57,
+     91.46
+    ],
+    [
+     0.78,
+     100.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.42,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    }
+   ]
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-joewil",
+   "race": "enwc-ussep-sc-2026-08-11-rep-joewil",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": 0.03,
+   "best_ask": 0.07,
+   "mid": 0.05,
+   "bid_depth": 1239.0,
+   "ask_depth": 226.0,
+   "bids": [
+    [
+     0.03,
+     8.0
+    ],
+    [
+     0.02,
+     1206.0
+    ],
+    [
+     0.01,
+     25.0
+    ]
+   ],
+   "asks": [
+    [
+     0.07,
+     6.0
+    ],
+    [
+     0.08,
+     3.0
+    ],
+    [
+     0.09,
+     8.0
+    ],
+    [
+     0.1,
+     84.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-marlyn",
+   "race": "enwc-ussep-sc-2026-08-11-rep-marlyn",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": 0.01,
+   "best_ask": 0.02,
+   "mid": 0.015,
+   "bid_depth": 99.98,
+   "ask_depth": 4961.02,
+   "bids": [
+    [
+     0.01,
+     99.98
+    ]
+   ],
+   "asks": [
+    [
+     0.02,
+     3612.0
+    ],
+    [
+     0.1,
+     100.0
+    ],
+    [
+     0.11,
+     124.0
+    ],
+    [
+     0.17,
+     100.02
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-nanmac",
+   "race": "enwc-ussep-sc-2026-08-11-rep-nanmac",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 3997.0,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     2264.0
+    ],
+    [
+     0.02,
+     508.0
+    ],
+    [
+     0.1,
+     100.0
+    ],
+    [
+     0.11,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-pameve",
+   "race": "enwc-ussep-sc-2026-08-11-rep-pameve",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": 0.01,
+   "best_ask": 0.02,
+   "mid": 0.015,
+   "bid_depth": 763.0,
+   "ask_depth": 4763.0,
+   "bids": [
+    [
+     0.01,
+     763.0
+    ]
+   ],
+   "asks": [
+    [
+     0.02,
+     3406.0
+    ],
+    [
+     0.1,
+     100.0
+    ],
+    [
+     0.11,
+     130.0
+    ],
+    [
+     0.16,
+     102.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-paudan",
+   "race": "enwc-ussep-sc-2026-08-11-rep-paudan",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": 0.03,
+   "best_ask": 0.04,
+   "mid": 0.035,
+   "bid_depth": 514.0,
+   "ask_depth": 2692.0,
+   "bids": [
+    [
+     0.03,
+     489.0
+    ],
+    [
+     0.01,
+     25.0
+    ]
+   ],
+   "asks": [
+    [
+     0.04,
+     587.0
+    ],
+    [
+     0.1,
+     100.0
+    ],
+    [
+     0.11,
+     100.0
+    ],
+    [
+     0.5,
+     25.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-ralnor",
+   "race": "enwc-ussep-sc-2026-08-11-rep-ralnor",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": 0.22,
+   "best_ask": 0.25,
+   "mid": 0.235,
+   "bid_depth": 2693.0,
+   "ask_depth": 6546.0,
+   "bids": [
+    [
+     0.22,
+     2550.0
+    ],
+    [
+     0.1,
+     100.0
+    ],
+    [
+     0.09,
+     25.0
+    ],
+    [
+     0.08,
+     18.0
+    ]
+   ],
+   "asks": [
+    [
+     0.25,
+     81.0
+    ],
+    [
+     0.27,
+     6310.0
+    ],
+    [
+     0.3,
+     40.0
+    ],
+    [
+     0.33,
+     100.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "SELL",
+     "price": 0.25,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    }
+   ]
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-rusfry",
+   "race": "enwc-ussep-sc-2026-08-11-rep-rusfry",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": 0.32,
+   "best_ask": 0.35,
+   "mid": 0.33499999999999996,
+   "bid_depth": 2902.1499999999996,
+   "ask_depth": 8260.0,
+   "bids": [
+    [
+     0.32,
+     176.0
+    ],
+    [
+     0.27,
+     2482.16
+    ],
+    [
+     0.2,
+     100.0
+    ],
+    [
+     0.18,
+     16.0
+    ]
+   ],
+   "asks": [
+    [
+     0.35,
+     7131.0
+    ],
+    [
+     0.44,
+     91.53
+    ],
+    [
+     0.5,
+     36.47
+    ],
+    [
+     0.78,
+     1.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.32,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    },
+    {
+     "side": "BUY",
+     "price": 0.32,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    }
+   ]
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-tregow",
+   "race": "enwc-ussep-sc-2026-08-11-rep-tregow",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": 0.01,
+   "best_ask": 0.02,
+   "mid": 0.015,
+   "bid_depth": 420.53,
+   "ask_depth": 4870.0,
+   "bids": [
+    [
+     0.01,
+     420.53
+    ]
+   ],
+   "asks": [
+    [
+     0.02,
+     3645.0
+    ],
+    [
+     0.1,
+     100.0
+    ],
+    [
+     0.11,
+     100.0
+    ],
+    [
+     0.5,
+     25.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-wiltim",
+   "race": "enwc-ussep-sc-2026-08-11-rep-wiltim",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 12,
+   "best_bid": 0.03,
+   "best_ask": 0.04,
+   "mid": 0.035,
+   "bid_depth": 519.02,
+   "ask_depth": 2599.99,
+   "bids": [
+    [
+     0.03,
+     495.01
+    ],
+    [
+     0.01,
+     24.01
+    ]
+   ],
+   "asks": [
+    [
+     0.04,
+     379.0
+    ],
+    [
+     0.1,
+     100.0
+    ],
+    [
+     0.11,
+     100.0
+    ],
+    [
+     0.16,
+     100.99
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-az-2026-11-03-dem",
+   "race": "ewc-usgub-az-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.82,
+   "best_ask": 0.83,
+   "mid": 0.825,
+   "bid_depth": 74124.0,
+   "ask_depth": 30400.0,
+   "bids": [
+    [
+     0.82,
+     18824.0
+    ],
+    [
+     0.73,
+     15000.0
+    ],
+    [
+     0.72,
+     100.0
+    ],
+    [
+     0.02,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.83,
+     540.0
+    ],
+    [
+     0.84,
+     1842.0
+    ],
+    [
+     0.85,
+     166.0
+    ],
+    [
+     0.87,
+     12752.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-az-2026-11-03-rep",
+   "race": "ewc-usgub-az-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.19,
+   "best_ask": 0.2,
+   "mid": 0.195,
+   "bid_depth": 29540.0,
+   "ask_depth": 88680.0,
+   "bids": [
+    [
+     0.19,
+     1957.0
+    ],
+    [
+     0.18,
+     600.0
+    ],
+    [
+     0.17,
+     147.0
+    ],
+    [
+     0.13,
+     11736.0
+    ]
+   ],
+   "asks": [
+    [
+     0.2,
+     30881.0
+    ],
+    [
+     0.26,
+     15000.0
+    ],
+    [
+     0.27,
+     100.0
+    ],
+    [
+     0.98,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-ca-2026-11-03-stehil",
+   "race": "ewc-usgub-ca-2026-11-03-stehil",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.05,
+   "best_ask": 0.06,
+   "mid": 0.055,
+   "bid_depth": 182016.86,
+   "ask_depth": 11709.13,
+   "bids": [
+    [
+     0.05,
+     87693.8
+    ],
+    [
+     0.04,
+     44098.06
+    ],
+    [
+     0.01,
+     50225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.06,
+     149.0
+    ],
+    [
+     0.1,
+     9842.74
+    ],
+    [
+     0.11,
+     100.8
+    ],
+    [
+     0.17,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-ca-2026-11-03-xavbec",
+   "race": "ewc-usgub-ca-2026-11-03-xavbec",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.94,
+   "best_ask": 0.95,
+   "mid": 0.945,
+   "bid_depth": 45828.76,
+   "ask_depth": 52437.09,
+   "bids": [
+    [
+     0.94,
+     128.0
+    ],
+    [
+     0.9,
+     1500.0
+    ],
+    [
+     0.89,
+     100.76
+    ],
+    [
+     0.88,
+     34000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.95,
+     398.68
+    ],
+    [
+     0.96,
+     80.0
+    ],
+    [
+     0.97,
+     21281.76
+    ],
+    [
+     0.99,
+     30676.65
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.94,
+     "size": 25.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    }
+   ]
+  },
+  {
+   "market": "ewc-usgub-ga-2026-11-03-dem",
+   "race": "ewc-usgub-ga-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.61,
+   "best_ask": 0.62,
+   "mid": 0.615,
+   "bid_depth": 44761.0,
+   "ask_depth": 73096.0,
+   "bids": [
+    [
+     0.61,
+     813.0
+    ],
+    [
+     0.6,
+     25000.0
+    ],
+    [
+     0.59,
+     462.0
+    ],
+    [
+     0.58,
+     3386.0
+    ]
+   ],
+   "asks": [
+    [
+     0.62,
+     15297.0
+    ],
+    [
+     0.71,
+     15000.0
+    ],
+    [
+     0.72,
+     100.0
+    ],
+    [
+     0.98,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-ga-2026-11-03-rep",
+   "race": "ewc-usgub-ga-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.39,
+   "best_ask": 0.4,
+   "mid": 0.395,
+   "bid_depth": 71864.0,
+   "ask_depth": 18869.0,
+   "bids": [
+    [
+     0.39,
+     16564.0
+    ],
+    [
+     0.29,
+     15000.0
+    ],
+    [
+     0.28,
+     100.0
+    ],
+    [
+     0.02,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.4,
+     112.0
+    ],
+    [
+     0.41,
+     636.0
+    ],
+    [
+     0.42,
+     70.0
+    ],
+    [
+     0.44,
+     2951.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-ia-2026-11-03-dem",
+   "race": "ewc-usgub-ia-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.63,
+   "best_ask": 0.64,
+   "mid": 0.635,
+   "bid_depth": 69520.0,
+   "ask_depth": 75558.0,
+   "bids": [
+    [
+     0.63,
+     14220.0
+    ],
+    [
+     0.57,
+     15000.0
+    ],
+    [
+     0.56,
+     100.0
+    ],
+    [
+     0.02,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.64,
+     8183.0
+    ],
+    [
+     0.65,
+     9576.0
+    ],
+    [
+     0.81,
+     15000.0
+    ],
+    [
+     0.82,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-ia-2026-11-03-rep",
+   "race": "ewc-usgub-ia-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.37,
+   "best_ask": 0.38,
+   "mid": 0.375,
+   "bid_depth": 42191.0,
+   "ask_depth": 89584.0,
+   "bids": [
+    [
+     0.37,
+     49.0
+    ],
+    [
+     0.36,
+     1405.0
+    ],
+    [
+     0.35,
+     10637.0
+    ],
+    [
+     0.19,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.38,
+     31785.0
+    ],
+    [
+     0.43,
+     15100.0
+    ],
+    [
+     0.98,
+     15000.0
+    ],
+    [
+     0.99,
+     27699.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-ks-2026-11-03-dem",
+   "race": "ewc-usgub-ks-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.23,
+   "best_ask": 0.24,
+   "mid": 0.235,
+   "bid_depth": 17480.0,
+   "ask_depth": 113526.0,
+   "bids": [
+    [
+     0.23,
+     453.0
+    ],
+    [
+     0.22,
+     1326.0
+    ],
+    [
+     0.21,
+     242.0
+    ],
+    [
+     0.2,
+     359.0
+    ]
+   ],
+   "asks": [
+    [
+     0.24,
+     19022.0
+    ],
+    [
+     0.38,
+     15000.0
+    ],
+    [
+     0.39,
+     100.0
+    ],
+    [
+     0.96,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-ks-2026-11-03-rep",
+   "race": "ewc-usgub-ks-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.77,
+   "best_ask": 0.78,
+   "mid": 0.775,
+   "bid_depth": 52742.0,
+   "ask_depth": 100686.0,
+   "bids": [
+    [
+     0.77,
+     7487.0
+    ],
+    [
+     0.73,
+     45.0
+    ],
+    [
+     0.72,
+     15110.0
+    ],
+    [
+     0.63,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.78,
+     12420.0
+    ],
+    [
+     0.81,
+     8762.0
+    ],
+    [
+     0.86,
+     15000.0
+    ],
+    [
+     0.87,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-mi-2026-11-03-dem",
+   "race": "ewc-usgub-mi-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": 0.83,
+   "best_ask": 0.84,
+   "mid": 0.835,
+   "bid_depth": 72044.0,
+   "ask_depth": 59672.0,
+   "bids": [
+    [
+     0.83,
+     16744.0
+    ],
+    [
+     0.73,
+     15000.0
+    ],
+    [
+     0.72,
+     100.0
+    ],
+    [
+     0.02,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.84,
+     17703.0
+    ],
+    [
+     0.85,
+     600.0
+    ],
+    [
+     0.86,
+     11269.0
+    ],
+    [
+     0.94,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-mi-2026-11-03-rep",
+   "race": "ewc-usgub-mi-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": 0.15,
+   "best_ask": 0.16,
+   "mid": 0.155,
+   "bid_depth": 72331.0,
+   "ask_depth": 46671.0,
+   "bids": [
+    [
+     0.15,
+     2031.0
+    ],
+    [
+     0.14,
+     15000.0
+    ],
+    [
+     0.05,
+     15000.0
+    ],
+    [
+     0.04,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.16,
+     16263.0
+    ],
+    [
+     0.18,
+     30.0
+    ],
+    [
+     0.19,
+     278.0
+    ],
+    [
+     0.26,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-mi-2026-11-03-mikdug",
+   "race": "ewc-usgub-mi-2026-11-03-mikdug",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 152209.0,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     99314.0
+    ],
+    [
+     0.11,
+     22920.0
+    ],
+    [
+     0.12,
+     53.0
+    ],
+    [
+     0.13,
+     29794.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-nv-2026-11-03-dem",
+   "race": "ewc-usgub-nv-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.56,
+   "best_ask": 0.57,
+   "mid": 0.565,
+   "bid_depth": 42894.0,
+   "ask_depth": 62520.0,
+   "bids": [
+    [
+     0.56,
+     2741.0
+    ],
+    [
+     0.55,
+     10052.0
+    ],
+    [
+     0.5,
+     15000.0
+    ],
+    [
+     0.49,
+     1.0
+    ]
+   ],
+   "asks": [
+    [
+     0.57,
+     4091.0
+    ],
+    [
+     0.58,
+     600.0
+    ],
+    [
+     0.62,
+     15030.0
+    ],
+    [
+     0.65,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-nv-2026-11-03-rep",
+   "race": "ewc-usgub-nv-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.43,
+   "best_ask": 0.44,
+   "mid": 0.435,
+   "bid_depth": 62334.0,
+   "ask_depth": 52119.0,
+   "bids": [
+    [
+     0.43,
+     2057.0
+    ],
+    [
+     0.42,
+     600.0
+    ],
+    [
+     0.4,
+     4447.0
+    ],
+    [
+     0.38,
+     15030.0
+    ]
+   ],
+   "asks": [
+    [
+     0.44,
+     7519.0
+    ],
+    [
+     0.45,
+     10083.0
+    ],
+    [
+     0.47,
+     4417.0
+    ],
+    [
+     0.61,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-oh-2026-11-03-dem",
+   "race": "ewc-usgub-oh-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.51,
+   "best_ask": 0.52,
+   "mid": 0.515,
+   "bid_depth": 67064.0,
+   "ask_depth": 118545.0,
+   "bids": [
+    [
+     0.51,
+     526.0
+    ],
+    [
+     0.5,
+     11238.0
+    ],
+    [
+     0.34,
+     15000.0
+    ],
+    [
+     0.33,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.52,
+     58278.0
+    ],
+    [
+     0.59,
+     17468.0
+    ],
+    [
+     0.6,
+     100.0
+    ],
+    [
+     0.98,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-oh-2026-11-03-rep",
+   "race": "ewc-usgub-oh-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.5,
+   "mid": 0.495,
+   "bid_depth": 89710.0,
+   "ask_depth": 77653.0,
+   "bids": [
+    [
+     0.49,
+     34352.0
+    ],
+    [
+     0.4,
+     15000.0
+    ],
+    [
+     0.39,
+     100.0
+    ],
+    [
+     0.02,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.5,
+     19254.0
+    ],
+    [
+     0.51,
+     600.0
+    ],
+    [
+     0.64,
+     15000.0
+    ],
+    [
+     0.65,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-wi-2026-11-03-dem",
+   "race": "ewc-usgub-wi-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.36,
+   "best_ask": 0.37,
+   "mid": 0.365,
+   "bid_depth": 69349.0,
+   "ask_depth": 36966.0,
+   "bids": [
+    [
+     0.36,
+     14049.0
+    ],
+    [
+     0.29,
+     15000.0
+    ],
+    [
+     0.28,
+     100.0
+    ],
+    [
+     0.02,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.37,
+     5083.0
+    ],
+    [
+     0.38,
+     1780.0
+    ],
+    [
+     0.42,
+     3.0
+    ],
+    [
+     0.43,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usgub-wi-2026-11-03-rep",
+   "race": "ewc-usgub-wi-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.61,
+   "best_ask": 0.62,
+   "mid": 0.615,
+   "bid_depth": 40330.0,
+   "ask_depth": 92996.0,
+   "bids": [
+    [
+     0.61,
+     3486.0
+    ],
+    [
+     0.58,
+     6714.0
+    ],
+    [
+     0.52,
+     15000.0
+    ],
+    [
+     0.51,
+     30.0
+    ]
+   ],
+   "asks": [
+    [
+     0.62,
+     34597.0
+    ],
+    [
+     0.63,
+     600.0
+    ],
+    [
+     0.72,
+     15000.0
+    ],
+    [
+     0.73,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usmayor-losang-2026-11-03-karbas",
+   "race": "ewc-usmayor-losang-2026-11-03-karbas",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.67,
+   "best_ask": 0.7,
+   "mid": 0.685,
+   "bid_depth": 1673.34,
+   "ask_depth": 9642.0,
+   "bids": [
+    [
+     0.67,
+     313.0
+    ],
+    [
+     0.65,
+     85.46
+    ],
+    [
+     0.54,
+     100.0
+    ],
+    [
+     0.52,
+     102.0
+    ]
+   ],
+   "asks": [
+    [
+     0.7,
+     9207.0
+    ],
+    [
+     0.71,
+     5.0
+    ],
+    [
+     0.72,
+     50.0
+    ],
+    [
+     0.73,
+     50.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usmayor-losang-2026-11-03-nitram",
+   "race": "ewc-usmayor-losang-2026-11-03-nitram",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.36,
+   "best_ask": 0.37,
+   "mid": 0.365,
+   "bid_depth": 3575.3,
+   "ask_depth": 229118.29,
+   "bids": [
+    [
+     0.36,
+     720.78
+    ],
+    [
+     0.35,
+     2325.0
+    ],
+    [
+     0.34,
+     73.52
+    ],
+    [
+     0.23,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.37,
+     85.0
+    ],
+    [
+     0.43,
+     200.29
+    ],
+    [
+     0.45,
+     100.0
+    ],
+    [
+     0.46,
+     122.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-ak-2026-11-03-dem",
+   "race": "ewc-usse-ak-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.54,
+   "best_ask": 0.55,
+   "mid": 0.545,
+   "bid_depth": 51614.0,
+   "ask_depth": 70510.0,
+   "bids": [
+    [
+     0.54,
+     2145.0
+    ],
+    [
+     0.53,
+     9269.0
+    ],
+    [
+     0.02,
+     15000.0
+    ],
+    [
+     0.01,
+     25200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.55,
+     27811.0
+    ],
+    [
+     0.98,
+     15000.0
+    ],
+    [
+     0.99,
+     27699.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-ak-2026-11-03-rep",
+   "race": "ewc-usse-ak-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.46,
+   "best_ask": 0.47,
+   "mid": 0.46499999999999997,
+   "bid_depth": 43846.0,
+   "ask_depth": 57920.0,
+   "bids": [
+    [
+     0.46,
+     3646.0
+    ],
+    [
+     0.02,
+     15000.0
+    ],
+    [
+     0.01,
+     25200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.47,
+     6359.0
+    ],
+    [
+     0.48,
+     8862.0
+    ],
+    [
+     0.98,
+     15000.0
+    ],
+    [
+     0.99,
+     27699.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-ga-2026-11-03-dem",
+   "race": "ewc-usse-ga-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.91,
+   "best_ask": 0.92,
+   "mid": 0.915,
+   "bid_depth": 112607.0,
+   "ask_depth": 124027.0,
+   "bids": [
+    [
+     0.91,
+     61391.0
+    ],
+    [
+     0.9,
+     600.0
+    ],
+    [
+     0.87,
+     23.0
+    ],
+    [
+     0.86,
+     18336.0
+    ]
+   ],
+   "asks": [
+    [
+     0.92,
+     81328.0
+    ],
+    [
+     0.98,
+     15000.0
+    ],
+    [
+     0.99,
+     27699.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-ga-2026-11-03-rep",
+   "race": "ewc-usse-ga-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.08,
+   "best_ask": 0.09,
+   "mid": 0.08499999999999999,
+   "bid_depth": 113456.0,
+   "ask_depth": 190680.0,
+   "bids": [
+    [
+     0.08,
+     56594.0
+    ],
+    [
+     0.07,
+     2717.0
+    ],
+    [
+     0.02,
+     28945.0
+    ],
+    [
+     0.01,
+     25200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.09,
+     91839.0
+    ],
+    [
+     0.14,
+     22493.0
+    ],
+    [
+     0.19,
+     27498.0
+    ],
+    [
+     0.2,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-ia-2026-11-03-dem",
+   "race": "ewc-usse-ia-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.42,
+   "best_ask": 0.43,
+   "mid": 0.425,
+   "bid_depth": 39938.0,
+   "ask_depth": 85934.0,
+   "bids": [
+    [
+     0.42,
+     1296.0
+    ],
+    [
+     0.41,
+     746.0
+    ],
+    [
+     0.4,
+     7796.0
+    ],
+    [
+     0.32,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.43,
+     28135.0
+    ],
+    [
+     0.56,
+     15000.0
+    ],
+    [
+     0.57,
+     100.0
+    ],
+    [
+     0.98,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-ia-2026-11-03-rep",
+   "race": "ewc-usse-ia-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.59,
+   "best_ask": 0.6,
+   "mid": 0.595,
+   "bid_depth": 49126.0,
+   "ask_depth": 42883.0,
+   "bids": [
+    [
+     0.59,
+     3906.0
+    ],
+    [
+     0.46,
+     15000.0
+    ],
+    [
+     0.45,
+     120.0
+    ],
+    [
+     0.44,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.6,
+     1353.0
+    ],
+    [
+     0.61,
+     11365.0
+    ],
+    [
+     0.62,
+     65.0
+    ],
+    [
+     0.69,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-me-2026-11-03-dem",
+   "race": "ewc-usse-me-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.65,
+   "best_ask": 0.66,
+   "mid": 0.655,
+   "bid_depth": 33885.0,
+   "ask_depth": 231638.0,
+   "bids": [
+    [
+     0.65,
+     2280.0
+    ],
+    [
+     0.64,
+     6505.0
+    ],
+    [
+     0.63,
+     5000.0
+    ],
+    [
+     0.62,
+     5000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.66,
+     132271.0
+    ],
+    [
+     0.81,
+     39618.0
+    ],
+    [
+     0.82,
+     100.0
+    ],
+    [
+     0.87,
+     39680.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-me-2026-11-03-rep",
+   "race": "ewc-usse-me-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.37,
+   "best_ask": 0.38,
+   "mid": 0.375,
+   "bid_depth": 43823.0,
+   "ask_depth": 144611.0,
+   "bids": [
+    [
+     0.37,
+     13113.0
+    ],
+    [
+     0.36,
+     600.0
+    ],
+    [
+     0.35,
+     10.0
+    ],
+    [
+     0.2,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.38,
+     75147.0
+    ],
+    [
+     0.44,
+     22565.0
+    ],
+    [
+     0.45,
+     100.0
+    ],
+    [
+     0.59,
+     24788.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-mi-2026-11-03-dem",
+   "race": "ewc-usse-mi-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.55,
+   "best_ask": 0.56,
+   "mid": 0.555,
+   "bid_depth": 38276.0,
+   "ask_depth": 76073.0,
+   "bids": [
+    [
+     0.55,
+     1229.0
+    ],
+    [
+     0.54,
+     6347.0
+    ],
+    [
+     0.53,
+     600.0
+    ],
+    [
+     0.49,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.56,
+     26348.0
+    ],
+    [
+     0.57,
+     362.0
+    ],
+    [
+     0.6,
+     13.0
+    ],
+    [
+     0.61,
+     29993.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-mi-2026-11-03-rep",
+   "race": "ewc-usse-mi-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.45,
+   "best_ask": 0.46,
+   "mid": 0.455,
+   "bid_depth": 117163.0,
+   "ask_depth": 85692.0,
+   "bids": [
+    [
+     0.45,
+     22048.0
+    ],
+    [
+     0.4,
+     15015.0
+    ],
+    [
+     0.3,
+     15000.0
+    ],
+    [
+     0.29,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.46,
+     20397.0
+    ],
+    [
+     0.47,
+     600.0
+    ],
+    [
+     0.53,
+     15000.0
+    ],
+    [
+     0.54,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-mn-2026-11-03-dem",
+   "race": "ewc-usse-mn-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.93,
+   "best_ask": 0.94,
+   "mid": 0.935,
+   "bid_depth": 47985.0,
+   "ask_depth": 82000.0,
+   "bids": [
+    [
+     0.93,
+     2279.0
+    ],
+    [
+     0.92,
+     600.0
+    ],
+    [
+     0.88,
+     15006.0
+    ],
+    [
+     0.83,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.94,
+     39301.0
+    ],
+    [
+     0.95,
+     15000.0
+    ],
+    [
+     0.99,
+     27699.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-mn-2026-11-03-rep",
+   "race": "ewc-usse-mn-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.07,
+   "best_ask": 0.08,
+   "mid": 0.07500000000000001,
+   "bid_depth": 53758.0,
+   "ask_depth": 90065.0,
+   "bids": [
+    [
+     0.07,
+     2966.0
+    ],
+    [
+     0.06,
+     630.0
+    ],
+    [
+     0.05,
+     9962.0
+    ],
+    [
+     0.02,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.08,
+     17186.0
+    ],
+    [
+     0.13,
+     15000.0
+    ],
+    [
+     0.14,
+     80.0
+    ],
+    [
+     0.18,
+     15100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-nc-2026-11-03-dem",
+   "race": "ewc-usse-nc-2026-11-03",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 2,
+   "best_bid": 0.91,
+   "best_ask": 0.92,
+   "mid": 0.915,
+   "bid_depth": 52168.0,
+   "ask_depth": 166982.0,
+   "bids": [
+    [
+     0.91,
+     5732.0
+    ],
+    [
+     0.9,
+     600.0
+    ],
+    [
+     0.86,
+     15736.0
+    ],
+    [
+     0.79,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.92,
+     115064.0
+    ],
+    [
+     0.98,
+     24219.0
+    ],
+    [
+     0.99,
+     27699.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-nc-2026-11-03-rep",
+   "race": "ewc-usse-nc-2026-11-03",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 2,
+   "best_bid": 0.08,
+   "best_ask": 0.1,
+   "mid": 0.09,
+   "bid_depth": 103577.0,
+   "ask_depth": 193585.0,
+   "bids": [
+    [
+     0.08,
+     63367.0
+    ],
+    [
+     0.02,
+     15000.0
+    ],
+    [
+     0.01,
+     25210.0
+    ]
+   ],
+   "asks": [
+    [
+     0.1,
+     93467.0
+    ],
+    [
+     0.14,
+     29280.0
+    ],
+    [
+     0.21,
+     28039.0
+    ],
+    [
+     0.22,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-ne-2026-11-03-dem",
+   "race": "ewc-usse-ne-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": 0.01,
+   "best_ask": 0.02,
+   "mid": 0.015,
+   "bid_depth": 7214.0,
+   "ask_depth": 113677.0,
+   "bids": [
+    [
+     0.01,
+     7214.0
+    ]
+   ],
+   "asks": [
+    [
+     0.02,
+     43659.0
+    ],
+    [
+     0.1,
+     15000.0
+    ],
+    [
+     0.11,
+     100.0
+    ],
+    [
+     0.98,
+     27219.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-ne-2026-11-03-rep",
+   "race": "ewc-usse-ne-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": 0.71,
+   "best_ask": 0.72,
+   "mid": 0.715,
+   "bid_depth": 53343.0,
+   "ask_depth": 74964.0,
+   "bids": [
+    [
+     0.71,
+     8163.0
+    ],
+    [
+     0.66,
+     15030.0
+    ],
+    [
+     0.64,
+     50.0
+    ],
+    [
+     0.6,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.72,
+     16565.0
+    ],
+    [
+     0.73,
+     600.0
+    ],
+    [
+     0.83,
+     15000.0
+    ],
+    [
+     0.84,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-ne-2026-11-03-danosb",
+   "race": "ewc-usse-ne-2026-11-03-danosb",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": 0.28,
+   "best_ask": 0.29,
+   "mid": 0.28500000000000003,
+   "bid_depth": 36767.0,
+   "ask_depth": 75565.0,
+   "bids": [
+    [
+     0.28,
+     855.0
+    ],
+    [
+     0.27,
+     5716.0
+    ],
+    [
+     0.26,
+     96.0
+    ],
+    [
+     0.15,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.29,
+     17766.0
+    ],
+    [
+     0.38,
+     15000.0
+    ],
+    [
+     0.39,
+     100.0
+    ],
+    [
+     0.98,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-nh-2026-11-03-dem",
+   "race": "ewc-usse-nh-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.86,
+   "best_ask": 0.87,
+   "mid": 0.865,
+   "bid_depth": 73190.0,
+   "ask_depth": 19175.0,
+   "bids": [
+    [
+     0.86,
+     17890.0
+    ],
+    [
+     0.74,
+     15000.0
+    ],
+    [
+     0.73,
+     100.0
+    ],
+    [
+     0.02,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.87,
+     355.0
+    ],
+    [
+     0.88,
+     3463.0
+    ],
+    [
+     0.89,
+     227.0
+    ],
+    [
+     0.93,
+     30.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "SELL",
+     "price": 0.87,
+     "size": 20.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    }
+   ]
+  },
+  {
+   "market": "ewc-usse-nh-2026-11-03-rep",
+   "race": "ewc-usse-nh-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.15,
+   "best_ask": 0.16,
+   "mid": 0.155,
+   "bid_depth": 18917.0,
+   "ask_depth": 88627.0,
+   "bids": [
+    [
+     0.15,
+     1126.0
+    ],
+    [
+     0.14,
+     600.0
+    ],
+    [
+     0.13,
+     192.0
+    ],
+    [
+     0.12,
+     1899.0
+    ]
+   ],
+   "asks": [
+    [
+     0.16,
+     30828.0
+    ],
+    [
+     0.25,
+     15000.0
+    ],
+    [
+     0.26,
+     100.0
+    ],
+    [
+     0.98,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-oh-2026-11-03-dem",
+   "race": "ewc-usse-oh-2026-11-03",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 2,
+   "best_bid": 0.5,
+   "best_ask": 0.51,
+   "mid": 0.505,
+   "bid_depth": 86891.0,
+   "ask_depth": 169818.0,
+   "bids": [
+    [
+     0.5,
+     153.0
+    ],
+    [
+     0.48,
+     31438.0
+    ],
+    [
+     0.4,
+     15000.0
+    ],
+    [
+     0.39,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     95638.0
+    ],
+    [
+     0.63,
+     28692.0
+    ],
+    [
+     0.64,
+     100.0
+    ],
+    [
+     0.95,
+     28692.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-oh-2026-11-03-rep",
+   "race": "ewc-usse-oh-2026-11-03",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 2,
+   "best_bid": 0.53,
+   "best_ask": 0.54,
+   "mid": 0.535,
+   "bid_depth": 39841.0,
+   "ask_depth": 173860.0,
+   "bids": [
+    [
+     0.53,
+     1384.0
+    ],
+    [
+     0.52,
+     3279.0
+    ],
+    [
+     0.51,
+     5098.0
+    ],
+    [
+     0.49,
+     50.0
+    ]
+   ],
+   "asks": [
+    [
+     0.54,
+     92929.0
+    ],
+    [
+     0.57,
+     171.0
+    ],
+    [
+     0.62,
+     27870.0
+    ],
+    [
+     0.63,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ewc-usse-tx-2026-11-03-dem",
+   "race": "ewc-usse-tx-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.51,
+   "best_ask": 0.52,
+   "mid": 0.515,
+   "bid_depth": 24052.0,
+   "ask_depth": 75693.0,
+   "bids": [
+    [
+     0.51,
+     603.0
+    ],
+    [
+     0.5,
+     271.0
+    ],
+    [
+     0.49,
+     1590.0
+    ],
+    [
+     0.48,
+     6587.0
+    ]
+   ],
+   "asks": [
+    [
+     0.52,
+     44970.0
+    ],
+    [
+     0.54,
+     500.0
+    ],
+    [
+     0.55,
+     115.0
+    ],
+    [
+     0.59,
+     15000.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.51,
+     "size": 50.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    }
+   ]
+  },
+  {
+   "market": "ewc-usse-tx-2026-11-03-rep",
+   "race": "ewc-usse-tx-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.51,
+   "best_ask": 0.52,
+   "mid": 0.515,
+   "bid_depth": 40543.0,
+   "ask_depth": 88665.0,
+   "bids": [
+    [
+     0.51,
+     9429.0
+    ],
+    [
+     0.5,
+     1063.0
+    ],
+    [
+     0.49,
+     21.0
+    ],
+    [
+     0.46,
+     15000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.52,
+     54941.0
+    ],
+    [
+     0.53,
+     1984.0
+    ],
+    [
+     0.57,
+     15030.0
+    ],
+    [
+     0.63,
+     16600.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "gsc-usfedgvmt-by-2026-10-01",
+   "race": "gsc-usfedgvmt-by-2026-10-01",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 1,
+   "best_bid": 0.39,
+   "best_ask": 0.5,
+   "mid": 0.445,
+   "bid_depth": 3402.76,
+   "ask_depth": 2748.9,
+   "bids": [
+    [
+     0.39,
+     1204.0
+    ],
+    [
+     0.2,
+     1.0
+    ],
+    [
+     0.02,
+     258.76
+    ],
+    [
+     0.01,
+     1939.0
+    ]
+   ],
+   "asks": [
+    [
+     0.5,
+     2260.0
+    ],
+    [
+     0.56,
+     45.0
+    ],
+    [
+     0.58,
+     100.0
+    ],
+    [
+     0.59,
+     83.9
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "mowc-nato-us-12-31-2026",
+   "race": "mowc-nato-us-12-31-2026",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 1,
+   "best_bid": 0.09,
+   "best_ask": 0.1,
+   "mid": 0.095,
+   "bid_depth": 127407.2,
+   "ask_depth": 263.99,
+   "bids": [
+    [
+     0.09,
+     7.2
+    ],
+    [
+     0.08,
+     811.0
+    ],
+    [
+     0.05,
+     126343.0
+    ],
+    [
+     0.02,
+     17.0
+    ]
+   ],
+   "asks": [
+    [
+     0.1,
+     17.0
+    ],
+    [
+     0.13,
+     118.0
+    ],
+    [
+     0.15,
+     101.0
+    ],
+    [
+     0.21,
+     1.99
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "paccc-usho-midterms-2026-11-03-dem",
+   "race": "paccc-usho-midterms-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.845,
+   "best_ask": 0.846,
+   "mid": 0.8454999999999999,
+   "bid_depth": 27683.0,
+   "ask_depth": 72048.0,
+   "bids": [
+    [
+     0.845,
+     26899.0
+    ],
+    [
+     0.843,
+     687.0
+    ],
+    [
+     0.836,
+     10.0
+    ],
+    [
+     0.833,
+     10.0
+    ]
+   ],
+   "asks": [
+    [
+     0.846,
+     31748.0
+    ],
+    [
+     0.85,
+     300.0
+    ],
+    [
+     0.885,
+     10000.0
+    ],
+    [
+     0.962,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "paccc-usho-midterms-2026-11-03-rep",
+   "race": "paccc-usho-midterms-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.174,
+   "best_ask": 0.175,
+   "mid": 0.1745,
+   "bid_depth": 34298.0,
+   "ask_depth": 48035.0,
+   "bids": [
+    [
+     0.174,
+     4214.0
+    ],
+    [
+     0.171,
+     30.0
+    ],
+    [
+     0.17,
+     2127.0
+    ],
+    [
+     0.169,
+     11535.0
+    ]
+   ],
+   "asks": [
+    [
+     0.175,
+     21115.0
+    ],
+    [
+     0.176,
+     7295.0
+    ],
+    [
+     0.177,
+     639.0
+    ],
+    [
+     0.179,
+     900.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "paccc-usse-midterms-2026-11-03-dem",
+   "race": "paccc-usse-midterms-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.46,
+   "best_ask": 0.461,
+   "mid": 0.4605,
+   "bid_depth": 30215.0,
+   "ask_depth": 259758.0,
+   "bids": [
+    [
+     0.46,
+     14175.0
+    ],
+    [
+     0.446,
+     80.0
+    ],
+    [
+     0.445,
+     858.0
+    ],
+    [
+     0.42,
+     2.0
+    ]
+   ],
+   "asks": [
+    [
+     0.461,
+     101239.0
+    ],
+    [
+     0.465,
+     900.0
+    ],
+    [
+     0.579,
+     30475.0
+    ],
+    [
+     0.58,
+     100.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "paccc-usse-midterms-2026-11-03-rep",
+   "race": "paccc-usse-midterms-2026-11-03",
+   "pool": 300.0,
+   "df": 0.2,
+   "target": 10000.0,
+   "event_n": 2,
+   "best_bid": 0.542,
+   "best_ask": 0.543,
+   "mid": 0.5425,
+   "bid_depth": 43718.0,
+   "ask_depth": 59859.0,
+   "bids": [
+    [
+     0.542,
+     26972.0
+    ],
+    [
+     0.54,
+     20.0
+    ],
+    [
+     0.537,
+     930.0
+    ],
+    [
+     0.51,
+     691.0
+    ]
+   ],
+   "asks": [
+    [
+     0.543,
+     28359.0
+    ],
+    [
+     0.544,
+     60.0
+    ],
+    [
+     0.547,
+     1340.0
+    ],
+    [
+     0.679,
+     15000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "pvwc-housepopw-2026-11-03-dem",
+   "race": "pvwc-housepopw-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.87,
+   "best_ask": 0.88,
+   "mid": 0.875,
+   "bid_depth": 2221.8,
+   "ask_depth": 5398.01,
+   "bids": [
+    [
+     0.87,
+     1151.3
+    ],
+    [
+     0.83,
+     5.0
+    ],
+    [
+     0.78,
+     65.5
+    ],
+    [
+     0.45,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.88,
+     2505.51
+    ],
+    [
+     0.89,
+     124.0
+    ],
+    [
+     0.9,
+     138.0
+    ],
+    [
+     0.99,
+     2630.5
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "pvwc-housepopw-2026-11-03-rep",
+   "race": "pvwc-housepopw-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.35,
+   "mid": 0.18,
+   "bid_depth": 9494.17,
+   "ask_depth": 9131.83,
+   "bids": [
+    [
+     0.01,
+     9494.17
+    ]
+   ],
+   "asks": [
+    [
+     0.35,
+     109.83
+    ],
+    [
+     0.36,
+     225.0
+    ],
+    [
+     0.99,
+     8797.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte180",
+   "race": "scc-hrep-rep-2026-11-03-gte180",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.78,
+   "best_ask": 0.87,
+   "mid": 0.825,
+   "bid_depth": 50501.0,
+   "ask_depth": 62460.979999999996,
+   "bids": [
+    [
+     0.78,
+     45.0
+    ],
+    [
+     0.76,
+     6.0
+    ],
+    [
+     0.02,
+     50250.0
+    ],
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.87,
+     25.0
+    ],
+    [
+     0.97,
+     5.0
+    ],
+    [
+     0.98,
+     60318.39
+    ],
+    [
+     0.99,
+     2112.59
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.78,
+     "size": 30.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    }
+   ]
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte185",
+   "race": "scc-hrep-rep-2026-11-03-gte185",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.77,
+   "best_ask": 0.78,
+   "mid": 0.775,
+   "bid_depth": 80583.22,
+   "ask_depth": 5524.1,
+   "bids": [
+    [
+     0.77,
+     2.0
+    ],
+    [
+     0.75,
+     31.0
+    ],
+    [
+     0.71,
+     100.22
+    ],
+    [
+     0.02,
+     80250.0
+    ]
+   ],
+   "asks": [
+    [
+     0.78,
+     90.0
+    ],
+    [
+     0.8,
+     775.0
+    ],
+    [
+     0.82,
+     10.0
+    ],
+    [
+     0.99,
+     4649.1
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.75,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    },
+    {
+     "side": "BUY",
+     "price": 0.75,
+     "size": 21.0,
+     "intent": "ORDER_INTENT_SELL_SHORT"
+    },
+    {
+     "side": "SELL",
+     "price": 0.82,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    },
+    {
+     "side": "SELL",
+     "price": 0.78,
+     "size": 8.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    },
+    {
+     "side": "BUY",
+     "price": 0.77,
+     "size": 2.0,
+     "intent": "ORDER_INTENT_SELL_SHORT"
+    }
+   ]
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte190",
+   "race": "scc-hrep-rep-2026-11-03-gte190",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.68,
+   "best_ask": 0.7,
+   "mid": 0.69,
+   "bid_depth": 80290.67,
+   "ask_depth": 5349.84,
+   "bids": [
+    [
+     0.68,
+     0.01
+    ],
+    [
+     0.64,
+     6.0
+    ],
+    [
+     0.63,
+     151.83
+    ],
+    [
+     0.02,
+     79932.83
+    ]
+   ],
+   "asks": [
+    [
+     0.7,
+     0.01
+    ],
+    [
+     0.74,
+     82.0
+    ],
+    [
+     0.75,
+     10.0
+    ],
+    [
+     0.95,
+     100.17
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "SELL",
+     "price": 0.75,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    }
+   ]
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte195",
+   "race": "scc-hrep-rep-2026-11-03-gte195",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.5,
+   "best_ask": 0.75,
+   "mid": 0.625,
+   "bid_depth": 80754.96,
+   "ask_depth": 5480.74,
+   "bids": [
+    [
+     0.5,
+     30.0
+    ],
+    [
+     0.49,
+     165.13
+    ],
+    [
+     0.24,
+     170.09
+    ],
+    [
+     0.02,
+     80189.74
+    ]
+   ],
+   "asks": [
+    [
+     0.75,
+     49.0
+    ],
+    [
+     0.76,
+     1149.0
+    ],
+    [
+     0.99,
+     4282.74
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.5,
+     "size": 25.0,
+     "intent": "ORDER_INTENT_SELL_SHORT"
+    },
+    {
+     "side": "BUY",
+     "price": 0.49,
+     "size": 115.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    }
+   ]
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte200",
+   "race": "scc-hrep-rep-2026-11-03-gte200",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.63,
+   "best_ask": 0.65,
+   "mid": 0.64,
+   "bid_depth": 80221.01,
+   "ask_depth": 48315.35,
+   "bids": [
+    [
+     0.63,
+     1.01
+    ],
+    [
+     0.61,
+     15.0
+    ],
+    [
+     0.59,
+     5.0
+    ],
+    [
+     0.02,
+     80000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.65,
+     0.01
+    ],
+    [
+     0.67,
+     76.0
+    ],
+    [
+     0.7,
+     514.0
+    ],
+    [
+     0.9,
+     1.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "SELL",
+     "price": 0.67,
+     "size": 40.0,
+     "intent": "ORDER_INTENT_SELL_LONG"
+    },
+    {
+     "side": "BUY",
+     "price": 0.61,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    },
+    {
+     "side": "BUY",
+     "price": 0.59,
+     "size": 5.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    }
+   ]
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte205",
+   "race": "scc-hrep-rep-2026-11-03-gte205",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.47,
+   "best_ask": 0.48,
+   "mid": 0.475,
+   "bid_depth": 81228.87,
+   "ask_depth": 62887.57,
+   "bids": [
+    [
+     0.47,
+     951.58
+    ],
+    [
+     0.46,
+     21.74
+    ],
+    [
+     0.45,
+     55.55
+    ],
+    [
+     0.02,
+     80000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.48,
+     63.0
+    ],
+    [
+     0.61,
+     100.23
+    ],
+    [
+     0.98,
+     60499.34
+    ],
+    [
+     0.99,
+     2225.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "SELL",
+     "price": 0.48,
+     "size": 20.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    }
+   ]
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte210",
+   "race": "scc-hrep-rep-2026-11-03-gte210",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.03,
+   "best_ask": 0.42,
+   "mid": 0.22499999999999998,
+   "bid_depth": 90549.65,
+   "ask_depth": 62836.689999999995,
+   "bids": [
+    [
+     0.03,
+     99.65
+    ],
+    [
+     0.02,
+     90250.0
+    ],
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.42,
+     11.0
+    ],
+    [
+     0.5,
+     100.35
+    ],
+    [
+     0.52,
+     1.0
+    ],
+    [
+     0.98,
+     60499.34
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "SELL",
+     "price": 0.42,
+     "size": 1.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    }
+   ]
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte215",
+   "race": "scc-hrep-rep-2026-11-03-gte215",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.17,
+   "best_ask": 0.43,
+   "mid": 0.3,
+   "bid_depth": 200300.01,
+   "ask_depth": 47993.35,
+   "bids": [
+    [
+     0.17,
+     0.01
+    ],
+    [
+     0.08,
+     100.0
+    ],
+    [
+     0.01,
+     200200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.43,
+     269.0
+    ],
+    [
+     0.66,
+     0.01
+    ],
+    [
+     0.98,
+     45499.34
+    ],
+    [
+     0.99,
+     2225.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte220",
+   "race": "scc-hrep-rep-2026-11-03-gte220",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.19,
+   "best_ask": 0.25,
+   "mid": 0.22,
+   "bid_depth": 85729.47,
+   "ask_depth": 54528.369999999995,
+   "bids": [
+    [
+     0.19,
+     1.01
+    ],
+    [
+     0.08,
+     100.0
+    ],
+    [
+     0.07,
+     81.0
+    ],
+    [
+     0.03,
+     5247.0
+    ]
+   ],
+   "asks": [
+    [
+     0.25,
+     84.0
+    ],
+    [
+     0.32,
+     0.03
+    ],
+    [
+     0.5,
+     25.0
+    ],
+    [
+     0.97,
+     1695.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.19,
+     "size": 1.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    },
+    {
+     "side": "SELL",
+     "price": 0.25,
+     "size": 20.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    },
+    {
+     "side": "SELL",
+     "price": 0.99,
+     "size": 5000.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    }
+   ]
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte225",
+   "race": "scc-hrep-rep-2026-11-03-gte225",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.01,
+   "best_ask": 0.12,
+   "mid": 0.065,
+   "bid_depth": 165934.53,
+   "ask_depth": 62833.509999999995,
+   "bids": [
+    [
+     0.01,
+     165934.53
+    ]
+   ],
+   "asks": [
+    [
+     0.12,
+     31.0
+    ],
+    [
+     0.14,
+     52.17
+    ],
+    [
+     0.2,
+     1.0
+    ],
+    [
+     0.5,
+     25.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.01,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    },
+    {
+     "side": "SELL",
+     "price": 0.12,
+     "size": 10.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    }
+   ]
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte230",
+   "race": "scc-hrep-rep-2026-11-03-gte230",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.01,
+   "best_ask": 0.29,
+   "mid": 0.15,
+   "bid_depth": 42103.4,
+   "ask_depth": 62863.31,
+   "bids": [
+    [
+     0.01,
+     42103.4
+    ]
+   ],
+   "asks": [
+    [
+     0.29,
+     114.6
+    ],
+    [
+     0.5,
+     25.0
+    ],
+    [
+     0.98,
+     60498.71
+    ],
+    [
+     0.99,
+     2225.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte235",
+   "race": "scc-hrep-rep-2026-11-03-gte235",
+   "pool": 100.0,
+   "df": 0.2,
+   "target": 5000.0,
+   "event_n": 12,
+   "best_bid": 0.02,
+   "best_ask": 0.08,
+   "mid": 0.05,
+   "bid_depth": 28162.0,
+   "ask_depth": 62941.979999999996,
+   "bids": [
+    [
+     0.02,
+     2966.0
+    ],
+    [
+     0.01,
+     25196.0
+    ]
+   ],
+   "asks": [
+    [
+     0.08,
+     150.0
+    ],
+    [
+     0.1,
+     28.77
+    ],
+    [
+     0.14,
+     15.0
+    ],
+    [
+     0.5,
+     25.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "usgcc-aliens-12-31-2026",
+   "race": "usgcc-aliens-12-31-2026",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 1,
+   "best_bid": 0.11,
+   "best_ask": 0.13,
+   "mid": 0.12,
+   "bid_depth": 83335.0,
+   "ask_depth": 45635.0,
+   "bids": [
+    [
+     0.11,
+     105.0
+    ],
+    [
+     0.08,
+     536.0
+    ],
+    [
+     0.07,
+     5315.0
+    ],
+    [
+     0.06,
+     29948.0
+    ]
+   ],
+   "asks": [
+    [
+     0.13,
+     193.0
+    ],
+    [
+     0.15,
+     91.0
+    ],
+    [
+     0.18,
+     50.0
+    ],
+    [
+     0.19,
+     45055.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-dem",
+   "race": "usgubewc-usgub-al-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-rep",
+   "race": "usgubewc-usgub-al-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2665.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     165.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-al-2026-11-03-dem",
+   "race": "ussewc-usse-al-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-al-2026-11-03-rep",
+   "race": "ussewc-usse-al-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2707.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     207.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-ar-2026-11-03-dem",
+   "race": "ussewc-usse-ar-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-ar-2026-11-03-rep",
+   "race": "ussewc-usse-ar-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2665.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     165.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-co-2026-11-03-dem",
+   "race": "ussewc-usse-co-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2707.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     207.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-co-2026-11-03-rep",
+   "race": "ussewc-usse-co-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": null,
+   "best_ask": 0.99,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "bids": [],
+   "asks": [
+    [
+     0.99,
+     25.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-fl-2026-11-03-dem",
+   "race": "ussewc-usse-fl-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-fl-2026-11-03-rep",
+   "race": "ussewc-usse-fl-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2600.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     100.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-id-2026-11-03-rep",
+   "race": "ussewc-usse-id-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2707.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     207.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-id-2026-11-03-todach",
+   "race": "ussewc-usse-id-2026-11-03-todach",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-ky-2026-11-03-dem",
+   "race": "ussewc-usse-ky-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-ky-2026-11-03-rep",
+   "race": "ussewc-usse-ky-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2600.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     100.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-la-2026-11-03-dem",
+   "race": "ussewc-usse-la-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-la-2026-11-03-rep",
+   "race": "ussewc-usse-la-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2707.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     207.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-ms-2026-11-03-dem",
+   "race": "ussewc-usse-ms-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-ms-2026-11-03-rep",
+   "race": "ussewc-usse-ms-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2707.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     207.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-mt-2026-11-03-dem",
+   "race": "ussewc-usse-mt-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-mt-2026-11-03-rep",
+   "race": "ussewc-usse-mt-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": 0.48,
+   "best_ask": 0.98,
+   "mid": 0.73,
+   "bid_depth": 2600.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.48,
+     100.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.98,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-mt-2026-11-03-setbod",
+   "race": "ussewc-usse-mt-2026-11-03-setbod",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 3,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-nj-2026-11-03-dem",
+   "race": "ussewc-usse-nj-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2707.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     207.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-nj-2026-11-03-rep",
+   "race": "ussewc-usse-nj-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-nm-2026-11-03-dem",
+   "race": "ussewc-usse-nm-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2707.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     207.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-nm-2026-11-03-rep",
+   "race": "ussewc-usse-nm-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-ok-2026-11-03-dem",
+   "race": "ussewc-usse-ok-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-ok-2026-11-03-rep",
+   "race": "ussewc-usse-ok-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 4715.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     215.0
+    ],
+    [
+     0.01,
+     4500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-or-2026-11-03-dem",
+   "race": "ussewc-usse-or-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2707.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     207.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-or-2026-11-03-rep",
+   "race": "ussewc-usse-or-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2500.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2400.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-ri-2026-11-03-dem",
+   "race": "ussewc-usse-ri-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2707.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     207.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-ri-2026-11-03-rep",
+   "race": "ussewc-usse-ri-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-sc-2026-11-03-dem",
+   "race": "ussewc-usse-sc-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-sc-2026-11-03-rep",
+   "race": "ussewc-usse-sc-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2665.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     165.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-sd-2026-11-03-rep",
+   "race": "ussewc-usse-sd-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2665.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     165.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-sd-2026-11-03-briben",
+   "race": "ussewc-usse-sd-2026-11-03-briben",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-tn-2026-11-03-dem",
+   "race": "ussewc-usse-tn-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.5,
+   "mid": 0.255,
+   "bid_depth": 2100.0,
+   "ask_depth": 4640.0,
+   "bids": [
+    [
+     0.01,
+     2100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.5,
+     40.0
+    ],
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     4500.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "SELL",
+     "price": 0.5,
+     "size": 40.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    },
+    {
+     "side": "BUY",
+     "price": 0.01,
+     "size": 2000.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    },
+    {
+     "side": "SELL",
+     "price": 0.99,
+     "size": 2000.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    }
+   ]
+  },
+  {
+   "market": "ussewc-usse-tn-2026-11-03-rep",
+   "race": "ussewc-usse-tn-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.51,
+   "best_ask": 0.99,
+   "mid": 0.75,
+   "bid_depth": 2140.0,
+   "ask_depth": 2125.0,
+   "bids": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.5,
+     40.0
+    ],
+    [
+     0.01,
+     2000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     2125.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.5,
+     "size": 40.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    },
+    {
+     "side": "BUY",
+     "price": 0.01,
+     "size": 2000.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    },
+    {
+     "side": "SELL",
+     "price": 0.99,
+     "size": 2000.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    }
+   ]
+  },
+  {
+   "market": "ussewc-usse-va-2026-11-03-dem",
+   "race": "ussewc-usse-va-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2665.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     165.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-va-2026-11-03-rep",
+   "race": "ussewc-usse-va-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-wv-2026-11-03-dem",
+   "race": "ussewc-usse-wv-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 100.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     100.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-wv-2026-11-03-rep",
+   "race": "ussewc-usse-wv-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.49,
+   "best_ask": 0.99,
+   "mid": 0.74,
+   "bid_depth": 2600.0,
+   "ask_depth": 125.0,
+   "bids": [
+    [
+     0.49,
+     100.0
+    ],
+    [
+     0.01,
+     2500.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     125.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-wy-2026-11-03-dem",
+   "race": "ussewc-usse-wy-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "mid": 0.26,
+   "bid_depth": 25.0,
+   "ask_depth": 2600.0,
+   "bids": [
+    [
+     0.01,
+     25.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     2500.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "ussewc-usse-wy-2026-11-03-rep",
+   "race": "ussewc-usse-wy-2026-11-03",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 2,
+   "best_bid": 0.5,
+   "best_ask": 0.99,
+   "mid": 0.745,
+   "bid_depth": 2140.0,
+   "ask_depth": 2216.0,
+   "bids": [
+    [
+     0.5,
+     40.0
+    ],
+    [
+     0.49,
+     100.0
+    ],
+    [
+     0.01,
+     2000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     2216.0
+    ]
+   ],
+   "already_in": true,
+   "my_orders": [
+    {
+     "side": "BUY",
+     "price": 0.5,
+     "size": 40.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    },
+    {
+     "side": "SELL",
+     "price": 0.99,
+     "size": 2000.0,
+     "intent": "ORDER_INTENT_BUY_SHORT"
+    },
+    {
+     "side": "BUY",
+     "price": 0.01,
+     "size": 2000.0,
+     "intent": "ORDER_INTENT_BUY_LONG"
+    }
+   ]
+  },
+  {
+   "market": "vmc-ussep-misen-2026-08-04-els0-5",
+   "race": "vmc-ussep-misen-2026-08-04-els0-5",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 10,
+   "best_bid": 0.99,
+   "best_ask": null,
+   "mid": null,
+   "bid_depth": 8637.0,
+   "ask_depth": 0,
+   "bids": [
+    [
+     0.99,
+     5250.0
+    ],
+    [
+     0.93,
+     257.0
+    ],
+    [
+     0.89,
+     100.0
+    ],
+    [
+     0.87,
+     30.0
+    ]
+   ],
+   "asks": [],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "vmc-ussep-misen-2026-08-04-els10-15",
+   "race": "vmc-ussep-misen-2026-08-04-els10-15",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 10,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 16272.28,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     8250.0
+    ],
+    [
+     0.05,
+     856.02
+    ],
+    [
+     0.06,
+     5000.0
+    ],
+    [
+     0.08,
+     1566.26
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "vmc-ussep-misen-2026-08-04-els15-20",
+   "race": "vmc-ussep-misen-2026-08-04-els15-20",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 10,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 25565.0,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     8250.0
+    ],
+    [
+     0.03,
+     1215.0
+    ],
+    [
+     0.04,
+     8000.0
+    ],
+    [
+     0.05,
+     5000.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "vmc-ussep-misen-2026-08-04-els5-10",
+   "race": "vmc-ussep-misen-2026-08-04-els5-10",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 10,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 168980.34,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     8156.0
+    ],
+    [
+     0.05,
+     534.4
+    ],
+    [
+     0.11,
+     100.0
+    ],
+    [
+     0.39,
+     189.94
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "vmc-ussep-misen-2026-08-04-elsgte20",
+   "race": "vmc-ussep-misen-2026-08-04-elsgte20",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 10,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 200689.03,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     10286.3
+    ],
+    [
+     0.02,
+     2699.0
+    ],
+    [
+     0.03,
+     2500.0
+    ],
+    [
+     0.06,
+     18.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "vmc-ussep-misen-2026-08-04-ste0-5",
+   "race": "vmc-ussep-misen-2026-08-04-ste0-5",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 10,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 179785.62,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     21214.84
+    ],
+    [
+     0.11,
+     100.0
+    ],
+    [
+     0.47,
+     1000.0
+    ],
+    [
+     0.7,
+     50.0
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "vmc-ussep-misen-2026-08-04-ste05-10",
+   "race": "vmc-ussep-misen-2026-08-04-ste05-10",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 10,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 21307.83,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     8250.0
+    ],
+    [
+     0.02,
+     5200.0
+    ],
+    [
+     0.04,
+     4858.02
+    ],
+    [
+     0.05,
+     2844.81
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "vmc-ussep-misen-2026-08-04-ste10-15",
+   "race": "vmc-ussep-misen-2026-08-04-ste10-15",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 10,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 300083.15,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     99256.85
+    ],
+    [
+     0.11,
+     100.0
+    ],
+    [
+     0.4,
+     83.71
+    ],
+    [
+     0.99,
+     200642.59
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "vmc-ussep-misen-2026-08-04-ste15-20",
+   "race": "vmc-ussep-misen-2026-08-04-ste15-20",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 10,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 318675.05,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     115446.97
+    ],
+    [
+     0.4,
+     60.89
+    ],
+    [
+     0.98,
+     102099.25
+    ],
+    [
+     0.99,
+     101067.94
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  },
+  {
+   "market": "vmc-ussep-misen-2026-08-04-stegte20",
+   "race": "vmc-ussep-misen-2026-08-04-stegte20",
+   "pool": 25.0,
+   "df": 0.1,
+   "target": 2000.0,
+   "event_n": 10,
+   "best_bid": null,
+   "best_ask": 0.01,
+   "mid": null,
+   "bid_depth": 0,
+   "ask_depth": 382061.94,
+   "bids": [],
+   "asks": [
+    [
+     0.01,
+     178876.0
+    ],
+    [
+     0.15,
+     18.75
+    ],
+    [
+     0.98,
+     102099.25
+    ],
+    [
+     0.99,
+     101067.94
+    ]
+   ],
+   "already_in": false,
+   "my_orders": []
+  }
+ ]
+}
