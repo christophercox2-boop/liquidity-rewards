@@ -1,0 +1,156 @@
+name: Discover new market pairs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/discover.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: discover
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: US politics markets with live pools, books, and the favourite side
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          mkdir -p data
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, time, requests, collections
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+
+          # markets we already rest orders in
+          op = "/v1/orders/open"
+          r = requests.get(tr.TRADE_API + op,
+                           headers=tr.auth_headers(kid, sec, "GET", op), timeout=30)
+          r.raise_for_status()
+          mine = collections.defaultdict(list)
+          for o in r.json().get("orders") or []:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              if slug:
+                  mine[slug].append({
+                      "side": "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL",
+                      "price": tr._num(o.get("price")),
+                      "size": tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")),
+                      "intent": str(o.get("intent") or "")})
+          print("markets we already quote:", len(mine))
+
+          # every US-politics slug the tag map knows about
+          pol_slugs, event_sizes = tr.fetch_politics_events()
+          print("politics slugs from tags:", len(pol_slugs))
+
+          # their programs
+          progs = {}
+          for i in range(0, len(pol_slugs), 25):
+              rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                params={"symbols": pol_slugs[i:i + 25], "pageSize": 100},
+                                timeout=30)
+              if rr.status_code >= 400:
+                  continue
+              for p in rr.json().get("programs") or []:
+                  slug = p.get("marketSlug", "")
+                  tp = tr._pick_period(p.get("timePeriods") or [], slug)
+                  if tp is None or not slug:
+                      continue
+                  if tr._is_econ(slug) or not tr._is_us_politics(slug):
+                      continue
+                  pr = tr._prog_of(tp)
+                  if pr.get("pool", 0) < 25 or not pr.get("df"):
+                      continue
+                  progs[slug] = {**pr, "event_n": event_sizes.get(slug, 1)}
+              time.sleep(0.05)
+          print("US-politics markets with a live pool:", len(progs))
+
+          # group into races: strip the trailing party/candidate token
+          def race_of(s):
+              parts = s.split("-")
+              return "-".join(parts[:-1]) if parts[-1] in ("dem", "rep") else s
+
+          races = collections.defaultdict(list)
+          for s in progs:
+              races[race_of(s)].append(s)
+
+          rows = []
+          for race, members in sorted(races.items()):
+              for s in sorted(members):
+                  try:
+                      bk = tr._fetch_book(s)
+                  except Exception as e:
+                      rows.append({"market": s, "race": race, "err": f"{type(e).__name__}"})
+                      continue
+                  time.sleep(0.25)
+                  bids = bk.get("bids") or []; asks = bk.get("asks") or []
+                  bb = bids[0][0] if bids else None
+                  ba = asks[0][0] if asks else None
+                  mid = (bb + ba) / 2 if (bb is not None and ba is not None) else None
+                  rows.append({
+                      "market": s, "race": race,
+                      "pool": progs[s]["pool"], "df": progs[s]["df"],
+                      "target": progs[s]["target"], "event_n": progs[s]["event_n"],
+                      "best_bid": bb, "best_ask": ba, "mid": mid,
+                      "bid_depth": sum(q for _, q in bids[:6]),
+                      "ask_depth": sum(q for _, q in asks[:6]),
+                      "bids": bids[:4], "asks": asks[:4],
+                      "already_in": s in mine, "my_orders": mine.get(s, []),
+                  })
+
+          with open("data/discover_pairs.json", "w") as f:
+              json.dump({"rows": rows}, f, indent=1)
+
+          print(f"\n{'market':46s} {'pool':>5s} {'tgt':>6s} {'bid':>5s} {'ask':>5s} "
+                f"{'mid':>5s} {'bidQ':>7s} {'askQ':>7s} {'in?':>4s}")
+          for x in rows:
+              if x.get("err"):
+                  print(f"{x['market']:46s} book error {x['err']}"); continue
+              f2 = lambda v: f"{v:.2f}" if v is not None else "  - "
+              print(f"{x['market']:46s} {x['pool']:5.0f} {x['target']:6.0f} "
+                    f"{f2(x['best_bid']):>5s} {f2(x['best_ask']):>5s} {f2(x['mid']):>5s} "
+                    f"{x['bid_depth']:7.0f} {x['ask_depth']:7.0f} "
+                    f"{'YES' if x['already_in'] else '-':>4s}")
+
+          print("\n=== RACES WHERE WE HOLD NOTHING YET ===")
+          for race, members in sorted(races.items()):
+              if any(m in mine for m in members):
+                  continue
+              print(f"\n{race}  ({len(members)} sides)")
+              for s in sorted(members):
+                  x = next((y for y in rows if y["market"] == s), None)
+                  if not x or x.get("err"):
+                      continue
+                  fav = ("FAVOURITE" if (x["mid"] or 0) > 0.5 else
+                         "underdog" if x["mid"] is not None else "no mid")
+                  print(f"   {s:44s} mid {x['mid']}  {fav}  "
+                        f"pool ${x['pool']:.0f}/day ÷ {x['event_n']}  target {x['target']:.0f}")
+                  print(f"      bids {x['bids']}")
+                  print(f"      asks {x['asks']}")
+          EOF
+
+      - name: Commit discovery
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/discover_pairs.json
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Discover market pairs [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
+
+# discover trigger 1
