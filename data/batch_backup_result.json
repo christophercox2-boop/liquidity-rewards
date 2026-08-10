@@ -1,0 +1,54 @@
+{
+ "placed": [
+  [
+   "usgubewc-usgub-al-2026-11-03-rep",
+   0.5,
+   50,
+   "best bid 0.51 / ask 0.99"
+  ],
+  [
+   "ussewc-usse-al-2026-11-03-rep",
+   0.5,
+   50,
+   "best bid 0.53 / ask 0.99"
+  ],
+  [
+   "ussewc-usse-ar-2026-11-03-rep",
+   0.5,
+   50,
+   "best bid 0.51 / ask 0.99"
+  ],
+  [
+   "ussewc-usse-co-2026-11-03-dem",
+   0.5,
+   50,
+   "best bid 0.51 / ask 0.99"
+  ],
+  [
+   "ussewc-usse-fl-2026-11-03-rep",
+   0.5,
+   50,
+   "best bid 0.53 / ask 0.99"
+  ],
+  [
+   "ussewc-usse-ky-2026-11-03-rep",
+   0.5,
+   50,
+   "best bid 0.53 / ask 0.99"
+  ],
+  [
+   "ussewc-usse-la-2026-11-03-rep",
+   0.5,
+   50,
+   "best bid 0.53 / ask 0.99"
+  ],
+  [
+   "ussewc-usse-ms-2026-11-03-rep",
+   0.5,
+   50,
+   "best bid 0.53 / ask 0.99"
+  ]
+ ],
+ "skipped": [],
+ "rejected": []
+}
