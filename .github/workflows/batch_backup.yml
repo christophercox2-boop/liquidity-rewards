@@ -1,0 +1,118 @@
+name: Backup bid on the remaining favourites
+
+# Replicates the leg being added by hand across the 17 new races: on the
+# FAVOURITE side, a 50-share BUY one tick behind the 51c front order, so that if
+# the 51c is lifted the backup inherits the touch instead of the side going bare.
+# Post-only, deduped against what is already resting, price.value sent as a
+# STRING (a float is rejected with a bare 400).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/batch_backup.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: batch-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place the backup bids
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, time, requests
+          import track_rewards as tr
+
+          PRICE, SIZE = 0.50, 50
+          FAVOURITES = [
+              "usgubewc-usgub-al-2026-11-03-rep",
+              "ussewc-usse-al-2026-11-03-rep",
+              "ussewc-usse-ar-2026-11-03-rep",
+              "ussewc-usse-co-2026-11-03-dem",
+              "ussewc-usse-fl-2026-11-03-rep",
+              "ussewc-usse-ky-2026-11-03-rep",
+              "ussewc-usse-la-2026-11-03-rep",
+              "ussewc-usse-ms-2026-11-03-rep",
+          ]
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+
+          def api(method, path, **kw):
+              return requests.request(
+                  method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  timeout=30, **kw)
+
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          resting = set()
+          nets_needed = set()
+          for o in r.json().get("orders") or []:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+              resting.add((slug, side, round(tr._num(o.get("price")), 4)))
+          print(f"{len(resting)} resting keys")
+
+          # a BUY must not cross: check the live book's best ask first
+          placed, skipped, rejected = [], [], []
+          for slug in FAVOURITES:
+              key = (slug, "BUY", round(PRICE, 4))
+              if key in resting:
+                  skipped.append([slug, "already resting"]); continue
+              try:
+                  bk = tr._fetch_book(slug)
+                  ba = (bk.get("asks") or [[None]])[0][0]
+                  bb = (bk.get("bids") or [[None]])[0][0]
+              except Exception as e:
+                  rejected.append([slug, "book unreadable", str(e)[:80]]); continue
+              if ba is not None and PRICE >= ba:
+                  rejected.append([slug, "would cross the ask", ba]); continue
+              body = {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_LONG",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{PRICE:.2f}", "currency": "USD"},
+                      "quantity": SIZE,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              rr = api("POST", "/v1/orders", json=body)
+              if rr.status_code < 300:
+                  placed.append([slug, PRICE, SIZE, f"best bid {bb} / ask {ba}"])
+                  print(f"  OK   {slug:40s} BUY {PRICE} x{SIZE}  (book {bb}/{ba})")
+              else:
+                  msg = " ".join(rr.text.split())[:180]
+                  rejected.append([slug, rr.status_code, msg])
+                  print(f"  FAIL {slug:40s} -> {rr.status_code} {msg}")
+              time.sleep(0.35)
+
+          print(f"\nplaced {len(placed)} | skipped {len(skipped)} | rejected {len(rejected)}")
+          print(f"capital added: ${len(placed) * PRICE * SIZE:,.2f}")
+          os.makedirs("data", exist_ok=True)
+          with open("data/batch_backup_result.json", "w") as f:
+              json.dump({"placed": placed, "skipped": skipped, "rejected": rejected}, f, indent=1)
+          EOF
+
+      - name: Commit result
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/batch_backup_result.json 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Backup bid result [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
