@@ -124,7 +124,9 @@ jobs:
                   skipped.append([slug, side, px, "already resting"]); continue
               body = {"marketSlug": slug, "intent": intent_for(side, nets.get(slug, 0.0)),
                       "type": "ORDER_TYPE_LIMIT",
-                      "price": {"value": px, "currency": "USD"},
+                      # price.value MUST be a string: a float is rejected with a
+                      # generic 400 (code 3), which is what killed the first run.
+                      "price": {"value": f"{px:.2f}", "currency": "USD"},
                       "quantity": sz,
                       "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
                       "participateDontInitiate": True}
