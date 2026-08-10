@@ -11,6 +11,13 @@ name: Pre-maintenance snapshot
 
 on:
   schedule:
+    # Two fires, not one. A scheduled run is queued, not guaranteed on time —
+    # under load Actions routinely starts 10-30 minutes late, and a single
+    # 17:40 fire that slips lands after the window has already opened. The
+    # 17:20 run guarantees a usable manifest exists; the 17:40 run overwrites
+    # it with a fresher one if it arrives in time. Later wins, so an extra
+    # run can only improve the snapshot.
+    - cron: "20 21 * * *"      # 17:20 ET — backstop
     - cron: "40 21 * * *"      # 17:40 ET — ahead of a 17:50 window
   push:
     branches: [main]
