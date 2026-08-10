@@ -1,0 +1,116 @@
+name: Status now
+
+# Read-only. Dumps open orders with quantity vs leavesQuantity vs cumQuantity,
+# plus net positions, so a shrunken order can be told apart from a filled one.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/status_now.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: status-now
+  cancel-in-progress: false
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Orders and positions
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, requests, io, collections
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO()
+          _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          r = requests.get(tr.TRADE_API + "/v1/orders/open",
+                           headers=tr.auth_headers(kid, sec, "GET", "/v1/orders/open"),
+                           timeout=30)
+          r.raise_for_status()
+          orders = r.json().get("orders") or []
+          with open("data/status_orders.json", "w") as f:
+              json.dump(orders, f, indent=1)
+          print("open orders:", len(orders))
+
+          print(f"\n{'market':40s} {'side':4s} {'px':>5s} {'qty':>7s} {'leaves':>8s} {'cum':>7s}")
+          shrunk, filled = [], []
+          for o in orders:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              if not slug.startswith(("ussewc-", "usgubewc-")):
+                  continue
+              side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+              px = tr._num(o.get("price"))
+              q = tr._num(o.get("quantity")); lv = tr._num(o.get("leavesQuantity"))
+              cum = tr._num(o.get("cumQuantity"))
+              if side == "SELL" and abs(px - 0.99) < 1e-9:
+                  print(f"{slug:40s} {side:4s} {px*100:5.0f} {q:7.0f} {lv:8.2f} {cum:7.2f}")
+                  if cum > 0.5:
+                      filled.append((slug, cum))
+                  elif q < 1999:
+                      shrunk.append((slug, q))
+          print(f"\n99c asks that were PLACED SMALL (quantity < 2000): {len(shrunk)}")
+          for s, q in shrunk[:40]:
+              print(f"   {s:40s} quantity {q:.2f}")
+          print(f"\n99c asks with REAL FILLS (cumQuantity > 0): {len(filled)}")
+          for s, c in filled[:40]:
+              print(f"   {s:40s} filled {c:.2f}")
+
+          # net positions
+          pos = {}
+          cursor = None
+          for _ in range(6):
+              params = {"limit": 200}
+              if cursor:
+                  params["cursor"] = cursor
+              rr = requests.get(tr.TRADE_API + "/v1/portfolio/positions",
+                                headers=tr.auth_headers(kid, sec, "GET", "/v1/portfolio/positions"),
+                                params=params, timeout=30)
+              if rr.status_code >= 400:
+                  print("positions error", rr.status_code, rr.text[:200]); break
+              j = rr.json()
+              pos.update(j.get("positions") or {})
+              cursor = j.get("nextCursor")
+              if j.get("eof") or not cursor:
+                  break
+          with open("data/status_positions.json", "w") as f:
+              json.dump(pos, f, indent=1)
+          nz = {k: v for k, v in pos.items()
+                if abs(float(v.get("netPosition") or 0)) > 0.001
+                and k.startswith(("ussewc-", "usgubewc-"))}
+          print(f"\nnon-zero positions in the new races: {len(nz)}")
+          for k, v in list(nz.items())[:40]:
+              print(f"   {k:40s} net {float(v.get('netPosition') or 0):+.2f}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/status_now.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit status
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/status_now.txt data/status_orders.json data/status_positions.json 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Status snapshot [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
