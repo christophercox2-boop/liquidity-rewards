@@ -1,6 +1,6 @@
 {
- "version": 5,
- "note": "Favourite (heavy partisan lean) side of every newly-listed senate and governor market. prior_caps lists caps this seed shipped previously, so markets armed by an older version are recognised as seed-owned and get raised; any other value is treated as hand-set and left alone.",
+ "version": 6,
+ "note": "Both sides of every newly-listed senate/governor market. Favourite: bid chases to 85c. Underdog: bid capped at 1c so the qualifier is never moved, ask defended down to 10c. prior_caps marks caps this seed shipped before, so an older-version market is recognised as seed-owned; anything else is hand-set.",
  "defend": {
   "usgubewc-usgub-al-2026-11-03-rep": {
    "BUY": {
@@ -245,6 +245,238 @@
   "usgubewc-usgub-vt-2026-11-03-rep": {
    "BUY": {
     "cap": 85.0
+   }
+  },
+  "usgubewc-usgub-ar-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-co-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-ct-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-fl-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-hi-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-id-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-il-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-ma-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-md-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-me-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-mn-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-ne-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-nh-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-nm-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-ny-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-or-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "ussewc-usse-de-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "ussewc-usse-il-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "ussewc-usse-ma-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "ussewc-usse-ks-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-ok-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-sc-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-sd-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-tn-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-tx-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-wy-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-ri-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-pa-2026-11-03-rep": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
+   }
+  },
+  "usgubewc-usgub-vt-2026-11-03-dem": {
+   "BUY": {
+    "cap": 1.0
+   },
+   "SELL": {
+    "cap": 10.0
    }
   }
  },

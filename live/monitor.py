@@ -47,7 +47,7 @@ MAX_GAP_SECONDS = 300  # an outage never extrapolates more than 5 minutes
 # Defined up here, not with the other DEFEND_* constants further down: the
 # defend-seed runs from Monitor.__init__, which executes long before that
 # block, so leaving it there raised NameError on boot.
-DEFEND_MAX_MARKETS = int(os.environ.get("DEFEND_MAX_MARKETS", "80"))
+DEFEND_MAX_MARKETS = int(os.environ.get("DEFEND_MAX_MARKETS", "140"))
 
 # Optional: phone notifications via ntfy (https://ntfy.sh). Install the ntfy
 # app, subscribe to a long random topic, set NTFY_TOPIC to the same string.
@@ -533,6 +533,7 @@ class Monitor:
         # what this seed wrote last time, so hand edits can be told apart
         prior = self.state.setdefault("defend_seed_caps", {})
         added = updated = kept = 0
+        hit_ceiling = False
         for slug, sides in (seed.get("defend") or {}).items():
             clean = {}
             for side in ("BUY", "SELL"):
@@ -552,7 +553,9 @@ class Monitor:
             if cur is None:
                 if len(self.state["defend"]) >= DEFEND_MAX_MARKETS:
                     print(f"[defend-seed] cap {DEFEND_MAX_MARKETS} reached — "
-                          f"{slug} and any after it skipped", flush=True)
+                          f"{slug} and any after it skipped; version NOT recorded "
+                          f"so a later pass can finish", flush=True)
+                    hit_ceiling = True
                     break
                 self.state["defend"][slug] = clean
                 wrote = {s_: dict(c_) for s_, c_ in clean.items()}
@@ -590,7 +593,11 @@ class Monitor:
             # seed owns a cap it never set, freezing that market forever.
             if wrote:
                 prior.setdefault(slug, {}).update(wrote)
-        self.state["defend_seed_v"] = version
+        # Only bank the version if the whole seed was applied. Stopping at the
+        # ceiling and recording it anyway would strand every market after the
+        # cut-off, since the version never rises again to retry them.
+        if not hit_ceiling:
+            self.state["defend_seed_v"] = version
         print(f"[defend-seed] v{version}: armed {added}, raised {updated}, "
               f"left {kept} hand-set; now defending {len(self.state['defend'])}",
               flush=True)
