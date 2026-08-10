@@ -1,0 +1,119 @@
+name: Diagnose order body
+
+# The 8/9 experiment re-placed 78 orders successfully by echoing price.value
+# straight back from the API, where it is a STRING ("0.01"). The rejected batch
+# sent a float. This tries the variants side by side, smallest size first, and
+# cancels anything that lands.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/diag_body.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: diag-body
+  cancel-in-progress: false
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: String vs float price
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, time, requests, io
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO()
+          _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          def api(method, path, **kw):
+              return requests.request(
+                  method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  timeout=30, **kw)
+
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          orders = r.json().get("orders") or []
+          print("open orders:", len(orders))
+
+          # safety: the parking order the cap test tried to cancel must still be there
+          park = [o for o in orders
+                  if "pandc-anydis" in ((o.get("marketSlug") or ""))
+                  and abs(tr._num(o.get("price")) - 0.99) < 1e-9]
+          print("pandc-anydis 99c parking orders still resting:", len(park),
+                [int(tr._num(o.get('leavesQuantity')) or 0) for o in park])
+
+          SLUG = "ussewc-usse-ar-2026-11-03-rep"
+          base = {"marketSlug": SLUG, "intent": "ORDER_INTENT_BUY_LONG",
+                  "type": "ORDER_TYPE_LIMIT",
+                  "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                  "participateDontInitiate": True}
+
+          trials = [
+              ("price.value STRING, qty int",
+               {**base, "price": {"value": "0.01", "currency": "USD"}, "quantity": 2000}),
+              ("price.value FLOAT, qty int",
+               {**base, "price": {"value": 0.01, "currency": "USD"}, "quantity": 2000}),
+              ("price.value STRING, qty STRING",
+               {**base, "price": {"value": "0.01", "currency": "USD"}, "quantity": "2000"}),
+              ("price.value STRING, no currency",
+               {**base, "price": {"value": "0.01"}, "quantity": 2000}),
+          ]
+
+          winner = None
+          for label, body in trials:
+              rr = api("POST", "/v1/orders", json=body)
+              ok = rr.status_code < 300
+              print(f"\n{label}: {rr.status_code} {' '.join(rr.text.split())[:220]}")
+              if ok:
+                  j = rr.json()
+                  oid = (j.get("order") or {}).get("id") or j.get("id")
+                  print("   PLACED id:", oid)
+                  winner = label
+                  if oid:
+                      c = api("POST", f"/v1/order/{oid}/cancel", json={})
+                      print("   cancel via /v1/order/{id}/cancel:", c.status_code,
+                            " ".join(c.text.split())[:160])
+                      if c.status_code >= 300:
+                          c2 = api("POST", "/v1/orders/cancel",
+                                   json={"orderIds": [oid]})
+                          print("   cancel via /v1/orders/cancel:", c2.status_code,
+                                " ".join(c2.text.split())[:160])
+                  break
+
+          print("\nWINNING BODY SHAPE:", winner or "none — none of the variants were accepted")
+          print("final open orders:", len((api('GET', '/v1/orders/open').json() or {}).get('orders') or []))
+          os.makedirs("data", exist_ok=True)
+          with open("data/diag_body.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit diagnosis
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/diag_body.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Order body diagnosis [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
