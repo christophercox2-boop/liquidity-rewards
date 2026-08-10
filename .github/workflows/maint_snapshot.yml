@@ -1,17 +1,13 @@
 name: Pre-maintenance snapshot
 
-# Before an exchange maintenance window:
-#   1. Log every resting order in enough detail to re-place it exactly.
-#   2. Pull each defend cap back to where that market's order actually sits, so
-#      after the window defend is willing to chase back to the pre-maintenance
-#      level and no further. If everyone's orders are wiped and the book reopens
-#      cheap, we re-enter cheap; if rivals return to their old prices, defend
-#      follows them up to where we already were.
+# Before an exchange maintenance window: log every resting order in enough
+# detail to re-place it exactly — market, side, price as the API's own STRING
+# (a float is rejected), quantity, intent and order id.
 #
-# Caps this seed did not write (hand-set from the dashboard) are left alone by
-# the monitor, by design — those are already at the levels you chose.
-#
-# The seed hot-reloads within ~60s of the commit, so no deploy is needed.
+# Defend caps are deliberately NOT touched. They already sit at or above the
+# levels these orders rest at, which is the headroom you want: if the books
+# reopen cheap you re-enter cheap, and defend is still willing to climb back to
+# where you were if rivals return to their old prices.
 
 on:
   schedule:
@@ -39,11 +35,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Snapshot orders and sync defend caps
+      - name: Log every resting order
         env:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
           POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
-          MAINT_DATE: "2026-08-10"      # cap-sync only runs on this UTC date
         run: |
           pip install -q -r requirements.txt
           python3 - <<'EOF'
@@ -83,66 +78,6 @@ jobs:
           by = collections.Counter(m["market"] for m in manifest)
           print(f"across {len(by)} markets")
 
-          # Cap-sync only inside the window it was written for. A run outside it
-          # still logs the orders, which is the useful part, but must not pull
-          # every cap down while the book is still live and being contested.
-          if now.strftime("%Y-%m-%d") != os.environ.get("MAINT_DATE"):
-              print(f"not the maintenance date ({os.environ.get('MAINT_DATE')}) — "
-                    "orders logged, defend caps left untouched")
-              raise SystemExit(0)
-          if now.hour < 21:
-              print(f"{now.strftime('%H:%M')}Z is before the 21:00Z (17:00 ET) window — "
-                    "orders logged, defend caps left untouched")
-              raise SystemExit(0)
-
-          # ---- pull each cap back to where that market's order actually is ----
-          seed = json.load(open("live/defend_seed.json"))
-          prior = set()
-          for cfg in seed["defend"].values():
-              for side in ("BUY", "SELL"):
-                  c = (cfg.get(side) or {}).get("cap")
-                  if c is not None:
-                      prior.add(float(c))
-
-          bids = collections.defaultdict(list)
-          asks = collections.defaultdict(list)
-          for m in manifest:
-              try:
-                  px = float(m["price"])
-              except (TypeError, ValueError):
-                  continue
-              (bids if m["side"] == "BUY" else asks)[m["market"]].append(px)
-
-          new_defend = {}
-          for slug in sorted(set(list(bids) + list(asks))):
-              cfg = {}
-              # ignore the 1c / 99c qualifiers: they are never repriced anyway,
-              # and they are not "where I was" in any meaningful sense
-              real_bids = [p for p in bids.get(slug, []) if p > 0.02]
-              real_asks = [p for p in asks.get(slug, []) if p < 0.98]
-              if real_bids:
-                  cfg["BUY"] = {"cap": round(max(real_bids) * 100, 1)}
-              elif bids.get(slug):
-                  cfg["BUY"] = {"cap": 1.0}      # qualifier only: leave it alone
-              if real_asks:
-                  cfg["SELL"] = {"cap": round(min(real_asks) * 100, 1)}
-              if cfg:
-                  new_defend[slug] = cfg
-
-          seed["defend"] = new_defend
-          seed["version"] = int(seed.get("version") or 0) + 1
-          seed["prior_caps"] = sorted(prior)
-          seed["note"] = (f"Pre-maintenance sync {now.strftime('%Y-%m-%d %H:%M')}Z: every cap set "
-                          "to where that market's own order was resting when the window opened, so "
-                          "defend will chase back to the pre-maintenance level and no further. "
-                          "Caps set by hand are left alone by the monitor.")
-          with open("live/defend_seed.json", "w") as f:
-              json.dump(seed, f, indent=1)
-              f.write("\n")
-          print(f"defend seed v{seed['version']}: {len(new_defend)} markets, caps set from live prices")
-          sample = list(new_defend.items())[:8]
-          for s, c in sample:
-              print(f"   {s:44s} {c}")
           EOF
 
       - name: Commit
@@ -150,7 +85,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/maint_orders.json live/defend_seed.json 2>/dev/null || true
+          # only the manifest — this job must never touch the defend config
+          git add data/maint_orders.json 2>/dev/null || true
           if git diff --cached --quiet; then echo "no change"; else
             git commit -m "Pre-maintenance snapshot [skip ci]"
             git pull --rebase origin main
