@@ -1,0 +1,45 @@
+name: Sync deploy branch
+
+# DigitalOcean redeploys on every push to its source branch. The hourly tracker
+# pushes data/ dozens of times a day, so pointing the app at main means the
+# monitor rebuilds constantly and a real code change queues behind unrelated
+# data commits.
+#
+# This branch carries ONLY the code the container actually runs. It advances
+# when the monitor, the tracker module, the deps or the Dockerfile change —
+# roughly a few times a day instead of ~95.
+#
+# Point the DigitalOcean app's source branch at `deploy` for this to take effect.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - live/**
+      - track_rewards.py
+      - requirements.txt
+      - Dockerfile
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-deploy
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fast-forward deploy to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          echo "main is at $(git rev-parse --short origin/main)"
+          git push origin origin/main:refs/heads/deploy
+          echo "deploy now at $(git rev-parse --short origin/main)"
