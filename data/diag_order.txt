@@ -1,0 +1,72 @@
+open orders: 106
+
+RESTING ORDER, full shape:
+{
+ "id": "BS9BDEF0ABA1",
+ "marketSlug": "ussewc-usse-ok-2026-11-03-dem",
+ "side": "ORDER_SIDE_BUY",
+ "type": "ORDER_TYPE_LIMIT",
+ "price": {
+  "value": "0.01",
+  "currency": "USD"
+ },
+ "quantity": 2000,
+ "cumQuantity": 0,
+ "leavesQuantity": 2000,
+ "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+ "goodTillTime": null,
+ "intent": "ORDER_INTENT_BUY_LONG",
+ "marketMetadata": {
+  "slug": "ussewc-usse-ok-2026-11-03-dem",
+  "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/flag-oklahoma-0c282adae9.png",
+  "title": "Oklahoma Senate Election Winner",
+  "outcome": "Yes",
+  "eventSlug": "usse-ok-2026-11-03",
+  "subject": {
+   "id": 0,
+   "name": "Democratic Party",
+   "subjectType": "",
+   "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/event-images/democratic.png"
+  },
+  "eventId": "77117"
+ },
+ "state": "ORDER_STATE_NEW",
+ "commissionNotionalTotalCollected": {
+  "value": "0.0000",
+  "currency": "USD"
+ },
+ "commissionsBasisPoints": "0",
+ "makerCommissionsBasisPoints": "0",
+ "avgPx": {
+  "value": "0.0000",
+  "currency": "USD"
+ },
+ "cashOrderQty": {
+  "value": "0.0000",
+  "currency": "USD"
+ },
+ "insertTime": "2026-08-10T03:45:31.646648406Z",
+ "createTime": "2026-08-10T03:45:31.644736636Z",
+ "outcomeSide": "OUTCOME_SIDE_YES",
+ "action": "ORDER_ACTION_BUY",
+ "manualOrderIndicator": "MANUAL_ORDER_INDICATOR_MANUAL",
+ "lastTransactTime": "2026-08-10T03:45:31.646648406Z"
+}
+
+/v1/portfolio/balance -> 404 {"code":5, "message":"The server was unable to process your request.", "details":[]}
+
+/v1/account/balance -> 404 {"code":5, "message":"The server was unable to process your request.", "details":[]}
+
+/v1/portfolio/summary -> 404 {"code":5, "message":"The server was unable to process your request.", "details":[]}
+
+/v1/markets/ussewc-usse-ar-2026-11-03-rep -> 404 {"code":5, "message":"The server was unable to process your request.", "details":[]}
+
+/v1/markets -> 200 {"markets":[{"id":"1", "question":"Los Angeles vs. Tennessee", "slug":"aec-nfl-lac-ten-2025-11-02", "endDate":"2025-11-03T13:00:00Z", "category":"sports", "startDate":"2025-10-29T22:00:01Z", "description":"In the upcoming american football game, scheduled for November 2 at 1:00PM ET:\nIf Los Angeles wins, the market will resolve to “Los Angeles”.\nIf Tennessee wins, the market will resolve to “Tennessee”.\nIf the game is postponed, this market will remain open until the game has been completed.\nIf the game is canceled entirely, with no make-up game, this market will resolve 50-50.", "active":true, "marketType":"moneyline", "closed":true, "createdAt":"2026-03-07T02:30:00Z", "updatedAt":"2026-08-10T03:10:00Z", "archived":false, "orderPriceMinTickSize":0.001, "gameStartTime":"2025-11-02T18:00:00Z", "manualActivation":false, "sportsMarketType":"moneyline", "marketSides":[{"id":"1", "marketS
+
+tiny post-only bid: 400 {"code":3, "message":"The server was unable to process your request.", "details":[]}
+
+tiny bid, no post-only flag: 400 {"code":3, "message":"The server was unable to process your request.", "details":[]}
+
+tiny bid, price as bare number: 400 {"code":3, "message":"The server was unable to process your request.", "details":[]}
+
+tiny bid at 2c (off the floor): 400 {"code":3, "message":"The server was unable to process your request.", "details":[]}
