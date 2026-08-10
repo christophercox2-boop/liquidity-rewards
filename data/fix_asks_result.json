@@ -1,0 +1,160 @@
+{
+ "done": [
+  [
+   "usgubewc-usgub-al-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "usgubewc-usgub-al-2026-11-03-rep",
+   177.46
+  ],
+  [
+   "ussewc-usse-al-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-ar-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-ar-2026-11-03-rep",
+   177.46
+  ],
+  [
+   "ussewc-usse-co-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-co-2026-11-03-rep",
+   177.46
+  ],
+  [
+   "ussewc-usse-fl-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-fl-2026-11-03-rep",
+   177.46
+  ],
+  [
+   "ussewc-usse-ky-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-la-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-la-2026-11-03-rep",
+   177.46
+  ],
+  [
+   "ussewc-usse-ms-2026-11-03-rep",
+   177.46
+  ],
+  [
+   "ussewc-usse-mt-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-mt-2026-11-03-rep",
+   177.46
+  ],
+  [
+   "ussewc-usse-nj-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-nj-2026-11-03-rep",
+   177.46
+  ],
+  [
+   "ussewc-usse-nm-2026-11-03-dem",
+   177.43
+  ],
+  [
+   "ussewc-usse-nm-2026-11-03-rep",
+   177.46
+  ],
+  [
+   "ussewc-usse-ok-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-ok-2026-11-03-rep",
+   172.95
+  ],
+  [
+   "ussewc-usse-or-2026-11-03-rep",
+   177.46
+  ],
+  [
+   "ussewc-usse-ri-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-sc-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-sc-2026-11-03-rep",
+   177.46
+  ],
+  [
+   "ussewc-usse-va-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-va-2026-11-03-rep",
+   172.95
+  ],
+  [
+   "ussewc-usse-wv-2026-11-03-dem",
+   177.46
+  ],
+  [
+   "ussewc-usse-wv-2026-11-03-rep",
+   177.46
+  ]
+ ],
+ "failed": [],
+ "totals": {
+  "ussewc-usse-ar-2026-11-03-dem": 2000.0,
+  "ussewc-usse-ms-2026-11-03-rep": 2000.0,
+  "ussewc-usse-co-2026-11-03-rep": 2000.0,
+  "ussewc-usse-or-2026-11-03-dem": 2000.0,
+  "ussewc-usse-mt-2026-11-03-dem": 2000.0,
+  "ussewc-usse-fl-2026-11-03-rep": 2000.0,
+  "ussewc-usse-la-2026-11-03-dem": 2000.0,
+  "ussewc-usse-al-2026-11-03-rep": 2000.0,
+  "ussewc-usse-la-2026-11-03-rep": 2000.0,
+  "ussewc-usse-tn-2026-11-03-dem": 2000.0,
+  "ussewc-usse-sc-2026-11-03-dem": 2000.0,
+  "ussewc-usse-or-2026-11-03-rep": 2000.0,
+  "ussewc-usse-wv-2026-11-03-rep": 2000.0,
+  "ussewc-usse-nj-2026-11-03-dem": 2000.0,
+  "ussewc-usse-ky-2026-11-03-dem": 2000.0,
+  "ussewc-usse-va-2026-11-03-rep": 2000.0,
+  "ussewc-usse-nm-2026-11-03-rep": 2000.0,
+  "usgubewc-usgub-al-2026-11-03-dem": 2000.0,
+  "ussewc-usse-va-2026-11-03-dem": 2000.0,
+  "ussewc-usse-sc-2026-11-03-rep": 2000.0,
+  "ussewc-usse-nm-2026-11-03-dem": 2000.0,
+  "ussewc-usse-nj-2026-11-03-rep": 2000.0,
+  "usgubewc-usgub-al-2026-11-03-rep": 2000.0,
+  "ussewc-usse-fl-2026-11-03-dem": 2000.0,
+  "ussewc-usse-al-2026-11-03-dem": 2000.0,
+  "ussewc-usse-mt-2026-11-03-rep": 2177.46,
+  "ussewc-usse-ms-2026-11-03-dem": 2000.0,
+  "ussewc-usse-tn-2026-11-03-rep": 2000.0,
+  "ussewc-usse-ar-2026-11-03-rep": 2000.0,
+  "ussewc-usse-ok-2026-11-03-rep": 2000.0,
+  "ussewc-usse-ri-2026-11-03-rep": 2000.0,
+  "ussewc-usse-wv-2026-11-03-dem": 2000.0,
+  "ussewc-usse-wy-2026-11-03-rep": 2000.0,
+  "ussewc-usse-ok-2026-11-03-dem": 2000.0,
+  "ussewc-usse-ri-2026-11-03-dem": 2000.0,
+  "ussewc-usse-co-2026-11-03-dem": 2000.0,
+  "ussewc-usse-ky-2026-11-03-rep": 2000.0
+ }
+}

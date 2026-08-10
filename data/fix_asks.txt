@@ -1,0 +1,72 @@
+markets whose lead 99c ask is under 2000: 29
+  OK   usgubewc-usgub-al-2026-11-03-dem          177.46 -> requested 2000
+  OK   usgubewc-usgub-al-2026-11-03-rep          177.46 -> requested 2000
+  OK   ussewc-usse-al-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-ar-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-ar-2026-11-03-rep             177.46 -> requested 2000
+  OK   ussewc-usse-co-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-co-2026-11-03-rep             177.46 -> requested 2000
+  OK   ussewc-usse-fl-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-fl-2026-11-03-rep             177.46 -> requested 2000
+  OK   ussewc-usse-ky-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-la-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-la-2026-11-03-rep             177.46 -> requested 2000
+  OK   ussewc-usse-ms-2026-11-03-rep             177.46 -> requested 2000
+  OK   ussewc-usse-mt-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-mt-2026-11-03-rep             177.46 -> requested 2000
+  OK   ussewc-usse-nj-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-nj-2026-11-03-rep             177.46 -> requested 2000
+  OK   ussewc-usse-nm-2026-11-03-dem             177.43 -> requested 2000
+  OK   ussewc-usse-nm-2026-11-03-rep             177.46 -> requested 2000
+  OK   ussewc-usse-ok-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-ok-2026-11-03-rep             172.95 -> requested 2000
+  OK   ussewc-usse-or-2026-11-03-rep             177.46 -> requested 2000
+  OK   ussewc-usse-ri-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-sc-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-sc-2026-11-03-rep             177.46 -> requested 2000
+  OK   ussewc-usse-va-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-va-2026-11-03-rep             172.95 -> requested 2000
+  OK   ussewc-usse-wv-2026-11-03-dem             177.46 -> requested 2000
+  OK   ussewc-usse-wv-2026-11-03-rep             177.46 -> requested 2000
+
+market                                      total 99c ask now  qualifies?
+usgubewc-usgub-al-2026-11-03-dem                      2000.00         YES
+usgubewc-usgub-al-2026-11-03-rep                      2000.00         YES
+ussewc-usse-al-2026-11-03-dem                         2000.00         YES
+ussewc-usse-al-2026-11-03-rep                         2000.00         YES
+ussewc-usse-ar-2026-11-03-dem                         2000.00         YES
+ussewc-usse-ar-2026-11-03-rep                         2000.00         YES
+ussewc-usse-co-2026-11-03-dem                         2000.00         YES
+ussewc-usse-co-2026-11-03-rep                         2000.00         YES
+ussewc-usse-fl-2026-11-03-dem                         2000.00         YES
+ussewc-usse-fl-2026-11-03-rep                         2000.00         YES
+ussewc-usse-ky-2026-11-03-dem                         2000.00         YES
+ussewc-usse-ky-2026-11-03-rep                         2000.00         YES
+ussewc-usse-la-2026-11-03-dem                         2000.00         YES
+ussewc-usse-la-2026-11-03-rep                         2000.00         YES
+ussewc-usse-ms-2026-11-03-dem                         2000.00         YES
+ussewc-usse-ms-2026-11-03-rep                         2000.00         YES
+ussewc-usse-mt-2026-11-03-dem                         2000.00         YES
+ussewc-usse-mt-2026-11-03-rep                         2177.46         YES
+ussewc-usse-nj-2026-11-03-dem                         2000.00         YES
+ussewc-usse-nj-2026-11-03-rep                         2000.00         YES
+ussewc-usse-nm-2026-11-03-dem                         2000.00         YES
+ussewc-usse-nm-2026-11-03-rep                         2000.00         YES
+ussewc-usse-ok-2026-11-03-dem                         2000.00         YES
+ussewc-usse-ok-2026-11-03-rep                         2000.00         YES
+ussewc-usse-or-2026-11-03-dem                         2000.00         YES
+ussewc-usse-or-2026-11-03-rep                         2000.00         YES
+ussewc-usse-ri-2026-11-03-dem                         2000.00         YES
+ussewc-usse-ri-2026-11-03-rep                         2000.00         YES
+ussewc-usse-sc-2026-11-03-dem                         2000.00         YES
+ussewc-usse-sc-2026-11-03-rep                         2000.00         YES
+ussewc-usse-tn-2026-11-03-dem                         2000.00         YES
+ussewc-usse-tn-2026-11-03-rep                         2000.00         YES
+ussewc-usse-va-2026-11-03-dem                         2000.00         YES
+ussewc-usse-va-2026-11-03-rep                         2000.00         YES
+ussewc-usse-wv-2026-11-03-dem                         2000.00         YES
+ussewc-usse-wv-2026-11-03-rep                         2000.00         YES
+ussewc-usse-wy-2026-11-03-rep                         2000.00         YES
+
+ask sides now at or above the 2000 target: 37 of 37
+modify accepted: 29 | rejected: 0
