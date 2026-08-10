@@ -1,0 +1,330 @@
+open orders now: 225
+usgubewc-usgub-ar-2026-11-03: favourite rep [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-co-2026-11-03: favourite dem [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-ct-2026-11-03: favourite dem [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-fl-2026-11-03: favourite rep [book agrees] (bids 0.47 vs 0.02)  pool $25.0 target 2000.0
+usgubewc-usgub-hi-2026-11-03: favourite dem [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-id-2026-11-03: favourite rep [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-il-2026-11-03: favourite dem [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-ma-2026-11-03: favourite dem [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-md-2026-11-03: favourite dem [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-me-2026-11-03: favourite dem [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-mn-2026-11-03: favourite dem [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-ne-2026-11-03: favourite rep [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-nh-2026-11-03: favourite rep [book agrees] (bids 0.48 vs 0.02)  pool $25.0 target 2000.0
+usgubewc-usgub-nm-2026-11-03: favourite dem [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-ny-2026-11-03: favourite dem [book agrees] (bids 0.49 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-or-2026-11-03: favourite dem [book agrees] (bids 0.47 vs 0.01)  pool $25.0 target 2000.0
+ussewc-usse-de-2026-11-03: favourite dem [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+ussewc-usse-il-2026-11-03: favourite dem [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+ussewc-usse-ma-2026-11-03: favourite dem [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+ussewc-usse-ks-2026-11-03: favourite rep [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-ok-2026-11-03: favourite rep [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-sc-2026-11-03: favourite rep [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-sd-2026-11-03: favourite rep [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-tn-2026-11-03: favourite rep [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-tx-2026-11-03: favourite rep [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-wy-2026-11-03: favourite rep [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-ri-2026-11-03: favourite dem [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-pa-2026-11-03: favourite dem [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+usgubewc-usgub-vt-2026-11-03: favourite rep [declared] (bids 0.01 vs 0.01)  pool $25.0 target 2000.0
+
+races to enter: 29
+
+--- buy legs ---
+  OK   usgubewc-usgub-ar-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-ar-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-ar-2026-11-03-rep       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-co-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-co-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-co-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-ct-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-ct-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-ct-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-fl-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-fl-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-fl-2026-11-03-rep       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-hi-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-hi-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-hi-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-id-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-id-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-id-2026-11-03-rep       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-il-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-il-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-il-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-ma-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-ma-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-ma-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-md-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-md-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-md-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-me-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-me-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-me-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-mn-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-mn-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-mn-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-ne-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-ne-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-ne-2026-11-03-rep       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-nh-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-nh-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-nh-2026-11-03-rep       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-nm-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-nm-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-nm-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-ny-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-ny-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-ny-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-or-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-or-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-or-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   ussewc-usse-de-2026-11-03-rep          BUY  0.01 x2000  qualifies the underdog bid side
+  OK   ussewc-usse-de-2026-11-03-dem          BUY  0.51 x40    51c bid on the favourite
+  OK   ussewc-usse-de-2026-11-03-dem          BUY  0.01 x2000  collapse option
+  OK   ussewc-usse-il-2026-11-03-rep          BUY  0.01 x2000  qualifies the underdog bid side
+  OK   ussewc-usse-il-2026-11-03-dem          BUY  0.51 x40    51c bid on the favourite
+  OK   ussewc-usse-il-2026-11-03-dem          BUY  0.01 x2000  collapse option
+  OK   ussewc-usse-ma-2026-11-03-rep          BUY  0.01 x2000  qualifies the underdog bid side
+  OK   ussewc-usse-ma-2026-11-03-dem          BUY  0.51 x40    51c bid on the favourite
+  skip ussewc-usse-ma-2026-11-03-dem          BUY  0.01 — already resting
+  OK   ussewc-usse-ks-2026-11-03-dem          BUY  0.01 x2000  qualifies the underdog bid side
+  OK   ussewc-usse-ks-2026-11-03-rep          BUY  0.51 x40    51c bid on the favourite
+  OK   ussewc-usse-ks-2026-11-03-rep          BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-ok-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-ok-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-ok-2026-11-03-rep       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-sc-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-sc-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-sc-2026-11-03-rep       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-sd-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-sd-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-sd-2026-11-03-rep       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-tn-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-tn-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-tn-2026-11-03-rep       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-tx-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-tx-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-tx-2026-11-03-rep       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-wy-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-wy-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-wy-2026-11-03-rep       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-ri-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-ri-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-ri-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-pa-2026-11-03-rep       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-pa-2026-11-03-dem       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-pa-2026-11-03-dem       BUY  0.01 x2000  collapse option
+  OK   usgubewc-usgub-vt-2026-11-03-dem       BUY  0.01 x2000  qualifies the underdog bid side
+  OK   usgubewc-usgub-vt-2026-11-03-rep       BUY  0.51 x40    51c bid on the favourite
+  OK   usgubewc-usgub-vt-2026-11-03-rep       BUY  0.01 x2000  collapse option
+
+--- sell legs (spaced, shorts squeeze when bursted) ---
+  OK   usgubewc-usgub-ar-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-ar-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-ar-2026-11-03-dem       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-co-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-co-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-co-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-ct-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-ct-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-ct-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-fl-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-fl-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-fl-2026-11-03-dem       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-hi-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-hi-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-hi-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-id-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-id-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-id-2026-11-03-dem       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-il-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-il-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-il-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-ma-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-ma-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-ma-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-md-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-md-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-md-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-me-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-me-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-me-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-mn-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-mn-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-mn-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-ne-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-ne-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-ne-2026-11-03-dem       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-nh-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-nh-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-nh-2026-11-03-dem       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-nm-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-nm-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-nm-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-ny-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-ny-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-ny-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-or-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-or-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-or-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   ussewc-usse-de-2026-11-03-dem          SELL 0.99 x2000  qualifies the favourite ask side
+  OK   ussewc-usse-de-2026-11-03-rep          SELL 0.51 x40    51c ask on the underdog
+  OK   ussewc-usse-de-2026-11-03-rep          SELL 0.99 x2000  collapse option
+  OK   ussewc-usse-il-2026-11-03-dem          SELL 0.99 x2000  qualifies the favourite ask side
+  OK   ussewc-usse-il-2026-11-03-rep          SELL 0.51 x40    51c ask on the underdog
+  OK   ussewc-usse-il-2026-11-03-rep          SELL 0.99 x2000  collapse option
+  OK   ussewc-usse-ma-2026-11-03-dem          SELL 0.99 x2000  qualifies the favourite ask side
+  OK   ussewc-usse-ma-2026-11-03-rep          SELL 0.51 x40    51c ask on the underdog
+  OK   ussewc-usse-ma-2026-11-03-rep          SELL 0.99 x2000  collapse option
+  OK   ussewc-usse-ks-2026-11-03-rep          SELL 0.99 x2000  qualifies the favourite ask side
+  OK   ussewc-usse-ks-2026-11-03-dem          SELL 0.51 x40    51c ask on the underdog
+  OK   ussewc-usse-ks-2026-11-03-dem          SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-ok-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-ok-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-ok-2026-11-03-dem       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-sc-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-sc-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-sc-2026-11-03-dem       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-sd-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-sd-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-sd-2026-11-03-dem       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-tn-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-tn-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-tn-2026-11-03-dem       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-tx-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-tx-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-tx-2026-11-03-dem       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-wy-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-wy-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-wy-2026-11-03-dem       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-ri-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-ri-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-ri-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-pa-2026-11-03-dem       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-pa-2026-11-03-rep       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-pa-2026-11-03-rep       SELL 0.99 x2000  collapse option
+  OK   usgubewc-usgub-vt-2026-11-03-rep       SELL 0.99 x2000  qualifies the favourite ask side
+  OK   usgubewc-usgub-vt-2026-11-03-dem       SELL 0.51 x40    51c ask on the underdog
+  OK   usgubewc-usgub-vt-2026-11-03-dem       SELL 0.99 x2000  collapse option
+
+--- verifying the 2000 qualifying asks ---
+  fix  usgubewc-usgub-ar-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-ar-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-co-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-co-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-ct-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-ct-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-fl-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-fl-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-hi-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-hi-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-id-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-id-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-il-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-il-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-ma-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-ma-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-md-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-md-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-me-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-me-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-mn-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-mn-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-ne-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-ne-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-nh-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-nh-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-nm-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-nm-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-ny-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-ny-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-ok-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-ok-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-or-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-or-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-pa-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-pa-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-ri-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-ri-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-sc-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-sc-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-sd-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-sd-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-tn-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-tn-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-tx-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-tx-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-vt-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-vt-2026-11-03-rep       171 -> 2000: 200 
+  fix  usgubewc-usgub-wy-2026-11-03-dem       171 -> 2000: 200 
+  fix  usgubewc-usgub-wy-2026-11-03-rep       171 -> 2000: 200 
+  fix  ussewc-usse-de-2026-11-03-dem          171 -> 2000: 200 
+  fix  ussewc-usse-de-2026-11-03-rep          171 -> 2000: 200 
+  fix  ussewc-usse-il-2026-11-03-dem          171 -> 2000: 200 
+  fix  ussewc-usse-il-2026-11-03-rep          171 -> 2000: 200 
+  fix  ussewc-usse-ks-2026-11-03-dem          171 -> 2000: 200 
+  fix  ussewc-usse-ks-2026-11-03-rep          171 -> 2000: 200 
+  fix  ussewc-usse-ma-2026-11-03-dem          171 -> 2000: 200 
+  fix  ussewc-usse-ma-2026-11-03-rep          171 -> 2000: 200 
+
+--- final state (398 open orders total) ---
+  usgubewc-usgub-ar-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-ar-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-co-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-co-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-ct-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-ct-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-fl-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-fl-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-hi-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-hi-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-id-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-id-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-il-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-il-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-ma-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-ma-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-md-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-md-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-me-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-me-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-mn-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-mn-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-ne-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-ne-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-nh-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-nh-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-nm-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-nm-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-ny-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-ny-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-ok-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-ok-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-or-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-or-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-pa-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-pa-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-ri-2026-11-03-dem         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-ri-2026-11-03-rep         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-sc-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-sc-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-sd-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-sd-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-tn-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-tn-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-tx-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-tx-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-vt-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-vt-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  usgubewc-usgub-wy-2026-11-03-dem         B1x2000 S51x40 S99x2000
+  usgubewc-usgub-wy-2026-11-03-rep         B1x2000 B51x40 S99x2000
+  ussewc-usse-de-2026-11-03-dem            B1x2000 B51x40 S99x2000
+  ussewc-usse-de-2026-11-03-rep            B1x2000 S51x40 S99x2000
+  ussewc-usse-il-2026-11-03-dem            B1x2000 B51x40 S99x2000
+  ussewc-usse-il-2026-11-03-rep            B1x2000 S51x40 S99x2000
+  ussewc-usse-ks-2026-11-03-dem            B1x2000 S51x40 S99x2000
+  ussewc-usse-ks-2026-11-03-rep            B1x2000 B51x40 S99x2000
+  ussewc-usse-ma-2026-11-03-dem            B1x2000 B51x40 S99x2000
+  ussewc-usse-ma-2026-11-03-rep            B1x2000 S51x40 S99x2000
