@@ -22,10 +22,16 @@ on:
     #   1. A scheduled run is queued, not guaranteed. Under load Actions
     #      routinely starts 10-30 minutes late, so a single fire timed just
     #      ahead of a window can land after it has already opened.
-    #   2. A stated window time is not always the time it happens, and "06:00"
-    #      is ambiguous between ET and UTC. Running every hour covers 06:00 ET
-    #      (10:00 UTC) and 06:00 UTC alike without having to guess, and leaves
-    #      the manifest at most an hour stale whenever the book goes away.
+    #   2. The manifest is worth having against ANY event that empties the
+    #      book, not just a scheduled window — see the 2026-08-10 cull above.
+    #      Hourly keeps it under an hour stale at all times, so there is no
+    #      window to aim at and miss.
+    #
+    # The window itself is 06:00 ET = 10:00 UTC, so the overnight run gives
+    # roughly ten snapshots ahead of it. Coverage runs past it to 11:20 UTC in
+    # case it starts late; a post-window run cannot damage the baseline, since
+    # the high-water-mark rule below refuses to overwrite a richer manifest
+    # with a poorer one on the same UTC date.
     #
     # This is cheap: one authenticated GET and a commit that carries
     # [skip ci] and touches nothing the deploy branch watches.
