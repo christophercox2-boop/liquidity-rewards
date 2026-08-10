@@ -499,8 +499,12 @@ class Monitor:
         self._apply_defend_seed()
         tr.PRIORITY_SLUGS = set(self.state["defend"])
 
-    def _apply_defend_seed(self) -> None:
-        """Adopt live/defend_seed.json once, per version bump.
+    def _apply_defend_seed(self, seed: dict | None = None) -> None:
+        """Adopt the defend seed once, per version bump.
+
+        `seed` lets the poll loop hand in a copy fetched from GitHub, so a
+        config change lands within a poll instead of waiting for a redeploy.
+        With no argument the file baked into the image is used (boot path).
 
         Lets a batch of markets be armed from a commit instead of twenty taps on
         a phone. Version-gated — nothing happens until the file's version rises.
@@ -512,13 +516,16 @@ class Monitor:
         the seed is the declared intent for these markets — stop it again after,
         or drop it from the file.
         """
-        path = Path(__file__).with_name("defend_seed.json")
-        if not path.exists():
-            return
-        try:
-            seed = json.loads(path.read_text())
-        except Exception as e:  # noqa: BLE001 — a bad seed must never block boot
-            print(f"[defend-seed] unreadable, ignored: {e}", flush=True)
+        if seed is None:
+            path = Path(__file__).with_name("defend_seed.json")
+            if not path.exists():
+                return
+            try:
+                seed = json.loads(path.read_text())
+            except Exception as e:  # noqa: BLE001 — a bad seed must never block boot
+                print(f"[defend-seed] unreadable, ignored: {e}", flush=True)
+                return
+        if not isinstance(seed, dict):
             return
         version = int(seed.get("version") or 0)
         if version <= int(self.state.get("defend_seed_v") or 0):
@@ -2092,6 +2099,45 @@ def _others_best(levels: list, mine_sz: dict) -> float | None:
         if q - mine_sz.get(round(p, 4), 0.0) > 0.5:
             return p
     return None
+
+
+# ---- Hot-reload the defend seed straight from GitHub ----------------------
+# The app redeploys on every push to main, and the hourly tracker pushes data
+# dozens of times a day, so a config-only change can sit behind a long queue of
+# unrelated deploys. Pulling the seed over the API instead means arming a market
+# takes effect on the next poll — no rebuild, no restart.
+SEED_POLL_SECONDS = 60.0
+SEED_FETCH = {"ts": 0.0, "err": ""}
+
+
+def refresh_defend_seed() -> None:
+    if not GITHUB_TOKEN:
+        return
+    now = time.time()
+    if now - SEED_FETCH["ts"] < SEED_POLL_SECONDS:
+        return
+    SEED_FETCH["ts"] = now
+    try:
+        r = requests.get(
+            f"{GH_API}/repos/{GITHUB_REPO}/contents/live/defend_seed.json",
+            params={"ref": "main"},
+            headers={"Authorization": f"Bearer {GITHUB_TOKEN}",
+                     "Accept": "application/vnd.github.raw+json"},
+            timeout=15,
+        )
+        if r.status_code != 200:
+            SEED_FETCH["err"] = f"HTTP {r.status_code}"
+            return
+        seed = json.loads(r.text)
+    except Exception as e:  # noqa: BLE001 — never let this break the poll
+        SEED_FETCH["err"] = f"{type(e).__name__}: {e}"[:120]
+        return
+    SEED_FETCH["err"] = ""
+    if int(seed.get("version") or 0) <= int(MONITOR.state.get("defend_seed_v") or 0):
+        return
+    with MONITOR.lock:
+        MONITOR._apply_defend_seed(seed)
+        tr.PRIORITY_SLUGS = set(MONITOR.state["defend"])
 
 
 # ---- Watch for reward pools arriving on markets that had none -------------
@@ -4914,6 +4960,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             MONITOR.error = None
             err_streak = 0
             last_ok = time.time()
+            try:
+                refresh_defend_seed()   # config changes land without a redeploy
+            except Exception:  # noqa: BLE001 — config refresh never kills the poll
+                pass
             try:
                 auto_defend()
             except Exception as e:  # noqa: BLE001 — defense never kills the poll
