@@ -1,0 +1,271 @@
+name: Enter newly incentivised races
+
+# Entry for the market pairs listed in PAIRS below. For each race it reads the
+# live book and the live incentives entry, then places the pattern.
+#
+# Guards, each earned from a real failure earlier:
+#   - skips any race with NO active reward program (nothing to earn there)
+#   - the declared favourite applies only where the book is silent; wherever
+#     the book leans, the book wins and the override is logged
+#   - price.value sent as a STRING (a float returns a bare 400)
+#   - BUY legs first, then SELL legs one at a time: shorts opened in a burst get
+#     collateral-squeezed (34 asks at 2000 came back at ~177)
+#   - re-reads afterwards and modifies any 99c ask short of the 2000 target,
+#     because a side under target scores nothing at all
+#   - post-only throughout, and dedupes on (market, side, price) so a re-run
+#     never doubles up
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/enter_races.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: enter-races
+  cancel-in-progress: false
+
+jobs:
+  enter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Enter
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, time, requests, io, collections
+          import track_rewards as tr
+
+          # (favourite, underdog). The seeded governor races take their
+          # favourite from the book; the bare ones from a partisan read, which
+          # the book cross-check below will veto if the book disagrees.
+          PAIRS = [
+              ("usgubewc-usgub-ar-2026-11-03-rep", "usgubewc-usgub-ar-2026-11-03-dem"),
+              ("usgubewc-usgub-co-2026-11-03-dem", "usgubewc-usgub-co-2026-11-03-rep"),
+              ("usgubewc-usgub-ct-2026-11-03-dem", "usgubewc-usgub-ct-2026-11-03-rep"),
+              ("usgubewc-usgub-fl-2026-11-03-rep", "usgubewc-usgub-fl-2026-11-03-dem"),
+              ("usgubewc-usgub-hi-2026-11-03-dem", "usgubewc-usgub-hi-2026-11-03-rep"),
+              ("usgubewc-usgub-id-2026-11-03-rep", "usgubewc-usgub-id-2026-11-03-dem"),
+              ("usgubewc-usgub-il-2026-11-03-dem", "usgubewc-usgub-il-2026-11-03-rep"),
+              ("usgubewc-usgub-ma-2026-11-03-dem", "usgubewc-usgub-ma-2026-11-03-rep"),
+              ("usgubewc-usgub-md-2026-11-03-dem", "usgubewc-usgub-md-2026-11-03-rep"),
+              ("usgubewc-usgub-me-2026-11-03-dem", "usgubewc-usgub-me-2026-11-03-rep"),
+              ("usgubewc-usgub-mn-2026-11-03-dem", "usgubewc-usgub-mn-2026-11-03-rep"),
+              ("usgubewc-usgub-ne-2026-11-03-rep", "usgubewc-usgub-ne-2026-11-03-dem"),
+              ("usgubewc-usgub-nh-2026-11-03-rep", "usgubewc-usgub-nh-2026-11-03-dem"),
+              ("usgubewc-usgub-nm-2026-11-03-dem", "usgubewc-usgub-nm-2026-11-03-rep"),
+              ("usgubewc-usgub-ny-2026-11-03-dem", "usgubewc-usgub-ny-2026-11-03-rep"),
+              ("usgubewc-usgub-or-2026-11-03-dem", "usgubewc-usgub-or-2026-11-03-rep"),
+              ("ussewc-usse-de-2026-11-03-dem", "ussewc-usse-de-2026-11-03-rep"),
+              ("ussewc-usse-il-2026-11-03-dem", "ussewc-usse-il-2026-11-03-rep"),
+              ("ussewc-usse-ma-2026-11-03-dem", "ussewc-usse-ma-2026-11-03-rep"),
+              ("ussewc-usse-ks-2026-11-03-rep", "ussewc-usse-ks-2026-11-03-dem"),
+              ("usgubewc-usgub-ok-2026-11-03-rep", "usgubewc-usgub-ok-2026-11-03-dem"),
+              ("usgubewc-usgub-sc-2026-11-03-rep", "usgubewc-usgub-sc-2026-11-03-dem"),
+              ("usgubewc-usgub-sd-2026-11-03-rep", "usgubewc-usgub-sd-2026-11-03-dem"),
+              ("usgubewc-usgub-tn-2026-11-03-rep", "usgubewc-usgub-tn-2026-11-03-dem"),
+              ("usgubewc-usgub-tx-2026-11-03-rep", "usgubewc-usgub-tx-2026-11-03-dem"),
+              ("usgubewc-usgub-wy-2026-11-03-rep", "usgubewc-usgub-wy-2026-11-03-dem"),
+              ("usgubewc-usgub-ri-2026-11-03-dem", "usgubewc-usgub-ri-2026-11-03-rep"),
+              ("usgubewc-usgub-pa-2026-11-03-dem", "usgubewc-usgub-pa-2026-11-03-rep"),
+              ("usgubewc-usgub-vt-2026-11-03-rep", "usgubewc-usgub-vt-2026-11-03-dem"),
+          ]
+          DEEP, MID = 2000, 40
+          DEEP_BID, DEEP_ASK, MID_PRICE = "0.01", "0.99", "0.51"
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO()
+          _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          def api(method, path, **kw):
+              return requests.request(
+                  method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  timeout=30, **kw)
+
+          def open_orders():
+              r = api("GET", "/v1/orders/open"); r.raise_for_status()
+              return r.json().get("orders") or []
+
+          orders = open_orders()
+          resting = set()
+          for o in orders:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+              resting.add((slug, side, round(tr._num(o.get("price")), 4)))
+          print(f"open orders now: {len(orders)}")
+
+          # --- resolve each race against live data ---------------------------
+          # The declared favourite is used only when the book has nothing to say.
+          # Where the book DOES lean, the book wins and the override is logged —
+          # a seeded book reflects a real view and beats my partisan guess.
+          plan = []
+          for dec_fav, dec_dog in PAIRS:
+              race = dec_fav.rsplit("-", 1)[0]
+              sides = [dec_fav, dec_dog]
+              progs = {}
+              r = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                               params={"symbols": sides, "pageSize": 50}, timeout=30)
+              if r.status_code < 400:
+                  for p in r.json().get("programs") or []:
+                      tp = tr._pick_period(p.get("timePeriods") or [], p.get("marketSlug", ""))
+                      if tp is not None:
+                          progs[p.get("marketSlug")] = tr._prog_of(tp)
+              if not progs:
+                  print(f"SKIP {race}: no active reward program"); continue
+              books = {}
+              ok = True
+              for s_ in sides:
+                  try:
+                      books[s_] = tr._fetch_book(s_)
+                  except Exception as e:
+                      print(f"SKIP {race}: book error on {s_}: {type(e).__name__}")
+                      ok = False; break
+                  time.sleep(0.25)
+              if not ok:
+                  continue
+
+              def bb(s_):
+                  b = (books[s_].get("bids") or [])
+                  return b[0][0] if b else -1.0
+
+              fav, dog, src = dec_fav, dec_dog, "declared"
+              if bb(dec_dog) > bb(dec_fav):
+                  fav, dog, src = dec_dog, dec_fav, "BOOK OVERRODE my call"
+              elif bb(dec_fav) > bb(dec_dog):
+                  src = "book agrees"
+              pr = progs.get(fav) or next(iter(progs.values()))
+              print(f"{race}: favourite {fav.rsplit('-',1)[-1]} [{src}] "
+                    f"(bids {bb(dec_fav)} vs {bb(dec_dog)})  pool ${pr.get('pool')} "
+                    f"target {pr.get('target')}")
+              plan.append((fav, dog))
+
+          if not plan:
+              print("\nnothing to enter."); raise SystemExit(0)
+          print(f"\nraces to enter: {len(plan)}")
+
+          nets = {}
+          try:
+              pth = "/v1/portfolio/positions"
+              rr = requests.get(tr.TRADE_API + pth,
+                                headers=tr.auth_headers(kid, sec, "GET", pth),
+                                params={"limit": 200}, timeout=30)
+              if rr.status_code < 400:
+                  for k, v in (rr.json().get("positions") or {}).items():
+                      nets[k] = float(v.get("netPosition") or 0)
+          except Exception as e:
+              print("positions lookup failed, assuming flat:", e)
+
+          def intent_for(side, net):
+              if side == "BUY":
+                  return "ORDER_INTENT_SELL_SHORT" if net < 0 else "ORDER_INTENT_BUY_LONG"
+              return "ORDER_INTENT_SELL_LONG" if net > 0 else "ORDER_INTENT_BUY_SHORT"
+
+          def place(slug, side, price, size, why):
+              key = (slug, side, round(float(price), 4))
+              if key in resting:
+                  print(f"  skip {slug:38s} {side:4s} {price} — already resting"); return None
+              body = {"marketSlug": slug, "intent": intent_for(side, nets.get(slug, 0.0)),
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": price, "currency": "USD"},
+                      "quantity": size,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              rr = api("POST", "/v1/orders", json=body)
+              ok = rr.status_code < 300
+              if ok:
+                  resting.add(key)
+                  print(f"  OK   {slug:38s} {side:4s} {price} x{size:<5d} {why}")
+              else:
+                  print(f"  FAIL {slug:38s} {side:4s} {price} x{size:<5d} "
+                        f"{rr.status_code} {' '.join(rr.text.split())[:140]}")
+              time.sleep(0.35)
+              return ok
+
+          # --- BUY legs first (cheap, no short collateral) --------------------
+          print("\n--- buy legs ---")
+          for fav, dog in plan:
+              place(dog, "BUY", DEEP_BID, DEEP, "qualifies the underdog bid side")
+              place(fav, "BUY", MID_PRICE, MID, "51c bid on the favourite")
+              place(fav, "BUY", DEEP_BID, DEEP, "collapse option")
+
+          # --- SELL legs last, spaced out -------------------------------------
+          print("\n--- sell legs (spaced, shorts squeeze when bursted) ---")
+          for fav, dog in plan:
+              place(fav, "SELL", DEEP_ASK, DEEP, "qualifies the favourite ask side")
+              time.sleep(1.0)
+              place(dog, "SELL", MID_PRICE, MID, "51c ask on the underdog")
+              time.sleep(1.0)
+              place(dog, "SELL", DEEP_ASK, DEEP, "collapse option")
+              time.sleep(1.0)
+
+          # --- repair any 99c ask that came in under target --------------------
+          print("\n--- verifying the 2000 qualifying asks ---")
+          time.sleep(6)
+          after = open_orders()
+          lead = {}
+          for o in after:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+              if side != "SELL" or abs(tr._num(o.get("price")) - 0.99) > 1e-9:
+                  continue
+              if not any(slug in (f, d) for f, d in plan):
+                  continue
+              lv = tr._num(o.get("leavesQuantity")) or 0
+              if slug not in lead or lv > lead[slug][1]:
+                  lead[slug] = (o["id"], lv)
+          for slug, (oid, lv) in sorted(lead.items()):
+              if lv >= DEEP - 0.5:
+                  print(f"  ok   {slug:38s} {lv:.0f}"); continue
+              rr = api("POST", f"/v1/order/{oid}/modify",
+                       json={"marketSlug": slug,
+                             "price": {"value": DEEP_ASK, "currency": "USD"},
+                             "quantity": DEEP})
+              print(f"  fix  {slug:38s} {lv:.0f} -> {DEEP}: {rr.status_code} "
+                    f"{'' if rr.status_code < 300 else ' '.join(rr.text.split())[:120]}")
+              time.sleep(0.4)
+
+          time.sleep(5)
+          final = open_orders()
+          mine = collections.defaultdict(list)
+          for o in final:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              if any(slug in (f, d) for f, d in plan):
+                  side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+                  mine[slug].append((side, tr._num(o.get("price")),
+                                     tr._num(o.get("leavesQuantity"))))
+          print(f"\n--- final state ({len(final)} open orders total) ---")
+          for slug in sorted(mine):
+              legs = " ".join(f"{s[0]}{p*100:.0f}x{q:g}" for s, p, q in sorted(mine[slug], key=lambda z: z[1]))
+              print(f"  {slug:40s} {legs}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/enter_races.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/enter_races.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Race entry result [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
