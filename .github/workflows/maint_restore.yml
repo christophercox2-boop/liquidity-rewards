@@ -48,7 +48,7 @@ jobs:
           import json, os, time, io, collections, requests
           import track_rewards as tr
 
-          MODE = "fire"            # "report" or "fire"
+          MODE = "report"          # "report" or "fire"
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           BUF = io.StringIO()
