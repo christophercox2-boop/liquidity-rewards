@@ -1,0 +1,186 @@
+name: Post-maintenance restore
+
+# Run by hand after the window. Two modes:
+#
+#   report  (default) — compares the live book against data/maint_orders.json
+#                       and prints what survived, what vanished, and where the
+#                       books reopened. Places nothing.
+#   fire              — re-places every order from the manifest that is no
+#                       longer resting, at its original price.
+#
+# Set MODE below to "fire" and push to actually restore. Re-running is safe:
+# an order already resting at the same (market, side, price) is skipped.
+#
+# If the books reopen empty and cheap, prefer entering fresh at the new touch
+# instead — the manifest prices were set against a book that no longer exists.
+# The report tells you which case you are in before you commit to either.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/maint_restore.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: maint-restore
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compare and optionally restore
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, time, io, collections, requests
+          import track_rewards as tr
+
+          MODE = "report"          # "report" or "fire"
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO()
+          _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          def api(method, path, **kw):
+              return requests.request(
+                  method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  timeout=30, **kw)
+
+          snap = json.load(open("data/maint_orders.json"))
+          want = snap["orders"]
+          print(f"manifest taken {snap['taken_at']}: {len(want)} orders")
+
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          live = r.json().get("orders") or []
+          resting = set()
+          for o in live:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+              resting.add((slug, side, round(tr._num(o.get("price")), 4)))
+          print(f"resting right now: {len(live)} orders")
+
+          missing = [w for w in want
+                     if (w["market"], w["side"], round(float(w["price"]), 4)) not in resting]
+          survived = len(want) - len(missing)
+          print(f"\nsurvived the window : {survived}")
+          print(f"vanished            : {len(missing)}")
+
+          # what do the reopened books look like where we lost orders?
+          hit = sorted({w["market"] for w in missing})
+          print(f"\nbooks where we lost orders ({len(hit)} markets), first 20:")
+          for slug in hit[:20]:
+              try:
+                  bk = tr._fetch_book(slug)
+              except Exception as e:
+                  print(f"   {slug:44s} book error {type(e).__name__}"); continue
+              time.sleep(0.2)
+              bb = (bk.get("bids") or [[None]])[0][0]
+              ba = (bk.get("asks") or [[None]])[0][0]
+              mine = [w for w in missing if w["market"] == slug]
+              px = " ".join(f"{w['side'][0]}{float(w['price'])*100:.0f}" for w in mine)
+              print(f"   {slug:44s} now {str(bb):>6s}/{str(ba):>6s}   was: {px}")
+
+          if MODE != "fire":
+              print("\nMODE is 'report' — nothing was placed.")
+          else:
+              nets = {}
+              try:
+                  pth = "/v1/portfolio/positions"
+                  rr = requests.get(tr.TRADE_API + pth,
+                                    headers=tr.auth_headers(kid, sec, "GET", pth),
+                                    params={"limit": 200}, timeout=30)
+                  if rr.status_code < 400:
+                      for k, v in (rr.json().get("positions") or {}).items():
+                          nets[k] = float(v.get("netPosition") or 0)
+              except Exception as e:
+                  print("positions lookup failed, assuming flat:", e)
+
+              def intent_for(side, net):
+                  if side == "BUY":
+                      return "ORDER_INTENT_SELL_SHORT" if net < 0 else "ORDER_INTENT_BUY_LONG"
+                  return "ORDER_INTENT_SELL_LONG" if net > 0 else "ORDER_INTENT_BUY_SHORT"
+
+              placed = failed = 0
+              # buys first, then sells spaced out: shorts reserve far more
+              # collateral and get sized down when opened in a burst
+              for phase, side_want in (("buys", "BUY"), ("sells", "SELL")):
+                  print(f"\n--- {phase} ---")
+                  for w in missing:
+                      if w["side"] != side_want:
+                          continue
+                      body = {"marketSlug": w["market"],
+                              "intent": w.get("intent") or intent_for(w["side"], nets.get(w["market"], 0.0)),
+                              "type": "ORDER_TYPE_LIMIT",
+                              "price": {"value": str(w["price"]), "currency": "USD"},
+                              "quantity": int(w["quantity"]),
+                              "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                              "participateDontInitiate": True}
+                      rr = api("POST", "/v1/orders", json=body)
+                      if rr.status_code < 300:
+                          placed += 1
+                          print(f"  OK   {w['market']:40s} {w['side']:4s} {w['price']} x{w['quantity']}")
+                      else:
+                          failed += 1
+                          print(f"  FAIL {w['market']:40s} {w['side']:4s} {w['price']} "
+                                f"-> {rr.status_code} {' '.join(rr.text.split())[:120]}")
+                      time.sleep(1.0 if side_want == "SELL" else 0.35)
+              print(f"\nrestored {placed} | failed {failed}")
+
+              # any qualifying ask that came back short of target is worthless —
+              # a side under target size scores nothing at all
+              time.sleep(6)
+              r2 = api("GET", "/v1/orders/open"); r2.raise_for_status()
+              lead = {}
+              for o in r2.json().get("orders") or []:
+                  slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+                  side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+                  if side != "SELL" or abs(tr._num(o.get("price")) - 0.99) > 1e-9:
+                      continue
+                  lv = tr._num(o.get("leavesQuantity")) or 0
+                  if slug not in lead or lv > lead[slug][1]:
+                      lead[slug] = (o["id"], lv)
+              fixed = 0
+              for slug, (oid, lv) in sorted(lead.items()):
+                  if lv >= 1999.5:
+                      continue
+                  rr = api("POST", f"/v1/order/{oid}/modify",
+                           json={"marketSlug": slug,
+                                 "price": {"value": "0.99", "currency": "USD"},
+                                 "quantity": 2000})
+                  fixed += rr.status_code < 300
+                  time.sleep(0.4)
+              print(f"qualifying asks topped back to 2000: {fixed}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/maint_restore.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/maint_restore.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Post-maintenance restore report [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
