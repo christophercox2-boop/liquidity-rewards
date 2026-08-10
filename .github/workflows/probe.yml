@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Raw incentives payload (zero-paying vs paying strikes)
+      - name: Live program map for every market we currently quote
         continue-on-error: true
         env:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
@@ -36,24 +36,61 @@ jobs:
           import json, os, requests
           import track_rewards as tr
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
-          syms = ["scc-senate-gop-2026-11-03-48", "scc-senate-gop-2026-11-03-51",
-                  "scc-senate-gop-2026-11-03-52", "scc-hrep-rep-2026-11-03-gte205",
-                  "scc-senate-gop-2026-11-03-49", "scc-senate-gop-2026-11-03-50",
-                  "scc-senate-gop-2026-11-03-53", "scc-hrep-rep-2026-11-03-gte200",
-                  "opdc-mcconnell-resign-2026-11-02", "apdc-jerpowgov-2026-12-31"]
-          path = "/v1/incentives"
-          r = requests.get(tr.TRADE_API + path,
-                           headers=tr.auth_headers(kid, sec, "GET", path),
-                           params={"symbols": syms, "pageSize": 50}, timeout=30)
+
+          # 1. every slug we have a resting order in, right now
+          op = "/v1/orders/open"
+          r = requests.get(tr.TRADE_API + op,
+                           headers=tr.auth_headers(kid, sec, "GET", op), timeout=30)
           r.raise_for_status()
+          orders = r.json().get("orders") or []
+          syms = sorted({(o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or "")
+                         for o in orders} - {""})
+          print(f"open orders: {len(orders)} across {len(syms)} markets")
+
+          # 2. their incentive programs, batched
+          path = "/v1/incentives"
+          progs = []
+          for i in range(0, len(syms), 40):
+              rr = requests.get(tr.TRADE_API + path,
+                                headers=tr.auth_headers(kid, sec, "GET", path),
+                                params={"symbols": syms[i:i + 40], "pageSize": 100}, timeout=30)
+              if rr.status_code >= 400:
+                  print("batch error", rr.status_code, rr.text[:200]); continue
+              progs.extend(rr.json().get("programs") or [])
           with open("data/probe_incentives.json", "w") as f:
-              json.dump(r.json(), f, indent=1)
-          for m in r.json().get("programs") or []:
-              tps = m.get("timePeriods") or []
-              live = [tp for tp in tps if str(tp.get("status")) != "closed"]
-              print(m.get("marketSlug"), "| periods:", len(tps), "active:",
-                    [(tp.get("programId"), tp.get("period"), tp.get("rewardPool"),
-                      tp.get("status"), str(tp.get("end"))) for tp in live][:3])
+              json.dump({"symbols": syms, "programs": progs}, f, indent=1)
+
+          seen = {}
+          for m in progs:
+              slug = m.get("marketSlug")
+              live = [tp for tp in (m.get("timePeriods") or [])
+                      if str(tp.get("status")) != "closed"]
+              seen[slug] = live
+          print(f"\n{'market':44s} {'programId':34s} {'period':13s} {'pool':>7s} {'df':>5s} {'target':>8s}")
+          for slug in syms:
+              live = seen.get(slug)
+              if not live:
+                  print(f"{slug:44s} -- NO ACTIVE PROGRAM --"); continue
+              for tp in live[:2]:
+                  print(f"{slug:44s} {str(tp.get('programId')):34s} {str(tp.get('period')):13s} "
+                        f"{str(tp.get('rewardPool')):>7s} {str(tp.get('discountFactor')):>5s} "
+                        f"{str(tp.get('targetSize')):>8s}")
+
+          # 3. anything the tracker has never recorded before
+          import csv, pathlib
+          old = set()
+          p = pathlib.Path("data/estimates.csv")
+          if p.exists():
+              with p.open(newline="") as f:
+                  for row in csv.DictReader(f):
+                      old.add(row["market"])
+          fresh = [s for s in syms if s not in old]
+          print("\nMARKETS NEVER SEEN BY THE TRACKER BEFORE:", fresh or "none")
+          for s in fresh:
+              for tp in (seen.get(s) or [])[:2]:
+                  print(f"  {s} -> {tp.get('programId')} | pool {tp.get('rewardPool')} "
+                        f"| df {tp.get('discountFactor')} | target {tp.get('targetSize')} "
+                        f"| period {tp.get('period')}")
           EOF
 
       - name: Recent activity payload (trade states)
@@ -255,6 +292,6 @@ jobs:
             git push
           fi
 
-# probe trigger 1786240185
+# probe trigger 1786332715
 
 # rewards check 1786173232
