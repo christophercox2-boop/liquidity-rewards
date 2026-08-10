@@ -1,0 +1,45 @@
+politics slugs from tags: 373
+usgubewc slugs visible: 32
+all prefixes seen: {'paccc': 4, 'enwc': 34, 'ewc': 77, 'usgcc': 1, 'apdc': 26, 'stsc': 3, 'cranc': 33, 'lawec': 4, 'pic': 1, 'mowc': 1, 'mlaec': 15, 'dipcc': 6, 'pintc': 15, 'opdc': 9, 'pvwc': 2, 'cpic': 10, 'vtc': 10, 'vmc': 10, 'gsc': 1, 'scc': 25, 'iarc': 11, 'ussewc': 41, 'usgubewc': 32, 'ushrewc': 2}
+
+incentives entries returned for governor slugs: 2
+
+market                                         prog?   pool    df  target     status
+usgubewc-usgub-al-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-al-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-ar-2026-11-03-dem                NONE
+usgubewc-usgub-ar-2026-11-03-rep                NONE
+usgubewc-usgub-co-2026-11-03-dem                NONE
+usgubewc-usgub-co-2026-11-03-rep                NONE
+usgubewc-usgub-ct-2026-11-03-dem                NONE
+usgubewc-usgub-ct-2026-11-03-rep                NONE
+usgubewc-usgub-fl-2026-11-03-dem                NONE
+usgubewc-usgub-fl-2026-11-03-rep                NONE
+usgubewc-usgub-hi-2026-11-03-dem                NONE
+usgubewc-usgub-hi-2026-11-03-rep                NONE
+usgubewc-usgub-id-2026-11-03-dem                NONE
+usgubewc-usgub-id-2026-11-03-rep                NONE
+usgubewc-usgub-il-2026-11-03-dem                NONE
+usgubewc-usgub-il-2026-11-03-rep                NONE
+usgubewc-usgub-ma-2026-11-03-dem                NONE
+usgubewc-usgub-ma-2026-11-03-rep                NONE
+usgubewc-usgub-md-2026-11-03-dem                NONE
+usgubewc-usgub-md-2026-11-03-rep                NONE
+usgubewc-usgub-me-2026-11-03-dem                NONE
+usgubewc-usgub-me-2026-11-03-rep                NONE
+usgubewc-usgub-mn-2026-11-03-dem                NONE
+usgubewc-usgub-mn-2026-11-03-rep                NONE
+usgubewc-usgub-ne-2026-11-03-dem                NONE
+usgubewc-usgub-ne-2026-11-03-rep                NONE
+usgubewc-usgub-nh-2026-11-03-dem                NONE
+usgubewc-usgub-nh-2026-11-03-rep                NONE
+usgubewc-usgub-nm-2026-11-03-dem                NONE
+usgubewc-usgub-nm-2026-11-03-rep                NONE
+usgubewc-usgub-ny-2026-11-03-dem                NONE
+usgubewc-usgub-ny-2026-11-03-rep                NONE
+
+fetching books for 2 governor markets with a live pool
+
+market                                            bid    ask     bidQ     askQ   n
+usgubewc-usgub-al-2026-11-03-dem                 0.01    0.5    17176     2565   2
+usgubewc-usgub-al-2026-11-03-rep                  0.7   0.99     2461    15649   2

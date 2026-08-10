@@ -1,0 +1,224 @@
+{
+ "rows": [
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.5,
+   "bid_depth": 17176.0,
+   "ask_depth": 2565.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-rep",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.7,
+   "best_ask": 0.99,
+   "bid_depth": 2461.0,
+   "ask_depth": 15648.9,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ar-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-ar-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-co-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-co-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-ct-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-ct-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-fl-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-fl-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-hi-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-hi-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-id-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-id-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-il-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-il-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-ma-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-ma-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-md-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-md-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-me-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-me-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-mn-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-mn-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-ne-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-ne-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-nh-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-nh-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-nm-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-nm-2026-11-03-rep",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-ny-2026-11-03-dem",
+   "program": null
+  },
+  {
+   "market": "usgubewc-usgub-ny-2026-11-03-rep",
+   "program": null
+  }
+ ]
+}
