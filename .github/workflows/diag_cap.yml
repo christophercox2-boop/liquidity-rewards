@@ -1,0 +1,141 @@
+name: Diagnose order cap
+
+# Decisive test: is the account at a maximum-open-orders ceiling?
+# Cancels ONE genuinely worthless resting order (a qualifier parked ~50 ticks
+# from the touch, scoring $0), immediately tries to place a small order, then
+# restores the cancelled one either way. Net position change: none.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/diag_cap.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: diag-cap
+  cancel-in-progress: false
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cancel one, place one, restore
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, time, requests, io
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO()
+          _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          def api(method, path, **kw):
+              return requests.request(
+                  method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  timeout=30, **kw)
+
+          def open_orders():
+              r = api("GET", "/v1/orders/open"); r.raise_for_status()
+              return r.json().get("orders") or []
+
+          orders = open_orders()
+          print("open orders now:", len(orders))
+
+          # A pure-parking order: 99c ask or 1c bid sitting far behind the touch.
+          # Cancelling one for ~20 seconds costs nothing in rewards.
+          victim = None
+          for o in orders:
+              px = tr._num(o.get("price"))
+              side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              if side == "SELL" and abs(px - 0.99) < 1e-9 and "pandc-anydis" in slug:
+                  victim = o; break
+          if victim is None:
+              for o in orders:
+                  px = tr._num(o.get("price"))
+                  side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+                  if side == "SELL" and abs(px - 0.99) < 1e-9:
+                      victim = o; break
+          if victim is None:
+              print("no safe parking order to borrow — aborting"); raise SystemExit(0)
+
+          vslug = victim.get("marketSlug") or (victim.get("marketMetadata") or {}).get("slug")
+          vqty = int(tr._num(victim.get("leavesQuantity")) or tr._num(victim.get("quantity")))
+          vintent = victim.get("intent")
+          vprice = tr._num(victim.get("price"))
+          print(f"borrowing: {vslug} SELL {vprice} x{vqty} intent={vintent} id={victim.get('id')}")
+
+          # baseline: does a place fail right now?
+          test = {"marketSlug": "ussewc-usse-ar-2026-11-03-rep",
+                  "intent": "ORDER_INTENT_BUY_LONG", "type": "ORDER_TYPE_LIMIT",
+                  "price": {"value": 0.01, "currency": "USD"}, "quantity": 2000,
+                  "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL", "participateDontInitiate": True}
+          r0 = api("POST", "/v1/orders", json=test)
+          print(f"\nBEFORE cancel -> place: {r0.status_code} {' '.join(r0.text.split())[:200]}")
+          if r0.status_code < 300:
+              oid = (r0.json().get("order") or {}).get("id") or r0.json().get("id")
+              print("   unexpectedly placed; id:", oid)
+              if oid:
+                  print("   cancel:", api("POST", f"/v1/order/{oid}/cancel", json={}).status_code)
+              print("\nRESULT: not a cap — placement works right now.")
+          else:
+              c = api("POST", f"/v1/order/{victim['id']}/cancel", json={})
+              print(f"cancelled the parking order: {c.status_code}")
+              time.sleep(4)
+              print("open orders after cancel:", len(open_orders()))
+              r1 = api("POST", "/v1/orders", json=test)
+              print(f"AFTER cancel -> place: {r1.status_code} {' '.join(r1.text.split())[:200]}")
+              if r1.status_code < 300:
+                  oid = (r1.json().get("order") or {}).get("id") or r1.json().get("id")
+                  print("   PLACED, id:", oid)
+                  print("\nRESULT: MAX-OPEN-ORDERS CAP CONFIRMED "
+                        f"(ceiling is about {len(orders)} orders).")
+                  if oid:
+                      print("   cancelling the test order:",
+                            api("POST", f"/v1/order/{oid}/cancel", json={}).status_code)
+              else:
+                  print("\nRESULT: not a cap — a freed slot still would not accept the order. "
+                        "Points at buying power or a market-level block.")
+              # restore the borrowed parking order
+              time.sleep(2)
+              back = {"marketSlug": vslug, "intent": vintent, "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": vprice, "currency": "USD"}, "quantity": vqty,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              rb = api("POST", "/v1/orders", json=back)
+              print(f"restored the parking order: {rb.status_code} "
+                    f"{'' if rb.status_code < 300 else ' '.join(rb.text.split())[:200]}")
+
+          print("\nfinal open orders:", len(open_orders()))
+          os.makedirs("data", exist_ok=True)
+          with open("data/diag_cap.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit diagnosis
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/diag_cap.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Order cap diagnosis [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
