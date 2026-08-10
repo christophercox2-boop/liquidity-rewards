@@ -1,0 +1,136 @@
+name: Probe the new governor markets
+
+# The dashboard's "New markets" list and the discovery scan share one source
+# (fetch_politics_events), yet the usgubewc governor races show on the dashboard
+# and not in discovery — so they are being dropped at the incentives filter.
+# This reports, for every usgubewc slug: whether a program exists at all, the
+# period/pool/target/df if it does, and the current book. Read-only.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/probe_gov.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe-gov
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Governor market inventory
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, time, requests, io, collections
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO()
+          _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          pol_slugs, event_sizes = tr.fetch_politics_events()
+          print("politics slugs from tags:", len(pol_slugs))
+          gov = sorted(s for s in pol_slugs if s.startswith("usgubewc-"))
+          print("usgubewc slugs visible:", len(gov))
+          # anything else freshly-shaped worth knowing about
+          pre = collections.Counter(s.split("-")[0] for s in pol_slugs)
+          print("all prefixes seen:", dict(pre))
+
+          # incentives for the governor slugs, in batches
+          progs = {}
+          raw_hits = 0
+          for i in range(0, len(gov), 25):
+              batch = gov[i:i + 25]
+              rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                params={"symbols": batch, "pageSize": 100}, timeout=30)
+              if rr.status_code >= 400:
+                  print("incentives batch error", rr.status_code, rr.text[:150]); continue
+              for p in rr.json().get("programs") or []:
+                  raw_hits += 1
+                  slug = p.get("marketSlug", "")
+                  periods = p.get("timePeriods") or []
+                  tp = tr._pick_period(periods, slug)
+                  progs[slug] = {"periods": len(periods),
+                                 "picked": None if tp is None else tr._prog_of(tp),
+                                 "statuses": [str(x.get("status")) for x in periods][:4],
+                                 "raw": [{"programId": x.get("programId"),
+                                          "period": x.get("period"),
+                                          "pool": x.get("rewardPool"),
+                                          "df": x.get("discountFactor"),
+                                          "target": x.get("targetSize"),
+                                          "status": str(x.get("status")),
+                                          "start": str(x.get("start"))[:19],
+                                          "end": str(x.get("end"))[:19]} for x in periods][:3]}
+              time.sleep(0.1)
+          print(f"\nincentives entries returned for governor slugs: {raw_hits}")
+
+          print(f"\n{'market':46s} {'prog?':>5s} {'pool':>6s} {'df':>5s} {'target':>7s} {'status':>10s}")
+          rows = []
+          for s in gov:
+              e = progs.get(s)
+              if not e:
+                  print(f"{s:46s} {'NONE':>5s}")
+                  rows.append({"market": s, "program": None}); continue
+              pk = e["picked"]
+              if pk is None:
+                  print(f"{s:46s} {'noper':>5s}  periods={e['periods']} statuses={e['statuses']}")
+                  rows.append({"market": s, "program": None, "raw": e["raw"]}); continue
+              print(f"{s:46s} {'yes':>5s} {pk['pool']:6.0f} {pk['df']:5.2f} "
+                    f"{pk['target']:7.0f} {'active':>10s}")
+              rows.append({"market": s, "program": pk, "raw": e["raw"]})
+
+          # books for the ones that have a live pool
+          live = [r for r in rows if r.get("program")]
+          print(f"\nfetching books for {len(live)} governor markets with a live pool")
+          for r in live:
+              try:
+                  bk = tr._fetch_book(r["market"])
+              except Exception as ex:
+                  r["book_err"] = f"{type(ex).__name__}"; continue
+              time.sleep(0.25)
+              bids = bk.get("bids") or []; asks = bk.get("asks") or []
+              r["best_bid"] = bids[0][0] if bids else None
+              r["best_ask"] = asks[0][0] if asks else None
+              r["bid_depth"] = sum(q for _, q in bids[:6])
+              r["ask_depth"] = sum(q for _, q in asks[:6])
+              r["event_n"] = event_sizes.get(r["market"], 1)
+
+          print(f"\n{'market':46s} {'bid':>6s} {'ask':>6s} {'bidQ':>8s} {'askQ':>8s} {'n':>3s}")
+          for r in live:
+              print(f"{r['market']:46s} {str(r.get('best_bid')):>6s} {str(r.get('best_ask')):>6s} "
+                    f"{r.get('bid_depth', 0):8.0f} {r.get('ask_depth', 0):8.0f} {r.get('event_n', 1):3d}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/probe_gov.json", "w") as f:
+              json.dump({"rows": rows}, f, indent=1)
+          with open("data/probe_gov.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/probe_gov.json data/probe_gov.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Governor market probe [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
