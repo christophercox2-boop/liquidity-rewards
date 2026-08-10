@@ -170,13 +170,16 @@ function famOf(m){
   if(m.startsWith('opdc-')) return 'resign';
   if(m.startsWith('apdc-')) return 'court';
   if(m.startsWith('tec-cbb')) return 'gym';
+  // state senate races arrive under more than one slug prefix (ewc-usse-…, ussewc-usse-…)
+  if(/^[a-z]*ewc-usse-/.test(m)) return 'usse';
   return m.split('-')[0];
 }
 const FAMLBL = {senate:'the senate cornfield', house:'the house tomato field',
   resign:'the resignation patch', court:'the courthouse bed', gym:'the gymnasium orchard',
   pandc:'the science greenhouse', lawec:'the law bed', dccc:'the clinic plot',
   stsc:'the shipping lane', pvwc:'the popular-vote row', vmc:'the primary rows',
-  enwc:'the primary rows', ewc:'the referendum row', usgcc:'the odd corner'};
+  enwc:'the primary rows', ewc:'the referendum row', usse:'the statehouse row',
+  usgcc:'the odd corner'};
 
 // ---------------- palettes / painters (unchanged storybook art) ----------------
 const PAL = {soil:'#7A5233', soilD:'#5A3B22'};
@@ -973,7 +976,7 @@ const KINDCYCLE = ['cucumber', 'lemon', 'coffee', 'cassava', 'pineapple', 'avoca
   'potato', 'orange'];
 const FAMKIND = {senate:'corn', house:'tomato', resign:'melon', court:'strawberry',
   gym:'grapes', pandc:'sunflower', lawec:'wheat', dccc:'turnip', stsc:'rice',
-  pvwc:'tulip', vmc:'rose', enwc:'rose', ewc:'tulip', usgcc:'eggplant'};
+  pvwc:'tulip', vmc:'rose', enwc:'rose', ewc:'tulip', usse:'lemon', usgcc:'eggplant'};
 const TIERS = {
   prize: {mul:1.24, word:'one of your best earners'},
   steady:{mul:1.0,  word:'a steady earner'},
