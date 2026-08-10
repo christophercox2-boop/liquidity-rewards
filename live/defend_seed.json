@@ -1,6 +1,6 @@
 {
- "version": 4,
- "note": "Favourite (heavy partisan lean) side of every newly-listed senate and governor market: let the front bid chase up to 85c. Version-gated; a raise moves caps this seed wrote, a cap changed by hand is left alone.",
+ "version": 5,
+ "note": "Favourite (heavy partisan lean) side of every newly-listed senate and governor market. prior_caps lists caps this seed shipped previously, so markets armed by an older version are recognised as seed-owned and get raised; any other value is treated as hand-set and left alone.",
  "defend": {
   "usgubewc-usgub-al-2026-11-03-rep": {
    "BUY": {
@@ -247,5 +247,8 @@
     "cap": 85.0
    }
   }
- }
+ },
+ "prior_caps": [
+  70.0
+ ]
 }

@@ -547,6 +547,7 @@ class Monitor:
                     clean[side] = {"cap": c}
             if not clean:
                 continue
+            wrote: dict = {}
             cur = self.state["defend"].get(slug)
             if cur is None:
                 if len(self.state["defend"]) >= DEFEND_MAX_MARKETS:
@@ -554,20 +555,41 @@ class Monitor:
                           f"{slug} and any after it skipped", flush=True)
                     break
                 self.state["defend"][slug] = clean
+                wrote = {s_: dict(c_) for s_, c_ in clean.items()}
                 added += 1
             else:
                 was = prior.get(slug) or {}
                 for side, cfg in clean.items():
                     live_cap = (cur.get(side) or {}).get("cap")
                     seeded_cap = (was.get(side) or {}).get("cap")
+                    # Is this cap ours to move? Either it matches what we last
+                    # wrote, or it matches a cap this seed is known to have
+                    # shipped (prior_caps) — which covers markets armed before
+                    # the bookkeeping existed, and records that went stale.
+                    owned = (live_cap is not None and seeded_cap is not None
+                             and abs(live_cap - seeded_cap) < 1e-9)
+                    if not owned and live_cap is not None:
+                        for pc in (seed.get("prior_caps") or []):
+                            try:
+                                if abs(live_cap - float(pc)) < 1e-9:
+                                    owned = True
+                                    break
+                            except (TypeError, ValueError):
+                                continue
                     if live_cap is None:
                         cur[side] = dict(cfg); updated += 1
-                    elif seeded_cap is not None and abs(live_cap - seeded_cap) < 1e-9:
+                        wrote[side] = dict(cfg)
+                    elif owned:
                         if abs(live_cap - cfg["cap"]) > 1e-9:
                             cur[side] = dict(cfg); updated += 1
+                        wrote[side] = dict(cfg)
                     else:
                         kept += 1   # set by hand — the seed does not touch it
-            prior[slug] = {s: dict(c) for s, c in clean.items()}
+            # Record ONLY what was actually written. Recording the seed's
+            # intent for a market it skipped makes the next run believe the
+            # seed owns a cap it never set, freezing that market forever.
+            if wrote:
+                prior.setdefault(slug, {}).update(wrote)
         self.state["defend_seed_v"] = version
         print(f"[defend-seed] v{version}: armed {added}, raised {updated}, "
               f"left {kept} hand-set; now defending {len(self.state['defend'])}",
