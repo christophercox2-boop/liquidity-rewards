@@ -1,0 +1,113 @@
+name: Diagnose order rejection
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/diag_order.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: diag-order
+  cancel-in-progress: false
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compare a working resting order against a rejected request
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, requests
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+
+          def api(method, path, **kw):
+              return requests.request(
+                  method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  timeout=30, **kw)
+
+          # 1. the orders that ARE resting in the markets my batch could not enter
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          orders = r.json().get("orders") or []
+          print("open orders:", len(orders))
+          for o in orders:
+              slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
+              if any(k in slug for k in ("-ok-", "-wv-", "-tn-")):
+                  print("\nRESTING ORDER, full shape:")
+                  print(json.dumps(o, indent=1)[:1400])
+                  break
+
+          # 2. account balance / buying power
+          for pth in ("/v1/portfolio/balance", "/v1/account/balance", "/v1/portfolio/summary"):
+              try:
+                  rr = requests.get(tr.TRADE_API + pth,
+                                    headers=tr.auth_headers(kid, sec, "GET", pth), timeout=20)
+                  print(f"\n{pth} -> {rr.status_code} {rr.text[:400]}")
+              except Exception as e:
+                  print(f"\n{pth} -> {type(e).__name__}: {e}")
+
+          # 3. market metadata: is the market actually accepting orders, and what tick?
+          slug = "ussewc-usse-ar-2026-11-03-rep"
+          for pth in (f"/v1/markets/{slug}", "/v1/markets"):
+              try:
+                  rr = requests.get(tr.TRADE_API + pth,
+                                    headers=tr.auth_headers(kid, sec, "GET", pth),
+                                    params=None if pth.endswith(slug) else {"symbols": [slug]},
+                                    timeout=20)
+                  print(f"\n{pth} -> {rr.status_code} {rr.text[:900]}")
+              except Exception as e:
+                  print(f"\n{pth} -> {type(e).__name__}: {e}")
+
+          # 4. escalating single-order attempts, smallest blast radius first
+          trials = [
+              ("tiny post-only bid",
+               {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_LONG",
+                "type": "ORDER_TYPE_LIMIT", "price": {"value": 0.01, "currency": "USD"},
+                "quantity": 5, "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                "participateDontInitiate": True}),
+              ("tiny bid, no post-only flag",
+               {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_LONG",
+                "type": "ORDER_TYPE_LIMIT", "price": {"value": 0.01, "currency": "USD"},
+                "quantity": 5, "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL"}),
+              ("tiny bid, price as bare number",
+               {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_LONG",
+                "type": "ORDER_TYPE_LIMIT", "price": 0.01,
+                "quantity": 5, "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                "participateDontInitiate": True}),
+              ("tiny bid at 2c (off the floor)",
+               {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_LONG",
+                "type": "ORDER_TYPE_LIMIT", "price": {"value": 0.02, "currency": "USD"},
+                "quantity": 5, "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                "participateDontInitiate": True}),
+          ]
+          placed_ids = []
+          for label, body in trials:
+              rr = api("POST", "/v1/orders", json=body)
+              print(f"\n{label}: {rr.status_code} {' '.join(rr.text.split())[:300]}")
+              if rr.status_code < 300:
+                  oid = (rr.json().get("order") or {}).get("orderId") or rr.json().get("orderId")
+                  print("   PLACED, id:", oid)
+                  if oid:
+                      placed_ids.append(oid)
+                  break   # first success tells us what the batch got wrong
+
+          # 5. clean up anything this diagnostic placed
+          for oid in placed_ids:
+              c = api("POST", f"/v1/order/{oid}/cancel", json={})
+              print("cancel", oid, c.status_code)
+          EOF
