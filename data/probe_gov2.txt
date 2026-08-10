@@ -1,0 +1,23 @@
+markets to price: 36
+
+race                                     FAVOURITE                             bid/ask   underdog                              bid/ask
+usgubewc-usgub-al-2026-11-03             rep al                               0.7/0.99   dem al                               0.01/0.5
+usgubewc-usgub-ar-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-co-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-ct-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-fl-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-hi-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-id-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-il-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-ma-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-md-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-me-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-mn-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-ne-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-nh-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-nm-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-ny-2026-11-03             -- cannot tell favourite, skipped
+usgubewc-usgub-or-2026-11-03             -- cannot tell favourite, skipped
+ushrewc-ushr-al-01-2026-11-03            -- cannot tell favourite, skipped
+
+clean two-sided races ready to plan: 1

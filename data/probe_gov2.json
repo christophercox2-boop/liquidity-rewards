@@ -1,0 +1,347 @@
+{
+ "rows": [
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-dem",
+   "race": "usgubewc-usgub-al-2026-11-03",
+   "best_bid": 0.01,
+   "best_ask": 0.5,
+   "bid_depth": 17176.0,
+   "ask_depth": 2565.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-rep",
+   "race": "usgubewc-usgub-al-2026-11-03",
+   "best_bid": 0.7,
+   "best_ask": 0.99,
+   "bid_depth": 2461.0,
+   "ask_depth": 15648.9,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ar-2026-11-03-dem",
+   "race": "usgubewc-usgub-ar-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ar-2026-11-03-rep",
+   "race": "usgubewc-usgub-ar-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-co-2026-11-03-dem",
+   "race": "usgubewc-usgub-co-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-co-2026-11-03-rep",
+   "race": "usgubewc-usgub-co-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ct-2026-11-03-dem",
+   "race": "usgubewc-usgub-ct-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ct-2026-11-03-rep",
+   "race": "usgubewc-usgub-ct-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-fl-2026-11-03-dem",
+   "race": "usgubewc-usgub-fl-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-fl-2026-11-03-rep",
+   "race": "usgubewc-usgub-fl-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-hi-2026-11-03-dem",
+   "race": "usgubewc-usgub-hi-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-hi-2026-11-03-rep",
+   "race": "usgubewc-usgub-hi-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-id-2026-11-03-dem",
+   "race": "usgubewc-usgub-id-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-id-2026-11-03-rep",
+   "race": "usgubewc-usgub-id-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-il-2026-11-03-dem",
+   "race": "usgubewc-usgub-il-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-il-2026-11-03-rep",
+   "race": "usgubewc-usgub-il-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ma-2026-11-03-dem",
+   "race": "usgubewc-usgub-ma-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ma-2026-11-03-rep",
+   "race": "usgubewc-usgub-ma-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-md-2026-11-03-dem",
+   "race": "usgubewc-usgub-md-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-md-2026-11-03-rep",
+   "race": "usgubewc-usgub-md-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-me-2026-11-03-dem",
+   "race": "usgubewc-usgub-me-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-me-2026-11-03-rep",
+   "race": "usgubewc-usgub-me-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-mn-2026-11-03-dem",
+   "race": "usgubewc-usgub-mn-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-mn-2026-11-03-rep",
+   "race": "usgubewc-usgub-mn-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ne-2026-11-03-dem",
+   "race": "usgubewc-usgub-ne-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ne-2026-11-03-rep",
+   "race": "usgubewc-usgub-ne-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-nh-2026-11-03-dem",
+   "race": "usgubewc-usgub-nh-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-nh-2026-11-03-rep",
+   "race": "usgubewc-usgub-nh-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-nm-2026-11-03-dem",
+   "race": "usgubewc-usgub-nm-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-nm-2026-11-03-rep",
+   "race": "usgubewc-usgub-nm-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ny-2026-11-03-dem",
+   "race": "usgubewc-usgub-ny-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ny-2026-11-03-rep",
+   "race": "usgubewc-usgub-ny-2026-11-03",
+   "best_bid": null,
+   "best_ask": 0.99,
+   "bid_depth": 0,
+   "ask_depth": 25.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-or-2026-11-03-dem",
+   "race": "usgubewc-usgub-or-2026-11-03",
+   "best_bid": null,
+   "best_ask": null,
+   "bid_depth": 0,
+   "ask_depth": 0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-or-2026-11-03-rep",
+   "race": "usgubewc-usgub-or-2026-11-03",
+   "best_bid": null,
+   "best_ask": null,
+   "bid_depth": 0,
+   "ask_depth": 0,
+   "event_n": 2
+  },
+  {
+   "market": "ushrewc-ushr-al-01-2026-11-03-dem",
+   "race": "ushrewc-ushr-al-01-2026-11-03",
+   "best_bid": 0.01,
+   "best_ask": 0.99,
+   "bid_depth": 200.0,
+   "ask_depth": 225.0,
+   "event_n": 2
+  },
+  {
+   "market": "ushrewc-ushr-al-01-2026-11-03-rep",
+   "race": "ushrewc-ushr-al-01-2026-11-03",
+   "best_bid": 0.01,
+   "best_ask": 0.99,
+   "bid_depth": 200.0,
+   "ask_depth": 225.0,
+   "event_n": 2
+  }
+ ],
+ "plan": [
+  {
+   "race": "usgubewc-usgub-al-2026-11-03",
+   "favourite": "usgubewc-usgub-al-2026-11-03-rep",
+   "underdog": "usgubewc-usgub-al-2026-11-03-dem",
+   "fav_bid": 0.7,
+   "fav_ask": 0.99,
+   "dog_bid": 0.01,
+   "dog_ask": 0.5,
+   "fav_depth": [
+    2461.0,
+    15648.9
+   ],
+   "dog_depth": [
+    17176.0,
+    2565.0
+   ]
+  }
+ ]
+}
