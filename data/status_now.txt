@@ -1,0 +1,77 @@
+open orders: 224
+
+market                                   side    px     qty   leaves     cum
+ussewc-usse-co-2026-11-03-rep            SELL    99     177   177.46    0.00
+ussewc-usse-fl-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-mt-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-tn-2026-11-03-dem            SELL    99    2000  2000.00    0.00
+ussewc-usse-ms-2026-11-03-rep            SELL    99     177   177.46    0.00
+ussewc-usse-ri-2026-11-03-rep            SELL    99    2000  2000.00    0.00
+ussewc-usse-or-2026-11-03-rep            SELL    99     177   177.46    0.00
+ussewc-usse-ar-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-ky-2026-11-03-rep            SELL    99    2000  2000.00    0.00
+ussewc-usse-ky-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-fl-2026-11-03-rep            SELL    99     177   177.46    0.00
+ussewc-usse-wv-2026-11-03-rep            SELL    99     177   177.46    0.00
+ussewc-usse-al-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-la-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-ms-2026-11-03-dem            SELL    99    2000  2000.00    0.00
+ussewc-usse-tn-2026-11-03-rep            SELL    99    2000  2000.00    0.00
+ussewc-usse-sc-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-wy-2026-11-03-rep            SELL    99    2000  2000.00    0.00
+ussewc-usse-ok-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-nj-2026-11-03-rep            SELL    99     177   177.46    0.00
+ussewc-usse-mt-2026-11-03-rep            SELL    99     177   177.46    0.00
+ussewc-usse-mt-2026-11-03-rep            SELL    99     177   177.46    0.00
+ussewc-usse-ok-2026-11-03-rep            SELL    99     173   172.95    0.00
+ussewc-usse-wv-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-va-2026-11-03-rep            SELL    99     173   172.95    0.00
+ussewc-usse-nm-2026-11-03-dem            SELL    99     177   177.43    0.00
+ussewc-usse-nm-2026-11-03-rep            SELL    99     177   177.46    0.00
+ussewc-usse-la-2026-11-03-rep            SELL    99     177   177.46    0.00
+ussewc-usse-sc-2026-11-03-rep            SELL    99     177   177.46    0.00
+usgubewc-usgub-al-2026-11-03-rep         SELL    99     177   177.46    0.00
+usgubewc-usgub-al-2026-11-03-dem         SELL    99     177   177.46    0.00
+ussewc-usse-ri-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-nj-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-va-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-co-2026-11-03-dem            SELL    99     177   177.46    0.00
+ussewc-usse-al-2026-11-03-rep            SELL    99    2000  2000.00    0.00
+ussewc-usse-or-2026-11-03-dem            SELL    99    2000  2000.00    0.00
+ussewc-usse-ar-2026-11-03-rep            SELL    99     177   177.46    0.00
+
+99c asks that were PLACED SMALL (quantity < 2000): 30
+   ussewc-usse-co-2026-11-03-rep            quantity 177.46
+   ussewc-usse-fl-2026-11-03-dem            quantity 177.46
+   ussewc-usse-mt-2026-11-03-dem            quantity 177.46
+   ussewc-usse-ms-2026-11-03-rep            quantity 177.46
+   ussewc-usse-or-2026-11-03-rep            quantity 177.46
+   ussewc-usse-ar-2026-11-03-dem            quantity 177.46
+   ussewc-usse-ky-2026-11-03-dem            quantity 177.46
+   ussewc-usse-fl-2026-11-03-rep            quantity 177.46
+   ussewc-usse-wv-2026-11-03-rep            quantity 177.46
+   ussewc-usse-al-2026-11-03-dem            quantity 177.46
+   ussewc-usse-la-2026-11-03-dem            quantity 177.46
+   ussewc-usse-sc-2026-11-03-dem            quantity 177.46
+   ussewc-usse-ok-2026-11-03-dem            quantity 177.46
+   ussewc-usse-nj-2026-11-03-rep            quantity 177.46
+   ussewc-usse-mt-2026-11-03-rep            quantity 177.46
+   ussewc-usse-mt-2026-11-03-rep            quantity 177.46
+   ussewc-usse-ok-2026-11-03-rep            quantity 172.95
+   ussewc-usse-wv-2026-11-03-dem            quantity 177.46
+   ussewc-usse-va-2026-11-03-rep            quantity 172.95
+   ussewc-usse-nm-2026-11-03-dem            quantity 177.43
+   ussewc-usse-nm-2026-11-03-rep            quantity 177.46
+   ussewc-usse-la-2026-11-03-rep            quantity 177.46
+   ussewc-usse-sc-2026-11-03-rep            quantity 177.46
+   usgubewc-usgub-al-2026-11-03-rep         quantity 177.46
+   usgubewc-usgub-al-2026-11-03-dem         quantity 177.46
+   ussewc-usse-ri-2026-11-03-dem            quantity 177.46
+   ussewc-usse-nj-2026-11-03-dem            quantity 177.46
+   ussewc-usse-va-2026-11-03-dem            quantity 177.46
+   ussewc-usse-co-2026-11-03-dem            quantity 177.46
+   ussewc-usse-ar-2026-11-03-rep            quantity 177.46
+
+99c asks with REAL FILLS (cumQuantity > 0): 0
+
+non-zero positions in the new races: 0
