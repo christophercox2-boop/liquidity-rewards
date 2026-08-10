@@ -44,6 +44,10 @@ DASH_PASSWORD = os.environ.get("DASH_PASSWORD", "")
 STATE_PATH = Path(os.environ.get("STATE_PATH", "state.json"))
 ET = ZoneInfo("America/New_York")
 MAX_GAP_SECONDS = 300  # an outage never extrapolates more than 5 minutes
+# Defined up here, not with the other DEFEND_* constants further down: the
+# defend-seed runs from Monitor.__init__, which executes long before that
+# block, so leaving it there raised NameError on boot.
+DEFEND_MAX_MARKETS = int(os.environ.get("DEFEND_MAX_MARKETS", "80"))
 
 # Optional: phone notifications via ntfy (https://ntfy.sh). Install the ntfy
 # app, subscribe to a long random topic, set NTFY_TOPIC to the same string.
@@ -2051,7 +2055,6 @@ def ws_stream_loop(key_id: str, secret_key: str) -> None:
 # Hard rails: the user's cap, a 2-tick gap to the opposite touch, a cooldown,
 # fresh books only, reprice-only (never places orders or adds size), and
 # floor/ceiling qualifier blocks are never touched.
-DEFEND_MAX_MARKETS = 80          # sanity bound only; books refresh proportionally slower
 DEFEND_SHARE_FLOOR = 0.25        # act only under 25% of the side's rewards
 DEFEND_COOLDOWN_SECONDS = 90.0   # per market+side between improvements
 DEFEND_MAX_PER_POLL = 6          # request-budget bound on a busy poll
