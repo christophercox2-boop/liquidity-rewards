@@ -19,6 +19,10 @@ on:
       - track_rewards.py
       - requirements.txt
       - Dockerfile
+      # The defend seed is fetched from main at runtime, so a config-only
+      # change needs no rebuild. Excluding it keeps arming a market a
+      # ~60-second operation instead of a deploy.
+      - '!live/defend_seed.json'
   workflow_dispatch: {}
 
 permissions:
