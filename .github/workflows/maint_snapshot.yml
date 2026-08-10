@@ -1,8 +1,13 @@
 name: Pre-maintenance snapshot
 
-# Before an exchange maintenance window: log every resting order in enough
-# detail to re-place it exactly — market, side, price as the API's own STRING
-# (a float is rejected), quantity, intent and order id.
+# Log every resting order in enough detail to re-place it exactly — market,
+# side, price as the API's own STRING (a float is rejected), quantity, intent
+# and order id.
+#
+# Written for a maintenance window, but it earns its keep against any event
+# that empties the book. On 2026-08-10, 223 orders were cancelled on an
+# ordinary evening with no window involved; the manifest taken 45 minutes
+# earlier was what put them all back.
 #
 # Defend caps are deliberately NOT touched. They already sit at or above the
 # levels these orders rest at, which is the headroom you want: if the books
@@ -11,14 +16,21 @@ name: Pre-maintenance snapshot
 
 on:
   schedule:
-    # Two fires, not one. A scheduled run is queued, not guaranteed on time —
-    # under load Actions routinely starts 10-30 minutes late, and a single
-    # 17:40 fire that slips lands after the window has already opened. The
-    # 17:20 run guarantees a usable manifest exists; the 17:40 run overwrites
-    # it with a fresher one if it arrives in time. Later wins, so an extra
-    # run can only improve the snapshot.
-    - cron: "20 21 * * *"      # 17:20 ET — backstop
-    - cron: "40 21 * * *"      # 17:40 ET — ahead of a 17:50 window
+    # Hourly through the night rather than a couple of shots aimed at a
+    # specific window. Two reasons:
+    #
+    #   1. A scheduled run is queued, not guaranteed. Under load Actions
+    #      routinely starts 10-30 minutes late, so a single fire timed just
+    #      ahead of a window can land after it has already opened.
+    #   2. A stated window time is not always the time it happens, and "06:00"
+    #      is ambiguous between ET and UTC. Running every hour covers 06:00 ET
+    #      (10:00 UTC) and 06:00 UTC alike without having to guess, and leaves
+    #      the manifest at most an hour stale whenever the book goes away.
+    #
+    # This is cheap: one authenticated GET and a commit that carries
+    # [skip ci] and touches nothing the deploy branch watches.
+    - cron: "20 23 * * *"      # 19:20 ET
+    - cron: "20 0-11 * * *"    # hourly overnight, through 07:20 ET
   push:
     branches: [main]
     paths:
