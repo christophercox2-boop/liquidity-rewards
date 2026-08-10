@@ -232,6 +232,13 @@
       "status": "PENDING"
     },
     {
+      "reward": 0.56,
+      "programType": "liquidityProgram",
+      "marketSlug": "vmc-ussep-misen-2026-08-04-els0-5",
+      "date": "2026-08-08",
+      "status": "PENDING"
+    },
+    {
       "reward": 3.12,
       "programType": "liquidityProgram",
       "marketSlug": "apdc-alito-2026-12-31",
