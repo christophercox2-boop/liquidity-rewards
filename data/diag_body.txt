@@ -1,0 +1,10 @@
+open orders: 118
+pandc-anydis 99c parking orders still resting: 1 [10000]
+
+price.value STRING, qty int: 200 {"id":"BS9KANC10BAK", "executions":[]}
+   PLACED id: BS9KANC10BAK
+   cancel via /v1/order/{id}/cancel: 400 {"code":3, "message":"The server was unable to process your request.", "details":[]}
+   cancel via /v1/orders/cancel: 404 {"code":5, "message":"The server was unable to process your request.", "details":[]}
+
+WINNING BODY SHAPE: price.value STRING, qty int
+final open orders: 119
