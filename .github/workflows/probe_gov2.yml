@@ -1,0 +1,114 @@
+name: Books for the un-incentivised new markets
+
+# The governor slate (and several other new prefixes) is listed but carries no
+# reward program yet. To have an entry plan ready for the moment a pool is
+# attached, this fetches the book for every usgubewc / ushrewc market so the
+# favourite side of each race can be identified now. Read-only.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/probe_gov2.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe-gov2
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Books
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, time, requests, io, collections
+          import track_rewards as tr
+          BUF = io.StringIO()
+          _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          pol_slugs, event_sizes = tr.fetch_politics_events()
+          want = sorted(s for s in pol_slugs
+                        if s.startswith(("usgubewc-", "ushrewc-")))
+          print("markets to price:", len(want))
+
+          rows = []
+          for s in want:
+              try:
+                  bk = tr._fetch_book(s)
+              except Exception as e:
+                  rows.append({"market": s, "err": type(e).__name__}); continue
+              time.sleep(0.25)
+              bids = bk.get("bids") or []; asks = bk.get("asks") or []
+              rows.append({
+                  "market": s,
+                  "race": s.rsplit("-", 1)[0] if s.rsplit("-", 1)[-1] in ("dem", "rep") else s,
+                  "best_bid": bids[0][0] if bids else None,
+                  "best_ask": asks[0][0] if asks else None,
+                  "bid_depth": sum(q for _, q in bids[:6]),
+                  "ask_depth": sum(q for _, q in asks[:6]),
+                  "event_n": event_sizes.get(s, 1),
+              })
+
+          by = {r["market"]: r for r in rows}
+          races = collections.defaultdict(list)
+          for r in rows:
+              if not r.get("err"):
+                  races[r["race"]].append(r["market"])
+
+          print(f"\n{'race':40s} {'FAVOURITE':32s} {'bid/ask':>12s}   {'underdog':32s} {'bid/ask':>12s}")
+          plan = []
+          for race, ms in sorted(races.items()):
+              if len(ms) != 2:
+                  print(f"{race:40s} -- {len(ms)} side(s), skipped"); continue
+              def bid(m):
+                  v = by[m]["best_bid"]
+                  return v if v is not None else -1
+              a, b = sorted(ms, key=bid, reverse=True)
+              if bid(a) <= bid(b):
+                  print(f"{race:40s} -- cannot tell favourite, skipped"); continue
+              fa, fb = by[a], by[b]
+              print(f"{race:40s} {a.rsplit('-',1)[-1]+' '+a.split('-')[2]:32s} "
+                    f"{str(fa['best_bid'])+'/'+str(fa['best_ask']):>12s}   "
+                    f"{b.rsplit('-',1)[-1]+' '+b.split('-')[2]:32s} "
+                    f"{str(fb['best_bid'])+'/'+str(fb['best_ask']):>12s}")
+              plan.append({"race": race, "favourite": a, "underdog": b,
+                           "fav_bid": fa["best_bid"], "fav_ask": fa["best_ask"],
+                           "dog_bid": fb["best_bid"], "dog_ask": fb["best_ask"],
+                           "fav_depth": [fa["bid_depth"], fa["ask_depth"]],
+                           "dog_depth": [fb["bid_depth"], fb["ask_depth"]]})
+          print(f"\nclean two-sided races ready to plan: {len(plan)}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/probe_gov2.json", "w") as f:
+              json.dump({"rows": rows, "plan": plan}, f, indent=1)
+          with open("data/probe_gov2.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/probe_gov2.json data/probe_gov2.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Governor book probe [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
