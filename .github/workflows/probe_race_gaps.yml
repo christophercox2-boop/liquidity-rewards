@@ -1,0 +1,155 @@
+name: Probe race gaps
+
+# READ-ONLY. Places nothing.
+#
+# Which senate and governor races carry a reward pool that we are NOT in?
+#
+# The full incentives crawl is useless for this: it is alphabetical and rate
+# limits out around 30 pages, deep in the sports families, long before it
+# reaches ussewc/usgubewc. So ask directly instead — build the candidate slug
+# for every state on both patterns and query the symbol-filtered endpoint,
+# which answers precisely for the slugs handed to it.
+#
+# Reports three groups: pools we hold, pools we do NOT hold (the actual
+# answer), and states where a market exists but only one side is entered.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/probe_race_gaps.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe-race-gaps
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Query
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import collections, io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          STATES = ("al ak az ar ca co ct de fl ga hi id il in ia ks ky la me md ma mi mn ms "
+                    "mo mt ne nv nh nj nm ny nc nd oh ok or pa ri sc sd tn tx ut vt va wa wv "
+                    "wi wy").split()
+          PATTERNS = [("senate", "ussewc-usse-{st}-2026-11-03-{side}"),
+                      ("governor", "usgubewc-usgub-{st}-2026-11-03-{side}")]
+          cand = []
+          for label, pat in PATTERNS:
+              for st in STATES:
+                  for side in ("dem", "rep"):
+                      cand.append((label, st, side, pat.format(st=st, side=side)))
+          print(f"checking {len(cand)} candidate slugs")
+
+          # what we actually hold (ignore REPLACED ghosts)
+          held = set()
+          r = requests.get(tr.TRADE_API + "/v1/orders/open",
+                           headers=tr.auth_headers(kid, sec, "GET", "/v1/orders/open"), timeout=30)
+          if r.status_code < 400:
+              for o in r.json().get("orders") or []:
+                  if str(o.get("state")) == "ORDER_STATE_NEW":
+                      held.add(o.get("marketSlug") or "")
+          else:
+              print(f"WARNING: open orders HTTP {r.status_code} — 'held' may be wrong")
+          print(f"markets we hold an order in: {len(held)}")
+
+          progs = {}
+          slugs = [c[3] for c in cand]
+          for i in range(0, len(slugs), 40):
+              batch = ",".join(slugs[i:i + 40])
+              try:
+                  rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                    params={"symbols": batch, "pageSize": 100}, timeout=30)
+                  if rr.status_code >= 400:
+                      print(f"  batch {i//40}: HTTP {rr.status_code}")
+                      time.sleep(2); continue
+                  for p in rr.json().get("programs") or []:
+                      s = p.get("marketSlug") or ""
+                      for tp in p.get("timePeriods") or []:
+                          if str(tp.get("status") or "").lower() in ("active", "live", "status_live"):
+                              progs[s] = tp
+              except Exception as e:
+                  print(f"  batch {i//40}: {type(e).__name__}")
+              time.sleep(0.4)
+          print(f"of those, carrying an ACTIVE pool: {len(progs)}\n")
+
+          gaps = collections.defaultdict(list)
+          have = collections.defaultdict(list)
+          for label, st, side, slug in cand:
+              if slug not in progs:
+                  continue
+              (have if slug in held else gaps)[label].append((st, side, slug, progs[slug]))
+
+          for label, _ in PATTERNS:
+              g = gaps[label]
+              print(f"=== {label.upper()}: {len(have[label])} held with a pool, "
+                    f"{len(g)} WITH A POOL AND NOT ENTERED ===")
+              if not g:
+                  print("   none — every funded race on this pattern is already entered\n")
+                  continue
+              bystate = collections.defaultdict(list)
+              for st, side, slug, tp in g:
+                  bystate[st].append((side, tp))
+              for st in sorted(bystate):
+                  sides = bystate[st]
+                  tp = sides[0][1]
+                  print(f"   {st.upper():3s} {','.join(sorted(s for s, _ in sides)):8s} "
+                        f"pool {tp['rewardPool']:>5} target {tp['targetSize']:>6} "
+                        f"df {tp['discountFactor']}   "
+                        f"{'BOTH sides open' if len(sides) == 2 else 'one side only'}")
+              print()
+
+          # a funded market where we hold only one of the two sides
+          print("=== funded races where we hold only ONE side ===")
+          bystate = collections.defaultdict(dict)
+          for label, st, side, slug in cand:
+              if slug in progs:
+                  bystate[(label, st)][side] = slug in held
+          lonely = [(l, s, v) for (l, s), v in bystate.items()
+                    if len(v) == 2 and sum(v.values()) == 1]
+          for l, s, v in sorted(lonely):
+              missing = [k for k, held_ in v.items() if not held_]
+              print(f"   {l:9s} {s.upper():3s} missing: {','.join(missing)}")
+          if not lonely:
+              print("   none")
+
+          os.makedirs("data", exist_ok=True)
+          json.dump({"programs": progs, "held": sorted(held)},
+                    open("data/race_gaps.json", "w"), indent=1)
+          with open("data/race_gaps.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/race_gaps.json data/race_gaps.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Probe race gaps [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
