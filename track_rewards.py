@@ -870,6 +870,15 @@ def _http_err(resp) -> str:
     return f"HTTP {resp.status_code}: {body[:150]}"
 
 
+# Order states that are finished: the API still returns them from
+# /v1/orders/open but they are not resting and must not be counted or scored.
+DEAD_ORDER_STATES = frozenset({
+    "ORDER_STATE_REPLACED", "ORDER_STATE_CANCELED", "ORDER_STATE_CANCELLED",
+    "ORDER_STATE_FILLED", "ORDER_STATE_EXPIRED", "ORDER_STATE_REJECTED",
+    "ORDER_STATE_DONE_FOR_DAY",
+})
+
+
 def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] | None = None) -> list[dict]:
     """Snapshot of resting orders scored with the official reward formula.
 
@@ -887,6 +896,19 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     payload = resp.json()
     orders: list[dict] = []
     for o in payload.get("orders") or []:
+        # /v1/orders/open keeps returning the ORIGINAL of every order we
+        # modify, as ORDER_STATE_REPLACED. Those are dead — the exchange's own
+        # app does not show them — but we counted and SCORED them, so our order
+        # count drifted further from reality with every top-up and reprice:
+        # 92 ghosts against 309 real orders at midday, 153 against 245 by
+        # evening, because each modify mints another one permanently.
+        #
+        # Denylist rather than allowlist on purpose. Dropping a state that is
+        # actually live would make us believe an order is missing and place a
+        # duplicate; keeping an unknown state merely over-counts, which is the
+        # cheaper mistake.
+        if str(o.get("state") or "") in DEAD_ORDER_STATES:
+            continue
         slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
         size = _num(o.get("leavesQuantity"))
         if not size:
