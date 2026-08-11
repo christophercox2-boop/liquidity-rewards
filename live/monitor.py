@@ -2717,6 +2717,12 @@ def keep_qualified() -> None:
                     px = ob + tick
             if not (0.005 <= px <= 0.995):
                 continue
+            # A cap that pins the "scoring" order back to the deep qualifier
+            # price can never reach the window — placing there just accretes
+            # junk orders at 1c/99c every cooldown, the opposite of keeping
+            # the book lean. Skip; raising the cap is the owner's lever.
+            if abs(px - deep_px) < 1e-9:
+                continue
             if side == "BUY" and px > cap + 1e-9:
                 continue
             if side == "SELL" and px < cap - 1e-9:
