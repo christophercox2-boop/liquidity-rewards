@@ -1,0 +1,41 @@
+funded markets: 132 of 132 held
+
+round 1: 154 rungs short (total 406,197 shares)
+   placed 154; settling 25s...
+   size gained this round: 131,476 shares
+round 2: 131 rungs short (total 274,707 shares)
+   placed 131; settling 25s...
+   size gained this round: 35,476 shares
+round 3: 131 rungs short (total 239,217 shares)
+   placed 131; settling 25s...
+   size gained this round: 35,476 shares
+round 4: 131 rungs short (total 203,727 shares)
+   placed 131; settling 25s...
+   size gained this round: 35,476 shares
+round 5: 131 rungs short (total 168,237 shares)
+   placed 131; settling 25s...
+   size gained this round: 35,476 shares
+
+FINAL: 2 markets fully qualified on both rungs, 130 still short
+   enwc-usgubp-wi-2026-08-11-dem-sarrod           bid      0 ask  1,364 / target 2,000
+   pandc-anydis-2027-12-31                        bid 10,000 ask  1,364 / target 10,000
+   scc-hrep-rep-2026-11-03-gte185                 bid  5,000 ask  1,364 / target 5,000
+   scc-hrep-rep-2026-11-03-gte190                 bid  5,000 ask  1,364 / target 5,000
+   scc-hrep-rep-2026-11-03-gte200                 bid  5,000 ask  1,364 / target 5,000
+   scc-hrep-rep-2026-11-03-gte225                 bid  5,000 ask  1,364 / target 5,000
+   scc-senate-gop-2026-11-03-46                   bid  5,000 ask  1,364 / target 5,000
+   scc-senate-gop-2026-11-03-48                   bid  5,000 ask  1,364 / target 5,000
+   scc-senate-gop-2026-11-03-49                   bid  5,000 ask  1,364 / target 5,000
+   scc-senate-gop-2026-11-03-50                   bid  5,000 ask  1,364 / target 5,000
+   scc-senate-gop-2026-11-03-51                   bid  5,000 ask  1,364 / target 5,000
+   scc-senate-gop-2026-11-03-53                   bid  5,000 ask  1,364 / target 5,000
+   scc-senate-gop-2026-11-03-54                   bid  5,000 ask  1,364 / target 5,000
+   scc-senate-gop-2026-11-03-56                   bid  5,000 ask  1,364 / target 5,000
+   scc-senate-gop-2026-11-03-gte57                bid  5,000 ask  1,364 / target 5,000
+   apdc-jerpowgov-2026-12-31                      bid  5,000 ask  1,637 / target 5,000
+   scc-hrep-rep-2026-11-03-gte180                 bid  5,000 ask  1,637 / target 5,000
+   scc-hrep-rep-2026-11-03-gte195                 bid  5,000 ask  1,637 / target 5,000
+   scc-hrep-rep-2026-11-03-gte205                 bid  5,000 ask  1,637 / target 5,000
+   scc-hrep-rep-2026-11-03-gte210                 bid  5,000 ask  1,637 / target 5,000
+
+total placements: 678
