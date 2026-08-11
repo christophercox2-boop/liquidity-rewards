@@ -849,67 +849,6 @@ def fetch_opportunities(
 
 PROG_TTL_SECONDS = 300  # reuse fetched program params this long between polls
 _PROG_CACHE: dict = {"ts": 0.0, "progs": {}, "slugs": (), "fails": 0, "retry_at": 0.0}
-
-# How many markets share each reward pool.
-#
-# THIS IS THE DENOMINATOR WE HAD WRONG, and it cost a factor of two.
-#
-# A pool belongs to a programId, and every market carrying that programId
-# splits it. We were instead splitting per EVENT — counting the markets in one
-# race — which for the seat-count ladders meant dividing $100 by 12 when 23
-# markets were actually sharing it. Measured against real payouts, on the same
-# orders and books, with no fitted parameters:
-#
-#     day        per-event      per-programId    actual
-#     2026-08-07   $88.21  2.16x   $46.15  1.13x   $40.82
-#     2026-08-08   $94.58  1.95x   $49.22  1.01x   $48.54
-#     2026-08-09  $147.99  2.46x   $68.65  1.14x   $60.24
-#
-# Grouping by slug family instead lands at 1.83x and by race prefix at 2.67x,
-# so programId is not merely closer, it is the right key.
-#
-# Counting requires the FULL program list — /v1/incentives filtered by our own
-# symbols only ever returns our markets, which is precisely how we came to
-# undercount. A truncated crawl would undercount the same way, so the result
-# is used only when the crawl ran to completion; otherwise the old per-event
-# estimate stands and says so in the debug line.
-PROG_SIZE_TTL = 3600.0
-_PROG_SIZE_CACHE: dict = {"ts": 0.0, "sizes": {}, "complete": False}
-
-
-def program_market_counts(max_pages: int = 60) -> tuple[dict[str, int], bool]:
-    """(markets per active programId, crawl_completed)."""
-    now = time.time()
-    if now - _PROG_SIZE_CACHE["ts"] < PROG_SIZE_TTL and _PROG_SIZE_CACHE["sizes"]:
-        return _PROG_SIZE_CACHE["sizes"], _PROG_SIZE_CACHE["complete"]
-    sizes: dict[str, set] = {}
-    complete = False
-    params: dict = {"pageSize": 100}
-    try:
-        for _ in range(max_pages):
-            r = requests.get(HOSTS[0] + "/v1/incentives", params=params, timeout=30)
-            if r.status_code >= 400:
-                break
-            data = r.json()
-            for p in data.get("programs") or []:
-                slug = p.get("marketSlug") or ""
-                for tp in p.get("timePeriods") or []:
-                    if str(tp.get("status") or "").lower() not in ("active", "live", "status_live"):
-                        continue
-                    pid = str(tp.get("programId") or "")
-                    if pid and slug:
-                        sizes.setdefault(pid, set()).add(slug)
-            token = data.get("nextPageToken") or data.get("nextToken")
-            if not token:
-                complete = True
-                break
-            params = {"pageSize": 100, "pageToken": token}
-    except Exception as e:  # noqa: BLE001 — never fatal; we just keep the old denominator
-        LAST_DEBUG["_program_sizes"] = f"{type(e).__name__}: {e}"
-    counts = {k: len(v) for k, v in sizes.items()}
-    if counts:
-        _PROG_SIZE_CACHE.update(ts=now, sizes=counts, complete=complete)
-    return counts, complete
 LAST_DEBUG: dict[str, str] = {}  # diagnostics from the most recent fetch, for the dashboard
 
 # The live monitor calls fetch_live_orders every poll; refreshing every book
@@ -1141,38 +1080,6 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
             _note_members(slug, SEARCH_KEY_MEMBERS.get(key, []))
     for slug in progs:
         progs[slug]["siblings"] = RACE_MEMBERS.get(slug, [])[:40]
-    # Authoritative denominator: everything sharing the programId splits the
-    # pool. Only trusted when the crawl finished — a partial list undercounts
-    # membership, which is the exact error this replaces.
-    try:
-        psizes, complete = program_market_counts()
-        # Sanity floor the crawl cannot lie past: we hold orders in these
-        # markets, so a pool that the crawl says has fewer markets than we
-        # personally hold on it was not fully enumerated. Undercounting here
-        # inflates the estimate, so any pid failing this is left alone.
-        ours: dict[str, int] = {}
-        for pr in progs.values():
-            pid = str(pr.get("pid") or "")
-            if pid:
-                ours[pid] = ours.get(pid, 0) + 1
-        trusted = {pid: n for pid, n in psizes.items() if n >= ours.get(pid, 0)}
-        if complete and trusted:
-            applied = 0
-            for slug, pr in progs.items():
-                n = trusted.get(str(pr.get("pid") or ""))
-                if n and n != pr.get("event_n"):
-                    pr["event_n"] = n
-                    applied += 1
-            short = len(psizes) - len(trusted)
-            debug["_pool_split"] = (
-                f"programId membership applied to {applied} markets"
-                + (f"; {short} pools looked smaller than our own holdings and were skipped"
-                   if short else ""))
-        else:
-            debug["_pool_split"] = ("program list incomplete — falling back to per-event "
-                                    "split, which runs ~2x high")
-    except Exception as e:  # noqa: BLE001 — never break a run over the denominator
-        debug["_pool_split"] = f"{type(e).__name__}: {e}"
 
     DATA.mkdir(exist_ok=True)
     (DATA / "live_raw.json").write_text(  # schema + failure reference for debugging
