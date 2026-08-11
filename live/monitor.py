@@ -2567,6 +2567,15 @@ def watch_program_arrivals(pol_slugs: list[str]) -> None:
 
 def auto_defend() -> None:
     """One pass over the defended markets after each poll."""
+    # PAUSED 2026-08-11: every reprice is currently DESTROYING its order.
+    # Modify is cancel-and-replace; with the account's buying power exhausted
+    # (the 15:05 restore re-committed ~$9k), the cancel succeeds and the
+    # replacement is rejected — and verify=False means nobody notices. Traced
+    # in the payload history: ct/mn/il asks all REPLACED in one 19:47 sweep
+    # with no successor order, live count 303 -> 227 over six hours. Until
+    # replacements are verified to stick, defending a rung deletes it.
+    if os.environ.get("DEFEND_RESUME", "") != "1":
+        return
     cfg = dict(MONITOR.state.get("defend") or {})
     if not cfg or not KEY_ID:
         return
