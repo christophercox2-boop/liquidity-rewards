@@ -58,6 +58,10 @@ HF_RATE_TAU = float(os.environ.get("HF_RATE_TAU", "600"))  # rate smoothing, sec
 BOOK_MAX_AGE = float(os.environ.get("BOOK_MAX_AGE", "180"))
 # Fraction of scorable orders needing a fresh book before a sample counts.
 HF_MIN_FRESH = float(os.environ.get("HF_MIN_FRESH", "0.5"))
+# A displayed rate older than this has no evidence behind it; see
+# has_live_data(). Four poll intervals, so a couple of missed polls do not
+# blank the dashboard but a real outage does.
+STALE_AFTER = float(os.environ.get("STALE_AFTER", str(POLL_SECONDS * 4)))
 # Fraction of the DAY the sampler must actually have measured before its
 # figure is treated as that day's earnings.
 #
@@ -480,19 +484,38 @@ class Monitor:
         as the day's total is how 2026-08-10 came to read $51.73.
         Caller must hold the lock.
         """
+        live = self.has_live_data()
         if self.hf_covers_day():
             rate = self.hf_rate if self.hf_rate is not None else self.rate
-            # No live books means no evidence of a rate, so report zero rather
-            # than the last good EWMA. A held-over number reads as a calm
-            # market when it is really our own feed standing still, and the
-            # accrual behind it has already stopped for the same reason.
-            fresh, considered = self.hf_fresh
-            if considered and fresh < considered * HF_MIN_FRESH:
-                rate = 0.0
             return (self.state.get("earned_hf") or 0.0,
-                    self.state.get("per_market_hf") or {}, rate, "hf")
+                    self.state.get("per_market_hf") or {},
+                    rate if live else 0.0, "hf")
         return (self.state.get("earned") or 0.0,
-                self.state.get("per_market") or {}, self.rate, "sparse")
+                self.state.get("per_market") or {},
+                self.rate if live else 0.0, "sparse")
+
+    def has_live_data(self) -> bool:
+        """Is there current evidence of a rate at all? Caller holds the lock.
+
+        Both displayed rates are last-known values that only move when their
+        producer runs: self.rate updates in sample(), self.hf_rate in the
+        sampler. When the exchange stops answering, neither updates and both
+        sit at whatever they last were — which is how the dashboard came to
+        advertise $374/day against ZERO open orders during the post-maintenance
+        401s. A rate is a claim about right now, so it needs evidence from
+        right now.
+        """
+        if not self.orders:
+            return False        # nothing resting can be earning anything
+        if self.last_ts is None:
+            return False        # no successful poll yet this process
+        age = (dt.datetime.now(dt.timezone.utc) - self.last_ts).total_seconds()
+        if age > STALE_AFTER:
+            return False        # polls are failing; the last rate is history
+        fresh, considered = self.hf_fresh
+        if considered and fresh < considered * HF_MIN_FRESH:
+            return False        # books have gone quiet even if polls have not
+        return True
 
     def __init__(self) -> None:
         self.lock = threading.Lock()
