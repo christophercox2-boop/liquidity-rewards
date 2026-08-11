@@ -48,7 +48,10 @@ jobs:
           import json, os, time, io, collections, requests
           import track_rewards as tr
 
-          MODE = "fire"            # "report" or "fire"
+          # Fired 2026-08-11 15:05 UTC after the window: 2 orders were still
+          # resting, 401 re-placed, 0 failures, 89 qualifying asks topped to
+          # 2000. Back to report so a stray push cannot repeat it.
+          MODE = "report"          # "report" or "fire"
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           BUF = io.StringIO()
