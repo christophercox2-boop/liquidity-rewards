@@ -1,9 +1,20 @@
-scc-hrep-rep-2026-11-03-gte180         TINY want    10  best bid   0.75  depth   450,478  ours 1
-scc-hrep-rep-2026-11-03-gte205         TINY want    10  best bid   0.47  depth    81,162  ours 1
-scc-hrep-rep-2026-11-03-gte225         BIG  want  1000  best bid   0.01  depth   256,231  ours 1
-scc-senate-gop-2026-11-03-47           MID  want   100  best bid   0.13  depth    30,714  ours 1
-scc-senate-gop-2026-11-03-51           TINY want    10  best bid   0.19  depth   200,589  ours 1
-scc-senate-gop-2026-11-03-52           MID  want   100  best bid   0.09  depth    51,751  ours 1
-scc-senate-gop-2026-11-03-54           MID  want   100  best bid   0.03  depth    74,090  ours 1
-scc-senate-gop-2026-11-03-gte57        BIG  want  1000  best bid   0.02  depth     6,314  ours 1
-scc-senate-gop-2026-11-03-lte45        BIG  want  1000  best bid   0.07  depth    82,087  ours 0
+cancel scc-hrep-rep-2026-11-03-gte180         0.75 -> 200
+  restore BUY  0.75 x50 -> 200
+cancel scc-hrep-rep-2026-11-03-gte205         0.47 -> 200
+  restore SELL 0.48 x20 -> 200
+cancel scc-hrep-rep-2026-11-03-gte225         0.01 -> 200
+  restore SELL 0.12 x20 -> 200
+cancel scc-senate-gop-2026-11-03-47           0.13 -> 200
+  restore BUY  0.13 x22 -> 200
+cancel scc-senate-gop-2026-11-03-51           0.19 -> 200
+  restore BUY  0.19 x2 -> 200
+  restore SELL 0.28 x50 -> 200
+cancel scc-senate-gop-2026-11-03-52           0.09 -> 200
+  restore BUY  0.09 x5 -> 200
+cancel scc-senate-gop-2026-11-03-54           0.03 -> 200
+  restore SELL 0.08 x30 -> 200
+cancel scc-senate-gop-2026-11-03-gte57        0.02 -> 200
+  restore SELL 0.04 x20 -> 200
+  restore BUY  0.01 x5000 -> 200
+
+cancelled 8 experiment orders | restored 10 | failed 0
