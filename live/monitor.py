@@ -53,6 +53,10 @@ MAX_GAP_SECONDS = 300  # an outage never extrapolates more than 5 minutes
 # Same reason as the note below: read from Monitor methods, so defined here.
 HF_MIN_SAMPLES = int(os.environ.get("HF_MIN_SAMPLES", "240"))
 HF_RATE_TAU = float(os.environ.get("HF_RATE_TAU", "600"))  # rate smoothing, seconds
+# Raw samples kept for the graph. At the 5s mean this is ~50 minutes of dots —
+# enough to see the scatter and how tight the smoothed line sits inside it,
+# without making every dashboard refresh carry a large payload.
+HF_POINTS_KEPT = int(os.environ.get("HF_POINTS_KEPT", "600"))
 # Defined up here, not with the other DEFEND_* constants further down: the
 # defend-seed runs from Monitor.__init__, which executes long before that
 # block, so leaving it there raised NameError on boot.
@@ -446,6 +450,11 @@ class Monitor:
         self.lock = threading.Lock()
         self._hf_samples = 0        # samples behind earned_hf, reset each day
         self.hf_rate: float | None = None   # EWMA of the Poisson-sampled rate
+        # Raw Poisson samples for the graph: [epoch_seconds, $/day]. Held in
+        # memory only, never in self.state — state.json is saved to GitHub on
+        # a timer and this would bloat every write for something that is
+        # purely a live view and rebuilds within minutes of a restart.
+        self.hf_points: list[list[float]] = []
         self.state: dict = {"day": None, "earned": 0.0, "per_market": {}, "history": [],
                             "saved_at": 0.0, "rate": 0.0, "market_rates": {}, "ts": None,
                             # High-frequency accrual: the same integration as
@@ -982,6 +991,7 @@ class Monitor:
                 "earned_today": round(_h_earned, 4),
                 "rate_per_day": round(_h_rate, 2),
                 "earned_basis": _h_basis,   # "hf" = unbiased sampler, "sparse" = old accrual
+                "hf_points": list(self.hf_points),   # raw Poisson samples for the graph
                 "per_market_today": {m: round(v, 4) for m, v in sorted(
                     _h_per.items(), key=lambda kv: -kv[1])},
                 "orders": [
@@ -1133,6 +1143,8 @@ def hf_sampler_loop() -> None:
             a = 1.0 - pow(2.718281828459045, -elapsed / HF_RATE_TAU)
             MONITOR.hf_rate = rate if MONITOR.hf_rate is None else \
                 MONITOR.hf_rate + a * (rate - MONITOR.hf_rate)
+            MONITOR.hf_points.append([round(now, 1), round(rate, 2)])
+            del MONITOR.hf_points[:-HF_POINTS_KEPT]
 
 
 ACTIONS: list[dict] = []  # audit log of every reprice: request + raw response + verification
@@ -4301,21 +4313,40 @@ function rateDayGraph(d){
     };
     for(let x = 0; x <= 24.001; x += 0.25) proj.push([Math.min(x, 24), rAt(Math.min(x, 24))]);
   }
-  const ys = sm.map(q => q[1]).concat(proj.map(q => q[1]));
+  // Raw Poisson samples — the individual measurements the day's figure is
+  // built from. Scale to their 95th percentile, not their max: in a deep book
+  // scoring flips to full whenever we hold the touch, so a handful of spikes
+  // would otherwise flatten the whole chart. Anything above is clamped to the
+  // top edge and drawn hollow so a clipped point is visibly clipped.
+  const dots = (d.hf_points || []).filter(q => q[0] * 1000 >= midMs);
+  const dsort = dots.map(q => q[1]).sort((a, b) => a - b);
+  const p95 = dsort.length ? dsort[Math.floor(dsort.length * 0.95)] : 0;
+  const ys = sm.map(q => q[1]).concat(proj.map(q => q[1])).concat(p95 ? [p95] : []);
   const ymax = Math.max(...ys, 1) * 1.1;
   const X = x => p + (w - 2 * p) * x / 24;
   const Y = v => h - p - (h - 2 * p) * v / ymax;
   const hx = ts => Math.min(Math.max((ts * 1000 - midMs) / 3600000, 0), 24);
+  const dotSvg = dots.map(q => {
+    const over = q[1] > ymax;
+    return '<circle cx="' + X(hx(q[0])).toFixed(1) + '" cy="' + Y(Math.min(q[1], ymax)).toFixed(1) +
+      '" r="' + (over ? 1.6 : 1.3) + '" ' +
+      (over ? 'fill="none" stroke="var(--accent)" stroke-width=".8" opacity=".55"'
+            : 'fill="var(--accent)" opacity=".22"') + '/>';
+  }).join('');
   const curve = sm.map((q, i) => (i ? 'L' : 'M') + X(hx(q[0])).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ');
   const pcurve = proj.map((q, i) => (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ');
+  const clipped = dots.filter(q => q[1] > ymax).length;
   return '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;background:#141a23;border-radius:12px">' +
     '<line x1="' + X(hf).toFixed(1) + '" y1="' + p + '" x2="' + X(hf).toFixed(1) + '" y2="' + (h - p) +
     '" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="2,4"/>' +
+    dotSvg +
     (pcurve ? '<path d="' + pcurve + '" fill="none" stroke="var(--good)" stroke-width="2" stroke-dasharray="4,5" opacity=".9"/>' : '') +
     '<path d="' + curve + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' +
     '</svg>' +
     '<div class="mkt">earning rate, midnight → midnight ET · solid: today, smoothed over ~8 min' +
-    (proj.length ? ' · dotted: your typical pattern (above it = beating your usual hour)' : '') + '</div>';
+    (dots.length ? ' · dots: ' + dots.length + ' raw samples (last ~50 min)' +
+                   (clipped ? ', ' + clipped + ' hollow = above the top edge' : '') : '') +
+    (proj.length ? ' · dashed: your typical pattern (above it = beating your usual hour)' : '') + '</div>';
 }
 function heroMode(){ return localStorage.getItem('heroG') || 'day'; }
 function setHeroMode(m){ localStorage.setItem('heroG', m); refresh(); }
