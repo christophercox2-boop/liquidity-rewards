@@ -1,0 +1,5 @@
+105 lost orders, 0 already back, placing 105
+
+
+placed 105 | bounced 0
+still resting after 60s: 79 of 105 placed
