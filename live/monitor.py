@@ -53,10 +53,6 @@ MAX_GAP_SECONDS = 300  # an outage never extrapolates more than 5 minutes
 # Same reason as the note below: read from Monitor methods, so defined here.
 HF_MIN_SAMPLES = int(os.environ.get("HF_MIN_SAMPLES", "240"))
 HF_RATE_TAU = float(os.environ.get("HF_RATE_TAU", "600"))  # rate smoothing, seconds
-# A book older than this is not evidence of anything; see _rescore_rate.
-BOOK_MAX_AGE = float(os.environ.get("BOOK_MAX_AGE", "180"))
-# Fraction of scorable orders needing a fresh book before a sample counts.
-HF_MIN_FRESH = float(os.environ.get("HF_MIN_FRESH", "0.5"))
 # Raw samples kept for the graph. At the 5s mean this is ~50 minutes of dots —
 # enough to see the scatter and how tight the smoothed line sits inside it,
 # without making every dashboard refresh carry a large payload.
@@ -459,7 +455,6 @@ class Monitor:
         # a timer and this would bloat every write for something that is
         # purely a live view and rebuilds within minutes of a restart.
         self.hf_points: list[list[float]] = []
-        self.hf_fresh: tuple[int, int] = (0, 0)   # books fresh / orders considered
         self.state: dict = {"day": None, "earned": 0.0, "per_market": {}, "history": [],
                             "saved_at": 0.0, "rate": 0.0, "market_rates": {}, "ts": None,
                             # High-frequency accrual: the same integration as
@@ -1092,33 +1087,20 @@ POLL_KICK = threading.Event()  # set after a reprice so the next poll runs immed
 SAMPLE_MEAN_SECONDS = float(os.environ.get("SAMPLE_MEAN_SECONDS", "5"))
 
 
-def _rescore_rate() -> tuple[float, dict[str, float], int, int]:
-    """(rate, per-market, books fresh enough to score, orders considered).
-
-    Only scores against books newer than BOOK_MAX_AGE. The cache keeps its
-    last value forever when the stream and REST both stop — during an exchange
-    maintenance window every book goes quiet at once — and re-scoring a frozen
-    book returns the same number indefinitely. That reads as a beautifully
-    stable rate and is really just our own feed standing still, so the caller
-    must know how much of the book it is actually seeing before accruing.
-    """
+def _rescore_rate() -> tuple[float, dict[str, float]]:
+    """Current $/day implied by the freshest known books. Same scoring path as
+    the tracker (tr._score_order), just evaluated at an unbiased moment."""
     progs = tr._PROG_CACHE.get("progs") or {}
-    now = time.time()
     total = 0.0
     per: dict[str, float] = {}
-    fresh = considered = 0
     for o in list(MONITOR.orders):
         slug = o.get("market")
         if not slug:
             continue
         cached = tr._BOOK_CACHE.get(slug)
         prog = progs.get(slug)
-        if not prog or not prog.get("pool"):
+        if not cached or not prog or not prog.get("pool"):
             continue
-        considered += 1
-        if not cached or now - cached[0] > BOOK_MAX_AGE:
-            continue
-        fresh += 1
         probe = {"market": slug, "side": o["side"], "price": o["price"], "size": o["size"]}
         try:
             tr._score_order(probe, cached[1], prog)
@@ -1128,7 +1110,7 @@ def _rescore_rate() -> tuple[float, dict[str, float], int, int]:
         if est:
             total += est
             per[slug] = per.get(slug, 0.0) + est
-    return total, per, fresh, considered
+    return total, per
 
 
 def hf_sampler_loop() -> None:
@@ -1144,18 +1126,8 @@ def hf_sampler_loop() -> None:
         if not MONITOR.orders or elapsed <= 0:
             continue
         try:
-            rate, per, fresh, considered = _rescore_rate()
+            rate, per = _rescore_rate()
         except Exception:  # noqa: BLE001 — measurement never kills its own thread
-            continue
-        # A dead feed must not be recorded as a steady rate. When most books
-        # have gone stale — maintenance, a dropped stream, a rate-limit stall —
-        # accrue NOTHING and bank the elapsed time as a gap instead. Carrying
-        # on at the last known rate would quietly invent hours of earnings
-        # during exactly the windows we least understand.
-        if considered and fresh < considered * HF_MIN_FRESH:
-            with MONITOR.lock:
-                MONITOR.state["hf_stale_s"] = MONITOR.state.get("hf_stale_s", 0.0) + elapsed
-                MONITOR.hf_fresh = (fresh, considered)
             continue
         frac = elapsed / 86400.0
         with MONITOR.lock:
@@ -1171,7 +1143,6 @@ def hf_sampler_loop() -> None:
             a = 1.0 - pow(2.718281828459045, -elapsed / HF_RATE_TAU)
             MONITOR.hf_rate = rate if MONITOR.hf_rate is None else \
                 MONITOR.hf_rate + a * (rate - MONITOR.hf_rate)
-            MONITOR.hf_fresh = (fresh, considered)
             MONITOR.hf_points.append([round(now, 1), round(rate, 2)])
             del MONITOR.hf_points[:-HF_POINTS_KEPT]
 
