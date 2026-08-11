@@ -1,0 +1,95 @@
+name: Position check
+
+# Read-only. Reports open positions and the book at each, so a fill can be
+# assessed before deciding whether to trade out of it. Places nothing,
+# cancels nothing.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/position_check.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: position-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Report positions
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, io, time, requests
+          import track_rewards as tr
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          path = "/v1/portfolio/positions"
+          r = requests.get(tr.TRADE_API + path,
+                           headers=tr.auth_headers(kid, sec, "GET", path),
+                           params={"limit": 300}, timeout=30)
+          print(f"positions HTTP {r.status_code}")
+          pos = {}
+          if r.status_code < 400:
+              body = r.json()
+              raw = body.get("positions")
+              items = raw.items() if isinstance(raw, dict) else \
+                      [((p.get("marketSlug") or ""), p) for p in (raw or [])]
+              for slug, v in items:
+                  n = float(v.get("netPosition") or v.get("quantity") or 0)
+                  if abs(n) > 1e-9:
+                      pos[slug] = {"net": n,
+                                   "avg": v.get("averagePrice") or v.get("avgPx"),
+                                   "raw": {k: v.get(k) for k in list(v)[:8]}}
+          print(f"non-zero positions: {len(pos)}\n")
+          WATCH = "scc-senate-gop-2026-11-03-lte45"
+          for slug, v in sorted(pos.items(), key=lambda kv: -abs(kv[1]["net"])):
+              mark = "  <-- experiment fill" if slug == WATCH else ""
+              print(f"{slug[:44]:44s} net {v['net']:10,.1f}  avg {v['avg']}{mark}")
+          if WATCH not in pos:
+              print(f"\n{WATCH}: NO position — the order did not fill after all")
+          try:
+              bk = tr._fetch_book(WATCH)
+              bb = (bk.get('bids') or [[None, None]])[0]
+              ba = (bk.get('asks') or [[None, None]])[0]
+              print(f"\n{WATCH} book now: best bid {bb} / best ask {ba}")
+              if WATCH in pos and bb and bb[0]:
+                  n = pos[WATCH]["net"]
+                  print(f"   exiting {n:,.0f} at the {bb[0]} bid would return "
+                        f"${n * bb[0]:,.2f} (paid ~${n * 0.07:,.2f})")
+          except Exception as e:
+              print("book error:", type(e).__name__, e)
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/position_check.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/position_check.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Position check [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
