@@ -4348,6 +4348,56 @@ function rateDayGraph(d){
                    (clipped ? ', ' + clipped + ' hollow = above the top edge' : '') : '') +
     (proj.length ? ' · dashed: your typical pattern (above it = beating your usual hour)' : '') + '</div>';
 }
+function rateZoomGraph(d){
+  // The last 15 minutes at full resolution: every Poisson sample as its own
+  // dot, no percentile scaling. The day view has to compress spikes to stay
+  // readable; here the spikes ARE the point — they show how much of the time
+  // we actually hold the touch, which is what the day's figure averages over.
+  const MINS = 15;
+  const nowS = Date.now() / 1000;
+  const t0 = nowS - MINS * 60;
+  const pts = (d.hf_points || []).filter(q => q[0] >= t0).sort((a, b) => a[0] - b[0]);
+  if(pts.length < 3) return '<div class="mkt">collecting samples — the zoom fills in over a minute or two…</div>';
+  const w = 360, h = 110, p = 10;
+  const ys = pts.map(q => q[1]);
+  const lo = Math.min(...ys), hi = Math.max(...ys);
+  const pad = Math.max((hi - lo) * 0.10, 0.01);
+  const y0 = Math.max(0, lo - pad), y1 = hi + pad;
+  const X = t => p + (w - 2 * p) * Math.min(Math.max((t - t0) / (MINS * 60), 0), 1);
+  const Y = v => h - p - (h - 2 * p) * (v - y0) / Math.max(y1 - y0, 1e-9);
+  // trailing mean over ~1 minute of samples — at this zoom the headline's
+  // ~10 min smoothing is a flat line and shows nothing
+  const W = 12;
+  const sm = pts.map((q, i) => {
+    const win = pts.slice(Math.max(0, i - W + 1), i + 1);
+    return [q[0], win.reduce((s, x) => s + x[1], 0) / win.length];
+  });
+  const mean = ys.reduce((a, b) => a + b, 0) / ys.length;
+  const dotSvg = pts.map(q =>
+    '<circle cx="' + X(q[0]).toFixed(1) + '" cy="' + Y(q[1]).toFixed(1) +
+    '" r="1.7" fill="var(--accent)" opacity=".45"/>').join('');
+  const curve = sm.map((q, i) => (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ');
+  // minute gridlines, so the gaps between samples are readable as time
+  let grid = '';
+  for(let k = 1; k < MINS; k++){
+    if(k % 5) continue;
+    const gx = X(t0 + k * 60).toFixed(1);
+    grid += '<line x1="' + gx + '" y1="' + p + '" x2="' + gx + '" y2="' + (h - p) +
+            '" stroke="var(--ink3)" stroke-width=".5" opacity=".45"/>';
+  }
+  const gapS = (pts[pts.length - 1][0] - pts[0][0]) / Math.max(pts.length - 1, 1);
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;background:#141a23;border-radius:12px">' +
+    grid +
+    '<line x1="' + p + '" y1="' + Y(mean).toFixed(1) + '" x2="' + (w - p) + '" y2="' + Y(mean).toFixed(1) +
+    '" stroke="var(--good)" stroke-width="1" stroke-dasharray="4,4" opacity=".85"/>' +
+    dotSvg +
+    '<path d="' + curve + '" fill="none" stroke="var(--accent)" stroke-width="2"/>' +
+    '</svg>' +
+    '<div class="mkt">last ' + MINS + ' min · ' + pts.length + ' samples, one every ' +
+    gapS.toFixed(1) + 's · dashed: window mean <b style="color:var(--good)">$' + mean.toFixed(2) +
+    '</b>/day · range $' + lo.toFixed(2) + '–$' + hi.toFixed(2) +
+    ' · solid: trailing 1 min. Gridlines every 5 min.</div>';
+}
 function heroMode(){ return localStorage.getItem('heroG') || 'day'; }
 function setHeroMode(m){ localStorage.setItem('heroG', m); refresh(); }
 function bigSpark(pts){
@@ -4704,8 +4754,10 @@ async function renderAll(d){
     document.getElementById('ovg').innerHTML =
       '<div class="chips" style="margin:2px 0 6px">'+
       '<button class="chip'+(heroMode()==='day' ? ' chipon' : '')+'" onclick="setHeroMode(\\'day\\')">earnings</button>'+
-      '<button class="chip'+(heroMode()==='rate' ? ' chipon' : '')+'" onclick="setHeroMode(\\'rate\\')">rate</button></div>'+
-      (heroMode() === 'day' ? dayGraph(d) : rateDayGraph(d));
+      '<button class="chip'+(heroMode()==='rate' ? ' chipon' : '')+'" onclick="setHeroMode(\\'rate\\')">rate</button>'+
+      '<button class="chip'+(heroMode()==='zoom' ? ' chipon' : '')+'" onclick="setHeroMode(\\'zoom\\')">live 15m</button></div>'+
+      (heroMode() === 'day' ? dayGraph(d)
+        : heroMode() === 'zoom' ? rateZoomGraph(d) : rateDayGraph(d));
     renderHome(d);
     BP = d.buying_power;
     document.getElementById('planBP').textContent =
