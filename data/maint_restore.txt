@@ -1,14 +1,29 @@
 manifest taken 2026-08-11T02:31:02.801491+00:00: 401 orders
-resting right now: 401 orders
+resting right now: 232 orders
 
-survived the window : 395
-vanished            : 6
+survived the window : 220
+vanished            : 181
 
-books where we lost orders (5 markets), first 20:
-   ewc-usgub-ca-2026-11-03-xavbec               now   0.53/  0.99   was: B93
-   ewc-usse-tx-2026-11-03-dem                   now   0.49/   0.5   was: B51
-   opdc-mcconnell-resign-2026-11-02             now    0.1/  0.45   was: B9
-   usgubewc-usgub-al-2026-11-03-dem             now   0.04/  0.24   was: S35
-   usgubewc-usgub-al-2026-11-03-rep             now   0.81/  None   was: B48 S50
+books where we lost orders (105 markets), first 20:
+   apdc-alito-2026-12-31                        now   0.11/  0.14   was: B8 B8
+   apdc-jerpowgov-2026-12-31                    now   0.16/  0.18   was: S26 B25 S99
+   enwc-ushrp-fl25-2026-08-18-dem-olilar        now   0.07/  0.49   was: S99
+   ewc-usgub-ca-2026-11-03-xavbec               now   0.92/  0.93   was: B93
+   ewc-usse-tx-2026-11-03-dem                   now   0.52/  0.53   was: B51
+   opdc-mcconnell-resign-2026-11-02             now   0.08/  0.27   was: B9
+   pandc-anydis-2027-12-31                      now   0.13/   0.2   was: S25 S24 S23
+   scc-hrep-rep-2026-11-03-gte180               now   0.85/  0.98   was: B75
+   scc-hrep-rep-2026-11-03-gte190               now   0.71/  0.75   was: S99
+   scc-hrep-rep-2026-11-03-gte205               now   0.35/   0.4   was: S48
+   scc-hrep-rep-2026-11-03-gte210               now   0.27/  0.37   was: S42
+   scc-hrep-rep-2026-11-03-gte220               now    0.2/  0.28   was: S99 B24
+   scc-senate-gop-2026-11-03-49                 now   0.15/  0.22   was: B14
+   scc-senate-gop-2026-11-03-50                 now   0.18/  0.21   was: S29 S28 S28
+   scc-senate-gop-2026-11-03-52                 now   0.15/  0.24   was: S15
+   usgubewc-usgub-al-2026-11-03-dem             now   0.04/  0.19   was: S99 S35
+   usgubewc-usgub-al-2026-11-03-rep             now   0.53/   0.8   was: B48 S50
+   usgubewc-usgub-ar-2026-11-03-dem             now   0.01/  0.08   was: S99 S20
+   usgubewc-usgub-ar-2026-11-03-rep             now   0.94/  0.99   was: B93 S99
+   usgubewc-usgub-co-2026-11-03-dem             now   0.92/  0.99   was: B91 S99
 
 MODE is 'report' — nothing was placed.
