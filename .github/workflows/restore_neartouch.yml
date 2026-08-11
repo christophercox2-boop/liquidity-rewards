@@ -1,0 +1,113 @@
+name: Restore near-touch orders
+
+# Re-places the 105 near-touch orders (everything that is not a 1c/99c
+# qualifier) destroyed by the broken modify endpoint, from the last clean
+# pre-shredding snapshot (15:18 UTC, live states only — no ghosts).
+#
+# PLACEMENTS ONLY, post-only: an order whose book has moved through its old
+# price is rejected by the exchange instead of trading, which is the correct
+# outcome — those need a fresh decision, not a blind re-entry. Skips anything
+# already resting at the same (market, side, price).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/restore_neartouch.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: restore-neartouch
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Restore
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          LOST = [{"m":"scc-hrep-rep-2026-11-03-gte190","s":"BUY","p":"0.71","q":10,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-or-2026-11-03-rep","s":"SELL","p":"0.08","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-tn-2026-11-03-rep","s":"BUY","p":"0.89","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-tx-2026-11-03-dem","s":"SELL","p":"0.17","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-nm-2026-11-03-rep","s":"SELL","p":"0.11","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-il-2026-11-03-dem","s":"BUY","p":"0.91","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-ky-2026-11-03-rep","s":"BUY","p":"0.84","q":75,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-ar-2026-11-03-dem","s":"SELL","p":"0.20","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"scc-hrep-rep-2026-11-03-gte180","s":"SELL","p":"0.88","q":50,"i":"ORDER_INTENT_SELL_LONG"},{"m":"ussewc-usse-ma-2026-11-03-dem","s":"BUY","p":"0.93","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-nh-2026-11-03-rep","s":"BUY","p":"0.65","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-co-2026-11-03-rep","s":"SELL","p":"0.31","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"scc-senate-gop-2026-11-03-49","s":"BUY","p":"0.14","q":20,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-hi-2026-11-03-rep","s":"SELL","p":"0.22","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-ny-2026-11-03-rep","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-ny-2026-11-03-rep","s":"SELL","p":"0.26","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-mn-2026-11-03-rep","s":"SELL","p":"0.12","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-mn-2026-11-03-rep","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-ma-2026-11-03-rep","s":"SELL","p":"0.14","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-ms-2026-11-03-rep","s":"BUY","p":"0.84","q":50,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-wy-2026-11-03-dem","s":"SELL","p":"0.12","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-hi-2026-11-03-dem","s":"BUY","p":"0.93","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-fl-2026-11-03-dem","s":"SELL","p":"0.34","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-or-2026-11-03-rep","s":"SELL","p":"0.26","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"scc-hrep-rep-2026-11-03-gte210","s":"SELL","p":"0.42","q":21,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"scc-hrep-rep-2026-11-03-gte210","s":"BUY","p":"0.10","q":10,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-id-2026-11-03-rep","s":"BUY","p":"0.93","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-wv-2026-11-03-dem","s":"SELL","p":"0.11","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-ms-2026-11-03-dem","s":"SELL","p":"0.18","q":50,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-nm-2026-11-03-rep","s":"SELL","p":"0.16","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-nm-2026-11-03-rep","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-ma-2026-11-03-dem","s":"BUY","p":"0.92","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-ok-2026-11-03-dem","s":"SELL","p":"0.11","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-ny-2026-11-03-dem","s":"BUY","p":"0.89","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-wy-2026-11-03-rep","s":"BUY","p":"0.93","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-md-2026-11-03-rep","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-md-2026-11-03-rep","s":"SELL","p":"0.16","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-nh-2026-11-03-dem","s":"SELL","p":"0.35","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-co-2026-11-03-rep","s":"SELL","p":"0.22","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-co-2026-11-03-rep","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-me-2026-11-03-rep","s":"SELL","p":"0.16","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-me-2026-11-03-rep","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-fl-2026-11-03-dem","s":"SELL","p":"0.41","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-sc-2026-11-03-rep","s":"BUY","p":"0.83","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-ar-2026-11-03-rep","s":"BUY","p":"0.93","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-fl-2026-11-03-rep","s":"BUY","p":"0.79","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-fl-2026-11-03-rep","s":"BUY","p":"0.50","q":50,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-ne-2026-11-03-rep","s":"BUY","p":"0.69","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-tn-2026-11-03-dem","s":"SELL","p":"0.16","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-tn-2026-11-03-dem","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-vt-2026-11-03-rep","s":"BUY","p":"0.71","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"scc-senate-gop-2026-11-03-53","s":"BUY","p":"0.13","q":1,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-al-2026-11-03-dem","s":"SELL","p":"0.07","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-fl-2026-11-03-rep","s":"BUY","p":"0.66","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-ky-2026-11-03-dem","s":"SELL","p":"0.12","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-sc-2026-11-03-dem","s":"SELL","p":"0.17","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-ct-2026-11-03-rep","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-ct-2026-11-03-rep","s":"SELL","p":"0.16","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-co-2026-11-03-dem","s":"BUY","p":"0.91","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-sc-2026-11-03-rep","s":"BUY","p":"0.77","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"scc-senate-gop-2026-11-03-50","s":"SELL","p":"0.28","q":2,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"scc-senate-gop-2026-11-03-50","s":"SELL","p":"0.29","q":10,"i":"ORDER_INTENT_SELL_LONG"},{"m":"scc-senate-gop-2026-11-03-50","s":"SELL","p":"0.28","q":2,"i":"ORDER_INTENT_SELL_LONG"},{"m":"ussewc-usse-co-2026-11-03-dem","s":"BUY","p":"0.79","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-co-2026-11-03-dem","s":"BUY","p":"0.50","q":50,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-mt-2026-11-03-rep","s":"BUY","p":"0.94","q":50,"i":"ORDER_INTENT_BUY_LONG"},{"m":"scc-senate-gop-2026-11-03-52","s":"SELL","p":"0.15","q":8,"i":"ORDER_INTENT_SELL_LONG"},{"m":"pandc-anydis-2027-12-31","s":"SELL","p":"0.24","q":2,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"pandc-anydis-2027-12-31","s":"SELL","p":"0.23","q":20,"i":"ORDER_INTENT_SELL_LONG"},{"m":"ussewc-usse-la-2026-11-03-rep","s":"BUY","p":"0.94","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-or-2026-11-03-dem","s":"SELL","p":"0.90","q":40,"i":"ORDER_INTENT_SELL_LONG"},{"m":"usgubewc-usgub-or-2026-11-03-dem","s":"BUY","p":"0.73","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-ri-2026-11-03-dem","s":"BUY","p":"0.83","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-il-2026-11-03-rep","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-il-2026-11-03-rep","s":"SELL","p":"0.24","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-il-2026-11-03-rep","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-il-2026-11-03-rep","s":"SELL","p":"0.50","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-de-2026-11-03-dem","s":"BUY","p":"0.93","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-ks-2026-11-03-dem","s":"SELL","p":"0.27","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-il-2026-11-03-dem","s":"BUY","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-ks-2026-11-03-rep","s":"BUY","p":"0.74","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-vt-2026-11-03-dem","s":"SELL","p":"0.29","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-sc-2026-11-03-dem","s":"SELL","p":"0.16","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"apdc-alito-2026-12-31","s":"BUY","p":"0.08","q":30,"i":"ORDER_INTENT_BUY_LONG"},{"m":"apdc-alito-2026-12-31","s":"BUY","p":"0.08","q":10,"i":"ORDER_INTENT_BUY_LONG"},{"m":"scc-hrep-rep-2026-11-03-gte205","s":"SELL","p":"0.48","q":20,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-or-2026-11-03-dem","s":"BUY","p":"0.89","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-tx-2026-11-03-rep","s":"BUY","p":"0.83","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-tx-2026-11-03-rep","s":"BUY","p":"0.83","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"ussewc-usse-la-2026-11-03-dem","s":"SELL","p":"0.37","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-ct-2026-11-03-dem","s":"BUY","p":"0.89","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-id-2026-11-03-dem","s":"SELL","p":"0.14","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-ri-2026-11-03-rep","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-ri-2026-11-03-rep","s":"SELL","p":"0.26","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-sd-2026-11-03-dem","s":"SELL","p":"0.12","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-sd-2026-11-03-dem","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"scc-hrep-rep-2026-11-03-gte220","s":"BUY","p":"0.24","q":5,"i":"ORDER_INTENT_SELL_SHORT"},{"m":"apdc-jerpowgov-2026-12-31","s":"BUY","p":"0.07","q":10,"i":"ORDER_INTENT_BUY_LONG"},{"m":"apdc-jerpowgov-2026-12-31","s":"SELL","p":"0.26","q":10,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-pa-2026-11-03-rep","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-pa-2026-11-03-rep","s":"SELL","p":"0.22","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-tn-2026-11-03-rep","s":"BUY","p":"0.90","q":40,"i":"ORDER_INTENT_BUY_LONG"},{"m":"usgubewc-usgub-ne-2026-11-03-dem","s":"SELL","p":"0.30","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"usgubewc-usgub-ne-2026-11-03-dem","s":"SELL","p":"0.51","q":40,"i":"ORDER_INTENT_BUY_SHORT"},{"m":"ussewc-usse-wv-2026-11-03-rep","s":"BUY","p":"0.94","q":50,"i":"ORDER_INTENT_BUY_LONG"}]
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+          LIVE = ("ORDER_STATE_NEW", "ORDER_STATE_PARTIALLY_FILLED")
+
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          resting = set()
+          for o in r.json().get("orders") or []:
+              if str(o.get("state")) in LIVE:
+                  resting.add((o.get("marketSlug"),
+                               "BUY" if str(o.get("side","")).upper().endswith("BUY") else "SELL",
+                               round(tr._num(o.get("price")), 2)))
+          todo = [x for x in LOST if (x["m"], x["s"], round(float(x["p"]), 2)) not in resting]
+          print(f"{len(LOST)} lost orders, {len(LOST)-len(todo)} already back, placing {len(todo)}\n")
+
+          placed = bounced = 0
+          for x in todo:
+              body = {"marketSlug": x["m"],
+                      "intent": x["i"] or ("ORDER_INTENT_BUY_LONG" if x["s"] == "BUY"
+                                           else "ORDER_INTENT_BUY_SHORT"),
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": x["p"], "currency": "USD"},
+                      "quantity": int(x["q"]),
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              rr = api("POST", "/v1/orders", json=body)
+              if rr.status_code < 300:
+                  placed += 1
+              else:
+                  bounced += 1
+                  print(f"  bounced {x['m'][:40]:40s} {x['s']:4s} {x['p']} x{x['q']} "
+                        f"-> {rr.status_code} {' '.join(rr.text.split())[:90]}")
+              time.sleep(0.5)
+          print(f"\nplaced {placed} | bounced {bounced}")
+
+          time.sleep(60)
+          r2 = api("GET", "/v1/orders/open"); r2.raise_for_status()
+          resting2 = set()
+          for o in r2.json().get("orders") or []:
+              if str(o.get("state")) in LIVE:
+                  resting2.add((o.get("marketSlug"),
+                                "BUY" if str(o.get("side","")).upper().endswith("BUY") else "SELL",
+                                round(tr._num(o.get("price")), 2)))
+          stuck = sum(1 for x in todo if (x["m"], x["s"], round(float(x["p"]), 2)) in resting2)
+          print(f"still resting after 60s: {stuck} of {placed} placed")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/restore_neartouch.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/restore_neartouch.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Restore near-touch orders [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
