@@ -1,0 +1,7 @@
+checking 870 House district slugs across 50 states
+
+batches with errors: 0 of 22
+House markets carrying an ACTIVE pool: 0
+
+CONFIRMED: no House district market has a reward program.
+The districts we hold earn nothing, and entering more earns nothing.
