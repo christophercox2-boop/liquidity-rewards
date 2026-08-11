@@ -1,0 +1,19 @@
+plan: 7 orders, ~$140.40 of capital, MODE=fire
+
+ussewc-usse-id-2026-11-03-rep                bid      (0.5, 2401.0) / ask    (0.99, 12966.0)  depth 504,901/12,966
+ussewc-usse-wy-2026-11-03-dem                bid      (0.01, 225.0) / ask      (0.51, 100.0)  depth 225/325
+usgubewc-usgub-al-2026-11-03-dem             bid     (0.04, 4743.0) / ask       (0.21, 98.0)  depth 4,943/2,739
+
+  OK   ussewc-usse-id-2026-11-03-rep                BUY  0.01 x2000  qualify bid side
+  OK   ussewc-usse-wy-2026-11-03-dem                BUY  0.01 x2000  qualify bid side
+  OK   usgubewc-usgub-al-2026-11-03-dem             BUY  0.01 x2000  qualify bid side
+  OK   ussewc-usse-id-2026-11-03-rep                SELL 0.99 x2000  qualify ask side
+  OK   ussewc-usse-wy-2026-11-03-dem                SELL 0.99 x2000  qualify ask side
+  OK   usgubewc-usgub-al-2026-11-03-dem             SELL 0.99 x2000  qualify ask side
+  OK   ussewc-usse-id-2026-11-03-rep                BUY  0.51 x40    directional: Republican hold in Idaho
+
+placed 7 | failed 0
+  topped ask ussewc-usse-wy-2026-11-03-dem 260 -> 2000  (200)
+  topped ask ussewc-usse-id-2026-11-03-rep 260 -> 2000  (200)
+  topped ask usgubewc-usgub-al-2026-11-03-dem 260 -> 2000  (200)
+asks topped back to 2000: 3
