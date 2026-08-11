@@ -45,7 +45,12 @@ jobs:
           import collections, io, json, os, time, requests
           import track_rewards as tr
 
-          ROUNDS = 5
+          # Asks stack at ~273 shares per placement (five rounds took every ask
+          # side to exactly 1,364, perfectly linear, no cap encountered). The
+          # 5,000-share scc sides need ~19 stacked placements, so the round
+          # count is the only thing that was holding this back. The loop still
+          # stops itself the moment a round gains nothing.
+          ROUNDS = 40
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           BUF = io.StringIO(); _p = print
           def print(*a, **k):
@@ -125,10 +130,10 @@ jobs:
                   if not ok:
                       print(f"   FAIL {m} {side} x{qty} -> {rr.status_code} "
                             f"{' '.join(rr.text.split())[:100]}")
-                  time.sleep(0.6)
+                  time.sleep(0.5)
               grand += placed
-              print(f"   placed {placed}; settling 25s...")
-              time.sleep(25)
+              print(f"   placed {placed}; settling 15s...")
+              time.sleep(15)
               _, nb, na = snapshot()
               gained = (sum(nb.values()) + sum(na.values())) - (sum(bid.values()) + sum(ask.values()))
               print(f"   size gained this round: {gained:,.0f} shares")
