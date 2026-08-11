@@ -78,8 +78,11 @@ jobs:
           progs = {}
           slugs = [c[3] for c in cand]
           for i in range(0, len(slugs), 40):
-              batch = ",".join(slugs[i:i + 40])
+              batch = slugs[i:i + 40]
               try:
+                  # symbols must be a LIST (requests emits repeated params).
+                  # Comma-joining it silently matches nothing, which is how the
+                  # first run "found" zero pools on markets we know are funded.
                   rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
                                     params={"symbols": batch, "pageSize": 100}, timeout=30)
                   if rr.status_code >= 400:
