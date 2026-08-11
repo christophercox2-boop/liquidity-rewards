@@ -1,0 +1,172 @@
+name: Requalify sides
+
+# Brings every funded market's qualifying rungs back to Target Size using
+# PLACEMENTS ONLY — the exchange's modify endpoint has destroyed every order
+# it touched since the 2026-08-11 maintenance, so nothing here modifies.
+#
+# Additional orders at the same price stack, and the exchange sizes each
+# placement down as it sees fit (the survival test came back 273 of 2,000).
+# So this works in rounds: read the live book, compute each qualifier rung's
+# shortfall against the market's own program Target Size, place the
+# difference, wait, re-read, repeat. A market that stops making progress is
+# left where it is rather than hammered. Qualifier rungs are 1c bids and 99c
+# asks — defend's deep-order exemption means it never touches them.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/requalify.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: requalify
+  cancel-in-progress: false
+
+jobs:
+  requalify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Top up by placement
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import collections, io, json, os, time, requests
+          import track_rewards as tr
+
+          ROUNDS = 5
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+          LIVE = ("ORDER_STATE_NEW", "ORDER_STATE_PARTIALLY_FILLED")
+
+          def snapshot():
+              r = api("GET", "/v1/orders/open"); r.raise_for_status()
+              bid = collections.defaultdict(float); ask = collections.defaultdict(float)
+              mkts = set()
+              for o in r.json().get("orders") or []:
+                  if str(o.get("state")) not in LIVE:
+                      continue
+                  slug = o.get("marketSlug") or ""
+                  mkts.add(slug)
+                  px = tr._num(o.get("price"))
+                  lv = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity"))
+                  if str(o.get("side", "")).upper().endswith("BUY"):
+                      if abs(px - 0.01) < 1e-9:
+                          bid[slug] += lv
+                  elif abs(px - 0.99) < 1e-9:
+                      ask[slug] += lv
+              return mkts, bid, ask
+
+          mkts, bid, ask = snapshot()
+          mkts = {m for m in mkts if not m.startswith("ushrewc-")}   # no pool, nothing to qualify
+          # each market's Target Size from its own program
+          target = {}
+          slugs = sorted(mkts)
+          for i in range(0, len(slugs), 40):
+              rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                params={"symbols": slugs[i:i + 40], "pageSize": 100}, timeout=30)
+              if rr.status_code >= 400:
+                  time.sleep(2); continue
+              for p in rr.json().get("programs") or []:
+                  s = p.get("marketSlug") or ""
+                  for tp in p.get("timePeriods") or []:
+                      if str(tp.get("status") or "").lower() in ("active", "live", "status_live"):
+                          target[s] = float(tp.get("targetSize") or 0)
+              time.sleep(0.4)
+          print(f"funded markets: {len(target)} of {len(mkts)} held\n")
+
+          grand = 0
+          for rnd in range(1, ROUNDS + 1):
+              mkts, bid, ask = snapshot()
+              todo = []
+              for m, tgt in sorted(target.items()):
+                  if not tgt:
+                      continue
+                  for side, cur, px in (("BUY", bid.get(m, 0.0), "0.01"),
+                                        ("SELL", ask.get(m, 0.0), "0.99")):
+                      short = tgt - cur
+                      if short >= 1:
+                          todo.append((m, side, px, int(round(short))))
+              if not todo:
+                  print(f"round {rnd}: nothing short — all qualifier rungs at target")
+                  break
+              print(f"round {rnd}: {len(todo)} rungs short "
+                    f"(total {sum(q for *_, q in todo):,.0f} shares)")
+              placed = 0
+              for m, side, px, qty in todo:
+                  body = {"marketSlug": m,
+                          "intent": "ORDER_INTENT_BUY_LONG" if side == "BUY"
+                                    else "ORDER_INTENT_BUY_SHORT",
+                          "type": "ORDER_TYPE_LIMIT",
+                          "price": {"value": px, "currency": "USD"},
+                          "quantity": qty,
+                          "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                          "participateDontInitiate": True}
+                  rr = api("POST", "/v1/orders", json=body)
+                  ok = rr.status_code < 300
+                  placed += ok
+                  if not ok:
+                      print(f"   FAIL {m} {side} x{qty} -> {rr.status_code} "
+                            f"{' '.join(rr.text.split())[:100]}")
+                  time.sleep(0.6)
+              grand += placed
+              print(f"   placed {placed}; settling 25s...")
+              time.sleep(25)
+              _, nb, na = snapshot()
+              gained = (sum(nb.values()) + sum(na.values())) - (sum(bid.values()) + sum(ask.values()))
+              print(f"   size gained this round: {gained:,.0f} shares")
+              if gained < 1:
+                  print("   no progress — the exchange is capping size; stopping here")
+                  break
+
+          # final report
+          mkts, bid, ask = snapshot()
+          full = short = 0
+          worst = []
+          for m, tgt in sorted(target.items()):
+              if not tgt:
+                  continue
+              b, a = bid.get(m, 0.0), ask.get(m, 0.0)
+              if b >= tgt - 0.5 and a >= tgt - 0.5:
+                  full += 1
+              else:
+                  short += 1
+                  worst.append((min(b, a) / tgt, m, b, a, tgt))
+          print(f"\nFINAL: {full} markets fully qualified on both rungs, {short} still short")
+          for frac, m, b, a, tgt in sorted(worst)[:20]:
+              print(f"   {m:46s} bid {b:6,.0f} ask {a:6,.0f} / target {tgt:,.0f}")
+          print(f"\ntotal placements: {grand}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/requalify.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/requalify.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Requalify sides [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
