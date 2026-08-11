@@ -1,0 +1,111 @@
+name: Test one ask
+
+# Places EXACTLY ONE order: a 99c x 2000 qualifying ask in a market whose ask
+# side was destroyed by the cancel-and-replace failure. Then polls open orders
+# for two minutes to see whether it SURVIVES — placement returning 200 proved
+# nothing today; orders were dying seconds after acceptance. Captures balance
+# and the full response bodies so a rejection names its reason.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/test_one_ask.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: test-one-ask
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place and watch
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          SLUG = "usgubewc-usgub-ct-2026-11-03-rep"   # ask side confirmed destroyed
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+
+          # balance / buying power first
+          for p in ("/v1/portfolio", "/v1/portfolio/balance", "/v1/balance"):
+              try:
+                  rr = api("GET", p)
+                  print(f"GET {p} -> {rr.status_code} {' '.join(rr.text.split())[:220]}")
+                  if rr.status_code < 400:
+                      break
+              except Exception as e:
+                  print(f"GET {p} -> {type(e).__name__}")
+
+          body = {"marketSlug": SLUG, "intent": "ORDER_INTENT_BUY_SHORT",
+                  "type": "ORDER_TYPE_LIMIT",
+                  "price": {"value": "0.99", "currency": "USD"},
+                  "quantity": 2000,
+                  "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                  "participateDontInitiate": True}
+          rr = api("POST", "/v1/orders", json=body)
+          print(f"\nPLACE SELL 0.99 x2000 {SLUG}")
+          print(f"  -> {rr.status_code} {' '.join(rr.text.split())[:400]}")
+          oid = ""
+          try:
+              oid = (rr.json().get("order") or {}).get("id") or rr.json().get("id") or ""
+          except Exception:
+              pass
+          print(f"  order id: {oid or '(none parsed)'}")
+
+          for i in range(6):
+              time.sleep(20)
+              r2 = api("GET", "/v1/orders/open")
+              found = None
+              for o in r2.json().get("orders") or []:
+                  if o.get("marketSlug") == SLUG and \
+                     not str(o.get("side", "")).upper().endswith("BUY"):
+                      found = o
+              if found:
+                  print(f"  +{20*(i+1):3d}s  state={found.get('state')} "
+                        f"leaves={found.get('leavesQuantity')}")
+              else:
+                  print(f"  +{20*(i+1):3d}s  NO ask resting — it died")
+          print("\nVERDICT:", "SURVIVED — mass re-place is safe" if found and
+                str(found.get('state')).endswith(('NEW','PARTIALLY_FILLED'))
+                else "DIED or never rested — read the bodies above for the reason")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/test_one_ask.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/test_one_ask.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Test one ask [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
