@@ -1,0 +1,155 @@
+name: Enter funded race gaps
+
+# The three funded races we were not in, found by probe_race_gaps.
+#
+#   senate ID rep       full pattern — a Republican hold in Idaho is about as
+#                       safe as this slate gets, so the 51c directional leg is
+#                       a sound position on its own merits
+#   senate WY dem       qualifying legs ONLY
+#   governor AL dem     qualifying legs ONLY
+#
+# WY-dem and AL-gov-dem are near-impossible outcomes. The qualifying legs are
+# fine there: a 1c bid is cheap and roughly fair, and a 99c ask is selling a
+# near-certainty for $20 of collateral. The 51c leg is NOT placed on those —
+# buying a coin-flip price on an outcome that is not going to happen is how
+# $70 ended up in scc-senate-gop-lte45. Every order has to stand up as a
+# position first.
+#
+# MODE below: "report" prints the plan and the live books, "fire" places.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/enter_gaps.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: enter-gaps
+  cancel-in-progress: false
+
+jobs:
+  enter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          MODE = "fire"            # "report" or "fire"
+
+          ID_R = "ussewc-usse-id-2026-11-03-rep"
+          WY_D = "ussewc-usse-wy-2026-11-03-dem"
+          AL_D = "usgubewc-usgub-al-2026-11-03-dem"
+
+          # (market, side, price, qty, why)
+          PLAN = [
+              (ID_R, "BUY",  "0.01", 2000, "qualify bid side"),
+              (WY_D, "BUY",  "0.01", 2000, "qualify bid side"),
+              (AL_D, "BUY",  "0.01", 2000, "qualify bid side"),
+              (ID_R, "SELL", "0.99", 2000, "qualify ask side"),
+              (WY_D, "SELL", "0.99", 2000, "qualify ask side"),
+              (AL_D, "SELL", "0.99", 2000, "qualify ask side"),
+              (ID_R, "BUY",  "0.51",   40, "directional: Republican hold in Idaho"),
+          ]
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+
+          cost = sum((float(p) if s == "BUY" else 1 - float(p)) * q for _, s, p, q, _ in PLAN)
+          print(f"plan: {len(PLAN)} orders, ~${cost:,.2f} of capital, MODE={MODE}\n")
+          for slug in (ID_R, WY_D, AL_D):
+              try:
+                  bk = tr._fetch_book(slug)
+                  bb = (bk.get("bids") or [[None, None]])[0]
+                  ba = (bk.get("asks") or [[None, None]])[0]
+                  dep_b = sum(q for _, q in bk.get("bids") or [])
+                  dep_a = sum(q for _, q in bk.get("asks") or [])
+                  print(f"{slug:44s} bid {str(bb):>18s} / ask {str(ba):>18s}  "
+                        f"depth {dep_b:,.0f}/{dep_a:,.0f}")
+              except Exception as e:
+                  print(f"{slug:44s} book error {type(e).__name__}")
+              time.sleep(0.25)
+
+          if MODE != "fire":
+              print("\nMODE is 'report' — nothing placed.")
+          else:
+              print()
+              placed = failed = 0
+              for slug, side, px, qty, why in PLAN:
+                  body = {"marketSlug": slug,
+                          "intent": "ORDER_INTENT_BUY_LONG" if side == "BUY"
+                                    else "ORDER_INTENT_BUY_SHORT",
+                          "type": "ORDER_TYPE_LIMIT",
+                          # price MUST be a string; a float is rejected with a bare 400
+                          "price": {"value": px, "currency": "USD"},
+                          "quantity": int(qty),
+                          "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                          "participateDontInitiate": True}
+                  rr = api("POST", "/v1/orders", json=body)
+                  ok = rr.status_code < 300
+                  placed += ok; failed += (not ok)
+                  print(f"  {'OK  ' if ok else 'FAIL'} {slug:44s} {side:4s} {px} x{qty:<5d} {why}"
+                        f"{'' if ok else '  -> ' + str(rr.status_code) + ' ' + ' '.join(rr.text.split())[:100]}")
+                  time.sleep(1.0 if side == "SELL" else 0.4)
+              print(f"\nplaced {placed} | failed {failed}")
+
+              # shorts come back sized down; a side under Target Size scores nothing
+              time.sleep(6)
+              r2 = api("GET", "/v1/orders/open"); r2.raise_for_status()
+              fixed = 0
+              for o in r2.json().get("orders") or []:
+                  if str(o.get("state")) != "ORDER_STATE_NEW":
+                      continue
+                  slug = o.get("marketSlug") or ""
+                  if slug not in (ID_R, WY_D, AL_D):
+                      continue
+                  side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+                  lv = tr._num(o.get("leavesQuantity")) or 0
+                  if side == "SELL" and abs(tr._num(o.get("price")) - 0.99) < 1e-9 and lv < 1999.5:
+                      rr = api("POST", f"/v1/order/{o['id']}/modify",
+                               json={"marketSlug": slug,
+                                     "price": {"value": "0.99", "currency": "USD"},
+                                     "quantity": 2000})
+                      fixed += rr.status_code < 300
+                      print(f"  topped ask {slug} {lv:.0f} -> 2000  ({rr.status_code})")
+                      time.sleep(0.5)
+              print(f"asks topped back to 2000: {fixed}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/enter_gaps.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/enter_gaps.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Enter funded race gaps [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
