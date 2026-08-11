@@ -1,0 +1,134 @@
+name: Replace lost asks
+
+# Re-places the qualifying 99c ask in every market that has a live 1c bid but
+# no live ask — the sides destroyed by the cancel-and-replace failure while
+# buying power was exhausted (105 asks alive yesterday evening, 4 now).
+#
+# NO TOP-UPS. Under tight collateral, modify (cancel-and-replace) is the exact
+# operation that has been deleting orders: the cancel succeeds, the oversized
+# replacement is rejected, the order is gone. Placements get sized down by the
+# exchange (~273 of 2000 in the survival test) and are left at whatever size
+# they come back at. Undersized asks on empty sides earn nothing but SURVIVE,
+# and sized asks on rival-populated sides earn immediately. Defend is paused,
+# so nothing modifies them afterwards.
+#
+# The one verification that matters is delayed: placement returning 200 proved
+# nothing today, so after placing, wait 90s and re-read open orders to count
+# how many actually stuck.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/replace_asks.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: replace-asks
+  cancel-in-progress: false
+
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Replace
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+
+          LIVE = ("ORDER_STATE_NEW", "ORDER_STATE_PARTIALLY_FILLED")
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          bid_m, ask_m = set(), set()
+          for o in r.json().get("orders") or []:
+              if str(o.get("state")) not in LIVE:
+                  continue
+              slug = o.get("marketSlug") or ""
+              if str(o.get("side", "")).upper().endswith("BUY"):
+                  bid_m.add(slug)
+              else:
+                  ask_m.add(slug)
+          missing = sorted(bid_m - ask_m)
+          # only reward markets — the House districts have no pool to qualify for
+          missing = [m for m in missing if not m.startswith("ushrewc-")]
+          print(f"markets with a live bid and NO live ask: {len(missing)}\n")
+
+          placed = failed = 0
+          ids = {}
+          for slug in missing:
+              body = {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_SHORT",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": "0.99", "currency": "USD"},
+                      "quantity": 2000,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              rr = api("POST", "/v1/orders", json=body)
+              ok = rr.status_code < 300
+              placed += ok; failed += (not ok)
+              if ok:
+                  try:
+                      ids[slug] = (rr.json().get("order") or {}).get("id") or rr.json().get("id")
+                  except Exception:
+                      pass
+                  print(f"  OK   {slug}")
+              else:
+                  print(f"  FAIL {slug} -> {rr.status_code} {' '.join(rr.text.split())[:120]}")
+              time.sleep(1.0)
+          print(f"\nplaced {placed} | failed {failed}")
+
+          print("\nwaiting 90s, then checking what actually stuck...")
+          time.sleep(90)
+          r2 = api("GET", "/v1/orders/open"); r2.raise_for_status()
+          alive = {}
+          for o in r2.json().get("orders") or []:
+              if str(o.get("state")) in LIVE and \
+                 not str(o.get("side", "")).upper().endswith("BUY"):
+                  alive[o.get("marketSlug")] = tr._num(o.get("leavesQuantity"))
+          stuck = [m for m in missing if m in alive]
+          died = [m for m in missing if m not in alive]
+          sizes = [alive[m] for m in stuck]
+          print(f"STUCK: {len(stuck)} of {len(missing)}"
+                + (f"  (sizes {min(sizes):.0f}-{max(sizes):.0f}, "
+                   f"median {sorted(sizes)[len(sizes)//2]:.0f})" if sizes else ""))
+          if died:
+              print(f"DIED after acceptance: {len(died)}")
+              for m in died[:15]:
+                  print(f"   {m}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/replace_asks.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/replace_asks.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Replace lost asks [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
