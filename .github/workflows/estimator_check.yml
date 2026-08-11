@@ -93,7 +93,7 @@ jobs:
               sparse[day] = tot; nsnap[day] = len(times)
 
           # ---- high-frequency estimator: state.json history -------------------
-          hf, hfn = {}, {}
+          hf, hfn, sparse_recorded = {}, {}, {}
           try:
               r = requests.get(f"https://api.github.com/repos/{REPO}/contents/state.json",
                                params={"ref": BRANCH},
@@ -107,6 +107,11 @@ jobs:
               for h in st.get("history") or []:
                   if h.get("earned_hf") is not None:
                       hf[h["day"]] = float(h["earned_hf"]); hfn[h["day"]] = h.get("hf_samples") or 0
+                  # `earned` is now the headline (hf once a day has enough
+                  # samples), so the sparse figure has its own key. Recomputed
+                  # from estimates.csv below either way; this is the crosscheck.
+                  if h.get("earned_sparse") is not None:
+                      sparse_recorded[h["day"]] = float(h["earned_sparse"])
               print(f"state.json: {len(st.get('history') or [])} history rows, "
                     f"{len(hf)} carrying earned_hf")
           except Exception as e:

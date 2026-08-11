@@ -45,6 +45,14 @@ DASH_PASSWORD = os.environ.get("DASH_PASSWORD", "")
 STATE_PATH = Path(os.environ.get("STATE_PATH", "state.json"))
 ET = ZoneInfo("America/New_York")
 MAX_GAP_SECONDS = 300  # an outage never extrapolates more than 5 minutes
+# How many Poisson samples today before the headline figures switch off the
+# old action-triggered accrual and onto the unbiased one. At the 5s mean this
+# is ~20 minutes of sampling — long enough that a fresh boot shows the
+# familiar number rather than a counter climbing from zero, short enough that
+# the honest figure is what you see for all but the first minutes of a day.
+# Same reason as the note below: read from Monitor methods, so defined here.
+HF_MIN_SAMPLES = int(os.environ.get("HF_MIN_SAMPLES", "240"))
+HF_RATE_TAU = float(os.environ.get("HF_RATE_TAU", "600"))  # rate smoothing, seconds
 # Defined up here, not with the other DEFEND_* constants further down: the
 # defend-seed runs from Monitor.__init__, which executes long before that
 # block, so leaving it there raised NameError on boot.
@@ -331,7 +339,7 @@ def day_shape_digest(text: str | None = None) -> str | None:
                      f"slowest {h12(worst)} ${hours[worst]:.2f}.")
         if MONITOR:
             with MONITOR.lock:
-                earned = MONITOR.state.get("earned") or 0.0
+                earned = MONITOR.headline()[0]
                 hist = [x.get("earned") or 0.0
                         for x in (MONITOR.state.get("history") or [])[-5:]]
             hf = now_et.hour + now_et.minute / 60.0
@@ -416,9 +424,28 @@ WINNERS: list[dict] = []
 
 
 class Monitor:
+    def headline(self) -> tuple[float, dict[str, float], float, str]:
+        """The figures shown to the user: (earned today, per-market, $/day, basis).
+
+        Prefers the Poisson-sampled accrual once today has enough samples to
+        stand on. The old accrual is woken by POLL_KICK the instant we place or
+        reprice, so it sampled our share at its peak and read 1.58x-2.03x above
+        real payouts; this one samples on a clock nothing we do can pull.
+        Falls back to the old figures early in a day, or if the sampler thread
+        is not running, so the dashboard never shows a counter stuck at zero.
+        Caller must hold the lock.
+        """
+        if self._hf_samples >= HF_MIN_SAMPLES:
+            rate = self.hf_rate if self.hf_rate is not None else self.rate
+            return (self.state.get("earned_hf") or 0.0,
+                    self.state.get("per_market_hf") or {}, rate, "hf")
+        return (self.state.get("earned") or 0.0,
+                self.state.get("per_market") or {}, self.rate, "sparse")
+
     def __init__(self) -> None:
         self.lock = threading.Lock()
         self._hf_samples = 0        # samples behind earned_hf, reset each day
+        self.hf_rate: float | None = None   # EWMA of the Poisson-sampled rate
         self.state: dict = {"day": None, "earned": 0.0, "per_market": {}, "history": [],
                             "saved_at": 0.0, "rate": 0.0, "market_rates": {}, "ts": None,
                             # High-frequency accrual: the same integration as
@@ -830,9 +857,16 @@ class Monitor:
                             old_day_earned = reb[0]
                     except Exception:  # noqa: BLE001 — fall back to accrual
                         pass
+                    hf_day = round(self.state.get("earned_hf", 0.0), 2)
+                    enough = self._hf_samples >= HF_MIN_SAMPLES
                     self.state["history"] = (self.state["history"] + [
-                        {"day": self.state["day"], "earned": old_day_earned,
-                         "earned_hf": round(self.state.get("earned_hf", 0.0), 2),
+                        # `earned` is the headline the history chart draws;
+                        # the other two are kept so estimator_check.yml can
+                        # keep scoring both methods against real payouts.
+                        {"day": self.state["day"],
+                         "earned": hf_day if enough else old_day_earned,
+                         "earned_sparse": old_day_earned,
+                         "earned_hf": hf_day,
                          "hf_samples": self._hf_samples}
                     ])[-30:]
                 self.state.update({"day": day, "earned": 0.0, "per_market": {},
@@ -883,19 +917,22 @@ class Monitor:
                 mkt: [p for p in s if p[0] >= cutoff]
                 for mkt, s in series.items() if s and s[-1][0] >= cutoff
             }
-            # Cumulative earned-today curve for the overall graph.
+            # Cumulative earned-today curve for the overall graph. Plots the
+            # same basis as the hero number, so the curve and the figure above
+            # it can never disagree.
+            g_earned, _, g_rate, _ = self.headline()
             es = self.state.setdefault("earned_series", [])
             if es and es[-1][0] == minute:
-                es[-1][1] = round(self.state["earned"], 4)
+                es[-1][1] = round(g_earned, 4)
             else:
-                es.append([minute, round(self.state["earned"], 4)])
+                es.append([minute, round(g_earned, 4)])
             del es[:-1500]
             # Overall earning-rate curve ($/day) — what the big graph plots.
             rs = self.state.setdefault("rate_series", [])
             if rs and rs[-1][0] == minute:
-                rs[-1][1] = round(self.rate, 4)
+                rs[-1][1] = round(g_rate, 4)
             else:
-                rs.append([minute, round(self.rate, 4)])
+                rs.append([minute, round(g_rate, 4)])
             del rs[:-1500]
             self.last_ts = now_utc
             self.orders = orders
@@ -928,6 +965,7 @@ class Monitor:
 
     def snapshot(self) -> dict:
         with self.lock:
+            _h_earned, _h_per, _h_rate, _h_basis = self.headline()
             batch_ids = set(self.state.get("batch_ids") or [])
             day_end = None
             if self.state.get("day"):
@@ -941,10 +979,11 @@ class Monitor:
                 "earned_series": self.state.get("earned_series", []),
                 "rate_series": self.state.get("rate_series", []),
                 "day_end": day_end,
-                "earned_today": round(self.state["earned"], 4),
-                "rate_per_day": round(self.rate, 2),
+                "earned_today": round(_h_earned, 4),
+                "rate_per_day": round(_h_rate, 2),
+                "earned_basis": _h_basis,   # "hf" = unbiased sampler, "sparse" = old accrual
                 "per_market_today": {m: round(v, 4) for m, v in sorted(
-                    self.state["per_market"].items(), key=lambda kv: -kv[1])},
+                    _h_per.items(), key=lambda kv: -kv[1])},
                 "orders": [
                     {**{k: o.get(k) for k in ("id", "market", "side", "price", "size", "ticks", "share",
                                               "est_day", "verdict", "window", "window_more",
@@ -1087,6 +1126,13 @@ def hf_sampler_loop() -> None:
             for m, r in per.items():
                 pm[m] = pm.get(m, 0.0) + r * frac
             MONITOR._hf_samples += 1
+            # Smooth the displayed $/day over ~HF_RATE_TAU. A single Poisson
+            # sample is an honest instant but a jumpy headline: in a deep book
+            # scoring flips between full and zero second to second, so the raw
+            # number would flicker even though the day's rate is steady.
+            a = 1.0 - pow(2.718281828459045, -elapsed / HF_RATE_TAU)
+            MONITOR.hf_rate = rate if MONITOR.hf_rate is None else \
+                MONITOR.hf_rate + a * (rate - MONITOR.hf_rate)
 
 
 ACTIONS: list[dict] = []  # audit log of every reprice: request + raw response + verification
