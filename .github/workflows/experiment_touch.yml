@@ -68,7 +68,15 @@ jobs:
           import json, os, time, datetime, io, requests
           import track_rewards as tr
 
-          MODE = "setup"           # "record" | "setup" | "restore"
+          # Setup ran 2026-08-11 03:1x UTC: 12 cancels, 9 placements, all 200.
+          # Each market now holds exactly one BUY at the touch. None of the
+          # nine is in the defend seed, so auto-defend will not reprice them.
+          # Back to "record" so a stray push cannot re-run the setup.
+          #
+          # READ THE RESULT: the 2026-08-11 payout lands ~2026-08-13 in
+          # data/rewards.csv. Compare per-market reward across arms with
+          # analyse_touch.py.
+          MODE = "record"          # "record" | "setup" | "restore"
 
           ARMS = {
               "TINY": [("scc-senate-gop-2026-11-03-51", 10),
