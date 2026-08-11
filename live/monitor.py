@@ -1370,6 +1370,10 @@ def _verify_resting(market: str, side: str, price_value: str) -> tuple[bool, str
             return False, f"verify fetch HTTP {r.status_code}"
         want = float(price_value)
         for o in r.json().get("orders") or []:
+            # a dead record at the target price must not count as "resting" —
+            # exactly that false positive is how destroyed replacements passed
+            if str(o.get("state") or "") in tr.DEAD_ORDER_STATES:
+                continue
             slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
             oside = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
             if slug == market and oside == side and abs(tr._num(o.get("price")) - want) < 0.0005:
@@ -2292,11 +2296,23 @@ def do_cancel_all() -> tuple[int, dict]:
 
 def do_reprice(order_id: str, price_cents: float, verify: bool = True,
                quantity: int | None = None) -> tuple[int, dict]:
-    """Modify one of OUR resting orders to a new price. The order must be in
-    the latest snapshot (can't touch anything else) and the price sane.
-    Modify is cancel-and-replace on the exchange, so the request carries the
-    FULL replacement (price and remaining quantity) and the result is
-    verified against the open-orders list before reporting success."""
+    """Move one of OUR resting orders to a new price — WITHOUT /modify.
+
+    The exchange's modify endpoint is cancel-and-replace, and since the
+    2026-08-11 maintenance it returns 200, cancels the original, and never
+    places the replacement. Proven with a controlled test: a non-crossing
+    0.99 -> 0.98 modify on a fresh 273-share ask answered 200 {} and the
+    order was simply gone. Every modify that day destroyed its order — the
+    restore's 89 ask top-ups and each defend nudge alike.
+
+    So the order of operations is inverted and nothing is ever cancelled on
+    faith: place the replacement first (post-only), poll until it is VERIFIED
+    resting, and only then cancel the original. Any failure before the cancel
+    leaves the original untouched; a failure of the cancel itself leaves two
+    resting orders, which costs a little doubled size, never a lost rung.
+    The `verify` parameter is kept for callers but ignored — verification is
+    the mechanism now, not an option.
+    """
     known = {o.get("id"): o for o in MONITOR.orders if o.get("id")}
     o = known.get(order_id)
     if o is None:
@@ -2306,38 +2322,69 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
     qty = int(quantity) if quantity else int(round(o["size"]))
     if not (1 <= qty <= 20000):
         return 400, {"ok": False, "error": "size out of range (1–20,000)"}
-    path = f"/v1/order/{order_id}/modify"
+    # A post-only replacement that would cross the opposite touch can never
+    # rest — refuse up front, which is a pure no-op for the resting order.
+    ent = tr._BOOK_CACHE.get(o["market"])
+    if ent:
+        bids, asks = ent[1].get("bids") or [], ent[1].get("asks") or []
+        newpx = price_cents / 100.0
+        if o["side"] == "SELL" and bids and newpx <= bids[0][0] + 1e-9:
+            return 400, {"ok": False,
+                         "error": f"refused: {price_cents}¢ would cross the {bids[0][0]*100:g}¢ bid"}
+        if o["side"] == "BUY" and asks and newpx >= asks[0][0] - 1e-9:
+            return 400, {"ok": False,
+                         "error": f"refused: {price_cents}¢ would cross the {asks[0][0]*100:g}¢ ask"}
     value = f"{price_cents / 100:.3f}".rstrip("0").rstrip(".")
     record = {"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
               "market": o["market"], "side": o["side"],
               "from": round(o["price"] * 100, 1), "to": price_cents,
               "size": (qty if qty == int(round(o["size"]))
                        else f"{int(round(o['size']))}→{qty}")}
-    try:
-        r = requests.request(
-            "POST", tr.TRADE_API + path,
-            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
+
+    def _api(method, path, body=None):
+        return requests.request(
+            method, tr.TRADE_API + path,
+            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, method, path),
                      "Content-Type": "application/json"},
-            json={"marketSlug": o["market"],
+            json=body, timeout=20)
+
+    try:
+        # 1) place the replacement
+        r = _api("POST", "/v1/orders",
+                 {"marketSlug": o["market"],
+                  "intent": o.get("intent") or ("ORDER_INTENT_BUY_LONG" if o["side"] == "BUY"
+                                                else "ORDER_INTENT_BUY_SHORT"),
+                  "type": "ORDER_TYPE_LIMIT",
                   "price": {"value": value, "currency": "USD"},
-                  "quantity": qty},
-            timeout=20,
-        )
+                  "quantity": qty,
+                  "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                  "participateDontInitiate": True})
         record["status"] = r.status_code
         record["response"] = " ".join(r.text.split())[:300]
-        ok = r.status_code < 300
-        if verify:  # batches verify once at the end instead — one orders fetch, not N
-            verified, note = _verify_resting(o["market"], o["side"], value) if ok else (False, "")
-            if ok and not verified:
-                notify("Reprice NOT verified", f"{o['market']} → {price_cents}¢: {note}", "high")
-        else:
-            verified, note = ok, ""
-        record["verified"] = verified
-        record["note"] = note
+        if r.status_code >= 300:
+            record["verified"] = False
+            record["note"] = "replacement rejected — original untouched"
+            return 502, {"ok": False, "status": r.status_code,
+                         "detail": record["response"][:250]}
+        # 2) confirm it is genuinely resting before touching the original
+        verified, note = _verify_resting(o["market"], o["side"], value)
+        if not verified:
+            record["verified"] = False
+            record["note"] = f"replacement did not rest ({note}) — original untouched"
+            notify("Reprice replacement did not rest",
+                   f"{o['market']} → {price_cents}¢: {note}", "high")
+            return 502, {"ok": False, "status": r.status_code, "detail": note[:250]}
+        # 3) only now retire the original
+        rc = _api("POST", f"/v1/order/{order_id}/cancel", {"marketSlug": o["market"]})
+        if rc.status_code >= 300:
+            time.sleep(1.0)
+            rc = _api("POST", f"/v1/order/{order_id}/cancel", {"marketSlug": o["market"]})
+        record["verified"] = True
+        record["note"] = note + (
+            "" if rc.status_code < 300 else
+            f" (old order cancel HTTP {rc.status_code} — both resting, harmless)")
         POLL_KICK.set()
-        payload = {"ok": ok and verified, "status": r.status_code,
-                   "detail": (note or record["response"])[:250]}
-        return (200 if ok else 502), payload
+        return 200, {"ok": True, "status": r.status_code, "detail": record["note"][:250]}
     except Exception as e:  # noqa: BLE001
         record["status"] = "error"
         record["response"] = f"{type(e).__name__}: {e}"[:300]
@@ -2567,14 +2614,15 @@ def watch_program_arrivals(pol_slugs: list[str]) -> None:
 
 def auto_defend() -> None:
     """One pass over the defended markets after each poll."""
-    # PAUSED 2026-08-11: every reprice is currently DESTROYING its order.
-    # Modify is cancel-and-replace; with the account's buying power exhausted
-    # (the 15:05 restore re-committed ~$9k), the cancel succeeds and the
-    # replacement is rejected — and verify=False means nobody notices. Traced
-    # in the payload history: ct/mn/il asks all REPLACED in one 19:47 sweep
-    # with no successor order, live count 303 -> 227 over six hours. Until
-    # replacements are verified to stick, defending a rung deletes it.
-    if os.environ.get("DEFEND_RESUME", "") != "1":
+    # Resumed 2026-08-11 after the /modify incident. The exchange's modify
+    # endpoint has returned 200 while cancelling the original and never
+    # placing the replacement since the morning maintenance (proven with a
+    # controlled non-crossing test: 0.99 -> 0.98 on a fresh 273-share ask,
+    # answer 200 {}, order gone), which let the old defend shred 100+ orders.
+    # do_reprice no longer touches modify: it places the replacement, VERIFIES
+    # it rests, and only then cancels the original — the worst remaining
+    # failure is a briefly doubled rung, never a lost one.
+    if os.environ.get("DEFEND_PAUSE", "") == "1":
         return
     cfg = dict(MONITOR.state.get("defend") or {})
     if not cfg or not KEY_ID:
