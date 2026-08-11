@@ -1,0 +1,13 @@
+{
+ "predicted_rate_per_day": 23.5246,
+ "per_hour": 0.98019,
+ "basis": "raw published formula on the provably frozen book",
+ "markets": [
+  "scc-hrep-rep-2026-11-03-gte185",
+  "opdc-mcconnell-resign-2026-11-02",
+  "scc-senate-gop-2026-11-03-53",
+  "pandc-anydis-2027-12-31",
+  "apdc-jerpowgov-2026-12-31",
+  "ussewc-usse-tn-2026-11-03-rep"
+ ]
+}
