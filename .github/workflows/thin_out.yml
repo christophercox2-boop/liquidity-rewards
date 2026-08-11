@@ -1,0 +1,181 @@
+name: Thin out redundant qualifiers
+
+# Owner's rule, 2026-08-11: if a side holds at least 2x Target Size WITHOUT
+# our orders, our deep qualifiers there are redundant — cancel them. Then a
+# second pass re-checks every book we touched and re-fills any side that
+# slipped below target after our size left.
+#
+# Only DEEP qualifier orders are cancelled (bids at or below 2c, asks at or
+# above 98c). Scoring orders near the touch are never touched — they are the
+# earners. The 2x margin plus the verification pass plus the monitor's
+# qualification keeper (which watches book totals every poll) give three
+# layers against a side reverting to unqualified.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/thin_out.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: thin-out
+  cancel-in-progress: false
+
+jobs:
+  thin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Trim and verify
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import collections, io, json, os, time, requests
+          import track_rewards as tr
+
+          MULT = 2.0
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+          LIVE = ("ORDER_STATE_NEW", "ORDER_STATE_PARTIALLY_FILLED")
+          def deep(side, px):
+              return px <= 0.02 if side == "BUY" else px >= 0.98
+
+          def my_orders():
+              r = api("GET", "/v1/orders/open"); r.raise_for_status()
+              out = collections.defaultdict(list)
+              for o in r.json().get("orders") or []:
+                  if str(o.get("state")) not in LIVE:
+                      continue
+                  slug = o.get("marketSlug") or ""
+                  side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+                  out[(slug, side)].append(
+                      {"id": o["id"],
+                       "px": tr._num(o.get("price")),
+                       "sz": tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity"))})
+              return out
+
+          mine = my_orders()
+          mkts = sorted({m for m, _ in mine})
+          target = {}
+          for i in range(0, len(mkts), 40):
+              rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                params={"symbols": mkts[i:i + 40], "pageSize": 100}, timeout=30)
+              if rr.status_code >= 400:
+                  time.sleep(2); continue
+              for p in rr.json().get("programs") or []:
+                  s = p.get("marketSlug") or ""
+                  for tp in p.get("timePeriods") or []:
+                      if str(tp.get("status") or "").lower() in ("active", "live", "status_live"):
+                          target[s] = float(tp.get("targetSize") or 0)
+              time.sleep(0.4)
+
+          books = {}
+          for m in mkts:
+              if m in target:
+                  try:
+                      books[m] = tr._fetch_book(m)
+                  except Exception:
+                      pass
+                  time.sleep(0.2)
+
+          cancelled = kept = 0
+          touched = collections.defaultdict(set)   # market -> sides trimmed
+          total_orders_before = sum(len(v) for v in mine.values())
+          for (m, side), orders in sorted(mine.items()):
+              tgt = target.get(m)
+              bk = books.get(m)
+              if not tgt or not bk:
+                  continue
+              levels = bk.get("bids") if side == "BUY" else bk.get("asks")
+              side_total = sum(q for _, q in (levels or []))
+              ours_total = sum(o["sz"] for o in orders)
+              others = side_total - ours_total
+              deep_orders = [o for o in orders if deep(side, o["px"])]
+              if others < MULT * tgt or not deep_orders:
+                  kept += len(deep_orders)
+                  continue
+              for o in deep_orders:
+                  rr = api("POST", f"/v1/order/{o['id']}/cancel", json={"marketSlug": m})
+                  ok = rr.status_code < 300
+                  cancelled += ok
+                  if ok:
+                      touched[m].add(side)
+                  else:
+                      print(f"  cancel FAIL {m} {side} {o['px']:.2f} -> {rr.status_code}")
+                  time.sleep(0.3)
+          print(f"orders before: {total_orders_before}")
+          print(f"cancelled {cancelled} redundant deep qualifiers "
+                f"across {len(touched)} markets; kept {kept} that are still load-bearing\n")
+
+          # verification pass — the user's explicit requirement
+          print("waiting 45s, then re-checking every book we touched...")
+          time.sleep(45)
+          refill = 0
+          for m, sides in sorted(touched.items()):
+              try:
+                  bk = tr._fetch_book(m)
+              except Exception as e:
+                  print(f"  {m}: book unreadable on recheck ({type(e).__name__})")
+                  continue
+              time.sleep(0.2)
+              tgt = target[m]
+              for side in sorted(sides):
+                  levels = bk.get("bids") if side == "BUY" else bk.get("asks")
+                  side_total = sum(q for _, q in (levels or []))
+                  if side_total >= tgt - 0.5:
+                      continue
+                  short = int(round(tgt - side_total))
+                  px = "0.01" if side == "BUY" else "0.99"
+                  rr = api("POST", "/v1/orders",
+                           json={"marketSlug": m,
+                                 "intent": "ORDER_INTENT_BUY_LONG" if side == "BUY"
+                                           else "ORDER_INTENT_BUY_SHORT",
+                                 "type": "ORDER_TYPE_LIMIT",
+                                 "price": {"value": px, "currency": "USD"},
+                                 "quantity": min(short, 2000),
+                                 "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                                 "participateDontInitiate": True})
+                  refill += rr.status_code < 300
+                  print(f"  REVERTED: {m} {side} at {side_total:,.0f}/{tgt:,.0f} — "
+                        f"re-filled {min(short, 2000)} (HTTP {rr.status_code}); "
+                        f"the keeper finishes the rest")
+                  time.sleep(0.5)
+          if not refill:
+              print("  no book reverted — every trimmed side still qualifies")
+
+          fin = my_orders()
+          print(f"\norders after: {sum(len(v) for v in fin.values())}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/thin_out.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/thin_out.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Thin out redundant qualifiers [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
