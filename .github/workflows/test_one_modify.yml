@@ -1,0 +1,114 @@
+name: Test one modify
+
+# ONE controlled modify on an expendable order, to settle why replacements
+# have been dying. Uses do_reprice's exact request shape. The target is a
+# fresh 273-share ask at 0.99 moved one tick to 0.98 — far from the bid, so
+# post-only crossing is ruled out by construction. Then polls for two minutes:
+# a 200 on the modify proved nothing today; survival is the only evidence.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/test_one_modify.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: test-one-modify
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Modify and watch
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          SLUG = "usgubewc-usgub-ct-2026-11-03-rep"   # the survival-test ask lives here
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+
+          LIVE = ("ORDER_STATE_NEW", "ORDER_STATE_PARTIALLY_FILLED")
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          target = None
+          for o in r.json().get("orders") or []:
+              if o.get("marketSlug") == SLUG and str(o.get("state")) in LIVE and \
+                 not str(o.get("side", "")).upper().endswith("BUY"):
+                  target = o
+          if not target:
+              print("no live ask found in the test market — aborting, nothing touched")
+              raise SystemExit(0)
+          qty = int(round(tr._num(target.get("leavesQuantity")) or tr._num(target.get("quantity"))))
+          oid = target["id"]
+          try:
+              bk = tr._fetch_book(SLUG)
+              print(f"book: best bid {(bk.get('bids') or [[None]])[0]} / "
+                    f"best ask {(bk.get('asks') or [[None]])[0]}")
+          except Exception as e:
+              print("book fetch failed:", type(e).__name__)
+          print(f"target: {oid}  SELL {tr._num(target.get('price')):.2f} x{qty}")
+
+          # do_reprice's exact body shape
+          rr = api("POST", f"/v1/order/{oid}/modify",
+                   json={"marketSlug": SLUG,
+                         "price": {"value": "0.98", "currency": "USD"},
+                         "quantity": qty})
+          print(f"\nMODIFY 0.99 -> 0.98 x{qty}")
+          print(f"  -> {rr.status_code} {' '.join(rr.text.split())[:400]}")
+
+          for i in range(6):
+              time.sleep(20)
+              r2 = api("GET", "/v1/orders/open")
+              found = None
+              for o in r2.json().get("orders") or []:
+                  if o.get("marketSlug") == SLUG and str(o.get("state")) in LIVE and \
+                     not str(o.get("side", "")).upper().endswith("BUY"):
+                      found = o
+              if found:
+                  print(f"  +{20*(i+1):3d}s  px={tr._num(found.get('price')):.2f} "
+                        f"state={found.get('state')} leaves={found.get('leavesQuantity')} "
+                        f"id={'SAME' if found['id']==oid else 'new:'+str(found['id'])[-6:]}")
+              else:
+                  print(f"  +{20*(i+1):3d}s  NO live ask — the modify destroyed it")
+          print("\nVERDICT:", ("SURVIVED at 0.98 — plain modifies are safe; the killer was "
+                "condition-specific") if found else
+                "DESTROYED — the modify path itself loses orders; body above says why")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/test_one_modify.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/test_one_modify.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Test one modify [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
