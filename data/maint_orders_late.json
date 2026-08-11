@@ -1,190 +1,174 @@
 {
- "taken_at": "2026-08-10T23:51:53.267122+00:00",
- "count": 430,
+ "taken_at": "2026-08-11T04:43:01.984746+00:00",
+ "count": 400,
  "orders": [
   {
-   "market": "scc-senate-gop-2026-11-03-54",
+   "market": "usgubewc-usgub-ny-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.89",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRG73922BA6"
+  },
+  {
+   "market": "usgubewc-usgub-ny-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJHHZ5MBAH"
+  },
+  {
+   "market": "usgubewc-usgub-ny-2026-11-03-dem",
    "side": "SELL",
-   "price": "0.08",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFAT19RB9T"
+  },
+  {
+   "market": "enwc-ussep-sc-2026-08-11-rep-ralnor",
+   "side": "BUY",
+   "price": "0.27",
    "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRXJWWTZWB9M"
+   "intent": "ORDER_INTENT_SELL_SHORT",
+   "id": "BSX2D6KRWB9T"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-54",
-   "side": "SELL",
-   "price": "0.09",
-   "quantity": 20,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRXJ7Y3B4B9J"
-  },
-  {
-   "market": "usgubewc-usgub-il-2026-11-03-rep",
+   "market": "ussewc-usse-ok-2026-11-03-dem",
    "side": "SELL",
    "price": "0.99",
-   "quantity": 2000,
+   "quantity": 174,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGY02WJBA4"
+   "id": "BSRGGB26CBAF"
   },
   {
-   "market": "usgubewc-usgub-il-2026-11-03-rep",
+   "market": "ussewc-usse-ok-2026-11-03-dem",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJ49520B9N"
+   "id": "BS9BDEF0ABA1"
   },
   {
-   "market": "usgubewc-usgub-il-2026-11-03-rep",
+   "market": "ussewc-usse-ok-2026-11-03-dem",
    "side": "SELL",
-   "price": "0.4",
-   "quantity": 40,
+   "price": "0.04",
+   "quantity": 60,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJ37TJ0B9T"
+   "id": "BS9M9ASTTB9V"
   },
   {
-   "market": "usgubewc-usgub-il-2026-11-03-rep",
+   "market": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
    "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG46S00BAE"
-  },
-  {
-   "market": "ussewc-usse-or-2026-11-03-dem",
-   "side": "BUY",
    "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9J3GJJTB9R"
-  },
-  {
-   "market": "ussewc-usse-or-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.83",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFFGYXGB9E"
-  },
-  {
-   "market": "ussewc-usse-or-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRF785SMB9P"
-  },
-  {
-   "market": "tec-cbb-champ-2027-04-05-w-iowast",
-   "side": "SELL",
-   "price": "0.1",
-   "quantity": 5,
+   "quantity": 100,
    "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BS5AB574WBAN"
+   "id": "BRXJA70QGBA8"
   },
   {
-   "market": "tec-cbb-champ-2027-04-05-w-iowast",
+   "market": "scc-senate-gop-2026-11-03-52",
    "side": "BUY",
-   "price": "0.01",
-   "quantity": 2500,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXSXQMEJBAH"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-46",
-   "side": "SELL",
-   "price": "0.04",
-   "quantity": 20,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRXKE11HMBAA"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-46",
-   "side": "BUY",
-   "price": "0.03",
-   "quantity": 500,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXJA3XARBAH"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-46",
-   "side": "SELL",
-   "price": "0.04",
-   "quantity": 5,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRXJA71JEBA8"
-  },
-  {
-   "market": "pic-congress-trump-2026-12-31",
-   "side": "BUY",
-   "price": "0.08",
+   "price": "0.09",
    "quantity": 5,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSQF79JQ2B9G"
+   "id": "BSXKD4EFEBA2"
   },
   {
-   "market": "ussewc-usse-ri-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.5",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFQ9MEPB9H"
-  },
-  {
-   "market": "ussewc-usse-ri-2026-11-03-dem",
+   "market": "ussewc-usse-va-2026-11-03-rep",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGFW78CB9M"
+   "id": "BSRGHV626B9N"
   },
   {
-   "market": "ussewc-usse-ri-2026-11-03-dem",
+   "market": "ussewc-usse-va-2026-11-03-rep",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9J4JBS4B9Q"
+   "id": "BS9GNYEYGB9R"
   },
   {
-   "market": "ussewc-usse-ri-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.94",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9HWQKRMBA7"
-  },
-  {
-   "market": "ussewc-usse-ri-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.93",
+   "market": "ussewc-usse-va-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.25",
    "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRG46E4PBAE"
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFW8PEWB9Q"
   },
   {
-   "market": "ussewc-usse-sd-2026-11-03-briben",
+   "market": "ussewc-usse-mt-2026-11-03-setbod",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9J5ET70B9W"
+   "id": "BS9M9AVPWB9V"
   },
   {
-   "market": "ussewc-usse-sd-2026-11-03-briben",
+   "market": "ussewc-usse-mt-2026-11-03-setbod",
    "side": "SELL",
    "price": "0.51",
-   "quantity": 50,
+   "quantity": 30,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSEPRPJ3ABAB"
+   "id": "BSTR2TMEWB9T"
   },
   {
-   "market": "usgubewc-usgub-fl-2026-11-03-rep",
+   "market": "usgubewc-usgub-md-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJWG346B9E"
+  },
+  {
+   "market": "usgubewc-usgub-md-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.12",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMHXM8QTB9Y"
+  },
+  {
+   "market": "usgubewc-usgub-md-2026-11-03-rep",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG9RRM6BAM"
+   "id": "BSRH7Y890B9R"
+  },
+  {
+   "market": "usgubewc-usgub-md-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFX8QBWB9G"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-53",
+   "side": "SELL",
+   "price": "0.16",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BRXJA7176BA8"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-53",
+   "side": "BUY",
+   "price": "0.13",
+   "quantity": 1,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BRXKE1180BAA"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte225",
+   "side": "SELL",
+   "price": "0.12",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSXKQ8K9RB9R"
   },
   {
    "market": "usgubewc-usgub-fl-2026-11-03-rep",
@@ -203,748 +187,116 @@
    "id": "BSMJHHXVYBAH"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-gte57",
-   "side": "SELL",
-   "price": "0.04",
-   "quantity": 20,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BSRAX9VP6BAK"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-gte57",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 5000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRY6QRNACB9H"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte205",
-   "side": "SELL",
-   "price": "0.48",
-   "quantity": 20,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRXHYE73JB9R"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte180",
-   "side": "BUY",
-   "price": "0.75",
-   "quantity": 20,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSQFTTE1WBA7"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte225",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRYZA2CH8BAH"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte225",
-   "side": "SELL",
-   "price": "0.12",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRYX6440GBAK"
-  },
-  {
-   "market": "usgubewc-usgub-al-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.78",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRG01JK6B9K"
-  },
-  {
-   "market": "usgubewc-usgub-al-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9WC73M0B9V"
-  },
-  {
-   "market": "usgubewc-usgub-al-2026-11-03-rep",
+   "market": "usgubewc-usgub-fl-2026-11-03-rep",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGPWJXYBA7"
+   "id": "BSRG9RRM6BAM"
   },
   {
-   "market": "usgubewc-usgub-al-2026-11-03-rep",
+   "market": "usgubewc-usgub-sd-2026-11-03-dem",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9MPFT58B9J"
+   "id": "BSMHTCWXCBAK"
   },
   {
-   "market": "usgubewc-usgub-al-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.5",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFAWAD8B9W"
-  },
-  {
-   "market": "ussewc-usse-fl-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BS9KEWKY2BAE"
-  },
-  {
-   "market": "ussewc-usse-fl-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KQ81QGB9Q"
-  },
-  {
-   "market": "ussewc-usse-fl-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGY05ZRBA4"
-  },
-  {
-   "market": "ussewc-usse-mt-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9MB3Z22BAD"
-  },
-  {
-   "market": "ussewc-usse-mt-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9MGD6JYBA9"
-  },
-  {
-   "market": "ussewc-usse-mt-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9M9AS1CB9V"
-  },
-  {
-   "market": "ussewc-usse-mt-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.7",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRF7832CB9P"
-  },
-  {
-   "market": "ussewc-usse-mt-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.82",
-   "quantity": 30,
-   "intent": "ORDER_INTENT_SELL_SHORT",
-   "id": "BSRG46E9JBAE"
-  },
-  {
-   "market": "ussewc-usse-mt-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BS9MN853GBAN"
-  },
-  {
-   "market": "ussewc-usse-mt-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.48",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFN05CPBA5"
-  },
-  {
-   "market": "usgubewc-usgub-ri-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJKBSHYB9G"
-  },
-  {
-   "market": "usgubewc-usgub-ri-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.42",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJ8RFZABAM"
-  },
-  {
-   "market": "usgubewc-usgub-ri-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGZF10YBA0"
-  },
-  {
-   "market": "usgubewc-usgub-ri-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRH9B6AWBAD"
-  },
-  {
-   "market": "opdc-mcconnell-resign-2026-11-02",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BSRATA57MB9X"
-  },
-  {
-   "market": "opdc-mcconnell-resign-2026-11-02",
-   "side": "SELL",
-   "price": "0.11",
-   "quantity": 9,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFASWX8B9T"
-  },
-  {
-   "market": "opdc-mcconnell-resign-2026-11-02",
-   "side": "BUY",
-   "price": "0.09",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSPS071F4BAB"
-  },
-  {
-   "market": "usgubewc-usgub-mn-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFB88NYBAK"
-  },
-  {
-   "market": "usgubewc-usgub-mn-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMGWB2MTBAA"
-  },
-  {
-   "market": "usgubewc-usgub-mn-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG0Z4WPB9F"
-  },
-  {
-   "market": "ussewc-usse-co-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9MBRFCTB9Z"
-  },
-  {
-   "market": "ussewc-usse-co-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.79",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFZ439JBA2"
-  },
-  {
-   "market": "ussewc-usse-co-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.5",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFQ9KEAB9H"
-  },
-  {
-   "market": "ussewc-usse-co-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.84",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9WEY9T4B9Z"
-  },
-  {
-   "market": "ussewc-usse-co-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGEQFNRBAG"
-  },
-  {
-   "market": "usgubewc-usgub-nh-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHKGM3EBA8"
-  },
-  {
-   "market": "usgubewc-usgub-nh-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.35",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGY05CEBA4"
-  },
-  {
-   "market": "usgubewc-usgub-nh-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGEQJQ0BAG"
-  },
-  {
-   "market": "ussewc-usse-de-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFN0532BA5"
-  },
-  {
-   "market": "ussewc-usse-de-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJ496B2B9N"
-  },
-  {
-   "market": "ussewc-usse-de-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGWT4CPBAK"
-  },
-  {
-   "market": "usgubewc-usgub-tx-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.79",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRF5VRDPB9S"
-  },
-  {
-   "market": "usgubewc-usgub-tx-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJ290EMBAC"
-  },
-  {
-   "market": "usgubewc-usgub-tx-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFQGZZCBAD"
-  },
-  {
-   "market": "ussewc-usse-co-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BS9M0XM5MB9F"
-  },
-  {
-   "market": "ussewc-usse-co-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KEBKNCBA0"
-  },
-  {
-   "market": "ussewc-usse-co-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG01SHTB9K"
-  },
-  {
-   "market": "usgubewc-usgub-tx-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHZQET0B9P"
-  },
-  {
-   "market": "usgubewc-usgub-tx-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.19",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGRVTHWB9W"
-  },
-  {
-   "market": "usgubewc-usgub-tx-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGMNJ28B9J"
-  },
-  {
-   "market": "ussewc-usse-ri-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFJ9ZRRB9Z"
-  },
-  {
-   "market": "ussewc-usse-ri-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9HN3N00B9P"
-  },
-  {
-   "market": "ussewc-usse-ri-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.1",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGRVJ7YB9W"
-  },
-  {
-   "market": "usgubewc-usgub-or-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMH37BJ2BAD"
-  },
-  {
-   "market": "usgubewc-usgub-or-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.32",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMHV3WGABA0"
-  },
-  {
-   "market": "usgubewc-usgub-or-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFX1ZRRBAH"
-  },
-  {
-   "market": "usgubewc-usgub-or-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG1XWBGBAC"
-  },
-  {
-   "market": "tec-cbb-champ-2027-04-05-w-butl",
-   "side": "SELL",
-   "price": "0.11",
-   "quantity": 2,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRXJ6Z1B4BAK"
-  },
-  {
-   "market": "tec-cbb-champ-2027-04-05-w-butl",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 1000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXJWWSZCB9M"
-  },
-  {
-   "market": "ussewc-usse-tn-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS93J82A0B9W"
-  },
-  {
-   "market": "ussewc-usse-tn-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFXVRD6BA3"
-  },
-  {
-   "market": "ussewc-usse-tn-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.09",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGFW4PCB9M"
-  },
-  {
-   "market": "ussewc-usse-va-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9GAN920BA0"
-  },
-  {
-   "market": "ussewc-usse-va-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 100,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRF887YMBA1"
-  },
-  {
-   "market": "ussewc-usse-va-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG1XRAGBAC"
-  },
-  {
-   "market": "ussewc-usse-fl-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.78",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9W3Z5VWB9N"
-  },
-  {
-   "market": "ussewc-usse-fl-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGVBSQ2BA8"
-  },
-  {
-   "market": "ussewc-usse-fl-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9MN830CBAN"
-  },
-  {
-   "market": "ussewc-usse-fl-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.77",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFZ440CBA2"
-  },
-  {
-   "market": "ussewc-usse-fl-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.5",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRG46DW2BAE"
-  },
-  {
-   "market": "ussewc-usse-ky-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.84",
-   "quantity": 75,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9WERA78B9J"
-  },
-  {
-   "market": "ussewc-usse-ky-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGPWG9TBA7"
-  },
-  {
-   "market": "ussewc-usse-ky-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9M9AR5GB9V"
-  },
-  {
-   "market": "usgubewc-usgub-ma-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFXVK2YBA3"
-  },
-  {
-   "market": "usgubewc-usgub-ma-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFJ9V6AB9Z"
-  },
-  {
-   "market": "usgubewc-usgub-ma-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMH37AH6BAD"
-  },
-  {
-   "market": "usgubewc-usgub-sc-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.83",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRF2TW2JB9J"
-  },
-  {
-   "market": "usgubewc-usgub-sc-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJ8R4HWBAM"
-  },
-  {
-   "market": "usgubewc-usgub-sc-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRF6E0GABA7"
-  },
-  {
-   "market": "usgubewc-usgub-wy-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJ3BWH8BAG"
-  },
-  {
-   "market": "usgubewc-usgub-wy-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.34",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMK1R7NGBAN"
-  },
-  {
-   "market": "usgubewc-usgub-wy-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGFW35CB9M"
-  },
-  {
-   "market": "usgubewc-usgub-wy-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFX24Z4BAH"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-51",
-   "side": "BUY",
-   "price": "0.19",
-   "quantity": 2,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXJ3ACXMBA6"
-  },
-  {
-   "market": "ussewc-usse-ky-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KZ5XVYB9N"
-  },
-  {
-   "market": "ussewc-usse-ky-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG2JSP2B9Y"
-  },
-  {
-   "market": "ussewc-usse-ky-2026-11-03-dem",
+   "market": "usgubewc-usgub-sd-2026-11-03-dem",
    "side": "SELL",
    "price": "0.12",
    "quantity": 40,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGFVV8TB9M"
+   "id": "BSMJ70RD6BAJ"
   },
   {
-   "market": "usgubewc-usgub-id-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSREYJGGABAG"
-  },
-  {
-   "market": "usgubewc-usgub-id-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJ28XZ8BAC"
-  },
-  {
-   "market": "usgubewc-usgub-id-2026-11-03-rep",
+   "market": "usgubewc-usgub-sd-2026-11-03-dem",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGZ46HAB9E"
+   "id": "BSRGVBV6CBA8"
   },
   {
-   "market": "apdc-alito-2026-12-31",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 5000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXKEJFHYB9Y"
-  },
-  {
-   "market": "apdc-alito-2026-12-31",
+   "market": "usgubewc-usgub-tn-2026-11-03-dem",
    "side": "SELL",
    "price": "0.99",
-   "quantity": 5000,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BRXJEB20EB9T"
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGBA6VABAJ"
+  },
+  {
+   "market": "usgubewc-usgub-tn-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJAX7QEBA9"
+  },
+  {
+   "market": "usgubewc-usgub-tn-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.12",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMJZ52HAB9Q"
+  },
+  {
+   "market": "usgubewc-usgub-tn-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFX8SDYB9G"
+  },
+  {
+   "market": "usgubewc-usgub-wy-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHGZ1B4BA3"
+  },
+  {
+   "market": "usgubewc-usgub-wy-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFZ497WBA2"
+  },
+  {
+   "market": "usgubewc-usgub-wy-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.93",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRG01H3AB9K"
+  },
+  {
+   "market": "usgubewc-usgub-pa-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFQ9PS8B9H"
+  },
+  {
+   "market": "usgubewc-usgub-pa-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.85",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRF780G8B9P"
+  },
+  {
+   "market": "usgubewc-usgub-pa-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJFCR16B9J"
   },
   {
    "market": "apdc-alito-2026-12-31",
@@ -956,14 +308,6 @@
   },
   {
    "market": "apdc-alito-2026-12-31",
-   "side": "SELL",
-   "price": "0.09",
-   "quantity": 200,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BS3QYWG7WB9G"
-  },
-  {
-   "market": "apdc-alito-2026-12-31",
    "side": "BUY",
    "price": "0.08",
    "quantity": 10,
@@ -971,124 +315,52 @@
    "id": "BS4XHQ47CBAH"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-56",
-   "side": "SELL",
-   "price": "0.05",
-   "quantity": 30,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGTXWR4B9T"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-56",
+   "market": "apdc-alito-2026-12-31",
    "side": "BUY",
    "price": "0.01",
    "quantity": 5000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXJ6Z2V4BAK"
+   "id": "BRXKEJFHYB9Y"
   },
   {
-   "market": "ussewc-usse-ms-2026-11-03-dem",
+   "market": "scc-senate-gop-2026-11-03-51",
    "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
+   "price": "0.19",
+   "quantity": 2,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9MRX398BA3"
+   "id": "BSXKD4EC8BA2"
   },
   {
-   "market": "ussewc-usse-ms-2026-11-03-dem",
+   "market": "scc-senate-gop-2026-11-03-51",
    "side": "SELL",
-   "price": "0.18",
+   "price": "0.25",
    "quantity": 50,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRHDTV2MBA3"
+   "id": "BSXKNNN9RB9E"
   },
   {
-   "market": "ussewc-usse-ms-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGNQ73TB9S"
+   "market": "usgubewc-usgub-ok-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.85",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFXVA8PBA3"
   },
   {
-   "market": "usgubewc-usgub-nm-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGJPCEGBAA"
-  },
-  {
-   "market": "usgubewc-usgub-nm-2026-11-03-rep",
+   "market": "usgubewc-usgub-ok-2026-11-03-rep",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMK6205CB9F"
+   "id": "BSMJF86GABA6"
   },
   {
-   "market": "usgubewc-usgub-nm-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.28",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMHXVAR2B9K"
-  },
-  {
-   "market": "usgubewc-usgub-nm-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFR32AWBAB"
-  },
-  {
-   "market": "usgubewc-usgub-vt-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHGZ1N4BA3"
-  },
-  {
-   "market": "usgubewc-usgub-vt-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.29",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGZ49NAB9E"
-  },
-  {
-   "market": "usgubewc-usgub-vt-2026-11-03-dem",
+   "market": "usgubewc-usgub-ok-2026-11-03-rep",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGMHBCGBA9"
-  },
-  {
-   "market": "ussewc-usse-sc-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.77",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRF2TW7MB9J"
-  },
-  {
-   "market": "ussewc-usse-sc-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9JPWH44B9V"
-  },
-  {
-   "market": "ussewc-usse-sc-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG0YV62B9F"
+   "id": "BSRGRVN1RB9W"
   },
   {
    "market": "ussewc-usse-ar-2026-11-03-rep",
@@ -1101,7 +373,7 @@
   {
    "market": "ussewc-usse-ar-2026-11-03-rep",
    "side": "BUY",
-   "price": "0.88",
+   "price": "0.9",
    "quantity": 40,
    "intent": "ORDER_INTENT_BUY_LONG",
    "id": "BSRGGAGDTBAF"
@@ -1115,164 +387,132 @@
    "id": "BSREQHJ7TBAN"
   },
   {
-   "market": "ussewc-usse-ar-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.89",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9V8S7E0BA3"
-  },
-  {
-   "market": "ussewc-usse-ar-2026-11-03-rep",
+   "market": "usgubewc-usgub-hi-2026-11-03-dem",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGFVTA0B9M"
+   "id": "BSRGJP61EBAA"
   },
   {
-   "market": "usgubewc-usgub-ar-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFFH2NYB9E"
-  },
-  {
-   "market": "usgubewc-usgub-ar-2026-11-03-rep",
+   "market": "usgubewc-usgub-hi-2026-11-03-dem",
    "side": "BUY",
-   "price": "0.85",
+   "price": "0.93",
    "quantity": 40,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFX8CNWB9G"
+   "id": "BSRFD9ENMB9X"
   },
   {
-   "market": "usgubewc-usgub-ar-2026-11-03-rep",
+   "market": "usgubewc-usgub-hi-2026-11-03-dem",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJGRV0YB9X"
+   "id": "BSMH37A8JBAD"
   },
   {
-   "market": "usgubewc-usgub-hi-2026-11-03-rep",
+   "market": "usgubewc-usgub-il-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.18",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMJ37TJ0B9T"
+  },
+  {
+   "market": "usgubewc-usgub-il-2026-11-03-rep",
    "side": "SELL",
    "price": "0.51",
    "quantity": 40,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGFVWWPB9M"
+   "id": "BSRG46S00BAE"
   },
   {
-   "market": "usgubewc-usgub-hi-2026-11-03-rep",
+   "market": "usgubewc-usgub-il-2026-11-03-rep",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGFVX0TB9M"
+   "id": "BSRGY02WJBA4"
   },
   {
-   "market": "usgubewc-usgub-hi-2026-11-03-rep",
+   "market": "usgubewc-usgub-il-2026-11-03-rep",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJFCNG4B9J"
+   "id": "BSMJ49520B9N"
   },
   {
-   "market": "usgubewc-usgub-hi-2026-11-03-rep",
+   "market": "scc-hrep-rep-2026-11-03-gte200",
    "side": "SELL",
-   "price": "0.4",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJNS2ZWB9Z"
+   "price": "0.44",
+   "quantity": 11,
+   "intent": "ORDER_INTENT_SELL_LONG",
+   "id": "BSTPCPP0PB9T"
   },
   {
-   "market": "ussewc-usse-ms-2026-11-03-rep",
+   "market": "scc-hrep-rep-2026-11-03-gte200",
    "side": "BUY",
-   "price": "0.5",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9VNGCCPBA7"
-  },
-  {
-   "market": "ussewc-usse-ms-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG0Z14PB9F"
-  },
-  {
-   "market": "ussewc-usse-ms-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KEWMGTBAE"
-  },
-  {
-   "market": "ussewc-usse-ms-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFR2RTRBAB"
-  },
-  {
-   "market": "ussewc-usse-ms-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9JXAVZ2BA9"
-  },
-  {
-   "market": "ussewc-usse-ms-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.81",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFASR5YB9T"
-  },
-  {
-   "market": "ussewc-usse-ms-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KQ7AFTB9H"
-  },
-  {
-   "market": "usgubewc-usgub-co-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJGRV18B9X"
-  },
-  {
-   "market": "usgubewc-usgub-co-2026-11-03-rep",
-   "side": "SELL",
    "price": "0.38",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMHXM5NPB9Y"
+   "quantity": 10,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSWAG1GK8BA4"
   },
   {
-   "market": "usgubewc-usgub-co-2026-11-03-rep",
+   "market": "scc-senate-gop-2026-11-03-56",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 5000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BRXJ6Z2V4BAK"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-56",
    "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
+   "price": "0.05",
+   "quantity": 30,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGEQF9MBAG"
+   "id": "BSRGTXWR4B9T"
   },
   {
-   "market": "usgubewc-usgub-co-2026-11-03-rep",
+   "market": "ussewc-usse-ky-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.84",
+   "quantity": 75,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9WERA78B9J"
+  },
+  {
+   "market": "ussewc-usse-ky-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9M9AR5GB9V"
+  },
+  {
+   "market": "usgubewc-usgub-fl-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJF55R0BA4"
+  },
+  {
+   "market": "usgubewc-usgub-fl-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.34",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG2JZ8JB9Y"
+  },
+  {
+   "market": "usgubewc-usgub-fl-2026-11-03-dem",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG01WCGB9K"
+   "id": "BSRGHV1N8B9N"
   },
   {
    "market": "usgubewc-usgub-nm-2026-11-03-dem",
@@ -1299,68 +539,380 @@
    "id": "BSRH31Y52BA5"
   },
   {
-   "market": "usgubewc-usgub-ct-2026-11-03-rep",
+   "market": "ussewc-usse-il-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHWWE02BAB"
+  },
+  {
+   "market": "ussewc-usse-il-2026-11-03-dem",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHD6612BAN"
+   "id": "BSMJDDRG4B9S"
   },
   {
-   "market": "usgubewc-usgub-ct-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.38",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJKBV0AB9G"
-  },
-  {
-   "market": "usgubewc-usgub-ct-2026-11-03-rep",
+   "market": "ussewc-usse-il-2026-11-03-dem",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRH7YCP8B9R"
+   "id": "BSRG6NRAWB9V"
   },
   {
-   "market": "usgubewc-usgub-ct-2026-11-03-rep",
+   "market": "scc-senate-gop-2026-11-03-47",
+   "side": "BUY",
+   "price": "0.13",
+   "quantity": 22,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSXJRW9AJBAJ"
+  },
+  {
+   "market": "ussewc-usse-co-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9MBRFCTB9Z"
+  },
+  {
+   "market": "ussewc-usse-co-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.79",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFZ439JBA2"
+  },
+  {
+   "market": "ussewc-usse-co-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.5",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFQ9KEAB9H"
+  },
+  {
+   "market": "ussewc-usse-la-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9KQ8286B9Q"
+  },
+  {
+   "market": "ussewc-usse-la-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRHNJTX2B9V"
+  },
+  {
+   "market": "ussewc-usse-la-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.31",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BS9M9ARPJB9V"
+  },
+  {
+   "market": "usgubewc-usgub-ma-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHTTC66BA1"
+  },
+  {
+   "market": "usgubewc-usgub-ma-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.1",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMJ49ABJB9N"
+  },
+  {
+   "market": "usgubewc-usgub-ma-2026-11-03-rep",
    "side": "SELL",
    "price": "0.51",
    "quantity": 40,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGT6KZAB9P"
+   "id": "BSRG1XQS6BAC"
   },
   {
-   "market": "ussewc-usse-ok-2026-11-03-dem",
+   "market": "usgubewc-usgub-ma-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFQ7JTTB9R"
+  },
+  {
+   "market": "usgubewc-usgub-wy-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGFW35CB9M"
+  },
+  {
+   "market": "usgubewc-usgub-wy-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFX24Z4BAH"
+  },
+  {
+   "market": "usgubewc-usgub-wy-2026-11-03-dem",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9BDEF0ABA1"
+   "id": "BSMJ3BWH8BAG"
   },
   {
-   "market": "ussewc-usse-ok-2026-11-03-dem",
+   "market": "usgubewc-usgub-wy-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.09",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMK1R7NGBAN"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte205",
+   "side": "SELL",
+   "price": "0.48",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSXMMMAPGB9J"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte220",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRHDEA4WBA2"
+   "id": "BSRH5H19GBAB"
   },
   {
-   "market": "ussewc-usse-ok-2026-11-03-dem",
+   "market": "pandc-anydis-2027-12-31",
+   "side": "BUY",
+   "price": "0.13",
+   "quantity": 10,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSW9SJ47MB9K"
+  },
+  {
+   "market": "pandc-anydis-2027-12-31",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 10000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BRXJ0DJ54BA9"
+  },
+  {
+   "market": "pandc-anydis-2027-12-31",
    "side": "SELL",
-   "price": "0.05",
-   "quantity": 60,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BS9M9ASTTB9V"
+   "price": "0.23",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_SELL_LONG",
+   "id": "BSRFX1XG2BAH"
   },
   {
-   "market": "ussewc-usse-ok-2026-11-03-dem",
+   "market": "pandc-anydis-2027-12-31",
+   "side": "SELL",
+   "price": "0.25",
+   "quantity": 10,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BRXKMEY1PB9S"
+  },
+  {
+   "market": "pandc-anydis-2027-12-31",
+   "side": "SELL",
+   "price": "0.24",
+   "quantity": 2,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFJGNTCBA0"
+  },
+  {
+   "market": "usgubewc-usgub-il-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.91",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFZ445MBA2"
+  },
+  {
+   "market": "usgubewc-usgub-il-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJ28Y3EBAC"
+  },
+  {
+   "market": "usgubewc-usgub-il-2026-11-03-dem",
    "side": "SELL",
    "price": "0.99",
-   "quantity": 174,
+   "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGGB26CBAF"
+   "id": "BSRH5H20CBAB"
+  },
+  {
+   "market": "ussewc-usse-ks-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.74",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSREWDVDTBAJ"
+  },
+  {
+   "market": "ussewc-usse-ks-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHCJ01YBA7"
+  },
+  {
+   "market": "ussewc-usse-ks-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGVBW3CBA8"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-54",
+   "side": "SELL",
+   "price": "0.08",
+   "quantity": 30,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSXKTPBG0B9H"
+  },
+  {
+   "market": "ussewc-usse-il-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.5",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMJ297B6BAC"
+  },
+  {
+   "market": "ussewc-usse-il-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGVBXJYBA8"
+  },
+  {
+   "market": "ussewc-usse-il-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGJPMJ8BAA"
+  },
+  {
+   "market": "ussewc-usse-il-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHTTD7MBA1"
+  },
+  {
+   "market": "usgubewc-usgub-sc-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRF6E0GABA7"
+  },
+  {
+   "market": "usgubewc-usgub-sc-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.83",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRF2TW2JB9J"
+  },
+  {
+   "market": "usgubewc-usgub-sc-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJ8R4HWBAM"
+  },
+  {
+   "market": "usgubewc-usgub-vt-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFXVKS0BA3"
+  },
+  {
+   "market": "usgubewc-usgub-vt-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.71",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRGGAHBGBAF"
+  },
+  {
+   "market": "usgubewc-usgub-vt-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHZQF9GB9P"
+  },
+  {
+   "market": "ussewc-usse-sc-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9HM0D26BA3"
+  },
+  {
+   "market": "ussewc-usse-sc-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRHNJNC4B9V"
+  },
+  {
+   "market": "ussewc-usse-sc-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.14",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG4N3A2BAN"
+  },
+  {
+   "market": "usgubewc-usgub-mn-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJAX6B4BA9"
+  },
+  {
+   "market": "usgubewc-usgub-mn-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.12",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMJZ4Y24B9Q"
   },
   {
    "market": "usgubewc-usgub-mn-2026-11-03-rep",
@@ -1379,308 +931,148 @@
    "id": "BSRGMNEC4B9J"
   },
   {
-   "market": "usgubewc-usgub-mn-2026-11-03-rep",
+   "market": "ussewc-usse-de-2026-11-03-rep",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJAX6B4BA9"
+   "id": "BSMHECYE6B9M"
   },
   {
-   "market": "usgubewc-usgub-mn-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.32",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJZ4Y24B9Q"
-  },
-  {
-   "market": "usgubewc-usgub-ny-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRG73922BA6"
-  },
-  {
-   "market": "usgubewc-usgub-ny-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJHHZ5MBAH"
-  },
-  {
-   "market": "usgubewc-usgub-ny-2026-11-03-dem",
+   "market": "ussewc-usse-de-2026-11-03-rep",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFAT19RB9T"
+   "id": "BSRGZF1HPBA0"
   },
   {
-   "market": "usgubewc-usgub-pa-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRF780G8B9P"
-  },
-  {
-   "market": "usgubewc-usgub-pa-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJFCR16B9J"
-  },
-  {
-   "market": "usgubewc-usgub-pa-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFQ9PS8B9H"
-  },
-  {
-   "market": "ussewc-usse-va-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.25",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFW8PEWB9Q"
-  },
-  {
-   "market": "ussewc-usse-va-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGHV626B9N"
-  },
-  {
-   "market": "ussewc-usse-va-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9GNYEYGB9R"
-  },
-  {
-   "market": "ussewc-usse-nm-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.49",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KA063CB9P"
-  },
-  {
-   "market": "ussewc-usse-nm-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KEBDS2BA0"
-  },
-  {
-   "market": "ussewc-usse-nm-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFJGRBYBA0"
-  },
-  {
-   "market": "ussewc-usse-nm-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG4N7MCBAN"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-53",
-   "side": "BUY",
-   "price": "0.13",
-   "quantity": 1,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXKE1180BAA"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-53",
-   "side": "SELL",
-   "price": "0.16",
-   "quantity": 20,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRXJA7176BA8"
-  },
-  {
-   "market": "usgubewc-usgub-sd-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHTCWXCBAK"
-  },
-  {
-   "market": "usgubewc-usgub-sd-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.3",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJ70RD6BAJ"
-  },
-  {
-   "market": "usgubewc-usgub-sd-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFW8PSCB9Q"
-  },
-  {
-   "market": "usgubewc-usgub-sd-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGVBV6CBA8"
-  },
-  {
-   "market": "usgubewc-usgub-md-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJWG346B9E"
-  },
-  {
-   "market": "usgubewc-usgub-md-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.34",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMHXM8QTB9Y"
-  },
-  {
-   "market": "usgubewc-usgub-md-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRH7Y890B9R"
-  },
-  {
-   "market": "usgubewc-usgub-md-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFX8QBWB9G"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-47",
-   "side": "BUY",
-   "price": "0.13",
-   "quantity": 7,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXJA71X6BA8"
-  },
-  {
-   "market": "ussewc-usse-nm-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9MBRB4EB9Z"
-  },
-  {
-   "market": "ussewc-usse-nm-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGVBGSEBA8"
-  },
-  {
-   "market": "ussewc-usse-nm-2026-11-03-rep",
+   "market": "ussewc-usse-de-2026-11-03-rep",
    "side": "SELL",
    "price": "0.11",
    "quantity": 40,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRF88E9WBA1"
+   "id": "BSRHNJV1AB9V"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-49",
-   "side": "SELL",
-   "price": "0.25",
-   "quantity": 20,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGFW5CTB9M"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-49",
+   "market": "scc-hrep-rep-2026-11-03-gte210",
    "side": "BUY",
-   "price": "0.14",
-   "quantity": 20,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS3R5BFY8BAM"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-50",
-   "side": "SELL",
-   "price": "0.28",
-   "quantity": 2,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRXJEB2Y4B9T"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-50",
-   "side": "SELL",
-   "price": "0.24",
-   "quantity": 25,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BS40KPZHEBAG"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-50",
-   "side": "SELL",
-   "price": "0.25",
-   "quantity": 5,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGGARTPBAF"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-50",
-   "side": "SELL",
-   "price": "0.29",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BRXKDAQBAB9N"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-50",
-   "side": "BUY",
-   "price": "0.18",
+   "price": "0.1",
    "quantity": 10,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS41DMNEYBAA"
+   "id": "BSGN3EBQPBAK"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-50",
+   "market": "scc-hrep-rep-2026-11-03-gte210",
    "side": "SELL",
-   "price": "0.28",
-   "quantity": 2,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BRXH1K1P6BA5"
+   "price": "0.42",
+   "quantity": 21,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGGAM1EBAF"
   },
   {
-   "market": "tec-cbb-champ-2027-04-05-w-nebr",
+   "market": "ussewc-usse-or-2026-11-03-dem",
    "side": "BUY",
    "price": "0.01",
-   "quantity": 1000,
+   "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXJWNZD0B9K"
+   "id": "BS9J3GJJTB9R"
+  },
+  {
+   "market": "ussewc-usse-or-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.93",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFFGYXGB9E"
+  },
+  {
+   "market": "ussewc-usse-or-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRF785SMB9P"
+  },
+  {
+   "market": "usgubewc-usgub-me-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.85",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFN0562BA5"
+  },
+  {
+   "market": "usgubewc-usgub-me-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHKGKX0BA8"
+  },
+  {
+   "market": "usgubewc-usgub-me-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGRVXPEB9W"
+  },
+  {
+   "market": "usgubewc-usgub-ne-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRF7HDETBA9"
+  },
+  {
+   "market": "usgubewc-usgub-ne-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHNS8PJB9V"
+  },
+  {
+   "market": "usgubewc-usgub-ne-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.3",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMJ49BY8B9N"
+  },
+  {
+   "market": "usgubewc-usgub-ne-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGMN60AB9J"
+  },
+  {
+   "market": "usgubewc-usgub-ar-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.93",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFX8CNWB9G"
+  },
+  {
+   "market": "usgubewc-usgub-ar-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJGRV0YB9X"
+  },
+  {
+   "market": "usgubewc-usgub-ar-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFFH2NYB9E"
   },
   {
    "market": "ussewc-usse-nj-2026-11-03-dem",
@@ -1707,422 +1099,6 @@
    "id": "BSRFE64WGBA4"
   },
   {
-   "market": "ussewc-usse-nj-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGZEXTCBA0"
-  },
-  {
-   "market": "ussewc-usse-al-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KB8W2MBA1"
-  },
-  {
-   "market": "ussewc-usse-al-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.98",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRG46CM6BAE"
-  },
-  {
-   "market": "ussewc-usse-al-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFJA3GEB9Z"
-  },
-  {
-   "market": "ussewc-usse-al-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.5",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9VVFM6EB9H"
-  },
-  {
-   "market": "usgubewc-usgub-id-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.3",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMHED1CYB9M"
-  },
-  {
-   "market": "usgubewc-usgub-id-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGRVZ2RB9W"
-  },
-  {
-   "market": "usgubewc-usgub-id-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRHB6FE2B9Q"
-  },
-  {
-   "market": "usgubewc-usgub-id-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJNRYVMB9Z"
-  },
-  {
-   "market": "usgubewc-usgub-ne-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.4",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJ49BY8B9N"
-  },
-  {
-   "market": "usgubewc-usgub-ne-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGMN60AB9J"
-  },
-  {
-   "market": "usgubewc-usgub-ne-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRF7HDETBA9"
-  },
-  {
-   "market": "usgubewc-usgub-ne-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHNS8PJB9V"
-  },
-  {
-   "market": "usgubewc-usgub-nh-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.65",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFE62YCBA4"
-  },
-  {
-   "market": "usgubewc-usgub-nh-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRABMNPABAG"
-  },
-  {
-   "market": "usgubewc-usgub-nh-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHFK40TBAF"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-52",
-   "side": "BUY",
-   "price": "0.09",
-   "quantity": 5,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXJWNZ0PB9K"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-52",
-   "side": "SELL",
-   "price": "0.15",
-   "quantity": 8,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BRXJ7Y3QYB9J"
-  },
-  {
-   "market": "usgubewc-usgub-ny-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJKBRB0B9G"
-  },
-  {
-   "market": "usgubewc-usgub-ny-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.4",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMK1R30CBAN"
-  },
-  {
-   "market": "usgubewc-usgub-ny-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG0YVGPB9F"
-  },
-  {
-   "market": "usgubewc-usgub-ny-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFQ7K3RB9R"
-  },
-  {
-   "market": "usgubewc-usgub-sc-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHV3NKYBA0"
-  },
-  {
-   "market": "usgubewc-usgub-sc-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.21",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGGARYWBAF"
-  },
-  {
-   "market": "usgubewc-usgub-sc-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGHTZ0AB9N"
-  },
-  {
-   "market": "apdc-jerpowgov-2026-12-31",
-   "side": "SELL",
-   "price": "0.26",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSSXNMEDMBAG"
-  },
-  {
-   "market": "apdc-jerpowgov-2026-12-31",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 5000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFQ7EH6B9R"
-  },
-  {
-   "market": "apdc-jerpowgov-2026-12-31",
-   "side": "BUY",
-   "price": "0.25",
-   "quantity": 14,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSGRCB5JJBA1"
-  },
-  {
-   "market": "apdc-jerpowgov-2026-12-31",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGMN6JCB9J"
-  },
-  {
-   "market": "ussewc-usse-sd-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9H67JATB9V"
-  },
-  {
-   "market": "ussewc-usse-sd-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFN03HCBA5"
-  },
-  {
-   "market": "ussewc-usse-ar-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KPN01GB9W"
-  },
-  {
-   "market": "ussewc-usse-ar-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.49",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFE69DJBA4"
-  },
-  {
-   "market": "ussewc-usse-ar-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRF7879JB9P"
-  },
-  {
-   "market": "usgubewc-usgub-pa-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHWWESPBAB"
-  },
-  {
-   "market": "usgubewc-usgub-pa-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.4",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJFD2ZRB9J"
-  },
-  {
-   "market": "usgubewc-usgub-pa-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGMH7ECBA9"
-  },
-  {
-   "market": "usgubewc-usgub-pa-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGJPCQ6BAA"
-  },
-  {
-   "market": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
-   "side": "SELL",
-   "price": "0.01",
-   "quantity": 100,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BRXJA70QGBA8"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte190",
-   "side": "BUY",
-   "price": "0.71",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRF6DXVYBA7"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte190",
-   "side": "SELL",
-   "price": "0.75",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRXJ3ADBRBA6"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte190",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFQ7Q5TB9R"
-  },
-  {
-   "market": "pandc-anydis-2027-12-31",
-   "side": "SELL",
-   "price": "0.25",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRXKMEY1PB9S"
-  },
-  {
-   "market": "pandc-anydis-2027-12-31",
-   "side": "SELL",
-   "price": "0.23",
-   "quantity": 20,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BSRFX1XG2BAH"
-  },
-  {
-   "market": "pandc-anydis-2027-12-31",
-   "side": "BUY",
-   "price": "0.22",
-   "quantity": 11,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSJR13652BA1"
-  },
-  {
-   "market": "pandc-anydis-2027-12-31",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 5000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXJ0DJ54BA9"
-  },
-  {
-   "market": "pandc-anydis-2027-12-31",
-   "side": "SELL",
-   "price": "0.24",
-   "quantity": 2,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFJGNTCBA0"
-  },
-  {
-   "market": "pandc-anydis-2027-12-31",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 10000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGRVKBRB9W"
-  },
-  {
-   "market": "enwc-ussep-sc-2026-08-11-rep-ralnor",
-   "side": "SELL",
-   "price": "0.25",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BS5N6HTV2BAD"
-  },
-  {
-   "market": "ussewc-usse-wv-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.94",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9FC9BXGB9F"
-  },
-  {
-   "market": "ussewc-usse-wv-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG46SSRBAE"
-  },
-  {
-   "market": "ussewc-usse-wv-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9G3W8C2BAC"
-  },
-  {
    "market": "ussewc-usse-nj-2026-11-03-rep",
    "side": "BUY",
    "price": "0.01",
@@ -2133,7 +1109,7 @@
   {
    "market": "ussewc-usse-nj-2026-11-03-rep",
    "side": "SELL",
-   "price": "0.51",
+   "price": "0.25",
    "quantity": 50,
    "intent": "ORDER_INTENT_BUY_SHORT",
    "id": "BS9MN81C4BAN"
@@ -2187,28 +1163,132 @@
    "id": "BS9M8QGC0BAM"
   },
   {
-   "market": "usgubewc-usgub-il-2026-11-03-dem",
+   "market": "usgubewc-usgub-co-2026-11-03-dem",
    "side": "BUY",
    "price": "0.91",
    "quantity": 40,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFZ445MBA2"
+   "id": "BSRF887EJBA1"
   },
   {
-   "market": "usgubewc-usgub-il-2026-11-03-dem",
+   "market": "usgubewc-usgub-co-2026-11-03-dem",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJ28Y3EBAC"
+   "id": "BSMJ23Q2GB9H"
   },
   {
-   "market": "usgubewc-usgub-il-2026-11-03-dem",
+   "market": "usgubewc-usgub-co-2026-11-03-dem",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRH5H20CBAB"
+   "id": "BSRGB9WJ0BAJ"
+  },
+  {
+   "market": "usgubewc-usgub-ct-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHD6612BAN"
+  },
+  {
+   "market": "usgubewc-usgub-ct-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.16",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMJKBV0AB9G"
+  },
+  {
+   "market": "usgubewc-usgub-ct-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRH7YCP8B9R"
+  },
+  {
+   "market": "usgubewc-usgub-ct-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGT6KZAB9P"
+  },
+  {
+   "market": "usgubewc-usgub-nm-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.16",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMHXVAR2B9K"
+  },
+  {
+   "market": "usgubewc-usgub-nm-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFR32AWBAB"
+  },
+  {
+   "market": "usgubewc-usgub-nm-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGJPCEGBAA"
+  },
+  {
+   "market": "usgubewc-usgub-nm-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMK6205CB9F"
+  },
+  {
+   "market": "usgubewc-usgub-ny-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJKBRB0B9G"
+  },
+  {
+   "market": "usgubewc-usgub-ny-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.2",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMK1R30CBAN"
+  },
+  {
+   "market": "usgubewc-usgub-ny-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG0YVGPB9F"
+  },
+  {
+   "market": "usgubewc-usgub-ny-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFQ7K3RB9R"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte185",
+   "side": "SELL",
+   "price": "0.78",
+   "quantity": 8,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BRXK04VA4B9V"
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte185",
@@ -2243,12 +1323,404 @@
    "id": "BRXHM5174BAG"
   },
   {
-   "market": "scc-hrep-rep-2026-11-03-gte185",
+   "market": "usgubewc-usgub-id-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJNRYVMB9Z"
+  },
+  {
+   "market": "usgubewc-usgub-id-2026-11-03-dem",
    "side": "SELL",
-   "price": "0.78",
-   "quantity": 8,
+   "price": "0.1",
+   "quantity": 40,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BRXK04VA4B9V"
+   "id": "BSMHED1CYB9M"
+  },
+  {
+   "market": "usgubewc-usgub-id-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGRVZ2RB9W"
+  },
+  {
+   "market": "usgubewc-usgub-id-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRHB6FE2B9Q"
+  },
+  {
+   "market": "ussewc-usse-ks-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHCJ00RBA7"
+  },
+  {
+   "market": "ussewc-usse-ks-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.27",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGFVWCGB9M"
+  },
+  {
+   "market": "ussewc-usse-ks-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFR2YM0BAB"
+  },
+  {
+   "market": "ussewc-usse-ma-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJNS0GPB9Z"
+  },
+  {
+   "market": "ussewc-usse-ma-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.11",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFW8KCRB9Q"
+  },
+  {
+   "market": "ussewc-usse-ma-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRHDEC22BA2"
+  },
+  {
+   "market": "usgubewc-usgub-ri-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJKBSHYB9G"
+  },
+  {
+   "market": "usgubewc-usgub-ri-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.22",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMJ8RFZABAM"
+  },
+  {
+   "market": "usgubewc-usgub-ri-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGZF10YBA0"
+  },
+  {
+   "market": "usgubewc-usgub-ri-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRH9B6AWBAD"
+  },
+  {
+   "market": "ushrewc-ushr-al-03-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSV8YDN2CB9P"
+  },
+  {
+   "market": "ushrewc-ushr-al-03-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSV8H121EB9W"
+  },
+  {
+   "market": "ushrewc-ushr-al-03-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.47",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSVAHSN2YBAG"
+  },
+  {
+   "market": "ussewc-usse-sd-2026-11-03-briben",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9J5ET70B9W"
+  },
+  {
+   "market": "ussewc-usse-sd-2026-11-03-briben",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSEPRPJ3ABAB"
+  },
+  {
+   "market": "ussewc-usse-ms-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9MRX398BA3"
+  },
+  {
+   "market": "ussewc-usse-ms-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.18",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRHDTV2MBA3"
+  },
+  {
+   "market": "ussewc-usse-ms-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGNQ73TB9S"
+  },
+  {
+   "market": "usgubewc-usgub-id-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.93",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSREYJGGABAG"
+  },
+  {
+   "market": "usgubewc-usgub-id-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJ28XZ8BAC"
+  },
+  {
+   "market": "usgubewc-usgub-id-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGZ46HAB9E"
+  },
+  {
+   "market": "usgubewc-usgub-co-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJGRV18B9X"
+  },
+  {
+   "market": "usgubewc-usgub-co-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.14",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMHXM5NPB9Y"
+  },
+  {
+   "market": "usgubewc-usgub-co-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGEQF9MBAG"
+  },
+  {
+   "market": "usgubewc-usgub-co-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG01WCGB9K"
+  },
+  {
+   "market": "usgubewc-usgub-or-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.73",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRF6DX0TBA7"
+  },
+  {
+   "market": "usgubewc-usgub-or-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJDDR8AB9S"
+  },
+  {
+   "market": "usgubewc-usgub-or-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG4MTQJBAN"
+  },
+  {
+   "market": "usgubewc-usgub-tx-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGMNJ28B9J"
+  },
+  {
+   "market": "usgubewc-usgub-tx-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.17",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSW9SHSYYB9K"
+  },
+  {
+   "market": "usgubewc-usgub-tx-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHZQET0B9P"
+  },
+  {
+   "market": "usgubewc-usgub-tx-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.02",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSW98S2C4BAG"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-50",
+   "side": "SELL",
+   "price": "0.28",
+   "quantity": 2,
+   "intent": "ORDER_INTENT_SELL_LONG",
+   "id": "BRXH1K1P6BA5"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-50",
+   "side": "SELL",
+   "price": "0.28",
+   "quantity": 2,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BRXJEB2Y4B9T"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-50",
+   "side": "SELL",
+   "price": "0.24",
+   "quantity": 25,
+   "intent": "ORDER_INTENT_SELL_LONG",
+   "id": "BS40KPZHEBAG"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-50",
+   "side": "SELL",
+   "price": "0.25",
+   "quantity": 5,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGGARTPBAF"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-50",
+   "side": "SELL",
+   "price": "0.29",
+   "quantity": 10,
+   "intent": "ORDER_INTENT_SELL_LONG",
+   "id": "BRXKDAQBAB9N"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-50",
+   "side": "BUY",
+   "price": "0.18",
+   "quantity": 10,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS41DMNEYBAA"
+  },
+  {
+   "market": "usgubewc-usgub-vt-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHGZ1N4BA3"
+  },
+  {
+   "market": "usgubewc-usgub-vt-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.29",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGZ49NAB9E"
+  },
+  {
+   "market": "usgubewc-usgub-vt-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGMHBCGBA9"
+  },
+  {
+   "market": "scc-hrep-rep-2026-11-03-gte180",
+   "side": "BUY",
+   "price": "0.75",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSXKH3FY4B9K"
+  },
+  {
+   "market": "ewc-usse-tx-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.51",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS5P0GCX6BA7"
+  },
+  {
+   "market": "ussewc-usse-or-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9K4Z35JBA3"
+  },
+  {
+   "market": "ussewc-usse-or-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.08",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFX8K22B9G"
+  },
+  {
+   "market": "ussewc-usse-or-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRF6E3T8BA7"
   },
   {
    "market": "ussewc-usse-al-2026-11-03-dem",
@@ -2275,92 +1747,28 @@
    "id": "BSRGEQA64BAG"
   },
   {
-   "market": "ussewc-usse-la-2026-11-03-dem",
+   "market": "usgubewc-usgub-tn-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.89",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFASS66B9T"
+  },
+  {
+   "market": "usgubewc-usgub-tn-2026-11-03-rep",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KQ8286B9Q"
+   "id": "BSMJF86V2BA6"
   },
   {
-   "market": "ussewc-usse-la-2026-11-03-dem",
+   "market": "usgubewc-usgub-tn-2026-11-03-rep",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRHNJTX2B9V"
-  },
-  {
-   "market": "ussewc-usse-la-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BS9M9ARPJB9V"
-  },
-  {
-   "market": "usgubewc-usgub-fl-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJF55R0BA4"
-  },
-  {
-   "market": "usgubewc-usgub-fl-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.34",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG2JZ8JB9Y"
-  },
-  {
-   "market": "usgubewc-usgub-fl-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGHV1N8B9N"
-  },
-  {
-   "market": "usgubewc-usgub-tn-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJAX7QEBA9"
-  },
-  {
-   "market": "usgubewc-usgub-tn-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.34",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJZ52HAB9Q"
-  },
-  {
-   "market": "usgubewc-usgub-tn-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFX8SDYB9G"
-  },
-  {
-   "market": "usgubewc-usgub-tn-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGBA6VABAJ"
-  },
-  {
-   "market": "usgubewc-usgub-ri-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.83",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFD9EDGB9X"
+   "id": "BSRG020DAB9K"
   },
   {
    "market": "usgubewc-usgub-ri-2026-11-03-dem",
@@ -2379,212 +1787,60 @@
    "id": "BSRGVBEJJBA8"
   },
   {
-   "market": "enwc-ushrp-fl25-2026-08-18-dem-olilar",
+   "market": "usgubewc-usgub-ri-2026-11-03-dem",
    "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
+   "price": "0.83",
+   "quantity": 40,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSQG51Y9EB9T"
+   "id": "BSRFD9EDGB9X"
   },
   {
-   "market": "enwc-ushrp-fl25-2026-08-18-dem-olilar",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFD9RSMB9X"
-  },
-  {
-   "market": "enwc-ushrp-fl25-2026-08-18-dem-olilar",
-   "side": "SELL",
+   "market": "enwc-ushrp-fl25-2026-08-18-dem-jarmos",
+   "side": "BUY",
    "price": "0.5",
    "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSR4RZ4ECB9S"
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSQ35HJ22B9N"
   },
   {
-   "market": "enwc-ushrp-fl25-2026-08-18-dem-olilar",
+   "market": "enwc-ushrp-fl25-2026-08-18-dem-jarmos",
    "side": "BUY",
-   "price": "0.07",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSQGXTE96B9Y"
+  },
+  {
+   "market": "enwc-ushrp-fl25-2026-08-18-dem-jarmos",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG01PJ6B9K"
+  },
+  {
+   "market": "enwc-ushrp-fl25-2026-08-18-dem-jarmos",
+   "side": "SELL",
+   "price": "0.99",
    "quantity": 5,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSSBHVGG6BA7"
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFW8BGCB9Q"
   },
   {
-   "market": "ussewc-usse-ma-2026-11-03-rep",
+   "market": "scc-senate-gop-2026-11-03-48",
    "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJNS0GPB9Z"
+   "price": "0.18",
+   "quantity": 7,
+   "intent": "ORDER_INTENT_SELL_SHORT",
+   "id": "BSE1RDZC8B9Y"
   },
   {
-   "market": "ussewc-usse-ma-2026-11-03-rep",
+   "market": "scc-senate-gop-2026-11-03-48",
    "side": "SELL",
-   "price": "0.15",
-   "quantity": 40,
+   "price": "0.19",
+   "quantity": 10,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFW8KCRB9Q"
-  },
-  {
-   "market": "ussewc-usse-ma-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRHDEC22BA2"
-  },
-  {
-   "market": "ussewc-usse-wy-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS96GS5YJB9X"
-  },
-  {
-   "market": "ussewc-usse-wy-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.93",
-   "quantity": 70,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFZ41VCBA2"
-  },
-  {
-   "market": "ussewc-usse-wy-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFXVE1WBA3"
-  },
-  {
-   "market": "ussewc-usse-wv-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGHV1S6B9N"
-  },
-  {
-   "market": "ussewc-usse-wv-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.11",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG4N1MCBAN"
-  },
-  {
-   "market": "ussewc-usse-wv-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9F8E6RYB9N"
-  },
-  {
-   "market": "usgubewc-usgub-al-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KQ80MPB9Q"
-  },
-  {
-   "market": "usgubewc-usgub-al-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRH7YDJAB9R"
-  },
-  {
-   "market": "usgubewc-usgub-al-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BS9MJZW78B9Y"
-  },
-  {
-   "market": "usgubewc-usgub-ar-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJF845YBA6"
-  },
-  {
-   "market": "usgubewc-usgub-ar-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.34",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJ37M2TBA5"
-  },
-  {
-   "market": "usgubewc-usgub-ar-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGPWC8CBA7"
-  },
-  {
-   "market": "usgubewc-usgub-ar-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG9RNQ0BAM"
-  },
-  {
-   "market": "usgubewc-usgub-md-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.79",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFAWB4GB9W"
-  },
-  {
-   "market": "usgubewc-usgub-md-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJ23R3AB9H"
-  },
-  {
-   "market": "usgubewc-usgub-md-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGJPK9WBAA"
-  },
-  {
-   "market": "usgubewc-usgub-me-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFN0562BA5"
-  },
-  {
-   "market": "usgubewc-usgub-me-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHKGKX0BA8"
-  },
-  {
-   "market": "usgubewc-usgub-me-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGRVXPEB9W"
+   "id": "BSE29GCQ0BA4"
   },
   {
    "market": "scc-senate-gop-2026-11-03-48",
@@ -2619,532 +1875,268 @@
    "id": "BS6H034E6B9E"
   },
   {
-   "market": "scc-senate-gop-2026-11-03-48",
-   "side": "BUY",
-   "price": "0.18",
-   "quantity": 7,
-   "intent": "ORDER_INTENT_SELL_SHORT",
-   "id": "BSE1RDZC8B9Y"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-48",
-   "side": "SELL",
-   "price": "0.19",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSE29GCQ0BA4"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte210",
-   "side": "BUY",
-   "price": "0.1",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSGN3EBQPBAK"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte210",
-   "side": "SELL",
-   "price": "0.42",
-   "quantity": 21,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGGAM1EBAF"
-  },
-  {
-   "market": "ussewc-usse-sc-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9HM0D26BA3"
-  },
-  {
-   "market": "ussewc-usse-sc-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRHNJNC4B9V"
-  },
-  {
-   "market": "ussewc-usse-sc-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.21",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG4N3A2BAN"
-  },
-  {
-   "market": "ussewc-usse-mt-2026-11-03-setbod",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9M9AVPWB9V"
-  },
-  {
-   "market": "usgubewc-usgub-ok-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFXVK9YBA3"
-  },
-  {
-   "market": "usgubewc-usgub-ok-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHWWE5PBAB"
-  },
-  {
-   "market": "usgubewc-usgub-ok-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.19",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG1XXMEBAC"
-  },
-  {
-   "market": "usgubewc-usgub-sd-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJAX7PTBA9"
-  },
-  {
-   "market": "usgubewc-usgub-sd-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFD9RQ0B9X"
-  },
-  {
-   "market": "usgubewc-usgub-sd-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFQGQ2EBAD"
-  },
-  {
-   "market": "enwc-ushrp-fl25-2026-08-18-dem-jarmos",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSQGXTE96B9Y"
-  },
-  {
-   "market": "enwc-ushrp-fl25-2026-08-18-dem-jarmos",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG01PJ6B9K"
-  },
-  {
-   "market": "enwc-ushrp-fl25-2026-08-18-dem-jarmos",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 5,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFW8BGCB9Q"
-  },
-  {
-   "market": "enwc-ushrp-fl25-2026-08-18-dem-jarmos",
-   "side": "BUY",
-   "price": "0.5",
-   "quantity": 10,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSQ35HJ22B9N"
-  },
-  {
-   "market": "ussewc-usse-tn-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.9",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFR2SAWBAB"
-  },
-  {
-   "market": "ussewc-usse-tn-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS8RVP9TGB9V"
-  },
-  {
-   "market": "ussewc-usse-tn-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFQH4P6BAD"
-  },
-  {
-   "market": "usgubewc-usgub-ma-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.32",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJ49ABJB9N"
-  },
-  {
-   "market": "usgubewc-usgub-ma-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG1XQS6BAC"
-  },
-  {
-   "market": "usgubewc-usgub-ma-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFQ7JTTB9R"
-  },
-  {
-   "market": "usgubewc-usgub-ma-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHTTC66BA1"
-  },
-  {
-   "market": "ussewc-usse-de-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.13",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRHNJV1AB9V"
-  },
-  {
-   "market": "ussewc-usse-de-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHECYE6B9M"
-  },
-  {
-   "market": "ussewc-usse-de-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGZF1HPBA0"
-  },
-  {
-   "market": "ussewc-usse-il-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGVBXJYBA8"
-  },
-  {
-   "market": "ussewc-usse-il-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGJPMJ8BAA"
-  },
-  {
-   "market": "ussewc-usse-il-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHTTD7MBA1"
-  },
-  {
-   "market": "ussewc-usse-il-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.5",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMJ297B6BAC"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte200",
-   "side": "SELL",
-   "price": "0.67",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BSRG46H50BAE"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte200",
-   "side": "SELL",
-   "price": "0.6",
-   "quantity": 80,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BSRFFGS7EB9E"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte200",
-   "side": "SELL",
-   "price": "0.66",
-   "quantity": 30,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BSRGB9Z5ABAJ"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte200",
-   "side": "BUY",
-   "price": "0.2",
-   "quantity": 20,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRB5HPKGBA5"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte200",
-   "side": "SELL",
-   "price": "0.64",
-   "quantity": 30,
-   "intent": "ORDER_INTENT_SELL_LONG",
-   "id": "BSPS5PNV0BAE"
-  },
-  {
-   "market": "ussewc-usse-ok-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFJA2P6B9Z"
-  },
-  {
-   "market": "ussewc-usse-ok-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9ASV0BAB9V"
-  },
-  {
-   "market": "ussewc-usse-ok-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.49",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9BJEPV0BA0"
-  },
-  {
-   "market": "ussewc-usse-ok-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFW864GB9Q"
-  },
-  {
-   "market": "ussewc-usse-or-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRF6E3T8BA7"
-  },
-  {
-   "market": "ussewc-usse-or-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9K4Z35JBA3"
-  },
-  {
-   "market": "ussewc-usse-or-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.08",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFX8K22B9G"
-  },
-  {
-   "market": "ewc-usse-tx-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.51",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS5P0GCX6BA7"
-  },
-  {
-   "market": "usgubewc-usgub-vt-2026-11-03-rep",
+   "market": "scc-hrep-rep-2026-11-03-gte190",
    "side": "BUY",
    "price": "0.71",
-   "quantity": 40,
+   "quantity": 10,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRGGAHBGBAF"
+   "id": "BSRF6DXVYBA7"
   },
   {
-   "market": "usgubewc-usgub-vt-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHZQF9GB9P"
+   "market": "scc-hrep-rep-2026-11-03-gte190",
+   "side": "SELL",
+   "price": "0.75",
+   "quantity": 10,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BRXJ3ADBRBA6"
   },
   {
-   "market": "usgubewc-usgub-vt-2026-11-03-rep",
+   "market": "scc-hrep-rep-2026-11-03-gte190",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFXVKS0BA3"
+   "id": "BSRFQ7Q5TB9R"
   },
   {
-   "market": "enwc-usgubp-mn-2026-08-11-rep-kenqua",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 92,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS52RZM3JBA6"
-  },
-  {
-   "market": "usgubewc-usgub-or-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.73",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRF6DX0TBA7"
-  },
-  {
-   "market": "usgubewc-usgub-or-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJDDR8AB9S"
-  },
-  {
-   "market": "usgubewc-usgub-or-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG4MTQJBAN"
-  },
-  {
-   "market": "usgubewc-usgub-wy-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.93",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRG01H3AB9K"
-  },
-  {
-   "market": "usgubewc-usgub-wy-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHGZ1B4BA3"
-  },
-  {
-   "market": "usgubewc-usgub-wy-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFZ497WBA2"
-  },
-  {
-   "market": "scc-senate-gop-2026-11-03-lte45",
-   "side": "BUY",
-   "price": "0.07",
-   "quantity": 100,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BRXKDAQJJB9N"
-  },
-  {
-   "market": "usgubewc-usgub-me-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJ37NQ0B9T"
-  },
-  {
-   "market": "usgubewc-usgub-me-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.36",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSMHJBE7YB9W"
-  },
-  {
-   "market": "usgubewc-usgub-me-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.51",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFJA4SAB9Z"
-  },
-  {
-   "market": "usgubewc-usgub-me-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFX8PFAB9G"
-  },
-  {
-   "market": "usgubewc-usgub-ok-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGRVN1RB9W"
-  },
-  {
-   "market": "usgubewc-usgub-ok-2026-11-03-rep",
+   "market": "ussewc-usse-ms-2026-11-03-rep",
    "side": "BUY",
    "price": "0.85",
-   "quantity": 40,
+   "quantity": 50,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFXVA8PBA3"
+   "id": "BSRFASR5YB9T"
   },
   {
-   "market": "usgubewc-usgub-ok-2026-11-03-rep",
+   "market": "ussewc-usse-ms-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFR2RTRBAB"
+  },
+  {
+   "market": "usgubewc-usgub-ma-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.92",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFJ9V6AB9Z"
+  },
+  {
+   "market": "usgubewc-usgub-ma-2026-11-03-dem",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJF86GABA6"
+   "id": "BSMH37AH6BAD"
   },
   {
-   "market": "usgubewc-usgub-tn-2026-11-03-rep",
+   "market": "usgubewc-usgub-ma-2026-11-03-dem",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG020DAB9K"
+   "id": "BSRFXVK2YBA3"
   },
   {
-   "market": "usgubewc-usgub-tn-2026-11-03-rep",
+   "market": "enwc-ushrp-fl25-2026-08-18-dem-olilar",
+   "side": "SELL",
+   "price": "0.5",
+   "quantity": 10,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSR4RZ4ECB9S"
+  },
+  {
+   "market": "enwc-ushrp-fl25-2026-08-18-dem-olilar",
+   "side": "BUY",
+   "price": "0.07",
+   "quantity": 5,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSSBHVGG6BA7"
+  },
+  {
+   "market": "enwc-ushrp-fl25-2026-08-18-dem-olilar",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSQG51Y9EB9T"
+  },
+  {
+   "market": "enwc-ushrp-fl25-2026-08-18-dem-olilar",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFD9RSMB9X"
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.5",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSX1MZSXPB9Z"
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.81",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSX255M50BAE"
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.48",
+   "quantity": 15,
+   "intent": "ORDER_INTENT_SELL_SHORT",
+   "id": "BSWA4V2S6BA6"
+  },
+  {
+   "market": "usgubewc-usgub-ct-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJ28XJ8BAC"
+  },
+  {
+   "market": "usgubewc-usgub-ct-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGGASZ6BAF"
+  },
+  {
+   "market": "usgubewc-usgub-ct-2026-11-03-dem",
    "side": "BUY",
    "price": "0.89",
    "quantity": 40,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFASS66B9T"
+   "id": "BSRFZ42XWBA2"
   },
   {
-   "market": "usgubewc-usgub-tn-2026-11-03-rep",
+   "market": "ussewc-usse-de-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.93",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFN0532BA5"
+  },
+  {
+   "market": "ussewc-usse-de-2026-11-03-dem",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJF86V2BA6"
+   "id": "BSMJ496B2B9N"
+  },
+  {
+   "market": "ussewc-usse-de-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGWT4CPBAK"
+  },
+  {
+   "market": "ussewc-usse-wy-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS96GS5YJB9X"
+  },
+  {
+   "market": "ussewc-usse-wy-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.93",
+   "quantity": 70,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFZ41VCBA2"
+  },
+  {
+   "market": "ussewc-usse-wv-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9G3W8C2BAC"
+  },
+  {
+   "market": "ussewc-usse-wv-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.94",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9FC9BXGB9F"
+  },
+  {
+   "market": "ussewc-usse-wv-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG46SSRBAE"
+  },
+  {
+   "market": "ussewc-usse-va-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9GAN920BA0"
+  },
+  {
+   "market": "ussewc-usse-nm-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.49",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9KA063CB9P"
+  },
+  {
+   "market": "ussewc-usse-nm-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9KEBDS2BA0"
+  },
+  {
+   "market": "ussewc-usse-nm-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.85",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFJGRBYBA0"
+  },
+  {
+   "market": "ussewc-usse-al-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9KB8W2MBA1"
+  },
+  {
+   "market": "ussewc-usse-al-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.98",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRG46CM6BAE"
+  },
+  {
+   "market": "ussewc-usse-al-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.5",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9VVFM6EB9H"
   },
   {
    "market": "scc-hrep-rep-2026-11-03-gte195",
@@ -3179,52 +2171,916 @@
    "id": "BSRF783DMB9P"
   },
   {
-   "market": "usgubewc-usgub-ct-2026-11-03-dem",
+   "market": "ussewc-usse-ri-2026-11-03-dem",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJ28XJ8BAC"
+   "id": "BS9J4JBS4B9Q"
   },
   {
-   "market": "usgubewc-usgub-ct-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGGASZ6BAF"
-  },
-  {
-   "market": "usgubewc-usgub-ct-2026-11-03-dem",
+   "market": "ussewc-usse-ri-2026-11-03-dem",
    "side": "BUY",
-   "price": "0.85",
+   "price": "0.95",
    "quantity": 40,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFZ42XWBA2"
+   "id": "BSRG46E4PBAE"
   },
   {
-   "market": "usgubewc-usgub-hi-2026-11-03-dem",
+   "market": "ussewc-usse-ri-2026-11-03-dem",
    "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
+   "price": "0.5",
+   "quantity": 50,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFD9ENMB9X"
+   "id": "BSRFQ9MEPB9H"
   },
   {
-   "market": "usgubewc-usgub-hi-2026-11-03-dem",
+   "market": "ussewc-usse-mt-2026-11-03-rep",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMH37A8JBAD"
+   "id": "BS9MGD6JYBA9"
   },
   {
-   "market": "usgubewc-usgub-hi-2026-11-03-dem",
+   "market": "ussewc-usse-mt-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.94",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9M9AS1CB9V"
+  },
+  {
+   "market": "ussewc-usse-mt-2026-11-03-rep",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGJP61EBAA"
+   "id": "BS9MN853GBAN"
+  },
+  {
+   "market": "usgubewc-usgub-nh-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.35",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGY05CEBA4"
+  },
+  {
+   "market": "usgubewc-usgub-nh-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGEQJQ0BAG"
+  },
+  {
+   "market": "usgubewc-usgub-nh-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHKGM3EBA8"
+  },
+  {
+   "market": "usgubewc-usgub-nh-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHFK40TBAF"
+  },
+  {
+   "market": "usgubewc-usgub-nh-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.65",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFE62YCBA4"
+  },
+  {
+   "market": "usgubewc-usgub-nh-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRABMNPABAG"
+  },
+  {
+   "market": "pic-congress-trump-2026-12-31",
+   "side": "SELL",
+   "price": "0.09",
+   "quantity": 5,
+   "intent": "ORDER_INTENT_SELL_LONG",
+   "id": "BSX8DNX9CB9G"
+  },
+  {
+   "market": "pic-congress-trump-2026-12-31",
+   "side": "BUY",
+   "price": "0.08",
+   "quantity": 5,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSX83NZ5MB9S"
+  },
+  {
+   "market": "ussewc-usse-tn-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.09",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGFW4PCB9M"
+  },
+  {
+   "market": "ussewc-usse-tn-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS93J82A0B9W"
+  },
+  {
+   "market": "ussewc-usse-tn-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFXVRD6BA3"
+  },
+  {
+   "market": "ussewc-usse-sd-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.85",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFN03HCBA5"
+  },
+  {
+   "market": "ussewc-usse-sd-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9H67JATB9V"
+  },
+  {
+   "market": "ussewc-usse-co-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9KEBKNCBA0"
+  },
+  {
+   "market": "ussewc-usse-co-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG01SHTB9K"
+  },
+  {
+   "market": "ussewc-usse-co-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.25",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BS9M0XM5MB9F"
+  },
+  {
+   "market": "usgubewc-usgub-ok-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHWWE5PBAB"
+  },
+  {
+   "market": "usgubewc-usgub-ok-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.11",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG1XXMEBAC"
+  },
+  {
+   "market": "usgubewc-usgub-ok-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFXVK9YBA3"
+  },
+  {
+   "market": "usgubewc-usgub-pa-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHWWESPBAB"
+  },
+  {
+   "market": "usgubewc-usgub-pa-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.18",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMJFD2ZRB9J"
+  },
+  {
+   "market": "usgubewc-usgub-pa-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGMH7ECBA9"
+  },
+  {
+   "market": "usgubewc-usgub-pa-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGJPCQ6BAA"
+  },
+  {
+   "market": "ussewc-usse-wv-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.11",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG4N1MCBAN"
+  },
+  {
+   "market": "ussewc-usse-wv-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9F8E6RYB9N"
+  },
+  {
+   "market": "ussewc-usse-wv-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGHV1S6B9N"
+  },
+  {
+   "market": "ussewc-usse-la-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9KQ75KYB9H"
+  },
+  {
+   "market": "ussewc-usse-la-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.94",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRF5VR6WB9S"
+  },
+  {
+   "market": "ussewc-usse-la-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.5",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFQ9K0YB9H"
+  },
+  {
+   "market": "usgubewc-usgub-sd-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.85",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFQGQ2EBAD"
+  },
+  {
+   "market": "usgubewc-usgub-sd-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJAX7PTBA9"
+  },
+  {
+   "market": "usgubewc-usgub-sd-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFD9RQ0B9X"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-46",
+   "side": "SELL",
+   "price": "0.04",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BRXKE11HMBAA"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-46",
+   "side": "BUY",
+   "price": "0.03",
+   "quantity": 500,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BRXJA3XARBAH"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-46",
+   "side": "SELL",
+   "price": "0.04",
+   "quantity": 5,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BRXJA71JEBA8"
+  },
+  {
+   "market": "usgubewc-usgub-md-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.85",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFAWB4GB9W"
+  },
+  {
+   "market": "usgubewc-usgub-md-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJ23R3AB9H"
+  },
+  {
+   "market": "usgubewc-usgub-md-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGJPK9WBAA"
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.35",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BS9MJZW78B9Y"
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.03",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSX1N1B22BAC"
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.24",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSX1ZYB16BA7"
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRH7YDJAB9R"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-49",
+   "side": "BUY",
+   "price": "0.14",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS3R5BFY8BAM"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-49",
+   "side": "SELL",
+   "price": "0.24",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGFW5CTB9M"
+  },
+  {
+   "market": "ussewc-usse-nm-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.11",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRF88E9WBA1"
+  },
+  {
+   "market": "ussewc-usse-nm-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9MBRB4EB9Z"
+  },
+  {
+   "market": "ussewc-usse-nm-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGVBGSEBA8"
+  },
+  {
+   "market": "usgubewc-usgub-ar-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.14",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMJ37M2TBA5"
+  },
+  {
+   "market": "usgubewc-usgub-ar-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGPWC8CBA7"
+  },
+  {
+   "market": "usgubewc-usgub-ar-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG9RNQ0BAM"
+  },
+  {
+   "market": "usgubewc-usgub-ar-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJF845YBA6"
+  },
+  {
+   "market": "usgubewc-usgub-hi-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJFCNG4B9J"
+  },
+  {
+   "market": "usgubewc-usgub-hi-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.14",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMJNS2ZWB9Z"
+  },
+  {
+   "market": "usgubewc-usgub-hi-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGFVWWPB9M"
+  },
+  {
+   "market": "usgubewc-usgub-hi-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGFVX0TB9M"
+  },
+  {
+   "market": "usgubewc-usgub-sc-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMHV3NKYBA0"
+  },
+  {
+   "market": "usgubewc-usgub-sc-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.17",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGGARYWBAF"
+  },
+  {
+   "market": "usgubewc-usgub-sc-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGHTZ0AB9N"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-gte57",
+   "side": "SELL",
+   "price": "0.04",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSXK10NK0BAG"
+  },
+  {
+   "market": "scc-senate-gop-2026-11-03-gte57",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 5000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSXK231H4BAH"
+  },
+  {
+   "market": "ussewc-usse-fl-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.26",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BS9KEWKY2BAE"
+  },
+  {
+   "market": "ussewc-usse-fl-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9KQ81QGB9Q"
+  },
+  {
+   "market": "ussewc-usse-fl-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGY05ZRBA4"
+  },
+  {
+   "market": "ussewc-usse-ky-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9KZ5XVYB9N"
+  },
+  {
+   "market": "ussewc-usse-ky-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG2JSP2B9Y"
+  },
+  {
+   "market": "ussewc-usse-ky-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.12",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGFVV8TB9M"
+  },
+  {
+   "market": "ussewc-usse-ma-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSM6NJ160B9S"
+  },
+  {
+   "market": "ussewc-usse-ma-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.93",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFQGPPYBAD"
+  },
+  {
+   "market": "ussewc-usse-ma-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRF6E3G6BA7"
+  },
+  {
+   "market": "usgubewc-usgub-mn-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.85",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFB88NYBAK"
+  },
+  {
+   "market": "usgubewc-usgub-mn-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMGWB2MTBAA"
+  },
+  {
+   "market": "usgubewc-usgub-mn-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG0Z4WPB9F"
+  },
+  {
+   "market": "ushrewc-ushr-al-04-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSWM2KNR2BAD"
+  },
+  {
+   "market": "ushrewc-ushr-al-04-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSWMB5HMEBA6"
+  },
+  {
+   "market": "ushrewc-ushr-al-04-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.5",
+   "quantity": 25,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSWP2WVC8B9Y"
+  },
+  {
+   "market": "tec-cbb-champ-2027-04-05-w-nebr",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 1000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BRXJWNZD0B9K"
+  },
+  {
+   "market": "tec-cbb-champ-2027-04-05-w-butl",
+   "side": "SELL",
+   "price": "0.11",
+   "quantity": 2,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BRXJ6Z1B4BAK"
+  },
+  {
+   "market": "tec-cbb-champ-2027-04-05-w-butl",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 1000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BRXJWWSZCB9M"
+  },
+  {
+   "market": "ussewc-usse-ok-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.85",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFW864GB9Q"
+  },
+  {
+   "market": "ussewc-usse-ok-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9ASV0BAB9V"
+  },
+  {
+   "market": "ussewc-usse-ok-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.49",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9BJEPV0BA0"
+  },
+  {
+   "market": "ussewc-usse-ar-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRF7879JB9P"
+  },
+  {
+   "market": "ussewc-usse-ar-2026-11-03-dem",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9KPN01GB9W"
+  },
+  {
+   "market": "ussewc-usse-ar-2026-11-03-dem",
+   "side": "SELL",
+   "price": "0.47",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFE69DJBA4"
+  },
+  {
+   "market": "ussewc-usse-fl-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.5",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRG46DW2BAE"
+  },
+  {
+   "market": "ussewc-usse-fl-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9MN830CBAN"
+  },
+  {
+   "market": "ussewc-usse-fl-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.79",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFZ440CBA2"
+  },
+  {
+   "market": "tec-cbb-champ-2027-04-05-w-iowast",
+   "side": "SELL",
+   "price": "0.1",
+   "quantity": 5,
+   "intent": "ORDER_INTENT_SELL_LONG",
+   "id": "BS5AB574WBAN"
+  },
+  {
+   "market": "tec-cbb-champ-2027-04-05-w-iowast",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2500,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BRXSXQMEJBAH"
+  },
+  {
+   "market": "ussewc-usse-tn-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS8RVP9TGB9V"
+  },
+  {
+   "market": "ussewc-usse-tn-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFQH4P6BAD"
+  },
+  {
+   "market": "ussewc-usse-tn-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.9",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRFR2SAWBAB"
+  },
+  {
+   "market": "ussewc-usse-sc-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG0YV62B9F"
+  },
+  {
+   "market": "ussewc-usse-sc-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.77",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRF2TW7MB9J"
+  },
+  {
+   "market": "ussewc-usse-sc-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9JPWH44B9V"
+  },
+  {
+   "market": "usgubewc-usgub-or-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMH37BJ2BAD"
+  },
+  {
+   "market": "usgubewc-usgub-or-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.26",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMHV3WGABA0"
+  },
+  {
+   "market": "usgubewc-usgub-or-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFX1ZRRBAH"
+  },
+  {
+   "market": "usgubewc-usgub-or-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRG1XWBGBAC"
+  },
+  {
+   "market": "opdc-mcconnell-resign-2026-11-02",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_SELL_LONG",
+   "id": "BSRATA57MB9X"
+  },
+  {
+   "market": "opdc-mcconnell-resign-2026-11-02",
+   "side": "SELL",
+   "price": "0.1",
+   "quantity": 20,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSX2108PJB9F"
+  },
+  {
+   "market": "ussewc-usse-ri-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BS9HN3N00B9P"
+  },
+  {
+   "market": "ussewc-usse-ri-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.1",
+   "quantity": 50,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRGRVJ7YB9W"
+  },
+  {
+   "market": "ussewc-usse-ri-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFJ9ZRRB9Z"
+  },
+  {
+   "market": "usgubewc-usgub-me-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.01",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSMJ37NQ0B9T"
+  },
+  {
+   "market": "usgubewc-usgub-me-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.14",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSMHJBE7YB9W"
+  },
+  {
+   "market": "usgubewc-usgub-me-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.51",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFJA4SAB9Z"
+  },
+  {
+   "market": "usgubewc-usgub-me-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.99",
+   "quantity": 2000,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSRFX8PFAB9G"
   },
   {
    "market": "usgubewc-usgub-ne-2026-11-03-rep",
@@ -3251,196 +3107,100 @@
    "id": "BSRGGAWRWBAF"
   },
   {
-   "market": "ussewc-usse-il-2026-11-03-dem",
+   "market": "usgubewc-usgub-tx-2026-11-03-rep",
    "side": "BUY",
-   "price": "0.51",
+   "price": "0.83",
    "quantity": 40,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHWWE02BAB"
+   "id": "BSW99887YB9G"
   },
   {
-   "market": "ussewc-usse-il-2026-11-03-dem",
+   "market": "usgubewc-usgub-tx-2026-11-03-rep",
+   "side": "SELL",
+   "price": "0.98",
+   "quantity": 100,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSW8ZN54EB9N"
+  },
+  {
+   "market": "usgubewc-usgub-tx-2026-11-03-rep",
+   "side": "BUY",
+   "price": "0.84",
+   "quantity": 40,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSRF5VRDPB9S"
+  },
+  {
+   "market": "usgubewc-usgub-tx-2026-11-03-rep",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJDDRG4B9S"
+   "id": "BSMJ290EMBAC"
   },
   {
-   "market": "ussewc-usse-il-2026-11-03-dem",
+   "market": "usgubewc-usgub-tx-2026-11-03-rep",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRG6NRAWB9V"
+   "id": "BSRFQGZZCBAD"
   },
   {
-   "market": "ussewc-usse-ma-2026-11-03-dem",
+   "market": "ushrewc-ushr-al-03-2026-11-03-rep",
    "side": "BUY",
    "price": "0.01",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSM6NJ160B9S"
+   "id": "BSV9GE9QCBAF"
   },
   {
-   "market": "ussewc-usse-ma-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.79",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFQGPPYBAD"
-  },
-  {
-   "market": "ussewc-usse-ma-2026-11-03-dem",
+   "market": "ushrewc-ushr-al-03-2026-11-03-rep",
    "side": "SELL",
    "price": "0.99",
    "quantity": 2000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRF6E3G6BA7"
+   "id": "BSVB0A2N8B9V"
   },
   {
-   "market": "usgubewc-usgub-co-2026-11-03-dem",
-   "side": "BUY",
-   "price": "0.85",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRF887EJBA1"
+   "market": "apdc-jerpowgov-2026-12-31",
+   "side": "SELL",
+   "price": "0.26",
+   "quantity": 10,
+   "intent": "ORDER_INTENT_BUY_SHORT",
+   "id": "BSSXNMEDMBAG"
   },
   {
-   "market": "usgubewc-usgub-co-2026-11-03-dem",
+   "market": "apdc-jerpowgov-2026-12-31",
    "side": "BUY",
    "price": "0.01",
-   "quantity": 2000,
+   "quantity": 5000,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMJ23Q2GB9H"
+   "id": "BSRFQ7EH6B9R"
   },
   {
-   "market": "usgubewc-usgub-co-2026-11-03-dem",
+   "market": "apdc-jerpowgov-2026-12-31",
+   "side": "BUY",
+   "price": "0.25",
+   "quantity": 14,
+   "intent": "ORDER_INTENT_BUY_LONG",
+   "id": "BSGRCB5JJBA1"
+  },
+  {
+   "market": "apdc-jerpowgov-2026-12-31",
    "side": "SELL",
    "price": "0.99",
-   "quantity": 2000,
+   "quantity": 5000,
    "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGB9WJ0BAJ"
+   "id": "BSRGMN6JCB9J"
   },
   {
-   "market": "ussewc-usse-ks-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRFR2YM0BAB"
-  },
-  {
-   "market": "ussewc-usse-ks-2026-11-03-dem",
+   "market": "pvwc-housepopw-2026-11-03-dem",
    "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
+   "price": "0.81",
+   "quantity": 10,
    "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHCJ00RBA7"
-  },
-  {
-   "market": "ussewc-usse-ks-2026-11-03-dem",
-   "side": "SELL",
-   "price": "0.27",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGFVWCGB9M"
-  },
-  {
-   "market": "ussewc-usse-la-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9KQ75KYB9H"
-  },
-  {
-   "market": "ussewc-usse-la-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.89",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRF5VR6WB9S"
-  },
-  {
-   "market": "ussewc-usse-la-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.5",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFQ9K0YB9H"
-  },
-  {
-   "market": "ussewc-usse-la-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.93",
-   "quantity": 50,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BS9VN079PB9M"
-  },
-  {
-   "market": "ussewc-usse-la-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGZEQV0BA0"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte220",
-   "side": "BUY",
-   "price": "0.19",
-   "quantity": 1,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSRFE6510BA4"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte220",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRH5H19GBAB"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte220",
-   "side": "BUY",
-   "price": "0.2",
-   "quantity": 5,
-   "intent": "ORDER_INTENT_SELL_SHORT",
-   "id": "BSPR6JH2TBA4"
-  },
-  {
-   "market": "scc-hrep-rep-2026-11-03-gte220",
-   "side": "BUY",
-   "price": "0.24",
-   "quantity": 5,
-   "intent": "ORDER_INTENT_SELL_SHORT",
-   "id": "BSS5F3SM6BAB"
-  },
-  {
-   "market": "ussewc-usse-ks-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.74",
-   "quantity": 40,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSREWDVDTBAJ"
-  },
-  {
-   "market": "ussewc-usse-ks-2026-11-03-rep",
-   "side": "BUY",
-   "price": "0.01",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_LONG",
-   "id": "BSMHCJ01YBA7"
-  },
-  {
-   "market": "ussewc-usse-ks-2026-11-03-rep",
-   "side": "SELL",
-   "price": "0.99",
-   "quantity": 2000,
-   "intent": "ORDER_INTENT_BUY_SHORT",
-   "id": "BSRGVBW3CBA8"
+   "id": "BSV4S585YBA3"
   }
  ]
 }
