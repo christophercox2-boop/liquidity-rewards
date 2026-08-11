@@ -1171,6 +1171,41 @@ def append_estimates(live_orders: list[dict]) -> None:
         writer = csv.DictWriter(f, fieldnames=["checked_at_utc", "market", "est_day"])
         writer.writeheader()
         writer.writerows(rows)
+    _log_run_trigger(ts)
+
+
+# This workflow runs on `push: branches: [main]` as well as hourly, so placing
+# a batch or arming a defend seed starts a tracker run seconds later — the
+# sample lands exactly when our orders have just been pushed to the touch and
+# our share is at its peak. That is a biased estimator of a day the exchange
+# measures with a random snapshot every second.
+#
+# Recorded in a SIDE file rather than a new estimates.csv column: several
+# readers (tracker_day_integral, the estimator scoreboard, the dashboard)
+# parse that schema, and widening it to answer one question is not worth
+# breaking them. Absent rows just mean "unknown", which every reader already
+# tolerates.
+RUNS_CSV = DATA / "estimate_runs.csv"
+
+
+def _log_run_trigger(ts: str) -> None:
+    """Note what started this run, so action-triggered samples can be told
+    apart from the scheduled ones that sample the day impartially."""
+    try:
+        trigger = os.environ.get("GITHUB_EVENT_NAME") or "local"
+        prev: list[dict] = []
+        if RUNS_CSV.exists():
+            with RUNS_CSV.open(newline="") as f:
+                prev = list(csv.DictReader(f))
+        prev.append({"checked_at_utc": ts, "trigger": trigger,
+                     "workflow": os.environ.get("GITHUB_WORKFLOW") or ""})
+        prev = prev[-5000:]
+        with RUNS_CSV.open("w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=["checked_at_utc", "trigger", "workflow"])
+            w.writeheader()
+            w.writerows(prev)
+    except Exception:  # noqa: BLE001 — bookkeeping never breaks a tracker run
+        pass
 
 
 def _estimate_days() -> dict[str, dict]:

@@ -25,6 +25,7 @@ import datetime as dt
 import gzip
 import json
 import os
+import random
 import sys
 import threading
 import time
@@ -801,11 +802,13 @@ class Monitor:
                 frac = min((now_utc - self.last_ts).total_seconds(), MAX_GAP_SECONDS) / 86400.0
                 if frac > 0:
                     self.state["earned"] += self.rate * frac
-                    self.state["earned_hf"] = self.state.get("earned_hf", 0.0) + self.rate * frac
-                    pm_hf = self.state.setdefault("per_market_hf", {})
                     for m, r in self.market_rates.items():
                         self.state["per_market"][m] = self.state["per_market"].get(m, 0.0) + r * frac
-                        pm_hf[m] = pm_hf.get(m, 0.0) + r * frac
+            # earned_hf is NOT accrued here. This loop is woken by POLL_KICK the
+            # instant we place, reprice or cancel, so its sample times are
+            # correlated with our own tending — exactly when our share is at its
+            # peak. hf_sampler_loop() accrues it instead, on a Poisson clock
+            # that nothing we do can pull.
             # …then roll the day over at midnight ET.
             old_day_earned = None
             if self.state["day"] != day:
@@ -1013,6 +1016,77 @@ MONITOR = Monitor()
 KEY_ID = ""
 SECRET_KEY = ""
 POLL_KICK = threading.Event()  # set after a reprice so the next poll runs immediately
+
+# ---- Unbiased earnings sampler ---------------------------------------------
+# The exchange scores a RANDOM snapshot of the book every second and weights
+# all 86,400 equally. Two things made our own sampling a biased estimator of
+# that average, both of them self-inflicted:
+#
+#   1. POLL_KICK wakes the poll loop the moment we place, reprice or cancel,
+#      so we sampled precisely when our order had just been pushed to the
+#      touch and our share was at its maximum.
+#   2. A fixed cadence can beat against anything else periodic — the defend
+#      cooldown, a rival's bot on a round interval — and lock onto one phase
+#      of a repeating cycle.
+#
+# This sampler fixes both. It runs on its own thread with EXPONENTIAL waits,
+# which makes the sample times a Poisson process: memoryless, so the next
+# sample is independent of when the last one fell and of anything we just did.
+# It never reads POLL_KICK. It costs no API calls — it re-scores the orders we
+# already hold against the WebSocket-fresh book cache — so the mean interval
+# can be short without spending request budget.
+SAMPLE_MEAN_SECONDS = float(os.environ.get("SAMPLE_MEAN_SECONDS", "5"))
+
+
+def _rescore_rate() -> tuple[float, dict[str, float]]:
+    """Current $/day implied by the freshest known books. Same scoring path as
+    the tracker (tr._score_order), just evaluated at an unbiased moment."""
+    progs = tr._PROG_CACHE.get("progs") or {}
+    total = 0.0
+    per: dict[str, float] = {}
+    for o in list(MONITOR.orders):
+        slug = o.get("market")
+        if not slug:
+            continue
+        cached = tr._BOOK_CACHE.get(slug)
+        prog = progs.get(slug)
+        if not cached or not prog or not prog.get("pool"):
+            continue
+        probe = {"market": slug, "side": o["side"], "price": o["price"], "size": o["size"]}
+        try:
+            tr._score_order(probe, cached[1], prog)
+        except Exception:  # noqa: BLE001 — one unscorable order never stops the sweep
+            continue
+        est = probe.get("est_day") or 0.0
+        if est:
+            total += est
+            per[slug] = per.get(slug, 0.0) + est
+    return total, per
+
+
+def hf_sampler_loop() -> None:
+    """Accrue earned_hf on a Poisson clock, independent of everything we do."""
+    last = time.time()
+    while True:
+        time.sleep(random.expovariate(1.0 / SAMPLE_MEAN_SECONDS))
+        now = time.time()
+        # advance the clock even on a skipped tick, or a quiet stretch would
+        # later be charged in full at whatever rate happens to come next
+        elapsed = min(now - last, MAX_GAP_SECONDS)
+        last = now
+        if not MONITOR.orders or elapsed <= 0:
+            continue
+        try:
+            rate, per = _rescore_rate()
+        except Exception:  # noqa: BLE001 — measurement never kills its own thread
+            continue
+        frac = elapsed / 86400.0
+        with MONITOR.lock:
+            MONITOR.state["earned_hf"] = MONITOR.state.get("earned_hf", 0.0) + rate * frac
+            pm = MONITOR.state.setdefault("per_market_hf", {})
+            for m, r in per.items():
+                pm[m] = pm.get(m, 0.0) + r * frac
+            MONITOR._hf_samples += 1
 
 
 ACTIONS: list[dict] = []  # audit log of every reprice: request + raw response + verification
@@ -5079,6 +5153,7 @@ def main() -> None:
     tr.BOOK_COLD_FETCH_ALL = False
     threading.Thread(target=poll_loop, args=(key_id, secret_key), daemon=True).start()
     threading.Thread(target=ws_stream_loop, args=(key_id, secret_key), daemon=True).start()
+    threading.Thread(target=hf_sampler_loop, daemon=True).start()
     server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
     print(f"live monitor on :{PORT}, polling every {POLL_SECONDS}s")
     server.serve_forever()
