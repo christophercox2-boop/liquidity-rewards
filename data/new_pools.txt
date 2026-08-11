@@ -1,0 +1,57 @@
+crawl stopped: HTTP 429
+crawled 30 pages, 2792 markets with an ACTIVE program, complete=False
+
+family      markets   held    NEW  pool/target/df
+asc            1292      0   1292  [800]/[15000]/[0.3]
+tec             496      0    496  [25, 300]/[5000, 15000]/[0.3, 0.5]
+ftsc            453      0    453  [100]/[7500]/[0.4]
+aachc           376      0    376  [25]/[5000]/[0.5]
+fptc            111      0    111  [100]/[7500]/[0.4]
+aec              64      0     64  [500]/[20000]/[0.3]
+
+=== ushrewc (House districts) ===
+  NO ushrewc market carries an active reward program.
+  The ones we hold are therefore earning nothing, and the newly
+  listed districts are not worth entering for rewards yet.
+
+markets WITH a pool that we hold no order in: 2792
+   aachc-cfb-txs-2026-01-25-w-texas               pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-ala-10pt5wins        pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-ala-6pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-ala-7pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-ala-8pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-ala-9pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-ark-1pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-ark-2pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-ark-3pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-ark-4pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-ark-5pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-arz-5pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-arz-6pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-arz-7pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-arz-8pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-arz-9pt5wins         pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-arzst-4pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-arzst-5pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-arzst-6pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-arzst-7pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-arzst-8pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-aubrn-4pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-aubrn-5pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-aubrn-6pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-aubrn-7pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-aubrn-8pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-bayl-4pt5wins        pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-bayl-5pt5wins        pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-bayl-6pt5wins        pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-bayl-7pt5wins        pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-bayl-8pt5wins        pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-boise-5pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-boise-6pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-boise-7pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-boise-8pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-boise-9pt5wins       pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-boscol-1pt5wins      pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-boscol-2pt5wins      pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-boscol-3pt5wins      pool     25 target    5000 df 0.5
+   aachc-cfb-wins-2026-11-28-boscol-4pt5wins      pool     25 target    5000 df 0.5
