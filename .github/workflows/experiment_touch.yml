@@ -68,15 +68,16 @@ jobs:
           import json, os, time, datetime, io, requests
           import track_rewards as tr
 
-          # Setup ran 2026-08-11 03:1x UTC: 12 cancels, 9 placements, all 200.
-          # Each market now holds exactly one BUY at the touch. None of the
-          # nine is in the defend seed, so auto-defend will not reprice them.
-          # Back to "record" so a stray push cannot re-run the setup.
+          # KILLED 2026-08-11. The design picked the CHEAPEST markets for the
+          # BIG arm to hold capital down, which meant buying 1,000 shares of
+          # scc-senate-gop-lte45 ("Republicans 45 or fewer Senate seats") at
+          # 7c — $70 long on an outcome that is not going to happen. Sizing an
+          # experiment by what the arm costs, with no regard for whether the
+          # position is sound, is how you lose money to learn something.
           #
-          # READ THE RESULT: the 2026-08-11 payout lands ~2026-08-13 in
-          # data/rewards.csv. Compare per-market reward across arms with
-          # analyse_touch.py.
-          MODE = "record"          # "record" | "setup" | "restore"
+          # Any rerun must pick markets on their merits first and accept the
+          # capital, or run the arms at prices that are not a directional bet.
+          MODE = "kill"            # "record" | "setup" | "kill"
 
           ARMS = {
               "TINY": [("scc-senate-gop-2026-11-03-51", 10),
@@ -108,6 +109,39 @@ jobs:
               s = o.get("marketSlug") or ""
               if s in PLAN:
                   held.setdefault(s, []).append(o)
+
+          if MODE == "kill":
+              # Cancel every experiment order, then put back exactly what was
+              # resting before setup — the pre-setup state was recorded in
+              # experiment_touch_setup.json before anything was cancelled.
+              prior = json.load(open("data/experiment_touch_setup.json"))["markets"]
+              killed = restored = failed = 0
+              for slug in sorted(PLAN):
+                  for o in held.get(slug, []):
+                      rr = api("POST", f"/v1/order/{o['id']}/cancel", json={"marketSlug": slug})
+                      killed += rr.status_code < 300
+                      print(f"cancel {slug:38s} {tr._num(o.get('price')):.2f} -> {rr.status_code}")
+                      time.sleep(0.3)
+                  for prev in (prior.get(slug, {}).get("our_orders") or []):
+                      body = {"marketSlug": slug,
+                              "intent": ("ORDER_INTENT_BUY_LONG" if prev["side"] == "BUY"
+                                         else "ORDER_INTENT_BUY_SHORT"),
+                              "type": "ORDER_TYPE_LIMIT",
+                              "price": {"value": f"{prev['price']:.2f}", "currency": "USD"},
+                              "quantity": int(round(prev["size"])),
+                              "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                              "participateDontInitiate": True}
+                      rr = api("POST", "/v1/orders", json=body)
+                      ok = rr.status_code < 300
+                      restored += ok; failed += (not ok)
+                      print(f"  restore {prev['side']:4s} {prev['price']:.2f} x{prev['size']:.0f}"
+                            f" -> {rr.status_code}"
+                            f"{'' if ok else ' ' + ' '.join(rr.text.split())[:100]}")
+                      time.sleep(0.5)
+              print(f"\ncancelled {killed} experiment orders | restored {restored} | failed {failed}")
+              with open("data/experiment_touch.txt", "w") as f:
+                  f.write(BUF.getvalue())
+              raise SystemExit(0)
 
           snap = {"taken_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                   "mode": MODE, "markets": {}}
