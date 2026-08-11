@@ -1,0 +1,12 @@
+checking 200 candidate slugs
+markets we hold an order in: 130
+of those, carrying an ACTIVE pool: 0
+
+=== SENATE: 0 held with a pool, 0 WITH A POOL AND NOT ENTERED ===
+   none — every funded race on this pattern is already entered
+
+=== GOVERNOR: 0 held with a pool, 0 WITH A POOL AND NOT ENTERED ===
+   none — every funded race on this pattern is already entered
+
+=== funded races where we hold only ONE side ===
+   none
