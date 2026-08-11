@@ -1,0 +1,7 @@
+orders before: 1685
+cancelled 1293 redundant deep qualifiers across 127 markets; kept 166 that are still load-bearing
+
+waiting 45s, then re-checking every book we touched...
+  no book reverted — every trimmed side still qualifies
+
+orders after: 477
