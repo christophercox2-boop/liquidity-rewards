@@ -1,0 +1,15 @@
+GET /v1/portfolio -> 404 {"code":5,"message":"The server was unable to process your request.","details":[]}
+GET /v1/portfolio/balance -> 404 {"code":5,"message":"The server was unable to process your request.","details":[]}
+GET /v1/balance -> 404 {"code":5,"message":"The server was unable to process your request.","details":[]}
+
+PLACE SELL 0.99 x2000 usgubewc-usgub-ct-2026-11-03-rep
+  -> 200 {"id":"BTEB4SV1RDK1","executions":[]}
+  order id: BTEB4SV1RDK1
+  + 20s  state=ORDER_STATE_NEW leaves=273.04
+  + 40s  state=ORDER_STATE_NEW leaves=273.04
+  + 60s  state=ORDER_STATE_NEW leaves=273.04
+  + 80s  state=ORDER_STATE_NEW leaves=273.04
+  +100s  state=ORDER_STATE_NEW leaves=273.04
+  +120s  state=ORDER_STATE_NEW leaves=273.04
+
+VERDICT: SURVIVED — mass re-place is safe
