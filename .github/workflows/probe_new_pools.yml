@@ -1,0 +1,149 @@
+name: Probe new pools
+
+# READ-ONLY. Places nothing.
+#
+# Which newly-listed markets actually carry a reward program?
+#
+# This matters because the answer changes fast and silently. On 2026-08-10 the
+# senate and governor slates had no pools at all; by 2026-08-11 all 98 of them
+# carried $25/2,000 programs and were producing most of the book's earnings.
+# Meanwhile the three House markets we hold still have none, so their capital
+# earns exactly zero. A family being listed says nothing about whether it pays.
+#
+# Crawls the full public incentives list — the symbol-filtered call only ever
+# returns markets we already hold, which is useless for finding new ones —
+# groups the active programs by family, and cross-references our open orders
+# so entered and unentered markets are separated.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/probe_new_pools.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe-new-pools
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Crawl incentives
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import collections, io, json, os, re, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          # every active program, whether or not we hold the market
+          progs = {}
+          params = {"pageSize": 100}
+          pages = 0
+          complete = False
+          for _ in range(120):
+              r = requests.get(tr.HOSTS[0] + "/v1/incentives", params=params, timeout=30)
+              if r.status_code >= 400:
+                  print(f"crawl stopped: HTTP {r.status_code}")
+                  break
+              data = r.json(); pages += 1
+              for p in data.get("programs") or []:
+                  slug = p.get("marketSlug") or ""
+                  for tp in p.get("timePeriods") or []:
+                      if str(tp.get("status") or "").lower() in ("active", "live", "status_live"):
+                          progs[slug] = tp
+              token = data.get("nextPageToken")
+              if not token:
+                  complete = True
+                  break
+              params = {"pageSize": 100, "pageToken": token}
+          print(f"crawled {pages} pages, {len(progs)} markets with an ACTIVE program, "
+                f"complete={complete}")
+
+          # what we already hold
+          held = set()
+          try:
+              r = requests.get(tr.TRADE_API + "/v1/orders/open",
+                               headers=tr.auth_headers(kid, sec, "GET", "/v1/orders/open"),
+                               timeout=30)
+              if r.status_code < 400:
+                  for o in r.json().get("orders") or []:
+                      if str(o.get("state")) == "ORDER_STATE_NEW":   # ignore REPLACED ghosts
+                          held.add(o.get("marketSlug") or "")
+              else:
+                  print(f"(open orders HTTP {r.status_code} — 'held' column unavailable)")
+          except Exception as e:
+              print(f"(open orders failed: {type(e).__name__} — 'held' column unavailable)")
+
+          fam = lambda s: (re.match(r"^([a-z]+)-", s) or [None, "?"])[1]
+          byfam = collections.defaultdict(list)
+          for s, tp in progs.items():
+              byfam[fam(s)].append((s, tp))
+
+          print(f"\n{'family':10s} {'markets':>8s} {'held':>6s} {'NEW':>6s}  pool/target/df")
+          for f, lst in sorted(byfam.items(), key=lambda kv: -len(kv[1])):
+              pools = sorted({t['rewardPool'] for _, t in lst})
+              tgts = sorted({t['targetSize'] for _, t in lst})
+              dfs = sorted({t['discountFactor'] for _, t in lst})
+              h = sum(1 for s, _ in lst if s in held)
+              print(f"{f:10s} {len(lst):8d} {h:6d} {len(lst)-h:6d}  {pools}/{tgts}/{dfs}")
+
+          # the House family specifically, since that is the open question
+          print("\n=== ushrewc (House districts) ===")
+          u = sorted(byfam.get("ushrewc", []))
+          if not u:
+              print("  NO ushrewc market carries an active reward program.")
+              print("  The ones we hold are therefore earning nothing, and the newly")
+              print("  listed districts are not worth entering for rewards yet.")
+          else:
+              print(f"  {len(u)} House markets DO have programs "
+                    f"({sum(1 for s, _ in u if s in held)} held, "
+                    f"{sum(1 for s, _ in u if s not in held)} unentered):")
+              for s, t in u[:60]:
+                  print(f"   {'HELD ' if s in held else '     '} {s:44s} "
+                        f"pool {t['rewardPool']:>6} target {t['targetSize']:>7} df {t['discountFactor']}")
+
+          # anything with a pool we are not in at all
+          unentered = sorted(s for s in progs if s not in held)
+          print(f"\nmarkets WITH a pool that we hold no order in: {len(unentered)}")
+          for s in unentered[:40]:
+              t = progs[s]
+              print(f"   {s:46s} pool {t['rewardPool']:>6} target {t['targetSize']:>7} "
+                    f"df {t['discountFactor']}")
+
+          os.makedirs("data", exist_ok=True)
+          json.dump({"complete": complete, "programs": {s: t for s, t in progs.items()},
+                     "held": sorted(held)},
+                    open("data/new_pools.json", "w"), indent=1)
+          with open("data/new_pools.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/new_pools.json data/new_pools.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Probe new pools [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
