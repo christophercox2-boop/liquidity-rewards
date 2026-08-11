@@ -2,7 +2,7 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ❌ Last check FAILED — 2026-08-11 7:10 AM ET
+## ❌ Last check FAILED — 2026-08-11 7:53 AM ET
 
 ```
 RuntimeError: https://api.prod.polymarketexchange.com/v1/incentives/earnings -> HTTP 401: {"message":"Unauthorized"}
@@ -99,6 +99,7 @@ _2026-08-09 is excluded: since the program restructure, pending rewards accumula
 
 | Checked (ET) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-08-11 7:53 AM ET | ❌ error | 1818 | $1889.44 |
 | 2026-08-11 7:10 AM ET | ❌ error | 1818 | $1889.44 |
 | 2026-08-11 7:08 AM ET | ❌ error | 1818 | $1889.44 |
 | 2026-08-11 6:35 AM ET | ✅ ok | 1818 | $1889.44 |
@@ -108,6 +109,5 @@ _2026-08-09 is excluded: since the program restructure, pending rewards accumula
 | 2026-08-11 3:41 AM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-11 2:07 AM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-11 12:43 AM ET | ✅ ok | 1818 | $1889.44 |
-| 2026-08-10 11:18 PM ET | ✅ ok | 1818 | $1889.44 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
