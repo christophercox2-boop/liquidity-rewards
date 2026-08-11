@@ -80,6 +80,13 @@ jobs:
 
           manifest = []
           for o in orders:
+              # The endpoint also returns finished orders (REPLACED originals of
+              # every modify, etc). The 2026-08-11 manifest included ~90 of them
+              # and the restore RE-PLACED them as real orders — a manifest is a
+              # list of things to recreate, so a dead record here becomes live
+              # money later. Only genuinely resting states may enter it.
+              if str(o.get("state") or "") in tr.DEAD_ORDER_STATES:
+                  continue
               slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
               if not slug:
                   continue

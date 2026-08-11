@@ -71,7 +71,11 @@ jobs:
           print(f"manifest taken {snap['taken_at']}: {len(want)} orders")
 
           r = api("GET", "/v1/orders/open"); r.raise_for_status()
-          live = r.json().get("orders") or []
+          live = [o for o in (r.json().get("orders") or [])
+                  # a REPLACED ghost at the same (market, side, price) would make
+                  # a genuinely-missing order look still-resting and never get
+                  # restored — the mirror image of the snapshot bug
+                  if str(o.get("state") or "") not in tr.DEAD_ORDER_STATES]
           resting = set()
           for o in live:
               slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
@@ -152,6 +156,8 @@ jobs:
               r2 = api("GET", "/v1/orders/open"); r2.raise_for_status()
               lead = {}
               for o in r2.json().get("orders") or []:
+                  if str(o.get("state") or "") in tr.DEAD_ORDER_STATES:
+                      continue   # never try to modify a dead order id
                   slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
                   side = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
                   if side != "SELL" or abs(tr._num(o.get("price")) - 0.99) > 1e-9:
