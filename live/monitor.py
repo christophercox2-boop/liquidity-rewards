@@ -51,12 +51,25 @@ MAX_GAP_SECONDS = 300  # an outage never extrapolates more than 5 minutes
 # familiar number rather than a counter climbing from zero, short enough that
 # the honest figure is what you see for all but the first minutes of a day.
 # Same reason as the note below: read from Monitor methods, so defined here.
-HF_MIN_SAMPLES = int(os.environ.get("HF_MIN_SAMPLES", "240"))
+# Retired: this counted samples, which says how DENSELY the day was measured
+# and nothing about how MUCH of it was. Superseded by HF_MIN_COVER below.
 HF_RATE_TAU = float(os.environ.get("HF_RATE_TAU", "600"))  # rate smoothing, seconds
 # A book older than this is not evidence of anything; see _rescore_rate.
 BOOK_MAX_AGE = float(os.environ.get("BOOK_MAX_AGE", "180"))
 # Fraction of scorable orders needing a fresh book before a sample counts.
 HF_MIN_FRESH = float(os.environ.get("HF_MIN_FRESH", "0.5"))
+# Fraction of the DAY the sampler must actually have measured before its
+# figure is treated as that day's earnings.
+#
+# This replaces a sample-count threshold, which asked the wrong question. On
+# 2026-08-10 the sampler had 863 samples — far past the old 240 — so the day
+# closed on earned_hf = $51.73. But 863 samples at a 5s mean is ~72 minutes:
+# it had measured about an hour of a 24-hour day, and that hour was recorded
+# as the day's total against a tracker integral of $455.38. Sample count says
+# how DENSELY you measured; it says nothing about HOW MUCH of the day. A
+# partial measurement of a day is not a smaller day, it is an unknown one, so
+# short coverage now falls back to the tracker figure instead.
+HF_MIN_COVER = float(os.environ.get("HF_MIN_COVER", "0.90"))
 # Raw samples kept for the graph. At the 5s mean this is ~50 minutes of dots —
 # enough to see the scatter and how tight the smoothed line sits inside it,
 # without making every dashboard refresh carry a large payload.
@@ -432,18 +445,42 @@ WINNERS: list[dict] = []
 
 
 class Monitor:
+    def hf_covers_day(self, full_day: bool = False) -> bool:
+        """Has the sampler measured enough of the day to speak for it?
+
+        full_day=False asks about the day so far (for the live dashboard);
+        full_day=True asks about a whole 24h (for closing a day into history).
+        Caller must hold the lock.
+        """
+        covered = self.state.get("hf_covered_s") or 0.0
+        if full_day:
+            return covered >= HF_MIN_COVER * 86400.0
+        day = self.state.get("day")
+        if not day:
+            return False
+        try:
+            midnight = dt.datetime.strptime(day, "%Y-%m-%d").replace(tzinfo=ET)
+        except Exception:  # noqa: BLE001 — malformed day never gates on garbage
+            return False
+        elapsed = (dt.datetime.now(ET) - midnight).total_seconds()
+        if elapsed <= 0:
+            return False
+        return covered >= HF_MIN_COVER * min(elapsed, 86400.0)
+
     def headline(self) -> tuple[float, dict[str, float], float, str]:
         """The figures shown to the user: (earned today, per-market, $/day, basis).
 
-        Prefers the Poisson-sampled accrual once today has enough samples to
-        stand on. The old accrual is woken by POLL_KICK the instant we place or
-        reprice, so it sampled our share at its peak and read 1.58x-2.03x above
-        real payouts; this one samples on a clock nothing we do can pull.
-        Falls back to the old figures early in a day, or if the sampler thread
-        is not running, so the dashboard never shows a counter stuck at zero.
+        Prefers the Poisson-sampled accrual once it has actually measured most
+        of the day so far. The old accrual is woken by POLL_KICK the instant we
+        place or reprice, so it sampled our share at its peak and read
+        1.58x-2.03x above real payouts; this one samples on a clock nothing we
+        do can pull. Falls back to the old figures when coverage is short — a
+        sampler that started mid-day, or one that has just come back from an
+        outage, holds a real number for a fraction of a day, and showing that
+        as the day's total is how 2026-08-10 came to read $51.73.
         Caller must hold the lock.
         """
-        if self._hf_samples >= HF_MIN_SAMPLES:
+        if self.hf_covers_day():
             rate = self.hf_rate if self.hf_rate is not None else self.rate
             # No live books means no evidence of a rate, so report zero rather
             # than the last good EWMA. A held-over number reads as a calm
@@ -479,7 +516,7 @@ class Monitor:
                             # 31 on 2026-08-09. Kept side by side so the two
                             # can be scored against real payouts instead of
                             # argued about.
-                            "earned_hf": 0.0, "per_market_hf": {}}
+                            "earned_hf": 0.0, "per_market_hf": {}, "hf_covered_s": 0.0}
         local: dict = {}
         if STATE_PATH.exists():
             try:
@@ -490,6 +527,30 @@ class Monitor:
         # A redeploy replaces the local disk — take whichever copy is newest.
         best = max((local, remote), key=lambda s: s.get("saved_at", 0.0) or 0.0)
         self.state.update(best)
+        # One-time repair of days closed by the old sample-count gate.
+        #
+        # That gate let a day close on earned_hf after merely 240 samples, so
+        # 2026-08-10 — where the sampler had been alive about an hour — was
+        # recorded as $51.73 against a tracker integral of $455.38. Rows
+        # written by the fixed gate carry hf_covered_s; rows that have an
+        # earned_hf but no hf_covered_s are exactly the damaged ones. Rebuild
+        # those from the tracker's own data, which is complete for those days,
+        # and mark them so the repair cannot run twice or touch anything else.
+        try:
+            for h in self.state.get("history") or []:
+                if "earned_hf" not in h or "hf_covered_s" in h or h.get("hf_repaired"):
+                    continue
+                reb = tracker_day_integral(h.get("day"))
+                if not reb:
+                    continue
+                was = h.get("earned")
+                h["earned"] = reb[0]
+                h["earned_sparse"] = reb[0]
+                h["hf_repaired"] = {"was": was, "reason": "partial-day earned_hf"}
+                print(f"[history] {h['day']}: repaired {was} -> {reb[0]:.2f} "
+                      f"(earned_hf covered only part of the day)")
+        except Exception as e:  # noqa: BLE001 — a failed repair never blocks boot
+            print(f"[history] repair skipped: {type(e).__name__}: {e}")
         # Backfill: if the restored counter is materially below what the
         # hourly tracker's data says today has produced, rebuild from that —
         # outages and state loss stop costing the day's number.
@@ -879,19 +940,24 @@ class Monitor:
                     except Exception:  # noqa: BLE001 — fall back to accrual
                         pass
                     hf_day = round(self.state.get("earned_hf", 0.0), 2)
-                    enough = self._hf_samples >= HF_MIN_SAMPLES
+                    covered = self.state.get("hf_covered_s") or 0.0
+                    enough = self.hf_covers_day(full_day=True)
                     self.state["history"] = (self.state["history"] + [
                         # `earned` is the headline the history chart draws;
                         # the other two are kept so estimator_check.yml can
                         # keep scoring both methods against real payouts.
+                        # hf_covered_s records WHY earned is what it is, and
+                        # its presence marks a row written by the fixed gate.
                         {"day": self.state["day"],
                          "earned": hf_day if enough else old_day_earned,
                          "earned_sparse": old_day_earned,
                          "earned_hf": hf_day,
-                         "hf_samples": self._hf_samples}
+                         "hf_samples": self._hf_samples,
+                         "hf_covered_s": round(covered)}
                     ])[-30:]
                 self.state.update({"day": day, "earned": 0.0, "per_market": {},
                                    "earned_hf": 0.0, "per_market_hf": {},
+                                   "hf_covered_s": 0.0,
                                    "earned_series": [], "rate_series": []})
                 self._hf_samples = 0
             self._hf_samples = getattr(self, "_hf_samples", 0) + 1
@@ -1167,6 +1233,9 @@ def hf_sampler_loop() -> None:
         frac = elapsed / 86400.0
         with MONITOR.lock:
             MONITOR.state["earned_hf"] = MONITOR.state.get("earned_hf", 0.0) + rate * frac
+            # Wall time genuinely measured today. Stale ticks are NOT counted:
+            # time we could not see is not time we covered.
+            MONITOR.state["hf_covered_s"] = MONITOR.state.get("hf_covered_s", 0.0) + elapsed
             pm = MONITOR.state.setdefault("per_market_hf", {})
             for m, r in per.items():
                 pm[m] = pm.get(m, 0.0) + r * frac
