@@ -1,0 +1,131 @@
+name: Maintenance capture
+
+# READ-ONLY. Places nothing, cancels nothing.
+#
+# A maintenance window is the only time the book holds still, which makes it
+# the one natural experiment available to us. Every failed explanation for the
+# ~2x gap so far has been about DYNAMICS — sampling cadence, sample timing,
+# position churn. If the book is genuinely frozen for a known stretch and we
+# record it exactly, then for that stretch there are no dynamics left: our
+# share is a fixed, computable number. When the 2026-08-11 payout lands we can
+# test the model against a segment with the confounds physically removed.
+#
+# It also answers a question we cannot answer any other way: does the exchange
+# keep scoring while it is down? The docs say a random snapshot every second.
+# If the window pays nothing, then downtime is dead time and the daily rate is
+# being diluted by it — which would be a real, previously invisible effect.
+#
+# Each run takes SAMPLES readings SPACED seconds apart and appends one JSON
+# line per reading, recording HTTP status for every call so an outage is
+# captured as data rather than as a hole.
+
+on:
+  schedule:
+    - cron: "*/15 10-13 * * *"     # through the window and an hour past it
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/maint_capture.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: maint-capture
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Capture
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import datetime, hashlib, json, os, time, requests
+          import track_rewards as tr
+
+          SAMPLES = 10
+          SPACED = 50          # ~8 minutes per run
+          WATCH = ["scc-hrep-rep-2026-11-03-gte185", "opdc-mcconnell-resign-2026-11-02",
+                   "scc-senate-gop-2026-11-03-53", "pandc-anydis-2027-12-31",
+                   "apdc-jerpowgov-2026-12-31", "ussewc-usse-tn-2026-11-03-rep"]
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+
+          def book_sig(b):
+              """Stable fingerprint of a book, so a freeze is provable."""
+              return hashlib.sha1(json.dumps(
+                  [[round(p, 4), round(q, 4)] for p, q in (b.get("bids") or [])] +
+                  [[round(p, 4), round(q, 4)] for p, q in (b.get("asks") or [])],
+                  sort_keys=True).encode()).hexdigest()[:12]
+
+          out = open("data/maint_capture.jsonl", "a")
+          for i in range(SAMPLES):
+              rec = {"ts": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                     "books": {}, "orders": None, "errors": {}}
+              # our resting orders — does the exchange still list them?
+              try:
+                  r = requests.get(tr.TRADE_API + "/v1/orders/open",
+                                   headers=tr.auth_headers(kid, sec, "GET", "/v1/orders/open"),
+                                   timeout=20)
+                  rec["orders_http"] = r.status_code
+                  if r.status_code < 400:
+                      os_ = r.json().get("orders") or []
+                      rec["orders"] = len(os_)
+                      rec["orders_sig"] = hashlib.sha1(json.dumps(sorted(
+                          (o.get("marketSlug") or "") + "|" +
+                          str((o.get("price") or {}).get("value")) + "|" +
+                          str(o.get("leavesQuantity")) for o in os_)).encode()).hexdigest()[:12]
+              except Exception as e:
+                  rec["errors"]["orders"] = f"{type(e).__name__}: {e}"[:120]
+              # the watched books, full depth plus a fingerprint
+              for slug in WATCH:
+                  try:
+                      b = tr._fetch_book(slug)
+                      rec["books"][slug] = {"sig": book_sig(b),
+                                            "bids": b.get("bids") or [],
+                                            "asks": b.get("asks") or [],
+                                            "tick": b.get("tick")}
+                  except Exception as e:
+                      rec["errors"][slug] = f"{type(e).__name__}: {e}"[:120]
+                  time.sleep(0.2)
+              out.write(json.dumps(rec) + "\n"); out.flush()
+              sig = {s: v["sig"] for s, v in rec["books"].items()}
+              print(f"{rec['ts']}  orders={rec['orders']} (HTTP {rec.get('orders_http')})  "
+                    f"books={len(rec['books'])}/{len(WATCH)}  errs={len(rec['errors'])}")
+              if i < SAMPLES - 1:
+                  time.sleep(SPACED)
+          out.close()
+
+          # summarise: did anything actually move?
+          lines = [json.loads(l) for l in open("data/maint_capture.jsonl")]
+          print(f"\ntotal readings on file: {len(lines)}")
+          for slug in WATCH:
+              sigs = [l["books"][slug]["sig"] for l in lines if slug in l.get("books", {})]
+              uniq = len(set(sigs))
+              print(f"  {slug[:44]:44s} {len(sigs):3d} readings, {uniq:2d} distinct book states"
+                    f"{'   <-- FROZEN' if uniq == 1 and len(sigs) > 2 else ''}")
+          osig = [l.get("orders_sig") for l in lines if l.get("orders_sig")]
+          print(f"  {'our order set':44s} {len(osig):3d} readings, {len(set(osig)):2d} distinct")
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/maint_capture.jsonl 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Maintenance capture [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
