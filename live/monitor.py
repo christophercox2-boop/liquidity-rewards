@@ -445,6 +445,13 @@ class Monitor:
         """
         if self._hf_samples >= HF_MIN_SAMPLES:
             rate = self.hf_rate if self.hf_rate is not None else self.rate
+            # No live books means no evidence of a rate, so report zero rather
+            # than the last good EWMA. A held-over number reads as a calm
+            # market when it is really our own feed standing still, and the
+            # accrual behind it has already stopped for the same reason.
+            fresh, considered = self.hf_fresh
+            if considered and fresh < considered * HF_MIN_FRESH:
+                rate = 0.0
             return (self.state.get("earned_hf") or 0.0,
                     self.state.get("per_market_hf") or {}, rate, "hf")
         return (self.state.get("earned") or 0.0,
