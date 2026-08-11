@@ -1,0 +1,13 @@
+book: best bid (0.01, 7800.0) / best ask (0.98, 199175.37)
+target: BTEB4SV1RDK1  SELL 0.99 x273
+
+MODIFY 0.99 -> 0.98 x273
+  -> 200 {}
+  + 20s  NO live ask — the modify destroyed it
+  + 40s  NO live ask — the modify destroyed it
+  + 60s  NO live ask — the modify destroyed it
+  + 80s  NO live ask — the modify destroyed it
+  +100s  NO live ask — the modify destroyed it
+  +120s  NO live ask — the modify destroyed it
+
+VERDICT: DESTROYED — the modify path itself loses orders; body above says why
