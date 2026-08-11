@@ -1,6 +1,20 @@
 {
   "rewards": [
     {
+      "reward": 6.91,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-alito-2026-12-31",
+      "date": "2026-08-09",
+      "status": "PENDING"
+    },
+    {
+      "reward": 22.67,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-jerpowgov-2026-12-31",
+      "date": "2026-08-09",
+      "status": "PENDING"
+    },
+    {
       "reward": 8.52,
       "programType": "liquidityProgram",
       "marketSlug": "apdc-alito-2026-12-31",
