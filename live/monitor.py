@@ -45,6 +45,10 @@ DASH_PASSWORD = os.environ.get("DASH_PASSWORD", "")
 STATE_PATH = Path(os.environ.get("STATE_PATH", "state.json"))
 ET = ZoneInfo("America/New_York")
 MAX_GAP_SECONDS = 300  # an outage never extrapolates more than 5 minutes
+# How long one tracker snapshot may stand in for. The tracker runs roughly
+# hourly, so 2h leaves normal cadence untouched while a real blackout stops
+# being charged at whatever rate happened to be showing when it began.
+EST_MAX_GAP = float(os.environ.get("EST_MAX_GAP", "7200"))
 # How many Poisson samples today before the headline figures switch off the
 # old action-triggered accrual and onto the unbiased one. At the 5s mean this
 # is ~20 minutes of sampling — long enough that a fresh boot shows the
@@ -242,7 +246,16 @@ def tracker_day_integral(day_et: str,
         for i, ts in enumerate(times):
             start = midnight.astimezone(dt.timezone.utc) if i == 0 else _utc(ts)
             end = _utc(times[i + 1]) if i + 1 < len(times) else now
-            frac = max((end - start).total_seconds(), 0.0) / 86400.0
+            # A snapshot's rate is evidence for at most EST_MAX_GAP. Beyond
+            # that we simply had no data, and unmeasured time earns zero.
+            #
+            # Without this, an outage is charged at whatever rate happened to
+            # be showing when the feed died: on 2026-08-11 the last reading
+            # before maintenance (10:14 UTC, $324/day) was extended across the
+            # whole 4.8h blackout, which is why this rebuild kept undoing the
+            # 6:00 ET clamp every time the anchor ran.
+            span = max((end - start).total_seconds(), 0.0)
+            frac = min(span, EST_MAX_GAP) / 86400.0
             for m, est in runs[ts].items():
                 total += est * frac
                 per_market[m] = per_market.get(m, 0.0) + est * frac
