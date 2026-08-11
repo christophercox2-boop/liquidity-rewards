@@ -1,9 +1,28 @@
 scc-hrep-rep-2026-11-03-gte180         TINY want    10  best bid   0.75  depth   450,518  ours 1
+   cancel BUY 0.75 x50 -> 200
+   place BUY 0.75 x10 -> 200
 scc-hrep-rep-2026-11-03-gte205         TINY want    10  best bid   0.47  depth    81,152  ours 1
+   cancel SELL 0.48 x20 -> 200
+   place BUY 0.47 x10 -> 200
 scc-hrep-rep-2026-11-03-gte225         BIG  want  1000  best bid   0.01  depth   255,231  ours 1
+   cancel SELL 0.12 x20 -> 200
+   place BUY 0.01 x1000 -> 200
 scc-senate-gop-2026-11-03-47           MID  want   100  best bid   0.13  depth    31,747  ours 1
-scc-senate-gop-2026-11-03-51           TINY want    10  best bid   0.19  depth   200,581  ours 2
+   cancel BUY 0.13 x22 -> 200
+   place BUY 0.13 x100 -> 200
+scc-senate-gop-2026-11-03-51           TINY want    10  best bid   0.19  depth   201,081  ours 2
+   cancel BUY 0.19 x2 -> 200
+   cancel SELL 0.28 x50 -> 200
+   place BUY 0.19 x10 -> 200
 scc-senate-gop-2026-11-03-52           MID  want   100  best bid   0.09  depth    90,545  ours 1
+   cancel BUY 0.09 x5 -> 200
+   place BUY 0.09 x100 -> 200
 scc-senate-gop-2026-11-03-54           MID  want   100  best bid   0.03  depth    73,990  ours 1
+   cancel SELL 0.08 x30 -> 200
+   place BUY 0.03 x100 -> 200
 scc-senate-gop-2026-11-03-gte57        BIG  want  1000  best bid   0.02  depth    10,314  ours 2
+   cancel SELL 0.04 x20 -> 200
+   cancel BUY 0.01 x5000 -> 200
+   place BUY 0.02 x1000 -> 200
 scc-senate-gop-2026-11-03-lte45        BIG  want  1000  best bid   0.07  depth    82,016  ours 0
+   place BUY 0.07 x1000 -> 200
