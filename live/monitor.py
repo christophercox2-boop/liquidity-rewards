@@ -550,6 +550,33 @@ class Monitor:
         # A redeploy replaces the local disk — take whichever copy is newest.
         best = max((local, remote), key=lambda s: s.get("saved_at", 0.0) or 0.0)
         self.state.update(best)
+        # One-time: drop today's earnings accrued after 2026-08-11 06:00 ET.
+        #
+        # The exchange entered maintenance at 06:00 ET and then began rejecting
+        # our key, so everything after that point was integrated against a book
+        # that had stopped moving — the accrual kept running on a frozen cache
+        # until the staleness guard shipped. Integrating estimates.csv from
+        # midnight ET to that cutoff gives $142.06, the last figure with live
+        # data behind it.
+        #
+        # Runs once: the marker stops it clipping legitimate accrual after the
+        # feed returns, and it only ever lowers, never raises.
+        try:
+            if self.state.get("day") == "2026-08-11" and not self.state.get("clamp_0811"):
+                cap = 142.06
+                cur = self.state.get("earned") or 0.0
+                for key, pm in (("earned", "per_market"), ("earned_hf", "per_market_hf")):
+                    val = self.state.get(key) or 0.0
+                    if val > cap:
+                        scale = cap / val if val else 0.0
+                        self.state[key] = cap
+                        self.state[pm] = {m: v * scale
+                                          for m, v in (self.state.get(pm) or {}).items()}
+                self.state["clamp_0811"] = True
+                print(f"[clamp] 2026-08-11 trimmed to the 06:00 ET cutoff: "
+                      f"{cur:.2f} -> {self.state.get('earned'):.2f}")
+        except Exception as e:  # noqa: BLE001 — never block boot over a one-off
+            print(f"[clamp] skipped: {type(e).__name__}: {e}")
         # One-time repair of days closed by the old sample-count gate.
         #
         # That gate let a day close on earned_hf after merely 240 samples, so
