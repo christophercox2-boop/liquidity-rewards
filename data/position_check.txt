@@ -1,0 +1,29 @@
+positions HTTP 200
+non-zero positions: 22
+
+enwc-usgubp-wi-2026-08-11-dem-sarrod         net      100.0  avg {'value': '0.0100', 'currency': 'USD'}
+scc-hrep-rep-2026-11-03-gte200               net      100.0  avg {'value': '0.6370', 'currency': 'USD'}
+scc-hrep-rep-2026-11-03-gte195               net      -90.0  avg {'value': '0.4760', 'currency': 'USD'}
+apdc-alito-2026-12-31                        net       61.0  avg {'value': '0.5220', 'currency': 'USD'}
+ussewc-usse-mt-2026-11-03-rep                net      -46.0  avg {'value': '0.0200', 'currency': 'USD'}
+scc-senate-gop-2026-11-03-50                 net       38.0  avg {'value': '0.2600', 'currency': 'USD'}
+scc-hrep-rep-2026-11-03-gte185               net      -23.0  avg {'value': '0.2440', 'currency': 'USD'}
+pandc-anydis-2027-12-31                      net       20.0  avg {'value': '0.2080', 'currency': 'USD'}
+scc-senate-gop-2026-11-03-gte57              net       20.0  avg {'value': '0.0690', 'currency': 'USD'}
+scc-senate-gop-2026-11-03-55                 net       14.0  avg {'value': '0.0390', 'currency': 'USD'}
+enwc-ussep-sc-2026-08-11-rep-ralnor          net      -10.0  avg {'value': '1.0780', 'currency': 'USD'}
+enwc-usgubp-mn-2026-08-11-rep-kenqua         net        8.0  avg {'value': '0.0100', 'currency': 'USD'}
+scc-hrep-rep-2026-11-03-gte190               net       -8.0  avg {'value': '0.3670', 'currency': 'USD'}
+scc-senate-gop-2026-11-03-48                 net       -7.0  avg {'value': '0.7990', 'currency': 'USD'}
+pic-congress-trump-2026-12-31                net        5.0  avg {'value': '0.2800', 'currency': 'USD'}
+scc-hrep-rep-2026-11-03-gte220               net       -5.0  avg {'value': '0.7490', 'currency': 'USD'}
+scc-senate-gop-2026-11-03-49                 net        5.0  avg {'value': '0.2870', 'currency': 'USD'}
+tec-cbb-champ-2027-04-05-w-iowast            net        5.0  avg {'value': '0.0980', 'currency': 'USD'}
+opdc-mcconnell-resign-2026-11-02             net       -2.0  avg {'value': '0.8590', 'currency': 'USD'}
+apdc-jerpowgov-2026-12-31                    net        1.0  avg {'value': '0.2480', 'currency': 'USD'}
+scc-hrep-rep-2026-11-03-gte225               net        1.0  avg {'value': '0.1200', 'currency': 'USD'}
+scc-senate-gop-2026-11-03-46                 net        1.0  avg {'value': '0.0300', 'currency': 'USD'}
+
+scc-senate-gop-2026-11-03-lte45: NO position — the order did not fill after all
+
+scc-senate-gop-2026-11-03-lte45 book now: best bid (0.07, 1787.19) / best ask (0.08, 1329.21)
