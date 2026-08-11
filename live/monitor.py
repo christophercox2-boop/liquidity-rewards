@@ -417,8 +417,20 @@ WINNERS: list[dict] = []
 class Monitor:
     def __init__(self) -> None:
         self.lock = threading.Lock()
+        self._hf_samples = 0        # samples behind earned_hf, reset each day
         self.state: dict = {"day": None, "earned": 0.0, "per_market": {}, "history": [],
-                            "saved_at": 0.0, "rate": 0.0, "market_rates": {}, "ts": None}
+                            "saved_at": 0.0, "rate": 0.0, "market_rates": {}, "ts": None,
+                            # High-frequency accrual: the same integration as
+                            # `earned`, but never overwritten by the hourly
+                            # rebuild. The exchange scores a random snapshot
+                            # EVERY SECOND and weights all 86,400 equally, so
+                            # what matters is sampling density. This process
+                            # samples every POLL_SECONDS (2,880/day at the
+                            # default 30s); the tracker's estimates.csv managed
+                            # 31 on 2026-08-09. Kept side by side so the two
+                            # can be scored against real payouts instead of
+                            # argued about.
+                            "earned_hf": 0.0, "per_market_hf": {}}
         local: dict = {}
         if STATE_PATH.exists():
             try:
@@ -789,15 +801,25 @@ class Monitor:
                 frac = min((now_utc - self.last_ts).total_seconds(), MAX_GAP_SECONDS) / 86400.0
                 if frac > 0:
                     self.state["earned"] += self.rate * frac
+                    self.state["earned_hf"] = self.state.get("earned_hf", 0.0) + self.rate * frac
+                    pm_hf = self.state.setdefault("per_market_hf", {})
                     for m, r in self.market_rates.items():
                         self.state["per_market"][m] = self.state["per_market"].get(m, 0.0) + r * frac
+                        pm_hf[m] = pm_hf.get(m, 0.0) + r * frac
             # …then roll the day over at midnight ET.
             old_day_earned = None
             if self.state["day"] != day:
                 if self.state["day"]:
-                    # Days close on the HOURLY RECORD (it reconciles at ~98%
-                    # against actual payouts); the fine-grained accrual is the
-                    # live feel between anchors, not the official figure.
+                    # Days close on the hourly record for continuity, but that
+                    # figure is NOT trustworthy: measured against actual
+                    # payouts it ran 1.58x-2.03x high, not the ~98% once
+                    # claimed here. It rebuilds the day from estimates.csv,
+                    # which held 31 snapshots on 2026-08-09 — 0.04% of the
+                    # 86,400 the exchange scores, and taken right after we
+                    # place or defend, when our share is at its peak.
+                    # `earned_hf` is the same integral at ~93x the sampling
+                    # density. Both are recorded; the day both are compared
+                    # against enough real payouts is the day one gets retired.
                     old_day_earned = round(self.state["earned"], 2)
                     try:
                         reb = tracker_day_integral(self.state["day"])
@@ -806,10 +828,15 @@ class Monitor:
                     except Exception:  # noqa: BLE001 — fall back to accrual
                         pass
                     self.state["history"] = (self.state["history"] + [
-                        {"day": self.state["day"], "earned": old_day_earned}
+                        {"day": self.state["day"], "earned": old_day_earned,
+                         "earned_hf": round(self.state.get("earned_hf", 0.0), 2),
+                         "hf_samples": self._hf_samples}
                     ])[-30:]
                 self.state.update({"day": day, "earned": 0.0, "per_market": {},
+                                   "earned_hf": 0.0, "per_market_hf": {},
                                    "earned_series": [], "rate_series": []})
+                self._hf_samples = 0
+            self._hf_samples = getattr(self, "_hf_samples", 0) + 1
             self.rate = sum(o.get("est_day") or 0.0 for o in orders)
             self.market_rates = {}
             for o in orders:
