@@ -2612,6 +2612,120 @@ def watch_program_arrivals(pol_slugs: list[str]) -> None:
           f"{', '.join(arrived[:8])}", flush=True)
 
 
+# ---- Qualification keeper --------------------------------------------------
+# The owner's priority order, stated 2026-08-11: where a side already holds
+# Target Size (from anyone's orders), what matters is having a SCORING order
+# near the touch — that is what earns. Deep 1c/99c size matters only where the
+# book would otherwise fall below target and the side would pay nobody.
+# So each poll, per funded side: (1) if the side qualifies but none of our
+# orders score, place one small order a tick inside the field, bounded by the
+# defend cap; (2) if the side's TOTAL resting size (every participant, from
+# the live book) is short of target, stack a deep qualifier chunk.
+# Placements only — post-only — never modify; defend handles repricing.
+KEEP_MAX_PER_POLL = int(os.environ.get("KEEP_MAX_PER_POLL", "4"))
+KEEP_SCORE_SIZE = int(os.environ.get("KEEP_SCORE_SIZE", "40"))
+KEEP_COOLDOWN = float(os.environ.get("KEEP_COOLDOWN", "600"))
+_KEEP_LAST: dict = {}
+
+
+def _keep_place(m: str, side: str, px: float, qty: int) -> bool:
+    body = {"marketSlug": m,
+            "intent": "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_BUY_SHORT",
+            "type": "ORDER_TYPE_LIMIT",
+            "price": {"value": f"{px:.2f}", "currency": "USD"},
+            "quantity": int(qty),
+            "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+            "participateDontInitiate": True}
+    try:
+        r = requests.request(
+            "POST", tr.TRADE_API + "/v1/orders",
+            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                     "Content-Type": "application/json"},
+            json=body, timeout=20)
+        ok = r.status_code < 300
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": m, "side": f"KEEP {side}", "from": "—",
+                        "to": round(px * 100, 1), "size": qty,
+                        "status": r.status_code,
+                        "response": " ".join(r.text.split())[:120], "verified": ok})
+        del ACTIONS[:-20]
+        return ok
+    except Exception:  # noqa: BLE001 — keeper must never kill the poll
+        return False
+
+
+def keep_qualified() -> None:
+    if os.environ.get("KEEP_PAUSE", "") == "1":
+        return
+    progs = tr._PROG_CACHE.get("progs") or {}
+    cfg = dict(MONITOR.state.get("defend") or {})
+    now = time.time()
+    placed = 0
+    by_mkt: dict = {}
+    for o in MONITOR.orders:
+        if o.get("market"):
+            by_mkt.setdefault(o["market"], []).append(o)
+    for m, orders in by_mkt.items():
+        if placed >= KEEP_MAX_PER_POLL:
+            return
+        pr = progs.get(m)
+        if not pr or not pr.get("pool") or not pr.get("target"):
+            continue
+        ent = tr._BOOK_CACHE.get(m)
+        if not ent or now - ent[0] > 300:
+            continue
+        book = ent[1]
+        tick = book.get("tick") or 0.01
+        target = float(pr["target"])
+        for side, levels, opp in (("BUY", book.get("bids") or [], book.get("asks") or []),
+                                  ("SELL", book.get("asks") or [], book.get("bids") or [])):
+            if placed >= KEEP_MAX_PER_POLL:
+                return
+            key = (m, side)
+            if now - _KEEP_LAST.get(key, 0.0) < KEEP_COOLDOWN:
+                continue
+            total = sum(q for _, q in levels)
+            mine = [o for o in orders if o.get("side") == side]
+            deep_px = 0.01 if side == "BUY" else 0.99
+            if total < target - 1:
+                # (2) the side does not qualify — stack deep size; each
+                # placement lands ~273 for shorts, so the shortfall closes
+                # over successive polls without any modify.
+                qty = int(min(target - total, 2000))
+                if qty >= 1 and _keep_place(m, side, deep_px, qty):
+                    placed += 1
+                    _KEEP_LAST[key] = now
+                continue
+            # (1) the side qualifies — make sure something of OURS scores.
+            if any((o.get("est_day") or 0) > 0.001 for o in mine):
+                continue
+            scfg = (cfg.get(m) or {}).get(side) or {}
+            try:
+                cap = float(scfg.get("cap")) / 100.0
+            except (TypeError, ValueError):
+                continue  # no sanctioned price bound — never invent one
+            if not levels:
+                continue
+            best = float(levels[0][0])
+            px = min(best + tick, cap) if side == "BUY" else max(best - tick, cap)
+            # never cross the opposite touch — post-only could not rest there
+            if opp:
+                ob = float(opp[0][0])
+                if side == "BUY" and px >= ob - 1e-9:
+                    px = ob - tick
+                if side == "SELL" and px <= ob + 1e-9:
+                    px = ob + tick
+            if not (0.005 <= px <= 0.995):
+                continue
+            if side == "BUY" and px > cap + 1e-9:
+                continue
+            if side == "SELL" and px < cap - 1e-9:
+                continue
+            if _keep_place(m, side, round(px, 2), KEEP_SCORE_SIZE):
+                placed += 1
+                _KEEP_LAST[key] = now
+
+
 def auto_defend() -> None:
     """One pass over the defended markets after each poll."""
     # Resumed 2026-08-11 after the /modify incident. The exchange's modify
@@ -5450,6 +5564,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                 pass
             try:
                 auto_defend()
+                try:
+                    keep_qualified()
+                except Exception as e:  # noqa: BLE001 — keeper never kills the poll
+                    MONITOR.error = f"keeper: {type(e).__name__}: {e}"[:150]
             except Exception as e:  # noqa: BLE001 — defense never kills the poll
                 MONITOR.error = f"defend: {type(e).__name__}: {e}"[:150]
             MONITOR.maybe_save_remote()
