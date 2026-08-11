@@ -2,7 +2,7 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-08-11 10:30 AM ET
+## ✅ Last successful check: 2026-08-11 10:35 AM ET
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
@@ -100,6 +100,7 @@ _No U.S. political markets with reachable pools found this run._
 
 | Checked (ET) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-08-11 10:35 AM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-11 10:30 AM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-11 10:27 AM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-11 9:47 AM ET | ✅ ok | 1818 | $1889.44 |
@@ -109,6 +110,5 @@ _No U.S. political markets with reachable pools found this run._
 | 2026-08-11 7:10 AM ET | ❌ error | 1818 | $1889.44 |
 | 2026-08-11 7:08 AM ET | ❌ error | 1818 | $1889.44 |
 | 2026-08-11 6:35 AM ET | ✅ ok | 1818 | $1889.44 |
-| 2026-08-11 6:25 AM ET | ❌ error | 1818 | $1889.44 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
