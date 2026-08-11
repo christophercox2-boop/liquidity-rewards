@@ -1,12 +1,14 @@
 checking 200 candidate slugs
 markets we hold an order in: 130
-of those, carrying an ACTIVE pool: 0
+of those, carrying an ACTIVE pool: 98
 
-=== SENATE: 0 held with a pool, 0 WITH A POOL AND NOT ENTERED ===
-   none — every funded race on this pattern is already entered
+=== SENATE: 44 held with a pool, 2 WITH A POOL AND NOT ENTERED ===
+   ID  rep      pool    25 target   2000 df 0.1   one side only
+   WY  dem      pool    25 target   2000 df 0.1   one side only
 
-=== GOVERNOR: 0 held with a pool, 0 WITH A POOL AND NOT ENTERED ===
-   none — every funded race on this pattern is already entered
+=== GOVERNOR: 51 held with a pool, 1 WITH A POOL AND NOT ENTERED ===
+   AL  dem      pool    25 target   2000 df 0.1   one side only
 
 === funded races where we hold only ONE side ===
-   none
+   governor  AL  missing: dem
+   senate    WY  missing: dem
