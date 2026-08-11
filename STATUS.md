@@ -2,7 +2,7 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-08-11 9:47 AM ET
+## ✅ Last successful check: 2026-08-11 10:27 AM ET
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
@@ -19,7 +19,7 @@ This runs automatically every hour. **If the timestamp above is more than ~2 hou
 
 ## 📍 Right now — your resting orders
 
-⚠️ Couldn't fetch live orders this run: `RuntimeError: /v1/orders/open -> HTTP 503: {"code":14,"message":"The server was unable to process your request.","details":[]}`
+⚠️ Couldn't fetch live orders this run: `RuntimeError: /v1/orders/open -> HTTP 401: {"code":16,"message":"The server was unable to process your request.","details":[]}`
 
 ## 📊 Estimate vs. actual — where the gap is
 
@@ -34,6 +34,10 @@ Time-weighted estimate for each day (each hourly snapshot's rate counts for the 
 Biggest gaps on 2026-08-08: `opdc-mcconnell-resign-2026-11-02` (est ~$9.47 → got $3.79), `scc-hrep-rep-2026-11-03-gte210` (est ~$5.11 → got $0.11), `scc-hrep-rep-2026-11-03-gte185` (est ~$4.26 → got $0.16)
 
 _2026-08-09 is excluded: since the program restructure, pending rewards accumulate under that one date (its total keeps growing day over day), so it can't be compared against a single day's estimate until it's finalized._
+
+## 💡 Suggested U.S. political markets
+
+_No U.S. political markets with reachable pools found this run._
 
 ## Totals
 
@@ -96,6 +100,7 @@ _2026-08-09 is excluded: since the program restructure, pending rewards accumula
 
 | Checked (ET) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-08-11 10:27 AM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-11 9:47 AM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-11 8:02 AM ET | ❌ error | 1818 | $1889.44 |
 | 2026-08-11 8:00 AM ET | ❌ error | 1818 | $1889.44 |
@@ -105,6 +110,5 @@ _2026-08-09 is excluded: since the program restructure, pending rewards accumula
 | 2026-08-11 6:35 AM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-11 6:25 AM ET | ❌ error | 1818 | $1889.44 |
 | 2026-08-11 6:14 AM ET | ✅ ok | 1818 | $1889.44 |
-| 2026-08-11 5:16 AM ET | ✅ ok | 1818 | $1889.44 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)

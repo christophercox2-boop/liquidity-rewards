@@ -15851,14 +15851,15 @@
     "tec-cbb-champ-2027-04-05-w-nebr": "search '2027 Men's College Basketball National C': event cbb-champ-2027-04-05-w with 73 open markets"
   },
   "suggestion_stats": {
-    "tag_slugs": 415,
-    "programs": 150,
-    "pages": 0,
+    "tag_slugs": 0,
+    "programs": 10000,
+    "pages": 100,
     "excluded": 0,
-    "not_politics": 54,
+    "not_politics": 9953,
     "no_pool_or_df": 0,
-    "candidates": 96,
+    "candidates": 0,
     "book_failures": 0,
-    "listed": 12
+    "listed": 0,
+    "ended": 47
   }
 }
