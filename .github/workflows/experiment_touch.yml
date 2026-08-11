@@ -1,0 +1,168 @@
+name: Touch-size experiment
+
+# Does a trivial order at the touch really earn most of the side pool?
+#
+# The model says yes. With scc's df=0.20 (and politics_low's 0.10), whoever
+# holds the best price takes nearly the whole side regardless of size, because
+# one tick back scores 20% and two ticks back 4%. That is why a 2-share order
+# in gte185 is scored at 27.6% of its side, and a 10-share order in McConnell
+# at 66.3%. Actual payouts say $0.05 and $0.25 — 94x and 83x less. Every
+# theory tried so far (sampling, timing, stability, depth, pool split) either
+# failed outright or only fixed the portfolio total by cancellation.
+#
+# So stop theorising and vary size directly.
+#
+# DESIGN. Nine scc markets, all on programId politics_mid_20260727 — same
+# pool, same discount factor, same Target Size — each holding exactly ONE
+# scoring order, so the per-market payout attributes to one order. Every order
+# is placed AT the best bid, so ticks-from-best is 0 in every arm and size is
+# the only thing that moves:
+#
+#     TINY  10 shares    MID  100 shares    BIG  1000 shares
+#
+# PREDICTIONS, decided before the data arrives:
+#   model correct  -> all three arms earn about the same (share ~ 100% either
+#                     way), and payout is flat in size
+#   size matters   -> payouts scale roughly 1 : 10 : 100
+#   touch is worth
+#   little at all  -> all three arms earn ~nothing, and the error is upstream
+#                     of size entirely
+#
+# KNOWN CONFOUND, stated up front: the BIG arm sits in the cheapest markets to
+# keep capital down (~$140 total), so arm correlates with price level and with
+# book depth. If the result is a clean 1:10:100 that is unlikely to matter; if
+# it is marginal, it needs a second round with arms reassigned.
+#
+# MODE below: "record" (default, touches nothing), "setup", or "restore".
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/experiment_touch.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: experiment-touch
+  cancel-in-progress: false
+
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import json, os, time, datetime, io, requests
+          import track_rewards as tr
+
+          MODE = "record"          # "record" | "setup" | "restore"
+
+          ARMS = {
+              "TINY": [("scc-senate-gop-2026-11-03-51", 10),
+                       ("scc-hrep-rep-2026-11-03-gte205", 10),
+                       ("scc-hrep-rep-2026-11-03-gte180", 10)],
+              "MID":  [("scc-senate-gop-2026-11-03-54", 100),
+                       ("scc-senate-gop-2026-11-03-52", 100),
+                       ("scc-senate-gop-2026-11-03-47", 100)],
+              "BIG":  [("scc-hrep-rep-2026-11-03-gte225", 1000),
+                       ("scc-senate-gop-2026-11-03-gte57", 1000),
+                       ("scc-senate-gop-2026-11-03-lte45", 1000)],
+          }
+          PLAN = {m: (arm, sz) for arm, lst in ARMS.items() for m, sz in lst}
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          live = r.json().get("orders") or []
+          held = {}
+          for o in live:
+              s = o.get("marketSlug") or ""
+              if s in PLAN:
+                  held.setdefault(s, []).append(o)
+
+          snap = {"taken_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                  "mode": MODE, "markets": {}}
+          for slug, (arm, want) in sorted(PLAN.items()):
+              try:
+                  bk = tr._fetch_book(slug)
+              except Exception as e:
+                  print(f"{slug}: book error {type(e).__name__}"); continue
+              time.sleep(0.25)
+              bids = bk.get("bids") or []; asks = bk.get("asks") or []
+              best = bids[0][0] if bids else None
+              mine = [{"id": o["id"], "side": "BUY" if str(o.get("side","")).upper().endswith("BUY") else "SELL",
+                       "price": tr._num(o.get("price")),
+                       "size": tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity"))}
+                      for o in held.get(slug, [])]
+              snap["markets"][slug] = {
+                  "arm": arm, "target_size": want, "best_bid": best,
+                  "best_ask": asks[0][0] if asks else None,
+                  "bid_depth": sum(q for _, q in bids), "ask_depth": sum(q for _, q in asks),
+                  "bids_top": bids[:6], "asks_top": asks[:6], "tick": bk.get("tick"),
+                  "our_orders": mine,
+              }
+              print(f"{slug:38s} {arm:4s} want {want:5d}  best bid {str(best):>6s}  "
+                    f"depth {sum(q for _,q in bids):>9,.0f}  ours {len(mine)}")
+
+              if MODE == "setup" and best is not None:
+                  # exactly one scoring order per market: clear ours, then place one
+                  for o in mine:
+                      rr = api("POST", f"/v1/order/{o['id']}/cancel", json={"marketSlug": slug})
+                      print(f"   cancel {o['side']} {o['price']} x{o['size']:.0f} -> {rr.status_code}")
+                      time.sleep(0.3)
+                  body = {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_LONG",
+                          "type": "ORDER_TYPE_LIMIT",
+                          # price MUST be a string; a float is rejected with a bare 400
+                          "price": {"value": f"{best:.2f}", "currency": "USD"},
+                          "quantity": int(want),
+                          "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                          "participateDontInitiate": True}
+                  rr = api("POST", "/v1/orders", json=body)
+                  ok = rr.status_code < 300
+                  print(f"   place BUY {best:.2f} x{want} -> {rr.status_code}"
+                        f"{'' if ok else ' ' + ' '.join(rr.text.split())[:120]}")
+                  snap["markets"][slug]["placed"] = ok
+                  time.sleep(0.6)
+
+          os.makedirs("data", exist_ok=True)
+          name = {"setup": "experiment_touch_setup.json",
+                  "restore": "experiment_touch_restore.json"}.get(MODE, "experiment_touch_state.json")
+          with open("data/" + name, "w") as f:
+              json.dump(snap, f, indent=1)
+          with open("data/experiment_touch.txt", "w") as f:
+              f.write(BUF.getvalue())
+          print(f"\nwrote data/{name}")
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/experiment_touch*.json data/experiment_touch.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Touch-size experiment [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
