@@ -191,50 +191,23 @@ def _num(x) -> float:
     return 0.0
 
 
-# Empirical depth calibration.
+# Why our numbers disagree with Polymarket's — open question, do NOT paper over.
 #
-# The formula below implements the published rules exactly — the arithmetic
-# reproduces the exchange's own share figures — yet the result ran ~2x above
-# what actually paid. Three explanations were tested against real payouts and
-# all three failed: sparse sampling (gap-weighted and flat-mean integrals agree
-# to within 2%), sample timing (high samples were charged SHORTER intervals,
-# 0.70h vs 0.83h), and position instability (stable markets are the WORST
-# overestimated at 2.51x, correlation -0.05).
+# The scoring below implements the published rules and reproduces the
+# exchange's own share arithmetic exactly from a real book. Yet the daily
+# total ran ~2x above what actually paid. Ruled out against real payouts:
 #
-# What does predict the error is how deep the book is relative to Target Size:
+#   sparse sampling      gap-weighted and flat-mean integrals agree within 2%
+#   sample timing        high samples were charged SHORTER intervals, not longer
+#   position stability   stable markets are the WORST overestimated (2.51x),
+#                        correlation -0.05
+#   discount factor      df is read correctly per market (0.5/0.3/0.2/0.1)
 #
-#     depth/target   <3x    3-20x   20-100x   >100x
-#     median error   1.12x  1.96x   2.50x     2.84x
-#
-# Fitted log-log over 69 market-days, then grid-searched: error ~ 1.4 x
-# (depth/target)^0.20. The FAMILY was validated by holding each day out of the
-# fit entirely, which is the check that matters:
-#
-#     train 07+08 -> test 08-09: 1.96x -> 1.10x
-#     train 08+09 -> test 08-07: 1.86x -> 1.00x
-#     train 07+09 -> test 08-08: 1.94x -> 0.87x
-#
-# At the shipped parameters the whole-portfolio figure lands at 1.10 / 0.98 /
-# 0.99 on the three days with payouts.
-#
-# Two honest limits. PER-MARKET error is still ~1.55x median — this fixes the
-# total you look at, not any single market's line. And it is a CALIBRATION,
-# not a mechanism: the likeliest reading is that in a deep book the top is
-# contested far more of the time than one aggregated snapshot shows, so our
-# window-based denominator understates real competition, but payout data
-# cannot prove that. est_day_raw keeps the uncalibrated figure so the
-# scoreboard can keep grading both, and DEPTH_K=1 disables the whole thing.
-DEPTH_K = float(os.environ.get("DEPTH_K", "1.40"))
-DEPTH_EXP = float(os.environ.get("DEPTH_EXP", "0.20"))
-DEPTH_MAX = float(os.environ.get("DEPTH_MAX", "6.0"))   # never divide by more than this
-
-
-def _depth_factor(side_total: float, target: float) -> float:
-    """How much the raw estimate overstates, given book depth vs Target Size."""
-    if DEPTH_K <= 0 or not target or side_total <= 0:
-        return 1.0
-    ratio = max(side_total / target, 1.0)
-    return min(max(DEPTH_K * ratio ** DEPTH_EXP, 1.0), DEPTH_MAX)
+# The one variable that tracks the disagreement is how deep a side is relative
+# to Target Size (median error 1.12x under 3x depth, 2.84x over 100x). That is
+# a clue to the mechanism, not a licence to divide it out — a fitted fudge
+# would hide exactly the signal we need. depth_ratio is therefore recorded as
+# a DIAGNOSTIC and never applied. est_day is the raw published-formula figure.
 
 
 def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
@@ -344,10 +317,9 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         verdict += f" ({side_total:,.0f} resting ≥ {target:,.0f} ✓)"
     if prog.get("pool"):
         slug = order.get("market") or ""
-        raw = share * _daily_pool(prog, slug) / 2  # pool split per side
-        order["est_day_raw"] = raw
-        order["depth_factor"] = _depth_factor(side_total, target)
-        order["est_day"] = raw / order["depth_factor"]
+        order["est_day"] = share * _daily_pool(prog, slug) / 2  # pool split per side
+        # diagnostic only, never applied — see the note above _score_order
+        order["depth_ratio"] = round(side_total / target, 1) if target else None
         verdict += f" ≈ {_usd(order['est_day'])}/day"
         n = prog.get("event_n") or 1
         order["event_n"] = n
@@ -359,17 +331,10 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
             verdict += f" (pre-tournament pool over {days:g}d)"
         side_pool = _daily_pool(prog, slug) / 2
         days_term = f" ÷ {days:g}d" if days > 1.001 else ""
-        dfac = order["depth_factor"]
         calc.append(
             f"${prog['pool']:,.0f}{days_term} ÷ {n} ÷ 2 = {_usd(side_pool)} × {share * 100:.1f}% "
-            f"= {_usd(raw)}/day"
+            f"= {_usd(order['est_day'])}/day"
         )
-        if dfac > 1.0001:
-            calc.append(
-                f"÷ {dfac:.2f} depth calibration ({side_total / target:,.0f}x Target Size) "
-                f"= {_usd(order['est_day'])}/day"
-            )
-            verdict += f" (÷{dfac:.2f} depth)"
     order["verdict"] = verdict
 
 
