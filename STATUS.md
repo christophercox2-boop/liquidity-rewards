@@ -2,16 +2,9 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ❌ Last check FAILED — 2026-08-11 6:25 AM ET
+## ✅ Last successful check: 2026-08-11 6:35 AM ET
 
-```
-RuntimeError: https://api.prod.polymarketexchange.com/v1/incentives/earnings -> HTTP 401: {"message":"Unauthorized"}
-https://api.polymarket.us/v1/incentives/earnings -> HTTP 500: {"code":2,"message":"The server was unable to process your request.","details":[]}
-probe https://api.prod.polymarketexchange.com/v1/incentives (no auth) -> HTTP 503
-probe https://api.polymarket.us/v1/incentives (no auth) -> HTTP 401
-```
-
-The data below is from the last successful run. See the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml) for logs.
+This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/Liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
 ## 📌 Summary
 
@@ -23,6 +16,10 @@ The data below is from the last successful run. See the [Actions tab](https://gi
 ---
 
 # The details (how the numbers above are computed)
+
+## 📍 Right now — your resting orders
+
+⚠️ Couldn't fetch live orders this run: `RuntimeError: /v1/orders/open -> HTTP 503: {"code":14,"message":"The server was unable to process your request.","details":[]}`
 
 ## 📊 Estimate vs. actual — where the gap is
 
@@ -99,6 +96,7 @@ _2026-08-09 is excluded: since the program restructure, pending rewards accumula
 
 | Checked (ET) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-08-11 6:35 AM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-11 6:25 AM ET | ❌ error | 1818 | $1889.44 |
 | 2026-08-11 6:14 AM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-11 5:16 AM ET | ✅ ok | 1818 | $1889.44 |
@@ -108,6 +106,5 @@ _2026-08-09 is excluded: since the program restructure, pending rewards accumula
 | 2026-08-10 11:18 PM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-10 11:17 PM ET | ✅ ok | 1818 | $1889.44 |
 | 2026-08-10 11:14 PM ET | ✅ ok | 1818 | $1889.44 |
-| 2026-08-10 11:13 PM ET | ✅ ok | 1818 | $1889.44 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
