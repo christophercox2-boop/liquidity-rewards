@@ -1,832 +1,32 @@
 {
- "generated": "2026-08-10 11:00 PM ET",
+ "generated": "2026-08-11 3:47 PM ET",
  "max_risk": 1.0,
  "results": [
   {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-corcon",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 47,
-    "capital": 0.61,
-    "covered": false,
-    "est_day": 25.414,
-    "share": 35.6
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 47,
-    "capital": 0.61,
-    "covered": false,
-    "est_day": 25.414,
-    "share": 35.6
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.017,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-hareng",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 48,
-    "capital": 0.62,
-    "covered": false,
-    "est_day": 25.369,
-    "share": 35.5
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 48,
-    "capital": 0.62,
-    "covered": false,
-    "est_day": 25.369,
-    "share": 35.5
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.019,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-jorsmi",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 48,
-    "capital": 0.62,
-    "covered": false,
-    "est_day": 25.369,
-    "share": 35.5
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 48,
-    "capital": 0.62,
-    "covered": false,
-    "est_day": 25.369,
-    "share": 35.5
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.018,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-jakkna",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 49,
-    "capital": 0.64,
-    "covered": false,
-    "est_day": 24.776,
-    "share": 34.7
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 49,
-    "capital": 0.64,
-    "covered": false,
-    "est_day": 24.776,
-    "share": 34.7
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.02,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-jacbri",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 45,
-    "capital": 0.58,
-    "covered": false,
-    "est_day": 24.324,
-    "share": 34.1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 45,
-    "capital": 0.58,
-    "covered": false,
-    "est_day": 24.324,
-    "share": 34.1
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.019,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-jorspi",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 45,
-    "capital": 0.58,
-    "covered": false,
-    "est_day": 24.324,
-    "share": 34.1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 45,
-    "capital": 0.58,
-    "covered": false,
-    "est_day": 24.324,
-    "share": 34.1
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.019,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-sunim",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 43,
-    "capital": 0.56,
-    "covered": false,
-    "est_day": 23.6,
-    "share": 33.0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 43,
-    "capital": 0.56,
-    "covered": false,
-    "est_day": 23.6,
-    "share": 33.0
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.018,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-ryager",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.017,
-    "size": 29,
-    "capital": 0.49,
-    "covered": false,
-    "est_day": 21.838,
-    "share": 30.6
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.017,
-    "size": 29,
-    "capital": 0.49,
-    "covered": false,
-    "est_day": 21.838,
-    "share": 30.6
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.018,
-   "best_ask": 0.019,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-ricfow",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 44,
-    "capital": 0.57,
-    "covered": false,
-    "est_day": 21.083,
-    "share": 29.5
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 44,
-    "capital": 0.57,
-    "covered": false,
-    "est_day": 21.083,
-    "share": 29.5
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.019,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-ryager",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 36,
-    "capital": 0.47,
-    "covered": false,
-    "est_day": 20.047,
-    "share": 28.1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 36,
-    "capital": 0.47,
-    "covered": false,
-    "est_day": 20.047,
-    "share": 28.1
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.019,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-bengri",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 61,
-    "capital": 0.91,
-    "covered": false,
-    "est_day": 18.778,
-    "share": 26.3
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 61,
-    "capital": 0.91,
-    "covered": false,
-    "est_day": 18.778,
-    "share": 26.3
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.016,
-   "best_ask": 0.018,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-mictho",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 71,
-    "capital": 0.92,
-    "covered": false,
-    "est_day": 15.513,
-    "share": 21.7
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 71,
-    "capital": 0.92,
-    "covered": false,
-    "est_day": 15.513,
-    "share": 21.7
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.015,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-aksbha",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 42,
-    "capital": 0.63,
-    "covered": false,
-    "est_day": 14.766,
-    "share": 20.7
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 42,
-    "capital": 0.63,
-    "covered": false,
-    "est_day": 14.766,
-    "share": 20.7
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.016,
-   "best_ask": 0.017,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-micbre",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 42,
-    "capital": 0.63,
-    "covered": false,
-    "est_day": 14.295,
-    "share": 20.0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 42,
-    "capital": 0.63,
-    "covered": false,
-    "est_day": 14.295,
-    "share": 20.0
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.016,
-   "best_ask": 0.017,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-mickim",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.012,
-    "size": 45,
-    "capital": 0.54,
-    "covered": false,
-    "est_day": 12.596,
-    "share": 17.6
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.012,
-    "size": 45,
-    "capital": 0.54,
-    "covered": false,
-    "est_day": 12.596,
-    "share": 17.6
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.013,
-   "best_ask": 0.015,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-harhal",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.011,
-    "size": 53,
-    "capital": 0.58,
-    "covered": false,
-    "est_day": 12.381,
-    "share": 17.3
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.011,
-    "size": 53,
-    "capital": 0.58,
-    "covered": false,
-    "est_day": 12.381,
-    "share": 17.3
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.012,
-   "best_ask": 0.014,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-ericol",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.012,
-    "size": 44,
-    "capital": 0.53,
-    "covered": false,
-    "est_day": 12.266,
-    "share": 17.2
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.012,
-    "size": 44,
-    "capital": 0.53,
-    "covered": false,
-    "est_day": 12.266,
-    "share": 17.2
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.013,
-   "best_ask": 0.016,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-ryohis",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.011,
-    "size": 48,
-    "capital": 0.53,
-    "covered": false,
-    "est_day": 11.462,
-    "share": 16.0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.011,
-    "size": 48,
-    "capital": 0.53,
-    "covered": false,
-    "est_day": 11.462,
-    "share": 16.0
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.012,
-   "best_ask": 0.014,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-matsch",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.018,
-    "size": 25,
-    "capital": 0.45,
-    "covered": false,
-    "est_day": 11.386,
-    "share": 15.9
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.018,
-    "size": 25,
-    "capital": 0.45,
-    "covered": false,
-    "est_day": 11.386,
-    "share": 15.9
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.019,
-   "best_ask": 0.02,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-wyncla",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 59,
-    "capital": 0.77,
-    "covered": false,
-    "est_day": 10.686,
-    "share": 15.0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 59,
-    "capital": 0.77,
-    "covered": false,
-    "est_day": 10.686,
-    "share": 15.0
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.015,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-sikim",
+   "market": "tec-pga-fedestju-2026-08-13-r3l-wyncla",
    "side": "BUY",
    "pick": {
     "side": "BUY",
     "price": 0.02,
-    "size": 41,
-    "capital": 0.82,
+    "size": 47,
+    "capital": 0.94,
     "covered": false,
-    "est_day": 10.44,
-    "share": 14.6
+    "est_day": 18.991,
+    "share": 26.6
    },
    "max": {
     "side": "BUY",
     "price": 0.02,
-    "size": 41,
-    "capital": 0.82,
+    "size": 47,
+    "capital": 0.94,
     "covered": false,
-    "est_day": 10.44,
-    "share": 14.6
+    "est_day": 18.991,
+    "share": 26.6
    },
    "side_pool": 71.43,
    "tick": 0.001,
    "best_bid": 0.021,
-   "best_ask": 0.022,
+   "best_ask": 0.025,
    "held": 0,
    "risk": null,
    "note": "resolves ~2026-08-13",
@@ -843,30 +43,30 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-rushen",
+   "market": "tec-pga-fedestju-2026-08-13-r1l-jakkna",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.018,
-    "size": 44,
-    "capital": 0.79,
+    "price": 0.013,
+    "size": 68,
+    "capital": 0.88,
     "covered": false,
-    "est_day": 9.831,
-    "share": 13.8
+    "est_day": 18.236,
+    "share": 25.5
    },
    "max": {
     "side": "BUY",
-    "price": 0.018,
-    "size": 44,
-    "capital": 0.79,
+    "price": 0.013,
+    "size": 68,
+    "capital": 0.88,
     "covered": false,
-    "est_day": 9.831,
-    "share": 13.8
+    "est_day": 18.236,
+    "share": 25.5
    },
    "side_pool": 71.43,
    "tick": 0.001,
-   "best_bid": 0.019,
-   "best_ask": 0.02,
+   "best_bid": 0.014,
+   "best_ask": 0.015,
    "held": 0,
    "risk": null,
    "note": "resolves ~2026-08-13",
@@ -883,390 +83,30 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-ricfow",
+   "market": "tec-pga-fedestju-2026-08-13-r1l-jackoi",
    "side": "BUY",
    "pick": {
     "side": "BUY",
     "price": 0.017,
-    "size": 23,
-    "capital": 0.39,
+    "size": 58,
+    "capital": 0.99,
     "covered": false,
-    "est_day": 9.74,
-    "share": 13.6
+    "est_day": 16.714,
+    "share": 23.4
    },
    "max": {
     "side": "BUY",
     "price": 0.017,
-    "size": 23,
-    "capital": 0.39,
+    "size": 58,
+    "capital": 0.99,
     "covered": false,
-    "est_day": 9.74,
-    "share": 13.6
+    "est_day": 16.714,
+    "share": 23.4
    },
    "side_pool": 71.43,
    "tick": 0.001,
    "best_bid": 0.018,
    "best_ask": 0.019,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-jorspi",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 24,
-    "capital": 0.36,
-    "covered": false,
-    "est_day": 9.173,
-    "share": 12.8
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 24,
-    "capital": 0.36,
-    "covered": false,
-    "est_day": 9.173,
-    "share": 12.8
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.016,
-   "best_ask": 0.017,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-aldpot",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 48,
-    "capital": 0.48,
-    "covered": false,
-    "est_day": 9.068,
-    "share": 12.7
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 48,
-    "capital": 0.48,
-    "covered": false,
-    "est_day": 9.068,
-    "share": 12.7
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-riccas",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 46,
-    "capital": 0.46,
-    "covered": false,
-    "est_day": 8.702,
-    "share": 12.2
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 46,
-    "capital": 0.46,
-    "covered": false,
-    "est_day": 8.702,
-    "share": 12.2
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-piecoo",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 45,
-    "capital": 0.45,
-    "covered": false,
-    "est_day": 8.56,
-    "share": 12.0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 45,
-    "capital": 0.45,
-    "covered": false,
-    "est_day": 8.56,
-    "share": 12.0
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-nicech",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 43,
-    "capital": 0.43,
-    "covered": false,
-    "est_day": 8.164,
-    "share": 11.4
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 43,
-    "capital": 0.43,
-    "covered": false,
-    "est_day": 8.164,
-    "share": 11.4
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-samste",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 42,
-    "capital": 0.42,
-    "covered": false,
-    "est_day": 8.053,
-    "share": 11.3
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 42,
-    "capital": 0.42,
-    "covered": false,
-    "est_day": 8.053,
-    "share": 11.3
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-patrod",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 42,
-    "capital": 0.42,
-    "covered": false,
-    "est_day": 8.01,
-    "share": 11.2
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 42,
-    "capital": 0.42,
-    "covered": false,
-    "est_day": 8.01,
-    "share": 11.2
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-patrod",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 42,
-    "capital": 0.42,
-    "covered": false,
-    "est_day": 8.009,
-    "share": 11.2
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 42,
-    "capital": 0.42,
-    "covered": false,
-    "est_day": 8.009,
-    "share": 11.2
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-matmcc",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 41,
-    "capital": 0.41,
-    "covered": false,
-    "est_day": 7.86,
-    "share": 11.0
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 41,
-    "capital": 0.41,
-    "covered": false,
-    "est_day": 7.86,
-    "share": 11.0
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
    "held": 0,
    "risk": null,
    "note": "resolves ~2026-08-13",
@@ -1287,226 +127,26 @@
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.013,
-    "size": 25,
-    "capital": 0.33,
-    "covered": false,
-    "est_day": 7.785,
-    "share": 10.9
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 25,
-    "capital": 0.33,
-    "covered": false,
-    "est_day": 7.785,
-    "share": 10.9
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.016,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-samste",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 41,
-    "capital": 0.41,
-    "covered": false,
-    "est_day": 7.731,
-    "share": 10.8
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 41,
-    "capital": 0.41,
-    "covered": false,
-    "est_day": 7.731,
-    "share": 10.8
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-sudyel",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 41,
-    "capital": 0.41,
-    "covered": false,
-    "est_day": 7.612,
-    "share": 10.7
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 41,
-    "capital": 0.41,
-    "covered": false,
-    "est_day": 7.612,
-    "share": 10.7
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-hareng",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 26,
-    "capital": 0.34,
-    "covered": false,
-    "est_day": 7.581,
-    "share": 10.6
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 26,
-    "capital": 0.34,
-    "covered": false,
-    "est_day": 7.581,
-    "share": 10.6
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.015,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-jorsmi",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 26,
-    "capital": 0.34,
-    "covered": false,
-    "est_day": 7.551,
-    "share": 10.6
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 26,
-    "capital": 0.34,
-    "covered": false,
-    "est_day": 7.551,
-    "share": 10.6
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.016,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-jackoi",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
     "price": 0.014,
-    "size": 64,
-    "capital": 0.9,
+    "size": 49,
+    "capital": 0.69,
     "covered": false,
-    "est_day": 7.508,
-    "share": 10.5
+    "est_day": 15.786,
+    "share": 22.1
    },
    "max": {
     "side": "BUY",
     "price": 0.014,
-    "size": 64,
-    "capital": 0.9,
+    "size": 49,
+    "capital": 0.69,
     "covered": false,
-    "est_day": 7.508,
-    "share": 10.5
+    "est_day": 15.786,
+    "share": 22.1
    },
    "side_pool": 71.43,
    "tick": 0.001,
    "best_bid": 0.015,
-   "best_ask": 0.016,
+   "best_ask": 0.078,
    "held": 0,
    "risk": null,
    "note": "resolves ~2026-08-13",
@@ -1523,269 +163,29 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-nictay",
+   "market": "tec-pga-fedestju-2026-08-13-r1l-corcon",
    "side": "BUY",
    "pick": {
     "side": "BUY",
     "price": 0.01,
-    "size": 38,
-    "capital": 0.38,
+    "size": 100,
+    "capital": 1.0,
     "covered": false,
-    "est_day": 7.344,
-    "share": 10.3
+    "est_day": 10.445,
+    "share": 14.6
    },
    "max": {
     "side": "BUY",
     "price": 0.01,
-    "size": 38,
-    "capital": 0.38,
+    "size": 100,
+    "capital": 1.0,
     "covered": false,
-    "est_day": 7.344,
-    "share": 10.3
+    "est_day": 10.445,
+    "share": 14.6
    },
    "side_pool": 71.43,
    "tick": 0.001,
    "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-jacbri",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 25,
-    "capital": 0.33,
-    "covered": false,
-    "est_day": 7.326,
-    "share": 10.3
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 25,
-    "capital": 0.33,
-    "covered": false,
-    "est_day": 7.326,
-    "share": 10.3
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.015,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-nictay",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 38,
-    "capital": 0.38,
-    "covered": false,
-    "est_day": 7.203,
-    "share": 10.1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 38,
-    "capital": 0.38,
-    "covered": false,
-    "est_day": 7.203,
-    "share": 10.1
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-matsch",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 36,
-    "capital": 0.36,
-    "covered": false,
-    "est_day": 7.016,
-    "share": 9.8
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 36,
-    "capital": 0.36,
-    "covered": false,
-    "est_day": 7.016,
-    "share": 9.8
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-sudyel",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 39,
-    "capital": 0.39,
-    "covered": false,
-    "est_day": 6.792,
-    "share": 9.5
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 39,
-    "capital": 0.39,
-    "covered": false,
-    "est_day": 6.792,
-    "share": 9.5
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-ericol",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.011,
-    "size": 34,
-    "capital": 0.37,
-    "covered": false,
-    "est_day": 6.219,
-    "share": 8.7
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.011,
-    "size": 34,
-    "capital": 0.37,
-    "covered": false,
-    "est_day": 6.219,
-    "share": 8.7
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.012,
-   "best_ask": 0.013,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-corcon",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.012,
-    "size": 25,
-    "capital": 0.3,
-    "covered": false,
-    "est_day": 6.105,
-    "share": 8.5
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.012,
-    "size": 25,
-    "capital": 0.3,
-    "covered": false,
-    "est_day": 6.105,
-    "share": 8.5
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.013,
    "best_ask": 0.014,
    "held": 0,
    "risk": null,
@@ -1803,309 +203,29 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-piecoo",
+   "market": "tec-pga-fedestju-2026-08-13-r1l-ryager",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.01,
-    "size": 36,
-    "capital": 0.36,
+    "price": 0.012,
+    "size": 75,
+    "capital": 0.9,
     "covered": false,
-    "est_day": 5.427,
-    "share": 7.6
+    "est_day": 9.836,
+    "share": 13.8
    },
    "max": {
     "side": "BUY",
-    "price": 0.01,
-    "size": 36,
-    "capital": 0.36,
+    "price": 0.012,
+    "size": 75,
+    "capital": 0.9,
     "covered": false,
-    "est_day": 5.427,
-    "share": 7.6
+    "est_day": 9.836,
+    "share": 13.8
    },
    "side_pool": 71.43,
    "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-riccas",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 36,
-    "capital": 0.36,
-    "covered": false,
-    "est_day": 5.36,
-    "share": 7.5
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 36,
-    "capital": 0.36,
-    "covered": false,
-    "est_day": 5.36,
-    "share": 7.5
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-ryohis",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 36,
-    "capital": 0.36,
-    "covered": false,
-    "est_day": 5.33,
-    "share": 7.5
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 36,
-    "capital": 0.36,
-    "covered": false,
-    "est_day": 5.33,
-    "share": 7.5
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-matmcc",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 34,
-    "capital": 0.34,
-    "covered": false,
-    "est_day": 5.235,
-    "share": 7.3
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 34,
-    "capital": 0.34,
-    "covered": false,
-    "est_day": 5.235,
-    "share": 7.3
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-nicech",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 34,
-    "capital": 0.34,
-    "covered": false,
-    "est_day": 5.138,
-    "share": 7.2
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 34,
-    "capital": 0.34,
-    "covered": false,
-    "est_day": 5.138,
-    "share": 7.2
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-mickim",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 34,
-    "capital": 0.34,
-    "covered": false,
-    "est_day": 4.823,
-    "share": 6.8
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 34,
-    "capital": 0.34,
-    "covered": false,
-    "est_day": 4.823,
-    "share": 6.8
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-harhal",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 33,
-    "capital": 0.33,
-    "covered": false,
-    "est_day": 3.86,
-    "share": 5.4
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.01,
-    "size": 33,
-    "capital": 0.33,
-    "covered": false,
-    "est_day": 3.86,
-    "share": 5.4
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.011,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-jakkna",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.016,
-    "size": 15,
-    "capital": 0.24,
-    "covered": false,
-    "est_day": 3.409,
-    "share": 4.8
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.016,
-    "size": 15,
-    "capital": 0.24,
-    "covered": false,
-    "est_day": 3.409,
-    "share": 4.8
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.017,
+   "best_bid": 0.013,
    "best_ask": 0.018,
    "held": 0,
    "risk": null,
@@ -2123,30 +243,30 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-hidmat",
+   "market": "tec-pga-fedestju-2026-08-13-r3l-ricfow",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.017,
-    "size": 58,
-    "capital": 0.99,
+    "price": 0.012,
+    "size": 55,
+    "capital": 0.66,
     "covered": false,
-    "est_day": 2.92,
-    "share": 4.1
+    "est_day": 9.617,
+    "share": 13.5
    },
    "max": {
     "side": "BUY",
-    "price": 0.017,
-    "size": 58,
-    "capital": 0.99,
+    "price": 0.012,
+    "size": 55,
+    "capital": 0.66,
     "covered": false,
-    "est_day": 2.92,
-    "share": 4.1
+    "est_day": 9.617,
+    "share": 13.5
    },
    "side_pool": 71.43,
    "tick": 0.001,
-   "best_bid": 0.018,
-   "best_ask": 0.019,
+   "best_bid": 0.013,
+   "best_ask": 0.017,
    "held": 0,
    "risk": null,
    "note": "resolves ~2026-08-13",
@@ -2163,105 +283,25 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r3l-aldpot",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.009,
-    "size": 29,
-    "capital": 0.26,
-    "covered": false,
-    "est_day": 2.637,
-    "share": 3.7
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.009,
-    "size": 29,
-    "capital": 0.26,
-    "covered": false,
-    "est_day": 2.637,
-    "share": 3.7
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.01,
-   "best_ask": 0.011,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-aksbha",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.014,
-    "size": 18,
-    "capital": 0.25,
-    "covered": false,
-    "est_day": 2.395,
-    "share": 3.4
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.014,
-    "size": 18,
-    "capital": 0.25,
-    "covered": false,
-    "est_day": 2.395,
-    "share": 3.4
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.015,
-   "best_ask": 0.016,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-matmcc",
+   "market": "tec-pga-fedestju-2026-08-13-r1l-riccas",
    "side": "BUY",
    "pick": {
     "side": "BUY",
     "price": 0.008,
-    "size": 26,
-    "capital": 0.21,
+    "size": 100,
+    "capital": 0.8,
     "covered": false,
-    "est_day": 1.951,
-    "share": 2.7
+    "est_day": 7.597,
+    "share": 10.6
    },
    "max": {
     "side": "BUY",
     "price": 0.008,
-    "size": 26,
-    "capital": 0.21,
+    "size": 112,
+    "capital": 0.9,
     "covered": false,
-    "est_day": 1.951,
-    "share": 2.7
+    "est_day": 8.402,
+    "share": 11.8
    },
    "side_pool": 71.43,
    "tick": 0.001,
@@ -2283,30 +323,30 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-chrgot",
+   "market": "tec-pga-fedestju-2026-08-13-r1l-matmcc",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.019,
-    "size": 27,
-    "capital": 0.51,
+    "price": 0.007,
+    "size": 100,
+    "capital": 0.7,
     "covered": false,
-    "est_day": 1.928,
-    "share": 2.7
+    "est_day": 6.543,
+    "share": 9.2
    },
    "max": {
     "side": "BUY",
-    "price": 0.019,
-    "size": 27,
-    "capital": 0.51,
+    "price": 0.007,
+    "size": 108,
+    "capital": 0.76,
     "covered": false,
-    "est_day": 1.928,
-    "share": 2.7
+    "est_day": 7.015,
+    "share": 9.8
    },
    "side_pool": 71.43,
    "tick": 0.001,
-   "best_bid": 0.02,
-   "best_ask": 0.021,
+   "best_bid": 0.008,
+   "best_ask": 0.01,
    "held": 0,
    "risk": null,
    "note": "resolves ~2026-08-13",
@@ -2323,30 +363,30 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-camyou",
+   "market": "tec-pga-fedestju-2026-08-13-r1l-nicech",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.018,
-    "size": 55,
-    "capital": 0.99,
+    "price": 0.008,
+    "size": 84,
+    "capital": 0.67,
     "covered": false,
-    "est_day": 1.906,
-    "share": 2.7
+    "est_day": 6.391,
+    "share": 8.9
    },
    "max": {
     "side": "BUY",
-    "price": 0.018,
-    "size": 55,
-    "capital": 0.99,
+    "price": 0.008,
+    "size": 84,
+    "capital": 0.67,
     "covered": false,
-    "est_day": 1.906,
-    "share": 2.7
+    "est_day": 6.391,
+    "share": 8.9
    },
    "side_pool": 71.43,
    "tick": 0.001,
-   "best_bid": 0.019,
-   "best_ask": 0.02,
+   "best_bid": 0.009,
+   "best_ask": 0.01,
    "held": 0,
    "risk": null,
    "note": "resolves ~2026-08-13",
@@ -2363,7 +403,47 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-xansch",
+   "market": "tec-pga-fedestju-2026-08-13-r1l-stefis",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 100,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.681,
+    "share": 1.0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 1000,
+    "capital": 1.0,
+    "covered": false,
+    "est_day": 6.271,
+    "share": 8.8
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.001,
+   "best_ask": 0.2,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-patcan",
    "side": "BUY",
    "pick": {
     "side": "BUY",
@@ -2371,8 +451,8 @@
     "size": 55,
     "capital": 0.99,
     "covered": false,
-    "est_day": 1.906,
-    "share": 2.7
+    "est_day": 6.027,
+    "share": 8.4
    },
    "max": {
     "side": "BUY",
@@ -2380,8 +460,8 @@
     "size": 55,
     "capital": 0.99,
     "covered": false,
-    "est_day": 1.906,
-    "share": 2.7
+    "est_day": 6.027,
+    "share": 8.4
    },
    "side_pool": 71.43,
    "tick": 0.001,
@@ -2407,26 +487,26 @@
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.008,
-    "size": 24,
-    "capital": 0.19,
+    "price": 0.007,
+    "size": 87,
+    "capital": 0.61,
     "covered": false,
-    "est_day": 1.803,
-    "share": 2.5
+    "est_day": 5.741,
+    "share": 8.0
    },
    "max": {
     "side": "BUY",
-    "price": 0.008,
-    "size": 24,
-    "capital": 0.19,
+    "price": 0.007,
+    "size": 87,
+    "capital": 0.61,
     "covered": false,
-    "est_day": 1.803,
-    "share": 2.5
+    "est_day": 5.741,
+    "share": 8.0
    },
    "side_pool": 71.43,
    "tick": 0.001,
-   "best_bid": 0.009,
-   "best_ask": 0.01,
+   "best_bid": 0.008,
+   "best_ask": 0.009,
    "held": 0,
    "risk": null,
    "note": "resolves ~2026-08-13",
@@ -2443,7 +523,7 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-w-stefis",
+   "market": "tec-pga-fedestju-2026-08-13-r3l-matsch",
    "side": "BUY",
    "pick": {
     "side": "BUY",
@@ -2451,622 +531,62 @@
     "size": 100,
     "capital": 0.1,
     "covered": false,
-    "est_day": 0.155,
-    "share": 0.2
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.001,
-    "size": 1000,
-    "capital": 1.0,
-    "covered": false,
-    "est_day": 1.517,
-    "share": 2.1
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.006,
-   "best_ask": 0.011,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-chrgot",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 25,
-    "capital": 0.38,
-    "covered": false,
-    "est_day": 1.055,
-    "share": 1.5
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 25,
-    "capital": 0.38,
-    "covered": false,
-    "est_day": 1.055,
-    "share": 1.5
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.016,
-   "best_ask": 0.017,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-patcan",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.019,
-    "size": 27,
-    "capital": 0.51,
-    "covered": false,
-    "est_day": 0.926,
-    "share": 1.3
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.019,
-    "size": 27,
-    "capital": 0.51,
-    "covered": false,
-    "est_day": 0.926,
-    "share": 1.3
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.02,
-   "best_ask": 0.021,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-sudyel",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.008,
-    "size": 18,
-    "capital": 0.14,
-    "covered": false,
-    "est_day": 0.898,
-    "share": 1.3
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.008,
-    "size": 18,
-    "capital": 0.14,
-    "covered": false,
-    "est_day": 0.898,
-    "share": 1.3
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.009,
-   "best_ask": 0.01,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-micbre",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.016,
-    "size": 10,
-    "capital": 0.16,
-    "covered": false,
-    "est_day": 0.894,
-    "share": 1.3
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.016,
-    "size": 10,
-    "capital": 0.16,
-    "covered": false,
-    "est_day": 0.894,
-    "share": 1.3
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.017,
-   "best_ask": 0.018,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-nicech",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.009,
-    "size": 16,
-    "capital": 0.14,
-    "covered": false,
-    "est_day": 0.861,
-    "share": 1.2
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.009,
-    "size": 16,
-    "capital": 0.14,
-    "covered": false,
-    "est_day": 0.861,
-    "share": 1.2
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.01,
-   "best_ask": 0.012,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-patcan",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 32,
-    "capital": 0.48,
-    "covered": false,
-    "est_day": 0.811,
-    "share": 1.1
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.015,
-    "size": 32,
-    "capital": 0.48,
-    "covered": false,
-    "est_day": 0.811,
-    "share": 1.1
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.016,
-   "best_ask": 0.017,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-micbre",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.001,
-    "size": 100,
-    "capital": 0.1,
-    "covered": false,
-    "est_day": 0.487,
-    "share": 0.7
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.001,
-    "size": 145,
-    "capital": 0.14,
-    "covered": false,
-    "est_day": 0.704,
-    "share": 1.0
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.002,
-   "best_ask": 0.003,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-wyncla",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.016,
-    "size": 12,
-    "capital": 0.19,
-    "covered": false,
-    "est_day": 0.686,
+    "est_day": 0.707,
     "share": 1.0
    },
    "max": {
     "side": "BUY",
-    "price": 0.016,
-    "size": 12,
-    "capital": 0.19,
-    "covered": false,
-    "est_day": 0.686,
-    "share": 1.0
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.017,
-   "best_ask": 0.018,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-piecoo",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.008,
-    "size": 16,
-    "capital": 0.13,
-    "covered": false,
-    "est_day": 0.666,
-    "share": 0.9
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.008,
-    "size": 16,
-    "capital": 0.13,
-    "covered": false,
-    "est_day": 0.666,
-    "share": 0.9
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.009,
-   "best_ask": 0.01,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-aldpot",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.006,
-    "size": 22,
-    "capital": 0.13,
-    "covered": false,
-    "est_day": 0.654,
-    "share": 0.9
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.006,
-    "size": 22,
-    "capital": 0.13,
-    "covered": false,
-    "est_day": 0.654,
-    "share": 0.9
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.007,
-   "best_ask": 0.008,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-sunim",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.012,
-    "size": 8,
-    "capital": 0.1,
-    "covered": false,
-    "est_day": 0.652,
-    "share": 0.9
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.012,
-    "size": 8,
-    "capital": 0.1,
-    "covered": false,
-    "est_day": 0.652,
-    "share": 0.9
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.013,
-   "best_ask": 0.015,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-samste",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.008,
-    "size": 15,
-    "capital": 0.12,
-    "covered": false,
-    "est_day": 0.629,
-    "share": 0.9
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.008,
-    "size": 15,
-    "capital": 0.12,
-    "covered": false,
-    "est_day": 0.629,
-    "share": 0.9
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.009,
-   "best_ask": 0.01,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-rushen",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 14,
-    "capital": 0.18,
-    "covered": false,
-    "est_day": 0.547,
-    "share": 0.8
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.013,
-    "size": 14,
-    "capital": 0.18,
-    "covered": false,
-    "est_day": 0.547,
-    "share": 0.8
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.014,
-   "best_ask": 0.015,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-matsch",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
-    "price": 0.008,
-    "size": 13,
-    "capital": 0.1,
-    "covered": false,
-    "est_day": 0.53,
-    "share": 0.7
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.008,
-    "size": 13,
-    "capital": 0.1,
-    "covered": false,
-    "est_day": 0.53,
-    "share": 0.7
-   },
-   "side_pool": 71.43,
-   "tick": 0.001,
-   "best_bid": 0.009,
-   "best_ask": 0.01,
-   "held": 0,
-   "risk": null,
-   "note": "resolves ~2026-08-13",
-   "prog": {
-    "df": 0.4,
-    "target": 10000.0,
-    "pool": 10000.0,
-    "event_n": 70,
-    "start": "2026-07-13T00:00:00Z",
-    "pid": "pga_round_2_20260712",
-    "tier": null
-   },
-   "event_n": 70,
-   "already_in": false
-  },
-  {
-   "market": "tec-pga-fedestju-2026-08-13-w-aldpot",
-   "side": "BUY",
-   "pick": {
-    "side": "BUY",
     "price": 0.001,
-    "size": 100,
-    "capital": 0.1,
+    "size": 820,
+    "capital": 0.82,
     "covered": false,
-    "est_day": 0.43,
-    "share": 0.6
-   },
-   "max": {
-    "side": "BUY",
-    "price": 0.001,
-    "size": 118,
-    "capital": 0.12,
-    "covered": false,
-    "est_day": 0.506,
-    "share": 0.7
+    "est_day": 5.413,
+    "share": 7.6
    },
    "side_pool": 71.43,
    "tick": 0.001,
    "best_bid": 0.001,
-   "best_ask": 0.002,
+   "best_ask": 0.493,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-bengri",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.012,
+    "size": 72,
+    "capital": 0.86,
+    "covered": false,
+    "est_day": 5.13,
+    "share": 7.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.012,
+    "size": 72,
+    "capital": 0.86,
+    "covered": false,
+    "est_day": 5.13,
+    "share": 7.2
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.013,
+   "best_ask": 0.014,
    "held": 0,
    "risk": null,
    "note": "resolves ~2026-08-13",
@@ -3091,17 +611,17 @@
     "size": 100,
     "capital": 0.1,
     "covered": false,
-    "est_day": 0.439,
-    "share": 0.6
+    "est_day": 0.682,
+    "share": 1.0
    },
    "max": {
     "side": "BUY",
     "price": 0.001,
-    "size": 106,
-    "capital": 0.11,
+    "size": 792,
+    "capital": 0.79,
     "covered": false,
-    "est_day": 0.465,
-    "share": 0.7
+    "est_day": 5.064,
+    "share": 7.1
    },
    "side_pool": 71.43,
    "tick": 0.001,
@@ -3123,30 +643,30 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r2l-sikim",
+   "market": "tec-pga-fedestju-2026-08-13-r1l-piecoo",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.015,
-    "size": 11,
-    "capital": 0.16,
+    "price": 0.006,
+    "size": 100,
+    "capital": 0.6,
     "covered": false,
-    "est_day": 0.437,
-    "share": 0.6
+    "est_day": 3.893,
+    "share": 5.4
    },
    "max": {
     "side": "BUY",
-    "price": 0.015,
-    "size": 11,
-    "capital": 0.16,
+    "price": 0.006,
+    "size": 130,
+    "capital": 0.78,
     "covered": false,
-    "est_day": 0.437,
-    "share": 0.6
+    "est_day": 4.979,
+    "share": 7.0
    },
    "side_pool": 71.43,
    "tick": 0.001,
-   "best_bid": 0.016,
-   "best_ask": 0.017,
+   "best_bid": 0.007,
+   "best_ask": 0.008,
    "held": 0,
    "risk": null,
    "note": "resolves ~2026-08-13",
@@ -3163,29 +683,869 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-riccas",
+   "market": "tec-pga-fedestju-2026-08-13-r3l-jorspi",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.008,
-    "size": 13,
+    "price": 0.001,
+    "size": 100,
     "capital": 0.1,
     "covered": false,
-    "est_day": 0.434,
-    "share": 0.6
+    "est_day": 0.707,
+    "share": 1.0
    },
    "max": {
     "side": "BUY",
-    "price": 0.008,
-    "size": 13,
-    "capital": 0.1,
+    "price": 0.001,
+    "size": 640,
+    "capital": 0.64,
     "covered": false,
-    "est_day": 0.434,
-    "share": 0.6
+    "est_day": 4.296,
+    "share": 6.0
    },
    "side_pool": 71.43,
    "tick": 0.001,
-   "best_bid": 0.009,
+   "best_bid": 0.001,
+   "best_ask": 0.493,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-micbre",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.014,
+    "size": 39,
+    "capital": 0.55,
+    "covered": false,
+    "est_day": 4.089,
+    "share": 5.7
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.014,
+    "size": 39,
+    "capital": 0.55,
+    "covered": false,
+    "est_day": 4.089,
+    "share": 5.7
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.015,
+   "best_ask": 0.016,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-ryohis",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 100,
+    "capital": 0.7,
+    "covered": false,
+    "est_day": 3.38,
+    "share": 4.7
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 119,
+    "capital": 0.83,
+    "covered": false,
+    "est_day": 3.987,
+    "share": 5.6
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.008,
+   "best_ask": 0.009,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-aldpot",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 100,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.65,
+    "share": 0.9
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 592,
+    "capital": 0.59,
+    "covered": false,
+    "est_day": 3.682,
+    "share": 5.2
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.001,
+   "best_ask": 0.002,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-aksbha",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 54,
+    "capital": 0.54,
+    "covered": false,
+    "est_day": 3.41,
+    "share": 4.8
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 54,
+    "capital": 0.54,
+    "covered": false,
+    "est_day": 3.41,
+    "share": 4.8
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.011,
+   "best_ask": 0.012,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r3l-mictho",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.014,
+    "size": 31,
+    "capital": 0.43,
+    "covered": false,
+    "est_day": 3.044,
+    "share": 4.3
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.014,
+    "size": 31,
+    "capital": 0.43,
+    "covered": false,
+    "est_day": 3.044,
+    "share": 4.3
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.015,
+   "best_ask": 0.016,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-rushen",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.013,
+    "size": 76,
+    "capital": 0.99,
+    "covered": false,
+    "est_day": 2.798,
+    "share": 3.9
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.013,
+    "size": 76,
+    "capital": 0.99,
+    "covered": false,
+    "est_day": 2.798,
+    "share": 3.9
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.014,
+   "best_ask": 0.022,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-mictho",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.014,
+    "size": 29,
+    "capital": 0.41,
+    "covered": false,
+    "est_day": 2.655,
+    "share": 3.7
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.014,
+    "size": 29,
+    "capital": 0.41,
+    "covered": false,
+    "est_day": 2.655,
+    "share": 3.7
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.015,
+   "best_ask": 0.016,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-micbre",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.013,
+    "size": 33,
+    "capital": 0.43,
+    "covered": false,
+    "est_day": 2.541,
+    "share": 3.6
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.013,
+    "size": 33,
+    "capital": 0.43,
+    "covered": false,
+    "est_day": 2.541,
+    "share": 3.6
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.014,
+   "best_ask": 0.015,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-aksbha",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.011,
+    "size": 41,
+    "capital": 0.45,
+    "covered": false,
+    "est_day": 2.376,
+    "share": 3.3
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.011,
+    "size": 41,
+    "capital": 0.45,
+    "covered": false,
+    "est_day": 2.376,
+    "share": 3.3
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.012,
+   "best_ask": 0.015,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-ricfow",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.011,
+    "size": 29,
+    "capital": 0.32,
+    "covered": false,
+    "est_day": 2.244,
+    "share": 3.1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.011,
+    "size": 29,
+    "capital": 0.32,
+    "covered": false,
+    "est_day": 2.244,
+    "share": 3.1
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.012,
+   "best_ask": 0.014,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-sunim",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 25,
+    "capital": 0.25,
+    "covered": false,
+    "est_day": 2.04,
+    "share": 2.9
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.01,
+    "size": 25,
+    "capital": 0.25,
+    "covered": false,
+    "est_day": 2.04,
+    "share": 2.9
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.011,
+   "best_ask": 0.015,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-chrgot",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.019,
+    "size": 42,
+    "capital": 0.8,
+    "covered": false,
+    "est_day": 1.903,
+    "share": 2.7
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.019,
+    "size": 42,
+    "capital": 0.8,
+    "covered": false,
+    "est_day": 1.903,
+    "share": 2.7
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.02,
+   "best_ask": 0.021,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r3l-nictay",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 100,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.508,
+    "share": 0.7
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 328,
+    "capital": 0.33,
+    "covered": false,
+    "est_day": 1.64,
+    "share": 2.3
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.003,
+   "best_ask": 0.009,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-sudyel",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 100,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.319,
+    "share": 0.4
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 517,
+    "capital": 0.52,
+    "covered": false,
+    "est_day": 1.62,
+    "share": 2.3
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.002,
+   "best_ask": 0.003,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-sudyel",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 68,
+    "capital": 0.48,
+    "covered": false,
+    "est_day": 1.4,
+    "share": 2.0
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 68,
+    "capital": 0.48,
+    "covered": false,
+    "est_day": 1.4,
+    "share": 2.0
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.008,
+   "best_ask": 0.009,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-sikim",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.014,
+    "size": 71,
+    "capital": 0.99,
+    "covered": false,
+    "est_day": 1.191,
+    "share": 1.7
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.014,
+    "size": 71,
+    "capital": 0.99,
+    "covered": false,
+    "est_day": 1.191,
+    "share": 1.7
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.015,
+   "best_ask": 0.023,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-jacbri",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.005,
+    "size": 100,
+    "capital": 0.5,
+    "covered": false,
+    "est_day": 0.919,
+    "share": 1.3
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.005,
+    "size": 126,
+    "capital": 0.63,
+    "covered": false,
+    "est_day": 1.154,
+    "share": 1.6
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.006,
+   "best_ask": 0.007,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-jorspi",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 44,
+    "capital": 0.31,
+    "covered": false,
+    "est_day": 1.011,
+    "share": 1.4
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 44,
+    "capital": 0.31,
+    "covered": false,
+    "est_day": 1.011,
+    "share": 1.4
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.008,
+   "best_ask": 0.009,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-mickim",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 59,
+    "capital": 0.41,
+    "covered": false,
+    "est_day": 0.881,
+    "share": 1.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 59,
+    "capital": 0.41,
+    "covered": false,
+    "est_day": 0.881,
+    "share": 1.2
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.008,
+   "best_ask": 0.012,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-harhal",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.003,
+    "size": 100,
+    "capital": 0.3,
+    "covered": false,
+    "est_day": 0.259,
+    "share": 0.4
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.003,
+    "size": 333,
+    "capital": 1.0,
+    "covered": false,
+    "est_day": 0.855,
+    "share": 1.2
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.004,
+   "best_ask": 0.005,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-hareng",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 100,
+    "capital": 0.7,
+    "covered": false,
+    "est_day": 0.803,
+    "share": 1.1
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 100,
+    "capital": 0.7,
+    "covered": false,
+    "est_day": 0.803,
+    "share": 1.1
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.008,
    "best_ask": 0.01,
    "held": 0,
    "risk": null,
@@ -3203,30 +1563,870 @@
    "already_in": false
   },
   {
-   "market": "tec-pga-fedestju-2026-08-13-r1l-jackoi",
+   "market": "tec-pga-fedestju-2026-08-13-w-mickim",
    "side": "BUY",
    "pick": {
     "side": "BUY",
-    "price": 0.015,
-    "size": 6,
-    "capital": 0.09,
+    "price": 0.004,
+    "size": 96,
+    "capital": 0.38,
     "covered": false,
-    "est_day": 0.084,
-    "share": 0.1
+    "est_day": 0.748,
+    "share": 1.0
    },
    "max": {
     "side": "BUY",
-    "price": 0.015,
-    "size": 6,
-    "capital": 0.09,
+    "price": 0.004,
+    "size": 96,
+    "capital": 0.38,
     "covered": false,
-    "est_day": 0.084,
-    "share": 0.1
+    "est_day": 0.748,
+    "share": 1.0
    },
    "side_pool": 71.43,
    "tick": 0.001,
-   "best_bid": 0.016,
-   "best_ask": 0.019,
+   "best_bid": 0.005,
+   "best_ask": 0.006,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r2l-aldpot",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 100,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.268,
+    "share": 0.4
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 256,
+    "capital": 0.26,
+    "covered": false,
+    "est_day": 0.683,
+    "share": 1.0
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.005,
+   "best_ask": 0.007,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-jorsmi",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.006,
+    "size": 100,
+    "capital": 0.6,
+    "covered": false,
+    "est_day": 0.379,
+    "share": 0.5
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.006,
+    "size": 166,
+    "capital": 1.0,
+    "covered": false,
+    "est_day": 0.627,
+    "share": 0.9
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.007,
+   "best_ask": 0.008,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-nicech",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 100,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.288,
+    "share": 0.4
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 206,
+    "capital": 0.21,
+    "covered": false,
+    "est_day": 0.59,
+    "share": 0.8
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.003,
+   "best_ask": 0.004,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-jacbri",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 52,
+    "capital": 0.36,
+    "covered": false,
+    "est_day": 0.393,
+    "share": 0.6
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.007,
+    "size": 52,
+    "capital": 0.36,
+    "covered": false,
+    "est_day": 0.393,
+    "share": 0.6
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.008,
+   "best_ask": 0.009,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-ericol",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.002,
+    "size": 100,
+    "capital": 0.2,
+    "covered": false,
+    "est_day": 0.15,
+    "share": 0.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.002,
+    "size": 262,
+    "capital": 0.52,
+    "covered": false,
+    "est_day": 0.392,
+    "share": 0.5
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.005,
+   "best_ask": 0.006,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-piecoo",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 100,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.176,
+    "share": 0.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 216,
+    "capital": 0.22,
+    "covered": false,
+    "est_day": 0.38,
+    "share": 0.5
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.001,
+   "best_ask": 0.002,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-camyou",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.019,
+    "size": 52,
+    "capital": 0.99,
+    "covered": false,
+    "est_day": 0.356,
+    "share": 0.5
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.019,
+    "size": 52,
+    "capital": 0.99,
+    "covered": false,
+    "est_day": 0.356,
+    "share": 0.5
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.02,
+   "best_ask": 0.032,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-patrod",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 100,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.168,
+    "share": 0.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 207,
+    "capital": 0.21,
+    "covered": false,
+    "est_day": 0.346,
+    "share": 0.5
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.005,
+   "best_ask": 0.007,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r3l-matmcc",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 100,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.201,
+    "share": 0.3
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 166,
+    "capital": 0.17,
+    "covered": false,
+    "est_day": 0.333,
+    "share": 0.5
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.001,
+   "best_ask": 0.008,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-mictho",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.014,
+    "size": 10,
+    "capital": 0.14,
+    "covered": false,
+    "est_day": 0.33,
+    "share": 0.5
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.014,
+    "size": 10,
+    "capital": 0.14,
+    "covered": false,
+    "est_day": 0.33,
+    "share": 0.5
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.015,
+   "best_ask": 0.016,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-ericol",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.005,
+    "size": 94,
+    "capital": 0.47,
+    "covered": false,
+    "est_day": 0.318,
+    "share": 0.4
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.005,
+    "size": 94,
+    "capital": 0.47,
+    "covered": false,
+    "est_day": 0.318,
+    "share": 0.4
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.006,
+   "best_ask": 0.014,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-matsch",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.002,
+    "size": 89,
+    "capital": 0.18,
+    "covered": false,
+    "est_day": 0.257,
+    "share": 0.4
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.002,
+    "size": 89,
+    "capital": 0.18,
+    "covered": false,
+    "est_day": 0.257,
+    "share": 0.4
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.007,
+   "best_ask": 0.01,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-aldpot",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 100,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.157,
+    "share": 0.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.001,
+    "size": 151,
+    "capital": 0.15,
+    "covered": false,
+    "est_day": 0.237,
+    "share": 0.3
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.006,
+   "best_ask": 0.007,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r3l-mickim",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.003,
+    "size": 65,
+    "capital": 0.2,
+    "covered": false,
+    "est_day": 0.192,
+    "share": 0.3
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.003,
+    "size": 65,
+    "capital": 0.2,
+    "covered": false,
+    "est_day": 0.192,
+    "share": 0.3
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.004,
+   "best_ask": 0.012,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r2l-nicech",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.003,
+    "size": 38,
+    "capital": 0.11,
+    "covered": false,
+    "est_day": 0.183,
+    "share": 0.3
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.003,
+    "size": 38,
+    "capital": 0.11,
+    "covered": false,
+    "est_day": 0.183,
+    "share": 0.3
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.004,
+   "best_ask": 0.448,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-hidmat",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.012,
+    "size": 83,
+    "capital": 1.0,
+    "covered": false,
+    "est_day": 0.147,
+    "share": 0.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.012,
+    "size": 83,
+    "capital": 1.0,
+    "covered": false,
+    "est_day": 0.147,
+    "share": 0.2
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.013,
+   "best_ask": 0.026,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-ryohis",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.003,
+    "size": 53,
+    "capital": 0.16,
+    "covered": false,
+    "est_day": 0.145,
+    "share": 0.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.003,
+    "size": 53,
+    "capital": 0.16,
+    "covered": false,
+    "est_day": 0.145,
+    "share": 0.2
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.004,
+   "best_ask": 0.005,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-hareng",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.006,
+    "size": 49,
+    "capital": 0.29,
+    "covered": false,
+    "est_day": 0.142,
+    "share": 0.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.006,
+    "size": 49,
+    "capital": 0.29,
+    "covered": false,
+    "est_day": 0.142,
+    "share": 0.2
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.007,
+   "best_ask": 0.008,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-bengri",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.011,
+    "size": 11,
+    "capital": 0.12,
+    "covered": false,
+    "est_day": 0.11,
+    "share": 0.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.011,
+    "size": 11,
+    "capital": 0.12,
+    "covered": false,
+    "est_day": 0.11,
+    "share": 0.2
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.012,
+   "best_ask": 0.013,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-r1l-chrgot",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.012,
+    "size": 16,
+    "capital": 0.19,
+    "covered": false,
+    "est_day": 0.11,
+    "share": 0.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.012,
+    "size": 16,
+    "capital": 0.19,
+    "covered": false,
+    "est_day": 0.11,
+    "share": 0.2
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.013,
+   "best_ask": 0.023,
+   "held": 0,
+   "risk": null,
+   "note": "resolves ~2026-08-13",
+   "prog": {
+    "df": 0.4,
+    "target": 10000.0,
+    "pool": 10000.0,
+    "event_n": 70,
+    "start": "2026-07-13T00:00:00Z",
+    "pid": "pga_round_2_20260712",
+    "tier": null
+   },
+   "event_n": 70,
+   "already_in": false
+  },
+  {
+   "market": "tec-pga-fedestju-2026-08-13-w-riccas",
+   "side": "BUY",
+   "pick": {
+    "side": "BUY",
+    "price": 0.002,
+    "size": 51,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.109,
+    "share": 0.2
+   },
+   "max": {
+    "side": "BUY",
+    "price": 0.002,
+    "size": 51,
+    "capital": 0.1,
+    "covered": false,
+    "est_day": 0.109,
+    "share": 0.2
+   },
+   "side_pool": 71.43,
+   "tick": 0.001,
+   "best_bid": 0.003,
+   "best_ask": 0.004,
    "held": 0,
    "risk": null,
    "note": "resolves ~2026-08-13",
