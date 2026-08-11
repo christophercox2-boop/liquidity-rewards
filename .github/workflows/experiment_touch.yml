@@ -68,7 +68,7 @@ jobs:
           import json, os, time, datetime, io, requests
           import track_rewards as tr
 
-          MODE = "record"          # "record" | "setup" | "restore"
+          MODE = "setup"           # "record" | "setup" | "restore"
 
           ARMS = {
               "TINY": [("scc-senate-gop-2026-11-03-51", 10),
