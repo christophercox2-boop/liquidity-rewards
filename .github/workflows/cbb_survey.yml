@@ -133,32 +133,34 @@ jobs:
                            "mine_a": mine.get((s,"SELL"), 0.0)})
           print(f"read {len(rows)} books\n")
 
-          # Cheapest way in: quote a tick inside the touch on whichever side
-          # costs least per share. A bid at p costs p; an ask at p ties up 1-p.
+          # BOTH sides of every market are quotable. An earlier version kept
+          # only the cheaper side per market and then reported that as though
+          # the exchange allowed nothing else -- it does not. A bid at p ties
+          # up p per share; an ask at p ties up 1-p. On a longshot the bid is
+          # far cheaper, on a favourite the ask is, but each side carries its
+          # own share of the pool and both count.
           plan = []
           for r_ in rows:
-              opts = []
               if r_["bb"] is not None and r_["bb"] > 0.011:
                   px = round(r_["bb"] + 0.01, 2)
                   if r_["ba"] is None or px < r_["ba"] - 1e-9:
-                      opts.append(("BUY", px, px, r_["bid_rest"], r_["mine_b"]))
+                      plan.append({"slug": r_["slug"], "side": "BUY", "px": px,
+                                   "cost_per": px, "rest": r_["bid_rest"],
+                                   "have": r_["mine_b"]})
               if r_["ba"] is not None and r_["ba"] < 0.989:
                   px = round(r_["ba"] - 0.01, 2)
                   if r_["bb"] is None or px > r_["bb"] + 1e-9:
-                      opts.append(("SELL", px, 1 - px, r_["ask_rest"], r_["mine_a"]))
-              if not opts:
-                  continue
-              opts.sort(key=lambda o: o[2])          # cheapest capital per share
-              side, px, cost_per, rest, have = opts[0]
-              plan.append({"slug": r_["slug"], "side": side, "px": px,
-                           "cost_per": cost_per, "rest": rest, "have": have})
+                      plan.append({"slug": r_["slug"], "side": "SELL", "px": px,
+                                   "cost_per": 1 - px, "rest": r_["ask_rest"],
+                                   "have": r_["mine_a"]})
 
           # Score is size within the Target Size window; treat our share of a
           # side as size/(size+resting). Aim for the same share on every side
           # we quote, since the event pool is split evenly per market.
           total_pool_per_side = pool / len(slugs) / 2
           print(f"each side of each market is worth ${total_pool_per_side:.3f}/day at 100% share")
-          print(f"{'quoting all':<24s} {len(plan)} sides\n")
+          print(f"quotable sides: {len(plan)} of {len(rows)*2} "
+                f"(skipped only when a tick inside the touch would cross)\n")
 
           plan.sort(key=lambda p: p["cost_per"] * p["rest"])
           print(f"  {'market':<40s} {'side':<4s} {'px':>5s} {'resting':>8s} "
