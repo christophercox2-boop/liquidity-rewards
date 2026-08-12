@@ -2654,7 +2654,23 @@ def _keep_place(m: str, side: str, px: float, qty: int) -> bool:
         return False
 
 
+# Hard stop on all automatic order placement, 2026-08-12, at the owner's
+# request. Deliberately NOT read from the environment: DEFEND_PAUSE and
+# KEEP_PAUSE below can be set to "0" on the host, in which case an env-based
+# default would quietly fail to stop anything. Turning placement back on is a
+# code change and a deploy, so it cannot happen by accident or by a host
+# setting drifting out of sync.
+#
+# This stops the two things that act on their own every poll: the defender and
+# the qualification keeper. The manual dashboard endpoints (/place, /reprice,
+# /reprice_batch, /cancel_batch) are untouched -- they only ever fire when
+# somebody presses the button.
+AUTOPLACE_ENABLED = False
+
+
 def keep_qualified() -> None:
+    if not AUTOPLACE_ENABLED:
+        return
     if os.environ.get("KEEP_PAUSE", "") == "1":
         return
     progs = tr._PROG_CACHE.get("progs") or {}
@@ -2753,6 +2769,8 @@ def auto_defend() -> None:
     # do_reprice no longer touches modify: it places the replacement, VERIFIES
     # it rests, and only then cancels the original — the worst remaining
     # failure is a briefly doubled rung, never a lost one.
+    if not AUTOPLACE_ENABLED:
+        return
     if os.environ.get("DEFEND_PAUSE", "") == "1":
         return
     cfg = dict(MONITOR.state.get("defend") or {})
