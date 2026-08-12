@@ -1,0 +1,122 @@
+name: Pool check
+
+# Asks the exchange which of the markets we hold orders in actually have a
+# funded reward program right now, and what each side needs to qualify.
+#
+# This exists because prog_seen was misread as a registry of funded markets.
+# It is not: watch_program_arrivals only samples US-politics slugs, truncates
+# to PROGRAM_WATCH_MAX, and excludes sports entirely, so absence from it says
+# nothing about whether a market has a pool.
+#
+# Read-only: GET only.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/pool_check.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pool-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Ask the exchange
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import collections, io, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          # every market we currently hold an order in
+          path = "/v1/orders/open"
+          r = requests.get(tr.TRADE_API + path,
+                           headers=tr.auth_headers(kid, sec, "GET", path), timeout=30)
+          r.raise_for_status()
+          held = collections.defaultdict(lambda: {"n": 0, "cap": 0.0})
+          for o in r.json().get("orders") or []:
+              if str(o.get("state")) in tr.DEAD_ORDER_STATES:
+                  continue
+              s = o.get("marketSlug") or ""
+              px = tr._num(o.get("price"))
+              sz = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity"))
+              held[s]["n"] += 1
+              held[s]["cap"] += px * sz if str(o.get("side","")).upper().endswith("BUY") \
+                                else (1 - px) * sz
+          slugs = sorted(held)
+          print(f"{len(slugs)} markets hold orders\n")
+
+          # symbols must be a LIST -- comma-joining silently matches nothing
+          prog = {}
+          for i in range(0, len(slugs), 40):
+              batch = slugs[i:i + 40]
+              rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                params={"symbols": batch, "pageSize": 100}, timeout=30)
+              if rr.status_code >= 400:
+                  print(f"batch {i}: HTTP {rr.status_code}")
+                  time.sleep(2); continue
+              for p in rr.json().get("programs") or []:
+                  s = p.get("marketSlug") or ""
+                  for tp in p.get("timePeriods") or []:
+                      if str(tp.get("status") or "").lower() in ("active", "live", "status_live"):
+                          prog[s] = {"pool": float(tp.get("rewardPool") or 0),
+                                     "target": float(tp.get("targetSize") or 0),
+                                     "pid": p.get("programId") or ""}
+              time.sleep(0.4)
+
+          funded = [s for s in slugs if s in prog]
+          bare = [s for s in slugs if s not in prog]
+          print(f"funded right now : {len(funded)}")
+          print(f"no active program: {len(bare)}\n")
+
+          print("MARKETS WITH NO ACTIVE PROGRAM (capital that cannot earn)")
+          print(f"  {'market':<46s} {'orders':>6s} {'capital':>9s}")
+          tot = 0.0
+          for s in sorted(bare, key=lambda x: -held[x]["cap"]):
+              print(f"  {s[:46]:<46s} {held[s]['n']:>6d} {held[s]['cap']:>9,.2f}")
+              tot += held[s]["cap"]
+          print(f"  {'TOTAL':<46s} {sum(held[s]['n'] for s in bare):>6d} {tot:>9,.2f}")
+
+          print("\nFUNDED, with pool and target")
+          print(f"  {'market':<46s} {'orders':>6s} {'capital':>9s} {'pool':>8s} {'target':>8s}")
+          for s in sorted(funded, key=lambda x: -prog[x]["pool"]):
+              p = prog[s]
+              print(f"  {s[:46]:<46s} {held[s]['n']:>6d} {held[s]['cap']:>9,.2f} "
+                    f"{p['pool']:>8,.0f} {p['target']:>8,.0f}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/pool_check.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/pool_check.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Pool check [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
