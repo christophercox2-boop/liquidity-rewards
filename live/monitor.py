@@ -3536,6 +3536,13 @@ SILVER: dict = {"races": {}, "ts": 0.0, "source": "none", "err": ""}
 MAP_CONFLICT = 0.10
 # below this a market is holding capital without paying for it
 MAP_IDLE_RATE = 1.00
+# The estimate has run anywhere from 2x to 94x above what actually paid, so a
+# healthy estimated rate is not evidence a market is earning. These gate a
+# separate test that compares the estimate against what the sampler actually
+# measured over the same window: only look once enough of the day has been
+# sampled, and flag when the take is far below what the estimate implied.
+MAP_PAY_MIN_COVER = 7200.0   # seconds of sampled day before the test means anything
+MAP_PAY_RATIO = 0.25         # earned this far under the implied take is a flag
 
 
 def _parse_silver(text: str) -> dict:
@@ -3609,8 +3616,11 @@ def _map_payload() -> dict:
         orders = [dict(o) for o in MONITOR.orders]
         earned = dict(MONITOR.state.get("per_market_hf")
                       or MONITOR.state.get("per_market") or {})
+        covered_s = float(MONITOR.state.get("hf_covered_s") or 0.0)
         updated = (MONITOR.updated.astimezone(ET).strftime("%I:%M %p ET")
                    if MONITOR.updated else None)
+    # what a day's estimated rate implies over the window actually sampled
+    day_frac = max(0.0, min(1.0, covered_s / 86400.0))
 
     states: dict = {}
 
@@ -3731,7 +3741,7 @@ def _map_payload() -> dict:
 
     # classify. Order matters: money at risk outranks money not being made,
     # which outranks a race we simply never entered.
-    counts = {"conflict": 0, "idle": 0, "gap": 0, "ok": 0, "none": 0}
+    counts = {"conflict": 0, "notpaying": 0, "idle": 0, "gap": 0, "ok": 0, "none": 0}
     for c in states.values():
         c["est_day"] = round(c["est_day"], 2)
         c["earned"] = round(c["earned"], 2)
@@ -3741,10 +3751,20 @@ def _map_payload() -> dict:
             oc["est_day"] = round(oc["est_day"], 2)
             if oc["worst_edge"] is not None:
                 oc["worst_edge"] = round(oc["worst_edge"], 4)
+        implied = round(c["est_day"] * day_frac, 2)
+        c["implied"] = implied
+        c["covered_h"] = round(covered_s / 3600.0, 1)
         if c["worst_edge"] is not None and c["worst_edge"] < -MAP_CONFLICT:
             c["status"] = "conflict"
             c["why"] = (f"an order rests {abs(c['worst_edge']):.0%} the wrong side of "
                         f"the model — a fill costs that per share")
+        elif (c["orders"] and covered_s >= MAP_PAY_MIN_COVER
+              and c["est_day"] >= MAP_IDLE_RATE
+              and c["earned"] < MAP_PAY_RATIO * implied):
+            c["status"] = "notpaying"
+            c["why"] = (f"estimated ${c['est_day']:.2f}/day, but only ${c['earned']:.2f} "
+                        f"has actually come in over {covered_s / 3600:.1f}h measured "
+                        f"(the estimate implied ${implied:.2f})")
         elif c["orders"] and c["est_day"] < MAP_IDLE_RATE:
             c["status"] = "idle"
             c["why"] = (f"{c['orders']} order{'s' if c['orders'] != 1 else ''} "
@@ -3754,7 +3774,8 @@ def _map_payload() -> dict:
             c["why"] = "the model covers this race and we hold no orders here"
         else:
             c["status"] = "ok"
-            c["why"] = f"${c['est_day']:.2f}/day across {c['orders']} orders"
+            c["why"] = (f"${c['est_day']:.2f}/day estimated across {c['orders']} orders; "
+                        f"${c['earned']:.2f} in so far")
         counts[c["status"]] = counts.get(c["status"], 0) + 1
 
     return {
@@ -3788,13 +3809,14 @@ a{color:var(--accent);text-decoration:none}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
 padding:12px;margin-bottom:12px}
 /* summary chips */
-.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
-.chip{flex:1 1 0;min-width:68px;background:var(--surface);border:1px solid var(--line);
-border-radius:11px;padding:8px 6px;text-align:center}
-.chip b{display:block;font-size:20px;font-variant-numeric:tabular-nums;line-height:1.1}
-.chip span{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:12px}
+.chip{background:var(--surface);border:1px solid var(--line);
+border-radius:10px;padding:7px 2px;text-align:center;min-width:0}
+.chip b{display:block;font-size:18px;font-variant-numeric:tabular-nums;line-height:1.1}
+.chip span{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.02em;
+display:block;line-height:1.2;overflow-wrap:anywhere}
 .chip.on{outline:2px solid var(--accent)}
-.c-conflict b{color:var(--bad)} .c-idle b{color:var(--warn)}
+.c-conflict b{color:var(--bad)} .c-idle b{color:var(--warn)} .c-notpaying b{color:#e07a3f}
 .c-gap b{color:var(--accent)} .c-ok b{color:var(--good)}
 /* tile map: fixed 12-col grid, squares, so it holds on a narrow phone */
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
@@ -3806,6 +3828,7 @@ color:var(--dim);padding:0;font-family:inherit;letter-spacing:.02em}
 .t.ok{background:rgba(52,192,124,.20);color:#8fe3b8;border-color:rgba(52,192,124,.35)}
 .t.gap{background:rgba(90,162,255,.16);color:#9cc7ff;border-color:rgba(90,162,255,.32)}
 .t.idle{background:rgba(217,161,50,.24);color:#f2cd7f;border-color:rgba(217,161,50,.45)}
+.t.notpaying{background:rgba(224,122,63,.55);color:#ffe0cc;border-color:#e07a3f}
 .t.conflict{background:var(--bad);color:#fff;border-color:#ff8b86}
 .t.sel{outline:2px solid var(--ink);outline-offset:1px}
 .t:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -3829,7 +3852,7 @@ margin:0 0 6px}
 cursor:pointer}
 .item:first-of-type{border-top:0}
 .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
-.d-conflict{background:var(--bad)} .d-idle{background:var(--warn)}
+.d-conflict{background:var(--bad)} .d-idle{background:var(--warn)} .d-notpaying{background:#e07a3f}
 .d-gap{background:var(--accent)} .d-ok{background:var(--good)}
 .item .nm{font-weight:600;min-width:30px}
 .item .tx{color:var(--dim);font-size:12.5px;flex:1}
@@ -3908,7 +3931,8 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     <div class="grid" id="grid"></div>
     <div class="leg">
       <span><i style="background:var(--bad)"></i>fix now</span>
-      <span><i style="background:var(--warn)"></i>not earning</span>
+      <span><i style="background:#e07a3f"></i>not paying</span>
+      <span><i style="background:var(--warn)"></i>low estimate</span>
       <span><i style="background:var(--accent)"></i>not entered</span>
       <span><i style="background:var(--good)"></i>fine</span>
       <span><i style="background:#212836"></i>no race</span>
@@ -3935,8 +3959,11 @@ const GRID = [
  ["","","","OK","LA","MS","AL","GA","","","",""],
  ["HI","","","TX","","","","","FL","","",""]
 ];
-const RANK = {conflict:0, idle:1, gap:2, ok:3};
-const LABEL = {conflict:"fix now", idle:"not earning", gap:"not entered", ok:"fine"};
+// order is urgency: money at risk, then a market whose estimate is not
+// materialising, then one the estimate itself says is barely worth holding
+const RANK = {conflict:0, notpaying:1, idle:2, gap:3, ok:4};
+const LABEL = {conflict:"fix now", notpaying:"not paying", idle:"low estimate",
+               gap:"not entered", ok:"fine"};
 let DATA=null, SEL=null, FILTER=null, SHOWGAPS=false;
 
 function hdrs(){ const h=new Headers(); h.set('X-Dash-Key', localStorage.getItem('dashKey')||''); return h; }
@@ -3958,7 +3985,7 @@ async function load(){
 function render(){
   const st={}; DATA.states.forEach(s=>st[s.abbr]=s);
   const c=DATA.counts;
-  document.getElementById('chips').innerHTML = ['conflict','idle','gap','ok'].map(k=>
+  document.getElementById('chips').innerHTML = ['conflict','notpaying','idle','gap','ok'].map(k=>
     `<button class="chip c-${k} ${FILTER===k?'on':''}" onclick="setFilter('${k}')">
      <b>${c[k]||0}</b><span>${LABEL[k]}</span></button>`).join('');
 
@@ -3986,7 +4013,7 @@ function render(){
   // Only things needing a decision get a row. Unentered races are a single
   // collapsed line: they all say the same sentence, and 40 copies of it would
   // bury the two orders that are actually losing money.
-  const act = DATA.states.filter(s=>s.status==='conflict'||s.status==='idle')
+  const act = DATA.states.filter(s=>s.status==='conflict'||s.status==='notpaying'||s.status==='idle')
     .sort((a,b)=> RANK[a.status]-RANK[b.status] || (b.orders-a.orders) || a.abbr.localeCompare(b.abbr));
   const gaps = DATA.states.filter(s=>s.status==='gap').sort((a,b)=>a.abbr.localeCompare(b.abbr));
   let out = act.map(s=>
@@ -4005,7 +4032,7 @@ function render(){
        `<button class="gchip" onclick="pick('${s.abbr}')">${s.abbr}</button>`).join('') + `</div>`;
   }
   if(!act.length && !gaps.length)
-    out = '<div class="muted">Nothing flagged — every modelled race is entered and earning.</div>';
+    out = '<div class="muted">Nothing flagged — every modelled race is entered and paying.</div>';
   else if(!act.length)
     out = '<div class="muted" style="padding-bottom:8px">No order is mispriced or idle.</div>' + out;
   document.getElementById('list').innerHTML = out;
@@ -4206,7 +4233,10 @@ function detail(ab){
   let h = `<h2>${s.name||s.abbr}</h2><div class="why">${s.why}</div>`;
   h += `<div class="row"><span>resting orders</span><b>${s.orders}</b></div>`;
   h += `<div class="row"><span>estimated rate</span><b>${money(s.est_day)}/day</b></div>`;
-  h += `<div class="row"><span>earned today</span><b>${money(s.earned)}</b></div>`;
+  h += `<div class="row"><span>earned today</span><b class="${
+    (s.implied>0 && s.earned < 0.25*s.implied)?'neg':''}">${money(s.earned)}</b></div>`;
+  if(s.implied>0) h += `<div class="row"><span>estimate implied by now</span>
+    <b>${money(s.implied)} over ${s.covered_h}h measured</b></div>`;
   ['senate','governor'].forEach(off=>{
     const o = s.offices[off]; if(!o) return;
     h += `<div class="off"><h3>${off}</h3>`;
@@ -4256,12 +4286,9 @@ function detail(ab){
             <button class="btn cx" id="c_${od.id}" onclick="cx('${od.id}')">Cancel</button>
           </div>
           <div class="hint">${(ed!=null && ed>=0)
-            ? 'Already on the right side of the model — moving it to fair value would only tie up more capital, so there is no shortcut button here. '
-            : ''}Move places the new order at this price and size, waits until it is
-            resting, then cancels this one. Asking for more than you have now only
-            retires the old order if the new one actually rests at the full size —
-            the exchange caps placements, and a short fill would leave you smaller
-            than you started.</div>
+            ? 'Right side of the model already, so no shortcut button. ' : ''}Places,
+            waits until it rests, then cancels this one. An increase only retires the
+            old order if the new one rests at full size.</div>
           <div id="r_${od.id}"${msgHTML('r_'+od.id)}</div>
         </div>`;
       });
