@@ -1,0 +1,188 @@
+name: Add to thin sides
+
+# Tops up seven Senate/Governor sides where our share of the side is small
+# and the competing size is light enough that a larger share is cheap.
+# Targets are ~30% of the side, at the price we already quote there, which is
+# within a tick of the touch -- size parked far from the touch scores nothing
+# no matter how big a share of the side it is.
+#
+# Placements are post-only, so an order that would cross is rejected rather
+# than filled on arrival. The exchange caps how much rests per placement, so
+# this works in rounds: read our size at the price, place the shortfall, wait,
+# re-read. A round that gains nothing stops the loop.
+#
+# Buying power is checked first and the run stops if it would be exhausted.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/add_thin_sides.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: add-thin-sides
+  cancel-in-progress: false
+
+jobs:
+  add:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+
+          # market, side, price, target size at that price
+          TARGETS = [
+              ("ussewc-usse-il-2026-11-03-dem",    "SELL", 0.99, 4928),
+              ("ussewc-usse-nm-2026-11-03-rep",    "BUY",  0.01, 4971),
+              ("ussewc-usse-wv-2026-11-03-rep",    "SELL", 0.99, 4976),
+              ("usgubewc-usgub-wy-2026-11-03-rep", "SELL", 0.99, 4982),
+              ("usgubewc-usgub-ma-2026-11-03-dem", "SELL", 0.99, 4976),
+              ("ussewc-usse-ma-2026-11-03-dem",    "SELL", 0.99, 4986),
+              ("ussewc-usse-ok-2026-11-03-dem",    "BUY",  0.01, 4971),
+          ]
+          MIN_CASH = 25.0     # stop before the account is bare
+          ROUNDS = 12
+
+          def buying_power():
+              p = "/v1/account/balances"
+              r = requests.get(tr.TRADE_API + p,
+                               headers=tr.auth_headers(kid, sec, "GET", p), timeout=20)
+              if r.status_code >= 400:
+                  return None
+              for b in r.json().get("balances") or []:
+                  if b.get("buyingPower") is not None:
+                      return float(b["buyingPower"])
+              return None
+
+          def mine_at(slug, side, px):
+              """Our resting size at exactly this price on this side."""
+              r = api("GET", "/v1/orders/open")
+              if r.status_code >= 400:
+                  return None
+              tot = 0.0
+              for o in r.json().get("orders") or []:
+                  if str(o.get("state")) in tr.DEAD_ORDER_STATES:
+                      continue
+                  if (o.get("marketSlug") or "") != slug:
+                      continue
+                  s = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
+                  if s != side:
+                      continue
+                  if abs(tr._num(o.get("price")) - px) > 0.0005:
+                      continue
+                  tot += tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity"))
+              return tot
+
+          bp = buying_power()
+          print(f"buying power at start: {('$%.2f' % bp) if bp is not None else 'unreadable'}")
+          if bp is not None and bp < MIN_CASH:
+              print(f"below the ${MIN_CASH:.0f} floor — nothing placed")
+              raise SystemExit(0)
+
+          start = {}
+          for slug, side, px, _ in TARGETS:
+              start[(slug, side)] = mine_at(slug, side, px)
+              time.sleep(0.3)
+          print("\nstarting size at each target price:")
+          for slug, side, px, tgt in TARGETS:
+              print(f"  {slug[:44]:<44s} {side:<4s} {px*100:>4.0f}c  "
+                    f"{start[(slug,side)]:>6,.0f} of {tgt:,}")
+
+          placed_total = 0
+          for rnd in range(1, ROUNDS + 1):
+              bp = buying_power()
+              if bp is not None and bp < MIN_CASH:
+                  print(f"\nround {rnd}: buying power ${bp:.2f} below floor — stopping")
+                  break
+              todo = []
+              for slug, side, px, tgt in TARGETS:
+                  have = mine_at(slug, side, px)
+                  time.sleep(0.25)
+                  if have is None:
+                      continue
+                  short = tgt - have
+                  if short >= 1:
+                      todo.append((slug, side, px, int(min(short, 2000))))
+              if not todo:
+                  print(f"\nround {rnd}: every target reached")
+                  break
+              print(f"\nround {rnd}: {len(todo)} sides short "
+                    f"(placing {sum(q for *_, q in todo):,} shares)")
+              gained = 0
+              for slug, side, px, qty in todo:
+                  value = f"{px:.2f}"
+                  body = {"marketSlug": slug,
+                          "intent": "ORDER_INTENT_BUY_LONG" if side == "BUY"
+                                    else "ORDER_INTENT_BUY_SHORT",
+                          "type": "ORDER_TYPE_LIMIT",
+                          "price": {"value": value, "currency": "USD"},
+                          "quantity": qty,
+                          "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                          "participateDontInitiate": True}
+                  r = api("POST", "/v1/orders", json=body)
+                  ok = r.status_code < 300
+                  placed_total += ok
+                  gained += ok
+                  if not ok:
+                      print(f"   FAIL {slug[:40]} {side} x{qty} -> {r.status_code} "
+                            f"{' '.join(r.text.split())[:110]}")
+                  time.sleep(0.5)
+              if not gained:
+                  print("   nothing accepted this round — stopping")
+                  break
+              time.sleep(12)
+
+          print("\nfinal size at each target price:")
+          spent = 0.0
+          for slug, side, px, tgt in TARGETS:
+              end = mine_at(slug, side, px)
+              time.sleep(0.3)
+              add = (end or 0) - (start[(slug, side)] or 0)
+              spent += add * (px if side == "BUY" else 1 - px)
+              print(f"  {slug[:44]:<44s} {side:<4s} {px*100:>4.0f}c  "
+                    f"{start[(slug,side)]:>6,.0f} -> {end:>6,.0f} of {tgt:,}  (+{add:,.0f})")
+          bp = buying_power()
+          print(f"\n{placed_total} placements accepted; about ${spent:,.2f} of capital committed")
+          print(f"buying power now: {('$%.2f' % bp) if bp is not None else 'unreadable'}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/add_thin_sides.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/add_thin_sides.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Add to thin sides [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
