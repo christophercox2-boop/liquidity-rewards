@@ -54,19 +54,27 @@ jobs:
               _p(*a, **k); _p(*a, **{**k, "file": BUF})
 
           # every open market in the event
+          # Market detail carries no eventSlug for these, which is exactly the
+          # case the tracker's _race_size_for fallback exists for: search by
+          # the market's question, find the event containing it, take its open
+          # markets. Calling it populates tr.RACE_MEMBERS with the sibling list.
           slugs = []
-          r = requests.get(f"{tr.GATEWAY}/v1/market/slug/{SEED}", timeout=20)
           ev_slug = None
-          if r.status_code < 400:
-              md = r.json().get("market") or r.json()
-              ev_slug = (md.get("eventSlug") or (md.get("event") or {}).get("slug")
-                         or (md.get("marketMetadata") or {}).get("eventSlug"))
+          r = requests.get(f"{tr.GATEWAY}/v1/market/slug/{SEED}", timeout=20)
+          md = (r.json().get("market") or r.json()) if r.status_code < 400 else {}
+          ev_slug = (md.get("eventSlug") or (md.get("event") or {}).get("slug")
+                     or (md.get("marketMetadata") or {}).get("eventSlug"))
           if ev_slug:
-              r = requests.get(f"{tr.GATEWAY}/v1/events/slug/{ev_slug}", timeout=20)
-              if r.status_code < 400:
-                  ev = r.json().get("event") or r.json()
+              rr = requests.get(f"{tr.GATEWAY}/v1/events/slug/{ev_slug}", timeout=20)
+              if rr.status_code < 400:
+                  ev = rr.json().get("event") or rr.json()
                   slugs = [m["slug"] for m in ev.get("markets") or []
                            if m.get("slug") and not m.get("closed")]
+          if not slugs:
+              n = tr._race_size_for(SEED, md.get("question") or md.get("title"))
+              slugs = list(tr.RACE_MEMBERS.get(SEED) or [])
+              print(f"eventSlug absent; search fallback found {n} open markets")
+              print(f"debug: {tr.EVENT_DEBUG.get(SEED)}")
           print(f"event: {ev_slug}   open markets: {len(slugs)}")
           if not slugs:
               print("could not enumerate the event")
