@@ -1359,8 +1359,19 @@ def fetch_positions(key_id: str, secret_key: str) -> dict[str, dict]:
     return out
 
 
-def _verify_resting(market: str, side: str, price_value: str) -> tuple[bool, str]:
-    """After a modify, confirm an order is actually resting at the new price."""
+def _verify_resting(market: str, side: str, price_value: str,
+                    want_id: str | None = None,
+                    min_qty: float | None = None) -> tuple[bool, str, float]:
+    """Confirm an order is actually resting at the new price.
+
+    Matching on market+side+price alone is not enough once quantity can
+    change. The replacement sits at the SAME price and side as the original,
+    so a price-only match can be satisfied by the original itself — and the
+    exchange caps placement size (a 2,000 request has come back as 273), so a
+    replacement can rest far smaller than asked. Verifying by the id the
+    placement returned, and reporting the size actually resting, is what stops
+    an increase from silently shrinking the position.
+    """
     try:
         time.sleep(1.0)  # give the exchange a beat to settle the replace
         path = "/v1/orders/open"
@@ -1369,7 +1380,7 @@ def _verify_resting(market: str, side: str, price_value: str) -> tuple[bool, str
             headers=tr.auth_headers(KEY_ID, SECRET_KEY, "GET", path), timeout=20,
         )
         if r.status_code >= 400:
-            return False, f"verify fetch HTTP {r.status_code}"
+            return False, f"verify fetch HTTP {r.status_code}", 0.0
         want = float(price_value)
         for o in r.json().get("orders") or []:
             # a dead record at the target price must not count as "resting" —
@@ -1378,11 +1389,23 @@ def _verify_resting(market: str, side: str, price_value: str) -> tuple[bool, str
                 continue
             slug = o.get("marketSlug") or (o.get("marketMetadata") or {}).get("slug") or ""
             oside = "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL"
-            if slug == market and oside == side and abs(tr._num(o.get("price")) - want) < 0.0005:
-                return True, f"verified resting at {want * 100:g}¢ (id {o.get('id')})"
-        return False, "NO order found at the new price — it may have been cancelled; check the app"
+            if slug != market or oside != side:
+                continue
+            if abs(tr._num(o.get("price")) - want) >= 0.0005:
+                continue
+            # when the placement handed back an id, only that order counts —
+            # otherwise the original, still resting at this price, matches
+            if want_id is not None and str(o.get("id")) != str(want_id):
+                continue
+            qty = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity"))
+            if min_qty is not None and qty + 1e-9 < min_qty:
+                return (False,
+                        f"rested at only {qty:,.0f} of the {min_qty:,.0f} asked for",
+                        qty)
+            return True, f"verified resting at {want * 100:g}¢ (id {o.get('id')})", qty
+        return False, "NO order found at the new price — it may have been cancelled; check the app", 0.0
     except Exception as e:  # noqa: BLE001
-        return False, f"verify failed: {type(e).__name__}: {e}"[:150]
+        return False, f"verify failed: {type(e).__name__}: {e}"[:150], 0.0
 
 
 PLAN_CACHE: dict = {"politics": {"ts": 0.0, "data": None}, "golf": {"ts": 0.0, "data": None},
@@ -2368,14 +2391,34 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
             record["note"] = "replacement rejected — original untouched"
             return 502, {"ok": False, "status": r.status_code,
                          "detail": record["response"][:250]}
-        # 2) confirm it is genuinely resting before touching the original
-        verified, note = _verify_resting(o["market"], o["side"], value)
+        # the id the exchange just handed back, so verification cannot be
+        # satisfied by the original order still resting at this same price
+        new_id = None
+        try:
+            j = r.json()
+            new_id = ((j.get("order") or {}).get("id") if isinstance(j.get("order"), dict)
+                      else None) or j.get("id") or j.get("orderId")
+        except Exception:  # noqa: BLE001 — no id is survivable, it just weakens the check
+            pass
+        # 2) confirm it is genuinely resting before touching the original.
+        #    An increase must actually achieve the old size before the old
+        #    order is retired; the exchange caps placements, and cancelling on
+        #    a short fill would leave less size than we started with.
+        old_qty = float(o["size"] or 0)
+        need = old_qty if qty >= old_qty else None
+        verified, note, rested = _verify_resting(o["market"], o["side"], value,
+                                                 want_id=str(new_id) if new_id else None,
+                                                 min_qty=need)
         if not verified:
             record["verified"] = False
-            record["note"] = f"replacement did not rest ({note}) — original untouched"
+            keep_both = rested > 0
+            record["note"] = (f"replacement {note} — original left in place"
+                              if keep_both else
+                              f"replacement did not rest ({note}) — original untouched")
             notify("Reprice replacement did not rest",
                    f"{o['market']} → {price_cents}¢: {note}", "high")
-            return 502, {"ok": False, "status": r.status_code, "detail": note[:250]}
+            return 502, {"ok": False, "status": r.status_code,
+                         "detail": (record["note"] if keep_both else note)[:250]}
         # 3) only now retire the original
         rc = _api("POST", f"/v1/order/{order_id}/cancel", {"marketSlug": o["market"]})
         if rc.status_code >= 300:
@@ -3801,7 +3844,7 @@ font-family:inherit}
 .side{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;
 border-radius:5px;background:var(--surface2);color:var(--dim)}
 .ctl{display:flex;gap:6px;align-items:center;margin-top:7px}
-.ctl input{width:74px;padding:8px;font-size:16px;text-align:right}
+.ctl input{flex:1;min-width:0;width:auto;padding:8px;font-size:16px;text-align:right}
 .ctl .unit{color:var(--dim);font-size:12px;margin-left:-2px}
 .btn{border:0;border-radius:8px;padding:9px 11px;font:700 13px inherit;font-family:inherit;
 cursor:pointer}
@@ -4123,16 +4166,19 @@ async function act(body){
 function show(id, ok, msg){ note('r_'+id, ok, msg); }
 function setp(id, c){ const el=document.getElementById('p_'+id); if(el) el.value=c.toFixed(1); }
 function busy(id, on){
-  ['p_','c_'].forEach(p=>{ const e=document.getElementById(p+id); if(e) e.disabled=on; });
+  ['p_','q_','c_'].forEach(p=>{ const e=document.getElementById(p+id); if(e) e.disabled=on; });
   const b=document.querySelector('#o_'+id+' .btn.mv'); if(b){ b.disabled=on; b.textContent=on?'…':'Move'; }
 }
 async function mv(id){
   const el=document.getElementById('p_'+id); if(!el) return;
   const c=parseFloat(el.value);
+  const q=parseInt((document.getElementById('q_'+id)||{}).value,10);
   if(!(c>=0.1 && c<=99.9)) return show(id,false,'price must be between 0.1 and 99.9c');
+  if(!(q>=1 && q<=20000))  return show(id,false,'size must be between 1 and 20,000');
   busy(id,true);
-  const r=await act({op:'modify', order_id:id, price_cents:c});
-  busy(id,false); show(id, r.ok, r.ok ? ('moved to '+c.toFixed(1)+'c') : r.msg);
+  const r=await act({op:'modify', order_id:id, price_cents:c, size:q});
+  busy(id,false);
+  show(id, r.ok, r.ok ? `now ${q.toLocaleString()} @ ${c.toFixed(1)}c` : r.msg);
   if(r.ok) setTimeout(load, 2500);
 }
 // two taps to cancel: this is a phone, and a mis-tap here removes a real order
@@ -4198,6 +4244,11 @@ function detail(ab){
             <input id="p_${od.id}" type="number" inputmode="decimal" step="0.1" min="0.1" max="99.9"
                    value="${(od.price*100).toFixed(1)}" aria-label="new price in cents">
             <span class="unit">c</span>
+            <input id="q_${od.id}" type="number" inputmode="numeric" step="1" min="1" max="20000"
+                   value="${od.size}" aria-label="new size">
+            <span class="unit">sh</span>
+          </div>
+          <div class="ctl">
             <button class="btn mv" onclick="mv('${od.id}')">Move</button>
             ${(fc==null || !(ed<0))?'':`<button class="btn"
                style="background:var(--surface2);color:var(--ink)"
@@ -4206,8 +4257,11 @@ function detail(ab){
           </div>
           <div class="hint">${(ed!=null && ed>=0)
             ? 'Already on the right side of the model — moving it to fair value would only tie up more capital, so there is no shortcut button here. '
-            : ''}Move places the new order, waits until it is resting, then cancels
-            this one. Nothing is cancelled on faith.</div>
+            : ''}Move places the new order at this price and size, waits until it is
+            resting, then cancels this one. Asking for more than you have now only
+            retires the old order if the new one actually rests at the full size —
+            the exchange caps placements, and a short fill would leave you smaller
+            than you started.</div>
           <div id="r_${od.id}"${msgHTML('r_'+od.id)}</div>
         </div>`;
       });
