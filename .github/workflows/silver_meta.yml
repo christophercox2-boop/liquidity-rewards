@@ -1,0 +1,99 @@
+name: Silver chart metadata
+
+# The CSV behind the owner's link is just three columns (modeldate, Democrats,
+# Republicans) with no units. Before any of it goes near pricing we need to
+# know what the number MEANS -- chamber-control probability, seat share, and
+# generic-ballot margin would each imply a completely different mapping onto
+# the scc- seat-count ladders. Datawrapper publishes the chart's title, notes
+# and axis config alongside the data, so pull those too.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/silver_meta.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: silver-meta
+  cancel-in-progress: false
+
+jobs:
+  meta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch chart config
+        run: |
+          pip install -q requests
+          python3 - <<'EOF'
+          import json, os, re, requests
+
+          UA = {"User-Agent": "Mozilla/5.0 (liquidity-rewards data pull)"}
+          CANDIDATES = [
+              "https://datawrapper.dwcdn.net/KQI8W/",
+              "https://api.datawrapper.de/v3/charts/KQI8W",
+              "https://datawrapper.dwcdn.net/KQI8W/1/",
+          ]
+          found = {}
+          for url in CANDIDATES:
+              try:
+                  r = requests.get(url, timeout=45, headers=UA)
+              except Exception as e:
+                  print(f"{url} -> {type(e).__name__}: {e}")
+                  continue
+              print(f"{url} -> HTTP {r.status_code}  {len(r.content):,} bytes")
+              if r.status_code >= 400:
+                  continue
+              found[url] = r.text[:400000]
+              body = r.text
+              # the embed page inlines __DW_SVELTE_PROPS__ with the whole chart object
+              m = re.search(r"__DW_SVELTE_PROPS__\s*=\s*(\{.*?\});\s*\n", body, re.S)
+              if m:
+                  try:
+                      props = json.loads(m.group(1))
+                      ch = props.get("chart") or {}
+                      print("\n  === chart object ===")
+                      for k in ("title", "subtitle", "intro", "notes", "source-name",
+                                "source-url", "byline", "lastModifiedAt", "publishedAt"):
+                          v = ch.get(k) or (ch.get("metadata", {}).get("describe", {}) or {}).get(k)
+                          if v:
+                              print(f"  {k}: {v}")
+                      desc = (ch.get("metadata") or {}).get("describe") or {}
+                      for k, v in desc.items():
+                          print(f"  describe.{k}: {v}")
+                      annot = (ch.get("metadata") or {}).get("annotate") or {}
+                      if annot.get("notes"):
+                          print(f"  notes: {annot['notes']}")
+                  except Exception as e:
+                      print(f"  props parse failed: {type(e).__name__}: {e}")
+              for tag in ("title", "h1"):
+                  for t in re.findall(rf"<{tag}[^>]*>(.*?)</{tag}>", body, re.S)[:3]:
+                      t = re.sub(r"<[^>]+>", "", t).strip()
+                      if t:
+                          print(f"  <{tag}>: {t[:200]}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/silver_meta_raw.json", "w") as f:
+              json.dump(found, f, indent=1)
+          print(f"\nsaved {len(found)} responses")
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/silver_meta_raw.json 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Fetch Silver chart metadata [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
