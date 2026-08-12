@@ -3780,6 +3780,24 @@ cursor:pointer}
 .res.err{display:block;background:rgba(229,100,95,.16);color:#ffb3af}
 .banner{background:rgba(217,161,50,.16);border:1px solid rgba(217,161,50,.4);
 color:#f2cd7f;border-radius:11px;padding:9px 11px;font-size:12.5px;margin-bottom:12px}
+.bkbtn{background:var(--surface2);color:var(--ink);border:1px solid var(--line);
+border-radius:8px;padding:6px 10px;font:600 12px inherit;font-family:inherit;cursor:pointer;
+margin-top:7px}
+.book{margin-top:8px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.brow{display:grid;grid-template-columns:52px 1fr 62px;align-items:center;gap:8px;
+padding:4px 8px;font-size:12px;font-variant-numeric:tabular-nums;position:relative}
+.brow .px{font-weight:700}
+.brow .bar{height:15px;border-radius:3px;min-width:2px}
+.brow .qt{text-align:right;color:var(--dim);font-size:11px}
+.ask .px{color:#ffb3af} .ask .bar{background:rgba(229,100,95,.42)}
+.bid .px{color:#8fe3b8} .bid .bar{background:rgba(52,192,124,.42)}
+.brow.me{background:rgba(90,162,255,.16)}
+.brow.me .qt{color:#9cc7ff;font-weight:700}
+.spread{padding:4px 8px;font-size:11px;color:var(--dim);background:rgba(10,14,20,.4);
+text-align:center;letter-spacing:.03em}
+.fair{padding:3px 8px;font-size:11px;font-weight:700;color:#f2cd7f;
+background:rgba(217,161,50,.18);border-top:1px dashed rgba(217,161,50,.5);
+border-bottom:1px dashed rgba(217,161,50,.5);text-align:center}
 input{background:var(--surface2);border:1px solid var(--line);color:var(--ink);
 border-radius:9px;padding:9px 10px;font-size:16px;width:100%}
 button.go{background:var(--accent);color:#06213f;border:0;border-radius:9px;
@@ -3904,6 +3922,72 @@ function render(){
 }
 
 function tglGaps(){ SHOWGAPS=!SHOWGAPS; render(); }
+// --- order book ---------------------------------------------------------
+// /market.json already returns the top of book, our orders in it and the
+// position, behind the same key check. Reusing it keeps one fetch path for
+// book data instead of a second one that could drift.
+const BOOKS={}, OPENBK={};
+function cssid(s){ return s.replace(/[^A-Za-z0-9_-]/g,'_'); }
+async function tglBook(slug){
+  OPENBK[slug] = !OPENBK[slug];
+  if(OPENBK[slug] && !BOOKS[slug]){
+    const el=document.getElementById('bk_'+cssid(slug));
+    if(el) el.innerHTML = '<div class="muted" style="padding:8px 0">loading book…</div>';
+    try{
+      const r = await fetch('/market.json?slug='+encodeURIComponent(slug), {headers:hdrs()});
+      BOOKS[slug] = r.ok ? await r.json() : {error:'HTTP '+r.status};
+    }catch(e){ BOOKS[slug] = {error:'offline'}; }
+  }
+  if(SEL) detail(SEL);
+}
+function bookHTML(slug, fair){
+  const b = BOOKS[slug];
+  if(!b) return '<div class="muted" style="padding:8px 0">loading book…</div>';
+  if(b.error) return `<div class="muted" style="padding:8px 0">book unavailable — ${b.error}</div>`;
+  const asks=(b.asks||[]).slice(), bids=(b.bids||[]).slice();
+  if(!asks.length && !bids.length)
+    return '<div class="muted" style="padding:8px 0">no resting size on either side</div>';
+  // our own size at each price, so a level we are in is obvious at a glance
+  const mineAt={};
+  (b.orders||[]).forEach(o=>{ const key=(o.side||'')+'@'+Math.round(o.price*1000);
+                              mineAt[key]=(mineAt[key]||0)+(o.size||0); });
+  const mx = Math.max(...asks.map(r=>r[1]), ...bids.map(r=>r[1]), 1);
+  const row=(p,q,side)=>{
+    const key=(side==='ask'?'SELL':'BUY')+'@'+Math.round(p*1000);
+    const mineQ=mineAt[key]||0;
+    return `<div class="brow ${side} ${mineQ?'me':''}">
+      <span class="px">${(p*100).toFixed(1)}c</span>
+      <span class="bar" style="width:${Math.max(2,(q/mx)*100).toFixed(1)}%"></span>
+      <span class="qt">${q.toLocaleString()}${mineQ?`<br>you ${Math.round(mineQ).toLocaleString()}`:''}</span>
+    </div>`;
+  };
+  // one continuous ladder, highest price at the top, with the model's own
+  // price slotted in where it belongs so "which side of fair are we on" is
+  // a matter of looking rather than arithmetic
+  const fairC = fair==null ? null : fair;
+  let rows=[];
+  asks.sort((a,b)=>b[0]-a[0]).forEach(r=>rows.push({p:r[0],q:r[1],s:'ask'}));
+  const bestAsk = asks.length? Math.min(...asks.map(r=>r[0])) : null;
+  const bestBid = bids.length? Math.max(...bids.map(r=>r[0])) : null;
+  bids.sort((a,b)=>b[0]-a[0]).forEach(r=>rows.push({p:r[0],q:r[1],s:'bid'}));
+  let out='<div class="book">';
+  let placedFair=false, placedSpread=false;
+  rows.forEach((r,i)=>{
+    if(fairC!=null && !placedFair && r.p <= fairC){
+      out += `<div class="fair">model ${(fairC*100).toFixed(1)}c</div>`; placedFair=true; }
+    if(!placedSpread && r.s==='bid' && bestAsk!=null && bestBid!=null){
+      out += `<div class="spread">spread ${((bestAsk-bestBid)*100).toFixed(1)}c</div>`;
+      placedSpread=true; }
+    out += row(r.p,r.q,r.s);
+  });
+  if(fairC!=null && !placedFair) out += `<div class="fair">model ${(fairC*100).toFixed(1)}c</div>`;
+  out += '</div>';
+  if(b.net) out += `<div class="hint">position: ${Math.round(b.net).toLocaleString()} contracts</div>`;
+  out += `<div class="hint">Top ${Math.max(asks.length,bids.length)} levels a side.
+    <a href="#" onclick="event.preventDefault();delete BOOKS['${slug}'];tglBook('${slug}');tglBook('${slug}')">refresh</a></div>`;
+  return out;
+}
+
 // Every write goes through /maction, which already carries the auth check,
 // the X-Reprice CSRF header requirement, the 0.1-99.9c price bounds and the
 // crossing guard. A new endpoint here would mean re-earning all of that.
@@ -3971,7 +4055,9 @@ function detail(ab){
       const tag = e==null ? '' :
         `<span class="${e<0?'neg':'pos'}">${e<0?'':'+'}${(e*100).toFixed(1)}c vs model</span>`;
       h += `<div class="mkt"><code>${k}</code><div class="row">
-        <span>${m.orders} order${m.orders===1?'':'s'} · ${money(m.est_day)}/day</span>${tag}</div>`;
+        <span>${m.orders} order${m.orders===1?'':'s'} · ${money(m.est_day)}/day</span>${tag}</div>
+        <button class="bkbtn" onclick="tglBook('${k}')">${OPENBK[k]?'hide book':'show book'}</button>
+        <div id="bk_${cssid(k)}">${OPENBK[k]?bookHTML(k, m.fair):''}</div>`;
       // one actionable row per resting order. The model's own price sits on
       // the button, so moving an order to fair value is a single tap rather
       // than mental arithmetic on a phone.
@@ -3991,11 +4077,14 @@ function detail(ab){
                    value="${(od.price*100).toFixed(1)}" aria-label="new price in cents">
             <span class="unit">c</span>
             <button class="btn mv" onclick="mv('${od.id}')">Move</button>
-            ${fc==null?'':`<button class="btn" style="background:var(--surface2);color:var(--ink)"
+            ${(fc==null || !(ed<0))?'':`<button class="btn"
+               style="background:var(--surface2);color:var(--ink)"
                onclick="setp('${od.id}',${fc.toFixed(1)})">model ${fc.toFixed(1)}c</button>`}
             <button class="btn cx" id="c_${od.id}" onclick="cx('${od.id}')">Cancel</button>
           </div>
-          <div class="hint">Move places the new order, waits until it is resting, then cancels
+          <div class="hint">${(ed!=null && ed>=0)
+            ? 'Already on the right side of the model — moving it to fair value would only tie up more capital, so there is no shortcut button here. '
+            : ''}Move places the new order, waits until it is resting, then cancels
             this one. Nothing is cancelled on faith.</div>
           <div class="res" id="r_${od.id}"></div>
         </div>`;
