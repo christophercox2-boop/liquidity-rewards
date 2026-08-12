@@ -2730,6 +2730,16 @@ def keep_qualified() -> None:
     for m, orders in by_mkt.items():
         if placed >= KEEP_MAX_PER_POLL:
             return
+        # Only markets that are actually armed to defend.
+        #
+        # The scoring branch below already required a sanctioned cap, so it
+        # never acted outside this list. The deep-qualifier branch did not:
+        # it ran on every market we hold orders in that has a pool, so the
+        # keeper was stacking 1c and 99c size into books the owner had never
+        # armed -- pandc-anydis and enwc-usgubp-wi among them on 2026-08-12.
+        # That is activity nobody asked for, in markets nobody chose.
+        if m not in cfg:
+            continue
         pr = progs.get(m)
         if not pr or not pr.get("pool") or not pr.get("target"):
             continue
