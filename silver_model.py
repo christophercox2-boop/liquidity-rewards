@@ -207,16 +207,22 @@ def compare(model_dem_pct: float, market_gop_prob: float | None) -> str:
 # per-race forecasts
 # --------------------------------------------------------------------------
 #
-# The owner's second link (Datawrapper chart kNspD, "Who is favored to win each
-# Senate race?") is the state-level file the chamber series could not provide.
-# One row per Senate race, with each party's win probability as a percentage.
-# That maps straight onto the ussewc-usse-{st}-{date}-{dem,rep} books, which is
-# where most of our resting size actually sits.
+# Two state-level charts, one per office, sharing a schema:
 #
-# Note the coverage limit: this is Senate only. The usgubewc- governor books
-# have no counterpart here and stay unmodelled.
+#   kNspD  "Who is favored to win each Senate race?"    -> ussewc-usse-*
+#   N13WX  "Who is favored to win each Governor race?"  -> usgubewc-usgub-*
+#
+# One row per race with each party's win probability as a percentage. Between
+# them they cover the two families most of our resting size sits in. The House
+# districts and the scc- seat-count ladders still have no per-race counterpart
+# and stay unmodelled.
 
-RACES_CSV = DATA / "silver_kNspD.csv"
+RACES_CSV = DATA / "silver_senate_races.csv"
+GOV_RACES_CSV = DATA / "silver_gov_races.csv"
+
+# the Senate file was first pulled under its chart id; keep reading that name
+# so an older checkout does not silently produce an empty race table
+_LEGACY_SENATE = DATA / "silver_kNspD.csv"
 
 
 def load_races(path: Path | str = RACES_CSV) -> dict[str, dict]:
@@ -226,6 +232,9 @@ def load_races(path: Path | str = RACES_CSV) -> dict[str, dict]:
     stores, so they can be compared to book prices without a unit slip.
     """
     out: dict[str, dict] = {}
+    path = Path(path)
+    if not path.exists() and path == Path(RACES_CSV) and _LEGACY_SENATE.exists():
+        path = _LEGACY_SENATE
     with open(path, newline="") as fh:
         for row in csv.DictReader(fh):
             abbr = (row.get("abbr") or "").strip().lower()
@@ -243,18 +252,39 @@ def load_races(path: Path | str = RACES_CSV) -> dict[str, dict]:
     return out
 
 
-def race_fair(slug: str, races: dict[str, dict]) -> float | None:
+def load_gov_races(path: Path | str = GOV_RACES_CSV) -> dict[str, dict]:
+    """Same shape as load_races, for the Governor chart."""
+    return load_races(path)
+
+
+# slug prefix -> which race table answers for it
+_OFFICE_PREFIX = {"ussewc-usse-": "senate", "usgubewc-usgub-": "governor"}
+
+
+def office_of(slug: str) -> str | None:
+    """Which race table covers this slug, or None when nothing does."""
+    for prefix, office in _OFFICE_PREFIX.items():
+        if slug.startswith(prefix):
+            return office
+    return None
+
+
+def race_fair(slug: str, races: dict[str, dict],
+              gov_races: dict[str, dict] | None = None) -> float | None:
     """Model probability that `slug` resolves YES, or None if unmodelled.
 
-    Only ussewc-usse-* slugs are covered. Governor, House, seat-count and
-    everything else return None rather than a guess.
+    Senate and Governor slugs resolve against their own table. House districts,
+    the scc- seat-count ladders and everything else return None rather than a
+    guess -- there is no state-level number for them in this data.
     """
-    if not slug.startswith("ussewc-usse-"):
+    office = office_of(slug)
+    if office is None:
         return None
+    table = races if office == "senate" else (gov_races or {})
     parts = slug.split("-")
     if len(parts) < 3:
         return None
-    race = races.get(parts[2].lower())
+    race = table.get(parts[2].lower())
     if not race:
         return None
     if slug.endswith("-dem"):

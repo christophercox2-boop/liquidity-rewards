@@ -1,11 +1,12 @@
 name: Silver race screen
 
-# Prices every resting Senate order against Silver Bulletin's per-race
-# forecast and reports which ones would lose money if they filled.
+# Prices every resting Senate and Governor order against Silver Bulletin's
+# per-race forecasts and reports which ones would lose money if they filled.
 #
-# This is the screen the chamber-level series could not support. Chart kNspD
-# ("Who is favored to win each Senate race?") gives a win probability per
-# state, which maps one-to-one onto the ussewc-usse-{st}-{date}-{dem,rep}
+# This is the screen the chamber-level series could not support. Two charts
+# carry it -- kNspD for Senate races and N13WX for Governor races -- each a
+# win probability per state, mapping one-to-one onto the
+# ussewc-usse-{st}-{date}-{dem,rep} and usgubewc-usgub-{st}-{date}-{dem,rep}
 # books. For a resting order the question that matters is not whether the
 # model beats the market in the long run, it is what a FILL costs: a bid at
 # 85c on something the model prices at 20c hands over 65c a share the moment
@@ -64,7 +65,12 @@ jobs:
                            "Content-Type": "application/json"}, timeout=30, **kw)
 
           races = sm.load_races()
-          print(f"Silver Bulletin per-race Senate forecast: {len(races)} races\n")
+          try:
+              gov = sm.load_gov_races()
+          except OSError:
+              gov = {}
+          print(f"Silver Bulletin per-race forecasts: "
+                f"{len(races)} Senate, {len(gov)} Governor\n")
 
           r = api("GET", "/v1/orders/open"); r.raise_for_status()
           orders = []
@@ -80,24 +86,28 @@ jobs:
               })
           print(f"{len(orders)} live orders")
 
-          senate = [o for o in orders if o["slug"].startswith("ussewc-usse-")]
+          in_scope = [o for o in orders if sm.office_of(o["slug"])]
           modelled = []
-          for o in senate:
-              fair = sm.race_fair(o["slug"], races)
+          for o in in_scope:
+              fair = sm.race_fair(o["slug"], races, gov)
               if fair is None:
                   continue
+              o["office"] = sm.office_of(o["slug"])
               o["fair"] = fair
               o["edge"] = sm.mark_to_model(o["side"], o["px"], fair)
               o["risk"] = o["edge"] * o["sz"]
               modelled.append(o)
-          print(f"{len(senate)} are Senate races, {len(modelled)} of those the model covers")
+          by_office = collections.Counter(o["office"] for o in modelled)
+          print(f"{len(in_scope)} orders are on Senate or Governor races; "
+                f"the model covers {len(modelled)} of them "
+                f"({by_office['senate']} Senate, {by_office['governor']} Governor)")
           uncovered = {o['slug'] for o in orders} - {o['slug'] for o in modelled}
           print(f"{len(uncovered)} markets left unmodelled "
-                f"(governor, House, seat counts, everything non-Senate)\n")
+                f"(House districts, seat-count ladders, and the rest)\n")
 
           bad = sorted((o for o in modelled if o["edge"] < -FLAG), key=lambda o: o["risk"])
           if not bad:
-              print(f"No resting Senate order is more than {FLAG:.0%} the wrong side "
+              print(f"No resting race order is more than {FLAG:.0%} the wrong side "
                     f"of the model.")
           else:
               gross = sum(o["risk"] for o in bad)
@@ -122,15 +132,20 @@ jobs:
           print("\nper-race view (model probability vs where our orders rest):")
           by_race = collections.defaultdict(list)
           for o in modelled:
-              by_race[o["slug"].split("-")[2].lower()].append(o)
-          print(f"  {'race':<6s} {'model D':>8s} {'model R':>8s} {'orders':>7s} "
-                f"{'worst/sh':>9s}")
-          for st in sorted(by_race):
-              g = by_race[st]
-              race = races[st]
-              worst = min(o["edge"] for o in g)
-              print(f"  {st.upper():<6s} {race['dem']:>8.3f} {race['rep']:>8.3f} "
-                    f"{len(g):>7d} {worst:>9.3f}")
+              by_race[(o["office"], o["slug"].split("-")[2].lower())].append(o)
+          for office, table in (("senate", races), ("governor", gov)):
+              rows = {k: v for k, v in by_race.items() if k[0] == office}
+              if not rows:
+                  continue
+              print(f"\n  {office.upper()}")
+              print(f"  {'race':<6s} {'model D':>8s} {'model R':>8s} {'orders':>7s} "
+                    f"{'worst/sh':>9s}")
+              for (_, st) in sorted(rows):
+                  g = rows[(office, st)]
+                  race = table[st]
+                  worst = min(o["edge"] for o in g)
+                  print(f"  {st.upper():<6s} {race['dem']:>8.3f} {race['rep']:>8.3f} "
+                        f"{len(g):>7d} {worst:>9.3f}")
 
           print("\nNothing was placed, cancelled or repriced. This is a read-only screen.")
 
