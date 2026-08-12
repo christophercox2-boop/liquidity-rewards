@@ -21,7 +21,7 @@ on:
         default: "5"
       seed:
         description: "any market slug in the event to survey"
-        default: "tec-cbb-champ-2027-04-05-w-uconn"
+        default: "tec-nba-eastconf-2027-05-19-w-mil"
 
 permissions:
   contents: write
@@ -44,7 +44,7 @@ jobs:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
           POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
           TARGET: ${{ github.event.inputs.target || '5' }}
-          SEED: ${{ github.event.inputs.seed || 'tec-cbb-champ-2027-04-05-w-uconn' }}
+          SEED: ${{ github.event.inputs.seed || 'tec-nba-eastconf-2027-05-19-w-mil' }}
         run: |
           pip install -q -r requirements.txt
           python3 - <<'EOF'
