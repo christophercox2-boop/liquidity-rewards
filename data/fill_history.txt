@@ -1,0 +1,5 @@
+pulled 1623 trade activities
+
+0 executions (1623 self-crosses skipped)
+
+no executions in the history returned
