@@ -1,156 +1,146 @@
 market,side,price,size,ticks,share,est_day,pool,verdict
 scc-senate-gop-2026-11-03-49,SELL,0.14,4.98,0,1.0,3.8461538461538463,100.0,"✅ scoring — ~100.0% of ask side (91,765 resting ≥ 5,000 ✓) ≈ $3.85/day (pool ÷ 13 markets)"
-scc-hrep-rep-2026-11-03-gte210,BUY,0.35,21.0,0,1.0,4.166666666666667,100.0,"✅ scoring — ~100.0% of bid side (400,471 resting ≥ 5,000 ✓) ≈ $4.17/day (pool ÷ 12 markets)"
 scc-senate-gop-2026-11-03-51,BUY,0.12,18.0,0,0.9996581791036999,3.8448391503988457,100.0,"✅ scoring — ~100.0% of bid side (300,549 resting ≥ 5,000 ✓) ≈ $3.84/day (pool ÷ 13 markets)"
-pandc-anydis-2027-12-31,SELL,0.3,19.91,0,0.9809165300251516,12.261456625314395,50.0,"✅ scoring — ~98.1% of ask side (11,100 resting ≥ 10,000 ✓) ≈ $12.26/day (pool ÷ 2 markets)"
-ussewc-usse-ms-2026-11-03-dem,SELL,0.18,40.0,0,0.9090907731405162,5.681817332128227,25.0,"✅ scoring — ~90.9% of ask side (74,169 resting ≥ 2,000 ✓) ≈ $5.68/day (pool ÷ 2 markets)"
+ussewc-usse-ms-2026-11-03-dem,SELL,0.15,40.0,0,0.9900990097397314,6.188118810873322,25.0,"✅ scoring — ~99.0% of ask side (74,007 resting ≥ 2,000 ✓) ≈ $6.19/day (pool ÷ 2 markets)"
 scc-senate-gop-2026-11-03-52,BUY,0.09,7.75,0,0.9075554090574437,3.4905977271440145,100.0,"✅ scoring — ~90.8% of bid side (300,564 resting ≥ 5,000 ✓) ≈ $3.49/day (pool ÷ 13 markets)"
-ussewc-usse-al-2026-11-03-rep,BUY,0.93,50.0,0,0.8333333333333334,5.208333333333334,25.0,"✅ scoring — ~83.3% of bid side (500,460 resting ≥ 2,000 ✓) ≈ $5.21/day (pool ÷ 2 markets)"
 scc-senate-gop-2026-11-03-49,BUY,0.11,40.0,0,0.8159846127788425,3.138402356841702,100.0,"✅ scoring — ~81.6% of bid side (200,595 resting ≥ 5,000 ✓) ≈ $3.14/day (pool ÷ 13 markets)"
-ussewc-usse-sc-2026-11-03-dem,SELL,0.1,40.0,0,0.799999999999992,4.99999999999995,25.0,"✅ scoring — ~80.0% of ask side (204,016 resting ≥ 2,000 ✓) ≈ $5.00/day (pool ÷ 2 markets)"
+ussewc-usse-sc-2026-11-03-dem,SELL,0.1,40.0,0,0.799999999999992,4.99999999999995,25.0,"✅ scoring — ~80.0% of ask side (203,859 resting ≥ 2,000 ✓) ≈ $5.00/day (pool ÷ 2 markets)"
 ussewc-usse-ok-2026-11-03-dem,SELL,0.04,40.0,0,0.7547169811320755,4.716981132075472,25.0,"✅ scoring — ~75.5% of ask side (130,978 resting ≥ 2,000 ✓) ≈ $4.72/day (pool ÷ 2 markets)"
-usgubewc-usgub-ok-2026-11-03-dem,SELL,0.05,40.0,0,0.7407407407407407,4.62962962962963,25.0,"✅ scoring — ~74.1% of ask side (130,779 resting ≥ 2,000 ✓) ≈ $4.63/day (pool ÷ 2 markets)"
-usgubewc-usgub-id-2026-11-03-dem,SELL,0.05,40.0,0,0.7407407407407407,4.62962962962963,25.0,"✅ scoring — ~74.1% of ask side (208,592 resting ≥ 2,000 ✓) ≈ $4.63/day (pool ÷ 2 markets)"
-usgubewc-usgub-hi-2026-11-03-rep,SELL,0.04,40.0,0,0.7407407407407407,4.62962962962963,25.0,"✅ scoring — ~74.1% of ask side (208,592 resting ≥ 2,000 ✓) ≈ $4.63/day (pool ÷ 2 markets)"
-pandc-anydis-2027-12-31,BUY,0.2,10.0,1,0.7142857123737634,8.928571404672041,50.0,"✅ scoring — ~71.4% of bid side (10,312 resting ≥ 10,000 ✓) ≈ $8.93/day (pool ÷ 2 markets)"
+scc-hrep-rep-2026-11-03-gte210,BUY,0.35,21.0,0,0.7241379310344828,3.017241379310345,100.0,"✅ scoring — ~72.4% of bid side (400,479 resting ≥ 5,000 ✓) ≈ $3.02/day (pool ÷ 12 markets)"
 usgubewc-usgub-ct-2026-11-03-dem,BUY,0.95,60.0,0,0.7058823529411765,4.411764705882353,25.0,"✅ scoring — ~70.6% of bid side (510,535 resting ≥ 2,000 ✓) ≈ $4.41/day (pool ÷ 2 markets)"
-usgubewc-usgub-mn-2026-11-03-rep,SELL,0.14,11.0,0,0.6532064859781731,4.082540537363582,25.0,"✅ scoring — ~65.3% of ask side (204,414 resting ≥ 2,000 ✓) ≈ $4.08/day (pool ÷ 2 markets)"
-usgubewc-usgub-mn-2026-11-03-rep,BUY,0.09,40.0,0,0.6315677918867917,3.947298699292448,25.0,"✅ scoring — ~63.2% of bid side (15,683 resting ≥ 2,000 ✓) ≈ $3.95/day (pool ÷ 2 markets)"
+ussewc-usse-al-2026-11-03-rep,BUY,0.93,50.0,0,0.6666666666666666,4.166666666666666,25.0,"✅ scoring — ~66.7% of bid side (500,475 resting ≥ 2,000 ✓) ≈ $4.17/day (pool ÷ 2 markets)"
 usgubewc-usgub-nm-2026-11-03-dem,BUY,0.95,40.0,0,0.6153846153846154,3.8461538461538463,25.0,"✅ scoring — ~61.5% of bid side (510,515 resting ≥ 2,000 ✓) ≈ $3.85/day (pool ÷ 2 markets)"
 ussewc-usse-or-2026-11-03-rep,SELL,0.03,40.0,0,0.5882352941176471,3.6764705882352944,25.0,"✅ scoring — ~58.8% of ask side (130,793 resting ≥ 2,000 ✓) ≈ $3.68/day (pool ÷ 2 markets)"
-ussewc-usse-ar-2026-11-03-dem,SELL,0.08,50.0,0,0.5813953488372093,3.6337209302325584,25.0,"✅ scoring — ~58.1% of ask side (274,069 resting ≥ 2,000 ✓) ≈ $3.63/day (pool ÷ 2 markets)"
-ussewc-usse-va-2026-11-03-rep,SELL,0.04,40.0,0,0.5782812036923255,3.6142575230770344,25.0,"✅ scoring — ~57.8% of ask side (65,764 resting ≥ 2,000 ✓) ≈ $3.61/day (pool ÷ 2 markets)"
-usgubewc-usgub-me-2026-11-03-dem,BUY,0.95,40.0,0,0.547945205479452,3.4246575342465753,25.0,"✅ scoring — ~54.8% of bid side (500,473 resting ≥ 2,000 ✓) ≈ $3.42/day (pool ÷ 2 markets)"
-usgubewc-usgub-vt-2026-11-03-rep,BUY,0.91,50.0,0,0.5,3.125,25.0,"✅ scoring — ~50.0% of bid side (210,550 resting ≥ 2,000 ✓) ≈ $3.12/day (pool ÷ 2 markets)"
-usgubewc-usgub-tx-2026-11-03-dem,BUY,0.15,10.59,0,0.42238800997966874,2.63992506237293,25.0,"✅ scoring — ~42.2% of bid side (11,162 resting ≥ 2,000 ✓) ≈ $2.64/day (pool ÷ 2 markets)"
+scc-senate-gop-2026-11-03-48,SELL,0.25,10.0,0,0.5880272016679274,2.2616430833381824,100.0,"✅ scoring — ~58.8% of ask side (92,177 resting ≥ 5,000 ✓) ≈ $2.26/day (pool ÷ 13 markets)"
+ussewc-usse-ar-2026-11-03-dem,SELL,0.08,50.0,0,0.5813953488372093,3.6337209302325584,25.0,"✅ scoring — ~58.1% of ask side (273,944 resting ≥ 2,000 ✓) ≈ $3.63/day (pool ÷ 2 markets)"
+usgubewc-usgub-hi-2026-11-03-rep,SELL,0.04,40.0,0,0.5797101449275363,3.6231884057971016,25.0,"✅ scoring — ~58.0% of ask side (208,607 resting ≥ 2,000 ✓) ≈ $3.62/day (pool ÷ 2 markets)"
+ussewc-usse-va-2026-11-03-rep,SELL,0.04,40.0,0,0.5782853838369235,3.614283648980772,25.0,"✅ scoring — ~57.8% of ask side (65,714 resting ≥ 2,000 ✓) ≈ $3.61/day (pool ÷ 2 markets)"
+usgubewc-usgub-ok-2026-11-03-dem,SELL,0.05,40.0,0,0.5633802816901409,3.5211267605633805,25.0,"✅ scoring — ~56.3% of ask side (130,796 resting ≥ 2,000 ✓) ≈ $3.52/day (pool ÷ 2 markets)"
+usgubewc-usgub-id-2026-11-03-dem,SELL,0.05,40.0,0,0.5633802816901409,3.5211267605633805,25.0,"✅ scoring — ~56.3% of ask side (208,609 resting ≥ 2,000 ✓) ≈ $3.52/day (pool ÷ 2 markets)"
+usgubewc-usgub-me-2026-11-03-dem,BUY,0.95,40.0,0,0.5405405405405406,3.3783783783783785,25.0,"✅ scoring — ~54.1% of bid side (500,474 resting ≥ 2,000 ✓) ≈ $3.38/day (pool ÷ 2 markets)"
+usgubewc-usgub-tx-2026-11-03-dem,BUY,0.15,10.59,0,0.5142091077389656,3.213806923368535,25.0,"✅ scoring — ~51.4% of bid side (10,474 resting ≥ 2,000 ✓) ≈ $3.21/day (pool ÷ 2 markets)"
+usgubewc-usgub-mn-2026-11-03-rep,BUY,0.09,40.0,0,0.4285662918983014,2.678539324364384,25.0,"✅ scoring — ~42.9% of bid side (15,713 resting ≥ 2,000 ✓) ≈ $2.68/day (pool ÷ 2 markets)"
+usgubewc-usgub-sc-2026-11-03-rep,BUY,0.92,40.0,0,0.37037037037037035,2.314814814814815,25.0,"✅ scoring — ~37.0% of bid side (510,308 resting ≥ 2,000 ✓) ≈ $2.31/day (pool ÷ 2 markets)"
+usgubewc-usgub-ct-2026-11-03-rep,SELL,0.09,40.0,0,0.35650623885918004,2.228163992869875,25.0,"✅ scoring — ~35.7% of ask side (207,528 resting ≥ 2,000 ✓) ≈ $2.23/day (pool ÷ 2 markets)"
 ussewc-usse-wy-2026-11-03-dem,BUY,0.01,5000.0,0,0.349870547897278,2.1866909243579875,25.0,"✅ scoring — ~35.0% of bid side (14,291 resting ≥ 2,000 ✓) ≈ $2.19/day (pool ÷ 2 markets)"
-usgubewc-usgub-ct-2026-11-03-rep,SELL,0.09,40.0,0,0.341296928327645,2.1331058020477816,25.0,"✅ scoring — ~34.1% of ask side (207,704 resting ≥ 2,000 ✓) ≈ $2.13/day (pool ÷ 2 markets)"
-scc-senate-gop-2026-11-03-48,SELL,0.27,10.0,0,0.3333288889481473,1.282034188262105,100.0,"✅ scoring — ~33.3% of ask side (91,905 resting ≥ 5,000 ✓) ≈ $1.28/day (pool ÷ 13 markets)"
-ussewc-usse-ok-2026-11-03-dem,BUY,0.01,5000.0,0,0.3184713375796178,1.9904458598726114,25.0,"✅ scoring — ~31.8% of bid side (15,700 resting ≥ 2,000 ✓) ≈ $1.99/day (pool ÷ 2 markets)"
-usgubewc-usgub-hi-2026-11-03-dem,SELL,0.96,40.0,0,0.30835985934781734,1.9272491209238585,25.0,"✅ scoring — ~30.8% of ask side (9,416 resting ≥ 2,000 ✓) ≈ $1.93/day (pool ÷ 2 markets)"
-pntcbk-wnba-freedom-2027-06-30-enekan,BUY,0.03,2500.0,6,0.30711676557663725,38.389595697079656,250.0,"✅ scoring — ~30.7% of bid side (42,394 resting ≥ 5,000 ✓) ≈ $38.39/day"
+ussewc-usse-ok-2026-11-03-dem,BUY,0.01,5000.0,0,0.31746031746031744,1.984126984126984,25.0,"✅ scoring — ~31.7% of bid side (15,750 resting ≥ 2,000 ✓) ≈ $1.98/day (pool ÷ 2 markets)"
 enwc-ussep-sc-2026-08-11-rep-darnor,BUY,0.77,66.31,0,0.30499924814775925,1.9062453009234952,25.0,"✅ scoring — ~30.5% of bid side (100,912 resting ≥ 2,000 ✓) ≈ $1.91/day (pool ÷ 2 markets)"
-usgubewc-usgub-sc-2026-11-03-rep,BUY,0.92,40.0,0,0.3007518796992481,1.8796992481203008,25.0,"✅ scoring — ~30.1% of bid side (510,333 resting ≥ 2,000 ✓) ≈ $1.88/day (pool ÷ 2 markets)"
-usgubewc-usgub-mn-2026-11-03-dem,SELL,0.96,50.0,0,0.28300731268255386,1.7687957042659617,25.0,"✅ scoring — ~28.3% of ask side (27,004 resting ≥ 2,000 ✓) ≈ $1.77/day (pool ÷ 2 markets)"
-usgubewc-usgub-co-2026-11-03-dem,BUY,0.95,40.0,0,0.2702702702702703,1.6891891891891893,25.0,"✅ scoring — ~27.0% of bid side (610,598 resting ≥ 2,000 ✓) ≈ $1.69/day (pool ÷ 2 markets)"
-scc-hrep-rep-2026-11-03-gte190,BUY,0.72,17.55,0,0.2598075499629904,1.0825314581791268,100.0,"✅ scoring — ~26.0% of bid side (500,428 resting ≥ 5,000 ✓) ≈ $1.08/day (pool ÷ 12 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,BUY,0.95,40.0,0,0.25806451612903225,1.6129032258064515,25.0,"✅ scoring — ~25.8% of bid side (2,105 resting ≥ 2,000 ✓) ≈ $1.61/day (pool ÷ 2 markets)"
-usgubewc-usgub-md-2026-11-03-dem,BUY,0.95,40.0,0,0.25806451612903225,1.6129032258064515,25.0,"✅ scoring — ~25.8% of bid side (510,605 resting ≥ 2,000 ✓) ≈ $1.61/day (pool ÷ 2 markets)"
-usgubewc-usgub-ar-2026-11-03-rep,SELL,0.96,40.0,0,0.25108492225626167,1.5692807641016353,25.0,"✅ scoring — ~25.1% of ask side (9,126 resting ≥ 2,000 ✓) ≈ $1.57/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.1,40.0,1,0.24844720496894407,1.5527950310559004,25.0,"✅ scoring — ~24.8% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $1.55/day (pool ÷ 2 markets)"
+pandc-anydis-2027-12-31,SELL,0.3,19.91,0,0.27539047726070487,3.4423809657588107,50.0,"✅ scoring — ~27.5% of ask side (11,152 resting ≥ 10,000 ✓) ≈ $3.44/day (pool ÷ 2 markets)"
+usgubewc-usgub-co-2026-11-03-dem,BUY,0.95,40.0,0,0.2684563758389262,1.6778523489932886,25.0,"✅ scoring — ~26.8% of bid side (610,599 resting ≥ 2,000 ✓) ≈ $1.68/day (pool ÷ 2 markets)"
+usgubewc-usgub-md-2026-11-03-dem,BUY,0.95,40.0,0,0.26666666666666666,1.6666666666666667,25.0,"✅ scoring — ~26.7% of bid side (510,600 resting ≥ 2,000 ✓) ≈ $1.67/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,BUY,0.95,40.0,0,0.2597402597402597,1.6233766233766231,25.0,"✅ scoring — ~26.0% of bid side (2,104 resting ≥ 2,000 ✓) ≈ $1.62/day (pool ÷ 2 markets)"
+usgubewc-usgub-ar-2026-11-03-rep,BUY,0.95,40.0,0,0.25477707006369427,1.5923566878980893,25.0,"✅ scoring — ~25.5% of bid side (610,607 resting ≥ 2,000 ✓) ≈ $1.59/day (pool ÷ 2 markets)"
+usgubewc-usgub-tn-2026-11-03-rep,BUY,0.96,40.0,0,0.25477707006369427,1.5923566878980893,25.0,"✅ scoring — ~25.5% of bid side (2,067 resting ≥ 2,000 ✓) ≈ $1.59/day (pool ÷ 2 markets)"
 pntcbk-wnba-white-2027-06-30-roywhi,BUY,0.01,10000.0,1,0.2419875241987524,30.248440524844053,250.0,"✅ scoring — ~24.2% of bid side (41,212 resting ≥ 5,000 ✓) ≈ $30.25/day"
-usgubewc-usgub-ok-2026-11-03-rep,BUY,0.95,40.0,0,0.23391811484422637,1.4619882177764147,25.0,"✅ scoring — ~23.4% of bid side (610,472 resting ≥ 2,000 ✓) ≈ $1.46/day (pool ÷ 2 markets)"
+usgubewc-usgub-vt-2026-11-03-rep,BUY,0.91,50.0,0,0.23923444976076555,1.4952153110047848,25.0,"✅ scoring — ~23.9% of bid side (210,659 resting ≥ 2,000 ✓) ≈ $1.50/day (pool ÷ 2 markets)"
+ussewc-usse-va-2026-11-03-rep,BUY,0.01,5000.0,1,0.23809523809523808,1.488095238095238,25.0,"✅ scoring — ~23.8% of bid side (6,780 resting ≥ 2,000 ✓) ≈ $1.49/day (pool ÷ 2 markets)"
+usgubewc-usgub-ok-2026-11-03-rep,BUY,0.95,40.0,0,0.23809522378684891,1.4880951486678058,25.0,"✅ scoring — ~23.8% of bid side (610,469 resting ≥ 2,000 ✓) ≈ $1.49/day (pool ÷ 2 markets)"
 usgubewc-usgub-id-2026-11-03-dem,BUY,0.01,2000.0,0,0.23285597857724996,1.4553498661078124,25.0,"✅ scoring — ~23.3% of bid side (8,589 resting ≥ 2,000 ✓) ≈ $1.46/day (pool ÷ 2 markets)"
 enwc-ushrp-fl25-2026-08-18-dem-olilar,SELL,0.13,5.0,0,0.22727221074497556,1.4204513171560973,25.0,"✅ scoring — ~22.7% of ask side (8,117 resting ≥ 2,000 ✓) ≈ $1.42/day (pool ÷ 2 markets)"
-ussewc-usse-or-2026-11-03-dem,BUY,0.94,40.0,0,0.2185792349726776,1.366120218579235,25.0,"✅ scoring — ~21.9% of bid side (810,633 resting ≥ 2,000 ✓) ≈ $1.37/day (pool ÷ 2 markets)"
+ussewc-usse-or-2026-11-03-dem,BUY,0.94,40.0,0,0.2127659574468085,1.3297872340425532,25.0,"✅ scoring — ~21.3% of bid side (810,638 resting ≥ 2,000 ✓) ≈ $1.33/day (pool ÷ 2 markets)"
 ussewc-usse-wy-2026-11-03-dem,SELL,0.03,85.0,0,0.20668944303274203,1.2918090189546376,25.0,"✅ scoring — ~20.7% of ask side (136,381 resting ≥ 2,000 ✓) ≈ $1.29/day (pool ÷ 2 markets)"
 ussewc-usse-or-2026-11-03-rep,BUY,0.01,1290.0,0,0.19864490298737297,1.2415306436710811,25.0,"✅ scoring — ~19.9% of bid side (6,494 resting ≥ 2,000 ✓) ≈ $1.24/day (pool ÷ 2 markets)"
 ussewc-usse-ky-2026-11-03-rep,BUY,0.95,40.0,0,0.18099547511312217,1.1312217194570136,25.0,"✅ scoring — ~18.1% of bid side (510,671 resting ≥ 2,000 ✓) ≈ $1.13/day (pool ÷ 2 markets)"
+pntcbk-nba-kawleo-2026-10-23-tor,BUY,0.7,10.0,0,0.18005819595896266,1.5004849663246889,500.0,"✅ scoring — ~18.0% of bid side (48,052 resting ≥ 2,500 ✓) ≈ $1.50/day (pool ÷ 30 markets)"
+ussewc-usse-il-2026-11-03-dem,BUY,0.95,40.0,0,0.17391304347826086,1.0869565217391304,25.0,"✅ scoring — ~17.4% of bid side (500,680 resting ≥ 2,000 ✓) ≈ $1.09/day (pool ÷ 2 markets)"
 ussewc-usse-sc-2026-11-03-rep,BUY,0.87,40.0,0,0.1721170395869191,1.0757314974182444,25.0,"✅ scoring — ~17.2% of bid side (710,472 resting ≥ 2,000 ✓) ≈ $1.08/day (pool ÷ 2 markets)"
-usgubewc-usgub-ar-2026-11-03-rep,BUY,0.95,40.0,0,0.16393442622950818,1.0245901639344261,25.0,"✅ scoring — ~16.4% of bid side (610,694 resting ≥ 2,000 ✓) ≈ $1.02/day (pool ÷ 2 markets)"
+ussewc-usse-wv-2026-11-03-rep,BUY,0.96,50.0,0,0.1718213058419244,1.0738831615120275,25.0,"✅ scoring — ~17.2% of bid side (600,491 resting ≥ 2,000 ✓) ≈ $1.07/day (pool ÷ 2 markets)"
+pntcbk-wnba-freedom-2027-06-30-enekan,BUY,0.03,2500.0,6,0.16883648119714625,21.10456014964328,250.0,"✅ scoring — ~16.9% of bid side (19,061 resting ≥ 5,000 ✓) ≈ $21.10/day"
+scc-hrep-rep-2026-11-03-gte190,BUY,0.72,17.55,0,0.1678622668579627,0.699426111908178,100.0,"✅ scoring — ~16.8% of bid side (500,465 resting ≥ 5,000 ✓) ≈ $0.70/day (pool ÷ 12 markets)"
 stsc-bab-el-mandeb-clsd-2026-08-31,SELL,0.09,10.0,0,0.1518420486813912,2.847038412776085,75.0,"✅ scoring — ~15.2% of ask side (2,534 resting ≥ 2,000 ✓) ≈ $2.85/day (pool ÷ 2 markets)"
-usgubewc-usgub-il-2026-11-03-dem,BUY,0.95,40.0,0,0.14388489208633093,0.8992805755395683,25.0,"✅ scoring — ~14.4% of bid side (610,678 resting ≥ 2,000 ✓) ≈ $0.90/day (pool ÷ 2 markets)"
+usgubewc-usgub-ar-2026-11-03-rep,SELL,0.96,40.0,0,0.15063175901178036,0.9414484938236273,25.0,"✅ scoring — ~15.1% of ask side (22,359 resting ≥ 2,000 ✓) ≈ $0.94/day (pool ÷ 2 markets)"
+ussewc-usse-ma-2026-11-03-dem,BUY,0.96,40.0,0,0.13935340022296544,0.870958751393534,25.0,"✅ scoring — ~13.9% of bid side (600,527 resting ≥ 2,000 ✓) ≈ $0.87/day (pool ÷ 2 markets)"
+usgubewc-usgub-mn-2026-11-03-rep,SELL,0.14,11.0,0,0.1392404988383276,0.8702531177395475,25.0,"✅ scoring — ~13.9% of ask side (204,295 resting ≥ 2,000 ✓) ≈ $0.87/day (pool ÷ 2 markets)"
 ussewc-usse-ky-2026-11-03-dem,SELL,0.05,50.0,0,0.1388888888888889,0.8680555555555556,25.0,"✅ scoring — ~13.9% of ask side (66,085 resting ≥ 2,000 ✓) ≈ $0.87/day (pool ÷ 2 markets)"
-ussewc-usse-nm-2026-11-03-rep,BUY,0.01,2000.0,0,0.12762427413694086,0.7976517133558804,25.0,"✅ scoring — ~12.8% of bid side (15,671 resting ≥ 2,000 ✓) ≈ $0.80/day (pool ÷ 2 markets)"
-ussewc-usse-nm-2026-11-03-rep,BUY,0.01,2000.0,0,0.12762427413694086,0.7976517133558804,25.0,"✅ scoring — ~12.8% of bid side (15,671 resting ≥ 2,000 ✓) ≈ $0.80/day (pool ÷ 2 markets)"
-ussewc-usse-wv-2026-11-03-rep,BUY,0.96,50.0,0,0.1268874508311128,0.793046567694455,25.0,"✅ scoring — ~12.7% of bid side (600,644 resting ≥ 2,000 ✓) ≈ $0.79/day (pool ÷ 2 markets)"
-usgubewc-usgub-vt-2026-11-03-dem,BUY,0.06,300.0,0,0.12679628064243448,0.7924767540152154,25.0,"✅ scoring — ~12.7% of bid side (22,566 resting ≥ 2,000 ✓) ≈ $0.79/day (pool ÷ 2 markets)"
-ussewc-usse-va-2026-11-03-dem,BUY,0.95,50.0,0,0.12315270935960591,0.7697044334975369,25.0,"✅ scoring — ~12.3% of bid side (610,856 resting ≥ 2,000 ✓) ≈ $0.77/day (pool ÷ 2 markets)"
+ussewc-usse-ar-2026-11-03-rep,BUY,0.95,50.0,0,0.1282051282051282,0.8012820512820512,25.0,"✅ scoring — ~12.8% of bid side (500,590 resting ≥ 2,000 ✓) ≈ $0.80/day (pool ÷ 2 markets)"
+ussewc-usse-nm-2026-11-03-rep,BUY,0.01,2000.0,0,0.1236781893513079,0.7729886834456743,25.0,"✅ scoring — ~12.4% of bid side (16,171 resting ≥ 2,000 ✓) ≈ $0.77/day (pool ÷ 2 markets)"
+ussewc-usse-nm-2026-11-03-rep,BUY,0.01,2000.0,0,0.1236781893513079,0.7729886834456743,25.0,"✅ scoring — ~12.4% of bid side (16,171 resting ≥ 2,000 ✓) ≈ $0.77/day (pool ÷ 2 markets)"
+ussewc-usse-va-2026-11-03-dem,BUY,0.95,50.0,0,0.12285012285012285,0.7678132678132679,25.0,"✅ scoring — ~12.3% of bid side (610,857 resting ≥ 2,000 ✓) ≈ $0.77/day (pool ÷ 2 markets)"
+ussewc-usse-ri-2026-11-03-dem,BUY,0.95,40.0,0,0.12048192771084337,0.7530120481927711,25.0,"✅ scoring — ~12.0% of bid side (610,782 resting ≥ 2,000 ✓) ≈ $0.75/day (pool ÷ 2 markets)"
 ussewc-usse-nj-2026-11-03-rep,BUY,0.01,1436.0,0,0.12015057309982621,0.7509410818739138,25.0,"✅ scoring — ~12.0% of bid side (11,952 resting ≥ 2,000 ✓) ≈ $0.75/day (pool ÷ 2 markets)"
-usgubewc-usgub-il-2026-11-03-rep,SELL,0.09,40.0,0,0.11695906432748537,0.7309941520467835,25.0,"✅ scoring — ~11.7% of ask side (216,572 resting ≥ 2,000 ✓) ≈ $0.73/day (pool ÷ 2 markets)"
-ussewc-usse-ar-2026-11-03-rep,BUY,0.95,50.0,0,0.11627906976744186,0.7267441860465116,25.0,"✅ scoring — ~11.6% of bid side (500,630 resting ≥ 2,000 ✓) ≈ $0.73/day (pool ÷ 2 markets)"
-scc-hrep-rep-2026-11-03-gte195,BUY,0.62,30.0,0,0.11320751259145811,0.47169796913107553,100.0,"✅ scoring — ~11.3% of bid side (400,873 resting ≥ 5,000 ✓) ≈ $0.47/day (pool ÷ 12 markets)"
-ussewc-usse-ri-2026-11-03-dem,BUY,0.95,40.0,0,0.11173184357541899,0.6983240223463687,25.0,"✅ scoring — ~11.2% of bid side (610,808 resting ≥ 2,000 ✓) ≈ $0.70/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-dem,SELL,0.07,70.0,0,0.1106981892939037,0.691863683086898,25.0,"✅ scoring — ~11.1% of ask side (2,812 resting ≥ 2,000 ✓) ≈ $0.69/day (pool ÷ 2 markets)"
-ussewc-usse-il-2026-11-03-dem,BUY,0.95,40.0,0,0.1092896174863388,0.6830601092896175,25.0,"✅ scoring — ~10.9% of bid side (500,816 resting ≥ 2,000 ✓) ≈ $0.68/day (pool ÷ 2 markets)"
-ussewc-usse-wy-2026-11-03-rep,BUY,0.95,50.0,0,0.10638297872340426,0.6648936170212766,25.0,"✅ scoring — ~10.6% of bid side (500,670 resting ≥ 2,000 ✓) ≈ $0.66/day (pool ÷ 2 markets)"
-ussewc-usse-wy-2026-11-03-rep,BUY,0.95,50.0,0,0.10638297872340426,0.6648936170212766,25.0,"✅ scoring — ~10.6% of bid side (500,670 resting ≥ 2,000 ✓) ≈ $0.66/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-dem,SELL,0.07,70.0,0,0.1199965715265278,0.7499785720407988,25.0,"✅ scoring — ~12.0% of ask side (2,763 resting ≥ 2,000 ✓) ≈ $0.75/day (pool ÷ 2 markets)"
+ussewc-usse-wy-2026-11-03-rep,BUY,0.95,50.0,0,0.1187648456057007,0.7422802850356294,25.0,"✅ scoring — ~11.9% of bid side (500,621 resting ≥ 2,000 ✓) ≈ $0.74/day (pool ÷ 2 markets)"
+ussewc-usse-wy-2026-11-03-rep,BUY,0.95,50.0,0,0.1187648456057007,0.7422802850356294,25.0,"✅ scoring — ~11.9% of bid side (500,621 resting ≥ 2,000 ✓) ≈ $0.74/day (pool ÷ 2 markets)"
+usgubewc-usgub-vt-2026-11-03-dem,BUY,0.06,300.0,0,0.1124859392575928,0.703037120359955,25.0,"✅ scoring — ~11.2% of bid side (22,897 resting ≥ 2,000 ✓) ≈ $0.70/day (pool ÷ 2 markets)"
+usgubewc-usgub-il-2026-11-03-dem,BUY,0.95,40.0,0,0.11235955056179775,0.7022471910112359,25.0,"✅ scoring — ~11.2% of bid side (610,756 resting ≥ 2,000 ✓) ≈ $0.70/day (pool ÷ 2 markets)"
+scc-hrep-rep-2026-11-03-gte195,BUY,0.62,30.0,0,0.10948901875080082,0.45620424479500343,100.0,"✅ scoring — ~10.9% of bid side (400,882 resting ≥ 5,000 ✓) ≈ $0.46/day (pool ÷ 12 markets)"
+ussewc-usse-de-2026-11-03-rep,SELL,0.06,40.0,0,0.10869565217391304,0.6793478260869565,25.0,"✅ scoring — ~10.9% of ask side (138,909 resting ≥ 2,000 ✓) ≈ $0.68/day (pool ÷ 2 markets)"
+usgubewc-usgub-hi-2026-11-03-dem,SELL,0.96,40.0,0,0.1086749803026598,0.6792186268916238,25.0,"✅ scoring — ~10.9% of ask side (34,027 resting ≥ 2,000 ✓) ≈ $0.68/day (pool ÷ 2 markets)"
 scc-senate-gop-2026-11-03-50,BUY,0.15,2.0,2,0.10526292983539715,0.4048574224438352,100.0,"✅ scoring — ~10.5% of bid side (50,570 resting ≥ 5,000 ✓) ≈ $0.40/day (pool ÷ 13 markets)"
 scc-hrep-rep-2026-11-03-gte200,SELL,0.44,4.0,0,0.10523546435148645,0.4384811014645269,100.0,"✅ scoring — ~10.5% of ask side (82,559 resting ≥ 5,000 ✓) ≈ $0.44/day (pool ÷ 12 markets)"
 ussewc-usse-wv-2026-11-03-dem,SELL,0.05,40.0,0,0.10471204188481675,0.6544502617801047,25.0,"✅ scoring — ~10.5% of ask side (131,357 resting ≥ 2,000 ✓) ≈ $0.65/day (pool ÷ 2 markets)"
-ussewc-usse-de-2026-11-03-dem,BUY,0.95,40.0,0,0.10442500978984466,0.6526563111865291,25.0,"✅ scoring — ~10.4% of bid side (510,833 resting ≥ 2,000 ✓) ≈ $0.65/day (pool ÷ 2 markets)"
-usgubewc-usgub-pa-2026-11-03-dem,BUY,0.94,40.0,0,0.10397712503249286,0.6498570314530804,25.0,"✅ scoring — ~10.4% of bid side (10,974 resting ≥ 2,000 ✓) ≈ $0.65/day (pool ÷ 2 markets)"
-ussewc-usse-de-2026-11-03-rep,SELL,0.06,40.0,0,0.10207206287639073,0.637950392977442,25.0,"✅ scoring — ~10.2% of ask side (139,145 resting ≥ 2,000 ✓) ≈ $0.64/day (pool ÷ 2 markets)"
-ussewc-usse-mt-2026-11-03-rep,BUY,0.87,40.0,0,0.09523809523806916,0.39682539682528817,25.0,"✅ scoring — ~9.5% of bid side (510,818 resting ≥ 2,000 ✓) ≈ $0.40/day (pool ÷ 3 markets)"
-ussewc-usse-sd-2026-11-03-rep,BUY,0.93,40.0,0,0.09411764705882353,0.5882352941176471,25.0,"✅ scoring — ~9.4% of bid side (610,875 resting ≥ 2,000 ✓) ≈ $0.59/day (pool ÷ 2 markets)"
+ussewc-usse-de-2026-11-03-dem,BUY,0.95,40.0,0,0.09925558312655088,0.620347394540943,25.0,"✅ scoring — ~9.9% of bid side (510,803 resting ≥ 2,000 ✓) ≈ $0.62/day (pool ÷ 2 markets)"
+scc-senate-gop-2026-11-03-53,BUY,0.07,10.0,0,0.09917807558353203,0.3814541368597386,100.0,"✅ scoring — ~9.9% of bid side (92,537 resting ≥ 5,000 ✓) ≈ $0.38/day (pool ÷ 13 markets)"
+usgubewc-usgub-pa-2026-11-03-dem,BUY,0.94,40.0,0,0.09910802775024777,0.6194251734390486,25.0,"✅ scoring — ~9.9% of bid side (10,992 resting ≥ 2,000 ✓) ≈ $0.62/day (pool ÷ 2 markets)"
+usgubewc-usgub-id-2026-11-03-rep,SELL,0.97,40.0,0,0.09557967880448937,0.5973729925280585,25.0,"✅ scoring — ~9.6% of ask side (11,015 resting ≥ 2,000 ✓) ≈ $0.60/day (pool ÷ 2 markets)"
+ussewc-usse-mt-2026-11-03-rep,BUY,0.87,40.0,0,0.09501187648453462,0.3958828186855609,25.0,"✅ scoring — ~9.5% of bid side (510,819 resting ≥ 2,000 ✓) ≈ $0.40/day (pool ÷ 3 markets)"
+ussewc-usse-sd-2026-11-03-rep,BUY,0.93,40.0,0,0.09389671361502347,0.5868544600938966,25.0,"✅ scoring — ~9.4% of bid side (610,876 resting ≥ 2,000 ✓) ≈ $0.59/day (pool ÷ 2 markets)"
 pntcbk-wnba-white-2027-06-30-roywhi,SELL,0.12,80.0,0,0.09282649487469355,11.603311859336694,250.0,"✅ scoring — ~9.3% of ask side (10,418 resting ≥ 5,000 ✓) ≈ $11.60/day"
-ussewc-usse-tn-2026-11-03-rep,BUY,0.92,40.0,0,0.09009009009009009,0.5630630630630631,25.0,"✅ scoring — ~9.0% of bid side (510,894 resting ≥ 2,000 ✓) ≈ $0.56/day (pool ÷ 2 markets)"
-ussewc-usse-ma-2026-11-03-dem,BUY,0.96,40.0,0,0.08868393047179851,0.5542745654487407,25.0,"✅ scoring — ~8.9% of bid side (600,691 resting ≥ 2,000 ✓) ≈ $0.55/day (pool ÷ 2 markets)"
-ussewc-usse-tn-2026-11-03-dem,SELL,0.09,40.0,0,0.08695652173913043,0.5434782608695652,25.0,"✅ scoring — ~8.7% of ask side (535,737 resting ≥ 2,000 ✓) ≈ $0.54/day (pool ÷ 2 markets)"
+usgubewc-usgub-ri-2026-11-03-dem,BUY,0.95,40.0,0,0.09090909090908987,0.3787878787878745,25.0,"✅ scoring — ~9.1% of bid side (11,450 resting ≥ 2,000 ✓) ≈ $0.38/day (pool ÷ 3 markets)"
+ussewc-usse-tn-2026-11-03-rep,BUY,0.92,40.0,0,0.09029345372460497,0.5643340857787811,25.0,"✅ scoring — ~9.0% of bid side (510,893 resting ≥ 2,000 ✓) ≈ $0.56/day (pool ÷ 2 markets)"
+ussewc-usse-tn-2026-11-03-dem,SELL,0.09,40.0,0,0.087527352297593,0.5470459518599562,25.0,"✅ scoring — ~8.8% of ask side (535,577 resting ≥ 2,000 ✓) ≈ $0.55/day (pool ÷ 2 markets)"
 usgubewc-usgub-me-2026-11-03-rep,SELL,0.05,40.0,0,0.081799591002045,0.5112474437627812,25.0,"✅ scoring — ~8.2% of ask side (65,964 resting ≥ 2,000 ✓) ≈ $0.51/day (pool ÷ 2 markets)"
-apdc-alito-2026-12-31,SELL,0.11,100.0,0,0.07650970791898735,1.9127426979746838,100.0,"✅ scoring — ~7.7% of ask side (12,135 resting ≥ 5,000 ✓) ≈ $1.91/day (pool ÷ 2 markets)"
-scc-hrep-rep-2026-11-03-gte220,SELL,0.18,8.82,0,0.07422710816568638,0.30927961735702664,100.0,"✅ scoring — ~7.4% of ask side (67,966 resting ≥ 5,000 ✓) ≈ $0.31/day (pool ÷ 12 markets)"
-pntcbk-nba-kawleo-2026-10-23-tor,BUY,0.7,10.0,0,0.07007065151651343,0.5839220959709452,500.0,"✅ scoring — ~7.0% of bid side (48,128 resting ≥ 2,500 ✓) ≈ $0.58/day (pool ÷ 30 markets)"
-usgubewc-usgub-tx-2026-11-03-dem,SELL,0.18,29.41,0,0.06871976959562748,0.4294985599726717,25.0,"✅ scoring — ~6.9% of ask side (8,624 resting ≥ 2,000 ✓) ≈ $0.43/day (pool ÷ 2 markets)"
+pandc-anydis-2027-12-31,BUY,0.2,10.0,1,0.07936507934147503,0.9920634917684379,50.0,"✅ scoring — ~7.9% of bid side (10,340 resting ≥ 10,000 ✓) ≈ $0.99/day (pool ÷ 2 markets)"
+apdc-alito-2026-12-31,SELL,0.11,100.0,0,0.07650502521728039,1.9126256304320097,100.0,"✅ scoring — ~7.7% of ask side (12,113 resting ≥ 5,000 ✓) ≈ $1.91/day (pool ÷ 2 markets)"
+scc-hrep-rep-2026-11-03-gte220,SELL,0.18,8.82,0,0.06846523053265252,0.28527179388605217,100.0,"✅ scoring — ~6.8% of ask side (67,976 resting ≥ 5,000 ✓) ≈ $0.29/day (pool ÷ 12 markets)"
 scc-hrep-rep-2026-11-03-gte180,SELL,0.86,200.0,0,0.06724113005443169,0.28017137522679875,100.0,"✅ scoring — ~6.7% of ask side (83,244 resting ≥ 5,000 ✓) ≈ $0.28/day (pool ÷ 12 markets)"
-usgubewc-usgub-pa-2026-11-03-rep,BUY,0.01,800.0,0,0.06504065040650407,0.40650406504065045,25.0,"✅ scoring — ~6.5% of bid side (12,300 resting ≥ 2,000 ✓) ≈ $0.41/day (pool ÷ 2 markets)"
-usgubewc-usgub-pa-2026-11-03-rep,BUY,0.01,800.0,0,0.06504065040650407,0.40650406504065045,25.0,"✅ scoring — ~6.5% of bid side (12,300 resting ≥ 2,000 ✓) ≈ $0.41/day (pool ÷ 2 markets)"
-usgubewc-usgub-ct-2026-11-03-dem,SELL,0.97,40.0,0,0.06494670473409521,0.40591690458809504,25.0,"✅ scoring — ~6.5% of ask side (9,317 resting ≥ 2,000 ✓) ≈ $0.41/day (pool ÷ 2 markets)"
-usgubewc-usgub-ny-2026-11-03-dem,SELL,0.94,70.0,0,0.06368267831149926,0.3980167394468704,25.0,"✅ scoring — ~6.4% of ask side (15,003 resting ≥ 2,000 ✓) ≈ $0.40/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,BUY,0.01,1660.0,2,0.06201434548714884,0.38758965929468026,25.0,"✅ scoring — ~6.2% of bid side (15,788 resting ≥ 2,000 ✓) ≈ $0.39/day (pool ÷ 2 markets)"
-ussewc-usse-nj-2026-11-03-dem,BUY,0.92,40.0,0,0.06006006006006006,0.37537537537537535,25.0,"✅ scoring — ~6.0% of bid side (500,866 resting ≥ 2,000 ✓) ≈ $0.38/day (pool ÷ 2 markets)"
-ussewc-usse-nm-2026-11-03-dem,BUY,0.93,40.0,0,0.05813953488372093,0.3633720930232558,25.0,"✅ scoring — ~5.8% of bid side (560,888 resting ≥ 2,000 ✓) ≈ $0.36/day (pool ÷ 2 markets)"
-usgubewc-usgub-co-2026-11-03-rep,SELL,0.1,40.0,0,0.057971014492753624,0.36231884057971014,25.0,"✅ scoring — ~5.8% of ask side (139,356 resting ≥ 2,000 ✓) ≈ $0.36/day (pool ÷ 2 markets)"
+ussewc-usse-nj-2026-11-03-dem,BUY,0.92,40.0,0,0.06482982171799027,0.4051863857374392,25.0,"✅ scoring — ~6.5% of bid side (500,817 resting ≥ 2,000 ✓) ≈ $0.41/day (pool ÷ 2 markets)"
+ussewc-usse-nm-2026-11-03-dem,BUY,0.93,40.0,0,0.06299212598425197,0.39370078740157477,25.0,"✅ scoring — ~6.3% of bid side (560,835 resting ≥ 2,000 ✓) ≈ $0.39/day (pool ÷ 2 markets)"
+usgubewc-usgub-il-2026-11-03-rep,SELL,0.09,40.0,0,0.06144393241167435,0.38402457757296465,25.0,"✅ scoring — ~6.1% of ask side (216,755 resting ≥ 2,000 ✓) ≈ $0.38/day (pool ÷ 2 markets)"
+usgubewc-usgub-co-2026-11-03-rep,SELL,0.1,40.0,0,0.05891016200294551,0.3681885125184094,25.0,"✅ scoring — ~5.9% of ask side (139,220 resting ≥ 2,000 ✓) ≈ $0.37/day (pool ÷ 2 markets)"
 opdc-mcconnell-resign-2026-11-02,BUY,0.12,40.0,0,0.0579710135713699,0.7246376696421237,25.0,"✅ scoring — ~5.8% of bid side (21,250 resting ≥ 2,000 ✓) ≈ $0.72/day"
-tec-wnba-mvp-2026-10-15-w-paibue,BUY,0.01,5000.0,0,0.05694825681385893,1.7796330254330914,250.0,"✅ scoring — ~5.7% of bid side (87,799 resting ≥ 5,000 ✓) ≈ $1.78/day (pool ÷ 4 markets)"
-usgubewc-usgub-ne-2026-11-03-dem,SELL,0.1,40.0,0,0.054274084124830396,0.33921302578018997,25.0,"✅ scoring — ~5.4% of ask side (274,520 resting ≥ 2,000 ✓) ≈ $0.34/day (pool ÷ 2 markets)"
-tec-wnba-mvp-2026-10-15-w-caicla,BUY,0.01,5000.0,4,0.0520154510366095,1.6254828448940468,250.0,"✅ scoring — ~5.2% of bid side (96,054 resting ≥ 5,000 ✓) ≈ $1.63/day (pool ÷ 4 markets)"
-ussewc-usse-ks-2026-11-03-rep,BUY,0.77,20.0,0,0.05181211311247488,0.323825706952968,25.0,"✅ scoring — ~5.2% of bid side (510,687 resting ≥ 2,000 ✓) ≈ $0.32/day (pool ÷ 2 markets)"
+usgubewc-usgub-hi-2026-11-03-dem,BUY,0.95,40.0,0,0.057803468208092484,0.36127167630057805,25.0,"✅ scoring — ~5.8% of bid side (510,892 resting ≥ 2,000 ✓) ≈ $0.36/day (pool ÷ 2 markets)"
+tec-wnba-mvp-2026-10-15-w-paibue,BUY,0.01,5000.0,0,0.05662578285144792,1.7695557141077474,250.0,"✅ scoring — ~5.7% of bid side (88,299 resting ≥ 5,000 ✓) ≈ $1.77/day (pool ÷ 4 markets)"
+usgubewc-usgub-ne-2026-11-03-dem,SELL,0.1,40.0,0,0.054274084124830396,0.33921302578018997,25.0,"✅ scoring — ~5.4% of ask side (274,395 resting ≥ 2,000 ✓) ≈ $0.34/day (pool ÷ 2 markets)"
+ussewc-usse-ks-2026-11-03-rep,BUY,0.77,20.0,0,0.051545047330208815,0.3221565458138051,25.0,"✅ scoring — ~5.2% of bid side (510,689 resting ≥ 2,000 ✓) ≈ $0.32/day (pool ÷ 2 markets)"
+tec-wnba-mvp-2026-10-15-w-caicla,BUY,0.01,5000.0,4,0.05101658417600156,1.5942682555000487,250.0,"✅ scoring — ~5.1% of bid side (97,937 resting ≥ 5,000 ✓) ≈ $1.59/day (pool ÷ 4 markets)"
+usgubewc-usgub-mn-2026-11-03-dem,SELL,0.96,50.0,0,0.04918355301987015,0.30739720637418844,25.0,"✅ scoring — ~4.9% of ask side (21,286 resting ≥ 2,000 ✓) ≈ $0.31/day (pool ÷ 2 markets)"
+usgubewc-usgub-ct-2026-11-03-dem,SELL,0.97,40.0,0,0.04910170276112377,0.3068856422570236,25.0,"✅ scoring — ~4.9% of ask side (9,392 resting ≥ 2,000 ✓) ≈ $0.31/day (pool ÷ 2 markets)"
 scc-senate-gop-2026-11-03-53,SELL,0.08,50.0,0,0.047909120864772455,0.18426584947989405,100.0,"✅ scoring — ~4.8% of ask side (80,343 resting ≥ 5,000 ✓) ≈ $0.18/day (pool ÷ 13 markets)"
-ussewc-usse-co-2026-11-03-dem,SELL,0.95,40.0,0,0.047670122750566084,0.297938267191038,25.0,"✅ scoring — ~4.8% of ask side (26,127 resting ≥ 2,000 ✓) ≈ $0.30/day (pool ÷ 2 markets)"
-scc-senate-gop-2026-11-03-53,BUY,0.07,10.0,0,0.04734428483654972,0.18209340321749892,100.0,"✅ scoring — ~4.7% of bid side (92,647 resting ≥ 5,000 ✓) ≈ $0.18/day (pool ÷ 13 markets)"
+ussewc-usse-co-2026-11-03-dem,SELL,0.95,40.0,0,0.04766955464718571,0.2979347165449107,25.0,"✅ scoring — ~4.8% of ask side (26,003 resting ≥ 2,000 ✓) ≈ $0.30/day (pool ÷ 2 markets)"
 scc-hrep-rep-2026-11-03-gte180,BUY,0.84,50.0,0,0.046992339872662034,0.1958014161360918,100.0,"✅ scoring — ~4.7% of bid side (101,314 resting ≥ 5,000 ✓) ≈ $0.20/day (pool ÷ 12 markets)"
-usgubewc-usgub-vt-2026-11-03-rep,SELL,0.94,232.75,0,0.04687106680763228,0.29294416754770175,25.0,"✅ scoring — ~4.7% of ask side (24,674 resting ≥ 2,000 ✓) ≈ $0.29/day (pool ÷ 2 markets)"
-enwc-ussep-nh-2026-09-01-rep-scobro,BUY,0.07,40.0,0,0.03962140703534721,0.24763379397092006,25.0,"✅ scoring — ~4.0% of bid side (11,812 resting ≥ 2,000 ✓) ≈ $0.25/day (pool ÷ 2 markets)"
-usgubewc-usgub-id-2026-11-03-rep,SELL,0.97,40.0,0,0.0375420365222071,0.23463772826379437,25.0,"✅ scoring — ~3.8% of ask side (70,871 resting ≥ 2,000 ✓) ≈ $0.23/day (pool ÷ 2 markets)"
-ussewc-usse-nm-2026-11-03-rep,BUY,0.01,571.0,0,0.03643673026609661,0.2277295641631038,25.0,"✅ scoring — ~3.6% of bid side (15,671 resting ≥ 2,000 ✓) ≈ $0.23/day (pool ÷ 2 markets)"
-pvwc-housepopw-2026-11-03-rep,SELL,0.11,10.0,0,0.03640348162898298,0.22752176018114362,25.0,"✅ scoring — ~3.6% of ask side (147,233 resting ≥ 2,000 ✓) ≈ $0.23/day (pool ÷ 2 markets)"
+usgubewc-usgub-vt-2026-11-03-rep,SELL,0.94,232.75,0,0.04564548899017078,0.28528430618856737,25.0,"✅ scoring — ~4.6% of ask side (24,632 resting ≥ 2,000 ✓) ≈ $0.29/day (pool ÷ 2 markets)"
+usgubewc-usgub-ny-2026-11-03-dem,SELL,0.94,70.0,0,0.04497847458716186,0.28111546616976163,25.0,"✅ scoring — ~4.5% of ask side (19,449 resting ≥ 2,000 ✓) ≈ $0.28/day (pool ÷ 2 markets)"
+scc-hrep-rep-2026-11-03-gte220,BUY,0.14,5.0,0,0.04201679913434499,0.17506999639310414,100.0,"✅ scoring — ~4.2% of bid side (805,666 resting ≥ 5,000 ✓) ≈ $0.18/day (pool ÷ 12 markets)"
+enwc-ussep-nh-2026-09-01-rep-scobro,BUY,0.07,40.0,0,0.04009802913545452,0.25061268209659077,25.0,"✅ scoring — ~4.0% of bid side (11,800 resting ≥ 2,000 ✓) ≈ $0.25/day (pool ÷ 2 markets)"
+usgubewc-usgub-pa-2026-11-03-rep,BUY,0.01,800.0,0,0.038797284190106696,0.24248302618816686,25.0,"✅ scoring — ~3.9% of bid side (20,620 resting ≥ 2,000 ✓) ≈ $0.24/day (pool ÷ 2 markets)"
+usgubewc-usgub-pa-2026-11-03-rep,BUY,0.01,800.0,0,0.038797284190106696,0.24248302618816686,25.0,"✅ scoring — ~3.9% of bid side (20,620 resting ≥ 2,000 ✓) ≈ $0.24/day (pool ÷ 2 markets)"
+usgubewc-usgub-tx-2026-11-03-dem,SELL,0.18,29.41,0,0.03829576661212378,0.2393485413257736,25.0,"✅ scoring — ~3.8% of ask side (8,839 resting ≥ 2,000 ✓) ≈ $0.24/day (pool ÷ 2 markets)"
+pvwc-housepopw-2026-11-03-rep,SELL,0.11,10.0,0,0.03640348162898298,0.22752176018114362,25.0,"✅ scoring — ~3.6% of ask side (147,108 resting ≥ 2,000 ✓) ≈ $0.23/day (pool ÷ 2 markets)"
 scc-hrep-rep-2026-11-03-gte210,SELL,0.37,2.0,0,0.036363626184571445,0.15151510910238103,100.0,"✅ scoring — ~3.6% of ask side (82,477 resting ≥ 5,000 ✓) ≈ $0.15/day (pool ÷ 12 markets)"
-usgubewc-usgub-md-2026-11-03-rep,SELL,0.1,40.0,2,0.03478260869565218,0.21739130434782614,25.0,"✅ scoring — ~3.5% of ask side (73,477 resting ≥ 2,000 ✓) ≈ $0.22/day (pool ÷ 2 markets)"
-ussewc-usse-or-2026-11-03-dem,SELL,0.96,40.0,0,0.031918543876028375,0.19949089922517735,25.0,"✅ scoring — ~3.2% of ask side (10,824 resting ≥ 2,000 ✓) ≈ $0.20/day (pool ÷ 2 markets)"
+ussewc-usse-nm-2026-11-03-rep,BUY,0.01,571.0,0,0.0353101230597984,0.22068826912374,25.0,"✅ scoring — ~3.5% of bid side (16,171 resting ≥ 2,000 ✓) ≈ $0.22/day (pool ÷ 2 markets)"
+usgubewc-usgub-md-2026-11-03-rep,SELL,0.1,40.0,2,0.03481288076588338,0.21758050478677113,25.0,"✅ scoring — ~3.5% of ask side (73,351 resting ≥ 2,000 ✓) ≈ $0.22/day (pool ÷ 2 markets)"
 scc-senate-gop-2026-11-03-lte45,SELL,0.07,40.0,0,0.031545741324921134,0.12132977432661975,100.0,"✅ scoring — ~3.2% of ask side (78,939 resting ≥ 5,000 ✓) ≈ $0.12/day (pool ÷ 13 markets)"
 ewc-usgub-ca-2026-11-03-stehil,SELL,0.06,42.17,0,0.030901488078488755,2.3176116058866567,300.0,"✅ scoring — ~3.1% of ask side (386,727 resting ≥ 10,000 ✓) ≈ $2.32/day (pool ÷ 2 markets)"
-usgubewc-usgub-hi-2026-11-03-dem,SELL,0.97,40.0,1,0.030835985934781734,0.19272491209238585,25.0,"✅ scoring — ~3.1% of ask side (9,416 resting ≥ 2,000 ✓) ≈ $0.19/day (pool ÷ 2 markets)"
-usgubewc-usgub-nm-2026-11-03-rep,SELL,0.1,40.0,0,0.02917578303516473,0.18234864396977957,25.0,"✅ scoring — ~2.9% of ask side (74,837 resting ≥ 2,000 ✓) ≈ $0.18/day (pool ÷ 2 markets)"
-usgubewc-usgub-id-2026-11-03-rep,BUY,0.96,50.0,0,0.02891844997108155,0.1807403123192597,25.0,"✅ scoring — ~2.9% of bid side (511,929 resting ≥ 2,000 ✓) ≈ $0.18/day (pool ÷ 2 markets)"
-usgubewc-usgub-ok-2026-11-03-dem,BUY,0.01,435.0,1,0.028741328047571853,0.17963330029732408,25.0,"✅ scoring — ~2.9% of bid side (2,085 resting ≥ 2,000 ✓) ≈ $0.18/day (pool ÷ 2 markets)"
-usgubewc-usgub-sc-2026-11-03-dem,SELL,0.07,40.0,0,0.027777777777777776,0.1736111111111111,25.0,"✅ scoring — ~2.8% of ask side (197,415 resting ≥ 2,000 ✓) ≈ $0.17/day (pool ÷ 2 markets)"
-usgubewc-usgub-ri-2026-11-03-dem,BUY,0.95,40.0,0,0.027777777777777683,0.11574074074074035,25.0,"✅ scoring — ~2.8% of bid side (12,450 resting ≥ 2,000 ✓) ≈ $0.12/day (pool ÷ 3 markets)"
-usgubewc-usgub-ne-2026-11-03-rep,BUY,0.92,40.0,0,0.026936026936026935,0.16835016835016833,25.0,"✅ scoring — ~2.7% of bid side (501,685 resting ≥ 2,000 ✓) ≈ $0.17/day (pool ÷ 2 markets)"
-opdc-mcconnell-resign-2026-11-02,SELL,0.13,40.0,0,0.026881720430107527,0.33602150537634407,25.0,"✅ scoring — ~2.7% of ask side (13,183 resting ≥ 2,000 ✓) ≈ $0.34/day"
-ussewc-usse-co-2026-11-03-rep,SELL,0.07,50.0,0,0.026737967914438502,0.16711229946524064,25.0,"✅ scoring — ~2.7% of ask side (60,983 resting ≥ 2,000 ✓) ≈ $0.17/day (pool ÷ 2 markets)"
-usgubewc-usgub-hi-2026-11-03-dem,BUY,0.95,40.0,0,0.025220680958385876,0.15762925598991173,25.0,"✅ scoring — ~2.5% of bid side (511,786 resting ≥ 2,000 ✓) ≈ $0.16/day (pool ÷ 2 markets)"
-enwc-ussep-nh-2026-09-01-rep-scobro,SELL,0.08,20.0,0,0.025210189954014684,0.15756368721259179,25.0,"✅ scoring — ~2.5% of ask side (60,481 resting ≥ 2,000 ✓) ≈ $0.16/day (pool ÷ 2 markets)"
-usgubewc-usgub-ar-2026-11-03-rep,SELL,0.97,40.0,1,0.025108492225626167,0.15692807641016354,25.0,"✅ scoring — ~2.5% of ask side (9,126 resting ≥ 2,000 ✓) ≈ $0.16/day (pool ÷ 2 markets)"
-usgubewc-usgub-tn-2026-11-03-rep,BUY,0.96,40.0,0,0.025031289111389236,0.15644555694618273,25.0,"✅ scoring — ~2.5% of bid side (3,508 resting ≥ 2,000 ✓) ≈ $0.16/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,BUY,0.95,40.0,0,0.024875621890547265,0.1554726368159204,25.0,"✅ scoring — ~2.5% of bid side (3,543 resting ≥ 2,000 ✓) ≈ $0.16/day (pool ÷ 2 markets)"
-scc-senate-gop-2026-11-03-lte45,BUY,0.06,1.0,0,0.024027371982162076,0.09241296916216184,100.0,"✅ scoring — ~2.4% of bid side (25,588 resting ≥ 5,000 ✓) ≈ $0.09/day (pool ÷ 13 markets)"
-apdc-jerpowgov-2026-12-31,SELL,0.28,2.0,0,0.022568269013766643,0.564206725344166,100.0,"✅ scoring — ~2.3% of ask side (14,687 resting ≥ 5,000 ✓) ≈ $0.56/day (pool ÷ 2 markets)"
-ussewc-usse-ri-2026-11-03-rep,SELL,0.05,40.0,0,0.022505795242274886,0.14066122026421804,25.0,"✅ scoring — ~2.3% of ask side (132,633 resting ≥ 2,000 ✓) ≈ $0.14/day (pool ÷ 2 markets)"
-ussewc-usse-nm-2026-11-03-rep,SELL,0.05,40.0,0,0.02189381451792415,0.13683634073702594,25.0,"✅ scoring — ~2.2% of ask side (132,592 resting ≥ 2,000 ✓) ≈ $0.14/day (pool ÷ 2 markets)"
-ussewc-usse-ks-2026-11-03-dem,SELL,0.13,10.0,0,0.02159827213822894,0.13498920086393087,25.0,"✅ scoring — ~2.2% of ask side (139,129 resting ≥ 2,000 ✓) ≈ $0.13/day (pool ÷ 2 markets)"
-usgubewc-usgub-ri-2026-11-03-rep,SELL,0.09,40.0,0,0.020634617666327914,0.08597757360969965,25.0,"✅ scoring — ~2.1% of ask side (10,203 resting ≥ 2,000 ✓) ≈ $0.09/day (pool ÷ 3 markets)"
-usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,259.3,1,0.018213528865949694,0.11383455541218558,25.0,"✅ scoring — ~1.8% of ask side (8,837 resting ≥ 2,000 ✓) ≈ $0.11/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,206.54,1,0.016501708175272526,0.1031356760954533,25.0,"✅ scoring — ~1.7% of ask side (2,391 resting ≥ 2,000 ✓) ≈ $0.10/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,206.54,1,0.016501708175272526,0.1031356760954533,25.0,"✅ scoring — ~1.7% of ask side (2,391 resting ≥ 2,000 ✓) ≈ $0.10/day (pool ÷ 2 markets)"
-ewc-usgub-ca-2026-11-03-xavbec,BUY,0.94,50.0,1,0.01640585995478104,1.230439496608578,300.0,"✅ scoring — ~1.6% of bid side (1,071,099 resting ≥ 10,000 ✓) ≈ $1.23/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,191.6,1,0.015308062779036584,0.09567539236897865,25.0,"✅ scoring — ~1.5% of ask side (2,391 resting ≥ 2,000 ✓) ≈ $0.10/day (pool ÷ 2 markets)"
-usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,217.91,1,0.01530624787959544,0.0956640492474715,25.0,"✅ scoring — ~1.5% of ask side (8,837 resting ≥ 2,000 ✓) ≈ $0.10/day (pool ÷ 2 markets)"
+usgubewc-usgub-id-2026-11-03-rep,BUY,0.96,50.0,0,0.029670068834559696,0.1854379302159981,25.0,"✅ scoring — ~3.0% of bid side (511,885 resting ≥ 2,000 ✓) ≈ $0.19/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-dem,BUY,0.01,1660.0,2,0.029242856639537757,0.18276785399711099,25.0,"✅ scoring — ~2.9% of bid side (16,086 resting ≥ 2,000 ✓) ≈ $0.18/day (pool ÷ 2 markets)"
+usgubewc-usgub-nm-2026-11-03-rep,SELL,0.1,40.0,0,0.02894355901072507,0.1808972438170317,25.0,"✅ scoring — ~2.9% of ask side (74,723 resting ≥ 2,000 ✓) ≈ $0.18/day (pool ÷ 2 markets)"
+usgubewc-usgub-ne-2026-11-03-rep,BUY,0.92,40.0,0,0.027874564459930314,0.17421602787456447,25.0,"✅ scoring — ~2.8% of bid side (501,635 resting ≥ 2,000 ✓) ≈ $0.17/day (pool ÷ 2 markets)"
+opdc-mcconnell-resign-2026-11-02,SELL,0.13,40.0,0,0.027470640752695553,0.34338300940869443,25.0,"✅ scoring — ~2.7% of ask side (13,027 resting ≥ 2,000 ✓) ≈ $0.34/day"
+ussewc-usse-co-2026-11-03-rep,SELL,0.07,50.0,0,0.02672367717797969,0.16702298236237306,25.0,"✅ scoring — ~2.7% of ask side (60,984 resting ≥ 2,000 ✓) ≈ $0.17/day (pool ÷ 2 markets)"
+ussewc-usse-or-2026-11-03-dem,SELL,0.96,40.0,0,0.02590019360394719,0.16187621002466993,25.0,"✅ scoring — ~2.6% of ask side (10,288 resting ≥ 2,000 ✓) ≈ $0.16/day (pool ÷ 2 markets)"
+enwc-ussep-nh-2026-09-01-rep-scobro,SELL,0.08,20.0,0,0.025220680953615255,0.15762925596009533,25.0,"✅ scoring — ~2.5% of ask side (60,349 resting ≥ 2,000 ✓) ≈ $0.16/day (pool ÷ 2 markets)"
+usgubewc-usgub-sc-2026-11-03-dem,SELL,0.07,40.0,0,0.02416918429003021,0.1510574018126888,25.0,"✅ scoring — ~2.4% of ask side (197,630 resting ≥ 2,000 ✓) ≈ $0.15/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,BUY,0.95,40.0,0,0.023962714016989566,0.14976696260618477,25.0,"✅ scoring — ~2.4% of bid side (3,604 resting ≥ 2,000 ✓) ≈ $0.15/day (pool ÷ 2 markets)"
+ussewc-usse-ri-2026-11-03-rep,SELL,0.05,40.0,0,0.02244341454108828,0.14027134088180176,25.0,"✅ scoring — ~2.2% of ask side (132,507 resting ≥ 2,000 ✓) ≈ $0.14/day (pool ÷ 2 markets)"
+ussewc-usse-nm-2026-11-03-rep,SELL,0.05,40.0,0,0.0218190541042939,0.13636908815183688,25.0,"✅ scoring — ~2.2% of ask side (132,598 resting ≥ 2,000 ✓) ≈ $0.14/day (pool ÷ 2 markets)"
+ussewc-usse-ks-2026-11-03-dem,SELL,0.13,10.0,0,0.02159827213822894,0.13498920086393087,25.0,"✅ scoring — ~2.2% of ask side (139,001 resting ≥ 2,000 ✓) ≈ $0.13/day (pool ÷ 2 markets)"
+usgubewc-usgub-ri-2026-11-03-rep,SELL,0.09,40.0,0,0.021169733631826577,0.08820722346594408,25.0,"✅ scoring — ~2.1% of ask side (10,029 resting ≥ 2,000 ✓) ≈ $0.09/day (pool ÷ 3 markets)"
+apdc-jerpowgov-2026-12-31,SELL,0.28,2.0,0,0.01807991321641656,0.451997830410414,100.0,"✅ scoring — ~1.8% of ask side (14,709 resting ≥ 5,000 ✓) ≈ $0.45/day (pool ÷ 2 markets)"
+ewc-usgub-ca-2026-11-03-xavbec,BUY,0.94,50.0,1,0.016541144172062112,1.2405858129046583,300.0,"✅ scoring — ~1.7% of bid side (1,071,078 resting ≥ 10,000 ✓) ≈ $1.24/day (pool ÷ 2 markets)"
+usgubewc-usgub-ar-2026-11-03-rep,SELL,0.97,40.0,1,0.015063175901178035,0.09414484938236271,25.0,"✅ scoring — ~1.5% of ask side (22,359 resting ≥ 2,000 ✓) ≈ $0.09/day (pool ÷ 2 markets)"
 pvwc-housepopw-2026-11-03-dem,BUY,0.86,10.0,0,0.013937087981145842,0.08710679988216151,25.0,"✅ scoring — ~1.4% of bid side (515,941 resting ≥ 2,000 ✓) ≈ $0.09/day (pool ÷ 2 markets)"
 scc-senate-gop-2026-11-03-55,SELL,0.04,13.74,0,0.013708470517696997,0.05272488660652691,100.0,"✅ scoring — ~1.4% of ask side (79,284 resting ≥ 5,000 ✓) ≈ $0.05/day (pool ÷ 13 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,165.18,1,0.013197211951154817,0.0824825746947176,25.0,"✅ scoring — ~1.3% of ask side (2,391 resting ≥ 2,000 ✓) ≈ $0.08/day (pool ÷ 2 markets)"
-usgubewc-usgub-tx-2026-11-03-rep,BUY,0.87,10.0,0,0.013175230566534914,0.08234519104084322,25.0,"✅ scoring — ~1.3% of bid side (10,959 resting ≥ 2,000 ✓) ≈ $0.08/day (pool ÷ 2 markets)"
-ussewc-usse-nm-2026-11-03-rep,BUY,0.01,200.0,0,0.012762427413694084,0.07976517133558803,25.0,"✅ scoring — ~1.3% of bid side (15,671 resting ≥ 2,000 ✓) ≈ $0.08/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,156.07,1,0.01246935990565887,0.07793349941036794,25.0,"✅ scoring — ~1.2% of ask side (2,391 resting ≥ 2,000 ✓) ≈ $0.08/day (pool ÷ 2 markets)"
-ussewc-usse-sc-2026-11-03-rep,SELL,0.91,34.79,0,0.011858381138390954,0.07411488211494346,25.0,"✅ scoring — ~1.2% of ask side (12,134 resting ≥ 2,000 ✓) ≈ $0.07/day (pool ÷ 2 markets)"
+usgubewc-usgub-tx-2026-11-03-rep,BUY,0.87,10.0,0,0.012853470437017995,0.08033419023136247,25.0,"✅ scoring — ~1.3% of bid side (10,978 resting ≥ 2,000 ✓) ≈ $0.08/day (pool ÷ 2 markets)"
+ussewc-usse-nm-2026-11-03-rep,BUY,0.01,200.0,0,0.01236781893513079,0.07729886834456744,25.0,"✅ scoring — ~1.2% of bid side (16,171 resting ≥ 2,000 ✓) ≈ $0.08/day (pool ÷ 2 markets)"
+ussewc-usse-la-2026-11-03-rep,BUY,0.94,40.0,1,0.011904761904761904,0.0744047619047619,25.0,"✅ scoring — ~1.2% of bid side (511,526 resting ≥ 2,000 ✓) ≈ $0.07/day (pool ÷ 2 markets)"
+ussewc-usse-sc-2026-11-03-rep,SELL,0.91,34.79,0,0.011858381138390954,0.07411488211494346,25.0,"✅ scoring — ~1.2% of ask side (11,977 resting ≥ 2,000 ✓) ≈ $0.07/day (pool ÷ 2 markets)"
 usgubewc-usgub-ny-2026-11-03-dem,BUY,0.93,10.0,0,0.01180637544273866,0.07378984651711663,25.0,"✅ scoring — ~1.2% of bid side (511,347 resting ≥ 2,000 ✓) ≈ $0.07/day (pool ÷ 2 markets)"
-usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,157.93,1,0.011093184010024817,0.0693324000626551,25.0,"✅ scoring — ~1.1% of ask side (8,837 resting ≥ 2,000 ✓) ≈ $0.07/day (pool ÷ 2 markets)"
-usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,156.18,1,0.010970262006494499,0.06856413754059063,25.0,"✅ scoring — ~1.1% of ask side (8,837 resting ≥ 2,000 ✓) ≈ $0.07/day (pool ÷ 2 markets)"
-usgubewc-usgub-pa-2026-11-03-dem,BUY,0.93,40.0,1,0.010397712503249286,0.06498570314530804,25.0,"✅ scoring — ~1.0% of bid side (10,974 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-ussewc-usse-la-2026-11-03-rep,BUY,0.94,40.0,1,0.010365379632029024,0.0647836227001814,25.0,"✅ scoring — ~1.0% of bid side (511,575 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-ussewc-usse-nm-2026-11-03-rep,BUY,0.01,160.0,0,0.010209941930955268,0.06381213706847043,25.0,"✅ scoring — ~1.0% of bid side (15,671 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,140.35,1,0.00985834468313166,0.061614654269572876,25.0,"✅ scoring — ~1.0% of ask side (8,837 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-ma-2026-11-03-dem,BUY,0.95,40.0,1,0.00977539801143966,0.061096237571497874,25.0,"✅ scoring — ~1.0% of bid side (2,435 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-hi-2026-11-03-dem,SELL,0.97,40.0,1,0.01086749803026598,0.06792186268916238,25.0,"✅ scoring — ~1.1% of ask side (34,027 resting ≥ 2,000 ✓) ≈ $0.07/day (pool ÷ 2 markets)"
+usgubewc-usgub-pa-2026-11-03-dem,BUY,0.93,40.0,1,0.009910802775024777,0.06194251734390485,25.0,"✅ scoring — ~1.0% of bid side (10,992 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+ussewc-usse-nm-2026-11-03-rep,BUY,0.01,160.0,0,0.009894255148104632,0.061839094675653954,25.0,"✅ scoring — ~1.0% of bid side (16,171 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-ma-2026-11-03-dem,BUY,0.95,40.0,1,0.009773021573945126,0.061081384837157034,25.0,"✅ scoring — ~1.0% of bid side (2,386 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-id-2026-11-03-rep,SELL,0.98,40.0,1,0.009557967880448937,0.05973729925280585,25.0,"✅ scoring — ~1.0% of ask side (11,015 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,222.43,0,0.009368234848165775,0.058551467801036094,25.0,"✅ scoring — ~0.9% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,222.43,0,0.009368234848165775,0.058551467801036094,25.0,"✅ scoring — ~0.9% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,222.43,0,0.009368234848165775,0.058551467801036094,25.0,"✅ scoring — ~0.9% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
@@ -161,23 +151,22 @@ ussewc-usse-il-2026-11-03-dem,SELL,0.99,222.43,0,0.009368234848165775,0.05855146
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,222.43,0,0.009368234848165775,0.058551467801036094,25.0,"✅ scoring — ~0.9% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,222.43,0,0.009368234848165775,0.058551467801036094,25.0,"✅ scoring — ~0.9% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,222.43,0,0.009368234848165775,0.058551467801036094,25.0,"✅ scoring — ~0.9% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009366897452623325,0.05854310907889578,25.0,"✅ scoring — ~0.9% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009366897452623325,0.05854310907889578,25.0,"✅ scoring — ~0.9% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009366897452623325,0.05854310907889578,25.0,"✅ scoring — ~0.9% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009366897452623325,0.05854310907889578,25.0,"✅ scoring — ~0.9% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009366897452623325,0.05854310907889578,25.0,"✅ scoring — ~0.9% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009366897452623325,0.05854310907889578,25.0,"✅ scoring — ~0.9% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009366897452623325,0.05854310907889578,25.0,"✅ scoring — ~0.9% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009366897452623325,0.05854310907889578,25.0,"✅ scoring — ~0.9% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009366897452623325,0.05854310907889578,25.0,"✅ scoring — ~0.9% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009366897452623325,0.05854310907889578,25.0,"✅ scoring — ~0.9% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,115.35,1,0.00921599708539598,0.05759998178372488,25.0,"✅ scoring — ~0.9% of ask side (2,391 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009173740574881694,0.057335878593010585,25.0,"✅ scoring — ~0.9% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009173740574881694,0.057335878593010585,25.0,"✅ scoring — ~0.9% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009173740574881694,0.057335878593010585,25.0,"✅ scoring — ~0.9% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009173740574881694,0.057335878593010585,25.0,"✅ scoring — ~0.9% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009173740574881694,0.057335878593010585,25.0,"✅ scoring — ~0.9% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009173740574881694,0.057335878593010585,25.0,"✅ scoring — ~0.9% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009173740574881694,0.057335878593010585,25.0,"✅ scoring — ~0.9% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009173740574881694,0.057335878593010585,25.0,"✅ scoring — ~0.9% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009173740574881694,0.057335878593010585,25.0,"✅ scoring — ~0.9% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,222.43,0,0.009173740574881694,0.057335878593010585,25.0,"✅ scoring — ~0.9% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,210.41,0,0.008861980373162616,0.05538737733226635,25.0,"✅ scoring — ~0.9% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,210.34,0,0.00885903213578739,0.05536895084867118,25.0,"✅ scoring — ~0.9% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,197.36,0,0.008312344691066842,0.05195215431916776,25.0,"✅ scoring — ~0.8% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,197.36,0,0.008311158032863102,0.051944737705394387,25.0,"✅ scoring — ~0.8% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,197.32,0,0.008310659983995283,0.051941624899970514,25.0,"✅ scoring — ~0.8% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,197.32,0,0.008309473566297867,0.05193420978936167,25.0,"✅ scoring — ~0.8% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,197.36,0,0.00813977179273772,0.05087357370461075,25.0,"✅ scoring — ~0.8% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,197.32,0,0.008138122061932544,0.050863262887078396,25.0,"✅ scoring — ~0.8% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
 ussewc-usse-wv-2026-11-03-rep,SELL,0.99,222.43,0,0.007898363476700308,0.04936477172937692,25.0,"✅ scoring — ~0.8% of ask side (28,162 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
 ussewc-usse-wv-2026-11-03-rep,SELL,0.99,222.43,0,0.007898363476700308,0.04936477172937692,25.0,"✅ scoring — ~0.8% of ask side (28,162 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
 ussewc-usse-wv-2026-11-03-rep,SELL,0.99,222.43,0,0.007898363476700308,0.04936477172937692,25.0,"✅ scoring — ~0.8% of ask side (28,162 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
@@ -188,7 +177,7 @@ ussewc-usse-wv-2026-11-03-rep,SELL,0.99,222.43,0,0.007898363476700308,0.04936477
 ussewc-usse-wv-2026-11-03-rep,SELL,0.99,222.43,0,0.007898363476700308,0.04936477172937692,25.0,"✅ scoring — ~0.8% of ask side (28,162 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
 ussewc-usse-wv-2026-11-03-rep,SELL,0.99,222.43,0,0.007898363476700308,0.04936477172937692,25.0,"✅ scoring — ~0.8% of ask side (28,162 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
 ussewc-usse-wv-2026-11-03-rep,SELL,0.99,222.43,0,0.007898363476700308,0.04936477172937692,25.0,"✅ scoring — ~0.8% of ask side (28,162 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
-ussewc-usse-de-2026-11-03-dem,SELL,0.96,40.0,0,0.007352941176470588,0.04595588235294117,25.0,"✅ scoring — ~0.7% of ask side (17,474 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
+ussewc-usse-de-2026-11-03-dem,SELL,0.96,40.0,0,0.007352941176470588,0.04595588235294117,25.0,"✅ scoring — ~0.7% of ask side (17,349 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
 ussewc-usse-wv-2026-11-03-rep,SELL,0.99,206.55,0,0.007334473659634261,0.04584046037271413,25.0,"✅ scoring — ~0.7% of ask side (28,162 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
 ussewc-usse-ma-2026-11-03-dem,SELL,0.99,222.43,0,0.007312441769714136,0.04570276106071335,25.0,"✅ scoring — ~0.7% of ask side (30,418 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
 ussewc-usse-ma-2026-11-03-dem,SELL,0.99,222.43,0,0.007312441769714136,0.04570276106071335,25.0,"✅ scoring — ~0.7% of ask side (30,418 resting ≥ 2,000 ✓) ≈ $0.05/day (pool ÷ 2 markets)"
@@ -206,214 +195,225 @@ ussewc-usse-wv-2026-11-03-rep,SELL,0.99,197.36,0,0.007008141958196164,0.04380088
 ussewc-usse-wv-2026-11-03-rep,SELL,0.99,197.32,0,0.007006721580823201,0.043792009880145005,25.0,"✅ scoring — ~0.7% of ask side (28,162 resting ≥ 2,000 ✓) ≈ $0.04/day (pool ÷ 2 markets)"
 ussewc-usse-ma-2026-11-03-dem,SELL,0.99,206.54,0,0.0067900540534854,0.04243783783428375,25.0,"✅ scoring — ~0.7% of ask side (30,418 resting ≥ 2,000 ✓) ≈ $0.04/day (pool ÷ 2 markets)"
 ussewc-usse-wv-2026-11-03-rep,SELL,0.99,190.0,0,0.006746792521571094,0.04216745325981934,25.0,"✅ scoring — ~0.7% of ask side (28,162 resting ≥ 2,000 ✓) ≈ $0.04/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,154.47,0,0.00650498875829126,0.040656179739320376,25.0,"✅ scoring — ~0.7% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.04/day (pool ÷ 2 markets)"
 ussewc-usse-ma-2026-11-03-dem,SELL,0.99,197.32,0,0.0064869442521242335,0.04054340157577646,25.0,"✅ scoring — ~0.6% of ask side (30,418 resting ≥ 2,000 ✓) ≈ $0.04/day (pool ÷ 2 markets)"
-scc-hrep-rep-2026-11-03-gte220,BUY,0.14,5.0,0,0.006385695865594462,0.026607066106643592,100.0,"✅ scoring — ~0.6% of bid side (806,330 resting ≥ 5,000 ✓) ≈ $0.03/day (pool ÷ 12 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,154.47,0,0.006370847936887898,0.03981779960554936,25.0,"✅ scoring — ~0.6% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.04/day (pool ÷ 2 markets)"
 pntcbk-wnba-freedom-2027-06-30-enekan,SELL,0.1,50.0,0,0.006027672320301828,0.7534590400377285,250.0,"✅ scoring — ~0.6% of ask side (15,278 resting ≥ 5,000 ✓) ≈ $0.75/day"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,132.59,0,0.005583585547108424,0.03489740966942765,25.0,"✅ scoring — ~0.6% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,115.35,0,0.004857580457492697,0.030359877859329355,25.0,"✅ scoring — ~0.5% of ask side (23,746 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
-usgubewc-usgub-pa-2026-11-03-dem,SELL,0.95,50.0,0,0.004776461597248758,0.02985288498280474,25.0,"✅ scoring — ~0.5% of ask side (18,768 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,206.54,1,0.00598386032289784,0.0373991270181115,25.0,"✅ scoring — ~0.6% of ask side (22,591 resting ≥ 2,000 ✓) ≈ $0.04/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,206.54,1,0.00598386032289784,0.0373991270181115,25.0,"✅ scoring — ~0.6% of ask side (22,591 resting ≥ 2,000 ✓) ≈ $0.04/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,191.6,1,0.0055510198405501416,0.03469387400343839,25.0,"✅ scoring — ~0.6% of ask side (22,591 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,132.59,0,0.0054684451864567,0.03417778241535437,25.0,"✅ scoring — ~0.5% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
+scc-senate-gop-2026-11-03-lte45,BUY,0.06,1.0,0,0.004959845094118021,0.019076327285069312,100.0,"✅ scoring — ~0.5% of bid side (26,388 resting ≥ 5,000 ✓) ≈ $0.02/day (pool ÷ 13 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,165.18,1,0.004785581718486808,0.029909885740542548,25.0,"✅ scoring — ~0.5% of ask side (22,591 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
+usgubewc-usgub-pa-2026-11-03-dem,SELL,0.95,50.0,0,0.004776005349125991,0.029850033432037442,25.0,"✅ scoring — ~0.5% of ask side (18,644 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,SELL,0.99,115.35,0,0.0047574112094259016,0.029733820058911883,25.0,"✅ scoring — ~0.5% of ask side (24,246 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
 ussewc-usse-ma-2026-11-03-dem,SELL,0.99,144.0,0,0.004734035943167898,0.029587724644799362,25.0,"✅ scoring — ~0.5% of ask side (30,418 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
-ussewc-usse-ky-2026-11-03-dem,BUY,0.02,25.0,0,0.004405286343612335,0.027533039647577095,25.0,"✅ scoring — ~0.4% of bid side (7,250 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
-usgubewc-usgub-il-2026-11-03-dem,SELL,0.97,40.0,0,0.004396087482140895,0.02747554676338059,25.0,"✅ scoring — ~0.4% of ask side (25,295 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
-usgubewc-usgub-id-2026-11-03-rep,SELL,0.98,40.0,1,0.0037542036522207095,0.023463772826379434,25.0,"✅ scoring — ~0.4% of ask side (70,871 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.98,40.0,0,0.003511852502194908,0.021949078138718173,25.0,"✅ scoring — ~0.4% of ask side (22,725 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
-usgubewc-usgub-co-2026-11-03-dem,SELL,0.97,40.0,0,0.0033377837116154874,0.020861148197596796,25.0,"✅ scoring — ~0.3% of ask side (29,087 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,156.07,1,0.004521647528782153,0.028260297054888455,25.0,"✅ scoring — ~0.5% of ask side (22,591 resting ≥ 2,000 ✓) ≈ $0.03/day (pool ÷ 2 markets)"
+ussewc-usse-ri-2026-11-03-dem,SELL,0.96,40.0,0,0.003742518471667732,0.023390740447923324,25.0,"✅ scoring — ~0.4% of ask side (18,817 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.98,40.0,0,0.0034364290690971386,0.021477681681857114,25.0,"✅ scoring — ~0.3% of ask side (22,975 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,SELL,0.99,115.35,1,0.003341910953066069,0.02088694345666293,25.0,"✅ scoring — ~0.3% of ask side (22,591 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
 ussewc-usse-ma-2026-11-03-dem,SELL,0.99,98.78,0,0.003247417156014757,0.02029635722509223,25.0,"✅ scoring — ~0.3% of ask side (30,418 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
-ussewc-usse-tn-2026-11-03-rep,SELL,0.96,40.0,0,0.0031138097462245057,0.01946131091390316,25.0,"✅ scoring — ~0.3% of ask side (31,012 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
 ussewc-usse-ma-2026-11-03-dem,SELL,0.99,86.65,0,0.0028486403783020723,0.017804002364387953,25.0,"✅ scoring — ~0.3% of ask side (30,418 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
-usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,167.87,2,0.002725650830928141,0.01703531769330088,25.0,"✅ scoring — ~0.3% of ask side (9,317 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
-ussewc-usse-ri-2026-11-03-dem,SELL,0.96,40.0,0,0.0026602819898909284,0.016626762436818304,25.0,"✅ scoring — ~0.3% of ask side (23,322 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
-ussewc-usse-nm-2026-11-03-rep,BUY,0.01,40.0,0,0.002552485482738817,0.015953034267117607,25.0,"✅ scoring — ~0.3% of bid side (15,671 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
+ussewc-usse-tn-2026-11-03-rep,SELL,0.96,40.0,0,0.002767017155506364,0.017293857221914774,25.0,"✅ scoring — ~0.3% of ask side (38,022 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
+ussewc-usse-ky-2026-11-03-dem,BUY,0.02,25.0,0,0.0026700843746662395,0.016688027341663997,25.0,"✅ scoring — ~0.3% of bid side (10,938 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
+ussewc-usse-nm-2026-11-03-rep,BUY,0.01,40.0,0,0.002473563787026158,0.015459773668913488,25.0,"✅ scoring — ~0.2% of bid side (16,171 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
 scc-senate-gop-2026-11-03-54,BUY,0.04,1.0,0,0.0024683069389044663,0.00949348822655564,100.0,"✅ scoring — ~0.2% of bid side (50,518 resting ≥ 5,000 ✓) ≈ $0.01/day (pool ÷ 13 markets)"
-usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,149.07,2,0.002420401318677893,0.015127508241736832,25.0,"✅ scoring — ~0.2% of ask side (9,317 resting ≥ 2,000 ✓) ≈ $0.02/day (pool ÷ 2 markets)"
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,55.27,0,0.0023278439961251737,0.014549024975782336,25.0,"✅ scoring — ~0.2% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-ussewc-usse-la-2026-11-03-rep,SELL,0.97,40.0,0,0.002188662727073758,0.013679142044210987,25.0,"✅ scoring — ~0.2% of ask side (26,442 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,273.04,3,0.0021048643999082017,0.01315540249942626,25.0,"✅ scoring — ~0.2% of ask side (9,416 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,128.02,2,0.002078619285014718,0.012991370531341986,25.0,"✅ scoring — ~0.2% of ask side (9,317 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,28.0,1,0.0019667520564851195,0.012292200353031997,25.0,"✅ scoring — ~0.2% of ask side (8,837 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,206.54,2,0.0019384830558241636,0.012115519098901023,25.0,"✅ scoring — ~0.2% of ask side (70,871 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,206.53,2,0.0019383892007328585,0.012114932504580365,25.0,"✅ scoring — ~0.2% of ask side (70,871 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,111.53,2,0.0018108764947484099,0.011317978092177562,25.0,"✅ scoring — ~0.2% of ask side (9,317 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,191.6,2,0.0017982635494137203,0.011239147183835752,25.0,"✅ scoring — ~0.2% of ask side (70,871 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
+ussewc-usse-la-2026-11-03-rep,SELL,0.97,40.0,0,0.002227791701475912,0.01392369813422445,25.0,"✅ scoring — ~0.2% of ask side (33,919 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
+usgubewc-usgub-il-2026-11-03-dem,SELL,0.97,40.0,0,0.0021723003465905204,0.013576877166190753,25.0,"✅ scoring — ~0.2% of ask side (34,484 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
+usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,167.87,2,0.0020606757106274624,0.01287922319142164,25.0,"✅ scoring — ~0.2% of ask side (9,392 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
+usgubewc-usgub-co-2026-11-03-dem,SELL,0.97,40.0,0,0.0019722893348454217,0.012326808342783886,25.0,"✅ scoring — ~0.2% of ask side (37,259 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
+usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,149.07,2,0.0018298977076501805,0.011436860672813628,25.0,"✅ scoring — ~0.2% of ask side (9,392 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
 ussewc-usse-sc-2026-11-03-rep,BUY,0.85,40.0,2,0.0017211703958691913,0.010757314974182445,25.0,"✅ scoring — ~0.2% of bid side (710,472 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-ar-2026-11-03-rep,SELL,0.99,273.04,3,0.0017139056793212424,0.010711910495757765,25.0,"✅ scoring — ~0.2% of ask side (9,126 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-tec-mlb-champ-2026-09-27-chc,BUY,0.084,2.0,0,0.0016544761432115709,0.013787301193429758,500.0,"✅ scoring — ~0.2% of bid side (312,115 resting ≥ 2,500 ✓) ≈ $0.01/day (pool ÷ 30 markets)"
-usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,165.18,2,0.0015502983981845423,0.009689364988653389,25.0,"✅ scoring — ~0.2% of ask side (70,871 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
+usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,128.02,2,0.001571499996869767,0.009821874980436043,25.0,"✅ scoring — ~0.2% of ask side (9,392 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
 ussewc-usse-or-2026-11-03-rep,BUY,0.01,10.0,0,0.001539882968894364,0.009624268555589776,25.0,"✅ scoring — ~0.2% of bid side (6,494 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,191.32,3,0.0014748852072606108,0.009218032545378818,25.0,"✅ scoring — ~0.1% of ask side (9,416 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,156.18,2,0.0014658288160095763,0.009161430100059851,25.0,"✅ scoring — ~0.1% of ask side (70,871 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
+tec-mlb-champ-2026-09-27-chc,BUY,0.084,2.0,0,0.0014782971372921231,0.012319142810767694,500.0,"✅ scoring — ~0.1% of bid side (437,638 resting ≥ 2,500 ✓) ≈ $0.01/day (pool ÷ 30 markets)"
 ussewc-usse-ma-2026-11-03-dem,SELL,0.99,44.0,0,0.0014465109826346356,0.009040693641466473,25.0,"✅ scoring — ~0.1% of ask side (30,418 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,176.52,3,0.0013607920593019184,0.00850495037063699,25.0,"✅ scoring — ~0.1% of ask side (9,416 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-ri-2026-11-03-rep,BUY,0.01,904.0,3,0.0013535973646776973,0.005639989019490406,25.0,"✅ scoring — ~0.1% of bid side (12,506 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 3 markets)"
-usgubewc-usgub-ar-2026-11-03-rep,SELL,0.99,210.41,3,0.0013207694622985008,0.00825480913936563,25.0,"✅ scoring — ~0.1% of ask side (9,126 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-mn-2026-11-03-dem,SELL,0.99,220.92,3,0.0012504395103565963,0.007815246939728727,25.0,"✅ scoring — ~0.1% of ask side (27,004 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,147.49,3,0.0011369998913802399,0.007106249321126499,25.0,"✅ scoring — ~0.1% of ask side (9,416 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-ar-2026-11-03-rep,SELL,0.99,159.0,3,0.0009980625659686403,0.006237891037304002,25.0,"✅ scoring — ~0.1% of ask side (9,126 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
+usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,111.53,2,0.0013690782272370338,0.008556738920231462,25.0,"✅ scoring — ~0.1% of ask side (9,392 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
+usgubewc-usgub-ar-2026-11-03-rep,SELL,0.99,273.04,3,0.0010282123870144128,0.006426327418840081,25.0,"✅ scoring — ~0.1% of ask side (22,359 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
 ussewc-usse-il-2026-11-03-dem,SELL,0.99,23.0,0,0.0009687065661458114,0.006054416038411321,25.0,"✅ scoring — ~0.1% of ask side (23,743 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,55.27,2,0.0008974010926633607,0.005608756829146005,25.0,"✅ scoring — ~0.1% of ask side (9,317 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-nm-2026-11-03-dem,SELL,0.99,157.93,2,0.0008774766365525444,0.005484228978453402,25.0,"✅ scoring — ~0.1% of ask side (10,197 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-usgubewc-usgub-nm-2026-11-03-dem,SELL,0.99,157.93,2,0.0008774766365525444,0.005484228978453402,25.0,"✅ scoring — ~0.1% of ask side (10,197 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
+usgubewc-usgub-ri-2026-11-03-rep,BUY,0.01,904.0,3,0.000829852664432919,0.003457719435137163,25.0,"✅ scoring — ~0.1% of bid side (12,428 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
 ewc-usgub-ca-2026-11-03-stehil,BUY,0.05,7.83,0,0.0007987248149212812,0.05990436111909609,300.0,"✅ scoring — ~0.1% of bid side (58,392 resting ≥ 10,000 ✓) ≈ $0.06/day (pool ÷ 2 markets)"
-ussewc-usse-ks-2026-11-03-dem,BUY,0.06,50.0,2,0.0006100287357696158,0.003812679598560099,25.0,"✅ scoring — ~0.1% of bid side (11,476 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-paccc-usse-midterms-2026-11-03-rep,SELL,0.507,20.0,0,0.0005875440658049354,0.04406580493537015,300.0,"✅ scoring — ~0.1% of ask side (820,858 resting ≥ 10,000 ✓) ≈ $0.04/day (pool ÷ 2 markets)"
+usgubewc-usgub-ar-2026-11-03-rep,SELL,0.99,210.41,3,0.0007923607103417177,0.0049522544396357355,25.0,"✅ scoring — ~0.1% of ask side (22,359 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,55.27,2,0.0006784627779018279,0.004240392361886424,25.0,"✅ scoring — ~0.1% of ask side (9,392 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ar-2026-11-03-rep,SELL,0.99,159.0,3,0.000598761242071827,0.0037422577629489186,25.0,"✅ scoring — ~0.1% of ask side (22,359 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+paccc-usse-midterms-2026-11-03-rep,SELL,0.507,20.0,0,0.0005875268059105196,0.04406451044328897,300.0,"✅ scoring — ~0.1% of ask side (820,859 resting ≥ 10,000 ✓) ≈ $0.04/day (pool ÷ 2 markets)"
 scc-senate-gop-2026-11-03-56,BUY,0.04,1.0,0,0.0005367398421984864,0.002064384008455717,100.0,"✅ scoring — ~0.1% of bid side (26,428 resting ≥ 5,000 ✓) ≈ $0.00/day (pool ÷ 13 markets)"
-usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,53.0,3,0.0004085768136358581,0.002553605085224113,25.0,"✅ scoring — ~0.0% of ask side (9,416 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-scc-senate-gop-2026-11-03-51,SELL,0.15,2.0,1,0.0003848373992501189,0.001480143843269688,100.0,"✅ scoring — ~0.0% of ask side (80,231 resting ≥ 5,000 ✓) ≈ $0.00/day (pool ÷ 13 markets)"
-usgubewc-usgub-ri-2026-11-03-rep,BUY,0.01,246.0,3,0.0003683461855207008,0.0015347757730029203,25.0,"✅ scoring — ~0.0% of bid side (12,506 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
+scc-senate-gop-2026-11-03-51,SELL,0.15,2.0,1,0.00038194543225226156,0.0014690208932779292,100.0,"✅ scoring — ~0.0% of ask side (80,239 resting ≥ 5,000 ✓) ≈ $0.00/day (pool ÷ 13 markets)"
 ussewc-usse-ma-2026-11-03-dem,SELL,0.99,10.0,0,0.00032875249605332626,0.002054703100333289,25.0,"✅ scoring — ~0.0% of ask side (30,418 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-tec-wnba-mvp-2026-10-15-w-caicla,BUY,0.05,20.0,0,0.00031711904305203165,0.009909970095375989,250.0,"✅ scoring — ~0.0% of bid side (96,054 resting ≥ 5,000 ✓) ≈ $0.01/day (pool ÷ 4 markets)"
-usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,23.0,2,0.00021586671000269083,0.0013491669375168176,25.0,"✅ scoring — ~0.0% of ask side (70,871 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,11.0,2,0.00017860343801876183,0.0011162714876172615,25.0,"✅ scoring — ~0.0% of ask side (9,317 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-ussewc-usse-ma-2026-11-03-dem,BUY,0.93,40.0,3,8.868393047179852e-05,0.0005542745654487408,25.0,"✅ scoring — ~0.0% of bid side (600,691 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,11.0,3,8.479896132064979e-05,0.0005299935082540612,25.0,"✅ scoring — ~0.0% of ask side (9,416 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ar-2026-11-03-dem,SELL,0.1,40.0,4,3.364058400053826e-05,0.00021025365000336413,25.0,"✅ scoring — ~0.0% of ask side (130,946 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-il-2026-11-03-rep,BUY,0.01,405.0,4,3.086747905298575e-05,0.00019292174408116095,25.0,"✅ scoring — ~0.0% of bid side (11,916 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-co-2026-11-03-rep,BUY,0.01,1462.0,5,1.527504558430926e-05,9.546903490193288e-05,25.0,"✅ scoring — ~0.0% of bid side (12,619 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-ussewc-usse-ma-2026-11-03-rep,SELL,0.1,40.0,4,2.2804965097000926e-06,1.4253103185625579e-05,25.0,"✅ scoring — ~0.0% of ask side (67,269 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-ussewc-usse-il-2026-11-03-rep,SELL,0.12,40.0,5,9.615375369831376e-07,6.00960960614461e-06,25.0,"✅ scoring — ~0.0% of ask side (338,569 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+tec-wnba-mvp-2026-10-15-w-caicla,BUY,0.05,20.0,0,0.00031102931977443414,0.009719666242951067,250.0,"✅ scoring — ~0.0% of bid side (97,937 resting ≥ 5,000 ✓) ≈ $0.01/day (pool ÷ 4 markets)"
+usgubewc-usgub-ri-2026-11-03-rep,BUY,0.01,246.0,3,0.00022582273833019698,0.0009409280763758209,25.0,"✅ scoring — ~0.0% of bid side (12,428 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
+ussewc-usse-ma-2026-11-03-dem,BUY,0.93,40.0,3,0.00013935340022296546,0.0008709587513935341,25.0,"✅ scoring — ~0.0% of bid side (600,527 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ct-2026-11-03-dem,SELL,0.99,11.0,2,0.0001350296825930904,0.000843935516206815,25.0,"✅ scoring — ~0.0% of ask side (9,392 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ar-2026-11-03-dem,SELL,0.1,40.0,4,7.142346975216057e-05,0.00044639668595100357,25.0,"✅ scoring — ~0.0% of ask side (130,821 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-co-2026-11-03-rep,BUY,0.01,1462.0,5,1.320547423450296e-05,8.25342139656435e-05,25.0,"✅ scoring — ~0.0% of bid side (12,769 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+ussewc-usse-ma-2026-11-03-rep,SELL,0.1,40.0,4,2.272321869848221e-06,1.4202011686551382e-05,25.0,"✅ scoring — ~0.0% of ask side (67,275 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+ussewc-usse-il-2026-11-03-rep,SELL,0.12,40.0,5,1.126759293792345e-06,7.042245586202157e-06,25.0,"✅ scoring — ~0.0% of ask side (338,380 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
 ussewc-usse-ar-2026-11-03-dem,BUY,0.01,1680.0,6,8.450653725469692e-07,5.281658578418558e-06,25.0,"✅ scoring — ~0.0% of bid side (13,868 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ma-2026-11-03-rep,BUY,0.01,40.0,5,4.245818416570255e-07,2.6536365103564094e-06,25.0,"✅ scoring — ~0.0% of bid side (11,283 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-ussewc-usse-nj-2026-11-03-rep,SELL,0.08,40.0,5,2.453038268807491e-07,1.533148918004682e-06,25.0,"✅ scoring — ~0.0% of ask side (67,495 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ma-2026-11-03-rep,SELL,0.14,40.0,7,3.539822883546094e-08,2.2123893022163088e-07,25.0,"✅ scoring — ~0.0% of ask side (8,746 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-ussewc-usse-nm-2026-11-03-rep,SELL,0.11,40.0,6,2.189381451792416e-08,1.36836340737026e-07,25.0,"✅ scoring — ~0.0% of ask side (132,592 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-pandc-anydis-2027-12-31,BUY,0.01,10000.0,20,2.5985562838241583e-09,3.2481953547801976e-08,50.0,"✅ scoring — ~0.0% of bid side (10,312 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ma-2026-11-03-rep,SELL,0.51,40.0,44,3.539822883546101e-45,2.2123893022163131e-44,25.0,"✅ scoring — ~0.0% of ask side (8,746 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,272.92,90,1.695155279503114e-89,1.0594720496894462e-88,25.0,"✅ scoring — ~0.0% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,217.91,90,1.3534782608695718e-89,8.459239130434824e-89,25.0,"✅ scoring — ~0.0% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,191.32,90,1.1883229813664654e-89,7.42701863354041e-89,25.0,"✅ scoring — ~0.0% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,166.29,90,1.032857142857148e-89,6.455357142857175e-89,25.0,"✅ scoring — ~0.0% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,152.78,90,9.489440993788866e-90,5.930900621118041e-89,25.0,"✅ scoring — ~0.0% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,149.07,90,9.25900621118017e-90,5.786878881987606e-89,25.0,"✅ scoring — ~0.0% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,111.97,90,6.954658385093202e-90,4.346661490683251e-89,25.0,"✅ scoring — ~0.0% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,111.97,90,6.954658385093202e-90,4.346661490683251e-89,25.0,"✅ scoring — ~0.0% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,98.78,90,6.135403726708105e-90,3.834627329192566e-89,25.0,"✅ scoring — ~0.0% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,56.0,90,3.478260869565234e-90,2.1739130434782712e-89,25.0,"✅ scoring — ~0.0% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,30.0,90,1.8633540372670898e-90,1.1645962732919312e-89,25.0,"✅ scoring — ~0.0% of ask side (9,787 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ri-2026-11-03-rep,SELL,0.99,98.78,90,5.095718832699705e-92,2.1232161802915438e-91,25.0,"✅ scoring — ~0.0% of ask side (10,203 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
-usgubewc-usgub-ma-2026-11-03-rep,SELL,0.99,217.91,92,1.9284070113838323e-92,1.2052543821148952e-91,25.0,"✅ scoring — ~0.0% of ask side (8,746 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ma-2026-11-03-rep,SELL,0.99,111.65,92,9.88053062369808e-93,6.1753316398113e-92,25.0,"✅ scoring — ~0.0% of ask side (8,746 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ma-2026-11-03-rep,SELL,0.99,57.0,92,5.044247609053208e-93,3.152654755658255e-92,25.0,"✅ scoring — ~0.0% of ask side (8,746 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-pa-2026-11-03-dem,BUY,0.01,320.0,93,8.318170002599472e-94,5.19885625162467e-93,25.0,"✅ scoring — ~0.0% of bid side (10,974 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,BUY,0.01,1171.0,94,7.554838709677459e-94,4.7217741935484116e-93,25.0,"✅ scoring — ~0.0% of bid side (2,105 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,BUY,0.01,200.0,94,1.290322580645168e-94,8.064516129032301e-94,25.0,"✅ scoring — ~0.0% of bid side (2,105 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,BUY,0.01,190.0,94,1.2258064516129096e-94,7.661290322580686e-94,25.0,"✅ scoring — ~0.0% of bid side (2,105 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-wy-2026-11-03-rep,BUY,0.01,189.0,94,1.219354838709684e-94,7.620967741935525e-94,25.0,"✅ scoring — ~0.0% of bid side (2,105 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ma-2026-11-03-dem,BUY,0.01,1340.0,95,3.2747583338323036e-95,2.0467239586451897e-94,25.0,"✅ scoring — ~0.0% of bid side (2,435 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ri-2026-11-03-dem,BUY,0.01,441.0,94,3.062500000000005e-95,1.276041666666669e-94,25.0,"✅ scoring — ~0.0% of bid side (12,450 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,350.0,94,2.176616915422897e-95,1.3603855721393107e-94,25.0,"✅ scoring — ~0.0% of bid side (3,543 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,343.0,94,2.1330845771144393e-95,1.3331778606965245e-94,25.0,"✅ scoring — ~0.0% of bid side (3,543 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,325.0,94,2.0211442786069758e-95,1.26321517412936e-94,25.0,"✅ scoring — ~0.0% of bid side (3,543 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ri-2026-11-03-dem,BUY,0.01,242.0,94,1.6805555555555585e-95,7.002314814814827e-95,25.0,"✅ scoring — ~0.0% of bid side (12,450 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,264.0,94,1.6417910447761282e-95,1.0261194029850801e-94,25.0,"✅ scoring — ~0.0% of bid side (3,543 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,192.0,94,1.194029850746275e-95,7.462686567164219e-95,25.0,"✅ scoring — ~0.0% of bid side (3,543 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,189.0,94,1.1753731343283644e-95,7.346082089552277e-95,25.0,"✅ scoring — ~0.0% of bid side (3,543 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ma-2026-11-03-dem,BUY,0.01,280.0,95,6.842778608007798e-96,4.276736630004874e-95,25.0,"✅ scoring — ~0.0% of bid side (2,435 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-tn-2026-11-03-rep,BUY,0.01,1000.0,95,6.257822277847342e-96,3.9111389236545884e-95,25.0,"✅ scoring — ~0.0% of bid side (3,508 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-ri-2026-11-03-dem,BUY,0.01,77.0,94,5.347222222222232e-96,2.2280092592592635e-95,25.0,"✅ scoring — ~0.0% of bid side (12,450 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
-usgubewc-usgub-ma-2026-11-03-dem,BUY,0.01,90.0,95,2.1994645525739353e-96,1.3746653453587095e-95,25.0,"✅ scoring — ~0.0% of bid side (2,435 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-tn-2026-11-03-rep,BUY,0.01,320.0,95,2.0025031289111497e-96,1.2515644555694685e-95,25.0,"✅ scoring — ~0.0% of bid side (3,508 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,25.0,94,1.5547263681592122e-96,9.717039800995076e-96,25.0,"✅ scoring — ~0.0% of bid side (3,543 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,24.0,94,1.4925373134328438e-96,9.328358208955274e-96,25.0,"✅ scoring — ~0.0% of bid side (3,543 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-tn-2026-11-03-rep,BUY,0.01,230.0,95,1.4392991239048887e-96,8.995619524405554e-96,25.0,"✅ scoring — ~0.0% of bid side (3,508 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-tn-2026-11-03-rep,BUY,0.01,160.0,95,1.0012515644555749e-96,6.257822277847343e-96,25.0,"✅ scoring — ~0.0% of bid side (3,508 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,13.0,94,8.084577114427904e-97,5.05286069651744e-96,25.0,"✅ scoring — ~0.0% of bid side (3,543 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
-usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,10.0,94,6.218905472636849e-97,3.886815920398031e-96,25.0,"✅ scoring — ~0.0% of bid side (3,543 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+ussewc-usse-nj-2026-11-03-rep,SELL,0.08,40.0,5,2.4470363453414307e-07,1.5293977158383943e-06,25.0,"✅ scoring — ~0.0% of ask side (67,449 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ma-2026-11-03-rep,SELL,0.14,40.0,7,7.142856632653101e-08,4.4642853954081884e-07,25.0,"✅ scoring — ~0.0% of ask side (8,563 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+ussewc-usse-nm-2026-11-03-rep,SELL,0.11,40.0,6,2.1819054104293912e-08,1.3636908815183695e-07,25.0,"✅ scoring — ~0.0% of ask side (132,598 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+ussewc-usse-mt-2026-11-03-rep,SELL,0.95,40.0,7,6.57894732419689e-09,2.7412280517487044e-08,25.0,"✅ scoring — ~0.0% of ask side (8,900 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
+pandc-anydis-2027-12-31,BUY,0.01,10000.0,20,2.887284766674385e-10,3.6091059583429814e-09,50.0,"✅ scoring — ~0.0% of bid side (10,340 resting ≥ 10,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+ussewc-usse-mt-2026-11-03-rep,SELL,0.99,164.35,11,2.7031249818293978e-12,1.1263020757622491e-11,25.0,"✅ scoring — ~0.0% of ask side (8,900 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
+usgubewc-usgub-ma-2026-11-03-rep,SELL,0.51,40.0,44,7.142856632653115e-45,4.4642853954081973e-44,25.0,"✅ scoring — ~0.0% of ask side (8,563 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ri-2026-11-03-rep,SELL,0.99,98.78,90,5.2278657203795997e-92,2.1782773834915e-91,25.0,"✅ scoring — ~0.0% of ask side (10,029 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
+usgubewc-usgub-ma-2026-11-03-rep,SELL,0.99,217.91,92,3.891249722053611e-92,2.432031076283507e-91,25.0,"✅ scoring — ~0.0% of ask side (8,563 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ma-2026-11-03-rep,SELL,0.99,111.65,92,1.993749857589306e-92,1.2460936609933164e-91,25.0,"✅ scoring — ~0.0% of ask side (8,563 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ma-2026-11-03-rep,SELL,0.99,57.0,92,1.0178570701530718e-92,6.361606688456699e-92,25.0,"✅ scoring — ~0.0% of ask side (8,563 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-pa-2026-11-03-dem,BUY,0.01,320.0,93,7.928642220019863e-94,4.955401387512414e-93,25.0,"✅ scoring — ~0.0% of bid side (10,992 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,BUY,0.01,1171.0,94,7.603896103896144e-94,4.75243506493509e-93,25.0,"✅ scoring — ~0.0% of bid side (2,104 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,BUY,0.01,200.0,94,1.2987012987013056e-94,8.11688311688316e-94,25.0,"✅ scoring — ~0.0% of bid side (2,104 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,BUY,0.01,190.0,94,1.2337662337662402e-94,7.711038961039002e-94,25.0,"✅ scoring — ~0.0% of bid side (2,104 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-wy-2026-11-03-rep,BUY,0.01,189.0,94,1.2272727272727338e-94,7.670454545454586e-94,25.0,"✅ scoring — ~0.0% of bid side (2,104 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ri-2026-11-03-dem,BUY,0.01,441.0,94,1.0022727272727212e-94,4.1761363636363383e-94,25.0,"✅ scoring — ~0.0% of bid side (11,450 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
+usgubewc-usgub-tn-2026-11-03-rep,BUY,0.01,1000.0,95,6.36942675159239e-95,3.9808917197452437e-94,25.0,"✅ scoring — ~0.0% of bid side (2,067 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ri-2026-11-03-dem,BUY,0.01,242.0,94,5.499999999999967e-95,2.291666666666653e-94,25.0,"✅ scoring — ~0.0% of bid side (11,450 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
+usgubewc-usgub-ma-2026-11-03-dem,BUY,0.01,1340.0,95,3.273962227271634e-95,2.0462263920447713e-94,25.0,"✅ scoring — ~0.0% of bid side (2,386 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,350.0,94,2.096737476486598e-95,1.3104609228041237e-94,25.0,"✅ scoring — ~0.0% of bid side (3,604 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,343.0,94,2.054802726956866e-95,1.2842517043480413e-94,25.0,"✅ scoring — ~0.0% of bid side (3,604 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-tn-2026-11-03-rep,BUY,0.01,320.0,95,2.038216560509565e-95,1.2738853503184782e-94,25.0,"✅ scoring — ~0.0% of bid side (2,067 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,325.0,94,1.9469705138804123e-95,1.2168565711752577e-94,25.0,"✅ scoring — ~0.0% of bid side (3,604 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ri-2026-11-03-dem,BUY,0.01,77.0,94,1.7499999999999895e-95,7.291666666666624e-95,25.0,"✅ scoring — ~0.0% of bid side (11,450 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 3 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,264.0,94,1.5815391251213198e-95,9.884619532008249e-95,25.0,"✅ scoring — ~0.0% of bid side (3,604 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-tn-2026-11-03-rep,BUY,0.01,230.0,95,1.4649681528662498e-95,9.156050955414061e-95,25.0,"✅ scoring — ~0.0% of bid side (2,067 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,192.0,94,1.1502102728155052e-95,7.188814205096908e-95,25.0,"✅ scoring — ~0.0% of bid side (3,604 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,189.0,94,1.1322382373027629e-95,7.076488983142268e-95,25.0,"✅ scoring — ~0.0% of bid side (3,604 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-tn-2026-11-03-rep,BUY,0.01,160.0,95,1.0191082802547825e-95,6.369426751592391e-95,25.0,"✅ scoring — ~0.0% of bid side (2,067 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ma-2026-11-03-dem,BUY,0.01,280.0,95,6.841115101761624e-96,4.275696938601015e-95,25.0,"✅ scoring — ~0.0% of bid side (2,386 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-ma-2026-11-03-dem,BUY,0.01,90.0,95,2.198929854137665e-96,1.3743311588360406e-95,25.0,"✅ scoring — ~0.0% of bid side (2,386 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,25.0,94,1.4976696260618556e-96,9.360435162886597e-96,25.0,"✅ scoring — ~0.0% of bid side (3,604 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,24.0,94,1.4377628410193815e-96,8.986017756371135e-96,25.0,"✅ scoring — ~0.0% of bid side (3,604 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,13.0,94,7.78788205552165e-97,4.8674262847010315e-96,25.0,"✅ scoring — ~0.0% of bid side (3,604 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
+usgubewc-usgub-sd-2026-11-03-rep,BUY,0.01,10.0,94,5.990678504247422e-97,3.744174065154639e-96,25.0,"✅ scoring — ~0.0% of bid side (3,604 resting ≥ 2,000 ✓) ≈ $0.00/day (pool ÷ 2 markets)"
 usgubewc-usgub-pa-2026-11-03-rep,SELL,0.06,50.0,0,,,25.0,"❌ side has 1,154 of 2,000 Target Size — side not qualifying"
-ussewc-usse-wv-2026-11-03-dem,BUY,0.01,200.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-wv-2026-11-03-dem,BUY,0.01,250.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-wv-2026-11-03-dem,BUY,0.01,400.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-wv-2026-11-03-dem,BUY,0.01,310.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-wv-2026-11-03-dem,BUY,0.01,200.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-wv-2026-11-03-dem,BUY,0.01,40.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-co-2026-11-03-rep,BUY,0.01,1150.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ky-2026-11-03-dem,BUY,0.01,600.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ky-2026-11-03-dem,BUY,0.01,40.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ky-2026-11-03-dem,BUY,0.01,310.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ky-2026-11-03-dem,BUY,0.01,175.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ky-2026-11-03-dem,BUY,0.01,250.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ma-2026-11-03-rep,BUY,0.01,287.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ma-2026-11-03-rep,BUY,0.01,700.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ma-2026-11-03-rep,BUY,0.01,250.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,212.52,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,159.37,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,176.52,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,83.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,114.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,197.36,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,166.25,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,197.32,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,115.35,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ri-2026-11-03-rep,BUY,0.01,200.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ri-2026-11-03-rep,BUY,0.01,250.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ri-2026-11-03-rep,BUY,0.01,270.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ri-2026-11-03-rep,BUY,0.01,80.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-ri-2026-11-03-rep,BUY,0.01,600.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+tec-cbb-champ-2027-04-05-w-iowast,SELL,0.05,5.0,1,,,500.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
 usgubewc-usgub-ar-2026-11-03-dem,BUY,0.01,200.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
 usgubewc-usgub-ar-2026-11-03-dem,BUY,0.01,987.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
 usgubewc-usgub-ar-2026-11-03-dem,BUY,0.01,120.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-de-2026-11-03-dem,SELL,0.97,40.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ewc-usse-tx-2026-11-03-dem,BUY,0.52,50.0,1,,,300.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-hi-2026-11-03-rep,BUY,0.01,2000.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ok-2026-11-03-dem,BUY,0.01,435.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-nj-2026-11-03-dem,SELL,0.99,165.18,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-nj-2026-11-03-dem,SELL,0.99,98.78,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-nj-2026-11-03-dem,SELL,0.99,149.07,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-nj-2026-11-03-dem,SELL,0.99,111.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-nj-2026-11-03-dem,SELL,0.99,147.11,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-nj-2026-11-03-dem,SELL,0.99,212.52,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,83.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,212.52,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,197.36,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,115.35,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,114.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,159.37,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,197.32,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,166.25,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,176.52,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-dem,SELL,0.99,222.43,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-wv-2026-11-03-dem,BUY,0.01,40.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-wv-2026-11-03-dem,BUY,0.01,310.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-wv-2026-11-03-dem,BUY,0.01,250.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-wv-2026-11-03-dem,BUY,0.01,400.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-wv-2026-11-03-dem,BUY,0.01,200.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-wv-2026-11-03-dem,BUY,0.01,200.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-co-2026-11-03-rep,BUY,0.01,1150.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,217.91,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,259.3,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,140.35,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,157.93,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,156.18,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-ne-2026-11-03-rep,SELL,0.99,28.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ma-2026-11-03-rep,BUY,0.01,700.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ma-2026-11-03-rep,BUY,0.01,287.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ma-2026-11-03-rep,BUY,0.01,250.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
 usgubewc-usgub-tn-2026-11-03-rep,SELL,0.99,140.35,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
 usgubewc-usgub-tn-2026-11-03-rep,SELL,0.99,139.41,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
 usgubewc-usgub-tn-2026-11-03-rep,SELL,0.99,137.29,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-hi-2026-11-03-rep,BUY,0.01,2000.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-va-2026-11-03-rep,BUY,0.01,5000.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ewc-usse-tx-2026-11-03-dem,BUY,0.52,50.0,1,,,300.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-de-2026-11-03-dem,SELL,0.97,40.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-nj-2026-11-03-dem,SELL,0.99,165.18,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-nj-2026-11-03-dem,SELL,0.99,149.07,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-nj-2026-11-03-dem,SELL,0.99,98.78,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-nj-2026-11-03-dem,SELL,0.99,147.11,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-nj-2026-11-03-dem,SELL,0.99,111.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-ussewc-usse-nj-2026-11-03-dem,SELL,0.99,212.52,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-tec-cbb-champ-2027-04-05-w-iowast,SELL,0.05,5.0,1,,,500.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
-usgubewc-usgub-ri-2026-11-03-dem,SELL,0.99,156.18,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
-usgubewc-usgub-ri-2026-11-03-dem,SELL,0.99,98.79,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
-usgubewc-usgub-ri-2026-11-03-dem,SELL,0.99,115.35,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
-tec-cbb-champ-2027-04-05-w-butl,SELL,0.11,2.0,2,,,500.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
-usgubewc-usgub-co-2026-11-03-dem,SELL,0.99,147.5,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
-usgubewc-usgub-co-2026-11-03-dem,SELL,0.99,191.63,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
-usgubewc-usgub-il-2026-11-03-dem,SELL,0.99,100.0,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
-usgubewc-usgub-il-2026-11-03-dem,SELL,0.99,176.52,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
-usgubewc-usgub-il-2026-11-03-dem,SELL,0.99,206.54,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+ussewc-usse-ri-2026-11-03-rep,BUY,0.01,200.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ri-2026-11-03-rep,BUY,0.01,250.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ri-2026-11-03-rep,BUY,0.01,600.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ri-2026-11-03-rep,BUY,0.01,270.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ri-2026-11-03-rep,BUY,0.01,80.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ky-2026-11-03-dem,BUY,0.01,40.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ky-2026-11-03-dem,BUY,0.01,600.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ky-2026-11-03-dem,BUY,0.01,310.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ky-2026-11-03-dem,BUY,0.01,175.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+ussewc-usse-ky-2026-11-03-dem,BUY,0.01,250.0,1,,,25.0,❌ outside Target Size window (order 1 tick from best; window ends 0)
+usgubewc-usgub-nm-2026-11-03-dem,SELL,0.99,157.93,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+usgubewc-usgub-nm-2026-11-03-dem,SELL,0.99,157.93,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+usgubewc-usgub-ct-2026-11-03-rep,BUY,0.01,40.0,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
 usgubewc-usgub-il-2026-11-03-dem,SELL,0.99,206.54,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
 usgubewc-usgub-il-2026-11-03-dem,SELL,0.99,75.0,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
-usgubewc-usgub-ct-2026-11-03-rep,BUY,0.01,40.0,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+usgubewc-usgub-il-2026-11-03-dem,SELL,0.99,176.52,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+usgubewc-usgub-il-2026-11-03-dem,SELL,0.99,206.54,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+usgubewc-usgub-il-2026-11-03-dem,SELL,0.99,100.0,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.1,40.0,2,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,206.53,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 1)
+usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,191.6,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 1)
+usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,23.0,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 1)
+usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,206.54,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 1)
+usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,165.18,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 1)
+usgubewc-usgub-id-2026-11-03-rep,SELL,0.99,156.18,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 1)
+usgubewc-usgub-co-2026-11-03-dem,SELL,0.99,147.5,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+usgubewc-usgub-co-2026-11-03-dem,SELL,0.99,191.63,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+tec-cbb-champ-2027-04-05-w-butl,SELL,0.11,2.0,2,,,500.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+ussewc-usse-ks-2026-11-03-dem,BUY,0.06,50.0,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+usgubewc-usgub-ri-2026-11-03-dem,SELL,0.99,115.35,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+usgubewc-usgub-ri-2026-11-03-dem,SELL,0.99,156.18,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+usgubewc-usgub-ri-2026-11-03-dem,SELL,0.99,98.79,2,,,25.0,❌ outside Target Size window (order 2 ticks from best; window ends 0)
+usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,53.0,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 2)
+usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,191.32,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 2)
+usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,273.04,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 2)
+usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,147.49,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 2)
+usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,176.52,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 2)
+usgubewc-usgub-hi-2026-11-03-dem,SELL,0.99,11.0,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 2)
 ussewc-usse-ky-2026-11-03-rep,SELL,0.99,40.0,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 0)
-usgubewc-usgub-md-2026-11-03-rep,BUY,0.01,18.0,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 0)
-usgubewc-usgub-md-2026-11-03-rep,BUY,0.01,1436.0,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 0)
 usgubewc-usgub-md-2026-11-03-rep,BUY,0.01,26.0,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 0)
-ussewc-usse-de-2026-11-03-dem,SELL,0.99,272.03,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 0)
+usgubewc-usgub-md-2026-11-03-rep,BUY,0.01,1436.0,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 0)
+usgubewc-usgub-md-2026-11-03-rep,BUY,0.01,18.0,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 0)
 ussewc-usse-ri-2026-11-03-dem,SELL,0.99,120.28,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 0)
+ussewc-usse-de-2026-11-03-dem,SELL,0.99,272.03,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 0)
+usgubewc-usgub-mn-2026-11-03-dem,SELL,0.99,220.92,3,,,25.0,❌ outside Target Size window (order 3 ticks from best; window ends 1)
 ussewc-usse-co-2026-11-03-dem,SELL,0.99,120.28,4,,,25.0,❌ outside Target Size window (order 4 ticks from best; window ends 2)
 ussewc-usse-co-2026-11-03-dem,SELL,0.99,102.78,4,,,25.0,❌ outside Target Size window (order 4 ticks from best; window ends 2)
-ussewc-usse-sc-2026-11-03-dem,BUY,0.01,600.0,4,,,25.0,❌ outside Target Size window (order 4 ticks from best; window ends 0)
-ussewc-usse-sc-2026-11-03-dem,BUY,0.01,200.0,4,,,25.0,❌ outside Target Size window (order 4 ticks from best; window ends 0)
+usgubewc-usgub-il-2026-11-03-rep,BUY,0.01,405.0,4,,,25.0,❌ outside Target Size window (order 4 ticks from best; window ends 1)
 ussewc-usse-il-2026-11-03-rep,BUY,0.01,501.0,4,,,25.0,❌ outside Target Size window (order 4 ticks from best; window ends 0)
 ussewc-usse-il-2026-11-03-rep,BUY,0.01,899.0,4,,,25.0,❌ outside Target Size window (order 4 ticks from best; window ends 0)
 usgubewc-usgub-pa-2026-11-03-dem,SELL,0.99,134.26,4,,,25.0,❌ outside Target Size window (order 4 ticks from best; window ends 0)
+ussewc-usse-sc-2026-11-03-dem,BUY,0.01,200.0,4,,,25.0,❌ outside Target Size window (order 4 ticks from best; window ends 0)
+ussewc-usse-sc-2026-11-03-dem,BUY,0.01,600.0,4,,,25.0,❌ outside Target Size window (order 4 ticks from best; window ends 0)
 ussewc-usse-mt-2026-11-03-setbod,BUY,0.01,716.0,4,,,25.0,❌ outside Target Size window (order 4 ticks from best; window ends 0)
+usgubewc-usgub-ma-2026-11-03-rep,BUY,0.01,40.0,5,,,25.0,❌ outside Target Size window (order 5 ticks from best; window ends 0)
 usgubewc-usgub-nm-2026-11-03-rep,BUY,0.01,931.0,5,,,25.0,❌ outside Target Size window (order 5 ticks from best; window ends 0)
 enwc-ussep-sc-2026-08-11-rep-ralnor,SELL,0.29,10.0,6,,,25.0,❌ outside Target Size window (order 6 ticks from best; window ends 3)
 usgubewc-usgub-ne-2026-11-03-dem,BUY,0.01,673.0,6,,,25.0,❌ outside Target Size window (order 6 ticks from best; window ends 0)
-ussewc-usse-mt-2026-11-03-rep,SELL,0.95,40.0,7,,,25.0,❌ outside Target Size window (order 7 ticks from best; window ends 2)
-ussewc-usse-mt-2026-11-03-rep,SELL,0.99,164.35,11,,,25.0,❌ outside Target Size window (order 11 ticks from best; window ends 2)
-ussewc-usse-mt-2026-11-03-dem,SELL,0.51,50.0,13,,,25.0,❌ outside Target Size window (order 13 ticks from best; window ends 11)
+ussewc-usse-mt-2026-11-03-dem,SELL,0.51,50.0,14,,,25.0,❌ outside Target Size window (order 14 ticks from best; window ends 12)
 ussewc-usse-sd-2026-11-03-briben,SELL,0.51,50.0,39,,,25.0,❌ outside Target Size window (order 39 ticks from best; window ends 37)
 ussewc-usse-mt-2026-11-03-setbod,SELL,0.51,30.0,40,,,25.0,❌ outside Target Size window (order 40 ticks from best; window ends 38)
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,98.78,91,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,111.97,91,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,30.0,91,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,272.92,91,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,217.91,91,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,56.0,91,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,166.29,91,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,191.32,91,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,111.97,91,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,152.78,91,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-sd-2026-11-03-dem,SELL,0.99,149.07,91,,,25.0,"❌ side has 1,828 of 2,000 Target Size — side not qualifying"
 tec-cbb-champ-2027-04-05-w-nebr,SELL,0.99,273.04,91,,,500.0,❌ outside Target Size window (order 91 ticks from best; window ends 1)
-usgubewc-usgub-pa-2026-11-03-rep,SELL,0.99,134.26,93,,,25.0,"❌ side has 1,154 of 2,000 Target Size — side not qualifying"
-usgubewc-usgub-pa-2026-11-03-rep,SELL,0.99,134.22,93,,,25.0,"❌ side has 1,154 of 2,000 Target Size — side not qualifying"
 usgubewc-usgub-pa-2026-11-03-rep,SELL,0.99,120.27,93,,,25.0,"❌ side has 1,154 of 2,000 Target Size — side not qualifying"
-usgubewc-usgub-pa-2026-11-03-rep,SELL,0.99,193.91,93,,,25.0,"❌ side has 1,154 of 2,000 Target Size — side not qualifying"
 usgubewc-usgub-pa-2026-11-03-rep,SELL,0.99,131.0,93,,,25.0,"❌ side has 1,154 of 2,000 Target Size — side not qualifying"
 usgubewc-usgub-pa-2026-11-03-rep,SELL,0.99,140.35,93,,,25.0,"❌ side has 1,154 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-pa-2026-11-03-rep,SELL,0.99,193.91,93,,,25.0,"❌ side has 1,154 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-pa-2026-11-03-rep,SELL,0.99,134.26,93,,,25.0,"❌ side has 1,154 of 2,000 Target Size — side not qualifying"
+usgubewc-usgub-pa-2026-11-03-rep,SELL,0.99,134.22,93,,,25.0,"❌ side has 1,154 of 2,000 Target Size — side not qualifying"
