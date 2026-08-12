@@ -1,24 +1,29 @@
-Silver Bulletin per-race Senate forecast: 35 races
+Silver Bulletin per-race forecasts: 35 Senate, 36 Governor
 
-380 live orders
-109 are Senate races, 107 of those the model covers
-86 markets left unmodelled (governor, House, seat counts, everything non-Senate)
+389 live orders
+270 orders are on Senate or Governor races; the model covers 268 of them (109 Senate, 159 Governor)
+34 markets left unmodelled (House districts, seat-count ladders, and the rest)
 
-No resting Senate order is more than 10% the wrong side of the model.
+1 resting orders would lose more than 10% a share if filled, -0 dollars in total if every one of them filled at once:
 
-70 of 107 modelled orders are at or better than model fair value -- a fill there is not a loss on the model's numbers.
+  market                                     side   price   model  per sh     size  if filled
+  usgubewc-usgub-al-2026-11-03-rep           SELL    0.80   0.983  -0.183        0         -0
+
+191 of 268 modelled orders are at or better than model fair value -- a fill there is not a loss on the model's numbers.
 
 per-race view (model probability vs where our orders rest):
+
+  SENATE
   race    model D  model R  orders  worst/sh
   AL        0.002    0.998       8    -0.008
   AR        0.007    0.993       5    -0.033
   CO        0.995    0.005       3    -0.005
   DE        0.999    0.001       4    -0.029
   FL        0.216    0.784       2    -0.016
-  ID        0.001    0.999       4    -0.069
+  ID        0.001    0.999       4    -0.089
   IL        0.996    0.004       5    -0.006
-  KS        0.171    0.829       5    -0.059
-  KY        0.004    0.996       6    -0.006
+  KS        0.171    0.829       6    -0.059
+  KY        0.004    0.996       7    -0.006
   LA        0.045    0.955       4     0.015
   MA        1.000    0.000       7    -0.010
   MS        0.034    0.966       4     0.024
@@ -34,5 +39,34 @@ per-race view (model probability vs where our orders rest):
   VA        0.996    0.004       4    -0.006
   WV        0.000    1.000       3    -0.010
   WY        0.000    1.000       6    -0.050
+
+  GOVERNOR
+  race    model D  model R  orders  worst/sh
+  AL        0.017    0.983       5    -0.183
+  AR        0.002    0.998       7    -0.028
+  CO        0.998    0.002       5    -0.008
+  CT        0.997    0.003      11    -0.007
+  FL        0.157    0.843       6     0.007
+  HI        1.000    0.000       6    -0.010
+  ID        0.002    0.998       5    -0.008
+  IL        0.999    0.001       7    -0.009
+  MA        1.000    0.000       9    -0.010
+  MD        1.000    0.000       4    -0.010
+  ME        0.990    0.010       4     0.000
+  MN        0.998    0.002       4    -0.008
+  NE        0.048    0.952       5     0.038
+  NH        0.152    0.848       7    -0.042
+  NM        0.984    0.016       4     0.006
+  NY        0.992    0.008       6    -0.032
+  OK        0.006    0.994       4    -0.004
+  OR        0.925    0.075       7    -0.025
+  PA        0.998    0.002       6    -0.008
+  RI        0.992    0.008       7    -0.002
+  SC        0.032    0.968       3     0.022
+  SD        0.006    0.994       6    -0.004
+  TN        0.003    0.997       6    -0.027
+  TX        0.106    0.894       6    -0.006
+  VT        0.103    0.897       5     0.046
+  WY        0.000    1.000      14    -0.010
 
 Nothing was placed, cancelled or repriced. This is a read-only screen.
