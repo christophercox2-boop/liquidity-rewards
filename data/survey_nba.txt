@@ -7,6 +7,24 @@ to earn $5.00/day you need 0.50% of the event
 
 read 15 books
 
+  every book in the event
+  market                                     bid   ask  spread  bid size  ask size
+  tec-nba-eastconf-2027-05-19-w-atl           2c    3c      1c   963,551   189,414
+  tec-nba-eastconf-2027-05-19-w-bkn           1c    2c      1c   479,217   277,279
+  tec-nba-eastconf-2027-05-19-w-bos           9c   10c      1c   499,721   201,543
+  tec-nba-eastconf-2027-05-19-w-cha           3c    4c      1c   114,028   280,075
+  tec-nba-eastconf-2027-05-19-w-chi           1c    2c      1c   515,242   279,586
+  tec-nba-eastconf-2027-05-19-w-cle           5c    6c      1c   680,898   130,131
+  tec-nba-eastconf-2027-05-19-w-det           6c    7c      1c   566,833   119,259
+  tec-nba-eastconf-2027-05-19-w-ind           5c    6c      1c   651,200   185,898
+  tec-nba-eastconf-2027-05-19-w-mia           9c   10c      1c    30,228    35,313
+  tec-nba-eastconf-2027-05-19-w-mil           1c    2c      1c   475,217   230,993
+  tec-nba-eastconf-2027-05-19-w-nyk          20c   21c      1c   551,122   166,870
+  tec-nba-eastconf-2027-05-19-w-orl           5c    6c      1c   275,066   272,121
+  tec-nba-eastconf-2027-05-19-w-phi          24c   25c      1c   562,338   252,010
+  tec-nba-eastconf-2027-05-19-w-tor           7c    8c      1c   167,800   206,523
+  tec-nba-eastconf-2027-05-19-w-was           4c    5c      1c    35,839   114,100
+
 each side of each market is worth $33.333/day at 100% share
 quotable sides: 0 of 30 (skipped only when a tick inside the touch would cross)
 
