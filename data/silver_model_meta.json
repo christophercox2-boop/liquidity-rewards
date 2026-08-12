@@ -1,36 +1,66 @@
 {
- "url": "https://static.dwcdn.net/data/KQI8W.csv",
- "n_rows": 8,
- "header": [
-  "modeldate",
-  "Democrats",
-  "Republicans"
- ],
- "sample": [
-  [
-   "8/5/2026",
-   "56.18",
-   "43.82"
+ "KQI8W": {
+  "url": "https://static.dwcdn.net/data/KQI8W.csv",
+  "file": "data/silver_model.csv",
+  "meaning": "Senate win probability, Deluxe model",
+  "n_rows": 8,
+  "header": [
+   "modeldate",
+   "Democrats",
+   "Republicans"
   ],
-  [
-   "8/6/2026",
-   "56",
-   "44"
-  ],
-  [
-   "8/7/2026",
-   "56.035",
-   "43.965"
-  ],
-  [
-   "8/8/2026",
-   "56.235",
-   "43.765"
-  ],
-  [
-   "8/9/2026",
-   "55.95",
-   "44.05"
+  "latest": [
+   "8/11/2026",
+   "57.3175",
+   "42.6825"
   ]
- ]
+ },
+ "igTt2": {
+  "url": "https://static.dwcdn.net/data/igTt2.csv",
+  "file": "data/silver_senate_classic.csv",
+  "meaning": "Senate win probability, Classic model",
+  "n_rows": 8,
+  "header": [
+   "modeldate",
+   "Democrats",
+   "Republicans"
+  ],
+  "latest": [
+   "8/11/2026",
+   "55.935",
+   "44.065"
+  ]
+ },
+ "6aks4": {
+  "url": "https://static.dwcdn.net/data/6aks4.csv",
+  "file": "data/silver_senate_lite.csv",
+  "meaning": "Senate win probability, Lite model",
+  "n_rows": 8,
+  "header": [
+   "modeldate",
+   "Democrats",
+   "Republicans"
+  ],
+  "latest": [
+   "8/11/2026",
+   "57.06",
+   "42.94"
+  ]
+ },
+ "6mA2E": {
+  "url": "https://static.dwcdn.net/data/6mA2E.csv",
+  "file": "data/silver_senate_seats.csv",
+  "meaning": "Senate average seats, Deluxe model",
+  "n_rows": 8,
+  "header": [
+   "modeldate",
+   "Democrats",
+   "Republicans"
+  ],
+  "latest": [
+   "8/11/2026",
+   "50.9049",
+   "49.0951"
+  ]
+ }
 }
