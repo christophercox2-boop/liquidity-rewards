@@ -1,0 +1,53 @@
+eventSlug absent; search fallback found None open markets
+debug: no event found via search for WNBA MVP
+searched 'WNBA MVP': 1 events with open markets
+   wnba-mvp-2026-10-15-w                          4 open   WNBA MVP
+
+surveying: wnba-mvp-2026-10-15-w
+seed: WNBA MVP
+event: wnba-mvp-2026-10-15-w   open markets: 4
+event pool: $250.0/day    target size per side: 5,000
+to earn $5.00/day you need 2.00% of the event
+
+read 4 books
+
+  every book in the event
+  market                                     bid   ask  spread  bid size  ask size
+  tec-wnba-mvp-2026-10-15-w-ajawil           83c   91c      8c    39,295   104,772
+  tec-wnba-mvp-2026-10-15-w-caicla            5c    8c      3c     2,914    39,281
+  tec-wnba-mvp-2026-10-15-w-olimil           18c   19c      1c    34,274    41,785
+  tec-wnba-mvp-2026-10-15-w-paibue            1c    5c      4c     2,799    41,601
+
+each side of each market is worth $31.250/day at 100% share
+quotable sides: 5 of 8 (skipped only when a tick inside the touch would cross)
+
+  market                                   side    px  resting   have   $/sh
+  tec-wnba-mvp-2026-10-15-w-caicla         BUY     6c    2,914      0   0.06
+  tec-wnba-mvp-2026-10-15-w-ajawil         SELL   90c  104,772      0   0.10
+  tec-wnba-mvp-2026-10-15-w-ajawil         BUY    84c   39,295      0   0.84
+  tec-wnba-mvp-2026-10-15-w-caicla         SELL    7c   39,281      0   0.93
+  tec-wnba-mvp-2026-10-15-w-paibue         SELL    4c   41,601      0   0.96
+
+=== holding 2% of a side, cheapest sides first ===
+   sides    capital   $/day  per $/day
+       5   2,451.60    3.12     0.0013
+  cheapest ten sides:
+    caicla     BUY    6c  resting   2,914  add      59  $    3.57
+    ajawil     SELL  90c  resting 104,772  add   2,138  $  213.82
+    ajawil     BUY   84c  resting  39,295  add     802  $  673.63
+    caicla     SELL   7c  resting  39,281  add     802  $  745.54
+    paibue     SELL   4c  resting  41,601  add     849  $  815.04
+
+=== holding 5% of a side, cheapest sides first ===
+   sides    capital   $/day  per $/day
+       5   6,322.54    7.81     0.0012
+  cheapest ten sides:
+    caicla     BUY    6c  resting   2,914  add     153  $    9.20
+    ajawil     SELL  90c  resting 104,772  add   5,514  $  551.43
+    ajawil     BUY   84c  resting  39,295  add   2,068  $1,737.25
+    caicla     SELL   7c  resting  39,281  add   2,067  $1,922.71
+    paibue     SELL   4c  resting  41,601  add   2,190  $2,101.95
+
+for 2.00% of every side we quote: $2,452 of capital across 5 sides -> $3.12/day
+
+for 4.00% of every side we quote: $5,005 of capital across 5 sides -> $6.25/day
