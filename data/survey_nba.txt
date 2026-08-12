@@ -1,0 +1,25 @@
+eventSlug absent; search fallback found 15 open markets
+debug: search 'NBA Eastern Conference Champion': event nba-eastconf-2027-05-19-w with 15 open markets
+seed: tec-nba-eastconf-2027-05-19-w-mil
+event: None   open markets: 15
+event pool: $1000.0/day    target size per side: 10,000
+to earn $5.00/day you need 0.50% of the event
+
+read 15 books
+
+each side of each market is worth $33.333/day at 100% share
+quotable sides: 0 of 30 (skipped only when a tick inside the touch would cross)
+
+  market                                   side    px  resting   have   $/sh
+
+=== holding 2% of a side, cheapest sides first ===
+   sides    capital   $/day  per $/day
+  cheapest ten sides:
+
+=== holding 5% of a side, cheapest sides first ===
+   sides    capital   $/day  per $/day
+  cheapest ten sides:
+
+for 0.50% of every side we quote: $0 of capital across 0 sides -> $0.00/day
+
+for 1.00% of every side we quote: $0 of capital across 0 sides -> $0.00/day
