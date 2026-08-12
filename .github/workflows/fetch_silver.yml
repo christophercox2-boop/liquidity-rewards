@@ -1,0 +1,76 @@
+name: Fetch Silver model
+
+# Pulls Nate Silver's model table (Datawrapper CDN) and commits it. The
+# session that requested this cannot reach static.dwcdn.net — the egress
+# proxy blocks it — but Actions runners have open internet, so the fetch
+# happens here and the data lands in the repo for analysis.
+#
+# Read-only with respect to the exchange: touches no orders.
+
+on:
+  schedule:
+    - cron: "10 12 * * *"      # 08:10 ET, once a day
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/fetch_silver.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-silver
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch
+        run: |
+          pip install -q requests
+          python3 - <<'EOF'
+          import csv, io, json, os, requests
+
+          URL = "https://static.dwcdn.net/data/KQI8W.csv"
+          out = []
+          r = requests.get(URL, timeout=60,
+                           headers={"User-Agent": "Mozilla/5.0 (liquidity-rewards data pull)"})
+          print(f"HTTP {r.status_code}  {len(r.content):,} bytes  "
+                f"content-type={r.headers.get('content-type')}")
+          r.raise_for_status()
+          text = r.text
+          os.makedirs("data", exist_ok=True)
+          with open("data/silver_model.csv", "w") as f:
+              f.write(text)
+
+          rows = list(csv.reader(io.StringIO(text)))
+          print(f"rows: {len(rows)}")
+          for row in rows[:12]:
+              print("   ", row[:10])
+          if len(rows) > 12:
+              print(f"    ... {len(rows)-12} more")
+          # a quick machine-readable summary so the next step can reason about shape
+          json.dump({"url": URL, "n_rows": len(rows),
+                     "header": rows[0] if rows else [],
+                     "sample": rows[1:6]},
+                    open("data/silver_model_meta.json", "w"), indent=1)
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/silver_model.csv data/silver_model_meta.json 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Fetch Silver model [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi

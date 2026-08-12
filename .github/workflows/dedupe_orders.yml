@@ -1,0 +1,182 @@
+name: Dedupe stacked orders
+
+# Cancels the duplicate non-scoring orders the keeper's cap bug accumulated
+# (188 copies, ~$1,815, across 48 sides) — WITHOUT breaking qualification.
+#
+# The naive read of "redundant" is wrong and would cost money: pandc-anydis
+# holds 37 copies of a 273-share ask, but its Target Size is 10,000 and those
+# copies sum to 10,101 — they ARE the qualification. Cancelling them would
+# drop the side below target and take it from earning to earning nothing.
+#
+# So every cancellation is checked against the live book first: a copy is
+# only removed while the side would still hold Target Size without it. Sides
+# are trimmed largest-stack-first, one order at a time, re-checking the
+# running total as it goes, and one order is always left at each price.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/dedupe_orders.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dedupe-orders
+  cancel-in-progress: false
+
+jobs:
+  dedupe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Trim duplicates
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import collections, io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+          LIVE = ("ORDER_STATE_NEW", "ORDER_STATE_PARTIALLY_FILLED")
+
+          def my_orders():
+              r = api("GET", "/v1/orders/open"); r.raise_for_status()
+              g = collections.defaultdict(list)
+              for o in r.json().get("orders") or []:
+                  if str(o.get("state")) not in LIVE:
+                      continue
+                  g[(o.get("marketSlug") or "",
+                     "BUY" if str(o.get("side","")).upper().endswith("BUY") else "SELL",
+                     round(tr._num(o.get("price")), 2))].append(
+                        {"id": o["id"],
+                         "sz": tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity"))})
+              return g
+
+          groups = my_orders()
+          dupes = {k: v for k, v in groups.items() if len(v) > 1}
+          mkts = sorted({k[0] for k in dupes})
+          print(f"{sum(len(v) for v in groups.values())} live orders; "
+                f"{len(dupes)} price rungs hold more than one\n")
+
+          target = {}
+          for i in range(0, len(mkts), 40):
+              rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                params={"symbols": mkts[i:i+40], "pageSize": 100}, timeout=30)
+              if rr.status_code >= 400:
+                  time.sleep(2); continue
+              for p in rr.json().get("programs") or []:
+                  s = p.get("marketSlug") or ""
+                  for tp in p.get("timePeriods") or []:
+                      if str(tp.get("status") or "").lower() in ("active","live","status_live"):
+                          target[s] = float(tp.get("targetSize") or 0)
+              time.sleep(0.4)
+
+          books = {}
+          for m in mkts:
+              try:
+                  books[m] = tr._fetch_book(m)
+              except Exception:
+                  pass
+              time.sleep(0.2)
+
+          cancelled = protected = 0
+          freed = 0.0
+          # biggest stacks first so the largest wins are taken while headroom lasts
+          for (m, side, px), orders in sorted(dupes.items(), key=lambda kv: -len(kv[1])):
+              bk = books.get(m); tgt = target.get(m)
+              if not bk:
+                  continue
+              levels = bk.get("bids") if side == "BUY" else bk.get("asks")
+              side_total = sum(q for _, q in (levels or []))
+              orders.sort(key=lambda o: -o["sz"])       # keep the largest
+              running = side_total
+              for o in orders[1:]:
+                  if tgt and running - o["sz"] < tgt:
+                      protected += 1
+                      continue                          # this copy holds the qualification
+                  rr = api("POST", f"/v1/order/{o['id']}/cancel", json={"marketSlug": m})
+                  if rr.status_code < 300:
+                      cancelled += 1
+                      running -= o["sz"]
+                      freed += (px if side == "BUY" else 1 - px) * o["sz"]
+                  else:
+                      print(f"  cancel FAIL {m} {side} {px} -> {rr.status_code}")
+                  time.sleep(0.3)
+              if len(orders) > 1:
+                  print(f"  {m[:42]:42s} {side:4s} {px:.2f}  had {len(orders)}, "
+                        f"side {side_total:,.0f}/{tgt or 0:,.0f}")
+
+          print(f"\ncancelled {cancelled} duplicate copies (${freed:,.2f} freed)")
+          print(f"kept {protected} copies that were holding Target Size")
+
+          # verification: nothing may have fallen below target
+          time.sleep(30)
+          reverted = []
+          for m in mkts:
+              tgt = target.get(m)
+              if not tgt:
+                  continue
+              try:
+                  bk = tr._fetch_book(m)
+              except Exception:
+                  continue
+              time.sleep(0.2)
+              for side in ("BUY", "SELL"):
+                  levels = bk.get("bids") if side == "BUY" else bk.get("asks")
+                  tot = sum(q for _, q in (levels or []))
+                  if tot < tgt - 0.5:
+                      reverted.append((m, side, tot, tgt))
+          if reverted:
+              print(f"\nWARNING: {len(reverted)} sides now below target — re-filling:")
+              for m, side, tot, tgt in reverted:
+                  rr = api("POST", "/v1/orders",
+                           json={"marketSlug": m,
+                                 "intent": "ORDER_INTENT_BUY_LONG" if side == "BUY"
+                                           else "ORDER_INTENT_BUY_SHORT",
+                                 "type": "ORDER_TYPE_LIMIT",
+                                 "price": {"value": "0.01" if side == "BUY" else "0.99",
+                                           "currency": "USD"},
+                                 "quantity": int(min(tgt - tot, 2000)),
+                                 "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                                 "participateDontInitiate": True})
+                  print(f"   {m} {side} {tot:,.0f}/{tgt:,.0f} -> HTTP {rr.status_code}")
+                  time.sleep(0.5)
+          else:
+              print("\nverified: every side still holds Target Size")
+
+          fin = my_orders()
+          print(f"orders now: {sum(len(v) for v in fin.values())}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/dedupe_orders.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/dedupe_orders.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Dedupe stacked orders [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
