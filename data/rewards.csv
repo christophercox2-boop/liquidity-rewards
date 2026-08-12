@@ -1817,3 +1817,5 @@ date,market,program_type,reward_usd,status
 2026-08-09,tec-cbb-champ-2027-04-05-w-iowast,liquidityProgram,0.18,PAID
 2026-08-09,tec-cbb-champ-2027-04-05-w-nebr,liquidityProgram,0.21,PAID
 2026-08-09,tec-cbb-champ-2027-04-05-w-uconn,liquidityProgram,1.22,PAID
+2026-08-10,apdc-alito-2026-12-31,liquidityProgram,8.64,PENDING
+2026-08-10,apdc-jerpowgov-2026-12-31,liquidityProgram,8.47,PENDING
