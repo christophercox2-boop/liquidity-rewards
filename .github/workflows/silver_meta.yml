@@ -42,10 +42,25 @@ jobs:
               "https://api.datawrapper.de/v3/charts/KQI8W",
               "https://datawrapper.dwcdn.net/KQI8W/1/",
           ]
+          # dwcdn answers the bare chart URL with a meta/JS refresh to whatever
+          # version is currently published. requests follows neither, so the
+          # first fetch returns a 241-byte stub and the real page is never seen.
+          def resolve(url, depth=0):
+              r = requests.get(url, timeout=45, headers=UA)
+              if depth < 4 and r.status_code < 400 and len(r.text) < 2000:
+                  m = (re.search(r"url=(https://datawrapper\.dwcdn\.net/[^\"'>\s]+)", r.text)
+                       or re.search(r"location\.href\s*=\s*'(https://datawrapper\.dwcdn\.net/[^']+)'",
+                                    r.text))
+                  if m:
+                      nxt = m.group(1).rstrip("+' ")
+                      print(f"  redirect -> {nxt}")
+                      return resolve(nxt, depth + 1)
+              return r
+
           found = {}
           for url in CANDIDATES:
               try:
-                  r = requests.get(url, timeout=45, headers=UA)
+                  r = resolve(url)
               except Exception as e:
                   print(f"{url} -> {type(e).__name__}: {e}")
                   continue
