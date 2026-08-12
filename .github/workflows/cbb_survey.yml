@@ -21,7 +21,7 @@ on:
         default: "5"
       seed:
         description: "any market slug in the event to survey"
-        default: "tec-nba-eastconf-2027-05-19-w-mil"
+        default: "WNBA MVP"
 
 permissions:
   contents: write
@@ -44,7 +44,7 @@ jobs:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
           POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
           TARGET: ${{ github.event.inputs.target || '5' }}
-          SEED: ${{ github.event.inputs.seed || 'tec-nba-eastconf-2027-05-19-w-mil' }}
+          SEED: ${{ github.event.inputs.seed || 'WNBA MVP' }}
         run: |
           pip install -q -r requirements.txt
           python3 - <<'EOF'
@@ -79,6 +79,26 @@ jobs:
               slugs = list(tr.RACE_MEMBERS.get(SEED) or [])
               print(f"eventSlug absent; search fallback found {n} open markets")
               print(f"debug: {tr.EVENT_DEBUG.get(SEED)}")
+
+          # SEED may be a search phrase rather than a slug, for an event whose
+          # slug we do not know yet. Search, list what matches, take the best.
+          if not slugs:
+              rs = requests.get(tr.GATEWAY + "/v1/search",
+                                params={"query": SEED, "limit": 25}, timeout=20)
+              cands = []
+              if rs.status_code < 400:
+                  for ev in rs.json().get("events") or []:
+                      opens = [m["slug"] for m in ev.get("markets") or []
+                               if m.get("slug") and not m.get("closed")]
+                      if opens:
+                          cands.append((ev.get("slug") or "?", ev.get("title") or "", opens))
+              print(f"searched '{SEED}': {len(cands)} events with open markets")
+              for s, title, opens in cands:
+                  print(f"   {s:<44s} {len(opens):>3d} open   {title[:52]}")
+              if cands:
+                  cands.sort(key=lambda c: -len(c[2]))
+                  ev_slug, _, slugs = cands[0]
+                  print(f"\nsurveying: {ev_slug}")
           print(f"seed: {SEED}")
           print(f"event: {ev_slug}   open markets: {len(slugs)}")
           if not slugs:
@@ -231,7 +251,8 @@ jobs:
                     f"-> ${tot_gain:.2f}/day")
 
           os.makedirs("data", exist_ok=True)
-          with open(f"data/survey_{SEED.split('-')[1]}.txt", "w") as f:
+          tag = "".join(c for c in SEED.lower() if c.isalnum())[:24]
+          with open(f"data/survey_{tag}.txt", "w") as f:
               f.write(BUF.getvalue())
           EOF
 
