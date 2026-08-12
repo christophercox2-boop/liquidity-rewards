@@ -54,6 +54,13 @@ jobs:
           def print(*a, **k):
               _p(*a, **k); _p(*a, **{**k, "file": BUF})
 
+          # Our own resting order ids, to check the ownership rule empirically.
+          OPEN = "/v1/orders/open"
+          r = requests.get(tr.TRADE_API + OPEN,
+                           headers=tr.auth_headers(kid, sec, "GET", OPEN), timeout=30)
+          ours = {str(o.get("id")) for o in (r.json().get("orders") or [])} if r.ok else set()
+          print(f"{len(ours)} of our orders currently open\n")
+
           PATH = "/v1/portfolio/activities"
           acts, cursor = [], None
           for page in range(PAGES):
@@ -83,18 +90,28 @@ jobs:
                     "ORDER_INTENT_SELL_LONG": ("Sold", "Yes", False),
                     "ORDER_INTENT_BUY_SHORT": ("Bought", "No", True),
                     "ORDER_INTENT_SELL_SHORT": ("Sold", "No", True)}
+          # Both sides of each trade come back, ours and the counterparty's.
+          # Every order we place is post-only (participateDontInitiate), and a
+          # post-only order can only ever rest -- it can never cross and take.
+          # So our side is the PASSIVE execution; the aggressor is the other
+          # party. The commission field agrees: the aggressor pays a taker fee,
+          # the passive side receives a maker rebate.
           rows = []
-          selfcross = 0
+          match_pass = match_agg = 0
           for a in acts:
               t = a.get("trade") or {}
+              ag = t.get("aggressorExecution") or {}
+              pa = t.get("passiveExecution") or {}
+              if str((ag.get("order") or {}).get("id")) in ours:
+                  match_agg += 1
+              if str((pa.get("order") or {}).get("id")) in ours:
+                  match_pass += 1
               execs = []
-              for ex in (t.get("aggressorExecution") or {}, t.get("passiveExecution") or {}):
+              for ex in ([pa] if (pa.get("order") or {}).get("id") else
+                         ([ag] if not pa else [])):
                   o = ex.get("order") or {}
                   if o.get("id") and tr._num(ex.get("lastShares")) > 0:
                       execs.append((ex, o))
-              if len(execs) == 2:
-                  selfcross += 1
-                  continue
               for ex, o in execs:
                   verb, yesno, no_terms = INTENT.get(str(o.get("intent") or ""),
                       ("Bought" if str(o.get("side") or "").endswith("BUY") else "Sold",
@@ -112,7 +129,9 @@ jobs:
                                "shares": tr._num(ex.get("lastShares")),
                                "oid": str(o.get("id"))})
           rows.sort(key=lambda r: r["when"] or dt.datetime.min.replace(tzinfo=ET))
-          print(f"{len(rows)} executions ({selfcross} self-crosses skipped)\n")
+          print(f"ownership check against our {len(ours)} open orders: "
+                f"passive side matched {match_pass}, aggressor side matched {match_agg}")
+          print(f"{len(rows)} executions taken as ours\n")
           if not rows:
               print("no executions in the history returned")
 
