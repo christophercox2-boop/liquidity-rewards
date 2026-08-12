@@ -1,0 +1,125 @@
+name: Health check
+
+# Why a placement can come back accepted and then not rest. The defender
+# reports "replacement did not rest" when the exchange returns 2xx for a
+# placement and no order is found at the new price a second later. Three
+# things explain that, and this tells them apart:
+#
+#   buying power   -- no headroom, so the order is accepted then dropped
+#   duplicates     -- verification false-negatives leaving both orders resting
+#   short exposure -- ask-side placements stalling at a per-market ceiling
+#
+# Read-only: GET only.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/health.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: health
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import collections, io, os, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          p = "/v1/account/balances"
+          r = requests.get(tr.TRADE_API + p,
+                           headers=tr.auth_headers(kid, sec, "GET", p), timeout=20)
+          print(f"GET {p} -> {r.status_code}")
+          if r.status_code < 400:
+              for b in r.json().get("balances") or []:
+                  keep = {k: v for k, v in b.items()
+                          if k in ("currency", "buyingPower", "cashBalance",
+                                   "totalValue", "available", "marginUsed")}
+                  print(f"  {keep}")
+
+          p = "/v1/orders/open"
+          r = requests.get(tr.TRADE_API + p,
+                           headers=tr.auth_headers(kid, sec, "GET", p), timeout=30)
+          r.raise_for_status()
+          live = [o for o in (r.json().get("orders") or [])
+                  if str(o.get("state")) not in tr.DEAD_ORDER_STATES]
+          print(f"\n{len(live)} live orders")
+
+          rung = collections.defaultdict(list)
+          committed = 0.0
+          for o in live:
+              slug = o.get("marketSlug") or ""
+              side = "BUY" if str(o.get("side","")).upper().endswith("BUY") else "SELL"
+              px = tr._num(o.get("price"))
+              sz = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity"))
+              committed += px * sz if side == "BUY" else (1 - px) * sz
+              rung[(slug, side, round(px, 2))].append(sz)
+          print(f"capital committed in resting orders: ${committed:,.2f}")
+
+          dupes = {k: v for k, v in rung.items() if len(v) > 1}
+          extra = sum(len(v) - 1 for v in dupes.values())
+          print(f"\nprice rungs holding more than one order: {len(dupes)} "
+                f"({extra} orders beyond the first)")
+          for (slug, side, px), sizes in sorted(dupes.items(),
+                                                key=lambda kv: -len(kv[1]))[:15]:
+              print(f"  {slug[:44]:<44s} {side:<4s} {px*100:>4.0f}c  "
+                    f"{len(sizes)} orders  sizes {[int(s) for s in sizes][:6]}")
+
+          # the market from the alert
+          tn = [o for o in live if (o.get("marketSlug") or "")
+                == "usgubewc-usgub-tn-2026-11-03-rep"]
+          print(f"\nusgubewc-usgub-tn-2026-11-03-rep: {len(tn)} orders")
+          for o in tn:
+              side = "BUY" if str(o.get("side","")).upper().endswith("BUY") else "SELL"
+              print(f"  {side:<4s} {tr._num(o.get('price'))*100:>5.1f}c  "
+                    f"leaves {tr._num(o.get('leavesQuantity')):>6,.0f}  "
+                    f"state {o.get('state')}  id {o.get('id')}")
+          try:
+              bk = tr._fetch_book("usgubewc-usgub-tn-2026-11-03-rep")
+              bids, asks = bk.get("bids") or [], bk.get("asks") or []
+              print(f"  book: best bid {bids[0][0]*100:.0f}c  best ask "
+                    f"{asks[0][0]*100:.0f}c" if bids and asks else f"  book: {bk}")
+              print(f"  a 96c bid would {'CROSS' if asks and 0.96 >= asks[0][0] else 'rest'}"
+                    f" the {asks[0][0]*100:.0f}c ask" if asks else "  no asks")
+          except Exception as e:
+              print(f"  book unreadable: {type(e).__name__}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/health.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/health.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Health check [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
