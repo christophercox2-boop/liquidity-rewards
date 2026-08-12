@@ -3543,6 +3543,7 @@ MAP_IDLE_RATE = 1.00
 # sampled, and flag when the take is far below what the estimate implied.
 MAP_PAY_MIN_COVER = 7200.0   # seconds of sampled day before the test means anything
 MAP_PAY_RATIO = 0.25         # earned this far under the implied take is a flag
+MAP_PAY_MIN_IMPLIED = 0.10   # ignore markets whose implied take is pocket change
 
 
 def _parse_silver(text: str) -> dict:
@@ -3754,17 +3755,40 @@ def _map_payload() -> dict:
         implied = round(c["est_day"] * day_frac, 2)
         c["implied"] = implied
         c["covered_h"] = round(covered_s / 3600.0, 1)
+
+        # Per market, not per state. A state total hides a dead market behind a
+        # live one -- Wyoming's governor book paying while its senate book pays
+        # nothing would still average out to "fine", which is the same masking
+        # one level down.
+        dead = []
+        for office, oc in c["offices"].items():
+            for slug, m in oc["markets"].items():
+                m_implied = round(m["est_day"] * day_frac, 2)
+                m["implied"] = m_implied
+                m["paying"] = True
+                if (m["orders"] and covered_s >= MAP_PAY_MIN_COVER
+                        and m_implied >= MAP_PAY_MIN_IMPLIED
+                        and m["earned"] < MAP_PAY_RATIO * m_implied):
+                    m["paying"] = False
+                    dead.append((slug, office, m))
+        c["dead_markets"] = [d[0] for d in dead]
+
         if c["worst_edge"] is not None and c["worst_edge"] < -MAP_CONFLICT:
             c["status"] = "conflict"
             c["why"] = (f"an order rests {abs(c['worst_edge']):.0%} the wrong side of "
                         f"the model — a fill costs that per share")
-        elif (c["orders"] and covered_s >= MAP_PAY_MIN_COVER
-              and c["est_day"] >= MAP_IDLE_RATE
-              and c["earned"] < MAP_PAY_RATIO * implied):
+        elif dead:
             c["status"] = "notpaying"
-            c["why"] = (f"estimated ${c['est_day']:.2f}/day, but only ${c['earned']:.2f} "
-                        f"has actually come in over {covered_s / 3600:.1f}h measured "
-                        f"(the estimate implied ${implied:.2f})")
+            if len(dead) == 1:
+                slug, office, m = dead[0]
+                c["why"] = (f"the {office} market has taken ${m['earned']:.2f} against "
+                            f"${m['implied']:.2f} implied by its ${m['est_day']:.2f}/day "
+                            f"estimate over {covered_s / 3600:.1f}h measured")
+            else:
+                tot_e = sum(m["earned"] for _, _, m in dead)
+                tot_i = sum(m["implied"] for _, _, m in dead)
+                c["why"] = (f"{len(dead)} markets here have taken ${tot_e:.2f} against "
+                            f"${tot_i:.2f} implied over {covered_s / 3600:.1f}h measured")
         elif c["orders"] and c["est_day"] < MAP_IDLE_RATE:
             c["status"] = "idle"
             c["why"] = (f"{c['orders']} order{'s' if c['orders'] != 1 else ''} "
@@ -3848,6 +3872,8 @@ margin:0 0 6px}
 .mkt{font-size:12px;padding:6px 0;border-top:1px dashed var(--line)}
 .mkt code{font-size:11px;color:var(--dim);word-break:break-all}
 .neg{color:var(--bad)} .pos{color:var(--good)}
+.deadmk{background:rgba(224,122,63,.18);border-left:3px solid #e07a3f;color:#ffc9a6;
+border-radius:0 6px 6px 0;padding:5px 8px;font-size:11.5px;margin:5px 0}
 .item{display:flex;align-items:center;gap:9px;padding:9px 0;border-top:1px solid var(--line);
 cursor:pointer}
 .item:first-of-type{border-top:0}
@@ -4250,7 +4276,10 @@ function detail(ab){
       const e=m.worst_edge;
       const tag = e==null ? '' :
         `<span class="${e<0?'neg':'pos'}">${e<0?'':'+'}${(e*100).toFixed(1)}c vs model</span>`;
-      h += `<div class="mkt"><code>${k}</code><div class="row">
+      const dead = (m.paying===false);
+      h += `<div class="mkt"><code>${k}</code>${dead?
+        `<div class="deadmk">not paying — ${money(m.earned)} in against ${money(m.implied)}
+         implied by the ${money(m.est_day)}/day estimate</div>`:''}<div class="row">
         <span>${m.orders} order${m.orders===1?'':'s'} · ${money(m.est_day)}/day</span>${tag}</div>
         <button class="bkbtn" onclick="tglBook('${k}')">${OPENBK[k]?'hide book':'show book'}</button>
         <button class="bkbtn" onclick="tglNew('${k}')">${OPENNEW[k]?'close':'new order'}</button>
