@@ -32,6 +32,52 @@ quoting all              66 sides
   tec-cbb-champ-2027-04-05-w-vcu           BUY     6c    3,162      0   0.06
   ... 46 more
 
-for 1.00% of every side we quote: $5,467 of capital across 66 sides -> $2.26/day
+=== holding 2% of a side, cheapest sides first ===
+   sides    capital   $/day  per $/day
+       5       1.15    0.34     0.2977
+      10       2.73    0.68     0.2512
+      15       7.01    1.03     0.1465
+      20      20.95    1.37     0.0654
+      25      44.61    1.71     0.0384
+      30      79.99    2.05     0.0257
+      40     198.30    2.74     0.0138
+      50     774.19    3.42     0.0044
+      66  11,433.68    4.52     0.0004
+  cheapest ten sides:
+    stan       BUY    3c  resting     334  add       7  $    0.20
+    nd         BUY    3c  resting     380  add       8  $    0.23
+    flst       BUY    3c  resting     383  add       8  $    0.23
+    cin        BUY    3c  resting     385  add       8  $    0.24
+    wisc       BUY    3c  resting     397  add       8  $    0.24
+    bayl       BUY    4c  resting     349  add       7  $    0.28
+    miss       BUY    3c  resting     483  add      10  $    0.30
+    sdst       BUY   10c  resting     150  add       3  $    0.31
+    clmsn      BUY    4c  resting     383  add       8  $    0.31
+    vtech      BUY    4c  resting     462  add       9  $    0.38
 
-for 2.00% of every side we quote: $11,045 of capital across 66 sides -> $4.52/day
+=== holding 5% of a side, cheapest sides first ===
+   sides    capital   $/day  per $/day
+       5       2.97    0.86     0.2886
+      10       7.03    1.71     0.2435
+      15      18.08    2.57     0.1421
+      20      54.02    3.42     0.0634
+      25     115.05    4.28     0.0372
+      30     206.29    5.14     0.0249
+      40     511.40    6.85     0.0134
+      50   1,996.59    8.56     0.0043
+      66  29,486.87   11.30     0.0004
+  cheapest ten sides:
+    stan       BUY    3c  resting     334  add      18  $    0.53
+    nd         BUY    3c  resting     380  add      20  $    0.60
+    flst       BUY    3c  resting     383  add      20  $    0.60
+    cin        BUY    3c  resting     385  add      20  $    0.61
+    wisc       BUY    3c  resting     397  add      21  $    0.63
+    bayl       BUY    4c  resting     349  add      18  $    0.73
+    miss       BUY    3c  resting     483  add      25  $    0.76
+    sdst       BUY   10c  resting     150  add       8  $    0.79
+    clmsn      BUY    4c  resting     383  add      20  $    0.81
+    vtech      BUY    4c  resting     462  add      24  $    0.97
+
+for 1.00% of every side we quote: $5,659 of capital across 66 sides -> $2.26/day
+
+for 2.00% of every side we quote: $11,434 of capital across 66 sides -> $4.52/day
