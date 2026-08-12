@@ -9,7 +9,7 @@ scc-senate-gop rung          bid    ask    mid
   46                      0.030  0.040  0.035
   47                      0.130  0.150  0.140
   48                      0.180  0.190  0.185
-  49                      0.140  0.220  0.180
+  49                      0.140  0.210  0.175
   50                      0.180  0.210  0.195
   51                      0.240  0.250  0.245
   52                      0.150  0.200  0.175
@@ -19,12 +19,29 @@ scc-senate-gop rung          bid    ask    mid
   56                      0.010  0.050  0.030
   gte57                   0.010  0.040  0.025
 
-P(GOP holds Senate), summing rungs 50 and up:
-  book:  68.0% (bid side) .. 98.0% (ask side)
-  Silver: 42.7%
-  gap at the midpoint: +40.3% (book rich vs the model)
+P(GOP holds Senate) -- rungs 50 and up:
+  raw sums:   bid side 0.680, ask side 0.980
+  normalised (bid): 57.6%   (all rungs on that side sum to 1.180)
+  normalised (ask): 59.4%   (all rungs on that side sum to 1.650)
+  normalised (mid): 58.7%   (all rungs on that side sum to 1.415)
+  Silver:     42.7%
+  gap: +15.9% (book leans Republican relative to the model)
 
-mean GOP seats implied by the ladder: 50.13   (rungs sum to 1.420; 1.000 would be a coherent book)
-Silver average GOP seats: 49.10   -> ladder is +1.04 seats away
+mean GOP seats implied by the ladder: 50.13   (a weighted average, so the sum of 1.415 divides out)
+Silver average GOP seats:             49.10
+  the ladder sits +1.04 seats Republican of the model
+
+  These two anchors agree. Control turns on the 49/50 boundary,
+  which sits right at the peak of the seat distribution, so the
+  probability moves fastest per seat exactly there -- about one
+  seat of difference in the mean is what a control-probability
+  gap of this size looks like. The disagreement is one seat, not
+  a chasm.
+
+Silver's own model variants, P(GOP holds Senate):
+  Deluxe   42.7%
+  Classic  44.1%
+  Lite     42.9%
+  spread across variants: 1.4% -- the distance to the book is much larger than Silver's own internal disagreement
 
 Nothing was placed, cancelled or repriced. This is a read-only report.
