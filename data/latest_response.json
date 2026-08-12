@@ -15,6 +15,76 @@
       "status": "PENDING"
     },
     {
+      "reward": 0.08,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-mn-2026-08-11-rep-kenqua",
+      "date": "2026-08-10",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-mn-2026-08-11-rep-lisdem",
+      "date": "2026-08-10",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.04,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
+      "date": "2026-08-10",
+      "status": "PENDING"
+    },
+    {
+      "reward": 5.16,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ushrp-fl25-2026-08-18-dem-jarmos",
+      "date": "2026-08-10",
+      "status": "PENDING"
+    },
+    {
+      "reward": 4.32,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ushrp-fl25-2026-08-18-dem-olilar",
+      "date": "2026-08-10",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.35,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-sc-2026-08-11-rep-ralnor",
+      "date": "2026-08-10",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.15,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-ussep-sc-2026-08-11-rep-rusfry",
+      "date": "2026-08-10",
+      "status": "PENDING"
+    },
+    {
+      "reward": 3.28,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usgub-ca-2026-11-03-xavbec",
+      "date": "2026-08-10",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-nh-2026-11-03-dem",
+      "date": "2026-08-10",
+      "status": "PENDING"
+    },
+    {
+      "reward": 2.75,
+      "programType": "liquidityProgram",
+      "marketSlug": "ewc-usse-tx-2026-11-03-dem",
+      "date": "2026-08-10",
+      "status": "PENDING"
+    },
+    {
       "reward": 6.91,
       "programType": "liquidityProgram",
       "marketSlug": "apdc-alito-2026-12-31",
