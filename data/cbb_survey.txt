@@ -7,7 +7,7 @@ to earn $5.00/day you need 1.00% of the event
 read 73 books
 
 each side of each market is worth $3.425/day at 100% share
-quoting all              66 sides
+quotable sides: 121 of 146 (skipped only when a tick inside the touch would cross)
 
   market                                   side    px  resting   have   $/sh
   tec-cbb-champ-2027-04-05-w-stan          BUY     3c      334      0   0.03
@@ -30,7 +30,7 @@ quoting all              66 sides
   tec-cbb-champ-2027-04-05-w-xav           BUY     3c    3,533      0   0.03
   tec-cbb-champ-2027-04-05-w-prov          BUY     3c    5,889      0   0.03
   tec-cbb-champ-2027-04-05-w-vcu           BUY     6c    3,162      0   0.06
-  ... 46 more
+  ... 101 more
 
 === holding 2% of a side, cheapest sides first ===
    sides    capital   $/day  per $/day
@@ -38,11 +38,11 @@ quoting all              66 sides
       10       2.73    0.68     0.2512
       15       7.01    1.03     0.1465
       20      20.95    1.37     0.0654
-      25      44.61    1.71     0.0384
-      30      79.99    2.05     0.0257
-      40     198.30    2.74     0.0138
-      50     774.19    3.42     0.0044
-      66  11,433.68    4.52     0.0004
+      25      44.66    1.71     0.0383
+      30      80.04    2.05     0.0257
+      40     220.46    2.74     0.0124
+      50     782.06    3.42     0.0044
+     120  39,008.48    8.22     0.0002
   cheapest ten sides:
     stan       BUY    3c  resting     334  add       7  $    0.20
     nd         BUY    3c  resting     380  add       8  $    0.23
@@ -61,11 +61,11 @@ quoting all              66 sides
       10       7.03    1.71     0.2435
       15      18.08    2.57     0.1421
       20      54.02    3.42     0.0634
-      25     115.05    4.28     0.0372
-      30     206.29    5.14     0.0249
-      40     511.40    6.85     0.0134
-      50   1,996.59    8.56     0.0043
-      66  29,486.87   11.30     0.0004
+      25     115.18    4.28     0.0372
+      30     206.41    5.14     0.0249
+      40     568.55    6.85     0.0120
+      50   2,016.88    8.56     0.0042
+     120 100,610.95   20.55     0.0002
   cheapest ten sides:
     stan       BUY    3c  resting     334  add      18  $    0.53
     nd         BUY    3c  resting     380  add      20  $    0.60
@@ -78,6 +78,6 @@ quoting all              66 sides
     clmsn      BUY    4c  resting     383  add      20  $    0.81
     vtech      BUY    4c  resting     462  add      24  $    0.97
 
-for 1.00% of every side we quote: $5,659 of capital across 66 sides -> $2.26/day
+for 1.00% of every side we quote: $19,304 of capital across 120 sides -> $4.11/day
 
-for 2.00% of every side we quote: $11,434 of capital across 66 sides -> $4.52/day
+for 2.00% of every side we quote: $39,008 of capital across 120 sides -> $8.22/day
