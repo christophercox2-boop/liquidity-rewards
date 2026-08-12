@@ -1,0 +1,37 @@
+eventSlug absent; search fallback found 73 open markets
+debug: search '2027 Men's College Basketball National C': event cbb-champ-2027-04-05-w with 73 open markets
+event: None   open markets: 73
+event pool: $500.0/day    target size per side: 2,500
+to earn $5.00/day you need 1.00% of the event
+
+read 73 books
+
+each side of each market is worth $3.425/day at 100% share
+quoting all              66 sides
+
+  market                                   side    px  resting   have   $/sh
+  tec-cbb-champ-2027-04-05-w-stan          BUY     3c      334      0   0.03
+  tec-cbb-champ-2027-04-05-w-nd            BUY     3c      380      0   0.03
+  tec-cbb-champ-2027-04-05-w-flst          BUY     3c      383      0   0.03
+  tec-cbb-champ-2027-04-05-w-cin           BUY     3c      385      0   0.03
+  tec-cbb-champ-2027-04-05-w-wisc          BUY     3c      397      0   0.03
+  tec-cbb-champ-2027-04-05-w-bayl          BUY     4c      349      0   0.04
+  tec-cbb-champ-2027-04-05-w-miss          BUY     3c      483      0   0.03
+  tec-cbb-champ-2027-04-05-w-sdst          BUY    10c      150      0   0.10
+  tec-cbb-champ-2027-04-05-w-clmsn         BUY     4c      383      0   0.04
+  tec-cbb-champ-2027-04-05-w-vtech         BUY     4c      462      0   0.04
+  tec-cbb-champ-2027-04-05-w-rich          BUY     8c      249      0   0.08
+  tec-cbb-champ-2027-04-05-w-syra          BUY     4c      558      0   0.04
+  tec-cbb-champ-2027-04-05-w-smu           BUY     7c      386      0   0.07
+  tec-cbb-champ-2027-04-05-w-mia           BUY     8c      480      0   0.08
+  tec-cbb-champ-2027-04-05-w-nebr          BUY     3c    3,409      0   0.03
+  tec-cbb-champ-2027-04-05-w-ohiost        BUY     3c    3,497      0   0.03
+  tec-cbb-champ-2027-04-05-w-byu           BUY     3c    3,517      0   0.03
+  tec-cbb-champ-2027-04-05-w-xav           BUY     3c    3,533      0   0.03
+  tec-cbb-champ-2027-04-05-w-prov          BUY     3c    5,889      0   0.03
+  tec-cbb-champ-2027-04-05-w-vcu           BUY     6c    3,162      0   0.06
+  ... 46 more
+
+for 1.00% of every side we quote: $5,467 of capital across 66 sides -> $2.26/day
+
+for 2.00% of every side we quote: $11,045 of capital across 66 sides -> $4.52/day
