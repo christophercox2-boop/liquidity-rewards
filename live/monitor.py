@@ -21,8 +21,10 @@ daily pools. State persists to state.json so restarts don't zero the counter
 from __future__ import annotations
 
 import base64
+import csv
 import datetime as dt
 import gzip
+import io
 import json
 import os
 import random
@@ -3468,6 +3470,439 @@ def do_maction(body: dict) -> tuple[int, dict]:
     return 400, {"ok": False, "error": "op must be place, modify, cancel, defend or undefend"}
 
 
+# ---------------------------------------------------------------------------
+# Silver Bulletin per-race model, and the per-state view built on top of it
+# ---------------------------------------------------------------------------
+#
+# The forecasts sit behind Datawrapper's CDN, which this host can reach, so the
+# monitor pulls them itself on a slow timer rather than depending on a repo
+# checkout that only refreshes on deploy. The committed CSVs are the fallback,
+# so the map still renders -- flagged stale, with its true date shown -- when
+# the CDN is unreachable.
+
+SILVER_SOURCES = {
+    "senate": ("https://static.dwcdn.net/data/kNspD.csv",
+               tr.DATA / "silver_senate_races.csv"),
+    "governor": ("https://static.dwcdn.net/data/N13WX.csv",
+                 tr.DATA / "silver_gov_races.csv"),
+}
+SILVER_TTL = 6 * 3600
+SILVER: dict = {"races": {}, "ts": 0.0, "source": "none", "err": ""}
+
+# a fill this far the wrong side of the model is real money, not rounding
+MAP_CONFLICT = 0.10
+# below this a market is holding capital without paying for it
+MAP_IDLE_RATE = 1.00
+
+
+def _parse_silver(text: str) -> dict:
+    """Datawrapper race table -> {state abbr: {dem, rep, name}} as fractions."""
+    out: dict = {}
+    for row in csv.DictReader(io.StringIO(text)):
+        abbr = (row.get("abbr") or "").strip().lower()
+        if not abbr:
+            continue
+        try:
+            dem = float(row.get("winner_Dparty") or "") / 100.0
+            rep = float(row.get("winner_Rparty") or "") / 100.0
+        except ValueError:
+            continue
+        out[abbr] = {"dem": dem, "rep": rep,
+                     "name": (row.get("state") or "").strip()}
+    return out
+
+
+def _silver_races() -> dict:
+    """{'senate': {...}, 'governor': {...}}, refreshed at most every SILVER_TTL."""
+    now = time.time()
+    if SILVER["races"] and now - SILVER["ts"] < SILVER_TTL:
+        return SILVER["races"]
+    races, source, errs = {}, "cdn", []
+    for office, (url, fallback) in SILVER_SOURCES.items():
+        table = {}
+        try:
+            r = requests.get(url, timeout=20,
+                             headers={"User-Agent": "liquidity-rewards monitor"})
+            if r.status_code < 400:
+                table = _parse_silver(r.text)
+        except Exception as e:  # noqa: BLE001 — the map must never kill the poll
+            errs.append(f"{office}: {type(e).__name__}")
+        if not table:
+            try:
+                table = _parse_silver(Path(fallback).read_text())
+                source = "disk"
+            except Exception as e:  # noqa: BLE001
+                errs.append(f"{office} fallback: {type(e).__name__}")
+        races[office] = table
+    SILVER.update({"races": races, "ts": now, "source": source,
+                   "err": "; ".join(errs)})
+    return races
+
+
+# slug prefix -> office, and the position of the state code inside the slug
+_MAP_FAMILIES = (("ussewc-usse-", "senate"), ("usgubewc-usgub-", "governor"))
+
+
+def _map_office(slug: str) -> tuple[str, str] | None:
+    """(office, state abbr) for a race slug, or None when it is not one."""
+    for prefix, office in _MAP_FAMILIES:
+        if slug.startswith(prefix):
+            parts = slug.split("-")
+            if len(parts) > 2 and len(parts[2]) == 2:
+                return office, parts[2].lower()
+    return None
+
+
+def _map_payload() -> dict:
+    """Per-state roll-up of model, resting orders and earnings.
+
+    Every state the model knows about gets a row, including ones we hold no
+    orders in -- a race we never entered is exactly the kind of thing this
+    screen exists to surface, and it cannot show up if the rows are built
+    from our orders alone.
+    """
+    races = _silver_races()
+    with MONITOR.lock:
+        orders = [dict(o) for o in MONITOR.orders]
+        earned = dict(MONITOR.state.get("per_market_hf")
+                      or MONITOR.state.get("per_market") or {})
+        updated = (MONITOR.updated.astimezone(ET).strftime("%I:%M %p ET")
+                   if MONITOR.updated else None)
+
+    states: dict = {}
+
+    def cell(abbr: str) -> dict:
+        return states.setdefault(abbr, {
+            "abbr": abbr.upper(), "name": "", "offices": {},
+            "orders": 0, "est_day": 0.0, "earned": 0.0,
+            "worst_edge": None, "worst_market": "", "status": "none",
+        })
+
+    # seed from the model so unentered races are visible
+    for office, table in races.items():
+        for abbr, race in table.items():
+            c = cell(abbr)
+            c["name"] = c["name"] or race["name"]
+            c["offices"][office] = {"dem": round(race["dem"], 4),
+                                    "rep": round(race["rep"], 4),
+                                    "orders": 0, "est_day": 0.0,
+                                    "earned": 0.0, "worst_edge": None,
+                                    "markets": {}}
+
+    for o in orders:
+        slug = o.get("market") or ""
+        hit = _map_office(slug)
+        if not hit:
+            continue
+        office, abbr = hit
+        race = (races.get(office) or {}).get(abbr)
+        c = cell(abbr)
+        oc = c["offices"].setdefault(office, {
+            "dem": None, "rep": None, "orders": 0, "est_day": 0.0,
+            "earned": 0.0, "worst_edge": None, "markets": {}})
+        est = float(o.get("est_day") or 0.0)
+        c["orders"] += 1
+        c["est_day"] += est
+        oc["orders"] += 1
+        oc["est_day"] += est
+
+        fair = None
+        if race:
+            if slug.endswith("-dem"):
+                fair = race["dem"]
+            elif slug.endswith("-rep"):
+                fair = race["rep"]
+        px = float(o.get("price") or 0.0)
+        side = str(o.get("side") or "").upper()
+        edge = None
+        if fair is not None and px:
+            edge = (fair - px) if side.startswith("BUY") else (px - fair)
+            for holder in (c, oc):
+                if holder["worst_edge"] is None or edge < holder["worst_edge"]:
+                    holder["worst_edge"] = edge
+            if c["worst_edge"] is not None and edge <= c["worst_edge"]:
+                c["worst_market"] = slug
+
+        m = oc["markets"].setdefault(slug, {
+            "orders": 0, "est_day": 0.0, "earned": round(earned.get(slug, 0.0), 2),
+            "fair": None if fair is None else round(fair, 4), "worst_edge": None})
+        m["orders"] += 1
+        m["est_day"] = round(m["est_day"] + est, 2)
+        if edge is not None and (m["worst_edge"] is None or edge < m["worst_edge"]):
+            m["worst_edge"] = round(edge, 4)
+
+    # earnings are keyed by market, so fold them in per state
+    for slug, amount in earned.items():
+        hit = _map_office(slug)
+        if not hit:
+            continue
+        office, abbr = hit
+        if abbr not in states:
+            continue
+        states[abbr]["earned"] += float(amount or 0.0)
+        oc = states[abbr]["offices"].get(office)
+        if oc is not None:
+            oc["earned"] = round(oc["earned"] + float(amount or 0.0), 2)
+
+    # classify. Order matters: money at risk outranks money not being made,
+    # which outranks a race we simply never entered.
+    counts = {"conflict": 0, "idle": 0, "gap": 0, "ok": 0, "none": 0}
+    for c in states.values():
+        c["est_day"] = round(c["est_day"], 2)
+        c["earned"] = round(c["earned"], 2)
+        if c["worst_edge"] is not None:
+            c["worst_edge"] = round(c["worst_edge"], 4)
+        for oc in c["offices"].values():
+            oc["est_day"] = round(oc["est_day"], 2)
+            if oc["worst_edge"] is not None:
+                oc["worst_edge"] = round(oc["worst_edge"], 4)
+        if c["worst_edge"] is not None and c["worst_edge"] < -MAP_CONFLICT:
+            c["status"] = "conflict"
+            c["why"] = (f"an order rests {abs(c['worst_edge']):.0%} the wrong side of "
+                        f"the model — a fill costs that per share")
+        elif c["orders"] and c["est_day"] < MAP_IDLE_RATE:
+            c["status"] = "idle"
+            c["why"] = (f"{c['orders']} order{'s' if c['orders'] != 1 else ''} "
+                        f"resting but only ${c['est_day']:.2f}/day estimated")
+        elif not c["orders"]:
+            c["status"] = "gap"
+            c["why"] = "the model covers this race and we hold no orders here"
+        else:
+            c["status"] = "ok"
+            c["why"] = f"${c['est_day']:.2f}/day across {c['orders']} orders"
+        counts[c["status"]] = counts.get(c["status"], 0) + 1
+
+    return {
+        "states": sorted(states.values(), key=lambda c: c["abbr"]),
+        "counts": counts,
+        "updated": updated,
+        "model": {"source": SILVER["source"], "err": SILVER["err"],
+                  "senate": len(races.get("senate") or {}),
+                  "governor": len(races.get("governor") or {}),
+                  "age_s": int(time.time() - SILVER["ts"]) if SILVER["ts"] else None},
+        "thresholds": {"conflict": MAP_CONFLICT, "idle_rate": MAP_IDLE_RATE},
+    }
+
+
+MAP_HTML = """<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map</title>
+<style>
+:root{--bg:#1a202b;--surface:#232b38;--surface2:#2b3442;--line:#3a4454;--ink:#eef2f7;
+--dim:#93a0b4;--good:#34c07c;--bad:#e5645f;--warn:#d9a132;--accent:#5aa2ff;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+padding:14px 12px 40px;-webkit-text-size-adjust:100%}
+h1{font-size:19px;margin:0 0 2px}
+.sub{color:var(--dim);font-size:12.5px;margin-bottom:12px}
+a{color:var(--accent);text-decoration:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+padding:12px;margin-bottom:12px}
+/* summary chips */
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.chip{flex:1 1 0;min-width:68px;background:var(--surface);border:1px solid var(--line);
+border-radius:11px;padding:8px 6px;text-align:center}
+.chip b{display:block;font-size:20px;font-variant-numeric:tabular-nums;line-height:1.1}
+.chip span{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+.chip.on{outline:2px solid var(--accent)}
+.c-conflict b{color:var(--bad)} .c-idle b{color:var(--warn)}
+.c-gap b{color:var(--accent)} .c-ok b{color:var(--good)}
+/* tile map: fixed 12-col grid, squares, so it holds on a narrow phone */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.t{aspect-ratio:1;border-radius:5px;border:1px solid transparent;background:transparent;
+display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;
+color:var(--dim);padding:0;font-family:inherit;letter-spacing:.02em}
+.t.has{cursor:pointer}
+.t.none{background:#212836;color:#4d5768}
+.t.ok{background:rgba(52,192,124,.20);color:#8fe3b8;border-color:rgba(52,192,124,.35)}
+.t.gap{background:rgba(90,162,255,.16);color:#9cc7ff;border-color:rgba(90,162,255,.32)}
+.t.idle{background:rgba(217,161,50,.24);color:#f2cd7f;border-color:rgba(217,161,50,.45)}
+.t.conflict{background:var(--bad);color:#fff;border-color:#ff8b86}
+.t.sel{outline:2px solid var(--ink);outline-offset:1px}
+.t:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* legend */
+.leg{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--dim)}
+.leg i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;
+vertical-align:-1px}
+/* detail + list */
+.det h2{font-size:16px;margin:0 0 2px}
+.why{font-size:13px;color:var(--dim);margin-bottom:10px}
+.off{border-top:1px solid var(--line);padding-top:9px;margin-top:9px}
+.off h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);
+margin:0 0 6px}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:3px 0}
+.row span{color:var(--dim)}
+.row b{font-variant-numeric:tabular-nums;font-weight:600}
+.mkt{font-size:12px;padding:6px 0;border-top:1px dashed var(--line)}
+.mkt code{font-size:11px;color:var(--dim);word-break:break-all}
+.neg{color:var(--bad)} .pos{color:var(--good)}
+.item{display:flex;align-items:center;gap:9px;padding:9px 0;border-top:1px solid var(--line);
+cursor:pointer}
+.item:first-of-type{border-top:0}
+.dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.d-conflict{background:var(--bad)} .d-idle{background:var(--warn)}
+.d-gap{background:var(--accent)} .d-ok{background:var(--good)}
+.item .nm{font-weight:600;min-width:30px}
+.item .tx{color:var(--dim);font-size:12.5px;flex:1}
+.muted{color:var(--dim);font-size:12.5px}
+.gaps{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 2px}
+.gchip{background:rgba(90,162,255,.16);border:1px solid rgba(90,162,255,.32);
+color:#9cc7ff;border-radius:7px;padding:7px 9px;font:600 12px inherit;cursor:pointer;
+font-family:inherit}
+input{background:var(--surface2);border:1px solid var(--line);color:var(--ink);
+border-radius:9px;padding:9px 10px;font-size:16px;width:100%}
+button.go{background:var(--accent);color:#06213f;border:0;border-radius:9px;
+padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
+</style></head><body>
+<h1>Where to manage orders</h1>
+<div class="sub"><a href="/">&larr; dashboard</a> &nbsp;·&nbsp; <span id="meta">loading…</span></div>
+<div id="login" class="card" style="display:none">
+  <div style="margin-bottom:8px">Dashboard key</div>
+  <input id="k" type="password" autocomplete="current-password" placeholder="key">
+  <button class="go" onclick="saveKey()">Unlock</button>
+</div>
+<div id="app" style="display:none">
+  <div class="chips" id="chips"></div>
+  <div class="card">
+    <div class="grid" id="grid"></div>
+    <div class="leg">
+      <span><i style="background:var(--bad)"></i>fix now</span>
+      <span><i style="background:var(--warn)"></i>not earning</span>
+      <span><i style="background:var(--accent)"></i>not entered</span>
+      <span><i style="background:var(--good)"></i>fine</span>
+      <span><i style="background:#212836"></i>no race</span>
+    </div>
+  </div>
+  <div class="card det" id="det" style="display:none"></div>
+  <div class="card">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--dim);margin-bottom:6px">Needs attention</div>
+    <div id="list"></div>
+  </div>
+</div>
+<script>
+// Approximate geographic tile grid. A real projection would put Rhode Island
+// under a fingertip on a phone; equal squares stay tappable and legible, which
+// is what this screen is for.
+const GRID = [
+ ["AK","","","","","","","","","","","ME"],
+ ["","","","","","","","","","","VT","NH"],
+ ["WA","ID","MT","ND","MN","IL","WI","MI","","NY","RI","MA"],
+ ["OR","NV","WY","SD","IA","IN","OH","PA","NJ","CT","",""],
+ ["CA","UT","CO","NE","MO","KY","WV","VA","MD","DE","",""],
+ ["","AZ","NM","KS","AR","TN","NC","SC","DC","","",""],
+ ["","","","OK","LA","MS","AL","GA","","","",""],
+ ["HI","","","TX","","","","","FL","","",""]
+];
+const RANK = {conflict:0, idle:1, gap:2, ok:3};
+const LABEL = {conflict:"fix now", idle:"not earning", gap:"not entered", ok:"fine"};
+let DATA=null, SEL=null, FILTER=null, SHOWGAPS=false;
+
+function hdrs(){ const h=new Headers(); h.set('X-Dash-Key', localStorage.getItem('dashKey')||''); return h; }
+function saveKey(){ localStorage.setItem('dashKey', document.getElementById('k').value); load(); }
+function money(v){ return '$'+(v||0).toFixed(2); }
+
+async function load(){
+  let r;
+  try { r = await fetch('/map.json', {headers:hdrs()}); }
+  catch(e){ document.getElementById('meta').textContent='offline'; return; }
+  if(r.status===401){ document.getElementById('login').style.display='block';
+                      document.getElementById('app').style.display='none'; return; }
+  DATA = await r.json();
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='block';
+  render();
+}
+
+function render(){
+  const st={}; DATA.states.forEach(s=>st[s.abbr]=s);
+  const c=DATA.counts;
+  document.getElementById('chips').innerHTML = ['conflict','idle','gap','ok'].map(k=>
+    `<button class="chip c-${k} ${FILTER===k?'on':''}" onclick="setFilter('${k}')">
+     <b>${c[k]||0}</b><span>${LABEL[k]}</span></button>`).join('');
+
+  document.getElementById('grid').innerHTML = GRID.map(row=>row.map(ab=>{
+    if(!ab) return '<div class="t"></div>';
+    const s=st[ab];
+    if(!s) return `<div class="t none">${ab}</div>`;
+    const dim = FILTER && s.status!==FILTER ? 'opacity:.25;' : '';
+    return `<button class="t has ${s.status} ${SEL===ab?'sel':''}" style="${dim}"
+            onclick="pick('${ab}')" aria-label="${s.name}: ${s.why}">${ab}</button>`;
+  }).join('')).join('');
+
+  const m=DATA.model;
+  document.getElementById('meta').textContent =
+    `${m.senate} Senate + ${m.governor} Governor races · model from ${m.source==='cdn'?'live feed':'last saved copy'}`
+    + (DATA.updated? ` · orders ${DATA.updated}`:'');
+
+  // Only things needing a decision get a row. Unentered races are a single
+  // collapsed line: they all say the same sentence, and 40 copies of it would
+  // bury the two orders that are actually losing money.
+  const act = DATA.states.filter(s=>s.status==='conflict'||s.status==='idle')
+    .sort((a,b)=> RANK[a.status]-RANK[b.status] || (b.orders-a.orders) || a.abbr.localeCompare(b.abbr));
+  const gaps = DATA.states.filter(s=>s.status==='gap').sort((a,b)=>a.abbr.localeCompare(b.abbr));
+  let out = act.map(s=>
+    `<div class="item" onclick="pick('${s.abbr}')">
+       <span class="dot d-${s.status}"></span>
+       <span class="nm">${s.abbr}</span>
+       <span class="tx">${s.why}</span>
+     </div>`).join('');
+  if(gaps.length){
+    out += `<div class="item" onclick="tglGaps()">
+       <span class="dot d-gap"></span>
+       <span class="nm">${gaps.length}</span>
+       <span class="tx">race${gaps.length===1?'':'s'} the model covers with no orders of ours
+         &nbsp;<a href="#">${SHOWGAPS?'hide':'show'}</a></span></div>`;
+    if(SHOWGAPS) out += `<div class="gaps">` + gaps.map(s=>
+       `<button class="gchip" onclick="pick('${s.abbr}')">${s.abbr}</button>`).join('') + `</div>`;
+  }
+  if(!act.length && !gaps.length)
+    out = '<div class="muted">Nothing flagged — every modelled race is entered and earning.</div>';
+  else if(!act.length)
+    out = '<div class="muted" style="padding-bottom:8px">No order is mispriced or idle.</div>' + out;
+  document.getElementById('list').innerHTML = out;
+  if(SEL) detail(SEL);
+}
+
+function tglGaps(){ SHOWGAPS=!SHOWGAPS; render(); }
+function setFilter(k){ FILTER = (FILTER===k? null : k); render(); }
+function pick(ab){ SEL=ab; render(); detail(ab);
+  document.getElementById('det').scrollIntoView({behavior:'smooth',block:'nearest'}); }
+
+function detail(ab){
+  const s = DATA.states.find(x=>x.abbr===ab);
+  const d = document.getElementById('det');
+  if(!s){ d.style.display='none'; return; }
+  d.style.display='block';
+  let h = `<h2>${s.name||s.abbr}</h2><div class="why">${s.why}</div>`;
+  h += `<div class="row"><span>resting orders</span><b>${s.orders}</b></div>`;
+  h += `<div class="row"><span>estimated rate</span><b>${money(s.est_day)}/day</b></div>`;
+  h += `<div class="row"><span>earned today</span><b>${money(s.earned)}</b></div>`;
+  ['senate','governor'].forEach(off=>{
+    const o = s.offices[off]; if(!o) return;
+    h += `<div class="off"><h3>${off}</h3>`;
+    if(o.dem!=null) h += `<div class="row"><span>model</span><b>D ${(o.dem*100).toFixed(1)}% ·
+      R ${(o.rep*100).toFixed(1)}%</b></div>`;
+    h += `<div class="row"><span>orders / rate</span><b>${o.orders} · ${money(o.est_day)}/day</b></div>`;
+    const mk = Object.keys(o.markets||{});
+    if(!mk.length) h += `<div class="muted" style="padding-top:4px">no orders here</div>`;
+    mk.sort().forEach(k=>{
+      const m=o.markets[k];
+      const e=m.worst_edge;
+      const tag = e==null ? '' :
+        `<span class="${e<0?'neg':'pos'}">${e<0?'':'+'}${(e*100).toFixed(1)}c vs model</span>`;
+      h += `<div class="mkt"><code>${k}</code><div class="row">
+        <span>${m.orders} order${m.orders===1?'':'s'} · ${money(m.est_day)}/day</span>${tag}</div></div>`;
+    });
+    h += `</div>`;
+  });
+  d.innerHTML = h;
+}
+load(); setInterval(load, 60000);
+</script></body></html>"""
+
+
 DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rewards</title>
@@ -3585,6 +4020,7 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  <button onclick="showTab('L')">🧭 Plan &amp; Restore</button>
  <button onclick="showTab('S')">↔️ Spreads</button>
  <button onclick="showTab('E')">🏛 Seats</button>
+ <button onclick="location.href='/map'">🗺 Map</button>
 </div>
 <div id="viewE" style="display:none">
 <div class="sub">Seat-count ladders — House &amp; Senate, in seat order</div>
@@ -5339,6 +5775,11 @@ class Handler(BaseHTTPRequestHandler):
             # The page's own login card gates the data underneath.
             self._send(200, "text/html; charset=utf-8", DASH_HTML.encode())
             return
+        if self.path.startswith("/map") and not self.path.startswith("/map.json"):
+            # shell only, no data — same pattern as "/": the page's own login
+            # card gates everything underneath it
+            self._send(200, "text/html; charset=utf-8", MAP_HTML.encode())
+            return
         if self.path.startswith("/garden"):
             # The garden view: same shell pattern — the page itself is
             # public, every data fetch inside it carries the key header.
@@ -5396,6 +5837,9 @@ class Handler(BaseHTTPRequestHandler):
             # plain 401, no WWW-Authenticate: the page shows its own login
             # card instead of the browser interrupting with a popup
             self._send(401, "application/json", b'{"error": "key required"}')
+            return
+        if self.path.startswith("/map.json"):
+            self._send(200, "application/json", json.dumps(_map_payload()).encode())
             return
         if self.path.startswith("/data.json"):
             self._send(200, "application/json", json.dumps(MONITOR.snapshot()).encode())
