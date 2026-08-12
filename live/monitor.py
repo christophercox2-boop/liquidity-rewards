@@ -2717,11 +2717,22 @@ def keep_qualified() -> None:
                     px = ob + tick
             if not (0.005 <= px <= 0.995):
                 continue
-            # A cap that pins the "scoring" order back to the deep qualifier
-            # price can never reach the window — placing there just accretes
-            # junk orders at 1c/99c every cooldown, the opposite of keeping
-            # the book lean. Skip; raising the cap is the owner's lever.
+            # The order must actually be able to SCORE, or this loop places a
+            # fresh one every cooldown forever — the "does anything of ours
+            # score?" test keeps failing, so it never stops. That is exactly
+            # what happened on 2026-08-12: caps below the market's touch
+            # produced 188 stacked 40-share orders, $1,815 of capital, all at
+            # 0.00% share. Two conditions, both required:
+            #   * the sanctioned price must reach the touch — a cap behind the
+            #     best price cannot compete, and raising it is the owner's call
+            #   * we must not already hold an order at that price
             if abs(px - deep_px) < 1e-9:
+                continue
+            if side == "BUY" and px < best - 1e-9:
+                continue
+            if side == "SELL" and px > best + 1e-9:
+                continue
+            if any(abs(float(o.get("price") or 0) - px) < 1e-9 for o in mine):
                 continue
             if side == "BUY" and px > cap + 1e-9:
                 continue
