@@ -2,34 +2,34 @@ Silver Bulletin Senate forecast (Deluxe), 2026-08-11
   Democrats 57.32%   Republicans 42.68%   (+1.14 pts for Dems over the series)
   average seats: Dem 50.9  Rep 49.1   (2026-08-11)
 
-read 21 of 21 ladder books
+read 25 of 25 ladder books
 
 scc-senate-gop rung          bid    ask    mid
-  lte45                   0.020  0.080  0.050
+  lte45                   0.030  0.070  0.050
   46                      0.030  0.040  0.035
   47                      0.130  0.150  0.140
   48                      0.180  0.190  0.185
-  49                      0.140  0.210  0.175
-  50                      0.180  0.210  0.195
+  49                      0.210  0.220  0.215
+  50                      0.190  0.200  0.195
   51                      0.240  0.250  0.245
   52                      0.150  0.200  0.175
-  53                      0.070  0.090  0.080
+  53                      0.070  0.080  0.075
   54                      0.010  0.080  0.045
   55                      0.010  0.060  0.035
   56                      0.010  0.050  0.030
-  gte57                   0.010  0.040  0.025
+  gte57                   0.030  0.040  0.035
 
 P(GOP holds Senate) -- rungs 50 and up:
-  raw sums:   bid side 0.680, ask side 0.980
-  normalised (bid): 57.6%   (all rungs on that side sum to 1.180)
-  normalised (ask): 59.4%   (all rungs on that side sum to 1.650)
-  normalised (mid): 58.7%   (all rungs on that side sum to 1.415)
+  raw sums:   bid side 0.710, ask side 0.960
+  normalised (bid): 55.0%   (all rungs on that side sum to 1.290)
+  normalised (ask): 58.9%   (all rungs on that side sum to 1.630)
+  normalised (mid): 57.2%   (all rungs on that side sum to 1.460)
   Silver:     42.7%
-  gap: +15.9% (book leans Republican relative to the model)
+  gap: +14.4% (book leans Republican relative to the model)
 
-mean GOP seats implied by the ladder: 50.13   (a weighted average, so the sum of 1.415 divides out)
+mean GOP seats implied by the ladder: 50.14   (a weighted average, so the sum of 1.460 divides out)
 Silver average GOP seats:             49.10
-  the ladder sits +1.04 seats Republican of the model
+  the ladder sits +1.05 seats Republican of the model
 
   These two anchors agree. Control turns on the 49/50 boundary,
   which sits right at the peak of the seat distribution, so the
