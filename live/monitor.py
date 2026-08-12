@@ -1913,17 +1913,26 @@ def _collect_fills(t: dict, fills_by_order: dict[str, dict]) -> None:
     — except when BOTH sides of the trade are ours (our bid and our ask
     crossing each other): that is ONE event, shown as a single 'own orders
     crossed' row instead of a buy plus a sell."""
+    # The feed returns BOTH sides of every trade: ours and the counterparty's.
+    # Two executions is the normal case, not a self-cross. Treating it as one
+    # dropped every fill that had a counterparty -- 1623 of 1623 across the
+    # whole history -- which is why the fills list and its alerts went quiet.
+    #
+    # Ours is the passive side. Every order we place is post-only
+    # (participateDontInitiate) and a post-only order can only rest; it can
+    # never cross and take. The commission agrees: the aggressor pays a taker
+    # fee, the passive side collects a maker rebate. Checked against the live
+    # book, the passive order id matched our open orders and the aggressor's
+    # never did.
+    pick = t.get("passiveExecution") or {}
+    if not (pick.get("order") or {}).get("id"):
+        pick = t.get("aggressorExecution") or {}
     execs = []
-    for ex in (t.get("aggressorExecution") or {}, t.get("passiveExecution") or {}):
-        o = ex.get("order") or {}
-        if o.get("id") and tr._num(ex.get("lastShares")) > 0:
-            execs.append((ex, o))
+    _o = pick.get("order") or {}
+    if _o.get("id") and tr._num(pick.get("lastShares")) > 0:
+        execs.append((pick, _o))
     rows_this = []
-    if len(execs) == 2:
-        # self-cross: our own bid and ask traded with each other — shares just
-        # moved between our positions. Not worth listing or alerting at all.
-        return
-    else:
+    if True:
         for ex, o in execs:
             oid = str(o.get("id"))
             shares = tr._num(ex.get("lastShares"))
