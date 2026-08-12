@@ -169,18 +169,42 @@ jobs:
           if len(plan) > 20:
               print(f"  ... {len(plan)-20} more")
 
-          # cost to reach the needed share on the cheapest N sides
-          for want in (share_needed, share_needed * 2):
-              tot_cost = 0.0; tot_gain = 0.0; used = 0
-              for p in sorted(plan, key=lambda q: q["cost_per"]):
+          # Cost per side to reach a given share, cheapest first, so the
+          # question "what is the best subset" has an answer rather than only
+          # the all-or-nothing figure.
+          def curve(want):
+              items = []
+              for p in plan:
                   add = (want * p["rest"] - p["have"]) / max(1e-9, 1 - want)
                   if add <= 0:
                       continue
-                  tot_cost += add * p["cost_per"]
-                  tot_gain += total_pool_per_side * want
-                  used += 1
+                  items.append((add * p["cost_per"], p, add))
+              items.sort()
+              return items
+
+          for want in (0.02, 0.05):
+              items = curve(want)
+              print(f"\n=== holding {want*100:.0f}% of a side, cheapest sides first ===")
+              print(f"  {'sides':>6s} {'capital':>10s} {'$/day':>7s} {'per $/day':>10s}")
+              cum = 0.0
+              for n, (c, p, add) in enumerate(items, 1):
+                  cum += c
+                  gain = total_pool_per_side * want * n
+                  if n in (5, 10, 15, 20, 25, 30, 40, 50, len(items)):
+                      print(f"  {n:>6d} {cum:>10,.2f} {gain:>7.2f} "
+                            f"{gain/cum if cum else 0:>10.4f}")
+              print("  cheapest ten sides:")
+              for c, p, add in items[:10]:
+                  print(f"    {p['slug'].replace('tec-cbb-champ-2027-04-05-w-',''):<10s} "
+                        f"{p['side']:<4s} {p['px']*100:>3.0f}c  resting {p['rest']:>7,.0f}  "
+                        f"add {add:>7,.0f}  ${c:>8,.2f}")
+
+          for want in (share_needed, share_needed * 2):
+              items = curve(want)
+              tot_cost = sum(c for c, _, _ in items)
+              tot_gain = total_pool_per_side * want * len(items)
               print(f"\nfor {want*100:.2f}% of every side we quote: "
-                    f"${tot_cost:,.0f} of capital across {used} sides "
+                    f"${tot_cost:,.0f} of capital across {len(items)} sides "
                     f"-> ${tot_gain:.2f}/day")
 
           os.makedirs("data", exist_ok=True)
