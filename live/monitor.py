@@ -2708,23 +2708,25 @@ def _keep_place(m: str, side: str, px: float, qty: int) -> bool:
         return False
 
 
-# Master switch for the two things that place orders on their own each poll:
-# the defender and the qualification keeper.
+# The two loops that place orders on their own each poll -- the defender and
+# the qualification keeper -- are now separate, owner-controlled switches.
 #
-# Stopped 2026-08-12 at the owner's request, resumed the same night so defend
-# runs overnight. Deliberately NOT read from the environment: DEFEND_PAUSE and
-# KEEP_PAUSE below can be set to "0" on the host, so an env-based switch could
-# quietly fail to stop anything when it mattered. Flipping this is a code
-# change and a deploy, which is the point -- it cannot drift.
+# Each is OFF unless the owner turned it on from the dashboard button. The
+# setting lives in persisted state, so a restart keeps the owner's choice
+# instead of silently resetting it, and a fresh deploy defaults to off. The
+# env pauses (DEFEND_PAUSE / KEEP_PAUSE) remain a host-side veto on top.
 #
-# The manual dashboard endpoints (/place, /reprice, /reprice_batch,
-# /cancel_batch, /maction) are not gated by this; they only ever fire on a
-# button press.
-AUTOPLACE_ENABLED = False
+# History that motivated this: the two loops shared one switch, so turning
+# defend on for the night also turned on the keeper, which placed orders the
+# owner never chose. Never again -- one switch per loop, owner's button only.
+def _auto_on(which: str) -> bool:
+    """Is this placement loop enabled? `which` is 'defend' or 'keeper'."""
+    auto = MONITOR.state.get("auto") or {}
+    return bool(auto.get(which) is True)
 
 
 def keep_qualified() -> None:
-    if not AUTOPLACE_ENABLED:
+    if not _auto_on("keeper"):
         return
     if os.environ.get("KEEP_PAUSE", "") == "1":
         return
@@ -2834,7 +2836,7 @@ def auto_defend() -> None:
     # do_reprice no longer touches modify: it places the replacement, VERIFIES
     # it rests, and only then cancels the original — the worst remaining
     # failure is a briefly doubled rung, never a lost one.
-    if not AUTOPLACE_ENABLED:
+    if not _auto_on("defend"):
         return
     if os.environ.get("DEFEND_PAUSE", "") == "1":
         return
@@ -3495,6 +3497,25 @@ def do_maction(body: dict) -> tuple[int, dict]:
                               close_short=bool(body.get("close_short")))
         except (KeyError, TypeError, ValueError):
             return 400, {"ok": False, "error": "bad request"}
+    if op == "auto":
+        # The owner's on/off button for a placement loop. Auth and the
+        # X-Reprice CSRF header are already enforced by the POST handler.
+        which = str(body.get("which") or "")
+        if which not in ("defend", "keeper"):
+            return 400, {"ok": False, "error": "which must be defend or keeper"}
+        on = bool(body.get("on"))
+        with MONITOR.lock:
+            auto = MONITOR.state.setdefault("auto", {})
+            auto[which] = on
+        # audit line in Recent actions, so every flip is visible in the app
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": f"[{which}]", "side": "switch",
+                        "from": "on" if not on else "off",
+                        "to": "on" if on else "off", "size": "",
+                        "status": 200, "response": "owner toggle", "verified": True})
+        del ACTIONS[:-20]
+        POLL_KICK.set()   # save + payload refresh promptly
+        return 200, {"ok": True, "which": which, "on": on}
     if op == "defend":
         slug = str(body.get("market") or "")
         if not _slug_known(slug):
@@ -3831,17 +3852,18 @@ def _map_payload() -> dict:
                   "governor": len(races.get("governor") or {}),
                   "age_s": int(time.time() - SILVER["ts"]) if SILVER["ts"] else None},
         "thresholds": {"conflict": MAP_CONFLICT, "idle_rate": MAP_IDLE_RATE},
-        # Effective state, not just the code switch. DEFEND_PAUSE/KEEP_PAUSE
-        # live in the host environment and can veto either loop; reporting the
-        # constant alone would show "defend is on" while the host had it off.
-        "autoplace": AUTOPLACE_ENABLED,
-        "defend_live": bool(AUTOPLACE_ENABLED
+        # Effective state: the owner's toggle AND the host env veto AND, for
+        # defend, whether any market is armed. The page shows the toggles and
+        # the reason the loop is not actually running when they disagree.
+        "auto": {"defend": _auto_on("defend"), "keeper": _auto_on("keeper")},
+        "defend_live": bool(_auto_on("defend")
                             and os.environ.get("DEFEND_PAUSE", "") != "1"
                             and (MONITOR.state.get("defend") or {})),
-        "keeper_live": bool(AUTOPLACE_ENABLED
+        "keeper_live": bool(_auto_on("keeper")
                             and os.environ.get("KEEP_PAUSE", "") != "1"),
         "defend_markets": len(MONITOR.state.get("defend") or {}),
-        "defend_note": ("placement stopped in code" if not AUTOPLACE_ENABLED else
+        "defend_note": ("switched off"
+                        if not _auto_on("defend") else
                         "DEFEND_PAUSE=1 is set on the host"
                         if os.environ.get("DEFEND_PAUSE", "") == "1" else
                         "no markets are armed to defend"
@@ -3940,6 +3962,16 @@ cursor:pointer}
 .banner{background:rgba(217,161,50,.16);border:1px solid rgba(217,161,50,.4);
 color:#f2cd7f;border-radius:11px;padding:9px 11px;font-size:12.5px;margin-bottom:12px}
 .banner.ok{background:rgba(52,192,124,.14);border-color:rgba(52,192,124,.4);color:#8fe3b8}
+.autorow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.autosw{background:var(--surface);border:1px solid var(--line);border-radius:11px;
+padding:10px 12px;text-align:left;cursor:pointer;font-family:inherit}
+.autosw .nm{font-size:13px;font-weight:700;color:var(--ink);display:block}
+.autosw .st{font-size:11.5px;color:var(--dim);display:block;margin-top:2px}
+.autosw.on{border-color:rgba(52,192,124,.5);background:rgba(52,192,124,.10)}
+.autosw.on .st{color:#8fe3b8}
+.autosw.arm{border-color:var(--warn);background:rgba(217,161,50,.14)}
+.autosw.arm .st{color:#f2cd7f}
+.autosw[disabled]{opacity:.5}
 .bkbtn{background:var(--surface2);color:var(--ink);border:1px solid var(--line);
 border-radius:8px;padding:6px 10px;font:600 12px inherit;font-family:inherit;cursor:pointer;
 margin-top:7px}
@@ -3984,6 +4016,12 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
   <button class="go" onclick="saveKey()">Unlock</button>
 </div>
 <div id="app" style="display:none">
+  <div class="autorow">
+    <button class="autosw" id="sw_defend" onclick="swTap('defend')" disabled>
+      <span class="nm">Defender</span><span class="st">loading…</span></button>
+    <button class="autosw" id="sw_keeper" onclick="swTap('keeper')" disabled>
+      <span class="nm">Keeper</span><span class="st">loading…</span></button>
+  </div>
   <div class="banner" id="banner" style="display:none"></div>
   <div class="chips" id="chips"></div>
   <div class="card">
@@ -4057,15 +4095,16 @@ function render(){
             onclick="pick('${ab}')" aria-label="${s.name}: ${s.why}">${ab}</button>`;
   }).join('')).join('');
 
+  swRender();
   const bn=document.getElementById('banner');
-  if(DATA.defend_live===false){
+  if(DATA.auto && DATA.auto.defend===true && DATA.defend_live===false){
+    // switched on but vetoed by something else -- say what
     bn.style.display='block'; bn.className='banner';
-    bn.textContent='Defend is NOT running — ' + (DATA.defend_note||'reason unknown')
-      + '. Orders you place or move stay exactly where you put them.';
+    bn.textContent='Defender is switched on but NOT running — '
+      + (DATA.defend_note||'reason unknown');
   } else if(DATA.defend_live===true){
     bn.style.display='block'; bn.className='banner ok';
-    bn.textContent='Defend is running across ' + DATA.defend_markets + ' markets'
-      + (DATA.keeper_live===false ? ', but the qualification keeper is off.' : '.');
+    bn.textContent='Defender running across ' + DATA.defend_markets + ' markets.';
   } else { bn.style.display='none'; }
 
   const m=DATA.model;
@@ -4102,6 +4141,41 @@ function render(){
   if(SEL) detail(SEL);
 }
 
+// Owner switches for the two placement loops. Off is one tap and takes
+// effect immediately. On requires a second tap within 5 seconds -- turning a
+// loop that places real orders on is the direction that deserves friction.
+const SWDESC = {
+  defend: {on:'repricing orders in armed markets', off:'not placing anything'},
+  keeper: {on:'placing size to hold qualification', off:'not placing anything'},
+};
+const SWARM = {};
+function swRender(){
+  if(!DATA || !DATA.auto) return;
+  ['defend','keeper'].forEach(k=>{
+    const b=document.getElementById('sw_'+k); if(!b) return;
+    b.disabled=false;
+    const on = DATA.auto[k]===true;
+    b.className='autosw'+(SWARM[k]?' arm':(on?' on':''));
+    b.querySelector('.st').textContent =
+      SWARM[k] ? 'tap again to turn ON' :
+      (on ? 'ON — '+SWDESC[k].on : 'OFF — '+SWDESC[k].off);
+  });
+}
+async function swTap(k){
+  const on = DATA && DATA.auto && DATA.auto[k]===true;
+  if(!on && !SWARM[k]){                      // arming the ON direction
+    SWARM[k]=1; swRender();
+    setTimeout(()=>{ if(SWARM[k]){ delete SWARM[k]; swRender(); } }, 5000);
+    return;
+  }
+  delete SWARM[k];
+  const b=document.getElementById('sw_'+k); if(b) b.disabled=true;
+  const r=await act({op:'auto', which:k, on:!on});
+  if(r.ok && DATA && DATA.auto) DATA.auto[k]=!on;
+  swRender();
+  if(!r.ok && b){ b.querySelector('.st').textContent='failed: '+r.msg; b.disabled=false; }
+  setTimeout(load, 1500);
+}
 function tglGaps(){ SHOWGAPS=!SHOWGAPS; render(); }
 // --- new order ----------------------------------------------------------
 // Placement goes through the same /maction route as everything else, so it
