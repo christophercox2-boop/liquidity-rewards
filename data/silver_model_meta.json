@@ -3,6 +3,7 @@
   "url": "https://static.dwcdn.net/data/KQI8W.csv",
   "file": "data/silver_model.csv",
   "meaning": "Senate win probability, Deluxe model",
+  "chart_title": "How our Senate forecast has changed over time",
   "n_rows": 8,
   "header": [
    "modeldate",
@@ -19,6 +20,7 @@
   "url": "https://static.dwcdn.net/data/igTt2.csv",
   "file": "data/silver_senate_classic.csv",
   "meaning": "Senate win probability, Classic model",
+  "chart_title": "How our Senate forecast has changed over time",
   "n_rows": 8,
   "header": [
    "modeldate",
@@ -35,6 +37,7 @@
   "url": "https://static.dwcdn.net/data/6aks4.csv",
   "file": "data/silver_senate_lite.csv",
   "meaning": "Senate win probability, Lite model",
+  "chart_title": "How our Senate forecast has changed over time",
   "n_rows": 8,
   "header": [
    "modeldate",
@@ -51,6 +54,7 @@
   "url": "https://static.dwcdn.net/data/6mA2E.csv",
   "file": "data/silver_senate_seats.csv",
   "meaning": "Senate average seats, Deluxe model",
+  "chart_title": "How our Senate forecast has changed over time",
   "n_rows": 8,
   "header": [
    "modeldate",
@@ -61,6 +65,59 @@
    "8/11/2026",
    "50.9049",
    "49.0951"
+  ]
+ },
+ "kNspD": {
+  "url": "https://static.dwcdn.net/data/kNspD.csv",
+  "file": "data/silver_kNspD.csv",
+  "meaning": "second link from the owner; identified below",
+  "chart_title": "Who is favored to win each Senate race?",
+  "n_rows": 36,
+  "header": [
+   "state",
+   "abbr",
+   "winner_Dparty",
+   "winner_Rparty",
+   "name_D1",
+   "name_D2",
+   "name_D3",
+   "name_D4",
+   "name_R1",
+   "name_R2",
+   "name_R3",
+   "name_R4",
+   "winner_D1",
+   "winner_D2",
+   "winner_D3",
+   "winner_D4",
+   "winner_R1",
+   "winner_R2",
+   "winner_R3",
+   "winner_R4",
+   "rating"
+  ],
+  "latest": [
+   "Wyoming",
+   "WY",
+   "0",
+   "100",
+   "James Byrd",
+   "",
+   "",
+   "",
+   "Harriet Hageman",
+   "",
+   "",
+   "",
+   "0",
+   "",
+   "",
+   "",
+   "100",
+   "",
+   "",
+   "",
+   "3"
   ]
  }
 }
