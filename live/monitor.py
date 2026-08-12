@@ -3625,11 +3625,18 @@ def _map_payload() -> dict:
 
         m = oc["markets"].setdefault(slug, {
             "orders": 0, "est_day": 0.0, "earned": round(earned.get(slug, 0.0), 2),
-            "fair": None if fair is None else round(fair, 4), "worst_edge": None})
+            "fair": None if fair is None else round(fair, 4), "worst_edge": None,
+            "list": []})
         m["orders"] += 1
         m["est_day"] = round(m["est_day"] + est, 2)
         if edge is not None and (m["worst_edge"] is None or edge < m["worst_edge"]):
             m["worst_edge"] = round(edge, 4)
+        # the id is what makes a row actionable — /maction addresses orders by it
+        m["list"].append({"id": o.get("id"), "side": side,
+                          "price": round(px, 4),
+                          "size": int(round(float(o.get("size") or 0))),
+                          "est_day": round(est, 2),
+                          "edge": None if edge is None else round(edge, 4)})
 
     # earnings are keyed by market, so fold them in per state
     for slug, amount in earned.items():
@@ -3681,6 +3688,9 @@ def _map_payload() -> dict:
                   "governor": len(races.get("governor") or {}),
                   "age_s": int(time.time() - SILVER["ts"]) if SILVER["ts"] else None},
         "thresholds": {"conflict": MAP_CONFLICT, "idle_rate": MAP_IDLE_RATE},
+        # the page says so plainly: an order moved by hand stays where it is
+        # put, because nothing is maintaining it while placement is stopped
+        "autoplace": AUTOPLACE_ENABLED,
     }
 
 
@@ -3750,6 +3760,26 @@ cursor:pointer}
 .gchip{background:rgba(90,162,255,.16);border:1px solid rgba(90,162,255,.32);
 color:#9cc7ff;border-radius:7px;padding:7px 9px;font:600 12px inherit;cursor:pointer;
 font-family:inherit}
+.ord{border-top:1px dashed var(--line);padding:8px 0}
+.ordhd{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:13px}
+.ordhd b{font-variant-numeric:tabular-nums}
+.side{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;
+border-radius:5px;background:var(--surface2);color:var(--dim)}
+.ctl{display:flex;gap:6px;align-items:center;margin-top:7px}
+.ctl input{width:74px;padding:8px;font-size:16px;text-align:right}
+.ctl .unit{color:var(--dim);font-size:12px;margin-left:-2px}
+.btn{border:0;border-radius:8px;padding:9px 11px;font:700 13px inherit;font-family:inherit;
+cursor:pointer}
+.btn.mv{background:var(--accent);color:#06213f}
+.btn.cx{background:rgba(229,100,95,.16);color:#ffb3af;border:1px solid rgba(229,100,95,.4)}
+.btn.cx.arm{background:var(--bad);color:#fff}
+.btn[disabled]{opacity:.45;cursor:default}
+.hint{font-size:11.5px;color:var(--dim);margin-top:5px}
+.res{font-size:12px;margin-top:6px;padding:7px 8px;border-radius:8px;display:none}
+.res.ok{display:block;background:rgba(52,192,124,.16);color:#8fe3b8}
+.res.err{display:block;background:rgba(229,100,95,.16);color:#ffb3af}
+.banner{background:rgba(217,161,50,.16);border:1px solid rgba(217,161,50,.4);
+color:#f2cd7f;border-radius:11px;padding:9px 11px;font-size:12.5px;margin-bottom:12px}
 input{background:var(--surface2);border:1px solid var(--line);color:var(--ink);
 border-radius:9px;padding:9px 10px;font-size:16px;width:100%}
 button.go{background:var(--accent);color:#06213f;border:0;border-radius:9px;
@@ -3763,6 +3793,7 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
   <button class="go" onclick="saveKey()">Unlock</button>
 </div>
 <div id="app" style="display:none">
+  <div class="banner" id="banner" style="display:none"></div>
   <div class="chips" id="chips"></div>
   <div class="card">
     <div class="grid" id="grid"></div>
@@ -3831,6 +3862,13 @@ function render(){
             onclick="pick('${ab}')" aria-label="${s.name}: ${s.why}">${ab}</button>`;
   }).join('')).join('');
 
+  const bn=document.getElementById('banner');
+  if(DATA.autoplace===false){
+    bn.style.display='block';
+    bn.textContent='Automatic placement is stopped. Orders you move here stay '
+      + 'exactly where you put them — the defender and keeper are not maintaining them.';
+  } else { bn.style.display='none'; }
+
   const m=DATA.model;
   document.getElementById('meta').textContent =
     `${m.senate} Senate + ${m.governor} Governor races · model from ${m.source==='cdn'?'live feed':'last saved copy'}`
@@ -3866,6 +3904,46 @@ function render(){
 }
 
 function tglGaps(){ SHOWGAPS=!SHOWGAPS; render(); }
+// Every write goes through /maction, which already carries the auth check,
+// the X-Reprice CSRF header requirement, the 0.1-99.9c price bounds and the
+// crossing guard. A new endpoint here would mean re-earning all of that.
+async function act(body){
+  const h = hdrs(); h.set('Content-Type','application/json'); h.set('X-Reprice','1');
+  const r = await fetch('/maction', {method:'POST', headers:h, body:JSON.stringify(body)});
+  let j={}; try{ j = await r.json(); }catch(e){}
+  return {ok: r.ok && j.ok !== false, msg: j.error || j.note || (r.ok?'done':'HTTP '+r.status)};
+}
+function show(id, ok, msg){
+  const el=document.getElementById('r_'+id); if(!el) return;
+  el.className = 'res ' + (ok?'ok':'err'); el.textContent = msg;
+}
+function setp(id, c){ const el=document.getElementById('p_'+id); if(el) el.value=c.toFixed(1); }
+function busy(id, on){
+  ['p_','c_'].forEach(p=>{ const e=document.getElementById(p+id); if(e) e.disabled=on; });
+  const b=document.querySelector('#o_'+id+' .btn.mv'); if(b){ b.disabled=on; b.textContent=on?'…':'Move'; }
+}
+async function mv(id){
+  const el=document.getElementById('p_'+id); if(!el) return;
+  const c=parseFloat(el.value);
+  if(!(c>=0.1 && c<=99.9)) return show(id,false,'price must be between 0.1 and 99.9c');
+  busy(id,true);
+  const r=await act({op:'modify', order_id:id, price_cents:c});
+  busy(id,false); show(id, r.ok, r.ok ? ('moved to '+c.toFixed(1)+'c') : r.msg);
+  if(r.ok) setTimeout(load, 2500);
+}
+// two taps to cancel: this is a phone, and a mis-tap here removes a real order
+const ARM={};
+async function cx(id){
+  const b=document.getElementById('c_'+id); if(!b) return;
+  if(!ARM[id]){ ARM[id]=1; b.classList.add('arm'); b.textContent='Sure?';
+    setTimeout(()=>{ if(ARM[id]){ delete ARM[id]; b.classList.remove('arm'); b.textContent='Cancel'; } }, 4000);
+    return; }
+  delete ARM[id]; b.classList.remove('arm'); b.textContent='…'; busy(id,true);
+  const r=await act({op:'cancel', order_id:id});
+  busy(id,false); b.textContent='Cancel';
+  show(id, r.ok, r.ok ? 'cancelled' : r.msg);
+  if(r.ok) setTimeout(load, 2500);
+}
 function setFilter(k){ FILTER = (FILTER===k? null : k); render(); }
 function pick(ab){ SEL=ab; render(); detail(ab);
   document.getElementById('det').scrollIntoView({behavior:'smooth',block:'nearest'}); }
@@ -3893,13 +3971,51 @@ function detail(ab){
       const tag = e==null ? '' :
         `<span class="${e<0?'neg':'pos'}">${e<0?'':'+'}${(e*100).toFixed(1)}c vs model</span>`;
       h += `<div class="mkt"><code>${k}</code><div class="row">
-        <span>${m.orders} order${m.orders===1?'':'s'} · ${money(m.est_day)}/day</span>${tag}</div></div>`;
+        <span>${m.orders} order${m.orders===1?'':'s'} · ${money(m.est_day)}/day</span>${tag}</div>`;
+      // one actionable row per resting order. The model's own price sits on
+      // the button, so moving an order to fair value is a single tap rather
+      // than mental arithmetic on a phone.
+      (m.list||[]).slice().sort((a,b)=>(a.edge??0)-(b.edge??0)).forEach(od=>{
+        if(!od.id) return;
+        const fc = m.fair==null ? null : (m.fair*100);
+        const ed = od.edge;
+        h += `<div class="ord" id="o_${od.id}">
+          <div class="ordhd">
+            <span><span class="side">${od.side}</span> <b>${(od.price*100).toFixed(1)}c</b>
+              &times; ${od.size.toLocaleString()}</span>
+            <span>${money(od.est_day)}/day ${ed==null?'':
+              `<span class="${ed<0?'neg':'pos'}">${ed<0?'':'+'}${(ed*100).toFixed(1)}c</span>`}</span>
+          </div>
+          <div class="ctl">
+            <input id="p_${od.id}" type="number" inputmode="decimal" step="0.1" min="0.1" max="99.9"
+                   value="${(od.price*100).toFixed(1)}" aria-label="new price in cents">
+            <span class="unit">c</span>
+            <button class="btn mv" onclick="mv('${od.id}')">Move</button>
+            ${fc==null?'':`<button class="btn" style="background:var(--surface2);color:var(--ink)"
+               onclick="setp('${od.id}',${fc.toFixed(1)})">model ${fc.toFixed(1)}c</button>`}
+            <button class="btn cx" id="c_${od.id}" onclick="cx('${od.id}')">Cancel</button>
+          </div>
+          <div class="hint">Move places the new order, waits until it is resting, then cancels
+            this one. Nothing is cancelled on faith.</div>
+          <div class="res" id="r_${od.id}"></div>
+        </div>`;
+      });
+      h += `</div>`;
     });
     h += `</div>`;
   });
   d.innerHTML = h;
 }
-load(); setInterval(load, 60000);
+load();
+// Do not refresh out from under someone mid-edit: re-rendering rebuilds the
+// detail panel and would silently discard a price being typed, or a cancel
+// that is armed and waiting for its second tap.
+setInterval(()=>{
+  const a=document.activeElement;
+  if(a && (a.tagName==='INPUT' || a.tagName==='BUTTON')) return;
+  if(Object.keys(ARM).length) return;
+  load();
+}, 60000);
 </script></body></html>"""
 
 
