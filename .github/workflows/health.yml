@@ -64,8 +64,27 @@ jobs:
           r = requests.get(tr.TRADE_API + p,
                            headers=tr.auth_headers(kid, sec, "GET", p), timeout=30)
           r.raise_for_status()
-          live = [o for o in (r.json().get("orders") or [])
-                  if str(o.get("state")) not in tr.DEAD_ORDER_STATES]
+          allrec = r.json().get("orders") or []
+
+          # Ghost census: every record the exchange returns, broken down by
+          # state. A ghost is a dead record (REPLACED/CANCELLED/FILLED/...)
+          # still coming back from /v1/orders/open. The live count is what the
+          # app shows; any difference is ghosts.
+          states = collections.Counter(str(o.get("state")) for o in allrec)
+          print(f"records returned by /v1/orders/open: {len(allrec)}")
+          for s, n in states.most_common():
+              tag = "LIVE" if s not in tr.DEAD_ORDER_STATES else "ghost"
+              print(f"  {s:<34s} {n:>5d}  {tag}")
+          ghosts = [o for o in allrec if str(o.get("state")) in tr.DEAD_ORDER_STATES]
+          live = [o for o in allrec if str(o.get("state")) not in tr.DEAD_ORDER_STATES]
+          print(f"ghosts: {len(ghosts)}   live: {len(live)}"
+                f"   (the app should show {len(live)})")
+          if ghosts:
+              gsz = sum((tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")))
+                        for o in ghosts)
+              print(f"ghost records carry {gsz:,.0f} shares of phantom size;")
+              print("the tracker, monitor, map and every workflow filter these out,")
+              print("so they affect nothing we compute -- they are exchange records only.")
           print(f"\n{len(live)} live orders")
 
           rung = collections.defaultdict(list)
