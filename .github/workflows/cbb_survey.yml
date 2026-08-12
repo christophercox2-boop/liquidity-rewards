@@ -138,6 +138,22 @@ jobs:
                            "mine_a": mine.get((s,"SELL"), 0.0)})
           print(f"read {len(rows)} books\n")
 
+          # Print every book unconditionally. A side can be unquotable for two
+          # very different reasons -- the spread is already one tick wide, or
+          # the book is empty at 1c/99c -- and those point opposite ways.
+          print("  every book in the event")
+          print(f"  {'market':<40s} {'bid':>5s} {'ask':>5s} {'spread':>7s} "
+                f"{'bid size':>9s} {'ask size':>9s}")
+          for r_ in sorted(rows, key=lambda x: x["slug"]):
+              bb, ba = r_["bb"], r_["ba"]
+              sp = (ba - bb) * 100 if (bb is not None and ba is not None) else None
+              print(f"  {r_['slug'][:40]:<40s} "
+                    f"{(f'{bb*100:.0f}c' if bb is not None else '-'):>5s} "
+                    f"{(f'{ba*100:.0f}c' if ba is not None else '-'):>5s} "
+                    f"{(f'{sp:.0f}c' if sp is not None else '-'):>7s} "
+                    f"{r_['bid_rest']:>9,.0f} {r_['ask_rest']:>9,.0f}")
+          print()
+
           # BOTH sides of every market are quotable. An earlier version kept
           # only the cheaper side per market and then reported that as though
           # the exchange allowed nothing else -- it does not. A bid at p ties
