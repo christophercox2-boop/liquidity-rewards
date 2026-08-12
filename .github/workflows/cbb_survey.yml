@@ -1,0 +1,193 @@
+name: Basketball survey
+
+# Measures what it would actually cost to earn a target amount per day across
+# the whole college-basketball championship event.
+#
+# The pool is per EVENT, not per market: $500/day split across every team in
+# it. So a target is a share of one $500 pool, and the question is how much
+# size at what prices buys that share across all the books at once.
+#
+# Read-only: GET only.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/cbb_survey.yml
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "dollars per day wanted from the event"
+        default: "5"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cbb-survey
+  cancel-in-progress: false
+
+jobs:
+  survey:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Read every book in the event
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          TARGET: ${{ github.event.inputs.target || '5' }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, os, time, requests
+          import track_rewards as tr
+
+          TARGET = float(os.environ.get("TARGET") or 5)
+          SEED = "tec-cbb-champ-2027-04-05-w-uconn"
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          # every open market in the event
+          slugs = []
+          r = requests.get(f"{tr.GATEWAY}/v1/market/slug/{SEED}", timeout=20)
+          ev_slug = None
+          if r.status_code < 400:
+              md = r.json().get("market") or r.json()
+              ev_slug = (md.get("eventSlug") or (md.get("event") or {}).get("slug")
+                         or (md.get("marketMetadata") or {}).get("eventSlug"))
+          if ev_slug:
+              r = requests.get(f"{tr.GATEWAY}/v1/events/slug/{ev_slug}", timeout=20)
+              if r.status_code < 400:
+                  ev = r.json().get("event") or r.json()
+                  slugs = [m["slug"] for m in ev.get("markets") or []
+                           if m.get("slug") and not m.get("closed")]
+          print(f"event: {ev_slug}   open markets: {len(slugs)}")
+          if not slugs:
+              print("could not enumerate the event")
+              raise SystemExit(0)
+
+          # the pool, and how the exchange splits it
+          pool = target_size = None
+          for i in range(0, len(slugs), 40):
+              rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                params={"symbols": slugs[i:i+40], "pageSize": 100}, timeout=30)
+              if rr.status_code >= 400:
+                  time.sleep(2); continue
+              for p in rr.json().get("programs") or []:
+                  for tp in p.get("timePeriods") or []:
+                      if str(tp.get("status") or "").lower() in ("active","live","status_live"):
+                          pool = float(tp.get("rewardPool") or 0)
+                          target_size = float(tp.get("targetSize") or 0)
+              time.sleep(0.3)
+          print(f"event pool: ${pool}/day    target size per side: {target_size:,.0f}")
+          if not pool:
+              print("no active pool")
+              raise SystemExit(0)
+          share_needed = TARGET / pool
+          print(f"to earn ${TARGET:.2f}/day you need {share_needed*100:.2f}% of the event\n")
+
+          # our own resting size, so existing position counts toward the target
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          op = "/v1/orders/open"
+          ro = requests.get(tr.TRADE_API + op,
+                            headers=tr.auth_headers(kid, sec, "GET", op), timeout=30)
+          mine = {}
+          for o in (ro.json().get("orders") or []) if ro.ok else []:
+              if str(o.get("state")) in tr.DEAD_ORDER_STATES:
+                  continue
+              s = o.get("marketSlug") or ""
+              if s in slugs:
+                  side = "BUY" if str(o.get("side","")).upper().endswith("BUY") else "SELL"
+                  q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity"))
+                  mine[(s, side)] = mine.get((s, side), 0.0) + q
+
+          rows = []
+          for s in slugs:
+              try:
+                  bk = tr._fetch_book(s)
+              except Exception:
+                  continue
+              time.sleep(0.25)
+              bids = bk.get("bids") or []
+              asks = bk.get("asks") or []
+              bb = bids[0][0] if bids else None
+              ba = asks[0][0] if asks else None
+              rows.append({"slug": s, "bb": bb, "ba": ba,
+                           "bid_rest": sum(q for _, q in bids),
+                           "ask_rest": sum(q for _, q in asks),
+                           "mine_b": mine.get((s,"BUY"), 0.0),
+                           "mine_a": mine.get((s,"SELL"), 0.0)})
+          print(f"read {len(rows)} books\n")
+
+          # Cheapest way in: quote a tick inside the touch on whichever side
+          # costs least per share. A bid at p costs p; an ask at p ties up 1-p.
+          plan = []
+          for r_ in rows:
+              opts = []
+              if r_["bb"] is not None and r_["bb"] > 0.011:
+                  px = round(r_["bb"] + 0.01, 2)
+                  if r_["ba"] is None or px < r_["ba"] - 1e-9:
+                      opts.append(("BUY", px, px, r_["bid_rest"], r_["mine_b"]))
+              if r_["ba"] is not None and r_["ba"] < 0.989:
+                  px = round(r_["ba"] - 0.01, 2)
+                  if r_["bb"] is None or px > r_["bb"] + 1e-9:
+                      opts.append(("SELL", px, 1 - px, r_["ask_rest"], r_["mine_a"]))
+              if not opts:
+                  continue
+              opts.sort(key=lambda o: o[2])          # cheapest capital per share
+              side, px, cost_per, rest, have = opts[0]
+              plan.append({"slug": r_["slug"], "side": side, "px": px,
+                           "cost_per": cost_per, "rest": rest, "have": have})
+
+          # Score is size within the Target Size window; treat our share of a
+          # side as size/(size+resting). Aim for the same share on every side
+          # we quote, since the event pool is split evenly per market.
+          total_pool_per_side = pool / len(slugs) / 2
+          print(f"each side of each market is worth ${total_pool_per_side:.3f}/day at 100% share")
+          print(f"{'quoting all':<24s} {len(plan)} sides\n")
+
+          plan.sort(key=lambda p: p["cost_per"] * p["rest"])
+          print(f"  {'market':<40s} {'side':<4s} {'px':>5s} {'resting':>8s} "
+                f"{'have':>6s} {'$/sh':>6s}")
+          for p in plan[:20]:
+              print(f"  {p['slug'][:40]:<40s} {p['side']:<4s} {p['px']*100:>4.0f}c "
+                    f"{p['rest']:>8,.0f} {p['have']:>6,.0f} {p['cost_per']:>6.2f}")
+          if len(plan) > 20:
+              print(f"  ... {len(plan)-20} more")
+
+          # cost to reach the needed share on the cheapest N sides
+          for want in (share_needed, share_needed * 2):
+              tot_cost = 0.0; tot_gain = 0.0; used = 0
+              for p in sorted(plan, key=lambda q: q["cost_per"]):
+                  add = (want * p["rest"] - p["have"]) / max(1e-9, 1 - want)
+                  if add <= 0:
+                      continue
+                  tot_cost += add * p["cost_per"]
+                  tot_gain += total_pool_per_side * want
+                  used += 1
+              print(f"\nfor {want*100:.2f}% of every side we quote: "
+                    f"${tot_cost:,.0f} of capital across {used} sides "
+                    f"-> ${tot_gain:.2f}/day")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/cbb_survey.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/cbb_survey.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Basketball survey [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
