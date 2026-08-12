@@ -1,0 +1,38 @@
+Silver Bulletin per-race Senate forecast: 35 races
+
+380 live orders
+109 are Senate races, 107 of those the model covers
+86 markets left unmodelled (governor, House, seat counts, everything non-Senate)
+
+No resting Senate order is more than 10% the wrong side of the model.
+
+70 of 107 modelled orders are at or better than model fair value -- a fill there is not a loss on the model's numbers.
+
+per-race view (model probability vs where our orders rest):
+  race    model D  model R  orders  worst/sh
+  AL        0.002    0.998       8    -0.008
+  AR        0.007    0.993       5    -0.033
+  CO        0.995    0.005       3    -0.005
+  DE        0.999    0.001       4    -0.029
+  FL        0.216    0.784       2    -0.016
+  ID        0.001    0.999       4    -0.069
+  IL        0.996    0.004       5    -0.006
+  KS        0.171    0.829       5    -0.059
+  KY        0.004    0.996       6    -0.006
+  LA        0.045    0.955       4     0.015
+  MA        1.000    0.000       7    -0.010
+  MS        0.034    0.966       4     0.024
+  MT        0.028    0.972       3    -0.022
+  NJ        0.995    0.005       3    -0.005
+  NM        0.994    0.006       4    -0.004
+  OK        0.001    1.000       5    -0.030
+  OR        0.999    0.001       6    -0.039
+  RI        0.999    0.001       5    -0.029
+  SC        0.120    0.880       6    -0.020
+  SD        0.002    0.998       1     0.148
+  TN        0.002    0.998       4    -0.038
+  VA        0.996    0.004       4    -0.006
+  WV        0.000    1.000       3    -0.010
+  WY        0.000    1.000       6    -0.050
+
+Nothing was placed, cancelled or repriced. This is a read-only screen.
