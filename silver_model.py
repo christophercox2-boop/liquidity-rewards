@@ -201,3 +201,73 @@ def compare(model_dem_pct: float, market_gop_prob: float | None) -> str:
     direction = "rich" if gap > 0 else "cheap"
     return (f"model says GOP {model_gop:.1%}, book says {market_gop_prob:.1%} "
             f"-- book is {abs(gap):.1%} {direction}")
+
+
+# --------------------------------------------------------------------------
+# per-race forecasts
+# --------------------------------------------------------------------------
+#
+# The owner's second link (Datawrapper chart kNspD, "Who is favored to win each
+# Senate race?") is the state-level file the chamber series could not provide.
+# One row per Senate race, with each party's win probability as a percentage.
+# That maps straight onto the ussewc-usse-{st}-{date}-{dem,rep} books, which is
+# where most of our resting size actually sits.
+#
+# Note the coverage limit: this is Senate only. The usgubewc- governor books
+# have no counterpart here and stay unmodelled.
+
+RACES_CSV = DATA / "silver_kNspD.csv"
+
+
+def load_races(path: Path | str = RACES_CSV) -> dict[str, dict]:
+    """Two-letter state code -> {'dem': p, 'rep': p, 'state': name, 'rating': r}.
+
+    Probabilities come back as fractions in 0..1, not the percentages the file
+    stores, so they can be compared to book prices without a unit slip.
+    """
+    out: dict[str, dict] = {}
+    with open(path, newline="") as fh:
+        for row in csv.DictReader(fh):
+            abbr = (row.get("abbr") or "").strip().lower()
+            if not abbr:
+                continue
+            try:
+                dem = float(row.get("winner_Dparty") or "") / 100.0
+                rep = float(row.get("winner_Rparty") or "") / 100.0
+            except ValueError:
+                continue
+            rating = (row.get("rating") or "").strip()
+            out[abbr] = {"state": (row.get("state") or "").strip(),
+                         "dem": dem, "rep": rep,
+                         "rating": float(rating) if rating else None}
+    return out
+
+
+def race_fair(slug: str, races: dict[str, dict]) -> float | None:
+    """Model probability that `slug` resolves YES, or None if unmodelled.
+
+    Only ussewc-usse-* slugs are covered. Governor, House, seat-count and
+    everything else return None rather than a guess.
+    """
+    if not slug.startswith("ussewc-usse-"):
+        return None
+    parts = slug.split("-")
+    if len(parts) < 3:
+        return None
+    race = races.get(parts[2].lower())
+    if not race:
+        return None
+    if slug.endswith("-dem"):
+        return race["dem"]
+    if slug.endswith("-rep"):
+        return race["rep"]
+    return None
+
+
+def mark_to_model(side: str, price: float, fair: float) -> float:
+    """Per-share profit if this resting order filled and the model were right.
+
+    A buy at `price` on something worth `fair` gains fair - price. A sell is
+    the mirror. Negative means a fill costs money against the model.
+    """
+    return (fair - price) if side.upper() == "BUY" else (price - fair)
