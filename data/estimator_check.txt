@@ -1,13 +1,10 @@
-state.json: 17 history rows, 1 carrying earned_hf
+state.json: 18 history rows, 2 carrying earned_hf
 
 day           snaps    sparse   ratio        hf   ratio    ACTUAL
-2026-08-06       21     56.57   1.08x         -       -     52.21
-2026-08-07       28    116.96   1.94x         -       -     60.33
-2026-08-08       28    111.62   2.04x         -       -     54.78
-2026-08-09       38    126.83   2.04x         -       -     62.24
+2026-08-10        5    236.97   0.42x     51.73   0.09x    557.62
 
-sparse: 4 days | median 1.99x | mean abs error 77% | within +/-25%: 1/4
+sparse: 1 days | median 0.42x | mean abs error 58% | within +/-25%: 0/1
 
-hf    : no days yet
+hf    : 1 days | median 0.09x | mean abs error 91% | within +/-25%: 0/1
 
-hf has no completed days yet. It starts accruing from the deploy that added it; check back after a full ET day has rolled over.
+VERDICT: sparse still wins — do not switch
