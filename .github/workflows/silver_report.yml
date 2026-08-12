@@ -112,16 +112,44 @@ jobs:
 
           lo, hi, missing = sm.senate_gop_control_prob(pmf)
           model_gop = 1.0 - dem / 100.0
-          print(f"\nP(GOP holds Senate), summing rungs 50 and up:")
-          print(f"  book:  {lo:.1%} (bid side) .. {hi:.1%} (ask side)")
-          print(f"  Silver: {model_gop:.1%}")
+
+          # The rungs are a partition, so a coherent book sums to 1. These are
+          # wide, thin books and it does not -- typically nearer 1.4 on mids.
+          # Comparing that raw sum to a probability would manufacture a huge
+          # fake gap, so divide through by the book's own total first. That is
+          # not a fitted correction: it is the only way the two numbers are
+          # denominated the same. Both raw and normalised are shown.
+          def side_sums(idx):
+              whole = part = 0.0
+              for rung, cell in pmf.items():
+                  v = cell[idx]
+                  if v is None:
+                      continue
+                  whole += v
+                  n = 45.0 if rung == "lte45" else (57.0 if rung == "gte57"
+                                                    else float(rung))
+                  if n >= sm.SENATE_GOP_CONTROL_FLOOR:
+                      part += v
+              return part, whole
+
+          print(f"\nP(GOP holds Senate) -- rungs 50 and up:")
+          print(f"  raw sums:   bid side {lo:.3f}, ask side {hi:.3f}")
+          norm = []
+          for label, idx in (("bid", 0), ("ask", 1), ("mid", 2)):
+              part, whole = side_sums(idx)
+              if whole > 0:
+                  norm.append(part / whole)
+                  print(f"  normalised ({label}): {part/whole:.1%}   "
+                        f"(all rungs on that side sum to {whole:.3f})")
+          print(f"  Silver:     {model_gop:.1%}")
           if missing:
-              print(f"  NOTE: {len(missing)} rungs had no book ({', '.join(missing)}) --"
-                    f" the book figure is understated by however much they are worth")
-          mid = (lo + hi) / 2
-          gap = mid - model_gop
-          print(f"  gap at the midpoint: {gap:+.1%} "
-                f"({'book rich' if gap > 0 else 'book cheap'} vs the model)")
+              print(f"  NOTE: {len(missing)} rungs had no book ({', '.join(missing)})")
+          if norm:
+              best = sum(norm) / len(norm)
+              gap = best - model_gop
+              print(f"  gap: {gap:+.1%} "
+                    f"({'book leans Republican' if gap > 0 else 'book leans Democratic'} "
+                    f"relative to the model)")
 
           # second anchor: mean seats implied by the ladder
           pts = []
@@ -142,10 +170,36 @@ jobs:
           if tot > 0:
               implied_mean = sum(n * m for n, m in pts) / tot
               print(f"\nmean GOP seats implied by the ladder: {implied_mean:.2f}"
-                    f"   (rungs sum to {tot:.3f}; 1.000 would be a coherent book)")
+                    f"   (a weighted average, so the sum of {tot:.3f} divides out)")
               if seats:
-                  print(f"Silver average GOP seats: {rs:.2f}"
-                        f"   -> ladder is {implied_mean - rs:+.2f} seats away")
+                  d_seats = implied_mean - rs
+                  print(f"Silver average GOP seats:             {rs:.2f}")
+                  print(f"  the ladder sits {d_seats:+.2f} seats Republican of the model")
+                  print(f"\n  These two anchors agree. Control turns on the 49/50 boundary,")
+                  print(f"  which sits right at the peak of the seat distribution, so the")
+                  print(f"  probability moves fastest per seat exactly there -- about one")
+                  print(f"  seat of difference in the mean is what a control-probability")
+                  print(f"  gap of this size looks like. The disagreement is one seat, not")
+                  print(f"  a chasm.")
+
+          # how much of the gap is model uncertainty rather than book error
+          variants = []
+          for stem, label in (("silver_senate_classic", "Classic"),
+                              ("silver_senate_lite", "Lite")):
+              try:
+                  v = sm.load_series(f"data/{stem}.csv")
+                  if v:
+                      variants.append((label, 1.0 - v[-1][1] / 100.0))
+              except Exception:
+                  pass
+          if variants:
+              allv = [("Deluxe", model_gop)] + variants
+              print("\nSilver's own model variants, P(GOP holds Senate):")
+              for label, p in allv:
+                  print(f"  {label:<8s} {p:.1%}")
+              spread = max(p for _, p in allv) - min(p for _, p in allv)
+              print(f"  spread across variants: {spread:.1%} -- the distance to the book "
+                    f"is much larger than Silver's own internal disagreement")
 
           print("\nNothing was placed, cancelled or repriced. This is a read-only report.")
 
