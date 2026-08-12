@@ -1,0 +1,165 @@
+name: Fill history
+
+# Pulls the full trade-activity history from the exchange and writes a plain
+# transaction log. The dashboard's Recent actions list holds 20 entries in
+# memory and does not survive a restart, and the monitor's fill watermark only
+# records the newest fill it has seen -- neither can show what traded earlier.
+# This reads the exchange's own record instead.
+#
+# Read-only: GET only, places nothing, cancels nothing.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/fill_history.yml
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: "activity pages to walk (100 per page)"
+        default: "40"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fill-history
+  cancel-in-progress: false
+
+jobs:
+  history:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Walk activities
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          PAGES: ${{ github.event.inputs.pages || '40' }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import collections, datetime as dt, io, json, os, time, requests
+          from zoneinfo import ZoneInfo
+          import track_rewards as tr
+
+          ET = ZoneInfo("America/New_York")
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          PAGES = int(os.environ.get("PAGES") or 40)
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          PATH = "/v1/portfolio/activities"
+          acts, cursor = [], None
+          for page in range(PAGES):
+              params = {"limit": 100, "sortOrder": "SORT_ORDER_DESCENDING",
+                        "types": ["ACTIVITY_TYPE_TRADE"]}
+              if cursor:
+                  params["cursor"] = cursor
+              r = requests.get(tr.TRADE_API + PATH,
+                               headers=tr.auth_headers(kid, sec, "GET", PATH),
+                               params=params, timeout=30)
+              if r.status_code >= 400:
+                  print(f"page {page}: HTTP {r.status_code} {r.text[:160]}")
+                  break
+              j = r.json()
+              batch = j.get("activities") or []
+              acts.extend(batch)
+              cursor = j.get("nextCursor")
+              if not batch or not cursor or j.get("eof"):
+                  break
+              time.sleep(0.25)
+          print(f"pulled {len(acts)} trade activities\n")
+
+          # One execution per row. A trade where BOTH sides are ours is our own
+          # bid and ask crossing -- shares moved between our own positions, so
+          # it is one event, not a buy plus a sell.
+          INTENT = {"ORDER_INTENT_BUY_LONG": ("Bought", "Yes", False),
+                    "ORDER_INTENT_SELL_LONG": ("Sold", "Yes", False),
+                    "ORDER_INTENT_BUY_SHORT": ("Bought", "No", True),
+                    "ORDER_INTENT_SELL_SHORT": ("Sold", "No", True)}
+          rows = []
+          selfcross = 0
+          for a in acts:
+              t = a.get("trade") or {}
+              execs = []
+              for ex in (t.get("aggressorExecution") or {}, t.get("passiveExecution") or {}):
+                  o = ex.get("order") or {}
+                  if o.get("id") and tr._num(ex.get("lastShares")) > 0:
+                      execs.append((ex, o))
+              if len(execs) == 2:
+                  selfcross += 1
+                  continue
+              for ex, o in execs:
+                  verb, yesno, no_terms = INTENT.get(str(o.get("intent") or ""),
+                      ("Bought" if str(o.get("side") or "").endswith("BUY") else "Sold",
+                       "Yes", False))
+                  px = tr._num(ex.get("lastPx") or o.get("avgPx") or o.get("price"))
+                  if no_terms:
+                      px = 1.0 - px
+                  raw = str(ex.get("transactTime") or "")
+                  try:
+                      when = dt.datetime.fromisoformat(raw.replace("Z", "+00:00")).astimezone(ET)
+                  except Exception:
+                      when = None
+                  rows.append({"when": when, "market": o.get("marketSlug") or "",
+                               "verb": verb, "yesno": yesno, "px": px,
+                               "shares": tr._num(ex.get("lastShares")),
+                               "oid": str(o.get("id"))})
+          rows.sort(key=lambda r: r["when"] or dt.datetime.min.replace(tzinfo=ET))
+          print(f"{len(rows)} executions ({selfcross} self-crosses skipped)\n")
+          if not rows:
+              print("no executions in the history returned")
+
+          if rows:
+              first, last = rows[0]["when"], rows[-1]["when"]
+              print(f"range: {first:%Y-%m-%d %I:%M %p ET}  ->  {last:%Y-%m-%d %I:%M %p ET}\n")
+
+              # per calendar day, so a quiet night is visible as a quiet night
+              byday = collections.defaultdict(lambda: {"n": 0, "bought": 0.0, "sold": 0.0,
+                                                       "cash": 0.0, "mkts": set()})
+              for r in rows:
+                  d = byday[r["when"].strftime("%Y-%m-%d")]
+                  d["n"] += 1
+                  d["mkts"].add(r["market"])
+                  val = r["px"] * r["shares"]
+                  if r["verb"] == "Bought":
+                      d["bought"] += r["shares"]; d["cash"] -= val
+                  else:
+                      d["sold"] += r["shares"]; d["cash"] += val
+              print(f"{'day':<12s} {'fills':>6s} {'bought':>9s} {'sold':>9s} "
+                    f"{'net cash':>10s} {'markets':>8s}")
+              for day in sorted(byday):
+                  d = byday[day]
+                  print(f"{day:<12s} {d['n']:>6d} {d['bought']:>9,.0f} {d['sold']:>9,.0f} "
+                        f"{d['cash']:>10,.2f} {len(d['mkts']):>8d}")
+
+              print("\nevery execution, oldest first:")
+              print(f"  {'time':<20s} {'market':<40s} {'action':<12s} {'px':>6s} {'shares':>8s}")
+              for r in rows:
+                  w = f"{r['when']:%m-%d %I:%M:%S %p}" if r["when"] else "?"
+                  print(f"  {w:<20s} {r['market'][:40]:<40s} "
+                        f"{r['verb'] + ' ' + r['yesno']:<12s} {r['px']*100:>5.1f}c "
+                        f"{r['shares']:>8,.0f}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/fill_history.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/fill_history.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Fill history [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
