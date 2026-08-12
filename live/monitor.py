@@ -2699,18 +2699,19 @@ def _keep_place(m: str, side: str, px: float, qty: int) -> bool:
         return False
 
 
-# Hard stop on all automatic order placement, 2026-08-12, at the owner's
-# request. Deliberately NOT read from the environment: DEFEND_PAUSE and
-# KEEP_PAUSE below can be set to "0" on the host, in which case an env-based
-# default would quietly fail to stop anything. Turning placement back on is a
-# code change and a deploy, so it cannot happen by accident or by a host
-# setting drifting out of sync.
+# Master switch for the two things that place orders on their own each poll:
+# the defender and the qualification keeper.
 #
-# This stops the two things that act on their own every poll: the defender and
-# the qualification keeper. The manual dashboard endpoints (/place, /reprice,
-# /reprice_batch, /cancel_batch) are untouched -- they only ever fire when
-# somebody presses the button.
-AUTOPLACE_ENABLED = False
+# Stopped 2026-08-12 at the owner's request, resumed the same night so defend
+# runs overnight. Deliberately NOT read from the environment: DEFEND_PAUSE and
+# KEEP_PAUSE below can be set to "0" on the host, so an env-based switch could
+# quietly fail to stop anything when it mattered. Flipping this is a code
+# change and a deploy, which is the point -- it cannot drift.
+#
+# The manual dashboard endpoints (/place, /reprice, /reprice_batch,
+# /cancel_batch, /maction) are not gated by this; they only ever fire on a
+# button press.
+AUTOPLACE_ENABLED = True
 
 
 def keep_qualified() -> None:
@@ -3811,9 +3812,21 @@ def _map_payload() -> dict:
                   "governor": len(races.get("governor") or {}),
                   "age_s": int(time.time() - SILVER["ts"]) if SILVER["ts"] else None},
         "thresholds": {"conflict": MAP_CONFLICT, "idle_rate": MAP_IDLE_RATE},
-        # the page says so plainly: an order moved by hand stays where it is
-        # put, because nothing is maintaining it while placement is stopped
+        # Effective state, not just the code switch. DEFEND_PAUSE/KEEP_PAUSE
+        # live in the host environment and can veto either loop; reporting the
+        # constant alone would show "defend is on" while the host had it off.
         "autoplace": AUTOPLACE_ENABLED,
+        "defend_live": bool(AUTOPLACE_ENABLED
+                            and os.environ.get("DEFEND_PAUSE", "") != "1"
+                            and (MONITOR.state.get("defend") or {})),
+        "keeper_live": bool(AUTOPLACE_ENABLED
+                            and os.environ.get("KEEP_PAUSE", "") != "1"),
+        "defend_markets": len(MONITOR.state.get("defend") or {}),
+        "defend_note": ("placement stopped in code" if not AUTOPLACE_ENABLED else
+                        "DEFEND_PAUSE=1 is set on the host"
+                        if os.environ.get("DEFEND_PAUSE", "") == "1" else
+                        "no markets are armed to defend"
+                        if not (MONITOR.state.get("defend") or {}) else ""),
     }
 
 
@@ -3907,6 +3920,7 @@ cursor:pointer}
 .res.err{display:block;background:rgba(229,100,95,.16);color:#ffb3af}
 .banner{background:rgba(217,161,50,.16);border:1px solid rgba(217,161,50,.4);
 color:#f2cd7f;border-radius:11px;padding:9px 11px;font-size:12.5px;margin-bottom:12px}
+.banner.ok{background:rgba(52,192,124,.14);border-color:rgba(52,192,124,.4);color:#8fe3b8}
 .bkbtn{background:var(--surface2);color:var(--ink);border:1px solid var(--line);
 border-radius:8px;padding:6px 10px;font:600 12px inherit;font-family:inherit;cursor:pointer;
 margin-top:7px}
@@ -4025,10 +4039,14 @@ function render(){
   }).join('')).join('');
 
   const bn=document.getElementById('banner');
-  if(DATA.autoplace===false){
-    bn.style.display='block';
-    bn.textContent='Automatic placement is stopped. Orders you move here stay '
-      + 'exactly where you put them — the defender and keeper are not maintaining them.';
+  if(DATA.defend_live===false){
+    bn.style.display='block'; bn.className='banner';
+    bn.textContent='Defend is NOT running — ' + (DATA.defend_note||'reason unknown')
+      + '. Orders you place or move stay exactly where you put them.';
+  } else if(DATA.defend_live===true){
+    bn.style.display='block'; bn.className='banner ok';
+    bn.textContent='Defend is running across ' + DATA.defend_markets + ' markets'
+      + (DATA.keeper_live===false ? ', but the qualification keeper is off.' : '.');
   } else { bn.style.display='none'; }
 
   const m=DATA.model;
