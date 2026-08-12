@@ -1,7 +1,7 @@
-name: Basketball survey
+name: Event survey
 
 # Measures what it would actually cost to earn a target amount per day across
-# the whole college-basketball championship event.
+# a whole futures event. Seeded with any one market slug from the event.
 #
 # The pool is per EVENT, not per market: $500/day split across every team in
 # it. So a target is a share of one $500 pool, and the question is how much
@@ -19,12 +19,15 @@ on:
       target:
         description: "dollars per day wanted from the event"
         default: "5"
+      seed:
+        description: "any market slug in the event to survey"
+        default: "tec-cbb-champ-2027-04-05-w-uconn"
 
 permissions:
   contents: write
 
 concurrency:
-  group: cbb-survey
+  group: event-survey
   cancel-in-progress: false
 
 jobs:
@@ -41,6 +44,7 @@ jobs:
           POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
           POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
           TARGET: ${{ github.event.inputs.target || '5' }}
+          SEED: ${{ github.event.inputs.seed || 'tec-cbb-champ-2027-04-05-w-uconn' }}
         run: |
           pip install -q -r requirements.txt
           python3 - <<'EOF'
@@ -48,7 +52,7 @@ jobs:
           import track_rewards as tr
 
           TARGET = float(os.environ.get("TARGET") or 5)
-          SEED = "tec-cbb-champ-2027-04-05-w-uconn"
+          SEED = os.environ.get("SEED") or "tec-cbb-champ-2027-04-05-w-uconn"
           BUF = io.StringIO(); _p = print
           def print(*a, **k):
               _p(*a, **k); _p(*a, **{**k, "file": BUF})
@@ -75,6 +79,7 @@ jobs:
               slugs = list(tr.RACE_MEMBERS.get(SEED) or [])
               print(f"eventSlug absent; search fallback found {n} open markets")
               print(f"debug: {tr.EVENT_DEBUG.get(SEED)}")
+          print(f"seed: {SEED}")
           print(f"event: {ev_slug}   open markets: {len(slugs)}")
           if not slugs:
               print("could not enumerate the event")
@@ -197,7 +202,7 @@ jobs:
                             f"{gain/cum if cum else 0:>10.4f}")
               print("  cheapest ten sides:")
               for c, p, add in items[:10]:
-                  print(f"    {p['slug'].replace('tec-cbb-champ-2027-04-05-w-',''):<10s} "
+                  print(f"    {p['slug'].split('-')[-1][:10]:<10s} "
                         f"{p['side']:<4s} {p['px']*100:>3.0f}c  resting {p['rest']:>7,.0f}  "
                         f"add {add:>7,.0f}  ${c:>8,.2f}")
 
@@ -210,7 +215,7 @@ jobs:
                     f"-> ${tot_gain:.2f}/day")
 
           os.makedirs("data", exist_ok=True)
-          with open("data/cbb_survey.txt", "w") as f:
+          with open(f"data/survey_{SEED.split('-')[1]}.txt", "w") as f:
               f.write(BUF.getvalue())
           EOF
 
@@ -219,9 +224,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/cbb_survey.txt 2>/dev/null || true
+          git add data/survey_*.txt 2>/dev/null || true
           if git diff --cached --quiet; then echo "no change"; else
-            git commit -m "Basketball survey [skip ci]"
+            git commit -m "Event survey [skip ci]"
             git pull --rebase origin main
             git push
           fi
