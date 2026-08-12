@@ -1,0 +1,28 @@
+Silver Bulletin Senate forecast (Deluxe), 2026-08-11
+  Democrats 57.32%   Republicans 42.68%   (+1.14 pts for Dems over the series)
+
+read 21 of 21 ladder books
+
+scc-senate-gop rung          bid    ask    mid
+  lte45                   0.020  0.080  0.050
+  46                      0.030  0.040  0.035
+  47                      0.130  0.150  0.140
+  48                      0.180  0.190  0.185
+  49                      0.140  0.220  0.180
+  50                      0.180  0.210  0.195
+  51                      0.240  0.250  0.245
+  52                      0.150  0.200  0.175
+  53                      0.070  0.090  0.080
+  54                      0.010  0.080  0.045
+  55                      0.010  0.060  0.035
+  56                      0.010  0.050  0.030
+  gte57                   0.010  0.040  0.025
+
+P(GOP holds Senate), summing rungs 50 and up:
+  book:  68.0% (bid side) .. 98.0% (ask side)
+  Silver: 42.7%
+  gap at the midpoint: +40.3% (book rich vs the model)
+
+mean GOP seats implied by the ladder: 50.13   (rungs sum to 1.420; 1.000 would be a coherent book)
+
+Nothing was placed, cancelled or repriced. This is a read-only report.
