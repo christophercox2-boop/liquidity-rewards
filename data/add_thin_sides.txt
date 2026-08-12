@@ -1,0 +1,46 @@
+buying power at start: $205.63
+
+starting size at each target price:
+  ussewc-usse-il-2026-11-03-dem                SELL   99c     499 of 4,928
+  ussewc-usse-nm-2026-11-03-rep                BUY     1c     400 of 4,971
+  ussewc-usse-wv-2026-11-03-rep                SELL   99c     397 of 4,976
+  usgubewc-usgub-wy-2026-11-03-rep             SELL   99c     402 of 4,982
+  usgubewc-usgub-ma-2026-11-03-dem             SELL   99c   1,027 of 4,976
+  ussewc-usse-ma-2026-11-03-dem                SELL   99c     590 of 4,986
+  ussewc-usse-ok-2026-11-03-dem                BUY     1c     800 of 4,971
+
+round 1: 7 sides short (placing 14,000 shares)
+
+round 2: 7 sides short (placing 14,000 shares)
+
+round 3: 7 sides short (placing 10,742 shares)
+
+round 4: 5 sides short (placing 10,000 shares)
+
+round 5: 5 sides short (placing 10,000 shares)
+
+round 6: 5 sides short (placing 10,000 shares)
+
+round 7: 5 sides short (placing 10,000 shares)
+
+round 8: 5 sides short (placing 10,000 shares)
+
+round 9: 5 sides short (placing 10,000 shares)
+
+round 10: 5 sides short (placing 9,996 shares)
+
+round 11: 5 sides short (placing 9,774 shares)
+
+round 12: 5 sides short (placing 9,526 shares)
+
+final size at each target price:
+  ussewc-usse-il-2026-11-03-dem                SELL   99c     499 ->  3,118 of 4,928  (+2,619)
+  ussewc-usse-nm-2026-11-03-rep                BUY     1c     400 ->  4,971 of 4,971  (+4,571)
+  ussewc-usse-wv-2026-11-03-rep                SELL   99c     397 ->  3,016 of 4,976  (+2,619)
+  usgubewc-usgub-wy-2026-11-03-rep             SELL   99c     402 ->  3,021 of 4,982  (+2,619)
+  usgubewc-usgub-ma-2026-11-03-dem             SELL   99c   1,027 ->  3,646 of 4,976  (+2,619)
+  ussewc-usse-ma-2026-11-03-dem                SELL   99c     590 ->  3,234 of 4,986  (+2,644)
+  ussewc-usse-ok-2026-11-03-dem                BUY     1c     800 ->  4,971 of 4,971  (+4,171)
+
+66 placements accepted; about $218.62 of capital committed
+buying power now: $231.80
