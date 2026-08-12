@@ -1,0 +1,167 @@
+name: Silver vs book
+
+# Compares Silver Bulletin's Senate forecast against what our seat-count
+# ladders are actually quoting, and reports the gap. Read-only: it places
+# nothing, cancels nothing, reprices nothing. The point is to see whether our
+# resting size in the scc- ladders is sitting on the wrong side of an outside
+# estimate before it gets filled, not to trade on the model.
+#
+# Two independent anchors come out of the same forecast:
+#
+#   win probability -> one exact point on the seat CDF. The VP is a Republican
+#                      this cycle, so a 50-50 Senate is Republican and
+#                      P(Dem control) == P(GOP seats <= 49).
+#
+#   average seats   -> the mean of the same distribution, which the ladder's
+#                      own quotes also imply. Two anchors disagreeing is a much
+#                      stronger signal than one anchor being off.
+
+on:
+  schedule:
+    - cron: "40 12 * * *"      # 08:40 ET, half an hour after the fetch
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/silver_report.yml
+      - silver_model.py
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: silver-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compare
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import collections, io, json, os, time, requests
+          import track_rewards as tr
+          import silver_model as sm
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+
+          latest = sm.latest()
+          if not latest:
+              print("no Silver series on disk -- run Fetch Silver model first")
+              raise SystemExit(0)
+          day, dem, rep = latest
+          drift = sm.trend()
+          print(f"Silver Bulletin Senate forecast (Deluxe), {day:%Y-%m-%d}")
+          print(f"  Democrats {dem:.2f}%   Republicans {rep:.2f}%"
+                + (f"   ({drift:+.2f} pts for Dems over the series)" if drift is not None else ""))
+          try:
+              seats = sm.load_series("data/silver_senate_seats.csv")
+              if seats:
+                  d2, ds, rs = seats[-1]
+                  print(f"  average seats: Dem {ds:.1f}  Rep {rs:.1f}   ({d2:%Y-%m-%d})")
+          except Exception:
+              seats = []
+
+          # every scc- market we hold, plus the rest of each ladder
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          held = {o.get("marketSlug") or "" for o in r.json().get("orders") or []
+                  if str(o.get("state")) in ("ORDER_STATE_NEW", "ORDER_STATE_PARTIALLY_FILLED")}
+          ladder = sorted(s for s in held if s.startswith("scc-"))
+          # the ladder only sums to 1 if every rung is present, so fill in the
+          # rungs we do not hold rather than quietly leaving a hole in the sum
+          for n in list(range(46, 57)) + ["lte45", "gte57"]:
+              ladder.append(f"scc-senate-gop-2026-11-03-{n}")
+          ladder = sorted(set(ladder))
+
+          books = {}
+          for s in ladder:
+              try:
+                  books[s] = tr._fetch_book(s)
+              except Exception:
+                  pass
+              time.sleep(0.2)
+          print(f"\nread {len(books)} of {len(ladder)} ladder books\n")
+
+          pmf = sm.senate_seat_pmf(books)
+          print("scc-senate-gop rung          bid    ask    mid")
+          for rung in ["lte45"] + [str(n) for n in range(46, 57)] + ["gte57"]:
+              cell = pmf.get(rung)
+              if not cell:
+                  print(f"  {rung:<10s}                 (no book)")
+                  continue
+              b, a, m = cell
+              f = lambda v: f"{v:.3f}" if v is not None else "  -  "
+              print(f"  {rung:<10s}              {f(b)}  {f(a)}  {f(m)}")
+
+          lo, hi, missing = sm.senate_gop_control_prob(pmf)
+          model_gop = 1.0 - dem / 100.0
+          print(f"\nP(GOP holds Senate), summing rungs 50 and up:")
+          print(f"  book:  {lo:.1%} (bid side) .. {hi:.1%} (ask side)")
+          print(f"  Silver: {model_gop:.1%}")
+          if missing:
+              print(f"  NOTE: {len(missing)} rungs had no book ({', '.join(missing)}) --"
+                    f" the book figure is understated by however much they are worth")
+          mid = (lo + hi) / 2
+          gap = mid - model_gop
+          print(f"  gap at the midpoint: {gap:+.1%} "
+                f"({'book rich' if gap > 0 else 'book cheap'} vs the model)")
+
+          # second anchor: mean seats implied by the ladder
+          pts = []
+          for rung, (_, _, m) in pmf.items():
+              if m is None:
+                  continue
+              if rung == "lte45":
+                  n = 45.0
+              elif rung == "gte57":
+                  n = 57.0
+              else:
+                  try:
+                      n = float(rung)
+                  except ValueError:
+                      continue
+              pts.append((n, m))
+          tot = sum(m for _, m in pts)
+          if tot > 0:
+              implied_mean = sum(n * m for n, m in pts) / tot
+              print(f"\nmean GOP seats implied by the ladder: {implied_mean:.2f}"
+                    f"   (rungs sum to {tot:.3f}; 1.000 would be a coherent book)")
+              if seats:
+                  print(f"Silver average GOP seats: {rs:.2f}"
+                        f"   -> ladder is {implied_mean - rs:+.2f} seats away")
+
+          print("\nNothing was placed, cancelled or repriced. This is a read-only report.")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/silver_report.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/silver_report.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Silver vs book report [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi

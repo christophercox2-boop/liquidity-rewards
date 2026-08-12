@@ -1,9 +1,16 @@
 name: Fetch Silver model
 
-# Pulls Nate Silver's model table (Datawrapper CDN) and commits it. The
-# session that requested this cannot reach static.dwcdn.net — the egress
-# proxy blocks it — but Actions runners have open internet, so the fetch
-# happens here and the data lands in the repo for analysis.
+# Pulls Silver Bulletin's Senate forecast series and commits them. The session
+# that requested this cannot reach static.dwcdn.net -- the egress proxy blocks
+# it -- but Actions runners have open internet, so the fetch happens here and
+# the data lands in the repo for analysis.
+#
+# The owner's link was KQI8W. Reading the chart page showed it is one of four
+# related series behind the same widget's toggles, so all four are pulled:
+# three model variants of the same win probability, plus the average seat
+# count. The seat mean is a second, independent anchor on the same underlying
+# distribution as the win probability, which makes the ladder check far more
+# informative than either number alone.
 #
 # Read-only with respect to the exchange: touches no orders.
 
@@ -38,29 +45,38 @@ jobs:
           python3 - <<'EOF'
           import csv, io, json, os, requests
 
-          URL = "https://static.dwcdn.net/data/KQI8W.csv"
-          out = []
-          r = requests.get(URL, timeout=60,
-                           headers={"User-Agent": "Mozilla/5.0 (liquidity-rewards data pull)"})
-          print(f"HTTP {r.status_code}  {len(r.content):,} bytes  "
-                f"content-type={r.headers.get('content-type')}")
-          r.raise_for_status()
-          text = r.text
+          # chart id -> (filename stem, what the numbers mean)
+          SERIES = {
+              "KQI8W": ("silver_model",         "Senate win probability, Deluxe model"),
+              "igTt2": ("silver_senate_classic","Senate win probability, Classic model"),
+              "6aks4": ("silver_senate_lite",   "Senate win probability, Lite model"),
+              "6mA2E": ("silver_senate_seats",  "Senate average seats, Deluxe model"),
+          }
+          UA = {"User-Agent": "Mozilla/5.0 (liquidity-rewards data pull)"}
           os.makedirs("data", exist_ok=True)
-          with open("data/silver_model.csv", "w") as f:
-              f.write(text)
+          meta = {}
 
-          rows = list(csv.reader(io.StringIO(text)))
-          print(f"rows: {len(rows)}")
-          for row in rows[:12]:
-              print("   ", row[:10])
-          if len(rows) > 12:
-              print(f"    ... {len(rows)-12} more")
-          # a quick machine-readable summary so the next step can reason about shape
-          json.dump({"url": URL, "n_rows": len(rows),
-                     "header": rows[0] if rows else [],
-                     "sample": rows[1:6]},
-                    open("data/silver_model_meta.json", "w"), indent=1)
+          for cid, (stem, meaning) in SERIES.items():
+              url = f"https://static.dwcdn.net/data/{cid}.csv"
+              try:
+                  r = requests.get(url, timeout=60, headers=UA)
+              except Exception as e:
+                  print(f"{cid}: {type(e).__name__}: {e}")
+                  continue
+              print(f"{cid} -> HTTP {r.status_code}  {len(r.content):,} bytes  ({meaning})")
+              if r.status_code >= 400:
+                  continue
+              with open(f"data/{stem}.csv", "w") as f:
+                  f.write(r.text)
+              rows = list(csv.reader(io.StringIO(r.text)))
+              meta[cid] = {"url": url, "file": f"data/{stem}.csv", "meaning": meaning,
+                           "n_rows": len(rows),
+                           "header": rows[0] if rows else [],
+                           "latest": rows[-1] if len(rows) > 1 else []}
+              print(f"    header={rows[0] if rows else []}  latest={rows[-1] if len(rows)>1 else []}")
+
+          json.dump(meta, open("data/silver_model_meta.json", "w"), indent=1)
+          print(f"\nwrote {len(meta)} series")
           EOF
 
       - name: Commit
@@ -68,7 +84,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/silver_model.csv data/silver_model_meta.json 2>/dev/null || true
+          git add data/silver_*.csv data/silver_model_meta.json 2>/dev/null || true
           if git diff --cached --quiet; then echo "no change"; else
             git commit -m "Fetch Silver model [skip ci]"
             git pull --rebase origin main
