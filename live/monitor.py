@@ -3589,6 +3589,41 @@ def _map_payload() -> dict:
                                     "earned": 0.0, "worst_edge": None,
                                     "markets": {}}
 
+    # Every tracked market in these families, whether or not we hold orders in
+    # it. Building the market list from our own orders alone would mean a race
+    # we never entered offers nothing to act on, which is precisely the case
+    # this screen exists to catch. Sourced from known_mkts because that is the
+    # same list manual_place whitelists against, so anything offered here is
+    # something the placer will actually accept.
+    with MONITOR.lock:
+        catalogue = list((MONITOR.state.get("known_mkts") or {}).get("politics") or [])
+    for slug in catalogue:
+        hit = _map_office(slug)
+        if not hit:
+            continue
+        office, abbr = hit
+        if abbr not in states:
+            continue
+        oc = states[abbr]["offices"].get(office)
+        if oc is None:
+            # a real market in a race the model has no row for (no Senate
+            # contest in this state this cycle, a special, a late addition).
+            # Still tradeable, so still offered -- just with no model price.
+            oc = states[abbr]["offices"][office] = {
+                "dem": None, "rep": None, "orders": 0, "est_day": 0.0,
+                "earned": 0.0, "worst_edge": None, "markets": {}}
+        if slug in oc["markets"]:
+            continue
+        race = (races.get(office) or {}).get(abbr)
+        fair = None
+        if race:
+            fair = race["dem"] if slug.endswith("-dem") else (
+                race["rep"] if slug.endswith("-rep") else None)
+        oc["markets"][slug] = {"orders": 0, "est_day": 0.0,
+                               "earned": round(earned.get(slug, 0.0), 2),
+                               "fair": None if fair is None else round(fair, 4),
+                               "worst_edge": None, "list": []}
+
     for o in orders:
         slug = o.get("market") or ""
         hit = _map_office(slug)
@@ -3783,6 +3818,19 @@ color:#f2cd7f;border-radius:11px;padding:9px 11px;font-size:12.5px;margin-bottom
 .bkbtn{background:var(--surface2);color:var(--ink);border:1px solid var(--line);
 border-radius:8px;padding:6px 10px;font:600 12px inherit;font-family:inherit;cursor:pointer;
 margin-top:7px}
+.newbox{margin-top:8px;border:1px dashed var(--line);border-radius:10px;padding:9px}
+.newbox .ttl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);
+margin-bottom:7px}
+.seg{display:flex;gap:0;margin-bottom:7px;border:1px solid var(--line);border-radius:8px;
+overflow:hidden}
+.seg button{flex:1;background:none;border:0;color:var(--dim);padding:9px 0;
+font:700 12px inherit;font-family:inherit;cursor:pointer}
+.seg button.on.buy{background:rgba(52,192,124,.25);color:#8fe3b8}
+.seg button.on.sell{background:rgba(229,100,95,.22);color:#ffb3af}
+.nrow{display:flex;gap:6px;align-items:center}
+.nrow input{flex:1;min-width:0;padding:8px;font-size:16px;text-align:right}
+.nrow .unit{color:var(--dim);font-size:12px}
+.btn.new{background:var(--good);color:#0b2417}
 .book{margin-top:8px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .brow{display:grid;grid-template-columns:52px 1fr 62px;align-items:center;gap:8px;
 padding:4px 8px;font-size:12px;font-variant-numeric:tabular-nums;position:relative}
@@ -3922,24 +3970,99 @@ function render(){
 }
 
 function tglGaps(){ SHOWGAPS=!SHOWGAPS; render(); }
+// --- new order ----------------------------------------------------------
+// Placement goes through the same /maction route as everything else, so it
+// inherits the key check, the CSRF header, the known-market whitelist, the
+// price and size bounds, and post-only (an order that would cross is
+// rejected rather than filled on arrival).
+const OPENNEW={}, NEWSIDE={};
+// results must outlive the re-render that a successful action triggers,
+// otherwise the confirmation vanishes the instant it is earned
+const MSG={};
+function note(key, ok, txt){ MSG[key]={ok:ok, txt:txt};
+  const el=document.getElementById(key);
+  if(el){ el.className='res '+(ok?'ok':'err'); el.textContent=txt; } }
+function msgHTML(key){ const m=MSG[key]; return m? ` class="res ${m.ok?'ok':'err'}">${m.txt}` : '>'; }
+function tglNew(slug){ OPENNEW[slug]=!OPENNEW[slug]; if(SEL) detail(SEL); }
+function nside(slug, s){ NEWSIDE[slug]=s; if(SEL) detail(SEL); }
+function newHTML(slug, fair){
+  const id=cssid(slug), side=NEWSIDE[slug]||'BUY';
+  const b=BOOKS[slug];
+  // default to a price that rests rather than one that would be rejected:
+  // a tick inside the touch on the side being quoted
+  let sug='';
+  if(b && !b.error){
+    const tick=(b.tick||0.01)*100;
+    const bestBid=(b.bids||[]).length? Math.max(...b.bids.map(r=>r[0]))*100 : null;
+    const bestAsk=(b.asks||[]).length? Math.min(...b.asks.map(r=>r[0]))*100 : null;
+    if(side==='BUY'  && bestBid!=null) sug=(bestBid+tick).toFixed(1);
+    if(side==='SELL' && bestAsk!=null) sug=(bestAsk-tick).toFixed(1);
+    if(side==='BUY'  && bestAsk!=null && sug && parseFloat(sug)>=bestAsk) sug=(bestAsk-tick).toFixed(1);
+    if(side==='SELL' && bestBid!=null && sug && parseFloat(sug)<=bestBid) sug=(bestBid+tick).toFixed(1);
+  }
+  const warn = (fair!=null && sug) ? (()=>{
+      const e = side==='BUY' ? (fair*100-parseFloat(sug)) : (parseFloat(sug)-fair*100);
+      return e < -10 ? `<div class="hint neg">that price is ${Math.abs(e).toFixed(1)}c the wrong
+        side of the model — a fill would cost that per share</div>` : '';
+    })() : '';
+  return `<div class="newbox">
+    <div class="ttl">new order</div>
+    <div class="seg">
+      <button class="buy ${side==='BUY'?'on':''}"  onclick="nside('${slug}','BUY')">BUY</button>
+      <button class="sell ${side==='SELL'?'on':''}" onclick="nside('${slug}','SELL')">SELL</button>
+    </div>
+    <div class="nrow">
+      <input id="np_${id}" type="number" inputmode="decimal" step="0.1" min="0.1" max="99.9"
+             value="${sug}" placeholder="price" aria-label="price in cents"><span class="unit">c</span>
+      <input id="nq_${id}" type="number" inputmode="numeric" step="1" min="1" max="20000"
+             placeholder="size" aria-label="size"><span class="unit">sh</span>
+      <button class="btn new" onclick="place('${slug}')">Place</button>
+    </div>
+    ${warn}
+    <div class="hint">${b&&!b.error?'Suggested price is one tick inside the touch. ':
+      'Open the book to get a suggested price. '}Post-only: if it would cross it is
+      rejected, never filled on arrival.</div>
+    <div id="nr_${id}"${msgHTML('nr_'+id)}</div>
+  </div>`;
+}
+async function place(slug){
+  const id=cssid(slug);
+  const c=parseFloat((document.getElementById('np_'+id)||{}).value);
+  const q=parseInt((document.getElementById('nq_'+id)||{}).value,10);
+  const say=(ok,msg)=>note('nr_'+id, ok, msg);
+  if(!(c>=0.1&&c<=99.9)) return say(false,'price must be between 0.1 and 99.9c');
+  if(!(q>=1&&q<=20000))  return say(false,'size must be between 1 and 20,000');
+  say(true,'placing…');
+  const r=await act({op:'place', market:slug, side:NEWSIDE[slug]||'BUY',
+                     price_cents:c, size:q});
+  say(r.ok, r.ok ? `placed ${NEWSIDE[slug]||'BUY'} ${q.toLocaleString()} @ ${c.toFixed(1)}c` : r.msg);
+  // refresh rather than drop: the price suggestion in this very form is
+  // derived from the cached book, and dropping it blanks the field
+  if(r.ok){ if(BOOKS[slug]) reBook(slug); setTimeout(load, 2500); }
+}
+
 // --- order book ---------------------------------------------------------
 // /market.json already returns the top of book, our orders in it and the
 // position, behind the same key check. Reusing it keeps one fetch path for
 // book data instead of a second one that could drift.
 const BOOKS={}, OPENBK={};
 function cssid(s){ return s.replace(/[^A-Za-z0-9_-]/g,'_'); }
+async function fetchBook(slug){
+  try{
+    const r = await fetch('/market.json?slug='+encodeURIComponent(slug), {headers:hdrs()});
+    BOOKS[slug] = r.ok ? await r.json() : {error:'HTTP '+r.status};
+  }catch(e){ BOOKS[slug] = {error:'offline'}; }
+}
 async function tglBook(slug){
   OPENBK[slug] = !OPENBK[slug];
   if(OPENBK[slug] && !BOOKS[slug]){
     const el=document.getElementById('bk_'+cssid(slug));
     if(el) el.innerHTML = '<div class="muted" style="padding:8px 0">loading book…</div>';
-    try{
-      const r = await fetch('/market.json?slug='+encodeURIComponent(slug), {headers:hdrs()});
-      BOOKS[slug] = r.ok ? await r.json() : {error:'HTTP '+r.status};
-    }catch(e){ BOOKS[slug] = {error:'offline'}; }
+    await fetchBook(slug);
   }
   if(SEL) detail(SEL);
 }
+async function reBook(slug){ await fetchBook(slug); if(SEL) detail(SEL); }
 function bookHTML(slug, fair){
   const b = BOOKS[slug];
   if(!b) return '<div class="muted" style="padding:8px 0">loading book…</div>';
@@ -3984,7 +4107,7 @@ function bookHTML(slug, fair){
   out += '</div>';
   if(b.net) out += `<div class="hint">position: ${Math.round(b.net).toLocaleString()} contracts</div>`;
   out += `<div class="hint">Top ${Math.max(asks.length,bids.length)} levels a side.
-    <a href="#" onclick="event.preventDefault();delete BOOKS['${slug}'];tglBook('${slug}');tglBook('${slug}')">refresh</a></div>`;
+    <a href="#" onclick="event.preventDefault();reBook('${slug}')">refresh</a></div>`;
   return out;
 }
 
@@ -3997,10 +4120,7 @@ async function act(body){
   let j={}; try{ j = await r.json(); }catch(e){}
   return {ok: r.ok && j.ok !== false, msg: j.error || j.note || (r.ok?'done':'HTTP '+r.status)};
 }
-function show(id, ok, msg){
-  const el=document.getElementById('r_'+id); if(!el) return;
-  el.className = 'res ' + (ok?'ok':'err'); el.textContent = msg;
-}
+function show(id, ok, msg){ note('r_'+id, ok, msg); }
 function setp(id, c){ const el=document.getElementById('p_'+id); if(el) el.value=c.toFixed(1); }
 function busy(id, on){
   ['p_','c_'].forEach(p=>{ const e=document.getElementById(p+id); if(e) e.disabled=on; });
@@ -4057,7 +4177,9 @@ function detail(ab){
       h += `<div class="mkt"><code>${k}</code><div class="row">
         <span>${m.orders} order${m.orders===1?'':'s'} · ${money(m.est_day)}/day</span>${tag}</div>
         <button class="bkbtn" onclick="tglBook('${k}')">${OPENBK[k]?'hide book':'show book'}</button>
-        <div id="bk_${cssid(k)}">${OPENBK[k]?bookHTML(k, m.fair):''}</div>`;
+        <button class="bkbtn" onclick="tglNew('${k}')">${OPENNEW[k]?'close':'new order'}</button>
+        <div id="bk_${cssid(k)}">${OPENBK[k]?bookHTML(k, m.fair):''}</div>
+        <div id="nw_${cssid(k)}">${OPENNEW[k]?newHTML(k, m.fair):''}</div>`;
       // one actionable row per resting order. The model's own price sits on
       // the button, so moving an order to fair value is a single tap rather
       // than mental arithmetic on a phone.
@@ -4086,7 +4208,7 @@ function detail(ab){
             ? 'Already on the right side of the model — moving it to fair value would only tie up more capital, so there is no shortcut button here. '
             : ''}Move places the new order, waits until it is resting, then cancels
             this one. Nothing is cancelled on faith.</div>
-          <div class="res" id="r_${od.id}"></div>
+          <div id="r_${od.id}"${msgHTML('r_'+od.id)}</div>
         </div>`;
       });
       h += `</div>`;
