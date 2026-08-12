@@ -43,7 +43,7 @@ jobs:
         run: |
           pip install -q requests
           python3 - <<'EOF'
-          import csv, io, json, os, requests
+          import csv, io, json, os, re, requests
 
           # chart id -> (filename stem, what the numbers mean)
           SERIES = {
@@ -51,10 +51,28 @@ jobs:
               "igTt2": ("silver_senate_classic","Senate win probability, Classic model"),
               "6aks4": ("silver_senate_lite",   "Senate win probability, Lite model"),
               "6mA2E": ("silver_senate_seats",  "Senate average seats, Deluxe model"),
+              "kNspD": ("silver_kNspD",         "second link from the owner; identified below"),
           }
           UA = {"User-Agent": "Mozilla/5.0 (liquidity-rewards data pull)"}
           os.makedirs("data", exist_ok=True)
           meta = {}
+
+          # a CSV alone never says what its columns mean, so read each chart's
+          # own title too rather than inferring it from the numbers
+          def chart_title(cid, depth=0, url=None):
+              url = url or f"https://datawrapper.dwcdn.net/{cid}/"
+              try:
+                  r = requests.get(url, timeout=45, headers=UA)
+              except Exception:
+                  return None
+              if r.status_code >= 400:
+                  return None
+              if depth < 4 and len(r.text) < 2000:
+                  m = re.search(r"url=(https://datawrapper\.dwcdn\.net/[^\"'>\s]+)", r.text)
+                  if m:
+                      return chart_title(cid, depth + 1, m.group(1).rstrip("+' "))
+              m = re.search(r'<meta property="og:title" content="([^"]+)"', r.text)
+              return m.group(1) if m else None
 
           for cid, (stem, meaning) in SERIES.items():
               url = f"https://static.dwcdn.net/data/{cid}.csv"
@@ -69,11 +87,18 @@ jobs:
               with open(f"data/{stem}.csv", "w") as f:
                   f.write(r.text)
               rows = list(csv.reader(io.StringIO(r.text)))
+              title = chart_title(cid)
               meta[cid] = {"url": url, "file": f"data/{stem}.csv", "meaning": meaning,
-                           "n_rows": len(rows),
+                           "chart_title": title, "n_rows": len(rows),
                            "header": rows[0] if rows else [],
                            "latest": rows[-1] if len(rows) > 1 else []}
-              print(f"    header={rows[0] if rows else []}  latest={rows[-1] if len(rows)>1 else []}")
+              print(f"    chart title: {title}")
+              print(f"    header={rows[0] if rows else []}")
+              for row in rows[:6]:
+                  print(f"      {row[:12]}")
+              if len(rows) > 8:
+                  print(f"      ... {len(rows)-6} more rows")
+                  print(f"      last: {rows[-1][:12]}")
 
           json.dump(meta, open("data/silver_model_meta.json", "w"), indent=1)
           print(f"\nwrote {len(meta)} series")
