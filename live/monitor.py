@@ -2720,7 +2720,7 @@ def _keep_place(m: str, side: str, px: float, qty: int) -> bool:
 # The manual dashboard endpoints (/place, /reprice, /reprice_batch,
 # /cancel_batch, /maction) are not gated by this; they only ever fire on a
 # button press.
-AUTOPLACE_ENABLED = True
+AUTOPLACE_ENABLED = False
 
 
 def keep_qualified() -> None:
