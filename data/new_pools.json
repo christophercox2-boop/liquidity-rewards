@@ -5,7 +5,7 @@
  "pages": 1737,
  "records": 173690,
  "retries": 0,
- "elapsed_s": 714,
+ "elapsed_s": 692,
  "programs": {
   "tec-dpwt-danigolf-2026-08-13-r2l-adrarn": {
    "pool": 5000,
@@ -33272,11 +33272,6 @@
    "target": 15000,
    "df": 0.3
   },
-  "aec-atp-stekoz-harwen-2026-08-14": {
-   "pool": 200,
-   "target": 15000,
-   "df": 0.3
-  },
   "aec-atp-titdro-matber-2026-08-14": {
    "pool": 200,
    "target": 15000,
@@ -33353,11 +33348,6 @@
    "df": 0.3
   },
   "aec-wta-emmnav-anhkal-2026-08-15": {
-   "pool": 200,
-   "target": 15000,
-   "df": 0.3
-  },
-  "aec-wta-igaswi-eleryb-2026-08-14": {
    "pool": 200,
    "target": 15000,
    "df": 0.3
@@ -36507,86 +36497,6 @@
    "target": 10000,
    "df": 0.3
   },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-neg-0pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-neg-1pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-neg-2pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-neg-3pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-neg-4pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-neg-5pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-neg-7pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-pos-0pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-pos-1pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-pos-2pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-pos-3pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-pos-4pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-pos-5pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-gs-pos-7pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-ss-neg-1pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "asc-wta-igaswi-eleryb-2026-08-14-ss-pos-1pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
   "asc-wta-jesman-annbon-2026-08-13-gs-neg-0pt5": {
    "pool": 200,
    "target": 10000,
@@ -37828,26 +37738,6 @@
    "df": 0.3
   },
   "tsc-wta-emiara-venwil-2026-08-14-tg-27pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "tsc-wta-igaswi-eleryb-2026-08-14-st-2pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "tsc-wta-igaswi-eleryb-2026-08-14-tg-17pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "tsc-wta-igaswi-eleryb-2026-08-14-tg-22pt5": {
-   "pool": 200,
-   "target": 10000,
-   "df": 0.3
-  },
-  "tsc-wta-igaswi-eleryb-2026-08-14-tg-27pt5": {
    "pool": 200,
    "target": 10000,
    "df": 0.3
@@ -39193,11 +39083,6 @@
    "df": 0.3
   },
   "astatc-cs2-fut-mouz-2026-08-14-map2": {
-   "pool": 50,
-   "target": 3000,
-   "df": 0.3
-  },
-  "astatc-cs2-ger-mne-2026-08-13-map2": {
    "pool": 50,
    "target": 3000,
    "df": 0.3
@@ -51657,11 +51542,6 @@
    "target": 5000,
    "df": 0.5
   },
-  "aec-setkameua-abaspa-pontym-2026-08-13": {
-   "pool": 35,
-   "target": 5000,
-   "df": 0.5
-  },
   "aec-setkameua-badmak-fediva-2026-08-14": {
    "pool": 35,
    "target": 5000,
@@ -52458,11 +52338,6 @@
    "df": 0.5
   },
   "aec-setkameua-napole-hairus-2026-08-14": {
-   "pool": 35,
-   "target": 5000,
-   "df": 0.5
-  },
-  "aec-setkameua-napole-kalser-2026-08-13": {
    "pool": 35,
    "target": 5000,
    "df": 0.5
@@ -65254,7 +65129,7 @@
   "vtc-hrep-to-2026-11-03-gte130m",
   "vtc-hrep-to-2026-11-03-lt90m"
  ],
- "politics_unreached": [
+ "politics_no_program": [
   "opdc-liscook-fedgov-2026-08-31",
   "opdc-liscook-fedgov-2026-12-31",
   "ushrewc-ushr-al-01-2026-11-03-dem",
@@ -66009,6 +65884,7 @@
   "ushrewc-ushr-wy-al-2026-11-03-rep"
  ],
  "held": [
+  "apdc-alito-2026-12-31",
   "apdc-jerpowgov-2026-12-31",
   "dccc-measles-us-2026-12-31-gt3000",
   "dccc-measles-us-2026-12-31-gt3500",
@@ -66042,9 +65918,11 @@
   "usgubewc-usgub-ma-2026-11-03-rep",
   "usgubewc-usgub-md-2026-11-03-rep",
   "usgubewc-usgub-mn-2026-11-03-dem",
+  "usgubewc-usgub-mn-2026-11-03-rep",
   "usgubewc-usgub-ne-2026-11-03-dem",
   "usgubewc-usgub-ne-2026-11-03-rep",
   "usgubewc-usgub-ny-2026-11-03-dem",
+  "usgubewc-usgub-ny-2026-11-03-rep",
   "usgubewc-usgub-pa-2026-11-03-dem",
   "usgubewc-usgub-pa-2026-11-03-rep",
   "usgubewc-usgub-ri-2026-11-03-dem",
@@ -66053,6 +65931,7 @@
   "usgubewc-usgub-sd-2026-11-03-rep",
   "usgubewc-usgub-tn-2026-11-03-rep",
   "usgubewc-usgub-tx-2026-11-03-dem",
+  "usgubewc-usgub-tx-2026-11-03-rep",
   "usgubewc-usgub-vt-2026-11-03-rep",
   "usgubewc-usgub-wy-2026-11-03-rep",
   "ussewc-usse-co-2026-11-03-dem",
@@ -66061,11 +65940,11 @@
   "ussewc-usse-il-2026-11-03-dem",
   "ussewc-usse-il-2026-11-03-rep",
   "ussewc-usse-ks-2026-11-03-dem",
-  "ussewc-usse-ks-2026-11-03-rep",
   "ussewc-usse-ky-2026-11-03-dem",
   "ussewc-usse-ma-2026-11-03-dem",
   "ussewc-usse-ma-2026-11-03-rep",
   "ussewc-usse-ms-2026-11-03-dem",
+  "ussewc-usse-ms-2026-11-03-rep",
   "ussewc-usse-mt-2026-11-03-setbod",
   "ussewc-usse-nm-2026-11-03-rep",
   "ussewc-usse-ok-2026-11-03-dem",
