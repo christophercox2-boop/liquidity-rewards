@@ -1,0 +1,208 @@
+name: Merge buy rungs
+
+# Collapses stacked BUY orders at the same price into fewer, larger orders --
+# WITHOUT ever reducing the size resting at any rung.
+#
+# Only BUY rungs. A single buy order can rest 10,000 shares (largest currently
+# resting is exactly that), but no sell order has ever rested more than ~273:
+# the exchange caps short size per order, so the 99c ask stacks are the only
+# way to hold that size and are left strictly alone.
+#
+# Order of operations, per rung: place the consolidated order first, wait,
+# measure how much of it actually rested, and only then cancel old copies --
+# smallest first, and only up to the amount the new order verifiably covers.
+# The rung's total size can end higher than it started (if a cancel fails or
+# the new order over-covers) but never lower.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/merge_buy_rungs.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: merge-buy-rungs
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Merge
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import collections, io, math, os, time, requests
+          import track_rewards as tr
+
+          CHUNK = 5000        # shares per consolidated buy order
+          MIN_CASH = 25.0     # never spend the account below this
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+          def api(method, path, **kw):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"}, timeout=30, **kw)
+
+          def buying_power():
+              p = "/v1/account/balances"
+              r = requests.get(tr.TRADE_API + p,
+                               headers=tr.auth_headers(kid, sec, "GET", p), timeout=20)
+              if r.status_code >= 400:
+                  return None
+              for b in r.json().get("balances") or []:
+                  if b.get("buyingPower") is not None:
+                      return float(b["buyingPower"])
+              return None
+
+          def open_orders():
+              r = api("GET", "/v1/orders/open"); r.raise_for_status()
+              out = []
+              for o in r.json().get("orders") or []:
+                  if str(o.get("state")) in tr.DEAD_ORDER_STATES:
+                      continue
+                  out.append({
+                      "id": str(o.get("id")),
+                      "slug": o.get("marketSlug") or "",
+                      "side": "BUY" if str(o.get("side","")).upper().endswith("BUY") else "SELL",
+                      "px": round(tr._num(o.get("price")), 2),
+                      "sz": tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")),
+                      "intent": o.get("intent"),
+                  })
+              return out
+
+          orders = open_orders()
+          rungs = collections.defaultdict(list)
+          for o in orders:
+              rungs[(o["slug"], o["side"], o["px"])].append(o)
+
+          buy_dupes = {k: v for k, v in rungs.items()
+                       if k[1] == "BUY" and len(v) > 1}
+          sell_dupes = sum(1 for k, v in rungs.items()
+                           if k[1] == "SELL" and len(v) > 1)
+          print(f"{len(orders)} live orders; BUY rungs with stacks: {len(buy_dupes)}; "
+                f"SELL rung stacks left alone: {sell_dupes} "
+                f"(short size caps at ~273/order — the stack IS the size)\n")
+
+          merged = skipped = 0
+          orders_before = len(orders)
+          for (slug, side, px), copies in sorted(buy_dupes.items(),
+                                                 key=lambda kv: -len(kv[1])):
+              total = sum(c["sz"] for c in copies)
+              n_target = max(1, math.ceil(total / CHUNK))
+              if n_target >= len(copies):
+                  skipped += 1
+                  continue
+              bp = buying_power()
+              overlap_cost = total * px    # new orders rest alongside old briefly
+              if bp is not None and bp - overlap_cost < MIN_CASH:
+                  print(f"  {slug[:40]} {px*100:.0f}c: skipped — consolidating needs "
+                        f"${overlap_cost:,.2f} of headroom, only ${bp:,.2f} free")
+                  skipped += 1
+                  continue
+
+              # 1) place consolidated chunks
+              new_ids = []
+              left = int(round(total))
+              ok_all = True
+              while left > 0:
+                  q = min(left, CHUNK)
+                  r = api("POST", "/v1/orders",
+                          json={"marketSlug": slug,
+                                "intent": copies[0].get("intent") or "ORDER_INTENT_BUY_LONG",
+                                "type": "ORDER_TYPE_LIMIT",
+                                "price": {"value": f"{px:.2f}", "currency": "USD"},
+                                "quantity": q,
+                                "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                                "participateDontInitiate": True})
+                  if r.status_code >= 300:
+                      ok_all = False
+                      break
+                  try:
+                      nid = (r.json().get("id")
+                             or (r.json().get("order") or {}).get("id"))
+                  except Exception:
+                      nid = None
+                  if nid:
+                      new_ids.append(str(nid))
+                  left -= q
+                  time.sleep(0.4)
+
+              # 2) measure what actually rested
+              time.sleep(6)
+              now = open_orders()
+              rested = sum(o["sz"] for o in now if o["id"] in new_ids)
+              old_ids = {c["id"] for c in copies}
+              old_now = [o for o in now if o["id"] in old_ids]
+
+              # 3) cancel old copies, smallest first, only up to what the new
+              #    order verifiably covers — the rung can never shrink
+              budget = rested
+              cancelled = 0
+              for c in sorted(old_now, key=lambda o: o["sz"]):
+                  if c["sz"] > budget + 0.5:
+                      break
+                  r = api("POST", f"/v1/order/{c['id']}/cancel",
+                          json={"marketSlug": slug})
+                  if r.status_code < 300:
+                      budget -= c["sz"]
+                      cancelled += 1
+                  time.sleep(0.3)
+              print(f"  {slug[:42]:<42s} {px*100:>3.0f}c  {len(copies)} copies "
+                    f"({total:,.0f} sh) -> placed {len(new_ids)} "
+                    f"({rested:,.0f} rested), cancelled {cancelled} old"
+                    + ("" if ok_all else "  [placement failed partway]"))
+              merged += 1
+
+          # final: the invariant, checked
+          time.sleep(4)
+          fin = open_orders()
+          fin_rungs = collections.defaultdict(float)
+          for o in fin:
+              fin_rungs[(o["slug"], o["side"], o["px"])] += o["sz"]
+          shrunk = []
+          for (slug, side, px), copies in buy_dupes.items():
+              before = sum(c["sz"] for c in copies)
+              after = fin_rungs.get((slug, side, px), 0.0)
+              if after < before - 1:
+                  shrunk.append((slug, px, before, after))
+          print(f"\norders: {orders_before} -> {len(fin)}")
+          if shrunk:
+              print("RUNGS THAT LOST SIZE (should be none):")
+              for slug, px, b, a in shrunk:
+                  print(f"  {slug} {px*100:.0f}c  {b:,.0f} -> {a:,.0f}")
+          else:
+              print("no rung lost size — invariant held everywhere")
+          bp = buying_power()
+          print(f"buying power now: {('$%.2f' % bp) if bp is not None else 'unreadable'}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/merge_buy_rungs.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/merge_buy_rungs.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Merge buy rungs [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
