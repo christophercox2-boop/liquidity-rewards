@@ -14,6 +14,8 @@ name: Probe new pools
 # returns markets we already hold, which is useless for finding new ones —
 # groups the active programs by family, and cross-references our open orders
 # so entered and unentered markets are separated.
+#
+# Nudge 2026-08-13: rerun requested by owner (fresh survey of new markets).
 
 on:
   push:
