@@ -24,8 +24,8 @@ name: Probe new pools
 #   2. backing off and retrying on 429/5xx instead of quitting the crawl,
 #   3. self-checking coverage against markets we KNOW carry pools (our own),
 #   4. refusing to state an absence unless the crawl actually completed, and
-#   5. reporting the politics slate separately, including how many politics
-#      markets the crawl never reached.
+#   5. reporting the politics slate separately, split into markets with a
+#      pool we hold, with a pool we do not, and with no program at all.
 
 on:
   push:
@@ -186,21 +186,35 @@ jobs:
           except Exception as e:  # noqa: BLE001
               pol, pol_err = set(), f"{type(e).__name__}: {e}"
 
-          print("\n=== US POLITICS ===")
+          # The politics/elections tag covers foreign races too (Argentina,
+          # Israel, UK…). Not filtered to US here: the token heuristic in
+          # _is_us_politics misreads real US slugs — it rejects
+          # scc-senate-gop-* and apdc-alito-*, both US markets we hold — so
+          # applying it would hide markets that matter. Scope stays a
+          # judgement call on the slug list below.
+          print("\n=== POLITICS / ELECTIONS (tag includes foreign races) ===")
           if pol_err:
               print(f"  politics tag lookup failed ({pol_err}) — section unavailable.")
-              pol_pools, pol_unreached = {}, []
+              pol_pools, pol_absent = {}, []
           else:
               # econ-data markets carry the politics tag but are never traded,
               # by standing instruction — counted, never suggested.
               pol_pools = {s: t for s, t in progs.items()
                            if s in pol and not tr._is_econ(s)}
               econ_n = sum(1 for s in progs if s in pol and tr._is_econ(s))
-              pol_unreached = sorted(s for s in pol if s not in seen)
+              # A market with no program NEVER appears in /v1/incentives at
+              # all. So on a COMPLETE crawl these are markets with no pool —
+              # not markets we failed to reach. Only on a partial crawl is
+              # their status genuinely unknown, and the wording says so.
+              pol_absent = sorted(s for s in pol if s not in seen)
               print(f"  open markets tagged politics/elections : {len(pol)}")
               print(f"  with an ACTIVE pool in this crawl      : {len(pol_pools)}")
               print(f"  econ-data markets excluded by request  : {econ_n}")
-              print(f"  NEVER REACHED by this crawl            : {len(pol_unreached)}")
+              if trustworthy:
+                  print(f"  no incentive program at all (no pool)  : {len(pol_absent)}")
+              else:
+                  print(f"  absent from this PARTIAL crawl (pool   : {len(pol_absent)}")
+                  print( "    status unknown — rerun to completion)")
               held_pol = sum(1 for s in pol_pools if s in held)
               print(f"  politics markets with a pool we are in : {held_pol}")
               print(f"  politics markets with a pool, unentered: {len(pol_pools) - held_pol}")
@@ -273,7 +287,7 @@ jobs:
                      "elapsed_s": int(time.time() - t0),
                      "programs": slim,
                      "politics_with_pool": sorted(pol_pools),
-                     "politics_unreached": pol_unreached,
+                     "politics_no_program": pol_absent,
                      "held": sorted(held)},
                     open("data/new_pools.json", "w"), indent=1)
           with open("data/new_pools.txt", "w") as f:
