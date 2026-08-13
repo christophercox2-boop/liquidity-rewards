@@ -1,20 +1,36 @@
-crawl stopped: HTTP 429
-crawled 30 pages, 2792 markets with an ACTIVE program, complete=False
+crawled 120 pages, 6874 markets with an ACTIVE program, complete=False
 
 family      markets   held    NEW  pool/target/df
-asc            1292      0   1292  [800]/[15000]/[0.3]
-tec             496      0    496  [25, 300]/[5000, 15000]/[0.3, 0.5]
+tec            1574      0   1574  [25, 100, 300, 5000, 10000]/[5000, 7500, 10000, 15000]/[0.3, 0.35, 0.4, 0.5]
+asc            1504      0   1504  [800]/[15000]/[0.3]
+tsc            1504      0   1504  [900]/[15000]/[0.3]
+atc             464      0    464  [200, 750]/[5000]/[0.3]
 ftsc            453      0    453  [100]/[7500]/[0.4]
+astatc          450      0    450  [500]/[5000]/[0.35]
 aachc           376      0    376  [25]/[5000]/[0.5]
+aec             193      0    193  [100, 150, 200, 500]/[5000, 7500, 15000, 20000]/[0.3, 0.4, 0.5]
+aqc             132      0    132  [25, 300]/[5000, 15000]/[0.3, 0.5]
 fptc            111      0    111  [100]/[7500]/[0.4]
-aec              64      0     64  [500]/[20000]/[0.3]
+rdc              40      0     40  [30, 150]/[5000]/[0.15]
+cpic             12      0     12  [150]/[5000]/[0.15]
+dccc             12      2     10  [50]/[10000]/[0.25]
+vmc              10      0     10  [300]/[10000]/[0.2]
+urc               9      0      9  [150]/[5000]/[0.15]
+dipcc             6      0      6  [75]/[2000]/[0.25]
+gdpc              6      0      6  [150]/[5000]/[0.15]
+nfpc              6      0      6  [150]/[5000]/[0.15]
+enwc              3      0      3  [300]/[10000]/[0.2]
+stsc              3      0      3  [75]/[2000]/[0.25]
+lawec             2      0      2  [1000]/[5000]/[0.3]
+cbpac             2      0      2  [150]/[5000]/[0.15]
+pandc             2      1      1  [50]/[10000]/[0.25]
 
 === ushrewc (House districts) ===
   NO ushrewc market carries an active reward program.
   The ones we hold are therefore earning nothing, and the newly
   listed districts are not worth entering for rewards yet.
 
-markets WITH a pool that we hold no order in: 2792
+markets WITH a pool that we hold no order in: 6871
    aachc-cfb-txs-2026-01-25-w-texas               pool     25 target    5000 df 0.5
    aachc-cfb-wins-2026-11-28-ala-10pt5wins        pool     25 target    5000 df 0.5
    aachc-cfb-wins-2026-11-28-ala-6pt5wins         pool     25 target    5000 df 0.5
