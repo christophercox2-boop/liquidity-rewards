@@ -15,7 +15,17 @@ name: Probe new pools
 # groups the active programs by family, and cross-references our open orders
 # so entered and unentered markets are separated.
 #
-# Nudge 2026-08-13: rerun requested by owner (fresh survey of new markets).
+# 2026-08-13: the old 120-page cap truncated the crawl silently. That run
+# reached 3 of 72 held markets and NO ussewc/usgubewc/scc/apdc — the families
+# paying most of our rewards — yet it still printed "NO ushrewc market carries
+# an active reward program". That conclusion was unprovable: a market missing
+# from a partial crawl may simply never have been reached. Fixed here by
+#   1. paging until the API says there is no next page (no arbitrary cap),
+#   2. backing off and retrying on 429/5xx instead of quitting the crawl,
+#   3. self-checking coverage against markets we KNOW carry pools (our own),
+#   4. refusing to state an absence unless the crawl actually completed, and
+#   5. reporting the politics slate separately, including how many politics
+#      markets the crawl never reached.
 
 on:
   push:
@@ -34,6 +44,7 @@ concurrency:
 jobs:
   probe:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -47,7 +58,7 @@ jobs:
         run: |
           pip install -q -r requirements.txt
           python3 - <<'EOF'
-          import collections, io, json, os, re, requests
+          import collections, io, json, os, re, time, requests
           import track_rewards as tr
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
@@ -55,32 +66,75 @@ jobs:
           def print(*a, **k):
               _p(*a, **k); _p(*a, **{**k, "file": BUF})
 
-          # every active program, whether or not we hold the market
-          progs = {}
-          params = {"pageSize": 100}
-          pages = 0
+          # No page cap by default — the list ends when the API stops handing
+          # out a nextPageToken. MAX_PAGES is a runaway backstop, not a limit
+          # we expect to hit; hitting it is reported as an incomplete crawl.
+          MAX_PAGES = int(os.environ.get("MAX_PAGES", "5000"))
+          BUDGET = float(os.environ.get("CRAWL_BUDGET", "1500"))  # 25 min
+          t0 = time.time()
+          deadline = t0 + BUDGET
+          retries = 0
+
+          def get_page(params):
+              """One page. Retries 429/5xx with exponential backoff rather
+              than abandoning the crawl — rate limiting is the single most
+              common reason this used to stop early."""
+              global retries
+              delay = 2.0
+              for attempt in range(7):
+                  try:
+                      r = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                       params=params, timeout=30)
+                  except Exception as e:  # noqa: BLE001 — network flake
+                      err = f"{type(e).__name__}: {e}"
+                  else:
+                      if r.status_code < 400:
+                          return r.json(), None
+                      err = f"HTTP {r.status_code}"
+                      if r.status_code not in (429, 500, 502, 503, 504):
+                          return None, err        # not worth retrying
+                  if attempt == 6 or time.time() > deadline:
+                      return None, f"{err} after {attempt + 1} attempts"
+                  retries += 1
+                  time.sleep(delay)
+                  delay = min(delay * 2, 60)
+              return None, "unreachable"
+
+          progs, seen = {}, set()
+          records = pages = 0
           complete = False
-          for _ in range(120):
-              r = requests.get(tr.HOSTS[0] + "/v1/incentives", params=params, timeout=30)
-              if r.status_code >= 400:
-                  print(f"crawl stopped: HTTP {r.status_code}")
+          stop_reason = f"hit MAX_PAGES={MAX_PAGES}"
+          params = {"pageSize": 100}
+          while pages < MAX_PAGES:
+              data, err = get_page(params)
+              if err:
+                  stop_reason = err
                   break
-              data = r.json(); pages += 1
+              pages += 1
               for p in data.get("programs") or []:
+                  records += 1
                   slug = p.get("marketSlug") or ""
+                  seen.add(slug)
                   for tp in p.get("timePeriods") or []:
                       if str(tp.get("status") or "").lower() in ("active", "live", "status_live"):
                           progs[slug] = tp
               token = data.get("nextPageToken")
               if not token:
                   complete = True
+                  stop_reason = "reached the end of the list"
+                  break
+              if time.time() > deadline:
+                  stop_reason = f"{int(BUDGET)}s time budget exhausted"
                   break
               params = {"pageSize": 100, "pageToken": token}
-          print(f"crawled {pages} pages, {len(progs)} markets with an ACTIVE program, "
-                f"complete={complete}")
+
+          print(f"crawled {pages} pages, {records} program records, "
+                f"{len(seen)} distinct markets, {len(progs)} with an ACTIVE program")
+          print(f"complete={complete} — {stop_reason}")
+          print(f"elapsed {int(time.time() - t0)}s, {retries} backoff retries")
 
           # what we already hold
-          held = set()
+          held, held_err = set(), ""
           try:
               r = requests.get(tr.TRADE_API + "/v1/orders/open",
                                headers=tr.auth_headers(kid, sec, "GET", "/v1/orders/open"),
@@ -90,48 +144,136 @@ jobs:
                       if str(o.get("state")) == "ORDER_STATE_NEW":   # ignore REPLACED ghosts
                           held.add(o.get("marketSlug") or "")
               else:
-                  print(f"(open orders HTTP {r.status_code} — 'held' column unavailable)")
-          except Exception as e:
-              print(f"(open orders failed: {type(e).__name__} — 'held' column unavailable)")
+                  held_err = f"HTTP {r.status_code}"
+          except Exception as e:  # noqa: BLE001
+              held_err = f"{type(e).__name__}: {e}"
+
+          # ---- coverage self-check -------------------------------------
+          # Every market we hold an order in demonstrably carries a pool (we
+          # are paid on them). If the crawl missed them, it is missing other
+          # markets too, and every "no pool here" line below is suspect.
+          print("\n=== COVERAGE CHECK (is this crawl worth believing?) ===")
+          trustworthy = complete
+          if held_err:
+              print(f"  open orders unavailable ({held_err}) — cannot self-check.")
+              trustworthy = False
+          else:
+              hit = sum(1 for h in held if h in seen)
+              print(f"  markets we hold orders in : {len(held)}")
+              print(f"  of those seen by the crawl: {hit}")
+              missed = sorted(h for h in held if h not in seen)
+              if missed:
+                  trustworthy = False
+                  print(f"  NOT seen: {len(missed)} — these DO carry pools, we earn on them")
+                  for m in missed[:15]:
+                      print(f"     {m}")
+                  if len(missed) > 15:
+                      print(f"     ... and {len(missed) - 15} more")
+          if trustworthy:
+              print("  OK — crawl completed and covered every market we hold.")
+              print("  A market absent from the lists below really has no active pool.")
+          else:
+              print("  PARTIAL — a market missing below may simply not have been")
+              print("  reached. Absence here is NOT evidence of a missing pool.")
 
           fam = lambda s: (re.match(r"^([a-z]+)-", s) or [None, "?"])[1]
-          byfam = collections.defaultdict(list)
-          for s, tp in progs.items():
-              byfam[fam(s)].append((s, tp))
 
-          print(f"\n{'family':10s} {'markets':>8s} {'held':>6s} {'NEW':>6s}  pool/target/df")
-          for f, lst in sorted(byfam.items(), key=lambda kv: -len(kv[1])):
-              pools = sorted({t['rewardPool'] for _, t in lst})
-              tgts = sorted({t['targetSize'] for _, t in lst})
-              dfs = sorted({t['discountFactor'] for _, t in lst})
-              h = sum(1 for s, _ in lst if s in held)
-              print(f"{f:10s} {len(lst):8d} {h:6d} {len(lst)-h:6d}  {pools}/{tgts}/{dfs}")
+          # ---- the politics slate, which is what we actually trade --------
+          try:
+              pol_slugs, _sizes = tr.fetch_politics_events()
+              pol = set(pol_slugs)
+              pol_err = ""
+          except Exception as e:  # noqa: BLE001
+              pol, pol_err = set(), f"{type(e).__name__}: {e}"
+
+          print("\n=== US POLITICS ===")
+          if pol_err:
+              print(f"  politics tag lookup failed ({pol_err}) — section unavailable.")
+              pol_pools, pol_unreached = {}, []
+          else:
+              # econ-data markets carry the politics tag but are never traded,
+              # by standing instruction — counted, never suggested.
+              pol_pools = {s: t for s, t in progs.items()
+                           if s in pol and not tr._is_econ(s)}
+              econ_n = sum(1 for s in progs if s in pol and tr._is_econ(s))
+              pol_unreached = sorted(s for s in pol if s not in seen)
+              print(f"  open markets tagged politics/elections : {len(pol)}")
+              print(f"  with an ACTIVE pool in this crawl      : {len(pol_pools)}")
+              print(f"  econ-data markets excluded by request  : {econ_n}")
+              print(f"  NEVER REACHED by this crawl            : {len(pol_unreached)}")
+              held_pol = sum(1 for s in pol_pools if s in held)
+              print(f"  politics markets with a pool we are in : {held_pol}")
+              print(f"  politics markets with a pool, unentered: {len(pol_pools) - held_pol}")
+
+              byfam = collections.defaultdict(list)
+              for s, t in pol_pools.items():
+                  byfam[fam(s)].append((s, t))
+              if byfam:
+                  print(f"\n  {'family':12s} {'markets':>8s} {'held':>6s} {'NEW':>6s}  pool/target/df")
+                  for f, lst in sorted(byfam.items(), key=lambda kv: -len(kv[1])):
+                      pools = sorted({t['rewardPool'] for _, t in lst})
+                      tgts = sorted({t['targetSize'] for _, t in lst})
+                      dfs = sorted({t['discountFactor'] for _, t in lst})
+                      h = sum(1 for s, _ in lst if s in held)
+                      print(f"  {f:12s} {len(lst):8d} {h:6d} {len(lst) - h:6d}  "
+                            f"{pools}/{tgts}/{dfs}")
+
+              unentered = sorted((s for s in pol_pools if s not in held),
+                                 key=lambda s: (-float(pol_pools[s]['rewardPool']), s))
+              print(f"\n  politics markets with a pool we hold NO order in: {len(unentered)}"
+                    "  (richest pools first)")
+              SHOW = 120
+              for s in unentered[:SHOW]:
+                  t = pol_pools[s]
+                  print(f"   {s:46s} pool {t['rewardPool']:>6} target {t['targetSize']:>7} "
+                        f"df {t['discountFactor']}")
+              if len(unentered) > SHOW:
+                  print(f"   ... and {len(unentered) - SHOW} more (full list in "
+                        "data/new_pools.json)")
 
           # the House family specifically, since that is the open question
           print("\n=== ushrewc (House districts) ===")
-          u = sorted(byfam.get("ushrewc", []))
-          if not u:
-              print("  NO ushrewc market carries an active reward program.")
-              print("  The ones we hold are therefore earning nothing, and the newly")
-              print("  listed districts are not worth entering for rewards yet.")
-          else:
+          u = sorted((s, t) for s, t in progs.items() if fam(s) == "ushrewc")
+          if u:
               print(f"  {len(u)} House markets DO have programs "
                     f"({sum(1 for s, _ in u if s in held)} held, "
                     f"{sum(1 for s, _ in u if s not in held)} unentered):")
               for s, t in u[:60]:
                   print(f"   {'HELD ' if s in held else '     '} {s:44s} "
-                        f"pool {t['rewardPool']:>6} target {t['targetSize']:>7} df {t['discountFactor']}")
+                        f"pool {t['rewardPool']:>6} target {t['targetSize']:>7} "
+                        f"df {t['discountFactor']}")
+          elif trustworthy:
+              print("  NO ushrewc market carries an active reward program.")
+              print("  The ones we hold are therefore earning nothing, and the newly")
+              print("  listed districts are not worth entering for rewards yet.")
+          else:
+              print("  No ushrewc program appeared — but this crawl is PARTIAL, so")
+              print("  that is not evidence they lack pools. Believe it only when the")
+              print("  coverage check above says OK.")
 
-          # anything with a pool we are not in at all
-          unentered = sorted(s for s in progs if s not in held)
-          print(f"\nmarkets WITH a pool that we hold no order in: {len(unentered)}")
-          for s in unentered[:40]:
-              t = progs[s]
-              print(f"   {s:46s} pool {t['rewardPool']:>6} target {t['targetSize']:>7} "
-                    f"df {t['discountFactor']}")
+          # ---- everything else, for completeness -------------------------
+          allfam = collections.defaultdict(list)
+          for s, t in progs.items():
+              allfam[fam(s)].append((s, t))
+          print(f"\n=== ALL families with active pools ({len(allfam)}) ===")
+          print(f"{'family':12s} {'markets':>8s} {'held':>6s} {'NEW':>6s}  pool/target/df")
+          for f, lst in sorted(allfam.items(), key=lambda kv: -len(kv[1])):
+              pools = sorted({t['rewardPool'] for _, t in lst})
+              tgts = sorted({t['targetSize'] for _, t in lst})
+              dfs = sorted({t['discountFactor'] for _, t in lst})
+              h = sum(1 for s, _ in lst if s in held)
+              print(f"{f:12s} {len(lst):8d} {h:6d} {len(lst) - h:6d}  {pools}/{tgts}/{dfs}")
 
           os.makedirs("data", exist_ok=True)
-          json.dump({"complete": complete, "programs": {s: t for s, t in progs.items()},
+          slim = {s: {"pool": t.get("rewardPool"), "target": t.get("targetSize"),
+                      "df": t.get("discountFactor")} for s, t in progs.items()}
+          json.dump({"complete": complete, "trustworthy": trustworthy,
+                     "stop_reason": stop_reason, "pages": pages,
+                     "records": records, "retries": retries,
+                     "elapsed_s": int(time.time() - t0),
+                     "programs": slim,
+                     "politics_with_pool": sorted(pol_pools),
+                     "politics_unreached": pol_unreached,
                      "held": sorted(held)},
                     open("data/new_pools.json", "w"), indent=1)
           with open("data/new_pools.txt", "w") as f:
