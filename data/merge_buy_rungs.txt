@@ -1,0 +1,23 @@
+412 live orders; BUY rungs with stacks: 17; SELL rung stacks left alone: 21 (short size caps at ~273/order — the stack IS the size)
+
+  usgubewc-usgub-sd-2026-11-03-rep             1c  10 copies (1,735 sh) -> placed 1 (1,735 rested), cancelled 10 old
+  ussewc-usse-nm-2026-11-03-rep                1c  6 copies (4,971 sh) -> placed 1 (4,971 rested), cancelled 6 old
+  ussewc-usse-wv-2026-11-03-dem                1c  6 copies (1,400 sh) -> placed 1 (1,400 rested), cancelled 6 old
+  ussewc-usse-ky-2026-11-03-dem                1c  5 copies (1,375 sh) -> placed 1 (1,375 rested), cancelled 5 old
+  ussewc-usse-ri-2026-11-03-rep                1c  5 copies (1,400 sh) -> placed 1 (1,400 rested), cancelled 5 old
+  usgubewc-usgub-wy-2026-11-03-rep             1c  4 copies (1,750 sh) -> placed 1 (1,750 rested), cancelled 4 old
+  usgubewc-usgub-tn-2026-11-03-rep             1c  4 copies (1,710 sh) -> placed 1 (1,710 rested), cancelled 4 old
+  usgubewc-usgub-ri-2026-11-03-dem             1c  3 copies (760 sh) -> placed 1 (760 rested), cancelled 3 old
+  usgubewc-usgub-ar-2026-11-03-dem             1c  3 copies (1,307 sh) -> placed 1 (1,307 rested), cancelled 3 old
+  ussewc-usse-ma-2026-11-03-rep                1c  3 copies (1,237 sh) -> placed 1 (1,237 rested), cancelled 3 old
+  usgubewc-usgub-ma-2026-11-03-dem             1c  3 copies (1,710 sh) -> placed 1 (1,710 rested), cancelled 3 old
+  usgubewc-usgub-md-2026-11-03-rep             1c  3 copies (1,480 sh) -> placed 1 (1,480 rested), cancelled 3 old
+  usgubewc-usgub-pa-2026-11-03-rep             1c  2 copies (1,600 sh) -> placed 1 (1,600 rested), cancelled 2 old
+  ussewc-usse-or-2026-11-03-rep                1c  2 copies (1,300 sh) -> placed 1 (1,300 rested), cancelled 2 old
+  usgubewc-usgub-ri-2026-11-03-rep             1c  2 copies (1,150 sh) -> placed 1 (1,150 rested), cancelled 2 old
+  ussewc-usse-sc-2026-11-03-dem                1c  2 copies (800 sh) -> placed 1 (800 rested), cancelled 2 old
+  ussewc-usse-il-2026-11-03-rep                1c  2 copies (1,400 sh) -> placed 1 (1,400 rested), cancelled 2 old
+
+orders: 412 -> 364
+no rung lost size — invariant held everywhere
+buying power now: $216.47
