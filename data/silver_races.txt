@@ -1,65 +1,68 @@
 Silver Bulletin per-race forecasts: 35 Senate, 36 Governor
 
-467 live orders
-365 orders are on Senate or Governor races; the model covers 360 of them (150 Senate, 210 Governor)
-49 markets left unmodelled (House districts, seat-count ladders, and the rest)
+410 live orders
+311 orders are on Senate or Governor races; the model covers 308 of them (122 Senate, 186 Governor)
+45 markets left unmodelled (House districts, seat-count ladders, and the rest)
 
 No resting race order is more than 10% the wrong side of the model.
 
-152 of 360 modelled orders are at or better than model fair value -- a fill there is not a loss on the model's numbers.
+132 of 308 modelled orders are at or better than model fair value -- a fill there is not a loss on the model's numbers.
 
 per-race view (model probability vs where our orders rest):
 
   SENATE
   race    model D  model R  orders  worst/sh
-  AL        0.002    0.998       4    -0.008
-  AR        0.007    0.993       4    -0.003
-  CO        0.995    0.005       4    -0.005
-  DE        0.999    0.001       4    -0.029
-  ID        0.001    0.999       4    -0.079
-  IL        0.996    0.004      20    -0.006
-  KS        0.171    0.829       3     0.059
-  KY        0.004    0.996       7    -0.016
-  LA        0.045    0.955       2     0.015
+  AL        0.002    0.998       2     0.068
+  AR        0.007    0.993       3    -0.003
+  CO        0.996    0.004       4    -0.006
+  DE        0.999    0.001       5    -0.039
+  FL        0.217    0.783       2    -0.087
+  IL        0.995    0.005      19    -0.005
+  KS        0.185    0.815       4    -0.055
+  KY        0.004    0.996       4    -0.016
+  LA        0.046    0.954       2     0.004
   MA        1.000    0.000      22    -0.010
-  MS        0.034    0.966       1     0.846
+  MS        0.034    0.966       1     0.066
   MT        0.028    0.972       4    -0.022
-  NJ        0.995    0.005       9    -0.005
-  NM        0.994    0.006       9    -0.004
-  OK        0.001    1.000       9    -0.030
+  NJ        0.996    0.004       3    -0.006
+  NM        0.994    0.006       4    -0.004
+  OK        0.001    0.999       2    -0.009
   OR        0.999    0.001       4    -0.039
-  RI        0.999    0.001       6    -0.039
-  SC        0.120    0.880       3    -0.020
+  RI        0.999    0.001       5    -0.039
+  SC        0.120    0.880       5    -0.020
   SD        0.002    0.998       1     0.068
   TN        0.002    0.998       3    -0.038
-  VA        0.996    0.004       5    -0.016
-  WV        0.000    1.000      19    -0.010
+  VA        0.995    0.005       3    -0.005
+  WV        0.000    1.000      17    -0.010
   WY        0.000    1.000       3    -0.010
 
   GOVERNOR
   race    model D  model R  orders  worst/sh
-  AR        0.002    0.998       9    -0.038
+  AL        0.017    0.983       2    -0.083
+  AR        0.002    0.998       8    -0.038
   CO        0.998    0.002       6    -0.028
-  CT        0.997    0.003       9    -0.027
+  CT        0.997    0.003      10    -0.027
+  FL        0.154    0.846       1     0.046
   HI        1.000    0.000      11    -0.040
-  ID        0.002    0.998      11    -0.028
+  ID        0.001    0.999      11    -0.029
   IL        0.999    0.001       9    -0.029
-  MA        1.000    0.000      28    -0.020
-  MD        1.000    0.000       5    -0.010
-  ME        0.990    0.010       2     0.040
-  MN        0.998    0.002       3    -0.008
-  NE        0.048    0.952       8     0.032
-  NH        0.152    0.848      15    -0.028
-  NM        0.984    0.016       5     0.006
-  NY        0.992    0.008       7    -0.032
-  OK        0.006    0.994       4    -0.004
-  PA        0.998    0.002       3    -0.048
-  RI        0.992    0.008      13    -0.002
-  SC        0.032    0.968       2     0.048
-  SD        0.006    0.994      30    -0.004
-  TN        0.003    0.997       1     0.057
-  TX        0.106    0.894       3     0.024
-  VT        0.103    0.897       4     0.017
-  WY        0.000    1.000      22    -0.010
+  MA        1.000    0.000      27    -0.010
+  MD        1.000    0.000       3    -0.010
+  ME        0.989    0.011       2     0.039
+  MN        0.990    0.010       2     0.000
+  NE        0.046    0.954       9    -0.074
+  NH        0.153    0.847       1     0.036
+  NM        0.983    0.017       5     0.007
+  NY        0.984    0.016       1     0.094
+  OK        0.006    0.994       3    -0.004
+  OR        0.926    0.074       2     0.036
+  PA        0.998    0.002      13    -0.048
+  RI        0.992    0.008       8    -0.002
+  SC        0.031    0.969       2     0.039
+  SD        0.006    0.995      21    -0.005
+  TN        0.003    0.997       5    -0.007
+  TX        0.103    0.897       3    -0.047
+  VT        0.101    0.899       3    -0.011
+  WY        0.000    1.000      18    -0.010
 
 Nothing was placed, cancelled or repriced. This is a read-only screen.
