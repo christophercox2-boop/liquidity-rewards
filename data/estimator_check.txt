@@ -1,10 +1,10 @@
-state.json: 18 history rows, 2 carrying earned_hf
+state.json: 19 history rows, 3 carrying earned_hf
 
 day           snaps    sparse   ratio        hf   ratio    ACTUAL
-2026-08-10        5    236.97   0.42x     51.73   0.09x    557.62
+2026-08-11       40     64.05   0.16x    325.87   0.80x    406.66
 
-sparse: 1 days | median 0.42x | mean abs error 58% | within +/-25%: 0/1
+sparse: 1 days | median 0.16x | mean abs error 84% | within +/-25%: 0/1
 
-hf    : 1 days | median 0.09x | mean abs error 91% | within +/-25%: 0/1
+hf    : 1 days | median 0.80x | mean abs error 20% | within +/-25%: 1/1
 
-VERDICT: sparse still wins — do not switch
+VERDICT: hf wins
