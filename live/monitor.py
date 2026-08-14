@@ -2603,7 +2603,13 @@ DEFEND_SHARE_FLOOR = 0.25        # act only under 25% of the side's rewards
 # 0.33: those are longshots, so an ask well above fair value is worth holding,
 # and a third of the side's score is the stake we want in each.
 DEFEND_COOLDOWN_SECONDS = 90.0   # per market+side between improvements
-DEFEND_MAX_PER_POLL = 6          # request-budget bound on a busy poll
+DEFEND_MAX_PER_POLL = 10         # request-budget bound on a busy poll
+# Where the last pass stopped. The budget above is spent in dict order, and
+# the pass RETURNS once it is used up — so with 175 armed markets the ones
+# near the front consumed every move and the 2028 slate, armed last, was
+# never reached at all. Resuming from where the previous pass left off gives
+# every armed market its turn.
+DEFEND_CURSOR = 0
 DEFEND_DEEP_BUY = 0.011          # floor-bid qualifiers: never repriced
 DEFEND_DEEP_SELL = 0.989         # ceiling-ask qualifiers: never repriced
 DEFEND_MOVED: dict[str, float] = {}
@@ -2937,12 +2943,21 @@ def auto_defend() -> None:
         return
     if os.environ.get("DEFEND_PAUSE", "") == "1":
         return
+    global DEFEND_CURSOR
     cfg = dict(MONITOR.state.get("defend") or {})
     if not cfg or not KEY_ID:
         return
     now = time.time()
     moves = 0
-    for m, sides in cfg.items():
+    # start where the last pass stopped and wrap, so the move budget rotates
+    # across every armed market instead of always landing on the same few
+    order = list(cfg.items())
+    start = DEFEND_CURSOR % len(order)
+    order = order[start:] + order[:start]
+    scanned = 0
+    for m, sides in order:
+        scanned += 1
+        DEFEND_CURSOR = (start + scanned) % len(cfg)
         ent = tr._BOOK_CACHE.get(m)
         if not ent or now - ent[0] > 300:
             continue  # stale book — never act on old prices
