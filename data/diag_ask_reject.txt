@@ -1,0 +1,32 @@
+buying power $243.80
+
+=== enwc-uspres-nom-rep-2028-thomas ===
+   ask touch 21c, best bid 1c, ask side 10,244, our net position 0
+   at the touch               ask 5 @ 21c -> HTTP 200
+      body: {"id":"BW93XSBB2DK0","executions":[]}
+      rested after 4s: 5 of 5  <-- ACCEPTED AND RESTED
+   2 ticks above touch        ask 5 @ 23c -> HTTP 200
+      body: {"id":"BW93T23Y0DJT","executions":[]}
+      rested after 4s: 5 of 5  <-- ACCEPTED AND RESTED
+   at the 99c ceiling         ask 5 @ 99c -> HTTP 200
+      body: {"id":"BW93TTRRJDK5","executions":[]}
+      rested after 4s: 5 of 5  <-- ACCEPTED AND RESTED
+
+=== enwc-uspres-nom-rep-2028-rondes ===
+   ask touch 24c, best bid 1c, ask side 12,607, our net position 0
+   at the touch               ask 5 @ 24c -> HTTP 200
+      body: {"id":"BW93QAYKJDJP","executions":[]}
+      rested after 4s: 5 of 5  <-- ACCEPTED AND RESTED
+   2 ticks above touch        ask 5 @ 26c -> HTTP 200
+      body: {"id":"BW93TTQN4DK7","executions":[]}
+      rested after 4s: 5 of 5  <-- ACCEPTED AND RESTED
+   at the 99c ceiling         ask 5 @ 99c -> HTTP 200
+      body: {"id":"BW93RD2AADK1","executions":[]}
+      rested after 4s: 5 of 5  <-- ACCEPTED AND RESTED
+
+cleanup: cancel BW93XSBB2DK0 in enwc-uspres-nom-rep-2028-thomas -> HTTP 200
+cleanup: cancel BW93T23Y0DJT in enwc-uspres-nom-rep-2028-thomas -> HTTP 200
+cleanup: cancel BW93TTRRJDK5 in enwc-uspres-nom-rep-2028-thomas -> HTTP 200
+cleanup: cancel BW93QAYKJDJP in enwc-uspres-nom-rep-2028-rondes -> HTTP 200
+cleanup: cancel BW93TTQN4DK7 in enwc-uspres-nom-rep-2028-rondes -> HTTP 200
+cleanup: cancel BW93RD2AADK1 in enwc-uspres-nom-rep-2028-rondes -> HTTP 200
