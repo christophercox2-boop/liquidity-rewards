@@ -125,10 +125,10 @@ jobs:
               r = requests.get(tr.TRADE_API + path,
                                headers=tr.auth_headers(kid, sec, "GET", path), timeout=20)
               if r.status_code < 400:
-                  for p in r.json().get("positions") or []:
-                      s = p.get("marketSlug") or ""
-                      if s:
-                          positions[s] = tr._num(p.get("netPosition"))
+                  # the endpoint returns {"positions": {slug: {...}}} — a dict
+                  # keyed by slug, not a list of rows
+                  for s, p in (r.json().get("positions") or {}).items():
+                      positions[s] = tr._num((p or {}).get("netPosition"))
           except Exception as e:
               print(f"(positions unavailable: {type(e).__name__} — ask intent falls back to short)")
 
