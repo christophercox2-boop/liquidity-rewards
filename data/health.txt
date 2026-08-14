@@ -1,36 +1,35 @@
 GET /v1/account/balances -> 200
-  {'currency': 'USD', 'buyingPower': 202.3823}
-records returned by /v1/orders/open: 4639
-  ORDER_STATE_NEW                     4618  LIVE
-  ORDER_STATE_REPLACED                  12  ghost
+  {'currency': 'USD', 'buyingPower': 243.8043}
+records returned by /v1/orders/open: 4620
+  ORDER_STATE_NEW                     4590  LIVE
+  ORDER_STATE_REPLACED                  21  ghost
   ORDER_STATE_PARTIALLY_FILLED           9  LIVE
-ghosts: 12   live: 4627   (the app should show 4627)
-ghost records carry 24,000 shares of phantom size;
+ghosts: 21   live: 4599   (the app should show 4599)
+ghost records carry 42,000 shares of phantom size;
 the tracker, monitor, map and every workflow filter these out,
 so they affect nothing we compute -- they are exchange records only.
 
-4627 live orders
-capital committed in resting orders: $17,989.36
+4599 live orders
+capital committed in resting orders: $18,017.65
 
-price rungs holding more than one order: 82 (4280 orders beyond the first)
-  ewc-usp-2028-11-07-rahema                    SELL   99c  93 orders  sizes [149, 149, 149, 27, 149, 149]
-  pandc-anydis-2027-12-31                      SELL   99c  88 orders  sizes [90, 146, 146, 159, 90, 159]
-  ewc-usp-2028-11-07-rondes                    SELL   99c  81 orders  sizes [149, 149, 149, 149, 27, 149]
-  ewc-usp-2028-11-07-thomas                    SELL   99c  77 orders  sizes [149, 149, 149, 165, 149, 149]
-  enwc-uspres-nom-rep-2028-rondes              SELL   99c  77 orders  sizes [170, 170, 170, 170, 165, 170]
-  ewc-usp-2028-11-07-micoba                    SELL   99c  76 orders  sizes [171, 165, 171, 171, 149, 149]
-  enwc-uspres-nom-rep-2028-tuccar              SELL   99c  73 orders  sizes [170, 170, 165, 170, 170, 170]
-  ewc-usp-2028-11-07-gavnew                    SELL   99c  73 orders  sizes [170, 170, 170, 170, 165, 170]
-  enwc-uspres-nom-rep-2028-marrub              SELL   99c  73 orders  sizes [170, 170, 170, 170, 170, 170]
-  enwc-uspres-nom-rep-2028-gleyou              SELL   99c  73 orders  sizes [165, 170, 170, 170, 170, 170]
-  enwc-uspres-nom-rep-2028-margre              SELL   99c  73 orders  sizes [170, 170, 170, 170, 170, 170]
-  ewc-usp-2028-11-07-andbes                    SELL   99c  73 orders  sizes [170, 170, 170, 170, 170, 170]
-  enwc-uspres-nom-dem-2028-wesmoo              SELL   99c  73 orders  sizes [170, 170, 170, 170, 170, 170]
-  enwc-uspres-nom-rep-2028-dontru              SELL   99c  73 orders  sizes [165, 165, 165, 165, 170, 170]
-  enwc-uspres-nom-rep-2028-tulgab              SELL   99c  73 orders  sizes [170, 170, 170, 25, 25, 170]
+price rungs holding more than one order: 80 (4255 orders beyond the first)
+  ewc-usp-2028-11-07-rahema                    SELL   99c  93 orders  sizes [149, 149, 28, 28, 149, 149]
+  ewc-usp-2028-11-07-rondes                    SELL   99c  81 orders  sizes [149, 149, 149, 149, 149, 149]
+  pandc-anydis-2027-12-31                      SELL   99c  80 orders  sizes [159, 159, 159, 159, 159, 159]
+  ewc-usp-2028-11-07-thomas                    SELL   99c  77 orders  sizes [149, 149, 149, 47, 165, 149]
+  enwc-uspres-nom-rep-2028-rondes              SELL   99c  77 orders  sizes [170, 170, 170, 170, 170, 170]
+  ewc-usp-2028-11-07-micoba                    SELL   99c  76 orders  sizes [171, 171, 171, 149, 149, 171]
+  ewc-usp-2028-11-07-elomus                    SELL   99c  73 orders  sizes [170, 170, 170, 170, 170, 165]
+  enwc-uspres-nom-rep-2028-dontru              SELL   99c  73 orders  sizes [165, 170, 170, 170, 170, 170]
+  enwc-uspres-nom-rep-2028-margre              SELL   99c  73 orders  sizes [165, 170, 170, 170, 165, 170]
+  ewc-usp-2028-11-07-andbes                    SELL   99c  73 orders  sizes [170, 170, 170, 165, 170, 170]
+  enwc-uspres-nom-rep-2028-tuccar              SELL   99c  73 orders  sizes [170, 170, 170, 170, 170, 170]
+  ewc-usp-2028-11-07-dontrujr                  SELL   99c  73 orders  sizes [170, 55, 165, 170, 170, 170]
+  ewc-usp-2028-11-07-gavnew                    SELL   99c  73 orders  sizes [170, 170, 170, 165, 165, 170]
+  enwc-uspres-nom-rep-2028-tulgab              SELL   99c  73 orders  sizes [170, 170, 170, 170, 25, 25]
+  enwc-uspres-nom-rep-2028-gleyou              SELL   99c  73 orders  sizes [170, 165, 170, 170, 170, 170]
 
-usgubewc-usgub-tn-2026-11-03-rep: 2 orders
+usgubewc-usgub-tn-2026-11-03-rep: 1 orders
   BUY    1.0c  leaves  1,710  state ORDER_STATE_NEW  id BV4XQN0J8DK0
-  SELL  99.0c  leaves    137  state ORDER_STATE_NEW  id BTXT6ZA8CDK7
-  book: best bid 88c  best ask 97c
-  a 96c bid would rest the 97c ask
+  book: best bid 51c  best ask 99c
+  a 96c bid would rest the 99c ask
