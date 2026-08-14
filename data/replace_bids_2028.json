@@ -1,0 +1,292 @@
+{
+ "dry_run": false,
+ "placed": 57,
+ "failed": 0,
+ "orders": [
+  {
+   "m": "enwc-uspres-nom-dem-2028-aleocc",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-andbes",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-dwajoh",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-gavnew",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jamtal",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jbpri",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonoss",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonste",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jossha",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-kamhar",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-markel",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-micoba",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-petbut",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rahema",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rokha",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-stasmi",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-wesmoo",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-dontrujr",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-elomus",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-gleyou",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-jdvan",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-margre",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-ranpau",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-rondes",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tedcru",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-thomas",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tuccar",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tulgab",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-vivram",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-aleocc",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-andbes",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontru",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontrujr",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dwajoh",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-elomus",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gavnew",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gleyou",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jamtal",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jbpri",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jdvan",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jonoss",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jossha",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-kamhar",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-marrub",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-micoba",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-petbut",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rahema",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rokha",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rondes",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-stasmi",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-thomas",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-tuccar",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-tulgab",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-vivram",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-wesmoo",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-party-2028-11-07-dem",
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-party-2028-11-07-rep",
+   "qty": 10000,
+   "ok": true
+  }
+ ]
+}

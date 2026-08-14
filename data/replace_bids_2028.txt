@@ -1,0 +1,65 @@
+buying power $259.29
+slate 60 markets — bid floor short on 57, 570,000 shares (~$5,700.00)
+
+  enwc-uspres-nom-dem-2028-aleocc: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-andbes: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-dwajoh: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-gavnew: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-jamtal: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-jbpri: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-jonoss: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-jonste: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-jossha: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-kamhar: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-markel: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-micoba: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-petbut: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-rahema: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-rokha: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-stasmi: 10,000 @ 1c -> ok
+  enwc-uspres-nom-dem-2028-wesmoo: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-dontrujr: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-elomus: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-gleyou: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-jdvan: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-margre: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-ranpau: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-rondes: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-tedcru: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-thomas: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-tuccar: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-tulgab: 10,000 @ 1c -> ok
+  enwc-uspres-nom-rep-2028-vivram: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-aleocc: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-andbes: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-dontru: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-dontrujr: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-dwajoh: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-elomus: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-gavnew: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-gleyou: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-jamtal: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-jbpri: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-jdvan: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-jonoss: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-jossha: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-kamhar: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-marrub: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-micoba: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-petbut: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-rahema: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-rokha: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-rondes: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-stasmi: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-thomas: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-tuccar: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-tulgab: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-vivram: 10,000 @ 1c -> ok
+  ewc-usp-2028-11-07-wesmoo: 10,000 @ 1c -> ok
+  ewc-usp-party-2028-11-07-dem: 10,000 @ 1c -> ok
+  ewc-usp-party-2028-11-07-rep: 10,000 @ 1c -> ok
+
+settling before verifying…
+placed 57, failed 0
+bid floors now holding our 10,000: 60 of 60
+buying power now $259.29
