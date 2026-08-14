@@ -87,7 +87,7 @@ HF_POINTS_KEPT = int(os.environ.get("HF_POINTS_KEPT", "600"))
 # Defined up here, not with the other DEFEND_* constants further down: the
 # defend-seed runs from Monitor.__init__, which executes long before that
 # block, so leaving it there raised NameError on boot.
-DEFEND_MAX_MARKETS = int(os.environ.get("DEFEND_MAX_MARKETS", "140"))
+DEFEND_MAX_MARKETS = int(os.environ.get("DEFEND_MAX_MARKETS", "260"))
 
 # Optional: phone notifications via ntfy (https://ntfy.sh). Install the ntfy
 # app, subscribe to a long random topic, set NTFY_TOPIC to the same string.
@@ -733,6 +733,14 @@ class Monitor:
                     continue
                 if 0.1 <= c <= 99.9:
                     clean[side] = {"cap": c}
+                    sh = ((sides or {}).get(side) or {}).get("share")
+                    if sh is not None:
+                        try:
+                            shv = float(sh)
+                        except (TypeError, ValueError):
+                            shv = None
+                        if shv is not None and 0.05 <= shv <= 0.95:
+                            clean[side]["share"] = shv
             if not clean:
                 continue
             wrote: dict = {}
@@ -2542,11 +2550,52 @@ def ws_stream_loop(key_id: str, secret_key: str) -> None:
 # fresh books only, reprice-only (never places orders or adds size), and
 # floor/ceiling qualifier blocks are never touched.
 DEFEND_SHARE_FLOOR = 0.25        # act only under 25% of the side's rewards
+# A market may ask for more than the default via its defend config
+# ({"SELL": {"cap": 25.0, "share": 0.33}}). The 2028 presidential slate runs at
+# 0.33: those are longshots, so an ask well above fair value is worth holding,
+# and a third of the side's score is the stake we want in each.
 DEFEND_COOLDOWN_SECONDS = 90.0   # per market+side between improvements
 DEFEND_MAX_PER_POLL = 6          # request-budget bound on a busy poll
 DEFEND_DEEP_BUY = 0.011          # floor-bid qualifiers: never repriced
 DEFEND_DEEP_SELL = 0.989         # ceiling-ask qualifiers: never repriced
 DEFEND_MOVED: dict[str, float] = {}
+
+
+def _defend_share_at(side: str, levels: list, best_mine: dict, price: float,
+                     df: float, target: float, tick: float) -> float:
+    """Our share of this side's score if our best order sat at `price`.
+
+    Rebuilds the level map with that one order moved, then applies the
+    official rule — walk out from the best price until Target Size has
+    accumulated, score each level as size x df^ticks — so the answer matches
+    what the exchange will actually pay rather than an approximation.
+    """
+    lv: dict[float, float] = {}
+    for px, q in levels or []:
+        lv[round(float(px), 4)] = lv.get(round(float(px), 4), 0.0) + float(q)
+    old = round(float(best_mine["price"]), 4)
+    sz = float(best_mine.get("size") or 0)
+    if sz <= 0:
+        return 0.0
+    lv[old] = lv.get(old, 0.0) - sz
+    if lv[old] <= 0.5:
+        lv.pop(old, None)
+    new = round(float(price), 4)
+    lv[new] = lv.get(new, 0.0) + sz
+    ordered = sorted(lv.items(), key=(lambda kv: -kv[0]) if side == "BUY" else (lambda kv: kv[0]))
+    if not ordered:
+        return 0.0
+    best = ordered[0][0]
+    win, cum = [], 0.0
+    for px, q in ordered:
+        win.append((px, q)); cum += q
+        if target and cum >= target:
+            break
+    den = sum(q * df ** round(abs(best - px) / tick) for px, q in win)
+    if den <= 0:
+        return 0.0
+    mine = sz * df ** round(abs(best - new) / tick) if any(abs(px - new) < 1e-9 for px, _ in win) else 0.0
+    return mine / den
 
 
 def _others_best(levels: list, mine_sz: dict) -> float | None:
@@ -2885,34 +2934,53 @@ def auto_defend() -> None:
             shares = [o.get("share") for o in all_side]
             share_known = any(s is not None for s in shares)
             my_share = sum(s or 0.0 for s in shares)
-            if side == "BUY":
-                in_front = best_mine["price"] > others + 1e-9
-                if share_known:
-                    # Healthy share → stay put, whether we're alone in front
-                    # or sharing the level with a reasonably sized order.
-                    if my_share >= DEFEND_SHARE_FLOOR:
-                        continue
-                    base = max(best_mine["price"], others)
-                elif in_front:
-                    continue  # share unknown: only retake when matched/beaten
-                else:
-                    base = others
-                target = round(base + tick, 4)
-                blocked = target > cap + 1e-9
-                squeezed = ba is not None and target > ba - 2 * tick + 1e-9
-            else:
-                in_front = best_mine["price"] < others - 1e-9
-                if share_known:
-                    if my_share >= DEFEND_SHARE_FLOOR:
-                        continue
-                    base = min(best_mine["price"], others)
-                elif in_front:
+            want = DEFEND_SHARE_FLOOR
+            try:
+                if scfg.get("share") is not None:
+                    want = float(scfg["share"])
+            except (TypeError, ValueError):
+                pass
+            in_front = (best_mine["price"] > others + 1e-9 if side == "BUY"
+                        else best_mine["price"] < others - 1e-9)
+            if share_known:
+                if my_share >= want:
                     continue
-                else:
-                    base = others
-                target = round(base - tick, 4)
-                blocked = target < cap - 1e-9
-                squeezed = bb is not None and target < bb + 2 * tick - 1e-9
+            elif in_front:
+                continue  # share unknown: only retake when matched/beaten
+            # Where to move to. The old rule always stepped one tick past the
+            # best other order, which can give away far more than the job
+            # needs. Instead, walk out from where we are and stop at the FIRST
+            # price that reaches the wanted share — for an ask that is the
+            # highest such price, so we never cut the offer further than it
+            # takes. Falls back to the one-tick step if the book has no
+            # program to score against.
+            pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
+            df = float(pr.get("df") or 0)
+            tgt_size = float(pr.get("target") or 0)
+            levels = bids if side == "BUY" else asks
+            step = tick if side == "BUY" else -tick
+            target = None
+            if df and tgt_size:
+                start = best_mine["price"] if not in_front else others
+                for k in range(1, int(abs(start - cap) / tick) + 2):
+                    cand = round(start + step * k, 4)
+                    if side == "BUY" and cand > cap + 1e-9:
+                        break
+                    if side == "SELL" and cand < cap - 1e-9:
+                        break
+                    if not 0.001 <= cand <= 0.999:
+                        break
+                    if _defend_share_at(side, levels, best_mine, cand,
+                                        df, tgt_size, tick) >= want:
+                        target = cand
+                        break
+            if target is None:
+                base = ((max if side == "BUY" else min)(best_mine["price"], others)
+                        if share_known else others)
+                target = round(base + step, 4)
+            blocked = (target > cap + 1e-9) if side == "BUY" else (target < cap - 1e-9)
+            squeezed = (ba is not None and target > ba - 2 * tick + 1e-9) if side == "BUY" \
+                else (bb is not None and target < bb + 2 * tick - 1e-9)
             if not 0.001 <= target <= 0.999:
                 continue
             if blocked:
