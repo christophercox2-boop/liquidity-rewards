@@ -1,6 +1,27 @@
 {
   "rewards": [
     {
+      "reward": 5.33,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-alito-2026-12-31",
+      "date": "2026-08-12",
+      "status": "PENDING"
+    },
+    {
+      "reward": 19.73,
+      "programType": "liquidityProgram",
+      "marketSlug": "apdc-jerpowgov-2026-12-31",
+      "date": "2026-08-12",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.01,
+      "programType": "liquidityProgram",
+      "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
+      "date": "2026-08-12",
+      "status": "PENDING"
+    },
+    {
       "reward": 4.88,
       "programType": "liquidityProgram",
       "marketSlug": "apdc-alito-2026-12-31",
@@ -480,6 +501,13 @@
       "reward": 5.77,
       "programType": "liquidityProgram",
       "marketSlug": "usgubewc-usgub-ok-2026-11-03-dem",
+      "date": "2026-08-11",
+      "status": "PENDING"
+    },
+    {
+      "reward": 2.93,
+      "programType": "liquidityProgram",
+      "marketSlug": "usgubewc-usgub-ok-2026-11-03-rep",
       "date": "2026-08-11",
       "status": "PENDING"
     },

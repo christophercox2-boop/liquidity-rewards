@@ -2020,6 +2020,7 @@ date,market,program_type,reward_usd,status
 2026-08-11,usgubewc-usgub-ny-2026-11-03-dem,liquidityProgram,4.49,PENDING
 2026-08-11,usgubewc-usgub-ny-2026-11-03-rep,liquidityProgram,5.8,PENDING
 2026-08-11,usgubewc-usgub-ok-2026-11-03-dem,liquidityProgram,5.77,PENDING
+2026-08-11,usgubewc-usgub-ok-2026-11-03-rep,liquidityProgram,2.93,PENDING
 2026-08-11,usgubewc-usgub-or-2026-11-03-dem,liquidityProgram,2.63,PENDING
 2026-08-11,usgubewc-usgub-or-2026-11-03-rep,liquidityProgram,5.48,PENDING
 2026-08-11,usgubewc-usgub-pa-2026-11-03-dem,liquidityProgram,2.89,PENDING
@@ -2086,3 +2087,6 @@ date,market,program_type,reward_usd,status
 2026-08-11,ussewc-usse-wv-2026-11-03-rep,liquidityProgram,2.26,PENDING
 2026-08-11,ussewc-usse-wy-2026-11-03-dem,liquidityProgram,0.62,PENDING
 2026-08-11,ussewc-usse-wy-2026-11-03-rep,liquidityProgram,1.06,PENDING
+2026-08-12,apdc-alito-2026-12-31,liquidityProgram,5.33,PENDING
+2026-08-12,apdc-jerpowgov-2026-12-31,liquidityProgram,19.73,PENDING
+2026-08-12,enwc-usgubp-wi-2026-08-11-dem-sarrod,liquidityProgram,0.01,PENDING
