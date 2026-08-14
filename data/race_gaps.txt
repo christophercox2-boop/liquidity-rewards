@@ -1,14 +1,50 @@
 checking 200 candidate slugs
-markets we hold an order in: 130
+markets we hold an order in: 159
 of those, carrying an ACTIVE pool: 98
 
-=== SENATE: 44 held with a pool, 2 WITH A POOL AND NOT ENTERED ===
+=== SENATE: 32 held with a pool, 14 WITH A POOL AND NOT ENTERED ===
+   AL  rep      pool    25 target   2000 df 0.1   one side only
+   AR  dem      pool    25 target   2000 df 0.1   one side only
+   CO  rep      pool    25 target   2000 df 0.1   one side only
+   FL  dem      pool    25 target   2000 df 0.1   one side only
    ID  rep      pool    25 target   2000 df 0.1   one side only
-   WY  dem      pool    25 target   2000 df 0.1   one side only
+   KS  dem,rep  pool    25 target   2000 df 0.1   BOTH sides open
+   KY  dem,rep  pool    25 target   2000 df 0.1   BOTH sides open
+   LA  rep      pool    25 target   2000 df 0.1   one side only
+   MS  dem      pool    25 target   2000 df 0.1   one side only
+   MT  dem      pool    25 target   2000 df 0.1   one side only
+   OK  rep      pool    25 target   2000 df 0.1   one side only
+   SD  rep      pool    25 target   2000 df 0.1   one side only
 
-=== GOVERNOR: 51 held with a pool, 1 WITH A POOL AND NOT ENTERED ===
-   AL  dem      pool    25 target   2000 df 0.1   one side only
+=== GOVERNOR: 34 held with a pool, 18 WITH A POOL AND NOT ENTERED ===
+   AL  dem,rep  pool    25 target   2000 df 0.1   BOTH sides open
+   CT  rep      pool    25 target   2000 df 0.1   one side only
+   HI  rep      pool    25 target   2000 df 0.1   one side only
+   ID  dem      pool    25 target   2000 df 0.1   one side only
+   ME  dem,rep  pool    25 target   2000 df 0.1   BOTH sides open
+   MN  rep      pool    25 target   2000 df 0.1   one side only
+   NH  dem      pool    25 target   2000 df 0.1   one side only
+   NM  dem,rep  pool    25 target   2000 df 0.1   BOTH sides open
+   NY  dem,rep  pool    25 target   2000 df 0.1   BOTH sides open
+   OK  rep      pool    25 target   2000 df 0.1   one side only
+   OR  dem,rep  pool    25 target   2000 df 0.1   BOTH sides open
+   SC  rep      pool    25 target   2000 df 0.1   one side only
+   TX  dem      pool    25 target   2000 df 0.1   one side only
 
 === funded races where we hold only ONE side ===
-   governor  AL  missing: dem
-   senate    WY  missing: dem
+   governor  CT  missing: rep
+   governor  HI  missing: rep
+   governor  ID  missing: dem
+   governor  MN  missing: rep
+   governor  NH  missing: dem
+   governor  OK  missing: rep
+   governor  SC  missing: rep
+   governor  TX  missing: dem
+   senate    AL  missing: rep
+   senate    AR  missing: dem
+   senate    CO  missing: rep
+   senate    FL  missing: dem
+   senate    LA  missing: rep
+   senate    MS  missing: dem
+   senate    MT  missing: dem
+   senate    OK  missing: rep
