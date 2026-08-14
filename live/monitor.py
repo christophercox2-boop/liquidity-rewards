@@ -3308,10 +3308,40 @@ def _slug_known(slug: str) -> bool:
 # thing automatically, but turning the keeper on also turns on its second
 # branch (40-share orders near the touch), which is why this exists
 # separately.
-QUALIFY_MAX_USD = float(os.environ.get("QUALIFY_MAX_USD", "50"))
-QUALIFY_MAX_ORDERS = int(os.environ.get("QUALIFY_MAX_ORDERS", "8"))
+# The real bound is buying power: capacity is recomputed from it before every
+# order and never dips into the reserve, so a tap cannot spend past the
+# balance whatever a resting contract turns out to tie up. MAX_USD is a
+# backstop on top of that, measured as the observed drop in buying power.
+QUALIFY_MAX_USD = float(os.environ.get("QUALIFY_MAX_USD", "100"))
+QUALIFY_MAX_ORDERS = int(os.environ.get("QUALIFY_MAX_ORDERS", "40"))
 QUALIFY_RESERVE_USD = float(os.environ.get("QUALIFY_RESERVE_USD", "5"))
-QUALIFY_CHUNK = int(os.environ.get("QUALIFY_CHUNK", "2000"))
+QUALIFY_BID_MAX = int(os.environ.get("QUALIFY_BID_MAX", "10000"))
+# Below this, an order is not worth its own slot in the book. A balance that
+# can only carry a handful of shares per order would otherwise dribble out
+# forty near-empty orders and still leave the side short.
+QUALIFY_MIN_CHUNK = int(os.environ.get("QUALIFY_MIN_CHUNK", "25"))
+
+
+def _qual_per_order(side: str, price: float, bp: float) -> int:
+    """How many shares ONE order can actually carry, at this price, with this
+    buying power.
+
+    The two sides are limited differently, and the ask side is the surprising
+    one: opening a short is capped at one share per DOLLAR of buying power,
+    not by the 1c per share it ties up while resting. A 2,000-share ask at
+    99c came back resting 273.04 — a fractional share count, because it is a
+    balance, not a size limit. Asking for more does not fail; it silently
+    rests short, which is why a gap has to be split into buying-power-sized
+    orders rather than sent as one.
+
+    A bid is cost-limited in the ordinary way (price x size) — a 2,000-share
+    bid at 1c rested in full — with the exchange's own 10,000 per-order ceiling.
+    """
+    if bp <= 0 or price <= 0:
+        return 0
+    if side == "SELL":
+        return int(bp)                                  # one share per dollar
+    return int(min(QUALIFY_BID_MAX, bp / price))
 
 
 def _qual_view(slug: str, book: dict) -> dict:
@@ -3364,32 +3394,52 @@ def do_qualify(slug: str, side: str) -> tuple[int, dict]:
         return 200, {"ok": True, "placed": 0,
                      "note": f"{name} side already holds Target Size"}
     px = (q["floor_c"] if side == "BUY" else q["ceil_c"]) / 100.0
-    unit = px if side == "BUY" else 1 - px          # capital locked per contract
-    bp = float(MONITOR.buying_power or 0.0)
-    budget = min(QUALIFY_MAX_USD, max(0.0, bp - QUALIFY_RESERVE_USD))
-    if budget <= 0 or unit <= 0:
+
+    def live_bp(fallback: float) -> float:
+        try:
+            v = fetch_buying_power(KEY_ID, SECRET_KEY)
+            return float(v) if v is not None else fallback
+        except Exception:  # noqa: BLE001 — fall back rather than stall
+            return fallback
+
+    bp_start = live_bp(float(MONITOR.buying_power or 0.0))
+    bp = bp_start
+    if _qual_per_order(side, px, max(0.0, bp - QUALIFY_RESERVE_USD)) < 1:
         return 400, {"ok": False,
                      "error": f"no headroom — buying power ${bp:,.2f}"}
-    want = min(need, int(budget / unit))
-    if want < 1:
-        return 400, {"ok": False,
-                     "error": f"${budget:.2f} of headroom buys nothing at {px * 100:.1f}c"}
     placed = 0
-    spent = 0.0
-    remaining = want
+    done = 0
     errs: list[str] = []
+    # One tap closes the whole gap, in as many orders as that takes: the ask
+    # side can only carry `buying power` shares per order, so a 1,200-share
+    # gap on a $120 balance is ten orders, not one. Buying power is re-read
+    # from the exchange between placements so each chunk is sized to what is
+    # actually there, not to a model of what resting costs.
     for _ in range(QUALIFY_MAX_ORDERS):
-        if remaining < 1:
+        if done >= need:
             break
-        qty = int(min(remaining, QUALIFY_CHUNK))
+        if bp_start - bp >= QUALIFY_MAX_USD:
+            errs.append(f"stopped at the ${QUALIFY_MAX_USD:.0f} per-tap cap")
+            break
+        short = need - done
+        qty = int(min(short, _qual_per_order(side, px,
+                                             max(0.0, bp - QUALIFY_RESERVE_USD))))
+        # finishing the gap is always worth an order; a dribble is not
+        if qty < 1 or (qty < QUALIFY_MIN_CHUNK and qty < short):
+            errs.append(f"buying power ${bp:,.2f} carries only {qty:,} shares per order "
+                        f"— {short:,} still needed, so it would take "
+                        f"{-(-short // max(qty, 1)):,} orders")
+            break
         code, res = manual_place(slug, side, round(px * 100, 1), qty)
         if not res.get("ok"):
             errs.append(str(res.get("detail") or res.get("error") or f"HTTP {code}"))
             break
         placed += 1
-        spent += qty * unit
-        remaining -= qty
+        done += qty
         time.sleep(1.0)
+        bp = live_bp(bp)
+    spent = max(0.0, bp_start - bp)
+    remaining = need - done
     # Report where the side actually ended up, not where we hoped it would.
     # The public book can lag a placement by a beat, so give it one, then
     # clamp what we report to what the arithmetic allows: never claim a
@@ -3397,20 +3447,19 @@ def do_qualify(slug: str, side: str) -> tuple[int, dict]:
     # book that still shows the old depth would otherwise invite a second
     # tap and place the size twice.
     left = None
-    done = want - remaining
     try:
         time.sleep(2.0)
         after = _qual_view(slug, tr._fetch_book(slug))
         left = after["need_bid"] if side == "BUY" else after["need_ask"]
-        left = max(0, min(int(left), max(0, need - done)))
+        left = max(0, min(int(left), remaining))
     except Exception:  # noqa: BLE001 — the placements already happened
         pass
     POLL_KICK.set()
     return (200 if placed else 502), {
-        "ok": bool(placed), "placed": placed, "size": want - remaining,
+        "ok": bool(placed), "placed": placed, "size": done,
         "price_cents": round(px * 100, 1), "spent": round(spent, 2),
-        "capped_by_budget": want < need, "remaining_gap": left,
-        "detail": "; ".join(errs)[:200]}
+        "buying_power": round(bp, 2), "short_of_gap": remaining,
+        "remaining_gap": left, "detail": "; ".join(errs)[:200]}
 
 
 def market_info(slug: str) -> tuple[int, dict]:
@@ -6136,17 +6185,29 @@ function qualBlock(d){
       'there is no Target Size to reach, so nothing here would earn.</div>';
   }
   const tgt = q.target.toLocaleString();
+  const bp = (typeof d.buying_power === 'number') ? d.buying_power : null;
   function row(side, tot, need, priceC, cost){
     const nm = side === 'BUY' ? 'Bid' : 'Ask';
     if(!need){
       return '<div class="mkt" style="color:#3fb950">'+nm+' side ✓ '+tot.toLocaleString()+
         ' of '+tgt+' — qualifying, this side pays</div>';
     }
+    // An ask carries one share per DOLLAR of buying power, so a wide gap is
+    // several orders; a bid is limited by cost instead.
+    let per = null, orders = null;
+    if(bp !== null && bp > 0){
+      per = (side === 'SELL') ? Math.floor(bp) : Math.floor(Math.min(10000, bp / (priceC/100)));
+      if(per > 0) orders = Math.ceil(need / per);
+    }
+    const plan = (orders && orders > 1)
+      ? ' in '+orders+' orders of '+per.toLocaleString()
+      : '';
     return '<div class="mkt" style="color:#ff9d99">'+nm+' side ✗ '+tot.toLocaleString()+' of '+tgt+
       ' — short '+need.toLocaleString()+', so this side pays nobody</div>'+
       '<div class="rp" style="margin-bottom:8px"><button onclick="mQualify(\\''+esc(m)+'\\',\\''+side+'\\')">'+
       '⚓ Qualify '+nm.toLowerCase()+' — '+need.toLocaleString()+' @ '+priceC+'¢ ≈ $'+cost.toFixed(2)+
-      '</button></div>';
+      '</button></div>'+
+      (plan ? '<div class="mkt">one tap places it'+plan+'</div>' : '');
   }
   return '<h3>Qualify</h3>'+
     '<div class="mkt">A side pays NOBODY until it holds Target Size ('+tgt+' resting contracts, '+
@@ -6154,7 +6215,9 @@ function qualBlock(d){
     'the gap — floor bid at '+q.floor_c+'¢, ceiling ask at '+q.ceil_c+'¢, where a contract ties up the '+
     'least capital. It unlocks the pool for the side; on its own it earns you almost nothing, because '+
     'an order that far from the touch scores about zero. It pays when you also hold an order near the '+
-    'touch on the same side. Size and price are recomputed from the live book when you tap.</div>'+
+    'touch on the same side. Size and price are recomputed from the live book when you tap. An ask '+
+    'order can only carry one share per dollar of buying power, so a wide ask gap goes in as several '+
+    'orders — one tap does them all, re-reading buying power between each.</div>'+
     row('BUY', q.bid_total, q.need_bid, q.floor_c, q.cost_bid)+
     row('SELL', q.ask_total, q.need_ask, q.ceil_c, q.cost_ask);
 }
