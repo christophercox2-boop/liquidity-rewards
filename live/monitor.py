@@ -2952,12 +2952,15 @@ def auto_defend() -> None:
     # start where the last pass stopped and wrap, so the move budget rotates
     # across every armed market instead of always landing on the same few
     order = list(cfg.items())
-    start = DEFEND_CURSOR % len(order)
-    order = order[start:] + order[:start]
+    # named rot_start, not start: the move logic below uses `start` for a
+    # starting PRICE, and letting that float overwrite this index killed the
+    # whole pass on the next poll with "slice indices must be integers"
+    rot_start = int(DEFEND_CURSOR) % len(order)
+    order = order[rot_start:] + order[:rot_start]
     scanned = 0
     for m, sides in order:
         scanned += 1
-        DEFEND_CURSOR = (start + scanned) % len(cfg)
+        DEFEND_CURSOR = (rot_start + scanned) % len(cfg)
         ent = tr._BOOK_CACHE.get(m)
         if not ent or now - ent[0] > 300:
             continue  # stale book — never act on old prices
