@@ -1,15 +1,12 @@
 Silver Bulletin per-race forecasts: 35 Senate, 36 Governor
 
-4649 live orders
-230 orders are on Senate or Governor races; the model covers 230 of them (89 Senate, 141 Governor)
-96 markets left unmodelled (House districts, seat-count ladders, and the rest)
+4639 live orders
+224 orders are on Senate or Governor races; the model covers 224 of them (83 Senate, 141 Governor)
+94 markets left unmodelled (House districts, seat-count ladders, and the rest)
 
-1 resting orders would lose more than 10% a share if filled, -3 dollars in total if every one of them filled at once:
+No resting race order is more than 10% the wrong side of the model.
 
-  market                                     side   price   model  per sh     size  if filled
-  ussewc-usse-ky-2026-11-03-rep              SELL    0.89   0.997  -0.107       25         -3
-
-91 of 230 modelled orders are at or better than model fair value -- a fill there is not a loss on the model's numbers.
+87 of 224 modelled orders are at or better than model fair value -- a fill there is not a loss on the model's numbers.
 
 per-race view (model probability vs where our orders rest):
 
@@ -21,8 +18,6 @@ per-race view (model probability vs where our orders rest):
   DE        0.999    0.001       3    -0.039
   FL        0.216    0.784       2    -0.026
   IL        0.996    0.004       5    -0.006
-  KS        0.185    0.815       2    -0.025
-  KY        0.003    0.997       4    -0.107
   LA        0.045    0.955       2     0.005
   MA        1.000    0.000      16    -0.020
   MS        0.033    0.967       2    -0.067
@@ -49,7 +44,7 @@ per-race view (model probability vs where our orders rest):
   IL        0.999    0.001       7    -0.039
   MA        1.000    0.000       4    -0.060
   MD        1.000    0.000       2     0.050
-  MN        0.990    0.010       4    -0.050
+  MN        0.990    0.010       4    -0.070
   NE        0.046    0.954       5     0.036
   NH        0.151    0.849       1     0.039
   OK        0.006    0.994       2    -0.044
