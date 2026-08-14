@@ -1,5 +1,4 @@
-buying power: $222.53  (an ask order carries 222 shares)
-(positions unavailable: AttributeError — ask intent falls back to short)
+buying power: $217.44  (an ask order carries 217 shares)
 slate: 58 markets
 
 [1/58] enwc-uspres-nom-dem-2028-aleocc
@@ -15,9 +14,9 @@ slate: 58 markets
     bid: 10,000 @ 1c → ok
     ask: join 33 @ 51c (~25% of side) → ok
 [4/58] enwc-uspres-nom-dem-2028-gavnew
-    bid    1c x300       ask   51c x11,100    target 10,000
+    bid    1c x300       ask   51c x11,150    target 10,000
     bid: 10,000 @ 1c → ok
-    ask: join 33 @ 51c (~25% of side) → ok
+    ask: join 50 @ 51c (~25% of side) → ok
 [5/58] enwc-uspres-nom-dem-2028-jamtal
     bid    1c x300       ask   51c x11,100    target 10,000
     bid: 10,000 @ 1c → ok
@@ -87,19 +86,19 @@ slate: 58 markets
     bid: 10,000 @ 1c → ok
     ask: join 56 @ 51c (~25% of side) → ok
 [22/58] enwc-uspres-nom-rep-2028-jdvan
-    bid   19c x11,334    ask   70c x11,100    target 10,000
+    bid   19c x11,115    ask   70c x11,100    target 10,000
     ask: join 33 @ 70c (~25% of side) → ok
 [23/58] enwc-uspres-nom-rep-2028-margre
     bid    1c x225       ask   51c x11,100    target 10,000
     bid: 10,000 @ 1c → ok
     ask: join 33 @ 51c (~25% of side) → ok
 [24/58] enwc-uspres-nom-rep-2028-marrub
-    bid    5c x11,280    ask   55c x11,150    target 10,000
+    bid    5c x11,332    ask   55c x11,150    target 10,000
     ask: join 50 @ 55c (~25% of side) → ok
 [25/58] enwc-uspres-nom-rep-2028-ranpau
     bid    1c x200       ask   99c x200       target 10,000
     bid: 10,000 @ 1c → ok
-    ask: 10,000 @ 99c in 46 orders
+    ask: 10,000 @ 99c in 47 orders
 [26/58] enwc-uspres-nom-rep-2028-rondes
     bid    1c x300       ask   51c x11,100    target 10,000
     bid: 10,000 @ 1c → ok
@@ -149,9 +148,9 @@ slate: 58 markets
     bid: 10,000 @ 1c → ok
     ask: join 33 @ 51c (~25% of side) → ok
 [38/58] ewc-usp-2028-11-07-gavnew
-    bid    1c x300       ask   51c x11,000    target 10,000
+    bid    1c x300       ask   51c x11,050    target 10,000
     bid: 10,000 @ 1c → ok
-    ask: join 33 @ 51c (~25% of side) → ok
+    ask: join 50 @ 51c (~25% of side) → ok
 [39/58] ewc-usp-2028-11-07-gleyou
     bid    1c x225       ask   21c x11,050    target 10,000
     bid: 10,000 @ 1c → ok
@@ -177,9 +176,9 @@ slate: 58 markets
     bid: 10,000 @ 1c → ok
     ask: join 33 @ 51c (~25% of side) → ok
 [45/58] ewc-usp-2028-11-07-kamhar
-    bid    1c x300       ask   25c x11,000    target 10,000
+    bid    1c x300       ask   51c x11,026    target 10,000
     bid: 10,000 @ 1c → ok
-    ask: join 33 @ 25c (~25% of side) → ok
+    ask: join 42 @ 51c (~25% of side) → ok
 [46/58] ewc-usp-2028-11-07-markel
     bid    1c x300       ask   22c x325       target 10,000
     bid: 10,000 @ 1c → ok
