@@ -67,7 +67,8 @@ jobs:
                       "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
           CEIL = 0.99
           WANT_OURS = 10000          # our own resting size on the side
-          MAX_ORDERS_PER_SIDE = 80
+          MAX_ORDERS_PER_SIDE = 140
+          BP_FLOOR = 25.0
           MAX_ORDERS_TOTAL = 4000
           PAUSE = 0.8
 
@@ -120,6 +121,12 @@ jobs:
           except Exception as e:
               print(f"politics tag lookup failed: {e}"); raise SystemExit(1)
           slate = sorted(s for s in pol if s.startswith(PREFIXES))
+          # richest pool-per-side first, so a partial run finishes
+          # the sides that are worth the most
+          _rank = {"enwc-uspres-nom-rep-2028-": 0, "enwc-uspres-nom-dem-2028-": 1,
+                   "ewc-usp-party-2028-11-07-": 0, "ewc-usp-2028-11-07-": 2}
+          slate.sort(key=lambda s: next((v for k, v in _rank.items()
+                                         if s.startswith(k)), 9))
           ours = open_orders()
           print(f"slate: {len(slate)} markets\n")
 
@@ -186,10 +193,20 @@ jobs:
                   continue
               print(f"[{i}/{len(slate)}] {slug}: ask {ask_tot:,.0f} of {target:,.0f}, "
                     f"ours {mine:,.0f} → adding {need:,}")
+              # Progress is measured from the BOOK, never from what we asked
+              # for. An order rests at whatever buying power allows at that
+              # moment — ~170 when we asked for 197 — so counting requests
+              # made the first run believe it was done at ~86% of Target Size.
               placed = 0
-              while need > 0 and placed < MAX_ORDERS_PER_SIDE and total < MAX_ORDERS_TOTAL:
-                  per = max(1, int(BP))
-                  qty = min(need, per)
+              stalled = 0
+              live_tot = ask_tot
+              while (live_tot < target and placed < MAX_ORDERS_PER_SIDE
+                     and total < MAX_ORDERS_TOTAL):
+                  if BP < BP_FLOOR:
+                      print(f"    stopping: buying power ${BP:,.2f} below the "
+                            f"${BP_FLOOR:.0f} floor")
+                      break
+                  qty = min(int(target - live_tot) + 1, max(1, int(BP)))
                   if DRY:
                       ok, why = True, ""
                   else:
@@ -197,11 +214,28 @@ jobs:
                   if not ok:
                       print(f"    FAILED after {placed} orders — {why}")
                       break
-                  placed += 1; total += 1; need -= qty
+                  placed += 1; total += 1
                   if not DRY:
                       time.sleep(PAUSE)
-                  if placed % 10 == 0:
+                  if DRY:
+                      break
+                  # re-read the book every few orders and judge by what moved
+                  if placed % 4 == 0:
                       BP = bp_now(BP)
+                      try:
+                          now_tot = sum(q for _, q in
+                                        (tr._fetch_book(slug).get("asks") or []))
+                      except Exception:
+                          continue
+                      gained = now_tot - live_tot
+                      live_tot = now_tot
+                      # a real exposure ceiling shows up here: orders accepted,
+                      # book not moving. Four rounds of that and we move on.
+                      stalled = stalled + 1 if gained < 25 else 0
+                      if stalled >= 4:
+                          print(f"    stalled at {live_tot:,.0f} — orders accepted "
+                                "but the book stopped moving; moving on")
+                          break
               try:
                   after = sum(q for _, q in (tr._fetch_book(slug).get("asks") or []))
               except Exception:
