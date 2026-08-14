@@ -1,0 +1,92 @@
+buying power $197.98 — an ask order carries 197 shares
+slate: 60 markets
+
+[1/60] enwc-uspres-nom-dem-2028-aleocc: ask 233 of 10,000, ours 33 → adding 9,967
+    51 orders placed, ask side now 8,782 → still 1,218 short
+[2/60] enwc-uspres-nom-dem-2028-andbes: ask 333 of 10,000, ours 33 → adding 9,967
+    51 orders placed, ask side now 8,502 → still 1,498 short
+[4/60] enwc-uspres-nom-dem-2028-gavnew: ask 350 of 10,000, ours 50 → adding 9,950
+    51 orders placed, ask side now 5,099 → still 4,901 short
+[5/60] enwc-uspres-nom-dem-2028-jamtal: ask 333 of 10,000, ours 33 → adding 9,967
+    51 orders placed, ask side now 9,948 → still 52 short
+[6/60] enwc-uspres-nom-dem-2028-jbpri: ask 233 of 10,000, ours 33 → adding 9,967
+    51 orders placed, ask side now 8,022 → still 1,978 short
+[7/60] enwc-uspres-nom-dem-2028-jonoss: ask 230 of 10,000, ours 27 → adding 9,973
+    51 orders placed, ask side now 9,158 → still 842 short
+[8/60] enwc-uspres-nom-dem-2028-jonste: ask 350 of 10,000, ours 50 → adding 9,950
+    51 orders placed, ask side now 9,948 → still 52 short
+[9/60] enwc-uspres-nom-dem-2028-jossha: ask 333 of 10,000, ours 33 → adding 9,967
+    51 orders placed, ask side now 9,948 → still 52 short
+[10/60] enwc-uspres-nom-dem-2028-kamhar: ask 233 of 10,000, ours 33 → adding 9,967
+    51 orders placed, ask side now 9,848 → still 152 short
+[11/60] enwc-uspres-nom-dem-2028-markel: ask 350 of 10,000, ours 50 → adding 9,950
+    51 orders placed, ask side now 9,659 → still 341 short
+[12/60] enwc-uspres-nom-dem-2028-micoba: ask 333 of 10,000, ours 33 → adding 9,967
+    51 orders placed, ask side now 8,500 → still 1,500 short
+[13/60] enwc-uspres-nom-dem-2028-petbut: ask 350 of 10,000, ours 50 → adding 9,950
+    51 orders placed, ask side now 9,946 → still 54 short
+[14/60] enwc-uspres-nom-dem-2028-rahema: ask 350 of 10,000, ours 50 → adding 9,950
+    51 orders placed, ask side now 9,946 → still 54 short
+[15/60] enwc-uspres-nom-dem-2028-rokha: ask 333 of 10,000, ours 33 → adding 9,967
+    53 orders placed, ask side now 7,636 → still 2,364 short
+[17/60] enwc-uspres-nom-dem-2028-wesmoo: ask 333 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 6,464 → still 3,536 short
+[18/60] enwc-uspres-nom-rep-2028-dontru: ask 333 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 9,925 → still 75 short
+[20/60] enwc-uspres-nom-rep-2028-elomus: ask 233 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 9,825 → still 175 short
+[21/60] enwc-uspres-nom-rep-2028-gleyou: ask 350 of 10,000, ours 50 → adding 9,950
+    57 orders placed, ask side now 9,925 → still 75 short
+[22/60] enwc-uspres-nom-rep-2028-jdvan: ask 333 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 6,294 → still 3,706 short
+[23/60] enwc-uspres-nom-rep-2028-margre: ask 333 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 9,925 → still 75 short
+[24/60] enwc-uspres-nom-rep-2028-marrub: ask 350 of 10,000, ours 50 → adding 9,950
+    57 orders placed, ask side now 9,925 → still 75 short
+[26/60] enwc-uspres-nom-rep-2028-rondes: ask 333 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 9,925 → still 75 short
+[27/60] enwc-uspres-nom-rep-2028-tedcru: ask 333 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 9,870 → still 130 short
+[29/60] enwc-uspres-nom-rep-2028-tuccar: ask 333 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 6,124 → still 3,876 short
+[30/60] enwc-uspres-nom-rep-2028-tulgab: ask 233 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 9,825 → still 175 short
+[33/60] ewc-usp-2028-11-07-andbes: ask 358 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 5,638 → still 4,362 short
+[35/60] ewc-usp-2028-11-07-dontrujr: ask 358 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 9,669 → still 331 short
+[36/60] ewc-usp-2028-11-07-dwajoh: ask 358 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 8,022 → still 1,978 short
+[37/60] ewc-usp-2028-11-07-elomus: ask 258 of 10,000, ours 33 → adding 9,967
+    57 orders placed, ask side now 9,850 → still 150 short
+[38/60] ewc-usp-2028-11-07-gavnew: ask 275 of 10,000, ours 50 → adding 9,950
+    57 orders placed, ask side now 7,258 → still 2,742 short
+[39/60] ewc-usp-2028-11-07-gleyou: ask 375 of 10,000, ours 50 → adding 9,950
+    56 orders placed, ask side now 9,956 → still 44 short
+[40/60] ewc-usp-2028-11-07-jamtal: ask 358 of 10,000, ours 33 → adding 9,967
+    56 orders placed, ask side now 9,946 → still 54 short
+[41/60] ewc-usp-2028-11-07-jbpri: ask 408 of 10,000, ours 33 → adding 9,967
+    56 orders placed, ask side now 9,063 → still 937 short
+[42/60] ewc-usp-2028-11-07-jdvan: ask 258 of 10,000, ours 33 → adding 9,967
+    56 orders placed, ask side now 9,413 → still 587 short
+[43/60] ewc-usp-2028-11-07-jonoss: ask 348 of 10,000, ours 33 → adding 9,967
+    56 orders placed, ask side now 6,353 → still 3,647 short
+[44/60] ewc-usp-2028-11-07-jossha: ask 358 of 10,000, ours 33 → adding 9,967
+    56 orders placed, ask side now 7,803 → still 2,197 short
+[45/60] ewc-usp-2028-11-07-kamhar: ask 358 of 10,000, ours 33 → adding 9,967
+    56 orders placed, ask side now 9,928 → still 72 short
+[46/60] ewc-usp-2028-11-07-markel: ask 225 of 10,000, ours 0 → adding 10,000
+    56 orders placed, ask side now 8,299 → still 1,701 short
+[47/60] ewc-usp-2028-11-07-marrub: ask 408 of 10,000, ours 33 → adding 9,967
+    56 orders placed, ask side now 6,421 → still 3,579 short
+[48/60] ewc-usp-2028-11-07-micoba: ask 358 of 10,000, ours 33 → adding 9,967
+    60 orders placed, ask side now 20,502 → QUALIFYING
+[50/60] ewc-usp-2028-11-07-rahema: ask 358 of 10,000, ours 33 → adding 9,967
+    65 orders placed, ask side now 9,974 → still 26 short
+[52/60] ewc-usp-2028-11-07-rondes: ask 358 of 10,000, ours 33 → adding 9,967
+    65 orders placed, ask side now 5,591 → still 4,409 short
+[54/60] ewc-usp-2028-11-07-thomas: ask 408 of 10,000, ours 33 → adding 9,967
+    65 orders placed, ask side now 8,332 → still 1,668 short
+
+2387 orders across 43 markets
+1 of 43 ask sides now at Target Size

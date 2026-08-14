@@ -1,0 +1,264 @@
+{
+ "dry_run": false,
+ "orders": 2387,
+ "summary": [
+  {
+   "m": "enwc-uspres-nom-dem-2028-aleocc",
+   "orders": 51,
+   "after": 8781.65,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-andbes",
+   "orders": 51,
+   "after": 8501.71,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-gavnew",
+   "orders": 51,
+   "after": 5099.25,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jamtal",
+   "orders": 51,
+   "after": 9948.5,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jbpri",
+   "orders": 51,
+   "after": 8021.77,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonoss",
+   "orders": 51,
+   "after": 9158.36,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonste",
+   "orders": 51,
+   "after": 9948.5,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jossha",
+   "orders": 51,
+   "after": 9948.5,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-kamhar",
+   "orders": 51,
+   "after": 9848.5,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-markel",
+   "orders": 51,
+   "after": 9658.53,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-micoba",
+   "orders": 51,
+   "after": 8499.76,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-petbut",
+   "orders": 51,
+   "after": 9946.0,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rahema",
+   "orders": 51,
+   "after": 9946.0,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rokha",
+   "orders": 53,
+   "after": 7635.65,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-wesmoo",
+   "orders": 57,
+   "after": 6464.16,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-dontru",
+   "orders": 57,
+   "after": 9925.36,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-elomus",
+   "orders": 57,
+   "after": 9825.36,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-gleyou",
+   "orders": 57,
+   "after": 9925.36,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-jdvan",
+   "orders": 57,
+   "after": 6293.85,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-margre",
+   "orders": 57,
+   "after": 9925.36,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-marrub",
+   "orders": 57,
+   "after": 9925.36,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-rondes",
+   "orders": 57,
+   "after": 9925.36,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tedcru",
+   "orders": 57,
+   "after": 9870.36,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tuccar",
+   "orders": 57,
+   "after": 6123.54,
+   "qualifying": false
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tulgab",
+   "orders": 57,
+   "after": 9825.36,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-andbes",
+   "orders": 57,
+   "after": 5637.61,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontrujr",
+   "orders": 57,
+   "after": 9669.05,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dwajoh",
+   "orders": 57,
+   "after": 8021.95,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-elomus",
+   "orders": 57,
+   "after": 9850.36,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gavnew",
+   "orders": 57,
+   "after": 7257.71,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gleyou",
+   "orders": 56,
+   "after": 9955.97,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jamtal",
+   "orders": 56,
+   "after": 9945.5,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jbpri",
+   "orders": 56,
+   "after": 9063.0,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jdvan",
+   "orders": 56,
+   "after": 9412.79,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jonoss",
+   "orders": 56,
+   "after": 6353.26,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jossha",
+   "orders": 56,
+   "after": 7802.74,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-kamhar",
+   "orders": 56,
+   "after": 9928.45,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-markel",
+   "orders": 56,
+   "after": 8299.13,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-marrub",
+   "orders": 56,
+   "after": 6420.65,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-micoba",
+   "orders": 60,
+   "after": 20502.37,
+   "qualifying": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rahema",
+   "orders": 65,
+   "after": 9973.64,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rondes",
+   "orders": 65,
+   "after": 5590.85,
+   "qualifying": false
+  },
+  {
+   "m": "ewc-usp-2028-11-07-thomas",
+   "orders": 65,
+   "after": 8332.029999999999,
+   "qualifying": false
+  }
+ ]
+}
