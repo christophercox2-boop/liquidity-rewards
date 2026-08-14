@@ -1,30 +1,30 @@
-crawled 1737 pages, 173690 program records, 173690 distinct markets, 12947 with an ACTIVE program
+crawled 1691 pages, 169000 program records, 169000 distinct markets, 13796 with an ACTIVE program
 complete=True — reached the end of the list
-elapsed 689s, 0 backoff retries
+elapsed 591s, 0 backoff retries
 
 === COVERAGE CHECK (is this crawl worth believing?) ===
-  markets we hold orders in : 78
-  of those seen by the crawl: 78
+  markets we hold orders in : 158
+  of those seen by the crawl: 158
   OK — crawl completed and covered every market we hold.
   A market absent from the lists below really has no active pool.
 
 === POLITICS / ELECTIONS (tag includes foreign races) ===
-  open markets tagged politics/elections : 1136
-  with an ACTIVE pool in this crawl      : 384
+  open markets tagged politics/elections : 1215
+  with an ACTIVE pool in this crawl      : 442
   econ-data markets excluded by request  : 0
-  no incentive program at all (no pool)  : 752
-  politics markets with a pool we are in : 70
-  politics markets with a pool, unentered: 314
+  no incentive program at all (no pool)  : 773
+  politics markets with a pool we are in : 152
+  politics markets with a pool, unentered: 290
 
   family        markets   held    NEW  pool/target/df
-  ewc                77      1     76  [25, 100, 300]/[2000, 5000, 10000]/[0.1, 0.2]
-  usgubewc           60     27     33  [25]/[2000]/[0.1]
-  ussewc             49     27     22  [25]/[2000]/[0.1]
+  ewc               104     32     72  [25, 100, 300]/[2000, 5000, 10000]/[0.1, 0.2]
+  usgubewc           60     34     26  [25]/[2000]/[0.1]
+  ussewc             49     31     18  [25]/[2000]/[0.1]
+  enwc               46     31     15  [25, 100, 300]/[2000, 5000, 10000]/[0.1, 0.2]
   cranc              33      0     33  [100]/[5000]/[0.2]
   apdc               25      2     23  [25, 100]/[2000, 5000]/[0.1, 0.2]
-  scc                25      8     17  [100]/[5000]/[0.2]
-  enwc               15      1     14  [25, 100, 300]/[2000, 5000, 10000]/[0.1, 0.2]
-  mlaec              15      1     14  [25]/[2000]/[0.1]
+  scc                25     20      5  [100]/[5000]/[0.2]
+  mlaec              15      0     15  [25]/[2000]/[0.1]
   pintc              15      0     15  [25]/[2000]/[0.1]
   iarc               11      0     11  [25]/[2000]/[0.1]
   vmc                10      0     10  [300]/[10000]/[0.2]
@@ -32,7 +32,7 @@ elapsed 689s, 0 backoff retries
   vtc                10      0     10  [25]/[2000]/[0.1]
   opdc                7      1      6  [25]/[2000]/[0.1]
   dipcc               6      0      6  [75]/[2000]/[0.25]
-  paccc               4      1      3  [300]/[10000]/[0.2]
+  paccc               4      0      4  [300]/[10000]/[0.2]
   lawec               3      0      3  [25, 1000]/[2000, 5000]/[0.1, 0.3]
   stsc                3      0      3  [75]/[2000]/[0.25]
   pvwc                2      0      2  [25]/[2000]/[0.1]
@@ -41,15 +41,12 @@ elapsed 689s, 0 backoff retries
   pic                 1      0      1  [25]/[2000]/[0.1]
   usgcc               1      0      1  [25]/[2000]/[0.1]
 
-  politics markets with a pool we hold NO order in: 314  (richest pools first)
+  politics markets with a pool we hold NO order in: 290  (richest pools first)
    lawec-saveact-2026-08-31                       pool   1000 target    5000 df 0.3
    lawec-saveact-2026-12-31                       pool   1000 target    5000 df 0.3
    enwc-usgubp-fl-2026-08-18-rep-byrdon           pool    300 target   10000 df 0.2
    enwc-usgubp-fl-2026-08-18-rep-jamfis           pool    300 target   10000 df 0.2
    enwc-usgubp-fl-2026-08-18-rep-jaycol           pool    300 target   10000 df 0.2
-   ewc-ukpol-leg-clacton-2026-08-13-coubin        pool    300 target   10000 df 0.2
-   ewc-ukpol-leg-clacton-2026-08-13-nigfar        pool    300 target   10000 df 0.2
-   ewc-usgub-ca-2026-11-03-stehil                 pool    300 target   10000 df 0.2
    ewc-usgub-ca-2026-11-03-xavbec                 pool    300 target   10000 df 0.2
    ewc-usgub-ga-2026-11-03-dem                    pool    300 target   10000 df 0.2
    ewc-usgub-ga-2026-11-03-rep                    pool    300 target   10000 df 0.2
@@ -59,11 +56,11 @@ elapsed 689s, 0 backoff retries
    ewc-usse-ga-2026-11-03-rep                     pool    300 target   10000 df 0.2
    ewc-usse-me-2026-11-03-dem                     pool    300 target   10000 df 0.2
    ewc-usse-me-2026-11-03-rep                     pool    300 target   10000 df 0.2
-   ewc-usse-tx-2026-11-03-dem                     pool    300 target   10000 df 0.2
    ewc-usse-tx-2026-11-03-rep                     pool    300 target   10000 df 0.2
    paccc-usho-midterms-2026-11-03-dem             pool    300 target   10000 df 0.2
    paccc-usho-midterms-2026-11-03-rep             pool    300 target   10000 df 0.2
    paccc-usse-midterms-2026-11-03-dem             pool    300 target   10000 df 0.2
+   paccc-usse-midterms-2026-11-03-rep             pool    300 target   10000 df 0.2
    vmc-ussep-misen-2026-08-04-els0-5              pool    300 target   10000 df 0.2
    vmc-ussep-misen-2026-08-04-els10-15            pool    300 target   10000 df 0.2
    vmc-ussep-misen-2026-08-04-els15-20            pool    300 target   10000 df 0.2
@@ -118,23 +115,11 @@ elapsed 689s, 0 backoff retries
    ewc-usse-oh-2026-11-03-dem                     pool    100 target    5000 df 0.2
    ewc-usse-oh-2026-11-03-rep                     pool    100 target    5000 df 0.2
    mowc-nato-us-12-31-2026                        pool    100 target    5000 df 0.2
-   scc-hrep-rep-2026-11-03-gte180                 pool    100 target    5000 df 0.2
    scc-hrep-rep-2026-11-03-gte185                 pool    100 target    5000 df 0.2
    scc-hrep-rep-2026-11-03-gte190                 pool    100 target    5000 df 0.2
    scc-hrep-rep-2026-11-03-gte195                 pool    100 target    5000 df 0.2
-   scc-hrep-rep-2026-11-03-gte205                 pool    100 target    5000 df 0.2
-   scc-hrep-rep-2026-11-03-gte210                 pool    100 target    5000 df 0.2
    scc-hrep-rep-2026-11-03-gte215                 pool    100 target    5000 df 0.2
-   scc-hrep-rep-2026-11-03-gte220                 pool    100 target    5000 df 0.2
-   scc-hrep-rep-2026-11-03-gte225                 pool    100 target    5000 df 0.2
-   scc-hrep-rep-2026-11-03-gte230                 pool    100 target    5000 df 0.2
-   scc-hrep-rep-2026-11-03-gte235                 pool    100 target    5000 df 0.2
-   scc-senate-gop-2026-11-03-46                   pool    100 target    5000 df 0.2
-   scc-senate-gop-2026-11-03-49                   pool    100 target    5000 df 0.2
-   scc-senate-gop-2026-11-03-50                   pool    100 target    5000 df 0.2
-   scc-senate-gop-2026-11-03-53                   pool    100 target    5000 df 0.2
-   scc-senate-gop-2026-11-03-56                   pool    100 target    5000 df 0.2
-   scc-senate-gop-2026-11-03-gte57                pool    100 target    5000 df 0.2
+   scc-senate-gop-2026-11-03-52                   pool    100 target    5000 df 0.2
    vsc-usgubp-fl-fshbck-atl-11pct                 pool    100 target    5000 df 0.2
    vsc-usgubp-fl-fshbck-atl-13pct                 pool    100 target    5000 df 0.2
    vsc-usgubp-fl-fshbck-atl-15pct                 pool    100 target    5000 df 0.2
@@ -162,7 +147,22 @@ elapsed 689s, 0 backoff retries
    apdc-trumpadmin-2026-kaspat                    pool     25 target    2000 df 0.1
    apdc-trumpadmin-2026-linmcm                    pool     25 target    2000 df 0.1
    apdc-trumpadmin-2026-marrub                    pool     25 target    2000 df 0.1
-   ... and 194 more (full list in data/new_pools.json)
+   apdc-trumpadmin-2026-petheg                    pool     25 target    2000 df 0.1
+   apdc-trumpadmin-2026-robken                    pool     25 target    2000 df 0.1
+   apdc-trumpadmin-2026-rodsco                    pool     25 target    2000 df 0.1
+   apdc-trumpadmin-2026-rusvou                    pool     25 target    2000 df 0.1
+   apdc-trumpadmin-2026-scobes                    pool     25 target    2000 df 0.1
+   apdc-trumpadmin-2026-steche                    pool     25 target    2000 df 0.1
+   apdc-trumpadmin-2026-stemil                    pool     25 target    2000 df 0.1
+   apdc-trumpadmin-2026-stewit                    pool     25 target    2000 df 0.1
+   apdc-trumpadmin-2026-suswil                    pool     25 target    2000 df 0.1
+   apdc-trumpadmin-2026-tomhom                    pool     25 target    2000 df 0.1
+   enwc-ushrp-fl25-2026-08-18-dem-jarmos          pool     25 target    2000 df 0.1
+   enwc-ushrp-fl25-2026-08-18-dem-olilar          pool     25 target    2000 df 0.1
+   enwc-ussep-ma-2026-09-01-dem-edmark            pool     25 target    2000 df 0.1
+   enwc-ussep-ma-2026-09-01-dem-setmou            pool     25 target    2000 df 0.1
+   enwc-ussep-nh-2026-09-01-rep-johsun            pool     25 target    2000 df 0.1
+   ... and 170 more (full list in data/new_pools.json)
 
 === ushrewc (House districts) ===
   NO ushrewc market carries an active reward program.
@@ -171,40 +171,40 @@ elapsed 689s, 0 backoff retries
 
 === ALL families with active pools (56) ===
 family        markets   held    NEW  pool/target/df
-tec              2747      2   2745  [25, 100, 200, 250, 300, 500, 800, 1000, 5000, 10000]/[2500, 5000, 7500, 10000, 15000]/[0.3, 0.35, 0.4, 0.5, 0.9]
-asc              2266      0   2266  [100, 200, 800, 1200]/[500, 5000, 10000, 15000]/[0.15, 0.3]
-tsc              1932      0   1932  [100, 200, 900, 1200]/[500, 5000, 10000, 15000]/[0.15, 0.3]
-astatc           1551      0   1551  [50, 100, 500, 750]/[500, 3000, 5000, 10000]/[0.15, 0.3, 0.35]
-atc              1013      0   1013  [200, 750, 800, 1600, 2400]/[5000, 10000]/[0.3, 0.35]
-aec               823      0    823  [35, 100, 150, 200, 400, 500, 1600, 2500]/[5000, 7500, 10000, 15000, 20000, 25000]/[0.3, 0.35, 0.4, 0.5]
-aachc             696      0    696  [25, 500]/[2500, 5000]/[0.5, 0.9]
+astatc           2958      0   2958  [50, 100, 500, 750]/[500, 3000, 5000, 10000]/[0.15, 0.3, 0.35]
+tec              2608      2   2606  [25, 100, 200, 250, 300, 500, 800, 1000, 5000, 10000]/[2500, 5000, 7500, 10000, 15000]/[0.3, 0.35, 0.4, 0.5, 0.9]
+asc              2096      0   2096  [100, 200, 800, 1200]/[500, 5000, 10000, 15000]/[0.15, 0.3]
+tsc              1663      0   1663  [100, 200, 900, 1200]/[500, 5000, 10000, 15000]/[0.15, 0.3]
+atc              1185      0   1185  [750, 800, 1600, 2400]/[5000, 10000]/[0.3, 0.35]
+aachc             727      0    727  [25, 500]/[2500, 5000]/[0.5, 0.9]
+aec               582      0    582  [35, 100, 150, 200, 300, 400, 500, 1600, 2500]/[500, 5000, 7500, 10000, 15000, 20000, 25000]/[0.15, 0.2, 0.3, 0.35, 0.4, 0.5]
 ftsc              453      0    453  [100]/[7500]/[0.4]
 aqc               162      0    162  [25, 300, 500]/[2500, 5000, 15000]/[0.3, 0.5, 0.9]
 fptc              111      0    111  [100]/[7500]/[0.4]
+ewc               104     32     72  [25, 100, 300]/[2000, 5000, 10000]/[0.1, 0.2]
 tac                97      0     97  [100]/[500]/[0.15]
 ccrc               88      0     88  [50, 100]/[500]/[0.15]
-ewc                77      1     76  [25, 100, 300]/[2000, 5000, 10000]/[0.1, 0.2]
 ccpc               76      0     76  [50]/[500]/[0.15]
 rtc                64      0     64  [100]/[500]/[0.15]
 pntcbk             62      2     60  [250, 500]/[2500, 5000]/[0.35, 0.9]
-usgubewc           60     27     33  [25]/[2000]/[0.1]
+usgubewc           60     34     26  [25]/[2000]/[0.1]
 tc                 60      0     60  [750]/[7500]/[0.3]
 aimrc              59      0     59  [150]/[1000]/[0.1]
 arankc             58      0     58  [500]/[10000]/[0.9]
 cpc                50      0     50  [800]/[15000]/[0.3]
-ussewc             49     27     22  [25]/[2000]/[0.1]
+ussewc             49     31     18  [25]/[2000]/[0.1]
+enwc               46     31     15  [25, 100, 300]/[2000, 5000, 10000]/[0.1, 0.2]
 rdc                40      0     40  [30, 150]/[5000]/[0.15]
 ipcc               35      0     35  [100]/[500]/[0.2]
 cranc              33      0     33  [100]/[5000]/[0.2]
 apdc               28      2     26  [25, 100]/[500, 2000, 5000]/[0.1, 0.2]
 pnwpc              26      0     26  [100]/[500]/[0.2]
-scc                25      8     17  [100]/[5000]/[0.2]
+scc                25     20      5  [100]/[5000]/[0.2]
 tpoyc              22      0     22  [100]/[500]/[0.15]
-enwc               15      1     14  [25, 100, 300]/[2000, 5000, 10000]/[0.1, 0.2]
-mlaec              15      1     14  [25]/[2000]/[0.1]
+mlaec              15      0     15  [25]/[2000]/[0.1]
 pintc              15      0     15  [25]/[2000]/[0.1]
 cpic               12      0     12  [150]/[5000]/[0.15]
-dccc               12      3      9  [50]/[10000]/[0.25]
+dccc               12      1     11  [50]/[10000]/[0.25]
 iarc               11      0     11  [25]/[2000]/[0.1]
 vmc                10      0     10  [300]/[10000]/[0.2]
 vsc                10      1      9  [100]/[5000]/[0.2]
@@ -216,7 +216,7 @@ opdc                7      1      6  [25]/[2000]/[0.1]
 dipcc               6      0      6  [75]/[2000]/[0.25]
 gdpc                6      0      6  [150]/[5000]/[0.15]
 nfpc                6      0      6  [150]/[5000]/[0.15]
-paccc               4      1      3  [300]/[10000]/[0.2]
+paccc               4      0      4  [300]/[10000]/[0.2]
 lawec               3      0      3  [25, 1000]/[2000, 5000]/[0.1, 0.3]
 stsc                3      0      3  [75]/[2000]/[0.25]
 cbpac               2      0      2  [150]/[5000]/[0.15]
