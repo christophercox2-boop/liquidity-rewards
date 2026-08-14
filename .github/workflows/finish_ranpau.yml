@@ -1,0 +1,152 @@
+name: Finish ranpau ask side
+
+# ORDER-TOUCHING. One market, two small orders, then it is done.
+# Runs on a push to this file (the owner approved these two placements).
+#
+# enwc-uspres-nom-rep-2028-ranpau came out of the slate entry with its ask
+# side at 9,916 of 10,000 — still short, so it pays nobody — and the touch
+# moved from 99c to 51c while we were filling it, which left the ~9,816 we
+# rested at 99c scoring about nothing (48 ticks off the touch).
+#
+# Two orders fix both halves:
+#   1. top up at 99c so the side actually reaches Target Size
+#   2. join the 51c touch with 33 shares (~25% of that side, the same sizing
+#      used across the rest of the slate) so the capital already committed
+#      here starts earning
+#
+# Bounded hard: this one market, these two prices, small sizes, post-only,
+# and it re-reads the live book first. If the side is already at Target Size
+# or we already hold an order at the touch, it places nothing.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/finish_ranpau.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finish-ranpau
+  cancel-in-progress: false
+
+jobs:
+  finish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          SLUG = "enwc-uspres-nom-rep-2028-ranpau"
+          CEIL, TOUCH = 0.99, 0.51
+          JOIN_QTY = 33            # ~25% of that side, same sizing as the slate
+          MAX_TOPUP = 300          # the gap was 84; this is headroom, not a target
+          TARGET = 10000.0
+
+          def book():
+              bk = tr._fetch_book(SLUG)
+              return (bk.get("bids") or []), (bk.get("asks") or [])
+
+          def place(side, px, qty, intent):
+              r = requests.post(
+                  tr.TRADE_API + "/v1/orders",
+                  headers={**tr.auth_headers(kid, sec, "POST", "/v1/orders"),
+                           "Content-Type": "application/json"},
+                  json={"marketSlug": SLUG, "intent": intent,
+                        "type": "ORDER_TYPE_LIMIT",
+                        "price": {"value": f"{px:.2f}", "currency": "USD"},
+                        "quantity": int(qty),
+                        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                        "participateDontInitiate": True},
+                  timeout=25)
+              ok = r.status_code < 300
+              print(f"   {side} {qty:,} @ {px*100:.0f}c -> "
+                    + ("ok" if ok else "FAILED " + " ".join(r.text.split())[:140]))
+              return ok
+
+          bids, asks = book()
+          ask_tot = sum(q for _, q in asks)
+          best_ask = asks[0][0] if asks else None
+          print(f"{SLUG}")
+          print(f"   asks {[(round(p*100), round(q)) for p, q in asks[:5]]}")
+          print(f"   ask side {ask_tot:,.0f} of {TARGET:,.0f}   best ask "
+                f"{best_ask*100:.0f}c" if best_ask else "   no asks")
+
+          # do we already sit at the touch?
+          mine_at_touch = 0
+          try:
+              path = "/v1/orders/open"
+              r = requests.get(tr.TRADE_API + path,
+                               headers=tr.auth_headers(kid, sec, "GET", path), timeout=30)
+              if r.status_code < 400:
+                  for o in r.json().get("orders") or []:
+                      if (o.get("marketSlug") == SLUG
+                              and str(o.get("state")) == "ORDER_STATE_NEW"
+                              and abs(tr._num((o.get("price") or {}).get("value")) - TOUCH) < 0.005):
+                          mine_at_touch += tr._num(o.get("leavesQuantity")) or 0
+          except Exception as e:
+              print(f"   (open orders unavailable: {type(e).__name__})")
+          print(f"   ours already at {TOUCH*100:.0f}c: {mine_at_touch:,.0f}")
+
+          # 1. top up the ceiling so the side reaches Target Size
+          gap = TARGET - ask_tot
+          if gap <= 0:
+              print("   top-up: side already at Target Size, nothing to place")
+          elif gap > MAX_TOPUP:
+              print(f"   top-up: gap is {gap:,.0f}, more than the {MAX_TOPUP} bound "
+                    "— not placing, the book moved and this needs a fresh look")
+          else:
+              place("SELL", CEIL, int(gap) + 1, "ORDER_INTENT_BUY_SHORT")
+              time.sleep(1.5)
+
+          # 2. join the touch so the capital already here earns
+          if mine_at_touch >= JOIN_QTY:
+              print("   join: already at the touch, nothing to place")
+          elif best_ask is None or abs(best_ask - TOUCH) > 0.005:
+              print(f"   join: touch is no longer {TOUCH*100:.0f}c — not placing")
+          else:
+              place("SELL", TOUCH, JOIN_QTY, "ORDER_INTENT_BUY_SHORT")
+              time.sleep(2.0)
+
+          bids, asks = book()
+          ask_tot = sum(q for _, q in asks)
+          print(f"\n   after: asks {[(round(p*100), round(q)) for p, q in asks[:5]]}")
+          print(f"   ask side {ask_tot:,.0f} of {TARGET:,.0f} -> "
+                + ("QUALIFYING" if ask_tot >= TARGET else "STILL SHORT"))
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/finish_ranpau.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/finish_ranpau.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Finish ranpau [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
