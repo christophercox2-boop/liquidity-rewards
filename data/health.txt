@@ -1,38 +1,32 @@
 GET /v1/account/balances -> 200
-  {'currency': 'USD', 'buyingPower': 131.1633}
-records returned by /v1/orders/open: 418
-  ORDER_STATE_NEW                      414  LIVE
-  ORDER_STATE_PARTIALLY_FILLED           4  LIVE
-ghosts: 0   live: 418   (the app should show 418)
+  {'currency': 'USD', 'buyingPower': 104.1826}
+records returned by /v1/orders/open: 223
+  ORDER_STATE_NEW                      221  LIVE
+  ORDER_STATE_PARTIALLY_FILLED           2  LIVE
+ghosts: 0   live: 223   (the app should show 223)
 
-418 live orders
-capital committed in resting orders: $5,254.40
+223 live orders
+capital committed in resting orders: $1,690.61
 
-price rungs holding more than one order: 39 (186 orders beyond the first)
-  usgubewc-usgub-ma-2026-11-03-dem             SELL   99c  19 orders  sizes [114, 222, 222, 166, 176, 222]
-  ussewc-usse-ma-2026-11-03-dem                SELL   99c  18 orders  sizes [222, 222, 222, 98, 197, 222]
-  ussewc-usse-il-2026-11-03-dem                SELL   99c  16 orders  sizes [222, 55, 210, 23, 222, 222]
-  usgubewc-usgub-wy-2026-11-03-rep             SELL   99c  15 orders  sizes [132, 197, 222, 154, 222, 222]
-  ussewc-usse-wv-2026-11-03-rep                SELL   99c  14 orders  sizes [222, 190, 222, 222, 222, 222]
-  usgubewc-usgub-sd-2026-11-03-dem             SELL   99c  11 orders  sizes [111, 152, 98, 217, 191, 272]
-  usgubewc-usgub-sd-2026-11-03-rep             BUY     1c  10 orders  sizes [343, 264, 10, 13, 24, 325]
-  ussewc-usse-wv-2026-11-03-dem                BUY     1c  6 orders  sizes [200, 250, 400, 310, 200, 40]
-  usgubewc-usgub-pa-2026-11-03-rep             SELL   99c  6 orders  sizes [131, 140, 134, 134, 120, 193]
-  usgubewc-usgub-hi-2026-11-03-dem             SELL   99c  6 orders  sizes [53, 11, 273, 176, 191, 147]
-  usgubewc-usgub-id-2026-11-03-rep             SELL   99c  6 orders  sizes [206, 206, 191, 165, 23, 156]
-  ussewc-usse-nj-2026-11-03-dem                SELL   99c  6 orders  sizes [149, 98, 212, 165, 111, 147]
-  usgubewc-usgub-sd-2026-11-03-rep             SELL   99c  6 orders  sizes [156, 115, 206, 191, 165, 206]
-  ussewc-usse-nm-2026-11-03-rep                BUY     1c  6 orders  sizes [160, 200, 2000, 40, 2000, 571]
-  usgubewc-usgub-ne-2026-11-03-rep             SELL   99c  6 orders  sizes [156, 217, 140, 259, 157, 28]
+price rungs holding more than one order: 18 (109 orders beyond the first)
+  usgubewc-usgub-ma-2026-11-03-dem             SELL   99c  15 orders  sizes [212, 197, 222, 222, 114, 222]
+  ussewc-usse-wv-2026-11-03-rep                SELL   99c  14 orders  sizes [197, 222, 222, 197, 222, 222]
+  usgubewc-usgub-wy-2026-11-03-rep             SELL   99c  13 orders  sizes [222, 222, 222, 222, 222, 154]
+  ussewc-usse-ma-2026-11-03-dem                SELL   99c  12 orders  sizes [222, 222, 197, 222, 222, 222]
+  ussewc-usse-wy-2026-11-03-rep                SELL   99c  12 orders  sizes [142, 142, 142, 142, 142, 142]
+  usgubewc-usgub-sd-2026-11-03-dem             SELL   99c  11 orders  sizes [56, 98, 166, 191, 272, 111]
+  pandc-anydis-2027-12-31                      SELL   99c  8 orders  sizes [228, 228, 228, 228, 228, 228]
+  usgubewc-usgub-pa-2026-11-03-rep             SELL   99c  6 orders  sizes [193, 131, 134, 120, 140, 134]
+  usgubewc-usgub-id-2026-11-03-rep             SELL   99c  6 orders  sizes [191, 23, 206, 206, 165, 156]
+  usgubewc-usgub-hi-2026-11-03-dem             SELL   99c  5 orders  sizes [53, 176, 191, 147, 11]
+  usgubewc-usgub-il-2026-11-03-dem             SELL   99c  4 orders  sizes [206, 206, 75, 100]
+  apdc-jerpowgov-2026-12-31                    SELL   99c  4 orders  sizes [135, 135, 135, 135]
+  usgubewc-usgub-sd-2026-11-03-rep             SELL   99c  4 orders  sizes [191, 156, 165, 206]
+  usgubewc-usgub-ct-2026-11-03-dem             SELL   99c  3 orders  sizes [11, 167, 55]
+  usgubewc-usgub-ne-2026-11-03-rep             SELL   99c  3 orders  sizes [28, 217, 140]
 
-usgubewc-usgub-tn-2026-11-03-rep: 8 orders
-  SELL  99.0c  leaves    140  state ORDER_STATE_NEW  id BTXH4GJXCDJV
-  SELL  99.0c  leaves    139  state ORDER_STATE_NEW  id BTXP0VYBADJV
-  BUY    1.0c  leaves  1,000  state ORDER_STATE_NEW  id BTXT2BJ2RDK0
+usgubewc-usgub-tn-2026-11-03-rep: 2 orders
   SELL  99.0c  leaves    137  state ORDER_STATE_NEW  id BTXT6ZA8CDK7
-  BUY    1.0c  leaves    230  state ORDER_STATE_NEW  id BTYG3SRMWDJP
-  BUY    1.0c  leaves    160  state ORDER_STATE_NEW  id BTY5G20WJDKA
-  BUY    1.0c  leaves    320  state ORDER_STATE_NEW  id BTXH8EJDTDJR
-  BUY   96.0c  leaves     40  state ORDER_STATE_NEW  id BTYCA1YE0DK5
-  book: best bid 96c  best ask 98c
-  a 96c bid would rest the 98c ask
+  BUY    1.0c  leaves  1,710  state ORDER_STATE_NEW  id BV4XQN0J8DK0
+  book: best bid 90c  best ask 95c
+  a 96c bid would CROSS the 95c ask
