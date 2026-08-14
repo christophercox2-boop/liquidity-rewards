@@ -3334,14 +3334,14 @@ def _qual_per_order(side: str, price: float, bp: float) -> int:
     rests short, which is why a gap has to be split into buying-power-sized
     orders rather than sent as one.
 
-    A bid is cost-limited in the ordinary way (price x size) — a 2,000-share
-    bid at 1c rested in full — with the exchange's own 10,000 per-order ceiling.
+    A bid has no such limit — the whole gap goes in a single order, up to the
+    exchange's per-order ceiling. A 2,000-share bid at 1c rested in full.
     """
     if bp <= 0 or price <= 0:
         return 0
     if side == "SELL":
         return int(bp)                                  # one share per dollar
-    return int(min(QUALIFY_BID_MAX, bp / price))
+    return QUALIFY_BID_MAX                              # bids go in one order
 
 
 def _qual_view(slug: str, book: dict) -> dict:
@@ -6193,10 +6193,10 @@ function qualBlock(d){
         ' of '+tgt+' — qualifying, this side pays</div>';
     }
     // An ask carries one share per DOLLAR of buying power, so a wide gap is
-    // several orders; a bid is limited by cost instead.
+    // several orders. A bid goes in one.
     let per = null, orders = null;
     if(bp !== null && bp > 0){
-      per = (side === 'SELL') ? Math.floor(bp) : Math.floor(Math.min(10000, bp / (priceC/100)));
+      per = (side === 'SELL') ? Math.floor(bp) : 10000;
       if(per > 0) orders = Math.ceil(need / per);
     }
     const plan = (orders && orders > 1)
@@ -6215,9 +6215,9 @@ function qualBlock(d){
     'the gap — floor bid at '+q.floor_c+'¢, ceiling ask at '+q.ceil_c+'¢, where a contract ties up the '+
     'least capital. It unlocks the pool for the side; on its own it earns you almost nothing, because '+
     'an order that far from the touch scores about zero. It pays when you also hold an order near the '+
-    'touch on the same side. Size and price are recomputed from the live book when you tap. An ask '+
-    'order can only carry one share per dollar of buying power, so a wide ask gap goes in as several '+
-    'orders — one tap does them all, re-reading buying power between each.</div>'+
+    'touch on the same side. Size and price are recomputed from the live book when you tap. A bid goes '+
+    'in as one order; an ask can only carry one share per dollar of buying power, so a wide ask gap '+
+    'goes in as several — one tap does them all, re-reading buying power between each.</div>'+
     row('BUY', q.bid_total, q.need_bid, q.floor_c, q.cost_bid)+
     row('SELL', q.ask_total, q.need_ask, q.ceil_c, q.cost_ask);
 }
