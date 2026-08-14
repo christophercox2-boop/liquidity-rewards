@@ -1,5 +1,5 @@
 markets found in the 2028 slate: 60
-buying power: $197.99
+buying power: $155.78
 of those, carrying an ACTIVE reward program: 60
 markets in this slate we already have orders in: 60
 
@@ -8,84 +8,84 @@ markets in this slate we already have orders in: 60
     with a reward program: 14 of 14   pool $300 / target 10000 / df 0.2 / pool split 14 ways
 
 market                                     bid   ask     bidQ     askQ    tgt  gapBID  gapASK  in?
-enwc-uspres-nom-rep-2028-dontru            1.0  47.0    16895      233  10000       0    9767    2
-enwc-uspres-nom-rep-2028-dontrujr          1.0  45.0    16895      233  10000       0    9767    2
-enwc-uspres-nom-rep-2028-elomus            1.0  49.0    16846      233  10000       0    9767    2
-enwc-uspres-nom-rep-2028-gleyou            1.0  51.0    16895      250  10000       0    9750    2
-enwc-uspres-nom-rep-2028-jdvan            19.0  68.0      215    10850  10000    9785       0    1
-enwc-uspres-nom-rep-2028-margre            1.0  51.0    16846      233  10000       0    9767    2
-enwc-uspres-nom-rep-2028-marrub            6.0  53.0    10900      250  10000       0    9750    1
-enwc-uspres-nom-rep-2028-ranpau            1.0  51.0    16846     9934  10000       0      66   50
-enwc-uspres-nom-rep-2028-rondes            1.0  43.0    16895      233  10000       0    9767    2
-enwc-uspres-nom-rep-2028-tedcru            1.0  51.0    16895      233  10000       0    9767    2
-enwc-uspres-nom-rep-2028-thomas            1.0  51.0    28933      233  10000       0    9767    2
-enwc-uspres-nom-rep-2028-tuccar            1.0  51.0    16895      233  10000       0    9767    2
-enwc-uspres-nom-rep-2028-tulgab            1.0  43.0    16895      233  10000       0    9767    2
-enwc-uspres-nom-rep-2028-vivram            1.0  51.0    16895      233  10000       0    9767    2
+enwc-uspres-nom-rep-2028-dontru            1.0  45.0    24176    20692  10000       0       0   59
+enwc-uspres-nom-rep-2028-dontrujr          1.0  41.0    24176    11000  10000       0       0    2
+enwc-uspres-nom-rep-2028-elomus            1.0  47.0    23999    10825  10000       0       0   71
+enwc-uspres-nom-rep-2028-gleyou            1.0  49.0    27208    20575  10000       0       0   59
+enwc-uspres-nom-rep-2028-jdvan            20.0  67.0    10985    20642  10000       0       0   58
+enwc-uspres-nom-rep-2028-margre            1.0  48.0    23999    11000  10000       0       0   59
+enwc-uspres-nom-rep-2028-marrub            7.0  53.0    11194    11000  10000       0       0   58
+enwc-uspres-nom-rep-2028-ranpau            1.0  50.0    24034    12068  10000       0       0   50
+enwc-uspres-nom-rep-2028-rondes            1.0  39.0    24176    10075  10000       0       0   63
+enwc-uspres-nom-rep-2028-tedcru            1.0  48.0    10300    10075  10000       0       0   63
+enwc-uspres-nom-rep-2028-thomas            1.0  50.0    24034    11000  10000       0       0    2
+enwc-uspres-nom-rep-2028-tuccar            1.0  49.0    24228    11050  10000       0       0   59
+enwc-uspres-nom-rep-2028-tulgab            1.0  41.0    24105    10375  10000       0       0   75
+enwc-uspres-nom-rep-2028-vivram            1.0  50.0    10300    11000  10000       0       0    2
 
 
 === Democratic nominee 2028 — 17 markets ===
     with a reward program: 17 of 17   pool $300 / target 10000 / df 0.2 / pool split 17 ways
 
 market                                     bid   ask     bidQ     askQ    tgt  gapBID  gapASK  in?
-enwc-uspres-nom-dem-2028-aleocc            1.0  49.0    10200      233  10000       0    9767    2
-enwc-uspres-nom-dem-2028-andbes            1.0  51.0    29298      233  10000       0    9767    2
-enwc-uspres-nom-dem-2028-dwajoh            1.0  51.0    10200      250  10000       0    9750    2
-enwc-uspres-nom-dem-2028-gavnew            1.0  51.0    10200      250  10000       0    9750    2
-enwc-uspres-nom-dem-2028-jamtal            1.0  49.0    10200      233  10000       0    9767    2
-enwc-uspres-nom-dem-2028-jbpri             1.0  51.0    10200      233  10000       0    9767    2
-enwc-uspres-nom-dem-2028-jonoss           11.0  52.0    10360    11020  10000       0       0    4
-enwc-uspres-nom-dem-2028-jonste            1.0  51.0    10200      250  10000       0    9750    2
-enwc-uspres-nom-dem-2028-jossha            1.0  51.0    10200      233  10000       0    9767    2
-enwc-uspres-nom-dem-2028-kamhar            1.0  49.0    10200      233  10000       0    9767    2
-enwc-uspres-nom-dem-2028-markel            1.0  51.0    10200      250  10000       0    9750    2
-enwc-uspres-nom-dem-2028-micoba            1.0  51.0    10200      233  10000       0    9767    2
-enwc-uspres-nom-dem-2028-petbut            1.0  49.0    28718      250  10000       0    9750    2
-enwc-uspres-nom-dem-2028-rahema            1.0  49.0    29326      250  10000       0    9750    2
-enwc-uspres-nom-dem-2028-rokha             1.0  51.0    10200      233  10000       0    9767    2
-enwc-uspres-nom-dem-2028-stasmi            1.0  51.0    10200      233  10000       0    9767    2
-enwc-uspres-nom-dem-2028-wesmoo            1.0  49.0    28718      233  10000       0    9767    2
+enwc-uspres-nom-dem-2028-aleocc            1.0  48.0    26000    11000  10000       0       0   53
+enwc-uspres-nom-dem-2028-andbes            1.0  50.0    10300     9998  10000       0       2   53
+enwc-uspres-nom-dem-2028-dwajoh            1.0  50.0    10225    11100  10000       0       0    2
+enwc-uspres-nom-dem-2028-gavnew            1.0  49.0    10300    10780  10000       0       0   69
+enwc-uspres-nom-dem-2028-jamtal            1.0  48.0    10300    11000  10000       0       0   53
+enwc-uspres-nom-dem-2028-jbpri             1.0  50.0    10300    11000  10000       0       0   53
+enwc-uspres-nom-dem-2028-jonoss           13.0  48.0    10453    11050  10000       0       0   55
+enwc-uspres-nom-dem-2028-jonste            1.0  47.0    25824    12052  10000       0       0   53
+enwc-uspres-nom-dem-2028-jossha            1.0  50.0    24210    11000  10000       0       0   53
+enwc-uspres-nom-dem-2028-kamhar            1.0  48.0    26013    11100  10000       0       0   53
+enwc-uspres-nom-dem-2028-markel            1.0  49.0    10300    11000  10000       0       0   53
+enwc-uspres-nom-dem-2028-micoba            1.0  48.0    25826    11050  10000       0       0   53
+enwc-uspres-nom-dem-2028-petbut            1.0  48.0    26013    11050  10000       0       0   53
+enwc-uspres-nom-dem-2028-rahema            1.0  48.0    26013    11050  10000       0       0   53
+enwc-uspres-nom-dem-2028-rokha             1.0  49.0    10300    12158  10000       0       0   55
+enwc-uspres-nom-dem-2028-stasmi            1.0  50.0    10225    11050  10000       0       0    2
+enwc-uspres-nom-dem-2028-wesmoo            1.0  49.0    26013    11000  10000       0       0   59
 
 
 === President winner 2028 — 27 markets ===
     with a reward program: 27 of 27   pool $300 / target 10000 / df 0.2 / pool split 27 ways
 
 market                                     bid   ask     bidQ     askQ    tgt  gapBID  gapASK  in?
-ewc-usp-2028-11-07-aleocc                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-andbes                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-dontru                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-dontrujr                1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-dwajoh                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-elomus                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-gavnew                  1.0  51.0    10200      275  10000       0    9725    2
-ewc-usp-2028-11-07-gleyou                  1.0  51.0    10200      275  10000       0    9725    2
-ewc-usp-2028-11-07-jamtal                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-jbpri                   1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-jdvan                   1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-jonoss                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-jossha                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-kamhar                  1.0  25.0    29326      258  10000       0    9742    2
-ewc-usp-2028-11-07-markel                  1.0  99.0    10200      225  10000       0    9775    1
-ewc-usp-2028-11-07-marrub                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-micoba                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-petbut                  1.0  51.0    29161      258  10000       0    9742    2
-ewc-usp-2028-11-07-rahema                  1.0  51.0    29161      258  10000       0    9742    2
-ewc-usp-2028-11-07-rokha                   1.0  51.0    29161      258  10000       0    9742    2
-ewc-usp-2028-11-07-rondes                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-stasmi                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-thomas                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-tuccar                  1.0  51.0    10200      275  10000       0    9725    2
-ewc-usp-2028-11-07-tulgab                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-vivram                  1.0  51.0    10200      258  10000       0    9742    2
-ewc-usp-2028-11-07-wesmoo                  1.0  51.0    10200      258  10000       0    9742    2
+ewc-usp-2028-11-07-aleocc                  1.0  50.0    10300    11000  10000       0       0    2
+ewc-usp-2028-11-07-andbes                  1.0  50.0    24174    20742  10000       0       0   59
+ewc-usp-2028-11-07-dontru                  1.0  49.0    10300    11000  10000       0       0    2
+ewc-usp-2028-11-07-dontrujr                1.0  46.0    10225    20642  10000       0       0   59
+ewc-usp-2028-11-07-dwajoh                  1.0  50.0    10225    20692  10000       0       0   59
+ewc-usp-2028-11-07-elomus                  1.0  50.0    10225    10000  10000       0       0   59
+ewc-usp-2028-11-07-gavnew                  1.0  50.0    24174    11000  10000       0       0   59
+ewc-usp-2028-11-07-gleyou                  1.0  50.0    10225    11001  10000       0       0   58
+ewc-usp-2028-11-07-jamtal                  1.0  50.0    10300    20638  10000       0       0   58
+ewc-usp-2028-11-07-jbpri                   1.0  50.0    10225     9996  10000       0       4   58
+ewc-usp-2028-11-07-jdvan                   1.0  49.0    10300    10003  10000       0       0   58
+ewc-usp-2028-11-07-jonoss                  1.0  50.0    10310    11000  10000       0       0   58
+ewc-usp-2028-11-07-jossha                  1.0  49.0    10300    11000  10000       0       0   58
+ewc-usp-2028-11-07-kamhar                  1.0  25.0    24174    11000  10000       0       0   58
+ewc-usp-2028-11-07-markel                  1.0  51.0    24174    20703  10000       0       0   57
+ewc-usp-2028-11-07-marrub                  1.0  49.0    10300    20620  10000       0       0   58
+ewc-usp-2028-11-07-micoba                  1.0  49.0    10225    20502  10000       0       0   62
+ewc-usp-2028-11-07-petbut                  1.0  50.0    29421    11000  10000       0       0    2
+ewc-usp-2028-11-07-rahema                  1.0  49.0    10300    10298  10000       0       0   79
+ewc-usp-2028-11-07-rokha                   1.0  50.0    24174    11000  10000       0       0    2
+ewc-usp-2028-11-07-rondes                  1.0  49.0    24174    10406  10000       0       0   83
+ewc-usp-2028-11-07-stasmi                  1.0  50.0    24052    11050  10000       0       0    2
+ewc-usp-2028-11-07-thomas                  1.0  50.0    10225    20766  10000       0       0   67
+ewc-usp-2028-11-07-tuccar                  1.0  50.0    10225    11000  10000       0       0    2
+ewc-usp-2028-11-07-tulgab                  1.0  48.0    24052    11050  10000       0       0    2
+ewc-usp-2028-11-07-vivram                  1.0  50.0    10225    11050  10000       0       0    2
+ewc-usp-2028-11-07-wesmoo                  1.0  50.0    24174    11100  10000       0       0    2
 
 
 === Winning party 2028 — 2 markets ===
     with a reward program: 2 of 2   pool $300 / target 10000 / df 0.2 / pool split 2 ways
 
 market                                     bid   ask     bidQ     askQ    tgt  gapBID  gapASK  in?
-ewc-usp-party-2028-11-07-dem              61.0  76.0    10338    10122  10000       0       0   53
-ewc-usp-party-2028-11-07-rep              51.0  57.0    10330     9957  10000       0      43   51
+ewc-usp-party-2028-11-07-dem              60.0  69.0    10516    10284  10000       0       0   53
+ewc-usp-party-2028-11-07-rep              30.0  55.0    10465    11051  10000       0       0   50
 
 
 === WHAT ENTRY WOULD COST ===
@@ -96,304 +96,304 @@ score   = join the touch with enough size for ~25% of the side
 
 enwc-uspres-nom-dem-2028-aleocc
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 49c ≈ $5.61 → ~$2.21/day
+   score   bid: 8,667 @ 1c ≈ $86.67 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 52 @ 48c ≈ $27.14 → ~$2.21/day
 enwc-uspres-nom-dem-2028-andbes
    qualify bid: already at Target Size ✓
-   score   bid: 9,766 @ 1c ≈ $97.66 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.21/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: 2 short → $0.01 in 1 order(s)
+   score   ask: 52 @ 50c ≈ $26.10 → ~$2.21/day
 enwc-uspres-nom-dem-2028-dwajoh
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,750 short → $97.50 in 50 order(s)
-   score   ask: 17 @ 51c ≈ $8.17 → ~$2.21/day
+   score   bid: 3,408 @ 1c ≈ $34.08 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 37 @ 50c ≈ $18.33 → ~$2.21/day
 enwc-uspres-nom-dem-2028-gavnew
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,750 short → $97.50 in 50 order(s)
-   score   ask: 17 @ 51c ≈ $8.17 → ~$2.21/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 34 @ 49c ≈ $17.34 → ~$2.21/day
 enwc-uspres-nom-dem-2028-jamtal
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 49c ≈ $5.61 → ~$2.21/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 36 @ 48c ≈ $18.48 → ~$2.21/day
 enwc-uspres-nom-dem-2028-jbpri
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.21/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 52 @ 50c ≈ $26.10 → ~$2.21/day
 enwc-uspres-nom-dem-2028-jonoss
    qualify bid: already at Target Size ✓
-   score   bid: 36 @ 11c ≈ $3.96 → ~$2.21/day
+   score   bid: 77 @ 13c ≈ $10.00 → ~$2.21/day
    qualify ask: already at Target Size ✓
-   score   ask: 8 @ 52c ≈ $4.00 → ~$2.21/day
+   score   ask: 12 @ 48c ≈ $6.23 → ~$2.21/day
 enwc-uspres-nom-dem-2028-jonste
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,750 short → $97.50 in 50 order(s)
-   score   ask: 17 @ 51c ≈ $8.17 → ~$2.21/day
+   score   bid: 8,608 @ 1c ≈ $86.08 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 33 @ 47c ≈ $17.68 → ~$2.21/day
 enwc-uspres-nom-dem-2028-jossha
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.21/day
+   score   bid: 8,070 @ 1c ≈ $80.70 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 36 @ 50c ≈ $17.77 → ~$2.21/day
 enwc-uspres-nom-dem-2028-kamhar
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 49c ≈ $5.61 → ~$2.21/day
+   score   bid: 8,671 @ 1c ≈ $86.71 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 36 @ 48c ≈ $18.48 → ~$2.21/day
 enwc-uspres-nom-dem-2028-markel
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,750 short → $97.50 in 50 order(s)
-   score   ask: 17 @ 51c ≈ $8.17 → ~$2.21/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 34 @ 49c ≈ $17.34 → ~$2.21/day
 enwc-uspres-nom-dem-2028-micoba
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.21/day
+   score   bid: 8,609 @ 1c ≈ $86.09 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 52 @ 48c ≈ $27.14 → ~$2.21/day
 enwc-uspres-nom-dem-2028-petbut
    qualify bid: already at Target Size ✓
-   score   bid: 9,573 @ 1c ≈ $95.73 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,750 short → $97.50 in 50 order(s)
-   score   ask: 17 @ 49c ≈ $8.50 → ~$2.21/day
+   score   bid: 8,671 @ 1c ≈ $86.71 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 53 @ 48c ≈ $27.73 → ~$2.21/day
 enwc-uspres-nom-dem-2028-rahema
    qualify bid: already at Target Size ✓
-   score   bid: 9,775 @ 1c ≈ $97.75 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,750 short → $97.50 in 50 order(s)
-   score   ask: 17 @ 49c ≈ $8.50 → ~$2.21/day
+   score   bid: 8,671 @ 1c ≈ $86.71 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 53 @ 48c ≈ $27.73 → ~$2.21/day
 enwc-uspres-nom-dem-2028-rokha
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.21/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 34 @ 49c ≈ $17.22 → ~$2.21/day
 enwc-uspres-nom-dem-2028-stasmi
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.21/day
+   score   bid: 3,408 @ 1c ≈ $34.08 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 52 @ 50c ≈ $26.10 → ~$2.21/day
 enwc-uspres-nom-dem-2028-wesmoo
    qualify bid: already at Target Size ✓
-   score   bid: 9,573 @ 1c ≈ $95.73 → ~$2.21/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 49c ≈ $5.61 → ~$2.21/day
+   score   bid: 8,671 @ 1c ≈ $86.71 → ~$2.21/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 61 @ 49c ≈ $31.11 → ~$2.21/day
 enwc-uspres-nom-rep-2028-dontru
    qualify bid: already at Target Size ✓
-   score   bid: 5,632 @ 1c ≈ $56.32 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 47c ≈ $5.83 → ~$2.68/day
+   score   bid: 8,059 @ 1c ≈ $80.59 → ~$2.68/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 18 @ 45c ≈ $9.72 → ~$2.68/day
 enwc-uspres-nom-rep-2028-dontrujr
    qualify bid: already at Target Size ✓
-   score   bid: 5,632 @ 1c ≈ $56.32 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 45c ≈ $6.05 → ~$2.68/day
+   score   bid: 8,059 @ 1c ≈ $80.59 → ~$2.68/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 18 @ 41c ≈ $10.42 → ~$2.68/day
 enwc-uspres-nom-rep-2028-elomus
    qualify bid: already at Target Size ✓
-   score   bid: 5,615 @ 1c ≈ $56.15 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 49c ≈ $5.61 → ~$2.68/day
+   score   bid: 8,000 @ 1c ≈ $80.00 → ~$2.68/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 18 @ 47c ≈ $9.36 → ~$2.68/day
 enwc-uspres-nom-rep-2028-gleyou
    qualify bid: already at Target Size ✓
-   score   bid: 5,632 @ 1c ≈ $56.32 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 9,750 short → $97.50 in 50 order(s)
-   score   ask: 17 @ 51c ≈ $8.17 → ~$2.68/day
-enwc-uspres-nom-rep-2028-jdvan
-   qualify bid: 9,785 short → $97.85 in 1 order(s)
-   score   bid: 5 @ 19c ≈ $0.95 → ~$2.68/day
+   score   bid: 9,069 @ 1c ≈ $90.69 → ~$2.68/day (same price as the qualifier — one order does both)
    qualify ask: already at Target Size ✓
-   score   ask: 11 @ 68c ≈ $3.52 → ~$2.68/day
+   score   ask: 34 @ 49c ≈ $17.34 → ~$2.68/day
+enwc-uspres-nom-rep-2028-jdvan
+   qualify bid: already at Target Size ✓
+   score   bid: 33 @ 20c ≈ $6.67 → ~$2.68/day
+   qualify ask: already at Target Size ✓
+   score   ask: 52 @ 67c ≈ $17.23 → ~$2.68/day
 enwc-uspres-nom-rep-2028-margre
    qualify bid: already at Target Size ✓
-   score   bid: 5,615 @ 1c ≈ $56.15 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.68/day
+   score   bid: 8,000 @ 1c ≈ $80.00 → ~$2.68/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 50 @ 48c ≈ $26.05 → ~$2.68/day
 enwc-uspres-nom-rep-2028-marrub
    qualify bid: already at Target Size ✓
-   score   bid: 689 @ 6c ≈ $41.32 → ~$2.68/day
-   qualify ask: 9,750 short → $97.50 in 50 order(s)
-   score   ask: 17 @ 53c ≈ $7.83 → ~$2.68/day
+   score   bid: 252 @ 7c ≈ $17.67 → ~$2.68/day
+   qualify ask: already at Target Size ✓
+   score   ask: 50 @ 53c ≈ $23.50 → ~$2.68/day
 enwc-uspres-nom-rep-2028-ranpau
    qualify bid: already at Target Size ✓
-   score   bid: 5,615 @ 1c ≈ $56.15 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 66 short → $0.66 in 1 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.68/day
+   score   bid: 8,011 @ 1c ≈ $80.11 → ~$2.68/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 36 @ 50c ≈ $17.77 → ~$2.68/day
 enwc-uspres-nom-rep-2028-rondes
    qualify bid: already at Target Size ✓
-   score   bid: 5,632 @ 1c ≈ $56.32 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 43c ≈ $6.27 → ~$2.68/day
+   score   bid: 8,059 @ 1c ≈ $80.59 → ~$2.68/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 21 @ 39c ≈ $12.81 → ~$2.68/day
 enwc-uspres-nom-rep-2028-tedcru
    qualify bid: already at Target Size ✓
-   score   bid: 5,632 @ 1c ≈ $56.32 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.68/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$2.68/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 50 @ 48c ≈ $26.05 → ~$2.68/day
 enwc-uspres-nom-rep-2028-thomas
    qualify bid: already at Target Size ✓
-   score   bid: 9,644 @ 1c ≈ $96.44 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.68/day
+   score   bid: 8,011 @ 1c ≈ $80.11 → ~$2.68/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 36 @ 50c ≈ $17.77 → ~$2.68/day
 enwc-uspres-nom-rep-2028-tuccar
    qualify bid: already at Target Size ✓
-   score   bid: 5,632 @ 1c ≈ $56.32 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.68/day
+   score   bid: 8,076 @ 1c ≈ $80.76 → ~$2.68/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 50 @ 49c ≈ $25.72 → ~$2.68/day
 enwc-uspres-nom-rep-2028-tulgab
    qualify bid: already at Target Size ✓
-   score   bid: 5,632 @ 1c ≈ $56.32 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 43c ≈ $6.27 → ~$2.68/day
+   score   bid: 8,035 @ 1c ≈ $80.35 → ~$2.68/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 21 @ 41c ≈ $12.39 → ~$2.68/day
 enwc-uspres-nom-rep-2028-vivram
    qualify bid: already at Target Size ✓
-   score   bid: 5,632 @ 1c ≈ $56.32 → ~$2.68/day (same price as the qualifier — one order does both)
-   qualify ask: 9,767 short → $97.67 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$2.68/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$2.68/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 36 @ 50c ≈ $17.77 → ~$2.68/day
 ewc-usp-2028-11-07-aleocc
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 36 @ 50c ≈ $17.77 → ~$1.39/day
 ewc-usp-2028-11-07-andbes
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 8,058 @ 1c ≈ $80.58 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 52 @ 50c ≈ $26.10 → ~$1.39/day
 ewc-usp-2028-11-07-dontru
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 34 @ 49c ≈ $17.22 → ~$1.39/day
 ewc-usp-2028-11-07-dontrujr
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,408 @ 1c ≈ $34.08 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 50 @ 46c ≈ $27.00 → ~$1.39/day
 ewc-usp-2028-11-07-dwajoh
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,408 @ 1c ≈ $34.08 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 36 @ 50c ≈ $17.77 → ~$1.39/day
 ewc-usp-2028-11-07-elomus
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,408 @ 1c ≈ $34.08 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 52 @ 50c ≈ $26.10 → ~$1.39/day
 ewc-usp-2028-11-07-gavnew
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,725 short → $97.25 in 50 order(s)
-   score   ask: 17 @ 51c ≈ $8.17 → ~$1.39/day
+   score   bid: 8,058 @ 1c ≈ $80.58 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 53 @ 50c ≈ $26.67 → ~$1.39/day
 ewc-usp-2028-11-07-gleyou
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,725 short → $97.25 in 50 order(s)
-   score   ask: 17 @ 51c ≈ $8.17 → ~$1.39/day
+   score   bid: 3,408 @ 1c ≈ $34.08 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 37 @ 50c ≈ $18.33 → ~$1.39/day
 ewc-usp-2028-11-07-jamtal
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 52 @ 50c ≈ $26.10 → ~$1.39/day
 ewc-usp-2028-11-07-jbpri
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,408 @ 1c ≈ $34.08 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: 4 short → $0.04 in 1 order(s)
+   score   ask: 52 @ 50c ≈ $26.10 → ~$1.39/day
 ewc-usp-2028-11-07-jdvan
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 50 @ 49c ≈ $25.72 → ~$1.39/day
 ewc-usp-2028-11-07-jonoss
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,437 @ 1c ≈ $34.37 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 49 @ 50c ≈ $24.48 → ~$1.39/day
 ewc-usp-2028-11-07-jossha
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 34 @ 49c ≈ $17.22 → ~$1.39/day
 ewc-usp-2028-11-07-kamhar
    qualify bid: already at Target Size ✓
-   score   bid: 9,775 @ 1c ≈ $97.75 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 25c ≈ $8.25 → ~$1.39/day
+   score   bid: 8,058 @ 1c ≈ $80.58 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 44 @ 25c ≈ $33.25 → ~$1.39/day
 ewc-usp-2028-11-07-markel
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,775 short → $97.75 in 50 order(s)
-   score   ask: 75 @ 99c ≈ $0.75 → ~$1.39/day (same price as the qualifier — one order does both)
+   score   bid: 8,058 @ 1c ≈ $80.58 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 33 @ 51c ≈ $16.33 → ~$1.39/day
 ewc-usp-2028-11-07-marrub
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 50 @ 49c ≈ $25.72 → ~$1.39/day
 ewc-usp-2028-11-07-micoba
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,408 @ 1c ≈ $34.08 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 34 @ 49c ≈ $17.22 → ~$1.39/day
 ewc-usp-2028-11-07-petbut
    qualify bid: already at Target Size ✓
-   score   bid: 9,720 @ 1c ≈ $97.20 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 9,807 @ 1c ≈ $98.07 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 36 @ 50c ≈ $17.77 → ~$1.39/day
 ewc-usp-2028-11-07-rahema
    qualify bid: already at Target Size ✓
-   score   bid: 9,720 @ 1c ≈ $97.20 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,433 @ 1c ≈ $34.33 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 34 @ 49c ≈ $17.22 → ~$1.39/day
 ewc-usp-2028-11-07-rokha
    qualify bid: already at Target Size ✓
-   score   bid: 9,720 @ 1c ≈ $97.20 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 8,058 @ 1c ≈ $80.58 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 36 @ 50c ≈ $17.77 → ~$1.39/day
 ewc-usp-2028-11-07-rondes
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 8,058 @ 1c ≈ $80.58 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 34 @ 49c ≈ $17.22 → ~$1.39/day
 ewc-usp-2028-11-07-stasmi
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 8,017 @ 1c ≈ $80.17 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 52 @ 50c ≈ $26.10 → ~$1.39/day
 ewc-usp-2028-11-07-thomas
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,408 @ 1c ≈ $34.08 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 52 @ 50c ≈ $26.10 → ~$1.39/day
 ewc-usp-2028-11-07-tuccar
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,725 short → $97.25 in 50 order(s)
-   score   ask: 17 @ 51c ≈ $8.17 → ~$1.39/day
+   score   bid: 3,408 @ 1c ≈ $34.08 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 37 @ 50c ≈ $18.33 → ~$1.39/day
 ewc-usp-2028-11-07-tulgab
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 8,017 @ 1c ≈ $80.17 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 50 @ 48c ≈ $26.05 → ~$1.39/day
 ewc-usp-2028-11-07-vivram
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 3,408 @ 1c ≈ $34.08 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 52 @ 50c ≈ $26.10 → ~$1.39/day
 ewc-usp-2028-11-07-wesmoo
    qualify bid: already at Target Size ✓
-   score   bid: 3,400 @ 1c ≈ $34.00 → ~$1.39/day (same price as the qualifier — one order does both)
-   qualify ask: 9,742 short → $97.42 in 50 order(s)
-   score   ask: 11 @ 51c ≈ $5.39 → ~$1.39/day
+   score   bid: 8,058 @ 1c ≈ $80.58 → ~$1.39/day (same price as the qualifier — one order does both)
+   qualify ask: already at Target Size ✓
+   score   ask: 36 @ 50c ≈ $17.77 → ~$1.39/day
 ewc-usp-party-2028-11-07-dem
    qualify bid: already at Target Size ✓
-   score   bid: 2 @ 61c ≈ $1.04 → ~$18.75/day
+   score   bid: 3 @ 60c ≈ $1.90 → ~$18.75/day
    qualify ask: already at Target Size ✓
-   score   ask: 48 @ 76c ≈ $11.52 → ~$18.75/day
+   score   ask: 8 @ 69c ≈ $2.48 → ~$18.75/day
 ewc-usp-party-2028-11-07-rep
    qualify bid: already at Target Size ✓
-   score   bid: 2 @ 51c ≈ $1.02 → ~$18.75/day
-   qualify ask: 43 short → $0.43 in 1 order(s)
-   score   ask: 19 @ 57c ≈ $8.03 → ~$18.75/day
+   score   bid: 55 @ 30c ≈ $16.50 → ~$18.75/day
+   qualify ask: already at Target Size ✓
+   score   ask: 9 @ 55c ≈ $3.90 → ~$18.75/day
 
-slate totals — qualify every short side: $5,462.50
-               score both sides everywhere: $3,091.95
+slate totals — qualify every short side: $0.06
+               score both sides everywhere: $4,517.41
