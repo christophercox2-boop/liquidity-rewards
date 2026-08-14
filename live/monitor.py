@@ -1380,15 +1380,46 @@ def _verify_resting(market: str, side: str, price_value: str,
     placement returned, and reporting the size actually resting, is what stops
     an increase from silently shrinking the position.
     """
+    # One look after one second was not enough. On 2026-08-14 the open-order
+    # list was lagging placements by several seconds — with ~4,600 orders on
+    # it — so replacements that HAD rested were reported missing, the defender
+    # gave up, and every stuck ask drifted further from the touch while the
+    # alert said the order "may have been cancelled". A controlled test placed
+    # six asks in the two worst markets: all six rested, and all six needed
+    # about four seconds to appear. So poll instead of glancing.
+    deadline = time.time() + VERIFY_MAX_WAIT
+    delay = 1.0
+    last = "no attempt made"
     try:
-        time.sleep(1.0)  # give the exchange a beat to settle the replace
+        while True:
+            time.sleep(delay)
+            found, msg, qty, decided = _verify_once(market, side, price_value,
+                                                    want_id, min_qty)
+            if decided:
+                return found, msg, qty
+            last = msg
+            if time.time() >= deadline:
+                return False, last, 0.0
+            delay = min(delay * 1.6, 4.0)
+    except Exception as e:  # noqa: BLE001
+        return False, f"verify failed: {type(e).__name__}: {e}"[:150], 0.0
+
+
+VERIFY_MAX_WAIT = float(os.environ.get("VERIFY_MAX_WAIT", "12"))
+
+
+def _verify_once(market: str, side: str, price_value: str,
+                 want_id: str | None, min_qty: float | None):
+    """One look at the open-order list. `decided` is False only when the
+    order simply is not there yet — the caller keeps polling on that."""
+    try:
         path = "/v1/orders/open"
         r = requests.request(
             "GET", tr.TRADE_API + path,
             headers=tr.auth_headers(KEY_ID, SECRET_KEY, "GET", path), timeout=20,
         )
         if r.status_code >= 400:
-            return False, f"verify fetch HTTP {r.status_code}", 0.0
+            return False, f"verify fetch HTTP {r.status_code}", 0.0, False
         want = float(price_value)
         for o in r.json().get("orders") or []:
             # a dead record at the target price must not count as "resting" —
@@ -1409,11 +1440,12 @@ def _verify_resting(market: str, side: str, price_value: str,
             if min_qty is not None and qty + 1e-9 < min_qty:
                 return (False,
                         f"rested at only {qty:,.0f} of the {min_qty:,.0f} asked for",
-                        qty)
-            return True, f"verified resting at {want * 100:g}¢ (id {o.get('id')})", qty
-        return False, "NO order found at the new price — it may have been cancelled; check the app", 0.0
+                        qty, True)
+            return True, f"verified resting at {want * 100:g}¢ (id {o.get('id')})", qty, True
+        return (False, "NO order found at the new price — it may have been "
+                "cancelled; check the app", 0.0, False)
     except Exception as e:  # noqa: BLE001
-        return False, f"verify failed: {type(e).__name__}: {e}"[:150], 0.0
+        return False, f"verify failed: {type(e).__name__}: {e}"[:150], 0.0, True
 
 
 PLAN_CACHE: dict = {"politics": {"ts": 0.0, "data": None}, "golf": {"ts": 0.0, "data": None},
@@ -2429,9 +2461,25 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
         if not verified:
             record["verified"] = False
             keep_both = rested > 0
+            # The replacement was accepted. If it is resting and we simply
+            # could not confirm it, retiring it is the honest thing to do:
+            # leaving it creates a duplicate rung nobody is tracking, and a
+            # day of failed verifications is how the book quietly grew by
+            # hundreds of orphan orders. The ORIGINAL is never touched here.
+            orphan = ""
+            if new_id and not keep_both:
+                try:
+                    rc = _api("POST", f"/v1/order/{new_id}/cancel",
+                              {"marketSlug": o["market"]})
+                    orphan = (" replacement withdrawn"
+                              if rc.status_code < 300 else
+                              f" replacement left (cancel HTTP {rc.status_code})")
+                except Exception:  # noqa: BLE001
+                    orphan = " replacement left (cancel failed)"
             record["note"] = (f"replacement {note} — original left in place"
                               if keep_both else
-                              f"replacement did not rest ({note}) — original untouched")
+                              f"replacement did not rest ({note}) — original untouched;"
+                              + (orphan or " no id to withdraw"))
             notify("Reprice replacement did not rest",
                    f"{o['market']} → {price_cents}¢: {note}", "high")
             return 502, {"ok": False, "status": r.status_code,
