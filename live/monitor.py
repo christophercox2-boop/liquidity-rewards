@@ -3061,6 +3061,103 @@ def auto_defend() -> None:
             moves += 1
 
 
+# ---------------------------------------------------------------------------
+# The bid sniper. Somebody keeps parking one- and two-contract bids well above
+# fair value on the 2028 longshots — 15c and up on candidates the market
+# otherwise prices near a cent. Two reasons to take them:
+#
+#   1. it is money. A contract sold at 20c on a name worth 1c is 19c.
+#   2. it unblocks our own scoring. That tiny bid SETS THE TOUCH, and our
+#      10,000-share block at 1c is then twenty-odd ticks behind it, scoring
+#      nothing on a side worth $5-10 a day. Clearing a 1-contract order at
+#      20c can switch a whole bid side back on.
+#
+# This is the one loop here that CROSSES the spread — it is a taker, not a
+# rester, and it pays the taker fee. It is deliberately narrow: only the 2028
+# slate, only levels at or under SNIPE_MAX_QTY contracts, only at or above
+# SNIPE_MIN_PRICE, never the three candidates the owner named as real
+# contenders, and bounded per cycle in both count and dollars.
+#
+# Like every other loop that places orders, it does nothing at all until the
+# owner turns its switch on from /map. Off by default, persisted, audit-logged.
+SNIPE_MAX_QTY = float(os.environ.get("SNIPE_MAX_QTY", "2"))
+SNIPE_MIN_PRICE = float(os.environ.get("SNIPE_MIN_PRICE", "0.15"))
+SNIPE_MAX_PER_CYCLE = int(os.environ.get("SNIPE_MAX_PER_CYCLE", "6"))
+SNIPE_MAX_SPEND = float(os.environ.get("SNIPE_MAX_SPEND", "25"))
+SNIPE_COOLDOWN = float(os.environ.get("SNIPE_COOLDOWN", "300"))
+SNIPE_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                  "ewc-usp-2028-11-07-")
+# the owner's own read: nobody outside these three is near a 25% chance, so
+# selling them at 15c+ is selling above fair. These three are not.
+SNIPE_EXCLUDE = {"jdvan", "marrub", "kamhar"}
+_SNIPE_LAST: dict = {}
+
+
+def auto_snipe() -> None:
+    """Take the tiny over-priced bids sitting on the 2028 longshots."""
+    if not _auto_on("snipe"):
+        return
+    if os.environ.get("SNIPE_PAUSE", "") == "1":
+        return
+    now = time.time()
+    took = 0
+    spent = 0.0
+    for m, ent in list(tr._BOOK_CACHE.items()):
+        if took >= SNIPE_MAX_PER_CYCLE or spent >= SNIPE_MAX_SPEND:
+            return
+        if not m.startswith(SNIPE_PREFIXES):
+            continue
+        if m.rsplit("-", 1)[-1] in SNIPE_EXCLUDE:
+            continue
+        if now - _SNIPE_LAST.get(m, 0.0) < SNIPE_COOLDOWN:
+            continue
+        if not ent or now - ent[0] > 120:
+            continue          # only ever act on a fresh book
+        bids = (ent[1] or {}).get("bids") or []
+        if not bids:
+            continue
+        px, q = float(bids[0][0]), float(bids[0][1])
+        # only the TOUCH level, and only if it is both small and rich. A big
+        # bid at 20c is somebody's real opinion; a single contract is not.
+        if px < SNIPE_MIN_PRICE or q > SNIPE_MAX_QTY or q < 1:
+            continue
+        # never trade with ourselves
+        ours = sum(o.get("size") or 0 for o in MONITOR.orders
+                   if o.get("market") == m and o.get("side") == "BUY"
+                   and abs(float(o.get("price") or 0) - px) < 1e-9)
+        if q - ours < 1:
+            continue
+        qty = int(min(q - ours, SNIPE_MAX_QTY))
+        if qty < 1 or spent + px * qty > SNIPE_MAX_SPEND:
+            continue
+        _SNIPE_LAST[m] = now
+        try:
+            r = requests.request(
+                "POST", tr.TRADE_API + "/v1/orders",
+                headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                         "Content-Type": "application/json"},
+                json={"marketSlug": m, "intent": "ORDER_INTENT_BUY_SHORT",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{px:.2f}", "currency": "USD"},
+                      "quantity": qty,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": False},   # crosses on purpose
+                timeout=20)
+            ok = r.status_code < 300
+            ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                            "market": m, "side": "SNIPE sell", "from": "—",
+                            "to": round(px * 100, 1), "size": qty,
+                            "status": r.status_code,
+                            "response": " ".join(r.text.split())[:120],
+                            "verified": ok})
+            del ACTIONS[:-20]
+            if ok:
+                took += 1
+                spent += px * qty
+        except Exception:  # noqa: BLE001 — a sniper must never kill the poll
+            continue
+
+
 def _race_prefix(slug: str) -> str:
     """Sibling-group key: seat ladders group by their ladder prefix, everything
     else by the slug minus its last token (the candidate/outcome)."""
@@ -3811,8 +3908,9 @@ def do_maction(body: dict) -> tuple[int, dict]:
         # The owner's on/off button for a placement loop. Auth and the
         # X-Reprice CSRF header are already enforced by the POST handler.
         which = str(body.get("which") or "")
-        if which not in ("defend", "keeper"):
-            return 400, {"ok": False, "error": "which must be defend or keeper"}
+        if which not in ("defend", "keeper", "snipe"):
+            return 400, {"ok": False,
+                         "error": "which must be defend, keeper or snipe"}
         on = bool(body.get("on"))
         with MONITOR.lock:
             auto = MONITOR.state.setdefault("auto", {})
@@ -4364,6 +4462,8 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
       <span class="nm">Defender</span><span class="st">loading…</span></button>
     <button class="autosw" id="sw_keeper" onclick="swTap('keeper')" disabled>
       <span class="nm">Keeper</span><span class="st">loading…</span></button>
+    <button class="autosw" id="sw_snipe" onclick="swTap('snipe')" disabled>
+      <span class="nm">Sniper</span><span class="st">loading…</span></button>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
   <div class="chips" id="chips"></div>
@@ -4490,11 +4590,12 @@ function render(){
 const SWDESC = {
   defend: {on:'repricing orders in armed markets', off:'not placing anything'},
   keeper: {on:'placing size to hold qualification', off:'not placing anything'},
+  snipe: {on:'taking tiny over-priced 2028 bids', off:'not taking anything'},
 };
 const SWARM = {};
 function swRender(){
   if(!DATA || !DATA.auto) return;
-  ['defend','keeper'].forEach(k=>{
+  ['defend','keeper','snipe'].forEach(k=>{
     const b=document.getElementById('sw_'+k); if(!b) return;
     b.disabled=false;
     const on = DATA.auto[k]===true;
@@ -7006,6 +7107,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     keep_qualified()
                 except Exception as e:  # noqa: BLE001 — keeper never kills the poll
                     MONITOR.error = f"keeper: {type(e).__name__}: {e}"[:150]
+                try:
+                    auto_snipe()
+                except Exception as e:  # noqa: BLE001 — sniper never kills the poll
+                    MONITOR.error = f"snipe: {type(e).__name__}: {e}"[:150]
             except Exception as e:  # noqa: BLE001 — defense never kills the poll
                 MONITOR.error = f"defend: {type(e).__name__}: {e}"[:150]
             MONITOR.maybe_save_remote()
