@@ -36,7 +36,7 @@ on:
         default: false
       budget:
         description: "max notional to commit, dollars"
-        default: "700"
+        default: "900"
 
 permissions:
   contents: write
@@ -69,7 +69,7 @@ jobs:
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
-          BUDGET = float(os.environ.get("BUDGET") or 700)
+          BUDGET = float(os.environ.get("BUDGET") or 900)
           BUF = io.StringIO(); _p = print
           def print(*a, **k):
               _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
