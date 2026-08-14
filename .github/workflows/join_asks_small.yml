@@ -1,0 +1,231 @@
+name: Join fair asks small
+
+# ORDER-TOUCHING. Places real orders — but push runs are FORCED DRY.
+# Manual dispatch with dry_run unchecked is the only way it places.
+#
+# The tactic (owner, 2026-08-14 evening): other participants are pricing
+# the 2028 slate asks fairly, tight to value. Rather than fight for share
+# there, join each fair touch with ONE share so we are never entirely
+# shut out of the ask-side pool. A single share at the touch carries full
+# discount-factor weight, so on thin touches it is a real fraction of the
+# score; and if it fills, selling one share at a fair price is a fair
+# trade, not a loss.
+#
+# Per market: if our ask size AT the current best ask is zero, place
+# qty (default 1) at that price, post-only. Markets where we already
+# hold the touch are skipped. Nothing is repriced or cancelled.
+#
+# Cost: an ask consumes about $1 of buying power per share regardless of
+# price, so the whole slate is roughly $60 of buying power for ~60 sides.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/join_asks_small.yml
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "plan only, place nothing"
+        type: boolean
+        default: false
+      qty:
+        description: "shares per market"
+        default: "1"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: join-asks-small
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          QTY: ${{ inputs.qty }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
+          if os.environ.get("GITHUB_EVENT_NAME") == "push":
+              DRY = True          # push never places; only a deliberate dispatch does
+          QTY = float(os.environ.get("QTY") or 1)
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+          TICK = 0.01
+          MAX_ORDERS = 80
+
+          def api(method, path, body=None):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  json=body, timeout=30)
+
+          # our resting asks per market, keyed by price — open orders are
+          # authoritative, the public book lags
+          mine: dict = {}
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          for o in r.json().get("orders") or []:
+              if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                             "ORDER_STATE_PARTIALLY_FILLED"):
+                  continue
+              s = o.get("marketSlug") or ""
+              if not s.startswith(PREFIXES):
+                  continue
+              if not str(o.get("intent") or "").endswith(("BUY_SHORT", "SELL_LONG")):
+                  continue
+              px = round(tr._num((o.get("price") or {}).get("value")) or 0, 2)
+              q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+              mine.setdefault(s, {})
+              mine[s][px] = mine[s].get(px, 0.0) + q
+
+          pol, sizes = tr.fetch_politics_events()
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+
+          progs = {}
+          for i in range(0, len(slate), 25):
+              try:
+                  rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                    params={"symbols": slate[i:i+25], "pageSize": 100}, timeout=30)
+                  for p in rr.json().get("programs") or []:
+                      s = p.get("marketSlug") or ""
+                      tp = tr._pick_period(p.get("timePeriods") or [], s)
+                      if tp is not None and s:
+                          progs[s] = tr._prog_of(tp)
+              except Exception:
+                  pass
+              time.sleep(0.1)
+
+          print(f"2028 slate: {len(slate)} markets — join each fair ask touch "
+                f"with {QTY:g} share{'s' if QTY != 1 else ''}"
+                + ("   (DRY RUN)" if DRY else "") + "\n")
+          print(f"{'market':42s} {'touch':>6s} {'at-touch':>9s} {'our off':>7s} "
+                f"{'est$/d':>7s}  action")
+
+          placed = failed = skipped = 0
+          spent_bp = 0.0
+          out = []
+          for slug in slate:
+              if placed >= MAX_ORDERS:
+                  print("order ceiling reached"); break
+              try:
+                  bk = tr._fetch_book(slug)
+              except Exception as e:
+                  print(f"{slug:42s} book unavailable ({type(e).__name__})"); continue
+              time.sleep(0.2)
+              asks = bk.get("asks") or []
+              if not asks:
+                  print(f"{slug:42s} {'—':>6s} no asks at all — nothing to join")
+                  continue
+              best = asks[0][0]
+              if not (0.001 <= best <= 0.999):
+                  continue
+              ours_px = mine.get(slug) or {}
+              at_touch = ours_px.get(round(best, 2), 0.0)
+              our_best = min(ours_px, key=lambda p: abs(p - best)) if ours_px else None
+              off = round(abs(best - our_best) / TICK) if our_best is not None else None
+              # est: our 1 share at the touch vs the scoring window
+              pr = progs.get(slug) or {}
+              target = float(pr.get("target") or 0)
+              df = float(pr.get("df") or 0.2)
+              per = float(pr.get("pool") or 0) / max(sizes.get(slug, 1), 1) / 2
+              win, cum = [], 0.0
+              for px, q in asks:
+                  win.append((px, q)); cum += q
+                  if target and cum >= target:
+                      break
+              den = sum(q * df ** round(abs(best - px) / TICK) for px, q in win)
+              tot = sum(q for _, q in asks)
+              qual = target and tot >= target
+              est = per * QTY / (den + QTY) if (qual and den) else 0.0
+              if at_touch > 0:
+                  skipped += 1
+                  print(f"{slug:42s} {best*100:5.1f}c {asks[0][1]:9,.1f} {0:7d} "
+                        f"{est:7.2f}  already at the touch ({at_touch:g}) — skip")
+                  continue
+              row = {"m": slug, "px": round(best, 2), "qty": QTY,
+                     "qual": bool(qual), "est": round(est, 2), "ok": None}
+              print(f"{slug:42s} {best*100:5.1f}c {asks[0][1]:9,.1f} "
+                    f"{off if off is not None else '-':>7} {est:7.2f}  "
+                    + ("join" if qual else "join (side below Target Size — pays 0 today)"))
+              if DRY:
+                  out.append(row); placed += 1; spent_bp += QTY
+                  continue
+              body = {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_SHORT",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{best:.2f}", "currency": "USD"},
+                      "quantity": QTY if QTY % 1 else int(QTY),
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              ok, why, delay = False, "", 2.0
+              for attempt in range(4):
+                  try:
+                      rr = api("POST", "/v1/orders", body)
+                      if rr.status_code < 300:
+                          ok = True; break
+                      why = " ".join(rr.text.split())[:120]
+                      if rr.status_code not in (429, 500, 502, 503, 504):
+                          break
+                  except Exception as e:
+                      why = type(e).__name__
+                  time.sleep(delay); delay = min(delay * 2, 20)
+              placed += ok; failed += (not ok)
+              spent_bp += QTY if ok else 0
+              row["ok"] = ok
+              if not ok:
+                  print(f"    FAILED {why}")
+              out.append(row)
+              time.sleep(0.7)
+
+          print(f"\n{'would place' if DRY else 'placed'} {placed}, failed {failed}, "
+                f"skipped (already at touch) {skipped}")
+          print(f"buying power used ~${spent_bp:,.0f} "
+                f"(an ask holds ~$1 of buying power per share)")
+          print(f"estimated added earnings ${sum(r['est'] for r in out):,.2f}/day "
+                f"across {sum(1 for r in out if r['qual'])} qualifying sides")
+
+          os.makedirs("data", exist_ok=True)
+          json.dump({"dry_run": DRY, "qty": QTY, "placed": placed,
+                     "failed": failed, "skipped": skipped, "orders": out},
+                    open("data/join_asks_small.json", "w"), indent=1)
+          with open("data/join_asks_small.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/join_asks_small.json data/join_asks_small.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Join fair asks small [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi
