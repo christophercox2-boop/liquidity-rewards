@@ -1,5 +1,5 @@
 {
- "buying_power": 155.7816,
+ "buying_power": 202.3823,
  "rows": [
   {
    "m": "enwc-uspres-nom-dem-2028-aleocc",
@@ -8,53 +8,53 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 17,
-   "held": 53,
-   "bb": 0.01,
-   "ba": 0.48,
-   "bid_total": 26000.0,
-   "ask_total": 11000.5,
+   "held": 69,
+   "bb": 0.02,
+   "ba": 0.4,
+   "bid_total": 10339.58,
+   "ask_total": 12559.82,
    "bids": [
     [
+     0.02,
+     139.58
+    ],
+    [
      0.01,
-     26000.0
+     10200.0
     ]
    ],
    "asks": [
     [
-     0.48,
-     150.0
-    ],
-    [
-     0.49,
-     33.0
+     0.4,
+     100.0
     ],
     [
      0.99,
-     10817.5
+     12459.82
     ]
    ],
    "gap_BUY": 0.0,
    "qcost_BUY": 0.0,
    "qorders_BUY": 1,
    "score_BUY": {
-    "px": 0.01,
-    "size": 8667,
-    "cost": 86.67,
+    "px": 0.02,
+    "size": 727,
+    "cost": 14.53,
     "est": 2.21,
-    "qual_at_touch": true,
-    "denom": 26000.0,
+    "qual_at_touch": false,
+    "denom": 2179.6,
     "per_side": 8.82
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.48,
-    "size": 52,
-    "cost": 27.14,
+    "px": 0.4,
+    "size": 33,
+    "cost": 20.0,
     "est": 2.21,
     "qual_at_touch": false,
-    "denom": 156.6,
+    "denom": 100.0,
     "per_side": 8.82
    }
   },
@@ -65,29 +65,29 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 17,
-   "held": 53,
+   "held": 69,
    "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 10300.0,
-   "ask_total": 9998.5,
+   "ba": 0.46,
+   "bid_total": 28818.0,
+   "ask_total": 12592.82,
    "bids": [
     [
      0.01,
-     10300.0
+     28818.0
     ]
    ],
    "asks": [
     [
-     0.5,
-     150.0
-    ],
-    [
-     0.51,
+     0.46,
      33.0
     ],
     [
+     0.47,
+     100.0
+    ],
+    [
      0.99,
-     9815.5
+     12459.82
     ]
    ],
    "gap_BUY": 0.0,
@@ -95,23 +95,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 3433,
-    "cost": 34.33,
+    "size": 9606,
+    "cost": 96.06,
     "est": 2.21,
     "qual_at_touch": true,
-    "denom": 10300.0,
+    "denom": 28818.0,
     "per_side": 8.82
    },
-   "gap_SELL": 1.5,
-   "qcost_SELL": 0.015,
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 52,
-    "cost": 26.1,
+    "px": 0.46,
+    "size": 18,
+    "cost": 9.54,
     "est": 2.21,
     "qual_at_touch": false,
-    "denom": 156.6,
+    "denom": 53.0,
     "per_side": 8.82
    }
   },
@@ -122,29 +122,25 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 17,
-   "held": 2,
+   "held": 66,
    "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 10225.0,
-   "ask_total": 11100.0,
+   "ba": 0.49,
+   "bid_total": 10419.0,
+   "ask_total": 10294.36,
    "bids": [
     [
      0.01,
-     10225.0
+     10419.0
     ]
    ],
    "asks": [
     [
-     0.5,
-     100.0
-    ],
-    [
-     0.51,
-     50.0
+     0.49,
+     150.0
     ],
     [
      0.99,
-     10950.0
+     10144.36
     ]
    ],
    "gap_BUY": 0.0,
@@ -152,23 +148,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 3408,
-    "cost": 34.08,
+    "size": 3473,
+    "cost": 34.73,
     "est": 2.21,
     "qual_at_touch": true,
-    "denom": 10225.0,
+    "denom": 10419.0,
     "per_side": 8.82
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 37,
-    "cost": 18.33,
+    "px": 0.49,
+    "size": 50,
+    "cost": 25.5,
     "est": 2.21,
     "qual_at_touch": false,
-    "denom": 110.0,
+    "denom": 150.0,
     "per_side": 8.82
    }
   },
@@ -181,7 +177,7 @@
    "event_n": 17,
    "held": 69,
    "bb": 0.01,
-   "ba": 0.49,
+   "ba": 0.5,
    "bid_total": 10300.0,
    "ask_total": 10780.5,
    "bids": [
@@ -192,12 +188,8 @@
    ],
    "asks": [
     [
-     0.49,
-     100.0
-    ],
-    [
-     0.51,
-     50.0
+     0.5,
+     150.0
     ],
     [
      0.99,
@@ -220,12 +212,12 @@
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.49,
-    "size": 34,
-    "cost": 17.34,
+    "px": 0.5,
+    "size": 50,
+    "cost": 25.0,
     "est": 2.21,
     "qual_at_touch": false,
-    "denom": 102.0,
+    "denom": 150.0,
     "per_side": 8.82
    }
   },
@@ -236,11 +228,68 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 17,
-   "held": 53,
+   "held": 69,
+   "bb": 0.01,
+   "ba": 0.46,
+   "bid_total": 29415.0,
+   "ask_total": 12592.82,
+   "bids": [
+    [
+     0.01,
+     29415.0
+    ]
+   ],
+   "asks": [
+    [
+     0.46,
+     33.0
+    ],
+    [
+     0.47,
+     100.0
+    ],
+    [
+     0.99,
+     12459.82
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 9805,
+    "cost": 98.05,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 29415.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.46,
+    "size": 18,
+    "cost": 9.54,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 53.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jbpri",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 65,
    "bb": 0.01,
    "ba": 0.48,
    "bid_total": 10300.0,
-   "ask_total": 11000.5,
+   "ask_total": 11931.74,
    "bids": [
     [
      0.01,
@@ -250,15 +299,15 @@
    "asks": [
     [
      0.48,
-     100.0
-    ],
-    [
-     0.49,
      33.0
     ],
     [
+     0.49,
+     100.0
+    ],
+    [
      0.99,
-     10867.5
+     11798.74
     ]
    ],
    "gap_BUY": 0.0,
@@ -278,68 +327,11 @@
    "qorders_SELL": 1,
    "score_SELL": {
     "px": 0.48,
-    "size": 36,
-    "cost": 18.48,
+    "size": 18,
+    "cost": 9.19,
     "est": 2.21,
     "qual_at_touch": false,
-    "denom": 106.6,
-    "per_side": 8.82
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-dem-2028-jbpri",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 17,
-   "held": 53,
-   "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 10300.0,
-   "ask_total": 11000.5,
-   "bids": [
-    [
-     0.01,
-     10300.0
-    ]
-   ],
-   "asks": [
-    [
-     0.5,
-     150.0
-    ],
-    [
-     0.51,
-     33.0
-    ],
-    [
-     0.99,
-     10817.5
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 3433,
-    "cost": 34.33,
-    "est": 2.21,
-    "qual_at_touch": true,
-    "denom": 10300.0,
-    "per_side": 8.82
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.5,
-    "size": 52,
-    "cost": 26.1,
-    "est": 2.21,
-    "qual_at_touch": false,
-    "denom": 156.6,
+    "denom": 53.0,
     "per_side": 8.82
    }
   },
@@ -350,11 +342,11 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 17,
-   "held": 55,
+   "held": 71,
    "bb": 0.13,
-   "ba": 0.48,
+   "ba": 0.42,
    "bid_total": 10452.75,
-   "ask_total": 11050.27,
+   "ask_total": 12495.59,
    "bids": [
     [
      0.13,
@@ -375,16 +367,16 @@
    ],
    "asks": [
     [
-     0.48,
+     0.42,
+     4.77
+    ],
+    [
+     0.43,
      25.0
     ],
     [
-     0.49,
-     54.77
-    ],
-    [
      0.99,
-     10970.5
+     12465.82
     ]
    ],
    "gap_BUY": 0.0,
@@ -403,12 +395,12 @@
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.48,
-    "size": 12,
-    "cost": 6.23,
+    "px": 0.42,
+    "size": 3,
+    "cost": 1.89,
     "est": 2.21,
     "qual_at_touch": false,
-    "denom": 36.0,
+    "denom": 9.8,
     "per_side": 8.82
    }
   },
@@ -419,29 +411,25 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 17,
-   "held": 53,
+   "held": 69,
    "bb": 0.01,
-   "ba": 0.47,
-   "bid_total": 25824.0,
-   "ask_total": 12052.5,
+   "ba": 0.51,
+   "bid_total": 10200.0,
+   "ask_total": 12492.82,
    "bids": [
     [
      0.01,
-     25824.0
+     10200.0
     ]
    ],
    "asks": [
-    [
-     0.47,
-     100.0
-    ],
     [
      0.51,
      50.0
     ],
     [
      0.99,
-     11902.5
+     12442.82
     ]
    ],
    "gap_BUY": 0.0,
@@ -449,23 +437,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8608,
-    "cost": 86.08,
+    "size": 3400,
+    "cost": 34.0,
     "est": 2.21,
     "qual_at_touch": true,
-    "denom": 25824.0,
+    "denom": 10200.0,
     "per_side": 8.82
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.47,
-    "size": 33,
-    "cost": 17.68,
+    "px": 0.51,
+    "size": 17,
+    "cost": 8.17,
     "est": 2.21,
     "qual_at_touch": false,
-    "denom": 100.1,
+    "denom": 50.0,
     "per_side": 8.82
    }
   },
@@ -476,29 +464,29 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 17,
-   "held": 53,
+   "held": 65,
    "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 24210.0,
-   "ask_total": 11000.5,
+   "ba": 0.49,
+   "bid_total": 29384.0,
+   "ask_total": 11931.74,
    "bids": [
     [
      0.01,
-     24210.0
+     29384.0
     ]
    ],
    "asks": [
+    [
+     0.49,
+     33.0
+    ],
     [
      0.5,
      100.0
     ],
     [
-     0.51,
-     33.0
-    ],
-    [
      0.99,
-     10867.5
+     11798.74
     ]
    ],
    "gap_BUY": 0.0,
@@ -506,23 +494,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8070,
-    "cost": 80.7,
+    "size": 9795,
+    "cost": 97.95,
     "est": 2.21,
     "qual_at_touch": true,
-    "denom": 24210.0,
+    "denom": 29384.0,
     "per_side": 8.82
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 36,
-    "cost": 17.77,
+    "px": 0.49,
+    "size": 18,
+    "cost": 9.01,
     "est": 2.21,
     "qual_at_touch": false,
-    "denom": 106.6,
+    "denom": 53.0,
     "per_side": 8.82
    }
   },
@@ -533,29 +521,25 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 17,
-   "held": 53,
+   "held": 69,
    "bb": 0.01,
-   "ba": 0.48,
-   "bid_total": 26013.0,
-   "ask_total": 11100.5,
+   "ba": 0.49,
+   "bid_total": 10200.0,
+   "ask_total": 12492.82,
    "bids": [
     [
      0.01,
-     26013.0
+     10200.0
     ]
    ],
    "asks": [
-    [
-     0.48,
-     100.0
-    ],
     [
      0.49,
      33.0
     ],
     [
      0.99,
-     10967.5
+     12459.82
     ]
    ],
    "gap_BUY": 0.0,
@@ -563,23 +547,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8671,
-    "cost": 86.71,
+    "size": 3400,
+    "cost": 34.0,
     "est": 2.21,
     "qual_at_touch": true,
-    "denom": 26013.0,
+    "denom": 10200.0,
     "per_side": 8.82
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.48,
-    "size": 36,
-    "cost": 18.48,
+    "px": 0.49,
+    "size": 11,
+    "cost": 5.61,
     "est": 2.21,
     "qual_at_touch": false,
-    "denom": 106.6,
+    "denom": 33.0,
     "per_side": 8.82
    }
   },
@@ -590,29 +574,25 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 17,
-   "held": 53,
+   "held": 69,
    "bb": 0.01,
    "ba": 0.49,
-   "bid_total": 10300.0,
-   "ask_total": 11000.5,
+   "bid_total": 28818.0,
+   "ask_total": 12592.82,
    "bids": [
     [
      0.01,
-     10300.0
+     28818.0
     ]
    ],
    "asks": [
     [
      0.49,
-     100.0
-    ],
-    [
-     0.51,
-     50.0
+     150.0
     ],
     [
      0.99,
-     10850.5
+     12442.82
     ]
    ],
    "gap_BUY": 0.0,
@@ -620,11 +600,11 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 3433,
-    "cost": 34.33,
+    "size": 9606,
+    "cost": 96.06,
     "est": 2.21,
     "qual_at_touch": true,
-    "denom": 10300.0,
+    "denom": 28818.0,
     "per_side": 8.82
    },
    "gap_SELL": 0.0,
@@ -632,11 +612,11 @@
    "qorders_SELL": 1,
    "score_SELL": {
     "px": 0.49,
-    "size": 34,
-    "cost": 17.34,
+    "size": 50,
+    "cost": 25.5,
     "est": 2.21,
     "qual_at_touch": false,
-    "denom": 102.0,
+    "denom": 150.0,
     "per_side": 8.82
    }
   },
@@ -647,353 +627,15 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 17,
-   "held": 53,
-   "bb": 0.01,
-   "ba": 0.48,
-   "bid_total": 25826.0,
-   "ask_total": 11050.2,
-   "bids": [
-    [
-     0.01,
-     25826.0
-    ]
-   ],
-   "asks": [
-    [
-     0.48,
-     150.0
-    ],
-    [
-     0.49,
-     33.0
-    ],
-    [
-     0.99,
-     10867.2
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 8609,
-    "cost": 86.09,
-    "est": 2.21,
-    "qual_at_touch": true,
-    "denom": 25826.0,
-    "per_side": 8.82
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.48,
-    "size": 52,
-    "cost": 27.14,
-    "est": 2.21,
-    "qual_at_touch": false,
-    "denom": 156.6,
-    "per_side": 8.82
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-dem-2028-petbut",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 17,
-   "held": 53,
-   "bb": 0.01,
-   "ba": 0.48,
-   "bid_total": 26013.0,
-   "ask_total": 11050.0,
-   "bids": [
-    [
-     0.01,
-     26013.0
-    ]
-   ],
-   "asks": [
-    [
-     0.48,
-     150.0
-    ],
-    [
-     0.49,
-     50.0
-    ],
-    [
-     0.99,
-     10850.0
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 8671,
-    "cost": 86.71,
-    "est": 2.21,
-    "qual_at_touch": true,
-    "denom": 26013.0,
-    "per_side": 8.82
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.48,
-    "size": 53,
-    "cost": 27.73,
-    "est": 2.21,
-    "qual_at_touch": false,
-    "denom": 160.0,
-    "per_side": 8.82
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-dem-2028-rahema",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 17,
-   "held": 53,
-   "bb": 0.01,
-   "ba": 0.48,
-   "bid_total": 26013.0,
-   "ask_total": 11050.0,
-   "bids": [
-    [
-     0.01,
-     26013.0
-    ]
-   ],
-   "asks": [
-    [
-     0.48,
-     150.0
-    ],
-    [
-     0.49,
-     50.0
-    ],
-    [
-     0.99,
-     10850.0
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 8671,
-    "cost": 86.71,
-    "est": 2.21,
-    "qual_at_touch": true,
-    "denom": 26013.0,
-    "per_side": 8.82
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.48,
-    "size": 53,
-    "cost": 27.73,
-    "est": 2.21,
-    "qual_at_touch": false,
-    "denom": 160.0,
-    "per_side": 8.82
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-dem-2028-rokha",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 17,
-   "held": 55,
-   "bb": 0.01,
-   "ba": 0.49,
-   "bid_total": 10300.0,
-   "ask_total": 12158.37,
-   "bids": [
-    [
-     0.01,
-     10300.0
-    ]
-   ],
-   "asks": [
-    [
-     0.49,
-     100.0
-    ],
-    [
-     0.51,
-     33.0
-    ],
-    [
-     0.99,
-     12025.37
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 3433,
-    "cost": 34.33,
-    "est": 2.21,
-    "qual_at_touch": true,
-    "denom": 10300.0,
-    "per_side": 8.82
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.49,
-    "size": 34,
-    "cost": 17.22,
-    "est": 2.21,
-    "qual_at_touch": false,
-    "denom": 101.3,
-    "per_side": 8.82
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-dem-2028-stasmi",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 17,
-   "held": 2,
-   "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 10225.0,
-   "ask_total": 11050.0,
-   "bids": [
-    [
-     0.01,
-     10225.0
-    ]
-   ],
-   "asks": [
-    [
-     0.5,
-     150.0
-    ],
-    [
-     0.51,
-     33.0
-    ],
-    [
-     0.99,
-     10867.0
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 3408,
-    "cost": 34.08,
-    "est": 2.21,
-    "qual_at_touch": true,
-    "denom": 10225.0,
-    "per_side": 8.82
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.5,
-    "size": 52,
-    "cost": 26.1,
-    "est": 2.21,
-    "qual_at_touch": false,
-    "denom": 156.6,
-    "per_side": 8.82
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-dem-2028-wesmoo",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 17,
-   "held": 59,
-   "bb": 0.01,
-   "ba": 0.49,
-   "bid_total": 26013.0,
-   "ask_total": 11000.36,
-   "bids": [
-    [
-     0.01,
-     26013.0
-    ]
-   ],
-   "asks": [
-    [
-     0.49,
-     183.0
-    ],
-    [
-     0.99,
-     10817.36
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 8671,
-    "cost": 86.71,
-    "est": 2.21,
-    "qual_at_touch": true,
-    "denom": 26013.0,
-    "per_side": 8.82
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.49,
-    "size": 61,
-    "cost": 31.11,
-    "est": 2.21,
-    "qual_at_touch": false,
-    "denom": 183.0,
-    "per_side": 8.82
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-dontru",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 14,
-   "held": 59,
+   "held": 69,
    "bb": 0.01,
    "ba": 0.45,
-   "bid_total": 24176.0,
-   "ask_total": 20692.36,
+   "bid_total": 28612.0,
+   "ask_total": 12590.52,
    "bids": [
     [
      0.01,
-     24176.0
+     28612.0
     ]
    ],
    "asks": [
@@ -1007,7 +649,7 @@
     ],
     [
      0.99,
-     20559.36
+     12457.52
     ]
    ],
    "gap_BUY": 0.0,
@@ -1015,12 +657,12 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8059,
-    "cost": 80.59,
-    "est": 2.68,
+    "size": 9537,
+    "cost": 95.37,
+    "est": 2.21,
     "qual_at_touch": true,
-    "denom": 24176.0,
-    "per_side": 10.71
+    "denom": 28612.0,
+    "per_side": 8.82
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
@@ -1029,6 +671,332 @@
     "px": 0.45,
     "size": 18,
     "cost": 9.72,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 53.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-petbut",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 65,
+   "bb": 0.01,
+   "ba": 0.47,
+   "bid_total": 10300.0,
+   "ask_total": 11929.24,
+   "bids": [
+    [
+     0.01,
+     10300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.47,
+     50.0
+    ],
+    [
+     0.48,
+     100.0
+    ],
+    [
+     0.99,
+     11779.24
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 3433,
+    "cost": 34.33,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 10300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.47,
+    "size": 23,
+    "cost": 12.37,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 70.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rahema",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 69,
+   "bb": 0.01,
+   "ba": 0.47,
+   "bid_total": 10494.0,
+   "ask_total": 12590.32,
+   "bids": [
+    [
+     0.01,
+     10494.0
+    ]
+   ],
+   "asks": [
+    [
+     0.47,
+     150.0
+    ],
+    [
+     0.99,
+     12440.32
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 3498,
+    "cost": 34.98,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 10494.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.47,
+    "size": 50,
+    "cost": 26.5,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 150.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rokha",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 71,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 29137.0,
+   "ask_total": 12386.69,
+   "bids": [
+    [
+     0.01,
+     29137.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     33.0
+    ],
+    [
+     0.99,
+     12353.69
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 9712,
+    "cost": 97.12,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 29137.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 11,
+    "cost": 5.39,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 33.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-stasmi",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 66,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 29130.0,
+   "ask_total": 10194.36,
+   "bids": [
+    [
+     0.01,
+     29130.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     33.0
+    ],
+    [
+     0.99,
+     10161.36
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 9710,
+    "cost": 97.1,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 29130.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 11,
+    "cost": 5.39,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 33.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-wesmoo",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 75,
+   "bb": 0.01,
+   "ba": 0.47,
+   "bid_total": 10200.0,
+   "ask_total": 12469.68,
+   "bids": [
+    [
+     0.01,
+     10200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.47,
+     33.0
+    ],
+    [
+     0.99,
+     12436.68
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 3400,
+    "cost": 34.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 10200.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.47,
+    "size": 11,
+    "cost": 5.83,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 33.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-dontru",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 75,
+   "bb": 0.01,
+   "ba": 0.39,
+   "bid_total": 10300.0,
+   "ask_total": 12569.68,
+   "bids": [
+    [
+     0.01,
+     10300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.39,
+     33.0
+    ],
+    [
+     0.4,
+     100.0
+    ],
+    [
+     0.99,
+     12436.68
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 3433,
+    "cost": 34.33,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 10300.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.39,
+    "size": 18,
+    "cost": 10.78,
     "est": 2.68,
     "qual_at_touch": false,
     "denom": 53.0,
@@ -1042,29 +1010,29 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 14,
-   "held": 2,
+   "held": 66,
    "bb": 0.01,
-   "ba": 0.41,
-   "bid_total": 24176.0,
-   "ask_total": 11000.0,
+   "ba": 0.37,
+   "bid_total": 28815.0,
+   "ask_total": 10294.84,
    "bids": [
     [
      0.01,
-     24176.0
+     28815.0
     ]
    ],
    "asks": [
     [
-     0.41,
+     0.37,
      33.0
     ],
     [
-     0.42,
+     0.38,
      100.0
     ],
     [
      0.99,
-     10867.0
+     10161.84
     ]
    ],
    "gap_BUY": 0.0,
@@ -1072,20 +1040,20 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8059,
-    "cost": 80.59,
+    "size": 9605,
+    "cost": 96.05,
     "est": 2.68,
     "qual_at_touch": true,
-    "denom": 24176.0,
+    "denom": 28815.0,
     "per_side": 10.71
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.41,
+    "px": 0.37,
     "size": 18,
-    "cost": 10.42,
+    "cost": 11.13,
     "est": 2.68,
     "qual_at_touch": false,
     "denom": 53.0,
@@ -1101,13 +1069,424 @@
    "event_n": 14,
    "held": 71,
    "bb": 0.01,
-   "ba": 0.47,
-   "bid_total": 23999.0,
+   "ba": 0.43,
+   "bid_total": 27781.0,
    "ask_total": 10825.36,
    "bids": [
     [
      0.01,
+     27781.0
+    ]
+   ],
+   "asks": [
+    [
+     0.43,
+     33.0
+    ],
+    [
+     0.44,
+     100.0
+    ],
+    [
+     0.99,
+     10692.36
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 9260,
+    "cost": 92.6,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 27781.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.43,
+    "size": 18,
+    "cost": 10.07,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 53.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-gleyou",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 75,
+   "bb": 0.01,
+   "ba": 0.5,
+   "bid_total": 10494.0,
+   "ask_total": 12569.68,
+   "bids": [
+    [
+     0.01,
+     10494.0
+    ]
+   ],
+   "asks": [
+    [
+     0.5,
+     150.0
+    ],
+    [
+     0.99,
+     12419.68
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 3498,
+    "cost": 34.98,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 10494.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.5,
+    "size": 50,
+    "cost": 25.0,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 150.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-jdvan",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 74,
+   "bb": 0.23,
+   "ba": 0.67,
+   "bid_total": 11000.0,
+   "ask_total": 12534.68,
+   "bids": [
+    [
+     0.23,
+     13.0
+    ],
+    [
+     0.16,
+     150.0
+    ],
+    [
+     0.01,
+     10837.0
+    ]
+   ],
+   "asks": [
+    [
+     0.67,
+     65.0
+    ],
+    [
+     0.68,
+     33.0
+    ],
+    [
+     0.99,
+     12436.68
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.23,
+    "size": 4,
+    "cost": 1.0,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 13.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.67,
+    "size": 24,
+    "cost": 7.88,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 71.6,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-margre",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 75,
+   "bb": 0.01,
+   "ba": 0.44,
+   "bid_total": 27781.0,
+   "ask_total": 12569.68,
+   "bids": [
+    [
+     0.01,
+     27781.0
+    ]
+   ],
+   "asks": [
+    [
+     0.44,
+     33.0
+    ],
+    [
+     0.45,
+     100.0
+    ],
+    [
+     0.99,
+     12436.68
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 9260,
+    "cost": 92.6,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 27781.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.44,
+    "size": 18,
+    "cost": 9.89,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 53.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-marrub",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 76,
+   "bb": 0.1,
+   "ba": 0.53,
+   "bid_total": 12743.0,
+   "ask_total": 12469.68,
+   "bids": [
+    [
+     0.1,
+     80.0
+    ],
+    [
+     0.08,
+     400.0
+    ],
+    [
+     0.06,
+     2063.0
+    ],
+    [
+     0.01,
+     10200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.53,
+     50.0
+    ],
+    [
+     0.99,
+     12419.68
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.1,
+    "size": 33,
+    "cost": 3.31,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 99.3,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.53,
+    "size": 17,
+    "cost": 7.83,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 50.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-ranpau",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 66,
+   "bb": 0.01,
+   "ba": 0.49,
+   "bid_total": 23999.0,
+   "ask_total": 12678.22,
+   "bids": [
+    [
+     0.01,
      23999.0
+    ]
+   ],
+   "asks": [
+    [
+     0.49,
+     33.0
+    ],
+    [
+     0.5,
+     100.0
+    ],
+    [
+     0.99,
+     12545.22
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 8000,
+    "cost": 80.0,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 23999.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.49,
+    "size": 18,
+    "cost": 9.01,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 53.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-rondes",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 79,
+   "bb": 0.01,
+   "ba": 0.32,
+   "bid_total": 10300.0,
+   "ask_total": 12656.68,
+   "bids": [
+    [
+     0.01,
+     10300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.32,
+     20.0
+    ],
+    [
+     0.33,
+     100.0
+    ],
+    [
+     0.99,
+     12536.68
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 3433,
+    "cost": 34.33,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 10300.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.32,
+    "size": 13,
+    "cost": 9.07,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 40.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tedcru",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 67,
+   "bb": 0.01,
+   "ba": 0.47,
+   "bid_total": 10300.0,
+   "ask_total": 10686.44,
+   "bids": [
+    [
+     0.01,
+     10300.0
     ]
    ],
    "asks": [
@@ -1121,7 +1500,7 @@
     ],
     [
      0.99,
-     10692.36
+     10553.44
     ]
    ],
    "gap_BUY": 0.0,
@@ -1129,11 +1508,11 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8000,
-    "cost": 80.0,
+    "size": 3433,
+    "cost": 34.33,
     "est": 2.68,
     "qual_at_touch": true,
-    "denom": 23999.0,
+    "denom": 10300.0,
     "per_side": 10.71
    },
    "gap_SELL": 0.0,
@@ -1150,442 +1529,31 @@
    }
   },
   {
-   "m": "enwc-uspres-nom-rep-2028-gleyou",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 14,
-   "held": 59,
-   "bb": 0.01,
-   "ba": 0.49,
-   "bid_total": 27208.0,
-   "ask_total": 20575.36,
-   "bids": [
-    [
-     0.01,
-     27208.0
-    ]
-   ],
-   "asks": [
-    [
-     0.49,
-     100.0
-    ],
-    [
-     0.51,
-     50.0
-    ],
-    [
-     0.99,
-     20425.36
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 9069,
-    "cost": 90.69,
-    "est": 2.68,
-    "qual_at_touch": true,
-    "denom": 27208.0,
-    "per_side": 10.71
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.49,
-    "size": 34,
-    "cost": 17.34,
-    "est": 2.68,
-    "qual_at_touch": false,
-    "denom": 102.0,
-    "per_side": 10.71
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-jdvan",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 14,
-   "held": 58,
-   "bb": 0.2,
-   "ba": 0.67,
-   "bid_total": 10985.0,
-   "ask_total": 20642.36,
-   "bids": [
-    [
-     0.2,
-     100.0
-    ],
-    [
-     0.01,
-     10885.0
-    ]
-   ],
-   "asks": [
-    [
-     0.67,
-     150.0
-    ],
-    [
-     0.68,
-     33.0
-    ],
-    [
-     0.99,
-     20459.36
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.2,
-    "size": 33,
-    "cost": 6.67,
-    "est": 2.68,
-    "qual_at_touch": false,
-    "denom": 100.0,
-    "per_side": 10.71
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.67,
-    "size": 52,
-    "cost": 17.23,
-    "est": 2.68,
-    "qual_at_touch": false,
-    "denom": 156.6,
-    "per_side": 10.71
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-margre",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 14,
-   "held": 59,
-   "bb": 0.01,
-   "ba": 0.48,
-   "bid_total": 23999.0,
-   "ask_total": 11000.36,
-   "bids": [
-    [
-     0.01,
-     23999.0
-    ]
-   ],
-   "asks": [
-    [
-     0.48,
-     150.0
-    ],
-    [
-     0.51,
-     33.0
-    ],
-    [
-     0.99,
-     10817.36
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 8000,
-    "cost": 80.0,
-    "est": 2.68,
-    "qual_at_touch": true,
-    "denom": 23999.0,
-    "per_side": 10.71
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.48,
-    "size": 50,
-    "cost": 26.05,
-    "est": 2.68,
-    "qual_at_touch": false,
-    "denom": 150.3,
-    "per_side": 10.71
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-marrub",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 14,
-   "held": 58,
-   "bb": 0.07,
-   "ba": 0.53,
-   "bid_total": 11194.0,
-   "ask_total": 11000.36,
-   "bids": [
-    [
-     0.07,
-     344.0
-    ],
-    [
-     0.06,
-     2063.0
-    ],
-    [
-     0.01,
-     8787.0
-    ]
-   ],
-   "asks": [
-    [
-     0.53,
-     150.0
-    ],
-    [
-     0.99,
-     10850.36
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.07,
-    "size": 252,
-    "cost": 17.67,
-    "est": 2.68,
-    "qual_at_touch": false,
-    "denom": 757.2,
-    "per_side": 10.71
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.53,
-    "size": 50,
-    "cost": 23.5,
-    "est": 2.68,
-    "qual_at_touch": false,
-    "denom": 150.0,
-    "per_side": 10.71
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-ranpau",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 14,
-   "held": 50,
-   "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 24034.0,
-   "ask_total": 12067.9,
-   "bids": [
-    [
-     0.01,
-     24034.0
-    ]
-   ],
-   "asks": [
-    [
-     0.5,
-     100.0
-    ],
-    [
-     0.51,
-     33.0
-    ],
-    [
-     0.99,
-     11934.9
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 8011,
-    "cost": 80.11,
-    "est": 2.68,
-    "qual_at_touch": true,
-    "denom": 24034.0,
-    "per_side": 10.71
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.5,
-    "size": 36,
-    "cost": 17.77,
-    "est": 2.68,
-    "qual_at_touch": false,
-    "denom": 106.6,
-    "per_side": 10.71
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-rondes",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 14,
-   "held": 63,
-   "bb": 0.01,
-   "ba": 0.39,
-   "bid_total": 24176.0,
-   "ask_total": 10075.36,
-   "bids": [
-    [
-     0.01,
-     24176.0
-    ]
-   ],
-   "asks": [
-    [
-     0.39,
-     33.0
-    ],
-    [
-     0.4,
-     150.0
-    ],
-    [
-     0.99,
-     9892.36
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 8059,
-    "cost": 80.59,
-    "est": 2.68,
-    "qual_at_touch": true,
-    "denom": 24176.0,
-    "per_side": 10.71
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.39,
-    "size": 21,
-    "cost": 12.81,
-    "est": 2.68,
-    "qual_at_touch": false,
-    "denom": 63.0,
-    "per_side": 10.71
-   }
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-tedcru",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 14,
-   "held": 63,
-   "bb": 0.01,
-   "ba": 0.48,
-   "bid_total": 10300.0,
-   "ask_total": 10075.36,
-   "bids": [
-    [
-     0.01,
-     10300.0
-    ]
-   ],
-   "asks": [
-    [
-     0.48,
-     150.0
-    ],
-    [
-     0.51,
-     33.0
-    ],
-    [
-     0.99,
-     9892.36
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 3433,
-    "cost": 34.33,
-    "est": 2.68,
-    "qual_at_touch": true,
-    "denom": 10300.0,
-    "per_side": 10.71
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.48,
-    "size": 50,
-    "cost": 26.05,
-    "est": 2.68,
-    "qual_at_touch": false,
-    "denom": 150.3,
-    "per_side": 10.71
-   }
-  },
-  {
    "m": "enwc-uspres-nom-rep-2028-thomas",
    "tick": 0.01,
    "pool": 300.0,
    "target": 10000.0,
    "df": 0.2,
    "event_n": 14,
-   "held": 2,
+   "held": 66,
    "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 24034.0,
-   "ask_total": 11000.0,
+   "ba": 0.51,
+   "bid_total": 28538.0,
+   "ask_total": 10194.36,
    "bids": [
     [
      0.01,
-     24034.0
+     28538.0
     ]
    ],
    "asks": [
-    [
-     0.5,
-     100.0
-    ],
     [
      0.51,
      33.0
     ],
     [
      0.99,
-     10867.0
+     10161.36
     ]
    ],
    "gap_BUY": 0.0,
@@ -1593,23 +1561,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8011,
-    "cost": 80.11,
+    "size": 9513,
+    "cost": 95.13,
     "est": 2.68,
     "qual_at_touch": true,
-    "denom": 24034.0,
+    "denom": 28538.0,
     "per_side": 10.71
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 36,
-    "cost": 17.77,
+    "px": 0.51,
+    "size": 11,
+    "cost": 5.39,
     "est": 2.68,
     "qual_at_touch": false,
-    "denom": 106.6,
+    "denom": 33.0,
     "per_side": 10.71
    }
   },
@@ -1620,29 +1588,29 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 14,
-   "held": 59,
+   "held": 75,
    "bb": 0.01,
    "ba": 0.49,
-   "bid_total": 24228.0,
-   "ask_total": 11050.36,
+   "bid_total": 24174.0,
+   "ask_total": 13744.68,
    "bids": [
     [
      0.01,
-     24228.0
+     24174.0
     ]
    ],
    "asks": [
     [
      0.49,
-     150.0
-    ],
-    [
-     0.51,
      33.0
     ],
     [
+     0.5,
+     100.0
+    ],
+    [
      0.99,
-     10867.36
+     13611.68
     ]
    ],
    "gap_BUY": 0.0,
@@ -1650,11 +1618,11 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8076,
-    "cost": 80.76,
+    "size": 8058,
+    "cost": 80.58,
     "est": 2.68,
     "qual_at_touch": true,
-    "denom": 24228.0,
+    "denom": 24174.0,
     "per_side": 10.71
    },
    "gap_SELL": 0.0,
@@ -1662,11 +1630,11 @@
    "qorders_SELL": 1,
    "score_SELL": {
     "px": 0.49,
-    "size": 50,
-    "cost": 25.72,
+    "size": 18,
+    "cost": 9.01,
     "est": 2.68,
     "qual_at_touch": false,
-    "denom": 151.3,
+    "denom": 53.0,
     "per_side": 10.71
    }
   },
@@ -1679,23 +1647,19 @@
    "event_n": 14,
    "held": 75,
    "bb": 0.01,
-   "ba": 0.41,
-   "bid_total": 24105.0,
-   "ask_total": 10375.36,
+   "ba": 0.39,
+   "bid_total": 23940.0,
+   "ask_total": 10225.36,
    "bids": [
     [
      0.01,
-     24105.0
+     23940.0
     ]
    ],
    "asks": [
     [
-     0.41,
+     0.39,
      33.0
-    ],
-    [
-     0.42,
-     150.0
     ],
     [
      0.99,
@@ -1707,23 +1671,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8035,
-    "cost": 80.35,
+    "size": 7980,
+    "cost": 79.8,
     "est": 2.68,
     "qual_at_touch": true,
-    "denom": 24105.0,
+    "denom": 23940.0,
     "per_side": 10.71
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.41,
-    "size": 21,
-    "cost": 12.39,
+    "px": 0.39,
+    "size": 11,
+    "cost": 6.71,
     "est": 2.68,
     "qual_at_touch": false,
-    "denom": 63.0,
+    "denom": 33.0,
     "per_side": 10.71
    }
   },
@@ -1734,29 +1698,29 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 14,
-   "held": 2,
+   "held": 66,
    "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 10300.0,
-   "ask_total": 11000.0,
+   "ba": 0.47,
+   "bid_total": 24174.0,
+   "ask_total": 10294.6,
    "bids": [
     [
      0.01,
-     10300.0
+     24174.0
     ]
    ],
    "asks": [
     [
-     0.5,
-     100.0
-    ],
-    [
-     0.51,
+     0.47,
      33.0
     ],
     [
+     0.48,
+     100.0
+    ],
+    [
      0.99,
-     10867.0
+     10161.6
     ]
    ],
    "gap_BUY": 0.0,
@@ -1764,23 +1728,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 3433,
-    "cost": 34.33,
+    "size": 8058,
+    "cost": 80.58,
     "est": 2.68,
     "qual_at_touch": true,
-    "denom": 10300.0,
+    "denom": 24174.0,
     "per_side": 10.71
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 36,
-    "cost": 17.77,
+    "px": 0.47,
+    "size": 18,
+    "cost": 9.36,
     "est": 2.68,
     "qual_at_touch": false,
-    "denom": 106.6,
+    "denom": 53.0,
     "per_side": 10.71
    }
   },
@@ -1791,11 +1755,11 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 2,
+   "held": 66,
    "bb": 0.01,
-   "ba": 0.5,
+   "ba": 0.49,
    "bid_total": 10300.0,
-   "ask_total": 11000.0,
+   "ask_total": 10319.72,
    "bids": [
     [
      0.01,
@@ -1804,16 +1768,16 @@
    ],
    "asks": [
     [
+     0.49,
+     33.0
+    ],
+    [
      0.5,
      100.0
     ],
     [
-     0.51,
-     33.0
-    ],
-    [
      0.99,
-     10867.0
+     10186.72
     ]
    ],
    "gap_BUY": 0.0,
@@ -1832,12 +1796,12 @@
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 36,
-    "cost": 17.77,
+    "px": 0.49,
+    "size": 18,
+    "cost": 9.01,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 106.6,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -1848,29 +1812,29 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 59,
+   "held": 75,
    "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 24174.0,
-   "ask_total": 20742.36,
+   "ba": 0.47,
+   "bid_total": 10300.0,
+   "ask_total": 12594.68,
    "bids": [
     [
      0.01,
-     24174.0
+     10300.0
     ]
    ],
    "asks": [
     [
-     0.5,
-     150.0
-    ],
-    [
-     0.51,
+     0.47,
      33.0
     ],
     [
+     0.48,
+     100.0
+    ],
+    [
      0.99,
-     20559.36
+     12461.68
     ]
    ],
    "gap_BUY": 0.0,
@@ -1878,23 +1842,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8058,
-    "cost": 80.58,
+    "size": 3433,
+    "cost": 34.33,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 24174.0,
+    "denom": 10300.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 52,
-    "cost": 26.1,
+    "px": 0.47,
+    "size": 18,
+    "cost": 9.36,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 156.6,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -1905,29 +1869,25 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 2,
+   "held": 66,
    "bb": 0.01,
-   "ba": 0.49,
-   "bid_total": 10300.0,
-   "ask_total": 11000.0,
+   "ba": 0.46,
+   "bid_total": 10200.0,
+   "ask_total": 17556.48,
    "bids": [
     [
      0.01,
-     10300.0
+     10200.0
     ]
    ],
    "asks": [
     [
-     0.49,
-     100.0
-    ],
-    [
-     0.51,
+     0.46,
      33.0
     ],
     [
      0.99,
-     10867.0
+     17523.48
     ]
    ],
    "gap_BUY": 0.0,
@@ -1935,23 +1895,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 3433,
-    "cost": 34.33,
+    "size": 3400,
+    "cost": 34.0,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 10300.0,
+    "denom": 10200.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.49,
-    "size": 34,
-    "cost": 17.22,
+    "px": 0.46,
+    "size": 11,
+    "cost": 5.94,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 101.3,
+    "denom": 33.0,
     "per_side": 5.56
    }
   },
@@ -1962,11 +1922,11 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 59,
+   "held": 75,
    "bb": 0.01,
-   "ba": 0.46,
+   "ba": 0.43,
    "bid_total": 10225.0,
-   "ask_total": 20642.36,
+   "ask_total": 12594.68,
    "bids": [
     [
      0.01,
@@ -1975,16 +1935,16 @@
    ],
    "asks": [
     [
-     0.46,
-     150.0
-    ],
-    [
-     0.51,
+     0.43,
      33.0
     ],
     [
+     0.44,
+     100.0
+    ],
+    [
      0.99,
-     20459.36
+     12461.68
     ]
    ],
    "gap_BUY": 0.0,
@@ -2003,12 +1963,12 @@
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.46,
-    "size": 50,
-    "cost": 27.0,
+    "px": 0.43,
+    "size": 18,
+    "cost": 10.07,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 150.0,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -2019,29 +1979,29 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 59,
+   "held": 71,
    "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 10225.0,
-   "ask_total": 20692.36,
+   "ba": 0.48,
+   "bid_total": 28282.0,
+   "ask_total": 11933.6,
    "bids": [
     [
      0.01,
-     10225.0
+     28282.0
     ]
    ],
    "asks": [
     [
-     0.5,
-     100.0
-    ],
-    [
-     0.51,
+     0.48,
      33.0
     ],
     [
+     0.49,
+     100.0
+    ],
+    [
      0.99,
-     20559.36
+     11800.6
     ]
    ],
    "gap_BUY": 0.0,
@@ -2049,23 +2009,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 3408,
-    "cost": 34.08,
+    "size": 9427,
+    "cost": 94.27,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 10225.0,
+    "denom": 28282.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 36,
-    "cost": 17.77,
+    "px": 0.48,
+    "size": 18,
+    "cost": 9.19,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 106.6,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -2076,11 +2036,11 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 59,
+   "held": 75,
    "bb": 0.01,
-   "ba": 0.5,
+   "ba": 0.47,
    "bid_total": 10225.0,
-   "ask_total": 10000.36,
+   "ask_total": 12594.68,
    "bids": [
     [
      0.01,
@@ -2089,16 +2049,16 @@
    ],
    "asks": [
     [
-     0.5,
-     150.0
-    ],
-    [
-     0.51,
+     0.47,
      33.0
     ],
     [
+     0.48,
+     100.0
+    ],
+    [
      0.99,
-     9817.36
+     12461.68
     ]
    ],
    "gap_BUY": 0.0,
@@ -2117,12 +2077,12 @@
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 52,
-    "cost": 26.1,
+    "px": 0.47,
+    "size": 18,
+    "cost": 9.36,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 156.6,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -2133,239 +2093,11 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 59,
-   "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 24174.0,
-   "ask_total": 11000.36,
-   "bids": [
-    [
-     0.01,
-     24174.0
-    ]
-   ],
-   "asks": [
-    [
-     0.5,
-     150.0
-    ],
-    [
-     0.51,
-     50.0
-    ],
-    [
-     0.99,
-     10800.36
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 8058,
-    "cost": 80.58,
-    "est": 1.39,
-    "qual_at_touch": true,
-    "denom": 24174.0,
-    "per_side": 5.56
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.5,
-    "size": 53,
-    "cost": 26.67,
-    "est": 1.39,
-    "qual_at_touch": false,
-    "denom": 160.0,
-    "per_side": 5.56
-   }
-  },
-  {
-   "m": "ewc-usp-2028-11-07-gleyou",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 27,
-   "held": 58,
-   "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 10225.0,
-   "ask_total": 11000.97,
-   "bids": [
-    [
-     0.01,
-     10225.0
-    ]
-   ],
-   "asks": [
-    [
-     0.5,
-     100.0
-    ],
-    [
-     0.51,
-     50.0
-    ],
-    [
-     0.99,
-     10850.97
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 3408,
-    "cost": 34.08,
-    "est": 1.39,
-    "qual_at_touch": true,
-    "denom": 10225.0,
-    "per_side": 5.56
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.5,
-    "size": 37,
-    "cost": 18.33,
-    "est": 1.39,
-    "qual_at_touch": false,
-    "denom": 110.0,
-    "per_side": 5.56
-   }
-  },
-  {
-   "m": "ewc-usp-2028-11-07-jamtal",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 27,
-   "held": 58,
-   "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 10300.0,
-   "ask_total": 20637.5,
-   "bids": [
-    [
-     0.01,
-     10300.0
-    ]
-   ],
-   "asks": [
-    [
-     0.5,
-     150.0
-    ],
-    [
-     0.51,
-     33.0
-    ],
-    [
-     0.99,
-     20454.5
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 3433,
-    "cost": 34.33,
-    "est": 1.39,
-    "qual_at_touch": true,
-    "denom": 10300.0,
-    "per_side": 5.56
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.5,
-    "size": 52,
-    "cost": 26.1,
-    "est": 1.39,
-    "qual_at_touch": false,
-    "denom": 156.6,
-    "per_side": 5.56
-   }
-  },
-  {
-   "m": "ewc-usp-2028-11-07-jbpri",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 27,
-   "held": 58,
-   "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 10225.0,
-   "ask_total": 9995.5,
-   "bids": [
-    [
-     0.01,
-     10225.0
-    ]
-   ],
-   "asks": [
-    [
-     0.5,
-     150.0
-    ],
-    [
-     0.51,
-     33.0
-    ],
-    [
-     0.99,
-     9812.5
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 3408,
-    "cost": 34.08,
-    "est": 1.39,
-    "qual_at_touch": true,
-    "denom": 10225.0,
-    "per_side": 5.56
-   },
-   "gap_SELL": 4.5,
-   "qcost_SELL": 0.045,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.5,
-    "size": 52,
-    "cost": 26.1,
-    "est": 1.39,
-    "qual_at_touch": false,
-    "denom": 156.6,
-    "per_side": 5.56
-   }
-  },
-  {
-   "m": "ewc-usp-2028-11-07-jdvan",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 27,
-   "held": 58,
+   "held": 75,
    "bb": 0.01,
    "ba": 0.49,
    "bid_total": 10300.0,
-   "ask_total": 10002.97,
+   "ask_total": 12594.68,
    "bids": [
     [
      0.01,
@@ -2378,12 +2110,8 @@
      150.0
     ],
     [
-     0.51,
-     33.0
-    ],
-    [
      0.99,
-     9819.97
+     12444.68
     ]
    ],
    "gap_BUY": 0.0,
@@ -2404,43 +2132,43 @@
    "score_SELL": {
     "px": 0.49,
     "size": 50,
-    "cost": 25.72,
+    "cost": 25.5,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 151.3,
+    "denom": 150.0,
     "per_side": 5.56
    }
   },
   {
-   "m": "ewc-usp-2028-11-07-jonoss",
+   "m": "ewc-usp-2028-11-07-gleyou",
    "tick": 0.01,
    "pool": 300.0,
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 58,
+   "held": 74,
    "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 10309.7,
-   "ask_total": 11000.019999999999,
+   "ba": 0.48,
+   "bid_total": 10485.0,
+   "ask_total": 12600.29,
    "bids": [
     [
      0.01,
-     10309.7
+     10485.0
     ]
    ],
    "asks": [
     [
-     0.5,
-     140.3
+     0.48,
+     50.0
     ],
     [
-     0.51,
-     33.0
+     0.49,
+     100.0
     ],
     [
      0.99,
-     10826.72
+     12450.29
     ]
    ],
    "gap_BUY": 0.0,
@@ -2448,42 +2176,156 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 3437,
-    "cost": 34.37,
+    "size": 3495,
+    "cost": 34.95,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 10309.7,
+    "denom": 10485.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 49,
-    "cost": 24.48,
+    "px": 0.48,
+    "size": 23,
+    "cost": 12.13,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 146.9,
+    "denom": 70.0,
     "per_side": 5.56
    }
   },
   {
-   "m": "ewc-usp-2028-11-07-jossha",
+   "m": "ewc-usp-2028-11-07-jamtal",
    "tick": 0.01,
    "pool": 300.0,
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 58,
+   "held": 74,
    "bb": 0.01,
    "ba": 0.49,
    "bid_total": 10300.0,
-   "ask_total": 11000.22,
+   "ask_total": 12589.82,
    "bids": [
     [
      0.01,
      10300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.49,
+     33.0
+    ],
+    [
+     0.5,
+     100.0
+    ],
+    [
+     0.99,
+     12456.82
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 3433,
+    "cost": 34.33,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 10300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.49,
+    "size": 18,
+    "cost": 9.01,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 53.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jbpri",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 62,
+   "bb": 0.01,
+   "ba": 0.46,
+   "bid_total": 28283.0,
+   "ask_total": 10606.58,
+   "bids": [
+    [
+     0.01,
+     28283.0
+    ]
+   ],
+   "asks": [
+    [
+     0.46,
+     33.0
+    ],
+    [
+     0.47,
+     100.0
+    ],
+    [
+     0.99,
+     10473.58
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 9428,
+    "cost": 94.28,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 28283.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.46,
+    "size": 18,
+    "cost": 9.54,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 53.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jdvan",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 70,
+   "bb": 0.01,
+   "ba": 0.49,
+   "bid_total": 28490.0,
+   "ask_total": 11936.21,
+   "bids": [
+    [
+     0.01,
+     28490.0
     ]
    ],
    "asks": [
@@ -2497,7 +2339,7 @@
     ],
     [
      0.99,
-     10867.22
+     11803.21
     ]
    ],
    "gap_BUY": 0.0,
@@ -2505,11 +2347,11 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 3433,
-    "cost": 34.33,
+    "size": 9497,
+    "cost": 94.97,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 10300.0,
+    "denom": 28490.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
@@ -2526,17 +2368,131 @@
    }
   },
   {
+   "m": "ewc-usp-2028-11-07-jonoss",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 74,
+   "bb": 0.01,
+   "ba": 0.48,
+   "bid_total": 24196.7,
+   "ask_total": 12600.34,
+   "bids": [
+    [
+     0.01,
+     24196.7
+    ]
+   ],
+   "asks": [
+    [
+     0.48,
+     33.0
+    ],
+    [
+     0.49,
+     90.3
+    ],
+    [
+     0.99,
+     12477.04
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 8066,
+    "cost": 80.66,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 24196.7,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.48,
+    "size": 17,
+    "cost": 8.85,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 51.1,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jossha",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 74,
+   "bb": 0.01,
+   "ba": 0.49,
+   "bid_total": 10300.0,
+   "ask_total": 12600.54,
+   "bids": [
+    [
+     0.01,
+     10300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.49,
+     33.0
+    ],
+    [
+     0.5,
+     100.0
+    ],
+    [
+     0.99,
+     12467.54
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 3433,
+    "cost": 34.33,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 10300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.49,
+    "size": 18,
+    "cost": 9.01,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 53.0,
+    "per_side": 5.56
+   }
+  },
+  {
    "m": "ewc-usp-2028-11-07-kamhar",
    "tick": 0.01,
    "pool": 300.0,
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 58,
+   "held": 66,
    "bb": 0.01,
    "ba": 0.25,
    "bid_total": 24174.0,
-   "ask_total": 11000.45,
+   "ask_total": 11250.61,
    "bids": [
     [
      0.01,
@@ -2546,11 +2502,15 @@
    "asks": [
     [
      0.25,
-     133.0
+     33.0
+    ],
+    [
+     0.51,
+     100.0
     ],
     [
      0.99,
-     10867.45
+     11117.61
     ]
    ],
    "gap_BUY": 0.0,
@@ -2570,11 +2530,11 @@
    "qorders_SELL": 1,
    "score_SELL": {
     "px": 0.25,
-    "size": 44,
-    "cost": 33.25,
+    "size": 11,
+    "cost": 8.25,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 133.0,
+    "denom": 33.0,
     "per_side": 5.56
    }
   },
@@ -2585,15 +2545,15 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 57,
+   "held": 61,
    "bb": 0.01,
    "ba": 0.51,
-   "bid_total": 24174.0,
-   "ask_total": 20703.45,
+   "bid_total": 10300.0,
+   "ask_total": 10589.53,
    "bids": [
     [
      0.01,
-     24174.0
+     10300.0
     ]
    ],
    "asks": [
@@ -2603,7 +2563,7 @@
     ],
     [
      0.99,
-     20603.45
+     10489.53
     ]
    ],
    "gap_BUY": 0.0,
@@ -2611,11 +2571,11 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8058,
-    "cost": 80.58,
+    "size": 3433,
+    "cost": 34.33,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 24174.0,
+    "denom": 10300.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
@@ -2638,21 +2598,21 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 58,
+   "held": 74,
    "bb": 0.01,
    "ba": 0.49,
-   "bid_total": 10300.0,
-   "ask_total": 20620.45,
+   "bid_total": 28490.0,
+   "ask_total": 12572.77,
    "bids": [
     [
      0.01,
-     10300.0
+     28490.0
     ]
    ],
    "asks": [
     [
      0.49,
-     150.0
+     100.0
     ],
     [
      0.51,
@@ -2660,7 +2620,7 @@
     ],
     [
      0.99,
-     20437.45
+     12439.77
     ]
    ],
    "gap_BUY": 0.0,
@@ -2668,11 +2628,11 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 3433,
-    "cost": 34.33,
+    "size": 9497,
+    "cost": 94.97,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 10300.0,
+    "denom": 28490.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
@@ -2680,11 +2640,11 @@
    "qorders_SELL": 1,
    "score_SELL": {
     "px": 0.49,
-    "size": 50,
-    "cost": 25.72,
+    "size": 34,
+    "cost": 17.22,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 151.3,
+    "denom": 101.3,
     "per_side": 5.56
    }
   },
@@ -2695,29 +2655,25 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 62,
+   "held": 78,
    "bb": 0.01,
-   "ba": 0.49,
-   "bid_total": 10225.0,
-   "ask_total": 20502.37,
+   "ba": 0.51,
+   "bid_total": 10200.0,
+   "ask_total": 12404.69,
    "bids": [
     [
      0.01,
-     10225.0
+     10200.0
     ]
    ],
    "asks": [
-    [
-     0.49,
-     100.0
-    ],
     [
      0.51,
      33.0
     ],
     [
      0.99,
-     20369.37
+     12371.69
     ]
    ],
    "gap_BUY": 0.0,
@@ -2725,23 +2681,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 3408,
-    "cost": 34.08,
+    "size": 3400,
+    "cost": 34.0,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 10225.0,
+    "denom": 10200.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.49,
-    "size": 34,
-    "cost": 17.22,
+    "px": 0.51,
+    "size": 11,
+    "cost": 5.39,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 101.3,
+    "denom": 33.0,
     "per_side": 5.56
    }
   },
@@ -2752,68 +2708,11 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 2,
-   "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 29421.0,
-   "ask_total": 11000.0,
-   "bids": [
-    [
-     0.01,
-     29421.0
-    ]
-   ],
-   "asks": [
-    [
-     0.5,
-     100.0
-    ],
-    [
-     0.51,
-     33.0
-    ],
-    [
-     0.99,
-     10867.0
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 9807,
-    "cost": 98.07,
-    "est": 1.39,
-    "qual_at_touch": true,
-    "denom": 29421.0,
-    "per_side": 5.56
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.5,
-    "size": 36,
-    "cost": 17.77,
-    "est": 1.39,
-    "qual_at_touch": false,
-    "denom": 106.6,
-    "per_side": 5.56
-   }
-  },
-  {
-   "m": "ewc-usp-2028-11-07-rahema",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 27,
-   "held": 79,
+   "held": 66,
    "bb": 0.01,
    "ba": 0.49,
    "bid_total": 10300.0,
-   "ask_total": 10297.64,
+   "ask_total": 10319.36,
    "bids": [
     [
      0.01,
@@ -2823,15 +2722,15 @@
    "asks": [
     [
      0.49,
-     100.0
-    ],
-    [
-     0.51,
      33.0
     ],
     [
+     0.5,
+     100.0
+    ],
+    [
      0.99,
-     10164.64
+     10186.36
     ]
    ],
    "gap_BUY": 0.0,
@@ -2851,11 +2750,68 @@
    "qorders_SELL": 1,
    "score_SELL": {
     "px": 0.49,
-    "size": 34,
-    "cost": 17.22,
+    "size": 18,
+    "cost": 9.01,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 101.3,
+    "denom": 53.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rahema",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 95,
+   "bb": 0.01,
+   "ba": 0.49,
+   "bid_total": 10300.0,
+   "ask_total": 10745.64,
+   "bids": [
+    [
+     0.01,
+     10300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.49,
+     33.0
+    ],
+    [
+     0.5,
+     100.0
+    ],
+    [
+     0.99,
+     10612.64
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 3433,
+    "cost": 34.33,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 10300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.49,
+    "size": 18,
+    "cost": 9.01,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -2866,29 +2822,29 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 2,
+   "held": 66,
    "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 24174.0,
-   "ask_total": 11000.0,
+   "ba": 0.49,
+   "bid_total": 10300.0,
+   "ask_total": 10319.36,
    "bids": [
     [
      0.01,
-     24174.0
+     10300.0
     ]
    ],
    "asks": [
+    [
+     0.49,
+     33.0
+    ],
     [
      0.5,
      100.0
     ],
     [
-     0.51,
-     33.0
-    ],
-    [
      0.99,
-     10867.0
+     10186.36
     ]
    ],
    "gap_BUY": 0.0,
@@ -2896,23 +2852,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8058,
-    "cost": 80.58,
+    "size": 3433,
+    "cost": 34.33,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 24174.0,
+    "denom": 10300.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 36,
-    "cost": 17.77,
+    "px": 0.49,
+    "size": 18,
+    "cost": 9.01,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 106.6,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -2926,22 +2882,22 @@
    "held": 83,
    "bb": 0.01,
    "ba": 0.49,
-   "bid_total": 24174.0,
+   "bid_total": 10300.0,
    "ask_total": 10405.64,
    "bids": [
     [
      0.01,
-     24174.0
+     10300.0
     ]
    ],
    "asks": [
     [
      0.49,
-     100.0
+     33.0
     ],
     [
-     0.51,
-     33.0
+     0.5,
+     100.0
     ],
     [
      0.99,
@@ -2953,11 +2909,11 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8058,
-    "cost": 80.58,
+    "size": 3433,
+    "cost": 34.33,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 24174.0,
+    "denom": 10300.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
@@ -2965,11 +2921,11 @@
    "qorders_SELL": 1,
    "score_SELL": {
     "px": 0.49,
-    "size": 34,
-    "cost": 17.22,
+    "size": 18,
+    "cost": 9.01,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 101.3,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -2980,29 +2936,29 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 2,
+   "held": 66,
    "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 24052.0,
-   "ask_total": 11050.0,
+   "ba": 0.47,
+   "bid_total": 10225.0,
+   "ask_total": 10319.36,
    "bids": [
     [
      0.01,
-     24052.0
+     10225.0
     ]
    ],
    "asks": [
     [
-     0.5,
-     150.0
-    ],
-    [
-     0.51,
+     0.47,
      33.0
     ],
     [
+     0.48,
+     100.0
+    ],
+    [
      0.99,
-     10867.0
+     10186.36
     ]
    ],
    "gap_BUY": 0.0,
@@ -3010,23 +2966,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8017,
-    "cost": 80.17,
+    "size": 3408,
+    "cost": 34.08,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 24052.0,
+    "denom": 10225.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 52,
-    "cost": 26.1,
+    "px": 0.47,
+    "size": 18,
+    "cost": 9.36,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 156.6,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -3037,11 +2993,11 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 67,
+   "held": 79,
    "bb": 0.01,
-   "ba": 0.5,
+   "ba": 0.49,
    "bid_total": 10225.0,
-   "ask_total": 20765.64,
+   "ask_total": 11956.88,
    "bids": [
     [
      0.01,
@@ -3050,16 +3006,16 @@
    ],
    "asks": [
     [
-     0.5,
-     150.0
-    ],
-    [
-     0.51,
+     0.49,
      33.0
     ],
     [
+     0.5,
+     100.0
+    ],
+    [
      0.99,
-     20582.64
+     11823.88
     ]
    ],
    "gap_BUY": 0.0,
@@ -3078,12 +3034,12 @@
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 52,
-    "cost": 26.1,
+    "px": 0.49,
+    "size": 18,
+    "cost": 9.01,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 156.6,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -3094,11 +3050,11 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 2,
+   "held": 66,
    "bb": 0.01,
-   "ba": 0.5,
+   "ba": 0.49,
    "bid_total": 10225.0,
-   "ask_total": 11000.0,
+   "ask_total": 10319.36,
    "bids": [
     [
      0.01,
@@ -3107,16 +3063,12 @@
    ],
    "asks": [
     [
-     0.5,
-     100.0
-    ],
-    [
-     0.51,
-     50.0
+     0.49,
+     150.0
     ],
     [
      0.99,
-     10850.0
+     10169.36
     ]
    ],
    "gap_BUY": 0.0,
@@ -3135,12 +3087,12 @@
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 37,
-    "cost": 18.33,
+    "px": 0.49,
+    "size": 50,
+    "cost": 25.5,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 110.0,
+    "denom": 150.0,
     "per_side": 5.56
    }
   },
@@ -3151,68 +3103,11 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 2,
+   "held": 66,
    "bb": 0.01,
-   "ba": 0.48,
-   "bid_total": 24052.0,
-   "ask_total": 11050.0,
-   "bids": [
-    [
-     0.01,
-     24052.0
-    ]
-   ],
-   "asks": [
-    [
-     0.48,
-     150.0
-    ],
-    [
-     0.51,
-     33.0
-    ],
-    [
-     0.99,
-     10867.0
-    ]
-   ],
-   "gap_BUY": 0.0,
-   "qcost_BUY": 0.0,
-   "qorders_BUY": 1,
-   "score_BUY": {
-    "px": 0.01,
-    "size": 8017,
-    "cost": 80.17,
-    "est": 1.39,
-    "qual_at_touch": true,
-    "denom": 24052.0,
-    "per_side": 5.56
-   },
-   "gap_SELL": 0.0,
-   "qcost_SELL": 0.0,
-   "qorders_SELL": 1,
-   "score_SELL": {
-    "px": 0.48,
-    "size": 50,
-    "cost": 26.05,
-    "est": 1.39,
-    "qual_at_touch": false,
-    "denom": 150.3,
-    "per_side": 5.56
-   }
-  },
-  {
-   "m": "ewc-usp-2028-11-07-vivram",
-   "tick": 0.01,
-   "pool": 300.0,
-   "target": 10000.0,
-   "df": 0.2,
-   "event_n": 27,
-   "held": 2,
-   "bb": 0.01,
-   "ba": 0.5,
+   "ba": 0.51,
    "bid_total": 10225.0,
-   "ask_total": 11050.0,
+   "ask_total": 10219.36,
    "bids": [
     [
      0.01,
@@ -3221,16 +3116,12 @@
    ],
    "asks": [
     [
-     0.5,
-     150.0
-    ],
-    [
      0.51,
      33.0
     ],
     [
      0.99,
-     10867.0
+     10186.36
     ]
    ],
    "gap_BUY": 0.0,
@@ -3249,12 +3140,69 @@
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 52,
-    "cost": 26.1,
+    "px": 0.51,
+    "size": 11,
+    "cost": 5.39,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 156.6,
+    "denom": 33.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-vivram",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 66,
+   "bb": 0.01,
+   "ba": 0.48,
+   "bid_total": 10225.0,
+   "ask_total": 10319.48,
+   "bids": [
+    [
+     0.01,
+     10225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.48,
+     33.0
+    ],
+    [
+     0.49,
+     100.0
+    ],
+    [
+     0.99,
+     10186.48
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 3408,
+    "cost": 34.08,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 10225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.48,
+    "size": 18,
+    "cost": 9.19,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -3265,29 +3213,29 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 27,
-   "held": 2,
+   "held": 66,
    "bb": 0.01,
-   "ba": 0.5,
-   "bid_total": 24174.0,
-   "ask_total": 11100.0,
+   "ba": 0.49,
+   "bid_total": 10300.0,
+   "ask_total": 10319.36,
    "bids": [
     [
      0.01,
-     24174.0
+     10300.0
     ]
    ],
    "asks": [
+    [
+     0.49,
+     33.0
+    ],
     [
      0.5,
      100.0
     ],
     [
-     0.51,
-     33.0
-    ],
-    [
      0.99,
-     10967.0
+     10186.36
     ]
    ],
    "gap_BUY": 0.0,
@@ -3295,23 +3243,23 @@
    "qorders_BUY": 1,
    "score_BUY": {
     "px": 0.01,
-    "size": 8058,
-    "cost": 80.58,
+    "size": 3433,
+    "cost": 34.33,
     "est": 1.39,
     "qual_at_touch": true,
-    "denom": 24174.0,
+    "denom": 10300.0,
     "per_side": 5.56
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.5,
-    "size": 36,
-    "cost": 17.77,
+    "px": 0.49,
+    "size": 18,
+    "cost": 9.01,
     "est": 1.39,
     "qual_at_touch": false,
-    "denom": 106.6,
+    "denom": 53.0,
     "per_side": 5.56
    }
   },
@@ -3322,27 +3270,23 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 2,
-   "held": 53,
-   "bb": 0.6,
+   "held": 68,
+   "bb": 0.62,
    "ba": 0.69,
-   "bid_total": 10516.48,
-   "ask_total": 10284.4,
+   "bid_total": 10367.06,
+   "ask_total": 12277.289999999999,
    "bids": [
     [
-     0.6,
-     9.48
+     0.62,
+     8.06
     ],
     [
-     0.44,
-     150.0
+     0.6,
+     34.0
     ],
     [
      0.4,
      100.0
-    ],
-    [
-     0.38,
-     32.0
     ],
     [
      0.01,
@@ -3352,31 +3296,27 @@
    "asks": [
     [
      0.69,
-     4.0
+     46.89
     ],
     [
-     0.7,
-     100.0
-    ],
-    [
-     0.76,
-     202.0
+     0.72,
+     44.0
     ],
     [
      0.99,
-     9978.4
+     12186.4
     ]
    ],
    "gap_BUY": 0.0,
    "qcost_BUY": 0.0,
    "qorders_BUY": 1,
    "score_BUY": {
-    "px": 0.6,
+    "px": 0.62,
     "size": 3,
-    "cost": 1.9,
+    "cost": 1.95,
     "est": 18.75,
     "qual_at_touch": false,
-    "denom": 9.5,
+    "denom": 9.4,
     "per_side": 75.0
    },
    "gap_SELL": 0.0,
@@ -3384,11 +3324,11 @@
    "qorders_SELL": 1,
    "score_SELL": {
     "px": 0.69,
-    "size": 8,
-    "cost": 2.48,
+    "size": 16,
+    "cost": 4.88,
     "est": 18.75,
     "qual_at_touch": false,
-    "denom": 24.0,
+    "denom": 47.2,
     "per_side": 75.0
    }
   },
@@ -3399,19 +3339,19 @@
    "target": 10000.0,
    "df": 0.2,
    "event_n": 2,
-   "held": 50,
-   "bb": 0.3,
-   "ba": 0.55,
-   "bid_total": 10465.0,
-   "ask_total": 11050.64,
+   "held": 66,
+   "bb": 0.43,
+   "ba": 0.54,
+   "bid_total": 10261.63,
+   "ask_total": 12600.96,
    "bids": [
     [
-     0.3,
-     165.0
+     0.43,
+     11.63
     ],
     [
-     0.24,
-     100.0
+     0.41,
+     50.0
     ],
     [
      0.01,
@@ -3420,40 +3360,36 @@
    ],
    "asks": [
     [
-     0.55,
-     6.0
-    ],
-    [
-     0.56,
-     100.0
+     0.54,
+     56.0
     ],
     [
      0.99,
-     10944.64
+     12544.96
     ]
    ],
    "gap_BUY": 0.0,
    "qcost_BUY": 0.0,
    "qorders_BUY": 1,
    "score_BUY": {
-    "px": 0.3,
-    "size": 55,
-    "cost": 16.5,
+    "px": 0.43,
+    "size": 5,
+    "cost": 1.95,
     "est": 18.75,
     "qual_at_touch": false,
-    "denom": 165.0,
+    "denom": 13.6,
     "per_side": 75.0
    },
    "gap_SELL": 0.0,
    "qcost_SELL": 0.0,
    "qorders_SELL": 1,
    "score_SELL": {
-    "px": 0.55,
-    "size": 9,
-    "cost": 3.9,
+    "px": 0.54,
+    "size": 19,
+    "cost": 8.59,
     "est": 18.75,
     "qual_at_touch": false,
-    "denom": 26.0,
+    "denom": 56.0,
     "per_side": 75.0
    }
   }
