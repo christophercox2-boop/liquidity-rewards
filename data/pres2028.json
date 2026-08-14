@@ -1,0 +1,3779 @@
+{
+ "buying_power": 222.5631,
+ "rows": [
+  {
+   "m": "enwc-uspres-nom-dem-2028-aleocc",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11099.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10999.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-andbes",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-dwajoh",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-gavnew",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jamtal",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jbpri",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonoss",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 395.23,
+   "ask_total": 11004.77,
+   "bids": [
+    [
+     0.01,
+     395.23
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     4.77
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9604.77,
+   "qcost_BUY": 96.0477,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 132,
+    "cost": 1.32,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 395.2,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 2,
+    "cost": 0.78,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 4.8,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonste",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 300.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     200.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 9700.0,
+   "qcost_SELL": 97.0,
+   "qorders_SELL": 44,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jossha",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-kamhar",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-markel",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-micoba",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.99,
+   "bid_total": 200.0,
+   "ask_total": 200.0,
+   "bids": [
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     200.0
+    ]
+   ],
+   "gap_BUY": 9800.0,
+   "qcost_BUY": 98.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 9800.0,
+   "qcost_SELL": 98.0,
+   "qorders_SELL": 45,
+   "score_SELL": {
+    "px": 0.99,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-petbut",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rahema",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rokha",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-stasmi",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-wesmoo",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 17,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.21,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 8.82
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.21,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 8.82
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-dontru",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-dontrujr",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.99,
+   "bid_total": 200.0,
+   "ask_total": 200.0,
+   "bids": [
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     200.0
+    ]
+   ],
+   "gap_BUY": 9800.0,
+   "qcost_BUY": 98.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 9800.0,
+   "qcost_SELL": 98.0,
+   "qorders_SELL": 45,
+   "score_SELL": {
+    "px": 0.99,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-elomus",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.99,
+   "bid_total": 200.0,
+   "ask_total": 200.0,
+   "bids": [
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     200.0
+    ]
+   ],
+   "gap_BUY": 9800.0,
+   "qcost_BUY": 98.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 9800.0,
+   "qcost_SELL": 98.0,
+   "qorders_SELL": 45,
+   "score_SELL": {
+    "px": 0.99,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-gleyou",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-jdvan",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.19,
+   "ba": 0.7,
+   "bid_total": 11150.0,
+   "ask_total": 11150.0,
+   "bids": [
+    [
+     0.19,
+     150.0
+    ],
+    [
+     0.01,
+     11000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.7,
+     150.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.19,
+    "size": 50,
+    "cost": 9.5,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 150.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.7,
+    "size": 50,
+    "cost": 15.0,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 150.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-margre",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-marrub",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.05,
+   "ba": 0.55,
+   "bid_total": 11100.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.05,
+     100.0
+    ],
+    [
+     0.01,
+     11000.0
+    ]
+   ],
+   "asks": [
+    [
+     0.55,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.05,
+    "size": 39,
+    "cost": 1.96,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 117.6,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.55,
+    "size": 33,
+    "cost": 15.0,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-ranpau",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.99,
+   "bid_total": 200.0,
+   "ask_total": 200.0,
+   "bids": [
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     200.0
+    ]
+   ],
+   "gap_BUY": 9800.0,
+   "qcost_BUY": 98.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 9800.0,
+   "qcost_SELL": 98.0,
+   "qorders_SELL": 45,
+   "score_SELL": {
+    "px": 0.99,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-rondes",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.99,
+   "bid_total": 200.0,
+   "ask_total": 200.0,
+   "bids": [
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     200.0
+    ]
+   ],
+   "gap_BUY": 9800.0,
+   "qcost_BUY": 98.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 9800.0,
+   "qcost_SELL": 98.0,
+   "qorders_SELL": 45,
+   "score_SELL": {
+    "px": 0.99,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tedcru",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.99,
+   "bid_total": 200.0,
+   "ask_total": 200.0,
+   "bids": [
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     200.0
+    ]
+   ],
+   "gap_BUY": 9800.0,
+   "qcost_BUY": 98.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 9800.0,
+   "qcost_SELL": 98.0,
+   "qorders_SELL": 45,
+   "score_SELL": {
+    "px": 0.99,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-thomas",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tuccar",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11197.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.52,
+     97.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 40,
+    "cost": 19.5,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 119.4,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tulgab",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.99,
+   "bid_total": 200.0,
+   "ask_total": 200.0,
+   "bids": [
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     200.0
+    ]
+   ],
+   "gap_BUY": 9800.0,
+   "qcost_BUY": 98.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 9800.0,
+   "qcost_SELL": 98.0,
+   "qorders_SELL": 45,
+   "score_SELL": {
+    "px": 0.99,
+    "size": 67,
+    "cost": 0.67,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-vivram",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 14,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 2.68,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 10.71
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 2.68,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 10.71
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-aleocc",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.99,
+   "bid_total": 200.0,
+   "ask_total": 225.0,
+   "bids": [
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     225.0
+    ]
+   ],
+   "gap_BUY": 9800.0,
+   "qcost_BUY": 98.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 67,
+    "cost": 0.67,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 9775.0,
+   "qcost_SELL": 97.75,
+   "qorders_SELL": 45,
+   "score_SELL": {
+    "px": 0.99,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-andbes",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontru",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontrujr",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dwajoh",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-elomus",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gavnew",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gleyou",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.21,
+   "bid_total": 225.0,
+   "ask_total": 11050.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.21,
+     100.0
+    ],
+    [
+     0.99,
+     10950.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.21,
+    "size": 33,
+    "cost": 26.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jamtal",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jbpri",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jdvan",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 10950.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10850.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jonoss",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jossha",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11050.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10950.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-kamhar",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.25,
+   "bid_total": 300.0,
+   "ask_total": 325.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.25,
+     100.0
+    ],
+    [
+     0.99,
+     225.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 9675.0,
+   "qcost_SELL": 96.75,
+   "qorders_SELL": 44,
+   "score_SELL": {
+    "px": 0.25,
+    "size": 33,
+    "cost": 25.0,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-markel",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.22,
+   "bid_total": 300.0,
+   "ask_total": 11050.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.22,
+     100.0
+    ],
+    [
+     0.99,
+     10950.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.22,
+    "size": 33,
+    "cost": 26.0,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-marrub",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 325.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     225.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 9675.0,
+   "qcost_SELL": 96.75,
+   "qorders_SELL": 44,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-micoba",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-petbut",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rahema",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rokha",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rondes",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.99,
+   "bid_total": 200.0,
+   "ask_total": 225.0,
+   "bids": [
+    [
+     0.01,
+     200.0
+    ]
+   ],
+   "asks": [
+    [
+     0.99,
+     225.0
+    ]
+   ],
+   "gap_BUY": 9800.0,
+   "qcost_BUY": 98.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 67,
+    "cost": 0.67,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 200.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 9775.0,
+   "qcost_SELL": 97.75,
+   "qorders_SELL": 45,
+   "score_SELL": {
+    "px": 0.99,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-stasmi",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 325.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     225.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 9675.0,
+   "qcost_SELL": 96.75,
+   "qorders_SELL": 44,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-thomas",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 325.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     225.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 9675.0,
+   "qcost_SELL": 96.75,
+   "qorders_SELL": 44,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-tuccar",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 11100.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     11000.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-tulgab",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 11000.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10900.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-vivram",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 225.0,
+   "ask_total": 10950.0,
+   "bids": [
+    [
+     0.01,
+     225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     10850.0
+    ]
+   ],
+   "gap_BUY": 9775.0,
+   "qcost_BUY": 97.75,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 75,
+    "cost": 0.75,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 225.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-2028-11-07-wesmoo",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 27,
+   "held": 0,
+   "bb": 0.01,
+   "ba": 0.51,
+   "bid_total": 300.0,
+   "ask_total": 325.0,
+   "bids": [
+    [
+     0.01,
+     300.0
+    ]
+   ],
+   "asks": [
+    [
+     0.51,
+     100.0
+    ],
+    [
+     0.99,
+     225.0
+    ]
+   ],
+   "gap_BUY": 9700.0,
+   "qcost_BUY": 97.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.01,
+    "size": 100,
+    "cost": 1.0,
+    "est": 1.39,
+    "qual_at_touch": true,
+    "denom": 300.0,
+    "per_side": 5.56
+   },
+   "gap_SELL": 9675.0,
+   "qcost_SELL": 96.75,
+   "qorders_SELL": 44,
+   "score_SELL": {
+    "px": 0.51,
+    "size": 33,
+    "cost": 16.33,
+    "est": 1.39,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 5.56
+   }
+  },
+  {
+   "m": "ewc-usp-party-2028-11-07-dem",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 2,
+   "held": 52,
+   "bb": 0.2,
+   "ba": 0.8,
+   "bid_total": 10325.0,
+   "ask_total": 10078.4,
+   "bids": [
+    [
+     0.2,
+     100.0
+    ],
+    [
+     0.01,
+     10225.0
+    ]
+   ],
+   "asks": [
+    [
+     0.8,
+     100.0
+    ],
+    [
+     0.99,
+     9978.4
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.2,
+    "size": 33,
+    "cost": 6.67,
+    "est": 18.75,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 75.0
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.8,
+    "size": 33,
+    "cost": 6.67,
+    "est": 18.75,
+    "qual_at_touch": false,
+    "denom": 100.0,
+    "per_side": 75.0
+   }
+  },
+  {
+   "m": "ewc-usp-party-2028-11-07-rep",
+   "tick": 0.01,
+   "pool": 300.0,
+   "target": 10000.0,
+   "df": 0.2,
+   "event_n": 2,
+   "held": 43,
+   "bb": 0.26,
+   "ba": 0.66,
+   "bid_total": 11019.23,
+   "ask_total": 11000.4,
+   "bids": [
+    [
+     0.26,
+     19.23
+    ],
+    [
+     0.24,
+     200.0
+    ],
+    [
+     0.2,
+     100.0
+    ],
+    [
+     0.01,
+     10700.0
+    ]
+   ],
+   "asks": [
+    [
+     0.66,
+     300.0
+    ],
+    [
+     0.99,
+     10700.4
+    ]
+   ],
+   "gap_BUY": 0.0,
+   "qcost_BUY": 0.0,
+   "qorders_BUY": 1,
+   "score_BUY": {
+    "px": 0.26,
+    "size": 9,
+    "cost": 2.36,
+    "est": 18.75,
+    "qual_at_touch": false,
+    "denom": 27.2,
+    "per_side": 75.0
+   },
+   "gap_SELL": 0.0,
+   "qcost_SELL": 0.0,
+   "qorders_SELL": 1,
+   "score_SELL": {
+    "px": 0.66,
+    "size": 100,
+    "cost": 34.0,
+    "est": 18.75,
+    "qual_at_touch": false,
+    "denom": 300.0,
+    "per_side": 75.0
+   }
+  }
+ ],
+ "programs": {
+  "enwc-uspres-nom-dem-2028-aleocc": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-andbes": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-dwajoh": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-gavnew": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-jamtal": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-jbpri": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-jonoss": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-jonste": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-jossha": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-kamhar": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-markel": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-micoba": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-petbut": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-rahema": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-rokha": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-stasmi": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-dem-2028-wesmoo": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-dontru": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-dontrujr": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-elomus": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-gleyou": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-jdvan": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-margre": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-marrub": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-ranpau": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-rondes": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-tedcru": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-thomas": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-tuccar": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-tulgab": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "enwc-uspres-nom-rep-2028-vivram": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-aleocc": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-andbes": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-dontru": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-dontrujr": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-dwajoh": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-elomus": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-gavnew": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-gleyou": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-jamtal": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-jbpri": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-jdvan": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-jonoss": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-jossha": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-kamhar": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-markel": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-marrub": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-micoba": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-petbut": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-rahema": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-rokha": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-rondes": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-stasmi": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-thomas": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-tuccar": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-tulgab": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-vivram": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-2028-11-07-wesmoo": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-party-2028-11-07-dem": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  },
+  "ewc-usp-party-2028-11-07-rep": {
+   "df": 0.2,
+   "target": 10000.0,
+   "pool": 300.0,
+   "start": "2026-07-28T00:00:00Z",
+   "end": null,
+   "pid": "politics_high_20260727",
+   "tier": "high",
+   "status": "active"
+  }
+ }
+}
