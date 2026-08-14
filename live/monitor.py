@@ -3299,6 +3299,120 @@ def _slug_known(slug: str) -> bool:
     return False
 
 
+# A side pays NOBODY until it holds Target Size in resting contracts — every
+# trader's size counts, not just ours. These bounds apply to the qualify
+# button on the market sheet, which closes that gap on demand.
+#
+# It is a button, not a loop: it acts once, when the owner taps it, and
+# places nothing on its own. The keeper loop has a branch that does the same
+# thing automatically, but turning the keeper on also turns on its second
+# branch (40-share orders near the touch), which is why this exists
+# separately.
+QUALIFY_MAX_USD = float(os.environ.get("QUALIFY_MAX_USD", "50"))
+QUALIFY_MAX_ORDERS = int(os.environ.get("QUALIFY_MAX_ORDERS", "8"))
+QUALIFY_RESERVE_USD = float(os.environ.get("QUALIFY_RESERVE_USD", "5"))
+QUALIFY_CHUNK = int(os.environ.get("QUALIFY_CHUNK", "2000"))
+
+
+def _qual_view(slug: str, book: dict) -> dict:
+    """Target Size against what is actually resting on each side, plus the
+    cheapest way to close any gap: the floor bid (one tick) or the ceiling
+    ask (one tick off the top), where a contract ties up the least capital —
+    a bid locks price x size, an ask locks (1 - price) x size."""
+    prog = (tr._PROG_CACHE.get("progs") or {}).get(slug) or {}
+    target = int(prog.get("target") or 0)
+    tick = float(book.get("tick") or 0.01)
+    bid_total = int(sum(q for _, q in (book.get("bids") or [])))
+    ask_total = int(sum(q for _, q in (book.get("asks") or [])))
+    out = {"target": target or None, "pool": prog.get("pool"),
+           "bid_total": bid_total, "ask_total": ask_total,
+           "floor_c": round(tick * 100, 1), "ceil_c": round((1 - tick) * 100, 1),
+           "need_bid": 0, "need_ask": 0, "cost_bid": 0.0, "cost_ask": 0.0}
+    if target:
+        out["need_bid"] = max(0, target - bid_total)
+        out["need_ask"] = max(0, target - ask_total)
+        out["cost_bid"] = round(out["need_bid"] * tick, 2)
+        out["cost_ask"] = round(out["need_ask"] * tick, 2)
+    return out
+
+
+def do_qualify(slug: str, side: str) -> tuple[int, dict]:
+    """Bring ONE side up to Target Size with the cheapest post-only orders.
+
+    The gap is recomputed here from a fresh book — the client sends only the
+    market and the side, never a size or a price, so a stale sheet can never
+    place more than the book currently needs. Bounded by a dollar cap per
+    tap, an order count per tap, and live buying power; an ask placement is
+    capped near 273 by the exchange, so a wide gap closes over several taps
+    and the reply says how much is left.
+    """
+    if not _slug_known(slug):
+        return 400, {"ok": False, "error": "unknown market"}
+    if side not in ("BUY", "SELL"):
+        return 400, {"ok": False, "error": "side must be BUY or SELL"}
+    try:
+        book = tr._fetch_book(slug)
+    except Exception as e:  # noqa: BLE001
+        return 502, {"ok": False, "error": f"book unavailable: {type(e).__name__}"}
+    q = _qual_view(slug, book)
+    name = "bid" if side == "BUY" else "ask"
+    if not q["target"]:
+        return 400, {"ok": False,
+                     "error": "no active reward program here — nothing to qualify"}
+    need = q["need_bid"] if side == "BUY" else q["need_ask"]
+    if need <= 0:
+        return 200, {"ok": True, "placed": 0,
+                     "note": f"{name} side already holds Target Size"}
+    px = (q["floor_c"] if side == "BUY" else q["ceil_c"]) / 100.0
+    unit = px if side == "BUY" else 1 - px          # capital locked per contract
+    bp = float(MONITOR.buying_power or 0.0)
+    budget = min(QUALIFY_MAX_USD, max(0.0, bp - QUALIFY_RESERVE_USD))
+    if budget <= 0 or unit <= 0:
+        return 400, {"ok": False,
+                     "error": f"no headroom — buying power ${bp:,.2f}"}
+    want = min(need, int(budget / unit))
+    if want < 1:
+        return 400, {"ok": False,
+                     "error": f"${budget:.2f} of headroom buys nothing at {px * 100:.1f}c"}
+    placed = 0
+    spent = 0.0
+    remaining = want
+    errs: list[str] = []
+    for _ in range(QUALIFY_MAX_ORDERS):
+        if remaining < 1:
+            break
+        qty = int(min(remaining, QUALIFY_CHUNK))
+        code, res = manual_place(slug, side, round(px * 100, 1), qty)
+        if not res.get("ok"):
+            errs.append(str(res.get("detail") or res.get("error") or f"HTTP {code}"))
+            break
+        placed += 1
+        spent += qty * unit
+        remaining -= qty
+        time.sleep(1.0)
+    # Report where the side actually ended up, not where we hoped it would.
+    # The public book can lag a placement by a beat, so give it one, then
+    # clamp what we report to what the arithmetic allows: never claim a
+    # bigger gap than (what was missing - what we just placed). A lagging
+    # book that still shows the old depth would otherwise invite a second
+    # tap and place the size twice.
+    left = None
+    done = want - remaining
+    try:
+        time.sleep(2.0)
+        after = _qual_view(slug, tr._fetch_book(slug))
+        left = after["need_bid"] if side == "BUY" else after["need_ask"]
+        left = max(0, min(int(left), max(0, need - done)))
+    except Exception:  # noqa: BLE001 — the placements already happened
+        pass
+    POLL_KICK.set()
+    return (200 if placed else 502), {
+        "ok": bool(placed), "placed": placed, "size": want - remaining,
+        "price_cents": round(px * 100, 1), "spent": round(spent, 2),
+        "capped_by_budget": want < need, "remaining_gap": left,
+        "detail": "; ".join(errs)[:200]}
+
+
 def market_info(slug: str) -> tuple[int, dict]:
     """Book + my orders + position for the tap-a-market action sheet."""
     if not slug or len(slug) > 120:
@@ -3316,6 +3430,9 @@ def market_info(slug: str) -> tuple[int, dict]:
                  "bids": [[p, q] for p, q in (book.get("bids") or [])[:6]],
                  "asks": [[p, q] for p, q in (book.get("asks") or [])[:6]],
                  "orders": mine, "net": net, "buying_power": MONITOR.buying_power,
+                 # depth here is the WHOLE side, not the six levels above —
+                 # Target Size counts every resting contract on the side
+                 "qual": _qual_view(slug, book),
                  "defend": (MONITOR.state.get("defend") or {}).get(slug)}
 
 
@@ -3497,6 +3614,10 @@ def do_maction(body: dict) -> tuple[int, dict]:
                               close_short=bool(body.get("close_short")))
         except (KeyError, TypeError, ValueError):
             return 400, {"ok": False, "error": "bad request"}
+    if op == "qualify":
+        # market + side only: the size and price are computed server-side
+        # from a fresh book, so a stale sheet cannot oversize a placement
+        return do_qualify(str(body.get("market") or ""), str(body.get("side") or ""))
     if op == "auto":
         # The owner's on/off button for a placement loop. Auth and the
         # X-Reprice CSRF header are already enforced by the POST handler.
@@ -3551,7 +3672,8 @@ def do_maction(body: dict) -> tuple[int, dict]:
             d.pop(slug, None)
             tr.PRIORITY_SLUGS = set(d)
         return 200, {"ok": True}
-    return 400, {"ok": False, "error": "op must be place, modify, cancel, defend or undefend"}
+    return 400, {"ok": False,
+                 "error": "op must be place, modify, cancel, qualify, defend or undefend"}
 
 
 # ---------------------------------------------------------------------------
@@ -6002,8 +6124,62 @@ function renderSheet(d){
     '<div class="ctlrow rp" style="margin-top:10px"><button onclick="mPlace(\\''+esc(m)+'\\')">Place</button></div>'+
     '</div>'+
     '<div class="mkt">post-only — the order rests or is rejected; it can never cross the spread and fill on arrival</div>'+
+    qualBlock(d)+
     defendBlock(d)+
     '<div class="rp" style="margin-top:12px"><button class="alt" onclick="closeSheet()">Close</button></div>';
+}
+function qualBlock(d){
+  const q = d.qual || null;
+  const m = d.market;
+  if(!q || !q.target){
+    return '<h3>Qualify</h3><div class="mkt">No active reward program on this market — '+
+      'there is no Target Size to reach, so nothing here would earn.</div>';
+  }
+  const tgt = q.target.toLocaleString();
+  function row(side, tot, need, priceC, cost){
+    const nm = side === 'BUY' ? 'Bid' : 'Ask';
+    if(!need){
+      return '<div class="mkt" style="color:#3fb950">'+nm+' side ✓ '+tot.toLocaleString()+
+        ' of '+tgt+' — qualifying, this side pays</div>';
+    }
+    return '<div class="mkt" style="color:#ff9d99">'+nm+' side ✗ '+tot.toLocaleString()+' of '+tgt+
+      ' — short '+need.toLocaleString()+', so this side pays nobody</div>'+
+      '<div class="rp" style="margin-bottom:8px"><button onclick="mQualify(\\''+esc(m)+'\\',\\''+side+'\\')">'+
+      '⚓ Qualify '+nm.toLowerCase()+' — '+need.toLocaleString()+' @ '+priceC+'¢ ≈ $'+cost.toFixed(2)+
+      '</button></div>';
+  }
+  return '<h3>Qualify</h3>'+
+    '<div class="mkt">A side pays NOBODY until it holds Target Size ('+tgt+' resting contracts, '+
+    'everyone\\'s size counted, not just yours). This places the cheapest post-only orders that close '+
+    'the gap — floor bid at '+q.floor_c+'¢, ceiling ask at '+q.ceil_c+'¢, where a contract ties up the '+
+    'least capital. It unlocks the pool for the side; on its own it earns you almost nothing, because '+
+    'an order that far from the touch scores about zero. It pays when you also hold an order near the '+
+    'touch on the same side. Size and price are recomputed from the live book when you tap.</div>'+
+    row('BUY', q.bid_total, q.need_bid, q.floor_c, q.cost_bid)+
+    row('SELL', q.ask_total, q.need_ask, q.ceil_c, q.cost_ask);
+}
+async function mQualify(m, side){
+  const nm = side === 'BUY' ? 'bid' : 'ask';
+  if(!arm('ql'+m+side, 'Qualify the '+nm+' side — cheapest orders to reach Target Size')) return;
+  try{
+    const r = await fetch('maction', {method:'POST',
+      headers:{'Content-Type':'application/json','X-Reprice':'1'},
+      body: JSON.stringify({op:'qualify', market:m, side:side})});
+    const d = await r.json().catch(() => ({ok:false, error:'HTTP '+r.status}));
+    if(!d.ok){
+      toast('Failed: ' + (d.detail || d.error || ('HTTP '+r.status)));
+    } else if(!d.placed){
+      toast(d.note || 'Nothing to do');
+    } else {
+      let msg = 'Placed '+d.placed+' order'+(d.placed>1?'s':'')+' — '+
+        (d.size||0).toLocaleString()+' @ '+d.price_cents+'¢, ~$'+(d.spent||0).toFixed(2)+' locked';
+      if(d.remaining_gap) msg += ' · '+d.remaining_gap.toLocaleString()+' still short, tap again';
+      else if(d.remaining_gap === 0) msg += ' · side qualifying ✓';
+      if(d.capped_by_budget) msg += ' (capped by buying power)';
+      toast(msg);
+    }
+  }catch(e){ toast('Failed: '+e); }
+  setTimeout(function(){ openMkt(m); refresh(); }, 1500);
 }
 function defendBlock(d){
   const m = d.market;
