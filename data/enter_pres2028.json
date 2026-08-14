@@ -1,7 +1,7 @@
 {
- "dry_run": true,
+ "dry_run": false,
  "buying_power": 217.4425,
- "placed": 0,
+ "placed": 159,
  "failed": 0,
  "log": [
   {
@@ -43,7 +43,7 @@
    "m": "enwc-uspres-nom-dem-2028-dwajoh",
    "side": "SELL",
    "px": 0.51,
-   "qty": 33,
+   "qty": 50,
    "ok": true
   },
   {
@@ -295,7 +295,7 @@
    "m": "enwc-uspres-nom-rep-2028-gleyou",
    "side": "SELL",
    "px": 0.51,
-   "qty": 56,
+   "qty": 50,
    "ok": true
   },
   {
@@ -532,8 +532,8 @@
   {
    "m": "ewc-usp-2028-11-07-gleyou",
    "side": "SELL",
-   "px": 0.21,
-   "qty": 33,
+   "px": 0.51,
+   "qty": 50,
    "ok": true
   },
   {
@@ -616,8 +616,8 @@
   {
    "m": "ewc-usp-2028-11-07-kamhar",
    "side": "SELL",
-   "px": 0.51,
-   "qty": 42,
+   "px": 0.25,
+   "qty": 33,
    "ok": true
   },
   {
@@ -702,6 +702,13 @@
    "side": "BUY",
    "px": 0.01,
    "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rondes",
+   "side": "SELL",
+   "px": 0.51,
+   "qty": 33,
    "ok": true
   },
   {

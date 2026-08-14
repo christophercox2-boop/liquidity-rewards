@@ -10,9 +10,9 @@ slate: 58 markets
     bid: 10,000 @ 1c → ok
     ask: join 33 @ 51c (~25% of side) → ok
 [3/58] enwc-uspres-nom-dem-2028-dwajoh
-    bid    1c x225       ask   51c x11,000    target 10,000
+    bid    1c x225       ask   51c x11,050    target 10,000
     bid: 10,000 @ 1c → ok
-    ask: join 33 @ 51c (~25% of side) → ok
+    ask: join 50 @ 51c (~25% of side) → ok
 [4/58] enwc-uspres-nom-dem-2028-gavnew
     bid    1c x300       ask   51c x11,150    target 10,000
     bid: 10,000 @ 1c → ok
@@ -82,11 +82,11 @@ slate: 58 markets
     bid: 10,000 @ 1c → ok
     ask: join 33 @ 51c (~25% of side) → ok
 [21/58] enwc-uspres-nom-rep-2028-gleyou
-    bid    1c x300       ask   51c x11,247    target 10,000
+    bid    1c x300       ask   51c x11,150    target 10,000
     bid: 10,000 @ 1c → ok
-    ask: join 56 @ 51c (~25% of side) → ok
+    ask: join 50 @ 51c (~25% of side) → ok
 [22/58] enwc-uspres-nom-rep-2028-jdvan
-    bid   19c x11,115    ask   70c x11,100    target 10,000
+    bid   19c x11,332    ask   70c x11,100    target 10,000
     ask: join 33 @ 70c (~25% of side) → ok
 [23/58] enwc-uspres-nom-rep-2028-margre
     bid    1c x225       ask   51c x11,100    target 10,000
@@ -152,9 +152,9 @@ slate: 58 markets
     bid: 10,000 @ 1c → ok
     ask: join 50 @ 51c (~25% of side) → ok
 [39/58] ewc-usp-2028-11-07-gleyou
-    bid    1c x225       ask   21c x11,050    target 10,000
+    bid    1c x225       ask   51c x11,100    target 10,000
     bid: 10,000 @ 1c → ok
-    ask: join 33 @ 21c (~25% of side) → ok
+    ask: join 50 @ 51c (~25% of side) → ok
 [40/58] ewc-usp-2028-11-07-jamtal
     bid    1c x300       ask   51c x11,000    target 10,000
     bid: 10,000 @ 1c → ok
@@ -176,13 +176,13 @@ slate: 58 markets
     bid: 10,000 @ 1c → ok
     ask: join 33 @ 51c (~25% of side) → ok
 [45/58] ewc-usp-2028-11-07-kamhar
-    bid    1c x300       ask   51c x11,026    target 10,000
+    bid    1c x300       ask   25c x11,050    target 10,000
     bid: 10,000 @ 1c → ok
-    ask: join 42 @ 51c (~25% of side) → ok
+    ask: join 33 @ 25c (~25% of side) → ok
 [46/58] ewc-usp-2028-11-07-markel
-    bid    1c x300       ask   22c x325       target 10,000
+    bid    1c x300       ask   51c x362       target 10,000
     bid: 10,000 @ 1c → ok
-    ask: side short but the touch is 22c — a 99c order would score ~0, skipped (qualifying it would pay whoever holds the touch)
+    ask: side short but the touch is 51c — a 99c order would score ~0, skipped (qualifying it would pay whoever holds the touch)
 [47/58] ewc-usp-2028-11-07-marrub
     bid    1c x300       ask   51c x11,050    target 10,000
     bid: 10,000 @ 1c → ok
@@ -204,9 +204,9 @@ slate: 58 markets
     bid: 10,000 @ 1c → ok
     ask: join 33 @ 51c (~25% of side) → ok
 [52/58] ewc-usp-2028-11-07-rondes
-    bid    1c x300       ask   51c x325       target 10,000
+    bid    1c x300       ask   51c x11,000    target 10,000
     bid: 10,000 @ 1c → ok
-    ask: side short but the touch is 51c — a 99c order would score ~0, skipped (qualifying it would pay whoever holds the touch)
+    ask: join 33 @ 51c (~25% of side) → ok
 [53/58] ewc-usp-2028-11-07-stasmi
     bid    1c x225       ask   51c x11,050    target 10,000
     bid: 10,000 @ 1c → ok
@@ -232,4 +232,4 @@ slate: 58 markets
     bid: 10,000 @ 1c → ok
     ask: join 33 @ 51c (~25% of side) → ok
 
-placed 0 orders, 0 failures  (DRY RUN — nothing was sent)
+placed 159 orders, 0 failures
