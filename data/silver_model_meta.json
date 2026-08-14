@@ -4,16 +4,16 @@
   "file": "data/silver_model.csv",
   "meaning": "Senate win probability, Deluxe model",
   "chart_title": "How our Senate forecast has changed over time",
-  "n_rows": 9,
+  "n_rows": 10,
   "header": [
    "modeldate",
    "Democrats",
    "Republicans"
   ],
   "latest": [
-   "8/12/2026",
-   "56.305",
-   "43.695"
+   "8/13/2026",
+   "55.965",
+   "44.035"
   ]
  },
  "igTt2": {
@@ -152,8 +152,8 @@
   "latest": [
    "Wyoming",
    "WY",
-   "0.01",
-   "99.99",
+   "0.0175",
+   "99.9825",
    "Ken Casner",
    "",
    "",
@@ -162,11 +162,11 @@
    "",
    "",
    "",
-   "0.01",
+   "0.0175",
    "",
    "",
    "",
-   "99.989998",
+   "99.9825",
    "",
    "",
    "",
