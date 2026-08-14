@@ -1,45 +1,131 @@
-politics slugs from tags: 373
-usgubewc slugs visible: 32
-all prefixes seen: {'paccc': 4, 'enwc': 34, 'ewc': 77, 'usgcc': 1, 'apdc': 26, 'stsc': 3, 'cranc': 33, 'lawec': 4, 'pic': 1, 'mowc': 1, 'mlaec': 15, 'dipcc': 6, 'pintc': 15, 'opdc': 9, 'pvwc': 2, 'cpic': 10, 'vtc': 10, 'vmc': 10, 'gsc': 1, 'scc': 25, 'iarc': 11, 'ussewc': 41, 'usgubewc': 32, 'ushrewc': 2}
+politics slugs from tags: 1194
+usgubewc slugs visible: 60
+all prefixes seen: {'paccc': 4, 'enwc': 46, 'ewc': 104, 'usgcc': 1, 'apdc': 25, 'stsc': 3, 'cranc': 33, 'lawec': 3, 'pic': 1, 'mowc': 1, 'mlaec': 15, 'dipcc': 6, 'pintc': 15, 'opdc': 9, 'pvwc': 2, 'vtc': 10, 'vmc': 10, 'gsc': 1, 'scc': 25, 'iarc': 11, 'ussewc': 49, 'usgubewc': 60, 'ushrewc': 750, 'vsc': 10}
 
-incentives entries returned for governor slugs: 2
+incentives entries returned for governor slugs: 60
 
 market                                         prog?   pool    df  target     status
+usgubewc-usgub-ak-2026-11-03-adacru              yes     25  0.10    2000     active
+usgubewc-usgub-ak-2026-11-03-berwil              yes     25  0.10    2000     active
+usgubewc-usgub-ak-2026-11-03-bilwal              yes     25  0.10    2000     active
+usgubewc-usgub-ak-2026-11-03-clibis              yes     25  0.10    2000     active
+usgubewc-usgub-ak-2026-11-03-davbro              yes     25  0.10    2000     active
+usgubewc-usgub-ak-2026-11-03-jonkre              yes     25  0.10    2000     active
+usgubewc-usgub-ak-2026-11-03-tombeg              yes     25  0.10    2000     active
 usgubewc-usgub-al-2026-11-03-dem                 yes     25  0.10    2000     active
 usgubewc-usgub-al-2026-11-03-rep                 yes     25  0.10    2000     active
-usgubewc-usgub-ar-2026-11-03-dem                NONE
-usgubewc-usgub-ar-2026-11-03-rep                NONE
-usgubewc-usgub-co-2026-11-03-dem                NONE
-usgubewc-usgub-co-2026-11-03-rep                NONE
-usgubewc-usgub-ct-2026-11-03-dem                NONE
-usgubewc-usgub-ct-2026-11-03-rep                NONE
-usgubewc-usgub-fl-2026-11-03-dem                NONE
-usgubewc-usgub-fl-2026-11-03-rep                NONE
-usgubewc-usgub-hi-2026-11-03-dem                NONE
-usgubewc-usgub-hi-2026-11-03-rep                NONE
-usgubewc-usgub-id-2026-11-03-dem                NONE
-usgubewc-usgub-id-2026-11-03-rep                NONE
-usgubewc-usgub-il-2026-11-03-dem                NONE
-usgubewc-usgub-il-2026-11-03-rep                NONE
-usgubewc-usgub-ma-2026-11-03-dem                NONE
-usgubewc-usgub-ma-2026-11-03-rep                NONE
-usgubewc-usgub-md-2026-11-03-dem                NONE
-usgubewc-usgub-md-2026-11-03-rep                NONE
-usgubewc-usgub-me-2026-11-03-dem                NONE
-usgubewc-usgub-me-2026-11-03-rep                NONE
-usgubewc-usgub-mn-2026-11-03-dem                NONE
-usgubewc-usgub-mn-2026-11-03-rep                NONE
-usgubewc-usgub-ne-2026-11-03-dem                NONE
-usgubewc-usgub-ne-2026-11-03-rep                NONE
-usgubewc-usgub-nh-2026-11-03-dem                NONE
-usgubewc-usgub-nh-2026-11-03-rep                NONE
-usgubewc-usgub-nm-2026-11-03-dem                NONE
-usgubewc-usgub-nm-2026-11-03-rep                NONE
-usgubewc-usgub-ny-2026-11-03-dem                NONE
-usgubewc-usgub-ny-2026-11-03-rep                NONE
+usgubewc-usgub-ar-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-ar-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-co-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-co-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-ct-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-ct-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-fl-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-fl-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-hi-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-hi-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-id-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-id-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-il-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-il-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-ma-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-ma-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-md-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-md-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-me-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-me-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-mn-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-mn-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-ne-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-ne-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-nh-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-nh-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-nm-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-nm-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-ny-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-ny-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-ok-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-ok-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-or-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-or-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-pa-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-pa-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-ri-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-ri-2026-11-03-kenblo              yes     25  0.10    2000     active
+usgubewc-usgub-ri-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-sc-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-sc-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-sd-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-sd-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-tn-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-tn-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-tx-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-tx-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-vt-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-vt-2026-11-03-rep                 yes     25  0.10    2000     active
+usgubewc-usgub-wy-2026-11-03-dem                 yes     25  0.10    2000     active
+usgubewc-usgub-wy-2026-11-03-rep                 yes     25  0.10    2000     active
 
-fetching books for 2 governor markets with a live pool
+fetching books for 60 governor markets with a live pool
 
 market                                            bid    ask     bidQ     askQ   n
-usgubewc-usgub-al-2026-11-03-dem                 0.01    0.5    17176     2565   2
-usgubewc-usgub-al-2026-11-03-rep                  0.7   0.99     2461    15649   2
+usgubewc-usgub-ak-2026-11-03-adacru              0.01    0.5    11300      325   7
+usgubewc-usgub-ak-2026-11-03-berwil              0.13   0.59      350      325   7
+usgubewc-usgub-ak-2026-11-03-bilwal              0.01    0.5    10300     2900   7
+usgubewc-usgub-ak-2026-11-03-clibis              0.01    0.5    10300     2900   7
+usgubewc-usgub-ak-2026-11-03-davbro              0.01   0.49    10300     2892   7
+usgubewc-usgub-ak-2026-11-03-jonkre              0.01   0.51    10300      325   7
+usgubewc-usgub-ak-2026-11-03-tombeg              0.21   0.71     2450     2657   7
+usgubewc-usgub-al-2026-11-03-dem                 0.04   0.17    44495   133908   2
+usgubewc-usgub-al-2026-11-03-rep                 0.82   0.91   301205    20307   2
+usgubewc-usgub-ar-2026-11-03-dem                 0.01   0.09      300   131649   2
+usgubewc-usgub-ar-2026-11-03-rep                 0.91   0.96   600904      674   2
+usgubewc-usgub-co-2026-11-03-dem                 0.88   0.96   600691      265   2
+usgubewc-usgub-co-2026-11-03-rep                 0.02   0.07     5700   130781   2
+usgubewc-usgub-ct-2026-11-03-dem                 0.95   0.96   500213      494   2
+usgubewc-usgub-ct-2026-11-03-rep                 0.01   0.12    12406   200017   2
+usgubewc-usgub-fl-2026-11-03-dem                 0.15   0.17    10813   265830   2
+usgubewc-usgub-fl-2026-11-03-rep                 0.86   0.87   500561    14502   2
+usgubewc-usgub-hi-2026-11-03-dem                 0.91   0.96   500818     4371   2
+usgubewc-usgub-hi-2026-11-03-rep                 0.01    0.1    10300   209034   2
+usgubewc-usgub-id-2026-11-03-dem                 0.01    0.1      300   209021   2
+usgubewc-usgub-id-2026-11-03-rep                 0.91   0.96   500967     2138   2
+usgubewc-usgub-il-2026-11-03-dem                 0.89   0.96   600956    18514   2
+usgubewc-usgub-il-2026-11-03-rep                 0.04   0.09     8008   208494   2
+usgubewc-usgub-ma-2026-11-03-dem                 0.86   0.94      792     3402   2
+usgubewc-usgub-ma-2026-11-03-rep                 0.06   0.09     3816      275   2
+usgubewc-usgub-md-2026-11-03-dem                 0.95   0.99   500256    24279   2
+usgubewc-usgub-md-2026-11-03-rep                 0.01   0.09    10300    65899   2
+usgubewc-usgub-me-2026-11-03-dem                 0.85   0.99   500820    58376   2
+usgubewc-usgub-me-2026-11-03-rep                 0.01   0.14    41300    66230   2
+usgubewc-usgub-mn-2026-11-03-dem                 0.85   0.92   580642    24585   2
+usgubewc-usgub-mn-2026-11-03-rep                 0.06    0.1     9634   196023   2
+usgubewc-usgub-ne-2026-11-03-dem                 0.03   0.09      361   265928   2
+usgubewc-usgub-ne-2026-11-03-rep                 0.91   0.94   500225    10086   2
+usgubewc-usgub-nh-2026-11-03-dem                  0.1   0.21     1025     2670   2
+usgubewc-usgub-nh-2026-11-03-rep                 0.81    0.9     2385     3797   2
+usgubewc-usgub-nm-2026-11-03-dem                 0.81   0.99   500843    24744   2
+usgubewc-usgub-nm-2026-11-03-rep                 0.01   0.19    10418    66355   2
+usgubewc-usgub-ny-2026-11-03-dem                 0.86   0.95   503241    11452   2
+usgubewc-usgub-ny-2026-11-03-rep                 0.01   0.13    12230    68197   2
+usgubewc-usgub-ok-2026-11-03-dem                 0.05   0.08     2500   130753   2
+usgubewc-usgub-ok-2026-11-03-rep                 0.88   0.98   600843      228   2
+usgubewc-usgub-or-2026-11-03-dem                 0.79   0.95   600858    12269   2
+usgubewc-usgub-or-2026-11-03-rep                 0.06   0.22     3179    66252   2
+usgubewc-usgub-pa-2026-11-03-dem                 0.88   0.99     2799    20459   2
+usgubewc-usgub-pa-2026-11-03-rep                 0.06   0.15     6143     3193   2
+usgubewc-usgub-ri-2026-11-03-dem                 0.91   0.94     2647     2040   3
+usgubewc-usgub-ri-2026-11-03-kenblo              0.01   0.12    10300      550   3
+usgubewc-usgub-ri-2026-11-03-rep                 0.01   0.14    11450      465   3
+usgubewc-usgub-sc-2026-11-03-dem                 0.02   0.07    11700   196092   2
+usgubewc-usgub-sc-2026-11-03-rep                 0.83   0.94   500770    19820   2
+usgubewc-usgub-sd-2026-11-03-dem                 0.01   0.11    15484     2597   2
+usgubewc-usgub-sd-2026-11-03-rep                 0.93   0.99     2360     4322   2
+usgubewc-usgub-tn-2026-11-03-dem                 0.01    0.1    11300      398   2
+usgubewc-usgub-tn-2026-11-03-rep                 0.88   0.97     2575    18231   2
+usgubewc-usgub-tx-2026-11-03-dem                 0.14   0.23      459      655   2
+usgubewc-usgub-tx-2026-11-03-rep                  0.8   0.91      575      357   2
+usgubewc-usgub-vt-2026-11-03-dem                 0.06   0.12    13176   330248   2
+usgubewc-usgub-vt-2026-11-03-rep                 0.85   0.94   200690    22600   2
+usgubewc-usgub-wy-2026-11-03-dem                 0.04   0.07     4757     2514   2
+usgubewc-usgub-wy-2026-11-03-rep                 0.95   0.99     2043    27484   2
