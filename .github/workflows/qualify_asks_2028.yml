@@ -69,7 +69,7 @@ jobs:
           WANT_OURS = 10000          # our own resting size on the side
           MAX_ORDERS_PER_SIDE = 140
           BP_FLOOR = 25.0
-          MAX_ORDERS_TOTAL = 4000
+          MAX_ORDERS_TOTAL = 1600
           PAUSE = 0.8
 
           def bp_now(default=0.0):
@@ -183,30 +183,31 @@ jobs:
               if not target:
                   print(f"[{i}/{len(slate)}] {slug}: no reward program — skipped")
                   continue
-              if ask_tot >= target:
-                  continue                      # already qualifying, leave it
+              # Target OUR OWN size, not the visible total. A side sitting at
+              # Target Size on someone else's stack was skipped by the earlier
+              # runs, and when they pulled it went straight to zero with no
+              # warning — 14 markets died exactly that way. A side we hold up
+              # ourselves cannot be switched off by anyone leaving.
               mine = ours.get(slug, 0.0)
-              need = int(max(0, WANT_OURS - mine))
-              if need < 1:
-                  print(f"[{i}/{len(slate)}] {slug}: we already rest {mine:,.0f} on the ask "
-                        "— side short only because others pulled; nothing more to add")
+              if mine >= WANT_OURS:
                   continue
               print(f"[{i}/{len(slate)}] {slug}: ask {ask_tot:,.0f} of {target:,.0f}, "
-                    f"ours {mine:,.0f} → adding {need:,}")
+                    f"OURS {mine:,.0f} → adding {int(WANT_OURS - mine):,} to stand alone")
               # Progress is measured from the BOOK, never from what we asked
               # for. An order rests at whatever buying power allows at that
               # moment — ~170 when we asked for 197 — so counting requests
               # made the first run believe it was done at ~86% of Target Size.
               placed = 0
               stalled = 0
-              live_tot = ask_tot
-              while (live_tot < target and placed < MAX_ORDERS_PER_SIDE
+              ours_now = mine
+              last_book = ask_tot
+              while (ours_now < WANT_OURS and placed < MAX_ORDERS_PER_SIDE
                      and total < MAX_ORDERS_TOTAL):
                   if BP < BP_FLOOR:
                       print(f"    stopping: buying power ${BP:,.2f} below the "
                             f"${BP_FLOOR:.0f} floor")
                       break
-                  qty = min(int(target - live_tot) + 1, max(1, int(BP)))
+                  qty = min(int(WANT_OURS - ours_now) + 1, max(1, int(BP)))
                   if DRY:
                       ok, why = True, ""
                   else:
@@ -223,17 +224,20 @@ jobs:
                   if placed % 4 == 0:
                       BP = bp_now(BP)
                       try:
-                          now_tot = sum(q for _, q in
-                                        (tr._fetch_book(slug).get("asks") or []))
+                          now_book = sum(q for _, q in
+                                         (tr._fetch_book(slug).get("asks") or []))
                       except Exception:
                           continue
-                      gained = now_tot - live_tot
-                      live_tot = now_tot
+                      # what the book gained is what of ours actually rested;
+                      # never count it backwards if someone else pulled
+                      gained = now_book - last_book
+                      last_book = now_book
+                      ours_now += max(0.0, gained)
                       # a real exposure ceiling shows up here: orders accepted,
                       # book not moving. Four rounds of that and we move on.
                       stalled = stalled + 1 if gained < 25 else 0
                       if stalled >= 4:
-                          print(f"    stalled at {live_tot:,.0f} — orders accepted "
+                          print(f"    stalled — ours ~{ours_now:,.0f}, orders accepted "
                                 "but the book stopped moving; moving on")
                           break
               try:
@@ -242,9 +246,11 @@ jobs:
                   after = None
               state = ("?" if after is None
                        else ("QUALIFYING" if after >= target else f"still {target-after:,.0f} short"))
-              print(f"    {placed} orders placed, ask side now "
+              print(f"    {placed} orders placed, ours ~{ours_now:,.0f}, ask side now "
                     f"{after if after is None else format(after, ',.0f')} → {state}")
               summary.append({"m": slug, "orders": placed, "after": after,
+                              "ours": round(ours_now),
+                              "self_sufficient": ours_now >= WANT_OURS,
                               "qualifying": bool(after and after >= target)})
               done_mkts += 1
 
