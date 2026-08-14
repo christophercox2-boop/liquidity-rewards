@@ -3074,13 +3074,13 @@ def auto_defend() -> None:
 #
 # This is the one loop here that CROSSES the spread — it is a taker, not a
 # rester, and it pays the taker fee. It is deliberately narrow: only the 2028
-# slate, only levels at or under SNIPE_MAX_QTY contracts, only at or above
+# slate, only levels under 5 contracts (SNIPE_MAX_QTY), only at or above
 # SNIPE_MIN_PRICE, never the three candidates the owner named as real
 # contenders, and bounded per cycle in both count and dollars.
 #
 # Like every other loop that places orders, it does nothing at all until the
 # owner turns its switch on from /map. Off by default, persisted, audit-logged.
-SNIPE_MAX_QTY = float(os.environ.get("SNIPE_MAX_QTY", "2"))
+SNIPE_MAX_QTY = float(os.environ.get("SNIPE_MAX_QTY", "4"))   # takes levels UNDER 5
 SNIPE_MIN_PRICE = float(os.environ.get("SNIPE_MIN_PRICE", "0.15"))
 SNIPE_MAX_PER_CYCLE = int(os.environ.get("SNIPE_MAX_PER_CYCLE", "6"))
 SNIPE_MAX_SPEND = float(os.environ.get("SNIPE_MAX_SPEND", "25"))
@@ -3120,7 +3120,7 @@ def auto_snipe() -> None:
             continue
         px, q = float(bids[0][0]), float(bids[0][1])
         # only the TOUCH level, and only if it is both small and rich. A big
-        # bid at 20c is somebody's real opinion; a single contract is not.
+        # bid at 20c is somebody's real opinion; a handful of contracts is not.
         if px < SNIPE_MIN_PRICE or q > SNIPE_MAX_QTY or q < 1:
             continue
         # never trade with ourselves
