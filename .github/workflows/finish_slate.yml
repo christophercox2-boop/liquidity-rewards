@@ -1,0 +1,245 @@
+name: Finish 2028 slate
+
+# ORDER-TOUCHING. Places real orders. Push-path / manual dispatch only.
+#
+# Two jobs, both approved:
+#
+#  1. The 11 ask sides still short of Target Size. They stopped early because
+#     the previous run watched the PUBLIC BOOK to judge progress, and the book
+#     lags a placement by several seconds — so it saw no movement and called a
+#     stall after 16 orders when ~57 were needed. It was never an exchange
+#     limit: 97% of every order actually rested. This version does not consult
+#     the book mid-flight at all. It places what is needed, lets it settle,
+#     then verifies against OUR OWN OPEN ORDERS, which is authoritative, and
+#     makes a second pass for anything still short.
+#
+#  2. Rubio's bid (enwc-uspres-nom-rep-2028-marrub). Unlike the rest of the
+#     slate his bid touch is ~8c, not 1c — he is a contender, not a longshot.
+#     So a 10,000 at 1c qualifies the side but scores nothing 7 ticks out.
+#     Both go in: the 1c block to hold the side up, and a smaller order at the
+#     live touch so the side actually pays us.
+#
+# Post-only throughout: an order rests or is rejected, never crosses.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/finish_slate.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finish-slate
+  cancel-in-progress: false
+
+jobs:
+  finish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, math, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+          RUBIO = "enwc-uspres-nom-rep-2028-marrub"
+          CEIL, FLOOR = 0.99, 0.01
+          WANT = 10000
+          RUBIO_TOUCH_QTY = 400
+          MAX_TOTAL = 1200
+          PAUSE = 0.8
+          BP_FLOOR = 25.0
+
+          def bp_now(default=0.0):
+              try:
+                  p = "/v1/account/balances"
+                  r = requests.get(tr.TRADE_API + p,
+                                   headers=tr.auth_headers(kid, sec, "GET", p), timeout=20)
+                  if r.status_code < 400:
+                      for b in r.json().get("balances") or []:
+                          if b.get("buyingPower") is not None:
+                              return float(b["buyingPower"])
+              except Exception:
+                  pass
+              return default
+
+          def ours_map():
+              """Authoritative: our resting size per (market, side). The public
+              book lags; our own order list does not."""
+              out = {}
+              p = "/v1/orders/open"
+              r = requests.get(tr.TRADE_API + p,
+                               headers=tr.auth_headers(kid, sec, "GET", p), timeout=40)
+              r.raise_for_status()
+              for o in r.json().get("orders") or []:
+                  if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                                 "ORDER_STATE_PARTIALLY_FILLED"):
+                      continue
+                  s = o.get("marketSlug") or ""
+                  if not s.startswith(PREFIXES):
+                      continue
+                  intent = str(o.get("intent") or "")
+                  side = "BUY" if intent.endswith(("BUY_LONG", "SELL_SHORT")) else "SELL"
+                  q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+                  out[(s, side)] = out.get((s, side), 0.0) + q
+              return out
+
+          placed = failed = 0
+          def place(slug, side, px, qty):
+              global placed, failed
+              if not slug.startswith(PREFIXES) or not (0.1 <= px * 100 <= 99.9):
+                  return False, "guard"
+              qty = int(qty)
+              if not (1 <= qty <= 20000):
+                  return False, "size"
+              intent = "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_BUY_SHORT"
+              delay = 2.0
+              for attempt in range(5):
+                  try:
+                      r = requests.post(tr.TRADE_API + "/v1/orders",
+                          headers={**tr.auth_headers(kid, sec, "POST", "/v1/orders"),
+                                   "Content-Type": "application/json"},
+                          json={"marketSlug": slug, "intent": intent,
+                                "type": "ORDER_TYPE_LIMIT",
+                                "price": {"value": f"{px:.2f}", "currency": "USD"},
+                                "quantity": qty,
+                                "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                                "participateDontInitiate": True}, timeout=25)
+                      if r.status_code < 300:
+                          placed += 1
+                          return True, ""
+                      if r.status_code not in (429, 500, 502, 503, 504):
+                          failed += 1
+                          return False, " ".join(r.text.split())[:120]
+                  except Exception as e:
+                      if attempt == 4:
+                          failed += 1
+                          return False, type(e).__name__
+                  time.sleep(delay); delay = min(delay * 2, 30)
+              failed += 1
+              return False, "rate limited"
+
+          BP = bp_now()
+          print(f"buying power ${BP:,.2f} — an ask order carries {int(BP):,} shares\n")
+          if BP <= 0:
+              raise SystemExit("no buying power reading — refusing to place")
+
+          # ---------- 1. Rubio's bid --------------------------------------
+          print(f"=== {RUBIO} — bid ===")
+          try:
+              bk = tr._fetch_book(RUBIO)
+              bids = bk.get("bids") or []
+              tot = sum(q for _, q in bids)
+              touch = bids[0][0] if bids else None
+              print(f"    bid side {tot:,.0f} of {WANT:,}, touch "
+                    f"{touch*100:.0f}c" if touch else "    no bids")
+              have = ours_map().get((RUBIO, "BUY"), 0.0)
+              if have < WANT:
+                  ok, why = place(RUBIO, "BUY", FLOOR, WANT - int(have))
+                  print(f"    qualify: {WANT - int(have):,} @ {FLOOR*100:.0f}c -> "
+                        + ("ok" if ok else "FAILED " + why))
+                  time.sleep(PAUSE)
+              else:
+                  print(f"    qualify: we already rest {have:,.0f} — skipped")
+              if touch is not None and abs(touch - FLOOR) > 0.005:
+                  ok, why = place(RUBIO, "BUY", round(touch, 2), RUBIO_TOUCH_QTY)
+                  print(f"    touch  : {RUBIO_TOUCH_QTY} @ {touch*100:.0f}c -> "
+                        + ("ok" if ok else "FAILED " + why))
+                  time.sleep(PAUSE)
+          except Exception as e:
+              print(f"    Rubio failed: {type(e).__name__}: {e}")
+
+          # ---------- 2. the ask sides still short ------------------------
+          print("\n=== ask sides short of Target Size ===")
+          for attempt in (1, 2):
+              have = ours_map()
+              todo = []
+              # rebuild the slate each pass so nothing is missed
+              pol, _ = tr.fetch_politics_events()
+              slate = sorted(s for s in pol if s.startswith(PREFIXES))
+              for slug in slate:
+                  mine = have.get((slug, "SELL"), 0.0)
+                  if mine < WANT:
+                      todo.append((slug, WANT - int(mine)))
+              if not todo:
+                  print("  every ask side already holds our full size")
+                  break
+              print(f"\n-- pass {attempt}: {len(todo)} sides short, "
+                    f"{sum(n for _, n in todo):,} shares to add --")
+              for slug, need in todo:
+                  if placed >= MAX_TOTAL:
+                      print("  order ceiling reached")
+                      break
+                  BP = bp_now(BP)
+                  if BP < BP_FLOOR:
+                      print(f"  buying power ${BP:,.2f} below floor — stopping")
+                      break
+                  per = max(1, int(BP))
+                  n = math.ceil(need / per)
+                  print(f"  {slug}: adding {need:,} in {n} orders of {per}")
+                  for _ in range(n):
+                      if placed >= MAX_TOTAL:
+                          break
+                      ok, why = place(slug, "SELL", CEIL, min(per, need))
+                      if not ok:
+                          print(f"     FAILED — {why}")
+                          break
+                      need -= per
+                      time.sleep(PAUSE)
+                      if need <= 0:
+                          break
+              print("  settling before verifying…")
+              time.sleep(20)          # the book lags; our order list does not
+
+          # ---------- verify against our own orders -----------------------
+          have = ours_map()
+          pol, _ = tr.fetch_politics_events()
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+          short = [(s, have.get((s, "SELL"), 0.0)) for s in slate
+                   if have.get((s, "SELL"), 0.0) < WANT]
+          print(f"\nplaced {placed} orders, {failed} failures")
+          print(f"ask sides holding our full {WANT:,}: {len(slate) - len(short)} of {len(slate)}")
+          for s, q in short:
+              print(f"   still short: {s:42s} ours {q:,.0f}")
+          print(f"Rubio bid, ours now: {have.get((RUBIO, 'BUY'), 0):,.0f}")
+
+          os.makedirs("data", exist_ok=True)
+          json.dump({"placed": placed, "failed": failed,
+                     "short": [{"m": s, "ours": q} for s, q in short],
+                     "rubio_bid": have.get((RUBIO, "BUY"), 0)},
+                    open("data/finish_slate.json", "w"), indent=1)
+          with open("data/finish_slate.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/finish_slate.json data/finish_slate.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Finish 2028 slate [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
