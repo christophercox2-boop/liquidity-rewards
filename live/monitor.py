@@ -3087,9 +3087,11 @@ SNIPE_MAX_SPEND = float(os.environ.get("SNIPE_MAX_SPEND", "25"))
 SNIPE_COOLDOWN = float(os.environ.get("SNIPE_COOLDOWN", "300"))
 SNIPE_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
                   "ewc-usp-2028-11-07-")
-# the owner's own read: nobody outside these three is near a 25% chance, so
-# selling them at 15c+ is selling above fair. These three are not.
-SNIPE_EXCLUDE = {"jdvan", "marrub", "kamhar"}
+# The owner's own read on who is a real contender. Selling a longshot at 15c+
+# is selling well above fair; selling one of these is not, so the sniper never
+# touches them. Vance, Rubio and Harris were the original three; Ossoff and
+# Buttigieg added 2026-08-14.
+SNIPE_EXCLUDE = {"jdvan", "marrub", "kamhar", "jonoss", "petbut"}
 _SNIPE_LAST: dict = {}
 
 
