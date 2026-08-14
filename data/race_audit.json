@@ -3,9 +3,9 @@
   "m": "enwc-usgubp-fl-2026-08-18-rep-byrdon",
   "side": "BUY",
   "target": 10000.0,
-  "total": 701622.51,
+  "total": 701233.16,
   "ours": 0,
-  "others": 701622.51,
+  "others": 701233.16,
   "qual": true,
   "self_sufficient": false,
   "best": 0.97,
@@ -16,10 +16,10 @@
   "levels": [
    [
     0.97,
-    93972.81
+    93560.46
    ]
   ],
-  "denom": 93972.81,
+  "denom": 93560.46,
   "my_score": 0,
   "ours_px": {}
  },
@@ -27,9 +27,9 @@
   "m": "enwc-usgubp-fl-2026-08-18-rep-byrdon",
   "side": "SELL",
   "target": 10000.0,
-  "total": 73629.72,
+  "total": 76249.19,
   "ours": 0,
-  "others": 73629.72,
+  "others": 76249.19,
   "qual": true,
   "self_sufficient": false,
   "best": 0.98,
@@ -40,10 +40,10 @@
   "levels": [
    [
     0.98,
-    17141.9
+    18793.37
    ]
   ],
-  "denom": 17141.9,
+  "denom": 18793.37,
   "my_score": 0,
   "ours_px": {}
  },
@@ -51,9 +51,9 @@
   "m": "enwc-usgubp-fl-2026-08-18-rep-jamfis",
   "side": "BUY",
   "target": 10000.0,
-  "total": 19007.96,
+  "total": 15610.2,
   "ours": 0,
-  "others": 19007.96,
+  "others": 15610.2,
   "qual": true,
   "self_sufficient": false,
   "best": 0.02,
@@ -64,10 +64,10 @@
   "levels": [
    [
     0.02,
-    14768.42
+    11401.66
    ]
   ],
-  "denom": 14768.42,
+  "denom": 11401.66,
   "my_score": 0,
   "ours_px": {}
  },
@@ -75,9 +75,9 @@
   "m": "enwc-usgubp-fl-2026-08-18-rep-jamfis",
   "side": "SELL",
   "target": 10000.0,
-  "total": 707186.37,
+  "total": 701876.37,
   "ours": 0,
-  "others": 707186.37,
+  "others": 701876.37,
   "qual": true,
   "self_sufficient": false,
   "best": 0.03,
@@ -88,10 +88,10 @@
   "levels": [
    [
     0.03,
-    114022.5
+    108712.5
    ]
   ],
-  "denom": 114022.5,
+  "denom": 108712.5,
   "my_score": 0,
   "ours_px": {}
  },
@@ -99,9 +99,9 @@
   "m": "enwc-usgubp-fl-2026-08-18-rep-jaycol",
   "side": "SELL",
   "target": 10000.0,
-  "total": 776383.52,
+  "total": 776284.52,
   "ours": 0,
-  "others": 776383.52,
+  "others": 776284.52,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -112,10 +112,10 @@
   "levels": [
    [
     0.01,
-    644694.04
+    644595.04
    ]
   ],
-  "denom": 644694.04,
+  "denom": 644595.04,
   "my_score": 0,
   "ours_px": {}
  },
@@ -123,24 +123,24 @@
   "m": "enwc-usgubp-ok-2026-06-16-rep-gendru",
   "side": "BUY",
   "target": 5000.0,
-  "total": 27800.0,
-  "ours": 0,
-  "others": 27800.0,
+  "total": 26933.0,
+  "ours": 50.0,
+  "others": 26883.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.26,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.26,
+  "ticks_off": 0,
+  "est": 7.25,
   "per_side": 25.0,
   "levels": [
    [
     0.26,
-    47.0
+    158.0
    ],
    [
     0.24,
-    373.0
+    357.0
    ],
    [
     0.21,
@@ -163,40 +163,42 @@
     326.0
    ],
    [
-    0.04,
-    812.0
+    0.01,
+    25000.0
    ]
   ],
-  "denom": 62.06,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 172.42,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.26": 50.0
+  }
  },
  {
   "m": "enwc-usgubp-ok-2026-06-16-rep-gendru",
   "side": "SELL",
   "target": 5000.0,
-  "total": 28279.0,
-  "ours": 0,
-  "others": 28279.0,
+  "total": 28621.0,
+  "ours": 50.0,
+  "others": 28571.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.27,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.27,
+  "ticks_off": 0,
+  "est": 1.79,
   "per_side": 25.0,
   "levels": [
    [
     0.27,
-    598.0
+    651.0
    ],
    [
     0.28,
-    30.0
+    81.0
    ],
    [
     0.29,
-    415.0
+    660.0
    ],
    [
     0.31,
@@ -204,7 +206,7 @@
    ],
    [
     0.37,
-    62.0
+    55.0
    ],
    [
     0.38,
@@ -215,17 +217,19 @@
     25024.0
    ]
   ],
-  "denom": 623.8,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 696.8,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.27": 50.0
+  }
  },
  {
   "m": "enwc-usgubp-ok-2026-06-16-rep-mikmaz",
   "side": "BUY",
   "target": 5000.0,
-  "total": 29327.0,
+  "total": 29189.0,
   "ours": 0,
-  "others": 29327.0,
+  "others": 29189.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.75,
@@ -236,7 +240,7 @@
   "levels": [
    [
     0.75,
-    1085.0
+    947.0
    ],
    [
     0.7,
@@ -259,7 +263,7 @@
     25000.0
    ]
   ],
-  "denom": 1085.18,
+  "denom": 947.18,
   "my_score": 0,
   "ours_px": {}
  },
@@ -267,31 +271,31 @@
   "m": "enwc-usgubp-ok-2026-06-16-rep-mikmaz",
   "side": "SELL",
   "target": 5000.0,
-  "total": 29324.0,
-  "ours": 0,
-  "others": 29324.0,
+  "total": 29146.0,
+  "ours": 50.0,
+  "others": 29096.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.76,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.76,
+  "ticks_off": 0,
+  "est": 0.73,
   "per_side": 25.0,
   "levels": [
    [
     0.76,
-    1369.0
+    1422.0
    ],
    [
     0.77,
-    1719.0
+    1488.0
    ],
    [
-    0.88,
+    0.9,
     437.0
    ],
    [
-    0.89,
+    0.91,
     150.0
    ],
    [
@@ -303,9 +307,11 @@
     25024.0
    ]
   ],
-  "denom": 1712.8,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 1719.6,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.76": 50.0
+  }
  },
  {
   "m": "enwc-usgubp-wy-2026-08-18-rep-brebie",
@@ -333,53 +339,25 @@
  },
  {
   "m": "enwc-usgubp-wy-2026-08-18-rep-eribar",
-  "side": "BUY",
-  "target": 2000.0,
-  "total": 18.0,
-  "ours": 0,
-  "others": 18.0,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.37,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 4.17,
-  "levels": [
-   [
-    0.37,
-    18.0
-   ]
-  ],
-  "denom": 18.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "enwc-usgubp-wy-2026-08-18-rep-eribar",
   "side": "SELL",
   "target": 2000.0,
-  "total": 65.0,
+  "total": 25.0,
   "ours": 0,
-  "others": 65.0,
+  "others": 25.0,
   "qual": false,
   "self_sufficient": false,
-  "best": 0.83,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 4.17,
   "levels": [
-   [
-    0.83,
-    40.0
-   ],
    [
     0.99,
     25.0
    ]
   ],
-  "denom": 40.0,
+  "denom": 25.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -499,20 +477,20 @@
   "m": "enwc-ussep-ma-2026-09-01-dem-edmark",
   "side": "SELL",
   "target": 2000.0,
-  "total": 13346.19,
-  "ours": 0,
-  "others": 13346.19,
+  "total": 13542.1,
+  "ours": 50.0,
+  "others": 13492.1,
   "qual": true,
   "self_sufficient": false,
   "best": 0.81,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.81,
+  "ticks_off": 0,
+  "est": 0.46,
   "per_side": 6.25,
   "levels": [
    [
     0.81,
-    478.0
+    673.91
    ],
    [
     0.9,
@@ -527,18 +505,20 @@
     11919.0
    ]
   ],
-  "denom": 478.0,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 673.91,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.81": 50.0
+  }
  },
  {
   "m": "enwc-ussep-ma-2026-09-01-dem-setmou",
   "side": "BUY",
   "target": 2000.0,
-  "total": 900.0,
+  "total": 3705.5,
   "ours": 0,
-  "others": 900.0,
-  "qual": false,
+  "others": 3705.5,
+  "qual": true,
   "self_sufficient": false,
   "best": 0.16,
   "our_best": null,
@@ -548,26 +528,10 @@
   "levels": [
    [
     0.16,
-    510.0
-   ],
-   [
-    0.07,
-    10.0
-   ],
-   [
-    0.06,
-    30.0
-   ],
-   [
-    0.05,
-    150.0
-   ],
-   [
-    0.01,
-    200.0
+    3315.5
    ]
   ],
-  "denom": 510.0,
+  "denom": 3315.5,
   "my_score": 0,
   "ours_px": {}
  },
@@ -575,9 +539,9 @@
   "m": "enwc-ussep-ma-2026-09-01-dem-setmou",
   "side": "SELL",
   "target": 2000.0,
-  "total": 3443.02,
+  "total": 2260.02,
   "ours": 0,
-  "others": 3443.02,
+  "others": 2260.02,
   "qual": true,
   "self_sufficient": false,
   "best": 0.17,
@@ -588,7 +552,7 @@
   "levels": [
    [
     0.17,
-    590.0
+    664.0
    ],
    [
     0.3,
@@ -600,14 +564,14 @@
    ],
    [
     0.94,
-    219.0
+    221.0
    ],
    [
     0.99,
-    2484.0
+    1225.0
    ]
   ],
-  "denom": 590.0,
+  "denom": 664.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -615,9 +579,9 @@
   "m": "enwc-ussep-nh-2026-09-01-rep-johsun",
   "side": "BUY",
   "target": 2000.0,
-  "total": 51059.46,
+  "total": 51221.46,
   "ours": 0,
-  "others": 51059.46,
+  "others": 51221.46,
   "qual": true,
   "self_sufficient": false,
   "best": 0.94,
@@ -628,7 +592,7 @@
   "levels": [
    [
     0.94,
-    428.45
+    590.45
    ],
    [
     0.9,
@@ -659,7 +623,7 @@
     50000.0
    ]
   ],
-  "denom": 428.45,
+  "denom": 590.45,
   "my_score": 0,
   "ours_px": {}
  },
@@ -667,9 +631,9 @@
   "m": "enwc-ussep-nh-2026-09-01-rep-johsun",
   "side": "SELL",
   "target": 2000.0,
-  "total": 71933.48,
+  "total": 71944.48,
   "ours": 0,
-  "others": 71933.48,
+  "others": 71944.48,
   "qual": true,
   "self_sufficient": false,
   "best": 0.97,
@@ -680,10 +644,10 @@
   "levels": [
    [
     0.97,
-    69908.48
+    69919.48
    ]
   ],
-  "denom": 69908.48,
+  "denom": 69919.48,
   "my_score": 0,
   "ours_px": {}
  },
@@ -719,9 +683,9 @@
   "m": "enwc-ussep-nh-2026-09-01-rep-scobro",
   "side": "SELL",
   "target": 2000.0,
-  "total": 52843.14,
+  "total": 52853.14,
   "ours": 0,
-  "others": 52843.14,
+  "others": 52853.14,
   "qual": true,
   "self_sufficient": false,
   "best": 0.08,
@@ -732,11 +696,11 @@
   "levels": [
    [
     0.08,
-    951.14
+    958.14
    ],
    [
     0.09,
-    517.0
+    520.0
    ],
    [
     0.17,
@@ -747,7 +711,7 @@
     50000.0
    ]
   ],
-  "denom": 1002.84,
+  "denom": 1010.14,
   "my_score": 0,
   "ours_px": {}
  },
@@ -755,9 +719,9 @@
   "m": "enwc-ussep-nh-2026-09-08-dem-chrpap",
   "side": "BUY",
   "target": 2000.0,
-  "total": 50651.37,
+  "total": 51223.37,
   "ours": 0,
-  "others": 50651.37,
+  "others": 51223.37,
   "qual": true,
   "self_sufficient": false,
   "best": 0.93,
@@ -768,18 +732,22 @@
   "levels": [
    [
     0.93,
-    440.79
+    862.79
    ],
    [
     0.85,
     10.58
    ],
    [
+    0.84,
+    150.0
+   ],
+   [
     0.02,
     50000.0
    ]
   ],
-  "denom": 440.79,
+  "denom": 862.79,
   "my_score": 0,
   "ours_px": {}
  },
@@ -787,20 +755,24 @@
   "m": "enwc-ussep-nh-2026-09-08-dem-chrpap",
   "side": "SELL",
   "target": 2000.0,
-  "total": 26417.4,
-  "ours": 0,
-  "others": 26417.4,
+  "total": 16560.49,
+  "ours": 50.0,
+  "others": 16510.49,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.96,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "best": 0.95,
+  "our_best": 0.95,
+  "ticks_off": 0,
+  "est": 1.25,
   "per_side": 6.25,
   "levels": [
    [
+    0.95,
+    199.29
+   ],
+   [
     0.96,
-    391.2
+    326.0
    ],
    [
     0.97,
@@ -808,21 +780,23 @@
    ],
    [
     0.98,
-    24506.99
+    14515.99
    ]
   ],
-  "denom": 676.37,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 250.42,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.95": 50.0
+  }
  },
  {
   "m": "enwc-ussep-nh-2026-09-08-dem-karman",
   "side": "BUY",
   "target": 2000.0,
-  "total": 694.58,
+  "total": 5864.0,
   "ours": 0,
-  "others": 694.58,
-  "qual": false,
+  "others": 5864.0,
+  "qual": true,
   "self_sufficient": false,
   "best": 0.04,
   "our_best": null,
@@ -832,18 +806,18 @@
   "levels": [
    [
     0.04,
-    30.58
+    200.0
    ],
    [
     0.03,
     464.0
    ],
    [
-    0.01,
-    200.0
+    0.02,
+    5000.0
    ]
   ],
-  "denom": 77.18,
+  "denom": 296.4,
   "my_score": 0,
   "ours_px": {}
  },
@@ -851,32 +825,28 @@
   "m": "enwc-ussep-nh-2026-09-08-dem-karman",
   "side": "SELL",
   "target": 2000.0,
-  "total": 94018.93,
-  "ours": 0,
-  "others": 94018.93,
+  "total": 94330.93,
+  "ours": 47.0,
+  "others": 94283.93,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.06,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "best": 0.05,
+  "our_best": 0.06,
+  "ticks_off": 1,
+  "est": 0.09,
   "per_side": 6.25,
   "levels": [
    [
+    0.05,
+    333.0
+   ],
+   [
     0.06,
-    58.0
-   ],
-   [
-    0.07,
-    70.0
-   ],
-   [
-    0.11,
-    50.0
+    107.0
    ],
    [
     0.12,
-    38.0
+    88.0
    ],
    [
     0.13,
@@ -887,17 +857,19 @@
     92427.93
    ]
   ],
-  "denom": 65.0,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 343.7,
+  "my_score": 4.7,
+  "ours_px": {
+   "0.06": 47.0
+  }
  },
  {
   "m": "enwc-ussep-sc-2026-08-11-rep-darnor",
   "side": "BUY",
   "target": 2000.0,
-  "total": 92905.34,
+  "total": 93045.66,
   "ours": 0,
-  "others": 92905.34,
+  "others": 93045.66,
   "qual": true,
   "self_sufficient": false,
   "best": 0.89,
@@ -908,10 +880,10 @@
   "levels": [
    [
     0.89,
-    2196.8
+    2337.12
    ]
   ],
-  "denom": 2196.8,
+  "denom": 2337.12,
   "my_score": 0,
   "ours_px": {}
  },
@@ -919,9 +891,9 @@
   "m": "enwc-ussep-sc-2026-08-11-rep-darnor",
   "side": "SELL",
   "target": 2000.0,
-  "total": 710940.76,
+  "total": 711040.76,
   "ours": 0,
-  "others": 710940.76,
+  "others": 711040.76,
   "qual": true,
   "self_sufficient": false,
   "best": 0.92,
@@ -943,9 +915,9 @@
   "m": "enwc-ussep-sc-2026-08-11-rep-ralnor",
   "side": "BUY",
   "target": 2000.0,
-  "total": 564437.86,
+  "total": 565326.69,
   "ours": 0,
-  "others": 564437.86,
+  "others": 565326.69,
   "qual": true,
   "self_sufficient": false,
   "best": 0.08,
@@ -956,14 +928,18 @@
   "levels": [
    [
     0.08,
-    797.19
+    1493.69
+   ],
+   [
+    0.07,
+    134.0
    ],
    [
     0.06,
-    13640.67
+    13699.0
    ]
   ],
-  "denom": 933.6,
+  "denom": 1644.08,
   "my_score": 0,
   "ours_px": {}
  },
@@ -971,23 +947,23 @@
   "m": "enwc-ussep-sc-2026-08-11-rep-ralnor",
   "side": "SELL",
   "target": 2000.0,
-  "total": 331543.2,
+  "total": 331393.43,
   "ours": 0,
-  "others": 331543.2,
+  "others": 331393.43,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.15,
+  "best": 0.11,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.15,
-    2644.36
+    0.11,
+    2440.59
    ]
   ],
-  "denom": 2644.36,
+  "denom": 2440.59,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1028,14 +1004,14 @@
   "others": 2550.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.04,
+  "best": 0.05,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 0.66,
   "levels": [
    [
-    0.04,
+    0.05,
     200.0
    ],
    [
@@ -1043,7 +1019,7 @@
     2350.0
    ]
   ],
-  "denom": 202.35,
+  "denom": 200.24,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1303,9 +1279,9 @@
   "m": "erac-usgubp-ak-adv-2026-08-18-jonkre",
   "side": "BUY",
   "target": 2000.0,
-  "total": 2400.0,
+  "total": 2406.0,
   "ours": 0,
-  "others": 2400.0,
+  "others": 2406.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.45,
@@ -1316,7 +1292,7 @@
   "levels": [
    [
     0.45,
-    99.99
+    105.99
    ],
    [
     0.44,
@@ -1327,7 +1303,7 @@
     2300.0
    ]
   ],
-  "denom": 99.99,
+  "denom": 105.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1479,9 +1455,9 @@
   "m": "erac-usgubp-ak-adv-2026-08-18-tombeg",
   "side": "BUY",
   "target": 2000.0,
-  "total": 2500.01,
+  "total": 2406.0,
   "ours": 0,
-  "others": 2500.01,
+  "others": 2406.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.53,
@@ -1492,7 +1468,7 @@
   "levels": [
    [
     0.53,
-    199.0
+    104.99
    ],
    [
     0.52,
@@ -1503,7 +1479,7 @@
     2301.0
    ]
   ],
-  "denom": 199.0,
+  "denom": 104.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1559,9 +1535,9 @@
   "m": "ewc-usgub-az-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 72861.0,
+  "total": 73861.0,
   "ours": 0,
-  "others": 72861.0,
+  "others": 73861.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.85,
@@ -1572,14 +1548,10 @@
   "levels": [
    [
     0.85,
-    1374.0
-   ],
-   [
-    0.84,
-    16137.0
+    2374.0
    ]
   ],
-  "denom": 2987.7,
+  "denom": 2374.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1587,9 +1559,9 @@
   "m": "ewc-usgub-az-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 62770.0,
+  "total": 62777.0,
   "ours": 0,
-  "others": 62770.0,
+  "others": 62777.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.86,
@@ -1600,10 +1572,10 @@
   "levels": [
    [
     0.86,
-    19654.0
+    19661.0
    ]
   ],
-  "denom": 19654.0,
+  "denom": 19661.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1611,37 +1583,39 @@
   "m": "ewc-usgub-az-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 46888.0,
-  "ours": 0,
+  "total": 46938.0,
+  "ours": 50.0,
   "others": 46888.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.14,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.14,
+  "ticks_off": 0,
+  "est": 0.55,
   "per_side": 6.25,
   "levels": [
    [
     0.14,
-    513.0
+    563.0
    ],
    [
     0.11,
     6175.0
    ]
   ],
-  "denom": 519.17,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 569.17,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.14": 50.0
+  }
  },
  {
   "m": "ewc-usgub-az-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 87585.0,
+  "total": 87593.0,
   "ours": 0,
-  "others": 87585.0,
+  "others": 87593.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.15,
@@ -1652,10 +1626,10 @@
   "levels": [
    [
     0.15,
-    29711.0
+    29719.0
    ]
   ],
-  "denom": 29711.0,
+  "denom": 29719.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1663,33 +1637,35 @@
   "m": "ewc-usgub-ca-2026-11-03-stehil",
   "side": "BUY",
   "target": 10000.0,
-  "total": 57578.48,
-  "ours": 0,
-  "others": 57578.48,
+  "total": 57806.48,
+  "ours": 50.0,
+  "others": 57756.48,
   "qual": true,
   "self_sufficient": false,
   "best": 0.05,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.05,
+  "ticks_off": 0,
+  "est": 0.35,
   "per_side": 75.0,
   "levels": [
    [
     0.05,
-    10430.0
+    10658.0
    ]
   ],
-  "denom": 10430.0,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 10658.0,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.05": 50.0
+  }
  },
  {
   "m": "ewc-usgub-ca-2026-11-03-stehil",
   "side": "SELL",
   "target": 10000.0,
-  "total": 399218.47,
+  "total": 399228.04,
   "ours": 0,
-  "others": 399218.47,
+  "others": 399228.04,
   "qual": true,
   "self_sufficient": false,
   "best": 0.06,
@@ -1700,14 +1676,14 @@
   "levels": [
    [
     0.06,
-    7530.78
+    7540.35
    ],
    [
     0.07,
     25001.0
    ]
   ],
-  "denom": 12530.98,
+  "denom": 12540.55,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1715,9 +1691,9 @@
   "m": "ewc-usgub-ca-2026-11-03-xavbec",
   "side": "BUY",
   "target": 10000.0,
-  "total": 1110149.57,
+  "total": 1110119.14,
   "ours": 0,
-  "others": 1110149.57,
+  "others": 1110119.14,
   "qual": true,
   "self_sufficient": false,
   "best": 0.94,
@@ -1728,10 +1704,10 @@
   "levels": [
    [
     0.94,
-    95321.05
+    95315.62
    ]
   ],
-  "denom": 95321.05,
+  "denom": 95315.62,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1739,9 +1715,9 @@
   "m": "ewc-usgub-ca-2026-11-03-xavbec",
   "side": "SELL",
   "target": 10000.0,
-  "total": 62904.159999999996,
+  "total": 62041.149999999994,
   "ours": 0,
-  "others": 62904.159999999996,
+  "others": 62041.149999999994,
   "qual": true,
   "self_sufficient": false,
   "best": 0.95,
@@ -1752,10 +1728,10 @@
   "levels": [
    [
     0.95,
-    19486.03
+    18646.02
    ]
   ],
-  "denom": 19486.03,
+  "denom": 18646.02,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1763,9 +1739,9 @@
   "m": "ewc-usgub-ga-2026-11-03-dem",
   "side": "BUY",
   "target": 10000.0,
-  "total": 78150.0,
+  "total": 80862.0,
   "ours": 0,
-  "others": 78150.0,
+  "others": 80862.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.59,
@@ -1776,10 +1752,10 @@
   "levels": [
    [
     0.59,
-    21787.0
+    24499.0
    ]
   ],
-  "denom": 21787.0,
+  "denom": 24499.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1787,20 +1763,20 @@
   "m": "ewc-usgub-ga-2026-11-03-dem",
   "side": "SELL",
   "target": 10000.0,
-  "total": 60559.0,
-  "ours": 0,
-  "others": 60559.0,
+  "total": 70177.0,
+  "ours": 50.0,
+  "others": 70127.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.6,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.6,
+  "ticks_off": 0,
+  "est": 5.47,
   "per_side": 75.0,
   "levels": [
    [
     0.6,
-    481.0
+    531.0
    ],
    [
     0.61,
@@ -1808,39 +1784,37 @@
    ],
    [
     0.63,
-    1887.0
-   ],
-   [
-    0.76,
-    15000.0
+    11455.0
    ]
   ],
-  "denom": 559.5,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 686.04,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.6": 50.0
+  }
  },
  {
   "m": "ewc-usgub-ga-2026-11-03-rep",
   "side": "BUY",
   "target": 10000.0,
-  "total": 57558.0,
-  "ours": 0,
-  "others": 57558.0,
+  "total": 57426.0,
+  "ours": 50.0,
+  "others": 57376.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.36,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.36,
+  "ticks_off": 0,
+  "est": 5.02,
   "per_side": 75.0,
   "levels": [
    [
     0.36,
-    534.0
+    430.0
    ],
    [
     0.35,
-    1598.0
+    1570.0
    ],
    [
     0.34,
@@ -1851,45 +1825,49 @@
     15000.0
    ]
   ],
-  "denom": 856.64,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 747.04,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.36": 50.0
+  }
  },
  {
   "m": "ewc-usgub-ga-2026-11-03-rep",
   "side": "SELL",
   "target": 10000.0,
-  "total": 83395.0,
-  "ours": 0,
-  "others": 83395.0,
+  "total": 85883.0,
+  "ours": 50.0,
+  "others": 85833.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.37,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.37,
+  "ticks_off": 0,
+  "est": 3.02,
   "per_side": 75.0,
   "levels": [
    [
     0.37,
-    702.0
+    752.0
    ],
    [
     0.39,
-    9817.0
+    12255.0
    ]
   ],
-  "denom": 1094.68,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 1242.2,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.37": 50.0
+  }
  },
  {
   "m": "ewc-usgub-ia-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 68983.0,
+  "total": 68990.0,
   "ours": 0,
-  "others": 68983.0,
+  "others": 68990.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.72,
@@ -1900,10 +1878,10 @@
   "levels": [
    [
     0.72,
-    2040.0
+    2047.0
    ]
   ],
-  "denom": 2040.0,
+  "denom": 2047.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1911,9 +1889,9 @@
   "m": "ewc-usgub-ia-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 72583.0,
+  "total": 87740.0,
   "ours": 0,
-  "others": 72583.0,
+  "others": 87740.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.73,
@@ -1924,10 +1902,10 @@
   "levels": [
    [
     0.73,
-    29884.0
+    29891.0
    ]
   ],
-  "denom": 29884.0,
+  "denom": 29891.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1935,9 +1913,9 @@
   "m": "ewc-usgub-ia-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 52498.0,
+  "total": 43072.0,
   "ours": 0,
-  "others": 52498.0,
+  "others": 43072.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.27,
@@ -1948,10 +1926,10 @@
   "levels": [
    [
     0.27,
-    12260.0
+    2834.0
    ]
   ],
-  "denom": 12260.0,
+  "denom": 2834.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1959,9 +1937,9 @@
   "m": "ewc-usgub-ia-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 72545.0,
+  "total": 70966.0,
   "ours": 0,
-  "others": 72545.0,
+  "others": 70966.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.28,
@@ -1972,10 +1950,10 @@
   "levels": [
    [
     0.28,
-    3661.0
+    2082.0
    ]
   ],
-  "denom": 3661.0,
+  "denom": 2082.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -1983,9 +1961,9 @@
   "m": "ewc-usgub-ks-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 66585.0,
+  "total": 62459.0,
   "ours": 0,
-  "others": 66585.0,
+  "others": 62459.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.34,
@@ -1999,11 +1977,11 @@
     719.0
    ],
    [
-    0.33,
-    10424.0
+    0.31,
+    6298.0
    ]
   ],
-  "denom": 1761.4,
+  "denom": 725.3,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2011,9 +1989,9 @@
   "m": "ewc-usgub-ks-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 61232.0,
+  "total": 84605.0,
   "ours": 0,
-  "others": 61232.0,
+  "others": 84605.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.35,
@@ -2024,14 +2002,10 @@
   "levels": [
    [
     0.35,
-    893.0
-   ],
-   [
-    0.36,
-    2465.0
+    26731.0
    ]
   ],
-  "denom": 1139.5,
+  "denom": 26731.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2039,23 +2013,31 @@
   "m": "ewc-usgub-ks-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 75351.0,
+  "total": 56595.0,
   "ours": 0,
-  "others": 75351.0,
+  "others": 56595.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.64,
+  "best": 0.65,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.64,
-    4454.0
+    0.65,
+    858.0
+   ],
+   [
+    0.63,
+    536.0
+   ],
+   [
+    0.41,
+    15000.0
    ]
   ],
-  "denom": 4454.0,
+  "denom": 863.36,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2063,9 +2045,9 @@
   "m": "ewc-usgub-ks-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 72741.0,
+  "total": 54670.0,
   "ours": 0,
-  "others": 72741.0,
+  "others": 54670.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.66,
@@ -2080,10 +2062,10 @@
    ],
    [
     0.67,
-    19609.0
+    11172.0
    ]
   ],
-  "denom": 2584.9,
+  "denom": 1741.2,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2091,9 +2073,9 @@
   "m": "ewc-usgub-mi-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 68335.0,
+  "total": 68334.0,
   "ours": 0,
-  "others": 68335.0,
+  "others": 68334.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.84,
@@ -2104,10 +2086,10 @@
   "levels": [
    [
     0.84,
-    12985.0
+    12984.0
    ]
   ],
-  "denom": 12985.0,
+  "denom": 12984.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2115,9 +2097,9 @@
   "m": "ewc-usgub-mi-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 88368.0,
+  "total": 87376.0,
   "ours": 0,
-  "others": 88368.0,
+  "others": 87376.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.85,
@@ -2128,10 +2110,10 @@
   "levels": [
    [
     0.85,
-    20166.0
+    19174.0
    ]
   ],
-  "denom": 20166.0,
+  "denom": 19174.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2139,9 +2121,9 @@
   "m": "ewc-usgub-mi-2026-11-03-mikdug",
   "side": "BUY",
   "target": 2000.0,
-  "total": 12525.0,
+  "total": 12500.0,
   "ours": 0,
-  "others": 12525.0,
+  "others": 12500.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -2152,10 +2134,10 @@
   "levels": [
    [
     0.01,
-    12525.0
+    12500.0
    ]
   ],
-  "denom": 12525.0,
+  "denom": 12500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2163,9 +2145,9 @@
   "m": "ewc-usgub-mi-2026-11-03-mikdug",
   "side": "SELL",
   "target": 2000.0,
-  "total": 88992.0,
+  "total": 89170.0,
   "ours": 0,
-  "others": 88992.0,
+  "others": 89170.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.02,
@@ -2187,9 +2169,9 @@
   "m": "ewc-usgub-mi-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 72697.0,
+  "total": 72707.0,
   "ours": 0,
-  "others": 72697.0,
+  "others": 72707.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.15,
@@ -2200,10 +2182,10 @@
   "levels": [
    [
     0.15,
-    2347.0
+    2357.0
    ]
   ],
-  "denom": 2347.0,
+  "denom": 2357.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2211,9 +2193,9 @@
   "m": "ewc-usgub-mi-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 74182.0,
+  "total": 89191.0,
   "ours": 0,
-  "others": 74182.0,
+  "others": 89191.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.16,
@@ -2224,10 +2206,10 @@
   "levels": [
    [
     0.16,
-    16278.0
+    16287.0
    ]
   ],
-  "denom": 16278.0,
+  "denom": 16287.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2235,9 +2217,9 @@
   "m": "ewc-usgub-nv-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 57626.0,
+  "total": 57487.0,
   "ours": 0,
-  "others": 57626.0,
+  "others": 57487.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.37,
@@ -2252,10 +2234,10 @@
    ],
    [
     0.35,
-    2035.0
+    1896.0
    ]
   ],
-  "denom": 387.35,
+  "denom": 385.96,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2263,9 +2245,9 @@
   "m": "ewc-usgub-nv-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 95998.0,
+  "total": 95027.0,
   "ours": 0,
-  "others": 95998.0,
+  "others": 95027.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.38,
@@ -2276,10 +2258,10 @@
   "levels": [
    [
     0.38,
-    23097.0
+    22126.0
    ]
   ],
-  "denom": 23097.0,
+  "denom": 22126.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2287,9 +2269,9 @@
   "m": "ewc-usgub-nv-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 66866.0,
+  "total": 82412.0,
   "ours": 0,
-  "others": 66866.0,
+  "others": 82412.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.63,
@@ -2300,10 +2282,10 @@
   "levels": [
    [
     0.63,
-    11133.0
+    11529.0
    ]
   ],
-  "denom": 11133.0,
+  "denom": 11529.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2311,9 +2293,9 @@
   "m": "ewc-usgub-nv-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 78405.0,
+  "total": 76961.0,
   "ours": 0,
-  "others": 78405.0,
+  "others": 76961.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.65,
@@ -2324,10 +2306,10 @@
   "levels": [
    [
     0.65,
-    5481.0
+    4037.0
    ]
   ],
-  "denom": 5481.0,
+  "denom": 4037.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2335,9 +2317,9 @@
   "m": "ewc-usgub-oh-2026-11-03-dem",
   "side": "BUY",
   "target": 10000.0,
-  "total": 284367.0,
+  "total": 280332.0,
   "ours": 0,
-  "others": 284367.0,
+  "others": 280332.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.51,
@@ -2348,10 +2330,18 @@
   "levels": [
    [
     0.51,
-    11721.0
+    8382.0
+   ],
+   [
+    0.5,
+    1600.0
+   ],
+   [
+    0.37,
+    15000.0
    ]
   ],
-  "denom": 11721.0,
+  "denom": 8702.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2359,9 +2349,9 @@
   "m": "ewc-usgub-oh-2026-11-03-dem",
   "side": "SELL",
   "target": 10000.0,
-  "total": 208025.0,
+  "total": 208035.0,
   "ours": 0,
-  "others": 208025.0,
+  "others": 208035.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.52,
@@ -2372,10 +2362,10 @@
   "levels": [
    [
     0.52,
-    62062.0
+    62072.0
    ]
   ],
-  "denom": 62062.0,
+  "denom": 62072.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2383,9 +2373,9 @@
   "m": "ewc-usgub-oh-2026-11-03-rep",
   "side": "BUY",
   "target": 10000.0,
-  "total": 316014.0,
+  "total": 315592.0,
   "ours": 0,
-  "others": 316014.0,
+  "others": 315592.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.49,
@@ -2396,14 +2386,14 @@
   "levels": [
    [
     0.49,
-    205.0
+    180.0
    ],
    [
     0.48,
-    45434.0
+    45048.0
    ]
   ],
-  "denom": 9291.8,
+  "denom": 9189.6,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2411,9 +2401,9 @@
   "m": "ewc-usgub-oh-2026-11-03-rep",
   "side": "SELL",
   "target": 10000.0,
-  "total": 265321.0,
+  "total": 272025.0,
   "ours": 0,
-  "others": 265321.0,
+  "others": 272025.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.5,
@@ -2424,10 +2414,10 @@
   "levels": [
    [
     0.5,
-    91660.0
+    98364.0
    ]
   ],
-  "denom": 91660.0,
+  "denom": 98364.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2435,9 +2425,9 @@
   "m": "ewc-usgub-wi-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 1239609.0,
+  "total": 1239683.0,
   "ours": 0,
-  "others": 1239609.0,
+  "others": 1239683.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.76,
@@ -2448,10 +2438,10 @@
   "levels": [
    [
     0.76,
-    2209.0
+    2283.0
    ]
   ],
-  "denom": 2209.0,
+  "denom": 2283.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2459,9 +2449,9 @@
   "m": "ewc-usgub-wi-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 381969.0,
+  "total": 381976.0,
   "ours": 0,
-  "others": 381969.0,
+  "others": 381976.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.77,
@@ -2472,10 +2462,10 @@
   "levels": [
    [
     0.77,
-    22595.0
+    22602.0
    ]
   ],
-  "denom": 22595.0,
+  "denom": 22602.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2483,9 +2473,9 @@
   "m": "ewc-usgub-wi-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 1097989.0,
+  "total": 1097644.0,
   "ours": 0,
-  "others": 1097989.0,
+  "others": 1097644.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.23,
@@ -2496,10 +2486,10 @@
   "levels": [
    [
     0.23,
-    17609.0
+    17256.0
    ]
   ],
-  "denom": 17609.0,
+  "denom": 17256.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2507,9 +2497,9 @@
   "m": "ewc-usgub-wi-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 365532.0,
+  "total": 363681.0,
   "ours": 0,
-  "others": 365532.0,
+  "others": 363681.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.24,
@@ -2520,14 +2510,14 @@
   "levels": [
    [
     0.24,
-    509.0
+    694.0
    ],
    [
     0.25,
-    5049.0
+    3013.0
    ]
   ],
-  "denom": 1013.9,
+  "denom": 995.3,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2535,9 +2525,9 @@
   "m": "ewc-usse-ak-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 366644.0,
+  "total": 366654.0,
   "ours": 20.0,
-  "others": 366624.0,
+  "others": 366634.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.54,
@@ -2552,14 +2542,14 @@
    ],
    [
     0.53,
-    1174.0
+    1184.0
    ],
    [
     0.51,
     9565.0
    ]
   ],
-  "denom": 831.97,
+  "denom": 832.97,
   "my_score": 20.0,
   "ours_px": {
    "0.54": 20.0
@@ -2569,9 +2559,9 @@
   "m": "ewc-usse-ak-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 155532.0,
+  "total": 155543.0,
   "ours": 0,
-  "others": 155532.0,
+  "others": 155543.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.55,
@@ -2582,10 +2572,10 @@
   "levels": [
    [
     0.55,
-    33237.0
+    33248.0
    ]
   ],
-  "denom": 33237.0,
+  "denom": 33248.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2593,9 +2583,9 @@
   "m": "ewc-usse-ak-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 371240.0,
+  "total": 372240.0,
   "ours": 0,
-  "others": 371240.0,
+  "others": 372240.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.46,
@@ -2606,10 +2596,10 @@
   "levels": [
    [
     0.46,
-    16040.0
+    17040.0
    ]
   ],
-  "denom": 16040.0,
+  "denom": 17040.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2617,9 +2607,9 @@
   "m": "ewc-usse-ak-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 135942.0,
+  "total": 134949.0,
   "ours": 0,
-  "others": 135942.0,
+  "others": 134949.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.47,
@@ -2630,10 +2620,10 @@
   "levels": [
    [
     0.47,
-    7244.0
+    6251.0
    ]
   ],
-  "denom": 7244.0,
+  "denom": 6251.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2641,9 +2631,9 @@
   "m": "ewc-usse-ga-2026-11-03-dem",
   "side": "BUY",
   "target": 10000.0,
-  "total": 123442.0,
+  "total": 123449.0,
   "ours": 0,
-  "others": 123442.0,
+  "others": 123449.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.91,
@@ -2654,10 +2644,10 @@
   "levels": [
    [
     0.91,
-    64156.0
+    64163.0
    ]
   ],
-  "denom": 64156.0,
+  "denom": 64163.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2665,9 +2655,9 @@
   "m": "ewc-usse-ga-2026-11-03-dem",
   "side": "SELL",
   "target": 10000.0,
-  "total": 130573.0,
+  "total": 146710.0,
   "ours": 0,
-  "others": 130573.0,
+  "others": 146710.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.92,
@@ -2678,10 +2668,10 @@
   "levels": [
    [
     0.92,
-    75190.0
+    80342.0
    ]
   ],
-  "denom": 75190.0,
+  "denom": 80342.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2689,9 +2679,9 @@
   "m": "ewc-usse-ga-2026-11-03-rep",
   "side": "BUY",
   "target": 10000.0,
-  "total": 139251.0,
+  "total": 149554.0,
   "ours": 0,
-  "others": 139251.0,
+  "others": 149554.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.07,
@@ -2702,10 +2692,10 @@
   "levels": [
    [
     0.07,
-    67031.0
+    77334.0
    ]
   ],
-  "denom": 67031.0,
+  "denom": 77334.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2713,9 +2703,9 @@
   "m": "ewc-usse-ga-2026-11-03-rep",
   "side": "SELL",
   "target": 10000.0,
-  "total": 98055.0,
+  "total": 108452.0,
   "ours": 0,
-  "others": 98055.0,
+  "others": 108452.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.08,
@@ -2726,10 +2716,10 @@
   "levels": [
    [
     0.08,
-    23139.0
+    33536.0
    ]
   ],
-  "denom": 23139.0,
+  "denom": 33536.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2737,9 +2727,9 @@
   "m": "ewc-usse-ia-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 73340.0,
+  "total": 73338.0,
   "ours": 0,
-  "others": 73340.0,
+  "others": 73338.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.4,
@@ -2750,10 +2740,10 @@
   "levels": [
    [
     0.4,
-    17990.0
+    17988.0
    ]
   ],
-  "denom": 17990.0,
+  "denom": 17988.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2761,9 +2751,9 @@
   "m": "ewc-usse-ia-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 60777.0,
+  "total": 68281.0,
   "ours": 0,
-  "others": 60777.0,
+  "others": 68281.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.41,
@@ -2782,10 +2772,14 @@
    ],
    [
     0.45,
-    1872.0
+    50.0
+   ],
+   [
+    0.46,
+    9326.0
    ]
   ],
-  "denom": 491.19,
+  "denom": 491.1,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2793,9 +2787,9 @@
   "m": "ewc-usse-ia-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 62325.0,
+  "total": 62326.0,
   "ours": 0,
-  "others": 62325.0,
+  "others": 62326.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.54,
@@ -2806,10 +2800,10 @@
   "levels": [
    [
     0.54,
-    6945.0
+    6946.0
    ]
   ],
-  "denom": 6945.0,
+  "denom": 6946.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2817,9 +2811,9 @@
   "m": "ewc-usse-ia-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 66723.0,
+  "total": 66287.0,
   "ours": 0,
-  "others": 66723.0,
+  "others": 66287.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.55,
@@ -2830,10 +2824,10 @@
   "levels": [
    [
     0.55,
-    7954.0
+    7518.0
    ]
   ],
-  "denom": 7954.0,
+  "denom": 7518.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2841,9 +2835,9 @@
   "m": "ewc-usse-me-2026-11-03-dem",
   "side": "BUY",
   "target": 10000.0,
-  "total": 638851.0,
+  "total": 628421.0,
   "ours": 0,
-  "others": 638851.0,
+  "others": 628421.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.65,
@@ -2854,10 +2848,22 @@
   "levels": [
    [
     0.65,
-    18063.0
+    6378.0
+   ],
+   [
+    0.64,
+    1643.0
+   ],
+   [
+    0.59,
+    50.0
+   ],
+   [
+    0.58,
+    15000.0
    ]
   ],
-  "denom": 18063.0,
+  "denom": 6706.8,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2865,9 +2871,9 @@
   "m": "ewc-usse-me-2026-11-03-dem",
   "side": "SELL",
   "target": 10000.0,
-  "total": 296092.0,
+  "total": 304321.0,
   "ours": 0,
-  "others": 296092.0,
+  "others": 304321.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.66,
@@ -2878,14 +2884,10 @@
   "levels": [
    [
     0.66,
-    9547.0
-   ],
-   [
-    0.67,
-    16541.0
+    34317.0
    ]
   ],
-  "denom": 12855.2,
+  "denom": 34317.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2893,9 +2895,9 @@
   "m": "ewc-usse-me-2026-11-03-rep",
   "side": "BUY",
   "target": 10000.0,
-  "total": 689735.0,
+  "total": 689206.0,
   "ours": 0,
-  "others": 689735.0,
+  "others": 689206.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.35,
@@ -2906,14 +2908,14 @@
   "levels": [
    [
     0.35,
-    6074.0
+    6551.0
    ],
    [
     0.34,
-    13311.0
+    12275.0
    ]
   ],
-  "denom": 8736.2,
+  "denom": 9006.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2921,9 +2923,9 @@
   "m": "ewc-usse-me-2026-11-03-rep",
   "side": "SELL",
   "target": 10000.0,
-  "total": 287228.0,
+  "total": 287223.0,
   "ours": 0,
-  "others": 287228.0,
+  "others": 287223.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.36,
@@ -2934,10 +2936,10 @@
   "levels": [
    [
     0.36,
-    76247.0
+    76242.0
    ]
   ],
-  "denom": 76247.0,
+  "denom": 76242.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2945,9 +2947,9 @@
   "m": "ewc-usse-mi-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 625684.0,
+  "total": 625694.0,
   "ours": 0,
-  "others": 625684.0,
+  "others": 625694.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.55,
@@ -2958,10 +2960,10 @@
   "levels": [
    [
     0.55,
-    4734.0
+    4744.0
    ]
   ],
-  "denom": 4734.0,
+  "denom": 4744.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2969,9 +2971,9 @@
   "m": "ewc-usse-mi-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 230811.0,
+  "total": 231265.0,
   "ours": 0,
-  "others": 230811.0,
+  "others": 231265.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.56,
@@ -2982,10 +2984,10 @@
   "levels": [
    [
     0.56,
-    7865.0
+    8319.0
    ]
   ],
-  "denom": 7865.0,
+  "denom": 8319.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -2993,9 +2995,9 @@
   "m": "ewc-usse-mi-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 645767.0,
+  "total": 645774.0,
   "ours": 0,
-  "others": 645767.0,
+  "others": 645774.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.43,
@@ -3006,10 +3008,10 @@
   "levels": [
    [
     0.43,
-    24917.0
+    24899.0
    ]
   ],
-  "denom": 24917.0,
+  "denom": 24899.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3017,9 +3019,9 @@
   "m": "ewc-usse-mi-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 220804.0,
+  "total": 220614.0,
   "ours": 0,
-  "others": 220804.0,
+  "others": 220614.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.44,
@@ -3030,10 +3032,10 @@
   "levels": [
    [
     0.44,
-    14364.0
+    14151.0
    ]
   ],
-  "denom": 14364.0,
+  "denom": 14151.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3041,9 +3043,9 @@
   "m": "ewc-usse-mn-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 72734.0,
+  "total": 72741.0,
   "ours": 0,
-  "others": 72734.0,
+  "others": 72741.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.87,
@@ -3054,10 +3056,10 @@
   "levels": [
    [
     0.87,
-    16884.0
+    16891.0
    ]
   ],
-  "denom": 16884.0,
+  "denom": 16891.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3065,65 +3067,69 @@
   "m": "ewc-usse-mn-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 100457.0,
-  "ours": 0,
-  "others": 100457.0,
+  "total": 98088.0,
+  "ours": 50.0,
+  "others": 98038.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.88,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.88,
+  "ticks_off": 0,
+  "est": 0.48,
   "per_side": 6.25,
   "levels": [
    [
     0.88,
-    426.0
+    477.0
    ],
    [
     0.89,
-    4225.0
+    1805.0
    ]
   ],
-  "denom": 848.5,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 657.5,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.88": 50.0
+  }
  },
  {
   "m": "ewc-usse-mn-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 63516.0,
-  "ours": 0,
-  "others": 63516.0,
+  "total": 77363.0,
+  "ours": 50.0,
+  "others": 77313.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.12,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.12,
+  "ticks_off": 0,
+  "est": 0.68,
   "per_side": 6.25,
   "levels": [
    [
     0.12,
-    10.0
+    131.0
    ],
    [
     0.11,
-    2607.0
+    3303.0
    ]
   ],
-  "denom": 270.7,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 461.3,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.12": 50.0
+  }
  },
  {
   "m": "ewc-usse-mn-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 74917.0,
+  "total": 74919.0,
   "ours": 0,
-  "others": 74917.0,
+  "others": 74919.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.13,
@@ -3134,10 +3140,10 @@
   "levels": [
    [
     0.13,
-    17043.0
+    17045.0
    ]
   ],
-  "denom": 17043.0,
+  "denom": 17045.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3145,9 +3151,9 @@
   "m": "ewc-usse-nc-2026-11-03-dem",
   "side": "BUY",
   "target": 5000.0,
-  "total": 119210.0,
+  "total": 113870.0,
   "ours": 0,
-  "others": 119210.0,
+  "others": 113870.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.91,
@@ -3158,10 +3164,10 @@
   "levels": [
    [
     0.91,
-    59334.0
+    53994.0
    ]
   ],
-  "denom": 59334.0,
+  "denom": 53994.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3169,9 +3175,9 @@
   "m": "ewc-usse-nc-2026-11-03-dem",
   "side": "SELL",
   "target": 5000.0,
-  "total": 81725.0,
+  "total": 80108.0,
   "ours": 0,
-  "others": 81725.0,
+  "others": 80108.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.92,
@@ -3182,14 +3188,14 @@
   "levels": [
    [
     0.92,
-    388.0
+    324.0
    ],
    [
     0.93,
-    34586.0
+    33033.0
    ]
   ],
-  "denom": 7305.2,
+  "denom": 6930.6,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3197,33 +3203,39 @@
   "m": "ewc-usse-nc-2026-11-03-rep",
   "side": "BUY",
   "target": 5000.0,
-  "total": 72367.0,
-  "ours": 0,
-  "others": 72367.0,
+  "total": 69664.0,
+  "ours": 50.0,
+  "others": 69614.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.06,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "best": 0.07,
+  "our_best": 0.07,
+  "ticks_off": 0,
+  "est": 0.39,
   "per_side": 25.0,
   "levels": [
    [
+    0.07,
+    343.0
+   ],
+   [
     0.06,
-    32167.0
+    14121.0
    ]
   ],
-  "denom": 32167.0,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 3167.2,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.07": 50.0
+  }
  },
  {
   "m": "ewc-usse-nc-2026-11-03-rep",
   "side": "SELL",
   "target": 5000.0,
-  "total": 138832.0,
+  "total": 124271.0,
   "ours": 0,
-  "others": 138832.0,
+  "others": 124271.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.08,
@@ -3234,10 +3246,14 @@
   "levels": [
    [
     0.08,
-    19101.0
+    942.0
+   ],
+   [
+    0.09,
+    33593.0
    ]
   ],
-  "denom": 19101.0,
+  "denom": 7660.6,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3269,9 +3285,9 @@
   "m": "ewc-usse-ne-2026-11-03-danosb",
   "side": "SELL",
   "target": 2000.0,
-  "total": 61039.0,
+  "total": 60182.0,
   "ours": 0,
-  "others": 61039.0,
+  "others": 60182.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.29,
@@ -3282,10 +3298,14 @@
   "levels": [
    [
     0.29,
-    2590.0
+    1733.0
+   ],
+   [
+    0.3,
+    600.0
    ]
   ],
-  "denom": 2590.0,
+  "denom": 1793.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3293,9 +3313,9 @@
   "m": "ewc-usse-ne-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 84938.0,
+  "total": 84939.0,
   "ours": 0,
-  "others": 84938.0,
+  "others": 84939.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -3306,10 +3326,10 @@
   "levels": [
    [
     0.01,
-    27064.0
+    27065.0
    ]
   ],
-  "denom": 27064.0,
+  "denom": 27065.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3317,9 +3337,9 @@
   "m": "ewc-usse-ne-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 74636.0,
+  "total": 73693.0,
   "ours": 0,
-  "others": 74636.0,
+  "others": 73693.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.72,
@@ -3334,10 +3354,14 @@
    ],
    [
     0.71,
-    1904.0
+    889.0
+   ],
+   [
+    0.7,
+    1923.0
    ]
   ],
-  "denom": 641.4,
+  "denom": 559.13,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3345,9 +3369,9 @@
   "m": "ewc-usse-ne-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 94862.0,
+  "total": 94873.0,
   "ours": 0,
-  "others": 94862.0,
+  "others": 94873.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.73,
@@ -3358,10 +3382,10 @@
   "levels": [
    [
     0.73,
-    36988.0
+    36999.0
    ]
   ],
-  "denom": 36988.0,
+  "denom": 36999.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3369,9 +3393,9 @@
   "m": "ewc-usse-nh-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 66317.0,
+  "total": 66325.0,
   "ours": 0,
-  "others": 66317.0,
+  "others": 66325.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.88,
@@ -3382,14 +3406,14 @@
   "levels": [
    [
     0.88,
-    144.0
+    152.0
    ],
    [
     0.87,
     10773.0
    ]
   ],
-  "denom": 1221.3,
+  "denom": 1229.3,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3397,9 +3421,9 @@
   "m": "ewc-usse-nh-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 86352.0,
+  "total": 86742.0,
   "ours": 0,
-  "others": 86352.0,
+  "others": 86742.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.89,
@@ -3410,10 +3434,10 @@
   "levels": [
    [
     0.89,
-    43448.0
+    43838.0
    ]
   ],
-  "denom": 43448.0,
+  "denom": 43838.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3469,9 +3493,9 @@
   "m": "ewc-usse-oh-2026-11-03-dem",
   "side": "BUY",
   "target": 5000.0,
-  "total": 686517.0,
+  "total": 686524.0,
   "ours": 0,
-  "others": 686517.0,
+  "others": 686524.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.49,
@@ -3482,10 +3506,10 @@
   "levels": [
    [
     0.49,
-    60313.0
+    60320.0
    ]
   ],
-  "denom": 60313.0,
+  "denom": 60320.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3493,9 +3517,9 @@
   "m": "ewc-usse-oh-2026-11-03-dem",
   "side": "SELL",
   "target": 5000.0,
-  "total": 131328.0,
+  "total": 134535.0,
   "ours": 0,
-  "others": 131328.0,
+  "others": 134535.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.5,
@@ -3510,10 +3534,10 @@
    ],
    [
     0.55,
-    6324.0
+    9531.0
    ]
   ],
-  "denom": 1163.02,
+  "denom": 1164.05,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3521,9 +3545,9 @@
   "m": "ewc-usse-oh-2026-11-03-rep",
   "side": "BUY",
   "target": 5000.0,
-  "total": 616525.0,
+  "total": 631536.0,
   "ours": 0,
-  "others": 616525.0,
+  "others": 631536.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.5,
@@ -3541,15 +3565,15 @@
     600.0
    ],
    [
-    0.45,
+    0.46,
     80.0
    ],
    [
-    0.44,
-    9461.0
+    0.45,
+    9472.0
    ]
   ],
-  "denom": 1154.63,
+  "denom": 1157.16,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3557,9 +3581,9 @@
   "m": "ewc-usse-oh-2026-11-03-rep",
   "side": "SELL",
   "target": 5000.0,
-  "total": 326879.0,
+  "total": 326886.0,
   "ours": 0,
-  "others": 326879.0,
+  "others": 326886.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.51,
@@ -3570,10 +3594,10 @@
   "levels": [
    [
     0.51,
-    92182.0
+    92189.0
    ]
   ],
-  "denom": 92182.0,
+  "denom": 92189.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3581,9 +3605,9 @@
   "m": "ewc-usse-tx-2026-11-03-dem",
   "side": "BUY",
   "target": 10000.0,
-  "total": 635332.0,
+  "total": 633213.0,
   "ours": 30.0,
-  "others": 635302.0,
+  "others": 633183.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.53,
@@ -3594,7 +3618,7 @@
   "levels": [
    [
     0.53,
-    6260.0
+    6236.0
    ],
    [
     0.52,
@@ -3606,10 +3630,10 @@
    ],
    [
     0.5,
-    7636.0
+    5541.0
    ]
   ],
-  "denom": 6402.65,
+  "denom": 6361.89,
   "my_score": 30.0,
   "ours_px": {
    "0.53": 30.0
@@ -3619,9 +3643,9 @@
   "m": "ewc-usse-tx-2026-11-03-dem",
   "side": "SELL",
   "target": 10000.0,
-  "total": 241231.0,
+  "total": 241259.0,
   "ours": 0,
-  "others": 241231.0,
+  "others": 241259.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.54,
@@ -3632,10 +3656,10 @@
   "levels": [
    [
     0.54,
-    53575.0
+    53603.0
    ]
   ],
-  "denom": 53575.0,
+  "denom": 53603.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3643,9 +3667,9 @@
   "m": "ewc-usse-tx-2026-11-03-rep",
   "side": "BUY",
   "target": 10000.0,
-  "total": 876018.0,
+  "total": 871901.0,
   "ours": 0,
-  "others": 876018.0,
+  "others": 871901.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.49,
@@ -3656,14 +3680,14 @@
   "levels": [
    [
     0.49,
-    2523.0
+    8600.0
    ],
    [
     0.48,
-    12480.0
+    2286.0
    ]
   ],
-  "denom": 5019.0,
+  "denom": 9057.2,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3671,9 +3695,9 @@
   "m": "ewc-usse-tx-2026-11-03-rep",
   "side": "SELL",
   "target": 10000.0,
-  "total": 141237.0,
+  "total": 140861.0,
   "ours": 0,
-  "others": 141237.0,
+  "others": 140861.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.5,
@@ -3684,10 +3708,10 @@
   "levels": [
    [
     0.5,
-    16971.0
+    16619.0
    ]
   ],
-  "denom": 16971.0,
+  "denom": 16619.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3695,9 +3719,9 @@
   "m": "paccc-usse-midterms-2026-11-03-dem",
   "side": "BUY",
   "target": 10000.0,
-  "total": 1044108.0,
+  "total": 1045526.0,
   "ours": 0,
-  "others": 1044108.0,
+  "others": 1045526.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.493,
@@ -3708,10 +3732,10 @@
   "levels": [
    [
     0.49,
-    25434.0
+    26434.0
    ]
   ],
-  "denom": 25434.0,
+  "denom": 26434.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3719,9 +3743,9 @@
   "m": "paccc-usse-midterms-2026-11-03-dem",
   "side": "SELL",
   "target": 10000.0,
-  "total": 783992.0,
+  "total": 782998.0,
   "ours": 0,
-  "others": 783992.0,
+  "others": 782998.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.494,
@@ -3732,10 +3756,10 @@
   "levels": [
    [
     0.49,
-    73974.0
+    72980.0
    ]
   ],
-  "denom": 73974.0,
+  "denom": 72980.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3743,9 +3767,9 @@
   "m": "paccc-usse-midterms-2026-11-03-rep",
   "side": "BUY",
   "target": 10000.0,
-  "total": 1064597.0,
+  "total": 1070548.0,
   "ours": 0,
-  "others": 1064597.0,
+  "others": 1070548.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.506,
@@ -3756,10 +3780,10 @@
   "levels": [
    [
     0.51,
-    31212.0
+    37086.0
    ]
   ],
-  "denom": 31212.0,
+  "denom": 37086.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3767,9 +3791,9 @@
   "m": "paccc-usse-midterms-2026-11-03-rep",
   "side": "SELL",
   "target": 10000.0,
-  "total": 818663.0,
+  "total": 819402.0,
   "ours": 0,
-  "others": 818663.0,
+  "others": 819402.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.507,
@@ -3780,10 +3804,10 @@
   "levels": [
    [
     0.51,
-    46894.0
+    46704.0
    ]
   ],
-  "denom": 46894.0,
+  "denom": 46704.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3791,9 +3815,9 @@
   "m": "usgubewc-usgub-ak-2026-11-03-adacru",
   "side": "BUY",
   "target": 2000.0,
-  "total": 10276.0,
+  "total": 11200.0,
   "ours": 0,
-  "others": 10276.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -3804,10 +3828,10 @@
   "levels": [
    [
     0.01,
-    10276.0
+    11200.0
    ]
   ],
-  "denom": 10276.0,
+  "denom": 11200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3815,27 +3839,23 @@
   "m": "usgubewc-usgub-ak-2026-11-03-adacru",
   "side": "SELL",
   "target": 2000.0,
-  "total": 226.0,
+  "total": 21224.99,
   "ours": 0,
-  "others": 226.0,
-  "qual": false,
+  "others": 21224.99,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.48,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 1.79,
   "levels": [
    [
-    0.48,
-    1.0
-   ],
-   [
     0.99,
-    225.0
+    21224.99
    ]
   ],
-  "denom": 1.0,
+  "denom": 21224.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3843,9 +3863,9 @@
   "m": "usgubewc-usgub-ak-2026-11-03-berwil",
   "side": "BUY",
   "target": 2000.0,
-  "total": 10200.0,
+  "total": 11200.0,
   "ours": 0,
-  "others": 10200.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -3856,10 +3876,10 @@
   "levels": [
    [
     0.01,
-    10200.0
+    11200.0
    ]
   ],
-  "denom": 10200.0,
+  "denom": 11200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3891,9 +3911,9 @@
   "m": "usgubewc-usgub-ak-2026-11-03-bilwal",
   "side": "BUY",
   "target": 2000.0,
-  "total": 10276.0,
+  "total": 11200.0,
   "ours": 0,
-  "others": 10276.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -3904,10 +3924,10 @@
   "levels": [
    [
     0.01,
-    10276.0
+    11200.0
    ]
   ],
-  "denom": 10276.0,
+  "denom": 11200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3915,27 +3935,23 @@
   "m": "usgubewc-usgub-ak-2026-11-03-bilwal",
   "side": "SELL",
   "target": 2000.0,
-  "total": 226.0,
+  "total": 21224.99,
   "ours": 0,
-  "others": 226.0,
-  "qual": false,
+  "others": 21224.99,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 1.79,
   "levels": [
    [
-    0.49,
-    1.0
-   ],
-   [
     0.99,
-    225.0
+    21224.99
    ]
   ],
-  "denom": 1.0,
+  "denom": 21224.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3943,9 +3959,9 @@
   "m": "usgubewc-usgub-ak-2026-11-03-clibis",
   "side": "BUY",
   "target": 2000.0,
-  "total": 10276.0,
+  "total": 11200.0,
   "ours": 0,
-  "others": 10276.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -3956,10 +3972,10 @@
   "levels": [
    [
     0.01,
-    10276.0
+    11200.0
    ]
   ],
-  "denom": 10276.0,
+  "denom": 11200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3967,27 +3983,23 @@
   "m": "usgubewc-usgub-ak-2026-11-03-clibis",
   "side": "SELL",
   "target": 2000.0,
-  "total": 226.0,
+  "total": 22224.98,
   "ours": 0,
-  "others": 226.0,
-  "qual": false,
+  "others": 22224.98,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.51,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 1.79,
   "levels": [
    [
-    0.51,
-    1.0
-   ],
-   [
     0.99,
-    225.0
+    22224.98
    ]
   ],
-  "denom": 1.0,
+  "denom": 22224.98,
   "my_score": 0,
   "ours_px": {}
  },
@@ -3995,9 +4007,9 @@
   "m": "usgubewc-usgub-ak-2026-11-03-davbro",
   "side": "BUY",
   "target": 2000.0,
-  "total": 10276.0,
+  "total": 11200.0,
   "ours": 0,
-  "others": 10276.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -4008,10 +4020,10 @@
   "levels": [
    [
     0.01,
-    10276.0
+    11200.0
    ]
   ],
-  "denom": 10276.0,
+  "denom": 11200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4019,27 +4031,23 @@
   "m": "usgubewc-usgub-ak-2026-11-03-davbro",
   "side": "SELL",
   "target": 2000.0,
-  "total": 226.0,
+  "total": 21224.99,
   "ours": 0,
-  "others": 226.0,
-  "qual": false,
+  "others": 21224.99,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.51,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 1.79,
   "levels": [
    [
-    0.51,
-    1.0
-   ],
-   [
     0.99,
-    225.0
+    21224.99
    ]
   ],
-  "denom": 1.0,
+  "denom": 21224.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4047,9 +4055,9 @@
   "m": "usgubewc-usgub-ak-2026-11-03-jonkre",
   "side": "BUY",
   "target": 2000.0,
-  "total": 10276.0,
+  "total": 11200.0,
   "ours": 0,
-  "others": 10276.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -4060,10 +4068,10 @@
   "levels": [
    [
     0.01,
-    10276.0
+    11200.0
    ]
   ],
-  "denom": 10276.0,
+  "denom": 11200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4071,27 +4079,23 @@
   "m": "usgubewc-usgub-ak-2026-11-03-jonkre",
   "side": "SELL",
   "target": 2000.0,
-  "total": 226.0,
+  "total": 22224.98,
   "ours": 0,
-  "others": 226.0,
-  "qual": false,
+  "others": 22224.98,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.5,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 1.79,
   "levels": [
    [
-    0.5,
-    1.0
-   ],
-   [
     0.99,
-    225.0
+    22224.98
    ]
   ],
-  "denom": 1.0,
+  "denom": 22224.98,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4099,31 +4103,23 @@
   "m": "usgubewc-usgub-ak-2026-11-03-tombeg",
   "side": "BUY",
   "target": 2000.0,
-  "total": 217.0,
+  "total": 12200.0,
   "ours": 0,
-  "others": 217.0,
-  "qual": false,
+  "others": 12200.0,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.22,
+  "best": 0.01,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 1.79,
   "levels": [
    [
-    0.22,
-    3.0
-   ],
-   [
-    0.21,
-    14.0
-   ],
-   [
     0.01,
-    200.0
+    12200.0
    ]
   ],
-  "denom": 4.4,
+  "denom": 12200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4131,27 +4127,23 @@
   "m": "usgubewc-usgub-ak-2026-11-03-tombeg",
   "side": "SELL",
   "target": 2000.0,
-  "total": 227.0,
+  "total": 22224.98,
   "ours": 0,
-  "others": 227.0,
-  "qual": false,
+  "others": 22224.98,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.7,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 1.79,
   "levels": [
    [
-    0.7,
-    2.0
-   ],
-   [
     0.99,
-    225.0
+    22224.98
    ]
   ],
-  "denom": 2.0,
+  "denom": 22224.98,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4159,9 +4151,9 @@
   "m": "usgubewc-usgub-al-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 44644.0,
+  "total": 47810.0,
   "ours": 0,
-  "others": 44644.0,
+  "others": 47810.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.04,
@@ -4172,10 +4164,10 @@
   "levels": [
    [
     0.04,
-    4444.0
+    7610.0
    ]
   ],
-  "denom": 4444.0,
+  "denom": 7610.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4183,9 +4175,9 @@
   "m": "usgubewc-usgub-al-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 134212.74,
+  "total": 134213.74,
   "ours": 0,
-  "others": 134212.74,
+  "others": 134213.74,
   "qual": true,
   "self_sufficient": false,
   "best": 0.21,
@@ -4200,18 +4192,18 @@
    ],
    [
     0.22,
-    776.0
+    775.0
    ],
    [
     0.23,
-    338.0
+    340.0
    ],
    [
     0.98,
     132817.74
    ]
   ],
-  "denom": 136.98,
+  "denom": 136.9,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4219,20 +4211,20 @@
   "m": "usgubewc-usgub-al-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 300781.0,
-  "ours": 0,
-  "others": 300781.0,
+  "total": 300819.0,
+  "ours": 39.0,
+  "others": 300780.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.62,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "best": 0.61,
+  "our_best": 0.61,
+  "ticks_off": 0,
+  "est": 5.19,
   "per_side": 6.25,
   "levels": [
    [
-    0.62,
-    1.0
+    0.61,
+    39.0
    ],
    [
     0.6,
@@ -4247,45 +4239,49 @@
     300000.0
    ]
   ],
-  "denom": 1.8,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 47.0,
+  "my_score": 39.0,
+  "ours_px": {
+   "0.61": 39.0
+  }
  },
  {
   "m": "usgubewc-usgub-al-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 20308.0,
-  "ours": 0,
-  "others": 20308.0,
+  "total": 23215.0,
+  "ours": 50.0,
+  "others": 23165.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.91,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.91,
+  "ticks_off": 0,
+  "est": 1.67,
   "per_side": 6.25,
   "levels": [
    [
     0.91,
-    108.0
+    158.0
    ],
    [
-    0.99,
-    20200.0
+    0.93,
+    2857.0
    ]
   ],
-  "denom": 108.0,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 186.57,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.91": 50.0
+  }
  },
  {
   "m": "usgubewc-usgub-ar-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 276.0,
+  "total": 200.0,
   "ours": 0,
-  "others": 276.0,
+  "others": 200.0,
   "qual": false,
   "self_sufficient": false,
   "best": 0.01,
@@ -4296,10 +4292,10 @@
   "levels": [
    [
     0.01,
-    276.0
+    200.0
    ]
   ],
-  "denom": 276.0,
+  "denom": 200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4307,27 +4303,27 @@
   "m": "usgubewc-usgub-ar-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 130755.86,
+  "total": 130754.86,
   "ours": 25.0,
-  "others": 130730.86,
+  "others": 130729.86,
   "qual": true,
   "self_sufficient": false,
   "best": 0.1,
   "our_best": 0.1,
   "ticks_off": 0,
-  "est": 5.04,
+  "est": 5.21,
   "per_side": 6.25,
   "levels": [
    [
     0.1,
-    31.0
+    30.0
    ],
    [
     0.98,
     130499.86
    ]
   ],
-  "denom": 31.0,
+  "denom": 30.0,
   "my_score": 25.0,
   "ours_px": {
    "0.1": 25.0
@@ -4337,9 +4333,9 @@
   "m": "usgubewc-usgub-ar-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 600200.0,
+  "total": 600700.0,
   "ours": 0,
-  "others": 600200.0,
+  "others": 600700.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.02,
@@ -4350,10 +4346,10 @@
   "levels": [
    [
     0.02,
-    600000.0
+    600500.0
    ]
   ],
-  "denom": 600000.0,
+  "denom": 600500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4361,63 +4357,59 @@
   "m": "usgubewc-usgub-ar-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 2464.0,
+  "total": 2600.0,
   "ours": 239.0,
-  "others": 2225.0,
+  "others": 2361.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.96,
   "our_best": 0.96,
   "ticks_off": 0,
-  "est": 5.95,
+  "est": 2.28,
   "per_side": 6.25,
   "levels": [
    [
     0.96,
-    40.0
+    108.0
    ],
    [
     0.97,
-    40.0
+    108.0
    ],
    [
     0.99,
     2384.0
    ]
   ],
-  "denom": 46.38,
+  "denom": 121.18,
   "my_score": 44.16,
   "ours_px": {
    "0.99": 159.0,
-   "0.96": 40.0,
-   "0.97": 40.0
+   "0.97": 40.0,
+   "0.96": 40.0
   }
  },
  {
   "m": "usgubewc-usgub-co-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 600202.0,
+  "total": 600700.0,
   "ours": 0,
-  "others": 600202.0,
+  "others": 600700.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.51,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.51,
-    2.0
-   ],
-   [
     0.02,
-    600000.0
+    600500.0
    ]
   ],
-  "denom": 2.0,
+  "denom": 600500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4425,9 +4417,9 @@
   "m": "usgubewc-usgub-co-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 284.0,
-  "ours": 40.0,
-  "others": 244.0,
+  "total": 516.26,
+  "ours": 291.26,
+  "others": 225.0,
   "qual": false,
   "self_sufficient": false,
   "best": 0.96,
@@ -4438,16 +4430,17 @@
   "levels": [
    [
     0.96,
-    59.0
+    40.0
    ],
    [
     0.99,
-    225.0
+    476.26
    ]
   ],
-  "denom": 59.23,
-  "my_score": 40.0,
+  "denom": 40.48,
+  "my_score": 40.25,
   "ours_px": {
+   "0.99": 251.26,
    "0.96": 40.0
   }
  },
@@ -4481,27 +4474,27 @@
   "m": "usgubewc-usgub-co-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 130780.86,
+  "total": 130781.86,
   "ours": 50.0,
-  "others": 130730.86,
+  "others": 130731.86,
   "qual": true,
   "self_sufficient": false,
   "best": 0.07,
   "our_best": 0.07,
   "ticks_off": 0,
-  "est": 5.58,
+  "est": 5.48,
   "per_side": 6.25,
   "levels": [
    [
     0.07,
-    56.0
+    57.0
    ],
    [
     0.98,
     130499.86
    ]
   ],
-  "denom": 56.0,
+  "denom": 57.0,
   "my_score": 50.0,
   "ours_px": {
    "0.07": 50.0
@@ -4564,17 +4557,17 @@
   "denom": 37.29,
   "my_score": 35.07,
   "ours_px": {
-   "0.96": 35.0,
-   "0.99": 66.27
+   "0.99": 66.27,
+   "0.96": 35.0
   }
  },
  {
   "m": "usgubewc-usgub-ct-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 6300.0,
+  "total": 10230.0,
   "ours": 0,
-  "others": 6300.0,
+  "others": 10230.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -4585,10 +4578,10 @@
   "levels": [
    [
     0.01,
-    6300.0
+    10230.0
    ]
   ],
-  "denom": 6300.0,
+  "denom": 10230.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4596,117 +4589,9 @@
   "m": "usgubewc-usgub-ct-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 199650.37,
+  "total": 265608.36,
   "ours": 0,
-  "others": 199650.37,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.49,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 6.25,
-  "levels": [
-   [
-    0.49,
-    95.0
-   ],
-   [
-    0.98,
-    199330.37
-   ]
-  ],
-  "denom": 95.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "usgubewc-usgub-fl-2026-11-03-dem",
-  "side": "BUY",
-  "target": 2000.0,
-  "total": 12470.0,
-  "ours": 0,
-  "others": 12470.0,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.08,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 6.25,
-  "levels": [
-   [
-    0.08,
-    2190.0
-   ]
-  ],
-  "denom": 2190.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "usgubewc-usgub-fl-2026-11-03-dem",
-  "side": "SELL",
-  "target": 2000.0,
-  "total": 265794.16,
-  "ours": 0,
-  "others": 265794.16,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.57,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 6.25,
-  "levels": [
-   [
-    0.57,
-    2.0
-   ],
-   [
-    0.98,
-    265567.16
-   ]
-  ],
-  "denom": 2.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "usgubewc-usgub-fl-2026-11-03-rep",
-  "side": "BUY",
-  "target": 2000.0,
-  "total": 500202.0,
-  "ours": 0,
-  "others": 500202.0,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.46,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 6.25,
-  "levels": [
-   [
-    0.46,
-    2.0
-   ],
-   [
-    0.02,
-    500000.0
-   ]
-  ],
-  "denom": 2.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "usgubewc-usgub-fl-2026-11-03-rep",
-  "side": "SELL",
-  "target": 2000.0,
-  "total": 21174.98,
-  "ours": 0,
-  "others": 21174.98,
+  "others": 265608.36,
   "qual": true,
   "self_sufficient": false,
   "best": 0.98,
@@ -4717,10 +4602,106 @@
   "levels": [
    [
     0.98,
-    20949.98
+    265383.36
    ]
   ],
-  "denom": 20949.98,
+  "denom": 265383.36,
+  "my_score": 0,
+  "ours_px": {}
+ },
+ {
+  "m": "usgubewc-usgub-fl-2026-11-03-dem",
+  "side": "BUY",
+  "target": 2000.0,
+  "total": 12519.0,
+  "ours": 0,
+  "others": 12519.0,
+  "qual": true,
+  "self_sufficient": false,
+  "best": 0.08,
+  "our_best": null,
+  "ticks_off": null,
+  "est": 0.0,
+  "per_side": 6.25,
+  "levels": [
+   [
+    0.08,
+    2239.0
+   ]
+  ],
+  "denom": 2239.0,
+  "my_score": 0,
+  "ours_px": {}
+ },
+ {
+  "m": "usgubewc-usgub-fl-2026-11-03-dem",
+  "side": "SELL",
+  "target": 2000.0,
+  "total": 266292.15,
+  "ours": 0,
+  "others": 266292.15,
+  "qual": true,
+  "self_sufficient": false,
+  "best": 0.98,
+  "our_best": null,
+  "ticks_off": null,
+  "est": 0.0,
+  "per_side": 6.25,
+  "levels": [
+   [
+    0.98,
+    266067.15
+   ]
+  ],
+  "denom": 266067.15,
+  "my_score": 0,
+  "ours_px": {}
+ },
+ {
+  "m": "usgubewc-usgub-fl-2026-11-03-rep",
+  "side": "BUY",
+  "target": 2000.0,
+  "total": 500700.0,
+  "ours": 0,
+  "others": 500700.0,
+  "qual": true,
+  "self_sufficient": false,
+  "best": 0.02,
+  "our_best": null,
+  "ticks_off": null,
+  "est": 0.0,
+  "per_side": 6.25,
+  "levels": [
+   [
+    0.02,
+    500500.0
+   ]
+  ],
+  "denom": 500500.0,
+  "my_score": 0,
+  "ours_px": {}
+ },
+ {
+  "m": "usgubewc-usgub-fl-2026-11-03-rep",
+  "side": "SELL",
+  "target": 2000.0,
+  "total": 46290.99,
+  "ours": 0,
+  "others": 46290.99,
+  "qual": true,
+  "self_sufficient": false,
+  "best": 0.98,
+  "our_best": null,
+  "ticks_off": null,
+  "est": 0.0,
+  "per_side": 6.25,
+  "levels": [
+   [
+    0.98,
+    46065.99
+   ]
+  ],
+  "denom": 46065.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4728,27 +4709,23 @@
   "m": "usgubewc-usgub-hi-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500530.0,
+  "total": 500700.0,
   "ours": 0,
-  "others": 500530.0,
+  "others": 500700.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.51,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.51,
-    330.0
-   ],
-   [
     0.02,
-    500000.0
+    500500.0
    ]
   ],
-  "denom": 330.0,
+  "denom": 500500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -4756,176 +4733,8 @@
   "m": "usgubewc-usgub-hi-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 3823.0,
+  "total": 4143.0,
   "ours": 468.01,
-  "others": 3354.99,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.96,
-  "our_best": 0.96,
-  "ticks_off": 0,
-  "est": 2.33,
-  "per_side": 6.25,
-  "levels": [
-   [
-    0.96,
-    105.0
-   ],
-   [
-    0.97,
-    105.0
-   ],
-   [
-    0.99,
-    3613.0
-   ]
-  ],
-  "denom": 119.11,
-  "my_score": 44.39,
-  "ours_px": {
-   "0.99": 388.01,
-   "0.97": 40.0,
-   "0.96": 40.0
-  }
- },
- {
-  "m": "usgubewc-usgub-hi-2026-11-03-rep",
-  "side": "BUY",
-  "target": 2000.0,
-  "total": 11276.0,
-  "ours": 0,
-  "others": 11276.0,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.01,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 6.25,
-  "levels": [
-   [
-    0.01,
-    11276.0
-   ]
-  ],
-  "denom": 11276.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "usgubewc-usgub-hi-2026-11-03-rep",
-  "side": "SELL",
-  "target": 2000.0,
-  "total": 208290.37,
-  "ours": 0,
-  "others": 208290.37,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.51,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 6.25,
-  "levels": [
-   [
-    0.51,
-    1.0
-   ],
-   [
-    0.98,
-    208064.37
-   ]
-  ],
-  "denom": 1.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "usgubewc-usgub-id-2026-11-03-dem",
-  "side": "BUY",
-  "target": 2000.0,
-  "total": 276.0,
-  "ours": 0,
-  "others": 276.0,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.01,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 6.25,
-  "levels": [
-   [
-    0.01,
-    276.0
-   ]
-  ],
-  "denom": 276.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "usgubewc-usgub-id-2026-11-03-dem",
-  "side": "SELL",
-  "target": 2000.0,
-  "total": 208290.37,
-  "ours": 0,
-  "others": 208290.37,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.5,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 6.25,
-  "levels": [
-   [
-    0.5,
-    1.0
-   ],
-   [
-    0.98,
-    208064.37
-   ]
-  ],
-  "denom": 1.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "usgubewc-usgub-id-2026-11-03-rep",
-  "side": "BUY",
-  "target": 2000.0,
-  "total": 500946.0,
-  "ours": 0,
-  "others": 500946.0,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.5,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 6.25,
-  "levels": [
-   [
-    0.5,
-    746.0
-   ],
-   [
-    0.02,
-    500000.0
-   ]
-  ],
-  "denom": 746.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "usgubewc-usgub-id-2026-11-03-rep",
-  "side": "SELL",
-  "target": 2000.0,
-  "total": 4497.48,
-  "ours": 822.49,
   "others": 3674.99,
   "qual": true,
   "self_sufficient": false,
@@ -4937,22 +4746,182 @@
   "levels": [
    [
     0.96,
+    106.0
+   ],
+   [
+    0.97,
     105.0
    ],
    [
     0.98,
-    1424.99
+    1318.99
+   ],
+   [
+    0.99,
+    2613.01
+   ]
+  ],
+  "denom": 132.3,
+  "my_score": 44.39,
+  "ours_px": {
+   "0.99": 388.01,
+   "0.96": 40.0,
+   "0.97": 40.0
+  }
+ },
+ {
+  "m": "usgubewc-usgub-hi-2026-11-03-rep",
+  "side": "BUY",
+  "target": 2000.0,
+  "total": 11200.0,
+  "ours": 0,
+  "others": 11200.0,
+  "qual": true,
+  "self_sufficient": false,
+  "best": 0.01,
+  "our_best": null,
+  "ticks_off": null,
+  "est": 0.0,
+  "per_side": 6.25,
+  "levels": [
+   [
+    0.01,
+    11200.0
+   ]
+  ],
+  "denom": 11200.0,
+  "my_score": 0,
+  "ours_px": {}
+ },
+ {
+  "m": "usgubewc-usgub-hi-2026-11-03-rep",
+  "side": "SELL",
+  "target": 2000.0,
+  "total": 283791.36,
+  "ours": 0,
+  "others": 283791.36,
+  "qual": true,
+  "self_sufficient": false,
+  "best": 0.98,
+  "our_best": null,
+  "ticks_off": null,
+  "est": 0.0,
+  "per_side": 6.25,
+  "levels": [
+   [
+    0.98,
+    283566.36
+   ]
+  ],
+  "denom": 283566.36,
+  "my_score": 0,
+  "ours_px": {}
+ },
+ {
+  "m": "usgubewc-usgub-id-2026-11-03-dem",
+  "side": "BUY",
+  "target": 2000.0,
+  "total": 200.0,
+  "ours": 0,
+  "others": 200.0,
+  "qual": false,
+  "self_sufficient": false,
+  "best": 0.01,
+  "our_best": null,
+  "ticks_off": null,
+  "est": 0.0,
+  "per_side": 6.25,
+  "levels": [
+   [
+    0.01,
+    200.0
+   ]
+  ],
+  "denom": 200.0,
+  "my_score": 0,
+  "ours_px": {}
+ },
+ {
+  "m": "usgubewc-usgub-id-2026-11-03-dem",
+  "side": "SELL",
+  "target": 2000.0,
+  "total": 281568.36,
+  "ours": 0,
+  "others": 281568.36,
+  "qual": true,
+  "self_sufficient": false,
+  "best": 0.98,
+  "our_best": null,
+  "ticks_off": null,
+  "est": 0.0,
+  "per_side": 6.25,
+  "levels": [
+   [
+    0.98,
+    277657.36
+   ]
+  ],
+  "denom": 277657.36,
+  "my_score": 0,
+  "ours_px": {}
+ },
+ {
+  "m": "usgubewc-usgub-id-2026-11-03-rep",
+  "side": "BUY",
+  "target": 2000.0,
+  "total": 500700.0,
+  "ours": 0,
+  "others": 500700.0,
+  "qual": true,
+  "self_sufficient": false,
+  "best": 0.02,
+  "our_best": null,
+  "ticks_off": null,
+  "est": 0.0,
+  "per_side": 6.25,
+  "levels": [
+   [
+    0.02,
+    500500.0
+   ]
+  ],
+  "denom": 500500.0,
+  "my_score": 0,
+  "ours_px": {}
+ },
+ {
+  "m": "usgubewc-usgub-id-2026-11-03-rep",
+  "side": "SELL",
+  "target": 2000.0,
+  "total": 4500.48,
+  "ours": 822.4900000000001,
+  "others": 3677.9899999999993,
+  "qual": true,
+  "self_sufficient": false,
+  "best": 0.96,
+  "our_best": 0.96,
+  "ticks_off": 0,
+  "est": 2.07,
+  "per_side": 6.25,
+  "levels": [
+   [
+    0.96,
+    107.0
+   ],
+   [
+    0.98,
+    1425.99
    ],
    [
     0.99,
     2967.49
    ]
   ],
-  "denom": 122.22,
+  "denom": 124.23,
   "my_score": 41.14,
   "ours_px": {
-   "0.96": 40.0,
    "0.99": 742.49,
+   "0.96": 40.0,
    "0.98": 40.0
   }
  },
@@ -4984,15 +4953,15 @@
   "m": "usgubewc-usgub-il-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 12942.869999999999,
+  "total": 17619.87,
   "ours": 421.53999999999996,
-  "others": 12521.329999999998,
+  "others": 17198.329999999998,
   "qual": true,
   "self_sufficient": false,
   "best": 0.96,
   "our_best": 0.96,
   "ticks_off": 0,
-  "est": 0.22,
+  "est": 0.16,
   "per_side": 6.25,
   "levels": [
    [
@@ -5001,37 +4970,37 @@
    ],
    [
     0.97,
-    10230.33
+    14907.33
    ]
   ],
-  "denom": 1129.03,
+  "denom": 1596.73,
   "my_score": 40.38,
   "ours_px": {
-   "0.99": 381.54,
-   "0.96": 40.0
+   "0.96": 40.0,
+   "0.99": 381.54
   }
  },
  {
   "m": "usgubewc-usgub-il-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 3350.0,
+  "total": 3100.0,
   "ours": 400.0,
-  "others": 2950.0,
+  "others": 2700.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.04,
   "our_best": 0.04,
   "ticks_off": 0,
-  "est": 0.79,
+  "est": 0.86,
   "per_side": 6.25,
   "levels": [
    [
     0.04,
-    3150.0
+    2900.0
    ]
   ],
-  "denom": 3150.0,
+  "denom": 2900.0,
   "my_score": 400.0,
   "ours_px": {
    "0.04": 400.0
@@ -5041,27 +5010,27 @@
   "m": "usgubewc-usgub-il-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 208635.37,
+  "total": 208376.37,
   "ours": 75.0,
-  "others": 208560.37,
+  "others": 208301.37,
   "qual": true,
   "self_sufficient": false,
   "best": 0.09,
   "our_best": 0.09,
   "ticks_off": 0,
-  "est": 1.35,
+  "est": 5.33,
   "per_side": 6.25,
   "levels": [
    [
     0.09,
-    347.0
+    88.0
    ],
    [
     0.98,
     208063.37
    ]
   ],
-  "denom": 347.0,
+  "denom": 88.0,
   "my_score": 75.0,
   "ours_px": {
    "0.09": 75.0
@@ -5071,27 +5040,23 @@
   "m": "usgubewc-usgub-ma-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 201.0,
+  "total": 13301.0,
   "ours": 0,
-  "others": 201.0,
-  "qual": false,
+  "others": 13301.0,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.5,
+  "best": 0.01,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.5,
-    1.0
-   ],
-   [
     0.01,
-    200.0
+    13301.0
    ]
   ],
-  "denom": 1.0,
+  "denom": 13301.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5099,9 +5064,9 @@
   "m": "usgubewc-usgub-ma-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 21300.99,
+  "total": 58121.99,
   "ours": 0,
-  "others": 21300.99,
+  "others": 58121.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -5112,10 +5077,10 @@
   "levels": [
    [
     0.99,
-    21300.99
+    58121.99
    ]
   ],
-  "denom": 21300.99,
+  "denom": 58121.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5123,23 +5088,23 @@
   "m": "usgubewc-usgub-ma-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 3184.66,
+  "total": 3418.0,
   "ours": 300.0,
-  "others": 2884.66,
+  "others": 3118.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.06,
   "our_best": 0.06,
   "ticks_off": 0,
-  "est": 0.63,
+  "est": 0.58,
   "per_side": 6.25,
   "levels": [
    [
     0.06,
-    2984.66
+    3218.0
    ]
   ],
-  "denom": 2984.66,
+  "denom": 3218.0,
   "my_score": 300.0,
   "ours_px": {
    "0.06": 300.0
@@ -5149,8 +5114,8 @@
   "m": "usgubewc-usgub-ma-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 275.0,
-  "ours": 50.0,
+  "total": 526.26,
+  "ours": 301.26,
   "others": 225.0,
   "qual": false,
   "self_sufficient": false,
@@ -5166,40 +5131,41 @@
    ],
    [
     0.99,
-    225.0
+    476.26
    ]
   ],
   "denom": 50.0,
   "my_score": 50.0,
   "ours_px": {
-   "0.09": 50.0
+   "0.09": 50.0,
+   "0.99": 251.26
   }
  },
  {
   "m": "usgubewc-usgub-md-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500257.0,
+  "total": 500256.0,
   "ours": 25.0,
-  "others": 500232.0,
+  "others": 500231.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.95,
   "our_best": 0.95,
   "ticks_off": 0,
-  "est": 2.74,
+  "est": 2.79,
   "per_side": 6.25,
   "levels": [
    [
     0.95,
-    57.0
+    56.0
    ],
    [
     0.02,
     500000.0
    ]
   ],
-  "denom": 57.0,
+  "denom": 56.0,
   "my_score": 25.0,
   "ours_px": {
    "0.95": 25.0
@@ -5209,9 +5175,9 @@
   "m": "usgubewc-usgub-md-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 25279.99,
+  "total": 22779.99,
   "ours": 0,
-  "others": 25279.99,
+  "others": 22779.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -5222,10 +5188,10 @@
   "levels": [
    [
     0.99,
-    25279.99
+    22779.99
    ]
   ],
-  "denom": 25279.99,
+  "denom": 22779.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5233,9 +5199,9 @@
   "m": "usgubewc-usgub-md-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 10276.0,
+  "total": 11200.0,
   "ours": 0,
-  "others": 10276.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -5246,10 +5212,10 @@
   "levels": [
    [
     0.01,
-    10276.0
+    11200.0
    ]
   ],
-  "denom": 10276.0,
+  "denom": 11200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5257,27 +5223,27 @@
   "m": "usgubewc-usgub-md-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 65497.93,
+  "total": 65498.93,
   "ours": 20.0,
-  "others": 65477.93,
+  "others": 65478.93,
   "qual": true,
   "self_sufficient": false,
   "best": 0.1,
   "our_best": 0.1,
   "ticks_off": 0,
-  "est": 5.43,
+  "est": 5.21,
   "per_side": 6.25,
   "levels": [
    [
     0.1,
-    23.0
+    24.0
    ],
    [
     0.98,
     65249.93
    ]
   ],
-  "denom": 23.0,
+  "denom": 24.0,
   "my_score": 20.0,
   "ours_px": {
    "0.1": 20.0
@@ -5287,27 +5253,23 @@
   "m": "usgubewc-usgub-me-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500517.0,
+  "total": 500700.0,
   "ours": 0,
-  "others": 500517.0,
+  "others": 500700.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.52,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.52,
-    317.0
-   ],
-   [
     0.02,
-    500000.0
+    500500.0
    ]
   ],
-  "denom": 317.0,
+  "denom": 500500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5315,23 +5277,23 @@
   "m": "usgubewc-usgub-me-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 51389.33,
+  "total": 121429.99,
   "ours": 0,
-  "others": 51389.33,
+  "others": 121429.99,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.97,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.97,
-    16246.33
+    0.99,
+    121429.99
    ]
   ],
-  "denom": 16246.33,
+  "denom": 121429.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5339,9 +5301,9 @@
   "m": "usgubewc-usgub-me-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 41276.0,
+  "total": 41200.0,
   "ours": 0,
-  "others": 41276.0,
+  "others": 41200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -5352,10 +5314,10 @@
   "levels": [
    [
     0.01,
-    41276.0
+    41200.0
    ]
   ],
-  "denom": 41276.0,
+  "denom": 41200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5363,27 +5325,23 @@
   "m": "usgubewc-usgub-me-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 65476.93,
+  "total": 150980.92,
   "ours": 0,
-  "others": 65476.93,
+  "others": 150980.92,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.98,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    1.0
-   ],
-   [
     0.98,
-    65250.93
+    150755.92
    ]
   ],
-  "denom": 1.0,
+  "denom": 150755.92,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5391,31 +5349,23 @@
   "m": "usgubewc-usgub-mn-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 580319.0,
+  "total": 580250.0,
   "ours": 0,
-  "others": 580319.0,
+  "others": 580250.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.53,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.53,
-    76.0
-   ],
-   [
-    0.48,
-    43.0
-   ],
-   [
     0.02,
-    580000.0
+    580050.0
    ]
   ],
-  "denom": 76.0,
+  "denom": 580050.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5423,9 +5373,9 @@
   "m": "usgubewc-usgub-mn-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 7120.16,
+  "total": 7220.16,
   "ours": 23.0,
-  "others": 7097.16,
+  "others": 7197.16,
   "qual": true,
   "self_sufficient": false,
   "best": 0.92,
@@ -5440,7 +5390,7 @@
    ],
    [
     0.99,
-    7097.16
+    7197.16
    ]
   ],
   "denom": 23.0,
@@ -5453,27 +5403,27 @@
   "m": "usgubewc-usgub-mn-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 7604.18,
+  "total": 7461.18,
   "ours": 488.89,
-  "others": 7115.29,
+  "others": 6972.29,
   "qual": true,
   "self_sufficient": false,
   "best": 0.07,
   "our_best": 0.06,
   "ticks_off": 1,
-  "est": 0.2,
+  "est": 0.24,
   "per_side": 6.25,
   "levels": [
    [
     0.07,
-    1462.29
+    1176.29
    ],
    [
     0.06,
-    941.89
+    1084.89
    ]
   ],
-  "denom": 1556.48,
+  "denom": 1284.78,
   "my_score": 48.89,
   "ours_px": {
    "0.06": 488.89
@@ -5483,9 +5433,9 @@
   "m": "usgubewc-usgub-mn-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 196124.6,
+  "total": 196024.6,
   "ours": 31.01,
-  "others": 196093.59,
+  "others": 195993.59,
   "qual": true,
   "self_sufficient": false,
   "best": 0.1,
@@ -5500,7 +5450,7 @@
    ],
    [
     0.15,
-    100.8
+    0.8
    ],
    [
     0.19,
@@ -5521,9 +5471,9 @@
   "m": "usgubewc-usgub-ne-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 11276.0,
+  "total": 18480.0,
   "ours": 0,
-  "others": 11276.0,
+  "others": 18480.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -5534,10 +5484,10 @@
   "levels": [
    [
     0.01,
-    11276.0
+    18480.0
    ]
   ],
-  "denom": 11276.0,
+  "denom": 18480.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5579,24 +5529,24 @@
   "m": "usgubewc-usgub-ne-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500267.0,
+  "total": 500266.0,
   "ours": 25.0,
-  "others": 500242.0,
+  "others": 500241.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.74,
-  "our_best": 0.74,
+  "best": 0.75,
+  "our_best": 0.75,
   "ticks_off": 0,
   "est": 5.39,
   "per_side": 6.25,
   "levels": [
    [
-    0.74,
+    0.75,
     29.0
    ],
    [
     0.11,
-    38.0
+    37.0
    ],
    [
     0.02,
@@ -5606,16 +5556,16 @@
   "denom": 29.0,
   "my_score": 25.0,
   "ours_px": {
-   "0.74": 25.0
+   "0.75": 25.0
   }
  },
  {
   "m": "usgubewc-usgub-ne-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 25175.34,
+  "total": 25094.34,
   "ours": 168.35,
-  "others": 25006.99,
+  "others": 24925.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -5626,10 +5576,10 @@
   "levels": [
    [
     0.99,
-    25175.34
+    25094.34
    ]
   ],
-  "denom": 25175.34,
+  "denom": 25094.34,
   "my_score": 168.35,
   "ours_px": {
    "0.99": 168.35
@@ -5639,9 +5589,9 @@
   "m": "usgubewc-usgub-nh-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 6891.33,
+  "total": 7798.33,
   "ours": 0,
-  "others": 6891.33,
+  "others": 7798.33,
   "qual": true,
   "self_sufficient": false,
   "best": 0.03,
@@ -5652,14 +5602,10 @@
   "levels": [
    [
     0.03,
-    1691.33
-   ],
-   [
-    0.02,
-    5000.0
+    7598.33
    ]
   ],
-  "denom": 2191.33,
+  "denom": 7598.33,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5667,27 +5613,23 @@
   "m": "usgubewc-usgub-nh-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 256.0,
+  "total": 25166.99,
   "ours": 0,
-  "others": 256.0,
-  "qual": false,
+  "others": 25166.99,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    1.0
-   ],
-   [
     0.99,
-    255.0
+    25166.99
    ]
   ],
-  "denom": 1.0,
+  "denom": 25166.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5695,17 +5637,21 @@
   "m": "usgubewc-usgub-nh-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 262.0,
-  "ours": 25.0,
-  "others": 237.0,
-  "qual": false,
+  "total": 2039.0,
+  "ours": 1724.0,
+  "others": 315.0,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.81,
-  "our_best": 0.81,
+  "best": 0.84,
+  "our_best": 0.84,
   "ticks_off": 0,
-  "est": 0.0,
+  "est": 2.05,
   "per_side": 6.25,
   "levels": [
+   [
+    0.84,
+    116.0
+   ],
    [
     0.81,
     25.0
@@ -5716,40 +5662,42 @@
    ],
    [
     0.01,
-    200.0
+    1861.0
    ]
   ],
-  "denom": 25.0,
-  "my_score": 25.0,
+  "denom": 116.03,
+  "my_score": 38.02,
   "ours_px": {
-   "0.81": 25.0
+   "0.81": 25.0,
+   "0.84": 38.0,
+   "0.01": 1661.0
   }
  },
  {
   "m": "usgubewc-usgub-nh-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 1107.0,
+  "total": 1974.85,
   "ours": 0,
-  "others": 1107.0,
+  "others": 1974.85,
   "qual": false,
   "self_sufficient": false,
-  "best": 0.9,
+  "best": 0.93,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.9,
-    882.0
+    0.93,
+    1749.85
    ],
    [
     0.99,
     225.0
    ]
   ],
-  "denom": 882.0,
+  "denom": 1749.85,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5757,27 +5705,23 @@
   "m": "usgubewc-usgub-nm-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500535.0,
+  "total": 500700.0,
   "ours": 0,
-  "others": 500535.0,
+  "others": 500700.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.5,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.5,
-    335.0
-   ],
-   [
     0.02,
-    500000.0
+    500500.0
    ]
   ],
-  "denom": 335.0,
+  "denom": 500500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5785,9 +5729,9 @@
   "m": "usgubewc-usgub-nm-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 21224.99,
+  "total": 53079.99,
   "ours": 0,
-  "others": 21224.99,
+  "others": 53079.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -5798,10 +5742,10 @@
   "levels": [
    [
     0.99,
-    21224.99
+    53079.99
    ]
   ],
-  "denom": 21224.99,
+  "denom": 53079.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5809,9 +5753,9 @@
   "m": "usgubewc-usgub-nm-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 11300.0,
+  "total": 10200.0,
   "ours": 0,
-  "others": 11300.0,
+  "others": 10200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -5822,10 +5766,10 @@
   "levels": [
    [
     0.01,
-    11300.0
+    10200.0
    ]
   ],
-  "denom": 11300.0,
+  "denom": 10200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5833,27 +5777,23 @@
   "m": "usgubewc-usgub-nm-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 65724.93,
+  "total": 150976.92,
   "ours": 0,
-  "others": 65724.93,
+  "others": 150976.92,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.98,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    95.0
-   ],
-   [
     0.98,
-    65404.93
+    150751.92
    ]
   ],
-  "denom": 95.0,
+  "denom": 150751.92,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5861,37 +5801,43 @@
   "m": "usgubewc-usgub-ny-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 502788.0,
-  "ours": 0,
-  "others": 502788.0,
+  "total": 502550.9,
+  "ours": 14.0,
+  "others": 502536.9,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.86,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "best": 0.87,
+  "our_best": 0.87,
+  "ticks_off": 0,
+  "est": 2.27,
   "per_side": 6.25,
   "levels": [
+   [
+    0.87,
+    36.0
+   ],
    [
     0.86,
     5.01
    ],
    [
     0.84,
-    2282.99
+    2009.89
    ]
   ],
-  "denom": 27.84,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 38.51,
+  "my_score": 14.0,
+  "ours_px": {
+   "0.87": 14.0
+  }
  },
  {
   "m": "usgubewc-usgub-ny-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 29071.98,
+  "total": 20297.99,
   "ours": 0,
-  "others": 29071.98,
+  "others": 20297.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -5902,10 +5848,10 @@
   "levels": [
    [
     0.99,
-    29071.98
+    20297.99
    ]
   ],
-  "denom": 29071.98,
+  "denom": 20297.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5913,9 +5859,9 @@
   "m": "usgubewc-usgub-ny-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 13306.0,
+  "total": 14928.0,
   "ours": 0,
-  "others": 13306.0,
+  "others": 14928.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -5926,10 +5872,10 @@
   "levels": [
    [
     0.01,
-    13306.0
+    14928.0
    ]
   ],
-  "denom": 13306.0,
+  "denom": 14928.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -5961,15 +5907,15 @@
   "m": "usgubewc-usgub-ok-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 250.0,
-  "ours": 50.0,
+  "total": 2001.0,
+  "ours": 1801.0,
   "others": 200.0,
-  "qual": false,
+  "qual": true,
   "self_sufficient": false,
   "best": 0.05,
   "our_best": 0.05,
   "ticks_off": 0,
-  "est": 0.0,
+  "est": 6.25,
   "per_side": 6.25,
   "levels": [
    [
@@ -5978,12 +5924,13 @@
    ],
    [
     0.01,
-    200.0
+    1951.0
    ]
   ],
-  "denom": 50.02,
-  "my_score": 50.0,
+  "denom": 50.2,
+  "my_score": 50.18,
   "ours_px": {
+   "0.01": 1751.0,
    "0.05": 50.0
   }
  },
@@ -5991,27 +5938,27 @@
   "m": "usgubewc-usgub-ok-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 130760.86,
+  "total": 130752.86,
   "ours": 25.0,
-  "others": 130735.86,
+  "others": 130727.86,
   "qual": true,
   "self_sufficient": false,
   "best": 0.07,
   "our_best": 0.07,
   "ticks_off": 0,
-  "est": 4.34,
+  "est": 5.58,
   "per_side": 6.25,
   "levels": [
    [
     0.07,
-    36.0
+    28.0
    ],
    [
     0.98,
     130499.86
    ]
   ],
-  "denom": 36.0,
+  "denom": 28.0,
   "my_score": 25.0,
   "ours_px": {
    "0.07": 25.0
@@ -6021,31 +5968,23 @@
   "m": "usgubewc-usgub-ok-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 600202.0,
+  "total": 600700.0,
   "ours": 0,
-  "others": 600202.0,
+  "others": 600700.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.59,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.59,
-    1.0
-   ],
-   [
-    0.54,
-    1.0
-   ],
-   [
     0.02,
-    600000.0
+    600500.0
    ]
   ],
-  "denom": 1.0,
+  "denom": 600500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6053,59 +5992,49 @@
   "m": "usgubewc-usgub-ok-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 227.99,
-  "ours": 0,
-  "others": 227.99,
-  "qual": false,
+  "total": 25537.99,
+  "ours": 50.0,
+  "others": 25487.99,
+  "qual": true,
   "self_sufficient": false,
   "best": 0.98,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.98,
+  "ticks_off": 0,
+  "est": 0.01,
   "per_side": 6.25,
   "levels": [
    [
     0.98,
-    2.99
-   ],
-   [
-    0.99,
-    225.0
+    25312.99
    ]
   ],
-  "denom": 25.49,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 25312.99,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.98": 50.0
+  }
  },
  {
   "m": "usgubewc-usgub-or-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 600638.0,
+  "total": 600700.0,
   "ours": 0,
-  "others": 600638.0,
+  "others": 600700.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.54,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.54,
-    123.0
-   ],
-   [
-    0.53,
-    315.0
-   ],
-   [
     0.02,
-    600000.0
+    600500.0
    ]
   ],
-  "denom": 154.5,
+  "denom": 600500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6113,9 +6042,9 @@
   "m": "usgubewc-usgub-or-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 18317.33,
+  "total": 18456.33,
   "ours": 0,
-  "others": 18317.33,
+  "others": 18456.33,
   "qual": true,
   "self_sufficient": false,
   "best": 0.97,
@@ -6126,10 +6055,10 @@
   "levels": [
    [
     0.97,
-    18092.33
+    18231.33
    ]
   ],
-  "denom": 18092.33,
+  "denom": 18231.33,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6137,9 +6066,9 @@
   "m": "usgubewc-usgub-or-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 3974.85,
+  "total": 3924.85,
   "ours": 0,
-  "others": 3974.85,
+  "others": 3924.85,
   "qual": true,
   "self_sufficient": false,
   "best": 0.03,
@@ -6150,10 +6079,10 @@
   "levels": [
    [
     0.03,
-    3774.85
+    3724.85
    ]
   ],
-  "denom": 3774.85,
+  "denom": 3724.85,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6161,31 +6090,23 @@
   "m": "usgubewc-usgub-or-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 66702.41,
+  "total": 151918.9,
   "ours": 0,
-  "others": 66702.41,
+  "others": 151918.9,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.5,
+  "best": 0.98,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.5,
-    1106.48
-   ],
-   [
-    0.51,
-    121.0
-   ],
-   [
     0.98,
-    65249.93
+    151693.9
    ]
   ],
-  "denom": 1118.58,
+  "denom": 151693.9,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6193,28 +6114,24 @@
   "m": "usgubewc-usgub-pa-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 521.0,
+  "total": 11520.0,
   "ours": 320.0,
-  "others": 201.0,
-  "qual": false,
+  "others": 11200.0,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.01,
   "our_best": 0.01,
-  "ticks_off": 48,
-  "est": 0.0,
+  "ticks_off": 0,
+  "est": 0.17,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    1.0
-   ],
-   [
     0.01,
-    520.0
+    11520.0
    ]
   ],
-  "denom": 1.0,
-  "my_score": 0.0,
+  "denom": 11520.0,
+  "my_score": 320.0,
   "ours_px": {
    "0.01": 320.0
   }
@@ -6223,9 +6140,9 @@
   "m": "usgubewc-usgub-pa-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 23300.99,
+  "total": 58933.99,
   "ours": 0,
-  "others": 23300.99,
+  "others": 58933.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -6236,10 +6153,10 @@
   "levels": [
    [
     0.99,
-    23300.99
+    58933.99
    ]
   ],
-  "denom": 23300.99,
+  "denom": 58933.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6247,54 +6164,51 @@
   "m": "usgubewc-usgub-pa-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 4849.66,
-  "ours": 1600.0,
-  "others": 3249.66,
+  "total": 4553.66,
+  "ours": 1650.0,
+  "others": 2903.66,
   "qual": true,
   "self_sufficient": false,
   "best": 0.06,
-  "our_best": 0.01,
-  "ticks_off": 5,
-  "est": 0.0,
+  "our_best": 0.06,
+  "ticks_off": 0,
+  "est": 0.11,
   "per_side": 6.25,
   "levels": [
    [
     0.06,
-    3049.66
+    2753.66
    ]
   ],
-  "denom": 3049.66,
-  "my_score": 0.02,
+  "denom": 2753.66,
+  "my_score": 50.02,
   "ours_px": {
-   "0.01": 1600.0
+   "0.01": 1600.0,
+   "0.06": 50.0
   }
  },
  {
   "m": "usgubewc-usgub-pa-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 3939.7,
+  "total": 23885.09,
   "ours": 660.1,
-  "others": 3279.6,
+  "others": 23224.99,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.99,
   "our_best": 0.99,
-  "ticks_off": 50,
-  "est": 0.0,
+  "ticks_off": 0,
+  "est": 0.17,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    1054.6
-   ],
-   [
     0.99,
-    2885.1
+    23885.09
    ]
   ],
-  "denom": 1054.6,
-  "my_score": 0.0,
+  "denom": 23885.09,
+  "my_score": 660.1,
   "ours_px": {
    "0.99": 660.1
   }
@@ -6303,71 +6217,71 @@
   "m": "usgubewc-usgub-ri-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 1967.0,
-  "ours": 1745.0,
-  "others": 222.0,
-  "qual": false,
+  "total": 2019.0,
+  "ours": 1791.0,
+  "others": 228.0,
+  "qual": true,
   "self_sufficient": false,
   "best": 0.92,
   "our_best": 0.92,
   "ticks_off": 0,
-  "est": 0.0,
+  "est": 1.97,
   "per_side": 4.17,
   "levels": [
    [
     0.92,
-    47.0
+    53.0
    ],
    [
     0.01,
-    1920.0
+    1966.0
    ]
   ],
-  "denom": 47.0,
+  "denom": 53.0,
   "my_score": 25.0,
   "ours_px": {
-   "0.01": 1720.0,
-   "0.92": 25.0
+   "0.92": 25.0,
+   "0.01": 1766.0
   }
  },
  {
   "m": "usgubewc-usgub-ri-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 3882.3,
+  "total": 3880.3,
   "ours": 1615.3000000000004,
-  "others": 2267.0,
+  "others": 2265.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.94,
   "our_best": 0.94,
   "ticks_off": 0,
-  "est": 1.55,
+  "est": 1.6,
   "per_side": 4.17,
   "levels": [
    [
     0.94,
-    67.0
+    65.0
    ],
    [
     0.99,
     3815.3
    ]
   ],
-  "denom": 67.04,
+  "denom": 65.04,
   "my_score": 25.02,
   "ours_px": {
-   "0.94": 25.0,
-   "0.99": 1590.3
+   "0.99": 1590.3,
+   "0.94": 25.0
   }
  },
  {
   "m": "usgubewc-usgub-ri-2026-11-03-kenblo",
   "side": "BUY",
   "target": 2000.0,
-  "total": 12300.0,
+  "total": 11200.0,
   "ours": 0,
-  "others": 12300.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -6378,10 +6292,10 @@
   "levels": [
    [
     0.01,
-    12300.0
+    11200.0
    ]
   ],
-  "denom": 12300.0,
+  "denom": 11200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6389,27 +6303,23 @@
   "m": "usgubewc-usgub-ri-2026-11-03-kenblo",
   "side": "SELL",
   "target": 2000.0,
-  "total": 238.0,
+  "total": 20225.0,
   "ours": 0,
-  "others": 238.0,
-  "qual": false,
+  "others": 20225.0,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.51,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 4.17,
   "levels": [
    [
-    0.51,
-    13.0
-   ],
-   [
     0.99,
-    225.0
+    20225.0
    ]
   ],
-  "denom": 13.0,
+  "denom": 20225.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6417,53 +6327,49 @@
   "m": "usgubewc-usgub-ri-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 17358.0,
-  "ours": 1150.0,
-  "others": 16208.0,
+  "total": 2001.0,
+  "ours": 1801.0,
+  "others": 200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
   "our_best": 0.01,
   "ticks_off": 0,
-  "est": 0.28,
+  "est": 3.75,
   "per_side": 4.17,
   "levels": [
    [
     0.01,
-    17358.0
+    2001.0
    ]
   ],
-  "denom": 17358.0,
-  "my_score": 1150.0,
+  "denom": 2001.0,
+  "my_score": 1801.0,
   "ours_px": {
-   "0.01": 1150.0
+   "0.01": 1801.0
   }
  },
  {
   "m": "usgubewc-usgub-ri-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 20486.0,
+  "total": 54345.99,
   "ours": 0,
-  "others": 20486.0,
+  "others": 54345.99,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.51,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 4.17,
   "levels": [
    [
-    0.51,
-    99.0
-   ],
-   [
     0.99,
-    20387.0
+    54345.99
    ]
   ],
-  "denom": 99.0,
+  "denom": 54345.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6497,27 +6403,27 @@
   "m": "usgubewc-usgub-sc-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 196091.79,
+  "total": 196089.79,
   "ours": 50.0,
-  "others": 196041.79,
+  "others": 196039.79,
   "qual": true,
   "self_sufficient": false,
   "best": 0.07,
   "our_best": 0.07,
   "ticks_off": 0,
-  "est": 2.67,
+  "est": 2.72,
   "per_side": 6.25,
   "levels": [
    [
     0.07,
-    117.0
+    115.0
    ],
    [
     0.98,
     195749.79
    ]
   ],
-  "denom": 117.0,
+  "denom": 115.0,
   "my_score": 50.0,
   "ours_px": {
    "0.07": 50.0
@@ -6527,31 +6433,23 @@
   "m": "usgubewc-usgub-sc-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500479.0,
+  "total": 501200.0,
   "ours": 0,
-  "others": 500479.0,
+  "others": 501200.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.5,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.5,
-    147.0
-   ],
-   [
-    0.49,
-    132.0
-   ],
-   [
     0.02,
-    500000.0
+    501000.0
    ]
   ],
-  "denom": 160.2,
+  "denom": 501000.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6559,9 +6457,9 @@
   "m": "usgubewc-usgub-sc-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 22986.989999999998,
+  "total": 21282.989999999998,
   "ours": 0,
-  "others": 22986.989999999998,
+  "others": 21282.989999999998,
   "qual": true,
   "self_sufficient": false,
   "best": 0.96,
@@ -6572,10 +6470,10 @@
   "levels": [
    [
     0.96,
-    13855.99
+    12331.99
    ]
   ],
-  "denom": 13855.99,
+  "denom": 12331.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6583,23 +6481,23 @@
   "m": "usgubewc-usgub-sd-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 7475.0,
+  "total": 2860.0,
   "ours": 1660.0,
-  "others": 5815.0,
+  "others": 1200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
   "our_best": 0.01,
   "ticks_off": 0,
-  "est": 1.39,
+  "est": 3.63,
   "per_side": 6.25,
   "levels": [
    [
     0.01,
-    7475.0
+    2860.0
    ]
   ],
-  "denom": 7475.0,
+  "denom": 2860.0,
   "my_score": 1660.0,
   "ours_px": {
    "0.01": 1660.0
@@ -6609,28 +6507,24 @@
   "m": "usgubewc-usgub-sd-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 31003.09,
+  "total": 37163.08,
   "ours": 1286.09,
-  "others": 29717.0,
+  "others": 35876.990000000005,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.5,
+  "best": 0.99,
   "our_best": 0.99,
-  "ticks_off": 49,
-  "est": 0.0,
+  "ticks_off": 0,
+  "est": 0.22,
   "per_side": 6.25,
   "levels": [
    [
-    0.5,
-    97.0
-   ],
-   [
     0.99,
-    30906.09
+    37163.08
    ]
   ],
-  "denom": 97.0,
-  "my_score": 0.0,
+  "denom": 37163.08,
+  "my_score": 1286.09,
   "ours_px": {
    "0.99": 1286.09
   }
@@ -6639,29 +6533,34 @@
   "m": "usgubewc-usgub-sd-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 2480.0,
-  "ours": 1735.0,
-  "others": 745.0,
+  "total": 2231.0,
+  "ours": 1785.0,
+  "others": 446.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.93,
-  "our_best": 0.01,
-  "ticks_off": 92,
-  "est": 0.0,
+  "best": 0.94,
+  "our_best": 0.94,
+  "ticks_off": 0,
+  "est": 4.19,
   "per_side": 6.25,
   "levels": [
    [
+    0.94,
+    50.0
+   ],
+   [
     0.93,
-    545.0
+    246.0
    ],
    [
     0.01,
     1935.0
    ]
   ],
-  "denom": 545.0,
-  "my_score": 0.0,
+  "denom": 74.6,
+  "my_score": 50.0,
   "ours_px": {
+   "0.94": 50.0,
    "0.01": 1735.0
   }
  },
@@ -6669,23 +6568,23 @@
   "m": "usgubewc-usgub-sd-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 28477.78,
-  "ours": 487.78999999999996,
-  "others": 27989.989999999998,
+  "total": 23512.78,
+  "ours": 487.79,
+  "others": 23024.989999999998,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
   "our_best": 0.99,
   "ticks_off": 0,
-  "est": 0.11,
+  "est": 0.13,
   "per_side": 6.25,
   "levels": [
    [
     0.99,
-    28477.78
+    23512.78
    ]
   ],
-  "denom": 28477.78,
+  "denom": 23512.78,
   "my_score": 487.79,
   "ours_px": {
    "0.99": 487.79
@@ -6695,9 +6594,9 @@
   "m": "usgubewc-usgub-tn-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 18621.0,
+  "total": 10200.0,
   "ours": 0,
-  "others": 18621.0,
+  "others": 10200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -6708,10 +6607,10 @@
   "levels": [
    [
     0.01,
-    18621.0
+    10200.0
    ]
   ],
-  "denom": 18621.0,
+  "denom": 10200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6719,8 +6618,8 @@
   "m": "usgubewc-usgub-tn-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 275.0,
-  "ours": 50.0,
+  "total": 526.26,
+  "ours": 301.26,
   "others": 225.0,
   "qual": false,
   "self_sufficient": false,
@@ -6736,44 +6635,41 @@
    ],
    [
     0.99,
-    225.0
+    476.26
    ]
   ],
   "denom": 50.0,
   "my_score": 50.0,
   "ours_px": {
-   "0.1": 50.0
+   "0.1": 50.0,
+   "0.99": 251.26
   }
  },
  {
   "m": "usgubewc-usgub-tn-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 2268.0,
+  "total": 17215.0,
   "ours": 1710.0,
-  "others": 558.0,
+  "others": 15505.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.53,
+  "best": 0.49,
   "our_best": 0.01,
-  "ticks_off": 52,
+  "ticks_off": 48,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.53,
-    118.0
-   ],
-   [
-    0.52,
-    240.0
+    0.49,
+    232.0
    ],
    [
     0.01,
-    1910.0
+    16983.0
    ]
   ],
-  "denom": 142.0,
+  "denom": 232.0,
   "my_score": 0.0,
   "ours_px": {
    "0.01": 1710.0
@@ -6783,9 +6679,9 @@
   "m": "usgubewc-usgub-tn-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 3300.99,
+  "total": 23324.99,
   "ours": 0,
-  "others": 3300.99,
+  "others": 23324.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -6796,10 +6692,10 @@
   "levels": [
    [
     0.99,
-    3300.99
+    23324.99
    ]
   ],
-  "denom": 3300.99,
+  "denom": 23324.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6807,9 +6703,9 @@
   "m": "usgubewc-usgub-tx-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 11325.01,
+  "total": 8521.01,
   "ours": 0,
-  "others": 11325.01,
+  "others": 8521.01,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -6820,10 +6716,10 @@
   "levels": [
    [
     0.01,
-    11325.01
+    8521.01
    ]
   ],
-  "denom": 11325.01,
+  "denom": 8521.01,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6831,27 +6727,23 @@
   "m": "usgubewc-usgub-tx-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 329.99,
+  "total": 54852.99,
   "ours": 0,
-  "others": 329.99,
-  "qual": false,
+  "others": 54852.99,
+  "qual": true,
   "self_sufficient": false,
-  "best": 0.5,
+  "best": 0.99,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.5,
-    74.99
-   ],
-   [
     0.99,
-    255.0
+    54852.99
    ]
   ],
-  "denom": 74.99,
+  "denom": 54852.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -6859,55 +6751,61 @@
   "m": "usgubewc-usgub-tx-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 250.0,
-  "ours": 50.0,
-  "others": 200.0,
-  "qual": false,
+  "total": 2042.0,
+  "ours": 1801.0,
+  "others": 241.0,
+  "qual": true,
   "self_sufficient": false,
   "best": 0.86,
   "our_best": 0.86,
   "ticks_off": 0,
-  "est": 0.0,
+  "est": 3.43,
   "per_side": 6.25,
   "levels": [
    [
     0.86,
-    50.0
+    91.0
    ],
    [
     0.01,
-    200.0
+    1951.0
    ]
   ],
-  "denom": 50.0,
+  "denom": 91.0,
   "my_score": 50.0,
   "ours_px": {
-   "0.86": 50.0
+   "0.86": 50.0,
+   "0.01": 1751.0
   }
  },
  {
   "m": "usgubewc-usgub-tx-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 6116.0,
-  "ours": 10.0,
-  "others": 6106.0,
-  "qual": true,
+  "total": 486.26,
+  "ours": 261.26,
+  "others": 225.0,
+  "qual": false,
   "self_sufficient": false,
   "best": 0.91,
   "our_best": 0.91,
   "ticks_off": 0,
-  "est": 0.01,
+  "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
     0.91,
-    5891.0
+    10.0
+   ],
+   [
+    0.99,
+    476.26
    ]
   ],
-  "denom": 5891.0,
+  "denom": 10.0,
   "my_score": 10.0,
   "ours_px": {
+   "0.99": 251.26,
    "0.91": 10.0
   }
  },
@@ -6915,23 +6813,23 @@
   "m": "usgubewc-usgub-vt-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 12670.66,
+  "total": 13120.66,
   "ours": 200.0,
-  "others": 12470.66,
+  "others": 12920.66,
   "qual": true,
   "self_sufficient": false,
   "best": 0.06,
   "our_best": 0.06,
   "ticks_off": 0,
-  "est": 0.51,
+  "est": 0.43,
   "per_side": 6.25,
   "levels": [
    [
     0.06,
-    2470.66
+    2920.66
    ]
   ],
-  "denom": 2470.66,
+  "denom": 2920.66,
   "my_score": 200.0,
   "ours_px": {
    "0.06": 200.0
@@ -6941,27 +6839,27 @@
   "m": "usgubewc-usgub-vt-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 330249.08999999997,
+  "total": 330748.08,
   "ours": 25.0,
-  "others": 330224.08999999997,
+  "others": 330723.08,
   "qual": true,
   "self_sufficient": false,
   "best": 0.12,
   "our_best": 0.12,
   "ticks_off": 0,
-  "est": 2.03,
+  "est": 2.06,
   "per_side": 6.25,
   "levels": [
    [
     0.12,
-    77.0
+    76.0
    ],
    [
     0.98,
-    132783.58
+    133283.57
    ]
   ],
-  "denom": 77.0,
+  "denom": 76.0,
   "my_score": 25.0,
   "ours_px": {
    "0.12": 25.0
@@ -6971,31 +6869,23 @@
   "m": "usgubewc-usgub-vt-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 200670.0,
+  "total": 200700.0,
   "ours": 0,
-  "others": 200670.0,
+  "others": 200700.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    128.0
-   ],
-   [
-    0.48,
-    342.0
-   ],
-   [
     0.02,
-    200000.0
+    200500.0
    ]
   ],
-  "denom": 162.2,
+  "denom": 200500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7003,9 +6893,9 @@
   "m": "usgubewc-usgub-vt-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 23199.41,
+  "total": 20037.41,
   "ours": 232.75,
-  "others": 22966.66,
+  "others": 19804.66,
   "qual": true,
   "self_sufficient": false,
   "best": 0.94,
@@ -7016,10 +6906,10 @@
   "levels": [
    [
     0.94,
-    9850.41
+    9762.41
    ]
   ],
-  "denom": 9850.41,
+  "denom": 9762.41,
   "my_score": 232.75,
   "ours_px": {
    "0.94": 232.75
@@ -7029,23 +6919,27 @@
   "m": "usgubewc-usgub-wy-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 4384.0,
+  "total": 2719.0,
   "ours": 2200.0,
-  "others": 2184.0,
+  "others": 519.0,
   "qual": true,
   "self_sufficient": true,
   "best": 0.04,
   "our_best": 0.04,
   "ticks_off": 0,
-  "est": 0.58,
+  "est": 2.42,
   "per_side": 6.25,
   "levels": [
    [
     0.04,
-    2184.0
+    519.0
+   ],
+   [
+    0.01,
+    2200.0
    ]
   ],
-  "denom": 2184.0,
+  "denom": 521.2,
   "my_score": 202.0,
   "ours_px": {
    "0.01": 2000.0,
@@ -7056,27 +6950,27 @@
   "m": "usgubewc-usgub-wy-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 4379.0,
+  "total": 5024.99,
   "ours": 1794.0,
-  "others": 2585.0,
+  "others": 3230.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.07,
   "our_best": 0.07,
   "ticks_off": 0,
-  "est": 0.76,
+  "est": 5.58,
   "per_side": 6.25,
   "levels": [
    [
     0.07,
-    410.0
+    56.0
    ],
    [
     0.99,
-    3969.0
+    4968.99
    ]
   ],
-  "denom": 410.0,
+  "denom": 56.0,
   "my_score": 50.0,
   "ours_px": {
    "0.99": 1744.0,
@@ -7118,23 +7012,23 @@
   "m": "usgubewc-usgub-wy-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 5852.01,
+  "total": 28126.01,
   "ours": 2551.02,
-  "others": 3300.9900000000002,
+  "others": 25574.989999999998,
   "qual": true,
   "self_sufficient": true,
   "best": 0.99,
   "our_best": 0.99,
   "ticks_off": 0,
-  "est": 2.72,
+  "est": 0.57,
   "per_side": 6.25,
   "levels": [
    [
     0.99,
-    5852.01
+    28126.01
    ]
   ],
-  "denom": 5852.01,
+  "denom": 28126.01,
   "my_score": 2551.02,
   "ours_px": {
    "0.99": 2551.02
@@ -7144,23 +7038,27 @@
   "m": "ussewc-usse-al-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 8041.0,
+  "total": 10315.0,
   "ours": 200.0,
-  "others": 7841.0,
+  "others": 10115.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.03,
   "our_best": 0.03,
   "ticks_off": 0,
-  "est": 0.44,
+  "est": 4.15,
   "per_side": 6.25,
   "levels": [
    [
     0.03,
-    2841.0
+    200.0
+   ],
+   [
+    0.01,
+    10115.0
    ]
   ],
-  "denom": 2841.0,
+  "denom": 301.15,
   "my_score": 200.0,
   "ours_px": {
    "0.03": 200.0
@@ -7170,32 +7068,28 @@
   "m": "ussewc-usse-al-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 203649.64,
+  "total": 203573.64,
   "ours": 20.0,
-  "others": 203629.64,
+  "others": 203553.64,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.1,
+  "best": 0.12,
   "our_best": 0.12,
-  "ticks_off": 2,
-  "est": 0.02,
+  "ticks_off": 0,
+  "est": 5.21,
   "per_side": 6.25,
   "levels": [
    [
-    0.1,
-    64.0
-   ],
-   [
     0.12,
-    36.0
+    24.0
    ],
    [
     0.98,
     203324.64
    ]
   ],
-  "denom": 64.36,
-  "my_score": 0.2,
+  "denom": 24.0,
+  "my_score": 20.0,
   "ours_px": {
    "0.12": 20.0
   }
@@ -7204,27 +7098,23 @@
   "m": "ussewc-usse-al-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500533.0,
+  "total": 500700.0,
   "ours": 0,
-  "others": 500533.0,
+  "others": 500700.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.5,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.5,
-    333.0
-   ],
-   [
     0.02,
-    500000.0
+    500500.0
    ]
   ],
-  "denom": 333.0,
+  "denom": 500500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7232,9 +7122,9 @@
   "m": "ussewc-usse-al-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 30969.99,
+  "total": 62008.99,
   "ours": 0,
-  "others": 30969.99,
+  "others": 62008.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -7245,10 +7135,10 @@
   "levels": [
    [
     0.99,
-    30969.99
+    62008.99
    ]
   ],
-  "denom": 30969.99,
+  "denom": 62008.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7284,27 +7174,23 @@
   "m": "ussewc-usse-ar-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 265794.16,
+  "total": 341294.15,
   "ours": 0,
-  "others": 265794.16,
+  "others": 341294.15,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.98,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    1.0
-   ],
-   [
     0.98,
-    265568.16
+    341069.15
    ]
   ],
-  "denom": 1.0,
+  "denom": 341069.15,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7312,27 +7198,27 @@
   "m": "ussewc-usse-ar-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500294.0,
+  "total": 500756.0,
   "ours": 50.0,
-  "others": 500244.0,
+  "others": 500706.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.95,
   "our_best": 0.95,
   "ticks_off": 0,
-  "est": 3.32,
+  "est": 0.56,
   "per_side": 6.25,
   "levels": [
    [
     0.95,
-    94.0
+    556.0
    ],
    [
     0.02,
     500000.0
    ]
   ],
-  "denom": 94.0,
+  "denom": 556.0,
   "my_score": 50.0,
   "ours_px": {
    "0.95": 50.0
@@ -7342,9 +7228,9 @@
   "m": "ussewc-usse-ar-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 20225.0,
+  "total": 21507.99,
   "ours": 0,
-  "others": 20225.0,
+  "others": 21507.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -7355,10 +7241,10 @@
   "levels": [
    [
     0.99,
-    20225.0
+    21507.99
    ]
   ],
-  "denom": 20225.0,
+  "denom": 21507.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7366,31 +7252,31 @@
   "m": "ussewc-usse-co-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500202.0,
+  "total": 501161.0,
   "ours": 0,
-  "others": 500202.0,
+  "others": 501161.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.54,
+  "best": 0.48,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.54,
-    1.0
+    0.48,
+    402.0
    ],
    [
-    0.43,
-    1.0
+    0.42,
+    59.0
    ],
    [
     0.02,
-    500000.0
+    500500.0
    ]
   ],
-  "denom": 1.0,
+  "denom": 402.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7398,9 +7284,9 @@
   "m": "ussewc-usse-co-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 23403.65,
+  "total": 23327.65,
   "ours": 102.78,
-  "others": 23300.870000000003,
+  "others": 23224.870000000003,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -7411,10 +7297,10 @@
   "levels": [
    [
     0.99,
-    23403.65
+    23327.65
    ]
   ],
-  "denom": 23403.65,
+  "denom": 23327.65,
   "my_score": 102.78,
   "ours_px": {
    "0.99": 102.78
@@ -7424,9 +7310,9 @@
   "m": "ussewc-usse-co-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 11300.0,
+  "total": 18480.0,
   "ours": 0,
-  "others": 11300.0,
+  "others": 18480.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -7437,10 +7323,10 @@
   "levels": [
    [
     0.01,
-    11300.0
+    18480.0
    ]
   ],
-  "denom": 11300.0,
+  "denom": 18480.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7448,27 +7334,23 @@
   "m": "ussewc-usse-co-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 69363.0,
+  "total": 144615.99,
   "ours": 0,
-  "others": 69363.0,
+  "others": 144615.99,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.98,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    95.0
-   ],
-   [
     0.98,
-    69043.0
+    144390.99
    ]
   ],
-  "denom": 95.0,
+  "denom": 144390.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7476,31 +7358,23 @@
   "m": "ussewc-usse-de-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500662.0,
+  "total": 500700.0,
   "ours": 0,
-  "others": 500662.0,
+  "others": 500700.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.51,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.51,
-    132.0
-   ],
-   [
-    0.5,
-    330.0
-   ],
-   [
     0.02,
-    500000.0
+    500500.0
    ]
   ],
-  "denom": 165.0,
+  "denom": 500500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7508,9 +7382,9 @@
   "m": "ussewc-usse-de-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 15009.99,
+  "total": 14186.99,
   "ours": 40.0,
-  "others": 14969.99,
+  "others": 14146.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.96,
@@ -7590,9 +7464,9 @@
   "m": "ussewc-usse-fl-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 55800.19,
+  "total": 55700.19,
   "ours": 0,
-  "others": 55800.19,
+  "others": 55700.19,
   "qual": true,
   "self_sufficient": false,
   "best": 0.02,
@@ -7614,27 +7488,23 @@
   "m": "ussewc-usse-fl-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 133149.38999999998,
+  "total": 143447.57,
   "ours": 0,
-  "others": 133149.38999999998,
+  "others": 143447.57,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.51,
+  "best": 0.98,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.51,
-    140.81
-   ],
-   [
     0.98,
-    132783.58
+    143222.57
    ]
   ],
-  "denom": 140.81,
+  "denom": 143222.57,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7676,20 +7546,20 @@
   "m": "ussewc-usse-fl-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 51589.27,
+  "total": 51644.82,
   "ours": 50.0,
-  "others": 51539.27,
+  "others": 51594.82,
   "qual": true,
   "self_sufficient": false,
   "best": 0.82,
   "our_best": 0.82,
   "ticks_off": 0,
-  "est": 0.27,
+  "est": 0.26,
   "per_side": 6.25,
   "levels": [
    [
     0.82,
-    1139.27
+    1194.82
    ],
    [
     0.83,
@@ -7700,7 +7570,7 @@
     50000.0
    ]
   ],
-  "denom": 1164.27,
+  "denom": 1219.82,
   "my_score": 50.0,
   "ours_px": {
    "0.82": 50.0
@@ -7710,27 +7580,23 @@
   "m": "ussewc-usse-id-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 502256.0,
+  "total": 502718.0,
   "ours": 0,
-  "others": 502256.0,
+  "others": 502718.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.53,
+  "best": 0.5,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.53,
-    2.0
-   ],
-   [
     0.5,
-    2000.0
+    2518.0
    ]
   ],
-  "denom": 4.0,
+  "denom": 2518.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7743,14 +7609,14 @@
   "others": 239.0,
   "qual": false,
   "self_sufficient": false,
-  "best": 0.97,
+  "best": 0.98,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.97,
+    0.98,
     14.0
    ],
    [
@@ -7758,7 +7624,7 @@
     225.0
    ]
   ],
-  "denom": 16.25,
+  "denom": 36.5,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7766,9 +7632,9 @@
   "m": "ussewc-usse-id-2026-11-03-todach",
   "side": "BUY",
   "target": 2000.0,
-  "total": 11276.0,
+  "total": 22212.0,
   "ours": 0,
-  "others": 11276.0,
+  "others": 22212.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -7779,10 +7645,10 @@
   "levels": [
    [
     0.01,
-    11276.0
+    22212.0
    ]
   ],
-  "denom": 11276.0,
+  "denom": 22212.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7790,27 +7656,23 @@
   "m": "ussewc-usse-id-2026-11-03-todach",
   "side": "SELL",
   "target": 2000.0,
-  "total": 70973.93,
+  "total": 70894.93,
   "ours": 0,
-  "others": 70973.93,
+  "others": 70894.93,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.5,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    99.0
-   ],
-   [
     0.5,
-    5400.0
+    5420.0
    ]
   ],
-  "denom": 639.0,
+  "denom": 5420.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7818,27 +7680,27 @@
   "m": "ussewc-usse-il-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500336.0,
+  "total": 500509.0,
   "ours": 40.0,
-  "others": 500296.0,
+  "others": 500469.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.95,
   "our_best": 0.95,
   "ticks_off": 0,
-  "est": 1.84,
+  "est": 0.81,
   "per_side": 6.25,
   "levels": [
    [
     0.95,
-    136.0
+    309.0
    ],
    [
     0.02,
     500000.0
    ]
   ],
-  "denom": 136.0,
+  "denom": 309.0,
   "my_score": 40.0,
   "ours_px": {
    "0.95": 40.0
@@ -7848,23 +7710,23 @@
   "m": "ussewc-usse-il-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 26540.85,
+  "total": 23669.85,
   "ours": 444.86,
-  "others": 26095.989999999998,
+  "others": 23224.989999999998,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
   "our_best": 0.99,
   "ticks_off": 0,
-  "est": 0.1,
+  "est": 0.12,
   "per_side": 6.25,
   "levels": [
    [
     0.99,
-    26540.85
+    23669.85
    ]
   ],
-  "denom": 26540.85,
+  "denom": 23669.85,
   "my_score": 444.86,
   "ours_px": {
    "0.99": 444.86
@@ -7874,9 +7736,9 @@
   "m": "ussewc-usse-il-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 11200.0,
+  "total": 23212.0,
   "ours": 0,
-  "others": 11200.0,
+  "others": 23212.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -7887,10 +7749,10 @@
   "levels": [
    [
     0.01,
-    11200.0
+    23212.0
    ]
   ],
-  "denom": 11200.0,
+  "denom": 23212.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7898,27 +7760,27 @@
   "m": "ussewc-usse-il-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 330289.08999999997,
+  "total": 330287.08999999997,
   "ours": 50.0,
-  "others": 330239.08999999997,
+  "others": 330237.08999999997,
   "qual": true,
   "self_sufficient": false,
   "best": 0.07,
   "our_best": 0.07,
   "ticks_off": 0,
-  "est": 2.67,
+  "est": 2.72,
   "per_side": 6.25,
   "levels": [
    [
     0.07,
-    117.0
+    115.0
    ],
    [
     0.98,
     132783.58
    ]
   ],
-  "denom": 117.0,
+  "denom": 115.0,
   "my_score": 50.0,
   "ours_px": {
    "0.07": 50.0
@@ -7928,9 +7790,9 @@
   "m": "ussewc-usse-ks-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 2684.63,
+  "total": 2589.26,
   "ours": 0,
-  "others": 2684.63,
+  "others": 2589.26,
   "qual": true,
   "self_sufficient": false,
   "best": 0.19,
@@ -7941,11 +7803,11 @@
   "levels": [
    [
     0.19,
-    1337.63
+    1342.26
    ],
    [
     0.13,
-    486.0
+    386.0
    ],
    [
     0.03,
@@ -7956,7 +7818,7 @@
     811.0
    ]
   ],
-  "denom": 1337.63,
+  "denom": 1342.26,
   "my_score": 0,
   "ours_px": {}
  },
@@ -7988,31 +7850,27 @@
   "m": "ussewc-usse-ks-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500217.0,
+  "total": 504551.0,
   "ours": 0,
-  "others": 500217.0,
+  "others": 504551.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.63,
+  "best": 0.03,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.63,
-    1.0
-   ],
-   [
     0.03,
-    16.0
+    86.0
    ],
    [
     0.02,
-    500000.0
+    504265.0
    ]
   ],
-  "denom": 1.0,
+  "denom": 50512.5,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8020,9 +7878,9 @@
   "m": "ussewc-usse-ks-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 5732.0,
+  "total": 6032.0,
   "ours": 0,
-  "others": 5732.0,
+  "others": 6032.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.9,
@@ -8033,10 +7891,10 @@
   "levels": [
    [
     0.9,
-    5507.0
+    5807.0
    ]
   ],
-  "denom": 5507.0,
+  "denom": 5807.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8044,9 +7902,9 @@
   "m": "ussewc-usse-ky-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 11276.0,
+  "total": 23212.0,
   "ours": 0,
-  "others": 11276.0,
+  "others": 23212.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -8057,10 +7915,10 @@
   "levels": [
    [
     0.01,
-    11276.0
+    23212.0
    ]
   ],
-  "denom": 11276.0,
+  "denom": 23212.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8068,27 +7926,23 @@
   "m": "ussewc-usse-ky-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 65573.93,
+  "total": 75974.92,
   "ours": 0,
-  "others": 65573.93,
+  "others": 75974.92,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.98,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    99.0
-   ],
-   [
     0.98,
-    65249.93
+    75749.92
    ]
   ],
-  "denom": 99.0,
+  "denom": 75749.92,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8096,74 +7950,70 @@
   "m": "ussewc-usse-ky-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500786.0,
-  "ours": 0,
-  "others": 500786.0,
+  "total": 500237.0,
+  "ours": 12.0,
+  "others": 500225.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "best": 0.4,
+  "our_best": 0.4,
+  "ticks_off": 0,
+  "est": 2.03,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    61.0
-   ],
-   [
     0.4,
-    25.0
+    37.0
    ],
    [
     0.02,
-    500500.0
+    500000.0
    ]
   ],
-  "denom": 61.0,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 37.0,
+  "my_score": 12.0,
+  "ours_px": {
+   "0.4": 12.0
+  }
  },
  {
   "m": "ussewc-usse-ky-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 8826.0,
-  "ours": 0,
-  "others": 8826.0,
+  "total": 2275.66,
+  "ours": 50.0,
+  "others": 2225.66,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.96,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "best": 0.93,
+  "our_best": 0.93,
+  "ticks_off": 0,
+  "est": 0.66,
   "per_side": 6.25,
   "levels": [
    [
-    0.96,
-    26.0
+    0.93,
+    300.0
    ],
    [
-    0.97,
-    250.0
-   ],
-   [
-    0.98,
-    8211.0
+    0.94,
+    1710.66
    ]
   ],
-  "denom": 133.11,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 471.07,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.93": 50.0
+  }
  },
  {
   "m": "ussewc-usse-la-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 2869.66,
+  "total": 616.0,
   "ours": 0,
-  "others": 2869.66,
-  "qual": true,
+  "others": 616.0,
+  "qual": false,
   "self_sufficient": false,
   "best": 0.06,
   "our_best": null,
@@ -8173,10 +8023,14 @@
   "levels": [
    [
     0.06,
-    2669.66
+    416.0
+   ],
+   [
+    0.01,
+    200.0
    ]
   ],
-  "denom": 2669.66,
+  "denom": 416.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8184,27 +8038,27 @@
   "m": "ussewc-usse-la-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 70531.93,
+  "total": 70568.93,
   "ours": 50.0,
-  "others": 70481.93,
+  "others": 70518.93,
   "qual": true,
   "self_sufficient": false,
   "best": 0.08,
   "our_best": 0.08,
   "ticks_off": 0,
-  "est": 5.48,
+  "est": 5.39,
   "per_side": 6.25,
   "levels": [
    [
     0.08,
-    57.0
+    58.0
    ],
    [
     0.32,
-    5000.0
+    5036.0
    ]
   ],
-  "denom": 57.0,
+  "denom": 58.0,
   "my_score": 50.0,
   "ours_px": {
    "0.08": 50.0
@@ -8214,27 +8068,27 @@
   "m": "ussewc-usse-la-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500287.96,
+  "total": 500520.96,
   "ours": 21.96,
-  "others": 500266.0,
+  "others": 500499.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.95,
   "our_best": 0.95,
   "ticks_off": 0,
-  "est": 1.56,
+  "est": 0.43,
   "per_side": 6.25,
   "levels": [
    [
     0.95,
-    87.96
+    320.96
    ],
    [
     0.02,
     500000.0
    ]
   ],
-  "denom": 87.96,
+  "denom": 320.96,
   "my_score": 21.96,
   "ours_px": {
    "0.95": 21.96
@@ -8244,9 +8098,9 @@
   "m": "ussewc-usse-la-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 20222.0,
+  "total": 20383.0,
   "ours": 0,
-  "others": 20222.0,
+  "others": 20383.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -8257,10 +8111,10 @@
   "levels": [
    [
     0.99,
-    20222.0
+    20383.0
    ]
   ],
-  "denom": 20222.0,
+  "denom": 20383.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8268,15 +8122,15 @@
   "m": "ussewc-usse-ma-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 600329.0,
+  "total": 600334.0,
   "ours": 25.0,
-  "others": 600304.0,
+  "others": 600309.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.96,
   "our_best": 0.96,
   "ticks_off": 0,
-  "est": 2.37,
+  "est": 2.35,
   "per_side": 6.25,
   "levels": [
    [
@@ -8285,14 +8139,14 @@
    ],
    [
     0.95,
-    70.0
+    75.0
    ],
    [
     0.02,
     600000.0
    ]
   ],
-  "denom": 66.0,
+  "denom": 66.5,
   "my_score": 25.0,
   "ours_px": {
    "0.96": 25.0
@@ -8303,7 +8157,7 @@
   "side": "SELL",
   "target": 2000.0,
   "total": 26430.0,
-  "ours": 2503.0,
+  "ours": 2503.0000000000005,
   "others": 23927.0,
   "qual": true,
   "self_sufficient": true,
@@ -8333,9 +8187,9 @@
   "m": "ussewc-usse-ma-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 12513.0,
+  "total": 12437.0,
   "ours": 1237.0,
-  "others": 11276.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -8346,10 +8200,10 @@
   "levels": [
    [
     0.01,
-    12513.0
+    12437.0
    ]
   ],
-  "denom": 12513.0,
+  "denom": 12437.0,
   "my_score": 1237.0,
   "ours_px": {
    "0.01": 1237.0
@@ -8417,20 +8271,24 @@
   "m": "ussewc-usse-ms-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 66309.8,
-  "ours": 0,
-  "others": 66309.8,
+  "total": 66124.8,
+  "ours": 50.0,
+  "others": 66074.8,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.44,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "best": 0.43,
+  "our_best": 0.43,
+  "ticks_off": 0,
+  "est": 4.81,
   "per_side": 6.25,
   "levels": [
    [
+    0.43,
+    50.0
+   ],
+   [
     0.44,
-    334.87
+    99.87
    ],
    [
     0.45,
@@ -8441,28 +8299,30 @@
     65249.93
    ]
   ],
-  "denom": 384.87,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 64.99,
+  "my_score": 50.0,
+  "ours_px": {
+   "0.43": 50.0
+  }
  },
  {
   "m": "ussewc-usse-ms-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 501761.0,
+  "total": 502064.0,
   "ours": 10.0,
-  "others": 501751.0,
+  "others": 502054.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.88,
   "our_best": 0.88,
   "ticks_off": 0,
-  "est": 0.11,
+  "est": 0.07,
   "per_side": 6.25,
   "levels": [
    [
     0.88,
-    561.0
+    864.0
    ],
    [
     0.77,
@@ -8473,7 +8333,7 @@
     500000.0
    ]
   ],
-  "denom": 561.0,
+  "denom": 864.0,
   "my_score": 10.0,
   "ours_px": {
    "0.88": 10.0
@@ -8483,15 +8343,15 @@
   "m": "ussewc-usse-ms-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 740.0,
-  "ours": 15.0,
-  "others": 725.0,
-  "qual": false,
+  "total": 2476.26,
+  "ours": 266.26,
+  "others": 2210.0,
+  "qual": true,
   "self_sufficient": false,
   "best": 0.9,
   "our_best": 0.9,
   "ticks_off": 0,
-  "est": 0.0,
+  "est": 6.25,
   "per_side": 6.25,
   "levels": [
    [
@@ -8500,26 +8360,27 @@
    ],
    [
     0.98,
-    500.0
+    1319.0
    ],
    [
     0.99,
-    225.0
+    1142.26
    ]
   ],
   "denom": 15.0,
   "my_score": 15.0,
   "ours_px": {
-   "0.9": 15.0
+   "0.9": 15.0,
+   "0.99": 251.26
   }
  },
  {
   "m": "ussewc-usse-mt-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 11300.0,
+  "total": 12200.0,
   "ours": 0,
-  "others": 11300.0,
+  "others": 12200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -8530,10 +8391,10 @@
   "levels": [
    [
     0.01,
-    11300.0
+    12200.0
    ]
   ],
-  "denom": 11300.0,
+  "denom": 12200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8541,27 +8402,23 @@
   "m": "ussewc-usse-mt-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 71093.53,
+  "total": 73441.53,
   "ours": 0,
-  "others": 71093.53,
+  "others": 73441.53,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.46,
+  "best": 0.49,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 4.17,
   "levels": [
    [
-    0.46,
-    90.0
-   ],
-   [
     0.49,
-    5528.6
+    7966.6
    ]
   ],
-  "denom": 95.53,
+  "denom": 7966.6,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8569,9 +8426,9 @@
   "m": "ussewc-usse-mt-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500348.62,
+  "total": 500848.62,
   "ours": 25.0,
-  "others": 500323.62,
+  "others": 500823.62,
   "qual": true,
   "self_sufficient": false,
   "best": 0.89,
@@ -8582,11 +8439,11 @@
   "levels": [
    [
     0.89,
-    82.0
+    83.0
    ],
    [
     0.88,
-    57.0
+    56.0
    ],
    [
     0.78,
@@ -8594,10 +8451,10 @@
    ],
    [
     0.02,
-    500000.0
+    500500.0
    ]
   ],
-  "denom": 87.7,
+  "denom": 88.6,
   "my_score": 2.5,
   "ours_px": {
    "0.88": 25.0
@@ -8607,15 +8464,15 @@
   "m": "ussewc-usse-mt-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 5085.0,
-  "ours": 50.0,
-  "others": 5035.0,
+  "total": 2047.26,
+  "ours": 301.26,
+  "others": 1746.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.9,
   "our_best": 0.9,
   "ticks_off": 0,
-  "est": 0.17,
+  "est": 0.26,
   "per_side": 4.17,
   "levels": [
    [
@@ -8623,13 +8480,14 @@
     791.0
    ],
    [
-    0.91,
-    4069.0
+    0.99,
+    1256.26
    ]
   ],
-  "denom": 1197.9,
+  "denom": 791.0,
   "my_score": 50.0,
   "ours_px": {
+   "0.99": 251.26,
    "0.9": 50.0
   }
  },
@@ -8637,9 +8495,9 @@
   "m": "ussewc-usse-mt-2026-11-03-setbod",
   "side": "BUY",
   "target": 2000.0,
-  "total": 10276.0,
+  "total": 11200.0,
   "ours": 0,
-  "others": 10276.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -8650,10 +8508,10 @@
   "levels": [
    [
     0.01,
-    10276.0
+    11200.0
    ]
   ],
-  "denom": 10276.0,
+  "denom": 11200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8661,27 +8519,23 @@
   "m": "ussewc-usse-mt-2026-11-03-setbod",
   "side": "SELL",
   "target": 2000.0,
-  "total": 70587.53,
+  "total": 70886.53,
   "ours": 0,
-  "others": 70587.53,
+  "others": 70886.53,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.46,
+  "best": 0.49,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 4.17,
   "levels": [
    [
-    0.46,
-    93.0
-   ],
-   [
     0.49,
-    5019.6
+    5411.6
    ]
   ],
-  "denom": 98.02,
+  "denom": 5411.6,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8719,9 +8573,9 @@
   "m": "ussewc-usse-nj-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 21324.99,
+  "total": 20225.0,
   "ours": 0,
-  "others": 21324.99,
+  "others": 20225.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -8732,10 +8586,10 @@
   "levels": [
    [
     0.99,
-    21324.99
+    20225.0
    ]
   ],
-  "denom": 21324.99,
+  "denom": 20225.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8743,23 +8597,23 @@
   "m": "ussewc-usse-nj-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 3076.0,
+  "total": 12916.0,
   "ours": 2000.0,
-  "others": 1076.0,
+  "others": 10916.0,
   "qual": true,
   "self_sufficient": true,
   "best": 0.01,
   "our_best": 0.01,
   "ticks_off": 0,
-  "est": 4.06,
+  "est": 0.97,
   "per_side": 6.25,
   "levels": [
    [
     0.01,
-    3076.0
+    12916.0
    ]
   ],
-  "denom": 3076.0,
+  "denom": 12916.0,
   "my_score": 2000.0,
   "ours_px": {
    "0.01": 2000.0
@@ -8769,9 +8623,9 @@
   "m": "ussewc-usse-nj-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 66617.23,
+  "total": 66822.23,
   "ours": 0,
-  "others": 66617.23,
+  "others": 66822.23,
   "qual": true,
   "self_sufficient": false,
   "best": 0.03,
@@ -8782,14 +8636,14 @@
   "levels": [
    [
     0.03,
-    1142.3
+    1347.3
    ],
    [
     0.98,
     65249.93
    ]
   ],
-  "denom": 1142.3,
+  "denom": 1347.3,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8797,27 +8651,27 @@
   "m": "ussewc-usse-nm-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 550552.0,
+  "total": 550529.0,
   "ours": 50.0,
-  "others": 550502.0,
+  "others": 550479.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.93,
   "our_best": 0.93,
   "ticks_off": 0,
-  "est": 0.89,
+  "est": 0.95,
   "per_side": 6.25,
   "levels": [
    [
     0.93,
-    352.0
+    329.0
    ],
    [
     0.02,
     550000.0
    ]
   ],
-  "denom": 352.0,
+  "denom": 329.0,
   "my_score": 50.0,
   "ours_px": {
    "0.93": 50.0
@@ -8827,9 +8681,9 @@
   "m": "ussewc-usse-nm-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 12626.99,
+  "total": 10845.99,
   "ours": 0,
-  "others": 12626.99,
+  "others": 10845.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.95,
@@ -8840,10 +8694,10 @@
   "levels": [
    [
     0.95,
-    12401.99
+    10620.99
    ]
   ],
-  "denom": 12401.99,
+  "denom": 10620.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8851,23 +8705,23 @@
   "m": "ussewc-usse-nm-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 16247.0,
+  "total": 26682.0,
   "ours": 4971.0,
-  "others": 11276.0,
+  "others": 21711.0,
   "qual": true,
   "self_sufficient": true,
   "best": 0.01,
   "our_best": 0.01,
   "ticks_off": 0,
-  "est": 1.91,
+  "est": 1.16,
   "per_side": 6.25,
   "levels": [
    [
     0.01,
-    16247.0
+    26682.0
    ]
   ],
-  "denom": 16247.0,
+  "denom": 26682.0,
   "my_score": 4971.0,
   "ours_px": {
    "0.01": 4971.0
@@ -8877,27 +8731,23 @@
   "m": "ussewc-usse-nm-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 130979.86,
+  "total": 199920.85,
   "ours": 0,
-  "others": 130979.86,
+  "others": 199920.85,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.98,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    99.0
-   ],
-   [
     0.98,
-    130655.86
+    199695.85
    ]
   ],
-  "denom": 99.0,
+  "denom": 199695.85,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8905,9 +8755,9 @@
   "m": "ussewc-usse-ok-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 13180.0,
+  "total": 22562.0,
   "ours": 0,
-  "others": 13180.0,
+  "others": 22562.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -8918,10 +8768,10 @@
   "levels": [
    [
     0.01,
-    13180.0
+    22562.0
    ]
   ],
-  "denom": 13180.0,
+  "denom": 22562.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -8959,28 +8809,28 @@
   "m": "ussewc-usse-ok-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 600384.25,
-  "ours": 0,
-  "others": 600384.25,
+  "total": 600366.5,
+  "ours": 27.0,
+  "others": 600339.5,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.55,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "best": 0.57,
+  "our_best": 0.56,
+  "ticks_off": 1,
+  "est": 0.54,
   "per_side": 6.25,
   "levels": [
    [
-    0.55,
-    32.99
+    0.57,
+    23.0
    ],
    [
-    0.54,
-    45.26
+    0.56,
+    81.5
    ],
    [
     0.51,
-    81.0
+    37.0
    ],
    [
     0.4,
@@ -8991,18 +8841,20 @@
     600000.0
    ]
   ],
-  "denom": 37.52,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 31.15,
+  "my_score": 2.7,
+  "ours_px": {
+   "0.56": 27.0
+  }
  },
  {
   "m": "ussewc-usse-ok-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 3530.98,
+  "total": 230.99,
   "ours": 0,
-  "others": 3530.98,
-  "qual": true,
+  "others": 230.99,
+  "qual": false,
   "self_sufficient": false,
   "best": 0.99,
   "our_best": null,
@@ -9012,10 +8864,10 @@
   "levels": [
    [
     0.99,
-    3530.98
+    230.99
    ]
   ],
-  "denom": 3530.98,
+  "denom": 230.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9023,55 +8875,57 @@
   "m": "ussewc-usse-or-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 800253.0,
-  "ours": 0,
-  "others": 800253.0,
+  "total": 800289.0,
+  "ours": 29.0,
+  "others": 800260.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.94,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.94,
+  "ticks_off": 0,
+  "est": 2.04,
   "per_side": 6.25,
   "levels": [
    [
     0.94,
-    53.0
+    89.0
    ],
    [
     0.02,
     800000.0
    ]
   ],
-  "denom": 53.0,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 89.0,
+  "my_score": 29.0,
+  "ours_px": {
+   "0.94": 29.0
+  }
  },
  {
   "m": "ussewc-usse-or-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 265.0,
+  "total": 13270.99,
   "ours": 40.0,
-  "others": 225.0,
-  "qual": false,
+  "others": 13230.99,
+  "qual": true,
   "self_sufficient": false,
   "best": 0.96,
   "our_best": 0.96,
   "ticks_off": 0,
-  "est": 0.0,
+  "est": 1.06,
   "per_side": 6.25,
   "levels": [
    [
     0.96,
-    40.0
+    107.0
    ],
    [
-    0.99,
-    225.0
+    0.98,
+    12938.99
    ]
   ],
-  "denom": 40.23,
+  "denom": 236.39,
   "my_score": 40.0,
   "ours_px": {
    "0.96": 40.0
@@ -9081,23 +8935,23 @@
   "m": "ussewc-usse-or-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 2376.0,
+  "total": 11300.0,
   "ours": 1300.0,
-  "others": 1076.0,
+  "others": 10000.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
   "our_best": 0.01,
   "ticks_off": 0,
-  "est": 3.42,
+  "est": 0.72,
   "per_side": 6.25,
   "levels": [
    [
     0.01,
-    2376.0
+    11300.0
    ]
   ],
-  "denom": 2376.0,
+  "denom": 11300.0,
   "my_score": 1300.0,
   "ours_px": {
    "0.01": 1300.0
@@ -9107,9 +8961,9 @@
   "m": "ussewc-usse-or-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 131424.86,
+  "total": 131630.86,
   "ours": 0,
-  "others": 131424.86,
+  "others": 131630.86,
   "qual": true,
   "self_sufficient": false,
   "best": 0.03,
@@ -9120,14 +8974,14 @@
   "levels": [
    [
     0.03,
-    700.0
+    906.0
    ],
    [
     0.98,
     130499.86
    ]
   ],
-  "denom": 700.0,
+  "denom": 906.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9135,31 +8989,23 @@
   "m": "ussewc-usse-ri-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 600652.0,
+  "total": 600700.0,
   "ours": 0,
-  "others": 600652.0,
+  "others": 600700.0,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.52,
+  "best": 0.02,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.52,
-    126.0
-   ],
-   [
-    0.51,
-    326.0
-   ],
-   [
     0.02,
-    600000.0
+    600500.0
    ]
   ],
-  "denom": 158.6,
+  "denom": 600500.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9167,9 +9013,9 @@
   "m": "ussewc-usse-ri-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 23300.99,
+  "total": 51858.99,
   "ours": 0,
-  "others": 23300.99,
+  "others": 51858.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -9180,10 +9026,10 @@
   "levels": [
    [
     0.99,
-    23300.99
+    51858.99
    ]
   ],
-  "denom": 23300.99,
+  "denom": 51858.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9191,9 +9037,9 @@
   "m": "ussewc-usse-ri-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 12676.0,
+  "total": 12600.0,
   "ours": 1400.0,
-  "others": 11276.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -9204,10 +9050,10 @@
   "levels": [
    [
     0.01,
-    12676.0
+    12600.0
    ]
   ],
-  "denom": 12676.0,
+  "denom": 12600.0,
   "my_score": 1400.0,
   "ours_px": {
    "0.01": 1400.0
@@ -9217,27 +9063,23 @@
   "m": "ussewc-usse-ri-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 130969.86,
+  "total": 206231.85,
   "ours": 0,
-  "others": 130969.86,
+  "others": 206231.85,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
+  "best": 0.98,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
-    99.0
-   ],
-   [
     0.98,
-    130645.86
+    206006.85
    ]
   ],
-  "denom": 99.0,
+  "denom": 206006.85,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9245,95 +9087,92 @@
   "m": "ussewc-usse-sc-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 316.0,
-  "ours": 40.0,
-  "others": 276.0,
-  "qual": false,
+  "total": 2445.0,
+  "ours": 1801.0,
+  "others": 644.0,
+  "qual": true,
   "self_sufficient": false,
   "best": 0.09,
   "our_best": 0.09,
   "ticks_off": 0,
-  "est": 0.0,
+  "est": 0.52,
   "per_side": 6.25,
   "levels": [
    [
     0.09,
-    40.0
+    484.0
    ],
    [
     0.01,
-    276.0
+    1961.0
    ]
   ],
-  "denom": 40.0,
+  "denom": 484.0,
   "my_score": 40.0,
   "ours_px": {
-   "0.09": 40.0
+   "0.09": 40.0,
+   "0.01": 1761.0
   }
  },
  {
   "m": "ussewc-usse-sc-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 196030.79,
+  "total": 195984.79,
   "ours": 10.0,
-  "others": 196020.79,
+  "others": 195974.79,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.49,
-  "our_best": 0.49,
+  "best": 0.41,
+  "our_best": 0.41,
   "ticks_off": 0,
-  "est": 4.28,
+  "est": 6.25,
   "per_side": 6.25,
   "levels": [
    [
-    0.49,
+    0.41,
     10.0
-   ],
-   [
-    0.5,
-    46.0
    ],
    [
     0.98,
     195749.79
    ]
   ],
-  "denom": 14.6,
+  "denom": 10.0,
   "my_score": 10.0,
   "ours_px": {
-   "0.49": 10.0
+   "0.41": 10.0
   }
  },
  {
   "m": "ussewc-usse-sc-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 700527.75,
+  "total": 700513.75,
   "ours": 45.75,
-  "others": 700482.0,
+  "others": 700468.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.9,
   "our_best": 0.9,
   "ticks_off": 0,
-  "est": 0.64,
+  "est": 0.65,
   "per_side": 6.25,
   "levels": [
    [
     0.9,
-    69.75
+    68.75
    ],
    [
     0.89,
-    258.0
+    245.0
    ],
    [
     0.02,
     700000.0
    ]
   ],
-  "denom": 95.55,
+  "denom": 93.25,
   "my_score": 9.75,
   "ours_px": {
    "0.9": 5.75,
@@ -9344,9 +9183,9 @@
   "m": "ussewc-usse-sc-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 6803.11,
+  "total": 7114.11,
   "ours": 0,
-  "others": 6803.11,
+  "others": 7114.11,
   "qual": true,
   "self_sufficient": false,
   "best": 0.91,
@@ -9357,10 +9196,10 @@
   "levels": [
    [
     0.91,
-    6578.11
+    6889.11
    ]
   ],
-  "denom": 6578.11,
+  "denom": 6889.11,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9368,9 +9207,9 @@
   "m": "ussewc-usse-sd-2026-11-03-briben",
   "side": "BUY",
   "target": 2000.0,
-  "total": 10276.0,
+  "total": 17830.0,
   "ours": 0,
-  "others": 10276.0,
+  "others": 17830.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -9381,10 +9220,10 @@
   "levels": [
    [
     0.01,
-    10276.0
+    17830.0
    ]
   ],
-  "denom": 10276.0,
+  "denom": 17830.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9392,27 +9231,23 @@
   "m": "ussewc-usse-sd-2026-11-03-briben",
   "side": "SELL",
   "target": 2000.0,
-  "total": 70587.53,
+  "total": 70886.53,
   "ours": 0,
-  "others": 70587.53,
+  "others": 70886.53,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.46,
+  "best": 0.49,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.46,
-    93.0
-   ],
-   [
     0.49,
-    5019.6
+    5411.6
    ]
   ],
-  "denom": 98.02,
+  "denom": 5411.6,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9420,37 +9255,39 @@
   "m": "ussewc-usse-sd-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 600257.0,
-  "ours": 0,
-  "others": 600257.0,
+  "total": 600422.0,
+  "ours": 29.0,
+  "others": 600393.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.93,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.93,
+  "ticks_off": 0,
+  "est": 0.82,
   "per_side": 6.25,
   "levels": [
    [
     0.93,
-    57.0
+    222.0
    ],
    [
     0.02,
     600000.0
    ]
   ],
-  "denom": 57.0,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 222.0,
+  "my_score": 29.0,
+  "ours_px": {
+   "0.93": 29.0
+  }
  },
  {
   "m": "ussewc-usse-sd-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 5230.99,
+  "total": 2069.99,
   "ours": 0,
-  "others": 5230.99,
+  "others": 2069.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.95,
@@ -9464,11 +9301,11 @@
     1844.99
    ],
    [
-    0.96,
-    3161.0
+    0.99,
+    225.0
    ]
   ],
-  "denom": 2161.09,
+  "denom": 1845.01,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9476,9 +9313,9 @@
   "m": "ussewc-usse-tn-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 21276.0,
+  "total": 21200.0,
   "ours": 0,
-  "others": 21276.0,
+  "others": 21200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -9489,10 +9326,10 @@
   "levels": [
    [
     0.01,
-    21276.0
+    21200.0
    ]
   ],
-  "denom": 21276.0,
+  "denom": 21200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9530,37 +9367,39 @@
   "m": "ussewc-usse-tn-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500308.0,
-  "ours": 0,
-  "others": 500308.0,
+  "total": 500451.0,
+  "ours": 49.0,
+  "others": 500402.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.93,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "our_best": 0.93,
+  "ticks_off": 0,
+  "est": 1.22,
   "per_side": 6.25,
   "levels": [
    [
     0.93,
-    108.0
+    251.0
    ],
    [
     0.02,
     500000.0
    ]
   ],
-  "denom": 108.0,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 251.0,
+  "my_score": 49.0,
+  "ours_px": {
+   "0.93": 49.0
+  }
  },
  {
   "m": "ussewc-usse-tn-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 17808.989999999998,
+  "total": 16401.989999999998,
   "ours": 40.0,
-  "others": 17768.989999999998,
+  "others": 16361.989999999998,
   "qual": true,
   "self_sufficient": false,
   "best": 0.95,
@@ -9584,27 +9423,27 @@
   "m": "ussewc-usse-va-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 600482.0,
+  "total": 600432.0,
   "ours": 50.0,
-  "others": 600432.0,
+  "others": 600382.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.95,
   "our_best": 0.95,
   "ticks_off": 0,
-  "est": 1.11,
+  "est": 1.35,
   "per_side": 6.25,
   "levels": [
    [
     0.95,
-    282.0
+    232.0
    ],
    [
     0.02,
     600000.0
    ]
   ],
-  "denom": 282.0,
+  "denom": 232.0,
   "my_score": 50.0,
   "ours_px": {
    "0.95": 50.0
@@ -9614,9 +9453,9 @@
   "m": "ussewc-usse-va-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 23002.99,
+  "total": 21224.99,
   "ours": 0,
-  "others": 23002.99,
+  "others": 21224.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
@@ -9627,10 +9466,10 @@
   "levels": [
    [
     0.99,
-    23002.99
+    21224.99
    ]
   ],
-  "denom": 23002.99,
+  "denom": 21224.99,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9638,9 +9477,9 @@
   "m": "ussewc-usse-va-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 11276.0,
+  "total": 11200.0,
   "ours": 0,
-  "others": 11276.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -9651,10 +9490,10 @@
   "levels": [
    [
     0.01,
-    11276.0
+    11200.0
    ]
   ],
-  "denom": 11276.0,
+  "denom": 11200.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9696,9 +9535,9 @@
   "m": "ussewc-usse-wv-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 12676.0,
+  "total": 12600.0,
   "ours": 1400.0,
-  "others": 11276.0,
+  "others": 11200.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.01,
@@ -9709,10 +9548,10 @@
   "levels": [
    [
     0.01,
-    12676.0
+    12600.0
    ]
   ],
-  "denom": 12676.0,
+  "denom": 12600.0,
   "my_score": 1400.0,
   "ours_px": {
    "0.01": 1400.0
@@ -9722,27 +9561,23 @@
   "m": "ussewc-usse-wv-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 130979.86,
+  "total": 206226.85,
   "ours": 0,
-  "others": 130979.86,
+  "others": 206226.85,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.51,
+  "best": 0.98,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 6.25,
   "levels": [
    [
-    0.51,
-    103.0
-   ],
-   [
     0.98,
-    130651.86
+    206001.85
    ]
   ],
-  "denom": 103.0,
+  "denom": 206001.85,
   "my_score": 0,
   "ours_px": {}
  },
@@ -9778,23 +9613,23 @@
   "m": "ussewc-usse-wv-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 31215.09,
-  "ours": 2793.1,
-  "others": 28421.99,
+  "total": 26018.09,
+  "ours": 2793.1000000000004,
+  "others": 23224.989999999998,
   "qual": true,
   "self_sufficient": true,
   "best": 0.99,
   "our_best": 0.99,
   "ticks_off": 0,
-  "est": 0.56,
+  "est": 0.67,
   "per_side": 6.25,
   "levels": [
    [
     0.99,
-    31215.09
+    26018.09
    ]
   ],
-  "denom": 31215.09,
+  "denom": 26018.09,
   "my_score": 2793.1,
   "ours_px": {
    "0.99": 2793.1
@@ -9804,23 +9639,23 @@
   "m": "ussewc-usse-wy-2026-11-03-dem",
   "side": "BUY",
   "target": 2000.0,
-  "total": 10015.0,
+  "total": 10744.0,
   "ours": 5000.0,
-  "others": 5015.0,
+  "others": 5744.0,
   "qual": true,
   "self_sufficient": true,
   "best": 0.01,
   "our_best": 0.01,
   "ticks_off": 0,
-  "est": 3.12,
+  "est": 2.91,
   "per_side": 6.25,
   "levels": [
    [
     0.01,
-    10015.0
+    10744.0
    ]
   ],
-  "denom": 10015.0,
+  "denom": 10744.0,
   "my_score": 5000.0,
   "ours_px": {
    "0.01": 5000.0
@@ -9830,9 +9665,9 @@
   "m": "ussewc-usse-wy-2026-11-03-dem",
   "side": "SELL",
   "target": 2000.0,
-  "total": 136205.86,
+  "total": 136224.86,
   "ours": 85.0,
-  "others": 136120.86,
+  "others": 136139.86,
   "qual": true,
   "self_sufficient": false,
   "best": 0.03,
@@ -9843,7 +9678,7 @@
   "levels": [
    [
     0.03,
-    370.0
+    369.0
    ],
    [
     0.04,
@@ -9851,10 +9686,10 @@
    ],
    [
     0.5,
-    5000.0
+    5020.0
    ]
   ],
-  "denom": 381.1,
+  "denom": 380.1,
   "my_score": 8.5,
   "ours_px": {
    "0.04": 85.0
@@ -9864,27 +9699,27 @@
   "m": "ussewc-usse-wy-2026-11-03-rep",
   "side": "BUY",
   "target": 2000.0,
-  "total": 500249.0,
+  "total": 500750.0,
   "ours": 20.0,
-  "others": 500229.0,
+  "others": 500730.0,
   "qual": true,
   "self_sufficient": false,
   "best": 0.95,
   "our_best": 0.95,
   "ticks_off": 0,
-  "est": 2.55,
+  "est": 2.5,
   "per_side": 6.25,
   "levels": [
    [
     0.95,
-    49.0
+    50.0
    ],
    [
     0.02,
-    500000.0
+    500500.0
    ]
   ],
-  "denom": 49.0,
+  "denom": 50.0,
   "my_score": 20.0,
   "ours_px": {
    "0.95": 20.0
@@ -9894,23 +9729,23 @@
   "m": "ussewc-usse-wy-2026-11-03-rep",
   "side": "SELL",
   "target": 2000.0,
-  "total": 7076.46,
+  "total": 6837.46,
   "ours": 1570.47,
-  "others": 5505.99,
+  "others": 5266.99,
   "qual": true,
   "self_sufficient": false,
   "best": 0.99,
   "our_best": 0.99,
   "ticks_off": 0,
-  "est": 1.39,
+  "est": 1.44,
   "per_side": 6.25,
   "levels": [
    [
     0.99,
-    7076.46
+    6837.46
    ]
   ],
-  "denom": 7076.46,
+  "denom": 6837.46,
   "my_score": 1570.47,
   "ours_px": {
    "0.99": 1570.47
@@ -10164,171 +9999,23 @@
   "m": "vsc-usgubp-fl-fshbck-atl-11pct",
   "side": "BUY",
   "target": 5000.0,
-  "total": 73.0,
+  "total": 50.0,
   "ours": 0,
-  "others": 73.0,
+  "others": 50.0,
   "qual": false,
   "self_sufficient": false,
-  "best": 0.43,
+  "best": 0.45,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 5.0,
   "levels": [
    [
-    0.43,
+    0.45,
     50.0
-   ],
-   [
-    0.42,
-    23.0
    ]
   ],
-  "denom": 54.6,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-11pct",
-  "side": "SELL",
-  "target": 5000.0,
-  "total": 37.0,
-  "ours": 0,
-  "others": 37.0,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.82,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.82,
-    37.0
-   ]
-  ],
-  "denom": 37.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-13pct",
-  "side": "BUY",
-  "target": 5000.0,
-  "total": 37.0,
-  "ours": 0,
-  "others": 37.0,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.18,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.18,
-    37.0
-   ]
-  ],
-  "denom": 37.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-13pct",
-  "side": "SELL",
-  "target": 5000.0,
-  "total": 20.0,
-  "ours": 0,
-  "others": 20.0,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.66,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.66,
-    20.0
-   ]
-  ],
-  "denom": 20.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-15pct",
-  "side": "BUY",
-  "target": 5000.0,
-  "total": 10100.0,
-  "ours": 0,
-  "others": 10100.0,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.01,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.01,
-    10100.0
-   ]
-  ],
-  "denom": 10100.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-15pct",
-  "side": "SELL",
-  "target": 5000.0,
-  "total": 100.0,
-  "ours": 0,
-  "others": 100.0,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.51,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.51,
-    100.0
-   ]
-  ],
-  "denom": 100.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-17pct",
-  "side": "BUY",
-  "target": 5000.0,
-  "total": 5500.0,
-  "ours": 0,
-  "others": 5500.0,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.02,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.02,
-    5500.0
-   ]
-  ],
-  "denom": 5500.0,
+  "denom": 50.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -10336,123 +10023,23 @@
   "m": "vsc-usgubp-fl-fshbck-atl-17pct",
   "side": "SELL",
   "target": 5000.0,
-  "total": 14.0,
+  "total": 1.0,
   "ours": 0,
-  "others": 14.0,
+  "others": 1.0,
   "qual": false,
   "self_sufficient": false,
-  "best": 0.5,
+  "best": 0.54,
   "our_best": null,
   "ticks_off": null,
   "est": 0.0,
   "per_side": 5.0,
   "levels": [
-   [
-    0.5,
-    13.0
-   ],
    [
     0.54,
     1.0
    ]
   ],
-  "denom": 13.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-19pct",
-  "side": "BUY",
-  "target": 5000.0,
-  "total": 10100.0,
-  "ours": 0,
-  "others": 10100.0,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.01,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.01,
-    10100.0
-   ]
-  ],
-  "denom": 10100.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-19pct",
-  "side": "SELL",
-  "target": 5000.0,
-  "total": 13.0,
-  "ours": 0,
-  "others": 13.0,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.48,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.48,
-    13.0
-   ]
-  ],
-  "denom": 13.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-21pct",
-  "side": "BUY",
-  "target": 5000.0,
-  "total": 11100.0,
-  "ours": 0,
-  "others": 11100.0,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.01,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.01,
-    11100.0
-   ]
-  ],
-  "denom": 11100.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-21pct",
-  "side": "SELL",
-  "target": 5000.0,
-  "total": 13.0,
-  "ours": 0,
-  "others": 13.0,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.5,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.5,
-    13.0
-   ]
-  ],
-  "denom": 13.0,
+  "denom": 1.0,
   "my_score": 0,
   "ours_px": {}
  },
@@ -10460,194 +10047,56 @@
   "m": "vsc-usgubp-fl-fshbck-atl-30pct",
   "side": "BUY",
   "target": 5000.0,
-  "total": 35025.0,
+  "total": 62499.0,
   "ours": 5000.0,
-  "others": 30025.0,
+  "others": 57499.0,
   "qual": true,
   "self_sufficient": true,
   "best": 0.01,
   "our_best": 0.01,
   "ticks_off": 0,
-  "est": 0.71,
+  "est": 0.4,
   "per_side": 5.0,
   "levels": [
    [
     0.01,
-    35025.0
+    62499.0
    ]
   ],
-  "denom": 35025.0,
+  "denom": 62499.0,
   "my_score": 5000.0,
   "ours_px": {
    "0.01": 5000.0
   }
  },
  {
-  "m": "vsc-usgubp-fl-fshbck-atl-30pct",
-  "side": "SELL",
-  "target": 5000.0,
-  "total": 20999.99,
-  "ours": 0,
-  "others": 20999.99,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.99,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.99,
-    20999.99
-   ]
-  ],
-  "denom": 20999.99,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
   "m": "vsc-usgubp-fl-fshbck-atl-5pct",
   "side": "BUY",
   "target": 5000.0,
-  "total": 13.0,
-  "ours": 0,
-  "others": 13.0,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.52,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.52,
-    13.0
-   ]
-  ],
-  "denom": 13.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-5pct",
-  "side": "SELL",
-  "target": 5000.0,
-  "total": 90.71,
-  "ours": 0,
-  "others": 90.71,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.99,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.99,
-    90.71
-   ]
-  ],
-  "denom": 90.71,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-7pct",
-  "side": "BUY",
-  "target": 5000.0,
-  "total": 5.0,
-  "ours": 0,
-  "others": 5.0,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.51,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.51,
-    5.0
-   ]
-  ],
-  "denom": 5.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-7pct",
-  "side": "SELL",
-  "target": 5000.0,
-  "total": 20999.99,
-  "ours": 0,
-  "others": 20999.99,
+  "total": 5533.29,
+  "ours": 42.0,
+  "others": 5491.29,
   "qual": true,
   "self_sufficient": false,
-  "best": 0.99,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
+  "best": 0.53,
+  "our_best": 0.53,
+  "ticks_off": 0,
+  "est": 1.66,
   "per_side": 5.0,
   "levels": [
    [
-    0.99,
-    20999.99
-   ]
-  ],
-  "denom": 20999.99,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-9pct",
-  "side": "BUY",
-  "target": 5000.0,
-  "total": 100.0,
-  "ours": 0,
-  "others": 100.0,
-  "qual": false,
-  "self_sufficient": false,
-  "best": 0.5,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
+    0.53,
+    126.29
+   ],
    [
-    0.5,
-    100.0
+    0.01,
+    5407.0
    ]
   ],
-  "denom": 100.0,
-  "my_score": 0,
-  "ours_px": {}
- },
- {
-  "m": "vsc-usgubp-fl-fshbck-atl-9pct",
-  "side": "SELL",
-  "target": 5000.0,
-  "total": 10100.0,
-  "ours": 0,
-  "others": 10100.0,
-  "qual": true,
-  "self_sufficient": false,
-  "best": 0.98,
-  "our_best": null,
-  "ticks_off": null,
-  "est": 0.0,
-  "per_side": 5.0,
-  "levels": [
-   [
-    0.98,
-    10100.0
-   ]
-  ],
-  "denom": 10100.0,
-  "my_score": 0,
-  "ours_px": {}
+  "denom": 126.29,
+  "my_score": 42.0,
+  "ours_px": {
+   "0.53": 42.0
+  }
  }
 ]
