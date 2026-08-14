@@ -1,23 +1,414 @@
-markets to price: 36
+markets to price: 810
 
 race                                     FAVOURITE                             bid/ask   underdog                              bid/ask
-usgubewc-usgub-al-2026-11-03             rep al                               0.7/0.99   dem al                               0.01/0.5
-usgubewc-usgub-ar-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-co-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-ct-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-fl-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-hi-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-id-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-il-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-ma-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-md-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-me-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-mn-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-ne-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-nh-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-nm-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-ny-2026-11-03             -- cannot tell favourite, skipped
-usgubewc-usgub-or-2026-11-03             -- cannot tell favourite, skipped
-ushrewc-ushr-al-01-2026-11-03            -- cannot tell favourite, skipped
+usgubewc-usgub-ak-2026-11-03-adacru      -- 1 side(s), skipped
+usgubewc-usgub-ak-2026-11-03-berwil      -- 1 side(s), skipped
+usgubewc-usgub-ak-2026-11-03-bilwal      -- 1 side(s), skipped
+usgubewc-usgub-ak-2026-11-03-clibis      -- 1 side(s), skipped
+usgubewc-usgub-ak-2026-11-03-davbro      -- 1 side(s), skipped
+usgubewc-usgub-ak-2026-11-03-jonkre      -- 1 side(s), skipped
+usgubewc-usgub-ak-2026-11-03-tombeg      -- 1 side(s), skipped
+usgubewc-usgub-al-2026-11-03             rep al                              0.82/0.91   dem al                              0.04/0.17
+usgubewc-usgub-ar-2026-11-03             rep ar                              0.91/0.96   dem ar                              0.01/0.09
+usgubewc-usgub-co-2026-11-03             dem co                              0.88/0.96   rep co                              0.02/0.07
+usgubewc-usgub-ct-2026-11-03             dem ct                              0.95/0.96   rep ct                              0.01/0.12
+usgubewc-usgub-fl-2026-11-03             rep fl                              0.86/0.87   dem fl                              0.15/0.17
+usgubewc-usgub-hi-2026-11-03             dem hi                              0.91/0.96   rep hi                               0.01/0.1
+usgubewc-usgub-id-2026-11-03             rep id                              0.91/0.96   dem id                               0.01/0.1
+usgubewc-usgub-il-2026-11-03             dem il                              0.89/0.96   rep il                              0.04/0.09
+usgubewc-usgub-ma-2026-11-03             dem ma                              0.86/0.94   rep ma                              0.06/0.09
+usgubewc-usgub-md-2026-11-03             dem md                              0.95/0.99   rep md                              0.01/0.09
+usgubewc-usgub-me-2026-11-03             dem me                              0.85/0.99   rep me                              0.01/0.14
+usgubewc-usgub-mn-2026-11-03             dem mn                              0.85/0.92   rep mn                               0.06/0.1
+usgubewc-usgub-ne-2026-11-03             rep ne                              0.91/0.94   dem ne                              0.03/0.09
+usgubewc-usgub-nh-2026-11-03             rep nh                               0.81/0.9   dem nh                               0.1/0.21
+usgubewc-usgub-nm-2026-11-03             dem nm                              0.81/0.99   rep nm                              0.01/0.19
+usgubewc-usgub-ny-2026-11-03             dem ny                              0.86/0.95   rep ny                              0.01/0.13
+usgubewc-usgub-ok-2026-11-03             rep ok                              0.88/0.98   dem ok                              0.05/0.08
+usgubewc-usgub-or-2026-11-03             dem or                              0.79/0.95   rep or                              0.06/0.22
+usgubewc-usgub-pa-2026-11-03             dem pa                              0.88/0.99   rep pa                              0.06/0.15
+usgubewc-usgub-ri-2026-11-03             dem ri                              0.91/0.94   rep ri                              0.01/0.14
+usgubewc-usgub-ri-2026-11-03-kenblo      -- 1 side(s), skipped
+usgubewc-usgub-sc-2026-11-03             rep sc                              0.83/0.94   dem sc                              0.02/0.07
+usgubewc-usgub-sd-2026-11-03             rep sd                              0.93/0.99   dem sd                              0.01/0.11
+usgubewc-usgub-tn-2026-11-03             rep tn                              0.88/0.97   dem tn                               0.01/0.1
+usgubewc-usgub-tx-2026-11-03             rep tx                               0.8/0.91   dem tx                              0.14/0.23
+usgubewc-usgub-vt-2026-11-03             rep vt                              0.85/0.94   dem vt                              0.06/0.12
+usgubewc-usgub-wy-2026-11-03             rep wy                              0.95/0.99   dem wy                              0.04/0.07
+ushrewc-ushr-al-01-2026-11-03            rep al                              0.85/0.99   dem al                              0.01/0.15
+ushrewc-ushr-al-03-2026-11-03            rep al                              0.87/0.99   dem al                              0.01/0.12
+ushrewc-ushr-al-04-2026-11-03            rep al                              0.89/0.99   dem al                               0.01/0.1
+ushrewc-ushr-al-05-2026-11-03            rep al                              0.85/0.99   dem al                              0.01/0.16
+ushrewc-ushr-al-06-2026-11-03            rep al                              0.85/0.99   dem al                              0.01/0.14
+ushrewc-ushr-al-07-2026-11-03            dem al                              0.86/0.99   rep al                              0.01/0.13
+ushrewc-ushr-ar-01-2026-11-03            rep ar                              0.88/0.99   dem ar                              0.01/0.11
+ushrewc-ushr-ar-02-2026-11-03            rep ar                              0.77/0.96   dem ar                              0.03/0.21
+ushrewc-ushr-ar-03-2026-11-03            rep ar                              0.88/0.99   dem ar                              0.01/0.12
+ushrewc-ushr-ar-04-2026-11-03            rep ar                              0.87/0.99   dem ar                              0.01/0.13
+ushrewc-ushr-az-01-2026-11-03            dem az                              0.66/0.84   rep az                              0.17/0.34
+ushrewc-ushr-az-02-2026-11-03            rep az                              0.53/0.72   dem az                              0.28/0.52
+ushrewc-ushr-az-04-2026-11-03            dem az                              0.86/0.99   rep az                              0.01/0.14
+ushrewc-ushr-az-05-2026-11-03            rep az                              0.79/0.97   dem az                              0.02/0.22
+ushrewc-ushr-az-06-2026-11-03            dem az                              0.74/0.93   rep az                              0.05/0.26
+ushrewc-ushr-az-07-2026-11-03            dem az                              0.87/0.99   rep az                              0.01/0.13
+ushrewc-ushr-az-08-2026-11-03            rep az                              0.77/0.94   dem az                              0.07/0.23
+ushrewc-ushr-az-09-2026-11-03            rep az                              0.84/0.99   dem az                              0.01/0.13
+ushrewc-ushr-ca-01-2026-11-03            dem ca                              0.87/0.99   rep ca                              0.01/0.13
+ushrewc-ushr-ca-02-2026-11-03            dem ca                              0.89/0.99   rep ca                              0.01/0.11
+ushrewc-ushr-ca-03-2026-11-03            dem ca                              0.86/0.99   rep ca                              0.01/0.14
+ushrewc-ushr-ca-05-2026-11-03            rep ca                              0.82/0.97   dem ca                              0.02/0.17
+ushrewc-ushr-ca-08-2026-11-03            dem ca                              0.87/0.99   rep ca                              0.01/0.13
+ushrewc-ushr-ca-09-2026-11-03            dem ca                              0.86/0.99   rep ca                              0.01/0.14
+ushrewc-ushr-ca-10-2026-11-03            dem ca                              0.88/0.99   rep ca                              0.01/0.12
+ushrewc-ushr-ca-13-2026-11-03            dem ca                              0.82/0.98   rep ca                              0.02/0.17
+ushrewc-ushr-ca-15-2026-11-03            dem ca                              0.88/0.99   rep ca                               0.01/0.1
+ushrewc-ushr-ca-16-2026-11-03            dem ca                              0.87/0.99   rep ca                              0.01/0.13
+ushrewc-ushr-ca-17-2026-11-03            dem ca                              0.88/0.99   rep ca                              0.01/0.12
+ushrewc-ushr-ca-18-2026-11-03            dem ca                              0.89/0.99   rep ca                              0.01/0.12
+ushrewc-ushr-ca-19-2026-11-03            dem ca                              0.89/0.99   rep ca                               0.01/0.1
+ushrewc-ushr-ca-20-2026-11-03            rep ca                              0.87/0.99   dem ca                               0.01/0.1
+ushrewc-ushr-ca-21-2026-11-03            dem ca                              0.83/0.99   rep ca                              0.01/0.17
+ushrewc-ushr-ca-22-2026-11-03            dem ca                              0.72/0.93   rep ca                              0.07/0.28
+ushrewc-ushr-ca-23-2026-11-03            rep ca                              0.85/0.99   dem ca                              0.01/0.14
+ushrewc-ushr-ca-24-2026-11-03            dem ca                              0.89/0.99   rep ca                               0.01/0.1
+ushrewc-ushr-ca-25-2026-11-03            dem ca                              0.84/0.99   rep ca                              0.01/0.14
+ushrewc-ushr-ca-26-2026-11-03            dem ca                              0.88/0.99   rep ca                              0.01/0.12
+ushrewc-ushr-ca-27-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-ca-28-2026-11-03            dem ca                              0.86/0.99   rep ca                              0.01/0.09
+ushrewc-ushr-ca-30-2026-11-03            dem ca                              0.88/0.99   rep ca                              0.01/0.12
+ushrewc-ushr-ca-31-2026-11-03            dem ca                              0.89/0.99   rep ca                              0.01/0.11
+ushrewc-ushr-ca-32-2026-11-03            dem ca                              0.89/0.99   rep ca                              0.01/0.11
+ushrewc-ushr-ca-33-2026-11-03            dem ca                              0.87/0.99   rep ca                              0.01/0.13
+ushrewc-ushr-ca-35-2026-11-03            dem ca                              0.89/0.99   rep ca                              0.01/0.11
+ushrewc-ushr-ca-36-2026-11-03            dem ca                              0.86/0.99   rep ca                              0.01/0.14
+ushrewc-ushr-ca-38-2026-11-03            dem ca                              0.88/0.99   rep ca                               0.01/0.1
+ushrewc-ushr-ca-39-2026-11-03            dem ca                              0.85/0.99   rep ca                              0.01/0.11
+ushrewc-ushr-ca-41-2026-11-03            dem ca                              0.85/0.99   rep ca                              0.01/0.15
+ushrewc-ushr-ca-42-2026-11-03            dem ca                              0.89/0.99   rep ca                              0.01/0.11
+ushrewc-ushr-co-01-2026-11-03            dem co                              0.86/0.99   rep co                              0.01/0.14
+ushrewc-ushr-co-02-2026-11-03            dem co                              0.86/0.99   rep co                              0.01/0.12
+ushrewc-ushr-co-03-2026-11-03            rep co                               0.56/0.8   dem co                              0.26/0.45
+ushrewc-ushr-co-04-2026-11-03            rep co                               0.6/0.73   dem co                              0.27/0.43
+ushrewc-ushr-co-05-2026-11-03            rep co                              0.65/0.79   dem co                              0.19/0.35
+ushrewc-ushr-co-06-2026-11-03            dem co                              0.88/0.99   rep co                              0.01/0.12
+ushrewc-ushr-co-07-2026-11-03            dem co                              0.87/0.99   rep co                              0.01/0.14
+ushrewc-ushr-co-08-2026-11-03            dem co                              0.65/0.79   rep co                              0.13/0.31
+ushrewc-ushr-ct-01-2026-11-03            dem ct                              0.87/0.99   rep ct                              0.01/0.14
+ushrewc-ushr-ct-02-2026-11-03            dem ct                              0.88/0.99   rep ct                              0.01/0.12
+ushrewc-ushr-ct-03-2026-11-03            dem ct                              0.88/0.99   rep ct                              0.01/0.12
+ushrewc-ushr-ct-04-2026-11-03            dem ct                              0.87/0.99   rep ct                              0.01/0.13
+ushrewc-ushr-ct-05-2026-11-03            dem ct                              0.86/0.99   rep ct                              0.01/0.14
+ushrewc-ushr-de-al-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-fl-01-2026-11-03            rep fl                              0.86/0.99   dem fl                              0.01/0.13
+ushrewc-ushr-fl-02-2026-11-03            rep fl                              0.81/0.97   dem fl                              0.04/0.19
+ushrewc-ushr-fl-03-2026-11-03            rep fl                              0.85/0.98   dem fl                              0.02/0.15
+ushrewc-ushr-fl-04-2026-11-03            rep fl                              0.76/0.88   dem fl                              0.08/0.24
+ushrewc-ushr-fl-05-2026-11-03            rep fl                              0.84/0.99   dem fl                              0.01/0.16
+ushrewc-ushr-fl-06-2026-11-03            rep fl                              0.85/0.99   dem fl                              0.01/0.14
+ushrewc-ushr-fl-07-2026-11-03            rep fl                              0.59/0.76   dem fl                              0.24/0.42
+ushrewc-ushr-fl-08-2026-11-03            rep fl                              0.84/0.98   dem fl                              0.02/0.16
+ushrewc-ushr-fl-11-2026-11-03            rep fl                              0.76/0.91   dem fl                              0.06/0.24
+ushrewc-ushr-fl-13-2026-11-03            rep fl                              0.67/0.85   dem fl                              0.06/0.34
+ushrewc-ushr-fl-15-2026-11-03            rep fl                              0.78/0.95   dem fl                              0.05/0.22
+ushrewc-ushr-fl-16-2026-11-03            rep fl                              0.71/0.88   dem fl                              0.13/0.29
+ushrewc-ushr-fl-17-2026-11-03            rep fl                              0.86/0.99   dem fl                              0.01/0.14
+ushrewc-ushr-fl-18-2026-11-03            rep fl                              0.84/0.96   dem fl                              0.03/0.16
+ushrewc-ushr-fl-19-2026-11-03            rep fl                              0.85/0.99   dem fl                              0.01/0.18
+ushrewc-ushr-fl-20-2026-11-03            dem fl                              0.85/0.99   rep fl                              0.01/0.15
+ushrewc-ushr-fl-21-2026-11-03            rep fl                              0.81/0.95   dem fl                              0.04/0.19
+ushrewc-ushr-fl-23-2026-11-03            dem fl                              0.83/0.99   rep fl                              0.01/0.15
+ushrewc-ushr-fl-24-2026-11-03            dem fl                              0.86/0.99   rep fl                              0.01/0.11
+ushrewc-ushr-fl-27-2026-11-03            rep fl                              0.75/0.89   dem fl                              0.07/0.25
+ushrewc-ushr-fl-28-2026-11-03            rep fl                              0.82/0.99   dem fl                              0.01/0.18
+ushrewc-ushr-ga-01-2026-11-03            rep ga                               0.8/0.93   dem ga                               0.02/0.2
+ushrewc-ushr-ga-02-2026-11-03            dem ga                              0.87/0.99   rep ga                              0.01/0.13
+ushrewc-ushr-ga-03-2026-11-03            rep ga                              0.85/0.99   dem ga                              0.01/0.14
+ushrewc-ushr-ga-04-2026-11-03            dem ga                              0.88/0.99   rep ga                              0.01/0.12
+ushrewc-ushr-ga-05-2026-11-03            dem ga                              0.89/0.99   rep ga                               0.01/0.1
+ushrewc-ushr-ga-06-2026-11-03            dem ga                              0.86/0.99   rep ga                               0.01/0.1
+ushrewc-ushr-ga-07-2026-11-03            rep ga                              0.84/0.99   dem ga                              0.01/0.16
+ushrewc-ushr-ga-08-2026-11-03            rep ga                              0.85/0.99   dem ga                              0.01/0.15
+ushrewc-ushr-ga-09-2026-11-03            rep ga                              0.85/0.99   dem ga                              0.01/0.15
+ushrewc-ushr-ga-10-2026-11-03            rep ga                              0.84/0.97   dem ga                              0.02/0.16
+ushrewc-ushr-ga-11-2026-11-03            rep ga                              0.85/0.99   dem ga                              0.01/0.15
+ushrewc-ushr-ga-12-2026-11-03            rep ga                              0.78/0.91   dem ga                              0.08/0.22
+ushrewc-ushr-ga-13-2026-11-03            dem ga                              0.86/0.99   rep ga                               0.01/0.1
+ushrewc-ushr-ga-14-2026-11-03            rep ga                              0.88/0.99   dem ga                              0.01/0.14
+ushrewc-ushr-hi-01-2026-11-03            dem hi                              0.89/0.99   rep hi                              0.01/0.11
+ushrewc-ushr-hi-02-2026-11-03            dem hi                              0.87/0.99   rep hi                              0.01/0.13
+ushrewc-ushr-ia-01-2026-11-03            dem ia                              0.65/0.82   rep ia                              0.19/0.37
+ushrewc-ushr-ia-02-2026-11-03            rep ia                              0.48/0.65   dem ia                               0.35/0.5
+ushrewc-ushr-ia-03-2026-11-03            dem ia                              0.54/0.79   rep ia                              0.09/0.39
+ushrewc-ushr-ia-04-2026-11-03            rep ia                              0.84/0.99   dem ia                              0.01/0.15
+ushrewc-ushr-id-01-2026-11-03            rep id                              0.87/0.99   dem id                              0.01/0.13
+ushrewc-ushr-id-02-2026-11-03            rep id                              0.85/0.99   dem id                              0.01/0.15
+ushrewc-ushr-il-01-2026-11-03            dem il                              0.86/0.99   rep il                              0.01/0.14
+ushrewc-ushr-il-02-2026-11-03            dem il                              0.89/0.99   rep il                              0.01/0.11
+ushrewc-ushr-il-03-2026-11-03            dem il                              0.89/0.99   rep il                              0.01/0.11
+ushrewc-ushr-il-04-2026-11-03            dem il                              0.87/0.99   rep il                              0.01/0.14
+ushrewc-ushr-il-05-2026-11-03            dem il                               0.9/0.99   rep il                               0.01/0.1
+ushrewc-ushr-il-06-2026-11-03            dem il                              0.89/0.99   rep il                              0.01/0.11
+ushrewc-ushr-il-07-2026-11-03            dem il                              0.88/0.99   rep il                              0.01/0.09
+ushrewc-ushr-il-08-2026-11-03            dem il                              0.85/0.99   rep il                              0.01/0.18
+ushrewc-ushr-il-09-2026-11-03            dem il                              0.88/0.99   rep il                              0.01/0.12
+ushrewc-ushr-il-10-2026-11-03            dem il                              0.87/0.99   rep il                               0.01/0.1
+ushrewc-ushr-il-11-2026-11-03            dem il                              0.86/0.99   rep il                              0.01/0.14
+ushrewc-ushr-il-12-2026-11-03            rep il                              0.86/0.99   dem il                              0.01/0.13
+ushrewc-ushr-il-13-2026-11-03            dem il                              0.87/0.99   rep il                              0.01/0.13
+ushrewc-ushr-il-14-2026-11-03            dem il                              0.86/0.99   rep il                              0.01/0.13
+ushrewc-ushr-il-15-2026-11-03            rep il                              0.85/0.99   dem il                              0.01/0.15
+ushrewc-ushr-il-16-2026-11-03            rep il                              0.83/0.99   dem il                              0.01/0.16
+ushrewc-ushr-il-17-2026-11-03            dem il                              0.82/0.99   rep il                              0.01/0.16
+ushrewc-ushr-in-01-2026-11-03            dem in                              0.72/0.92   rep in                              0.06/0.25
+ushrewc-ushr-in-02-2026-11-03            rep in                              0.82/0.99   dem in                              0.01/0.14
+ushrewc-ushr-in-03-2026-11-03            rep in                              0.87/0.99   dem in                              0.01/0.13
+ushrewc-ushr-in-04-2026-11-03            rep in                              0.84/0.99   dem in                              0.01/0.15
+ushrewc-ushr-in-05-2026-11-03            rep in                               0.72/0.9   dem in                               0.1/0.29
+ushrewc-ushr-in-06-2026-11-03            rep in                              0.87/0.99   dem in                              0.01/0.14
+ushrewc-ushr-in-07-2026-11-03            dem in                              0.86/0.99   rep in                              0.01/0.14
+ushrewc-ushr-in-08-2026-11-03            rep in                              0.88/0.99   dem in                               0.01/0.1
+ushrewc-ushr-in-09-2026-11-03            rep in                              0.84/0.99   dem in                              0.01/0.15
+ushrewc-ushr-ks-01-2026-11-03            rep ks                              0.85/0.99   dem ks                              0.01/0.14
+ushrewc-ushr-ks-02-2026-11-03            rep ks                              0.83/0.97   dem ks                              0.04/0.17
+ushrewc-ushr-ks-03-2026-11-03            dem ks                              0.84/0.97   rep ks                              0.02/0.16
+ushrewc-ushr-ks-04-2026-11-03            rep ks                              0.86/0.99   dem ks                              0.01/0.14
+ushrewc-ushr-ky-01-2026-11-03            rep ky                              0.86/0.99   dem ky                              0.01/0.14
+ushrewc-ushr-ky-02-2026-11-03            rep ky                              0.85/0.99   dem ky                              0.01/0.14
+ushrewc-ushr-ky-03-2026-11-03            dem ky                              0.86/0.98   rep ky                              0.01/0.14
+ushrewc-ushr-ky-04-2026-11-03            rep ky                              0.83/0.99   dem ky                              0.01/0.16
+ushrewc-ushr-ky-05-2026-11-03            rep ky                              0.86/0.99   dem ky                              0.01/0.12
+ushrewc-ushr-ky-06-2026-11-03            rep ky                              0.67/0.83   dem ky                              0.17/0.33
+ushrewc-ushr-ma-03-2026-11-03            dem ma                              0.89/0.99   rep ma                              0.01/0.11
+ushrewc-ushr-ma-04-2026-11-03            dem ma                              0.88/0.99   rep ma                               0.01/0.1
+ushrewc-ushr-ma-06-2026-11-03            dem ma                              0.87/0.99   rep ma                              0.01/0.13
+ushrewc-ushr-ma-08-2026-11-03            dem ma                              0.89/0.99   rep ma                               0.01/0.1
+ushrewc-ushr-ma-09-2026-11-03            dem ma                              0.89/0.99   rep ma                              0.01/0.11
+ushrewc-ushr-md-01-2026-11-03            rep md                              0.79/0.92   dem md                              0.08/0.21
+ushrewc-ushr-md-02-2026-11-03            dem md                              0.83/0.99   rep md                              0.01/0.14
+ushrewc-ushr-md-03-2026-11-03            dem md                              0.87/0.99   rep md                              0.01/0.13
+ushrewc-ushr-md-04-2026-11-03            dem md                              0.89/0.99   rep md                               0.01/0.1
+ushrewc-ushr-md-05-2026-11-03            dem md                              0.88/0.99   rep md                              0.01/0.12
+ushrewc-ushr-md-06-2026-11-03            dem md                              0.83/0.99   rep md                              0.01/0.18
+ushrewc-ushr-md-07-2026-11-03            dem md                              0.89/0.99   rep md                              0.01/0.11
+ushrewc-ushr-md-08-2026-11-03            dem md                              0.89/0.99   rep md                              0.01/0.11
+ushrewc-ushr-me-01-2026-11-03            dem me                              0.88/0.99   rep me                              0.01/0.11
+ushrewc-ushr-me-02-2026-11-03            rep me                               0.49/0.7   dem me                              0.32/0.52
+ushrewc-ushr-mi-01-2026-11-03            rep mi                              0.81/0.96   dem mi                              0.05/0.19
+ushrewc-ushr-mi-02-2026-11-03            rep mi                              0.88/0.99   dem mi                              0.01/0.08
+ushrewc-ushr-mi-03-2026-11-03            dem mi                              0.82/0.99   rep mi                              0.01/0.16
+ushrewc-ushr-mi-04-2026-11-03            dem mi                              0.44/0.65   rep mi                              0.34/0.57
+ushrewc-ushr-mi-05-2026-11-03            rep mi                              0.85/0.99   dem mi                              0.01/0.14
+ushrewc-ushr-mi-06-2026-11-03            dem mi                              0.88/0.99   rep mi                               0.01/0.1
+ushrewc-ushr-mi-07-2026-11-03            dem mi                              0.57/0.73   rep mi                              0.27/0.43
+ushrewc-ushr-mi-08-2026-11-03            dem mi                              0.85/0.99   rep mi                              0.01/0.15
+ushrewc-ushr-mi-09-2026-11-03            rep mi                              0.87/0.99   dem mi                              0.01/0.13
+ushrewc-ushr-mi-10-2026-11-03            dem mi                              0.52/0.99   rep mi                                0.2/0.4
+ushrewc-ushr-mi-11-2026-11-03            dem mi                              0.88/0.99   rep mi                              0.01/0.12
+ushrewc-ushr-mi-12-2026-11-03            dem mi                              0.88/0.99   rep mi                              0.01/0.12
+ushrewc-ushr-mi-13-2026-11-03            dem mi                              0.89/0.99   rep mi                               0.01/0.1
+ushrewc-ushr-mn-01-2026-11-03            rep mn                              0.58/0.78   dem mn                                0.2/0.4
+ushrewc-ushr-mn-02-2026-11-03            dem mn                              0.83/0.99   rep mn                              0.01/0.17
+ushrewc-ushr-mn-03-2026-11-03            dem mn                              0.88/0.99   rep mn                              0.01/0.12
+ushrewc-ushr-mn-04-2026-11-03            dem mn                              0.85/0.99   rep mn                              0.01/0.14
+ushrewc-ushr-mn-05-2026-11-03            dem mn                              0.86/0.99   rep mn                               0.01/0.1
+ushrewc-ushr-mn-06-2026-11-03            rep mn                               0.8/0.94   dem mn                              0.01/0.19
+ushrewc-ushr-mn-07-2026-11-03            rep mn                              0.87/0.99   dem mn                              0.01/0.14
+ushrewc-ushr-mn-08-2026-11-03            rep mn                              0.72/0.94   dem mn                              0.04/0.23
+ushrewc-ushr-mo-01-2026-11-03            dem mo                              0.87/0.99   rep mo                               0.01/0.1
+ushrewc-ushr-mo-02-2026-11-03            rep mo                              0.68/0.86   dem mo                               0.15/0.3
+ushrewc-ushr-mo-03-2026-11-03            rep mo                              0.84/0.99   dem mo                              0.01/0.16
+ushrewc-ushr-mo-04-2026-11-03            rep mo                              0.83/0.99   dem mo                              0.01/0.18
+ushrewc-ushr-mo-05-2026-11-03            rep mo                              0.75/0.92   dem mo                              0.07/0.25
+ushrewc-ushr-mo-06-2026-11-03            rep mo                              0.85/0.99   dem mo                              0.01/0.15
+ushrewc-ushr-mo-07-2026-11-03            rep mo                              0.88/0.99   dem mo                              0.02/0.12
+ushrewc-ushr-mo-08-2026-11-03            rep mo                              0.89/0.99   dem mo                              0.01/0.11
+ushrewc-ushr-ms-01-2026-11-03            rep ms                              0.85/0.99   dem ms                              0.01/0.11
+ushrewc-ushr-ms-02-2026-11-03            dem ms                              0.83/0.99   rep ms                              0.01/0.17
+ushrewc-ushr-ms-03-2026-11-03            rep ms                              0.88/0.99   dem ms                               0.01/0.1
+ushrewc-ushr-ms-04-2026-11-03            rep ms                              0.89/0.99   dem ms                              0.01/0.11
+ushrewc-ushr-mt-01-2026-11-03            rep mt                              0.51/0.69   dem mt                              0.31/0.49
+ushrewc-ushr-mt-02-2026-11-03            rep mt                              0.83/0.99   dem mt                              0.01/0.17
+ushrewc-ushr-nc-01-2026-11-03            dem nc                              0.47/0.66   rep nc                              0.33/0.54
+ushrewc-ushr-nc-02-2026-11-03            dem nc                              0.87/0.99   rep nc                              0.01/0.12
+ushrewc-ushr-nc-03-2026-11-03            rep nc                               0.8/0.94   dem nc                               0.05/0.2
+ushrewc-ushr-nc-04-2026-11-03            dem nc                              0.88/0.99   rep nc                              0.01/0.12
+ushrewc-ushr-nc-05-2026-11-03            rep nc                              0.82/0.95   dem nc                              0.04/0.18
+ushrewc-ushr-nc-06-2026-11-03            rep nc                              0.78/0.91   dem nc                              0.07/0.22
+ushrewc-ushr-nc-07-2026-11-03            rep nc                               0.78/0.9   dem nc                              0.06/0.22
+ushrewc-ushr-nc-08-2026-11-03            rep nc                              0.82/0.99   dem nc                              0.01/0.18
+ushrewc-ushr-nc-09-2026-11-03            rep nc                              0.66/0.87   dem nc                              0.14/0.28
+ushrewc-ushr-nc-10-2026-11-03            rep nc                              0.84/0.97   dem nc                              0.03/0.16
+ushrewc-ushr-nc-11-2026-11-03            dem nc                              0.52/0.72   rep nc                              0.01/0.47
+ushrewc-ushr-nc-12-2026-11-03            dem nc                              0.88/0.99   rep nc                              0.01/0.13
+ushrewc-ushr-nc-13-2026-11-03            rep nc                              0.78/0.92   dem nc                              0.07/0.22
+ushrewc-ushr-nc-14-2026-11-03            rep nc                              0.79/0.92   dem nc                              0.02/0.21
+ushrewc-ushr-nd-al-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-ne-01-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-ne-02-2026-11-03            dem ne                              0.64/0.99   rep ne                              0.09/0.25
+ushrewc-ushr-ne-03-2026-11-03            rep ne                              0.87/0.99   dem ne                              0.01/0.11
+ushrewc-ushr-nh-01-2026-11-03            dem nh                              0.78/0.94   rep nh                              0.04/0.21
+ushrewc-ushr-nh-02-2026-11-03            dem nh                              0.85/0.99   rep nh                              0.01/0.15
+ushrewc-ushr-nj-01-2026-11-03            dem nj                              0.88/0.99   rep nj                              0.01/0.12
+ushrewc-ushr-nj-02-2026-11-03            rep nj                              0.76/0.91   dem nj                              0.07/0.24
+ushrewc-ushr-nj-03-2026-11-03            dem nj                              0.87/0.99   rep nj                              0.01/0.13
+ushrewc-ushr-nj-04-2026-11-03            rep nj                              0.86/0.99   dem nj                              0.01/0.14
+ushrewc-ushr-nj-05-2026-11-03            dem nj                               0.8/0.98   rep nj                               0.01/0.2
+ushrewc-ushr-nj-06-2026-11-03            dem nj                              0.88/0.99   rep nj                              0.01/0.12
+ushrewc-ushr-nj-07-2026-11-03            dem nj                               0.75/0.9   rep nj                              0.07/0.25
+ushrewc-ushr-nj-09-2026-11-03            dem nj                              0.81/0.98   rep nj                              0.01/0.17
+ushrewc-ushr-nj-10-2026-11-03            dem nj                              0.89/0.99   rep nj                              0.01/0.11
+ushrewc-ushr-nj-11-2026-11-03            dem nj                              0.87/0.99   rep nj                              0.01/0.14
+ushrewc-ushr-nj-12-2026-11-03            dem nj                              0.87/0.99   rep nj                              0.01/0.13
+ushrewc-ushr-nm-01-2026-11-03            dem nm                              0.85/0.99   rep nm                              0.01/0.15
+ushrewc-ushr-nm-02-2026-11-03            dem nm                               0.8/0.97   rep nm                              0.03/0.19
+ushrewc-ushr-nm-03-2026-11-03            dem nm                              0.81/0.98   rep nm                              0.02/0.16
+ushrewc-ushr-nv-01-2026-11-03            dem nv                              0.81/0.99   rep nv                              0.01/0.18
+ushrewc-ushr-nv-02-2026-11-03            rep nv                              0.69/0.83   dem nv                               0.1/0.31
+ushrewc-ushr-nv-03-2026-11-03            dem nv                              0.76/0.93   rep nv                              0.08/0.25
+ushrewc-ushr-nv-04-2026-11-03            dem nv                              0.79/0.97   rep nv                               0.02/0.2
+ushrewc-ushr-ny-01-2026-11-03            rep ny                              0.67/0.83   dem ny                              0.17/0.34
+ushrewc-ushr-ny-02-2026-11-03            rep ny                              0.81/0.96   dem ny                              0.05/0.19
+ushrewc-ushr-ny-03-2026-11-03            dem ny                              0.77/0.94   rep ny                              0.06/0.24
+ushrewc-ushr-ny-04-2026-11-03            dem ny                              0.72/0.92   rep ny                              0.05/0.24
+ushrewc-ushr-ny-05-2026-11-03            dem ny                              0.87/0.99   rep ny                              0.01/0.12
+ushrewc-ushr-ny-06-2026-11-03            dem ny                              0.88/0.99   rep ny                              0.01/0.12
+ushrewc-ushr-ny-07-2026-11-03            dem ny                              0.89/0.99   rep ny                               0.01/0.1
+ushrewc-ushr-ny-08-2026-11-03            dem ny                              0.89/0.99   rep ny                              0.01/0.11
+ushrewc-ushr-ny-09-2026-11-03            dem ny                              0.89/0.99   rep ny                              0.01/0.11
+ushrewc-ushr-ny-10-2026-11-03            dem ny                              0.89/0.99   rep ny                               0.01/0.1
+ushrewc-ushr-ny-11-2026-11-03            rep ny                              0.86/0.99   dem ny                              0.01/0.14
+ushrewc-ushr-ny-12-2026-11-03            dem ny                              0.89/0.99   rep ny                               0.01/0.1
+ushrewc-ushr-ny-13-2026-11-03            dem ny                               0.9/0.99   rep ny                               0.01/0.1
+ushrewc-ushr-ny-14-2026-11-03            dem ny                              0.88/0.99   rep ny                              0.01/0.12
+ushrewc-ushr-ny-15-2026-11-03            dem ny                               0.9/0.99   rep ny                               0.01/0.1
+ushrewc-ushr-ny-16-2026-11-03            dem ny                              0.89/0.99   rep ny                               0.01/0.1
+ushrewc-ushr-ny-17-2026-11-03            dem ny                              0.57/0.77   rep ny                              0.24/0.38
+ushrewc-ushr-ny-18-2026-11-03            dem ny                              0.83/0.99   rep ny                              0.01/0.17
+ushrewc-ushr-ny-19-2026-11-03            dem ny                              0.81/0.98   rep ny                              0.01/0.18
+ushrewc-ushr-ny-20-2026-11-03            dem ny                              0.87/0.99   rep ny                              0.01/0.11
+ushrewc-ushr-ny-21-2026-11-03            rep ny                              0.61/0.84   dem ny                              0.18/0.38
+ushrewc-ushr-ny-22-2026-11-03            dem ny                              0.83/0.99   rep ny                              0.01/0.18
+ushrewc-ushr-ny-23-2026-11-03            rep ny                              0.83/0.98   dem ny                              0.01/0.17
+ushrewc-ushr-ny-24-2026-11-03            rep ny                              0.83/0.99   dem ny                              0.01/0.17
+ushrewc-ushr-ny-25-2026-11-03            dem ny                              0.89/0.99   rep ny                               0.01/0.1
+ushrewc-ushr-ny-26-2026-11-03            dem ny                              0.88/0.99   rep ny                              0.01/0.12
+ushrewc-ushr-oh-01-2026-11-03            dem oh                              0.85/0.99   rep oh                              0.09/0.14
+ushrewc-ushr-oh-02-2026-11-03            rep oh                              0.87/0.99   dem oh                              0.01/0.13
+ushrewc-ushr-oh-03-2026-11-03            dem oh                              0.88/0.99   rep oh                              0.01/0.12
+ushrewc-ushr-oh-04-2026-11-03            rep oh                              0.84/0.99   dem oh                              0.01/0.14
+ushrewc-ushr-oh-05-2026-11-03            rep oh                              0.85/0.99   dem oh                              0.01/0.14
+ushrewc-ushr-oh-06-2026-11-03            rep oh                              0.83/0.99   dem oh                              0.01/0.14
+ushrewc-ushr-oh-07-2026-11-03            dem oh                              0.68/0.86   rep oh                              0.14/0.31
+ushrewc-ushr-oh-08-2026-11-03            rep oh                              0.79/0.96   dem oh                              0.02/0.19
+ushrewc-ushr-oh-09-2026-11-03            dem oh                               0.6/0.82   rep oh                               0.18/0.5
+ushrewc-ushr-oh-10-2026-11-03            rep oh                              0.78/0.92   dem oh                              0.04/0.22
+ushrewc-ushr-oh-11-2026-11-03            dem oh                              0.87/0.99   rep oh                              0.01/0.12
+ushrewc-ushr-oh-12-2026-11-03            rep oh                              0.85/0.99   dem oh                              0.01/0.15
+ushrewc-ushr-oh-13-2026-11-03            dem oh                              0.85/0.99   rep oh                              0.01/0.27
+ushrewc-ushr-oh-14-2026-11-03            rep oh                              0.86/0.99   dem oh                              0.01/0.14
+ushrewc-ushr-oh-15-2026-11-03            rep oh                              0.75/0.89   dem oh                              0.08/0.25
+ushrewc-ushr-ok-01-2026-11-03            rep ok                              0.82/0.99   dem ok                               0.01/0.2
+ushrewc-ushr-ok-02-2026-11-03            rep ok                              0.85/0.99   dem ok                              0.01/0.11
+ushrewc-ushr-ok-03-2026-11-03            rep ok                              0.88/0.99   dem ok                               0.01/0.1
+ushrewc-ushr-ok-04-2026-11-03            rep ok                              0.85/0.99   dem ok                              0.01/0.14
+ushrewc-ushr-ok-05-2026-11-03            rep ok                               0.8/0.95   dem ok                              0.02/0.19
+ushrewc-ushr-or-01-2026-11-03            dem or                              0.88/0.99   rep or                              0.01/0.12
+ushrewc-ushr-or-02-2026-11-03            rep or                              0.85/0.99   dem or                              0.01/0.14
+ushrewc-ushr-or-03-2026-11-03            dem or                               0.9/0.99   rep or                               0.01/0.1
+ushrewc-ushr-or-04-2026-11-03            dem or                              0.86/0.99   rep or                              0.01/0.14
+ushrewc-ushr-or-05-2026-11-03            dem or                              0.83/0.99   rep or                              0.01/0.15
+ushrewc-ushr-or-06-2026-11-03            dem or                              0.86/0.99   rep or                              0.01/0.12
+ushrewc-ushr-pa-01-2026-11-03            rep pa                               0.47/0.6   dem pa                              0.36/0.53
+ushrewc-ushr-pa-02-2026-11-03            dem pa                               0.9/0.99   rep pa                               0.01/0.1
+ushrewc-ushr-pa-04-2026-11-03            dem pa                              0.85/0.99   rep pa                              0.01/0.15
+ushrewc-ushr-pa-05-2026-11-03            dem pa                              0.86/0.99   rep pa                              0.01/0.14
+ushrewc-ushr-pa-06-2026-11-03            dem pa                              0.89/0.99   rep pa                              0.01/0.11
+ushrewc-ushr-pa-07-2026-11-03            dem pa                              0.67/0.85   rep pa                               0.1/0.33
+ushrewc-ushr-pa-08-2026-11-03            dem pa                              0.51/0.71   rep pa                               0.31/0.5
+ushrewc-ushr-pa-09-2026-11-03            rep pa                              0.89/0.99   dem pa                              0.01/0.11
+ushrewc-ushr-pa-10-2026-11-03            dem pa                              0.69/0.87   rep pa                              0.09/0.28
+ushrewc-ushr-pa-11-2026-11-03            rep pa                              0.81/0.99   dem pa                              0.01/0.17
+ushrewc-ushr-pa-12-2026-11-03            dem pa                              0.85/0.99   rep pa                              0.01/0.14
+ushrewc-ushr-pa-13-2026-11-03            rep pa                              0.85/0.99   dem pa                              0.01/0.14
+ushrewc-ushr-pa-14-2026-11-03            rep pa                              0.84/0.99   dem pa                              0.01/0.15
+ushrewc-ushr-pa-15-2026-11-03            rep pa                              0.85/0.99   dem pa                              0.01/0.14
+ushrewc-ushr-pa-16-2026-11-03            rep pa                              0.81/0.97   dem pa                              0.02/0.19
+ushrewc-ushr-pa-17-2026-11-03            dem pa                               0.8/0.98   rep pa                               0.03/0.2
+ushrewc-ushr-ri-01-2026-11-03            dem ri                              0.86/0.99   rep ri                              0.01/0.14
+ushrewc-ushr-ri-02-2026-11-03            dem ri                              0.88/0.99   rep ri                              0.01/0.12
+ushrewc-ushr-sc-01-2026-11-03            rep sc                              0.66/0.78   dem sc                              0.22/0.34
+ushrewc-ushr-sc-02-2026-11-03            rep sc                              0.82/0.94   dem sc                              0.05/0.18
+ushrewc-ushr-sc-03-2026-11-03            rep sc                              0.88/0.99   dem sc                              0.01/0.12
+ushrewc-ushr-sc-04-2026-11-03            rep sc                              0.83/0.99   dem sc                              0.01/0.16
+ushrewc-ushr-sc-05-2026-11-03            rep sc                              0.82/0.99   dem sc                              0.01/0.17
+ushrewc-ushr-sc-06-2026-11-03            dem sc                              0.86/0.99   rep sc                              0.01/0.14
+ushrewc-ushr-sc-07-2026-11-03            rep sc                              0.85/0.99   dem sc                              0.01/0.15
+ushrewc-ushr-sd-al-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-tn-01-2026-11-03            rep tn                              0.85/0.99   dem tn                              0.01/0.13
+ushrewc-ushr-tn-02-2026-11-03            rep tn                              0.85/0.99   dem tn                              0.01/0.14
+ushrewc-ushr-tn-03-2026-11-03            rep tn                              0.85/0.99   dem tn                              0.01/0.14
+ushrewc-ushr-tn-05-2026-11-03            rep tn                              0.82/0.99   dem tn                              0.01/0.18
+ushrewc-ushr-tn-06-2026-11-03            rep tn                              0.85/0.99   dem tn                              0.01/0.15
+ushrewc-ushr-tn-07-2026-11-03            rep tn                              0.82/0.97   dem tn                               0.02/0.2
+ushrewc-ushr-tx-01-2026-11-03            rep tx                              0.88/0.99   dem tx                              0.01/0.11
+ushrewc-ushr-tx-02-2026-11-03            rep tx                              0.81/0.95   dem tx                              0.03/0.19
+ushrewc-ushr-tx-03-2026-11-03            rep tx                              0.83/0.96   dem tx                              0.02/0.17
+ushrewc-ushr-tx-04-2026-11-03            rep tx                              0.85/0.99   dem tx                              0.01/0.14
+ushrewc-ushr-tx-05-2026-11-03            rep tx                              0.83/0.99   dem tx                              0.01/0.17
+ushrewc-ushr-tx-06-2026-11-03            rep tx                              0.84/0.99   dem tx                              0.01/0.17
+ushrewc-ushr-tx-07-2026-11-03            dem tx                              0.85/0.99   rep tx                              0.01/0.15
+ushrewc-ushr-tx-08-2026-11-03            rep tx                              0.85/0.99   dem tx                              0.01/0.13
+ushrewc-ushr-tx-09-2026-11-03            rep tx                              0.71/0.89   dem tx                              0.07/0.25
+ushrewc-ushr-tx-10-2026-11-03            rep tx                               0.8/0.95   dem tx                              0.04/0.21
+ushrewc-ushr-tx-11-2026-11-03            rep tx                              0.85/0.99   dem tx                              0.01/0.14
+ushrewc-ushr-tx-12-2026-11-03            rep tx                              0.83/0.99   dem tx                              0.01/0.17
+ushrewc-ushr-tx-13-2026-11-03            rep tx                              0.88/0.99   dem tx                              0.01/0.13
+ushrewc-ushr-tx-14-2026-11-03            rep tx                              0.87/0.99   dem tx                              0.01/0.13
+ushrewc-ushr-tx-15-2026-11-03            dem tx                               0.5/0.69   rep tx                                0.3/0.5
+ushrewc-ushr-tx-16-2026-11-03            dem tx                              0.88/0.99   rep tx                              0.01/0.12
+ushrewc-ushr-tx-17-2026-11-03            rep tx                              0.84/0.99   dem tx                              0.01/0.16
+ushrewc-ushr-tx-18-2026-11-03            dem tx                              0.88/0.99   rep tx                              0.01/0.12
+ushrewc-ushr-tx-19-2026-11-03            rep tx                              0.88/0.99   dem tx                              0.01/0.12
+ushrewc-ushr-tx-20-2026-11-03            dem tx                              0.85/0.99   rep tx                              0.01/0.14
+ushrewc-ushr-tx-21-2026-11-03            rep tx                              0.82/0.95   dem tx                              0.03/0.18
+ushrewc-ushr-tx-22-2026-11-03            rep tx                              0.81/0.99   dem tx                              0.01/0.16
+ushrewc-ushr-tx-23-2026-11-03            rep tx                              0.56/0.77   dem tx                              0.23/0.44
+ushrewc-ushr-tx-24-2026-11-03            rep tx                               0.8/0.99   dem tx                               0.01/0.2
+ushrewc-ushr-tx-25-2026-11-03            rep tx                              0.82/0.98   dem tx                               0.03/0.2
+ushrewc-ushr-tx-26-2026-11-03            rep tx                              0.81/0.96   dem tx                              0.01/0.18
+ushrewc-ushr-tx-27-2026-11-03            rep tx                              0.82/0.99   dem tx                              0.01/0.18
+ushrewc-ushr-tx-28-2026-11-03            dem tx                              0.73/0.91   rep tx                              0.09/0.26
+ushrewc-ushr-tx-29-2026-11-03            dem tx                              0.85/0.99   rep tx                              0.01/0.14
+ushrewc-ushr-tx-30-2026-11-03            dem tx                              0.88/0.99   rep tx                              0.01/0.12
+ushrewc-ushr-tx-31-2026-11-03            rep tx                              0.82/0.98   dem tx                              0.01/0.17
+ushrewc-ushr-tx-32-2026-11-03            dem tx                              0.09/0.28   rep tx                              0.01/0.99
+ushrewc-ushr-tx-33-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-tx-34-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-tx-35-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-tx-36-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-tx-37-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-tx-38-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-ut-01-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-ut-02-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-ut-03-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-ut-04-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-va-01-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-va-02-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-va-03-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-va-04-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-va-07-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-va-09-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-va-10-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-vt-al-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-wi-01-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-wi-03-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-wi-04-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-wi-05-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-wi-06-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-wi-07-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-wi-08-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-wv-01-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-wv-02-2026-11-03            -- cannot tell favourite, skipped
+ushrewc-ushr-wy-al-2026-11-03            -- cannot tell favourite, skipped
 
-clean two-sided races ready to plan: 1
+clean two-sided races ready to plan: 368
