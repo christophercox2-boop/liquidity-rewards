@@ -1,0 +1,9 @@
+enwc-uspres-nom-rep-2028-ranpau
+   asks [(51, 100), (99, 9816)]
+   ask side 9,916 of 10,000   best ask 51c
+   ours already at 51c: 0
+   SELL 85 @ 99c -> ok
+   SELL 33 @ 51c -> ok
+
+   after: asks [(51, 100), (99, 9816)]
+   ask side 9,916 of 10,000 -> STILL SHORT
