@@ -3308,12 +3308,12 @@ def _slug_known(slug: str) -> bool:
 # thing automatically, but turning the keeper on also turns on its second
 # branch (40-share orders near the touch), which is why this exists
 # separately.
-# The real bound is buying power: capacity is recomputed from it before every
-# order and never dips into the reserve, so a tap cannot spend past the
-# balance whatever a resting contract turns out to tie up. MAX_USD is a
-# backstop on top of that, measured as the observed drop in buying power.
-QUALIFY_MAX_USD = float(os.environ.get("QUALIFY_MAX_USD", "100"))
-QUALIFY_MAX_ORDERS = int(os.environ.get("QUALIFY_MAX_ORDERS", "40"))
+# Buying power is a per-side, per-book ceiling — resting orders do not draw
+# it down, only fills do, and the same balance backs every market at once.
+# So this caps what one side of one book can take, not a budget shared across
+# markets: qualifying market A leaves market B just as fundable.
+QUALIFY_MAX_USD = float(os.environ.get("QUALIFY_MAX_USD", "250"))
+QUALIFY_MAX_ORDERS = int(os.environ.get("QUALIFY_MAX_ORDERS", "60"))
 QUALIFY_RESERVE_USD = float(os.environ.get("QUALIFY_RESERVE_USD", "5"))
 QUALIFY_BID_MAX = int(os.environ.get("QUALIFY_BID_MAX", "10000"))
 # Below this, an order is not worth its own slot in the book. A balance that
@@ -3402,28 +3402,30 @@ def do_qualify(slug: str, side: str) -> tuple[int, dict]:
         except Exception:  # noqa: BLE001 — fall back rather than stall
             return fallback
 
-    bp_start = live_bp(float(MONITOR.buying_power or 0.0))
-    bp = bp_start
-    if _qual_per_order(side, px, max(0.0, bp - QUALIFY_RESERVE_USD)) < 1:
+    bp = live_bp(float(MONITOR.buying_power or 0.0))
+    unit = px if side == "BUY" else 1 - px      # notional a share holds while resting
+    # Buying power is NOT drawn down by resting orders — only a fill moves it.
+    # It is a ceiling on ONE side of ONE book, and the same balance backs
+    # every other market at the same time. So the bound here is this side of
+    # this book; there is no budget being shared across a slate of markets,
+    # and nothing to reserve for the next market.
+    room = max(0.0, min(bp, QUALIFY_MAX_USD) - QUALIFY_RESERVE_USD)
+    affordable = int(room / unit) if unit > 0 else 0
+    if affordable < 1:
         return 400, {"ok": False,
-                     "error": f"no headroom — buying power ${bp:,.2f}"}
+                     "error": f"no headroom on this side — buying power ${bp:,.2f}"}
+    want = min(need, affordable)
     placed = 0
     done = 0
     errs: list[str] = []
-    # One tap closes the whole gap, in as many orders as that takes: the ask
-    # side can only carry `buying power` shares per order, so a 1,200-share
-    # gap on a $120 balance is ten orders, not one. Buying power is re-read
-    # from the exchange between placements so each chunk is sized to what is
-    # actually there, not to a model of what resting costs.
+    # One tap closes the whole gap, in as many orders as that takes: an ask
+    # order can only carry `buying power` shares, so a 1,200-share gap on a
+    # $120 balance is ten orders, not one. A bid goes in one.
     for _ in range(QUALIFY_MAX_ORDERS):
-        if done >= need:
+        if done >= want:
             break
-        if bp_start - bp >= QUALIFY_MAX_USD:
-            errs.append(f"stopped at the ${QUALIFY_MAX_USD:.0f} per-tap cap")
-            break
-        short = need - done
-        qty = int(min(short, _qual_per_order(side, px,
-                                             max(0.0, bp - QUALIFY_RESERVE_USD))))
+        short = want - done
+        qty = int(min(short, _qual_per_order(side, px, bp)))
         # finishing the gap is always worth an order; a dribble is not
         if qty < 1 or (qty < QUALIFY_MIN_CHUNK and qty < short):
             errs.append(f"buying power ${bp:,.2f} carries only {qty:,} shares per order "
@@ -3437,8 +3439,12 @@ def do_qualify(slug: str, side: str) -> tuple[int, dict]:
         placed += 1
         done += qty
         time.sleep(1.0)
+        # only a fill moves buying power, but one can land mid-run
         bp = live_bp(bp)
-    spent = max(0.0, bp_start - bp)
+    if want < need:
+        errs.append(f"this side of this book tops out at {want:,} shares "
+                    f"(${room:,.2f} of room) — {need - want:,} short of Target Size")
+    spent = done * unit
     remaining = need - done
     # Report where the side actually ended up, not where we hoped it would.
     # The public book can lag a placement by a beat, so give it one, then
