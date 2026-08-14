@@ -1,0 +1,63 @@
+{
+ "placed": 630,
+ "failed": 0,
+ "short": [
+  {
+   "m": "enwc-uspres-nom-dem-2028-dwajoh",
+   "ours": 9994.359999999995
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-stasmi",
+   "ours": 9994.359999999997
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-dontrujr",
+   "ours": 9994.84
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-thomas",
+   "ours": 9994.359999999997
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-vivram",
+   "ours": 9994.6
+  },
+  {
+   "m": "ewc-usp-2028-11-07-aleocc",
+   "ours": 9994.720000000003
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontru",
+   "ours": 9994.48
+  },
+  {
+   "m": "ewc-usp-2028-11-07-petbut",
+   "ours": 9994.359999999999
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rokha",
+   "ours": 9994.359999999997
+  },
+  {
+   "m": "ewc-usp-2028-11-07-stasmi",
+   "ours": 9994.359999999995
+  },
+  {
+   "m": "ewc-usp-2028-11-07-tuccar",
+   "ours": 9994.359999999997
+  },
+  {
+   "m": "ewc-usp-2028-11-07-tulgab",
+   "ours": 9994.359999999995
+  },
+  {
+   "m": "ewc-usp-2028-11-07-vivram",
+   "ours": 9994.479999999998
+  },
+  {
+   "m": "ewc-usp-2028-11-07-wesmoo",
+   "ours": 9994.359999999997
+  }
+ ],
+ "rubio_bid": 10400.0
+}
