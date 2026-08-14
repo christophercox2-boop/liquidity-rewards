@@ -257,3 +257,5 @@ jobs:
             git pull --rebase origin main
             git push
           fi
+
+# verify 2026-08-14: confirm the slate entry actually rested at Target Size
