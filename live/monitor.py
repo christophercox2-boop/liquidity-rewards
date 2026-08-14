@@ -4308,12 +4308,18 @@ def _map_payload() -> dict:
         # Effective state: the owner's toggle AND the host env veto AND, for
         # defend, whether any market is armed. The page shows the toggles and
         # the reason the loop is not actually running when they disagree.
-        "auto": {"defend": _auto_on("defend"), "keeper": _auto_on("keeper")},
+        # Every switch the page draws must appear here. A key missing from
+        # this dict reads as undefined in the browser, so the button repaints
+        # OFF on the next refresh even though the loop is running.
+        "auto": {"defend": _auto_on("defend"), "keeper": _auto_on("keeper"),
+                 "snipe": _auto_on("snipe")},
         "defend_live": bool(_auto_on("defend")
                             and os.environ.get("DEFEND_PAUSE", "") != "1"
                             and (MONITOR.state.get("defend") or {})),
         "keeper_live": bool(_auto_on("keeper")
                             and os.environ.get("KEEP_PAUSE", "") != "1"),
+        "snipe_live": bool(_auto_on("snipe")
+                           and os.environ.get("SNIPE_PAUSE", "") != "1"),
         "defend_markets": len(MONITOR.state.get("defend") or {}),
         "defend_note": ("switched off"
                         if not _auto_on("defend") else
@@ -4611,9 +4617,14 @@ function swRender(){
     const b=document.getElementById('sw_'+k); if(!b) return;
     b.disabled=false;
     const on = DATA.auto[k]===true;
+    // A switch the server does not report at all is NOT off -- it is unknown.
+    // Painting it OFF would hide a running loop, which is how the sniper
+    // switch appeared to snap back the moment it was turned on.
+    const missing = DATA.auto[k]===undefined;
     b.className='autosw'+(SWARM[k]?' arm':(on?' on':''));
     b.querySelector('.st').textContent =
       SWARM[k] ? 'tap again to turn ON' :
+      missing ? 'state not reported — reload' :
       (on ? 'ON — '+SWDESC[k].on : 'OFF — '+SWDESC[k].off);
   });
 }
@@ -5970,12 +5981,25 @@ function renderPositions(){
       const ownTxt = r.short
         ? '<b style="color:#f0883e">No '+Math.abs(r.net).toLocaleString()+'</b>'
         : r.net.toLocaleString();
-      return '<tr style="'+bg+'" onclick="openMkt(\\''+esc(r.market)+'\\')">'+
-        '<td class="mkt"><b style="color:var(--ink);font-size:12px">'+esc(mname(r.market))+'</b><div style="font-size:9px">'+esc(r.market)+'</div></td>'+
-        '<td class="r">'+ownTxt+
-        (r.avg_cents != null ? '<br><span class="sub" style="font-size:10px">@ '+r.avg_cents.toFixed(1)+'¢ avg</span>' : '')+'</td>'+
-        '<td class="r" style="font-size:11px">'+(sells ? esc(sells) : '<span class="sub">no sell resting</span>')+'</td>'+
-        '<td class="r">'+btn+'</td></tr>';
+      // One cell per position, not four columns. On a phone the button column
+      // demands ~300px, and a four-column row answers that by squeezing the
+      // name to a single character per line. Name gets its own full-width
+      // line; the numbers and the buttons share the line below and wrap.
+      return '<tr style="'+bg+'">'+
+        '<td style="padding:8px 0">'+
+        '<div onclick="openMkt(\\''+esc(r.market)+'\\')">'+
+          '<b style="color:var(--ink);font-size:13px;line-height:1.3">'+esc(mname(r.market))+'</b>'+
+          '<div class="sub" style="font-size:9px;word-break:break-all">'+esc(r.market)+'</div>'+
+        '</div>'+
+        '<div style="display:flex;flex-wrap:wrap;align-items:flex-start;'+
+             'justify-content:space-between;gap:10px;margin-top:6px">'+
+          '<div style="flex:1 1 120px;min-width:110px">'+ownTxt+
+            (r.avg_cents != null ? '<span class="sub" style="font-size:10px"> @ '+r.avg_cents.toFixed(1)+'¢ avg</span>' : '')+
+            '<div class="sub" style="font-size:11px;margin-top:2px">'+
+            (sells ? esc(sells) : 'no sell resting')+'</div>'+
+          '</div>'+
+          '<div style="flex:0 0 auto;text-align:right">'+btn+'</div>'+
+        '</div></td></tr>';
     }).join('') || '<tr><td class="sub">no open positions</td></tr>';
 }
 async function posFix(i, ask){
