@@ -1,0 +1,94 @@
+Senate/Governor markets: 210   budget $700
+
+
+=== JOB 1a — lift short sides to Target Size: 12 ===
+  usgubewc-usgub-co-2026-11-03-dem SELL
+    SELL 1736 @ 99c  $17.36  [qualify] -> ok
+  usgubewc-usgub-ma-2026-11-03-rep SELL
+    SELL 1726 @ 99c  $17.26  [qualify] -> ok
+  usgubewc-usgub-nh-2026-11-03-rep BUY
+    BUY 1661 @ 1c  $16.61  [qualify] -> ok
+  usgubewc-usgub-ok-2026-11-03-dem BUY
+    BUY 1751 @ 1c  $17.51  [qualify] -> ok
+  usgubewc-usgub-ri-2026-11-03-dem BUY
+    BUY 46 @ 1c  $0.46  [qualify] -> ok
+  usgubewc-usgub-ri-2026-11-03-rep BUY
+    BUY 651 @ 1c  $6.51  [qualify] -> ok
+  usgubewc-usgub-tn-2026-11-03-dem SELL
+    SELL 1726 @ 99c  $17.26  [qualify] -> ok
+  usgubewc-usgub-tx-2026-11-03-rep BUY
+    BUY 1751 @ 1c  $17.51  [qualify] -> ok
+  usgubewc-usgub-tx-2026-11-03-rep SELL
+    SELL 1766 @ 99c  $17.66  [qualify] -> ok
+  ussewc-usse-ms-2026-11-03-rep SELL
+    SELL 1261 @ 99c  $12.61  [qualify] -> ok
+  ussewc-usse-mt-2026-11-03-rep SELL
+    SELL 1476 @ 99c  $14.76  [qualify] -> ok
+  ussewc-usse-sc-2026-11-03-dem BUY
+    BUY 1761 @ 1c  $17.61  [qualify] -> ok
+
+=== JOB 1b — put an order AT the touch: 3 ===
+  usgubewc-usgub-nh-2026-11-03-rep BUY
+    BUY 38 @ 84c  $31.92  [touch] -> ok
+  usgubewc-usgub-sd-2026-11-03-rep BUY
+    BUY 50 @ 93c  $46.50  [touch] -> ok
+  usgubewc-usgub-pa-2026-11-03-rep BUY
+    BUY 50 @ 6c  $3.00  [touch] -> ok
+
+=== JOB 3 — join qualifying sides we are not in: 47 ===
+  usgubewc-usgub-ok-2026-11-03-rep SELL
+    SELL 50 @ 98c  $1.00  [join] -> ok
+  enwc-usgubp-ok-2026-06-16-rep-gendru BUY
+    BUY 50 @ 26c  $13.00  [join] -> ok
+  enwc-ussep-nh-2026-09-08-dem-chrpap SELL
+    SELL 50 @ 95c  $2.50  [join] -> ok
+  usgubewc-usgub-al-2026-11-03-rep SELL
+    SELL 50 @ 91c  $4.50  [join] -> ok
+  ussewc-usse-ky-2026-11-03-rep BUY
+    BUY 12 @ 40c  $4.80  [join] -> ok
+  ewc-usgub-ga-2026-11-03-rep BUY
+    BUY 50 @ 36c  $18.00  [join] -> ok
+  ewc-usgub-ga-2026-11-03-dem SELL
+    SELL 50 @ 60c  $20.00  [join] -> ok
+  ussewc-usse-ky-2026-11-03-rep SELL
+    SELL 50 @ 93c  $3.50  [join] -> ok
+  usgubewc-usgub-ny-2026-11-03-dem BUY
+    BUY 14 @ 86c  $12.04  [join] -> ok
+  ewc-usgub-ca-2026-11-03-stehil BUY
+    BUY 50 @ 5c  $2.50  [join] -> ok
+  ussewc-usse-ok-2026-11-03-rep BUY
+    BUY 27 @ 56c  $15.12  [join] -> ok
+  ewc-usse-mn-2026-11-03-rep BUY
+    BUY 50 @ 12c  $6.00  [join] -> ok
+  ewc-usse-nc-2026-11-03-rep BUY
+    BUY 50 @ 7c  $3.50  [join] -> ok
+  ewc-usgub-ga-2026-11-03-rep SELL
+    SELL 50 @ 37c  $31.50  [join] -> ok
+  usgubewc-usgub-al-2026-11-03-rep BUY
+    BUY 39 @ 60c  $23.40  [join] -> ok
+  ewc-usgub-az-2026-11-03-rep BUY
+    BUY 50 @ 14c  $7.00  [join] -> ok
+  ussewc-usse-sd-2026-11-03-rep BUY
+    BUY 29 @ 93c  $26.97  [join] -> ok
+  ussewc-usse-or-2026-11-03-dem BUY
+    BUY 29 @ 94c  $27.26  [join] -> ok
+  vsc-usgubp-fl-fshbck-atl-5pct BUY
+    BUY 42 @ 53c  $22.26  [join] -> ok
+  enwc-usgubp-ok-2026-06-16-rep-mikmaz SELL
+    SELL 50 @ 76c  $12.00  [join] -> ok
+  ewc-usse-mn-2026-11-03-dem SELL
+    SELL 50 @ 88c  $6.00  [join] -> ok
+  ussewc-usse-ms-2026-11-03-dem SELL
+    SELL 50 @ 44c  $28.00  [join] -> ok
+  enwc-usgubp-ok-2026-06-16-rep-gendru SELL
+    SELL 50 @ 27c  $36.50  [join] -> ok
+  enwc-ussep-ma-2026-09-01-dem-edmark SELL
+    SELL 50 @ 81c  $9.50  [join] -> ok
+  enwc-ussep-nh-2026-09-08-dem-karman SELL
+    SELL 47 @ 6c  $44.18  [join] -> ok
+  ussewc-usse-tn-2026-11-03-rep BUY
+    BUY 49 @ 93c  $45.57  [join] -> ok
+  usgubewc-usgub-al-2026-11-03-dem SELL
+    budget $700 reached — stopping
+
+placed 41, failed 0, committed $681.14 of $700
