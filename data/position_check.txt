@@ -1,14 +1,33 @@
 === auth probe ===
-https://api.polymarket.us/v1/orders/open -> 401  {"code":16,"message":"The server was unable to process your request.","details":[]}
-https://api.polymarket.us/v1/portfolio/positions -> 401  {"code":16,"message":"The server was unable to process your request.","details":[]}
+https://api.polymarket.us/v1/orders/open -> 200  {"orders":[{"id":"BVVWG16TGDK0","marketSlug":"usgubewc-usgub-co-2026-11-03-rep","side":"ORDER_SIDE_BUY","type":"ORDER_TYPE_LIMIT","price":{"value":"0.02","currency":"USD"},"quantity":500,"cumQuantity"
+https://api.polymarket.us/v1/portfolio/positions -> 200  {"positions":{"apdc-alito-2026-12-31":{"netPosition":"64","qtyBought":"736","qtySold":"672","cost":{"value":"38.5070","currency":"USD"},"realized":{"value":"-35.4710","currency":"USD"},"bodPosition":"
 https://api.prod.polymarketexchange.com/v1/incentives/earnings -> 401  {"message":"Unauthorized"}
 (no auth) /v1/incentives -> 200
-local clock (epoch): 1786458419
+local clock (epoch): 1786719052
 
-positions HTTP 401
-non-zero positions: 0
+positions HTTP 200
+non-zero positions: 19
 
+ussewc-usse-wy-2026-11-03-dem                net       85.0  avg {'value': '0.0590', 'currency': 'USD'}
+apdc-alito-2026-12-31                        net       64.0  avg {'value': '0.6050', 'currency': 'USD'}
+usgubewc-usgub-sd-2026-11-03-rep             net      -40.0  avg {'value': '0.0100', 'currency': 'USD'}
+ussewc-usse-va-2026-11-03-rep                net       40.0  avg {'value': '0.0590', 'currency': 'USD'}
+apdc-jerpowgov-2026-12-31                    net      -25.0  avg {'value': '0.8430', 'currency': 'USD'}
+usgubewc-usgub-mn-2026-11-03-dem             net       25.0  avg {'value': '0.9500', 'currency': 'USD'}
+usgubewc-usgub-nh-2026-11-03-rep             net      -25.0  avg {'value': '0.1380', 'currency': 'USD'}
+ussewc-usse-ma-2026-11-03-dem                net      -25.0  avg {'value': '0.0200', 'currency': 'USD'}
+pandc-anydis-2027-12-31                      net       18.0  avg {'value': '0.2270', 'currency': 'USD'}
+scc-hrep-rep-2026-11-03-gte190               net      -17.0  avg {'value': '0.3000', 'currency': 'USD'}
+ussewc-usse-ms-2026-11-03-rep                net       15.0  avg {'value': '0.9290', 'currency': 'USD'}
+ewc-usp-party-2028-11-07-dem                 net      -13.0  avg {'value': '0.3080', 'currency': 'USD'}
+usgubewc-usgub-mn-2026-11-03-rep             net       11.0  avg {'value': '0.0590', 'currency': 'USD'}
+usgubewc-usgub-tx-2026-11-03-rep             net       10.0  avg {'value': '0.8580', 'currency': 'USD'}
+scc-hrep-rep-2026-11-03-gte200               net        8.0  avg {'value': '6.6260', 'currency': 'USD'}
+ussewc-usse-sc-2026-11-03-rep                net       -6.0  avg {'value': '0.0880', 'currency': 'USD'}
+usgubewc-usgub-ct-2026-11-03-dem             net       -5.0  avg {'value': '0.0300', 'currency': 'USD'}
+ussewc-usse-la-2026-11-03-rep                net        3.0  avg {'value': '0.9500', 'currency': 'USD'}
+enwc-uspres-nom-dem-2028-jonoss              net       -2.0  avg {'value': '0.4850', 'currency': 'USD'}
 
 scc-senate-gop-2026-11-03-lte45: NO position — the order did not fill after all
 
-scc-senate-gop-2026-11-03-lte45 book now: best bid (0.07, 359.19) / best ask (0.08, 1329.21)
+scc-senate-gop-2026-11-03-lte45 book now: best bid (0.02, 25687.0) / best ask (0.07, 937.0)
