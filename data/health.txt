@@ -1,32 +1,32 @@
 GET /v1/account/balances -> 200
-  {'currency': 'USD', 'buyingPower': 170.2063}
-records returned by /v1/orders/open: 686
-  ORDER_STATE_NEW                      679  LIVE
-  ORDER_STATE_PARTIALLY_FILLED           7  LIVE
-ghosts: 0   live: 686   (the app should show 686)
+  {'currency': 'USD', 'buyingPower': 155.8116}
+records returned by /v1/orders/open: 3072
+  ORDER_STATE_NEW                     3063  LIVE
+  ORDER_STATE_PARTIALLY_FILLED           9  LIVE
+ghosts: 0   live: 3072   (the app should show 3072)
 
-686 live orders
-capital committed in resting orders: $11,534.65
+3072 live orders
+capital committed in resting orders: $15,572.20
 
-price rungs holding more than one order: 26 (389 orders beyond the first)
-  pandc-anydis-2027-12-31                      SELL   99c  88 orders  sizes [90, 159, 159, 159, 159, 159]
-  ewc-usp-party-2028-11-07-dem                 SELL   99c  49 orders  sizes [200, 200, 200, 200, 200, 200]
-  enwc-uspres-nom-rep-2028-ranpau              SELL   99c  48 orders  sizes [208, 208, 208, 208, 208, 208]
-  ewc-usp-party-2028-11-07-rep                 SELL   99c  47 orders  sizes [213, 213, 14, 213, 213, 213]
-  apdc-jerpowgov-2026-12-31                    SELL   99c  37 orders  sizes [135, 86, 95, 95, 95, 148]
-  usgubewc-usgub-wy-2026-11-03-dem             SELL   99c  15 orders  sizes [132, 132, 132, 132, 79, 132]
-  ussewc-usse-wv-2026-11-03-rep                SELL   99c  14 orders  sizes [197, 222, 222, 222, 222, 222]
-  usgubewc-usgub-wy-2026-11-03-rep             SELL   99c  13 orders  sizes [154, 197, 222, 222, 222, 197]
-  usgubewc-usgub-ri-2026-11-03-dem             SELL   99c  12 orders  sizes [148, 156, 156, 98, 148, 148]
-  ussewc-usse-wy-2026-11-03-rep                SELL   99c  12 orders  sizes [142, 142, 142, 142, 142, 142]
-  ussewc-usse-ma-2026-11-03-dem                SELL   99c  12 orders  sizes [197, 222, 222, 222, 222, 222]
-  usgubewc-usgub-ma-2026-11-03-dem             SELL   99c  11 orders  sizes [222, 222, 222, 222, 222, 222]
-  usgubewc-usgub-sd-2026-11-03-dem             SELL   99c  11 orders  sizes [217, 166, 111, 152, 149, 56]
-  usgubewc-usgub-pa-2026-11-03-rep             SELL   99c  6 orders  sizes [193, 131, 134, 140, 134, 120]
-  usgubewc-usgub-id-2026-11-03-rep             SELL   99c  6 orders  sizes [206, 206, 165, 156, 191, 23]
+price rungs holding more than one order: 70 (2726 orders beyond the first)
+  pandc-anydis-2027-12-31                      SELL   99c  88 orders  sizes [90, 228, 90, 159, 159, 159]
+  ewc-usp-2028-11-07-rahema                    SELL   99c  65 orders  sizes [149, 149, 149, 149, 149, 149]
+  ewc-usp-2028-11-07-thomas                    SELL   99c  65 orders  sizes [149, 149, 149, 149, 149, 149]
+  ewc-usp-2028-11-07-rondes                    SELL   99c  65 orders  sizes [149, 149, 149, 149, 149, 149]
+  ewc-usp-2028-11-07-micoba                    SELL   99c  60 orders  sizes [149, 149, 149, 171, 171, 171]
+  enwc-uspres-nom-dem-2028-wesmoo              SELL   99c  57 orders  sizes [170, 170, 170, 170, 170, 170]
+  enwc-uspres-nom-rep-2028-margre              SELL   99c  57 orders  sizes [170, 170, 170, 170, 170, 170]
+  enwc-uspres-nom-rep-2028-tuccar              SELL   99c  57 orders  sizes [170, 170, 170, 170, 170, 170]
+  ewc-usp-2028-11-07-dontrujr                  SELL   99c  57 orders  sizes [170, 170, 170, 170, 170, 170]
+  ewc-usp-2028-11-07-elomus                    SELL   99c  57 orders  sizes [170, 170, 170, 170, 170, 170]
+  enwc-uspres-nom-rep-2028-dontru              SELL   99c  57 orders  sizes [170, 170, 170, 170, 170, 170]
+  ewc-usp-2028-11-07-andbes                    SELL   99c  57 orders  sizes [170, 170, 170, 170, 170, 170]
+  enwc-uspres-nom-rep-2028-elomus              SELL   99c  57 orders  sizes [170, 170, 170, 170, 170, 170]
+  enwc-uspres-nom-rep-2028-tulgab              SELL   99c  57 orders  sizes [170, 170, 170, 170, 170, 55]
+  enwc-uspres-nom-rep-2028-marrub              SELL   99c  57 orders  sizes [170, 170, 170, 170, 170, 170]
 
 usgubewc-usgub-tn-2026-11-03-rep: 2 orders
-  BUY    1.0c  leaves  1,710  state ORDER_STATE_NEW  id BV4XQN0J8DK0
   SELL  99.0c  leaves    137  state ORDER_STATE_NEW  id BTXT6ZA8CDK7
-  book: best bid 93c  best ask 94c
+  BUY    1.0c  leaves  1,710  state ORDER_STATE_NEW  id BV4XQN0J8DK0
+  book: best bid 49c  best ask 94c
   a 96c bid would CROSS the 94c ask
