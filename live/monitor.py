@@ -2393,9 +2393,13 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
         return 400, {"ok": False, "error": "unknown order id — wait for the next refresh"}
     if not (0.1 <= price_cents <= 99.9):
         return 400, {"ok": False, "error": "price out of range (0.1–99.9¢)"}
-    qty = int(quantity) if quantity else int(round(o["size"]))
-    if not (1 <= qty <= 20000):
-        return 400, {"ok": False, "error": "size out of range (1–20,000)"}
+    # Sizes are fractional. int(round(...)) turned a 273.04 order into 273,
+    # which then FAILED its own verification — the check demands the
+    # replacement match the original's size, and 273 is short of 273.04. Every
+    # reprice of a fractional order was unwinnable that way.
+    qty = round(float(quantity) if quantity else float(o["size"] or 0), 2)
+    if not (0.01 <= qty <= 20000):
+        return 400, {"ok": False, "error": "size out of range (0.01–20,000)"}
     # A post-only replacement that would cross the opposite touch can never
     # rest — refuse up front, which is a pure no-op for the resting order.
     ent = tr._BOOK_CACHE.get(o["market"])
@@ -2412,8 +2416,8 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
     record = {"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
               "market": o["market"], "side": o["side"],
               "from": round(o["price"] * 100, 1), "to": price_cents,
-              "size": (qty if qty == int(round(o["size"]))
-                       else f"{int(round(o['size']))}→{qty}")}
+              "size": (qty if abs(qty - float(o["size"] or 0)) < 0.005
+                       else f"{float(o['size'] or 0):g}→{qty:g}")}
 
     def _api(method, path, body=None):
         return requests.request(
@@ -3074,13 +3078,16 @@ def auto_defend() -> None:
 #
 # This is the one loop here that CROSSES the spread — it is a taker, not a
 # rester, and it pays the taker fee. It is deliberately narrow: only the 2028
-# slate, only levels under 5 contracts (SNIPE_MAX_QTY), only at or above
+# slate, only touch levels under SNIPE_MAX_LEVEL contracts, only at or above
 # SNIPE_MIN_PRICE, never the three candidates the owner named as real
 # contenders, and bounded per cycle in both count and dollars.
 #
 # Like every other loop that places orders, it does nothing at all until the
 # owner turns its switch on from /map. Off by default, persisted, audit-logged.
-SNIPE_MAX_QTY = float(os.environ.get("SNIPE_MAX_QTY", "4"))   # takes levels UNDER 5
+# A touch level strictly under this many contracts is fair game, and the
+# WHOLE level is taken — 4.9 contracts is under five just as much as 1 is,
+# and leaving 0.9 behind would leave the touch exactly where it was.
+SNIPE_MAX_LEVEL = float(os.environ.get("SNIPE_MAX_LEVEL", "5"))
 SNIPE_MIN_PRICE = float(os.environ.get("SNIPE_MIN_PRICE", "0.15"))
 SNIPE_MAX_PER_CYCLE = int(os.environ.get("SNIPE_MAX_PER_CYCLE", "6"))
 SNIPE_MAX_SPEND = float(os.environ.get("SNIPE_MAX_SPEND", "25"))
@@ -3121,16 +3128,19 @@ def auto_snipe() -> None:
         px, q = float(bids[0][0]), float(bids[0][1])
         # only the TOUCH level, and only if it is both small and rich. A big
         # bid at 20c is somebody's real opinion; a handful of contracts is not.
-        if px < SNIPE_MIN_PRICE or q > SNIPE_MAX_QTY or q < 1:
+        # Sizes here are FRACTIONAL — books carry levels like 0.06 and 273.04.
+        # Rounding them away broke this twice over: a 0.4-contract bid was
+        # skipped entirely as "under one", and a 1.5-contract level was taken
+        # as 1, leaving 0.5 resting and the touch exactly where it was. The
+        # whole point is to CLEAR the level, so work in fractions throughout.
+        if px < SNIPE_MIN_PRICE or q >= SNIPE_MAX_LEVEL or q <= 0:
             continue
         # never trade with ourselves
         ours = sum(o.get("size") or 0 for o in MONITOR.orders
                    if o.get("market") == m and o.get("side") == "BUY"
                    and abs(float(o.get("price") or 0) - px) < 1e-9)
-        if q - ours < 1:
-            continue
-        qty = int(min(q - ours, SNIPE_MAX_QTY))
-        if qty < 1 or spent + px * qty > SNIPE_MAX_SPEND:
+        qty = round(q - ours, 2)      # the whole level, fractions included
+        if qty <= 0 or spent + px * qty > SNIPE_MAX_SPEND:
             continue
         _SNIPE_LAST[m] = now
         try:
@@ -3141,7 +3151,7 @@ def auto_snipe() -> None:
                 json={"marketSlug": m, "intent": "ORDER_INTENT_BUY_SHORT",
                       "type": "ORDER_TYPE_LIMIT",
                       "price": {"value": f"{px:.2f}", "currency": "USD"},
-                      "quantity": qty,
+                      "quantity": qty,                     # may be fractional
                       "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
                       "participateDontInitiate": False},   # crosses on purpose
                 timeout=20)
