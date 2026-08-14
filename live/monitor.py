@@ -3898,6 +3898,24 @@ MAP_PAY_RATIO = 0.25         # earned this far under the implied take is a flag
 MAP_PAY_MIN_IMPLIED = 0.10   # ignore markets whose implied take is pocket change
 
 
+def _gh_text(path: str, ref: str = "main") -> str:
+    """A file's contents from the repo. The monitor runs from a deploy branch
+    checkout that carries no data/, so anything the daily workflows produce
+    has to be read over the API rather than off disk."""
+    if not GITHUB_TOKEN:
+        return ""
+    try:
+        r = requests.get(
+            f"{GH_API}/repos/{GITHUB_REPO}/contents/{path}",
+            params={"ref": ref},
+            headers={"Authorization": f"Bearer {GITHUB_TOKEN}",
+                     "Accept": "application/vnd.github.raw+json"},
+            timeout=20)
+        return r.text if r.status_code == 200 else ""
+    except Exception:  # noqa: BLE001 — never kill the poll over this
+        return ""
+
+
 def _parse_silver(text: str) -> dict:
     """Datawrapper race table -> {state abbr: {dem, rep, name}} as fractions."""
     out: dict = {}
@@ -3930,6 +3948,20 @@ def _silver_races() -> dict:
                 table = _parse_silver(r.text)
         except Exception as e:  # noqa: BLE001 — the map must never kill the poll
             errs.append(f"{office}: {type(e).__name__}")
+        if not table:
+            # The container has no data/ directory at all — the Dockerfile
+            # copies only live/ and track_rewards.py — so the disk fallback
+            # below could never work in production, and whenever the CDN was
+            # unreachable the map simply had no model. Read the copy the daily
+            # Actions fetch commits to main instead; that is the whole reason
+            # that workflow exists.
+            try:
+                txt = _gh_text(f"data/{Path(fallback).name}")
+                if txt:
+                    table = _parse_silver(txt)
+                    source = "github"
+            except Exception as e:  # noqa: BLE001
+                errs.append(f"{office} github: {type(e).__name__}")
         if not table:
             try:
                 table = _parse_silver(Path(fallback).read_text())
