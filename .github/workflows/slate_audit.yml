@@ -133,7 +133,10 @@ jobs:
                       "best": best, "our_best": best_ours,
                       "ticks_off": (round(abs(best - best_ours) / TICK)
                                     if best_ours is not None else None),
-                      "est": round(est, 2), "per_side": round(per, 2)})
+                      "est": round(est, 2), "per_side": round(per, 2),
+                      "levels": [[round(px, 2), round(q, 2)] for px, q in win[:8]],
+                      "denom": round(den, 2), "my_score": round(my_score, 2),
+                      "ours_px": {str(k): round(v, 2) for k, v in ours_px.items()}})
 
           print(f"{'market':40s} {'side':4s} {'ours':>8s} {'others':>8s} {'total':>8s} "
                 f"{'tgt':>6s} {'qual':>4s} {'self':>4s} {'off':>3s} {'$/day':>6s}")
