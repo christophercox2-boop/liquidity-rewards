@@ -1,35 +1,35 @@
-Silver Bulletin Senate forecast (Deluxe), 2026-08-12
-  Democrats 56.30%   Republicans 43.70%   (+0.30 pts for Dems over the series)
+Silver Bulletin Senate forecast (Deluxe), 2026-08-13
+  Democrats 55.97%   Republicans 44.03%   (-0.07 pts for Dems over the series)
   average seats: Dem 50.9  Rep 49.1   (2026-08-12)
 
-read 15 of 15 ladder books
+read 22 of 22 ladder books
 
 scc-senate-gop rung          bid    ask    mid
-  lte45                   0.060  0.070  0.065
+  lte45                   0.020  0.070  0.045
   46                      0.030  0.040  0.035
-  47                      0.080  0.150  0.115
-  48                      0.140  0.200  0.170
-  49                      0.120  0.140  0.130
-  50                      0.170  0.280  0.225
-  51                      0.120  0.140  0.130
-  52                      0.090  0.170  0.130
+  47                      0.010  0.150  0.080
+  48                      0.130  0.200  0.165
+  49                      0.230  0.450  0.340
+  50                      0.230  0.280  0.255
+  51                      0.100  0.140  0.120
+  52                      0.090  0.110  0.100
   53                      0.070  0.080  0.075
-  54                      0.040  0.080  0.060
+  54                      0.010  0.060  0.035
   55                      0.010  0.040  0.025
-  56                      0.040  0.050  0.045
+  56                      0.010  0.050  0.030
   gte57                   0.030  0.040  0.035
 
 P(GOP holds Senate) -- rungs 50 and up:
-  raw sums:   bid side 0.570, ask side 0.880
-  normalised (bid): 57.0%   (all rungs on that side sum to 1.000)
-  normalised (ask): 59.5%   (all rungs on that side sum to 1.480)
-  normalised (mid): 58.5%   (all rungs on that side sum to 1.240)
-  Silver:     43.7%
-  gap: +14.6% (book leans Republican relative to the model)
+  raw sums:   bid side 0.550, ask side 0.800
+  normalised (bid): 56.7%   (all rungs on that side sum to 0.970)
+  normalised (ask): 46.8%   (all rungs on that side sum to 1.710)
+  normalised (mid): 50.4%   (all rungs on that side sum to 1.340)
+  Silver:     44.0%
+  gap: +7.3% (book leans Republican relative to the model)
 
-mean GOP seats implied by the ladder: 50.17   (a weighted average, so the sum of 1.240 divides out)
+mean GOP seats implied by the ladder: 49.97   (a weighted average, so the sum of 1.340 divides out)
 Silver average GOP seats:             49.10
-  the ladder sits +1.08 seats Republican of the model
+  the ladder sits +0.87 seats Republican of the model
 
   These two anchors agree. Control turns on the 49/50 boundary,
   which sits right at the peak of the seat distribution, so the
@@ -39,7 +39,7 @@ Silver average GOP seats:             49.10
   a chasm.
 
 Silver's own model variants, P(GOP holds Senate):
-  Deluxe   43.7%
+  Deluxe   44.0%
   Classic  44.7%
   Lite     43.6%
   spread across variants: 1.1% -- the distance to the book is much larger than Silver's own internal disagreement
