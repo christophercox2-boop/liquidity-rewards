@@ -1,11 +1,11 @@
-355 of our orders currently open
+223 of our orders currently open
 
-pulled 1623 trade activities
+pulled 1825 trade activities
 
-ownership check against our 355 open orders: passive side matched 5, aggressor side matched 0
-1623 executions taken as ours
+ownership check against our 223 open orders: passive side matched 1, aggressor side matched 1
+1825 executions taken as ours
 
-range: 2025-12-16 04:32 PM ET  ->  2026-08-12 06:09 AM ET
+range: 2025-12-16 04:32 PM ET  ->  2026-08-13 08:45 PM ET
 
 day           fills    bought      sold   net cash  markets
 2025-12-16        4         4         2       1.09        4
@@ -54,7 +54,8 @@ day           fills    bought      sold   net cash  markets
 2026-08-09       41       345       113     -74.16       17
 2026-08-10       84       853       543    -272.00       22
 2026-08-11      107     1,891       221  -1,078.42       35
-2026-08-12       48       885       364    -532.97       16
+2026-08-12      171     2,679     1,532  -1,164.12       53
+2026-08-13       79     1,118       290    -471.57       35
 
 every execution, oldest first:
   time                 market                                   action           px   shares
@@ -1681,3 +1682,205 @@ every execution, oldest first:
   08-12 06:08:49 AM    ewc-usse-tx-2026-11-03-dem               Sold Yes      53.0c        4
   08-12 06:08:49 AM    ewc-usse-tx-2026-11-03-dem               Sold Yes      53.0c       36
   08-12 06:09:02 AM    ussewc-usse-ms-2026-11-03-dem            Bought No     91.0c       20
+  08-12 06:51:01 AM    apdc-alito-2026-12-31                    Bought Yes    11.0c       40
+  08-12 07:21:22 AM    apdc-jerpowgov-2026-12-31                Bought No     77.0c       10
+  08-12 07:21:23 AM    opdc-mcconnell-resign-2026-11-02         Bought No     87.0c       40
+  08-12 07:26:13 AM    apdc-jerpowgov-2026-12-31                Bought No     76.0c       40
+  08-12 07:28:14 AM    opdc-mcconnell-resign-2026-11-02         Bought No     86.0c       10
+  08-12 07:30:34 AM    opdc-mcconnell-resign-2026-11-02         Bought No     85.0c       40
+  08-12 07:35:38 AM    scc-hrep-rep-2026-11-03-gte205           Bought No     61.0c        2
+  08-12 07:36:07 AM    scc-hrep-rep-2026-11-03-gte200           Sold Yes      43.0c        2
+  08-12 07:36:35 AM    opdc-mcconnell-resign-2026-11-02         Sold Yes      16.0c      123
+  08-12 07:47:06 AM    apdc-jerpowgov-2026-12-31                Bought No     76.0c       40
+  08-12 07:47:07 AM    lawec-cryptoleg-2026-12-31               Bought No     63.0c       40
+  08-12 07:55:49 AM    lawec-cryptoleg-2026-12-31               Sold No       65.0c       30
+  08-12 07:56:56 AM    lawec-cryptoleg-2026-12-31               Bought Yes    34.0c       30
+  08-12 07:57:34 AM    apdc-jerpowgov-2026-12-31                Bought No     76.0c       25
+  08-12 07:57:34 AM    apdc-jerpowgov-2026-12-31                Sold Yes      24.0c       10
+  08-12 08:12:20 AM    scc-hrep-rep-2026-11-03-gte220           Bought Yes    22.0c        0
+  08-12 08:12:20 AM    scc-hrep-rep-2026-11-03-gte220           Bought Yes    24.0c        0
+  08-12 08:27:01 AM    apdc-alito-2026-12-31                    Bought Yes    11.0c       40
+  08-12 08:52:20 AM    apdc-alito-2026-12-31                    Bought Yes    10.0c        5
+  08-12 10:06:26 AM    scc-hrep-rep-2026-11-03-gte180           Bought No     14.0c        1
+  08-12 10:07:56 AM    stsc-bab-el-mandeb-clsd-2026-08-31       Bought No     87.0c       10
+  08-12 10:26:02 AM    scc-senate-gop-2026-11-03-46             Bought No     96.0c        1
+  08-12 10:26:07 AM    scc-senate-gop-2026-11-03-56             Bought No     95.0c        1
+  08-12 10:26:14 AM    scc-senate-gop-2026-11-03-48             Bought No     81.0c        1
+  08-12 10:26:25 AM    scc-senate-gop-2026-11-03-54             Bought No     92.0c        1
+  08-12 10:26:28 AM    scc-senate-gop-2026-11-03-lte45          Bought No     93.0c        1
+  08-12 10:26:44 AM    scc-senate-gop-2026-11-03-51             Bought No     75.0c        1
+  08-12 10:28:00 AM    ussewc-usse-al-2026-11-03-dem            Bought No     96.0c        5
+  08-12 10:29:49 AM    enwc-ussep-sc-2026-08-11-rep-darnor      Bought Yes    72.0c       10
+  08-12 10:32:02 AM    lawec-cryptoleg-2026-12-31               Sold No       65.0c       10
+  08-12 10:37:13 AM    lawec-cryptoleg-2026-12-31               Bought No     64.0c       10
+  08-12 10:47:03 AM    stsc-bab-el-mandeb-clsd-2026-08-31       Sold No       88.0c       10
+  08-12 10:57:55 AM    usgubewc-usgub-ny-2026-11-03-rep         Bought No     90.0c       40
+  08-12 11:07:40 AM    enwc-ussep-sc-2026-08-11-rep-darnor      Sold Yes      73.0c       10
+  08-12 11:10:52 AM    enwc-ussep-sc-2026-08-11-rep-ralnor      Bought Yes    27.0c        2
+  08-12 11:21:13 AM    usgubewc-usgub-mn-2026-11-03-rep         Bought No     89.0c       40
+  08-12 11:45:30 AM    stsc-bab-el-mandeb-clsd-2026-08-31       Bought Yes    10.0c       10
+  08-12 11:55:01 AM    enwc-ussep-sc-2026-08-11-rep-ralnor      Bought Yes    27.0c        8
+  08-12 11:59:54 AM    ussewc-usse-id-2026-11-03-rep            Bought No      8.0c       40
+  08-12 12:36:24 PM    scc-senate-gop-2026-11-03-53             Sold No       93.0c        1
+  08-12 12:37:23 PM    ewc-usgub-ca-2026-11-03-xavbec           Bought Yes    95.0c       25
+  08-12 12:38:17 PM    pvwc-housepopw-2026-11-03-rep            Bought Yes    10.0c       14
+  08-12 12:38:45 PM    scc-senate-gop-2026-11-03-gte57          Sold No       97.0c       20
+  08-12 12:40:00 PM    pic-congress-trump-2026-12-31            Sold No       92.0c        6
+  08-12 12:40:46 PM    enwc-ushrp-fl25-2026-08-18-dem-jarmos    Sold No        4.0c       10
+  08-12 12:43:10 PM    ussewc-usse-ok-2026-11-03-rep            Sold Yes      97.0c       40
+  08-12 12:44:38 PM    ussewc-usse-al-2026-11-03-dem            Bought No     96.0c        5
+  08-12 12:56:14 PM    scc-hrep-rep-2026-11-03-gte185           Sold Yes      78.0c       23
+  08-12 12:56:21 PM    lawec-cryptoleg-2026-12-31               Sold Yes      30.0c       10
+  08-12 12:58:40 PM    scc-senate-gop-2026-11-03-50             Bought Yes    20.0c        6
+  08-12 12:59:54 PM    ussewc-usse-id-2026-11-03-rep            Sold Yes      92.0c      144
+  08-12 01:01:04 PM    apdc-jerpowgov-2026-12-31                Bought No     73.0c       10
+  08-12 01:02:24 PM    usgubewc-usgub-nh-2026-11-03-dem         Sold Yes      19.0c       40
+  08-12 01:04:33 PM    scc-hrep-rep-2026-11-03-gte180           Sold Yes      86.0c        1
+  08-12 01:04:40 PM    scc-hrep-rep-2026-11-03-gte195           Sold Yes      63.0c       83
+  08-12 01:04:40 PM    scc-hrep-rep-2026-11-03-gte195           Sold Yes      63.0c        7
+  08-12 01:08:18 PM    ewc-usgub-ca-2026-11-03-xavbec           Sold Yes      95.0c       20
+  08-12 01:14:28 PM    ewc-usgub-ca-2026-11-03-xavbec           Sold Yes      95.0c        5
+  08-12 01:14:35 PM    enwc-ussep-sc-2026-08-11-rep-darnor      Bought No     25.0c      100
+  08-12 01:22:40 PM    ussewc-usse-ar-2026-11-03-dem            Bought No     92.0c        3
+  08-12 01:22:56 PM    enwc-ussep-sc-2026-08-11-rep-ralnor      Sold Yes      24.0c       10
+  08-12 01:24:20 PM    usgubewc-usgub-ny-2026-11-03-rep         Bought No     81.0c       10
+  08-12 01:48:09 PM    ussewc-usse-sc-2026-11-03-rep            Bought No      9.0c        5
+  08-12 01:53:58 PM    usgubewc-usgub-ok-2026-11-03-rep         Bought Yes    95.0c       40
+  08-12 01:57:56 PM    scc-senate-gop-2026-11-03-50             Sold Yes      20.0c       32
+  08-12 02:03:20 PM    usgubewc-usgub-ok-2026-11-03-rep         Bought Yes    95.0c       40
+  08-12 02:12:36 PM    ewc-usgub-ca-2026-11-03-stehil           Bought No     94.0c        8
+  08-12 02:36:38 PM    apdc-alito-2026-12-31                    Bought Yes    10.0c       10
+  08-12 02:41:59 PM    apdc-jerpowgov-2026-12-31                Sold No       73.0c       30
+  08-12 03:01:05 PM    ussewc-usse-ar-2026-11-03-dem            Sold Yes       8.0c        3
+  08-12 03:11:50 PM    ussewc-usse-ok-2026-11-03-rep            Bought No      3.0c       40
+  08-12 03:12:18 PM    enwc-ussep-sc-2026-08-11-rep-darnor      Sold No       23.0c       34
+  08-12 03:50:20 PM    usgubewc-usgub-ny-2026-11-03-dem         Bought Yes    93.0c       70
+  08-12 03:52:25 PM    usgubewc-usgub-ny-2026-11-03-rep         Sold No       87.0c       50
+  08-12 03:56:01 PM    scc-senate-gop-2026-11-03-48             Sold No       72.0c        8
+  08-12 04:15:04 PM    ussewc-usse-ok-2026-11-03-rep            Bought Yes    96.0c       10
+  08-12 04:17:07 PM    ussewc-usse-ok-2026-11-03-rep            Sold Yes      97.0c       30
+  08-12 04:35:20 PM    ussewc-usse-co-2026-11-03-dem            Bought Yes    94.0c        5
+  08-12 04:35:42 PM    ussewc-usse-co-2026-11-03-dem            Bought Yes    94.0c       35
+  08-12 04:52:45 PM    usgubewc-usgub-tx-2026-11-03-dem         Bought No     82.0c       11
+  08-12 04:54:24 PM    usgubewc-usgub-vt-2026-11-03-dem         Bought No     88.0c       20
+  08-12 04:57:10 PM    usgubewc-usgub-mn-2026-11-03-dem         Bought Yes    95.0c        5
+  08-12 04:57:22 PM    usgubewc-usgub-mn-2026-11-03-dem         Bought Yes    95.0c       45
+  08-12 04:59:56 PM    usgubewc-usgub-vt-2026-11-03-dem         Bought No     88.0c       20
+  08-12 05:22:54 PM    apdc-jerpowgov-2026-12-31                Bought No     72.0c        2
+  08-12 05:25:14 PM    usgubewc-usgub-ny-2026-11-03-dem         Bought Yes    93.0c       10
+  08-12 05:30:12 PM    usgubewc-usgub-ny-2026-11-03-dem         Bought Yes    93.0c       10
+  08-12 05:33:15 PM    usgubewc-usgub-ok-2026-11-03-rep         Bought Yes    95.0c       40
+  08-12 05:37:02 PM    usgubewc-usgub-ok-2026-11-03-rep         Bought Yes    95.0c        3
+  08-12 05:37:02 PM    usgubewc-usgub-ok-2026-11-03-rep         Bought Yes    95.0c       37
+  08-12 05:37:30 PM    usgubewc-usgub-mn-2026-11-03-dem         Sold No        5.0c       50
+  08-12 06:00:52 PM    usgubewc-usgub-mn-2026-11-03-rep         Bought No     89.0c       11
+  08-12 06:17:45 PM    enwc-ussep-sc-2026-08-11-rep-darnor      Sold No       23.0c        9
+  08-12 06:41:24 PM    ewc-usgub-ca-2026-11-03-stehil           Bought No     94.0c       42
+  08-12 07:14:01 PM    ewc-usgub-ca-2026-11-03-stehil           Sold Yes       6.0c       50
+  08-12 07:15:32 PM    ussewc-usse-co-2026-11-03-dem            Bought Yes    94.0c       40
+  08-12 07:21:37 PM    usgubewc-usgub-mn-2026-11-03-rep         Sold No       89.0c       51
+  08-12 07:33:53 PM    scc-hrep-rep-2026-11-03-gte220           Sold Yes      18.0c        9
+  08-12 07:46:50 PM    ewc-usgub-ca-2026-11-03-xavbec           Bought Yes    94.0c       30
+  08-12 07:52:23 PM    ewc-usgub-ca-2026-11-03-xavbec           Bought Yes    94.0c       20
+  08-12 07:55:30 PM    usgubewc-usgub-tn-2026-11-03-rep         Bought Yes    96.0c       16
+  08-12 07:55:52 PM    usgubewc-usgub-tn-2026-11-03-rep         Bought Yes    96.0c        1
+  08-12 08:04:55 PM    ewc-usgub-ca-2026-11-03-xavbec           Sold Yes      95.0c       20
+  08-12 08:10:41 PM    ewc-usgub-ca-2026-11-03-xavbec           Sold Yes      95.0c       30
+  08-12 08:16:39 PM    ussewc-usse-ks-2026-11-03-dem            Bought No     87.0c       10
+  08-12 08:27:12 PM    ewc-usgub-ca-2026-11-03-xavbec           Bought Yes    94.0c       30
+  08-12 08:28:42 PM    ewc-usgub-ca-2026-11-03-xavbec           Bought Yes    94.0c       10
+  08-12 08:43:48 PM    ewc-usgub-ca-2026-11-03-xavbec           Sold Yes      95.0c       10
+  08-12 08:43:48 PM    ewc-usgub-ca-2026-11-03-xavbec           Sold Yes      95.0c       30
+  08-12 09:50:11 PM    enwc-ussep-sc-2026-08-11-rep-darnor      Sold No       23.0c        4
+  08-12 10:00:23 PM    stsc-bab-el-mandeb-clsd-2026-08-31       Sold Yes       9.0c       10
+  08-12 10:26:35 PM    enwc-ussep-sc-2026-08-11-rep-darnor      Sold No       23.0c       53
+  08-12 10:47:06 PM    usgubewc-usgub-ny-2026-11-03-dem         Bought Yes    90.0c       60
+  08-12 11:01:17 PM    usgubewc-usgub-ne-2026-11-03-dem         Bought No     90.0c       40
+  08-12 11:05:23 PM    usgubewc-usgub-tn-2026-11-03-rep         Bought Yes    96.0c       17
+  08-12 11:14:10 PM    ewc-usse-me-2026-11-03-rep               Bought Yes    36.0c       50
+  08-12 11:17:16 PM    usgubewc-usgub-ny-2026-11-03-dem         Bought No      8.0c       10
+  08-12 11:19:33 PM    usgubewc-usgub-ne-2026-11-03-dem         Sold Yes      10.0c       40
+  08-12 11:23:24 PM    ewc-usse-me-2026-11-03-rep               Bought Yes    35.0c       50
+  08-12 11:24:10 PM    usgubewc-usgub-ny-2026-11-03-dem         Bought Yes    92.0c      140
+  08-12 11:34:47 PM    tec-mlb-champ-2026-09-27-chc             Bought Yes     8.4c        2
+  08-12 11:37:33 PM    usgubewc-usgub-ny-2026-11-03-dem         Bought Yes    92.0c       10
+  08-12 11:42:41 PM    usgubewc-usgub-mn-2026-11-03-rep         Bought No     89.0c       20
+  08-13 12:08:22 AM    usgubewc-usgub-fl-2026-11-03-dem         Bought No     84.0c       10
+  08-13 12:16:21 AM    ewc-pres-fra-2027-04-11-marlep           Bought Yes    39.0c       50
+  08-13 12:17:02 AM    scc-senate-gop-2026-11-03-52             Bought No     81.0c       10
+  08-13 12:52:55 AM    usgubewc-usgub-ne-2026-11-03-dem         Bought No     89.0c       10
+  08-13 12:53:14 AM    usgubewc-usgub-al-2026-11-03-rep         Bought Yes    94.0c       11
+  08-13 01:29:19 AM    opdc-mcconnell-resign-2026-11-02         Bought Yes    12.0c       40
+  08-13 02:03:11 AM    scc-senate-gop-2026-11-03-47             Bought No     86.0c       10
+  08-13 02:39:53 AM    usgubewc-usgub-ny-2026-11-03-rep         Bought No     90.0c       30
+  08-13 03:12:38 AM    enwc-ussep-nh-2026-09-01-rep-scobro      Bought Yes     7.0c       40
+  08-13 06:05:01 AM    opdc-mcconnell-resign-2026-11-02         Bought Yes    12.0c       40
+  08-13 06:05:11 AM    enwc-ussep-nh-2026-09-01-rep-scobro      Bought Yes     7.0c       15
+  08-13 06:05:11 AM    enwc-ussep-nh-2026-09-01-rep-scobro      Bought Yes     7.0c       25
+  08-13 06:06:09 AM    scc-hrep-rep-2026-11-03-gte210           Bought No     63.0c       21
+  08-13 06:07:01 AM    scc-hrep-rep-2026-11-03-gte205           Sold Yes      40.0c        2
+  08-13 06:13:39 AM    pic-congress-trump-2026-12-31            Bought No     90.0c       19
+  08-13 06:15:31 AM    apdc-alito-2026-12-31                    Bought Yes    10.0c       20
+  08-13 06:15:31 AM    apdc-alito-2026-12-31                    Bought Yes    10.0c      100
+  08-13 06:16:02 AM    apdc-alito-2026-12-31                    Bought Yes    10.0c        6
+  08-13 06:16:32 AM    usgubewc-usgub-al-2026-11-03-rep         Bought Yes    94.0c       10
+  08-13 06:27:02 AM    ewc-pres-fra-2027-04-11-marlep           Bought Yes    30.0c       50
+  08-13 06:46:33 AM    tec-mlb-champ-2026-09-27-chc             Bought Yes     7.8c        2
+  08-13 06:49:43 AM    ewc-pres-fra-2027-04-11-marlep           Sold Yes      31.0c       50
+  08-13 07:08:56 AM    usgubewc-usgub-mn-2026-11-03-rep         Sold No       86.0c       20
+  08-13 07:13:20 AM    usgubewc-usgub-ny-2026-11-03-rep         Bought No     87.0c        7
+  08-13 07:22:13 AM    scc-senate-gop-2026-11-03-48             Bought No     80.0c       10
+  08-13 07:50:41 AM    usgubewc-usgub-ny-2026-11-03-rep         Bought No     88.0c        3
+  08-13 08:03:00 AM    usgubewc-usgub-fl-2026-11-03-dem         Sold No       77.0c       10
+  08-13 08:07:23 AM    apdc-jerpowgov-2026-12-31                Sold No       73.0c        2
+  08-13 08:08:08 AM    apdc-jerpowgov-2026-12-31                Bought Yes    26.0c       30
+  08-13 08:12:04 AM    ussewc-usse-ks-2026-11-03-dem            Bought No     69.0c        6
+  08-13 08:20:28 AM    usgubewc-usgub-ny-2026-11-03-rep         Sold Yes      12.0c       30
+  08-13 08:20:39 AM    usgubewc-usgub-ny-2026-11-03-rep         Bought No     87.0c       10
+  08-13 08:20:55 AM    ewc-pres-fra-2027-04-11-marlep           Sold Yes      37.0c       50
+  08-13 08:45:28 AM    ussewc-usse-sc-2026-11-03-rep            Bought No      9.0c        1
+  08-13 08:45:51 AM    usgubewc-usgub-ct-2026-11-03-dem         Bought No      3.0c        5
+  08-13 09:15:16 AM    usgubewc-usgub-ma-2026-11-03-dem         Bought No      2.0c       40
+  08-13 09:25:01 AM    pic-congress-trump-2026-12-31            Sold No       91.0c       19
+  08-13 09:32:28 AM    pandc-anydis-2027-12-31                  Sold Yes      25.0c        1
+  08-13 10:04:01 AM    dccc-measles-us-2026-12-31-gt3500        Bought No     29.0c       10
+  08-13 10:23:47 AM    ussewc-usse-ms-2026-11-03-dem            Bought No     90.0c       40
+  08-13 10:34:00 AM    ussewc-usse-ks-2026-11-03-dem            Bought No     72.0c        4
+  08-13 10:35:38 AM    usgubewc-usgub-mn-2026-11-03-rep         Bought No     86.0c       10
+  08-13 10:46:01 AM    apdc-jerpowgov-2026-12-31                Bought Yes    17.0c       10
+  08-13 11:14:00 AM    apdc-jerpowgov-2026-12-31                Sold Yes      15.0c       30
+  08-13 11:17:06 AM    apdc-jerpowgov-2026-12-31                Bought No     85.0c       10
+  08-13 11:36:17 AM    ewc-usse-ak-2026-11-03-rep               Bought No     53.0c       20
+  08-13 11:37:31 AM    ewc-usse-ak-2026-11-03-rep               Sold Yes      47.0c       20
+  08-13 11:50:13 AM    opdc-mcconnell-resign-2026-11-02         Bought No     90.0c       40
+  08-13 12:00:58 PM    ussewc-usse-ms-2026-11-03-dem            Bought No     83.0c       10
+  08-13 12:02:53 PM    usgubewc-usgub-nh-2026-11-03-rep         Bought Yes    81.0c       30
+  08-13 12:05:19 PM    usgubewc-usgub-wy-2026-11-03-dem         Bought No     93.0c       68
+  08-13 12:06:14 PM    opdc-mcconnell-resign-2026-11-02         Bought No     89.0c       40
+  08-13 12:06:35 PM    usgubewc-usgub-wy-2026-11-03-dem         Bought No     93.0c       68
+  08-13 12:08:02 PM    usgubewc-usgub-nh-2026-11-03-rep         Bought Yes    81.0c       30
+  08-13 12:18:33 PM    enwc-ushrp-fl25-2026-08-18-dem-olilar    Bought No     87.0c        5
+  08-13 12:44:01 PM    enwc-ushrp-fl25-2026-08-18-dem-olilar    Sold No       80.0c        2
+  08-13 12:44:02 PM    enwc-ushrp-fl25-2026-08-18-dem-olilar    Sold No       80.0c        3
+  08-13 12:49:28 PM    usgubewc-usgub-ne-2026-11-03-dem         Sold No       88.0c       10
+  08-13 01:33:56 PM    scc-senate-gop-2026-11-03-49             Sold Yes      14.0c        1
+  08-13 02:09:26 PM    pandc-anydis-2027-12-31                  Sold Yes      25.0c        1
+  08-13 02:40:00 PM    usgubewc-usgub-al-2026-11-03-rep         Bought Yes    89.0c        0
+  08-13 02:55:37 PM    pvwc-housepopw-2026-11-03-rep            Bought No     89.0c        0
+  08-13 03:00:45 PM    scc-senate-gop-2026-11-03-49             Sold Yes      14.0c        4
+  08-13 03:15:15 PM    scc-hrep-rep-2026-11-03-gte190           Sold No       26.0c        0
+  08-13 04:25:01 PM    usgubewc-usgub-al-2026-11-03-rep         Bought Yes    89.0c        1
+  08-13 04:53:09 PM    pic-congress-trump-2026-12-31            Bought No     90.0c        1
+  08-13 07:24:18 PM    pvwc-housepopw-2026-11-03-rep            Sold Yes      11.0c        0
+  08-13 07:27:01 PM    pic-congress-trump-2026-12-31            Bought No     90.0c        1
+  08-13 07:27:26 PM    tec-cbb-champ-2027-04-05-w-iowast        Bought Yes     3.0c        5
+  08-13 07:34:01 PM    scc-senate-gop-2026-11-03-56             Sold Yes       5.0c        1
+  08-13 07:47:33 PM    ussewc-usse-ks-2026-11-03-dem            Bought Yes    32.0c        2
+  08-13 07:47:33 PM    ussewc-usse-ks-2026-11-03-dem            Bought Yes    40.0c        2
+  08-13 07:51:20 PM    ussewc-usse-ms-2026-11-03-dem            Bought Yes    14.0c       10
+  08-13 07:55:45 PM    usgubewc-usgub-mn-2026-11-03-rep         Bought No     82.0c       20
+  08-13 08:06:17 PM    usgubewc-usgub-tx-2026-11-03-dem         Bought No     82.0c       10
+  08-13 08:12:31 PM    ussewc-usse-ks-2026-11-03-dem            Sold No       70.0c       24
+  08-13 08:37:29 PM    usgubewc-usgub-ny-2026-11-03-dem         Sold Yes      92.0c       10
+  08-13 08:37:58 PM    ussewc-usse-ms-2026-11-03-dem            Bought No     84.0c       20
+  08-13 08:45:05 PM    usgubewc-usgub-ny-2026-11-03-dem         Bought Yes    90.0c       20
