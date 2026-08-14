@@ -617,6 +617,13 @@
       "status": "PENDING"
     },
     {
+      "reward": 0.49,
+      "programType": "liquidityProgram",
+      "marketSlug": "usgubewc-usgub-sc-2026-11-03-dem",
+      "date": "2026-08-12",
+      "status": "PENDING"
+    },
+    {
       "reward": 0.97,
       "programType": "liquidityProgram",
       "marketSlug": "usgubewc-usgub-sc-2026-11-03-rep",
