@@ -2,48 +2,170 @@
  "symbols": [
   "apdc-alito-2026-12-31",
   "apdc-jerpowgov-2026-12-31",
-  "enwc-usgubp-mn-2026-08-11-rep-kenqua",
-  "enwc-usgubp-mn-2026-08-11-rep-lisdem",
-  "enwc-usgubp-wi-2026-08-11-dem-sarrod",
-  "enwc-ussep-sc-2026-08-11-rep-darnor",
-  "enwc-ussep-sc-2026-08-11-rep-ralnor",
-  "enwc-ussep-sc-2026-08-11-rep-rusfry",
-  "ewc-usgub-ca-2026-11-03-xavbec",
-  "ewc-usse-nh-2026-11-03-dem",
+  "dccc-measles-us-2026-12-31-gt4500",
+  "enwc-uspres-nom-dem-2028-aleocc",
+  "enwc-uspres-nom-dem-2028-andbes",
+  "enwc-uspres-nom-dem-2028-dwajoh",
+  "enwc-uspres-nom-dem-2028-gavnew",
+  "enwc-uspres-nom-dem-2028-jamtal",
+  "enwc-uspres-nom-dem-2028-jbpri",
+  "enwc-uspres-nom-dem-2028-jonoss",
+  "enwc-uspres-nom-dem-2028-jonste",
+  "enwc-uspres-nom-dem-2028-jossha",
+  "enwc-uspres-nom-dem-2028-kamhar",
+  "enwc-uspres-nom-dem-2028-markel",
+  "enwc-uspres-nom-dem-2028-micoba",
+  "enwc-uspres-nom-dem-2028-petbut",
+  "enwc-uspres-nom-dem-2028-rahema",
+  "enwc-uspres-nom-dem-2028-rokha",
+  "enwc-uspres-nom-dem-2028-stasmi",
+  "enwc-uspres-nom-dem-2028-wesmoo",
+  "enwc-uspres-nom-rep-2028-dontru",
+  "enwc-uspres-nom-rep-2028-dontrujr",
+  "enwc-uspres-nom-rep-2028-elomus",
+  "enwc-uspres-nom-rep-2028-gleyou",
+  "enwc-uspres-nom-rep-2028-jdvan",
+  "enwc-uspres-nom-rep-2028-margre",
+  "enwc-uspres-nom-rep-2028-marrub",
+  "enwc-uspres-nom-rep-2028-ranpau",
+  "enwc-uspres-nom-rep-2028-rondes",
+  "enwc-uspres-nom-rep-2028-tedcru",
+  "enwc-uspres-nom-rep-2028-thomas",
+  "enwc-uspres-nom-rep-2028-tuccar",
+  "enwc-uspres-nom-rep-2028-tulgab",
+  "enwc-uspres-nom-rep-2028-vivram",
+  "ewc-usgub-ca-2026-11-03-stehil",
+  "ewc-usp-2028-11-07-aleocc",
+  "ewc-usp-2028-11-07-andbes",
+  "ewc-usp-2028-11-07-dontru",
+  "ewc-usp-2028-11-07-dontrujr",
+  "ewc-usp-2028-11-07-dwajoh",
+  "ewc-usp-2028-11-07-elomus",
+  "ewc-usp-2028-11-07-gavnew",
+  "ewc-usp-2028-11-07-gleyou",
+  "ewc-usp-2028-11-07-jamtal",
+  "ewc-usp-2028-11-07-jbpri",
+  "ewc-usp-2028-11-07-jdvan",
+  "ewc-usp-2028-11-07-jonoss",
+  "ewc-usp-2028-11-07-jossha",
+  "ewc-usp-2028-11-07-kamhar",
+  "ewc-usp-2028-11-07-markel",
+  "ewc-usp-2028-11-07-marrub",
+  "ewc-usp-2028-11-07-micoba",
+  "ewc-usp-2028-11-07-petbut",
+  "ewc-usp-2028-11-07-rahema",
+  "ewc-usp-2028-11-07-rokha",
+  "ewc-usp-2028-11-07-rondes",
+  "ewc-usp-2028-11-07-stasmi",
+  "ewc-usp-2028-11-07-thomas",
+  "ewc-usp-2028-11-07-tuccar",
+  "ewc-usp-2028-11-07-tulgab",
+  "ewc-usp-2028-11-07-vivram",
+  "ewc-usp-2028-11-07-wesmoo",
+  "ewc-usp-party-2028-11-07-dem",
+  "ewc-usp-party-2028-11-07-rep",
+  "ewc-usse-ak-2026-11-03-dem",
   "ewc-usse-tx-2026-11-03-dem",
   "opdc-mcconnell-resign-2026-11-02",
   "pandc-anydis-2027-12-31",
-  "pic-congress-trump-2026-12-31",
+  "pntcbk-wnba-freedom-2027-06-30-enekan",
+  "pntcbk-wnba-white-2027-06-30-roywhi",
   "scc-hrep-rep-2026-11-03-gte180",
-  "scc-hrep-rep-2026-11-03-gte185",
   "scc-hrep-rep-2026-11-03-gte190",
-  "scc-hrep-rep-2026-11-03-gte195",
   "scc-hrep-rep-2026-11-03-gte200",
   "scc-hrep-rep-2026-11-03-gte205",
   "scc-hrep-rep-2026-11-03-gte210",
   "scc-hrep-rep-2026-11-03-gte220",
   "scc-hrep-rep-2026-11-03-gte225",
+  "scc-hrep-rep-2026-11-03-gte230",
+  "scc-hrep-rep-2026-11-03-gte235",
   "scc-senate-gop-2026-11-03-46",
   "scc-senate-gop-2026-11-03-47",
   "scc-senate-gop-2026-11-03-48",
   "scc-senate-gop-2026-11-03-49",
   "scc-senate-gop-2026-11-03-50",
   "scc-senate-gop-2026-11-03-51",
-  "scc-senate-gop-2026-11-03-52",
   "scc-senate-gop-2026-11-03-53",
   "scc-senate-gop-2026-11-03-54",
+  "scc-senate-gop-2026-11-03-55",
   "scc-senate-gop-2026-11-03-56",
   "scc-senate-gop-2026-11-03-gte57",
   "scc-senate-gop-2026-11-03-lte45",
-  "tec-cbb-champ-2027-04-05-w-butl",
-  "tec-cbb-champ-2027-04-05-w-iowast",
-  "tec-cbb-champ-2027-04-05-w-nebr",
+  "tec-cbb-champ-2027-04-05-w-stmry",
+  "tec-cbb-champ-2027-04-05-w-wisc",
+  "usgubewc-usgub-ar-2026-11-03-dem",
+  "usgubewc-usgub-ar-2026-11-03-rep",
+  "usgubewc-usgub-co-2026-11-03-dem",
+  "usgubewc-usgub-co-2026-11-03-rep",
+  "usgubewc-usgub-ct-2026-11-03-dem",
+  "usgubewc-usgub-fl-2026-11-03-dem",
+  "usgubewc-usgub-fl-2026-11-03-rep",
+  "usgubewc-usgub-hi-2026-11-03-dem",
+  "usgubewc-usgub-id-2026-11-03-rep",
+  "usgubewc-usgub-il-2026-11-03-dem",
+  "usgubewc-usgub-il-2026-11-03-rep",
+  "usgubewc-usgub-ma-2026-11-03-dem",
+  "usgubewc-usgub-ma-2026-11-03-rep",
+  "usgubewc-usgub-md-2026-11-03-dem",
+  "usgubewc-usgub-md-2026-11-03-rep",
+  "usgubewc-usgub-mn-2026-11-03-dem",
+  "usgubewc-usgub-mn-2026-11-03-rep",
+  "usgubewc-usgub-ne-2026-11-03-dem",
+  "usgubewc-usgub-ne-2026-11-03-rep",
+  "usgubewc-usgub-nh-2026-11-03-rep",
+  "usgubewc-usgub-ok-2026-11-03-dem",
+  "usgubewc-usgub-pa-2026-11-03-dem",
+  "usgubewc-usgub-pa-2026-11-03-rep",
+  "usgubewc-usgub-ri-2026-11-03-dem",
+  "usgubewc-usgub-ri-2026-11-03-rep",
+  "usgubewc-usgub-sc-2026-11-03-dem",
+  "usgubewc-usgub-sd-2026-11-03-dem",
+  "usgubewc-usgub-sd-2026-11-03-rep",
+  "usgubewc-usgub-tn-2026-11-03-dem",
+  "usgubewc-usgub-tn-2026-11-03-rep",
+  "usgubewc-usgub-tx-2026-11-03-rep",
+  "usgubewc-usgub-vt-2026-11-03-dem",
+  "usgubewc-usgub-vt-2026-11-03-rep",
+  "usgubewc-usgub-wy-2026-11-03-dem",
+  "usgubewc-usgub-wy-2026-11-03-rep",
+  "ussewc-usse-al-2026-11-03-dem",
+  "ussewc-usse-ar-2026-11-03-rep",
+  "ussewc-usse-co-2026-11-03-dem",
+  "ussewc-usse-de-2026-11-03-dem",
+  "ussewc-usse-de-2026-11-03-rep",
+  "ussewc-usse-fl-2026-11-03-rep",
+  "ussewc-usse-il-2026-11-03-dem",
+  "ussewc-usse-il-2026-11-03-rep",
+  "ussewc-usse-la-2026-11-03-dem",
+  "ussewc-usse-la-2026-11-03-rep",
+  "ussewc-usse-ma-2026-11-03-dem",
+  "ussewc-usse-ma-2026-11-03-rep",
+  "ussewc-usse-ms-2026-11-03-rep",
+  "ussewc-usse-mt-2026-11-03-rep",
+  "ussewc-usse-nj-2026-11-03-dem",
+  "ussewc-usse-nj-2026-11-03-rep",
+  "ussewc-usse-nm-2026-11-03-dem",
+  "ussewc-usse-nm-2026-11-03-rep",
+  "ussewc-usse-ok-2026-11-03-dem",
+  "ussewc-usse-or-2026-11-03-dem",
+  "ussewc-usse-or-2026-11-03-rep",
+  "ussewc-usse-ri-2026-11-03-dem",
+  "ussewc-usse-ri-2026-11-03-rep",
+  "ussewc-usse-sc-2026-11-03-dem",
+  "ussewc-usse-sc-2026-11-03-rep",
   "ussewc-usse-tn-2026-11-03-dem",
-  "ussewc-usse-tn-2026-11-03-rep"
+  "ussewc-usse-tn-2026-11-03-rep",
+  "ussewc-usse-va-2026-11-03-dem",
+  "ussewc-usse-va-2026-11-03-rep",
+  "ussewc-usse-wv-2026-11-03-dem",
+  "ussewc-usse-wv-2026-11-03-rep",
+  "ussewc-usse-wy-2026-11-03-dem",
+  "ussewc-usse-wy-2026-11-03-rep",
+  "vsc-usgubp-fl-fshbck-atl-30pct"
  ],
  "programs": [
   {
-   "marketSlug": "pandc-anydis-2027-12-31",
+   "marketSlug": "dccc-measles-us-2026-12-31-gt4500",
    "timePeriods": [
     {
      "programId": "science_20260804",
@@ -66,18 +188,6 @@
   {
    "marketSlug": "apdc-alito-2026-12-31",
    "timePeriods": [
-    {
-     "programId": "politics_futures_v3",
-     "programType": "liquidityProgram",
-     "start": "2026-07-03T00:00:00Z",
-     "end": "2026-07-13T00:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily_event",
-     "createdAt": "2026-07-02T23:11:38Z"
-    },
     {
      "programId": "politics_20260712",
      "programType": "liquidityProgram",
@@ -136,18 +246,6 @@
    "marketSlug": "apdc-jerpowgov-2026-12-31",
    "timePeriods": [
     {
-     "programId": "politics_futures_v3",
-     "programType": "liquidityProgram",
-     "start": "2026-07-03T00:00:00Z",
-     "end": "2026-07-13T00:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily_event",
-     "createdAt": "2026-07-02T23:11:38Z"
-    },
-    {
      "programId": "politics_20260712",
      "programType": "liquidityProgram",
      "start": "2026-07-13T00:00:00Z",
@@ -202,434 +300,659 @@
    "instrumentProduct": "apdc"
   },
   {
-   "marketSlug": "enwc-usgubp-mn-2026-08-11-rep-kenqua",
+   "marketSlug": "enwc-uspres-nom-dem-2028-aleocc",
    "timePeriods": [
     {
-     "programId": "politics_enwc_v2",
-     "programType": "liquidityProgram",
-     "start": "2026-07-03T00:00:00Z",
-     "end": "2026-07-13T00:00:00Z",
-     "rewardPool": 500,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily_event",
-     "createdAt": "2026-07-02T23:11:37Z"
-    },
-    {
-     "programId": "politics_20260712",
-     "programType": "liquidityProgram",
-     "start": "2026-07-13T00:00:00Z",
-     "end": "2026-07-23T18:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily",
-     "createdAt": "2026-07-12T20:27:48Z"
-    },
-    {
-     "programId": "politics_20260723",
-     "programType": "liquidityProgram",
-     "start": "2026-07-23T17:00:00Z",
-     "end": "2026-07-25T00:00:00Z",
-     "rewardPool": 150,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-23T16:59:02Z"
-    },
-    {
-     "programId": "politics_20260724",
-     "programType": "liquidityProgram",
-     "start": "2026-07-25T00:00:00Z",
-     "end": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-24T22:03:13Z"
-    },
-    {
-     "programId": "politics_low_20260727",
+     "programId": "politics_high_20260727",
      "programType": "liquidityProgram",
      "start": "2026-07-28T00:00:00Z",
-     "rewardPool": 25,
+     "rewardPool": 300,
      "status": "active",
-     "discountFactor": 0.1,
-     "targetSize": 2000,
+     "discountFactor": 0.2,
+     "targetSize": 10000,
      "period": "daily_event",
-     "createdAt": "2026-07-27T22:53:46Z"
+     "createdAt": "2026-07-27T22:41:12Z"
     }
    ],
-   "instrumentState": "INSTRUMENT_STATE_OPEN",
-   "category": "POL",
-   "subcategory": "USSTATE",
-   "eventStartTime": "2026-08-11T16:00:00.000Z",
-   "instrumentProduct": "enwc"
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
   },
   {
-   "marketSlug": "enwc-usgubp-mn-2026-08-11-rep-lisdem",
+   "marketSlug": "enwc-uspres-nom-dem-2028-andbes",
    "timePeriods": [
     {
-     "programId": "politics_enwc_v2",
-     "programType": "liquidityProgram",
-     "start": "2026-07-03T00:00:00Z",
-     "end": "2026-07-13T00:00:00Z",
-     "rewardPool": 500,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily_event",
-     "createdAt": "2026-07-02T23:11:37Z"
-    },
-    {
-     "programId": "politics_20260712",
-     "programType": "liquidityProgram",
-     "start": "2026-07-13T00:00:00Z",
-     "end": "2026-07-23T18:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily",
-     "createdAt": "2026-07-12T20:27:48Z"
-    },
-    {
-     "programId": "politics_20260723",
-     "programType": "liquidityProgram",
-     "start": "2026-07-23T17:00:00Z",
-     "end": "2026-07-25T00:00:00Z",
-     "rewardPool": 150,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-23T16:59:02Z"
-    },
-    {
-     "programId": "politics_20260724",
-     "programType": "liquidityProgram",
-     "start": "2026-07-25T00:00:00Z",
-     "end": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-24T22:03:13Z"
-    },
-    {
-     "programId": "politics_low_20260727",
+     "programId": "politics_high_20260727",
      "programType": "liquidityProgram",
      "start": "2026-07-28T00:00:00Z",
-     "rewardPool": 25,
+     "rewardPool": 300,
      "status": "active",
-     "discountFactor": 0.1,
-     "targetSize": 2000,
+     "discountFactor": 0.2,
+     "targetSize": 10000,
      "period": "daily_event",
-     "createdAt": "2026-07-27T22:53:46Z"
+     "createdAt": "2026-07-27T22:41:12Z"
     }
    ],
-   "instrumentState": "INSTRUMENT_STATE_OPEN",
-   "category": "POL",
-   "subcategory": "USSTATE",
-   "eventStartTime": "2026-08-11T16:00:00.000Z",
-   "instrumentProduct": "enwc"
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
   },
   {
-   "marketSlug": "enwc-usgubp-wi-2026-08-11-dem-sarrod",
+   "marketSlug": "enwc-uspres-nom-dem-2028-dwajoh",
    "timePeriods": [
     {
-     "programId": "politics_enwc_v2",
-     "programType": "liquidityProgram",
-     "start": "2026-07-03T00:00:00Z",
-     "end": "2026-07-13T00:00:00Z",
-     "rewardPool": 500,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily_event",
-     "createdAt": "2026-07-02T23:11:37Z"
-    },
-    {
-     "programId": "politics_20260712",
-     "programType": "liquidityProgram",
-     "start": "2026-07-13T00:00:00Z",
-     "end": "2026-07-23T18:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily",
-     "createdAt": "2026-07-12T20:27:48Z"
-    },
-    {
-     "programId": "politics_20260723",
-     "programType": "liquidityProgram",
-     "start": "2026-07-23T17:00:00Z",
-     "end": "2026-07-25T00:00:00Z",
-     "rewardPool": 150,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-23T16:59:02Z"
-    },
-    {
-     "programId": "politics_20260724",
-     "programType": "liquidityProgram",
-     "start": "2026-07-25T00:00:00Z",
-     "end": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-24T22:03:13Z"
-    },
-    {
-     "programId": "politics_low_20260727",
+     "programId": "politics_high_20260727",
      "programType": "liquidityProgram",
      "start": "2026-07-28T00:00:00Z",
-     "rewardPool": 25,
+     "rewardPool": 300,
      "status": "active",
-     "discountFactor": 0.1,
-     "targetSize": 2000,
+     "discountFactor": 0.2,
+     "targetSize": 10000,
      "period": "daily_event",
-     "createdAt": "2026-07-27T22:53:46Z"
+     "createdAt": "2026-07-27T22:41:12Z"
     }
    ],
-   "instrumentState": "INSTRUMENT_STATE_OPEN",
-   "category": "POL",
-   "subcategory": "USSTATE",
-   "eventStartTime": "2026-08-11T16:00:00.000Z",
-   "instrumentProduct": "enwc"
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
   },
   {
-   "marketSlug": "enwc-ussep-sc-2026-08-11-rep-darnor",
+   "marketSlug": "enwc-uspres-nom-dem-2028-gavnew",
    "timePeriods": [
     {
-     "programId": "politics_enwc_v2",
-     "programType": "liquidityProgram",
-     "start": "2026-07-03T00:00:00Z",
-     "end": "2026-07-13T00:00:00Z",
-     "rewardPool": 500,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily_event",
-     "createdAt": "2026-07-02T23:11:37Z"
-    },
-    {
-     "programId": "politics_20260712",
-     "programType": "liquidityProgram",
-     "start": "2026-07-13T00:00:00Z",
-     "end": "2026-07-23T18:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily",
-     "createdAt": "2026-07-12T20:27:48Z"
-    },
-    {
-     "programId": "politics_20260723",
-     "programType": "liquidityProgram",
-     "start": "2026-07-23T17:00:00Z",
-     "end": "2026-07-25T00:00:00Z",
-     "rewardPool": 150,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-23T16:59:02Z"
-    },
-    {
-     "programId": "politics_20260724",
-     "programType": "liquidityProgram",
-     "start": "2026-07-25T00:00:00Z",
-     "end": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-24T22:03:13Z"
-    },
-    {
-     "programId": "politics_low_20260727",
+     "programId": "politics_high_20260727",
      "programType": "liquidityProgram",
      "start": "2026-07-28T00:00:00Z",
-     "rewardPool": 25,
+     "rewardPool": 300,
      "status": "active",
-     "discountFactor": 0.1,
-     "targetSize": 2000,
+     "discountFactor": 0.2,
+     "targetSize": 10000,
      "period": "daily_event",
-     "createdAt": "2026-07-27T22:53:46Z"
+     "createdAt": "2026-07-27T22:41:12Z"
     }
    ],
-   "instrumentState": "INSTRUMENT_STATE_OPEN",
-   "category": "POL",
-   "subcategory": "USSTATE",
-   "eventStartTime": "2026-08-11T16:00:00.000Z",
-   "instrumentProduct": "enwc"
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
   },
   {
-   "marketSlug": "enwc-ussep-sc-2026-08-11-rep-ralnor",
+   "marketSlug": "enwc-uspres-nom-dem-2028-jamtal",
    "timePeriods": [
     {
-     "programId": "politics_enwc_v2",
-     "programType": "liquidityProgram",
-     "start": "2026-07-03T00:00:00Z",
-     "end": "2026-07-13T00:00:00Z",
-     "rewardPool": 500,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily_event",
-     "createdAt": "2026-07-02T23:11:37Z"
-    },
-    {
-     "programId": "politics_20260712",
-     "programType": "liquidityProgram",
-     "start": "2026-07-13T00:00:00Z",
-     "end": "2026-07-23T18:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily",
-     "createdAt": "2026-07-12T20:27:48Z"
-    },
-    {
-     "programId": "politics_20260723",
-     "programType": "liquidityProgram",
-     "start": "2026-07-23T17:00:00Z",
-     "end": "2026-07-25T00:00:00Z",
-     "rewardPool": 150,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-23T16:59:02Z"
-    },
-    {
-     "programId": "politics_20260724",
-     "programType": "liquidityProgram",
-     "start": "2026-07-25T00:00:00Z",
-     "end": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-24T22:03:13Z"
-    },
-    {
-     "programId": "politics_low_20260727",
+     "programId": "politics_high_20260727",
      "programType": "liquidityProgram",
      "start": "2026-07-28T00:00:00Z",
-     "rewardPool": 25,
+     "rewardPool": 300,
      "status": "active",
-     "discountFactor": 0.1,
-     "targetSize": 2000,
+     "discountFactor": 0.2,
+     "targetSize": 10000,
      "period": "daily_event",
-     "createdAt": "2026-07-27T22:53:46Z"
+     "createdAt": "2026-07-27T22:41:12Z"
     }
    ],
-   "instrumentState": "INSTRUMENT_STATE_OPEN",
-   "category": "POL",
-   "subcategory": "USSTATE",
-   "eventStartTime": "2026-08-11T16:00:00.000Z",
-   "instrumentProduct": "enwc"
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
   },
   {
-   "marketSlug": "enwc-ussep-sc-2026-08-11-rep-rusfry",
+   "marketSlug": "enwc-uspres-nom-dem-2028-jbpri",
    "timePeriods": [
     {
-     "programId": "politics_enwc_v2",
-     "programType": "liquidityProgram",
-     "start": "2026-07-03T00:00:00Z",
-     "end": "2026-07-13T00:00:00Z",
-     "rewardPool": 500,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily_event",
-     "createdAt": "2026-07-02T23:11:37Z"
-    },
-    {
-     "programId": "politics_20260712",
-     "programType": "liquidityProgram",
-     "start": "2026-07-13T00:00:00Z",
-     "end": "2026-07-23T18:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily",
-     "createdAt": "2026-07-12T20:27:48Z"
-    },
-    {
-     "programId": "politics_20260723",
-     "programType": "liquidityProgram",
-     "start": "2026-07-23T17:00:00Z",
-     "end": "2026-07-25T00:00:00Z",
-     "rewardPool": 150,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-23T16:59:02Z"
-    },
-    {
-     "programId": "politics_20260724",
-     "programType": "liquidityProgram",
-     "start": "2026-07-25T00:00:00Z",
-     "end": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-24T22:03:13Z"
-    },
-    {
-     "programId": "politics_low_20260727",
+     "programId": "politics_high_20260727",
      "programType": "liquidityProgram",
      "start": "2026-07-28T00:00:00Z",
-     "rewardPool": 25,
+     "rewardPool": 300,
      "status": "active",
-     "discountFactor": 0.1,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-27T22:53:46Z"
-    }
-   ],
-   "instrumentState": "INSTRUMENT_STATE_OPEN",
-   "category": "POL",
-   "subcategory": "USSTATE",
-   "eventStartTime": "2026-08-11T16:00:00.000Z",
-   "instrumentProduct": "enwc"
-  },
-  {
-   "marketSlug": "ewc-usgub-ca-2026-11-03-xavbec",
-   "timePeriods": [
-    {
-     "programId": "politics_futures_v3",
-     "programType": "liquidityProgram",
-     "start": "2026-07-03T00:00:00Z",
-     "end": "2026-07-13T00:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
+     "discountFactor": 0.2,
      "targetSize": 10000,
      "period": "daily_event",
-     "createdAt": "2026-07-02T23:11:38Z"
-    },
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-dem-2028-jonoss",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-dem-2028-jonste",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-dem-2028-jossha",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-dem-2028-kamhar",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-dem-2028-markel",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-dem-2028-micoba",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-dem-2028-petbut",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-dem-2028-rahema",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-dem-2028-rokha",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-dem-2028-stasmi",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-dem-2028-wesmoo",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-dontru",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-dontrujr",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-elomus",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-gleyou",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-jdvan",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-margre",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-marrub",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-ranpau",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-rondes",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-tedcru",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-thomas",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-tuccar",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-tulgab",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "enwc-uspres-nom-rep-2028-vivram",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usgub-ca-2026-11-03-stehil",
+   "timePeriods": [
     {
      "programId": "politics_20260712",
      "programType": "liquidityProgram",
@@ -685,20 +1008,638 @@
    "instrumentProduct": "ewc"
   },
   {
-   "marketSlug": "ewc-usse-nh-2026-11-03-dem",
+   "marketSlug": "ewc-usp-2028-11-07-aleocc",
    "timePeriods": [
     {
-     "programId": "politics_futures_v3",
+     "programId": "politics_high_20260727",
      "programType": "liquidityProgram",
-     "start": "2026-07-03T00:00:00Z",
-     "end": "2026-07-13T00:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
      "targetSize": 10000,
      "period": "daily_event",
-     "createdAt": "2026-07-02T23:11:38Z"
-    },
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-andbes",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-dontru",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-dontrujr",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-dwajoh",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "pandc-anydis-2027-12-31",
+   "timePeriods": [
+    {
+     "programId": "science_20260804",
+     "programType": "liquidityProgram",
+     "start": "2026-08-05T00:00:00Z",
+     "rewardPool": 50,
+     "status": "active",
+     "discountFactor": 0.25,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-08-04T23:35:23Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-elomus",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-gavnew",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-gleyou",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-jamtal",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-jbpri",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-jdvan",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-jonoss",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-jossha",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-kamhar",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-markel",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-marrub",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-micoba",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-petbut",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-rahema",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-rokha",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-rondes",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-stasmi",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-thomas",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-tuccar",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-tulgab",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-vivram",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-2028-11-07-wesmoo",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-party-2028-11-07-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usp-party-2028-11-07-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_high_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 300,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 10000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:41:12Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ewc-usse-ak-2026-11-03-dem",
+   "timePeriods": [
     {
      "programId": "politics_20260712",
      "programType": "liquidityProgram",
@@ -756,18 +1697,6 @@
   {
    "marketSlug": "ewc-usse-tx-2026-11-03-dem",
    "timePeriods": [
-    {
-     "programId": "politics_futures_v3",
-     "programType": "liquidityProgram",
-     "start": "2026-07-03T00:00:00Z",
-     "end": "2026-07-13T00:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily_event",
-     "createdAt": "2026-07-02T23:11:38Z"
-    },
     {
      "programId": "politics_20260712",
      "programType": "liquidityProgram",
@@ -868,63 +1797,6 @@
    "instrumentProduct": "opdc"
   },
   {
-   "marketSlug": "pic-congress-trump-2026-12-31",
-   "timePeriods": [
-    {
-     "programId": "politics_20260712",
-     "programType": "liquidityProgram",
-     "start": "2026-07-13T00:00:00Z",
-     "end": "2026-07-23T18:00:00Z",
-     "rewardPool": 250,
-     "status": "closed",
-     "discountFactor": 0.3,
-     "targetSize": 10000,
-     "period": "daily",
-     "createdAt": "2026-07-12T20:27:48Z"
-    },
-    {
-     "programId": "politics_20260723",
-     "programType": "liquidityProgram",
-     "start": "2026-07-23T17:00:00Z",
-     "end": "2026-07-25T00:00:00Z",
-     "rewardPool": 150,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-23T16:59:02Z"
-    },
-    {
-     "programId": "politics_20260724",
-     "programType": "liquidityProgram",
-     "start": "2026-07-25T00:00:00Z",
-     "end": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-24T22:03:13Z"
-    },
-    {
-     "programId": "politics_low_20260727",
-     "programType": "liquidityProgram",
-     "start": "2026-07-28T00:00:00Z",
-     "rewardPool": 25,
-     "status": "active",
-     "discountFactor": 0.1,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-27T22:53:46Z"
-    }
-   ],
-   "instrumentState": "INSTRUMENT_STATE_OPEN",
-   "category": "POL",
-   "subcategory": "USCONGRESS",
-   "eventStartTime": "2027-07-01T03:59:00.000Z",
-   "instrumentProduct": "pic"
-  },
-  {
    "marketSlug": "scc-hrep-rep-2026-11-03-gte180",
    "timePeriods": [
     {
@@ -970,97 +1842,7 @@
    "instrumentProduct": ""
   },
   {
-   "marketSlug": "scc-hrep-rep-2026-11-03-gte185",
-   "timePeriods": [
-    {
-     "programId": "politics_20260723",
-     "programType": "liquidityProgram",
-     "start": "2026-07-23T17:00:00Z",
-     "end": "2026-07-25T00:00:00Z",
-     "rewardPool": 150,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-23T16:59:02Z"
-    },
-    {
-     "programId": "politics_20260724",
-     "programType": "liquidityProgram",
-     "start": "2026-07-25T00:00:00Z",
-     "end": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-24T22:03:13Z"
-    },
-    {
-     "programId": "politics_mid_20260727",
-     "programType": "liquidityProgram",
-     "start": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "active",
-     "discountFactor": 0.2,
-     "targetSize": 5000,
-     "period": "daily_event",
-     "createdAt": "2026-07-27T22:49:04Z"
-    }
-   ],
-   "instrumentState": "INSTRUMENT_STATE_CLOSED",
-   "category": "",
-   "subcategory": "",
-   "eventStartTime": "",
-   "instrumentProduct": ""
-  },
-  {
    "marketSlug": "scc-hrep-rep-2026-11-03-gte190",
-   "timePeriods": [
-    {
-     "programId": "politics_20260723",
-     "programType": "liquidityProgram",
-     "start": "2026-07-23T17:00:00Z",
-     "end": "2026-07-25T00:00:00Z",
-     "rewardPool": 150,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-23T16:59:02Z"
-    },
-    {
-     "programId": "politics_20260724",
-     "programType": "liquidityProgram",
-     "start": "2026-07-25T00:00:00Z",
-     "end": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-24T22:03:13Z"
-    },
-    {
-     "programId": "politics_mid_20260727",
-     "programType": "liquidityProgram",
-     "start": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "active",
-     "discountFactor": 0.2,
-     "targetSize": 5000,
-     "period": "daily_event",
-     "createdAt": "2026-07-27T22:49:04Z"
-    }
-   ],
-   "instrumentState": "INSTRUMENT_STATE_CLOSED",
-   "category": "",
-   "subcategory": "",
-   "eventStartTime": "",
-   "instrumentProduct": ""
-  },
-  {
-   "marketSlug": "scc-hrep-rep-2026-11-03-gte195",
    "timePeriods": [
     {
      "programId": "politics_20260723",
@@ -1330,6 +2112,96 @@
    "instrumentProduct": ""
   },
   {
+   "marketSlug": "scc-hrep-rep-2026-11-03-gte230",
+   "timePeriods": [
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_mid_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 5000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:49:04Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "scc-hrep-rep-2026-11-03-gte235",
+   "timePeriods": [
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_mid_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 5000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:49:04Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
    "marketSlug": "scc-senate-gop-2026-11-03-46",
    "timePeriods": [
     {
@@ -1366,6 +2238,48 @@
      "targetSize": 5000,
      "period": "daily_event",
      "createdAt": "2026-07-27T22:49:04Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "pntcbk-wnba-freedom-2027-06-30-enekan",
+   "timePeriods": [
+    {
+     "programId": "wnba_futures_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-24T19:00:00Z",
+     "rewardPool": 250,
+     "status": "active",
+     "discountFactor": 0.9,
+     "targetSize": 5000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T19:27:42Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "pntcbk-wnba-white-2027-06-30-roywhi",
+   "timePeriods": [
+    {
+     "programId": "wnba_futures_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-24T19:00:00Z",
+     "rewardPool": 250,
+     "status": "active",
+     "discountFactor": 0.9,
+     "targetSize": 5000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T19:27:42Z"
     }
    ],
    "instrumentState": "INSTRUMENT_STATE_CLOSED",
@@ -1600,51 +2514,6 @@
    "instrumentProduct": ""
   },
   {
-   "marketSlug": "scc-senate-gop-2026-11-03-52",
-   "timePeriods": [
-    {
-     "programId": "politics_20260723",
-     "programType": "liquidityProgram",
-     "start": "2026-07-23T17:00:00Z",
-     "end": "2026-07-25T00:00:00Z",
-     "rewardPool": 150,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-23T16:59:02Z"
-    },
-    {
-     "programId": "politics_20260724",
-     "programType": "liquidityProgram",
-     "start": "2026-07-25T00:00:00Z",
-     "end": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "closed",
-     "discountFactor": 0.5,
-     "targetSize": 2000,
-     "period": "daily_event",
-     "createdAt": "2026-07-24T22:03:13Z"
-    },
-    {
-     "programId": "politics_mid_20260727",
-     "programType": "liquidityProgram",
-     "start": "2026-07-28T00:00:00Z",
-     "rewardPool": 100,
-     "status": "active",
-     "discountFactor": 0.2,
-     "targetSize": 5000,
-     "period": "daily_event",
-     "createdAt": "2026-07-27T22:49:04Z"
-    }
-   ],
-   "instrumentState": "INSTRUMENT_STATE_CLOSED",
-   "category": "",
-   "subcategory": "",
-   "eventStartTime": "",
-   "instrumentProduct": ""
-  },
-  {
    "marketSlug": "scc-senate-gop-2026-11-03-53",
    "timePeriods": [
     {
@@ -1691,6 +2560,51 @@
   },
   {
    "marketSlug": "scc-senate-gop-2026-11-03-54",
+   "timePeriods": [
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_mid_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 5000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:49:04Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "scc-senate-gop-2026-11-03-55",
    "timePeriods": [
     {
      "programId": "politics_20260723",
@@ -1870,6 +2784,3468 @@
    "instrumentProduct": ""
   },
   {
+   "marketSlug": "usgubewc-usgub-ar-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-ar-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-co-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-co-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-ct-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-fl-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-fl-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-hi-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-id-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-il-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-il-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-ma-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-ma-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-md-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-md-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-mn-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-mn-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-ne-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-ne-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-nh-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-ok-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-pa-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-pa-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-ri-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-ri-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-sc-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-sd-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "tec-cbb-champ-2027-04-05-w-stmry",
+   "timePeriods": [
+    {
+     "programId": "cbb_national_champ_futures_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-24T12:00:00Z",
+     "rewardPool": 500,
+     "status": "active",
+     "discountFactor": 0.35,
+     "targetSize": 2500,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T12:09:36Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "tec-cbb-champ-2027-04-05-w-wisc",
+   "timePeriods": [
+    {
+     "programId": "cbb_national_champ_futures_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-24T12:00:00Z",
+     "rewardPool": 500,
+     "status": "active",
+     "discountFactor": 0.35,
+     "targetSize": 2500,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T12:09:36Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-sd-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-tn-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-tn-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-tx-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-vt-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-vt-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-wy-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "usgubewc-usgub-wy-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-al-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-ar-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-co-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-de-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-de-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-fl-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-il-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-il-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-la-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-la-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-ma-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-ma-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-ms-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-mt-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-nj-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-nj-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-nm-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-nm-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-ok-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-or-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-or-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-ri-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-ri-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-sc-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-sc-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
    "marketSlug": "ussewc-usse-tn-2026-11-03-dem",
    "timePeriods": [
     {
@@ -1984,18 +6360,54 @@
    "instrumentProduct": ""
   },
   {
-   "marketSlug": "tec-cbb-champ-2027-04-05-w-butl",
+   "marketSlug": "ussewc-usse-va-2026-11-03-dem",
    "timePeriods": [
     {
-     "programId": "cbb_national_champ_futures_20260724",
+     "programId": "politics_20260712",
      "programType": "liquidityProgram",
-     "start": "2026-07-24T12:00:00Z",
-     "rewardPool": 500,
-     "status": "active",
-     "discountFactor": 0.35,
-     "targetSize": 2500,
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
      "period": "daily_event",
-     "createdAt": "2026-07-24T12:09:36Z"
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
     }
    ],
    "instrumentState": "INSTRUMENT_STATE_CLOSED",
@@ -2005,18 +6417,54 @@
    "instrumentProduct": ""
   },
   {
-   "marketSlug": "tec-cbb-champ-2027-04-05-w-iowast",
+   "marketSlug": "ussewc-usse-va-2026-11-03-rep",
    "timePeriods": [
     {
-     "programId": "cbb_national_champ_futures_20260724",
+     "programId": "politics_20260712",
      "programType": "liquidityProgram",
-     "start": "2026-07-24T12:00:00Z",
-     "rewardPool": 500,
-     "status": "active",
-     "discountFactor": 0.35,
-     "targetSize": 2500,
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
      "period": "daily_event",
-     "createdAt": "2026-07-24T12:09:36Z"
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
     }
    ],
    "instrumentState": "INSTRUMENT_STATE_CLOSED",
@@ -2026,18 +6474,282 @@
    "instrumentProduct": ""
   },
   {
-   "marketSlug": "tec-cbb-champ-2027-04-05-w-nebr",
+   "marketSlug": "ussewc-usse-wv-2026-11-03-dem",
    "timePeriods": [
     {
-     "programId": "cbb_national_champ_futures_20260724",
+     "programId": "politics_20260712",
      "programType": "liquidityProgram",
-     "start": "2026-07-24T12:00:00Z",
-     "rewardPool": 500,
-     "status": "active",
-     "discountFactor": 0.35,
-     "targetSize": 2500,
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
      "period": "daily_event",
-     "createdAt": "2026-07-24T12:09:36Z"
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-wv-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-wy-2026-11-03-dem",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "ussewc-usse-wy-2026-11-03-rep",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_low_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 25,
+     "status": "active",
+     "discountFactor": 0.1,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:53:46Z"
+    }
+   ],
+   "instrumentState": "INSTRUMENT_STATE_CLOSED",
+   "category": "",
+   "subcategory": "",
+   "eventStartTime": "",
+   "instrumentProduct": ""
+  },
+  {
+   "marketSlug": "vsc-usgubp-fl-fshbck-atl-30pct",
+   "timePeriods": [
+    {
+     "programId": "politics_20260712",
+     "programType": "liquidityProgram",
+     "start": "2026-07-13T00:00:00Z",
+     "end": "2026-07-23T18:00:00Z",
+     "rewardPool": 250,
+     "status": "closed",
+     "discountFactor": 0.3,
+     "targetSize": 10000,
+     "period": "daily",
+     "createdAt": "2026-07-12T20:27:48Z"
+    },
+    {
+     "programId": "politics_20260723",
+     "programType": "liquidityProgram",
+     "start": "2026-07-23T17:00:00Z",
+     "end": "2026-07-25T00:00:00Z",
+     "rewardPool": 150,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-23T16:59:02Z"
+    },
+    {
+     "programId": "politics_20260724",
+     "programType": "liquidityProgram",
+     "start": "2026-07-25T00:00:00Z",
+     "end": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "closed",
+     "discountFactor": 0.5,
+     "targetSize": 2000,
+     "period": "daily_event",
+     "createdAt": "2026-07-24T22:03:13Z"
+    },
+    {
+     "programId": "politics_mid_20260727",
+     "programType": "liquidityProgram",
+     "start": "2026-07-28T00:00:00Z",
+     "rewardPool": 100,
+     "status": "active",
+     "discountFactor": 0.2,
+     "targetSize": 5000,
+     "period": "daily_event",
+     "createdAt": "2026-07-27T22:49:04Z"
     }
    ],
    "instrumentState": "INSTRUMENT_STATE_CLOSED",
