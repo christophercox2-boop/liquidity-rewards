@@ -1,0 +1,236 @@
+buying power: $222.53  (an ask order carries 222 shares)
+(positions unavailable: AttributeError — ask intent falls back to short)
+slate: 58 markets
+
+[1/58] enwc-uspres-nom-dem-2028-aleocc
+    bid    1c x300       ask   51c x11,099    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[2/58] enwc-uspres-nom-dem-2028-andbes
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[3/58] enwc-uspres-nom-dem-2028-dwajoh
+    bid    1c x225       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[4/58] enwc-uspres-nom-dem-2028-gavnew
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[5/58] enwc-uspres-nom-dem-2028-jamtal
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[6/58] enwc-uspres-nom-dem-2028-jbpri
+    bid    1c x300       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[7/58] enwc-uspres-nom-dem-2028-jonoss
+    bid    1c x395       ask   51c x11,005    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 2 @ 51c (~30% of side) → ok
+[8/58] enwc-uspres-nom-dem-2028-jonste
+    bid    1c x225       ask   51c x11,150    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 50 @ 51c (~25% of side) → ok
+[9/58] enwc-uspres-nom-dem-2028-jossha
+    bid    1c x300       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[10/58] enwc-uspres-nom-dem-2028-kamhar
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[11/58] enwc-uspres-nom-dem-2028-markel
+    bid    1c x300       ask   51c x11,150    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 50 @ 51c (~25% of side) → ok
+[12/58] enwc-uspres-nom-dem-2028-micoba
+    bid    1c x225       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[13/58] enwc-uspres-nom-dem-2028-petbut
+    bid    1c x300       ask   51c x11,150    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 50 @ 51c (~25% of side) → ok
+[14/58] enwc-uspres-nom-dem-2028-rahema
+    bid    1c x300       ask   51c x11,150    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 50 @ 51c (~25% of side) → ok
+[15/58] enwc-uspres-nom-dem-2028-rokha
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[16/58] enwc-uspres-nom-dem-2028-stasmi
+    bid    1c x225       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[17/58] enwc-uspres-nom-dem-2028-wesmoo
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[18/58] enwc-uspres-nom-rep-2028-dontru
+    bid    1c x300       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[19/58] enwc-uspres-nom-rep-2028-dontrujr
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[20/58] enwc-uspres-nom-rep-2028-elomus
+    bid    1c x225       ask   51c x21,800    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[21/58] enwc-uspres-nom-rep-2028-gleyou
+    bid    1c x300       ask   51c x11,247    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 56 @ 51c (~25% of side) → ok
+[22/58] enwc-uspres-nom-rep-2028-jdvan
+    bid   19c x11,334    ask   70c x11,100    target 10,000
+    ask: join 33 @ 70c (~25% of side) → ok
+[23/58] enwc-uspres-nom-rep-2028-margre
+    bid    1c x225       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[24/58] enwc-uspres-nom-rep-2028-marrub
+    bid    5c x11,280    ask   55c x11,150    target 10,000
+    ask: join 50 @ 55c (~25% of side) → ok
+[25/58] enwc-uspres-nom-rep-2028-ranpau
+    bid    1c x200       ask   99c x200       target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: 10,000 @ 99c in 46 orders
+[26/58] enwc-uspres-nom-rep-2028-rondes
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[27/58] enwc-uspres-nom-rep-2028-tedcru
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[28/58] enwc-uspres-nom-rep-2028-thomas
+    bid    1c x225       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[29/58] enwc-uspres-nom-rep-2028-tuccar
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[30/58] enwc-uspres-nom-rep-2028-tulgab
+    bid    1c x300       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[31/58] enwc-uspres-nom-rep-2028-vivram
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[32/58] ewc-usp-2028-11-07-aleocc
+    bid    1c x300       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[33/58] ewc-usp-2028-11-07-andbes
+    bid    1c x300       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[34/58] ewc-usp-2028-11-07-dontru
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[35/58] ewc-usp-2028-11-07-dontrujr
+    bid    1c x225       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[36/58] ewc-usp-2028-11-07-dwajoh
+    bid    1c x225       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[37/58] ewc-usp-2028-11-07-elomus
+    bid    1c x225       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[38/58] ewc-usp-2028-11-07-gavnew
+    bid    1c x300       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[39/58] ewc-usp-2028-11-07-gleyou
+    bid    1c x225       ask   21c x11,050    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 21c (~25% of side) → ok
+[40/58] ewc-usp-2028-11-07-jamtal
+    bid    1c x300       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[41/58] ewc-usp-2028-11-07-jbpri
+    bid    1c x225       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[42/58] ewc-usp-2028-11-07-jdvan
+    bid    1c x300       ask   51c x10,950    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[43/58] ewc-usp-2028-11-07-jonoss
+    bid    1c x300       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[44/58] ewc-usp-2028-11-07-jossha
+    bid    1c x300       ask   51c x11,050    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[45/58] ewc-usp-2028-11-07-kamhar
+    bid    1c x300       ask   25c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 25c (~25% of side) → ok
+[46/58] ewc-usp-2028-11-07-markel
+    bid    1c x300       ask   22c x325       target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: side short but the touch is 22c — a 99c order would score ~0, skipped (qualifying it would pay whoever holds the touch)
+[47/58] ewc-usp-2028-11-07-marrub
+    bid    1c x300       ask   51c x11,050    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[48/58] ewc-usp-2028-11-07-micoba
+    bid    1c x225       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[49/58] ewc-usp-2028-11-07-petbut
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[50/58] ewc-usp-2028-11-07-rahema
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[51/58] ewc-usp-2028-11-07-rokha
+    bid    1c x300       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[52/58] ewc-usp-2028-11-07-rondes
+    bid    1c x300       ask   51c x325       target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: side short but the touch is 51c — a 99c order would score ~0, skipped (qualifying it would pay whoever holds the touch)
+[53/58] ewc-usp-2028-11-07-stasmi
+    bid    1c x225       ask   51c x11,050    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[54/58] ewc-usp-2028-11-07-thomas
+    bid    1c x225       ask   51c x11,100    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[55/58] ewc-usp-2028-11-07-tuccar
+    bid    1c x225       ask   51c x11,150    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 50 @ 51c (~25% of side) → ok
+[56/58] ewc-usp-2028-11-07-tulgab
+    bid    1c x225       ask   51c x11,000    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[57/58] ewc-usp-2028-11-07-vivram
+    bid    1c x225       ask   51c x10,950    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+[58/58] ewc-usp-2028-11-07-wesmoo
+    bid    1c x300       ask   51c x11,050    target 10,000
+    bid: 10,000 @ 1c → ok
+    ask: join 33 @ 51c (~25% of side) → ok
+
+placed 0 orders, 0 failures  (DRY RUN — nothing was sent)
