@@ -142,3 +142,5 @@ jobs:
             git pull --rebase origin main
             git push
           fi
+
+# refresh 2026-08-13: current buying power and order census for entry planning
