@@ -3599,16 +3599,32 @@ def _bayes_fair(m: str) -> dict | None:
 # them (the short-lived CONSERVE_BP override taught that lesson on
 # 2026-08-15: "I'll turn it off if that is what I want"). Buying-power
 # discipline lives in each loop's own hard caps instead.
-EARN_MAX_USD = float(os.environ.get("EARN_MAX_USD", "3.0"))
-EARN_TOTAL_USD = float(os.environ.get("EARN_TOTAL_USD", "60.0"))
-EARN_MIN_SHARES, EARN_MAX_SHARES = 5, 100
-EARN_BAND_MAX = int(os.environ.get("EARN_BAND_MAX", "4"))
-EARN_MIN_FILLS = 2
+# Aggression raised 2026-08-15 late (owner: "surely there's more value out
+# there based on what the prober is finding"): double the per-market and
+# total budgets, twice the placement cadence, and a GRADUATED confidence
+# gate — one real trade is enough when the band is very tight (<=3 ticks),
+# two when it's merely tight (<=6). The price rule stays: never above
+# median minus a tick, never above the real touch. Aggression buys more
+# coverage, not worse prices.
+EARN_MAX_USD = float(os.environ.get("EARN_MAX_USD", "6.0"))
+EARN_TOTAL_USD = float(os.environ.get("EARN_TOTAL_USD", "100.0"))
+EARN_MIN_SHARES, EARN_MAX_SHARES = 5, 200
+EARN_BAND_MAX = int(os.environ.get("EARN_BAND_MAX", "6"))
 EARN_MARGIN_T = 1
 EARN_DRIFT_T = 2
-EARN_MAX_PER_POLL = 2
-EARN_COOLDOWN = 600.0
+EARN_MAX_PER_POLL = 4
+EARN_COOLDOWN = 300.0
 _EARN: dict = {"orders": {}, "last": {}, "cancelled": set()}
+
+
+def _earn_confident(b: dict | None) -> bool:
+    """Graduated: a very tight band earns trust from a single real trade,
+    a merely tight one needs two."""
+    if not (b and b.get("med")):
+        return False
+    band = b["hi"] - b["lo"]
+    fills = b.get("fills", 0)
+    return (fills >= 1 and band <= 3) or (fills >= 2 and band <= EARN_BAND_MAX)
 
 
 def _earn_log(m: str, ev: str, px: float, qty: int, note: str = "") -> None:
@@ -3666,8 +3682,7 @@ def auto_earn() -> None:
                 _EARN["last"][m] = now
             continue
         b = _bayes_fair(m)
-        confident = (b and b.get("med") and b.get("fills", 0) >= EARN_MIN_FILLS
-                     and (b["hi"] - b["lo"]) <= EARN_BAND_MAX)
+        confident = _earn_confident(b)
         tgt = None
         if confident:
             tgt = b["med"] - EARN_MARGIN_T
@@ -3702,8 +3717,7 @@ def auto_earn() -> None:
         if _earn_outstanding_usd() >= EARN_TOTAL_USD:
             break
         b = _bayes_fair(m)
-        if not (b and b.get("med") and b.get("fills", 0) >= EARN_MIN_FILLS
-                and (b["hi"] - b["lo"]) <= EARN_BAND_MAX):
+        if not _earn_confident(b):
             continue
         tgt = b["med"] - EARN_MARGIN_T
         if b.get("bb") is not None:
