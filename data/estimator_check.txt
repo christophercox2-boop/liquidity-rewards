@@ -1,4 +1,4 @@
-state.json: 20 history rows, 4 carrying earned_hf
+state.json: 21 history rows, 5 carrying earned_hf
 
 day           snaps    sparse   ratio        hf   ratio    ACTUAL
 
