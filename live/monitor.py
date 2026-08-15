@@ -3334,9 +3334,11 @@ def _probe_log(m: str, ev: str, side: str, px: float, note: str = "") -> None:
         del log[:-200]
 
 
-def _probe_real_touches(book: dict) -> tuple[float | None, float | None]:
-    bb = next((p for p, q in book.get("bids") or [] if q >= PROBE_REAL_MIN), None)
-    ba = next((p for p, q in book.get("asks") or [] if q >= PROBE_REAL_MIN), None)
+def _probe_real_touches(book: dict):
+    """Best REAL level on each side, with its size: ((px, q) | None) x 2.
+    Levels under PROBE_REAL_MIN shares are bait and ignored."""
+    bb = next(((p, q) for p, q in book.get("bids") or [] if q >= PROBE_REAL_MIN), None)
+    ba = next(((p, q) for p, q in book.get("asks") or [] if q >= PROBE_REAL_MIN), None)
     return bb, ba
 
 
@@ -3387,6 +3389,17 @@ def auto_probe() -> None:
             granted = True
     if granted:   # log outside the lock — _probe_log takes it too
         _probe_log("[owner]", "grant", "+", 0.0, "+$10.00 into the info fund")
+    # After a rebuild the in-memory registry is empty but our scouts still
+    # rest on the exchange. Re-adopt from the mirror saved in state, keeping
+    # only orders that still exist — so fills keep moving the fund and TTLs
+    # keep rotating across container replacements.
+    if not _PROBE["active"]:
+        saved = MONITOR.state.get("probe_active_reg") or {}
+        if saved:
+            live = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
+            for oid, r in saved.items():
+                if oid in live and len(r) == 5:
+                    _PROBE["active"][oid] = (r[0], r[1], float(r[2]), float(r[3]), r[4])
     if not _auto_on("probe"):
         return
     if os.environ.get("PROBE_PAUSE", "") == "1":
@@ -3458,6 +3471,32 @@ def auto_probe() -> None:
                     _PROBE["active"][fid] = (m, "BUY", fpx, now, "flip")
                     _probe_log(m, "flip", "BUY", fpx,
                                f"re-buying the share sold at {px*100:.0f}c")
+    # 1b. outbid/undercut: a competitor resting REAL size at a better price
+    # than our scout is revealed preference — someone else's money saying
+    # fair is beyond our scout's price (owner, 2026-08-15: "the probe found
+    # a good price but was outbid — that IS the information"). One event
+    # per scout, so a hovering competitor doesn't flood the journal.
+    beaten = _PROBE.setdefault("beaten", set())
+    for oid, rec in list(_PROBE["active"].items()):
+        m, side, px, ts, kind = rec
+        if kind != "probe" or oid in beaten or oid not in open_ids:
+            continue
+        ent = tr._BOOK_CACHE.get(m)
+        if not ent or now - ent[0] > 300:
+            continue
+        rbb, rba = _probe_real_touches(ent[1])
+        if side == "BUY" and rbb and rbb[0] > px + 1e-9:
+            beaten.add(oid)
+            _probe_log(m, "outbid", "BUY", rbb[0],
+                       f"{rbb[1]:,.0f} real shares bidding above our "
+                       f"{px*100:.0f}c scout")
+        elif side == "SELL" and rba and rba[0] < px - 1e-9:
+            beaten.add(oid)
+            _probe_log(m, "undercut", "SELL", rba[0],
+                       f"{rba[1]:,.0f} real shares asking below our "
+                       f"{px*100:.0f}c scout")
+    beaten &= set(_PROBE["active"])   # forget scouts that are gone
+
     # 2. seed new probes at random interior ticks
     if len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
         return
@@ -3474,9 +3513,10 @@ def auto_probe() -> None:
         ent = tr._BOOK_CACHE.get(m)
         if not ent or now - ent[0] > 300:
             continue
-        bb, ba = _probe_real_touches(ent[1])
-        if bb is None or ba is None:
+        rbb, rba = _probe_real_touches(ent[1])
+        if rbb is None or rba is None:
             continue
+        bb, ba = rbb[0], rba[0]
         lo_t = round(bb / 0.01) + 1
         hi_t = round(ba / 0.01) - 1
         if hi_t - lo_t + 1 < PROBE_MIN_GAP:
@@ -3509,6 +3549,9 @@ def auto_probe() -> None:
             _PROBE["active"][oid] = (m, side, px, now, "probe")
             _probe_log(m, "scout", side, px, "resting inside the gap")
             placed += 1
+    # mirror the registry so a rebuild can re-adopt (see top of function)
+    with MONITOR.lock:
+        MONITOR.state["probe_active_reg"] = {k: list(v) for k, v in _PROBE["active"].items()}
 
 
 def _bayes_fair(m: str) -> dict | None:
@@ -3528,8 +3571,17 @@ def _bayes_fair(m: str) -> dict | None:
     evs = [l for l in (MONITOR.state.get("probe_log") or []) if l.get("m") == m]
     ent = tr._BOOK_CACHE.get(m)
     bb = ba = None
+    bbw = baw = 0.5
     if ent and time.time() - ent[0] < 900:
-        bb, ba = _probe_real_touches(ent[1])
+        rbb, rba = _probe_real_touches(ent[1])
+        # size-weighted anchors: a big resting level is stronger revealed
+        # preference than a small one
+        def _aw(q: float) -> float:
+            return 0.4 if q < 100 else (0.8 if q < 1000 else 1.2)
+        if rbb:
+            bb, bbw = rbb[0], _aw(rbb[1])
+        if rba:
+            ba, baw = rba[0], _aw(rba[1])
     # scouts still resting are evidence too, growing with age: no taker at
     # that price for this long pushes fair away from it. Weighted up to the
     # same 0.35 a completed rotation earns, pro-rated by age/TTL.
@@ -3565,15 +3617,19 @@ def _bayes_fair(m: str) -> dict | None:
                     lp += 0.35 * llog(1.0 - 0.8 * sig((p - f) / S))
                 else:
                     lp += 0.35 * llog(1.0 - 0.8 * sig((f - p) / S))
+            elif ev == "outbid":     # real money bidding above our scout: fair >= p
+                lp += 0.5 * llog(sig((f - p) / S))
+            elif ev == "undercut":   # real money asking below our scout: fair <= p
+                lp += 0.5 * llog(sig((p - f) / S))
         for side, p, w in partial:
             if side == "BUY":
                 lp += w * llog(1.0 - 0.8 * sig((p - f) / S))
             else:
                 lp += w * llog(1.0 - 0.8 * sig((f - p) / S))
         if bb is not None:
-            lp += 0.5 * llog(sig((f - bb * 100) / S))
+            lp += bbw * llog(sig((f - bb * 100) / S))
         if ba is not None:
-            lp += 0.5 * llog(sig((ba * 100 - f) / S))
+            lp += baw * llog(sig((ba * 100 - f) / S))
         logp[f] = lp
     mx = max(logp[1:])
     ps = [0.0] + [math.exp(l - mx) for l in logp[1:]]
@@ -3692,6 +3748,13 @@ def auto_earn() -> None:
         return
     if os.environ.get("EARN_PAUSE", "") == "1":
         return
+    if not _EARN["orders"]:
+        saved = MONITOR.state.get("earn_orders_reg") or {}
+        if saved:
+            live = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
+            for oid, r in saved.items():
+                if oid in live and len(r) == 5:
+                    _EARN["orders"][oid] = (r[0], r[1], int(r[2]), int(r[3]), float(r[4]))
     now = time.time()
     open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
     # reconcile: fills and drift
@@ -3789,6 +3852,9 @@ def auto_earn() -> None:
                 placed += 1
         except Exception:  # noqa: BLE001 — the earner must never kill the poll
             continue
+    # mirror the registry so a rebuild can re-adopt (see top of function)
+    with MONITOR.lock:
+        MONITOR.state["earn_orders_reg"] = {k: list(v) for k, v in _EARN["orders"].items()}
 
 
 # --- slate health watch (in-process; replaced the slate_watch.yml cron) ----
