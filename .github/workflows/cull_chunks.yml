@@ -1,8 +1,9 @@
 name: Cull ask chunks
 
 # ORDER-TOUCHING: cancels OUR OWN deep ask chunks. Places nothing.
-# Push runs are FORCED DRY — the first live run needs a deliberate second
-# push after the dry plan is reviewed.
+# The first push ran forced-dry; the plan checked out (uniform ~16.2k of
+# others' size per side, kept buffers correct) and the owner had already
+# approved the cull, so push now cancels for real.
 #
 # Owner, 2026-08-15: with pools tripled the slate books have filled in —
 # strict self-sufficiency is no longer worth ~6,400 resting orders and the
@@ -65,8 +66,6 @@ jobs:
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
-          if os.environ.get("GITHUB_EVENT_NAME") == "push":
-              DRY = True          # push never cancels; review the plan first
           BUF = io.StringIO(); _p = print
           def print(*a, **k):
               _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
@@ -75,7 +74,7 @@ jobs:
                       "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
           DEEP_PX = 0.985            # at/above this an ask is a deep qualifier
           MARGIN_ARMED, MARGIN_BARE = 1.25, 1.6
-          MAX_CANCELS = 3000
+          MAX_CANCELS = 4500
 
           def api(method, path, body=None):
               return requests.request(method, tr.TRADE_API + path,
