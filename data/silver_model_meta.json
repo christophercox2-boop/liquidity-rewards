@@ -4,16 +4,16 @@
   "file": "data/silver_model.csv",
   "meaning": "Senate win probability, Deluxe model",
   "chart_title": "How our Senate forecast has changed over time",
-  "n_rows": 10,
+  "n_rows": 11,
   "header": [
    "modeldate",
    "Democrats",
    "Republicans"
   ],
   "latest": [
-   "8/13/2026",
-   "55.965",
-   "44.035"
+   "8/14/2026",
+   "56.4225",
+   "43.5775"
   ]
  },
  "igTt2": {
@@ -21,16 +21,16 @@
   "file": "data/silver_senate_classic.csv",
   "meaning": "Senate win probability, Classic model",
   "chart_title": "How our Senate forecast has changed over time",
-  "n_rows": 9,
+  "n_rows": 11,
   "header": [
    "modeldate",
    "Democrats",
    "Republicans"
   ],
   "latest": [
-   "8/12/2026",
-   "55.295",
-   "44.705"
+   "8/14/2026",
+   "55.11",
+   "44.89"
   ]
  },
  "6aks4": {
@@ -38,16 +38,16 @@
   "file": "data/silver_senate_lite.csv",
   "meaning": "Senate win probability, Lite model",
   "chart_title": "How our Senate forecast has changed over time",
-  "n_rows": 9,
+  "n_rows": 11,
   "header": [
    "modeldate",
    "Democrats",
    "Republicans"
   ],
   "latest": [
-   "8/12/2026",
-   "56.42",
-   "43.58"
+   "8/14/2026",
+   "56.7825",
+   "43.2175"
   ]
  },
  "6mA2E": {
@@ -55,16 +55,16 @@
   "file": "data/silver_senate_seats.csv",
   "meaning": "Senate average seats, Deluxe model",
   "chart_title": "How our Senate forecast has changed over time",
-  "n_rows": 9,
+  "n_rows": 11,
   "header": [
    "modeldate",
    "Democrats",
    "Republicans"
   ],
   "latest": [
-   "8/12/2026",
-   "50.9027",
-   "49.0973"
+   "8/14/2026",
+   "50.9034",
+   "49.0966"
   ]
  },
  "kNspD": {
