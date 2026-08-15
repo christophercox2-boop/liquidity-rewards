@@ -1,88 +1,24 @@
 {
  "dry_run": false,
- "qty": 1.0,
- "placed": 10,
+ "qty": 5.0,
+ "placed": 2,
  "failed": 0,
- "skipped": 50,
+ "skipped": 58,
  "orders": [
   {
-   "m": "enwc-uspres-nom-dem-2028-kamhar",
-   "px": 0.43,
-   "qty": 1.0,
+   "m": "enwc-uspres-nom-dem-2028-jonoss",
+   "px": 0.35,
+   "qty": 5.0,
    "qual": true,
-   "est": 2.42,
+   "est": 17.86,
    "ok": true
   },
   {
    "m": "enwc-uspres-nom-rep-2028-dontru",
-   "px": 0.04,
-   "qty": 1.0,
-   "qual": true,
-   "est": 4.36,
-   "ok": true
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-vivram",
    "px": 0.03,
-   "qty": 1.0,
+   "qty": 5.0,
    "qual": true,
-   "est": 4.39,
-   "ok": true
-  },
-  {
-   "m": "ewc-usp-2028-11-07-andbes",
-   "px": 0.11,
-   "qty": 1.0,
-   "qual": true,
-   "est": 6.16,
-   "ok": true
-  },
-  {
-   "m": "ewc-usp-2028-11-07-dwajoh",
-   "px": 0.24,
-   "qty": 1.0,
-   "qual": true,
-   "est": 0.03,
-   "ok": true
-  },
-  {
-   "m": "ewc-usp-2028-11-07-gleyou",
-   "px": 0.26,
-   "qty": 1.0,
-   "qual": true,
-   "est": 1.01,
-   "ok": true
-  },
-  {
-   "m": "ewc-usp-2028-11-07-stasmi",
-   "px": 0.14,
-   "qty": 1.0,
-   "qual": true,
-   "est": 6.17,
-   "ok": true
-  },
-  {
-   "m": "ewc-usp-2028-11-07-tuccar",
-   "px": 0.26,
-   "qty": 1.0,
-   "qual": true,
-   "est": 1.02,
-   "ok": true
-  },
-  {
-   "m": "ewc-usp-2028-11-07-vivram",
-   "px": 0.14,
-   "qty": 1.0,
-   "qual": true,
-   "est": 6.17,
-   "ok": true
-  },
-  {
-   "m": "ewc-usp-2028-11-07-wesmoo",
-   "px": 0.14,
-   "qty": 1.0,
-   "qual": true,
-   "est": 6.17,
+   "est": 21.67,
    "ok": true
   }
  ]
