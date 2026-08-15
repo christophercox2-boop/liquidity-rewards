@@ -6,11 +6,18 @@ name: Qualify 2028 ask sides
 # 2028 presidential market, dropping 56 ask sides from ~11,100 to ~250 and
 # so below the 10,000 Target Size. A side under Target Size pays nobody.
 #
-# This rests OUR OWN 10,000 at the 99c ceiling on every ask side that is
-# short, so the side no longer depends on anyone else's size staying put —
-# the same reasoning as the flat 10,000 used on the bid sides. It tops up to
-# 10,000 of ours, so a market where we already hold 9,901 gets 99 more, not
-# another 10,000.
+# This rests OUR OWN size at the 99c ceiling on every ask side that is
+# short of the market's LIVE Target Size, so the side no longer depends on
+# anyone else's size staying put — the same reasoning as the flat blocks on
+# the bid sides. It tops up, so a market where we already hold most of the
+# target gets the difference, not another full block.
+#
+# 2026-08-15: Target Size doubled to 20,000 across the slate, putting all
+# 59 self-held ask sides back under the line. The wanted size now comes
+# from the incentives API at run time instead of a hardcoded 10,000, so a
+# future change re-runs with no edit. The single-order top-up attempt
+# (requalify_slate) proved the per-order cap again: every order trimmed to
+# exactly ~322 shares — one share per dollar of buying power.
 #
 # An ask order carries only one share per dollar of buying power, so each
 # side takes ~50 orders and the whole run is a few thousand. Buying power is
@@ -66,10 +73,11 @@ jobs:
           PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
                       "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
           CEIL = 0.99
-          WANT_OURS = 10000          # our own resting size on the side
+          # our own resting size on a side must reach the market's live
+          # Target Size (20,000 since 2026-08-15) — read per market below
           MAX_ORDERS_PER_SIDE = 140
           BP_FLOOR = 25.0
-          MAX_ORDERS_TOTAL = 1600
+          MAX_ORDERS_TOTAL = 2000
           PAUSE = 0.8
 
           def bp_now(default=0.0):
@@ -188,11 +196,12 @@ jobs:
               # runs, and when they pulled it went straight to zero with no
               # warning — 14 markets died exactly that way. A side we hold up
               # ourselves cannot be switched off by anyone leaving.
+              want = target
               mine = ours.get(slug, 0.0)
-              if mine >= WANT_OURS:
+              if mine >= want:
                   continue
               print(f"[{i}/{len(slate)}] {slug}: ask {ask_tot:,.0f} of {target:,.0f}, "
-                    f"OURS {mine:,.0f} → adding {int(WANT_OURS - mine):,} to stand alone")
+                    f"OURS {mine:,.0f} → adding {int(want - mine):,} to stand alone")
               # Progress is measured from the BOOK, never from what we asked
               # for. An order rests at whatever buying power allows at that
               # moment — ~170 when we asked for 197 — so counting requests
@@ -201,13 +210,13 @@ jobs:
               stalled = 0
               ours_now = mine
               last_book = ask_tot
-              while (ours_now < WANT_OURS and placed < MAX_ORDERS_PER_SIDE
+              while (ours_now < want and placed < MAX_ORDERS_PER_SIDE
                      and total < MAX_ORDERS_TOTAL):
                   if BP < BP_FLOOR:
                       print(f"    stopping: buying power ${BP:,.2f} below the "
                             f"${BP_FLOOR:.0f} floor")
                       break
-                  qty = min(int(WANT_OURS - ours_now) + 1, max(1, int(BP)))
+                  qty = min(int(want - ours_now) + 1, max(1, int(BP)))
                   if DRY:
                       ok, why = True, ""
                   else:
@@ -250,7 +259,7 @@ jobs:
                     f"{after if after is None else format(after, ',.0f')} → {state}")
               summary.append({"m": slug, "orders": placed, "after": after,
                               "ours": round(ours_now),
-                              "self_sufficient": ours_now >= WANT_OURS,
+                              "self_sufficient": ours_now >= want,
                               "qualifying": bool(after and after >= target)})
               done_mkts += 1
 
@@ -273,6 +282,11 @@ jobs:
           git add data/qualify_asks_2028.json data/qualify_asks_2028.txt 2>/dev/null || true
           if git diff --cached --quiet; then echo "no change"; else
             git commit -m "Qualify 2028 ask sides [skip ci]"
-            git pull --rebase origin main
-            git push
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
           fi
