@@ -1,24 +1,16 @@
 {
  "dry_run": false,
  "qty": 5.0,
- "placed": 2,
+ "placed": 1,
  "failed": 0,
- "skipped": 58,
+ "skipped": 59,
  "orders": [
   {
-   "m": "enwc-uspres-nom-dem-2028-jonoss",
-   "px": 0.35,
+   "m": "enwc-uspres-nom-dem-2028-stasmi",
+   "px": 0.14,
    "qty": 5.0,
    "qual": true,
-   "est": 17.86,
-   "ok": true
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-dontru",
-   "px": 0.03,
-   "qty": 5.0,
-   "qual": true,
-   "est": 21.67,
+   "est": 21.01,
    "ok": true
   }
  ]
