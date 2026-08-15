@@ -82,8 +82,6 @@ jobs:
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
-          if os.environ.get("GITHUB_EVENT_NAME") == "push":
-              DRY = True          # push never places; review the plan first
           BUDGET = float(os.environ.get("BUDGET") or 80)
           BUF = io.StringIO(); _p = print
           def print(*a, **k):
@@ -213,8 +211,10 @@ jobs:
               spent += 1.0
 
           # a rung must pay its own worst-case exposure back within ~10 days
-          # or it is not worth the inventory risk
+          # or it is not worth the inventory risk; a side where we already
+          # hold a rung at the touch is done — never stack a second one
           plan = [s for s in sides if s["r"] >= MIN_RUNG
+                  and s["have"] < MIN_RUNG
                   and gain(s, s["r"]) >= 0.10 * s["r"] * s["px"]]
           est = sum(gain(s, s["r"]) for s in plan)
           expo = sum(s["r"] * s["px"] for s in plan)
