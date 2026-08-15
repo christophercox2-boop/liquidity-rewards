@@ -379,6 +379,20 @@
       "status": "PENDING"
     },
     {
+      "reward": 1.53,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-wnba-mvp-2026-10-15-w-caicla",
+      "date": "2026-08-13",
+      "status": "PENDING"
+    },
+    {
+      "reward": 1.38,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-wnba-mvp-2026-10-15-w-paibue",
+      "date": "2026-08-13",
+      "status": "PENDING"
+    },
+    {
       "reward": 5.33,
       "programType": "liquidityProgram",
       "marketSlug": "apdc-alito-2026-12-31",
