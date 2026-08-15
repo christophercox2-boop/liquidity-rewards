@@ -1,94 +1,72 @@
 buying power $329.48 — an ask order carries 329 shares
 slate: 60 markets
 
-[1/60] enwc-uspres-nom-rep-2028-dontru: ask 43,501 of 20,000, OURS 17,068 → adding 2,932 to stand alone
-    10 orders placed, ours ~19,988, ask side now 43,501 → QUALIFYING
-[4/60] enwc-uspres-nom-rep-2028-gleyou: ask 38,350 of 20,000, OURS 15,705 → adding 4,294 to stand alone
-    14 orders placed, ours ~19,988, ask side now 38,350 → QUALIFYING
-[5/60] enwc-uspres-nom-rep-2028-jdvan: ask 43,525 of 20,000, OURS 16,889 → adding 3,110 to stand alone
-    10 orders placed, ours ~19,988, ask side now 43,525 → QUALIFYING
-[6/60] enwc-uspres-nom-rep-2028-margre: ask 44,794 of 20,000, OURS 18,356 → adding 1,643 to stand alone
-    6 orders placed, ours ~19,987, ask side now 44,794 → QUALIFYING
-[7/60] enwc-uspres-nom-rep-2028-marrub: ask 25,073 of 20,000, OURS 8,721 → adding 11,278 to stand alone
-    37 orders placed, ours ~20,001, ask side now 34,922 → QUALIFYING
-[8/60] enwc-uspres-nom-rep-2028-ranpau: ask 44,790 of 20,000, OURS 18,730 → adding 1,269 to stand alone
-    5 orders placed, ours ~20,001, ask side now 44,790 → QUALIFYING
-[9/60] enwc-uspres-nom-rep-2028-rondes: ask 43,179 of 20,000, OURS 17,816 → adding 2,184 to stand alone
-    7 orders placed, ours ~19,975, ask side now 43,179 → QUALIFYING
-[10/60] enwc-uspres-nom-rep-2028-tedcru: ask 47,045 of 20,000, OURS 19,732 → adding 267 to stand alone
-    1 orders placed, ours ~20,000, ask side now 47,045 → QUALIFYING
-[12/60] enwc-uspres-nom-rep-2028-tuccar: ask 43,501 of 20,000, OURS 17,238 → adding 2,762 to stand alone
-    9 orders placed, ours ~20,000, ask side now 43,501 → QUALIFYING
-[13/60] enwc-uspres-nom-rep-2028-tulgab: ask 43,500 of 20,000, OURS 15,504 → adding 4,495 to stand alone
-    15 orders placed, ours ~19,975, ask side now 43,500 → QUALIFYING
-[17/60] enwc-uspres-nom-dem-2028-aleocc: ask 30,173 of 20,000, OURS 13,876 → adding 6,123 to stand alone
-    21 orders placed, ours ~20,000, ask side now 34,283 → QUALIFYING
-[18/60] enwc-uspres-nom-dem-2028-andbes: ask 43,193 of 20,000, OURS 17,771 → adding 2,229 to stand alone
-    7 orders placed, ours ~19,975, ask side now 43,193 → QUALIFYING
-[20/60] enwc-uspres-nom-dem-2028-gavnew: ask 27,479 of 20,000, OURS 15,948 → adding 4,051 to stand alone
-    13 orders placed, ours ~20,001, ask side now 30,957 → QUALIFYING
-[21/60] enwc-uspres-nom-dem-2028-jamtal: ask 33,430 of 20,000, OURS 17,012 → adding 2,987 to stand alone
-    10 orders placed, ours ~19,988, ask side now 33,430 → QUALIFYING
-[24/60] enwc-uspres-nom-dem-2028-jonste: ask 43,178 of 20,000, OURS 16,822 → adding 3,177 to stand alone
-    10 orders placed, ours ~19,984, ask side now 45,707 → QUALIFYING
-[25/60] enwc-uspres-nom-dem-2028-jossha: ask 27,505 of 20,000, OURS 17,111 → adding 2,889 to stand alone
-    10 orders placed, ours ~19,987, ask side now 27,505 → QUALIFYING
-[26/60] enwc-uspres-nom-dem-2028-kamhar: ask 34,128 of 20,000, OURS 17,771 → adding 2,229 to stand alone
-    7 orders placed, ours ~19,975, ask side now 36,332 → QUALIFYING
-[27/60] enwc-uspres-nom-dem-2028-markel: ask 27,454 of 20,000, OURS 16,632 → adding 3,367 to stand alone
-    11 orders placed, ours ~19,975, ask side now 27,454 → QUALIFYING
-[28/60] enwc-uspres-nom-dem-2028-micoba: ask 34,620 of 20,000, OURS 18,301 → adding 1,699 to stand alone
-    6 orders placed, ours ~19,988, ask side now 34,620 → QUALIFYING
-[29/60] enwc-uspres-nom-dem-2028-petbut: ask 35,236 of 20,000, OURS 18,926 → adding 1,074 to stand alone
-    5 orders placed, ours ~20,000, ask side now 36,377 → QUALIFYING
-[30/60] enwc-uspres-nom-dem-2028-rahema: ask 33,430 of 20,000, OURS 17,109 → adding 2,890 to stand alone
-    10 orders placed, ours ~19,988, ask side now 33,430 → QUALIFYING
-[31/60] enwc-uspres-nom-dem-2028-rokha: ask 33,411 of 20,000, OURS 17,190 → adding 2,809 to stand alone
-    9 orders placed, ours ~20,001, ask side now 36,222 → QUALIFYING
-[32/60] enwc-uspres-nom-dem-2028-stasmi: ask 34,225 of 20,000, OURS 17,904 → adding 2,095 to stand alone
-    7 orders placed, ours ~19,974, ask side now 34,225 → QUALIFYING
-[34/60] ewc-usp-2028-11-07-aleocc: ask 43,394 of 20,000, OURS 15,376 → adding 4,624 to stand alone
-    15 orders placed, ours ~19,975, ask side now 47,187 → QUALIFYING
-[37/60] ewc-usp-2028-11-07-dontrujr: ask 33,316 of 20,000, OURS 16,970 → adding 3,029 to stand alone
-    10 orders placed, ours ~19,988, ask side now 35,529 → QUALIFYING
-[38/60] ewc-usp-2028-11-07-dwajoh: ask 35,865 of 20,000, OURS 19,519 → adding 481 to stand alone
-    2 orders placed, ours ~19,988, ask side now 35,865 → QUALIFYING
-[39/60] ewc-usp-2028-11-07-elomus: ask 33,329 of 20,000, OURS 16,969 → adding 3,030 to stand alone
-    10 orders placed, ours ~19,988, ask side now 33,329 → QUALIFYING
-[40/60] ewc-usp-2028-11-07-gavnew: ask 43,403 of 20,000, OURS 17,140 → adding 2,860 to stand alone
-    10 orders placed, ours ~19,988, ask side now 46,251 → QUALIFYING
-[41/60] ewc-usp-2028-11-07-gleyou: ask 32,591 of 20,000, OURS 16,344 → adding 3,656 to stand alone
-    13 orders placed, ours ~20,001, ask side now 34,172 → QUALIFYING
-[42/60] ewc-usp-2028-11-07-jamtal: ask 43,491 of 20,000, OURS 17,646 → adding 2,354 to stand alone
-    9 orders placed, ours ~20,001, ask side now 43,491 → QUALIFYING
-[43/60] ewc-usp-2028-11-07-jbpri: ask 34,439 of 20,000, OURS 18,193 → adding 1,807 to stand alone
-    6 orders placed, ours ~19,987, ask side now 36,234 → QUALIFYING
-[44/60] ewc-usp-2028-11-07-jdvan: ask 35,892 of 20,000, OURS 19,521 → adding 478 to stand alone
-    2 orders placed, ours ~19,987, ask side now 35,892 → QUALIFYING
-[45/60] ewc-usp-2028-11-07-jonoss: ask 33,243 of 20,000, OURS 16,979 → adding 3,020 to stand alone
-    10 orders placed, ours ~19,988, ask side now 33,243 → QUALIFYING
-[46/60] ewc-usp-2028-11-07-jossha: ask 36,017 of 20,000, OURS 19,671 → adding 329 to stand alone
-    2 orders placed, ours ~19,988, ask side now 36,017 → QUALIFYING
-[49/60] ewc-usp-2028-11-07-marrub: ask 33,884 of 20,000, OURS 17,630 → adding 2,370 to stand alone
-    9 orders placed, ours ~20,001, ask side now 33,884 → QUALIFYING
-[51/60] ewc-usp-2028-11-07-petbut: ask 31,723 of 20,000, OURS 15,375 → adding 4,624 to stand alone
-    15 orders placed, ours ~19,974, ask side now 36,322 → QUALIFYING
-[52/60] ewc-usp-2028-11-07-rahema: ask 35,955 of 20,000, OURS 19,595 → adding 404 to stand alone
-    2 orders placed, ours ~19,988, ask side now 35,955 → QUALIFYING
-[53/60] ewc-usp-2028-11-07-rokha: ask 31,723 of 20,000, OURS 15,375 → adding 4,624 to stand alone
-    15 orders placed, ours ~19,974, ask side now 36,322 → QUALIFYING
-[54/60] ewc-usp-2028-11-07-rondes: ask 45,908 of 20,000, OURS 17,992 → adding 2,008 to stand alone
-    7 orders placed, ours ~19,975, ask side now 47,891 → QUALIFYING
-[56/60] ewc-usp-2028-11-07-thomas: ask 33,260 of 20,000, OURS 17,015 → adding 2,985 to stand alone
-    10 orders placed, ours ~19,988, ask side now 33,260 → QUALIFYING
-[57/60] ewc-usp-2028-11-07-tuccar: ask 35,517 of 20,000, OURS 19,171 → adding 828 to stand alone
-    3 orders placed, ours ~19,974, ask side now 36,320 → QUALIFYING
-[58/60] ewc-usp-2028-11-07-tulgab: ask 32,886 of 20,000, OURS 16,640 → adding 3,360 to stand alone
-    11 orders placed, ours ~19,974, ask side now 32,886 → QUALIFYING
-[59/60] ewc-usp-2028-11-07-vivram: ask 31,735 of 20,000, OURS 15,375 → adding 4,624 to stand alone
-    15 orders placed, ours ~19,975, ask side now 34,896 → QUALIFYING
-[60/60] ewc-usp-2028-11-07-wesmoo: ask 32,886 of 20,000, OURS 16,640 → adding 3,360 to stand alone
-    11 orders placed, ours ~19,974, ask side now 32,886 → QUALIFYING
+[1/60] enwc-uspres-nom-rep-2028-dontru: ask 36,209 of 20,000, OURS 19,988 → adding 12 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,209 → QUALIFYING
+[4/60] enwc-uspres-nom-rep-2028-gleyou: ask 36,211 of 20,000, OURS 19,988 → adding 11 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,211 → QUALIFYING
+[5/60] enwc-uspres-nom-rep-2028-jdvan: ask 36,237 of 20,000, OURS 19,988 → adding 12 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,237 → QUALIFYING
+[6/60] enwc-uspres-nom-rep-2028-margre: ask 36,210 of 20,000, OURS 19,987 → adding 12 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,210 → QUALIFYING
+[9/60] enwc-uspres-nom-rep-2028-rondes: ask 36,197 of 20,000, OURS 19,975 → adding 25 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,197 → QUALIFYING
+[13/60] enwc-uspres-nom-rep-2028-tulgab: ask 36,199 of 20,000, OURS 19,975 → adding 25 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,199 → QUALIFYING
+[18/60] enwc-uspres-nom-dem-2028-andbes: ask 36,196 of 20,000, OURS 19,975 → adding 25 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,196 → QUALIFYING
+[21/60] enwc-uspres-nom-dem-2028-jamtal: ask 36,265 of 20,000, OURS 19,988 → adding 12 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,265 → QUALIFYING
+[24/60] enwc-uspres-nom-dem-2028-jonste: ask 36,208 of 20,000, OURS 19,984 → adding 16 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,208 → QUALIFYING
+[25/60] enwc-uspres-nom-dem-2028-jossha: ask 20,189 of 20,000, OURS 19,987 → adding 12 to stand alone
+    1 orders placed, ours ~20,000, ask side now 20,189 → QUALIFYING
+[26/60] enwc-uspres-nom-dem-2028-kamhar: ask 36,300 of 20,000, OURS 19,975 → adding 25 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,300 → QUALIFYING
+[27/60] enwc-uspres-nom-dem-2028-markel: ask 30,797 of 20,000, OURS 19,975 → adding 25 to stand alone
+    1 orders placed, ours ~20,001, ask side now 30,797 → QUALIFYING
+[28/60] enwc-uspres-nom-dem-2028-micoba: ask 36,271 of 20,000, OURS 19,988 → adding 12 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,271 → QUALIFYING
+[30/60] enwc-uspres-nom-dem-2028-rahema: ask 36,209 of 20,000, OURS 19,988 → adding 12 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,209 → QUALIFYING
+[32/60] enwc-uspres-nom-dem-2028-stasmi: ask 36,223 of 20,000, OURS 19,974 → adding 25 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,223 → QUALIFYING
+[34/60] ewc-usp-2028-11-07-aleocc: ask 36,228 of 20,000, OURS 19,975 → adding 25 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,228 → QUALIFYING
+[37/60] ewc-usp-2028-11-07-dontrujr: ask 36,234 of 20,000, OURS 19,988 → adding 12 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,234 → QUALIFYING
+[38/60] ewc-usp-2028-11-07-dwajoh: ask 36,248 of 20,000, OURS 19,988 → adding 12 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,248 → QUALIFYING
+[39/60] ewc-usp-2028-11-07-elomus: ask 36,247 of 20,000, OURS 19,988 → adding 12 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,247 → QUALIFYING
+[40/60] ewc-usp-2028-11-07-gavnew: ask 36,234 of 20,000, OURS 19,988 → adding 12 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,234 → QUALIFYING
+[43/60] ewc-usp-2028-11-07-jbpri: ask 36,233 of 20,000, OURS 19,987 → adding 12 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,233 → QUALIFYING
+[44/60] ewc-usp-2028-11-07-jdvan: ask 36,238 of 20,000, OURS 19,987 → adding 12 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,246 → QUALIFYING
+[45/60] ewc-usp-2028-11-07-jonoss: ask 36,236 of 20,000, OURS 19,988 → adding 12 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,236 → QUALIFYING
+[46/60] ewc-usp-2028-11-07-jossha: ask 36,241 of 20,000, OURS 19,988 → adding 11 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,241 → QUALIFYING
+[51/60] ewc-usp-2028-11-07-petbut: ask 36,227 of 20,000, OURS 19,974 → adding 25 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,227 → QUALIFYING
+[52/60] ewc-usp-2028-11-07-rahema: ask 36,247 of 20,000, OURS 19,988 → adding 12 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,247 → QUALIFYING
+[53/60] ewc-usp-2028-11-07-rokha: ask 36,220 of 20,000, OURS 19,974 → adding 25 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,220 → QUALIFYING
+[54/60] ewc-usp-2028-11-07-rondes: ask 36,227 of 20,000, OURS 19,975 → adding 25 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,227 → QUALIFYING
+[56/60] ewc-usp-2028-11-07-thomas: ask 36,237 of 20,000, OURS 19,988 → adding 11 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,249 → QUALIFYING
+[57/60] ewc-usp-2028-11-07-tuccar: ask 36,325 of 20,000, OURS 19,974 → adding 25 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,325 → QUALIFYING
+[58/60] ewc-usp-2028-11-07-tulgab: ask 36,247 of 20,000, OURS 19,974 → adding 25 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,247 → QUALIFYING
+[59/60] ewc-usp-2028-11-07-vivram: ask 36,234 of 20,000, OURS 19,975 → adding 25 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,234 → QUALIFYING
+[60/60] ewc-usp-2028-11-07-wesmoo: ask 36,241 of 20,000, OURS 19,974 → adding 25 to stand alone
+    1 orders placed, ours ~20,000, ask side now 36,241 → QUALIFYING
 
-427 orders across 44 markets
-44 of 44 ask sides now at Target Size
+33 orders across 33 markets
+33 of 33 ask sides now at Target Size
