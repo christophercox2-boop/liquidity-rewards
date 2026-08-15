@@ -1,6 +1,8 @@
 name: Bid rungs
 
-# ORDER-TOUCHING. Places real orders — but push runs are FORCED DRY.
+# ORDER-TOUCHING. Places real orders. Push-path / manual dispatch only.
+# First push ran forced-dry; owner approved the plan shape (25 rungs,
+# $100 worst-case, +$275/day) and the budget, so push now places.
 #
 # Owner-approved 2026-08-15: bid-side presence sized to a HARD worst-case
 # fill budget, because buying power (~$320) is the operating fuel — $200
@@ -65,8 +67,6 @@ jobs:
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
-          if os.environ.get("GITHUB_EVENT_NAME") == "push":
-              DRY = True          # push never places; review the plan first
           BUDGET = float(os.environ.get("BUDGET") or 100)
           BUF = io.StringIO(); _p = print
           def print(*a, **k):
