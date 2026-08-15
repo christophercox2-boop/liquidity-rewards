@@ -69,8 +69,6 @@ jobs:
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
-          if os.environ.get("GITHUB_EVENT_NAME") == "push":
-              DRY = True          # push never places; review the plan first
           BUDGET = float(os.environ.get("BUDGET") or 80)
           BUF = io.StringIO(); _p = print
           def print(*a, **k):
