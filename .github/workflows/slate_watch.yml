@@ -20,13 +20,12 @@ name: Slate watch
 # A quiet night sends nothing. Findings are also committed to
 # data/slate_watch.txt either way, so the morning read shows history.
 
+# 2026-08-15: the 30-minute cron was ~120 Actions minutes/day against a
+# 2,000-minute monthly plan (the 90% usage warning arrived the same day).
+# The identical check now runs INSIDE live/monitor.py every 10 minutes at
+# zero Actions cost, with real ntfy access. This file stays for manual
+# dispatch only.
 on:
-  schedule:
-    - cron: "*/30 * * * *"
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/slate_watch.yml
   workflow_dispatch: {}
 
 permissions:

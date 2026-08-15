@@ -3170,6 +3170,67 @@ def auto_snipe() -> None:
             continue
 
 
+# --- slate health watch (in-process; replaced the slate_watch.yml cron) ----
+# Moved out of GitHub Actions 2026-08-15: the 30-minute cron was burning
+# ~120 Actions minutes a day against a 2,000/month plan, and the monitor
+# already holds every book, target, and order in memory — the same check
+# here costs nothing and can actually reach ntfy. Alerts when a slate
+# side's TOTAL size drops under Target Size (that side pays nobody) or the
+# open-order count collapses (the mass-cancel signature). OUR size alone
+# below target is the designed state since the chunk cull — not alerted.
+WATCH_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                  "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+WATCH_INTERVAL = float(os.environ.get("WATCH_INTERVAL", "600"))
+WATCH_REALERT = float(os.environ.get("WATCH_REALERT", "21600"))  # per finding
+_WATCH: dict = {"last_run": 0.0, "alerted": {}, "prev_orders": 0}
+
+
+def slate_health_check() -> None:
+    now = time.time()
+    if now - _WATCH["last_run"] < WATCH_INTERVAL:
+        return
+    _WATCH["last_run"] = now
+    progs = tr._PROG_CACHE.get("progs") or {}
+    ours: dict = {}
+    for o in MONITOR.orders:
+        m = o.get("market") or ""
+        if m.startswith(WATCH_PREFIXES):
+            k = (m, o.get("side"))
+            ours[k] = ours.get(k, 0.0) + float(o.get("size") or 0)
+    problems = []
+    for m, ent in list(tr._BOOK_CACHE.items()):
+        if not m.startswith(WATCH_PREFIXES):
+            continue
+        if now - ent[0] > 900:      # stale book — never alarm on old data
+            continue
+        target = float((progs.get(m) or {}).get("target") or 0)
+        if not target:
+            continue
+        for side, key in (("BUY", "bids"), ("SELL", "asks")):
+            # the book lags our own placements; take the larger read
+            tot = max(sum(q for _, q in (ent[1] or {}).get(key) or []),
+                      ours.get((m, side), 0.0))
+            if tot < target:
+                problems.append((f"{m}|{side}",
+                                 f"{m.rsplit('-', 1)[-1]} {side} {tot:,.0f}/{target:,.0f}"))
+    n = len(MONITOR.orders)
+    if _WATCH["prev_orders"] and n < _WATCH["prev_orders"] * 0.85:
+        problems.append(("open-orders",
+                         f"open orders fell {_WATCH['prev_orders']:,} -> {n:,}"))
+    _WATCH["prev_orders"] = n
+    fresh = [(k, txt) for k, txt in problems
+             if now - _WATCH["alerted"].get(k, 0.0) > WATCH_REALERT]
+    if fresh:
+        for k, _ in fresh:
+            _WATCH["alerted"][k] = now
+        body = " | ".join(txt for _, txt in fresh[:6])
+        if len(fresh) > 6:
+            body += f" (+{len(fresh) - 6} more)"
+        with MONITOR.lock:
+            MONITOR.pending_alerts.append(
+                ("Slate watch: sides not paying", body[:900], "high"))
+
+
 def _race_prefix(slug: str) -> str:
     """Sibling-group key: seat ladders group by their ladder prefix, everything
     else by the slug minus its last token (the candidate/outcome)."""
@@ -7196,6 +7257,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     auto_snipe()
                 except Exception as e:  # noqa: BLE001 — sniper never kills the poll
                     MONITOR.error = f"snipe: {type(e).__name__}: {e}"[:150]
+                try:
+                    slate_health_check()
+                except Exception:  # noqa: BLE001 — the watch never kills the poll
+                    pass
             except Exception as e:  # noqa: BLE001 — defense never kills the poll
                 MONITOR.error = f"defend: {type(e).__name__}: {e}"[:150]
             MONITOR.maybe_save_remote()
