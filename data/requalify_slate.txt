@@ -1,4 +1,4 @@
-2028 slate: 60 markets   (DRY RUN)
+2028 slate: 60 markets
 live Target Sizes seen: [20000.0]  (old was 10,000)
 
 market                                     side   target      ours      add
@@ -123,4 +123,47 @@ ewc-usp-party-2028-11-07-dem               SELL   20,000    19,751      250
 ewc-usp-party-2028-11-07-rep               BUY    20,000     9,180   10,821
 ewc-usp-party-2028-11-07-rep               SELL   20,000     9,712   10,288
 
-would place 120, failed 0, fill-side notional ~$11,185.26
+placed 120, failed 0, fill-side notional ~$11,185.26
+
+settling before verifying…
+sides still below the new target: 59
+   enwc-uspres-nom-dem-2028-aleocc            SELL ours    12,592 of 20,000
+   enwc-uspres-nom-dem-2028-andbes            SELL ours    12,615 of 20,000
+   enwc-uspres-nom-dem-2028-dwajoh            SELL ours    10,318 of 20,000
+   enwc-uspres-nom-dem-2028-gavnew            SELL ours    10,792 of 20,000
+   enwc-uspres-nom-dem-2028-jamtal            SELL ours    11,836 of 20,000
+   enwc-uspres-nom-dem-2028-jbpri             SELL ours    11,954 of 20,000
+   enwc-uspres-nom-dem-2028-jonoss            SELL ours    12,600 of 20,000
+   enwc-uspres-nom-dem-2028-jonste            SELL ours    11,666 of 20,000
+   enwc-uspres-nom-dem-2028-jossha            SELL ours    11,955 of 20,000
+   enwc-uspres-nom-dem-2028-kamhar            SELL ours    12,616 of 20,000
+   enwc-uspres-nom-dem-2028-markel            SELL ours    11,476 of 20,000
+   enwc-uspres-nom-dem-2028-micoba            SELL ours    11,854 of 20,000
+   enwc-uspres-nom-dem-2028-petbut            SELL ours    11,179 of 20,000
+   enwc-uspres-nom-dem-2028-rahema            SELL ours    10,714 of 20,000
+   enwc-uspres-nom-dem-2028-rokha             SELL ours    12,129 of 20,000
+   enwc-uspres-nom-dem-2028-stasmi            SELL ours    10,317 of 20,000
+   enwc-uspres-nom-dem-2028-wesmoo            SELL ours    12,081 of 20,000
+   enwc-uspres-nom-rep-2028-dontru            SELL ours    11,912 of 20,000
+   enwc-uspres-nom-rep-2028-dontrujr          SELL ours    10,318 of 20,000
+   enwc-uspres-nom-rep-2028-elomus            SELL ours    10,849 of 20,000
+   enwc-uspres-nom-rep-2028-gleyou            SELL ours    10,549 of 20,000
+   enwc-uspres-nom-rep-2028-jdvan             SELL ours    11,733 of 20,000
+   enwc-uspres-nom-rep-2028-margre            SELL ours    11,912 of 20,000
+   enwc-uspres-nom-rep-2028-marrub            SELL ours     3,565 of 20,000
+   enwc-uspres-nom-rep-2028-ranpau            SELL ours    12,284 of 20,000
+   enwc-uspres-nom-rep-2028-rondes            SELL ours    12,660 of 20,000
+   enwc-uspres-nom-rep-2028-tedcru            SELL ours    10,710 of 20,000
+   enwc-uspres-nom-rep-2028-thomas            SELL ours    10,318 of 20,000
+   enwc-uspres-nom-rep-2028-tuccar            SELL ours    12,082 of 20,000
+   enwc-uspres-nom-rep-2028-tulgab            SELL ours    10,349 of 20,000
+   enwc-uspres-nom-rep-2028-vivram            SELL ours    10,318 of 20,000
+   ewc-usp-2028-11-07-aleocc                  SELL ours    10,317 of 20,000
+   ewc-usp-2028-11-07-andbes                  SELL ours    12,081 of 20,000
+   ewc-usp-2028-11-07-dontru                  SELL ours    10,317 of 20,000
+   ewc-usp-2028-11-07-dontrujr                SELL ours    11,912 of 20,000
+   ewc-usp-2028-11-07-dwajoh                  SELL ours    11,931 of 20,000
+   ewc-usp-2028-11-07-elomus                  SELL ours    11,911 of 20,000
+   ewc-usp-2028-11-07-gavnew                  SELL ours    12,081 of 20,000
+   ewc-usp-2028-11-07-gleyou                  SELL ours    11,233 of 20,000
+   ewc-usp-2028-11-07-jamtal                  SELL ours    12,587 of 20,000
