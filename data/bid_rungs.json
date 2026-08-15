@@ -1,22 +1,16 @@
 {
- "dry_run": true,
+ "dry_run": false,
  "budget": 80.0,
- "exposure": 24.0,
- "est_gain": 8.51,
+ "exposure": 0,
+ "est_gain": 0,
  "orders": [
   {
-   "m": "enwc-uspres-nom-rep-2028-ranpau",
-   "px": 0.05,
-   "qty": 240,
-   "wall": 505,
-   "ok": null
-  },
-  {
-   "m": "enwc-uspres-nom-dem-2028-jonste",
-   "px": 0.04,
-   "qty": 300,
-   "wall": 212,
-   "ok": null
+   "m": "enwc-uspres-nom-rep-2028-gleyou",
+   "px": 0.01,
+   "qty": 20000,
+   "wall": 21200,
+   "tier": 2,
+   "ok": true
   },
   {
    "m": "enwc-uspres-nom-rep-2028-tulgab",
@@ -24,7 +18,7 @@
    "qty": 20000,
    "wall": 21200,
    "tier": 2,
-   "ok": null
+   "ok": true
   },
   {
    "m": "enwc-uspres-nom-rep-2028-vivram",
@@ -32,7 +26,55 @@
    "qty": 20000,
    "wall": 21200,
    "tier": 2,
-   "ok": null
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-elomus",
+   "px": 0.01,
+   "qty": 20000,
+   "wall": 21200,
+   "tier": 2,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-thomas",
+   "px": 0.01,
+   "qty": 20000,
+   "wall": 21200,
+   "tier": 2,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-margre",
+   "px": 0.01,
+   "qty": 20000,
+   "wall": 21200,
+   "tier": 2,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tedcru",
+   "px": 0.01,
+   "qty": 20000,
+   "wall": 21200,
+   "tier": 2,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rahema",
+   "px": 0.01,
+   "qty": 20000,
+   "wall": 21300,
+   "tier": 2,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-dwajoh",
+   "px": 0.02,
+   "qty": 20000,
+   "wall": 103473,
+   "tier": 2,
+   "ok": true
   },
   {
    "m": "enwc-uspres-nom-dem-2028-jamtal",
@@ -40,15 +82,7 @@
    "qty": 20000,
    "wall": 21200,
    "tier": 2,
-   "ok": null
-  },
-  {
-   "m": "enwc-uspres-nom-dem-2028-dwajoh",
-   "px": 0.02,
-   "qty": 20000,
-   "wall": 111993,
-   "tier": 2,
-   "ok": null
+   "ok": true
   },
   {
    "m": "ewc-usp-2028-11-07-petbut",
@@ -56,63 +90,15 @@
    "qty": 10000,
    "wall": 39916,
    "tier": 2,
-   "ok": null
+   "ok": true
   },
   {
-   "m": "enwc-uspres-nom-rep-2028-gleyou",
-   "px": 0.01,
-   "qty": 20000,
-   "wall": 131200,
-   "tier": 2,
-   "ok": null
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-elomus",
-   "px": 0.01,
-   "qty": 20000,
-   "wall": 131200,
-   "tier": 2,
-   "ok": null
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-dontru",
+   "m": "enwc-uspres-nom-rep-2028-dontrujr",
    "px": 0.02,
    "qty": 20000,
-   "wall": 187106,
+   "wall": 210710,
    "tier": 2,
-   "ok": null
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-thomas",
-   "px": 0.01,
-   "qty": 20000,
-   "wall": 131200,
-   "tier": 2,
-   "ok": null
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-margre",
-   "px": 0.01,
-   "qty": 20000,
-   "wall": 131200,
-   "tier": 2,
-   "ok": null
-  },
-  {
-   "m": "enwc-uspres-nom-rep-2028-tedcru",
-   "px": 0.01,
-   "qty": 20000,
-   "wall": 131200,
-   "tier": 2,
-   "ok": null
-  },
-  {
-   "m": "enwc-uspres-nom-dem-2028-rahema",
-   "px": 0.01,
-   "qty": 20000,
-   "wall": 136563,
-   "tier": 2,
-   "ok": null
+   "ok": true
   }
  ],
  "skipped": [
@@ -137,7 +123,7 @@
   {
    "m": "enwc-uspres-nom-dem-2028-jamtal",
    "px": 0.03,
-   "others": 22,
+   "others": 33,
    "why": "thin touch \u2014 bait"
   },
   {
@@ -155,7 +141,7 @@
   {
    "m": "enwc-uspres-nom-dem-2028-kamhar",
    "px": 0.14,
-   "others": 1,
+   "others": 2,
    "why": "thin touch \u2014 bait"
   },
   {
@@ -215,7 +201,7 @@
   {
    "m": "ewc-usp-2028-11-07-dontru",
    "px": 0.05,
-   "others": 12450,
+   "others": 12250,
    "why": "above fair cap 2c"
   },
   {
@@ -281,7 +267,7 @@
   {
    "m": "ewc-usp-2028-11-07-thomas",
    "px": 0.15,
-   "others": 1,
+   "others": 0,
    "why": "thin touch \u2014 bait"
   },
   {
