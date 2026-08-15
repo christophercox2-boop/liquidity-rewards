@@ -202,14 +202,15 @@ jobs:
                   continue
               print(f"[{i}/{len(slate)}] {slug}: ask {ask_tot:,.0f} of {target:,.0f}, "
                     f"OURS {mine:,.0f} → adding {int(want - mine):,} to stand alone")
-              # Progress is measured from the BOOK, never from what we asked
-              # for. An order rests at whatever buying power allows at that
-              # moment — ~170 when we asked for 197 — so counting requests
-              # made the first run believe it was done at ~86% of Target Size.
+              # Progress is measured from our OPEN ORDERS, never the public
+              # book and never what we asked for. The book lags placements by
+              # more than the re-check cadence — the 2026-08-15 run tracked
+              # book gains, saw nothing move, stalled out on all 59 sides and
+              # believed 1 side done when open orders later showed 16. Open
+              # orders are authoritative and do not lag.
               placed = 0
               stalled = 0
               ours_now = mine
-              last_book = ask_tot
               while (ours_now < want and placed < MAX_ORDERS_PER_SIDE
                      and total < MAX_ORDERS_TOTAL):
                   if BP < BP_FLOOR:
@@ -229,26 +230,28 @@ jobs:
                       time.sleep(PAUSE)
                   if DRY:
                       break
-                  # re-read the book every few orders and judge by what moved
+                  # an order rests at whatever buying power allows (~1 share
+                  # per dollar), so assume int(BP) rested and reconcile
+                  # against open orders every few orders
+                  ours_now += max(1, int(BP))
                   if placed % 4 == 0:
                       BP = bp_now(BP)
-                      try:
-                          now_book = sum(q for _, q in
-                                         (tr._fetch_book(slug).get("asks") or []))
-                      except Exception:
+                      known = open_orders().get(slug)
+                      if known is None:
                           continue
-                      # what the book gained is what of ours actually rested;
-                      # never count it backwards if someone else pulled
-                      gained = now_book - last_book
-                      last_book = now_book
-                      ours_now += max(0.0, gained)
-                      # a real exposure ceiling shows up here: orders accepted,
-                      # book not moving. Four rounds of that and we move on.
-                      stalled = stalled + 1 if gained < 25 else 0
-                      if stalled >= 4:
-                          print(f"    stalled — ours ~{ours_now:,.0f}, orders accepted "
-                                "but the book stopped moving; moving on")
+                      # a real ceiling shows up here: orders accepted but
+                      # nothing resting. Two flat rounds and we move on.
+                      stalled = stalled + 1 if known <= ours_now - max(1, int(BP)) * 4 else 0
+                      ours_now = known
+                      if stalled >= 2:
+                          print(f"    stalled — ours {ours_now:,.0f}, orders accepted "
+                                "but not resting; moving on")
                           break
+              if not DRY and placed:
+                  time.sleep(2)
+                  known = open_orders().get(slug)
+                  if known is not None:
+                      ours_now = known      # settle on the authoritative count
               try:
                   after = sum(q for _, q in (tr._fetch_book(slug).get("asks") or []))
               except Exception:
