@@ -1,161 +1,182 @@
-buying power $172.24 — an ask order carries 172 shares
+buying power $335.82 — an ask order carries 335 shares
 slate: 60 markets
 
-[1/60] enwc-uspres-nom-rep-2028-dontru: ask 9,825 of 10,000, OURS 9,625 → adding 374 to stand alone
-    stalled — ours ~9,625, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,625, ask side now 9,825 → still 175 short
-[2/60] enwc-uspres-nom-rep-2028-dontrujr: ask 233 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~2,677, orders accepted but the book stopped moving; moving on
-    32 orders placed, ours ~2,677, ask side now 2,877 → still 7,123 short
-[4/60] enwc-uspres-nom-rep-2028-gleyou: ask 9,825 of 10,000, OURS 9,625 → adding 374 to stand alone
-    16 orders placed, ours ~12,270, ask side now 12,470 → QUALIFYING
-[5/60] enwc-uspres-nom-rep-2028-jdvan: ask 9,825 of 10,000, OURS 9,625 → adding 374 to stand alone
-    stalled — ours ~9,625, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,625, ask side now 9,825 → still 175 short
-[6/60] enwc-uspres-nom-rep-2028-margre: ask 9,852 of 10,000, OURS 9,625 → adding 374 to stand alone
-    stalled — ours ~9,625, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,625, ask side now 9,852 → still 148 short
-[7/60] enwc-uspres-nom-rep-2028-marrub: ask 9,825 of 10,000, OURS 9,625 → adding 374 to stand alone
-    16 orders placed, ours ~12,270, ask side now 12,470 → QUALIFYING
-[8/60] enwc-uspres-nom-rep-2028-ranpau: ask 9,974 of 10,000, OURS 9,734 → adding 266 to stand alone
-    stalled — ours ~9,734, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,734, ask side now 9,974 → still 26 short
-[9/60] enwc-uspres-nom-rep-2028-rondes: ask 9,925 of 10,000, OURS 9,725 → adding 274 to stand alone
-    stalled — ours ~9,725, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,725, ask side now 9,925 → still 75 short
-[10/60] enwc-uspres-nom-rep-2028-tedcru: ask 9,952 of 10,000, OURS 9,725 → adding 274 to stand alone
-    4 orders placed, ours ~10,386, ask side now 10,613 → QUALIFYING
-[11/60] enwc-uspres-nom-rep-2028-thomas: ask 233 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~33, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~33, ask side now 233 → still 9,767 short
-[12/60] enwc-uspres-nom-rep-2028-tuccar: ask 11,035 of 10,000, OURS 9,625 → adding 374 to stand alone
-    stalled — ours ~9,625, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,625, ask side now 11,035 → QUALIFYING
-[14/60] enwc-uspres-nom-rep-2028-vivram: ask 333 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~1,355, orders accepted but the book stopped moving; moving on
-    24 orders placed, ours ~1,355, ask side now 1,655 → still 8,345 short
-[15/60] ewc-usp-party-2028-11-07-dem: ask 10,082 of 10,000, OURS 9,863 → adding 137 to stand alone
-    stalled — ours ~9,863, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,863, ask side now 10,082 → QUALIFYING
-[16/60] ewc-usp-party-2028-11-07-rep: ask 9,946 of 10,000, OURS 9,681 → adding 319 to stand alone
-    stalled — ours ~9,681, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,681, ask side now 9,946 → still 54 short
-[17/60] enwc-uspres-nom-dem-2028-aleocc: ask 9,948 of 10,000, OURS 9,648 → adding 351 to stand alone
-    stalled — ours ~9,648, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,648, ask side now 9,948 → still 52 short
-[18/60] enwc-uspres-nom-dem-2028-andbes: ask 9,882 of 10,000, OURS 9,648 → adding 351 to stand alone
-    stalled — ours ~9,648, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,648, ask side now 9,882 → still 118 short
-[19/60] enwc-uspres-nom-dem-2028-dwajoh: ask 250 of 10,000, OURS 50 → adding 9,950 to stand alone
-    stalled — ours ~50, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~50, ask side now 250 → still 9,750 short
-[21/60] enwc-uspres-nom-dem-2028-jamtal: ask 9,852 of 10,000, OURS 9,648 → adding 351 to stand alone
-    stalled — ours ~9,648, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,648, ask side now 9,852 → still 148 short
-[22/60] enwc-uspres-nom-dem-2028-jbpri: ask 9,882 of 10,000, OURS 9,648 → adding 351 to stand alone
-    12 orders placed, ours ~11,632, ask side now 11,866 → QUALIFYING
-[23/60] enwc-uspres-nom-dem-2028-jonoss: ask 11,000 of 10,000, OURS 9,648 → adding 351 to stand alone
-    stalled — ours ~9,648, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,648, ask side now 11,000 → QUALIFYING
-[24/60] enwc-uspres-nom-dem-2028-jonste: ask 9,848 of 10,000, OURS 9,648 → adding 351 to stand alone
-    stalled — ours ~9,648, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,648, ask side now 9,848 → still 152 short
-[25/60] enwc-uspres-nom-dem-2028-jossha: ask 9,848 of 10,000, OURS 9,648 → adding 351 to stand alone
-    12 orders placed, ours ~11,632, ask side now 11,832 → QUALIFYING
-[26/60] enwc-uspres-nom-dem-2028-kamhar: ask 9,848 of 10,000, OURS 9,648 → adding 351 to stand alone
-    stalled — ours ~9,648, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,648, ask side now 9,848 → still 152 short
-[27/60] enwc-uspres-nom-dem-2028-markel: ask 9,852 of 10,000, OURS 9,648 → adding 351 to stand alone
-    stalled — ours ~9,648, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,648, ask side now 9,852 → still 148 short
-[28/60] enwc-uspres-nom-dem-2028-micoba: ask 9,879 of 10,000, OURS 9,646 → adding 353 to stand alone
-    stalled — ours ~9,646, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,646, ask side now 9,879 → still 121 short
-[29/60] enwc-uspres-nom-dem-2028-petbut: ask 10,934 of 10,000, OURS 9,646 → adding 353 to stand alone
-    12 orders placed, ours ~11,629, ask side now 12,917 → QUALIFYING
-[30/60] enwc-uspres-nom-dem-2028-rahema: ask 9,879 of 10,000, OURS 9,646 → adding 353 to stand alone
-    stalled — ours ~9,646, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,646, ask side now 9,879 → still 121 short
-[31/60] enwc-uspres-nom-dem-2028-rokha: ask 11,100 of 10,000, OURS 9,542 → adding 457 to stand alone
-    16 orders placed, ours ~12,187, ask side now 13,745 → QUALIFYING
-[32/60] enwc-uspres-nom-dem-2028-stasmi: ask 267 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~33, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~33, ask side now 267 → still 9,733 short
-[33/60] enwc-uspres-nom-dem-2028-wesmoo: ask 9,859 of 10,000, OURS 9,625 → adding 374 to stand alone
-    stalled — ours ~9,625, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,625, ask side now 9,859 → still 141 short
-[34/60] ewc-usp-2028-11-07-aleocc: ask 258 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~2,016, orders accepted but the book stopped moving; moving on
-    28 orders placed, ours ~2,016, ask side now 2,241 → still 7,759 short
-[35/60] ewc-usp-2028-11-07-andbes: ask 9,884 of 10,000, OURS 9,625 → adding 374 to stand alone
-    stalled — ours ~9,625, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,625, ask side now 9,884 → still 116 short
-[36/60] ewc-usp-2028-11-07-dontru: ask 261 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~694, orders accepted but the book stopped moving; moving on
-    20 orders placed, ours ~694, ask side now 922 → still 9,078 short
-[37/60] ewc-usp-2028-11-07-dontrujr: ask 9,882 of 10,000, OURS 9,625 → adding 374 to stand alone
-    stalled — ours ~9,625, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,625, ask side now 9,882 → still 118 short
-[38/60] ewc-usp-2028-11-07-dwajoh: ask 9,850 of 10,000, OURS 9,625 → adding 374 to stand alone
-    12 orders placed, ours ~11,609, ask side now 11,834 → QUALIFYING
-[39/60] ewc-usp-2028-11-07-elomus: ask 9,884 of 10,000, OURS 9,625 → adding 374 to stand alone
-    stalled — ours ~9,625, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,625, ask side now 9,884 → still 116 short
-[40/60] ewc-usp-2028-11-07-gavnew: ask 9,950 of 10,000, OURS 9,625 → adding 374 to stand alone
-    stalled — ours ~9,625, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,625, ask side now 9,950 → still 50 short
-[41/60] ewc-usp-2028-11-07-gleyou: ask 9,956 of 10,000, OURS 9,631 → adding 369 to stand alone
-    stalled — ours ~9,631, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,631, ask side now 9,956 → still 44 short
-[42/60] ewc-usp-2028-11-07-jamtal: ask 11,050 of 10,000, OURS 9,621 → adding 379 to stand alone
-    stalled — ours ~9,621, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,621, ask side now 11,050 → QUALIFYING
-[43/60] ewc-usp-2028-11-07-jbpri: ask 9,946 of 10,000, OURS 9,621 → adding 379 to stand alone
-    4 orders placed, ours ~11,337, ask side now 11,662 → QUALIFYING
-[44/60] ewc-usp-2028-11-07-jdvan: ask 9,953 of 10,000, OURS 9,628 → adding 372 to stand alone
-    12 orders placed, ours ~11,611, ask side now 11,936 → QUALIFYING
-[45/60] ewc-usp-2028-11-07-jonoss: ask 9,956 of 10,000, OURS 9,641 → adding 359 to stand alone
-    stalled — ours ~9,641, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,641, ask side now 9,956 → still 44 short
-[46/60] ewc-usp-2028-11-07-jossha: ask 9,956 of 10,000, OURS 9,631 → adding 368 to stand alone
-    stalled — ours ~9,631, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,631, ask side now 9,956 → still 44 short
-[47/60] ewc-usp-2028-11-07-kamhar: ask 9,828 of 10,000, OURS 9,603 → adding 396 to stand alone
-    8 orders placed, ours ~10,926, ask side now 11,151 → QUALIFYING
-[48/60] ewc-usp-2028-11-07-markel: ask 23,067 of 10,000, OURS 9,603 → adding 396 to stand alone
-    4 orders placed, ours ~10,265, ask side now 23,729 → QUALIFYING
-[49/60] ewc-usp-2028-11-07-marrub: ask 9,928 of 10,000, OURS 9,603 → adding 396 to stand alone
-    stalled — ours ~9,603, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,603, ask side now 9,928 → still 72 short
-[50/60] ewc-usp-2028-11-07-micoba: ask 9,760 of 10,000, OURS 9,535 → adding 464 to stand alone
-    stalled — ours ~9,535, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,535, ask side now 9,760 → still 240 short
-[51/60] ewc-usp-2028-11-07-petbut: ask 258 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~33, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~33, ask side now 258 → still 9,742 short
-[52/60] ewc-usp-2028-11-07-rahema: ask 10,298 of 10,000, OURS 9,973 → adding 27 to stand alone
-    stalled — ours ~9,973, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~9,973, ask side now 10,298 → QUALIFYING
-[53/60] ewc-usp-2028-11-07-rokha: ask 258 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~33, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~33, ask side now 258 → still 9,742 short
-[55/60] ewc-usp-2028-11-07-stasmi: ask 358 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~33, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~33, ask side now 358 → still 9,642 short
-[56/60] ewc-usp-2028-11-07-thomas: ask 9,974 of 10,000, OURS 9,649 → adding 351 to stand alone
-    12 orders placed, ours ~11,632, ask side now 11,957 → QUALIFYING
-[57/60] ewc-usp-2028-11-07-tuccar: ask 375 of 10,000, OURS 50 → adding 9,950 to stand alone
-    stalled — ours ~50, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~50, ask side now 375 → still 9,625 short
-[58/60] ewc-usp-2028-11-07-tulgab: ask 358 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~33, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~33, ask side now 358 → still 9,642 short
-[59/60] ewc-usp-2028-11-07-vivram: ask 358 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~694, orders accepted but the book stopped moving; moving on
-    20 orders placed, ours ~694, ask side now 1,019 → still 8,981 short
-[60/60] ewc-usp-2028-11-07-wesmoo: ask 358 of 10,000, OURS 33 → adding 9,967 to stand alone
-    stalled — ours ~33, orders accepted but the book stopped moving; moving on
-    16 orders placed, ours ~33, ask side now 358 → still 9,642 short
+[1/60] enwc-uspres-nom-rep-2028-dontru: ask 12,137 of 20,000, OURS 11,912 → adding 8,088 to stand alone
+    stalled — ours ~11,912, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~11,912, ask side now 12,137 → still 7,863 short
+[2/60] enwc-uspres-nom-rep-2028-dontrujr: ask 10,545 of 20,000, OURS 10,318 → adding 9,681 to stand alone
+    stalled — ours ~15,474, orders accepted but the book stopped moving; moving on
+    32 orders placed, ours ~15,474, ask side now 15,701 → still 4,299 short
+[3/60] enwc-uspres-nom-rep-2028-elomus: ask 11,076 of 20,000, OURS 10,849 → adding 9,151 to stand alone
+    stalled — ours ~16,004, orders accepted but the book stopped moving; moving on
+    32 orders placed, ours ~16,004, ask side now 16,231 → still 3,769 short
+[4/60] enwc-uspres-nom-rep-2028-gleyou: ask 10,776 of 20,000, OURS 10,549 → adding 9,450 to stand alone
+    stalled — ours ~10,549, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~10,549, ask side now 10,776 → still 9,224 short
+[5/60] enwc-uspres-nom-rep-2028-jdvan: ask 11,960 of 20,000, OURS 11,733 → adding 8,266 to stand alone
+    stalled — ours ~11,733, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~11,733, ask side now 11,960 → still 8,040 short
+[6/60] enwc-uspres-nom-rep-2028-margre: ask 12,139 of 20,000, OURS 11,912 → adding 8,088 to stand alone
+    stalled — ours ~13,201, orders accepted but the book stopped moving; moving on
+    20 orders placed, ours ~13,201, ask side now 13,428 → still 6,572 short
+[7/60] enwc-uspres-nom-rep-2028-marrub: ask 3,791 of 20,000, OURS 3,565 → adding 16,434 to stand alone
+    stalled — ours ~3,565, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~3,565, ask side now 3,791 → still 16,209 short
+[8/60] enwc-uspres-nom-rep-2028-ranpau: ask 12,511 of 20,000, OURS 12,285 → adding 7,714 to stand alone
+    stalled — ours ~13,574, orders accepted but the book stopped moving; moving on
+    20 orders placed, ours ~13,574, ask side now 13,800 → still 6,200 short
+[9/60] enwc-uspres-nom-rep-2028-rondes: ask 12,886 of 20,000, OURS 12,660 → adding 7,340 to stand alone
+    stalled — ours ~12,660, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~12,660, ask side now 12,886 → still 7,114 short
+[10/60] enwc-uspres-nom-rep-2028-tedcru: ask 10,937 of 20,000, OURS 10,710 → adding 9,290 to stand alone
+    stalled — ours ~14,254, orders accepted but the book stopped moving; moving on
+    28 orders placed, ours ~14,254, ask side now 14,481 → still 5,519 short
+[11/60] enwc-uspres-nom-rep-2028-thomas: ask 10,545 of 20,000, OURS 10,318 → adding 9,682 to stand alone
+    stalled — ours ~15,473, orders accepted but the book stopped moving; moving on
+    32 orders placed, ours ~15,473, ask side now 15,700 → still 4,300 short
+[12/60] enwc-uspres-nom-rep-2028-tuccar: ask 12,309 of 20,000, OURS 12,082 → adding 7,918 to stand alone
+    stalled — ours ~12,082, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~12,082, ask side now 12,309 → still 7,691 short
+[13/60] enwc-uspres-nom-rep-2028-tulgab: ask 10,576 of 20,000, OURS 10,349 → adding 9,651 to stand alone
+    stalled — ours ~10,349, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~10,349, ask side now 10,576 → still 9,424 short
+[14/60] enwc-uspres-nom-rep-2028-vivram: ask 10,545 of 20,000, OURS 10,318 → adding 9,682 to stand alone
+    stalled — ours ~15,474, orders accepted but the book stopped moving; moving on
+    32 orders placed, ours ~15,474, ask side now 15,701 → still 4,299 short
+[16/60] ewc-usp-party-2028-11-07-rep: ask 19,643 of 20,000, OURS 10,035 → adding 9,965 to stand alone
+    stalled — ours ~10,035, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~10,035, ask side now 19,643 → still 357 short
+[17/60] enwc-uspres-nom-dem-2028-aleocc: ask 12,817 of 20,000, OURS 12,597 → adding 7,402 to stand alone
+    4 orders placed, ours ~28,941, ask side now 29,160 → QUALIFYING
+[18/60] enwc-uspres-nom-dem-2028-andbes: ask 28,861 of 20,000, OURS 12,615 → adding 7,384 to stand alone
+    stalled — ours ~12,615, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~12,615, ask side now 28,861 → QUALIFYING
+[19/60] enwc-uspres-nom-dem-2028-dwajoh: ask 26,566 of 20,000, OURS 10,318 → adding 9,682 to stand alone
+    stalled — ours ~14,829, orders accepted but the book stopped moving; moving on
+    32 orders placed, ours ~14,829, ask side now 31,077 → QUALIFYING
+[20/60] enwc-uspres-nom-dem-2028-gavnew: ask 11,019 of 20,000, OURS 10,792 → adding 9,207 to stand alone
+    stalled — ours ~10,792, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~10,792, ask side now 11,019 → still 8,981 short
+[21/60] enwc-uspres-nom-dem-2028-jamtal: ask 28,084 of 20,000, OURS 11,856 → adding 8,143 to stand alone
+    stalled — ours ~11,856, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~11,856, ask side now 28,084 → QUALIFYING
+[22/60] enwc-uspres-nom-dem-2028-jbpri: ask 28,200 of 20,000, OURS 11,954 → adding 8,046 to stand alone
+    stalled — ours ~15,176, orders accepted but the book stopped moving; moving on
+    28 orders placed, ours ~15,176, ask side now 31,422 → QUALIFYING
+[23/60] enwc-uspres-nom-dem-2028-jonoss: ask 28,876 of 20,000, OURS 12,636 → adding 7,363 to stand alone
+    stalled — ours ~17,792, orders accepted but the book stopped moving; moving on
+    32 orders placed, ours ~17,792, ask side now 34,032 → QUALIFYING
+[24/60] enwc-uspres-nom-dem-2028-jonste: ask 27,914 of 20,000, OURS 11,666 → adding 8,333 to stand alone
+    stalled — ours ~11,666, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~11,666, ask side now 27,914 → QUALIFYING
+[25/60] enwc-uspres-nom-dem-2028-jossha: ask 12,182 of 20,000, OURS 11,955 → adding 8,045 to stand alone
+    stalled — ours ~11,955, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~11,955, ask side now 12,182 → still 7,818 short
+[26/60] enwc-uspres-nom-dem-2028-kamhar: ask 28,963 of 20,000, OURS 12,616 → adding 7,383 to stand alone
+    stalled — ours ~12,616, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~12,616, ask side now 28,963 → QUALIFYING
+[27/60] enwc-uspres-nom-dem-2028-markel: ask 11,703 of 20,000, OURS 11,476 → adding 8,523 to stand alone
+    stalled — ours ~11,476, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~11,476, ask side now 11,703 → still 8,297 short
+[28/60] enwc-uspres-nom-dem-2028-micoba: ask 28,100 of 20,000, OURS 11,856 → adding 8,143 to stand alone
+    stalled — ours ~13,145, orders accepted but the book stopped moving; moving on
+    20 orders placed, ours ~13,145, ask side now 29,389 → QUALIFYING
+[29/60] enwc-uspres-nom-dem-2028-petbut: ask 27,427 of 20,000, OURS 11,192 → adding 8,808 to stand alone
+    stalled — ours ~13,770, orders accepted but the book stopped moving; moving on
+    24 orders placed, ours ~13,770, ask side now 30,005 → QUALIFYING
+[30/60] enwc-uspres-nom-dem-2028-rahema: ask 27,060 of 20,000, OURS 10,714 → adding 9,285 to stand alone
+    stalled — ours ~12,003, orders accepted but the book stopped moving; moving on
+    20 orders placed, ours ~12,003, ask side now 28,349 → QUALIFYING
+[31/60] enwc-uspres-nom-dem-2028-rokha: ask 28,375 of 20,000, OURS 12,129 → adding 7,870 to stand alone
+    stalled — ours ~12,129, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~12,129, ask side now 28,375 → QUALIFYING
+[32/60] enwc-uspres-nom-dem-2028-stasmi: ask 26,563 of 20,000, OURS 10,317 → adding 9,683 to stand alone
+    stalled — ours ~12,846, orders accepted but the book stopped moving; moving on
+    24 orders placed, ours ~12,846, ask side now 29,092 → QUALIFYING
+[33/60] enwc-uspres-nom-dem-2028-wesmoo: ask 28,327 of 20,000, OURS 12,081 → adding 7,919 to stand alone
+    stalled — ours ~17,140, orders accepted but the book stopped moving; moving on
+    32 orders placed, ours ~17,140, ask side now 33,386 → QUALIFYING
+[34/60] ewc-usp-2028-11-07-aleocc: ask 26,588 of 20,000, OURS 10,317 → adding 9,683 to stand alone
+    stalled — ours ~10,317, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~10,317, ask side now 26,588 → QUALIFYING
+[35/60] ewc-usp-2028-11-07-andbes: ask 28,452 of 20,000, OURS 12,081 → adding 7,919 to stand alone
+    stalled — ours ~15,255, orders accepted but the book stopped moving; moving on
+    28 orders placed, ours ~15,255, ask side now 31,626 → QUALIFYING
+[36/60] ewc-usp-2028-11-07-dontru: ask 26,688 of 20,000, OURS 10,317 → adding 9,683 to stand alone
+    stalled — ours ~15,059, orders accepted but the book stopped moving; moving on
+    32 orders placed, ours ~15,059, ask side now 31,430 → QUALIFYING
+[37/60] ewc-usp-2028-11-07-dontrujr: ask 28,283 of 20,000, OURS 11,912 → adding 8,088 to stand alone
+    stalled — ours ~11,912, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~11,912, ask side now 28,283 → QUALIFYING
+[38/60] ewc-usp-2028-11-07-dwajoh: ask 28,206 of 20,000, OURS 11,931 → adding 8,069 to stand alone
+    stalled — ours ~14,460, orders accepted but the book stopped moving; moving on
+    24 orders placed, ours ~14,460, ask side now 30,735 → QUALIFYING
+[39/60] ewc-usp-2028-11-07-elomus: ask 28,182 of 20,000, OURS 11,911 → adding 8,089 to stand alone
+    stalled — ours ~11,911, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~11,911, ask side now 28,182 → QUALIFYING
+[40/60] ewc-usp-2028-11-07-gavnew: ask 28,356 of 20,000, OURS 12,081 → adding 7,919 to stand alone
+    stalled — ours ~12,081, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~12,081, ask side now 28,356 → QUALIFYING
+[41/60] ewc-usp-2028-11-07-gleyou: ask 27,554 of 20,000, OURS 11,285 → adding 8,714 to stand alone
+    stalled — ours ~11,285, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~11,285, ask side now 27,554 → QUALIFYING
+[42/60] ewc-usp-2028-11-07-jamtal: ask 28,972 of 20,000, OURS 12,587 → adding 7,412 to stand alone
+    stalled — ours ~12,587, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~12,587, ask side now 28,972 → QUALIFYING
+[43/60] ewc-usp-2028-11-07-jbpri: ask 26,878 of 20,000, OURS 10,605 → adding 9,395 to stand alone
+    stalled — ours ~12,832, orders accepted but the book stopped moving; moving on
+    24 orders placed, ours ~12,832, ask side now 29,105 → QUALIFYING
+[44/60] ewc-usp-2028-11-07-jdvan: ask 28,304 of 20,000, OURS 11,933 → adding 8,066 to stand alone
+    stalled — ours ~14,565, orders accepted but the book stopped moving; moving on
+    24 orders placed, ours ~14,565, ask side now 30,936 → QUALIFYING
+[45/60] ewc-usp-2028-11-07-jonoss: ask 28,194 of 20,000, OURS 11,921 → adding 8,079 to stand alone
+    stalled — ours ~11,921, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~11,921, ask side now 28,194 → QUALIFYING
+[46/60] ewc-usp-2028-11-07-jossha: ask 28,454 of 20,000, OURS 12,083 → adding 7,916 to stand alone
+    stalled — ours ~14,296, orders accepted but the book stopped moving; moving on
+    24 orders placed, ours ~14,296, ask side now 30,667 → QUALIFYING
+[47/60] ewc-usp-2028-11-07-kamhar: ask 27,525 of 20,000, OURS 11,248 → adding 8,752 to stand alone
+    stalled — ours ~16,306, orders accepted but the book stopped moving; moving on
+    32 orders placed, ours ~16,306, ask side now 32,583 → QUALIFYING
+[48/60] ewc-usp-2028-11-07-markel: ask 38,122 of 20,000, OURS 10,637 → adding 9,363 to stand alone
+    stalled — ours ~15,695, orders accepted but the book stopped moving; moving on
+    32 orders placed, ours ~15,695, ask side now 43,180 → QUALIFYING
+[49/60] ewc-usp-2028-11-07-marrub: ask 28,825 of 20,000, OURS 12,571 → adding 7,428 to stand alone
+    stalled — ours ~12,571, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~12,571, ask side now 28,825 → QUALIFYING
+[50/60] ewc-usp-2028-11-07-micoba: ask 31,576 of 20,000, OURS 12,503 → adding 7,497 to stand alone
+    stalled — ours ~16,297, orders accepted but the book stopped moving; moving on
+    28 orders placed, ours ~16,297, ask side now 35,370 → QUALIFYING
+[51/60] ewc-usp-2028-11-07-petbut: ask 26,690 of 20,000, OURS 10,317 → adding 9,683 to stand alone
+    stalled — ours ~10,317, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~10,317, ask side now 26,690 → QUALIFYING
+[52/60] ewc-usp-2028-11-07-rahema: ask 27,020 of 20,000, OURS 10,743 → adding 9,257 to stand alone
+    stalled — ours ~14,537, orders accepted but the book stopped moving; moving on
+    28 orders placed, ours ~14,537, ask side now 30,814 → QUALIFYING
+[53/60] ewc-usp-2028-11-07-rokha: ask 26,688 of 20,000, OURS 10,317 → adding 9,683 to stand alone
+    stalled — ours ~10,317, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~10,317, ask side now 26,688 → QUALIFYING
+[54/60] ewc-usp-2028-11-07-rondes: ask 38,345 of 20,000, OURS 10,404 → adding 9,596 to stand alone
+    stalled — ours ~12,933, orders accepted but the book stopped moving; moving on
+    24 orders placed, ours ~12,933, ask side now 40,874 → QUALIFYING
+[55/60] ewc-usp-2028-11-07-stasmi: ask 38,135 of 20,000, OURS 10,317 → adding 9,683 to stand alone
+    stalled — ours ~15,375, orders accepted but the book stopped moving; moving on
+    32 orders placed, ours ~15,375, ask side now 43,194 → QUALIFYING
+[56/60] ewc-usp-2028-11-07-thomas: ask 28,225 of 20,000, OURS 11,956 → adding 8,043 to stand alone
+    stalled — ours ~11,956, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~11,956, ask side now 28,225 → QUALIFYING
+[57/60] ewc-usp-2028-11-07-tuccar: ask 26,772 of 20,000, OURS 10,319 → adding 9,681 to stand alone
+    stalled — ours ~14,031, orders accepted but the book stopped moving; moving on
+    28 orders placed, ours ~14,031, ask side now 30,484 → QUALIFYING
+[58/60] ewc-usp-2028-11-07-tulgab: ask 26,588 of 20,000, OURS 10,317 → adding 9,683 to stand alone
+    stalled — ours ~11,581, orders accepted but the book stopped moving; moving on
+    20 orders placed, ours ~11,581, ask side now 27,852 → QUALIFYING
+[59/60] ewc-usp-2028-11-07-vivram: ask 26,592 of 20,000, OURS 10,317 → adding 9,683 to stand alone
+    stalled — ours ~10,317, orders accepted but the book stopped moving; moving on
+    16 orders placed, ours ~10,317, ask side now 26,592 → QUALIFYING
+[60/60] ewc-usp-2028-11-07-wesmoo: ask 26,588 of 20,000, OURS 10,317 → adding 9,683 to stand alone
+    stalled — ours ~11,265, orders accepted but the book stopped moving; moving on
+    20 orders placed, ours ~11,265, ask side now 27,536 → QUALIFYING
 
-872 orders across 56 markets
-18 of 56 ask sides now at Target Size
+1260 orders across 59 markets
+41 of 59 ask sides now at Target Size
