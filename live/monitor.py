@@ -2097,6 +2097,7 @@ def _collect_fills(t: dict, fills_by_order: dict[str, dict]) -> None:
                 ts_s, when = _fill_ts(str(ex.get("transactTime") or ""))
                 fills_by_order[oid] = row = {
                     "oid": oid, "kind": "fill", "verb": verb, "yesno": yesno,
+                    "intent": str(o.get("intent") or ""),
                     "market": o.get("marketSlug") or t.get("marketSlug") or "",
                     "filled": 0.0, "_val": 0.0, "price_cents": None,
                     "ts_s": ts_s, "when": when, "pnl": 0.0}
@@ -3417,6 +3418,12 @@ def auto_probe() -> None:
         _probe_log(m, "FILLED" if kind == "probe" else "round trip", side, px,
                    "a real trade at this price" if kind == "probe"
                    else "flip filled — gap captured")
+        if kind == "probe" and side == "BUY":
+            # cash left the wallet and became inventory; the flip's SELL_LONG
+            # fill credits it back (plus the gap) through credit_sales
+            with MONITOR.lock:
+                MONITOR.state["probe_budget"] = round(max(
+                    0.0, float(MONITOR.state.get("probe_budget") or 0.0) - px), 2)
         if side == "BUY":
             e["traded_at_bid"] = px       # a seller exists at px: fair <= px
             fpx = round(px + PROBE_FLIP_TICKS * 0.01, 2)
@@ -3439,12 +3446,15 @@ def auto_probe() -> None:
                                f"buying back the fill from {px*100:.0f}c")
     # 2. seed new probes at random interior ticks
     if CONSERVE_BP:
-        # no new scouts while conserving buying power — reconcile-only above
-        # (closing flips keep running; they RETURN cash and collateral).
-        # Withdraw scouts still resting so nothing new can fill.
+        # Conserving: the probe WALLET is the only money the prober may
+        # spend — funded exclusively by SELL_LONG sale proceeds
+        # (credit_sales). Ask scouts stay off entirely (a fill locks 1-px
+        # of collateral, the expensive side); bid scouts may rest only
+        # while the wallet covers every resting scout's worst case.
+        # An empty wallet means no scouts until more sales land.
         for oid, rec in list(_PROBE["active"].items()):
             m, side, px, ts, kind = rec
-            if kind != "probe" or oid not in open_ids:
+            if kind != "probe" or side != "SELL" or oid not in open_ids:
                 continue
             try:
                 requests.request(
@@ -3456,10 +3466,9 @@ def auto_probe() -> None:
                 _PROBE["cancelled"].add(oid)
                 del _PROBE["active"][oid]
                 _probe_log(m, "scout withdrawn", side, px,
-                           "conserving buying power")
+                           "conserving — ask scouts lock collateral")
             except Exception:  # noqa: BLE001
                 pass
-        return
     if len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
         return
     placed = 0
@@ -3487,6 +3496,14 @@ def auto_probe() -> None:
         side = "BUY" if random.random() < 0.5 else "SELL"
         if side == "BUY" and px > PROBE_MAX_PX:
             side = "SELL"
+        if CONSERVE_BP:
+            if side == "SELL":
+                continue          # collateral-locking side is off while conserving
+            wallet = float(MONITOR.state.get("probe_budget") or 0.0)
+            resting = sum(r[2] for r in _PROBE["active"].values()
+                          if r[1] == "BUY" and r[4] == "probe")
+            if resting + px > wallet:
+                continue          # wallet spent — wait for more sales
         intent = "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_BUY_SHORT"
         oid = _probe_place(m, side, px, intent, f"{side.lower()} scout")
         _PROBE["last"][m] = now
@@ -3590,6 +3607,36 @@ EARN_DRIFT_T = 2
 EARN_MAX_PER_POLL = 2
 EARN_COOLDOWN = 600.0
 _EARN: dict = {"orders": {}, "last": {}, "cancelled": set()}
+
+
+def credit_sales() -> None:
+    """Sales fund the probe wallet (owner, 2026-08-15): every filled
+    SELL_LONG — a real sale of inventory for cash — credits its proceeds to
+    state['probe_budget']. The prober spends the wallet on bid scouts while
+    conserving; when it runs out, probing stops until more sales land.
+    Per-order credited amounts are remembered so re-reading the fills feed
+    never double-counts."""
+    with MONITOR.lock:
+        cred = MONITOR.state.setdefault("probe_credited", {})
+        bud = float(MONITOR.state.get("probe_budget") or 0.0)
+        changed = False
+        for row in MONITOR.trades or []:
+            if not str(row.get("intent") or "").endswith("SELL_LONG"):
+                continue
+            oid = str(row.get("oid") or "")
+            filled = float(row.get("filled") or 0)
+            pc = row.get("price_cents")
+            if not oid or not pc or filled <= 0:
+                continue
+            prev = float(cred.get(oid) or 0)
+            if filled > prev + 1e-9:
+                bud += (filled - prev) * float(pc) / 100.0
+                cred[oid] = filled
+                changed = True
+        while len(cred) > 300:
+            cred.pop(next(iter(cred)))
+        if changed:
+            MONITOR.state["probe_budget"] = round(bud, 2)
 
 
 def _earn_outstanding_usd() -> float:
@@ -4939,6 +4986,7 @@ def _map_payload() -> dict:
                           and os.environ.get("EARN_PAUSE", "") != "1"
                           and not CONSERVE_BP),
         "conserve_bp": CONSERVE_BP,
+        "probe_budget": round(float(MONITOR.state.get("probe_budget") or 0.0), 2),
         "earn_active": [{"m": r[0], "px": r[2], "qty": r[3],
                          "age_m": int((time.time() - r[4]) / 60)}
                         for r in _EARN["orders"].values()],
@@ -5315,7 +5363,12 @@ function renderProbe(){
      l.ev === 'round trip' ? '<span style="color:#3fb950">round trip ✓</span>' : l.ev) +
     ' ' + l.side + ' @ ' + l.px + '¢' +
     (l.note ? ' <span class="sub">— ' + l.note + '</span>' : '') + '</div>').join('');
-  document.getElementById('probeBody').innerHTML =
+  const wallet = (DATA.conserve_bp
+    ? '<div class="sub" style="margin-bottom:4px">probe wallet: <b style="color:' +
+      ((DATA.probe_budget || 0) > 0.5 ? '#3fb950' : '#ff9d99') + '">$' +
+      (DATA.probe_budget || 0).toFixed(2) + '</b> — funded by sales; empty = scouting stops</div>'
+    : '');
+  document.getElementById('probeBody').innerHTML = wallet +
     (act.length ? '<div class="sub" style="margin-bottom:4px">' + act.length +
       ' scout' + (act.length > 1 ? 's' : '') + ' resting</div>' + scouts :
       '<div class="sub">no scouts resting' + (on ? ' — placing as books allow' : ' — Prober is off') + '</div>') +
@@ -7970,6 +8023,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     MONITOR.note_fills_alert()
                 except Exception:  # noqa: BLE001 — the 10-min sweep still covers it
                     pass
+            try:
+                credit_sales()   # sales proceeds -> the probe wallet
+            except Exception:  # noqa: BLE001 — bookkeeping never kills the poll
+                pass
         except Exception as e:  # noqa: BLE001 — shown on the dashboard, loop survives
             MONITOR.error = f"{type(e).__name__}: {e}"
             err_streak += 1
