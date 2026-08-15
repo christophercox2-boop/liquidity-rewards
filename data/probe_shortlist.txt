@@ -1,0 +1,221 @@
+=== lawec-saveact-2026-08-31 ===
+   pool $100.0 / 2 markets / 2 sides = $25.00/side/day
+   target 5,000   df 0.2
+   BID: touch   1.0c (106,431) total 106,431 of 5,000 -> QUALIFIES
+        top: 1c×106,431
+        50 at the touch would take  1.0% ≈ $0.25/day
+   ASK: touch   2.0c (70,875) total 357,169 of 5,000 -> QUALIFIES
+        top: 2c×70,875  3c×22,630  4c×2,000  20c×25  99c×261,639
+        50 at the touch would take  1.0% ≈ $0.25/day
+
+=== lawec-saveact-2026-12-31 ===
+   pool $100.0 / 2 markets / 2 sides = $25.00/side/day
+   target 5,000   df 0.2
+   BID: touch  13.0c (11,584) total 98,368 of 5,000 -> QUALIFIES
+        top: 13c×11,584  11c×233  8c×624  7c×9,540  2c×1,187
+        50 at the touch would take  1.0% ≈ $0.25/day
+   ASK: touch  14.0c (115,450) total 386,924 of 5,000 -> QUALIFIES
+        top: 14c×115,450  17c×45  20c×1,000  32c×0  35c×25
+        50 at the touch would take  1.0% ≈ $0.25/day
+
+=== enwc-usgubp-fl-2026-08-18-rep-byrdon ===
+   pool $300.0 / 3 markets / 2 sides = $50.00/side/day
+   target 10,000   df 0.2
+   BID: touch  97.0c (89,979) total 697,651 of 10,000 -> QUALIFIES
+        top: 97c×89,979  91c×6  89c×17  88c×150  75c×500
+        50 at the touch would take  0.5% ≈ $0.25/day
+   ASK: touch  98.0c (2,837) total 48,053 of 10,000 -> QUALIFIES
+        top: 98c×2,837  99c×45,216
+        50 at the touch would take  1.2% ≈ $0.58/day
+
+=== enwc-usgubp-fl-2026-08-18-rep-jamfis ===
+   pool $300.0 / 3 markets / 2 sides = $50.00/side/day
+   target 10,000   df 0.2
+   BID: touch   2.0c (18,001) total 20,240 of 10,000 -> QUALIFIES
+        top: 2c×18,001  1c×2,240
+        50 at the touch would take  0.5% ≈ $0.25/day
+   ASK: touch   3.0c (85,367) total 678,531 of 10,000 -> QUALIFIES
+        top: 3c×85,367  4c×111,114  5c×314  8c×111,111  12c×150
+        50 at the touch would take  0.5% ≈ $0.25/day
+
+=== enwc-usgubp-fl-2026-08-18-rep-jaycol ===
+   pool $300.0 / 3 markets / 2 sides = $50.00/side/day
+   target 10,000   df 0.2
+   BID: EMPTY — first order in sets the touch
+   ASK: touch   1.0c (99,383) total 231,073 of 10,000 -> QUALIFIES
+        top: 1c×99,383  2c×2  4c×16  11c×150  50c×50
+        50 at the touch would take  0.5% ≈ $0.25/day
+
+=== ewc-usgub-ca-2026-11-03-xavbec ===
+   pool $300.0 / 2 markets / 2 sides = $75.00/side/day
+   target 10,000   df 0.2
+   BID: touch  94.0c (94,918) total 1,109,721 of 10,000 -> QUALIFIES
+        top: 94c×94,918  93c×4,453  86c×10,000  82c×150  40c×1
+        50 at the touch would take  0.5% ≈ $0.37/day
+   ASK: touch  95.0c (17,663) total 61,058 of 10,000 -> QUALIFIES
+        top: 95c×17,663  96c×40,695  99c×2,700
+        50 at the touch would take  0.5% ≈ $0.37/day
+
+=== ewc-usse-ga-2026-11-03-dem ===
+   pool $300.0 / 2 markets / 2 sides = $75.00/side/day
+   target 10,000   df 0.2
+   BID: touch  91.0c (61,511) total 124,174 of 10,000 -> QUALIFIES
+        top: 91c×61,511  90c×600  88c×23  87c×3,336  82c×18,354
+        50 at the touch would take  0.5% ≈ $0.37/day
+   ASK: touch  92.0c (78,264) total 127,307 of 10,000 -> QUALIFIES
+        top: 92c×78,264  98c×21,319  99c×27,724
+        50 at the touch would take  0.5% ≈ $0.37/day
+
+=== ewc-usse-ga-2026-11-03-rep ===
+   pool $300.0 / 2 markets / 2 sides = $75.00/side/day
+   target 10,000   df 0.2
+   BID: touch   7.0c (81,266) total 147,587 of 10,000 -> QUALIFIES
+        top: 7c×81,266  6c×20,938  2c×20,183  1c×25,200
+        50 at the touch would take  0.5% ≈ $0.37/day
+   ASK: touch   8.0c (26,600) total 101,516 of 10,000 -> QUALIFIES
+        top: 8c×26,600  9c×600  13c×16,442  19c×15,000  20c×150
+        50 at the touch would take  0.5% ≈ $0.37/day
+
+=== paccc-usho-midterms-2026-11-03-dem ===
+   pool $300.0 / 2 markets / 2 sides = $75.00/side/day
+   target 10,000   df 0.2
+   BID: touch  84.8c (7,283) total 937,014 of 10,000 -> QUALIFIES
+        top: 85c×7,283  84c×500  84c×700  80c×30  79c×6
+        50 at the touch would take  0.7% ≈ $0.50/day
+   ASK: touch  84.9c (7,496) total 546,476 of 10,000 -> QUALIFIES
+        top: 85c×7,496  85c×5,000  85c×4,115  85c×2,960  85c×20,000
+        50 at the touch would take  0.5% ≈ $0.37/day
+
+=== paccc-usho-midterms-2026-11-03-rep ===
+   pool $300.0 / 2 markets / 2 sides = $75.00/side/day
+   target 10,000   df 0.2
+   BID: touch  15.0c (37,369) total 827,900 of 10,000 -> QUALIFIES
+        top: 15c×37,369  10c×10  9c×21  9c×15,000  5c×15,000
+        50 at the touch would take  0.5% ≈ $0.37/day
+   ASK: touch  15.1c (468) total 482,911 of 10,000 -> QUALIFIES
+        top: 15c×468  15c×358  16c×900  16c×1,379  20c×28
+        50 at the touch would take  3.8% ≈ $2.81/day
+
+=== paccc-usse-midterms-2026-11-03-dem ===
+   pool $300.0 / 2 markets / 2 sides = $75.00/side/day
+   target 10,000   df 0.2
+   BID: touch  49.3c (25,571) total 1,045,900 of 10,000 -> QUALIFIES
+        top: 49c×25,571  49c×900  48c×277  48c×775  40c×15,000
+        50 at the touch would take  0.5% ≈ $0.37/day
+   ASK: touch  49.4c (72,168) total 784,543 of 10,000 -> QUALIFIES
+        top: 49c×72,168  50c×900  50c×1  65c×21,641  65c×150
+        50 at the touch would take  0.5% ≈ $0.37/day
+
+=== paccc-usse-midterms-2026-11-03-rep ===
+   pool $300.0 / 2 markets / 2 sides = $75.00/side/day
+   target 10,000   df 0.2
+   BID: touch  50.6c (29,824) total 1,064,171 of 10,000 -> QUALIFIES
+        top: 51c×29,824  50c×900  50c×40  41c×15,000  41c×30
+        50 at the touch would take  0.5% ≈ $0.37/day
+   ASK: touch  50.7c (44,360) total 816,950 of 10,000 -> QUALIFIES
+        top: 51c×44,360  51c×903  51c×900  61c×15,000  61c×150
+        50 at the touch would take  0.5% ≈ $0.37/day
+
+=== vmc-ussep-misen-2026-08-04-els0-5 ===
+   pool $300.0 / 10 markets / 2 sides = $15.00/side/day
+   target 10,000   df 0.2
+   BID: touch  93.0c (15,000) total 522,343 of 10,000 -> QUALIFIES
+        top: 93c×15,000  92c×2,000  91c×92  40c×1  10c×5,250
+        50 at the touch would take  0.5% ≈ $0.07/day
+   ASK: EMPTY — first order in sets the touch
+
+=== vmc-ussep-misen-2026-08-04-els10-15 ===
+   pool $300.0 / 10 markets / 2 sides = $15.00/side/day
+   target 10,000   df 0.2
+   BID: EMPTY — first order in sets the touch
+   ASK: touch   1.0c (67,946) total 139,047 of 10,000 -> QUALIFIES
+        top: 1c×67,946  4c×4,999  5c×1,864  78c×150  99c×64,088
+        50 at the touch would take  0.5% ≈ $0.07/day
+
+=== vmc-ussep-misen-2026-08-04-els15-20 ===
+   pool $300.0 / 10 markets / 2 sides = $15.00/side/day
+   target 10,000   df 0.2
+   BID: EMPTY — first order in sets the touch
+   ASK: touch   1.0c (332,750) total 462,794 of 10,000 -> QUALIFIES
+        top: 1c×332,750  3c×1,215  14c×150  99c×128,679
+        50 at the touch would take  0.5% ≈ $0.07/day
+
+=== vmc-ussep-misen-2026-08-04-els5-10 ===
+   pool $300.0 / 10 markets / 2 sides = $15.00/side/day
+   target 10,000   df 0.2
+   BID: EMPTY — first order in sets the touch
+   ASK: touch   1.0c (1,836) total 96,233 of 10,000 -> QUALIFIES
+        top: 1c×1,836  2c×8,602  3c×1,500  5c×58  11c×150
+        50 at the touch would take  1.4% ≈ $0.21/day
+
+=== vmc-ussep-misen-2026-08-04-elsgte20 ===
+   pool $300.0 / 10 markets / 2 sides = $15.00/side/day
+   target 10,000   df 0.2
+   BID: EMPTY — first order in sets the touch
+   ASK: touch   1.0c (283,892) total 471,512 of 10,000 -> QUALIFIES
+        top: 1c×283,892  6c×54  99c×187,567
+        50 at the touch would take  0.5% ≈ $0.07/day
+
+=== vmc-ussep-misen-2026-08-04-ste0-5 ===
+   pool $300.0 / 10 markets / 2 sides = $15.00/side/day
+   target 10,000   df 0.2
+   BID: EMPTY — first order in sets the touch
+   ASK: touch   1.0c (283,717) total 479,591 of 10,000 -> QUALIFIES
+        top: 1c×283,717  18c×150  98c×129,483  99c×66,241
+        50 at the touch would take  0.5% ≈ $0.07/day
+
+=== vmc-ussep-misen-2026-08-04-ste05-10 ===
+   pool $300.0 / 10 markets / 2 sides = $15.00/side/day
+   target 10,000   df 0.2
+   BID: EMPTY — first order in sets the touch
+   ASK: touch   1.0c (331,555) total 595,222 of 10,000 -> QUALIFIES
+        top: 1c×331,555  11c×150  15c×55  98c×64,741  99c×198,721
+        50 at the touch would take  0.5% ≈ $0.07/day
+
+=== vmc-ussep-misen-2026-08-04-ste10-15 ===
+   pool $300.0 / 10 markets / 2 sides = $15.00/side/day
+   target 10,000   df 0.2
+   BID: EMPTY — first order in sets the touch
+   ASK: touch   1.0c (319,999) total 396,893 of 10,000 -> QUALIFIES
+        top: 1c×319,999  2c×1,033  3c×859  4c×324  5c×1,378
+        50 at the touch would take  0.5% ≈ $0.07/day
+
+=== vmc-ussep-misen-2026-08-04-ste15-20 ===
+   pool $300.0 / 10 markets / 2 sides = $15.00/side/day
+   target 10,000   df 0.2
+   BID: EMPTY — first order in sets the touch
+   ASK: touch   1.0c (13,417) total 343,848 of 10,000 -> QUALIFIES
+        top: 1c×13,417  40c×61  97c×65,408  99c×264,961
+        50 at the touch would take  0.5% ≈ $0.07/day
+
+=== vmc-ussep-misen-2026-08-04-stegte20 ===
+   pool $300.0 / 10 markets / 2 sides = $15.00/side/day
+   target 10,000   df 0.2
+   BID: EMPTY — first order in sets the touch
+   ASK: touch   1.0c (11,817) total 274,389 of 10,000 -> QUALIFIES
+        top: 1c×11,817  15c×19  97c×65,408  99c×197,145
+        50 at the touch would take  0.5% ≈ $0.07/day
+
+=== SUMMARY (per-side $/day if entered modestly) ===
+  lawec-saveact-2026-08-31                     $  25.00/side  bid50 $  0.25  ask50 $  0.25
+  lawec-saveact-2026-12-31                     $  25.00/side  bid50 $  0.25  ask50 $  0.25
+  enwc-usgubp-fl-2026-08-18-rep-byrdon         $  50.00/side  bid50 $  0.25  ask50 $  0.58
+  enwc-usgubp-fl-2026-08-18-rep-jamfis         $  50.00/side  bid50 $  0.25  ask50 $  0.25
+  enwc-usgubp-fl-2026-08-18-rep-jaycol         $  50.00/side  bid50 $  0.00  ask50 $  0.25  [needs qualifying]
+  ewc-usgub-ca-2026-11-03-xavbec               $  75.00/side  bid50 $  0.37  ask50 $  0.37
+  ewc-usse-ga-2026-11-03-dem                   $  75.00/side  bid50 $  0.37  ask50 $  0.37
+  ewc-usse-ga-2026-11-03-rep                   $  75.00/side  bid50 $  0.37  ask50 $  0.37
+  paccc-usho-midterms-2026-11-03-dem           $  75.00/side  bid50 $  0.50  ask50 $  0.37
+  paccc-usho-midterms-2026-11-03-rep           $  75.00/side  bid50 $  0.37  ask50 $  2.81
+  paccc-usse-midterms-2026-11-03-dem           $  75.00/side  bid50 $  0.37  ask50 $  0.37
+  paccc-usse-midterms-2026-11-03-rep           $  75.00/side  bid50 $  0.37  ask50 $  0.37
+  vmc-ussep-misen-2026-08-04-els0-5            $  15.00/side  bid50 $  0.07  ask50 $  0.00  [needs qualifying]
+  vmc-ussep-misen-2026-08-04-els10-15          $  15.00/side  bid50 $  0.00  ask50 $  0.07  [needs qualifying]
+  vmc-ussep-misen-2026-08-04-els15-20          $  15.00/side  bid50 $  0.00  ask50 $  0.07  [needs qualifying]
+  vmc-ussep-misen-2026-08-04-els5-10           $  15.00/side  bid50 $  0.00  ask50 $  0.21  [needs qualifying]
+  vmc-ussep-misen-2026-08-04-elsgte20          $  15.00/side  bid50 $  0.00  ask50 $  0.07  [needs qualifying]
+  vmc-ussep-misen-2026-08-04-ste0-5            $  15.00/side  bid50 $  0.00  ask50 $  0.07  [needs qualifying]
+  vmc-ussep-misen-2026-08-04-ste05-10          $  15.00/side  bid50 $  0.00  ask50 $  0.07  [needs qualifying]
+  vmc-ussep-misen-2026-08-04-ste10-15          $  15.00/side  bid50 $  0.00  ask50 $  0.07  [needs qualifying]
+  vmc-ussep-misen-2026-08-04-ste15-20          $  15.00/side  bid50 $  0.00  ask50 $  0.07  [needs qualifying]
+  vmc-ussep-misen-2026-08-04-stegte20          $  15.00/side  bid50 $  0.00  ask50 $  0.07  [needs qualifying]
