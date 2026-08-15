@@ -1,67 +1,67 @@
 2028 slate: 60 markets — join each fair ask touch with 1 share
 
 market                                      touch  at-touch our off  est$/d  action
-enwc-uspres-nom-dem-2028-aleocc             42.0c      10.0       0    0.79  already at the touch (10) — skip
-enwc-uspres-nom-dem-2028-andbes             28.0c      33.0       0    0.26  already at the touch (33) — skip
-enwc-uspres-nom-dem-2028-dwajoh              3.0c       2.0      39    2.94  join
-enwc-uspres-nom-dem-2028-gavnew              3.0c       2.0      27    2.94  join
-enwc-uspres-nom-dem-2028-jamtal             25.0c      14.1       0    0.58  already at the touch (14.1) — skip
-enwc-uspres-nom-dem-2028-jbpri              26.0c      33.0       0    0.26  already at the touch (33) — skip
-enwc-uspres-nom-dem-2028-jonoss             36.0c       2.0      12    1.10  join
-enwc-uspres-nom-dem-2028-jonste              3.0c       2.0      41    2.94  join
-enwc-uspres-nom-dem-2028-jossha              3.0c       2.0      25    2.94  join
-enwc-uspres-nom-dem-2028-kamhar             43.0c       1.0       6    4.41  join
-enwc-uspres-nom-dem-2028-markel              3.0c       2.0      40    2.94  join
-enwc-uspres-nom-dem-2028-micoba             23.0c      25.0       2    0.32  join
-enwc-uspres-nom-dem-2028-petbut             37.0c      37.0       0    0.23  already at the touch (36.98) — skip
-enwc-uspres-nom-dem-2028-rahema             24.0c      25.0       1    0.25  join
-enwc-uspres-nom-dem-2028-rokha              31.0c      33.0       0    0.26  already at the touch (33) — skip
-enwc-uspres-nom-dem-2028-stasmi             33.0c      33.0       0    0.26  already at the touch (33) — skip
-enwc-uspres-nom-dem-2028-wesmoo             27.0c      33.0       0    0.26  already at the touch (33) — skip
-enwc-uspres-nom-rep-2028-dontru             12.0c       2.0      10    3.57  join
-enwc-uspres-nom-rep-2028-dontrujr            3.0c       2.0      30    3.57  join
-enwc-uspres-nom-rep-2028-elomus              3.0c       2.0      28    3.57  join
-enwc-uspres-nom-rep-2028-gleyou              3.0c       2.0      11    3.57  join
-enwc-uspres-nom-rep-2028-jdvan              50.0c       2.0       1    1.34  join
-enwc-uspres-nom-rep-2028-margre              3.0c       2.0      22    3.57  join
-enwc-uspres-nom-rep-2028-marrub             50.0c      51.0       0    0.00  already at the touch (50) — skip
-enwc-uspres-nom-rep-2028-ranpau              7.0c       2.0      29    3.57  join
-enwc-uspres-nom-rep-2028-rondes             23.0c       2.0       0    3.57  already at the touch (1) — skip
-enwc-uspres-nom-rep-2028-tedcru              3.0c       2.0      93    3.57  join
-enwc-uspres-nom-rep-2028-thomas              3.0c       2.0      28    3.57  join
-enwc-uspres-nom-rep-2028-tuccar              3.0c       2.0      28    3.57  join
-enwc-uspres-nom-rep-2028-tulgab              3.0c       2.0      93    3.57  join
-enwc-uspres-nom-rep-2028-vivram             14.0c       2.0      14    3.57  join
-ewc-usp-2028-11-07-aleocc                   25.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-andbes                   29.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-dontru                   50.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-dontrujr                 21.0c      25.0       4    0.21  join
-ewc-usp-2028-11-07-dwajoh                   50.0c      33.2       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-elomus                   25.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-gavnew                   29.0c      50.0       0    0.11  already at the touch (50) — skip
-ewc-usp-2028-11-07-gleyou                   29.0c       2.0       2    1.11  join
-ewc-usp-2028-11-07-jamtal                   28.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-jbpri                    22.0c      25.0       3    0.21  join
-ewc-usp-2028-11-07-jdvan                    51.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-jonoss                   25.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-jossha                   29.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-kamhar                   25.0c      58.0       0    0.09  already at the touch (33) — skip
-ewc-usp-2028-11-07-markel                   25.0c      75.0       0    0.07  already at the touch (50) — skip
-ewc-usp-2028-11-07-marrub                   50.0c      27.0       1    0.16  join
-ewc-usp-2028-11-07-micoba                   21.0c      25.0       5    0.21  join
-ewc-usp-2028-11-07-petbut                   29.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-rahema                   33.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-rokha                    27.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-rondes                   14.0c       2.0      11    1.85  join
-ewc-usp-2028-11-07-stasmi                   25.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-thomas                   95.0c      33.0       0    0.10  already at the touch (33) — skip
-ewc-usp-2028-11-07-tuccar                   36.0c      50.0       0    0.11  already at the touch (50) — skip
-ewc-usp-2028-11-07-tulgab                   50.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-vivram                   25.0c      33.0       0    0.16  already at the touch (33) — skip
-ewc-usp-2028-11-07-wesmoo                   95.0c      33.0       0    0.11  already at the touch (33) — skip
-ewc-usp-party-2028-11-07-dem                64.0c     114.4       0    0.00  already at the touch (114.36) — skip
-ewc-usp-party-2028-11-07-rep                49.0c     416.0       0    0.00  already at the touch (155) — skip
+enwc-uspres-nom-dem-2028-aleocc             43.0c      25.0       0    0.57  already at the touch (25) — skip
+enwc-uspres-nom-dem-2028-andbes             14.0c       3.0       0    7.35  already at the touch (3) — skip
+enwc-uspres-nom-dem-2028-dwajoh              3.0c       3.0       0    3.22  already at the touch (1) — skip
+enwc-uspres-nom-dem-2028-gavnew              3.0c       3.0       0    7.35  already at the touch (1) — skip
+enwc-uspres-nom-dem-2028-jamtal             25.0c      14.1       0    1.45  already at the touch (14.1) — skip
+enwc-uspres-nom-dem-2028-jbpri              25.0c      33.0       0    0.49  already at the touch (33) — skip
+enwc-uspres-nom-dem-2028-jonoss             36.0c       1.0       0    4.10  already at the touch (1) — skip
+enwc-uspres-nom-dem-2028-jonste              3.0c       3.0       0    3.22  already at the touch (1) — skip
+enwc-uspres-nom-dem-2028-jossha              3.0c       3.0       0    7.35  already at the touch (1) — skip
+enwc-uspres-nom-dem-2028-kamhar             43.0c       6.0       6    2.42  join
+enwc-uspres-nom-dem-2028-markel              3.0c       3.0       0    7.35  already at the touch (1) — skip
+enwc-uspres-nom-dem-2028-micoba             23.0c       1.0       0    3.48  already at the touch (1) — skip
+enwc-uspres-nom-dem-2028-petbut             37.0c      37.0       0    0.68  already at the touch (36.98) — skip
+enwc-uspres-nom-dem-2028-rahema             24.0c       1.0       0    1.72  already at the touch (1) — skip
+enwc-uspres-nom-dem-2028-rokha              25.0c      33.0       0    0.49  already at the touch (33) — skip
+enwc-uspres-nom-dem-2028-stasmi             25.0c      33.0       0    0.18  already at the touch (33) — skip
+enwc-uspres-nom-dem-2028-wesmoo             25.0c      33.0       0    0.75  already at the touch (33) — skip
+enwc-uspres-nom-rep-2028-dontru              4.0c       2.0       1    4.36  join
+enwc-uspres-nom-rep-2028-dontrujr            3.0c       7.0       0    4.46  already at the touch (5) — skip
+enwc-uspres-nom-rep-2028-elomus              3.0c       3.0       0    3.91  already at the touch (1) — skip
+enwc-uspres-nom-rep-2028-gleyou              3.0c       3.0       0    3.91  already at the touch (1) — skip
+enwc-uspres-nom-rep-2028-jdvan              50.0c       3.0       0    2.53  already at the touch (1) — skip
+enwc-uspres-nom-rep-2028-margre              3.0c       3.0       0    3.91  already at the touch (1) — skip
+enwc-uspres-nom-rep-2028-marrub             50.0c      51.0       0    0.47  already at the touch (50) — skip
+enwc-uspres-nom-rep-2028-ranpau              7.0c       3.0       0    3.91  already at the touch (1) — skip
+enwc-uspres-nom-rep-2028-rondes             23.0c       2.0       0    4.39  already at the touch (1) — skip
+enwc-uspres-nom-rep-2028-tedcru              3.0c       3.0       0    3.91  already at the touch (1) — skip
+enwc-uspres-nom-rep-2028-thomas              3.0c       3.0       0    3.91  already at the touch (1) — skip
+enwc-uspres-nom-rep-2028-tuccar              3.0c       3.0       0    3.91  already at the touch (1) — skip
+enwc-uspres-nom-rep-2028-tulgab              3.0c       3.0       0    3.91  already at the touch (1) — skip
+enwc-uspres-nom-rep-2028-vivram              3.0c       2.0      11    4.39  join
+ewc-usp-2028-11-07-aleocc                   25.0c      33.0       0    0.47  already at the touch (33) — skip
+ewc-usp-2028-11-07-andbes                   11.0c       2.0      16    6.16  join
+ewc-usp-2028-11-07-dontru                   25.0c      33.0       0    0.01  already at the touch (33) — skip
+ewc-usp-2028-11-07-dontrujr                 21.0c       1.0       0    2.58  already at the touch (1) — skip
+ewc-usp-2028-11-07-dwajoh                   24.0c       0.2       1    0.03  join
+ewc-usp-2028-11-07-elomus                   25.0c      33.0       0    0.01  already at the touch (33) — skip
+ewc-usp-2028-11-07-gavnew                   29.0c      50.0       0    0.33  already at the touch (50) — skip
+ewc-usp-2028-11-07-gleyou                   26.0c       2.0       1    1.01  join
+ewc-usp-2028-11-07-jamtal                   25.0c      33.0       0    0.01  already at the touch (33) — skip
+ewc-usp-2028-11-07-jbpri                    22.0c      34.0       0    0.46  already at the touch (34) — skip
+ewc-usp-2028-11-07-jdvan                    51.0c      33.0       0    0.47  already at the touch (33) — skip
+ewc-usp-2028-11-07-jonoss                   25.0c      33.0       0    0.47  already at the touch (33) — skip
+ewc-usp-2028-11-07-jossha                   25.0c      33.0       0    0.31  already at the touch (33) — skip
+ewc-usp-2028-11-07-kamhar                   25.0c      33.0       0    0.47  already at the touch (33) — skip
+ewc-usp-2028-11-07-markel                   25.0c      50.0       0    0.33  already at the touch (50) — skip
+ewc-usp-2028-11-07-marrub                   50.0c       3.0       0    1.18  already at the touch (1) — skip
+ewc-usp-2028-11-07-micoba                   21.0c       1.0       0    2.59  already at the touch (1) — skip
+ewc-usp-2028-11-07-petbut                   29.0c      33.0       0    0.47  already at the touch (33) — skip
+ewc-usp-2028-11-07-rahema                   25.0c      33.0       0    0.03  already at the touch (33) — skip
+ewc-usp-2028-11-07-rokha                    25.0c      33.0       0    0.01  already at the touch (33) — skip
+ewc-usp-2028-11-07-rondes                   14.0c       1.0       0    2.60  already at the touch (1) — skip
+ewc-usp-2028-11-07-stasmi                   14.0c       2.0      11    6.17  join
+ewc-usp-2028-11-07-thomas                   25.0c      33.0       0    0.01  already at the touch (33) — skip
+ewc-usp-2028-11-07-tuccar                   26.0c       2.0       1    1.02  join
+ewc-usp-2028-11-07-tulgab                   25.0c      33.0       0    0.01  already at the touch (33) — skip
+ewc-usp-2028-11-07-vivram                   14.0c       2.0      11    6.17  join
+ewc-usp-2028-11-07-wesmoo                   14.0c       2.0      11    6.17  join
+ewc-usp-party-2028-11-07-dem                64.0c     189.4       0    1.14  already at the touch (139.36) — skip
+ewc-usp-party-2028-11-07-rep                49.0c     563.0       0    0.44  already at the touch (155) — skip
 
-placed 27, failed 0, skipped (already at touch) 33
-buying power used ~$27 (an ask holds ~$1 of buying power per share)
-estimated added earnings $65.14/day across 27 qualifying sides
+placed 10, failed 0, skipped (already at touch) 50
+buying power used ~$10 (an ask holds ~$1 of buying power per share)
+estimated added earnings $37.90/day across 10 qualifying sides
