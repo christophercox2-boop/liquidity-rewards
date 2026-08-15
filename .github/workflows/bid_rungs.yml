@@ -21,6 +21,19 @@ name: Bid rungs
 #   * worst-case fill budget $80 total, $12 per market, greedy-allocated
 #     by marginal estimated income per dollar of exposure
 #
+# TIER 2 (owner, 2026-08-15): WALL JOINS. A level holding >= 20,000 of
+# other people's shares within 2 ticks of the touch can be joined with
+# real size, because queue priority puts us BEHIND the wall — a fill
+# would first have to eat through 20,000+ shares of someone else's
+# money. At an oversubscribed level the scoring window's take is split
+# pro-rata, so joining claims our fraction without moving the price or
+# the denominator. This is also how we widen our slice of our own 1c
+# mega-levels. Fair caps still apply — a wall at a silly price can still
+# be dumped through profitably, so we never join above fair. Join size
+# up to 20,000, never more than the wall itself, gain >= $1/day to
+# bother. Fill risk is catastrophic-only; the all-fill notional is
+# reported so the number is never a surprise.
+#
 # Post-only. The 20,000-share 1c qualification floors are never touched.
 
 on:
@@ -69,6 +82,8 @@ jobs:
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
+          if os.environ.get("GITHUB_EVENT_NAME") == "push":
+              DRY = True          # push never places; review the plan first
           BUDGET = float(os.environ.get("BUDGET") or 80)
           BUF = io.StringIO(); _p = print
           def print(*a, **k):
@@ -129,6 +144,7 @@ jobs:
               time.sleep(0.1)
 
           nom_touch: dict = {}
+          books: dict = {}
           sides, skipped = [], []
           for slug in slate:
               tail = slug.rsplit("-", 1)[-1]
@@ -147,8 +163,9 @@ jobs:
               bb = round(bids[0][0], 2)
               if slug.startswith(NOM):
                   nom_touch[tail] = bb
+              books[slug] = (bids, target, per, tail, bb)   # for the wall tier
               if bb <= 0.015:
-                  continue      # the touch IS the floor level — nothing to add
+                  continue      # the touch IS the floor level — tier 1 has nothing to add
               ours_at = (mine.get(slug) or {}).get(bb, 0.0)
               others_at = max(0.0, bids[0][1] - ours_at)
               fair = FAIR_CONTENDER if tail in CONTENDER else FAIR_MINOR
@@ -246,6 +263,105 @@ jobs:
               print("\nskipped sides (no real touch to join):")
               for m, bb, w, why in skipped:
                   print(f"  {m:44s} {bb*100:5.1f}c others-at-touch {w:7,.0f} — {why}")
+
+          # ---- TIER 2: join big walls from behind ---------------------------
+          WALL_MIN = 20000
+          WALL_TICKS = 2
+          WALL_GAIN_MIN = 1.0
+          WALL_NOTIONAL_CAP = 3000.0
+          WALL_PER_MARKET_USD = 500.0   # one market must never carry more
+          def wall_gain(bids, mine_px, target, per, jp, r):
+              """estimated $/day change from adding r of ours at price jp,
+              with pro-rata attribution at partially included levels"""
+              bb2 = bids[0][0]
+              def calc(extra):
+                  den = c = cum = 0.0
+                  for p, q in bids:
+                      q2 = q + (extra if abs(p - jp) < 0.005 else 0)
+                      take = min(q2, max(0.0, target - cum))
+                      if take <= 0:
+                          break
+                      w = DF ** round((bb2 - p) / TICK)
+                      den += take * w
+                      op = mine_px.get(round(p, 2), 0.0) + \
+                           (extra if abs(p - jp) < 0.005 else 0)
+                      if q2 > 0:
+                          c += take * (min(op, q2) / q2) * w
+                      cum += q2
+                  return (per * c / den) if den else 0.0
+              return calc(r) - calc(0.0)
+
+          walls = []
+          for slug, (bids, target, per, tail, bb) in books.items():
+              mine_px = mine.get(slug) or {}
+              fair = FAIR_CONTENDER if tail in CONTENDER else FAIR_MINOR
+              if slug.startswith(WIN) and tail in nom_touch:
+                  fair = min(fair, nom_touch[tail])
+              best = None
+              for p, q in bids:
+                  p = round(p, 2)
+                  if round((bb - p) / TICK) > WALL_TICKS:
+                      break
+                  others = q - mine_px.get(p, 0.0)
+                  if others < WALL_MIN or p > fair + 1e-9:
+                      continue
+                  gains = []
+                  for r in (2000, 5000, 10000, 20000):
+                      if r > others or r * p > WALL_PER_MARKET_USD:
+                          break
+                      gains.append((r, wall_gain(bids, mine_px, target, per, p, r)))
+                  if not gains:
+                      continue
+                  # gains are sublinear in size — take the smallest join that
+                  # captures at least 85% of the best on offer at this level
+                  gmax = max(g for _, g in gains)
+                  r, g = next((r, g) for r, g in gains if g >= 0.85 * gmax)
+                  if best is None or g > best[0]:
+                      best = (g, slug, p, r, others)
+              if best and best[0] >= WALL_GAIN_MIN:
+                  walls.append(best)
+          walls.sort(key=lambda x: -x[0])
+          print(f"\n=== TIER 2 — wall joins (behind >= {WALL_MIN:,} of others) ===")
+          w_notional = 0.0
+          w_placed = w_failed = 0
+          for g, slug, p, r, others in walls:
+              if w_notional + r * p > WALL_NOTIONAL_CAP:
+                  continue
+              print(f"{slug:44s} {p*100:5.1f}c behind {others:9,.0f} join {r:6,} "
+                    f"notional ${r*p:6.0f}  +${g:5.2f}/d")
+              row = {"m": slug, "px": p, "qty": r, "wall": round(others),
+                     "tier": 2, "ok": None}
+              if DRY:
+                  out.append(row); w_placed += 1; w_notional += r * p
+                  continue
+              body = {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_LONG",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{p:.2f}", "currency": "USD"},
+                      "quantity": int(r),
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              ok, why, delay = False, "", 2.0
+              for attempt in range(4):
+                  try:
+                      rr = api("POST", "/v1/orders", body)
+                      if rr.status_code < 300:
+                          ok = True; break
+                      why = " ".join(rr.text.split())[:120]
+                      if rr.status_code not in (429, 500, 502, 503, 504):
+                          break
+                  except Exception as e:
+                      why = type(e).__name__
+                  time.sleep(delay); delay = min(delay * 2, 20)
+              w_placed += ok; w_failed += (not ok)
+              w_notional += r * p if ok else 0
+              row["ok"] = ok
+              if not ok:
+                  print(f"    FAILED {why}")
+              out.append(row)
+              time.sleep(0.6)
+          print(f"tier 2: {'would join' if DRY else 'joined'} {w_placed} walls, "
+                f"failed {w_failed}, est +${sum(g for g,*_ in walls[:w_placed]):,.2f}/day, "
+                f"apocalypse-only notional ${w_notional:,.0f}")
 
           print(f"\n{'would place' if DRY else 'placed'} {placed}, failed {failed}")
           os.makedirs("data", exist_ok=True)
