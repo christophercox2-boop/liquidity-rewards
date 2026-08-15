@@ -1,0 +1,226 @@
+name: Requalify 2028 slate
+
+# ORDER-TOUCHING. Places real orders — but push runs are FORCED DRY.
+# Manual dispatch with dry_run unchecked is the only way it places.
+#
+# 2026-08-15: the owner reports Target Size on the slate has DOUBLED. Our
+# floor blocks (10,000 bids at 1c, 10,000 asks at 99c) were sized to the
+# old 10,000 target, so every side we hold up ourselves is back below the
+# line and pays nobody.
+#
+# This reads the CURRENT target from the live incentives API — nothing is
+# assumed about the new number — and, per side, tops our own total size up
+# to it with one post-only order at the floor (1c bids, 99c asks). Our
+# total counts every resting order we have on the side, so touch orders
+# are not duplicated. Sides already self-sufficient at the new target are
+# left alone. Nothing is repriced or cancelled.
+#
+# Cost: floors only fill if the market goes to the extreme, so the spend
+# is collateral, ~1c per share on either side (a 1c bid costs 1c/share; a
+# 99c ask locks 1c/share). Doubling both sides of ~60 markets is roughly
+# $100-120 of fill-side notional per market pair.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/requalify_slate.yml
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "plan only, place nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: requalify-slate
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
+          if os.environ.get("GITHUB_EVENT_NAME") == "push":
+              DRY = True          # push never places; only a deliberate dispatch does
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+          BID_FLOOR, ASK_FLOOR = 0.01, 0.99
+          OLD_TARGET = 10000          # for the old-vs-new report only
+          MAX_ORDERS = 130
+          MAX_SHARES_PER_ORDER = 20000
+
+          def api(method, path, body=None):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  json=body, timeout=30)
+
+          # our resting size per (market, side) — ALL prices, so a side's
+          # touch orders count toward its qualification total
+          ours: dict = {}
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          for o in r.json().get("orders") or []:
+              if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                             "ORDER_STATE_PARTIALLY_FILLED"):
+                  continue
+              s = o.get("marketSlug") or ""
+              if not s.startswith(PREFIXES):
+                  continue
+              intent = str(o.get("intent") or "")
+              side = "BUY" if intent.endswith(("BUY_LONG", "SELL_SHORT")) else "SELL"
+              q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+              ours[(s, side)] = ours.get((s, side), 0.0) + q
+
+          pol, sizes = tr.fetch_politics_events()
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+
+          progs = {}
+          for i in range(0, len(slate), 25):
+              try:
+                  rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                    params={"symbols": slate[i:i+25], "pageSize": 100}, timeout=30)
+                  for p in rr.json().get("programs") or []:
+                      s = p.get("marketSlug") or ""
+                      tp = tr._pick_period(p.get("timePeriods") or [], s)
+                      if tp is not None and s:
+                          progs[s] = tr._prog_of(tp)
+              except Exception:
+                  pass
+              time.sleep(0.1)
+
+          targets = sorted({float((progs.get(s) or {}).get("target") or 0) for s in slate})
+          print(f"2028 slate: {len(slate)} markets" + ("   (DRY RUN)" if DRY else ""))
+          print(f"live Target Sizes seen: {targets}  (old was {OLD_TARGET:,})\n")
+
+          placed = failed = 0
+          notional = 0.0
+          out = []
+          print(f"{'market':42s} {'side':4s} {'target':>8s} {'ours':>9s} {'add':>8s}")
+          for slug in slate:
+              pr = progs.get(slug) or {}
+              target = float(pr.get("target") or 0)
+              if not target:
+                  print(f"{slug:42s} no live program — skip")
+                  continue
+              for side, floor in (("BUY", BID_FLOOR), ("SELL", ASK_FLOOR)):
+                  have = ours.get((slug, side), 0.0)
+                  need = int(target - have) + 1
+                  if need <= 0:
+                      continue
+                  if need > MAX_SHARES_PER_ORDER:
+                      print(f"{slug:42s} {side:4s} need {need:,} exceeds per-order cap — capping")
+                      need = MAX_SHARES_PER_ORDER
+                  if placed >= MAX_ORDERS:
+                      print("order ceiling reached"); break
+                  unit = floor if side == "BUY" else 1 - floor
+                  print(f"{slug:42s} {side:4s} {target:8,.0f} {have:9,.0f} {need:8,}")
+                  row = {"m": slug, "side": side, "px": floor, "qty": need, "ok": None}
+                  if DRY:
+                      out.append(row); placed += 1; notional += unit * need
+                      continue
+                  intent = ("ORDER_INTENT_BUY_LONG" if side == "BUY"
+                            else "ORDER_INTENT_BUY_SHORT")
+                  body = {"marketSlug": slug, "intent": intent,
+                          "type": "ORDER_TYPE_LIMIT",
+                          "price": {"value": f"{floor:.2f}", "currency": "USD"},
+                          "quantity": need,
+                          "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                          "participateDontInitiate": True}
+                  ok, why, delay = False, "", 2.0
+                  for attempt in range(4):
+                      try:
+                          rr = api("POST", "/v1/orders", body)
+                          if rr.status_code < 300:
+                              ok = True; break
+                          why = " ".join(rr.text.split())[:120]
+                          if rr.status_code not in (429, 500, 502, 503, 504):
+                              break
+                      except Exception as e:
+                          why = type(e).__name__
+                      time.sleep(delay); delay = min(delay * 2, 20)
+                  placed += ok; failed += (not ok)
+                  notional += unit * need if ok else 0
+                  row["ok"] = ok
+                  if not ok:
+                      print(f"    FAILED {why}")
+                  out.append(row)
+                  time.sleep(0.7)
+
+          print(f"\n{'would place' if DRY else 'placed'} {placed}, failed {failed}, "
+                f"fill-side notional ~${notional:,.2f}")
+
+          if not DRY and placed:
+              print("\nsettling before verifying…")
+              time.sleep(20)
+              after: dict = {}
+              r = api("GET", "/v1/orders/open"); r.raise_for_status()
+              for o in r.json().get("orders") or []:
+                  if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                                 "ORDER_STATE_PARTIALLY_FILLED"):
+                      continue
+                  s = o.get("marketSlug") or ""
+                  if not s.startswith(PREFIXES):
+                      continue
+                  intent = str(o.get("intent") or "")
+                  side = "BUY" if intent.endswith(("BUY_LONG", "SELL_SHORT")) else "SELL"
+                  q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+                  after[(s, side)] = after.get((s, side), 0.0) + q
+              short = [(s, sd, after.get((s, sd), 0.0),
+                        float((progs.get(s) or {}).get("target") or 0))
+                       for s in slate for sd in ("BUY", "SELL")
+                       if (progs.get(s) or {}).get("target")
+                       and after.get((s, sd), 0.0) < float(progs[s]["target"])]
+              print(f"sides still below the new target: {len(short)}")
+              for s, sd, have, tgt in short[:40]:
+                  print(f"   {s:42s} {sd:4s} ours {have:9,.0f} of {tgt:,.0f}")
+
+          os.makedirs("data", exist_ok=True)
+          json.dump({"dry_run": DRY, "targets_seen": targets, "placed": placed,
+                     "failed": failed, "notional": round(notional, 2), "orders": out},
+                    open("data/requalify_slate.json", "w"), indent=1)
+          with open("data/requalify_slate.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/requalify_slate.json data/requalify_slate.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Requalify 2028 slate [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi
