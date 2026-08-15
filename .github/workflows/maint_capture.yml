@@ -19,13 +19,11 @@ name: Maintenance capture
 # line per reading, recording HTTP status for every call so an outage is
 # captured as data rather than as a hole.
 
+# 2026-08-15: cron disabled in the Actions-minutes cleanup. The experiment
+# this fed (frozen-book segments for the estimator gap) has its captures,
+# and the Aug 10-13 payouts it was waiting on have landed. Manual dispatch
+# still works if another window is ever worth recording.
 on:
-  schedule:
-    - cron: "*/15 10-13 * * *"     # through the window and an hour past it
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/maint_capture.yml
   workflow_dispatch: {}
 
 permissions:

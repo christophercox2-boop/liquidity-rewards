@@ -210,6 +210,113 @@ def _estimates_csv_text() -> str | None:
         return None
 
 
+# --- in-process tracker (replaced the hourly Actions run, 2026-08-15) -------
+# The hourly "Track liquidity rewards" workflow burned ~85 Actions minutes a
+# day against a 2,000/month plan. This thread runs the SAME track_rewards.py,
+# unchanged, as a subprocess (its own interpreter — no shared module state
+# with the poll loop), then pushes every output to main as ONE commit via the
+# git data API. Append-history files are seeded from main first, so container
+# restarts never reset them. The Actions workflow still runs every 4 hours as
+# an independent heartbeat: if this container dies, that run still stamps the
+# ❌ freshness banner into STATUS.md and emails the owner.
+TRACKER_INTERVAL = float(os.environ.get("TRACKER_INTERVAL", "3600"))
+TRACKER_ENABLED = os.environ.get("TRACKER_IN_MONITOR", "1") != "0"
+APP_DIR = Path(__file__).resolve().parent.parent
+TRACKER_SEED = ("data/estimates.csv", "data/checks.csv", "data/estimate_runs.csv")
+TRACKER_PUSH = ("STATUS.md", "data/rewards.csv", "data/checks.csv",
+                "data/estimates.csv", "data/estimate_runs.csv",
+                "data/live_orders.csv", "data/latest_response.json")
+TRACKER_STATUS = {"ok_ts": 0.0, "err": "", "runs": 0}
+
+
+def _tracker_commit(files: dict[str, bytes]) -> str:
+    """One fast-forward commit on main. Returns '' or a short error."""
+    for attempt in range(2):
+        r = _gh("GET", f"/repos/{GITHUB_REPO}/git/ref/heads/main")
+        if r.status_code >= 300:
+            return f"head HTTP {r.status_code}"
+        head = r.json()["object"]["sha"]
+        r = _gh("GET", f"/repos/{GITHUB_REPO}/git/commits/{head}")
+        if r.status_code >= 300:
+            return f"head commit HTTP {r.status_code}"
+        base_tree = r.json()["tree"]["sha"]
+        tree = []
+        for path, data in files.items():
+            rb = _gh("POST", f"/repos/{GITHUB_REPO}/git/blobs",
+                     json={"content": base64.b64encode(data).decode(),
+                           "encoding": "base64"})
+            if rb.status_code >= 300:
+                return f"blob {path} HTTP {rb.status_code}"
+            tree.append({"path": path, "mode": "100644", "type": "blob",
+                         "sha": rb.json()["sha"]})
+        rt = _gh("POST", f"/repos/{GITHUB_REPO}/git/trees",
+                 json={"base_tree": base_tree, "tree": tree})
+        if rt.status_code >= 300:
+            return f"tree HTTP {rt.status_code}"
+        if rt.json()["sha"] == base_tree:
+            return ""          # nothing actually changed — no empty commit
+        rc = _gh("POST", f"/repos/{GITHUB_REPO}/git/commits",
+                 json={"message": "Liquidity rewards check [skip ci]",
+                       "tree": rt.json()["sha"], "parents": [head]})
+        if rc.status_code >= 300:
+            return f"commit HTTP {rc.status_code}"
+        rr = _gh("PATCH", f"/repos/{GITHUB_REPO}/git/refs/heads/main",
+                 json={"sha": rc.json()["sha"]})   # fast-forward only, no force
+        if rr.status_code < 300:
+            return ""
+        if attempt == 0 and rr.status_code in (409, 422):
+            continue           # lost a push race — rebuild on the new head
+        return f"ref HTTP {rr.status_code}"
+    return "ref race"
+
+
+def _tracker_once() -> str:
+    import subprocess
+    for path in TRACKER_SEED:
+        txt = _gh_text(path, ref="main")
+        if txt:
+            p = APP_DIR / path
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(txt)
+    proc = subprocess.run([sys.executable, str(APP_DIR / "track_rewards.py")],
+                          cwd=str(APP_DIR), capture_output=True, text=True,
+                          timeout=1800)
+    tail = " ".join(((proc.stdout or "") + " " + (proc.stderr or "")).split())[-300:]
+    files = {}
+    for path in TRACKER_PUSH:
+        p = APP_DIR / path
+        if p.exists():
+            files[path] = p.read_bytes()
+    if not files:
+        return ("tracker wrote nothing: " + tail)[:250]
+    err = _tracker_commit(files)
+    if err.startswith("blob data/estimates.csv") and "data/estimates.csv" in files:
+        # the one file big enough to trip a request-body limit — commit the
+        # rest; the 4-hourly Actions run still refreshes it
+        del files["data/estimates.csv"]
+        err = _tracker_commit(files) or "estimates.csv skipped (too big for the API)"
+    if err:
+        return err[:250]
+    # a failed fetch still commits its ❌ banner (same as Actions did) but is
+    # still a failure worth surfacing
+    return "" if proc.returncode == 0 else (f"tracker exit {proc.returncode}: {tail}")[:250]
+
+
+def tracker_loop() -> None:
+    time.sleep(120)            # let the poll loop warm its caches first
+    while True:
+        if TRACKER_ENABLED and GITHUB_TOKEN:
+            try:
+                err = _tracker_once()
+            except Exception as e:  # noqa: BLE001 — the loop must survive anything
+                err = f"{type(e).__name__}: {e}"[:200]
+            TRACKER_STATUS["runs"] += 1
+            TRACKER_STATUS["err"] = err
+            if not err:
+                TRACKER_STATUS["ok_ts"] = time.time()
+        time.sleep(TRACKER_INTERVAL)
+
+
 def tracker_day_integral(day_et: str,
                          text: str | None = None) -> tuple[float, dict[str, float]] | None:
     """Rebuild a day's earnings from the hourly tracker's estimate snapshots
@@ -7319,6 +7426,7 @@ def main() -> None:
     threading.Thread(target=poll_loop, args=(key_id, secret_key), daemon=True).start()
     threading.Thread(target=ws_stream_loop, args=(key_id, secret_key), daemon=True).start()
     threading.Thread(target=hf_sampler_loop, daemon=True).start()
+    threading.Thread(target=tracker_loop, daemon=True).start()
     server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
     print(f"live monitor on :{PORT}, polling every {POLL_SECONDS}s")
     server.serve_forever()
