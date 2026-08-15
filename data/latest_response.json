@@ -365,6 +365,20 @@
       "status": "PENDING"
     },
     {
+      "reward": 0.02,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-cbb-champ-2027-04-05-w-stmry",
+      "date": "2026-08-13",
+      "status": "PENDING"
+    },
+    {
+      "reward": 0.03,
+      "programType": "liquidityProgram",
+      "marketSlug": "tec-cbb-champ-2027-04-05-w-wisc",
+      "date": "2026-08-13",
+      "status": "PENDING"
+    },
+    {
       "reward": 5.33,
       "programType": "liquidityProgram",
       "marketSlug": "apdc-alito-2026-12-31",
