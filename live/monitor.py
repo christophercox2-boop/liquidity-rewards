@@ -27,6 +27,7 @@ import gzip
 import io
 import json
 import os
+import math
 import random
 import sys
 import threading
@@ -3455,6 +3456,72 @@ def auto_probe() -> None:
             placed += 1
 
 
+def _bayes_fair(m: str) -> dict | None:
+    """A deliberately simple Bayesian read of a market's fair price from the
+    prober's evidence. Grid prior over 1..99c; every journal event is a soft
+    one-sided observation through a logistic likelihood (scale ~2 ticks):
+
+      probe bid FILLED at p   -> a seller accepted p   -> fair likely <= p
+      probe ask FILLED at p   -> a buyer paid p        -> fair likely >= p
+      flip (round trip) fills -> the same, from the flip's side
+      probe rested 45 min     -> weak opposite evidence (thin flow means
+                                 absence of a taker proves little — 0.35x)
+
+    plus the current de-baited real touches as gentle anchors (someone
+    risks actual size there). Returns the posterior median and the 10-90%
+    credible interval, in cents."""
+    evs = [l for l in (MONITOR.state.get("probe_log") or []) if l.get("m") == m]
+    ent = tr._BOOK_CACHE.get(m)
+    bb = ba = None
+    if ent and time.time() - ent[0] < 900:
+        bb, ba = _probe_real_touches(ent[1])
+    if not evs and bb is None and ba is None:
+        return None
+    S = 2.0
+    def sig(x: float) -> float:
+        return 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, x))))
+    def llog(v: float) -> float:
+        return math.log(max(v, 1e-9))
+    logp = [0.0] * 100
+    for f in range(1, 100):
+        lp = 0.0
+        for l in evs:
+            p = float(l.get("px") or 0)
+            side = l.get("side")
+            ev = l.get("ev")
+            if ev == "FILLED":
+                lp += llog(sig((p - f) / S)) if side == "BUY" else llog(sig((f - p) / S))
+            elif ev == "round trip":
+                # the FLIP filled: a SELL flip filling means a buyer at p
+                lp += llog(sig((f - p) / S)) if side == "SELL" else llog(sig((p - f) / S))
+            elif ev == "rested":
+                if side == "BUY":
+                    lp += 0.35 * llog(1.0 - 0.8 * sig((p - f) / S))
+                else:
+                    lp += 0.35 * llog(1.0 - 0.8 * sig((f - p) / S))
+        if bb is not None:
+            lp += 0.5 * llog(sig((f - bb * 100) / S))
+        if ba is not None:
+            lp += 0.5 * llog(sig((ba * 100 - f) / S))
+        logp[f] = lp
+    mx = max(logp[1:])
+    ps = [0.0] + [math.exp(l - mx) for l in logp[1:]]
+    tot = sum(ps) or 1.0
+    cum, lo, med, hi = 0.0, None, None, None
+    for i in range(1, 100):
+        cum += ps[i] / tot
+        if lo is None and cum >= 0.10:
+            lo = i
+        if med is None and cum >= 0.50:
+            med = i
+        if hi is None and cum >= 0.90:
+            hi = i
+    n_hard = sum(1 for l in evs if l.get("ev") in ("FILLED", "round trip"))
+    return {"med": med, "lo": lo, "hi": hi, "n": len(evs), "fills": n_hard,
+            "bb": round(bb * 100, 1) if bb is not None else None,
+            "ba": round(ba * 100, 1) if ba is not None else None}
+
+
 # --- slate health watch (in-process; replaced the slate_watch.yml cron) ----
 # Moved out of GitHub Actions 2026-08-15: the 30-minute cron was burning
 # ~120 Actions minutes a day against a 2,000/month plan, and the monitor
@@ -4669,6 +4736,11 @@ def _map_payload() -> dict:
         "probe_live": bool(_auto_on("probe")
                            and os.environ.get("PROBE_PAUSE", "") != "1"),
         "probe_est": MONITOR.state.get("probe") or {},
+        "probe_bayes": {m: b for m in sorted(
+                            {l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
+                            | set((MONITOR.state.get("probe") or {}))
+                            | {r[0] for r in _PROBE["active"].values()})
+                        if m and (b := _bayes_fair(m))},
         "probe_log": list(reversed((MONITOR.state.get("probe_log") or [])[-40:])),
         "probe_active": [{"m": r[0], "side": r[1], "px": round(r[2] * 100, 1),
                           "age_m": int((time.time() - r[3]) / 60), "kind": r[4]}
@@ -4982,15 +5054,38 @@ function renderProbe(){
   }
   card.style.display = 'block';
   const nm = m => m.replace(/^enwc-uspres-nom-/, 'nom·').replace(/^ewc-usp-2028-11-07-/, 'win·');
+  const bayes = DATA.probe_bayes || {};
+  // one bar per market: 1-99c scale, shaded 10-90% credible interval,
+  // solid line at the posterior median, ticks at the real (de-baited) touches
+  const fairBar = b => {
+    if(!b || b.med == null) return '';
+    const seg = (x, w, css) => '<div style="position:absolute;top:0;bottom:0;left:' +
+      x + '%;width:' + w + ';' + css + '"></div>';
+    return '<div style="position:relative;height:16px;background:var(--surface2);' +
+      'border-radius:4px;margin:4px 0;overflow:hidden">' +
+      seg(b.lo, (b.hi - b.lo) + '%', 'background:rgba(63,185,80,.30)') +
+      seg(b.med, '2px', 'background:#3fb950') +
+      (b.bb != null ? seg(b.bb, '2px', 'background:#58a6ff;opacity:.8') : '') +
+      (b.ba != null ? seg(b.ba, '2px', 'background:#e5645f;opacity:.8') : '') +
+      '</div><div class="sub" style="font-size:10px">fair ~' + b.med + '¢ (' +
+      b.lo + '–' + b.hi + '¢, ' + b.fills + ' trade' + (b.fills === 1 ? '' : 's') +
+      ', ' + b.n + ' obs)' +
+      (b.bb != null ? ' · <span style="color:#58a6ff">|</span> bid ' + b.bb + '¢' : '') +
+      (b.ba != null ? ' · <span style="color:#e5645f">|</span> ask ' + b.ba + '¢' : '') +
+      '</div>';
+  };
   // fair bands: what traded vs what rested untouched
-  const bands = Object.entries(est).map(([m, e]) => {
+  const mktSet = Object.keys(Object.assign({}, est, bayes));
+  const bands = mktSet.map(m => {
+    const e = est[m] || {};
     const parts = [];
     if(e.traded_at_bid != null) parts.push('sold to us @ ' + (e.traded_at_bid*100).toFixed(0) + '¢');
     if(e.traded_at_ask != null) parts.push('bought from us @ ' + (e.traded_at_ask*100).toFixed(0) + '¢');
     if(e.rested_bid != null) parts.push('bid ' + (e.rested_bid*100).toFixed(0) + '¢ rested');
     if(e.rested_ask != null) parts.push('ask ' + (e.rested_ask*100).toFixed(0) + '¢ rested');
-    return '<tr><td class="mkt" style="word-break:normal"><b>' + nm(m) + '</b></td>' +
-      '<td style="font-size:11px">' + (parts.join(' · ') || 'no signal yet') +
+    return '<tr><td class="mkt" style="word-break:normal;vertical-align:top"><b>' + nm(m) + '</b></td>' +
+      '<td style="font-size:11px">' + fairBar(bayes[m]) +
+      (parts.length ? '<div>' + parts.join(' · ') + '</div>' : '') +
       (e.last_fill ? '<div class="sub" style="font-size:10px">last fill: ' +
         e.last_fill.side + ' ' + (e.last_fill.px*100).toFixed(0) + '¢ · ' +
         e.last_fill.ts + '</div>' : '') + '</td></tr>';
