@@ -481,20 +481,12 @@
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 19.0,
-    "share": 0.1
    }
   },
   "enwc-uspres-nom-dem-2028-andbes": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 16.0,
-    "share": 0.1
    }
   },
   "enwc-uspres-nom-dem-2028-dwajoh": {
@@ -543,10 +535,6 @@
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 11.0,
-    "share": 0.1
    }
   },
   "enwc-uspres-nom-dem-2028-rahema": {
@@ -559,20 +547,12 @@
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 10.0,
-    "share": 0.1
    }
   },
   "enwc-uspres-nom-dem-2028-stasmi": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 10.0,
-    "share": 0.1
    }
   },
   "enwc-uspres-nom-dem-2028-wesmoo": {
@@ -663,10 +643,6 @@
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 9.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-dontru": {
@@ -685,10 +661,6 @@
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 9.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-elomus": {
@@ -701,30 +673,18 @@
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 11.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-gleyou": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 26.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-jamtal": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 12.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-jbpri": {
@@ -737,10 +697,6 @@
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 9.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-markel": {
@@ -753,131 +709,67 @@
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 10.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-rahema": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 11.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-rokha": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 10.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-rondes": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 9.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-stasmi": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 10.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-thomas": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 16.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-tuccar": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 26.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-tulgab": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 10.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-vivram": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 11.0,
-    "share": 0.1
    }
   },
   "ewc-usp-2028-11-07-wesmoo": {
    "SELL": {
     "cap": 25.0,
     "share": 0.6
-   },
-   "BUY": {
-    "cap": 8.0,
-    "share": 0.1
-   }
-  },
-  "enwc-uspres-nom-dem-2028-petbut": {
-   "BUY": {
-    "cap": 8.0,
-    "share": 0.1
-   }
-  },
-  "enwc-uspres-nom-rep-2028-jdvan": {
-   "BUY": {
-    "cap": 50.0,
-    "share": 0.1
-   }
-  },
-  "enwc-uspres-nom-rep-2028-marrub": {
-   "BUY": {
-    "cap": 27.0,
-    "share": 0.1
-   }
-  },
-  "enwc-uspres-nom-dem-2028-jonoss": {
-   "BUY": {
-    "cap": 16.0,
-    "share": 0.1
    }
   }
  },
- "note": "v7: favourite-side defend caps raised toward Silver Bulletin's model fair value, less a 3c margin, ceiling 95c. Idaho excluded by request. Deep qualifier rungs (bids under 50c and every ask floor) untouched: they hold Target Size cheaply and are not a model question -- raising a 1c qualifier to 14c would multiply its capital and move it off the touch. Caps already above model fair value were left alone; this pass only raises. v8: the four caps that sat ABOVE model fair value lowered to fair minus 3c (Florida senate and governor, Kansas senate, New Hampshire governor). Lowering a cap does not move or cancel anything -- defend treats the cap purely as a ceiling on how high it will chase, so orders already resting above it stay put and simply stop being re-taken. v11: slate ask share target raised 0.33 -> 0.6 (owner, 2026-08-15) \u2014 pools roughly tripled and the scoring windows are nearly empty, so a few extra shares at the touch buy a much larger slice; cap stays 25. v12: BUY armed on the 25 bid-rung markets \u2014 share floor 0.10, cap = the rung's touch + 1 tick at placement (2026-08-15). The defender may only move the small rung (floors are guarded), so the most capital that can ever be walked up a book is the rung itself, one tick.",
+ "note": "v7: favourite-side defend caps raised toward Silver Bulletin's model fair value, less a 3c margin, ceiling 95c. Idaho excluded by request. Deep qualifier rungs (bids under 50c and every ask floor) untouched: they hold Target Size cheaply and are not a model question -- raising a 1c qualifier to 14c would multiply its capital and move it off the touch. Caps already above model fair value were left alone; this pass only raises. v8: the four caps that sat ABOVE model fair value lowered to fair minus 3c (Florida senate and governor, Kansas senate, New Hampshire governor). Lowering a cap does not move or cancel anything -- defend treats the cap purely as a ceiling on how high it will chase, so orders already resting above it stay put and simply stop being re-taken. v11: slate ask share target raised 0.33 -> 0.6 (owner, 2026-08-15) \u2014 pools roughly tripled and the scoring windows are nearly empty, so a few extra shares at the touch buy a much larger slice; cap stays 25. v12: BUY armed on the 25 bid-rung markets \u2014 share floor 0.10, cap = the rung's touch + 1 tick at placement (2026-08-15). The defender may only move the small rung (floors are guarded), so the most capital that can ever be walked up a book is the rung itself, one tick. v13: v12 REVERTED \u2014 the rung-at-the-touch design joined manipulated thin touches (a 25c bid on a longshot winner market filled in minutes). All BUY arming removed 2026-08-15; nothing may re-establish or move bid rungs until a fair-value guard exists.",
  "prior_caps": [
   70.0,
   85.0
  ],
- "version": 12
+ "version": 13
 }
