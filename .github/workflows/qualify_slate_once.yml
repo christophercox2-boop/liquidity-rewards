@@ -1,0 +1,192 @@
+name: Qualify slate once
+
+# ORDER-TOUCHING. Places real orders on push — a deliberate ONE-TIME pass,
+# owner-requested 2026-08-15 ("just wanted one time thing — to the 2028
+# markets; I can't do it by hand now"). NOT a recurring loop.
+#
+# For every 2028 slate market, both sides: if the side's TOTAL resting
+# size (everyone's, taking the larger of the book and our own open orders
+# where the book lags) is under the live Target Size, place the shortfall
+# at the floor — post-only 1c bids in one order, 99c asks in chunks sized
+# to buying power. Sides already at target are untouched. Run it again by
+# hand (push or dispatch) if it's ever wanted again.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/qualify_slate_once.yml
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "plan only, place nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: qualify-slate-once
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Qualify
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+          MAX_ORDERS = 400
+
+          def api(method, path, body=None):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  json=body, timeout=30)
+
+          def bp_now(default=0.0):
+              try:
+                  r = api("GET", "/v1/account/balances")
+                  if r.status_code < 400:
+                      for b in r.json().get("balances") or []:
+                          if b.get("buyingPower") is not None:
+                              return float(b["buyingPower"])
+              except Exception:
+                  pass
+              return default
+
+          ours: dict = {}
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          for o in r.json().get("orders") or []:
+              if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                             "ORDER_STATE_PARTIALLY_FILLED"):
+                  continue
+              s = o.get("marketSlug") or ""
+              if not s.startswith(PREFIXES):
+                  continue
+              it = str(o.get("intent") or "")
+              side = "BUY" if it.endswith(("BUY_LONG", "SELL_SHORT")) else "SELL"
+              q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+              ours[(s, side)] = ours.get((s, side), 0.0) + q
+
+          pol, _ = tr.fetch_politics_events()
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+          progs = {}
+          for i in range(0, len(slate), 25):
+              try:
+                  rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                    params={"symbols": slate[i:i+25], "pageSize": 100}, timeout=30)
+                  for p in rr.json().get("programs") or []:
+                      s = p.get("marketSlug") or ""
+                      tp = tr._pick_period(p.get("timePeriods") or [], s)
+                      if tp is not None and s:
+                          progs[s] = tr._prog_of(tp)
+              except Exception:
+                  pass
+              time.sleep(0.1)
+
+          BP = bp_now()
+          print(f"one-time slate qualification pass — buying power ${BP:,.2f}"
+                + ("   (DRY RUN)" if DRY else "") + "\n")
+
+          placed = failed = 0
+          short_sides = []
+          for slug in slate:
+              target = float((progs.get(slug) or {}).get("target") or 0)
+              if not target:
+                  continue
+              try:
+                  bk = tr._fetch_book(slug)
+              except Exception:
+                  continue
+              time.sleep(0.15)
+              for side, key, floor, intent in (
+                      ("BUY", "bids", 0.01, "ORDER_INTENT_BUY_LONG"),
+                      ("SELL", "asks", 0.99, "ORDER_INTENT_BUY_SHORT")):
+                  tot = max(sum(q for _, q in bk.get(key) or []),
+                            ours.get((slug, side), 0.0))
+                  if tot >= target:
+                      continue
+                  gap = int(target - tot) + 1
+                  short_sides.append((slug, side, tot, target, gap))
+                  print(f"{slug:44s} {side:4s} total {tot:9,.0f} of {target:,.0f} "
+                        f"-> topping {gap:,}")
+                  remaining = gap
+                  while remaining > 0 and placed < MAX_ORDERS:
+                      qty = remaining if side == "BUY" else min(remaining, max(1, int(BP)))
+                      if DRY:
+                          print(f"    would place {qty:,} @ {floor*100:.0f}c")
+                          placed += 1; remaining -= qty; continue
+                      ok, why, delay = False, "", 2.0
+                      for attempt in range(4):
+                          try:
+                              rr = api("POST", "/v1/orders",
+                                  {"marketSlug": slug, "intent": intent,
+                                   "type": "ORDER_TYPE_LIMIT",
+                                   "price": {"value": f"{floor:.2f}", "currency": "USD"},
+                                   "quantity": int(qty),
+                                   "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                                   "participateDontInitiate": True})
+                              if rr.status_code < 300:
+                                  ok = True; break
+                              why = " ".join(rr.text.split())[:110]
+                              if rr.status_code not in (429, 500, 502, 503, 504):
+                                  break
+                          except Exception as e:
+                              why = type(e).__name__
+                          time.sleep(delay); delay = min(delay * 2, 20)
+                      placed += ok; failed += (not ok)
+                      if not ok:
+                          print(f"    FAILED {why}"); break
+                      remaining -= qty
+                      if side == "SELL" and remaining > 0:
+                          BP = bp_now(BP)
+                      time.sleep(0.6)
+
+          if not short_sides:
+              print("every slate side already at Target Size — nothing to do")
+          print(f"\nsides topped: {len(short_sides)}, orders {placed}, failed {failed}")
+          os.makedirs("data", exist_ok=True)
+          with open("data/qualify_slate_once.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/qualify_slate_once.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Qualify slate once [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi
