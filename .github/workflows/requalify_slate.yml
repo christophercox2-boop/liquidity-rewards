@@ -1,7 +1,9 @@
 name: Requalify 2028 slate
 
-# ORDER-TOUCHING. Places real orders — but push runs are FORCED DRY.
-# Manual dispatch with dry_run unchecked is the only way it places.
+# ORDER-TOUCHING. Places real orders. Push-path / manual dispatch only.
+# The first push ran forced-dry; the owner reviewed that plan (120 orders,
+# targets 20,000 everywhere) and approved placement 2026-08-15, so push
+# now places, same as fix_races and replace_bids_2028.
 #
 # 2026-08-15: the owner reports Target Size on the slate has DOUBLED. Our
 # floor blocks (10,000 bids at 1c, 10,000 asks at 99c) were sized to the
@@ -62,8 +64,6 @@ jobs:
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
-          if os.environ.get("GITHUB_EVENT_NAME") == "push":
-              DRY = True          # push never places; only a deliberate dispatch does
           BUF = io.StringIO(); _p = print
           def print(*a, **k):
               _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
