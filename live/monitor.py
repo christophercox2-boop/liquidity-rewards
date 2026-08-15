@@ -3631,6 +3631,22 @@ def _earn_outstanding_usd() -> float:
 
 
 def auto_earn() -> None:
+    # accrue what the earner's resting bids are EARNING (reward-scoring
+    # rate integrated over time, same formula as the headline counter but
+    # filtered to the earner's own order ids) — runs even while the switch
+    # is off so a resting order's income is never lost from the tally
+    if _EARN["orders"]:
+        nowa = time.time()
+        by_id = {str(o.get("id")): o for o in MONITOR.orders if o.get("id")}
+        rate = sum(float((by_id.get(oid) or {}).get("est_day") or 0)
+                   for oid in _EARN["orders"])
+        with MONITOR.lock:
+            st = MONITOR.state.setdefault("earn_stats", {})
+            last = float(st.get("_acc_ts") or 0)
+            if last and rate > 0:
+                st["earned_usd"] = round(float(st.get("earned_usd") or 0)
+                                         + rate * (nowa - last) / 86400.0, 4)
+            st["_acc_ts"] = nowa
     if not _auto_on("earn"):
         return
     if os.environ.get("EARN_PAUSE", "") == "1":
@@ -5375,6 +5391,10 @@ function renderEarn(){
     ' ' + l.qty + ' @ ' + l.px + '¢' +
     (l.note ? ' <span class="sub">— ' + l.note + '</span>' : '') + '</div>').join('');
   document.getElementById('earnBody').innerHTML =
+    '<div style="font-size:15px;font-weight:700;margin-bottom:2px">earned $' +
+    ((st.earned_usd || 0) >= 0.1 ? (st.earned_usd || 0).toFixed(2)
+                                 : (st.earned_usd || 0).toFixed(3)) +
+    ' <span class="sub" style="font-weight:400;font-size:11px">in rewards from its resting bids</span></div>' +
     '<div class="sub" style="margin-bottom:4px">' + status +
     ' · resting worst-case $' + (caps.outstanding || 0).toFixed(2) +
     ' of $' + (caps.total || 0).toFixed(0) + ' cap ($' + (caps.per_mkt || 0).toFixed(0) +
