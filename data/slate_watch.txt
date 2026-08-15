@@ -1,3 +1,7 @@
 2026-08-15 01:54 UTC  open orders 6,446  slate sides short 1  targets [20000.0]
   PROBLEM: 1 slate sides below target on OUR size (worst: andbes SELL 19,971/20,000)
 (no ntfy topic — alert not sent)
+2026-08-15 02:53 UTC  open orders 5,450  slate sides short 18  targets [20000.0]
+  PROBLEM: 18 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, aleocc SELL 8,783/20,000)
+  PROBLEM: open orders fell 6,446 -> 5,450 (-15%) — mass-cancel pattern
+(no ntfy topic — alert not sent)
