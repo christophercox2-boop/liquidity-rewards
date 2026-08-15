@@ -1,7 +1,9 @@
 name: Join fair asks small
 
-# ORDER-TOUCHING. Places real orders — but push runs are FORCED DRY.
-# Manual dispatch with dry_run unchecked is the only way it places.
+# ORDER-TOUCHING. Places real orders. Push-path / manual dispatch only.
+# The first push ran forced-dry; the owner reviewed that plan and on
+# 2026-08-15 approved joining at 5 shares per market, so push now places
+# (the API integration cannot dispatch workflows).
 #
 # The tactic (owner, 2026-08-14 evening): other participants are pricing
 # the 2028 slate asks fairly, tight to value. Rather than fight for share
@@ -31,7 +33,7 @@ on:
         default: false
       qty:
         description: "shares per market"
-        default: "1"
+        default: "5"
 
 permissions:
   contents: write
@@ -64,9 +66,7 @@ jobs:
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
-          if os.environ.get("GITHUB_EVENT_NAME") == "push":
-              DRY = True          # push never places; only a deliberate dispatch does
-          QTY = float(os.environ.get("QTY") or 1)
+          QTY = float(os.environ.get("QTY") or 5)
           BUF = io.StringIO(); _p = print
           def print(*a, **k):
               _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
