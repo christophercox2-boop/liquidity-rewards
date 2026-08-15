@@ -1,25 +1,27 @@
 name: Bid rungs
 
-# ORDER-TOUCHING. Places real orders. Push-path / manual dispatch only.
-# First push ran forced-dry; owner approved the plan shape (25 rungs,
-# $100 worst-case, +$275/day) and the budget, so push now places.
+# ORDER-TOUCHING. Places real orders — but push runs are FORCED DRY.
 #
-# Owner-approved 2026-08-15: bid-side presence sized to a HARD worst-case
-# fill budget, because buying power (~$320) is the operating fuel — $200
-# of fills would choke every ask placement and defender replacement. The
-# slate bid touches are thin, so 20-30 share rungs AT the touch capture
-# most of a side's scoring window for $2-3 of worst-case exposure each.
+# v2, after the 2026-08-15 tuccar lesson. v1 joined the book's touch on
+# the assumption the touch is fair; on thin books the touch is bait — a
+# 25c bid on a longshot winner market got dumped into within minutes.
 #
-# The plan is recomputed from live books at run time — never replayed
-# from a stale snapshot. A greedy pass allocates BUDGET dollars of
-# worst-case exposure one dollar at a time to whichever side's next
-# dollar buys the most estimated income. Longshot sides (touch <= 5.5c)
-# are excluded — the 1c floors already score there; party markets are
-# excluded — hand-tended, and their 40c+ rungs price out of the budget
-# anyway. Existing non-floor bids near the touch count toward a side's
-# rung, so re-runs top up instead of stacking.
+# The rules now (owner: "don't put them at the touch alone; find places
+# where they can earn and STAY earning"):
+#   * join a touch only when OTHER people hold at least REAL_MIN shares
+#     at that exact price — we queue BEHIND real money, which fills first
+#     and vouches for the price with its own capital
+#   * fair-value caps: minor candidates never above 15c (the sniper's own
+#     overpriced line), contenders never above 60c, and a winner market
+#     never above its candidate's live nominee touch — you cannot be more
+#     likely to win the presidency than your own nomination
+#   * a side whose touch fails these tests is BAIT and is skipped, listed
+#     in the output; under a bait touch nothing below it earns anyway,
+#     because the discount factor anchors to the book's best bid
+#   * worst-case fill budget $80 total, $12 per market, greedy-allocated
+#     by marginal estimated income per dollar of exposure
 #
-# Post-only throughout. The 20,000-share floor blocks are never touched.
+# Post-only. The 20,000-share 1c qualification floors are never touched.
 
 on:
   push:
@@ -34,7 +36,7 @@ on:
         default: false
       budget:
         description: "worst-case fill dollars"
-        default: "100"
+        default: "80"
 
 permissions:
   contents: write
@@ -67,17 +69,23 @@ jobs:
 
           kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
           DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
-          BUDGET = float(os.environ.get("BUDGET") or 100)
+          if os.environ.get("GITHUB_EVENT_NAME") == "push":
+              DRY = True          # push never places; review the plan first
+          BUDGET = float(os.environ.get("BUDGET") or 80)
           BUF = io.StringIO(); _p = print
           def print(*a, **k):
               _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
 
-          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
-                      "ewc-usp-2028-11-07-")
+          NOM = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-")
+          WIN = ("ewc-usp-2028-11-07-",)
+          PREFIXES = NOM + WIN
+          CONTENDER = {"jdvan", "marrub", "kamhar", "jonoss", "petbut"}
           DF = 0.2; TICK = 0.01
+          REAL_MIN = 100        # others' shares required AT the touch price
+          FAIR_MINOR = 0.15     # the sniper's own overpriced line
+          FAIR_CONTENDER = 0.60
           MIN_RUNG = 5
-          MAX_PER_ORDER_USD = 15.0
-          MIN_TOUCH = 0.055     # below this the 1c floor already scores
+          MAX_PER_ORDER_USD = 12.0
 
           def api(method, path, body=None):
               return requests.request(method, tr.TRADE_API + path,
@@ -85,8 +93,10 @@ jobs:
                            "Content-Type": "application/json"},
                   json=body, timeout=30)
 
-          # our resting bids: floors (~1c) vs existing near-touch rungs
-          near: dict = {}
+          # every resting bid of OURS, per market and price — needed both to
+          # subtract us from the touch level (others must be real) and to
+          # count what we already have queued there
+          mine: dict = {}
           r = api("GET", "/v1/orders/open"); r.raise_for_status()
           for o in r.json().get("orders") or []:
               if str(o.get("state")) not in ("ORDER_STATE_NEW",
@@ -97,13 +107,13 @@ jobs:
                   continue
               if not str(o.get("intent") or "").endswith(("BUY_LONG", "SELL_SHORT")):
                   continue
-              px = tr._num((o.get("price") or {}).get("value")) or 0
-              if px <= 0.015:
-                  continue          # the qualification floor — not a rung
+              px = round(tr._num((o.get("price") or {}).get("value")) or 0, 2)
               q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
-              near.setdefault(s, []).append((px, q))
+              mine.setdefault(s, {})
+              mine[s][px] = mine[s].get(px, 0.0) + q
 
           pol, sizes = tr.fetch_politics_events()
+          # nominee markets FIRST so winner caps can reference their touches
           slate = sorted(s for s in pol if s.startswith(PREFIXES))
 
           progs = {}
@@ -120,8 +130,10 @@ jobs:
                   pass
               time.sleep(0.1)
 
-          sides = []
+          nom_touch: dict = {}
+          sides, skipped = [], []
           for slug in slate:
+              tail = slug.rsplit("-", 1)[-1]
               pr = progs.get(slug) or {}
               target = float(pr.get("target") or 0)
               per = float(pr.get("pool") or 0) / max(sizes.get(slug, 1), 1) / 2
@@ -134,8 +146,21 @@ jobs:
               time.sleep(0.15)
               if not bids:
                   continue
-              bb = bids[0][0]
-              if bb <= MIN_TOUCH or not (0.001 <= bb <= 0.999):
+              bb = round(bids[0][0], 2)
+              if slug.startswith(NOM):
+                  nom_touch[tail] = bb
+              if bb <= 0.015:
+                  continue      # the touch IS the floor level — nothing to add
+              ours_at = (mine.get(slug) or {}).get(bb, 0.0)
+              others_at = max(0.0, bids[0][1] - ours_at)
+              fair = FAIR_CONTENDER if tail in CONTENDER else FAIR_MINOR
+              if slug.startswith(WIN) and tail in nom_touch:
+                  fair = min(fair, nom_touch[tail])
+              if others_at < REAL_MIN:
+                  skipped.append((slug, bb, others_at, "thin touch — bait"))
+                  continue
+              if bb > fair + 1e-9:
+                  skipped.append((slug, bb, others_at, f"above fair cap {fair*100:.0f}c"))
                   continue
               den = ours_in = 0.0; cum = 0.0
               for p, q in bids:
@@ -144,29 +169,25 @@ jobs:
                       break
                   w = DF ** round((bb - p) / TICK)
                   den += take * w
-                  if abs(p - 0.01) < 0.005:
-                      ours_in += min(take, 20000) * w
+                  op = (mine.get(slug) or {}).get(round(p, 2), 0.0)
+                  ours_in += min(op, take) * w
                   cum += q
-              # an existing rung within 3 ticks of the touch counts as placed
-              have = sum(q for p, q in near.get(slug, [])
-                         if round((bb - p) / TICK) <= 3 and q >= 1)
               sides.append({"m": slug, "px": bb, "per": per, "den": den,
-                            "ours": ours_in, "have": have, "r": 0.0})
+                            "ours": ours_in, "have": ours_at, "r": 0.0,
+                            "wall": others_at})
 
           def gain(s, r):
-              tot = s["have"] + r
-              if not s["den"] and not tot:
-                  return 0.0
-              base = s["per"] * (s["ours"] + s["have"]) / (s["den"] + s["have"]) \
-                     if (s["den"] + s["have"]) else 0.0
-              return s["per"] * (s["ours"] + tot) / (s["den"] + tot) - base
+              # ours_in already contains anything we hold at the touch; the
+              # added rung r raises both our score and the denominator
+              base = s["per"] * s["ours"] / s["den"] if s["den"] else 0.0
+              return s["per"] * (s["ours"] + r) / (s["den"] + r) - base
 
           spent = 0.0
           while spent < BUDGET:
               best, bi = 0.0, None
               for i, s in enumerate(sides):
                   if s["r"] * s["px"] + 1.0 > MAX_PER_ORDER_USD:
-                      continue          # per-market exposure cap
+                      continue
                   dr = 1.0 / s["px"]
                   mg = gain(s, s["r"] + dr) - gain(s, s["r"])
                   if mg > best:
@@ -176,23 +197,25 @@ jobs:
               sides[bi]["r"] += 1.0 / sides[bi]["px"]
               spent += 1.0
 
-          plan = [s for s in sides if s["r"] >= MIN_RUNG]
+          # a rung must pay its own worst-case exposure back within ~10 days
+          # or it is not worth the inventory risk
+          plan = [s for s in sides if s["r"] >= MIN_RUNG
+                  and gain(s, s["r"]) >= 0.10 * s["r"] * s["px"]]
           est = sum(gain(s, s["r"]) for s in plan)
           expo = sum(s["r"] * s["px"] for s in plan)
-          print(f"bid rungs: {len(plan)} sides, worst-case fills ${expo:,.2f} "
-                f"of ${BUDGET:.0f}, est +${est:,.2f}/day"
-                + ("   (DRY RUN)" if DRY else "") + "\n")
-          print(f"{'market':44s} {'touch':>6s} {'rung':>6s} {'expo$':>6s} {'est+':>7s}")
+          print(f"joinable real touches: {len(sides)}   bait/over-fair skipped: {len(skipped)}")
+          print(f"plan: {len(plan)} rungs, worst-case fills ${expo:,.2f} of ${BUDGET:.0f}, "
+                f"est +${est:,.2f}/day" + ("   (DRY RUN)" if DRY else "") + "\n")
+          print(f"{'market':44s} {'join@':>6s} {'wall':>9s} {'rung':>6s} {'expo$':>6s} {'est+':>6s}")
 
           placed = failed = 0
           out = []
           for s in sorted(plan, key=lambda y: -gain(y, y["r"])):
               qty = round(s["r"])
-              print(f"{s['m']:44s} {s['px']*100:5.1f}c {qty:6d} "
-                    f"{qty*s['px']:6.2f} {gain(s, s['r']):7.2f}"
-                    + (f"   (top-up; {s['have']:.0f} already near touch)" if s["have"] else ""))
-              row = {"m": s["m"], "px": round(s["px"], 2), "qty": qty,
-                     "cap_c": round((s["px"] + TICK) * 100, 1), "ok": None}
+              print(f"{s['m']:44s} {s['px']*100:5.1f}c {s['wall']:9,.0f} {qty:6d} "
+                    f"{qty*s['px']:6.2f} {gain(s, s['r']):6.2f}")
+              row = {"m": s["m"], "px": s["px"], "qty": qty, "wall": round(s["wall"]),
+                     "ok": None}
               if DRY:
                   out.append(row); placed += 1
                   continue
@@ -221,10 +244,17 @@ jobs:
               out.append(row)
               time.sleep(0.6)
 
+          if skipped:
+              print("\nskipped sides (no real touch to join):")
+              for m, bb, w, why in skipped:
+                  print(f"  {m:44s} {bb*100:5.1f}c others-at-touch {w:7,.0f} — {why}")
+
           print(f"\n{'would place' if DRY else 'placed'} {placed}, failed {failed}")
           os.makedirs("data", exist_ok=True)
           json.dump({"dry_run": DRY, "budget": BUDGET, "exposure": round(expo, 2),
-                     "est_gain": round(est, 2), "orders": out},
+                     "est_gain": round(est, 2), "orders": out,
+                     "skipped": [{"m": m, "px": bb, "others": round(w), "why": why}
+                                 for m, bb, w, why in skipped]},
                     open("data/bid_rungs.json", "w"), indent=1)
           with open("data/bid_rungs.txt", "w") as f:
               f.write(BUF.getvalue())
