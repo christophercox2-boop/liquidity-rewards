@@ -1,5 +1,5 @@
 joinable real touches: 17   bait/over-fair skipped: 30
-plan: 2 rungs, worst-case fills $24.00 of $80, est +$21.38/day   (DRY RUN)
+plan: 2 rungs, worst-case fills $24.00 of $80, est +$21.38/day
 
 market                                        join@      wall   rung  expo$   est+
 enwc-uspres-nom-rep-2028-ranpau                5.0c       282    240  12.00  13.85
@@ -21,7 +21,7 @@ skipped sides (no real touch to join):
   enwc-uspres-nom-rep-2028-marrub               26.0c others-at-touch      21 — thin touch — bait
   enwc-uspres-nom-rep-2028-rondes                5.0c others-at-touch      10 — thin touch — bait
   ewc-usp-2028-11-07-andbes                      8.0c others-at-touch       0 — thin touch — bait
-  ewc-usp-2028-11-07-dontru                      5.0c others-at-touch  12,250 — above fair cap 2c
+  ewc-usp-2028-11-07-dontru                      5.0c others-at-touch  12,450 — above fair cap 2c
   ewc-usp-2028-11-07-dwajoh                      8.0c others-at-touch       0 — thin touch — bait
   ewc-usp-2028-11-07-gavnew                     10.0c others-at-touch       1 — thin touch — bait
   ewc-usp-2028-11-07-gleyou                     25.0c others-at-touch       0 — thin touch — bait
@@ -37,4 +37,4 @@ skipped sides (no real touch to join):
   ewc-usp-2028-11-07-vivram                     10.0c others-at-touch       0 — thin touch — bait
   ewc-usp-2028-11-07-wesmoo                      7.0c others-at-touch       0 — thin touch — bait
 
-would place 2, failed 0
+placed 2, failed 0

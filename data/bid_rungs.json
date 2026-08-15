@@ -1,5 +1,5 @@
 {
- "dry_run": true,
+ "dry_run": false,
  "budget": 80.0,
  "exposure": 24.0,
  "est_gain": 21.38,
@@ -9,14 +9,14 @@
    "px": 0.05,
    "qty": 240,
    "wall": 282,
-   "ok": null
+   "ok": true
   },
   {
    "m": "enwc-uspres-nom-dem-2028-jonste",
    "px": 0.04,
    "qty": 300,
    "wall": 183,
-   "ok": null
+   "ok": true
   }
  ],
  "skipped": [
@@ -113,7 +113,7 @@
   {
    "m": "ewc-usp-2028-11-07-dontru",
    "px": 0.05,
-   "others": 12250,
+   "others": 12450,
    "why": "above fair cap 2c"
   },
   {
