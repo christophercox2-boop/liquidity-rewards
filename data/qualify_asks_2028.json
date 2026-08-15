@@ -1,5 +1,62 @@
 {
  "dry_run": false,
- "orders": 0,
- "summary": []
+ "orders": 7,
+ "summary": [
+  {
+   "m": "enwc-uspres-nom-rep-2028-ranpau",
+   "orders": 1,
+   "after": 36293.44,
+   "ours": 20000,
+   "self_sufficient": true,
+   "qualifying": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jamtal",
+   "orders": 1,
+   "after": 36377.56,
+   "ours": 20001,
+   "self_sufficient": true,
+   "qualifying": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-micoba",
+   "orders": 1,
+   "after": 36319.479999999996,
+   "ours": 20000,
+   "self_sufficient": true,
+   "qualifying": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-petbut",
+   "orders": 1,
+   "after": 36227.26,
+   "ours": 20000,
+   "self_sufficient": true,
+   "qualifying": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gleyou",
+   "orders": 1,
+   "after": 36246.58,
+   "ours": 20001,
+   "self_sufficient": true,
+   "qualifying": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-thomas",
+   "orders": 1,
+   "after": 36309.119999999995,
+   "ours": 20000,
+   "self_sufficient": true,
+   "qualifying": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-tuccar",
+   "orders": 1,
+   "after": 36346.4,
+   "ours": 20000,
+   "self_sufficient": true,
+   "qualifying": true
+  }
+ ]
 }
