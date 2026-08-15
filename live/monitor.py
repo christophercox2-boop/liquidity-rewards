@@ -3609,6 +3609,21 @@ EARN_COOLDOWN = 600.0
 _EARN: dict = {"orders": {}, "last": {}, "cancelled": set()}
 
 
+def _earn_log(m: str, ev: str, px: float, qty: int, note: str = "") -> None:
+    """The earner's own journal and tallies — separate from the prober's,
+    like its money. Shown on the /map Earner card."""
+    with MONITOR.lock:
+        log = MONITOR.state.setdefault("earn_log", [])
+        log.append({"ts": dt.datetime.now(ET).strftime("%m-%d %I:%M:%S %p"),
+                    "m": m, "ev": ev, "px": round(px * 100, 1),
+                    "qty": qty, "note": note})
+        del log[:-150]
+        st = MONITOR.state.setdefault("earn_stats", {})
+        st[ev] = int(st.get(ev) or 0) + 1
+        if ev == "filled":
+            st["spent_usd"] = round(float(st.get("spent_usd") or 0) + px * qty, 2)
+
+
 def _earn_outstanding_usd() -> float:
     return sum(px / 100.0 * q for _, _, px, q, _ in _EARN["orders"].values())
 
@@ -3630,8 +3645,8 @@ def auto_earn() -> None:
                              "Content-Type": "application/json"},
                     json={"marketSlug": m}, timeout=15)
                 del _EARN["orders"][oid]
-                _probe_log(m, "earn withdrawn", side, px / 100.0,
-                           "conserving buying power")
+                _earn_log(m, "withdrawn", px / 100.0, qty,
+                          "conserving buying power")
             except Exception:  # noqa: BLE001
                 pass
         return
@@ -3645,8 +3660,8 @@ def auto_earn() -> None:
             if oid in _EARN["cancelled"]:
                 _EARN["cancelled"].discard(oid)
             else:
-                _probe_log(m, "earn FILLED", side, px / 100.0,
-                           f"{qty} bought at/below modeled fair")
+                _earn_log(m, "filled", px / 100.0, qty,
+                          "bought at/below modeled fair")
                 _EARN["last"][m] = now
             continue
         b = _bayes_fair(m)
@@ -3669,8 +3684,8 @@ def auto_earn() -> None:
                     json={"marketSlug": m}, timeout=15)
                 _EARN["cancelled"].add(oid)
                 del _EARN["orders"][oid]
-                _probe_log(m, "earn withdrawn", side, px / 100.0,
-                           "model moved" if confident else "model no longer confident")
+                _earn_log(m, "withdrawn", px / 100.0, qty,
+                          "model moved" if confident else "model no longer confident")
             except Exception:  # noqa: BLE001
                 pass
     # place where the model is confident and we hold nothing yet
@@ -3728,9 +3743,9 @@ def auto_earn() -> None:
             del ACTIONS[:-20]
             if ok and oid:
                 _EARN["orders"][str(oid)] = (m, "BUY", tgt, qty, now)
-                _probe_log(m, "earn", "BUY", px,
-                           f"{qty} resting at fair−{EARN_MARGIN_T} "
-                           f"(band {b['lo']}–{b['hi']}¢)")
+                _earn_log(m, "placed", px, qty,
+                          f"at fair−{EARN_MARGIN_T} (band {b['lo']}–{b['hi']}¢, "
+                          f"{b['fills']} trades)")
                 placed += 1
         except Exception:  # noqa: BLE001 — the earner must never kill the poll
             continue
@@ -4960,6 +4975,10 @@ def _map_payload() -> dict:
         "earn_active": [{"m": r[0], "px": r[2], "qty": r[3],
                          "age_m": int((time.time() - r[4]) / 60)}
                         for r in _EARN["orders"].values()],
+        "earn_log": list(reversed((MONITOR.state.get("earn_log") or [])[-30:])),
+        "earn_stats": MONITOR.state.get("earn_stats") or {},
+        "earn_caps": {"per_mkt": EARN_MAX_USD, "total": EARN_TOTAL_USD,
+                      "outstanding": round(_earn_outstanding_usd(), 2)},
         "probe_est": MONITOR.state.get("probe") or {},
         "probe_bayes": {m: b for m in sorted(
                             {l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
@@ -5156,6 +5175,11 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     color:var(--dim);margin-bottom:6px">🔍 Prober — what the scouts found</div>
     <div id="probeBody"></div>
   </div>
+  <div class="card" id="earnCard" style="display:none">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--dim);margin-bottom:6px">💰 Earner — model-confident bids</div>
+    <div id="earnBody"></div>
+  </div>
   <div class="card">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--dim);margin-bottom:6px">Needs attention</div>
@@ -5217,6 +5241,7 @@ function render(){
 
   swRender();
   renderProbe();
+  renderEarn();
   const bn=document.getElementById('banner');
   if(DATA.auto && DATA.auto.defend===true && DATA.defend_live===false){
     // switched on but vetoed by something else -- say what
@@ -5321,11 +5346,7 @@ function renderProbe(){
   const scouts = act.map(a =>
     '<span style="display:inline-block;background:var(--surface2);border-radius:6px;' +
     'padding:2px 8px;margin:2px;font-size:11px">' + nm(a.m) + ' ' +
-    (a.kind === 'flip' ? '↩' : '') + a.side + ' @ ' + a.px + '¢ · ' + a.age_m + 'm</span>').join('')
-    + (DATA.earn_active || []).map(a =>
-    '<span style="display:inline-block;background:rgba(63,185,80,.15);border-radius:6px;' +
-    'padding:2px 8px;margin:2px;font-size:11px">💰 ' + nm(a.m) + ' ' + a.qty +
-    ' @ ' + a.px + '¢ · ' + a.age_m + 'm</span>').join('');
+    (a.kind === 'flip' ? '↩' : '') + a.side + ' @ ' + a.px + '¢ · ' + a.age_m + 'm</span>').join('');
   const lines = log.map(l =>
     '<div style="font-size:11px;padding:3px 0;border-top:1px dashed var(--line)">' +
     '<span class="sub">' + l.ts + '</span> <b>' + nm(l.m) + '</b> ' +
@@ -5343,6 +5364,44 @@ function renderProbe(){
       ' scout' + (act.length > 1 ? 's' : '') + ' resting</div>' + scouts :
       '<div class="sub">no scouts resting' + (on ? ' — placing as books allow' : ' — Prober is off') + '</div>') +
     (bands ? '<table style="width:100%;border-collapse:collapse;margin-top:8px">' + bands + '</table>' : '') +
+    (lines ? '<details style="margin-top:8px"><summary class="sub" style="cursor:pointer">' +
+      'journal (' + log.length + ')</summary>' + lines + '</details>' : '');
+}
+
+function renderEarn(){
+  const card = document.getElementById('earnCard'); if(!card) return;
+  const act = DATA.earn_active || [], log = DATA.earn_log || [];
+  const st = DATA.earn_stats || {}, caps = DATA.earn_caps || {};
+  const on = DATA.auto && DATA.auto.earn === true;
+  if(!on && !act.length && !log.length){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  const nm = m => m.replace(/^enwc-uspres-nom-/, 'nom·').replace(/^ewc-usp-2028-11-07-/, 'win·');
+  const bayes = DATA.probe_bayes || {};
+  const status = !on ? 'switch OFF' :
+    (DATA.conserve_bp ? '<span style="color:#ff9d99">paused — conserving buying power</span>' :
+     (DATA.earn_live ? '<span style="color:#3fb950">live</span>' : 'paused'));
+  const rows = act.map(a => {
+    const b = bayes[a.m];
+    return '<tr><td class="mkt" style="word-break:normal"><b>' + nm(a.m) + '</b></td>' +
+      '<td class="r" style="font-size:11px">' + a.qty + ' @ ' + a.px + '¢ · ' + a.age_m + 'm' +
+      (b && b.med != null ? '<div class="sub" style="font-size:10px">model now: ~' +
+        b.med + '¢ (' + b.lo + '–' + b.hi + '¢)</div>' : '') + '</td></tr>';
+  }).join('');
+  const lines = log.map(l =>
+    '<div style="font-size:11px;padding:3px 0;border-top:1px dashed var(--line)">' +
+    '<span class="sub">' + l.ts + '</span> <b>' + nm(l.m) + '</b> ' +
+    (l.ev === 'filled' ? '<span style="color:#f0883e">FILLED</span>' :
+     l.ev === 'placed' ? '<span style="color:#3fb950">placed</span>' : l.ev) +
+    ' ' + l.qty + ' @ ' + l.px + '¢' +
+    (l.note ? ' <span class="sub">— ' + l.note + '</span>' : '') + '</div>').join('');
+  document.getElementById('earnBody').innerHTML =
+    '<div class="sub" style="margin-bottom:4px">' + status +
+    ' · resting worst-case $' + (caps.outstanding || 0).toFixed(2) +
+    ' of $' + (caps.total || 0).toFixed(0) + ' cap ($' + (caps.per_mkt || 0).toFixed(0) +
+    '/market) · lifetime: ' + (st.placed || 0) + ' placed, ' + (st.filled || 0) +
+    ' filled ($' + (st.spent_usd || 0).toFixed(2) + '), ' + (st.withdrawn || 0) + ' withdrawn</div>' +
+    (rows ? '<table style="width:100%;border-collapse:collapse">' + rows + '</table>'
+          : '<div class="sub">no bids resting</div>') +
     (lines ? '<details style="margin-top:8px"><summary class="sub" style="cursor:pointer">' +
       'journal (' + log.length + ')</summary>' + lines + '</details>' : '');
 }
