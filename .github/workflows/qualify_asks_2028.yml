@@ -296,3 +296,5 @@ jobs:
             done
             if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
           fi
+
+# top-off 2026-08-15: seven sides drifted 1-19 shares under
