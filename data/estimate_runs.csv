@@ -241,3 +241,4 @@ checked_at_utc,trigger,workflow
 2026-08-15 14:09:09,local,
 2026-08-15 15:09:41,local,
 2026-08-15 16:10:10,local,
+2026-08-15 16:45:00,schedule,Track liquidity rewards
