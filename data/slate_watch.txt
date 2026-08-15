@@ -45,3 +45,6 @@
 2026-08-15 11:34 UTC  open orders 3,063  slate sides short 1  targets [20000.0]
   PROBLEM: 1 slate sides below target on TOTAL size — those sides pay NOBODY (worst: jonste SELL 18,890/20,000)
 (no ntfy topic — alert not sent)
+2026-08-15 11:46 UTC  open orders 3,008  slate sides short 2  targets [20000.0]
+  PROBLEM: 2 slate sides below target on TOTAL size — those sides pay NOBODY (worst: rep SELL 17,579/20,000, jonste SELL 18,890/20,000)
+(no ntfy topic — alert not sent)
