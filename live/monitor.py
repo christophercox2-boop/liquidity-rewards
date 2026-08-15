@@ -3217,11 +3217,6 @@ def auto_snipe() -> None:
         return
     if os.environ.get("SNIPE_PAUSE", "") == "1":
         return
-    if CONSERVE_BP:
-        # a snipe opens a short and locks 1-px collateral until resolution —
-        # exactly what a buying-power crunch cannot afford, however
-        # profitable the pick. Paused while conserving.
-        return
     now = time.time()
     took = 0
     spent = 0.0
@@ -3380,6 +3375,18 @@ def _probe_place(m: str, side: str, px: float, intent: str, note: str) -> str | 
 
 
 def auto_probe() -> None:
+    # one-time owner grants into the info fund, applied exactly once each
+    # (the applied list persists with the saved state, surviving restarts)
+    granted = False
+    with MONITOR.lock:
+        grants = MONITOR.state.setdefault("probe_grants", [])
+        if "2026-08-15-owner-10usd" not in grants:
+            grants.append("2026-08-15-owner-10usd")
+            MONITOR.state["probe_budget"] = round(
+                float(MONITOR.state.get("probe_budget") or 0.0) + 10.0, 2)
+            granted = True
+    if granted:   # log outside the lock — _probe_log takes it too
+        _probe_log("[owner]", "grant", "+", 0.0, "+$10.00 into the info fund")
     if not _auto_on("probe"):
         return
     if os.environ.get("PROBE_PAUSE", "") == "1":
@@ -3588,15 +3595,10 @@ def _bayes_fair(m: str) -> dict | None:
 # would let the model confirm itself. Earner sizing stays small: EARN_MAX_USD
 # per market, EARN_TOTAL_USD across all.
 #
-# Owner, 2026-08-15 evening: buying power is short — STOP ACQUIRING. While
-# CONSERVE_BP is on (default), the earner places nothing and withdraws its
-# resting bids, and the prober stops seeding scouts on BOTH sides (a bid
-# scout fill spends cash; an ask scout fill locks 1-px collateral, which at
-# longshot prices is the expensive side). Flips that CLOSE a position keep
-# running — selling a long returns cash, buying back a short frees more
-# collateral than it spends. Flip CONSERVE_BP=0 in the environment (or ship
-# a one-line change) when the owner wants acquisition back.
-CONSERVE_BP = os.environ.get("CONSERVE_BP", "1") != "0"
+# The /map switches are the OWNER'S controls and the code never overrules
+# them (the short-lived CONSERVE_BP override taught that lesson on
+# 2026-08-15: "I'll turn it off if that is what I want"). Buying-power
+# discipline lives in each loop's own hard caps instead.
 EARN_MAX_USD = float(os.environ.get("EARN_MAX_USD", "3.0"))
 EARN_TOTAL_USD = float(os.environ.get("EARN_TOTAL_USD", "60.0"))
 EARN_MIN_SHARES, EARN_MAX_SHARES = 5, 100
@@ -3632,23 +3634,6 @@ def auto_earn() -> None:
     if not _auto_on("earn"):
         return
     if os.environ.get("EARN_PAUSE", "") == "1":
-        return
-    if CONSERVE_BP:
-        # withdraw whatever is resting, place nothing
-        for oid, rec in list(_EARN["orders"].items()):
-            m, side, px, qty, ts = rec
-            try:
-                requests.request(
-                    "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
-                    headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST",
-                                               f"/v1/order/{oid}/cancel"),
-                             "Content-Type": "application/json"},
-                    json={"marketSlug": m}, timeout=15)
-                del _EARN["orders"][oid]
-                _earn_log(m, "withdrawn", px / 100.0, qty,
-                          "conserving buying power")
-            except Exception:  # noqa: BLE001
-                pass
         return
     now = time.time()
     open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
@@ -4962,15 +4947,11 @@ def _map_payload() -> dict:
         "keeper_live": bool(_auto_on("keeper")
                             and os.environ.get("KEEP_PAUSE", "") != "1"),
         "snipe_live": bool(_auto_on("snipe")
-                           and os.environ.get("SNIPE_PAUSE", "") != "1"
-                           and not CONSERVE_BP),
+                           and os.environ.get("SNIPE_PAUSE", "") != "1"),
         "probe_live": bool(_auto_on("probe")
-                           and os.environ.get("PROBE_PAUSE", "") != "1"
-                           and not CONSERVE_BP),
+                           and os.environ.get("PROBE_PAUSE", "") != "1"),
         "earn_live": bool(_auto_on("earn")
-                          and os.environ.get("EARN_PAUSE", "") != "1"
-                          and not CONSERVE_BP),
-        "conserve_bp": CONSERVE_BP,
+                          and os.environ.get("EARN_PAUSE", "") != "1"),
         "probe_budget": round(float(MONITOR.state.get("probe_budget") or 0.0), 2),
         "earn_active": [{"m": r[0], "px": r[2], "qty": r[3],
                          "age_m": int((time.time() - r[4]) / 60)}
@@ -5378,8 +5359,7 @@ function renderEarn(){
   const nm = m => m.replace(/^enwc-uspres-nom-/, 'nom·').replace(/^ewc-usp-2028-11-07-/, 'win·');
   const bayes = DATA.probe_bayes || {};
   const status = !on ? 'switch OFF' :
-    (DATA.conserve_bp ? '<span style="color:#ff9d99">paused — conserving buying power</span>' :
-     (DATA.earn_live ? '<span style="color:#3fb950">live</span>' : 'paused'));
+    (DATA.earn_live ? '<span style="color:#3fb950">live</span>' : 'paused by host');
   const rows = act.map(a => {
     const b = bayes[a.m];
     return '<tr><td class="mkt" style="word-break:normal"><b>' + nm(a.m) + '</b></td>' +
