@@ -3681,31 +3681,23 @@ def _bayes_fair(m: str) -> dict | None:
 # two when it's merely tight (<=6). The price rule stays: never above
 # median minus a tick, never above the real touch. Aggression buys more
 # coverage, not worse prices.
+# v3 (owner, 2026-08-16): "the earner is not meant to sit — it's meant to
+# earn using what we know." The deal test replaced the fair test: at penny
+# prices an order's INCOME dwarfing its TOTAL-LOSS worst case is the real
+# safety (a 1-share bid at a thin 7c touch earns $2.48/day against a 7c
+# ruin). Price may go through and past the band; size shrinks as
+# confidence does — proven zone gets full exposure, the stretch zone 40%,
+# the speculative zone above the band 15%. The penny ceiling keeps "total
+# loss is trivial" true; expensive markets are not the earner's game.
 EARN_MAX_USD = float(os.environ.get("EARN_MAX_USD", "6.0"))
 EARN_TOTAL_USD = float(os.environ.get("EARN_TOTAL_USD", "100.0"))
-EARN_MIN_SHARES, EARN_MAX_SHARES = 5, 200
-EARN_BAND_MAX = int(os.environ.get("EARN_BAND_MAX", "6"))
-EARN_MARGIN_T = 1
-EARN_DRIFT_T = 2
+EARN_MAX_SHARES = 200
+EARN_PX_MAX_C = int(os.environ.get("EARN_PX_MAX_C", "10"))
 EARN_MAX_PER_POLL = 4
 EARN_COOLDOWN = 300.0
 _EARN: dict = {"orders": {}, "last": {}, "cancelled": set()}
 
 
-def _earn_confident(b: dict | None) -> bool:
-    """Graduated: a very tight band earns trust from a single real trade, a
-    merely tight one needs two — and enough SURVIVAL evidence (scouts that
-    rested untouched, bracketing the price) substitutes for trades when it
-    has squeezed the band very tight. Silence at the right prices is also
-    information (owner, 2026-08-15)."""
-    if not (b and b.get("med")):
-        return False
-    band = b["hi"] - b["lo"]
-    fills = b.get("fills", 0)
-    rested = b.get("rested", 0)
-    return ((fills >= 1 and band <= 3)
-            or (fills >= 2 and band <= EARN_BAND_MAX)
-            or (rested >= 4 and band <= 2))
 
 
 def _earn_log(m: str, ev: str, px: float, qty: int, note: str = "") -> None:
@@ -3769,16 +3761,17 @@ def auto_earn() -> None:
                           "bought at/below modeled fair")
                 _EARN["last"][m] = now
             continue
-        b = _bayes_fair(m)
-        confident = _earn_confident(b)
-        tgt = None
-        if confident:
-            tgt = b["med"] - EARN_MARGIN_T
-            if b.get("bb") is not None:
-                tgt = min(tgt, int(b["bb"]))
-        if not confident or (tgt and abs(tgt - px) > EARN_DRIFT_T):
-            # model moved or went vague — withdraw; a confident re-place
-            # happens naturally on a later poll
+        # Withdrawal is by PERFORMANCE now, not price drift: the monitor
+        # already scores every resting order (est_day). An order that keeps
+        # earning stays put whatever the median does — "the earner is not
+        # meant to sit; it's meant to earn." Withdraw only when its income
+        # no longer justifies its worst case (payback beyond ~4 days), with
+        # a 10-minute grace so fresh orders aren't judged before scoring.
+        if now - ts < 600:
+            continue
+        o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
+        est = float((o or {}).get("est_day") or 0)
+        if est < 0.25 * (px / 100.0) * qty:
             try:
                 requests.request(
                     "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
@@ -3789,7 +3782,7 @@ def auto_earn() -> None:
                 _EARN["cancelled"].add(oid)
                 del _EARN["orders"][oid]
                 _earn_log(m, "withdrawn", px / 100.0, qty,
-                          "model moved" if confident else "model no longer confident")
+                          f"earning ${est:.2f}/d — payback beyond 4 days")
             except Exception:  # noqa: BLE001
                 pass
     # place where the model is confident and we hold nothing yet
@@ -3805,15 +3798,66 @@ def auto_earn() -> None:
         if _earn_outstanding_usd() >= EARN_TOTAL_USD:
             break
         b = _bayes_fair(m)
-        if not _earn_confident(b):
+        # minimum knowledge: anything real — one trade, two rested scouts,
+        # or three observations. Size, not certainty, carries the risk.
+        if not (b and b.get("med")
+                and (b.get("fills", 0) >= 1 or b.get("rested", 0) >= 2
+                     or b.get("n", 0) >= 3)):
             continue
-        tgt = b["med"] - EARN_MARGIN_T
-        if b.get("bb") is not None:
-            tgt = min(tgt, int(b["bb"]))
-        if tgt < 1:
+        pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
+        target = float(pr.get("target") or 0)
+        per = (float(pr.get("pool") or 0)
+               / max(int(pr.get("event_n") or 1), 1) / 2)
+        df = float(pr.get("df") or 0.2)
+        ent = tr._BOOK_CACHE.get(m)
+        if not target or per <= 0 or not ent or now - ent[0] > 300:
             continue
+        real_bids = [(round(p_ * 100), q_) for p_, q_ in ent[1].get("bids") or []
+                     if q_ >= PROBE_REAL_MIN]
+        # candidate prices: from the real touch up through the band and two
+        # ticks of stretch, never above the penny ceiling where a total
+        # loss stops being trivial
+        base = real_bids[0][0] if real_bids else max(1, b["lo"])
+        top = min(b["hi"] + 2, EARN_PX_MAX_C)
+        if top < base:
+            continue
+        best = None
+        for pc in range(base, top + 1):
+            # confidence tier sets the exposure: proven / stretch / speculative
+            if pc <= b["med"]:
+                cap = EARN_MAX_USD
+                tier = "proven"
+            elif pc <= b["hi"]:
+                cap = EARN_MAX_USD * 0.4
+                tier = "stretch"
+            else:
+                cap = EARN_MAX_USD * 0.15
+                tier = "speculative"
+            q = max(1, min(EARN_MAX_SHARES, int(cap * 100 / pc)))
+            # score with us resting at pc: merge, walk the window from the
+            # best price, sum discounted takes
+            lv = sorted(real_bids + [(pc, float(q))], key=lambda x: -x[0])
+            anchor = lv[0][0]
+            den = cum = ours_sc = 0.0
+            for p_, q_ in lv:
+                take = min(q_, max(0.0, target - cum))
+                if take <= 0:
+                    break
+                w = df ** (anchor - p_)
+                den += take * w
+                if p_ == pc:
+                    ours_sc += min(take, float(q)) * w
+                cum += q_
+            est = per * ours_sc / den if den else 0.0
+            # the deal test: income must dwarf the worst case — total-loss
+            # payback within two days
+            if est >= 0.5 * (pc / 100.0) * q:
+                if best is None or est > best[0]:
+                    best = (est, pc, q, tier)
+        if best is None:
+            continue
+        est, tgt, qty, tier = best
         px = round(tgt / 100.0, 2)
-        qty = max(EARN_MIN_SHARES, min(EARN_MAX_SHARES, int(EARN_MAX_USD / px)))
         if px * qty + _earn_outstanding_usd() > EARN_TOTAL_USD:
             continue
         try:
@@ -3847,8 +3891,8 @@ def auto_earn() -> None:
             if ok and oid:
                 _EARN["orders"][str(oid)] = (m, "BUY", tgt, qty, now)
                 _earn_log(m, "placed", px, qty,
-                          f"at fair−{EARN_MARGIN_T} (band {b['lo']}–{b['hi']}¢, "
-                          f"{b['fills']} trades)")
+                          f"{tier}: est ${est:.2f}/d vs ${px*qty:.2f} worst case "
+                          f"(band {b['lo']}–{b['hi']}¢, {b['fills']}t/{b.get('rested',0)}r)")
                 placed += 1
         except Exception:  # noqa: BLE001 — the earner must never kill the poll
             continue
