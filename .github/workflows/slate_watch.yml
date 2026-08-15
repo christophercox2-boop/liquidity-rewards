@@ -124,21 +124,31 @@ jobs:
           if prev_t and tset and tset != prev_t:
               problems.append(f"Target Size changed: {prev_t} -> {tset}")
 
+          # Since the 2026-08-15 cull, OUR size alone is below target on
+          # every ask side BY DESIGN — the crowd carries qualification.
+          # What matters now is the side's TOTAL: book total, plus our own
+          # open orders where the lagging book hasn't caught up (take the
+          # larger of the two, never both).
           short = []
           for s in slate:
               t = targets.get(s) or 0
               if not t:
                   continue
-              for side in ("BUY", "SELL"):
-                  have = ours.get(s + "|" + side, 0.0)
-                  if have < t:
-                      short.append((s, side, have, t))
+              try:
+                  bk = tr._fetch_book(s)
+              except Exception:
+                  continue
+              time.sleep(0.15)
+              for side, lv in (("BUY", bk.get("bids") or []), ("SELL", bk.get("asks") or [])):
+                  tot = max(sum(q for _, q in lv), ours.get(s + "|" + side, 0.0))
+                  if tot < t:
+                      short.append((s, side, tot, t))
           if short:
               worst = sorted(short, key=lambda x: x[2] / x[3])[:5]
               lines = ", ".join(f"{s.rsplit('-', 1)[-1]} {sd} {h:,.0f}/{t:,.0f}"
                                 for s, sd, h, t in worst)
-              problems.append(f"{len(short)} slate sides below target on OUR size "
-                              f"(worst: {lines})")
+              problems.append(f"{len(short)} slate sides below target on TOTAL size "
+                              f"— those sides pay NOBODY (worst: {lines})")
 
           prev_n = prev.get("open_orders")
           if prev_n and n_open < prev_n * 0.85:
