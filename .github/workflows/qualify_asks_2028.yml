@@ -108,11 +108,14 @@ jobs:
                           s = o.get("marketSlug") or ""
                           if not s.startswith(PREFIXES):
                               continue
-                          if not str(o.get("side", "")).upper().endswith("SELL") and \
-                             "SHORT" not in str(o.get("intent") or ""):
-                              # asks are BUY_SHORT (opening) or SELL_LONG (closing)
-                              if "SELL_LONG" not in str(o.get("intent") or ""):
-                                  continue
+                          # asks are BUY_SHORT (opening) or SELL_LONG (closing).
+                          # NOT substring "SHORT" — that swept in SELL_SHORT,
+                          # which is a BID (a buy-back exit resting on the bid
+                          # side), and made 7 sides look full when they were
+                          # 1-19 shares under the target (2026-08-15).
+                          it = str(o.get("intent") or "")
+                          if not (it.endswith("BUY_SHORT") or it.endswith("SELL_LONG")):
+                              continue
                           q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
                           ours[s] = ours.get(s, 0.0) + q
               except Exception as e:
