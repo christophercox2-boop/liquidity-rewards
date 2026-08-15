@@ -6613,15 +6613,20 @@ function renderSheet(d){
   const lv = a => (a && a.length ? a : []).map(x =>
     '<tr><td>'+(+(x[0]*100).toFixed(2))+'¢</td><td class="r">'+x[1].toLocaleString()+'</td></tr>').join('')
     || '<tr><td class="sub">empty</td></tr>';
-  const ords = (d.orders || []).map(o =>
-    '<div class="osub">'+
-    '<div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px">'+
+  // Every order collapses to one line (tap to open its controls), and the
+  // deep qualifier blocks — 1c floor bids and 99c ceiling asks, dozens of
+  // chunks on some markets — fold behind a single count-and-size line.
+  const isQual = o => (o.side === 'BUY' && o.price <= 0.015)
+                   || (o.side !== 'BUY' && o.price >= 0.985);
+  const mkOrd = o =>
+    '<details class="osub"><summary style="cursor:pointer;display:flex;align-items:center;gap:10px;list-style:none">'+
     '<input type="checkbox" class="mck" data-oid="'+o.id+'" onchange="mSelUpd()" '+
-    'style="width:22px;height:22px;flex:0 0 auto">'+
-    '<span>'+o.side+' '+o.size.toLocaleString()+' @ '+
+    'onclick="event.stopPropagation()" style="width:22px;height:22px;flex:0 0 auto">'+
+    '<span style="font-size:14px;font-weight:600">'+o.side+' '+o.size.toLocaleString()+' @ '+
     (+(o.price*100).toFixed(2))+'¢ <span class="sub" style="font-weight:400">· '+
-    (o.est_day ? '$'+o.est_day.toFixed(2)+'/day' : '$0/day')+'</span></span></div>'+
-    '<div class="ctlrow">'+
+    (o.est_day ? '$'+o.est_day.toFixed(2)+'/day' : '$0/day')+'</span></span>'+
+    '<span class="sub" style="margin-left:auto">▾</span></summary>'+
+    '<div class="ctlrow" style="margin-top:8px">'+
     '<span class="ctl"><label>price</label><input id="mp'+o.id+'" type="number" step="0.1" min="0.1" max="99.9" value="'+(o.price*100).toFixed(1)+'"><span class="sub">¢</span></span>'+
     '<span class="ctl"><label>qty</label><button class="alt bump" onclick="qBump(\\'mq'+o.id+'\\',-1)">−</button>'+
     '<input id="mq'+o.id+'" type="number" step="1" min="1" max="20000" value="'+Math.round(o.size)+'">'+
@@ -6629,7 +6634,22 @@ function renderSheet(d){
     '<div class="ctlrow rp" style="margin-top:10px">'+
     '<button onclick="mModify(\\''+o.id+'\\',\\''+esc(m)+'\\')">Modify</button>'+
     '<button class="alt" style="background:rgba(229,100,95,.18);color:#ff9d99" onclick="mCancel(\\''+o.id+'\\',\\''+esc(m)+'\\')">Cancel</button>'+
-    '</div></div>').join('') || '<div class="sub">no resting orders here</div>';
+    '</div></details>';
+  const work = (d.orders || []).filter(o => !isQual(o));
+  const qual = (d.orders || []).filter(isQual);
+  const qb = qual.filter(o => o.side === 'BUY').reduce((a, o) => a + o.size, 0);
+  const qa = qual.filter(o => o.side !== 'BUY').reduce((a, o) => a + o.size, 0);
+  const qualParts = [];
+  if(qb) qualParts.push(Math.round(qb).toLocaleString()+' bid @ 1¢');
+  if(qa) qualParts.push(Math.round(qa).toLocaleString()+' ask @ 99¢');
+  const ords =
+    (work.map(mkOrd).join('') || (qual.length ? '' : '<div class="sub">no resting orders here</div>'))+
+    (qual.length ?
+      '<details class="osub"><summary style="cursor:pointer;list-style:none">'+
+      '<span style="font-size:13px;font-weight:600">⚓ '+qual.length+' qualifying order'+
+      (qual.length > 1 ? 's' : '')+'</span> <span class="sub">· '+qualParts.join(' · ')+
+      ' · holds Target Size, earns ~nothing — tap to manage</span></summary>'+
+      qual.map(mkOrd).join('')+'</details>' : '');
   document.getElementById('sheetIn').innerHTML =
     '<div style="font-size:17px;font-weight:700">'+esc(mname(m))+'</div>'+
     '<div class="mkt">'+esc(m)+'</div>'+
