@@ -3579,6 +3579,15 @@ def _bayes_fair(m: str) -> dict | None:
 # BELOW fair, where being picked off is a purchase at better than fair — the
 # opposite of the tuccar trap. Sizes are worst-case-dollar capped per market
 # and in total, far under the buying-power ceiling.
+# INVARIANT (owner, 2026-08-15): the earner and the prober's info fund are
+# SEPARATE BOOKS. state["probe_budget"] moves only on the prober's own
+# fills (its sales in, its buys out — see auto_probe's reconcile). Earner
+# sales and purchases never credit or debit it, and earner journal entries
+# ("earn ...") are deliberately ignored by _bayes_fair — an earn fill sits
+# at fair-1 because the model put it there, so counting it as evidence
+# would let the model confirm itself. Earner sizing stays small: EARN_MAX_USD
+# per market, EARN_TOTAL_USD across all.
+#
 # Owner, 2026-08-15 evening: buying power is short — STOP ACQUIRING. While
 # CONSERVE_BP is on (default), the earner places nothing and withdraws its
 # resting bids, and the prober stops seeding scouts on BOTH sides (a bid
