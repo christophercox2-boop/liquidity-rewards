@@ -3241,7 +3241,20 @@ def auto_snipe() -> None:
         # skipped entirely as "under one", and a 1.5-contract level was taken
         # as 1, leaving 0.5 resting and the touch exactly where it was. The
         # whole point is to CLEAR the level, so work in fractions throughout.
-        if px < SNIPE_MIN_PRICE or q >= SNIPE_MAX_LEVEL or q <= 0:
+        if q >= SNIPE_MAX_LEVEL or q <= 0:
+            continue
+        # Overpriced by whose measure? When the Bayesian band is usable
+        # (any real trade, reasonably tight), the bid must clear the band's
+        # TOP plus a margin — which both unlocks snipes below the static
+        # 15c line (a 9c bait bid on a 3c-fair longshot is profit) and
+        # blocks unprofitable ones the static rule would have taken (a 16c
+        # bid when fair is modeled at 15c is no edge). With no usable band
+        # the static floor stands.
+        b = _bayes_fair(m)
+        if b and b.get("med") and b.get("fills", 0) >= 1 and (b["hi"] - b["lo"]) <= 6:
+            if px * 100 < b["hi"] + 2:
+                continue
+        elif px < SNIPE_MIN_PRICE:
             continue
         # never trade with ourselves
         ours = sum(o.get("size") or 0 for o in MONITOR.orders
@@ -3520,6 +3533,137 @@ def _bayes_fair(m: str) -> dict | None:
     return {"med": med, "lo": lo, "hi": hi, "n": len(evs), "fills": n_hard,
             "bb": round(bb * 100, 1) if bb is not None else None,
             "ba": round(ba * 100, 1) if ba is not None else None}
+
+
+# --- earner: model-confident small bids (owner, 2026-08-15) -----------------
+# When the Bayesian band is TIGHT and built on real trades, rest a small bid
+# at fair-or-better and collect the side's scoring. Bid side only — the ask
+# side is already defender-managed, and two loops steering the same orders
+# would fight. Price = min(posterior median − 1 tick, the de-baited real
+# touch): joining real money when fair supports it, otherwise resting alone
+# BELOW fair, where being picked off is a purchase at better than fair — the
+# opposite of the tuccar trap. Sizes are worst-case-dollar capped per market
+# and in total, far under the buying-power ceiling.
+EARN_MAX_USD = float(os.environ.get("EARN_MAX_USD", "3.0"))
+EARN_TOTAL_USD = float(os.environ.get("EARN_TOTAL_USD", "60.0"))
+EARN_MIN_SHARES, EARN_MAX_SHARES = 5, 100
+EARN_BAND_MAX = int(os.environ.get("EARN_BAND_MAX", "4"))
+EARN_MIN_FILLS = 2
+EARN_MARGIN_T = 1
+EARN_DRIFT_T = 2
+EARN_MAX_PER_POLL = 2
+EARN_COOLDOWN = 600.0
+_EARN: dict = {"orders": {}, "last": {}, "cancelled": set()}
+
+
+def _earn_outstanding_usd() -> float:
+    return sum(px / 100.0 * q for _, _, px, q, _ in _EARN["orders"].values())
+
+
+def auto_earn() -> None:
+    if not _auto_on("earn"):
+        return
+    if os.environ.get("EARN_PAUSE", "") == "1":
+        return
+    now = time.time()
+    open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
+    # reconcile: fills and drift
+    for oid, rec in list(_EARN["orders"].items()):
+        m, side, px, qty, ts = rec
+        if oid not in open_ids:
+            del _EARN["orders"][oid]
+            if oid in _EARN["cancelled"]:
+                _EARN["cancelled"].discard(oid)
+            else:
+                _probe_log(m, "earn FILLED", side, px / 100.0,
+                           f"{qty} bought at/below modeled fair")
+                _EARN["last"][m] = now
+            continue
+        b = _bayes_fair(m)
+        confident = (b and b.get("med") and b.get("fills", 0) >= EARN_MIN_FILLS
+                     and (b["hi"] - b["lo"]) <= EARN_BAND_MAX)
+        tgt = None
+        if confident:
+            tgt = b["med"] - EARN_MARGIN_T
+            if b.get("bb") is not None:
+                tgt = min(tgt, int(b["bb"]))
+        if not confident or (tgt and abs(tgt - px) > EARN_DRIFT_T):
+            # model moved or went vague — withdraw; a confident re-place
+            # happens naturally on a later poll
+            try:
+                requests.request(
+                    "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
+                    headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST",
+                                               f"/v1/order/{oid}/cancel"),
+                             "Content-Type": "application/json"},
+                    json={"marketSlug": m}, timeout=15)
+                _EARN["cancelled"].add(oid)
+                del _EARN["orders"][oid]
+                _probe_log(m, "earn withdrawn", side, px / 100.0,
+                           "model moved" if confident else "model no longer confident")
+            except Exception:  # noqa: BLE001
+                pass
+    # place where the model is confident and we hold nothing yet
+    placed = 0
+    have = {rec[0] for rec in _EARN["orders"].values()}
+    cands = sorted({l.get("m") for l in (MONITOR.state.get("probe_log") or [])
+                    if l.get("m")})
+    for m in cands:
+        if placed >= EARN_MAX_PER_POLL:
+            break
+        if m in have or now - _EARN["last"].get(m, 0.0) < EARN_COOLDOWN:
+            continue
+        if _earn_outstanding_usd() >= EARN_TOTAL_USD:
+            break
+        b = _bayes_fair(m)
+        if not (b and b.get("med") and b.get("fills", 0) >= EARN_MIN_FILLS
+                and (b["hi"] - b["lo"]) <= EARN_BAND_MAX):
+            continue
+        tgt = b["med"] - EARN_MARGIN_T
+        if b.get("bb") is not None:
+            tgt = min(tgt, int(b["bb"]))
+        if tgt < 1:
+            continue
+        px = round(tgt / 100.0, 2)
+        qty = max(EARN_MIN_SHARES, min(EARN_MAX_SHARES, int(EARN_MAX_USD / px)))
+        if px * qty + _earn_outstanding_usd() > EARN_TOTAL_USD:
+            continue
+        try:
+            r = requests.request(
+                "POST", tr.TRADE_API + "/v1/orders",
+                headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                         "Content-Type": "application/json"},
+                json={"marketSlug": m, "intent": "ORDER_INTENT_BUY_LONG",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{px:.2f}", "currency": "USD"},
+                      "quantity": qty,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True},
+                timeout=20)
+            ok = r.status_code < 300
+            oid = None
+            if ok:
+                try:
+                    j = r.json()
+                    o = j.get("order")
+                    oid = (o.get("id") if isinstance(o, dict) else None) \
+                          or j.get("id") or j.get("orderId")
+                except Exception:  # noqa: BLE001
+                    pass
+            ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                            "market": m, "side": "EARN bid", "from": "—",
+                            "to": tgt, "size": qty, "status": r.status_code,
+                            "response": " ".join(r.text.split())[:100],
+                            "verified": ok})
+            del ACTIONS[:-20]
+            if ok and oid:
+                _EARN["orders"][str(oid)] = (m, "BUY", tgt, qty, now)
+                _probe_log(m, "earn", "BUY", px,
+                           f"{qty} resting at fair−{EARN_MARGIN_T} "
+                           f"(band {b['lo']}–{b['hi']}¢)")
+                placed += 1
+        except Exception:  # noqa: BLE001 — the earner must never kill the poll
+            continue
 
 
 # --- slate health watch (in-process; replaced the slate_watch.yml cron) ----
@@ -4333,9 +4477,9 @@ def do_maction(body: dict) -> tuple[int, dict]:
         # The owner's on/off button for a placement loop. Auth and the
         # X-Reprice CSRF header are already enforced by the POST handler.
         which = str(body.get("which") or "")
-        if which not in ("defend", "keeper", "snipe", "probe"):
+        if which not in ("defend", "keeper", "snipe", "probe", "earn"):
             return 400, {"ok": False,
-                         "error": "which must be defend, keeper, snipe or probe"}
+                         "error": "which must be defend, keeper, snipe, probe or earn"}
         on = bool(body.get("on"))
         with MONITOR.lock:
             auto = MONITOR.state.setdefault("auto", {})
@@ -4725,7 +4869,8 @@ def _map_payload() -> dict:
         # this dict reads as undefined in the browser, so the button repaints
         # OFF on the next refresh even though the loop is running.
         "auto": {"defend": _auto_on("defend"), "keeper": _auto_on("keeper"),
-                 "snipe": _auto_on("snipe"), "probe": _auto_on("probe")},
+                 "snipe": _auto_on("snipe"), "probe": _auto_on("probe"),
+                 "earn": _auto_on("earn")},
         "defend_live": bool(_auto_on("defend")
                             and os.environ.get("DEFEND_PAUSE", "") != "1"
                             and (MONITOR.state.get("defend") or {})),
@@ -4735,6 +4880,11 @@ def _map_payload() -> dict:
                            and os.environ.get("SNIPE_PAUSE", "") != "1"),
         "probe_live": bool(_auto_on("probe")
                            and os.environ.get("PROBE_PAUSE", "") != "1"),
+        "earn_live": bool(_auto_on("earn")
+                          and os.environ.get("EARN_PAUSE", "") != "1"),
+        "earn_active": [{"m": r[0], "px": r[2], "qty": r[3],
+                         "age_m": int((time.time() - r[4]) / 60)}
+                        for r in _EARN["orders"].values()],
         "probe_est": MONITOR.state.get("probe") or {},
         "probe_bayes": {m: b for m in sorted(
                             {l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
@@ -4909,6 +5059,8 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
       <span class="nm">Sniper</span><span class="st">loading…</span></button>
     <button class="autosw" id="sw_probe" onclick="swTap('probe')" disabled>
       <span class="nm">Prober</span><span class="st">loading…</span></button>
+    <button class="autosw" id="sw_earn" onclick="swTap('earn')" disabled>
+      <span class="nm">Earner</span><span class="st">loading…</span></button>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
   <div class="chips" id="chips"></div>
@@ -5043,6 +5195,7 @@ const SWDESC = {
   keeper: {on:'placing size to hold qualification', off:'not placing anything'},
   snipe: {on:'taking tiny over-priced 2028 bids', off:'not taking anything'},
   probe: {on:'1-share scouts mapping fair prices', off:'not scouting'},
+  earn: {on:'small bids where the model is confident', off:'not placing'},
 };
 const SWARM = {};
 function renderProbe(){
@@ -5093,7 +5246,11 @@ function renderProbe(){
   const scouts = act.map(a =>
     '<span style="display:inline-block;background:var(--surface2);border-radius:6px;' +
     'padding:2px 8px;margin:2px;font-size:11px">' + nm(a.m) + ' ' +
-    (a.kind === 'flip' ? '↩' : '') + a.side + ' @ ' + a.px + '¢ · ' + a.age_m + 'm</span>').join('');
+    (a.kind === 'flip' ? '↩' : '') + a.side + ' @ ' + a.px + '¢ · ' + a.age_m + 'm</span>').join('')
+    + (DATA.earn_active || []).map(a =>
+    '<span style="display:inline-block;background:rgba(63,185,80,.15);border-radius:6px;' +
+    'padding:2px 8px;margin:2px;font-size:11px">💰 ' + nm(a.m) + ' ' + a.qty +
+    ' @ ' + a.px + '¢ · ' + a.age_m + 'm</span>').join('');
   const lines = log.map(l =>
     '<div style="font-size:11px;padding:3px 0;border-top:1px dashed var(--line)">' +
     '<span class="sub">' + l.ts + '</span> <b>' + nm(l.m) + '</b> ' +
@@ -5112,7 +5269,7 @@ function renderProbe(){
 
 function swRender(){
   if(!DATA || !DATA.auto) return;
-  ['defend','keeper','snipe','probe'].forEach(k=>{
+  ['defend','keeper','snipe','probe','earn'].forEach(k=>{
     const b=document.getElementById('sw_'+k); if(!b) return;
     b.disabled=false;
     const on = DATA.auto[k]===true;
@@ -7723,6 +7880,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     auto_probe()
                 except Exception as e:  # noqa: BLE001 — prober never kills the poll
                     MONITOR.error = f"probe: {type(e).__name__}: {e}"[:150]
+                try:
+                    auto_earn()
+                except Exception as e:  # noqa: BLE001 — earner never kills the poll
+                    MONITOR.error = f"earn: {type(e).__name__}: {e}"[:150]
             except Exception as e:  # noqa: BLE001 — defense never kills the poll
                 MONITOR.error = f"defend: {type(e).__name__}: {e}"[:150]
             MONITOR.maybe_save_remote()
