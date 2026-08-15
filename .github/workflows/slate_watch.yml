@@ -1,0 +1,183 @@
+name: Slate watch
+
+# READ-ONLY. GET only, plus an ntfy push when something is WRONG. Places
+# nothing, cancels nothing — safe to run on a schedule.
+#
+# The overnight guard (owner asked before sleeping, 2026-08-15). Twice now
+# the ground has moved without warning: a market maker pulled ~11,000 of
+# depth per side, and the exchange doubled Target Size overnight. Both
+# times every affected side silently stopped paying until someone noticed.
+# The keeper self-heals armed markets while it is on, but nothing TELLS
+# the owner when something big changes.
+#
+# Every 30 minutes this checks, for the 2028 slate:
+#   * our own size per side vs the LIVE Target Size (detects target
+#     changes AND mass cancels — ours dropping is a cancel, target
+#     rising is a program change)
+#   * total open order count vs the last run (a >15% drop is the
+#     mass-cancel signature)
+# and pushes ONE ntfy alert (max one per run) only when something is off.
+# A quiet night sends nothing. Findings are also committed to
+# data/slate_watch.txt either way, so the morning read shows history.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: slate-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Watch
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          topic = os.environ.get("NTFY_TOPIC", "").strip()
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          def notify(title, msg, priority="high"):
+              if not topic:
+                  print("(no ntfy topic — alert not sent)"); return
+              try:
+                  requests.post(f"https://ntfy.sh/{topic}", data=msg.encode(),
+                                headers={"Title": title, "Priority": priority}, timeout=10)
+              except Exception as e:
+                  print(f"(ntfy send failed: {type(e).__name__})")
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+          STATE = "data/slate_watch.json"
+
+          prev = {}
+          try:
+              prev = json.load(open(STATE))
+          except Exception:
+              pass
+
+          # every open order — total count for the mass-cancel check, slate
+          # subset for the per-side totals
+          path = "/v1/orders/open"
+          r = requests.get(tr.TRADE_API + path,
+                           headers=tr.auth_headers(kid, sec, "GET", path), timeout=40)
+          r.raise_for_status()
+          orders = [o for o in r.json().get("orders") or []
+                    if str(o.get("state")) in ("ORDER_STATE_NEW",
+                                               "ORDER_STATE_PARTIALLY_FILLED")]
+          n_open = len(orders)
+          ours: dict = {}
+          for o in orders:
+              s = o.get("marketSlug") or ""
+              if not s.startswith(PREFIXES):
+                  continue
+              it = str(o.get("intent") or "")
+              side = "BUY" if it.endswith(("BUY_LONG", "SELL_SHORT")) else "SELL"
+              q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+              ours[s + "|" + side] = ours.get(s + "|" + side, 0.0) + q
+
+          pol, _ = tr.fetch_politics_events()
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+          targets = {}
+          for i in range(0, len(slate), 25):
+              try:
+                  rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                    params={"symbols": slate[i:i+25], "pageSize": 100}, timeout=30)
+                  for p in rr.json().get("programs") or []:
+                      s = p.get("marketSlug") or ""
+                      tp = tr._pick_period(p.get("timePeriods") or [], s)
+                      if tp is not None and s:
+                          targets[s] = float(tr._prog_of(tp).get("target") or 0)
+              except Exception:
+                  pass
+              time.sleep(0.1)
+
+          problems = []
+          tset = sorted({t for t in targets.values() if t})
+          prev_t = prev.get("targets_seen") or []
+          if prev_t and tset and tset != prev_t:
+              problems.append(f"Target Size changed: {prev_t} -> {tset}")
+
+          short = []
+          for s in slate:
+              t = targets.get(s) or 0
+              if not t:
+                  continue
+              for side in ("BUY", "SELL"):
+                  have = ours.get(s + "|" + side, 0.0)
+                  if have < t:
+                      short.append((s, side, have, t))
+          if short:
+              worst = sorted(short, key=lambda x: x[2] / x[3])[:5]
+              lines = ", ".join(f"{s.rsplit('-', 1)[-1]} {sd} {h:,.0f}/{t:,.0f}"
+                                for s, sd, h, t in worst)
+              problems.append(f"{len(short)} slate sides below target on OUR size "
+                              f"(worst: {lines})")
+
+          prev_n = prev.get("open_orders")
+          if prev_n and n_open < prev_n * 0.85:
+              problems.append(f"open orders fell {prev_n:,} -> {n_open:,} "
+                              f"(-{(1 - n_open / prev_n) * 100:.0f}%) — mass-cancel pattern")
+
+          stamp = time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime())
+          print(f"{stamp}  open orders {n_open:,}  slate sides short {len(short)}  "
+                f"targets {tset}")
+          if problems:
+              for p in problems:
+                  print("  PROBLEM: " + p)
+              notify("Slate watch", " | ".join(problems)[:900])
+          else:
+              print("  all clear")
+
+          json.dump({"open_orders": n_open, "targets_seen": tset,
+                     "short_sides": len(short), "checked": stamp},
+                    open(STATE, "w"), indent=1)
+          # append-style history: keep the last ~200 lines
+          hist = ""
+          try:
+              hist = open("data/slate_watch.txt").read()
+          except Exception:
+              pass
+          lines = (hist.splitlines()[-199:] + BUF.getvalue().splitlines())
+          with open("data/slate_watch.txt", "w") as f:
+              f.write("\n".join(lines) + "\n")
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/slate_watch.json data/slate_watch.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Slate watch [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi
