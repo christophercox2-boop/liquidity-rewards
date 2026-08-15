@@ -210,6 +210,7 @@ jobs:
               # orders are authoritative and do not lag.
               placed = 0
               stalled = 0
+              sent = 0
               ours_now = mine
               while (ours_now < want and placed < MAX_ORDERS_PER_SIDE
                      and total < MAX_ORDERS_TOTAL):
@@ -230,10 +231,12 @@ jobs:
                       time.sleep(PAUSE)
                   if DRY:
                       break
-                  # an order rests at whatever buying power allows (~1 share
-                  # per dollar), so assume int(BP) rested and reconcile
-                  # against open orders every few orders
-                  ours_now += max(1, int(BP))
+                  # the order rests at qty (already capped to buying power),
+                  # so credit qty — crediting a full BP chunk overshot small
+                  # remainders and left 33 sides 12-26 shares short of the
+                  # line on 2026-08-15. Reconcile against open orders every
+                  # few orders.
+                  ours_now += qty; sent += qty
                   if placed % 4 == 0:
                       BP = bp_now(BP)
                       known = open_orders().get(slug)
@@ -241,8 +244,8 @@ jobs:
                           continue
                       # a real ceiling shows up here: orders accepted but
                       # nothing resting. Two flat rounds and we move on.
-                      stalled = stalled + 1 if known <= ours_now - max(1, int(BP)) * 4 else 0
-                      ours_now = known
+                      stalled = stalled + 1 if known <= ours_now - sent else 0
+                      ours_now = known; sent = 0
                       if stalled >= 2:
                           print(f"    stalled — ours {ours_now:,.0f}, orders accepted "
                                 "but not resting; moving on")
