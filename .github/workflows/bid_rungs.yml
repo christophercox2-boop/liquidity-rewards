@@ -1,0 +1,248 @@
+name: Bid rungs
+
+# ORDER-TOUCHING. Places real orders — but push runs are FORCED DRY.
+#
+# Owner-approved 2026-08-15: bid-side presence sized to a HARD worst-case
+# fill budget, because buying power (~$320) is the operating fuel — $200
+# of fills would choke every ask placement and defender replacement. The
+# slate bid touches are thin, so 20-30 share rungs AT the touch capture
+# most of a side's scoring window for $2-3 of worst-case exposure each.
+#
+# The plan is recomputed from live books at run time — never replayed
+# from a stale snapshot. A greedy pass allocates BUDGET dollars of
+# worst-case exposure one dollar at a time to whichever side's next
+# dollar buys the most estimated income. Longshot sides (touch <= 5.5c)
+# are excluded — the 1c floors already score there; party markets are
+# excluded — hand-tended, and their 40c+ rungs price out of the budget
+# anyway. Existing non-floor bids near the touch count toward a side's
+# rung, so re-runs top up instead of stacking.
+#
+# Post-only throughout. The 20,000-share floor blocks are never touched.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/bid_rungs.yml
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "plan only, place nothing"
+        type: boolean
+        default: false
+      budget:
+        description: "worst-case fill dollars"
+        default: "100"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bid-rungs
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          BUDGET: ${{ inputs.budget }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
+          if os.environ.get("GITHUB_EVENT_NAME") == "push":
+              DRY = True          # push never places; review the plan first
+          BUDGET = float(os.environ.get("BUDGET") or 100)
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-")
+          DF = 0.2; TICK = 0.01
+          MIN_RUNG = 5
+          MAX_PER_ORDER_USD = 15.0
+          MIN_TOUCH = 0.055     # below this the 1c floor already scores
+
+          def api(method, path, body=None):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  json=body, timeout=30)
+
+          # our resting bids: floors (~1c) vs existing near-touch rungs
+          near: dict = {}
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          for o in r.json().get("orders") or []:
+              if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                             "ORDER_STATE_PARTIALLY_FILLED"):
+                  continue
+              s = o.get("marketSlug") or ""
+              if not s.startswith(PREFIXES):
+                  continue
+              if not str(o.get("intent") or "").endswith(("BUY_LONG", "SELL_SHORT")):
+                  continue
+              px = tr._num((o.get("price") or {}).get("value")) or 0
+              if px <= 0.015:
+                  continue          # the qualification floor — not a rung
+              q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+              near.setdefault(s, []).append((px, q))
+
+          pol, sizes = tr.fetch_politics_events()
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+
+          progs = {}
+          for i in range(0, len(slate), 25):
+              try:
+                  rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                    params={"symbols": slate[i:i+25], "pageSize": 100}, timeout=30)
+                  for p in rr.json().get("programs") or []:
+                      s = p.get("marketSlug") or ""
+                      tp = tr._pick_period(p.get("timePeriods") or [], s)
+                      if tp is not None and s:
+                          progs[s] = tr._prog_of(tp)
+              except Exception:
+                  pass
+              time.sleep(0.1)
+
+          sides = []
+          for slug in slate:
+              pr = progs.get(slug) or {}
+              target = float(pr.get("target") or 0)
+              per = float(pr.get("pool") or 0) / max(sizes.get(slug, 1), 1) / 2
+              if not target or per <= 0:
+                  continue
+              try:
+                  bids = (tr._fetch_book(slug).get("bids") or [])
+              except Exception:
+                  continue
+              time.sleep(0.15)
+              if not bids:
+                  continue
+              bb = bids[0][0]
+              if bb <= MIN_TOUCH or not (0.001 <= bb <= 0.999):
+                  continue
+              den = ours_in = 0.0; cum = 0.0
+              for p, q in bids:
+                  take = min(q, max(0.0, target - cum))
+                  if take <= 0:
+                      break
+                  w = DF ** round((bb - p) / TICK)
+                  den += take * w
+                  if abs(p - 0.01) < 0.005:
+                      ours_in += min(take, 20000) * w
+                  cum += q
+              # an existing rung within 3 ticks of the touch counts as placed
+              have = sum(q for p, q in near.get(slug, [])
+                         if round((bb - p) / TICK) <= 3 and q >= 1)
+              sides.append({"m": slug, "px": bb, "per": per, "den": den,
+                            "ours": ours_in, "have": have, "r": 0.0})
+
+          def gain(s, r):
+              tot = s["have"] + r
+              if not s["den"] and not tot:
+                  return 0.0
+              base = s["per"] * (s["ours"] + s["have"]) / (s["den"] + s["have"]) \
+                     if (s["den"] + s["have"]) else 0.0
+              return s["per"] * (s["ours"] + tot) / (s["den"] + tot) - base
+
+          spent = 0.0
+          while spent < BUDGET:
+              best, bi = 0.0, None
+              for i, s in enumerate(sides):
+                  if s["r"] * s["px"] + 1.0 > MAX_PER_ORDER_USD:
+                      continue          # per-market exposure cap
+                  dr = 1.0 / s["px"]
+                  mg = gain(s, s["r"] + dr) - gain(s, s["r"])
+                  if mg > best:
+                      best, bi = mg, i
+              if bi is None or best < 0.02:
+                  break
+              sides[bi]["r"] += 1.0 / sides[bi]["px"]
+              spent += 1.0
+
+          plan = [s for s in sides if s["r"] >= MIN_RUNG]
+          est = sum(gain(s, s["r"]) for s in plan)
+          expo = sum(s["r"] * s["px"] for s in plan)
+          print(f"bid rungs: {len(plan)} sides, worst-case fills ${expo:,.2f} "
+                f"of ${BUDGET:.0f}, est +${est:,.2f}/day"
+                + ("   (DRY RUN)" if DRY else "") + "\n")
+          print(f"{'market':44s} {'touch':>6s} {'rung':>6s} {'expo$':>6s} {'est+':>7s}")
+
+          placed = failed = 0
+          out = []
+          for s in sorted(plan, key=lambda y: -gain(y, y["r"])):
+              qty = round(s["r"])
+              print(f"{s['m']:44s} {s['px']*100:5.1f}c {qty:6d} "
+                    f"{qty*s['px']:6.2f} {gain(s, s['r']):7.2f}"
+                    + (f"   (top-up; {s['have']:.0f} already near touch)" if s["have"] else ""))
+              row = {"m": s["m"], "px": round(s["px"], 2), "qty": qty,
+                     "cap_c": round((s["px"] + TICK) * 100, 1), "ok": None}
+              if DRY:
+                  out.append(row); placed += 1
+                  continue
+              body = {"marketSlug": s["m"], "intent": "ORDER_INTENT_BUY_LONG",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{s['px']:.2f}", "currency": "USD"},
+                      "quantity": qty,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              ok, why, delay = False, "", 2.0
+              for attempt in range(4):
+                  try:
+                      rr = api("POST", "/v1/orders", body)
+                      if rr.status_code < 300:
+                          ok = True; break
+                      why = " ".join(rr.text.split())[:120]
+                      if rr.status_code not in (429, 500, 502, 503, 504):
+                          break
+                  except Exception as e:
+                      why = type(e).__name__
+                  time.sleep(delay); delay = min(delay * 2, 20)
+              placed += ok; failed += (not ok)
+              row["ok"] = ok
+              if not ok:
+                  print(f"    FAILED {why}")
+              out.append(row)
+              time.sleep(0.6)
+
+          print(f"\n{'would place' if DRY else 'placed'} {placed}, failed {failed}")
+          os.makedirs("data", exist_ok=True)
+          json.dump({"dry_run": DRY, "budget": BUDGET, "exposure": round(expo, 2),
+                     "est_gain": round(est, 2), "orders": out},
+                    open("data/bid_rungs.json", "w"), indent=1)
+          with open("data/bid_rungs.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/bid_rungs.json data/bid_rungs.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Bid rungs [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi
