@@ -1,29 +1,30 @@
-joinable real touches: 17   bait/over-fair skipped: 30
-plan: 2 rungs, worst-case fills $24.00 of $80, est +$21.38/day
+joinable real touches: 17   bait/over-fair skipped: 31
+plan: 2 rungs, worst-case fills $24.00 of $80, est +$8.51/day   (DRY RUN)
 
 market                                        join@      wall   rung  expo$   est+
-enwc-uspres-nom-rep-2028-ranpau                5.0c       282    240  12.00  13.85
-enwc-uspres-nom-dem-2028-jonste                4.0c       183    300  12.00   7.53
+enwc-uspres-nom-rep-2028-ranpau                5.0c       505    240  12.00   5.48
+enwc-uspres-nom-dem-2028-jonste                4.0c       212    300  12.00   3.03
 
 skipped sides (no real touch to join):
   enwc-uspres-nom-dem-2028-aleocc               18.0c others-at-touch      52 — thin touch — bait
-  enwc-uspres-nom-dem-2028-andbes               15.0c others-at-touch       1 — thin touch — bait
+  enwc-uspres-nom-dem-2028-andbes               15.0c others-at-touch       0 — thin touch — bait
+  enwc-uspres-nom-dem-2028-gavnew                8.0c others-at-touch       0 — thin touch — bait
   enwc-uspres-nom-dem-2028-jamtal                3.0c others-at-touch      22 — thin touch — bait
   enwc-uspres-nom-dem-2028-jonoss               15.0c others-at-touch      38 — thin touch — bait
   enwc-uspres-nom-dem-2028-jossha                2.0c others-at-touch       0 — thin touch — bait
   enwc-uspres-nom-dem-2028-kamhar               14.0c others-at-touch       1 — thin touch — bait
-  enwc-uspres-nom-dem-2028-markel                2.0c others-at-touch       0 — thin touch — bait
-  enwc-uspres-nom-dem-2028-micoba               10.0c others-at-touch       1 — thin touch — bait
-  enwc-uspres-nom-dem-2028-petbut                7.0c others-at-touch      23 — thin touch — bait
-  enwc-uspres-nom-dem-2028-rokha                 9.0c others-at-touch       1 — thin touch — bait
-  enwc-uspres-nom-dem-2028-stasmi                9.0c others-at-touch       1 — thin touch — bait
-  enwc-uspres-nom-rep-2028-jdvan                49.0c others-at-touch       7 — thin touch — bait
+  enwc-uspres-nom-dem-2028-markel                3.0c others-at-touch       1 — thin touch — bait
+  enwc-uspres-nom-dem-2028-micoba               10.0c others-at-touch       0 — thin touch — bait
+  enwc-uspres-nom-dem-2028-petbut                7.0c others-at-touch      26 — thin touch — bait
+  enwc-uspres-nom-dem-2028-rokha                 9.0c others-at-touch       2 — thin touch — bait
+  enwc-uspres-nom-dem-2028-stasmi                9.0c others-at-touch       0 — thin touch — bait
+  enwc-uspres-nom-rep-2028-jdvan                49.0c others-at-touch      12 — thin touch — bait
   enwc-uspres-nom-rep-2028-marrub               26.0c others-at-touch      21 — thin touch — bait
-  enwc-uspres-nom-rep-2028-rondes                5.0c others-at-touch      10 — thin touch — bait
+  enwc-uspres-nom-rep-2028-rondes                5.0c others-at-touch       6 — thin touch — bait
   ewc-usp-2028-11-07-andbes                      8.0c others-at-touch       0 — thin touch — bait
   ewc-usp-2028-11-07-dontru                      5.0c others-at-touch  12,450 — above fair cap 2c
   ewc-usp-2028-11-07-dwajoh                      8.0c others-at-touch       0 — thin touch — bait
-  ewc-usp-2028-11-07-gavnew                     10.0c others-at-touch       1 — thin touch — bait
+  ewc-usp-2028-11-07-gavnew                     11.0c others-at-touch       0 — thin touch — bait
   ewc-usp-2028-11-07-gleyou                     25.0c others-at-touch       0 — thin touch — bait
   ewc-usp-2028-11-07-jamtal                     11.0c others-at-touch       0 — thin touch — bait
   ewc-usp-2028-11-07-jossha                      8.0c others-at-touch       0 — thin touch — bait
@@ -32,9 +33,24 @@ skipped sides (no real touch to join):
   ewc-usp-2028-11-07-rokha                       9.0c others-at-touch       0 — thin touch — bait
   ewc-usp-2028-11-07-rondes                      8.0c others-at-touch       0 — thin touch — bait
   ewc-usp-2028-11-07-stasmi                      9.0c others-at-touch       0 — thin touch — bait
-  ewc-usp-2028-11-07-thomas                     15.0c others-at-touch       0 — thin touch — bait
+  ewc-usp-2028-11-07-thomas                     15.0c others-at-touch       1 — thin touch — bait
   ewc-usp-2028-11-07-tulgab                      9.0c others-at-touch       0 — thin touch — bait
   ewc-usp-2028-11-07-vivram                     10.0c others-at-touch       0 — thin touch — bait
   ewc-usp-2028-11-07-wesmoo                      7.0c others-at-touch       0 — thin touch — bait
 
-placed 2, failed 0
+=== TIER 2 — wall joins (behind >= 20,000 of others) ===
+enwc-uspres-nom-rep-2028-tulgab                1.0c behind    21,200 join 20,000 notional $   200  +$ 5.79/d
+enwc-uspres-nom-rep-2028-vivram                1.0c behind    21,200 join 20,000 notional $   200  +$ 5.79/d
+enwc-uspres-nom-dem-2028-jamtal                1.0c behind    21,200 join 20,000 notional $   200  +$ 4.82/d
+enwc-uspres-nom-dem-2028-dwajoh                2.0c behind   111,993 join 20,000 notional $   400  +$ 4.46/d
+ewc-usp-2028-11-07-petbut                      3.0c behind    39,916 join 10,000 notional $   300  +$ 3.67/d
+enwc-uspres-nom-rep-2028-gleyou                1.0c behind   131,200 join 20,000 notional $   200  +$ 3.49/d
+enwc-uspres-nom-rep-2028-elomus                1.0c behind   131,200 join 20,000 notional $   200  +$ 3.49/d
+enwc-uspres-nom-rep-2028-dontru                2.0c behind   187,106 join 20,000 notional $   400  +$ 3.45/d
+enwc-uspres-nom-rep-2028-thomas                1.0c behind   131,200 join 20,000 notional $   200  +$ 3.42/d
+enwc-uspres-nom-rep-2028-margre                1.0c behind   131,200 join 20,000 notional $   200  +$ 3.42/d
+enwc-uspres-nom-rep-2028-tedcru                1.0c behind   131,200 join 20,000 notional $   200  +$ 3.38/d
+enwc-uspres-nom-dem-2028-rahema                1.0c behind   136,563 join 20,000 notional $   200  +$ 2.91/d
+tier 2: would join 12 walls, failed 0, est +$48.07/day, apocalypse-only notional $2,900
+
+would place 2, failed 0
