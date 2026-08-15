@@ -1,25 +1,25 @@
-slate: 60 markets   (DRY RUN)
+slate: 60 markets
 market                                         tgt   others   near     deep     keep      cut ords
 enwc-uspres-nom-dem-2028-aleocc             20,000   16,260     25   19,995    8,758   11,237 -63
 enwc-uspres-nom-dem-2028-andbes             20,000   16,221      3   19,998    8,822   11,176 -63
-enwc-uspres-nom-dem-2028-dwajoh             20,000   16,319     51   20,578    8,700   11,878 -70
-enwc-uspres-nom-dem-2028-jamtal             20,000   16,221     14   19,986    8,893   11,093 -63
+enwc-uspres-nom-dem-2028-dwajoh             20,000   16,221     51   20,578    9,023   11,556 -69
+enwc-uspres-nom-dem-2028-jamtal             20,000   16,443     14   19,986    8,703   11,283 -64
 enwc-uspres-nom-dem-2028-jbpri              20,000   16,321     33   20,944    8,700   12,243 -65
 enwc-uspres-nom-dem-2028-jonoss             20,000   16,251     17   22,900   15,763    7,137 -40
-enwc-uspres-nom-dem-2028-jonste             20,000   16,221     51   19,950    8,830   11,120 -62
-enwc-uspres-nom-dem-2028-kamhar             20,000   16,226     34   19,968   15,851    4,117 -25
+enwc-uspres-nom-dem-2028-jonste             20,000   16,334     51   19,950    8,640   11,310 -63
+enwc-uspres-nom-dem-2028-kamhar             20,000   16,318     34   19,968   15,661    4,307 -26
 enwc-uspres-nom-dem-2028-micoba             20,000   16,221     34   19,966    8,918   11,049 -63
 enwc-uspres-nom-dem-2028-petbut             20,000   16,221     37   19,963   15,842    4,121 -26
 enwc-uspres-nom-dem-2028-rahema             20,000   16,321     51   19,950    8,930   11,019 -61
-enwc-uspres-nom-dem-2028-rokha              20,000   16,321     33   19,968    8,764   11,204 -64
+enwc-uspres-nom-dem-2028-rokha              20,000   16,386     33   19,968    8,764   11,204 -64
 enwc-uspres-nom-dem-2028-stasmi             20,000   16,238     38   19,967    8,859   11,109 -69
 enwc-uspres-nom-dem-2028-wesmoo             20,000   16,321     33   22,165    8,859   13,307 -75
-enwc-uspres-nom-rep-2028-dontru             20,000   16,321     65   19,967    8,664   11,303 -69
-enwc-uspres-nom-rep-2028-elomus             20,000   16,221     34   21,126    9,023   12,104 -74
+enwc-uspres-nom-rep-2028-dontru             20,000   16,263     65   19,967    8,834   11,133 -68
+enwc-uspres-nom-rep-2028-elomus             20,000   16,334     34   21,126    8,700   12,426 -75
 enwc-uspres-nom-rep-2028-gleyou             20,000   16,221     55   14,805    8,875    5,930 -37
-enwc-uspres-nom-rep-2028-jdvan              20,000   16,246     26   19,975   15,730    4,245 -27
+enwc-uspres-nom-rep-2028-jdvan              20,000   16,359     26   19,975   15,730    4,245 -27
 enwc-uspres-nom-rep-2028-margre             20,000   16,221     34   19,966    8,859   11,108 -68
-enwc-uspres-nom-rep-2028-marrub             20,000   16,221     50   19,951   15,911    4,040 -24
+enwc-uspres-nom-rep-2028-marrub             20,000   16,359     50   19,951   15,595    4,356 -25
 enwc-uspres-nom-rep-2028-ranpau             20,000   16,221     34   19,966    8,833   11,133 -60
 enwc-uspres-nom-rep-2028-rondes             20,000   16,221     51   20,000    8,829   11,171 -71
 enwc-uspres-nom-rep-2028-tedcru             20,000   16,221     34   19,966    9,023   10,944 -67
@@ -27,28 +27,36 @@ enwc-uspres-nom-rep-2028-thomas             20,000   16,221     34   20,595    9
 enwc-uspres-nom-rep-2028-tuccar             20,000   16,221     34   19,966    8,751   11,215 -67
 enwc-uspres-nom-rep-2028-tulgab             20,000   16,221     34   19,967    8,956   11,011 -78
 enwc-uspres-nom-rep-2028-vivram             20,000   16,221     35   20,596    9,023   11,573 -69
-ewc-usp-2028-11-07-aleocc                   20,000   16,346     33   19,968    8,859   11,109 -69
-ewc-usp-2028-11-07-andbes                   20,000   16,346     34   20,900    8,859   12,042 -71
-ewc-usp-2028-11-07-dontru                   20,000   16,346     33   20,401    8,859   11,542 -69
-ewc-usp-2028-11-07-dontrujr                 20,000   16,346     59   19,967    8,739   11,228 -68
+ewc-usp-2028-11-07-aleocc                   20,000   16,246     33   19,968    8,859   11,109 -69
+ewc-usp-2028-11-07-andbes                   20,000   16,246     34   20,900    8,859   12,042 -71
+ewc-usp-2028-11-07-dontru                   20,000   16,246     33   20,401    8,859   11,542 -69
+ewc-usp-2028-11-07-dontrujr                 20,000   16,246     59   19,967    8,739   11,228 -68
 ewc-usp-2028-11-07-dwajoh                   20,000   16,246     34   19,968    8,737   11,231 -68
 ewc-usp-2028-11-07-elomus                   20,000   16,246     33   19,968    8,740   11,228 -68
-ewc-usp-2028-11-07-gavnew                   20,000   16,346     50   19,951    8,737   11,214 -69
+ewc-usp-2028-11-07-gavnew                   20,000   16,246     50   19,951    8,737   11,214 -69
 ewc-usp-2028-11-07-gleyou                   20,000   16,246    102   19,900    8,859   11,041 -67
-ewc-usp-2028-11-07-jamtal                   20,000   16,346     33   19,968    8,633   11,335 -68
-ewc-usp-2028-11-07-jbpri                    20,000   16,346     34   19,966    8,859   11,108 -64
-ewc-usp-2028-11-07-jdvan                    20,000   16,246     33   19,967   15,837    4,131 -26
+ewc-usp-2028-11-07-jamtal                   20,000   16,246     33   19,968    8,806   11,162 -67
+ewc-usp-2028-11-07-jbpri                    20,000   16,246     34   19,966    8,859   11,108 -64
+ewc-usp-2028-11-07-jdvan                    20,000   16,258     33   19,967   15,837    4,131 -26
 ewc-usp-2028-11-07-jonoss                   20,000   16,246     33   19,968   15,775    4,193 -26
 ewc-usp-2028-11-07-jossha                   20,000   16,246     33   19,967    8,747   11,220 -68
 ewc-usp-2028-11-07-kamhar                   20,000   16,246     33   21,332   15,765    5,567 -33
-ewc-usp-2028-11-07-markel                   20,000   16,346     50   20,704    8,859   11,845 -65
-ewc-usp-2028-11-07-marrub                   20,000   16,246     34   19,967   15,840    4,127 -26
+ewc-usp-2028-11-07-markel                   20,000   16,246     50   20,704    8,859   11,845 -65
+ewc-usp-2028-11-07-marrub                   20,000   16,258     34   19,967   15,840    4,127 -26
 ewc-usp-2028-11-07-micoba                   20,000   16,246     34   21,321    8,859   12,463 -77
-ewc-usp-2028-11-07-petbut                   20,000   16,346     33   19,967   15,709    4,258 -29
+ewc-usp-2028-11-07-petbut                   20,000   16,246     33   19,967   15,863    4,104 -28
 ewc-usp-2028-11-07-rahema                   20,000   16,246     33   19,968    8,859   11,109 -97
 ewc-usp-2028-11-07-rokha                    20,000   16,246     33   19,967    8,859   11,109 -69
-ewc-usp-2028-11-07-rondes                   20,000   16,346     34   19,967    8,859   11,108 -86
+ewc-usp-2028-11-07-rondes                   20,000   16,246     34   19,967    8,859   11,108 -86
 ewc-usp-2028-11-07-stasmi                   20,000   16,246     34   20,401    8,859   11,542 -69
-ewc-usp-2028-11-07-thomas                   20,000   16,365     33   19,967   11,555    8,412 -59
+ewc-usp-2028-11-07-thomas                   20,000   16,260     33   19,967    8,722   11,245 -77
+ewc-usp-2028-11-07-tuccar                   20,000   16,246     51   19,950    8,859   11,092 -70
+ewc-usp-2028-11-07-tulgab                   20,000   16,246     33   19,967    8,859   11,109 -69
+ewc-usp-2028-11-07-vivram                   20,000   16,246     34   19,968    8,859   11,109 -69
+ewc-usp-2028-11-07-wesmoo                   20,000   16,263     34   19,967    8,859   11,109 -69
 
-would cancel 3000 orders (493,319 deep shares), failed 0, deep orders kept 2698
+cancelled 3296 orders (540,959 deep shares), failed 0, deep orders kept 2402
+
+settling, then verifying every side still qualifies…
+   BELOW TARGET after cull: enwc-uspres-nom-dem-2028-jonste 8,920 of 20,000
+1 sides below target — keeper will re-stack armed ones
