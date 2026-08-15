@@ -886,13 +886,30 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     failure here shows a warning in STATUS.md but never fails the run.
     """
     path = "/v1/orders/open"
-    resp = requests.get(
-        TRADE_API + path,
-        headers=auth_headers(key_id, secret_key, "GET", path),
-        timeout=30,
-    )
-    if resp.status_code >= 400:
-        raise RuntimeError(f"{path} -> {_http_err(resp)}")
+    # With ~6,400 resting orders this endpoint draws the rate limiter's
+    # attention (2026-08-15: frequent 429s). One throttled response used to
+    # abort the whole poll cycle — no sample, and the defend/keeper/snipe
+    # loops all sat the cycle out. Retry in place instead: a 429 usually
+    # clears in seconds, and the Retry-After header says exactly when.
+    resp = None
+    delay = 2.0
+    for attempt in range(4):
+        resp = requests.get(
+            TRADE_API + path,
+            headers=auth_headers(key_id, secret_key, "GET", path),
+            timeout=30,
+        )
+        if resp.status_code < 400:
+            break
+        if resp.status_code not in (429, 500, 502, 503, 504) or attempt == 3:
+            raise RuntimeError(f"{path} -> {_http_err(resp)}")
+        ra = resp.headers.get("Retry-After")
+        try:
+            wait = min(float(ra), 30.0) if ra else delay
+        except ValueError:
+            wait = delay
+        time.sleep(wait)
+        delay = min(delay * 2, 15.0)
     payload = resp.json()
     orders: list[dict] = []
     for o in payload.get("orders") or []:
