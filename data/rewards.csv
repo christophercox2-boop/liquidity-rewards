@@ -2233,3 +2233,6 @@ date,market,program_type,reward_usd,status
 2026-08-12,ussewc-usse-wv-2026-11-03-rep,liquidityProgram,1.28,PENDING
 2026-08-12,ussewc-usse-wy-2026-11-03-dem,liquidityProgram,4.05,PENDING
 2026-08-12,ussewc-usse-wy-2026-11-03-rep,liquidityProgram,0.49,PENDING
+2026-08-13,apdc-alito-2026-08-31,liquidityProgram,3.2,PENDING
+2026-08-13,apdc-alito-2026-12-31,liquidityProgram,2.42,PENDING
+2026-08-13,apdc-jerpowgov-2026-12-31,liquidityProgram,14.35,PENDING
