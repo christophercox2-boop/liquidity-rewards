@@ -2895,6 +2895,16 @@ def watch_program_arrivals(pol_slugs: list[str]) -> None:
 KEEP_MAX_PER_POLL = int(os.environ.get("KEEP_MAX_PER_POLL", "4"))
 KEEP_SCORE_SIZE = int(os.environ.get("KEEP_SCORE_SIZE", "40"))
 KEEP_COOLDOWN = float(os.environ.get("KEEP_COOLDOWN", "600"))
+# Owner, 2026-08-15 late: "add qualifying back in — to the 2028 markets.
+# I can't do it by hand now." The keeper's DEEP-QUALIFIER branch covers the
+# whole 2028 slate, armed or not: any slate side whose total falls under
+# Target Size gets floor/ceiling size stacked back (post-only 1c bids / 99c
+# asks, chunked to what buying power allows). This deliberately widens the
+# 2026-08-12 cfg-only rule for exactly these prefixes and nothing else —
+# the SCORING branch stays armed-markets-only, and the keeper switch still
+# governs the whole loop.
+KEEP_QUALIFY_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                         "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
 _KEEP_LAST: dict = {}
 
 
@@ -2965,7 +2975,8 @@ def keep_qualified() -> None:
         # keeper was stacking 1c and 99c size into books the owner had never
         # armed -- pandc-anydis and enwc-usgubp-wi among them on 2026-08-12.
         # That is activity nobody asked for, in markets nobody chose.
-        if m not in cfg:
+        slate_qualify = m.startswith(KEEP_QUALIFY_PREFIXES)
+        if m not in cfg and not slate_qualify:
             continue
         pr = progs.get(m)
         if not pr or not pr.get("pool") or not pr.get("target"):
