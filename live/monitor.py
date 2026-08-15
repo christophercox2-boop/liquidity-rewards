@@ -3444,11 +3444,12 @@ def auto_probe() -> None:
         _probe_log(m, "FILLED" if kind == "probe" else "round trip", side, px,
                    "a real trade at this price" if kind == "probe"
                    else "flip filled — gap captured")
-        # the info fund moves ONLY on prober fills: its sales in, its buys out
+        # the info fund moves ONLY on prober activity: its sales and its
+        # scouts' reward earnings in, its buys out
         with MONITOR.lock:
             bud = float(MONITOR.state.get("probe_budget") or 0.0)
             bud += px if side == "SELL" else -px
-            MONITOR.state["probe_budget"] = round(max(0.0, bud), 2)
+            MONITOR.state["probe_budget"] = round(max(0.0, bud), 4)
         if side == "BUY":
             e["traded_at_bid"] = px       # a seller exists at px: fair <= px
             fpx = round(px + PROBE_FLIP_TICKS * 0.01, 2)
@@ -3724,17 +3725,30 @@ def auto_earn() -> None:
     # rate integrated over time, same formula as the headline counter but
     # filtered to the earner's own order ids) — runs even while the switch
     # is off so a resting order's income is never lost from the tally
-    if _EARN["orders"]:
+    if _EARN["orders"] or _PROBE["active"]:
         nowa = time.time()
         by_id = {str(o.get("id")): o for o in MONITOR.orders if o.get("id")}
         rate = sum(float((by_id.get(oid) or {}).get("est_day") or 0)
                    for oid in _EARN["orders"])
+        # the prober's scouts earn rewards too while they rest — counted in
+        # the same tracker, and their share is CREDITED TO THE INFO FUND so
+        # scouting pays for more scouting (owner, 2026-08-16)
+        probe_rate = sum(float((by_id.get(oid) or {}).get("est_day") or 0)
+                         for oid in _PROBE["active"])
         with MONITOR.lock:
             st = MONITOR.state.setdefault("earn_stats", {})
             last = float(st.get("_acc_ts") or 0)
-            if last and rate > 0:
-                st["earned_usd"] = round(float(st.get("earned_usd") or 0)
-                                         + rate * (nowa - last) / 86400.0, 4)
+            if last:
+                dtd = (nowa - last) / 86400.0
+                if rate > 0:
+                    st["earned_usd"] = round(float(st.get("earned_usd") or 0)
+                                             + rate * dtd, 4)
+                if probe_rate > 0:
+                    inc = probe_rate * dtd
+                    st["probe_earned_usd"] = round(
+                        float(st.get("probe_earned_usd") or 0) + inc, 4)
+                    MONITOR.state["probe_budget"] = round(
+                        float(MONITOR.state.get("probe_budget") or 0.0) + inc, 4)
             st["_acc_ts"] = nowa
     if not _auto_on("earn"):
         return
@@ -5540,10 +5554,15 @@ function renderEarn(){
     ' ' + l.qty + ' @ ' + l.px + '¢' +
     (l.note ? ' <span class="sub">— ' + l.note + '</span>' : '') + '</div>').join('');
   document.getElementById('earnBody').innerHTML =
-    '<div style="font-size:15px;font-weight:700;margin-bottom:2px">earned $' +
-    ((st.earned_usd || 0) >= 0.1 ? (st.earned_usd || 0).toFixed(2)
-                                 : (st.earned_usd || 0).toFixed(3)) +
-    ' <span class="sub" style="font-weight:400;font-size:11px">in rewards from its resting bids</span></div>' +
+    (function(){
+      const e = st.earned_usd || 0, p = st.probe_earned_usd || 0, t = e + p;
+      return '<div style="font-size:15px;font-weight:700;margin-bottom:2px">earned $' +
+        (t >= 0.1 ? t.toFixed(2) : t.toFixed(3)) +
+        ' <span class="sub" style="font-weight:400;font-size:11px">in rewards — $' +
+        (e >= 0.1 ? e.toFixed(2) : e.toFixed(3)) + ' its bids, $' +
+        (p >= 0.1 ? p.toFixed(2) : p.toFixed(3)) +
+        ' the prober\\'s scouts (credited to the info fund)</span></div>';
+    })() +
     '<div class="sub" style="margin-bottom:4px">' + status +
     ' · resting worst-case $' + (caps.outstanding || 0).toFixed(2) +
     ' of $' + (caps.total || 0).toFixed(0) + ' cap ($' + (caps.per_mkt || 0).toFixed(0) +
