@@ -1,0 +1,358 @@
+{
+ "dry_run": true,
+ "cancelled": 3000,
+ "failed": 0,
+ "cut_shares": 493319,
+ "sides": [
+  {
+   "m": "enwc-uspres-nom-dem-2028-aleocc",
+   "cut_orders": 63,
+   "cut_shares": 11237,
+   "keep_deep": 8758,
+   "others": 16260
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-andbes",
+   "cut_orders": 63,
+   "cut_shares": 11176,
+   "keep_deep": 8822,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-dwajoh",
+   "cut_orders": 70,
+   "cut_shares": 11878,
+   "keep_deep": 8700,
+   "others": 16319
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jamtal",
+   "cut_orders": 63,
+   "cut_shares": 11093,
+   "keep_deep": 8893,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jbpri",
+   "cut_orders": 65,
+   "cut_shares": 12243,
+   "keep_deep": 8700,
+   "others": 16321
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonoss",
+   "cut_orders": 40,
+   "cut_shares": 7137,
+   "keep_deep": 15763,
+   "others": 16251
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonste",
+   "cut_orders": 62,
+   "cut_shares": 11120,
+   "keep_deep": 8830,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-kamhar",
+   "cut_orders": 25,
+   "cut_shares": 4117,
+   "keep_deep": 15851,
+   "others": 16226
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-micoba",
+   "cut_orders": 63,
+   "cut_shares": 11049,
+   "keep_deep": 8918,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-petbut",
+   "cut_orders": 26,
+   "cut_shares": 4121,
+   "keep_deep": 15842,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rahema",
+   "cut_orders": 61,
+   "cut_shares": 11019,
+   "keep_deep": 8930,
+   "others": 16321
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rokha",
+   "cut_orders": 64,
+   "cut_shares": 11204,
+   "keep_deep": 8764,
+   "others": 16321
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-stasmi",
+   "cut_orders": 69,
+   "cut_shares": 11109,
+   "keep_deep": 8859,
+   "others": 16238
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-wesmoo",
+   "cut_orders": 75,
+   "cut_shares": 13307,
+   "keep_deep": 8859,
+   "others": 16321
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-dontru",
+   "cut_orders": 69,
+   "cut_shares": 11303,
+   "keep_deep": 8664,
+   "others": 16321
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-elomus",
+   "cut_orders": 74,
+   "cut_shares": 12104,
+   "keep_deep": 9023,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-gleyou",
+   "cut_orders": 37,
+   "cut_shares": 5930,
+   "keep_deep": 8875,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-jdvan",
+   "cut_orders": 27,
+   "cut_shares": 4245,
+   "keep_deep": 15730,
+   "others": 16246
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-margre",
+   "cut_orders": 68,
+   "cut_shares": 11108,
+   "keep_deep": 8859,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-marrub",
+   "cut_orders": 24,
+   "cut_shares": 4040,
+   "keep_deep": 15911,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-ranpau",
+   "cut_orders": 60,
+   "cut_shares": 11133,
+   "keep_deep": 8833,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-rondes",
+   "cut_orders": 71,
+   "cut_shares": 11171,
+   "keep_deep": 8829,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tedcru",
+   "cut_orders": 67,
+   "cut_shares": 10944,
+   "keep_deep": 9023,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-thomas",
+   "cut_orders": 69,
+   "cut_shares": 11573,
+   "keep_deep": 9023,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tuccar",
+   "cut_orders": 67,
+   "cut_shares": 11215,
+   "keep_deep": 8751,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tulgab",
+   "cut_orders": 78,
+   "cut_shares": 11011,
+   "keep_deep": 8956,
+   "others": 16221
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-vivram",
+   "cut_orders": 69,
+   "cut_shares": 11573,
+   "keep_deep": 9023,
+   "others": 16221
+  },
+  {
+   "m": "ewc-usp-2028-11-07-aleocc",
+   "cut_orders": 69,
+   "cut_shares": 11109,
+   "keep_deep": 8859,
+   "others": 16346
+  },
+  {
+   "m": "ewc-usp-2028-11-07-andbes",
+   "cut_orders": 71,
+   "cut_shares": 12042,
+   "keep_deep": 8859,
+   "others": 16346
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontru",
+   "cut_orders": 69,
+   "cut_shares": 11542,
+   "keep_deep": 8859,
+   "others": 16346
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontrujr",
+   "cut_orders": 68,
+   "cut_shares": 11228,
+   "keep_deep": 8739,
+   "others": 16346
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dwajoh",
+   "cut_orders": 68,
+   "cut_shares": 11231,
+   "keep_deep": 8737,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-elomus",
+   "cut_orders": 68,
+   "cut_shares": 11228,
+   "keep_deep": 8740,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gavnew",
+   "cut_orders": 69,
+   "cut_shares": 11214,
+   "keep_deep": 8737,
+   "others": 16346
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gleyou",
+   "cut_orders": 67,
+   "cut_shares": 11041,
+   "keep_deep": 8859,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jamtal",
+   "cut_orders": 68,
+   "cut_shares": 11335,
+   "keep_deep": 8633,
+   "others": 16346
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jbpri",
+   "cut_orders": 64,
+   "cut_shares": 11108,
+   "keep_deep": 8859,
+   "others": 16346
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jdvan",
+   "cut_orders": 26,
+   "cut_shares": 4131,
+   "keep_deep": 15837,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jonoss",
+   "cut_orders": 26,
+   "cut_shares": 4193,
+   "keep_deep": 15775,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jossha",
+   "cut_orders": 68,
+   "cut_shares": 11220,
+   "keep_deep": 8747,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-kamhar",
+   "cut_orders": 33,
+   "cut_shares": 5567,
+   "keep_deep": 15765,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-markel",
+   "cut_orders": 65,
+   "cut_shares": 11845,
+   "keep_deep": 8859,
+   "others": 16346
+  },
+  {
+   "m": "ewc-usp-2028-11-07-marrub",
+   "cut_orders": 26,
+   "cut_shares": 4127,
+   "keep_deep": 15840,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-micoba",
+   "cut_orders": 77,
+   "cut_shares": 12463,
+   "keep_deep": 8859,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-petbut",
+   "cut_orders": 29,
+   "cut_shares": 4258,
+   "keep_deep": 15709,
+   "others": 16346
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rahema",
+   "cut_orders": 97,
+   "cut_shares": 11109,
+   "keep_deep": 8859,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rokha",
+   "cut_orders": 69,
+   "cut_shares": 11109,
+   "keep_deep": 8859,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rondes",
+   "cut_orders": 86,
+   "cut_shares": 11108,
+   "keep_deep": 8859,
+   "others": 16346
+  },
+  {
+   "m": "ewc-usp-2028-11-07-stasmi",
+   "cut_orders": 69,
+   "cut_shares": 11542,
+   "keep_deep": 8859,
+   "others": 16246
+  },
+  {
+   "m": "ewc-usp-2028-11-07-thomas",
+   "cut_orders": 59,
+   "cut_shares": 8412,
+   "keep_deep": 11555,
+   "others": 16365
+  }
+ ]
+}
