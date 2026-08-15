@@ -6447,9 +6447,12 @@ function renderSheet(d){
     || '<tr><td class="sub">empty</td></tr>';
   const ords = (d.orders || []).map(o =>
     '<div class="osub">'+
-    '<div style="font-size:14px;font-weight:600">'+o.side+' '+o.size.toLocaleString()+' @ '+
+    '<div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px">'+
+    '<input type="checkbox" class="mck" data-oid="'+o.id+'" onchange="mSelUpd()" '+
+    'style="width:22px;height:22px;flex:0 0 auto">'+
+    '<span>'+o.side+' '+o.size.toLocaleString()+' @ '+
     (+(o.price*100).toFixed(2))+'¢ <span class="sub" style="font-weight:400">· '+
-    (o.est_day ? '$'+o.est_day.toFixed(2)+'/day' : '$0/day')+'</span></div>'+
+    (o.est_day ? '$'+o.est_day.toFixed(2)+'/day' : '$0/day')+'</span></span></div>'+
     '<div class="ctlrow">'+
     '<span class="ctl"><label>price</label><input id="mp'+o.id+'" type="number" step="0.1" min="0.1" max="99.9" value="'+(o.price*100).toFixed(1)+'"><span class="sub">¢</span></span>'+
     '<span class="ctl"><label>qty</label><button class="alt bump" onclick="qBump(\\'mq'+o.id+'\\',-1)">−</button>'+
@@ -6466,7 +6469,15 @@ function renderSheet(d){
     '<div style="display:flex;gap:18px;margin-top:8px">'+
     '<div style="flex:1"><div class="sub">Bids</div><table class="bk">'+lv(d.bids)+'</table></div>'+
     '<div style="flex:1"><div class="sub">Asks</div><table class="bk">'+lv(d.asks)+'</table></div></div>'+
-    '<h3>Your orders</h3>'+ords+
+    '<h3>Your orders</h3>'+
+    ((d.orders || []).length > 1 ?
+      '<div class="ctlrow" style="margin-bottom:8px;align-items:center">'+
+      '<button class="alt" onclick="mSelAll()">Select all</button>'+
+      '<button class="alt" id="mSelBtn" disabled '+
+      'style="background:rgba(229,100,95,.18);color:#ff9d99" '+
+      'onclick="mCancelSel(\\''+esc(m)+'\\')">Cancel selected</button>'+
+      '<span class="sub" id="mSelNote"></span></div>' : '')+
+    ords+
     '<h3>Place new</h3><div class="osub">'+
     '<div class="ctlrow">'+
     '<span class="ctl"><label>side</label><select id="mSide">'+
@@ -6614,6 +6625,44 @@ function mModify(id, m){
 function mCancel(id, m){
   if(!arm('can'+id, 'Cancel this order')) return;
   mact({op:'cancel', order_id:id}, m);
+}
+// --- batch cancel: tick boxes, one armed confirm, sequential cancels ----
+function mSel(){
+  return Array.from(document.querySelectorAll('.mck:checked')).map(c => c.dataset.oid);
+}
+function mSelUpd(){
+  const n = mSel().length;
+  const b = document.getElementById('mSelBtn');
+  if(!b) return;
+  b.disabled = !n;
+  b.textContent = n ? 'Cancel selected ('+n+')' : 'Cancel selected';
+}
+function mSelAll(){
+  const all = document.querySelectorAll('.mck');
+  const on = mSel().length < all.length;   // any unchecked -> check all; else clear
+  all.forEach(c => { c.checked = on; });
+  mSelUpd();
+}
+async function mCancelSel(m){
+  const ids = mSel();
+  if(!ids.length) return;
+  if(!arm('bcx'+m, 'Cancel '+ids.length+' order'+(ids.length>1?'s':''))) return;
+  const b = document.getElementById('mSelBtn');
+  if(b) b.disabled = true;
+  let ok = 0, bad = 0;
+  for(let i = 0; i < ids.length; i++){
+    if(b) b.textContent = 'cancelling '+(i+1)+'/'+ids.length+'…';
+    try{
+      const r = await fetch('maction', {method:'POST',
+        headers:{'Content-Type':'application/json','X-Reprice':'1'},
+        body: JSON.stringify({op:'cancel', order_id:ids[i]})});
+      const d = await r.json().catch(() => ({ok:false}));
+      d.ok ? ok++ : bad++;
+    }catch(e){ bad++; }
+    await new Promise(res => setTimeout(res, 350));
+  }
+  toast('Cancelled '+ok+' ✓'+(bad ? ' · '+bad+' failed' : ''));
+  setTimeout(function(){ openMkt(m); refresh(); }, 1200);
 }
 function mPlace(m){
   const side = document.getElementById('mSide').value;
