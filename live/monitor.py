@@ -3303,6 +3303,16 @@ PROBE_COOLDOWN = 300.0        # per market between new probes
 _PROBE: dict = {"active": {}, "last": {}, "cancelled": set()}
 
 
+def _probe_log(m: str, ev: str, side: str, px: float, note: str = "") -> None:
+    """One line in the prober's own journal, shown on the /map Prober card."""
+    with MONITOR.lock:
+        log = MONITOR.state.setdefault("probe_log", [])
+        log.append({"ts": dt.datetime.now(ET).strftime("%m-%d %I:%M:%S %p"),
+                    "m": m, "ev": ev, "side": side,
+                    "px": round(px * 100, 1), "note": note})
+        del log[:-200]
+
+
 def _probe_real_touches(book: dict) -> tuple[float | None, float | None]:
     bb = next((p for p, q in book.get("bids") or [] if q >= PROBE_REAL_MIN), None)
     ba = next((p for p, q in book.get("asks") or [] if q >= PROBE_REAL_MIN), None)
@@ -3372,6 +3382,8 @@ def auto_probe() -> None:
                         e["rested_bid"] = max(float(e.get("rested_bid") or 0), px)
                     else:
                         e["rested_ask"] = min(float(e.get("rested_ask") or 1), px)
+                    _probe_log(m, "rested", side, px,
+                               "no taker for 45 min — rotating")
                 except Exception:  # noqa: BLE001
                     pass
             continue
@@ -3383,6 +3395,9 @@ def auto_probe() -> None:
         e = est.setdefault(m, {})
         e["last_fill"] = {"side": side, "px": px,
                           "ts": dt.datetime.now(ET).strftime("%m-%d %I:%M %p")}
+        _probe_log(m, "FILLED" if kind == "probe" else "round trip", side, px,
+                   "a real trade at this price" if kind == "probe"
+                   else "flip filled — gap captured")
         if side == "BUY":
             e["traded_at_bid"] = px       # a seller exists at px: fair <= px
             fpx = round(px + PROBE_FLIP_TICKS * 0.01, 2)
@@ -3391,6 +3406,8 @@ def auto_probe() -> None:
                                    f"flip sell (bid {px*100:.0f}c filled)")
                 if fid:
                     _PROBE["active"][fid] = (m, "SELL", fpx, now, "flip")
+                    _probe_log(m, "flip", "SELL", fpx,
+                               f"reselling the fill from {px*100:.0f}c")
         else:
             e["traded_at_ask"] = px       # a buyer exists at px: fair >= px
             fpx = round(px - PROBE_FLIP_TICKS * 0.01, 2)
@@ -3399,6 +3416,8 @@ def auto_probe() -> None:
                                    f"flip buy-back (ask {px*100:.0f}c filled)")
                 if fid:
                     _PROBE["active"][fid] = (m, "BUY", fpx, now, "flip")
+                    _probe_log(m, "flip", "BUY", fpx,
+                               f"buying back the fill from {px*100:.0f}c")
     # 2. seed new probes at random interior ticks
     if len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
         return
@@ -3432,6 +3451,7 @@ def auto_probe() -> None:
         _PROBE["last"][m] = now
         if oid:
             _PROBE["active"][oid] = (m, side, px, now, "probe")
+            _probe_log(m, "scout", side, px, "resting inside the gap")
             placed += 1
 
 
@@ -4649,6 +4669,10 @@ def _map_payload() -> dict:
         "probe_live": bool(_auto_on("probe")
                            and os.environ.get("PROBE_PAUSE", "") != "1"),
         "probe_est": MONITOR.state.get("probe") or {},
+        "probe_log": list(reversed((MONITOR.state.get("probe_log") or [])[-40:])),
+        "probe_active": [{"m": r[0], "side": r[1], "px": round(r[2] * 100, 1),
+                          "age_m": int((time.time() - r[3]) / 60), "kind": r[4]}
+                         for r in _PROBE["active"].values()],
         "defend_markets": len(MONITOR.state.get("defend") or {}),
         "defend_note": ("switched off"
                         if not _auto_on("defend") else
@@ -4828,6 +4852,11 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     </div>
   </div>
   <div class="card det" id="det" style="display:none"></div>
+  <div class="card" id="probeCard" style="display:none">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--dim);margin-bottom:6px">🔍 Prober — what the scouts found</div>
+    <div id="probeBody"></div>
+  </div>
   <div class="card">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--dim);margin-bottom:6px">Needs attention</div>
@@ -4888,6 +4917,7 @@ function render(){
   }).join('')).join('');
 
   swRender();
+  renderProbe();
   const bn=document.getElementById('banner');
   if(DATA.auto && DATA.auto.defend===true && DATA.defend_live===false){
     // switched on but vetoed by something else -- say what
@@ -4943,6 +4973,48 @@ const SWDESC = {
   probe: {on:'1-share scouts mapping fair prices', off:'not scouting'},
 };
 const SWARM = {};
+function renderProbe(){
+  const card = document.getElementById('probeCard'); if(!card) return;
+  const est = DATA.probe_est || {}, act = DATA.probe_active || [], log = DATA.probe_log || [];
+  const on = DATA.auto && DATA.auto.probe === true;
+  if(!on && !Object.keys(est).length && !act.length && !log.length){
+    card.style.display = 'none'; return;
+  }
+  card.style.display = 'block';
+  const nm = m => m.replace(/^enwc-uspres-nom-/, 'nom·').replace(/^ewc-usp-2028-11-07-/, 'win·');
+  // fair bands: what traded vs what rested untouched
+  const bands = Object.entries(est).map(([m, e]) => {
+    const parts = [];
+    if(e.traded_at_bid != null) parts.push('sold to us @ ' + (e.traded_at_bid*100).toFixed(0) + '¢');
+    if(e.traded_at_ask != null) parts.push('bought from us @ ' + (e.traded_at_ask*100).toFixed(0) + '¢');
+    if(e.rested_bid != null) parts.push('bid ' + (e.rested_bid*100).toFixed(0) + '¢ rested');
+    if(e.rested_ask != null) parts.push('ask ' + (e.rested_ask*100).toFixed(0) + '¢ rested');
+    return '<tr><td class="mkt" style="word-break:normal"><b>' + nm(m) + '</b></td>' +
+      '<td style="font-size:11px">' + (parts.join(' · ') || 'no signal yet') +
+      (e.last_fill ? '<div class="sub" style="font-size:10px">last fill: ' +
+        e.last_fill.side + ' ' + (e.last_fill.px*100).toFixed(0) + '¢ · ' +
+        e.last_fill.ts + '</div>' : '') + '</td></tr>';
+  }).join('');
+  const scouts = act.map(a =>
+    '<span style="display:inline-block;background:var(--surface2);border-radius:6px;' +
+    'padding:2px 8px;margin:2px;font-size:11px">' + nm(a.m) + ' ' +
+    (a.kind === 'flip' ? '↩' : '') + a.side + ' @ ' + a.px + '¢ · ' + a.age_m + 'm</span>').join('');
+  const lines = log.map(l =>
+    '<div style="font-size:11px;padding:3px 0;border-top:1px dashed var(--line)">' +
+    '<span class="sub">' + l.ts + '</span> <b>' + nm(l.m) + '</b> ' +
+    (l.ev === 'FILLED' ? '<span style="color:#f0883e">FILLED</span>' :
+     l.ev === 'round trip' ? '<span style="color:#3fb950">round trip ✓</span>' : l.ev) +
+    ' ' + l.side + ' @ ' + l.px + '¢' +
+    (l.note ? ' <span class="sub">— ' + l.note + '</span>' : '') + '</div>').join('');
+  document.getElementById('probeBody').innerHTML =
+    (act.length ? '<div class="sub" style="margin-bottom:4px">' + act.length +
+      ' scout' + (act.length > 1 ? 's' : '') + ' resting</div>' + scouts :
+      '<div class="sub">no scouts resting' + (on ? ' — placing as books allow' : ' — Prober is off') + '</div>') +
+    (bands ? '<table style="width:100%;border-collapse:collapse;margin-top:8px">' + bands + '</table>' : '') +
+    (lines ? '<details style="margin-top:8px"><summary class="sub" style="cursor:pointer">' +
+      'journal (' + log.length + ')</summary>' + lines + '</details>' : '');
+}
+
 function swRender(){
   if(!DATA || !DATA.auto) return;
   ['defend','keeper','snipe','probe'].forEach(k=>{
