@@ -3277,6 +3277,164 @@ def auto_snipe() -> None:
             continue
 
 
+# --- price prober (owner, 2026-08-15) --------------------------------------
+# Fair-price discovery by tiny probes. The bait era makes the visible touch
+# meaningless, so: rest ONE-share post-only orders at random ticks inside the
+# de-baited spread (levels under 5 shares ignored on both sides). A probe
+# that fills is information — a real counterparty traded at that price — and
+# the loop answers by placing the flip on the other side of the gap: a
+# filled 1-share bid becomes a 1-share SELL_LONG two ticks higher, a filled
+# 1-share ask becomes a 1-share SELL_SHORT buy-back two ticks lower. Each
+# round trip costs pennies at worst, sometimes earns the gap, and pins fair
+# between the prices that trade and the prices that rest untouched.
+# The running band per market is kept in state["probe"] and every placement
+# is audit-logged. Owner switch: auto["probe"], off by default.
+PROBE_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                  "ewc-usp-2028-11-07-")
+PROBE_SIZE = 1
+PROBE_REAL_MIN = 5.0          # book levels smaller than this are bait — ignore
+PROBE_MIN_GAP = 3             # need at least this many interior ticks to learn
+PROBE_MAX_PX = 0.60           # never probe-bid above this
+PROBE_FLIP_TICKS = 2
+PROBE_TTL = float(os.environ.get("PROBE_TTL", "2700"))     # rotate after 45 min
+PROBE_ACTIVE_MAX = int(os.environ.get("PROBE_ACTIVE_MAX", "24"))
+PROBE_MAX_PER_POLL = 2
+PROBE_COOLDOWN = 300.0        # per market between new probes
+_PROBE: dict = {"active": {}, "last": {}, "cancelled": set()}
+
+
+def _probe_real_touches(book: dict) -> tuple[float | None, float | None]:
+    bb = next((p for p, q in book.get("bids") or [] if q >= PROBE_REAL_MIN), None)
+    ba = next((p for p, q in book.get("asks") or [] if q >= PROBE_REAL_MIN), None)
+    return bb, ba
+
+
+def _probe_place(m: str, side: str, px: float, intent: str, note: str) -> str | None:
+    try:
+        r = requests.request(
+            "POST", tr.TRADE_API + "/v1/orders",
+            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                     "Content-Type": "application/json"},
+            json={"marketSlug": m, "intent": intent,
+                  "type": "ORDER_TYPE_LIMIT",
+                  "price": {"value": f"{px:.2f}", "currency": "USD"},
+                  "quantity": PROBE_SIZE,
+                  "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                  "participateDontInitiate": True},
+            timeout=20)
+        ok = r.status_code < 300
+        oid = None
+        if ok:
+            try:
+                j = r.json()
+                o = j.get("order")
+                oid = (o.get("id") if isinstance(o, dict) else None) \
+                      or j.get("id") or j.get("orderId")
+            except Exception:  # noqa: BLE001
+                pass
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": m, "side": f"PROBE {note}", "from": "—",
+                        "to": round(px * 100, 1), "size": PROBE_SIZE,
+                        "status": r.status_code,
+                        "response": " ".join(r.text.split())[:100], "verified": ok})
+        del ACTIONS[:-20]
+        return str(oid) if oid else None
+    except Exception:  # noqa: BLE001 — the prober must never kill the poll
+        return None
+
+
+def auto_probe() -> None:
+    if not _auto_on("probe"):
+        return
+    if os.environ.get("PROBE_PAUSE", "") == "1":
+        return
+    now = time.time()
+    open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
+    est = MONITOR.state.setdefault("probe", {})
+    # 1. reconcile: a probe missing from open orders that we did not cancel
+    #    was FILLED — record the price and place the flip
+    for oid, rec in list(_PROBE["active"].items()):
+        m, side, px, ts, kind = rec
+        if oid in open_ids:
+            if now - ts > PROBE_TTL:      # rotate a stale probe
+                try:
+                    requests.request(
+                        "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
+                        headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST",
+                                                   f"/v1/order/{oid}/cancel"),
+                                 "Content-Type": "application/json"},
+                        json={"marketSlug": m}, timeout=15)
+                    _PROBE["cancelled"].add(oid)
+                    del _PROBE["active"][oid]
+                    # untouched for the whole TTL: fair is beyond this price
+                    e = est.setdefault(m, {})
+                    if side == "BUY":
+                        e["rested_bid"] = max(float(e.get("rested_bid") or 0), px)
+                    else:
+                        e["rested_ask"] = min(float(e.get("rested_ask") or 1), px)
+                except Exception:  # noqa: BLE001
+                    pass
+            continue
+        del _PROBE["active"][oid]
+        if oid in _PROBE["cancelled"]:
+            _PROBE["cancelled"].discard(oid)
+            continue
+        # filled — a real trade happened at px
+        e = est.setdefault(m, {})
+        e["last_fill"] = {"side": side, "px": px,
+                          "ts": dt.datetime.now(ET).strftime("%m-%d %I:%M %p")}
+        if side == "BUY":
+            e["traded_at_bid"] = px       # a seller exists at px: fair <= px
+            fpx = round(px + PROBE_FLIP_TICKS * 0.01, 2)
+            if kind == "probe" and 0.01 <= fpx <= 0.99:
+                fid = _probe_place(m, "SELL", fpx, "ORDER_INTENT_SELL_LONG",
+                                   f"flip sell (bid {px*100:.0f}c filled)")
+                if fid:
+                    _PROBE["active"][fid] = (m, "SELL", fpx, now, "flip")
+        else:
+            e["traded_at_ask"] = px       # a buyer exists at px: fair >= px
+            fpx = round(px - PROBE_FLIP_TICKS * 0.01, 2)
+            if kind == "probe" and 0.01 <= fpx <= 0.99:
+                fid = _probe_place(m, "BUY", fpx, "ORDER_INTENT_SELL_SHORT",
+                                   f"flip buy-back (ask {px*100:.0f}c filled)")
+                if fid:
+                    _PROBE["active"][fid] = (m, "BUY", fpx, now, "flip")
+    # 2. seed new probes at random interior ticks
+    if len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
+        return
+    placed = 0
+    mkts = [m for m in tr._BOOK_CACHE if m.startswith(PROBE_PREFIXES)]
+    random.shuffle(mkts)
+    for m in mkts:
+        if placed >= PROBE_MAX_PER_POLL or len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
+            break
+        if now - _PROBE["last"].get(m, 0.0) < PROBE_COOLDOWN:
+            continue
+        if any(r[0] == m and r[4] == "probe" for r in _PROBE["active"].values()):
+            continue
+        ent = tr._BOOK_CACHE.get(m)
+        if not ent or now - ent[0] > 300:
+            continue
+        bb, ba = _probe_real_touches(ent[1])
+        if bb is None or ba is None:
+            continue
+        lo_t = round(bb / 0.01) + 1
+        hi_t = round(ba / 0.01) - 1
+        if hi_t - lo_t + 1 < PROBE_MIN_GAP:
+            continue          # spread too tight to learn anything
+        t = random.randint(lo_t, hi_t)
+        px = round(t * 0.01, 2)
+        side = "BUY" if random.random() < 0.5 else "SELL"
+        if side == "BUY" and px > PROBE_MAX_PX:
+            side = "SELL"
+        intent = "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_BUY_SHORT"
+        oid = _probe_place(m, side, px, intent, f"{side.lower()} scout")
+        _PROBE["last"][m] = now
+        if oid:
+            _PROBE["active"][oid] = (m, side, px, now, "probe")
+            placed += 1
+
+
 # --- slate health watch (in-process; replaced the slate_watch.yml cron) ----
 # Moved out of GitHub Actions 2026-08-15: the 30-minute cron was burning
 # ~120 Actions minutes a day against a 2,000/month plan, and the monitor
@@ -4088,9 +4246,9 @@ def do_maction(body: dict) -> tuple[int, dict]:
         # The owner's on/off button for a placement loop. Auth and the
         # X-Reprice CSRF header are already enforced by the POST handler.
         which = str(body.get("which") or "")
-        if which not in ("defend", "keeper", "snipe"):
+        if which not in ("defend", "keeper", "snipe", "probe"):
             return 400, {"ok": False,
-                         "error": "which must be defend, keeper or snipe"}
+                         "error": "which must be defend, keeper, snipe or probe"}
         on = bool(body.get("on"))
         with MONITOR.lock:
             auto = MONITOR.state.setdefault("auto", {})
@@ -4480,7 +4638,7 @@ def _map_payload() -> dict:
         # this dict reads as undefined in the browser, so the button repaints
         # OFF on the next refresh even though the loop is running.
         "auto": {"defend": _auto_on("defend"), "keeper": _auto_on("keeper"),
-                 "snipe": _auto_on("snipe")},
+                 "snipe": _auto_on("snipe"), "probe": _auto_on("probe")},
         "defend_live": bool(_auto_on("defend")
                             and os.environ.get("DEFEND_PAUSE", "") != "1"
                             and (MONITOR.state.get("defend") or {})),
@@ -4488,6 +4646,9 @@ def _map_payload() -> dict:
                             and os.environ.get("KEEP_PAUSE", "") != "1"),
         "snipe_live": bool(_auto_on("snipe")
                            and os.environ.get("SNIPE_PAUSE", "") != "1"),
+        "probe_live": bool(_auto_on("probe")
+                           and os.environ.get("PROBE_PAUSE", "") != "1"),
+        "probe_est": MONITOR.state.get("probe") or {},
         "defend_markets": len(MONITOR.state.get("defend") or {}),
         "defend_note": ("switched off"
                         if not _auto_on("defend") else
@@ -4650,6 +4811,8 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
       <span class="nm">Keeper</span><span class="st">loading…</span></button>
     <button class="autosw" id="sw_snipe" onclick="swTap('snipe')" disabled>
       <span class="nm">Sniper</span><span class="st">loading…</span></button>
+    <button class="autosw" id="sw_probe" onclick="swTap('probe')" disabled>
+      <span class="nm">Prober</span><span class="st">loading…</span></button>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
   <div class="chips" id="chips"></div>
@@ -4777,11 +4940,12 @@ const SWDESC = {
   defend: {on:'repricing orders in armed markets', off:'not placing anything'},
   keeper: {on:'placing size to hold qualification', off:'not placing anything'},
   snipe: {on:'taking tiny over-priced 2028 bids', off:'not taking anything'},
+  probe: {on:'1-share scouts mapping fair prices', off:'not scouting'},
 };
 const SWARM = {};
 function swRender(){
   if(!DATA || !DATA.auto) return;
-  ['defend','keeper','snipe'].forEach(k=>{
+  ['defend','keeper','snipe','probe'].forEach(k=>{
     const b=document.getElementById('sw_'+k); if(!b) return;
     b.disabled=false;
     const on = DATA.auto[k]===true;
@@ -7388,6 +7552,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     slate_health_check()
                 except Exception:  # noqa: BLE001 — the watch never kills the poll
                     pass
+                try:
+                    auto_probe()
+                except Exception as e:  # noqa: BLE001 — prober never kills the poll
+                    MONITOR.error = f"probe: {type(e).__name__}: {e}"[:150]
             except Exception as e:  # noqa: BLE001 — defense never kills the poll
                 MONITOR.error = f"defend: {type(e).__name__}: {e}"[:150]
             MONITOR.maybe_save_remote()
