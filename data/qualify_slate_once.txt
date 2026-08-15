@@ -1,0 +1,9 @@
+one-time slate qualification pass — buying power $211.67
+
+enwc-uspres-nom-dem-2028-kamhar              BUY  total    10,992 of 20,000 -> topping 9,008
+ewc-usp-2028-11-07-dontru                    BUY  total       455 of 20,000 -> topping 19,546
+ewc-usp-2028-11-07-gleyou                    BUY  total     2,452 of 20,000 -> topping 17,548
+ewc-usp-2028-11-07-jamtal                    BUY  total       458 of 20,000 -> topping 19,542
+ewc-usp-party-2028-11-07-dem                 SELL total    13,243 of 20,000 -> topping 6,758
+
+sides topped: 5, orders 37, failed 0
