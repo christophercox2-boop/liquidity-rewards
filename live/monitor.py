@@ -3530,7 +3530,18 @@ def _bayes_fair(m: str) -> dict | None:
     bb = ba = None
     if ent and time.time() - ent[0] < 900:
         bb, ba = _probe_real_touches(ent[1])
-    if not evs and bb is None and ba is None:
+    # scouts still resting are evidence too, growing with age: no taker at
+    # that price for this long pushes fair away from it. Weighted up to the
+    # same 0.35 a completed rotation earns, pro-rated by age/TTL.
+    nowp = time.time()
+    partial = []
+    for r in _PROBE["active"].values():
+        if r[0] != m or r[4] != "probe":
+            continue
+        w = 0.35 * min((nowp - r[3]) / PROBE_TTL, 1.0)
+        if w > 0.02:
+            partial.append((r[1], r[2] * 100, w))
+    if not evs and not partial and bb is None and ba is None:
         return None
     S = 2.0
     def sig(x: float) -> float:
@@ -3554,6 +3565,11 @@ def _bayes_fair(m: str) -> dict | None:
                     lp += 0.35 * llog(1.0 - 0.8 * sig((p - f) / S))
                 else:
                     lp += 0.35 * llog(1.0 - 0.8 * sig((f - p) / S))
+        for side, p, w in partial:
+            if side == "BUY":
+                lp += w * llog(1.0 - 0.8 * sig((p - f) / S))
+            else:
+                lp += w * llog(1.0 - 0.8 * sig((f - p) / S))
         if bb is not None:
             lp += 0.5 * llog(sig((f - bb * 100) / S))
         if ba is not None:
@@ -3572,7 +3588,10 @@ def _bayes_fair(m: str) -> dict | None:
         if hi is None and cum >= 0.90:
             hi = i
     n_hard = sum(1 for l in evs if l.get("ev") in ("FILLED", "round trip"))
+    n_rest = sum(1 for l in evs if l.get("ev") == "rested") \
+             + sum(1 for _, _, w in partial if w >= 0.175)   # half-aged or more
     return {"med": med, "lo": lo, "hi": hi, "n": len(evs), "fills": n_hard,
+            "rested": n_rest,
             "bb": round(bb * 100, 1) if bb is not None else None,
             "ba": round(ba * 100, 1) if ba is not None else None}
 
@@ -3618,13 +3637,19 @@ _EARN: dict = {"orders": {}, "last": {}, "cancelled": set()}
 
 
 def _earn_confident(b: dict | None) -> bool:
-    """Graduated: a very tight band earns trust from a single real trade,
-    a merely tight one needs two."""
+    """Graduated: a very tight band earns trust from a single real trade, a
+    merely tight one needs two — and enough SURVIVAL evidence (scouts that
+    rested untouched, bracketing the price) substitutes for trades when it
+    has squeezed the band very tight. Silence at the right prices is also
+    information (owner, 2026-08-15)."""
     if not (b and b.get("med")):
         return False
     band = b["hi"] - b["lo"]
     fills = b.get("fills", 0)
-    return (fills >= 1 and band <= 3) or (fills >= 2 and band <= EARN_BAND_MAX)
+    rested = b.get("rested", 0)
+    return ((fills >= 1 and band <= 3)
+            or (fills >= 2 and band <= EARN_BAND_MAX)
+            or (rested >= 4 and band <= 2))
 
 
 def _earn_log(m: str, ev: str, px: float, qty: int, note: str = "") -> None:
@@ -5333,7 +5358,7 @@ function renderProbe(){
       (b.ba != null ? seg(b.ba, '2px', 'background:#e5645f;opacity:.8') : '') +
       '</div><div class="sub" style="font-size:10px">fair ~' + b.med + '¢ (' +
       b.lo + '–' + b.hi + '¢, ' + b.fills + ' trade' + (b.fills === 1 ? '' : 's') +
-      ', ' + b.n + ' obs)' +
+      ', ' + (b.rested || 0) + ' rested, ' + b.n + ' obs)' +
       (b.bb != null ? ' · <span style="color:#58a6ff">|</span> bid ' + b.bb + '¢' : '') +
       (b.ba != null ? ' · <span style="color:#e5645f">|</span> ask ' + b.ba + '¢' : '') +
       '</div>';
