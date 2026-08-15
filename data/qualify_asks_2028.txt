@@ -1,20 +1,8 @@
-buying power $329.49 — an ask order carries 329 shares
+buying power $327.80 — an ask order carries 327 shares
 slate: 60 markets
 
-[8/60] enwc-uspres-nom-rep-2028-ranpau: ask 36,293 of 20,000, OURS 19,999 → adding 0 to stand alone
-    1 orders placed, ours ~20,000, ask side now 36,293 → QUALIFYING
-[21/60] enwc-uspres-nom-dem-2028-jamtal: ask 36,378 of 20,000, OURS 19,981 → adding 19 to stand alone
-    1 orders placed, ours ~20,001, ask side now 36,378 → QUALIFYING
-[28/60] enwc-uspres-nom-dem-2028-micoba: ask 36,319 of 20,000, OURS 19,998 → adding 1 to stand alone
-    1 orders placed, ours ~20,000, ask side now 36,319 → QUALIFYING
-[29/60] enwc-uspres-nom-dem-2028-petbut: ask 36,227 of 20,000, OURS 19,987 → adding 12 to stand alone
-    1 orders placed, ours ~20,000, ask side now 36,227 → QUALIFYING
-[41/60] ewc-usp-2028-11-07-gleyou: ask 36,247 of 20,000, OURS 19,999 → adding 1 to stand alone
-    1 orders placed, ours ~20,001, ask side now 36,247 → QUALIFYING
-[56/60] ewc-usp-2028-11-07-thomas: ask 36,309 of 20,000, OURS 19,998 → adding 1 to stand alone
-    1 orders placed, ours ~20,000, ask side now 36,309 → QUALIFYING
-[57/60] ewc-usp-2028-11-07-tuccar: ask 36,346 of 20,000, OURS 19,998 → adding 1 to stand alone
-    1 orders placed, ours ~20,000, ask side now 36,346 → QUALIFYING
+[18/60] enwc-uspres-nom-dem-2028-andbes: ask 36,199 of 20,000, OURS 19,971 → adding 29 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,199 → QUALIFYING
 
-7 orders across 7 markets
-7 of 7 ask sides now at Target Size
+1 orders across 1 markets
+1 of 1 ask sides now at Target Size
