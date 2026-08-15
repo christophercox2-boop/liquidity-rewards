@@ -1,0 +1,3 @@
+2026-08-15 01:54 UTC  open orders 6,446  slate sides short 1  targets [20000.0]
+  PROBLEM: 1 slate sides below target on OUR size (worst: andbes SELL 19,971/20,000)
+(no ntfy topic — alert not sent)
