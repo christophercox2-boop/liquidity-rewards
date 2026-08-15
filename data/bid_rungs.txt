@@ -1,0 +1,30 @@
+bid rungs: 25 sides, worst-case fills $100.00 of $100, est +$274.61/day   (DRY RUN)
+
+market                                        touch   rung  expo$    est+
+enwc-uspres-nom-rep-2028-jdvan                49.0c     24  11.76   23.58
+enwc-uspres-nom-dem-2028-petbut                7.0c    114   7.98   23.39
+enwc-uspres-nom-rep-2028-marrub               26.0c     50  13.00   23.19
+enwc-uspres-nom-dem-2028-aleocc               18.0c     61  10.98   15.04
+enwc-uspres-nom-dem-2028-rokha                 9.0c     33   2.97   13.41   (top-up; 2 already near touch)
+enwc-uspres-nom-dem-2028-stasmi                9.0c     33   2.97   13.41   (top-up; 2 already near touch)
+enwc-uspres-nom-dem-2028-micoba               10.0c     30   3.00   13.36   (top-up; 2 already near touch)
+enwc-uspres-nom-dem-2028-andbes               15.0c     20   3.00   12.78   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-gavnew                     10.0c     40   4.00   11.86   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-stasmi                      9.0c     22   1.98    8.70   (top-up; 1 already near touch)
+ewc-usp-2028-11-07-micoba                      9.0c     22   1.98    8.07   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-rokha                       9.0c     22   1.98    8.07   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-tulgab                      9.0c     22   1.98    8.07   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-thomas                     15.0c     20   3.00    8.04   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-rahema                     10.0c     20   2.00    8.02   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-vivram                     10.0c     20   2.00    8.02   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-jamtal                     11.0c     18   1.98    7.90   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-andbes                      8.0c     25   2.00    7.82   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-dwajoh                      8.0c     25   2.00    7.82   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-jossha                      8.0c     25   2.00    7.82   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-rondes                      8.0c     25   2.00    7.75   (top-up; 2 already near touch)
+enwc-uspres-nom-dem-2028-jonoss               15.0c     47   7.05    7.56   (top-up; 25 already near touch)
+ewc-usp-2028-11-07-gleyou                     25.0c     12   3.00    7.21   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-tuccar                     25.0c     12   3.00    7.21   (top-up; 2 already near touch)
+ewc-usp-2028-11-07-wesmoo                      7.0c     29   2.03    6.49   (top-up; 2 already near touch)
+
+would place 25, failed 0
