@@ -5991,6 +5991,13 @@ def auto_earn() -> None:
             # its chances with everything else. Two ways to stop paying: our
             # own order fading, or the whole market being diluted out from
             # under it — the second shows in the rate series first.
+            # EVERY CONDITION OF ENTRY IS ALSO A CONDITION OF STAYING.
+            # Demotion used to test earnings only, while graduation ALSO
+            # required that the market had never taken a fill off us and that
+            # the order was visibly on the book. An entry test that is never
+            # re-checked is a one-way ratchet: a graduate could start taking
+            # fills, or go dark on the book, and keep its exemption from the
+            # dollar cap indefinitely. Both now demote.
             pk, cur = _rate_trend(m)
             if est < EARN_GRAD_MIN_RATE / 2:
                 grad.discard(oid)
@@ -6001,6 +6008,16 @@ def auto_earn() -> None:
                 _earn_log(m, "demoted", px / 100.0, qty,
                           f"market fell ${pk:.2f} to ${cur:.2f}/day — being "
                           "diluted, back on the search budget")
+            elif (est_pm.get(m) or {}).get("fills"):
+                grad.discard(oid)
+                _earn_log(m, "demoted", px / 100.0, qty,
+                          "this market has taken a fill off us since it "
+                          "graduated — back under the cap")
+            elif _on_book(m, "BUY", px / 100.0, qty, ts) is False:
+                # only an explicit False; an unknown reading is not evidence
+                grad.discard(oid)
+                _earn_log(m, "demoted", px / 100.0, qty,
+                          "no longer visibly on the book — back under the cap")
             continue
         if now - ts < EARN_GRAD_AGE or est < EARN_GRAD_MIN_RATE:
             continue

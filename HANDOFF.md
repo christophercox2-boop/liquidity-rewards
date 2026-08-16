@@ -265,6 +265,43 @@ the SHA it just read — which still refuses if someone else moved deploy. All
 three paths (already in sync, needs updating, does not exist) are tested
 against a stubbed git.
 
+### 2026-08-16 — can a graduate fall back down? Yes, but two exits were missing
+
+Owner: "Can a graduated market ever fall back down? If it's not based on
+confidence I don't see how."
+
+It can, and it always could — demotion just had nothing to do with knowledge.
+Graduation grants ONE thing: exemption from `EARN_TOTAL_USD`, so the order
+keeps earning without consuming the search budget. It is never a licence to
+place more.
+
+Entry needs five things: an hour on the book, >= EARN_GRAD_MIN_RATE, payback
+of its own worst case inside EARN_GRAD_PAYBACK days, NO fill ever taken in
+that market, visibly on the book, and room under EARN_GRAD_MAX_USD.
+
+Demotion tested only the first two, which made the other three a ONE-WAY
+RATCHET: a graduate could start taking fills, or go dark on the book, and keep
+its cap exemption forever. Both now demote, so every condition of entry is a
+condition of staying. Full trigger list, all tested in t_grad:
+  * its own rate falls below half the floor;
+  * the market is diluted to under 40% of an >= $1/day peak;
+  * the market takes a fill after graduating  (NEW);
+  * the order is no longer visibly on the book (NEW — explicit False only, an
+    unknown book reading is not evidence);
+  * the order disappears (`grad &= set(_EARN["orders"])`);
+  * the off-model sweep pulls it — that pass does NOT exempt graduates, and
+    discards from `grad` when it cancels. Now that `_silver_fair` actually
+    works, this is the route by which the race model reaches a graduate.
+
+CONFIDENCE STILL PLAYS NO PART, on the way in or out. The loop never calls
+`_earn_confidence` or `_bayes_fair`. That is defensible — a quiet market gives
+low confidence AND low fill risk for the same reason — but it means exempt
+capital can sit in markets we cannot price. Deliberately NOT changed: demoting
+on low confidence would demote nearly every quiet market at once and gut the
+point of graduation. If the owner wants it, the better shape is a separate cap
+on how much GRADUATED capital may sit below the confidence floor, rather than
+a blanket demotion.
+
 ### 2026-08-16 — a SHORT is not a SALE, and my own carve-out let one through
 
 Owner's receipt: "Rhode Island Governor Election Winner / Democratic Party ·
