@@ -866,7 +866,12 @@ LAST_DEBUG: dict[str, str] = {}  # diagnostics from the most recent fetch, for t
 # every time tripped the exchange's per-IP rate limit once the portfolio grew.
 # Refresh a rotating subset per call instead — a fresh process (the hourly
 # tracker) still fetches everything on its first call.
-BOOK_REFRESH_PER_CALL = 20
+# Books go stale at 300s and the prober will not place against a stale one.
+# At 20 per call across ~180 markets each book was refreshed every 4.5 minutes,
+# which left markets dropping in and out of the scout's candidate pool for no
+# better reason than refresh timing. 28 puts the cycle comfortably inside the
+# window without a big jump in calls against the exchange.
+BOOK_REFRESH_PER_CALL = 28
 BOOK_COLD_FETCH_ALL = True  # one-shot runs sweep every book; the monitor sets False
 _BOOK_CACHE: dict[str, tuple[float, dict]] = {}  # slug -> (fetched_at, book)
 _BOOK_VOLATILITY: dict[str, float] = {}  # EWMA of "book changed since last refresh"

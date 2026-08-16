@@ -3379,9 +3379,19 @@ PROBE_REAL_MIN = 5.0          # book levels smaller than this are bait — ignor
 PROBE_MIN_GAP = 3             # need at least this many interior ticks to learn
 PROBE_MAX_PX = 0.60           # never probe-bid above this
 PROBE_FLIP_TICKS = 2
-PROBE_TTL = float(os.environ.get("PROBE_TTL", "2700"))     # rotate after 45 min
-PROBE_ACTIVE_MAX = int(os.environ.get("PROBE_ACTIVE_MAX", "60"))
-PROBE_MAX_PER_POLL = 2
+# PACE. The binding limit was never the placement rate — it was turnover.
+# 60 scouts each sitting for 45 minutes retire at 80/hour however often the
+# poll runs, and 176 markets at 3 scouts each is 528 slots, so a full sweep
+# took 6.6 hours. More scouts alive at once, retiring sooner, cuts that to
+# under two hours.
+#
+# The cost of a shorter TTL is evidence quality: "held 30 minutes with no
+# taker" says less than "held 45". It is still the same KIND of evidence and
+# the model already weights a resting scout by how long it has sat, so a
+# shorter sit simply counts for less rather than counting wrongly.
+PROBE_TTL = float(os.environ.get("PROBE_TTL", "1800"))     # rotate after 30 min
+PROBE_ACTIVE_MAX = int(os.environ.get("PROBE_ACTIVE_MAX", "140"))
+PROBE_MAX_PER_POLL = 5
 # Several scouts may sit in one market at DIFFERENT prices (owner, 2026-08-16:
 # "it can stack the single orders so that it can increase its confidence in the
 # info it is getting"). One scout per market gives one observation per 45-minute
@@ -3397,7 +3407,10 @@ PROBE_FILL_COOLDOWN = float(os.environ.get("PROBE_FILL_COOLDOWN", "5400"))
 # nearer the bid touch rests and earns. Weighting the draw toward the safe half
 # buys information more slowly and much more cheaply than a uniform draw.
 PROBE_SAFE_BIAS = float(os.environ.get("PROBE_SAFE_BIAS", "0.7"))
-PROBE_COOLDOWN = 300.0        # per market between new probes
+# Per market between new scouts. At 300s a market took over ten minutes to
+# collect its three scouts; at 90s it takes three, so a market gets bracketed
+# while its book still looks the way it did when the first scout went in.
+PROBE_COOLDOWN = 90.0
 _PROBE: dict = {"active": {}, "last": {}, "cancelled": set(), "pending": {}}
 PROBE_CONFIRM_WAIT = 300.0   # fills feed lag allowance before "vanished"
 
@@ -3439,18 +3452,30 @@ def _probe_real_touches(book: dict):
 
 
 def _probe_place(m: str, side: str, px: float, intent: str, note: str) -> str | None:
+    # One retry on a rate-limit or a server wobble. At the old pace a dropped
+    # scout barely mattered; running several times faster, silently losing
+    # placements to 429s would quietly cap the very throughput the pace change
+    # is meant to buy, and look like nothing at all in the journal.
     try:
-        r = requests.request(
-            "POST", tr.TRADE_API + "/v1/orders",
-            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
-                     "Content-Type": "application/json"},
-            json={"marketSlug": m, "intent": intent,
-                  "type": "ORDER_TYPE_LIMIT",
-                  "price": {"value": f"{px:.2f}", "currency": "USD"},
-                  "quantity": PROBE_SIZE,
-                  "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
-                  "participateDontInitiate": True},
-            timeout=20)
+        r = None
+        for attempt in range(2):
+            r = requests.request(
+                "POST", tr.TRADE_API + "/v1/orders",
+                headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                         "Content-Type": "application/json"},
+                json={"marketSlug": m, "intent": intent,
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{px:.2f}", "currency": "USD"},
+                      "quantity": PROBE_SIZE,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True},
+                timeout=20)
+            if r.status_code not in (429, 500, 502, 503, 504) or attempt:
+                break
+            with MONITOR.lock:
+                sb = MONITOR.state.setdefault("probe_scoreboard", {})
+                sb["throttled"] = int(sb.get("throttled") or 0) + 1
+            time.sleep(1.5)
         ok = r.status_code < 300
         oid = None
         if ok:
