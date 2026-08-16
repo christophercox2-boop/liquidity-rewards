@@ -2,7 +2,7 @@
 
 [![Track liquidity rewards](https://github.com/wfco223/liquidity-rewards/actions/workflows/liquidity-rewards.yml/badge.svg)](https://github.com/wfco223/liquidity-rewards/actions/workflows/liquidity-rewards.yml)
 
-## ✅ Last successful check: 2026-08-16 9:33 AM ET
+## ✅ Last successful check: 2026-08-16 9:56 AM ET
 
 This runs automatically every hour. **If the timestamp above is more than ~2 hours old, something is broken** — check the [Actions tab](https://github.com/wfco223/liquidity-rewards/actions/workflows/liquidity-rewards.yml).
 
@@ -14,7 +14,7 @@ This runs automatically every hour. **If the timestamp above is more than ~2 hou
 
 **Earned:** $3,567.53 lifetime ($1,888.03 paid). Last three recorded days — 2026-08-14: **$274.59** ⚠️ pending bucket — covers every day since then, still growing · 2026-08-13: **$223.24** · 2026-08-12: **$213.04** _(Polymarket reports ~1–2 days behind)_
 
-**What else to join:** `paccc-usho-midterms-2026-11-03-rep` — BUY at the best price, ~$44.64/day for 200 contracts. Runners-up: `ewc-usgub-oh-2026-11-03-rep` (~$12.94/day), `apdc-jerpowgov-2026-12-31` (~$10.01/day)
+**What else to join:** `ewc-usgub-ga-2026-11-03-rep` — BUY at the best price, ~$51.58/day for 200 contracts. Runners-up: `ewc-usgub-ga-2026-11-03-dem` (~$18.66/day), `ewc-usgub-oh-2026-11-03-rep` (~$9.82/day)
 
 ---
 
@@ -34,18 +34,18 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 
 | Market | Reward pool | Discount | Target Size | Best entry | Est. share | Est. $/day |
 |---|---:|---:|---:|---|---:|---:|
-| `paccc-usho-midterms-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (544,054 resting) | ~59.5% | ~$44.64 |
-| `ewc-usgub-oh-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (201,417 resting) | ~17.3% | ~$12.94 |
-| `apdc-jerpowgov-2026-12-31` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (6,188 resting) | ~40.0% | ~$10.01 |
-| `ewc-usse-oh-2026-11-03-dem` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (595,436 resting) | ~34.6% | ~$8.65 |
-| `ewc-usse-tx-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (553,692 resting) | ~6.2% | ~$4.64 |
-| `ewc-usse-tx-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | SELL side (71,749 resting) | ~5.0% | ~$3.73 |
-| `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (11,515 resting) | ~8.5% | ~$2.12 |
-| `ewc-usgub-oh-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (210,455 resting) | ~2.6% | ~$1.95 |
-| `ewc-usse-oh-2026-11-03-rep` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (555,102 resting) | ~7.0% | ~$1.75 |
-| `cranc-uspres28-12-31-2026-aleoca` | $100.00 ÷ 33 | 0.20 | 5,000 | BUY side (80,998 resting) | ~99.9% | ~$1.51 |
-| `ewc-usse-me-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (611,045 resting) | ~1.9% | ~$1.46 |
-| `ewc-usgub-ca-2026-11-03-stehil` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (57,401 resting) | ~1.9% | ~$1.44 |
+| `ewc-usgub-ga-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (71,946 resting) | ~68.8% | ~$51.58 |
+| `ewc-usgub-ga-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | SELL side (62,096 resting) | ~24.9% | ~$18.66 |
+| `ewc-usgub-oh-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (275,279 resting) | ~13.1% | ~$9.82 |
+| `enwc-usgubp-ok-2026-06-16-rep-gendru` | $100.00 ÷ 2 | 0.20 | 5,000 | SELL side (27,723 resting) | ~27.7% | ~$6.92 |
+| `paccc-usho-midterms-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (818,356 resting) | ~7.8% | ~$5.82 |
+| `ewc-usse-tx-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (633,753 resting) | ~7.7% | ~$5.77 |
+| `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (35,638 resting) | ~10.7% | ~$2.67 |
+| `cranc-uspres28-12-31-2026-dontrujr` | $100.00 ÷ 33 | 0.20 | 5,000 | BUY side (20,460 resting) | ~100.0% | ~$1.51 |
+| `cranc-uspres28-12-31-2026-aleoca` | $100.00 ÷ 33 | 0.20 | 5,000 | BUY side (80,998 resting) | ~99.7% | ~$1.51 |
+| `ewc-usgub-oh-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (281,725 resting) | ~1.9% | ~$1.46 |
+| `ewc-usgub-ca-2026-11-03-stehil` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (57,506 resting) | ~1.9% | ~$1.42 |
+| `ewc-usse-tx-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | SELL side (150,457 resting) | ~1.6% | ~$1.18 |
 
 ## Totals
 
@@ -108,6 +108,7 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 
 | Checked (ET) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-08-16 9:56 AM ET | ✅ ok | 2562 | $3567.53 |
 | 2026-08-16 9:33 AM ET | ✅ ok | 2562 | $3567.53 |
 | 2026-08-16 9:28 AM ET | ✅ ok | 2562 | $3567.53 |
 | 2026-08-16 8:31 AM ET | ✅ ok | 2562 | $3567.53 |
@@ -117,6 +118,5 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 | 2026-08-16 8:09 AM ET | ✅ ok | 2562 | $3567.53 |
 | 2026-08-16 8:03 AM ET | ✅ ok | 2562 | $3567.53 |
 | 2026-08-16 7:52 AM ET | ✅ ok | 2562 | $3567.53 |
-| 2026-08-16 7:47 AM ET | ✅ ok | 2562 | $3567.53 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
