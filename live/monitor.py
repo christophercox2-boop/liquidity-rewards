@@ -3992,6 +3992,18 @@ EARN_FLIP_MAX_SHARES = int(os.environ.get("EARN_FLIP_MAX_SHARES", "400"))
 # transacts, dearer size that keeps the upside. Each rung that sells or holds
 # is also a price observation the prober gets for free.
 EARN_FLIP_STEP_AFTER = float(os.environ.get("EARN_FLIP_STEP_AFTER", "1800"))
+# AFTER THIS LONG, STOP ANCHORING TO WHAT WE PAID. Our cost is sunk; it says
+# nothing about what the stock is worth now. If the price genuinely moved
+# against us, a floor at cost+1 means the shares never sell and the fill is
+# recovered at zero percent — which is exactly where the earner sits today
+# (owner, 2026-08-16: "selling at a loss isn't terrible, that reduces the net
+# cost of fills, which is 100% not because we haven't flipped anything").
+#
+# Past this point the floor becomes the MARKET's price rather than ours: one
+# tick above the best bid, the lowest an ask can rest without crossing. That
+# is not giving the shares away — it is selling them for what somebody is
+# actually willing to pay, which beats holding them at a price nobody is.
+EARN_FLIP_LOSS_AFTER = float(os.environ.get("EARN_FLIP_LOSS_AFTER", "7200"))
 # GRADUATION. The point of the earner is to find where the money is, not to
 # sit on the first thing it finds — but an order that has PROVED it earns and
 # stays put should not keep occupying the search budget while it does so
@@ -4181,7 +4193,8 @@ def auto_earn() -> None:
             if oid in live and len(r) >= 4:
                 _EARN.setdefault("flips", {})[oid] = (
                     r[0], float(r[1]), int(r[2]), float(r[3]),
-                    float(r[4]) if len(r) > 4 else float(r[1]) - EARN_FLIP_TICKS)
+                    float(r[4]) if len(r) > 4 else float(r[1]) - EARN_FLIP_TICKS,
+                    float(r[5]) if len(r) > 5 else float(r[3]))
     if not _EARN.get("toflip"):
         _EARN["toflip"] = [list(j) for j in (MONITOR.state.get("earn_toflip") or [])
                            if len(j) == 4]
@@ -4189,7 +4202,7 @@ def auto_earn() -> None:
         _EARN["grad"] = set(MONITOR.state.get("earn_grad") or [])
     if not _EARN.get("adopt"):
         _EARN["adopt"] = [list(j) for j in (MONITOR.state.get("earn_adopt") or [])
-                          if len(j) == 5]
+                          if len(j) >= 5]
     now = time.time()
     open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
     # FILL ACCOUNTING COMES FROM THE FILLS FEED, the only place the truth
@@ -4394,7 +4407,8 @@ def auto_earn() -> None:
 
     # Pick up a repriced flip once the order list shows it.
     for job3 in list(_EARN.get("adopt") or []):
-        am, apx, aq, acost, ats = job3
+        am, apx, aq, acost, ats = job3[0], job3[1], job3[2], job3[3], job3[4]
+        asince = job3[5] if len(job3) > 5 else ats
         if now - ats > 600:
             _EARN["adopt"].remove(job3)
             continue
@@ -4407,7 +4421,8 @@ def auto_earn() -> None:
         if hit:
             _EARN["adopt"].remove(job3)
             _own_id("earn", hit)
-            _EARN.setdefault("flips", {})[hit] = (am, float(apx), int(aq), now, acost)
+            _EARN.setdefault("flips", {})[hit] = (
+                am, float(apx), int(aq), now, acost, asince)
 
     # NEVER SIT OUTBID ON A FLIP. A flip exists to get the money back, and an
     # ask that somebody has undercut sells nothing and, once it falls out of
@@ -4419,6 +4434,7 @@ def auto_earn() -> None:
     for foid, rec_ in list((_EARN.get("flips") or {}).items()):
         fm3, fpc3, fq3, fts3 = rec_[0], rec_[1], rec_[2], rec_[3]
         cost3 = rec_[4] if len(rec_) > 4 else fpc3 - EARN_FLIP_TICKS
+        since3 = rec_[5] if len(rec_) > 5 else fts3
         if now - fts3 < 300 or foid not in open_ids:
             continue                      # let a fresh flip settle first
         ent3 = tr._BOOK_CACHE.get(fm3)
@@ -4428,7 +4444,14 @@ def auto_earn() -> None:
         if not asks3:
             continue
         best3 = round(float(asks3[0][0]) * 100)
-        floor3_ = cost3 + 1
+        # Held long enough that our cost has stopped being the right anchor?
+        # Then the floor is the market: a tick above the best bid, the lowest
+        # an ask can rest without crossing.
+        bids3 = ent3[1].get("bids") or []
+        if now - since3 >= EARN_FLIP_LOSS_AFTER and bids3:
+            floor3_ = max(1.0, round(float(bids3[0][0]) * 100) + 1)
+        else:
+            floor3_ = cost3 + 1
         if best3 >= fpc3:
             # Not undercut — but is it just sitting there? Step half of it
             # down toward the floor so we find out where a buyer actually is
@@ -4440,18 +4463,20 @@ def auto_earn() -> None:
                 if code_ == 200 and res_.get("ok"):
                     del _EARN["flips"][foid]
                     _EARN.setdefault("adopt", []).append(
-                        [fm3, float(step_), half_, cost3, now])
+                        [fm3, float(step_), half_, cost3, now, since3])
                     _earn_log(fm3, "flip laddered", step_ / 100.0, half_,
                               f"no taker at {fpc3:.0f}¢ for 30m — {half_} moved to "
-                              f"{step_:.0f}¢, the rest goes back at the touch "
-                              f"(cost {cost3:.0f}¢)")
+                              f"{step_:.0f}¢" +
+                              (f", BELOW the {cost3:.0f}¢ it cost, to get the "
+                               "money back" if step_ < cost3 else
+                               f" (cost {cost3:.0f}¢)"))
             continue                      # we are at or better than the touch
         floor3 = floor3_                  # a flip must still make money
         if best3 < floor3:
             _earn_log(fm3, "flip held", fpc3 / 100.0, int(fq3),
-                      f"undercut at {best3:.0f}¢ but that is under our "
-                      f"{cost3:.0f}¢ cost — holding rather than selling for peanuts")
-            _EARN["flips"][foid] = (fm3, fpc3, fq3, now, cost3)   # re-arm the timer
+                      f"undercut at {best3:.0f}¢, under our floor of "
+                      f"{floor3_:.0f}¢ — holding for now")
+            _EARN["flips"][foid] = (fm3, fpc3, fq3, now, cost3, since3)
             continue
         code, res = do_reprice(foid, float(best3), quantity=int(fq3))
         if code == 200 and res.get("ok"):
@@ -4461,7 +4486,8 @@ def auto_earn() -> None:
             # and its sale would never be credited. Adopt it next poll by an
             # exact market/price/quantity match instead.
             del _EARN["flips"][foid]
-            _EARN.setdefault("adopt", []).append([fm3, float(best3), int(fq3), cost3, now])
+            _EARN.setdefault("adopt", []).append(
+                [fm3, float(best3), int(fq3), cost3, now, since3])
             _earn_log(fm3, "flip chased", best3 / 100.0, int(fq3),
                       f"undercut — moved {fpc3:.0f}¢ to {best3:.0f}¢, still above "
                       f"the {cost3:.0f}¢ it cost us")
@@ -4570,7 +4596,7 @@ def auto_earn() -> None:
                 if oid2:
                     _own_id("earn", str(oid2))
                     _EARN.setdefault("flips", {})[str(oid2)] = (
-                        fm, round(out * 100), fq, now, float(fpx_c))
+                        fm, round(out * 100), fq, now, float(fpx_c), now)
                 _earn_log(fm, "flipped", out, fq,
                           f"selling back the {fq} bought at {fpx_c:.0f}¢ — "
                           "inventory, so no buying power used")
