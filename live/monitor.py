@@ -2072,9 +2072,22 @@ def _collect_fills(t: dict, fills_by_order: dict[str, dict]) -> None:
     # fee, the passive side collects a maker rebate. Checked against the live
     # book, the passive order id matched our open orders and the aggressor's
     # never did.
+    # OUR side of a trade is the one whose order carries a real intent —
+    # the API redacts the counterparty's to ORDER_INTENT_UNDEFINED. The old
+    # passive-first pick assumed we always rest; the sniper (which takes on
+    # purpose) and the owner's own manual crosses broke that, attributing
+    # those fills to the counterparty's order.
+    def _ours(ex):
+        o_ = (ex or {}).get("order") or {}
+        it_ = str(o_.get("intent") or "")
+        return o_.get("id") and it_ and not it_.endswith("UNDEFINED")
     pick = t.get("passiveExecution") or {}
-    if not (pick.get("order") or {}).get("id"):
+    if not _ours(pick):
         pick = t.get("aggressorExecution") or {}
+    if not _ours(pick):
+        pick = t.get("passiveExecution") or {}
+        if not (pick.get("order") or {}).get("id"):
+            pick = t.get("aggressorExecution") or {}
     execs = []
     _o = pick.get("order") or {}
     if _o.get("id") and tr._num(pick.get("lastShares")) > 0:
