@@ -4571,10 +4571,20 @@ def auto_earn() -> None:
     # Cancelling is not placing. It only ever reduces exposure, so it is not
     # gated on the switch.
     sweep = []
+    owner_ids = set((MONITOR.state.get("loop_ids") or {}).get("owner") or [])
     for o_ in MONITOR.orders:
         oid_ = str(o_.get("id") or "")
         m_ = o_.get("market") or ""
         if not oid_ or not m_:
+            continue
+        # THE OWNER'S OWN ORDERS ARE NEVER SWEPT. This pass was widened to
+        # every resting order to clear the model-breaking junk the loops had
+        # left behind, and that scope quietly included orders placed by hand.
+        # Automation may clean up after itself; it does not overrule a person.
+        # Two ways to tell: the exchange flags anything placed in its own app
+        # MANUAL, and orders placed through the /map form are recorded here as
+        # they go out.
+        if o_.get("manual") == "MANUAL" or oid_ in owner_ids:
             continue
         px_ = float(o_.get("price") or 0) * 100
         qty_ = float(o_.get("size") or 0)
@@ -6071,6 +6081,19 @@ def manual_place(slug: str, side: str, price_cents: float, size: int,
             timeout=20,
         )
         ok = r.status_code < 300
+        if ok:
+            # placed from the /map form: the exchange will call this
+            # AUTOMATIC because it arrived over the API, but it is the
+            # owner's order and nothing of ours may cancel it
+            try:
+                j_ = r.json()
+                o_ = j_.get("order")
+                oid_ = ((o_.get("id") if isinstance(o_, dict) else None)
+                        or j_.get("id") or j_.get("orderId"))
+                if oid_:
+                    _own_id("owner", str(oid_))
+            except Exception:  # noqa: BLE001
+                pass
         ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
                         "market": slug, "side": f"{side} (manual)", "from": "—",
                         "to": price_cents, "size": size, "status": r.status_code,
