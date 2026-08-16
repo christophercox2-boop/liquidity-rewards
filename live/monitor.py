@@ -3918,17 +3918,29 @@ def _bayes_fair(m: str) -> dict | None:
     evs = [l for l in (MONITOR.state.get("probe_log") or []) if l.get("m") == m]
     ent = tr._BOOK_CACHE.get(m)
     bb = ba = None
-    bbw = baw = 0.5
+    # THE BOOK BOUNDS THE PRICE. IT DOES NOT MEASURE THE VALUE.
+    #
+    # These anchors used to be size-weighted — 0.4 under a hundred shares,
+    # 1.2 over a thousand — on the theory that a big resting level is stronger
+    # revealed preference. In a book where everyone is farming rewards that is
+    # exactly backwards, and it is the single assumption that produced every
+    # bad valuation today. New Mexico Senate Republican: the model said 0.62%,
+    # the bid-touch anchor said 10c and won by 4.25 to 1.06 in log-likelihood,
+    # purely because thousands of farmed shares were stacked behind it. Depth
+    # was being read as belief, so the more crowded the farming the more
+    # certain the model became of a price nobody actually believed.
+    #
+    # A touch still says something — fair value is probably somewhere between
+    # the bid and the ask — so it is kept as a weak bound at a FIXED weight.
+    # What it can never again do is grow stronger because more people are
+    # standing there. Trades move this model now; crowds do not.
+    bbw = baw = 0.3
     if ent and time.time() - ent[0] < 900:
         rbb, rba = _probe_real_touches(ent[1])
-        # size-weighted anchors: a big resting level is stronger revealed
-        # preference than a small one
-        def _aw(q: float) -> float:
-            return 0.4 if q < 100 else (0.8 if q < 1000 else 1.2)
         if rbb:
-            bb, bbw = rbb[0], _aw(rbb[1])
+            bb = rbb[0]
         if rba:
-            ba, baw = rba[0], _aw(rba[1])
+            ba = rba[0]
     # scouts still resting are evidence too, growing with age: no taker at
     # that price for this long pushes fair away from it. Weighted up to the
     # same 0.35 a completed rotation earns, pro-rated by age/TTL.
