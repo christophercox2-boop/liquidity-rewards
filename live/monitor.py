@@ -5520,10 +5520,14 @@ def _map_payload() -> dict:
                             | {r[0] for r in _PROBE["active"].values()})
                         if m and (b := _bayes_fair(m))},
         "probe_log": list(reversed((MONITOR.state.get("probe_log") or [])[-40:])),
+        # `beaten` marks a scout somebody has since outbid or undercut with
+        # real size — the chart draws those amber, because a beaten scout is
+        # evidence about fair value rather than a scout still gathering it.
         "probe_active": [{"m": r[0], "side": r[1], "px": round(r[2] * 100, 1),
                           "age_m": int((time.time() - r[3]) / 60), "kind": r[4],
+                          "beaten": oid in _PROBE.get("beaten", set()),
                           "on_book": _on_book(r[0], r[1], r[2], PROBE_SIZE, r[3])}
-                         for r in _PROBE["active"].values()],
+                         for oid, r in _PROBE["active"].items()],
         "defend_markets": len(MONITOR.state.get("defend") or {}),
         "defend_note": ("switched off"
                         if not _auto_on("defend") else
@@ -5863,40 +5867,105 @@ function renderProbe(){
   card.style.display = 'block';
   const nm = m => m.replace(/^enwc-uspres-nom-/, 'nom·').replace(/^ewc-usp-2028-11-07-/, 'win·');
   const bayes = DATA.probe_bayes || {};
-  // one bar per market: 1-99c scale, shaded 10-90% credible interval,
-  // solid line at the posterior median, ticks at the real (de-baited) touches
-  const fairBar = b => {
-    if(!b || b.med == null) return '';
-    const seg = (x, w, css) => '<div style="position:absolute;top:0;bottom:0;left:' +
-      x + '%;width:' + w + ';' + css + '"></div>';
-    return '<div style="position:relative;height:16px;background:var(--surface2);' +
-      'border-radius:4px;margin:4px 0;overflow:hidden">' +
-      seg(b.lo, (b.hi - b.lo) + '%', 'background:rgba(63,185,80,.30)') +
-      seg(b.med, '2px', 'background:#3fb950') +
-      (b.bb != null ? seg(b.bb, '2px', 'background:#58a6ff;opacity:.8') : '') +
-      (b.ba != null ? seg(b.ba, '2px', 'background:#e5645f;opacity:.8') : '') +
-      '</div><div class="sub" style="font-size:10px">fair ~' + b.med + '¢ (' +
-      b.lo + '–' + b.hi + '¢, ' + b.fills + ' trade' + (b.fills === 1 ? '' : 's') +
-      ', ' + (b.rested || 0) + ' rested, ' + b.n + ' obs)' +
-      (b.bb != null ? ' · <span style="color:#58a6ff">|</span> bid ' + b.bb + '¢' : '') +
-      (b.ba != null ? ' · <span style="color:#e5645f">|</span> ask ' + b.ba + '¢' : '') +
-      '</div>';
+  // ONE PICTURE PER MARKET, on a common 0-100c axis so markets can be read
+  // against each other at a glance. Everything the prober knows is on it:
+  //
+  //   above the axis   sell scouts as down-arrows, and any real trade
+  //   the axis itself  the posterior — a wide 10-90% band with a brighter
+  //                    core, so certainty reads as a narrow bright shape and
+  //                    doubt as a wide dim one, without needing a number
+  //   on the axis      the real de-baited touches, blue bid and red ask; the
+  //                    dark space between them is the gap nobody is quoting
+  //   below the axis   buy scouts as up-arrows, earner bids as green blocks,
+  //                    and hollow ticks where a scout sat untouched
+  //
+  // Scale is 1 SVG unit = 1 cent, so a price maps straight to an x with no
+  // arithmetic to get wrong.
+  const clamp = v => Math.max(0, Math.min(100, +v || 0));
+  const mktChart = (b, e, sc, eb) => {
+    const g = [];
+    // the unquoted gap between the real touches
+    if (b.bb != null && b.ba != null && b.ba > b.bb)
+      g.push('<rect x="' + b.bb + '" y="6" width="' + (b.ba - b.bb) +
+             '" height="7" fill="#161c26"/>');
+    // posterior: full credible band, then the middle half brighter
+    const w = Math.max(0.7, b.hi - b.lo), q = (b.hi - b.lo) / 4;
+    g.push('<rect x="' + b.lo + '" y="6" width="' + w +
+           '" height="7" fill="rgba(63,185,80,.22)"/>');
+    g.push('<rect x="' + clamp(b.med - q) + '" y="6" width="' + Math.max(0.7, 2 * q) +
+           '" height="7" fill="rgba(63,185,80,.45)"/>');
+    // the median, the single number the model would name
+    g.push('<rect x="' + clamp(b.med - 0.28) + '" y="4" width="0.56" height="11" fill="#3fb950"/>');
+    // real touches
+    if (b.bb != null) g.push('<rect x="' + clamp(b.bb - 0.22) + '" y="5.5" width="0.44" height="8" fill="#58a6ff"/>');
+    if (b.ba != null) g.push('<rect x="' + clamp(b.ba - 0.22) + '" y="5.5" width="0.44" height="8" fill="#e5645f"/>');
+    // a real trade against a scout — the expensive kind of evidence
+    [e.traded_at_bid, e.traded_at_ask].forEach(v => { if (v != null) {
+      const x = clamp(v * 100);
+      g.push('<rect x="' + (x - 0.9) + '" y="0.4" width="1.8" height="1.8" fill="#f0883e"/>');
+      g.push('<rect x="' + (x - 0.2) + '" y="2.2" width="0.4" height="3.4" fill="#f0883e" opacity=".7"/>');
+    }});
+    // prices a scout held without a taker — the cheap kind
+    [e.rested_bid, e.rested_ask].forEach(v => { if (v != null) {
+      const x = clamp(v * 100);
+      g.push('<rect x="' + (x - 0.22) + '" y="13.6" width="0.44" height="1.6" fill="#93a0b4" opacity=".8"/>');
+    }});
+    // live scouts: up-arrow for a bid, down-arrow for an ask
+    sc.forEach(a => {
+      const x = clamp(a.px);
+      const col = a.beaten ? '#f2cd7f' : a.on_book === false ? '#e5645f' : '#58a6ff';
+      g.push(a.side === 'BUY'
+        ? '<path d="M' + (x - 1.1) + ' 18 L' + (x + 1.1) + ' 18 L' + x + ' 14.6 Z" fill="' + col + '"/>'
+        : '<path d="M' + (x - 1.1) + ' 1 L' + (x + 1.1) + ' 1 L' + x + ' 4.4 Z" fill="' + col + '"/>');
+    });
+    // where the earner has money working
+    eb.forEach(p => g.push('<rect x="' + (clamp(p) - 0.6) + '" y="15.4" width="1.2" height="2.4" fill="#3fb950"/>'));
+    return '<svg viewBox="0 0 100 19" width="100%" height="58" ' +
+      'preserveAspectRatio="none" style="display:block">' +
+      '<rect x="0" y="9.2" width="100" height="0.6" fill="#3a4454"/>' + g.join('') + '</svg>';
   };
-  // fair bands: what traded vs what rested untouched
-  const mktSet = Object.keys(Object.assign({}, est, bayes));
+  const chartLegend =
+    '<div class="sub" style="font-size:10px;display:flex;gap:9px;flex-wrap:wrap;' +
+    'margin:2px 0 8px">' +
+    '<span><b style="color:#3fb950">▌</b> fair estimate</span>' +
+    '<span><span style="color:#3fb950">▓</span> likely range</span>' +
+    '<span><b style="color:#58a6ff">▌</b> best bid</span>' +
+    '<span><b style="color:#e5645f">▌</b> best ask</span>' +
+    '<span><span style="color:#58a6ff">▲▼</span> our scouts</span>' +
+    '<span><span style="color:#f2cd7f">▲</span> outbid</span>' +
+    '<span><span style="color:#f0883e">■</span> got traded</span>' +
+    '<span><span style="color:#93a0b4">▕</span> held, no taker</span>' +
+    '<span><span style="color:#3fb950">■</span> earner bid</span>' +
+    '<span>0¢ left → 100¢ right</span></div>';
+  // Strongest evidence first: a market we have traded in beats one we have
+  // only rested in, which beats one we have merely watched.
+  const mktSet = Object.keys(Object.assign({}, est, bayes))
+    .filter(m => bayes[m] && bayes[m].med != null)
+    .sort((a, c) => {
+      const w = k => (bayes[k].fills || 0) * 3 + (bayes[k].rested || 0) * 2 + (bayes[k].n || 0);
+      return w(c) - w(a);
+    });
   const bands = mktSet.map(m => {
-    const e = est[m] || {};
-    const parts = [];
-    if(e.traded_at_bid != null) parts.push('sold to us @ ' + (e.traded_at_bid*100).toFixed(0) + '¢');
-    if(e.traded_at_ask != null) parts.push('bought from us @ ' + (e.traded_at_ask*100).toFixed(0) + '¢');
-    if(e.rested_bid != null) parts.push('bid ' + (e.rested_bid*100).toFixed(0) + '¢ rested');
-    if(e.rested_ask != null) parts.push('ask ' + (e.rested_ask*100).toFixed(0) + '¢ rested');
-    return '<tr><td class="mkt" style="word-break:normal;vertical-align:top"><b>' + nm(m) + '</b></td>' +
-      '<td style="font-size:11px">' + fairBar(bayes[m]) +
-      (parts.length ? '<div>' + parts.join(' · ') + '</div>' : '') +
-      (e.last_fill ? '<div class="sub" style="font-size:10px">last fill: ' +
-        e.last_fill.side + ' ' + (e.last_fill.px*100).toFixed(0) + '¢ · ' +
-        e.last_fill.ts + '</div>' : '') + '</td></tr>';
+    const b = bayes[m], e = est[m] || {};
+    const sc = act.filter(a => a.m === m);
+    const eb = (DATA.earn_active || []).filter(x => x.m === m).map(x => x.px);
+    const span = b.hi - b.lo;
+    const conf = span <= 4 ? ['tight', '#3fb950'] : span <= 10 ? ['fair', '#d9a132']
+                                                              : ['loose', '#93a0b4'];
+    return '<div style="margin:0 0 12px">' +
+      '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:1px">' +
+      '<b style="font-size:13px">' + nm(m) + '</b>' +
+      '<span style="font-size:12px;color:#3fb950;font-weight:600">' + b.med + '¢</span>' +
+      '<span style="font-size:10px;padding:1px 6px;border-radius:4px;' +
+      'background:rgba(147,160,180,.16);color:' + conf[1] + '">' + conf[0] + ' ' +
+      b.lo + '–' + b.hi + '¢</span>' +
+      '<span class="sub" style="font-size:10px;margin-left:auto">' +
+      (b.fills || 0) + ' traded · ' + (b.rested || 0) + ' held · ' + b.n + ' obs</span>' +
+      '</div>' + mktChart(b, e, sc, eb) +
+      (e.last_fill ? '<div class="sub" style="font-size:10px">last trade: ' +
+        e.last_fill.side + ' ' + (e.last_fill.px * 100).toFixed(0) + '¢ · ' +
+        e.last_fill.ts + '</div>' : '') +
+      '</div>';
   }).join('');
   const scouts = act.map(a =>
     '<span style="display:inline-block;background:var(--surface2);border-radius:6px;' +
@@ -5916,13 +5985,24 @@ function renderProbe(){
     ((DATA.probe_budget || 0) > 0.5 ? '#3fb950' : '#ff9d99') + '">$' +
     (DATA.probe_budget || 0).toFixed(2) +
     '</b> — prober sales in, prober buys out; sell scouts use your existing shares</div>';
-  document.getElementById('probeBody').innerHTML = wallet +
-    (act.length ? '<div class="sub" style="margin-bottom:4px">' + act.length +
+  // Charts first — they are what the page is for. The fund, the scout chips
+  // and the journal are supporting detail and fold underneath.
+  const tight = mktSet.filter(m => bayes[m].hi - bayes[m].lo <= 4).length;
+  const headline = mktSet.length
+    ? '<div style="font-size:13px;margin-bottom:2px">' + mktSet.length +
+      ' market' + (mktSet.length === 1 ? '' : 's') + ' mapped · <b style="color:#3fb950">' +
+      tight + '</b> priced to within 4¢</div>'
+    : '<div class="sub">no market has enough evidence for a fair-price estimate yet' +
+      (on ? ' — scouts are out' : ' — Prober is off') + '</div>';
+  document.getElementById('probeBody').innerHTML = headline +
+    (bands ? chartLegend + bands : '') +
+    '<details style="margin-top:2px"><summary class="sub" style="cursor:pointer">' +
+    'fund, scouts and journal</summary>' + wallet +
+    (act.length ? '<div class="sub" style="margin:6px 0 4px">' + act.length +
       ' scout' + (act.length > 1 ? 's' : '') + ' resting</div>' + scouts :
       '<div class="sub">no scouts resting' + (on ? ' — placing as books allow' : ' — Prober is off') + '</div>') +
-    (bands ? '<table style="width:100%;border-collapse:collapse;margin-top:8px">' + bands + '</table>' : '') +
-    (lines ? '<details style="margin-top:8px"><summary class="sub" style="cursor:pointer">' +
-      'journal (' + log.length + ')</summary>' + lines + '</details>' : '');
+    (lines ? '<div style="margin-top:8px">' + lines + '</div>' : '') +
+    '</details>';
 }
 
 function renderEarn(){
