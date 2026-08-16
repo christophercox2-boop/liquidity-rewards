@@ -6731,6 +6731,73 @@ const SWDESC = {
   earn: {on:'small bids where the model is confident', off:'not placing'},
 };
 const SWARM = {};
+// Tap a face -> the book, our orders there, and what each is earning.
+// /market.json already serves all of it; this page simply never had a reader,
+// the same way it never had esc(). Rendered into the detail card the map
+// already owns, so /slate and /map share one panel.
+async function openMkt(slug){
+  const det = document.getElementById('det'); if(!det) return;
+  det.style.display = 'block';
+  det.innerHTML = '<div class="sub">loading ' + esc(slug) + '…</div>';
+  let d;
+  try {
+    const r = await fetch('/market.json?slug=' + encodeURIComponent(slug), {headers: hdrs()});
+    d = await r.json();
+    if (!r.ok || d.error) throw new Error(d.error || ('HTTP ' + r.status));
+  } catch (e) {
+    det.innerHTML = '<div style="color:#ff9d99">could not load ' + esc(slug) +
+      ' — ' + esc((e && e.message) || e) + '</div>';
+    return;
+  }
+  const nm = (DATA.labels && DATA.labels[slug]) || slug;
+  const q = d.qual || {};
+  const cents = v => (+(v * 100)).toFixed(0) + '¢';
+  // book: their size against ours, so it is obvious who owns each level
+  const mineAt = {};
+  (d.orders || []).forEach(o => {
+    const k = o.side + ':' + Math.round(o.price * 100);
+    mineAt[k] = (mineAt[k] || 0) + (o.size || 0);
+  });
+  const side = (rows, sd, col) => (rows || []).map(r => {
+    const mine = mineAt[sd + ':' + Math.round(r[0] * 100)] || 0;
+    return '<tr><td style="color:' + col + '">' + cents(r[0]) + '</td>' +
+      '<td class="r">' + r[1].toLocaleString() + '</td>' +
+      '<td class="r sub">' + (mine ? mine.toLocaleString() + ' ours' : '') + '</td></tr>';
+  }).join('') || '<tr><td class="sub">empty</td></tr>';
+  const totRate = (d.orders || []).reduce((t, o) => t + (o.est_day || 0), 0);
+  const ordRows = (d.orders || []).sort((a,b) => (b.est_day||0)-(a.est_day||0)).map(o =>
+    '<tr><td>' + o.side + ' <b>' + (o.size||0).toLocaleString() + '</b> @ ' +
+      cents(o.price) + (o.src ? ' <span class="sub">' + esc(o.src) + '</span>' : '') + '</td>' +
+    '<td class="r"><b style="color:' + (o.est_day > 0 ? '#3fb950' : 'var(--dim)') + '">$' +
+      (o.est_day || 0).toFixed(2) + '</b>/day</td></tr>' +
+    '<tr><td colspan="2" class="sub" style="font-size:10px;padding-bottom:6px">' +
+      esc(o.verdict || '') + '</td></tr>').join('')
+    || '<tr><td class="sub">no orders of ours here</td></tr>';
+  const qline = q.target
+    ? 'Target Size ' + q.target.toLocaleString() + ' · bids ' +
+      (q.bid_total||0).toLocaleString() + (q.bid_total >= q.target ? ' ✅' : ' ❌ pays nobody') +
+      ' · asks ' + (q.ask_total||0).toLocaleString() +
+      (q.ask_total >= q.target ? ' ✅' : ' ❌ pays nobody')
+    : 'no reward program on this market';
+  det.innerHTML =
+    '<div style="display:flex;align-items:baseline;gap:8px">' +
+    '<b style="font-size:15px;flex:1 1 auto">' + esc(nm) + '</b>' +
+    '<span style="color:#3fb950;font-weight:700">$' + totRate.toFixed(2) + '/day</span>' +
+    '<button class="alt" style="flex:0 0 auto" onclick="document.getElementById(&#39;det&#39;)' +
+      '.style.display=&#39;none&#39;">close</button></div>' +
+    '<div class="sub" style="font-size:11px;margin:2px 0 8px">' + esc(slug) +
+      ' · position ' + (d.net || 0).toLocaleString() + ' · ' + qline + '</div>' +
+    '<div style="display:flex;gap:12px">' +
+    '<table style="flex:1"><tr><td class="sub" colspan="3">bids</td></tr>' +
+      side(d.bids, 'BUY', '#58a6ff') + '</table>' +
+    '<table style="flex:1"><tr><td class="sub" colspan="3">asks</td></tr>' +
+      side(d.asks, 'SELL', '#e5645f') + '</table></div>' +
+    '<div class="sub" style="margin:10px 0 4px">our orders — ' +
+      (d.orders || []).length + ', earning $' + totRate.toFixed(2) + '/day</div>' +
+    '<table style="width:100%">' + ordRows + '</table>';
+  det.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
 function renderSlate(){
   const card = document.getElementById('slateCard'); if(!card) return;
   const rows = DATA.slate || [];
