@@ -4164,13 +4164,18 @@ def auto_earn() -> None:
     if not _EARN.get("flips"):
         live = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
         for oid, r in (MONITOR.state.get("earn_flips_reg") or {}).items():
-            if oid in live and len(r) == 4:
-                _EARN.setdefault("flips", {})[oid] = (r[0], float(r[1]), int(r[2]), float(r[3]))
+            if oid in live and len(r) >= 4:
+                _EARN.setdefault("flips", {})[oid] = (
+                    r[0], float(r[1]), int(r[2]), float(r[3]),
+                    float(r[4]) if len(r) > 4 else float(r[1]) - EARN_FLIP_TICKS)
     if not _EARN.get("toflip"):
         _EARN["toflip"] = [list(j) for j in (MONITOR.state.get("earn_toflip") or [])
                            if len(j) == 4]
     if not _EARN.get("grad"):
         _EARN["grad"] = set(MONITOR.state.get("earn_grad") or [])
+    if not _EARN.get("adopt"):
+        _EARN["adopt"] = [list(j) for j in (MONITOR.state.get("earn_adopt") or [])
+                          if len(j) == 5]
     now = time.time()
     open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
     # FILL ACCOUNTING COMES FROM THE FILLS FEED, the only place the truth
@@ -4331,7 +4336,7 @@ def auto_earn() -> None:
     # forced on us is gone and the cash is back — so it CREDITS the fill cost
     # that the earner card nets against its earnings. Without this the cost
     # only ever grows and the net line lies about how the day went.
-    for foid, (fm, fpxc, fq, fts) in list((_EARN.get("flips") or {}).items()):
+    for foid, (fm, fpxc, fq, fts, *_c) in list((_EARN.get("flips") or {}).items()):
         if foid in open_ids:
             continue
         del _EARN["flips"][foid]
@@ -4358,7 +4363,7 @@ def auto_earn() -> None:
     # BELOW its price, the same thing the prober learns from a sell scout
     # ageing out — and this one is free and much larger. Recorded once per
     # market per price so a long-lived flip does not shout.
-    for foid, (fm2, fpc2, fq2, fts2) in list((_EARN.get("flips") or {}).items()):
+    for foid, (fm2, fpc2, fq2, fts2, *_c2) in list((_EARN.get("flips") or {}).items()):
         if now - fts2 < PROBE_TTL:
             continue
         with MONITOR.lock:
@@ -4372,6 +4377,64 @@ def auto_earn() -> None:
         if fresh_:
             _probe_log(fm2, "rested", "SELL", fpc2 / 100.0,
                        f"the earner's flip of {int(fq2)} held here with no buyer")
+
+    # Pick up a repriced flip once the order list shows it.
+    for job3 in list(_EARN.get("adopt") or []):
+        am, apx, aq, acost, ats = job3
+        if now - ats > 600:
+            _EARN["adopt"].remove(job3)
+            continue
+        hit = next((str(o.get("id")) for o in MONITOR.orders
+                    if o.get("market") == am
+                    and str(o.get("intent") or "").endswith("SELL_LONG")
+                    and abs(float(o.get("price") or 0) * 100 - apx) < 0.51
+                    and abs(float(o.get("size") or 0) - aq) < 0.51
+                    and str(o.get("id")) not in (_EARN.get("flips") or {})), None)
+        if hit:
+            _EARN["adopt"].remove(job3)
+            _own_id("earn", hit)
+            _EARN.setdefault("flips", {})[hit] = (am, float(apx), int(aq), now, acost)
+
+    # NEVER SIT OUTBID ON A FLIP. A flip exists to get the money back, and an
+    # ask that somebody has undercut sells nothing and, once it falls out of
+    # the scoring window, earns nothing either — the worst of both. So follow
+    # the touch down, but only while the price is still fair: never below the
+    # cost the fill left us with, so chasing can turn a flip into a smaller
+    # gain but never into a loss (owner, 2026-08-16: "you don't want to sell
+    # for peanuts, but the goal is to get money back").
+    for foid, rec_ in list((_EARN.get("flips") or {}).items()):
+        fm3, fpc3, fq3, fts3 = rec_[0], rec_[1], rec_[2], rec_[3]
+        cost3 = rec_[4] if len(rec_) > 4 else fpc3 - EARN_FLIP_TICKS
+        if now - fts3 < 300 or foid not in open_ids:
+            continue                      # let a fresh flip settle first
+        ent3 = tr._BOOK_CACHE.get(fm3)
+        if not ent3 or now - ent3[0] > 300:
+            continue
+        asks3 = ent3[1].get("asks") or []
+        if not asks3:
+            continue
+        best3 = round(float(asks3[0][0]) * 100)
+        if best3 >= fpc3:
+            continue                      # we are at or better than the touch
+        floor3 = cost3 + 1                # a flip must still make money
+        if best3 < floor3:
+            _earn_log(fm3, "flip held", fpc3 / 100.0, int(fq3),
+                      f"undercut at {best3:.0f}¢ but that is under our "
+                      f"{cost3:.0f}¢ cost — holding rather than selling for peanuts")
+            _EARN["flips"][foid] = (fm3, fpc3, fq3, now, cost3)   # re-arm the timer
+            continue
+        code, res = do_reprice(foid, float(best3), quantity=int(fq3))
+        if code == 200 and res.get("ok"):
+            # do_reprice places a replacement and cancels the original, but it
+            # does not hand back the new id. Left there the repriced flip would
+            # drop out of the registry: its earnings would stop being counted
+            # and its sale would never be credited. Adopt it next poll by an
+            # exact market/price/quantity match instead.
+            del _EARN["flips"][foid]
+            _EARN.setdefault("adopt", []).append([fm3, float(best3), int(fq3), cost3, now])
+            _earn_log(fm3, "flip chased", best3 / 100.0, int(fq3),
+                      f"undercut — moved {fpc3:.0f}¢ to {best3:.0f}¢, still above "
+                      f"the {cost3:.0f}¢ it cost us")
 
     # Self-correct an over-sold market: if our inventory asks exceed what we
     # actually hold, pull the newest until they do not. Cancelling here only
@@ -4476,7 +4539,8 @@ def auto_earn() -> None:
                     job[2] = fqty - fq          # partial: flip the rest later
                 if oid2:
                     _own_id("earn", str(oid2))
-                    _EARN.setdefault("flips", {})[str(oid2)] = (fm, round(out * 100), fq, now)
+                    _EARN.setdefault("flips", {})[str(oid2)] = (
+                        fm, round(out * 100), fq, now, float(fpx_c))
                 _earn_log(fm, "flipped", out, fq,
                           f"selling back the {fq} bought at {fpx_c:.0f}¢ — "
                           "inventory, so no buying power used")
@@ -4713,6 +4777,7 @@ def auto_earn() -> None:
         MONITOR.state["earn_flips_reg"] = {k: list(v) for k, v in (_EARN.get("flips") or {}).items()}
         MONITOR.state["earn_toflip"] = [list(j) for j in (_EARN.get("toflip") or [])]
         MONITOR.state["earn_grad"] = sorted(_EARN.get("grad") or set())
+        MONITOR.state["earn_adopt"] = [list(j) for j in (_EARN.get("adopt") or [])]
 
 
 # --- slate health watch (in-process; replaced the slate_watch.yml cron) ----
