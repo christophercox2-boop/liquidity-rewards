@@ -4590,6 +4590,18 @@ def auto_earn() -> None:
             continue
         real_bids = [(round(p_ * 100), q_) for p_, q_ in ent[1].get("bids") or []
                      if q_ >= PROBE_REAL_MIN]
+        # A SIDE BELOW TARGET SIZE PAYS NOBODY, so an order resting on one
+        # earns exactly zero however well placed it is. The scoring walk below
+        # fills its window up to `target` and never asked whether the side
+        # actually HAS that much, so it produced a confident positive estimate
+        # for sides paying nothing: 79 small bids were sitting on sides like
+        # "403 of 2,000" and "10,582 of 20,000" when the owner asked whether
+        # this was being checked. It was not.
+        #
+        # Counted over the WHOLE book, not the de-baited levels — the exchange
+        # counts every resting contract towards Target Size, including the
+        # one- and two-share bait the rest of this function ignores.
+        side_total = sum(q_ for _, q_ in (ent[1].get("bids") or []))
         # candidate prices: from the real touch up through the band and two
         # ticks of stretch, never above the penny ceiling where a total
         # loss stops being trivial
@@ -4635,7 +4647,10 @@ def auto_earn() -> None:
                 if p_ == pc:
                     ours_sc += min(take, float(q)) * w
                 cum += q_
-            est = per * ours_sc / den if den else 0.0
+            # our own size counts towards Target Size too, so a side just
+            # short of it can be tipped over by the order we are about to
+            # place — but only just short, and this rarely applies
+            est = (per * ours_sc / den) if (den and side_total + q >= target) else 0.0
             # the deal test: income must dwarf the worst case — total-loss
             # payback within two days
             if est >= 0.5 * (pc / 100.0) * q:
