@@ -1,9 +1,2 @@
 market,side,price,size,ticks,share,est_day,pool,verdict
-usgubewc-usgub-pa-2026-11-03-dem,BUY,0.02,1.0,0,0.0023752969121140144,0.01484560570071259,25.0,"✅ scoring — ~0.2% of bid side (4,201 resting ≥ 2,000 ✓) ≈ $0.01/day (pool ÷ 2 markets)"
-enwc-uspres-nom-dem-2028-jonste,SELL,0.2,1.0,0,0.0004726523358478437,0.01390153928964246,1000.0,"✅ scoring — ~0.0% of ask side (71,640 resting ≥ 20,000 ✓) ≈ $0.01/day (pool ÷ 17 markets)"
-ewc-usp-2028-11-07-andbes,BUY,0.03,1.0,7,0.00017404925593943088,0.00322313436924872,1000.0,"✅ scoring — ~0.0% of bid side (104,551 resting ≥ 20,000 ✓) ≈ $0.00/day (pool ÷ 27 markets)"
-scc-senate-gop-2026-11-03-51,BUY,0.03,1.0,0,7.342165468914738e-05,0.00028239097957364376,100.0,"✅ scoring — ~0.0% of bid side (340,475 resting ≥ 5,000 ✓) ≈ $0.00/day (pool ÷ 13 markets)"
-ewc-usp-2028-11-07-thomas,BUY,0.03,1.0,0,,,1000.0,"❌ side has 451 of 20,000 Target Size — side not qualifying"
-ewc-usp-2028-11-07-gleyou,BUY,0.04,1.0,0,,,1000.0,"❌ side has 451 of 20,000 Target Size — side not qualifying"
-ewc-usp-2028-11-07-stasmi,BUY,0.02,1.0,0,,,1000.0,"❌ side has 451 of 20,000 Target Size — side not qualifying"
-ewc-usp-2028-11-07-vivram,BUY,0.03,1.0,0,,,1000.0,"❌ side has 451 of 20,000 Target Size — side not qualifying"
+ewc-usp-2028-11-07-vivram,BUY,0.04,1.0,0,,,1000.0,"❌ side has 451 of 20,000 Target Size — side not qualifying"
