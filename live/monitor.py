@@ -4379,7 +4379,10 @@ EARN_FLIP_STEP_AFTER = float(os.environ.get("EARN_FLIP_STEP_AFTER", "1800"))
 # tick above the best bid, the lowest an ask can rest without crossing. That
 # is not giving the shares away — it is selling them for what somebody is
 # actually willing to pay, which beats holding them at a price nobody is.
-EARN_FLIP_LOSS_AFTER = float(os.environ.get("EARN_FLIP_LOSS_AFTER", "7200"))
+# A day, not a couple of hours. The owner would sell low if cash were needed,
+# but not before giving the position a proper run at earning first — and a
+# flip that is still collecting rewards never reaches this at all.
+EARN_FLIP_LOSS_AFTER = float(os.environ.get("EARN_FLIP_LOSS_AFTER", "86400"))
 # GRADUATION. The point of the earner is to find where the money is, not to
 # sit on the first thing it finds — but an order that has PROVED it earns and
 # stays put should not keep occupying the search budget while it does so
@@ -4948,7 +4951,15 @@ def auto_earn() -> None:
         # Then the floor is the market: a tick above the best bid, the lowest
         # an ask can rest without crossing.
         bids3 = ent3[1].get("bids") or []
-        if now - since3 >= EARN_FLIP_LOSS_AFTER and bids3:
+        # An ask that is still EARNING is not a problem to solve. It collects
+        # rewards for as long as it rests, so there is no reason to concede
+        # anything while it pays (owner, 2026-08-16: "I would wait for more
+        # than a couple of hours and get the rewards before selling that
+        # low"). Only stock that has sat a long time earning nothing is worth
+        # giving up on.
+        o3 = next((x for x in MONITOR.orders if str(x.get("id")) == foid), None)
+        earning3 = float((o3 or {}).get("est_day") or 0) > 0.05
+        if now - since3 >= EARN_FLIP_LOSS_AFTER and bids3 and not earning3:
             # Conceding to the market is for stock we should not be holding.
             # It is NOT licence to hand over something the model says is
             # nearly certain: Kentucky Senate Republican went at 72c on a
