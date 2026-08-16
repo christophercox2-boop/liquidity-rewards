@@ -4586,6 +4586,16 @@ def auto_earn() -> None:
         # they go out.
         if o_.get("manual") == "MANUAL" or oid_ in owner_ids:
             continue
+        # AND ONLY THE LOOPS' OWN ORDERS. Widening this pass to every resting
+        # order was the mistake behind the cancellations: the 2028 party
+        # markets carry no Silver forecast and do not parse as a state race,
+        # so they fell under the 15c unbacked ceiling — in markets that trade
+        # near 50c. Everything there looked off-model, including orders no
+        # loop had placed. Automation cleans up after ITSELF; the keeper's
+        # rungs, the workflows' entries and the owner's own orders are not
+        # its to judge.
+        if _fill_src(oid_) not in ("earner", "prober"):
+            continue
         px_ = float(o_.get("price") or 0) * 100
         qty_ = float(o_.get("size") or 0)
         if o_.get("side") == "BUY":
