@@ -4184,6 +4184,32 @@ def auto_earn() -> None:
             continue
         _earn_log(fm, "recovered", fpxc / 100.0, fq,
                   f"sold the {fq} back at {fpxc:.0f}¢ — position closed")
+    # Self-correct an over-sold market: if our inventory asks exceed what we
+    # actually hold, pull the newest until they do not. Cancelling here only
+    # ever REDUCES exposure, and leaves the oldest flip — the one nearest the
+    # front of the queue — in place.
+    for fm_ in {r[0] for r in (_EARN.get("flips") or {}).values()}:
+        net_ = tr._num((MONITOR.positions.get(fm_) or {}).get("netPosition")) or 0
+        mine_ = [(o_, r_) for o_, r_ in (_EARN.get("flips") or {}).items() if r_[0] == fm_]
+        excess = sum(r_[2] for _, r_ in mine_) - net_
+        if excess <= 0:
+            continue
+        for o_, r_ in sorted(mine_, key=lambda x: -x[1][3]):
+            if excess <= 0:
+                break
+            try:
+                requests.request(
+                    "POST", tr.TRADE_API + f"/v1/order/{o_}/cancel",
+                    headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST",
+                                               f"/v1/order/{o_}/cancel"),
+                             "Content-Type": "application/json"},
+                    json={"marketSlug": fm_}, timeout=15)
+                _EARN["flips"].pop(o_, None)
+                excess -= r_[2]
+                _earn_log(fm_, "flip pulled", r_[1] / 100.0, int(r_[2]),
+                          f"would have sold {int(excess + r_[2])} more than we hold")
+            except Exception:  # noqa: BLE001
+                pass
     # Flip out anything that filled. Retried each poll until the position
     # snapshot catches up with the fill, then given up on so a stale entry
     # cannot place an order against stock we no longer hold.
@@ -4195,7 +4221,16 @@ def auto_earn() -> None:
                       "position never showed the stock — left holding it")
             continue
         net = tr._num((MONITOR.positions.get(fm) or {}).get("netPosition")) or 0
-        fq = int(min(fqty, net))
+        # Asks we ALREADY have resting against this stock. Without this the
+        # same shares get sold twice: the pending-queue flipped 60 CT governor
+        # at 12:59, the feed-driven queue flipped the same 60 again at 01:02,
+        # and 144 shares of ask stood against 84 held. A flip beyond the
+        # position is not a flip at all — it opens a short, which is the one
+        # thing that DOES consume buying power.
+        committed = sum(float(o.get("size") or 0) for o in MONITOR.orders
+                        if o.get("market") == fm
+                        and str(o.get("intent") or "").endswith("SELL_LONG"))
+        fq = int(min(fqty, net - committed))
         if fq < 1:
             continue
         out = min(0.99, round((fpx_c + EARN_FLIP_TICKS) / 100.0, 2))
