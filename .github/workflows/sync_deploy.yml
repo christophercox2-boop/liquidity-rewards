@@ -10,19 +10,37 @@ name: Sync deploy branch
 # roughly a few times a day instead of ~95.
 #
 # Point the DigitalOcean app's source branch at `deploy` for this to take effect.
+#
+# ---------------------------------------------------------------------------
+# 2026-08-16: THE PUSH TRIGGER IS OFF ON PURPOSE. It is commented out below,
+# not deleted — put it back when the account's Actions minutes are restored.
+#
+# Since ~03:34 UTC on 2026-08-16 no job in this repository reaches a runner at
+# all. Every run across every workflow fails in three or four seconds with no
+# runner assigned and no logs — the tracker job, which installs Python and
+# pip-installs the requirements, "completed" in four seconds. That is not a
+# fault in this file; it is GitHub refusing to dispatch jobs, which for a
+# private repo means the included Actions minutes are spent or the spending
+# limit is zero. Check github.com/settings/billing.
+#
+# While that is true, every trigger produces a failed run and an email. This
+# workflow fired on EVERY code push to main, so it was almost the entire
+# flood. Nothing is lost by holding it: main is force-aligned onto deploy by
+# hand at each deploy, and the monitor only picks up code on restart anyway.
+# ---------------------------------------------------------------------------
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - live/**
-      - track_rewards.py
-      - requirements.txt
-      - Dockerfile
-      # The defend seed is fetched from main at runtime, so a config-only
-      # change needs no rebuild. Excluding it keeps arming a market a
-      # ~60-second operation instead of a deploy.
-      - '!live/defend_seed.json'
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - live/**
+  #     - track_rewards.py
+  #     - requirements.txt
+  #     - Dockerfile
+  #     # The defend seed is fetched from main at runtime, so a config-only
+  #     # change needs no rebuild. Excluding it keeps arming a market a
+  #     # ~60-second operation instead of a deploy.
+  #     - '!live/defend_seed.json'
   workflow_dispatch: {}
 
 permissions:
@@ -40,10 +58,35 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fast-forward deploy to main
+      - name: Point deploy at main
         run: |
-          git config user.name "github-actions[bot]"
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          echo "main is at $(git rev-parse --short origin/main)"
-          git push origin origin/main:refs/heads/deploy
-          echo "deploy now at $(git rev-parse --short origin/main)"
+          git fetch --quiet origin main
+          main_sha=$(git rev-parse origin/main)
+          deploy_sha=$(git ls-remote origin refs/heads/deploy | cut -f1)
+
+          if [ "$main_sha" = "$deploy_sha" ]; then
+            echo "deploy is already at ${main_sha:0:8} — nothing to do"
+            exit 0
+          fi
+
+          if [ -z "$deploy_sha" ]; then
+            echo "deploy does not exist yet — creating it at ${main_sha:0:8}"
+            git push origin "$main_sha:refs/heads/deploy"
+            exit 0
+          fi
+
+          # deploy is a MIRROR of main, not a branch anyone commits to, so
+          # whenever main's history is rewritten — a rebase before a push, a
+          # merge — deploy has to follow even though that is not a
+          # fast-forward. The old plain `git push origin origin/main:deploy`
+          # could only ever fast-forward, so any rewrite left it stuck.
+          #
+          # --force-with-lease keeps the safety that matters: if deploy is not
+          # where we just read it, somebody else moved it and the push is
+          # refused rather than silently discarding their work.
+          echo "deploy ${deploy_sha:0:8} -> ${main_sha:0:8}"
+          git push --force-with-lease="refs/heads/deploy:$deploy_sha" \
+                   origin "$main_sha:refs/heads/deploy"

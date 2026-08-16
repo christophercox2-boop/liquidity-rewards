@@ -200,6 +200,48 @@ per order in the sweep and per market in the earner: 0.33us cached.
 Not fixed by this: the 1 kenblo share already held. The guard stops new
 bids; it does not unwind a position.
 
+### 2026-08-16 — GitHub Actions is not running ANY job (OWNER ACTION NEEDED)
+
+Owner was being flooded with "Sync deploy branch" failure emails. The workflow
+is not the fault.
+
+Evidence: since ~03:34 UTC on 2026-08-16, every run of every workflow in the
+repo fails. The jobs report `runner_id: 0`, `runner_name: ""`, no logs at all
+(the log download 404s), and finish in three or four seconds — including the
+`track` job, which installs Python and pip-installs requirements and cannot
+possibly finish in four seconds. Jobs are never being dispatched to a runner.
+The last successful run was 02:51 UTC; 141 sync_deploy runs, 1,410 runs in the
+repo overall.
+
+For a private repo that signature means the account's included Actions minutes
+are spent, or the spending limit is zero. **Fix at github.com/settings/billing
+— nothing in this repo can fix it.**
+
+Do not be fooled by the data commits still landing in main. Those are authored
+by `wfco223`, not `github-actions[bot]`: they come from live/monitor.py on
+DigitalOcean, which took over the hourly tracker on 2026-08-15. Actions is
+contributing nothing right now.
+
+What is actually degraded while Actions is down: the 4-hourly heartbeat that
+posts the ❌ freshness banner, the daily estimator scoreboard, the silver
+report and races jobs, and every manual-dispatch workflow (the poke.txt
+pattern). The Silver MODEL itself is fine — the monitor fetches it from
+Datawrapper's CDN directly, not from fetch_silver.yml.
+
+The push trigger on sync_deploy.yml is commented out (not deleted) because
+that one workflow fired on every code push and was 26 of the last 30 failures.
+Restore it once minutes are back. Nothing is lost meanwhile: deploy is
+force-aligned onto main by hand at each deploy, and the monitor only picks up
+code on restart anyway.
+
+Its git logic was wrong regardless and is now fixed. It used to run
+`git push origin origin/main:refs/heads/deploy`, which can only fast-forward,
+so any rewrite of main's history left deploy stuck. deploy is a MIRROR that
+nobody commits to, so it now force-updates with `--force-with-lease` against
+the SHA it just read — which still refuses if someone else moved deploy. All
+three paths (already in sync, needs updating, does not exist) are tested
+against a stubbed git.
+
 ### 2026-08-16 — /why, one page per market (SHIPPED)
 
 Owner: "Give me some insight into where the confidence numbers come from. Let
