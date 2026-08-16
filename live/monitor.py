@@ -3338,8 +3338,15 @@ def auto_snipe() -> None:
 # the de-baited spread (levels under 5 shares ignored). Every event lands in
 # the journal and the Bayesian bands. Owner switch: auto["probe"], off by
 # default.
+# Owner, 2026-08-16: extended beyond the 2028 slate to the race families —
+# governor, senate, the ewc singles, seat-count ladders, house — where the
+# tier pools have reconciled ~100% all week, so the earner's deal test runs
+# on validated (small, honest) numbers. Scouts only ever appear in markets
+# the book cache holds, i.e. where we already trade.
 PROBE_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
-                  "ewc-usp-2028-11-07-")
+                  "ewc-usp-2028-11-07-",
+                  "ussewc-", "usgubewc-", "ewc-usse-", "ewc-usgub-",
+                  "scc-", "ushrewc-", "enwc-usgubp-", "enwc-ushrp-")
 PROBE_SIZE = 1
 PROBE_REAL_MIN = 5.0          # book levels smaller than this are bait — ignore
 PROBE_MIN_GAP = 3             # need at least this many interior ticks to learn
@@ -3637,6 +3644,30 @@ def auto_probe() -> None:
         MONITOR.state["probe_active_reg"] = {k: list(v) for k, v in _PROBE["active"].items()}
 
 
+def _silver_fair(m: str) -> float | None:
+    """Model prior for race markets, in cents: the Silver table the map
+    already loads, keyed by state and party. None for anything it doesn't
+    cover — the prior is a nudge, never a requirement."""
+    try:
+        races = (SILVER.get("races") or {})
+        parts = m.split("-")
+        fam = ("senate" if any(t in ("usse", "ussep") for t in parts)
+               else "governor" if any(t in ("usgub", "usgubp") for t in parts)
+               else None)
+        if not fam:
+            return None
+        party = next((t for t in parts if t in ("dem", "rep")), None)
+        st = next((t for t in parts if len(t) == 2 and t.isalpha()
+                   and t not in ("us",)), None)
+        if not party or not st:
+            return None
+        row = (races.get(fam) or {}).get(st.upper()) or {}
+        v = row.get(party)
+        return float(v) * 100.0 if v is not None else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def _bayes_fair(m: str) -> dict | None:
     """A deliberately simple Bayesian read of a market's fair price from the
     prober's evidence. Grid prior over 1..99c; every journal event is a soft
@@ -3676,7 +3707,8 @@ def _bayes_fair(m: str) -> dict | None:
         w = 0.35 * min((nowp - r[3]) / PROBE_TTL, 1.0)
         if w > 0.02:
             partial.append((r[1], r[2] * 100, w))
-    if not evs and not partial and bb is None and ba is None:
+    sv = _silver_fair(m)
+    if not evs and not partial and bb is None and ba is None and sv is None:
         return None
     S = 2.0
     def sig(x: float) -> float:
@@ -3713,6 +3745,11 @@ def _bayes_fair(m: str) -> dict | None:
             lp += bbw * llog(sig((f - bb * 100) / S))
         if ba is not None:
             lp += baw * llog(sig((ba * 100 - f) / S))
+        if sv is not None:
+            # soft ±6c window around the Silver model's number — a prior
+            # that real trades can overrule but bait cannot
+            lp += 0.6 * (llog(sig((f - (sv - 6)) / S))
+                         + llog(sig(((sv + 6) - f) / S)))
         logp[f] = lp
     mx = max(logp[1:])
     ps = [0.0] + [math.exp(l - mx) for l in logp[1:]]
