@@ -84,6 +84,21 @@ reasoning ahead of the data).
   owner's stated preference: rest near the touch with low fill risk.
 
 ## Open items
+
+### Owner-requested, NOT yet built (2026-08-16)
+- **Auto-qualify markets resolving Nov 2026 or later.** Owner: for anything
+  resolving that far out it is fine to qualify BOTH sides automatically,
+  because the chance of being filled at the 1c/99c floors is very small.
+  For anything sooner, or when buying power will not cover it, the market
+  goes into a pending list the owner approves or denies by hand. Needs its
+  own /map switch (nothing places orders without one), a resolution-date
+  parse per market, a buying-power reserve, and an approve/deny queue.
+- **Negative risk.** Owner wants the concept incorporated — remind them.
+  In a mutually exclusive event set, holding No on every outcome (or Yes
+  across a complete set) caps the downside, because at most one can
+  resolve Yes. Worth working out how it changes the earner's worst case,
+  which is currently priced as if every position could lose in full.
+
 1. Cancel leftover Ralph Norman ask (enwc-ussep-sc-2026-08-11-rep-ralnor,
    10sh @29c) — primary already happened; frees $7.10. Owner said include in
    next cleanup.
