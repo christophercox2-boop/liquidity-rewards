@@ -4086,19 +4086,39 @@ def auto_earn() -> None:
         st_["bought_usd"] = round(bought, 4)
         st_["recovered_usd"] = round(sold, 4)
         st_["fill_cost_usd"] = round(bought - sold, 4)
-        # queue a flip for every bought order we have not flipped yet — driven
-        # by the feed, so partial fills are covered and nothing has to disappear
-        fl_done = MONITOR.state.setdefault("earn_flipped_oids", [])
-        seen_ = set(fl_done)
-        newflips = []
-        for oid_, (m_, pc_, q_, isbuy) in list(led.items()):
-            if not isbuy or oid_ in seen_ or not m_ or int(q_) < 1:
+        # WHAT STILL NEEDS FLIPPING is derived from current state every poll,
+        # not from a one-shot list of order ids. The one-shot version wedged:
+        # when the self-correction below pulled a set of flips, their ids were
+        # already marked done, so nothing re-placed them and 84 shares sat with
+        # no ask against them. Recomputing means a cancelled, vanished or
+        # partial flip simply comes back round.
+        want = {}
+        for oid_, (m_, pc_, q_, isbuy) in led.items():
+            if not m_:
                 continue
-            fl_done.append(oid_)
-            seen_.add(oid_)
-            _EARN.setdefault("toflip", []).append([m_, pc_, int(q_), now])
-            newflips.append((m_, pc_, int(q_)))
-        del fl_done[:-500]
+            a = want.setdefault(m_, [0.0, 0.0, 0.0])   # bought, sold, top price
+            if isbuy:
+                a[0] += q_
+                a[2] = max(a[2], pc_)
+            else:
+                a[1] += q_
+        newflips = []
+        for m_, (bq, sq, topc) in want.items():
+            outstanding = bq - sq
+            if outstanding < 1:
+                continue
+            pos_ = MONITOR.positions.get(m_)
+            if pos_ is None:
+                continue                      # no reading: do not guess
+            held = tr._num(pos_.get("netPosition")) or 0
+            committed = sum(float(o.get("size") or 0) for o in MONITOR.orders
+                            if o.get("market") == m_
+                            and str(o.get("intent") or "").endswith("SELL_LONG"))
+            queued = sum(j[2] for j in (_EARN.get("toflip") or []) if j[0] == m_)
+            need = int(min(outstanding, held - committed - queued))
+            if need >= 1:
+                _EARN.setdefault("toflip", []).append([m_, topc, need, now])
+                newflips.append((m_, topc, need))
     for m_, pc_, q_ in newflips:          # log outside the lock
         _earn_log(m_, "to flip", pc_ / 100.0, q_,
                   "queued to sell back — inventory, so no buying power used")
@@ -4189,7 +4209,10 @@ def auto_earn() -> None:
     # ever REDUCES exposure, and leaves the oldest flip — the one nearest the
     # front of the queue — in place.
     for fm_ in {r[0] for r in (_EARN.get("flips") or {}).values()}:
-        net_ = tr._num((MONITOR.positions.get(fm_) or {}).get("netPosition")) or 0
+        pos_ = MONITOR.positions.get(fm_)
+        if pos_ is None:
+            continue          # an absent reading is not a zero position
+        net_ = tr._num(pos_.get("netPosition")) or 0
         mine_ = [(o_, r_) for o_, r_ in (_EARN.get("flips") or {}).items() if r_[0] == fm_]
         excess = sum(r_[2] for _, r_ in mine_) - net_
         if excess <= 0:
