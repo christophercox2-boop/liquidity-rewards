@@ -3915,6 +3915,16 @@ EARN_FILL_COOLDOWN = float(os.environ.get("EARN_FILL_COOLDOWN", "7200"))
 # happened in that market (capped at 6x) — a market that keeps eating orders
 # gets left alone for the night instead of absorbing every attempt.
 EARN_VANISH_COOLDOWN = float(os.environ.get("EARN_VANISH_COOLDOWN", "1800"))
+# Flipping a fill back out. Once a bid fills we HOLD the stock, and selling
+# stock we hold is a SELL_LONG, which costs no buying power — the exchange only
+# trims a new ask against BP when it opens a short. So the flip is the cheapest
+# order on the book: it recovers the cash the fill just spent, and it earns
+# rewards on the ask side the whole time it waits (owner, 2026-08-16: "you can
+# be more aggressive with those because they don't decrease buying power").
+# It is therefore exempt from the earner's dollar cap, which exists to limit
+# money at RISK — a flip is money already spent, coming back.
+EARN_FLIP_TICKS = int(os.environ.get("EARN_FLIP_TICKS", "2"))
+EARN_FLIP_RETRY = float(os.environ.get("EARN_FLIP_RETRY", "1800"))
 # Same idea for an order we pulled ourselves: it was not earning, so the market
 # should wait its turn behind untried ones rather than being re-entered at once.
 EARN_WITHDRAW_COOLDOWN = float(os.environ.get("EARN_WITHDRAW_COOLDOWN", "3600"))
@@ -4055,6 +4065,10 @@ def auto_earn() -> None:
                 st_["fills"] = int(st_.get("fills") or 0) + 1
                 st_["fill_cost_usd"] = round(float(st_.get("fill_cost_usd") or 0)
                                              + px / 100.0 * qty, 4)
+            # queue the flip rather than placing it here: the positions
+            # snapshot refreshes on its own timer and may not show the stock
+            # yet, and a flip that is silently skipped is a fill left sitting
+            _EARN.setdefault("toflip", []).append([m, px, qty, now])
         elif now - ts_gone > EARN_CONFIRM_WAIT:
             del _EARN["pending"][oid]
             # The exchange keeps silently cancelling in some markets. Re-placing
@@ -4106,6 +4120,91 @@ def auto_earn() -> None:
                           "moving on for an hour")
             except Exception:  # noqa: BLE001
                 pass
+    # Settle flips. A flip that fills is the good outcome — the stock a fill
+    # forced on us is gone and the cash is back — so it CREDITS the fill cost
+    # that the earner card nets against its earnings. Without this the cost
+    # only ever grows and the net line lies about how the day went.
+    for foid, (fm, fpxc, fq, fts) in list((_EARN.get("flips") or {}).items()):
+        if foid in open_ids:
+            continue
+        del _EARN["flips"][foid]
+        if not _fill_confirmed(foid):
+            _earn_log(fm, "flip vanished", fpxc / 100.0, fq,
+                      "exchange-side cancel — still holding the stock")
+            _EARN.setdefault("toflip", []).append([fm, fpxc - EARN_FLIP_TICKS, fq, now])
+            continue
+        with MONITOR.lock:
+            st_ = MONITOR.state.setdefault("earn_stats", {})
+            st_["recovered_usd"] = round(float(st_.get("recovered_usd") or 0)
+                                         + fpxc / 100.0 * fq, 4)
+            st_["fill_cost_usd"] = round(float(st_.get("fill_cost_usd") or 0)
+                                         - fpxc / 100.0 * fq, 4)
+        _earn_log(fm, "recovered", fpxc / 100.0, fq,
+                  f"sold the {fq} back at {fpxc:.0f}¢ — position closed")
+    # Flip out anything that filled. Retried each poll until the position
+    # snapshot catches up with the fill, then given up on so a stale entry
+    # cannot place an order against stock we no longer hold.
+    for job in list(_EARN.get("toflip") or []):
+        fm, fpx_c, fqty, fts = job
+        if now - fts > EARN_FLIP_RETRY:
+            _EARN["toflip"].remove(job)
+            _earn_log(fm, "flip missed", fpx_c / 100.0, fqty,
+                      "position never showed the stock — left holding it")
+            continue
+        net = tr._num((MONITOR.positions.get(fm) or {}).get("netPosition")) or 0
+        fq = int(min(fqty, net))
+        if fq < 1:
+            continue
+        out = min(0.99, round((fpx_c + EARN_FLIP_TICKS) / 100.0, 2))
+        ent_ = tr._BOOK_CACHE.get(fm)
+        asks_ = (ent_[1].get("asks") or []) if ent_ else []
+        if asks_:
+            ba_ = float(asks_[0][0])
+            # join the touch when it sits between our cost and our target:
+            # earlier in the queue, and never below what we paid
+            if (fpx_c + 1) / 100.0 <= ba_ < out:
+                out = round(ba_, 2)
+        try:
+            r = requests.request(
+                "POST", tr.TRADE_API + "/v1/orders",
+                headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                         "Content-Type": "application/json"},
+                json={"marketSlug": fm, "intent": "ORDER_INTENT_SELL_LONG",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{out:.2f}", "currency": "USD"},
+                      "quantity": fq,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True},
+                timeout=20)
+            ok = r.status_code < 300
+            oid2 = None
+            if ok:
+                try:
+                    j = r.json()
+                    o_ = j.get("order")
+                    oid2 = (o_.get("id") if isinstance(o_, dict) else None) \
+                           or j.get("id") or j.get("orderId")
+                except Exception:  # noqa: BLE001
+                    pass
+            ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                            "market": fm, "side": "EARN flip", "from": fpx_c,
+                            "to": round(out * 100, 1), "size": fq,
+                            "status": r.status_code,
+                            "response": " ".join(r.text.split())[:100], "verified": ok})
+            del ACTIONS[:-20]
+            if ok:
+                if fq >= fqty:
+                    _EARN["toflip"].remove(job)
+                else:
+                    job[2] = fqty - fq          # partial: flip the rest later
+                if oid2:
+                    _own_id("earn", str(oid2))
+                    _EARN.setdefault("flips", {})[str(oid2)] = (fm, round(out * 100), fq, now)
+                _earn_log(fm, "flipped", out, fq,
+                          f"selling back the {fq} bought at {fpx_c:.0f}¢ — "
+                          "inventory, so no buying power used")
+        except Exception:  # noqa: BLE001 — a flip never kills the poll
+            pass
     # Rotation: at capacity, abandon the worst few so the search can continue.
     # Skips anything inside the scoring grace — a fresh order has no rate yet
     # and would rank bottom purely for being new.
@@ -5508,6 +5607,12 @@ def _map_payload() -> dict:
                          "age_m": int((time.time() - r[4]) / 60),
                          "on_book": _on_book(r[0], "BUY", r[2] / 100.0, r[3], r[4])}
                         for r in _EARN["orders"].values()],
+        # Flips rest on the ASK side out of stock we already hold, so they are
+        # listed apart from the bids and never counted against the dollar cap.
+        "earn_flips": [{"m": r[0], "px": r[1], "qty": r[2],
+                        "age_m": int((time.time() - r[3]) / 60)}
+                       for r in (_EARN.get("flips") or {}).values()],
+        "earn_toflip": len(_EARN.get("toflip") or []),
         "earn_log": list(reversed((MONITOR.state.get("earn_log") or [])[-30:])),
         "earn_stats": MONITOR.state.get("earn_stats") or {},
         "probe_scoreboard": MONITOR.state.get("probe_scoreboard") or {},
@@ -6156,6 +6261,18 @@ function renderEarn(){
         ' <span class="sub" style="font-weight:400">after ' + nf + ' fill' +
         (nf === 1 ? '' : 's') + ' costing $' + fc.toFixed(2) +
         ' — fills are losses, resting income is the win</span></div>';
+    })() +
+    (function(){
+      const fl = DATA.earn_flips || [], pend = DATA.earn_toflip || 0;
+      if (!fl.length && !pend) return '';
+      const rec = st.recovered_usd || 0;
+      return '<div style="font-size:11.5px;margin-bottom:4px;color:#f2cd7f">↩ ' +
+        (fl.length ? fl.length + ' flip' + (fl.length === 1 ? '' : 's') +
+          ' resting (' + fl.map(f => f.qty + '@' + f.px + '¢').join(', ') + ')' : '') +
+        (pend ? (fl.length ? ' · ' : '') + pend + ' waiting on the position' : '') +
+        (rec ? ' · $' + rec.toFixed(2) + ' recovered so far' : '') +
+        '<br><span class="sub">selling back what fills forced on us — inventory, ' +
+        'so it costs no buying power</span></div>';
     })() +
     '<div class="sub" style="margin-bottom:4px">' + status +
     ' · resting worst-case $' + (caps.outstanding || 0).toFixed(2) +
