@@ -1,0 +1,189 @@
+name: Replace 2028 bids
+
+# ORDER-TOUCHING. Places real orders. Push-path / manual dispatch only.
+#
+# Between 14:31 and 15:38 on 2026-08-14, 54 of the 60 bid sides in the 2028
+# slate lost our 10,000-share 1c block. Nothing we ran cancelled them: the
+# audit at 14:31 showed 59 of 60 present, and the only order-touching thing
+# running since was the defender, which never touches a floor qualifier
+# (DEFEND_DEEP_BUY). The owner's read is a momentary buying-power dip, which
+# would explain a mass cancel the exchange did on its own.
+#
+# Effect: bid income fell from $335/day to $12/day, and 48 of those sides
+# dropped below Target Size, so they now pay nobody.
+#
+# This restores our own 10,000 at 1c on every slate bid side holding less,
+# one order each. Post-only. It reads our live orders first and tops up to
+# 10,000 rather than adding a flat block, so a side that kept its order is
+# left alone instead of ending up with 20,000.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/replace_bids_2028.yml
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "plan only, place nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: replace-bids-2028
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+          FLOOR = 0.01
+          WANT = 10000
+          PAUSE = 0.8
+          MAX_ORDERS = 80
+
+          def bp_now(d=0.0):
+              try:
+                  p = "/v1/account/balances"
+                  r = requests.get(tr.TRADE_API + p,
+                                   headers=tr.auth_headers(kid, sec, "GET", p), timeout=20)
+                  if r.status_code < 400:
+                      for b in r.json().get("balances") or []:
+                          if b.get("buyingPower") is not None:
+                              return float(b["buyingPower"])
+              except Exception:
+                  pass
+              return d
+
+          def ours_at_floor():
+              """Our resting BUY size at the 1c floor, per market. Authoritative
+              — the public book lags, our own order list does not."""
+              out = {}
+              p = "/v1/orders/open"
+              r = requests.get(tr.TRADE_API + p,
+                               headers=tr.auth_headers(kid, sec, "GET", p), timeout=40)
+              r.raise_for_status()
+              for o in r.json().get("orders") or []:
+                  if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                                 "ORDER_STATE_PARTIALLY_FILLED"):
+                      continue
+                  s = o.get("marketSlug") or ""
+                  if not s.startswith(PREFIXES):
+                      continue
+                  if not str(o.get("intent") or "").endswith("BUY_LONG"):
+                      continue
+                  px = tr._num((o.get("price") or {}).get("value")) or 0
+                  if abs(px - FLOOR) > 0.005:
+                      continue          # only the floor block counts here
+                  q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+                  out[s] = out.get(s, 0.0) + q
+              return out
+
+          BP = bp_now()
+          print(f"buying power ${BP:,.2f}")
+          if BP <= 0:
+              raise SystemExit("no buying power reading — refusing to place")
+
+          pol, _ = tr.fetch_politics_events()
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+          have = ours_at_floor()
+          todo = [(s, WANT - int(have.get(s, 0))) for s in slate
+                  if have.get(s, 0) < WANT - 1]
+          print(f"slate {len(slate)} markets — bid floor short on {len(todo)}, "
+                f"{sum(n for _, n in todo):,} shares (~${sum(n for _, n in todo) * 0.01:,.2f})\n")
+
+          placed = failed = 0
+          out = []
+          for slug, need in todo:
+              if placed >= MAX_ORDERS:
+                  print("order ceiling reached"); break
+              if DRY:
+                  print(f"  {slug}: would place {need:,} @ 1c"); out.append({"m": slug, "qty": need, "ok": None}); continue
+              body = {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_LONG",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{FLOOR:.2f}", "currency": "USD"},
+                      "quantity": int(need),
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              ok, why, delay = False, "", 2.0
+              for attempt in range(4):
+                  try:
+                      r = requests.post(tr.TRADE_API + "/v1/orders",
+                          headers={**tr.auth_headers(kid, sec, "POST", "/v1/orders"),
+                                   "Content-Type": "application/json"},
+                          json=body, timeout=25)
+                      if r.status_code < 300:
+                          ok = True; break
+                      why = " ".join(r.text.split())[:120]
+                      if r.status_code not in (429, 500, 502, 503, 504):
+                          break
+                  except Exception as e:
+                      why = type(e).__name__
+                  time.sleep(delay); delay = min(delay * 2, 20)
+              placed += ok; failed += (not ok)
+              print(f"  {slug}: {need:,} @ 1c -> " + ("ok" if ok else "FAILED " + why))
+              out.append({"m": slug, "qty": need, "ok": ok})
+              time.sleep(PAUSE)
+
+          print("\nsettling before verifying…")
+          if not DRY:
+              time.sleep(20)
+              after = ours_at_floor()
+              still = [s for s in slate if after.get(s, 0) < WANT - 1]
+              print(f"placed {placed}, failed {failed}")
+              print(f"bid floors now holding our {WANT:,}: {len(slate) - len(still)} of {len(slate)}")
+              for s in still:
+                  print(f"   still short: {s:42s} ours {after.get(s, 0):,.0f}")
+              print(f"buying power now ${bp_now(BP):,.2f}")
+
+          os.makedirs("data", exist_ok=True)
+          json.dump({"dry_run": DRY, "placed": placed, "failed": failed, "orders": out},
+                    open("data/replace_bids_2028.json", "w"), indent=1)
+          with open("data/replace_bids_2028.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/replace_bids_2028.json data/replace_bids_2028.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Replace 2028 bids [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi

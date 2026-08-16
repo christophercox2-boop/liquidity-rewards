@@ -1,0 +1,286 @@
+name: Enter 2028 president slate
+
+# ORDER-TOUCHING. Places real orders. Manual dispatch / push-path only —
+# never cron, never on a schedule.
+#
+# What it does, per market in the 2028 presidential slate (nominee + winner
+# families; the party markets and the candidacy-announcement ladder are NOT
+# in scope):
+#
+#   BID  — rest a flat 10,000 at 1c. The best bid in this slate is 1c, so
+#          that single order both lifts the side to Target Size AND sits at
+#          the touch, scoring at full weight. A flat 10,000 rather than just
+#          the gap, so the side stays qualified if others pull their size.
+#   ASK  — where the ask side is short AND the best ask is 99c, the same
+#          move at 99c. An ask order carries only `buying power` shares, so
+#          this goes in ~46 orders of ~222 rather than one.
+#   ASK  — where the ask side already qualifies, join the touch with enough
+#          size for a real share of that side.
+#
+# Every order is post-only: it rests or it is rejected, it can never cross
+# the spread and fill on arrival. Slugs are whitelisted to the slate
+# prefixes, prices are bounded, and each side re-reads the live book and
+# stops the moment it is at Target Size.
+
+on:
+  workflow_dispatch:
+    inputs:
+      do_bids:
+        description: "qualify bid sides (10,000 @ 1c)"
+        type: boolean
+        default: true
+      do_ask_qualify:
+        description: "qualify short ask sides whose touch is 99c"
+        type: boolean
+        default: true
+      do_ask_join:
+        description: "join the touch where the ask already qualifies"
+        type: boolean
+        default: true
+      dry_run:
+        description: "plan only, place nothing"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/enter_pres2028.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: enter-pres2028
+  cancel-in-progress: false
+
+jobs:
+  enter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          DO_BIDS: ${{ inputs.do_bids }}
+          DO_ASK_QUALIFY: ${{ inputs.do_ask_qualify }}
+          DO_ASK_JOIN: ${{ inputs.do_ask_join }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, math, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          flag = lambda k, d: str(os.environ.get(k, d)).lower() not in ("false", "0", "")
+          DO_BIDS = flag("DO_BIDS", "true")
+          DO_ASK_Q = flag("DO_ASK_QUALIFY", "true")
+          DO_ASK_J = flag("DO_ASK_JOIN", "true")
+          DRY = flag("DRY_RUN", "false")
+          # A push only ever rehearses. Real placement requires the owner to
+          # press Run workflow and choose the boxes — editing this file can
+          # never, by itself, put an order on the exchange.
+          if os.environ.get("GITHUB_EVENT_NAME") == "push":
+              DO_BIDS = DO_ASK_Q = DO_ASK_J = True
+              DRY = True
+
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-")          # party markets excluded
+          FLAT = 10000            # rest a round Target Size, not just the gap
+          JOIN_SHARE = 0.25       # target share when joining a qualifying touch
+          MAX_ORDERS_PER_SIDE = 60
+          TICK = 0.01
+
+          def bp_now(default=0.0):
+              try:
+                  path = "/v1/account/balances"
+                  r = requests.get(tr.TRADE_API + path,
+                                   headers=tr.auth_headers(kid, sec, "GET", path), timeout=20)
+                  if r.status_code < 400:
+                      for b in r.json().get("balances") or []:
+                          if b.get("buyingPower") is not None:
+                              return float(b["buyingPower"])
+              except Exception:
+                  pass
+              return default
+
+          BP = bp_now()
+          print(f"buying power: ${BP:,.2f}  (an ask order carries {int(BP):,} shares)")
+          if BP <= 0:
+              print("no buying power reading — refusing to place"); raise SystemExit(1)
+
+          positions = {}
+          try:
+              path = "/v1/portfolio/positions"
+              r = requests.get(tr.TRADE_API + path,
+                               headers=tr.auth_headers(kid, sec, "GET", path), timeout=20)
+              if r.status_code < 400:
+                  # the endpoint returns {"positions": {slug: {...}}} — a dict
+                  # keyed by slug, not a list of rows
+                  for s, p in (r.json().get("positions") or {}).items():
+                      positions[s] = tr._num((p or {}).get("netPosition"))
+          except Exception as e:
+              print(f"(positions unavailable: {type(e).__name__} — ask intent falls back to short)")
+
+          try:
+              pol, _ = tr.fetch_politics_events()
+          except Exception as e:
+              print(f"politics tag lookup failed: {e}"); raise SystemExit(1)
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+          print(f"slate: {len(slate)} markets\n")
+
+          placed = failed = 0
+          log = []
+
+          def place(slug, side, px, qty):
+              """ONE post-only order. Returns (ok, detail)."""
+              global placed, failed
+              if not slug.startswith(PREFIXES):
+                  return False, "slug not in slate"          # whitelist
+              if not (0.1 <= px * 100 <= 99.9):
+                  return False, "price out of bounds"
+              qty = int(qty)
+              if not (1 <= qty <= 20000):
+                  return False, "size out of bounds"
+              if DRY:
+                  return True, "dry-run"
+              intent = "ORDER_INTENT_BUY_LONG"
+              if side == "SELL":
+                  net = positions.get(slug) or 0
+                  intent = "ORDER_INTENT_SELL_LONG" if net >= qty else "ORDER_INTENT_BUY_SHORT"
+              try:
+                  r = requests.post(
+                      tr.TRADE_API + "/v1/orders",
+                      headers={**tr.auth_headers(kid, sec, "POST", "/v1/orders"),
+                               "Content-Type": "application/json"},
+                      json={"marketSlug": slug, "intent": intent,
+                            "type": "ORDER_TYPE_LIMIT",
+                            "price": {"value": f"{px:.2f}", "currency": "USD"},
+                            "quantity": qty,
+                            "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                            "participateDontInitiate": True},
+                      timeout=25)
+                  ok = r.status_code < 300
+                  placed += ok; failed += (not ok)
+                  return ok, ("" if ok else " ".join(r.text.split())[:120])
+              except Exception as e:
+                  failed += 1
+                  return False, f"{type(e).__name__}"
+
+          def side_state(slug):
+              bk = tr._fetch_book(slug)
+              return (bk.get("tick") or TICK,
+                      bk.get("bids") or [], bk.get("asks") or [])
+
+          for i, slug in enumerate(slate, 1):
+              try:
+                  tick, bids, asks = side_state(slug)
+              except Exception as e:
+                  print(f"[{i}/{len(slate)}] {slug}: book unavailable ({type(e).__name__}) — skipped")
+                  continue
+              pr = (tr._PROG_CACHE.get("progs") or {}).get(slug) or {}
+              if not pr:
+                  try:
+                      rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                        params={"symbols": [slug], "pageSize": 10}, timeout=20)
+                      for p in rr.json().get("programs") or []:
+                          tp = tr._pick_period(p.get("timePeriods") or [], slug)
+                          if tp is not None:
+                              pr = tr._prog_of(tp)
+                  except Exception:
+                      pass
+              target = float(pr.get("target") or 0)
+              if not target:
+                  print(f"[{i}/{len(slate)}] {slug}: no reward program — skipped")
+                  continue
+              df = float(pr.get("df") or 0.2)
+              bid_tot = sum(q for _, q in bids); ask_tot = sum(q for _, q in asks)
+              best_bid = bids[0][0] if bids else None
+              best_ask = asks[0][0] if asks else None
+              print(f"[{i}/{len(slate)}] {slug}")
+              print(f"    bid {('%.0fc' % (best_bid*100)) if best_bid else '-':>5s} x{bid_tot:<8,.0f}"
+                    f"  ask {(('%.0fc' % (best_ask*100)) if best_ask else '-'):>5s} x{ask_tot:<8,.0f}"
+                    f"  target {target:,.0f}")
+
+              # ---- BID: flat 10,000 at the floor, which is also the touch --
+              if DO_BIDS and bid_tot < target:
+                  if best_bid is not None and abs(best_bid - tick) > tick / 2:
+                      print(f"    bid: best bid is {best_bid*100:.0f}c, not the {tick*100:.0f}c floor "
+                            "— a floor order would score ~0, skipped")
+                  else:
+                      ok, why = place(slug, "BUY", tick, FLAT)
+                      log.append({"m": slug, "side": "BUY", "px": tick, "qty": FLAT, "ok": ok})
+                      print(f"    bid: 10,000 @ {tick*100:.0f}c → {'ok' if ok else 'FAILED ' + why}")
+                      time.sleep(1.0)
+
+              # ---- ASK: qualify only where the ceiling IS the touch --------
+              if DO_ASK_Q and ask_tot < target:
+                  ceil_px = round(1 - tick, 2)
+                  if best_ask is None or abs(best_ask - ceil_px) > tick / 2:
+                      print(f"    ask: side short but the touch is "
+                            f"{best_ask*100:.0f}c — a {ceil_px*100:.0f}c order would score ~0, "
+                            "skipped (qualifying it would pay whoever holds the touch)")
+                  else:
+                      per = max(1, int(bp_now(BP)))
+                      done = 0
+                      for _ in range(MAX_ORDERS_PER_SIDE):
+                          if done >= FLAT:
+                              break
+                          qty = min(FLAT - done, per)
+                          ok, why = place(slug, "SELL", ceil_px, qty)
+                          if not ok:
+                              print(f"    ask: FAILED after {done:,} — {why}")
+                              break
+                          done += qty
+                          time.sleep(1.0)
+                      log.append({"m": slug, "side": "SELL", "px": ceil_px, "qty": done, "ok": done > 0})
+                      print(f"    ask: {done:,} @ {ceil_px*100:.0f}c in "
+                            f"{math.ceil(done/per) if per else 0} orders")
+
+              # ---- ASK: join a touch that already qualifies ----------------
+              elif DO_ASK_J and ask_tot >= target and best_ask is not None:
+                  win, cum = [], 0.0
+                  for px, q in asks:
+                      win.append((px, q)); cum += q
+                      if cum >= target:
+                          break
+                  den = sum(q * df ** round(abs(best_ask - px) / tick) for px, q in win)
+                  want = max(1, round(den * JOIN_SHARE / (1 - JOIN_SHARE)))
+                  want = min(want, int(bp_now(BP)))     # one order, capped by buying power
+                  ok, why = place(slug, "SELL", round(best_ask, 2), want)
+                  log.append({"m": slug, "side": "SELL", "px": best_ask, "qty": want, "ok": ok})
+                  print(f"    ask: join {want:,} @ {best_ask*100:.0f}c "
+                        f"(~{want/(want+den)*100:.0f}% of side) → {'ok' if ok else 'FAILED ' + why}")
+                  time.sleep(1.0)
+
+          print(f"\nplaced {placed} orders, {failed} failures"
+                + ("  (DRY RUN — nothing was sent)" if DRY else ""))
+          os.makedirs("data", exist_ok=True)
+          json.dump({"dry_run": DRY, "buying_power": BP, "placed": placed,
+                     "failed": failed, "log": log},
+                    open("data/enter_pres2028.json", "w"), indent=1)
+          with open("data/enter_pres2028.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/enter_pres2028.json data/enter_pres2028.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Enter 2028 slate [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi

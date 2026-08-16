@@ -1,0 +1,851 @@
+{
+ "dry_run": false,
+ "targets_seen": [
+  20000.0
+ ],
+ "placed": 120,
+ "failed": 0,
+ "notional": 11185.26,
+ "orders": [
+  {
+   "m": "enwc-uspres-nom-dem-2028-aleocc",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 207,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-aleocc",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 7731,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-andbes",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-andbes",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 7708,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-dwajoh",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-dwajoh",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10005,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-gavnew",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-gavnew",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9531,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jamtal",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 9980,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jamtal",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8486,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jbpri",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jbpri",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8369,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonoss",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 9940,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonoss",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 7723,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonste",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jonste",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8657,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jossha",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-jossha",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8368,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-kamhar",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-kamhar",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 7707,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-markel",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-markel",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8847,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-micoba",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 9998,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-micoba",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8469,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-petbut",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 9987,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-petbut",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9144,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rahema",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rahema",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9608,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rokha",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-rokha",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8194,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-stasmi",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-stasmi",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10006,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-wesmoo",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-dem-2028-wesmoo",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8242,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-dontru",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-dontru",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8411,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-dontrujr",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-dontrujr",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10005,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-elomus",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-elomus",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9474,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-gleyou",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-gleyou",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9774,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-jdvan",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-jdvan",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8589,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-margre",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-margre",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8411,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-marrub",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 9501,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-marrub",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 16757,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-ranpau",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 9999,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-ranpau",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8039,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-rondes",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10000,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-rondes",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 7663,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tedcru",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tedcru",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9613,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-thomas",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-thomas",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10005,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tuccar",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tuccar",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8241,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tulgab",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-tulgab",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9974,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-vivram",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "enwc-uspres-nom-rep-2028-vivram",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10005,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-aleocc",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-aleocc",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10006,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-andbes",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-andbes",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8242,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontru",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontru",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10006,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontrujr",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dontrujr",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8411,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dwajoh",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-dwajoh",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8392,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-elomus",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-elomus",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8412,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gavnew",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gavnew",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8242,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gleyou",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 9999,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-gleyou",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9089,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jamtal",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jamtal",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 7736,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jbpri",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jbpri",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9718,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jdvan",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jdvan",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8389,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jonoss",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jonoss",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8402,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jossha",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-jossha",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8240,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-kamhar",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-kamhar",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9075,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-markel",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-markel",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9686,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-marrub",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-marrub",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 7752,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-micoba",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-micoba",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 7820,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-petbut",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-petbut",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10006,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rahema",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rahema",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9580,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rokha",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rokha",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10006,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rondes",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-rondes",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 9919,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-stasmi",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-stasmi",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10006,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-thomas",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 9999,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-thomas",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 8369,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-tuccar",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 9999,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-tuccar",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10006,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-tulgab",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-tulgab",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10006,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-vivram",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-vivram",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10006,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-wesmoo",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10001,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-2028-11-07-wesmoo",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10006,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-party-2028-11-07-dem",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 227,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-party-2028-11-07-dem",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 250,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-party-2028-11-07-rep",
+   "side": "BUY",
+   "px": 0.01,
+   "qty": 10821,
+   "ok": true
+  },
+  {
+   "m": "ewc-usp-party-2028-11-07-rep",
+   "side": "SELL",
+   "px": 0.99,
+   "qty": 10288,
+   "ok": true
+  }
+ ]
+}

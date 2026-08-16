@@ -1,0 +1,50 @@
+2026-08-15 01:54 UTC  open orders 6,446  slate sides short 1  targets [20000.0]
+  PROBLEM: 1 slate sides below target on OUR size (worst: andbes SELL 19,971/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 02:53 UTC  open orders 5,450  slate sides short 18  targets [20000.0]
+  PROBLEM: 18 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, aleocc SELL 8,783/20,000)
+  PROBLEM: open orders fell 6,446 -> 5,450 (-15%) — mass-cancel pattern
+(no ntfy topic — alert not sent)
+2026-08-15 03:40 UTC  open orders 3,081  slate sides short 57  targets [20000.0]
+  PROBLEM: 57 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+  PROBLEM: open orders fell 5,450 -> 3,081 (-43%) — mass-cancel pattern
+(no ntfy topic — alert not sent)
+2026-08-15 04:33 UTC  open orders 3,074  slate sides short 61  targets [20000.0]
+  PROBLEM: 61 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 05:26 UTC  open orders 3,074  slate sides short 61  targets [20000.0]
+  PROBLEM: 61 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 05:53 UTC  open orders 3,072  slate sides short 61  targets [20000.0]
+  PROBLEM: 61 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 06:41 UTC  open orders 3,072  slate sides short 61  targets [20000.0]
+  PROBLEM: 61 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 07:32 UTC  open orders 3,072  slate sides short 61  targets [20000.0]
+  PROBLEM: 61 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 08:31 UTC  open orders 3,062  slate sides short 62  targets [20000.0]
+  PROBLEM: 62 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 09:27 UTC  open orders 3,062  slate sides short 62  targets [20000.0]
+  PROBLEM: 62 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 09:51 UTC  open orders 3,062  slate sides short 62  targets [20000.0]
+  PROBLEM: 62 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 10:25 UTC  open orders 3,062  slate sides short 62  targets [20000.0]
+  PROBLEM: 62 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 10:49 UTC  open orders 3,062  slate sides short 62  targets [20000.0]
+  PROBLEM: 62 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 11:21 UTC  open orders 3,062  slate sides short 62  targets [20000.0]
+  PROBLEM: 62 slate sides below target on OUR size (worst: dem SELL 5,252/20,000, jonste SELL 8,690/20,000, jamtal SELL 8,718/20,000, jbpri SELL 8,733/20,000, elomus SELL 8,734/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 11:34 UTC  open orders 3,063  slate sides short 1  targets [20000.0]
+  PROBLEM: 1 slate sides below target on TOTAL size — those sides pay NOBODY (worst: jonste SELL 18,890/20,000)
+(no ntfy topic — alert not sent)
+2026-08-15 11:46 UTC  open orders 3,008  slate sides short 2  targets [20000.0]
+  PROBLEM: 2 slate sides below target on TOTAL size — those sides pay NOBODY (worst: rep SELL 17,579/20,000, jonste SELL 18,890/20,000)
+(no ntfy topic — alert not sent)

@@ -1,0 +1,60 @@
+buying power $160.75 — an ask order carries 160 shares
+
+=== enwc-uspres-nom-rep-2028-marrub — bid ===
+    bid side 2,363 of 10,000, touch 8c
+    qualify: 10,000 @ 1c -> ok
+    touch  : 400 @ 8c -> ok
+
+=== ask sides short of Target Size ===
+
+-- pass 1: 14 sides short, 95,217 shares to add --
+  enwc-uspres-nom-dem-2028-dwajoh: adding 7,306 in 46 orders of 160
+  enwc-uspres-nom-dem-2028-stasmi: adding 7,323 in 46 orders of 160
+  enwc-uspres-nom-rep-2028-dontrujr: adding 4,679 in 30 orders of 160
+  enwc-uspres-nom-rep-2028-thomas: adding 7,323 in 46 orders of 160
+  enwc-uspres-nom-rep-2028-vivram: adding 6,001 in 38 orders of 160
+  ewc-usp-2028-11-07-aleocc: adding 5,340 in 34 orders of 160
+  ewc-usp-2028-11-07-dontru: adding 6,662 in 42 orders of 160
+  ewc-usp-2028-11-07-petbut: adding 7,323 in 46 orders of 160
+  ewc-usp-2028-11-07-rokha: adding 7,323 in 46 orders of 160
+  ewc-usp-2028-11-07-stasmi: adding 7,323 in 46 orders of 160
+  ewc-usp-2028-11-07-tuccar: adding 7,306 in 46 orders of 160
+  ewc-usp-2028-11-07-tulgab: adding 7,323 in 46 orders of 160
+  ewc-usp-2028-11-07-vivram: adding 6,662 in 42 orders of 160
+  ewc-usp-2028-11-07-wesmoo: adding 7,323 in 46 orders of 160
+  settling before verifying…
+
+-- pass 2: 14 sides short, 3,373 shares to add --
+  enwc-uspres-nom-dem-2028-dwajoh: adding 259 in 2 orders of 160
+  enwc-uspres-nom-dem-2028-stasmi: adding 259 in 2 orders of 160
+  enwc-uspres-nom-rep-2028-dontrujr: adding 167 in 2 orders of 160
+  enwc-uspres-nom-rep-2028-thomas: adding 259 in 2 orders of 160
+  enwc-uspres-nom-rep-2028-vivram: adding 213 in 2 orders of 160
+  ewc-usp-2028-11-07-aleocc: adding 190 in 2 orders of 160
+  ewc-usp-2028-11-07-dontru: adding 236 in 2 orders of 160
+  ewc-usp-2028-11-07-petbut: adding 259 in 2 orders of 160
+  ewc-usp-2028-11-07-rokha: adding 259 in 2 orders of 160
+  ewc-usp-2028-11-07-stasmi: adding 259 in 2 orders of 160
+  ewc-usp-2028-11-07-tuccar: adding 259 in 2 orders of 160
+  ewc-usp-2028-11-07-tulgab: adding 259 in 2 orders of 160
+  ewc-usp-2028-11-07-vivram: adding 236 in 2 orders of 160
+  ewc-usp-2028-11-07-wesmoo: adding 259 in 2 orders of 160
+  settling before verifying…
+
+placed 630 orders, 0 failures
+ask sides holding our full 10,000: 46 of 60
+   still short: enwc-uspres-nom-dem-2028-dwajoh            ours 9,994
+   still short: enwc-uspres-nom-dem-2028-stasmi            ours 9,994
+   still short: enwc-uspres-nom-rep-2028-dontrujr          ours 9,995
+   still short: enwc-uspres-nom-rep-2028-thomas            ours 9,994
+   still short: enwc-uspres-nom-rep-2028-vivram            ours 9,995
+   still short: ewc-usp-2028-11-07-aleocc                  ours 9,995
+   still short: ewc-usp-2028-11-07-dontru                  ours 9,994
+   still short: ewc-usp-2028-11-07-petbut                  ours 9,994
+   still short: ewc-usp-2028-11-07-rokha                   ours 9,994
+   still short: ewc-usp-2028-11-07-stasmi                  ours 9,994
+   still short: ewc-usp-2028-11-07-tuccar                  ours 9,994
+   still short: ewc-usp-2028-11-07-tulgab                  ours 9,994
+   still short: ewc-usp-2028-11-07-vivram                  ours 9,994
+   still short: ewc-usp-2028-11-07-wesmoo                  ours 9,994
+Rubio bid, ours now: 10,400

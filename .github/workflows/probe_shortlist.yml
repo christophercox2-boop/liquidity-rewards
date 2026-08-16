@@ -1,0 +1,171 @@
+name: Probe shortlist
+
+# READ-ONLY. GET only. Places nothing.
+#
+# The 21 unentered pool markets shortlisted from the 2026-08-15 full
+# crawl: SAVE Act x2, Florida REP gubernatorial primary x3, Georgia
+# senate x2, California governor (Becerra), midterm chamber control x4,
+# and the suspicious Michigan senate primary ladder x11 whose slug date
+# has already passed. For each: live program, event proration, both
+# books, qualification state per side, cost to qualify with our own
+# size, and what a modest order at the touch would earn.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/probe_shortlist.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe-shortlist
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Probe
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          TARGETS = [
+              "lawec-saveact-2026-08-31", "lawec-saveact-2026-12-31",
+              "enwc-usgubp-fl-2026-08-18-rep-byrdon",
+              "enwc-usgubp-fl-2026-08-18-rep-jamfis",
+              "enwc-usgubp-fl-2026-08-18-rep-jaycol",
+              "ewc-usgub-ca-2026-11-03-xavbec",
+              "ewc-usse-ga-2026-11-03-dem", "ewc-usse-ga-2026-11-03-rep",
+              "paccc-usho-midterms-2026-11-03-dem",
+              "paccc-usho-midterms-2026-11-03-rep",
+              "paccc-usse-midterms-2026-11-03-dem",
+              "paccc-usse-midterms-2026-11-03-rep",
+          ] + [f"vmc-ussep-misen-2026-08-04-{t}" for t in
+               ("els0-5", "els10-15", "els15-20", "els5-10", "elsgte20",
+                "ste0-5", "ste05-10", "ste10-15", "ste15-20", "stegte20")]
+          DF_TICK = 0.01
+
+          pol, sizes = tr.fetch_politics_events()
+          pol = set(pol)
+
+          progs = {}
+          try:
+              rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                params={"symbols": TARGETS, "pageSize": 100}, timeout=30)
+              for p in rr.json().get("programs") or []:
+                  s = p.get("marketSlug") or ""
+                  tp = tr._pick_period(p.get("timePeriods") or [], s)
+                  if tp is not None and s:
+                      progs[s] = tr._prog_of(tp)
+          except Exception as e:
+              print(f"incentives lookup failed: {type(e).__name__}")
+
+          rows = []
+          for slug in TARGETS:
+              pr = progs.get(slug) or {}
+              target = float(pr.get("target") or 0)
+              df = float(pr.get("df") or 0.2)
+              n = sizes.get(slug, 0)
+              per = (float(pr.get("pool") or 0) / max(n, 1) / 2) if n else None
+              print(f"=== {slug} ===")
+              if not pr:
+                  print("   NO ACTIVE PROGRAM (pool gone since the crawl?)\n")
+                  rows.append({"m": slug, "program": False}); continue
+              if not n:
+                  print(f"   not in the open politics tag list — market may be "
+                        f"closed/resolving. pool {pr.get('pool')} target {target:,.0f}")
+              try:
+                  bk = tr._fetch_book(slug)
+              except Exception as e:
+                  print(f"   book unavailable ({type(e).__name__})\n")
+                  rows.append({"m": slug, "program": True, "book": False}); continue
+              time.sleep(0.25)
+              row = {"m": slug, "program": True, "book": True,
+                     "pool": pr.get("pool"), "target": target, "df": df,
+                     "event_n": n, "per_side": round(per, 2) if per else None}
+              print(f"   pool ${pr.get('pool')} / {n or '?'} markets / 2 sides = "
+                    f"${per:,.2f}/side/day" if per else
+                    f"   pool ${pr.get('pool')}, event size unknown")
+              print(f"   target {target:,.0f}   df {df}")
+              for side, lv in (("BID", bk.get("bids") or []), ("ASK", bk.get("asks") or [])):
+                  if not lv:
+                      print(f"   {side}: EMPTY — first order in sets the touch")
+                      row[side] = {"empty": True}
+                      continue
+                  tot = sum(q for _, q in lv)
+                  best, bq = lv[0]
+                  win, cum = [], 0.0
+                  for p, q in lv:
+                      take = min(q, max(0.0, target - cum))
+                      if take <= 0: break
+                      win.append((p, take)); cum += q
+                  den = sum(q * df ** round(abs(best - p) / DF_TICK) for p, q in win)
+                  probe = 50.0
+                  est50 = per * probe / (den + probe) if (per and tot + probe >= target and den >= 0) else None
+                  qual = tot >= target
+                  print(f"   {side}: touch {best*100:5.1f}c ({bq:,.0f}) total {tot:,.0f} "
+                        f"of {target:,.0f} -> {'QUALIFIES' if qual else 'below target — pays nobody'}")
+                  print(f"        top: " + "  ".join(f"{p*100:.0f}c×{q:,.0f}" for p, q in lv[:5]))
+                  if est50 is not None:
+                      print(f"        50 at the touch would take "
+                            f"{probe/(den+probe)*100:4.1f}% ≈ ${est50:,.2f}/day")
+                  if not qual:
+                      gap = target - tot
+                      floor = 0.01 if side == "BID" else 0.99
+                      print(f"        to qualify: {gap:,.0f} more at "
+                            f"{floor*100:.0f}c ≈ ${gap*0.01:,.0f} fill-side")
+                  row[side] = {"touch": best, "touch_q": bq, "total": tot,
+                               "qual": qual, "den": round(den, 1),
+                               "est50": round(est50, 2) if est50 else None}
+              rows.append(row)
+              print()
+
+          print("=== SUMMARY (per-side $/day if entered modestly) ===")
+          for r in rows:
+              if not r.get("book"): continue
+              b, a = r.get("BID") or {}, r.get("ASK") or {}
+              print(f"  {r['m']:44s} ${r['per_side'] or 0:7.2f}/side  "
+                    f"bid50 ${b.get('est50') or 0:6.2f}  ask50 ${a.get('est50') or 0:6.2f}"
+                    + ("" if (b.get('qual') and a.get('qual')) else "  [needs qualifying]"))
+
+          os.makedirs("data", exist_ok=True)
+          json.dump(rows, open("data/probe_shortlist.json", "w"), indent=1)
+          with open("data/probe_shortlist.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/probe_shortlist.json data/probe_shortlist.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Probe shortlist [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi

@@ -101,6 +101,7 @@ jobs:
               return None, "unreachable"
 
           progs, seen = {}, set()
+          first_start: dict = {}
           records = pages = 0
           complete = False
           stop_reason = f"hit MAX_PAGES={MAX_PAGES}"
@@ -116,6 +117,9 @@ jobs:
                   slug = p.get("marketSlug") or ""
                   seen.add(slug)
                   for tp in p.get("timePeriods") or []:
+                      st = str(tp.get("start") or "")
+                      if st and (slug not in first_start or st < first_start[slug]):
+                          first_start[slug] = st   # ISO-8601 sorts lexically
                       if str(tp.get("status") or "").lower() in ("active", "live", "status_live"):
                           progs[slug] = tp
               token = data.get("nextPageToken")
@@ -177,6 +181,43 @@ jobs:
               print("  reached. Absence here is NOT evidence of a missing pool.")
 
           fam = lambda s: (re.match(r"^([a-z]+)-", s) or [None, "?"])[1]
+
+          # ---- programs that began in the last 7 days, unentered ----------
+          # "New" here means the market's EARLIEST program period starts
+          # within the window. Caveat, checked below against markets whose
+          # true age we know: if the API only returns the current rolling
+          # period (politics pools refresh every ~3 days), an old market can
+          # masquerade as new. The calibration line says whether the earliest
+          # starts of long-held families are believable before the list is.
+          import datetime as _dt
+          cutoff = (_dt.datetime.now(_dt.timezone.utc)
+                    - _dt.timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
+          print("\n=== PROGRAMS STARTED IN THE LAST 7 DAYS, THAT WE ARE NOT IN ===")
+          old_held = sorted((first_start.get(h, "?"), h) for h in held
+                            if h.split("-")[0] in ("ussewc", "usgubewc"))[:3]
+          if old_held:
+              print("  calibration — senate/governor markets held since ~08-11, "
+                    "earliest starts seen:")
+              for st, h in old_held:
+                  print(f"     {h:44s} {st}")
+              print("  (starts near 08-11 mean the ages below are real; starts that"
+                    " look like the current 3-day window mean they are NOT.)")
+          fresh = sorted(((first_start.get(s, ""), s) for s in progs
+                          if s not in held and first_start.get(s, "") >= cutoff),
+                         key=lambda x: x[0])
+          byfam_new = collections.defaultdict(list)
+          for st, s in fresh:
+              byfam_new[fam(s)].append((st, s))
+          print(f"  markets: {len(fresh)} across {len(byfam_new)} families")
+          for f, lst in sorted(byfam_new.items(), key=lambda kv: -len(kv[1])):
+              t0_ = progs[lst[0][1]]
+              print(f"\n  {f}: {len(lst)} markets — pool {t0_.get('rewardPool')} "
+                    f"target {t0_.get('targetSize')} df {t0_.get('discountFactor')}"
+                    f"  (first start {lst[0][0][:10]})")
+              for st, s in lst[:12]:
+                  print(f"     {s:52s} {st[:10]}")
+              if len(lst) > 12:
+                  print(f"     ... and {len(lst) - 12} more")
 
           # ---- the politics slate, which is what we actually trade --------
           try:
@@ -302,6 +343,13 @@ jobs:
           git add data/new_pools.json data/new_pools.txt 2>/dev/null || true
           if git diff --cached --quiet; then echo "no change"; else
             git commit -m "Probe new pools [skip ci]"
-            git pull --rebase origin main
-            git push
+            # Several workflows push to this repo at once. A lost race used to
+            # fail the step and throw the run's output away — retry instead.
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
           fi

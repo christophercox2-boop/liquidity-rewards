@@ -1,0 +1,158 @@
+=== ewc-usp-party-2028-11-07-dem ===
+   net position: 0
+   ceiling asks: 0 (0 correctly BUY NO, 0 wrongly SELL YES in 0 orders)
+   nothing to fix here
+
+=== ewc-usp-party-2028-11-07-rep ===
+   net position: 400.0
+   ceiling asks: 20,120 (0 correctly BUY NO, 20,120 wrongly SELL YES in 71 orders)
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 105 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 288 @ 99c
+   cancelled SELL YES 287 @ 99c
+   cancelled SELL YES 289 @ 99c
+   cancelled SELL YES 133 @ 99c
+   cancelled SELL YES 290 @ 99c
+   cancelled SELL YES 289 @ 99c
+   replacing 20,121 as BUY NO — buying power $281.67
+   rested BUY NO 270 @ 99c  (270.28/20,121)
+   rested BUY NO 270 @ 99c  (540.53/20,121)
+   rested BUY NO 270 @ 99c  (810.75/20,121)
+   rested BUY NO 270 @ 99c  (1,080.94/20,121)
+   rested BUY NO 270 @ 99c  (1,351.1000000000001/20,121)
+   rested BUY NO 270 @ 99c  (1,621.2400000000002/20,121)
+   rested BUY NO 270 @ 99c  (1,891.3500000000004/20,121)
+   rested BUY NO 270 @ 99c  (2,161.4300000000003/20,121)
+   rested BUY NO 270 @ 99c  (2,431.4800000000005/20,121)
+   rested BUY NO 270 @ 99c  (2,701.5000000000005/20,121)
+   rested BUY NO 270 @ 99c  (2,971.4800000000005/20,121)
+   rested BUY NO 270 @ 99c  (3,241.4300000000003/20,121)
+   rested BUY NO 270 @ 99c  (3,511.36/20,121)
+   rested BUY NO 270 @ 99c  (3,781.26/20,121)
+   rested BUY NO 270 @ 99c  (4,051.13/20,121)
+   rested BUY NO 270 @ 99c  (4,320.97/20,121)
+   rested BUY NO 270 @ 99c  (4,590.780000000001/20,121)
+   rested BUY NO 270 @ 99c  (4,860.56/20,121)
+   rested BUY NO 270 @ 99c  (5,130.31/20,121)
+   rested BUY NO 270 @ 99c  (5,400.040000000001/20,121)
+   rested BUY NO 270 @ 99c  (5,669.740000000001/20,121)
+   rested BUY NO 270 @ 99c  (5,939.410000000001/20,121)
+   rested BUY NO 270 @ 99c  (6,209.050000000001/20,121)
+   rested BUY NO 270 @ 99c  (6,478.660000000001/20,121)
+   rested BUY NO 270 @ 99c  (6,748.240000000001/20,121)
+   rested BUY NO 270 @ 99c  (7,017.800000000001/20,121)
+   rested BUY NO 270 @ 99c  (7,287.330000000001/20,121)
+   rested BUY NO 270 @ 99c  (7,556.830000000001/20,121)
+   rested BUY NO 269 @ 99c  (7,826.300000000001/20,121)
+   rested BUY NO 269 @ 99c  (8,095.740000000001/20,121)
+   rested BUY NO 269 @ 99c  (8,365.150000000001/20,121)
+   rested BUY NO 269 @ 99c  (8,634.53/20,121)
+   rested BUY NO 269 @ 99c  (8,903.890000000001/20,121)
+   rested BUY NO 269 @ 99c  (9,173.220000000001/20,121)
+   rested BUY NO 269 @ 99c  (9,442.52/20,121)
+   rested BUY NO 269 @ 99c  (9,711.79/20,121)
+   rested BUY NO 269 @ 99c  (9,981.03/20,121)
+   rested BUY NO 269 @ 99c  (10,250.24/20,121)
+   rested BUY NO 269 @ 99c  (10,519.42/20,121)
+   rested BUY NO 269 @ 99c  (10,788.58/20,121)
+   rested BUY NO 269 @ 99c  (11,057.71/20,121)
+   rested BUY NO 269 @ 99c  (11,326.81/20,121)
+   rested BUY NO 269 @ 99c  (11,595.88/20,121)
+   rested BUY NO 269 @ 99c  (11,864.92/20,121)
+   rested BUY NO 269 @ 99c  (12,133.93/20,121)
+   rested BUY NO 269 @ 99c  (12,402.91/20,121)
+   rested BUY NO 269 @ 99c  (12,671.86/20,121)
+   rested BUY NO 269 @ 99c  (12,940.78/20,121)
+   rested BUY NO 269 @ 99c  (13,209.67/20,121)
+   rested BUY NO 269 @ 99c  (13,478.53/20,121)
+   rested BUY NO 269 @ 99c  (13,747.36/20,121)
+   rested BUY NO 269 @ 99c  (14,016.16/20,121)
+   rested BUY NO 269 @ 99c  (14,284.94/20,121)
+   rested BUY NO 269 @ 99c  (14,553.69/20,121)
+   rested BUY NO 269 @ 99c  (14,822.41/20,121)
+   rested BUY NO 269 @ 99c  (15,091.1/20,121)
+   rested BUY NO 269 @ 99c  (15,359.76/20,121)
+   rested BUY NO 269 @ 99c  (15,628.39/20,121)
+   rested BUY NO 269 @ 99c  (15,896.99/20,121)
+   rested BUY NO 269 @ 99c  (16,165.57/20,121)
+   rested BUY NO 269 @ 99c  (16,434.12/20,121)
+   rested BUY NO 269 @ 99c  (16,702.64/20,121)
+   rested BUY NO 268 @ 99c  (16,971.13/20,121)
+   rested BUY NO 268 @ 99c  (17,239.59/20,121)
+   rested BUY NO 268 @ 99c  (17,508.02/20,121)
+   rested BUY NO 268 @ 99c  (17,776.43/20,121)
+   rested BUY NO 268 @ 99c  (18,044.81/20,121)
+   rested BUY NO 268 @ 99c  (18,313.16/20,121)
+   rested BUY NO 268 @ 99c  (18,581.48/20,121)
+   rested BUY NO 268 @ 99c  (18,849.77/20,121)
+   rested BUY NO 268 @ 99c  (19,118.03/20,121)
+   rested BUY NO 268 @ 99c  (19,386.26/20,121)
+   rested BUY NO 268 @ 99c  (19,654.469999999998/20,121)
+   rested BUY NO 268 @ 99c  (19,922.649999999998/20,121)
+   rested BUY NO 198 @ 99c  (20,120.649999999998/20,121)
+   STOPPED: placement HTTP 400: {"code":3, "message":"The server was unable to process your request.", "details":[]}
+   net position after: 400.0 (before 400.0)
+

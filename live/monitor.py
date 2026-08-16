@@ -27,6 +27,7 @@ import gzip
 import io
 import json
 import os
+import math
 import random
 import sys
 import threading
@@ -87,7 +88,7 @@ HF_POINTS_KEPT = int(os.environ.get("HF_POINTS_KEPT", "600"))
 # Defined up here, not with the other DEFEND_* constants further down: the
 # defend-seed runs from Monitor.__init__, which executes long before that
 # block, so leaving it there raised NameError on boot.
-DEFEND_MAX_MARKETS = int(os.environ.get("DEFEND_MAX_MARKETS", "140"))
+DEFEND_MAX_MARKETS = int(os.environ.get("DEFEND_MAX_MARKETS", "260"))
 
 # Optional: phone notifications via ntfy (https://ntfy.sh). Install the ntfy
 # app, subscribe to a long random topic, set NTFY_TOPIC to the same string.
@@ -208,6 +209,128 @@ def _estimates_csv_text() -> str | None:
         return r.text if r.status_code == 200 else None
     except Exception:  # noqa: BLE001
         return None
+
+
+# --- in-process tracker (replaced the hourly Actions run, 2026-08-15) -------
+# The hourly "Track liquidity rewards" workflow burned ~85 Actions minutes a
+# day against a 2,000/month plan. This thread runs the SAME track_rewards.py,
+# unchanged, as a subprocess (its own interpreter — no shared module state
+# with the poll loop), then pushes every output to main as ONE commit via the
+# git data API. Append-history files are seeded from main first, so container
+# restarts never reset them. The Actions workflow still runs every 4 hours as
+# an independent heartbeat: if this container dies, that run still stamps the
+# ❌ freshness banner into STATUS.md and emails the owner.
+TRACKER_INTERVAL = float(os.environ.get("TRACKER_INTERVAL", "3600"))
+TRACKER_ENABLED = os.environ.get("TRACKER_IN_MONITOR", "1") != "0"
+APP_DIR = Path(__file__).resolve().parent.parent
+TRACKER_SEED = ("data/estimates.csv", "data/checks.csv", "data/estimate_runs.csv",
+                "data/family_day.csv")
+TRACKER_PUSH = ("STATUS.md", "data/rewards.csv", "data/checks.csv",
+                "data/estimates.csv", "data/estimate_runs.csv",
+                "data/family_day.csv", "data/live_orders.csv",
+                "data/latest_response.json")
+TRACKER_STATUS = {"ok_ts": 0.0, "err": "", "runs": 0}
+
+
+def _tracker_commit(files: dict[str, bytes]) -> str:
+    """One fast-forward commit on main. Returns '' or a short error."""
+    for attempt in range(2):
+        r = _gh("GET", f"/repos/{GITHUB_REPO}/git/ref/heads/main")
+        if r.status_code >= 300:
+            return f"head HTTP {r.status_code}"
+        head = r.json()["object"]["sha"]
+        r = _gh("GET", f"/repos/{GITHUB_REPO}/git/commits/{head}")
+        if r.status_code >= 300:
+            return f"head commit HTTP {r.status_code}"
+        base_tree = r.json()["tree"]["sha"]
+        tree = []
+        for path, data in files.items():
+            rb = _gh("POST", f"/repos/{GITHUB_REPO}/git/blobs",
+                     json={"content": base64.b64encode(data).decode(),
+                           "encoding": "base64"})
+            if rb.status_code >= 300:
+                return f"blob {path} HTTP {rb.status_code}"
+            tree.append({"path": path, "mode": "100644", "type": "blob",
+                         "sha": rb.json()["sha"]})
+        rt = _gh("POST", f"/repos/{GITHUB_REPO}/git/trees",
+                 json={"base_tree": base_tree, "tree": tree})
+        if rt.status_code >= 300:
+            return f"tree HTTP {rt.status_code}"
+        if rt.json()["sha"] == base_tree:
+            return ""          # nothing actually changed — no empty commit
+        rc = _gh("POST", f"/repos/{GITHUB_REPO}/git/commits",
+                 json={"message": "Liquidity rewards check [skip ci]",
+                       "tree": rt.json()["sha"], "parents": [head]})
+        if rc.status_code >= 300:
+            return f"commit HTTP {rc.status_code}"
+        rr = _gh("PATCH", f"/repos/{GITHUB_REPO}/git/refs/heads/main",
+                 json={"sha": rc.json()["sha"]})   # fast-forward only, no force
+        if rr.status_code < 300:
+            return ""
+        if attempt == 0 and rr.status_code in (409, 422):
+            continue           # lost a push race — rebuild on the new head
+        return f"ref HTTP {rr.status_code}"
+    return "ref race"
+
+
+def _tracker_once() -> str:
+    import subprocess
+    for path in TRACKER_SEED:
+        txt = _gh_text(path, ref="main")
+        if txt:
+            p = APP_DIR / path
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(txt)
+    proc = subprocess.run([sys.executable, str(APP_DIR / "track_rewards.py")],
+                          cwd=str(APP_DIR), capture_output=True, text=True,
+                          timeout=1800)
+    tail = " ".join(((proc.stdout or "") + " " + (proc.stderr or "")).split())[-300:]
+    files = {}
+    for path in TRACKER_PUSH:
+        p = APP_DIR / path
+        if p.exists():
+            files[path] = p.read_bytes()
+    if not files:
+        return ("tracker wrote nothing: " + tail)[:250]
+    err = _tracker_commit(files)
+    if err.startswith("blob data/estimates.csv") and "data/estimates.csv" in files:
+        # the one file big enough to trip a request-body limit — commit the
+        # rest; the 4-hourly Actions run still refreshes it
+        del files["data/estimates.csv"]
+        err = _tracker_commit(files) or "estimates.csv skipped (too big for the API)"
+    if err:
+        return err[:250]
+    # a failed fetch still commits its ❌ banner (same as Actions did) but is
+    # still a failure worth surfacing
+    return "" if proc.returncode == 0 else (f"tracker exit {proc.returncode}: {tail}")[:250]
+
+
+def tracker_loop() -> None:
+    time.sleep(120)            # let the poll loop warm its caches first
+    while True:
+        if TRACKER_ENABLED and GITHUB_TOKEN:
+            try:
+                err = _tracker_once()
+            except Exception as e:  # noqa: BLE001 — the loop must survive anything
+                err = f"{type(e).__name__}: {e}"[:200]
+            TRACKER_STATUS["runs"] += 1
+            TRACKER_STATUS["err"] = err
+            if not err:
+                TRACKER_STATUS["ok_ts"] = time.time()
+                # the run just rewrote rewards.csv — refresh the paid-days
+                # table NOW instead of waiting for the hourly sweep (the
+                # owner caught 'not posted yet' beside freshly posted rows)
+                try:
+                    winners, rew_total, day_paid = load_winners()
+                    if winners:
+                        global WINNERS
+                        WINNERS = winners
+                    MONITOR.day_paid = day_paid
+                    if rew_total:
+                        MONITOR.note_rewards_total(rew_total)
+                except Exception:  # noqa: BLE001
+                    pass
+        time.sleep(TRACKER_INTERVAL)
 
 
 def tracker_day_integral(day_et: str,
@@ -733,6 +856,14 @@ class Monitor:
                     continue
                 if 0.1 <= c <= 99.9:
                     clean[side] = {"cap": c}
+                    sh = ((sides or {}).get(side) or {}).get("share")
+                    if sh is not None:
+                        try:
+                            shv = float(sh)
+                        except (TypeError, ValueError):
+                            shv = None
+                        if shv is not None and 0.05 <= shv <= 0.95:
+                            clean[side]["share"] = shv
             if not clean:
                 continue
             wrote: dict = {}
@@ -1372,15 +1503,46 @@ def _verify_resting(market: str, side: str, price_value: str,
     placement returned, and reporting the size actually resting, is what stops
     an increase from silently shrinking the position.
     """
+    # One look after one second was not enough. On 2026-08-14 the open-order
+    # list was lagging placements by several seconds — with ~4,600 orders on
+    # it — so replacements that HAD rested were reported missing, the defender
+    # gave up, and every stuck ask drifted further from the touch while the
+    # alert said the order "may have been cancelled". A controlled test placed
+    # six asks in the two worst markets: all six rested, and all six needed
+    # about four seconds to appear. So poll instead of glancing.
+    deadline = time.time() + VERIFY_MAX_WAIT
+    delay = 1.0
+    last = "no attempt made"
     try:
-        time.sleep(1.0)  # give the exchange a beat to settle the replace
+        while True:
+            time.sleep(delay)
+            found, msg, qty, decided = _verify_once(market, side, price_value,
+                                                    want_id, min_qty)
+            if decided:
+                return found, msg, qty
+            last = msg
+            if time.time() >= deadline:
+                return False, last, 0.0
+            delay = min(delay * 1.6, 4.0)
+    except Exception as e:  # noqa: BLE001
+        return False, f"verify failed: {type(e).__name__}: {e}"[:150], 0.0
+
+
+VERIFY_MAX_WAIT = float(os.environ.get("VERIFY_MAX_WAIT", "12"))
+
+
+def _verify_once(market: str, side: str, price_value: str,
+                 want_id: str | None, min_qty: float | None):
+    """One look at the open-order list. `decided` is False only when the
+    order simply is not there yet — the caller keeps polling on that."""
+    try:
         path = "/v1/orders/open"
         r = requests.request(
             "GET", tr.TRADE_API + path,
             headers=tr.auth_headers(KEY_ID, SECRET_KEY, "GET", path), timeout=20,
         )
         if r.status_code >= 400:
-            return False, f"verify fetch HTTP {r.status_code}", 0.0
+            return False, f"verify fetch HTTP {r.status_code}", 0.0, False
         want = float(price_value)
         for o in r.json().get("orders") or []:
             # a dead record at the target price must not count as "resting" —
@@ -1401,11 +1563,12 @@ def _verify_resting(market: str, side: str, price_value: str,
             if min_qty is not None and qty + 1e-9 < min_qty:
                 return (False,
                         f"rested at only {qty:,.0f} of the {min_qty:,.0f} asked for",
-                        qty)
-            return True, f"verified resting at {want * 100:g}¢ (id {o.get('id')})", qty
-        return False, "NO order found at the new price — it may have been cancelled; check the app", 0.0
+                        qty, True)
+            return True, f"verified resting at {want * 100:g}¢ (id {o.get('id')})", qty, True
+        return (False, "NO order found at the new price — it may have been "
+                "cancelled; check the app", 0.0, False)
     except Exception as e:  # noqa: BLE001
-        return False, f"verify failed: {type(e).__name__}: {e}"[:150], 0.0
+        return False, f"verify failed: {type(e).__name__}: {e}"[:150], 0.0, True
 
 
 PLAN_CACHE: dict = {"politics": {"ts": 0.0, "data": None}, "golf": {"ts": 0.0, "data": None},
@@ -1924,9 +2087,22 @@ def _collect_fills(t: dict, fills_by_order: dict[str, dict]) -> None:
     # fee, the passive side collects a maker rebate. Checked against the live
     # book, the passive order id matched our open orders and the aggressor's
     # never did.
+    # OUR side of a trade is the one whose order carries a real intent —
+    # the API redacts the counterparty's to ORDER_INTENT_UNDEFINED. The old
+    # passive-first pick assumed we always rest; the sniper (which takes on
+    # purpose) and the owner's own manual crosses broke that, attributing
+    # those fills to the counterparty's order.
+    def _ours(ex):
+        o_ = (ex or {}).get("order") or {}
+        it_ = str(o_.get("intent") or "")
+        return o_.get("id") and it_ and not it_.endswith("UNDEFINED")
     pick = t.get("passiveExecution") or {}
-    if not (pick.get("order") or {}).get("id"):
+    if not _ours(pick):
         pick = t.get("aggressorExecution") or {}
+    if not _ours(pick):
+        pick = t.get("passiveExecution") or {}
+        if not (pick.get("order") or {}).get("id"):
+            pick = t.get("aggressorExecution") or {}
     execs = []
     _o = pick.get("order") or {}
     if _o.get("id") and tr._num(pick.get("lastShares")) > 0:
@@ -1949,6 +2125,7 @@ def _collect_fills(t: dict, fills_by_order: dict[str, dict]) -> None:
                 ts_s, when = _fill_ts(str(ex.get("transactTime") or ""))
                 fills_by_order[oid] = row = {
                     "oid": oid, "kind": "fill", "verb": verb, "yesno": yesno,
+                    "intent": str(o.get("intent") or ""),
                     "market": o.get("marketSlug") or t.get("marketSlug") or "",
                     "filled": 0.0, "_val": 0.0, "price_cents": None,
                     "ts_s": ts_s, "when": when, "pnl": 0.0}
@@ -2353,9 +2530,13 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
         return 400, {"ok": False, "error": "unknown order id — wait for the next refresh"}
     if not (0.1 <= price_cents <= 99.9):
         return 400, {"ok": False, "error": "price out of range (0.1–99.9¢)"}
-    qty = int(quantity) if quantity else int(round(o["size"]))
-    if not (1 <= qty <= 20000):
-        return 400, {"ok": False, "error": "size out of range (1–20,000)"}
+    # Sizes are fractional. int(round(...)) turned a 273.04 order into 273,
+    # which then FAILED its own verification — the check demands the
+    # replacement match the original's size, and 273 is short of 273.04. Every
+    # reprice of a fractional order was unwinnable that way.
+    qty = round(float(quantity) if quantity else float(o["size"] or 0), 2)
+    if not (0.01 <= qty <= 20000):
+        return 400, {"ok": False, "error": "size out of range (0.01–20,000)"}
     # A post-only replacement that would cross the opposite touch can never
     # rest — refuse up front, which is a pure no-op for the resting order.
     ent = tr._BOOK_CACHE.get(o["market"])
@@ -2372,8 +2553,8 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
     record = {"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
               "market": o["market"], "side": o["side"],
               "from": round(o["price"] * 100, 1), "to": price_cents,
-              "size": (qty if qty == int(round(o["size"]))
-                       else f"{int(round(o['size']))}→{qty}")}
+              "size": (qty if abs(qty - float(o["size"] or 0)) < 0.005
+                       else f"{float(o['size'] or 0):g}→{qty:g}")}
 
     def _api(method, path, body=None):
         return requests.request(
@@ -2421,9 +2602,25 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
         if not verified:
             record["verified"] = False
             keep_both = rested > 0
+            # The replacement was accepted. If it is resting and we simply
+            # could not confirm it, retiring it is the honest thing to do:
+            # leaving it creates a duplicate rung nobody is tracking, and a
+            # day of failed verifications is how the book quietly grew by
+            # hundreds of orphan orders. The ORIGINAL is never touched here.
+            orphan = ""
+            if new_id and not keep_both:
+                try:
+                    rc = _api("POST", f"/v1/order/{new_id}/cancel",
+                              {"marketSlug": o["market"]})
+                    orphan = (" replacement withdrawn"
+                              if rc.status_code < 300 else
+                              f" replacement left (cancel HTTP {rc.status_code})")
+                except Exception:  # noqa: BLE001
+                    orphan = " replacement left (cancel failed)"
             record["note"] = (f"replacement {note} — original left in place"
                               if keep_both else
-                              f"replacement did not rest ({note}) — original untouched")
+                              f"replacement did not rest ({note}) — original untouched;"
+                              + (orphan or " no id to withdraw"))
             notify("Reprice replacement did not rest",
                    f"{o['market']} → {price_cents}¢: {note}", "high")
             return 502, {"ok": False, "status": r.status_code,
@@ -2542,11 +2739,58 @@ def ws_stream_loop(key_id: str, secret_key: str) -> None:
 # fresh books only, reprice-only (never places orders or adds size), and
 # floor/ceiling qualifier blocks are never touched.
 DEFEND_SHARE_FLOOR = 0.25        # act only under 25% of the side's rewards
+# A market may ask for more than the default via its defend config
+# ({"SELL": {"cap": 25.0, "share": 0.33}}). The 2028 presidential slate runs at
+# 0.33: those are longshots, so an ask well above fair value is worth holding,
+# and a third of the side's score is the stake we want in each.
 DEFEND_COOLDOWN_SECONDS = 90.0   # per market+side between improvements
-DEFEND_MAX_PER_POLL = 6          # request-budget bound on a busy poll
+DEFEND_MAX_PER_POLL = 10         # request-budget bound on a busy poll
+# Where the last pass stopped. The budget above is spent in dict order, and
+# the pass RETURNS once it is used up — so with 175 armed markets the ones
+# near the front consumed every move and the 2028 slate, armed last, was
+# never reached at all. Resuming from where the previous pass left off gives
+# every armed market its turn.
+DEFEND_CURSOR = 0
 DEFEND_DEEP_BUY = 0.011          # floor-bid qualifiers: never repriced
 DEFEND_DEEP_SELL = 0.989         # ceiling-ask qualifiers: never repriced
 DEFEND_MOVED: dict[str, float] = {}
+
+
+def _defend_share_at(side: str, levels: list, best_mine: dict, price: float,
+                     df: float, target: float, tick: float) -> float:
+    """Our share of this side's score if our best order sat at `price`.
+
+    Rebuilds the level map with that one order moved, then applies the
+    official rule — walk out from the best price until Target Size has
+    accumulated, score each level as size x df^ticks — so the answer matches
+    what the exchange will actually pay rather than an approximation.
+    """
+    lv: dict[float, float] = {}
+    for px, q in levels or []:
+        lv[round(float(px), 4)] = lv.get(round(float(px), 4), 0.0) + float(q)
+    old = round(float(best_mine["price"]), 4)
+    sz = float(best_mine.get("size") or 0)
+    if sz <= 0:
+        return 0.0
+    lv[old] = lv.get(old, 0.0) - sz
+    if lv[old] <= 0.5:
+        lv.pop(old, None)
+    new = round(float(price), 4)
+    lv[new] = lv.get(new, 0.0) + sz
+    ordered = sorted(lv.items(), key=(lambda kv: -kv[0]) if side == "BUY" else (lambda kv: kv[0]))
+    if not ordered:
+        return 0.0
+    best = ordered[0][0]
+    win, cum = [], 0.0
+    for px, q in ordered:
+        win.append((px, q)); cum += q
+        if target and cum >= target:
+            break
+    den = sum(q * df ** round(abs(best - px) / tick) for px, q in win)
+    if den <= 0:
+        return 0.0
+    mine = sz * df ** round(abs(best - new) / tick) if any(abs(px - new) < 1e-9 for px, _ in win) else 0.0
+    return mine / den
 
 
 def _others_best(levels: list, mine_sz: dict) -> float | None:
@@ -2840,12 +3084,24 @@ def auto_defend() -> None:
         return
     if os.environ.get("DEFEND_PAUSE", "") == "1":
         return
+    global DEFEND_CURSOR
     cfg = dict(MONITOR.state.get("defend") or {})
     if not cfg or not KEY_ID:
         return
     now = time.time()
     moves = 0
-    for m, sides in cfg.items():
+    # start where the last pass stopped and wrap, so the move budget rotates
+    # across every armed market instead of always landing on the same few
+    order = list(cfg.items())
+    # named rot_start, not start: the move logic below uses `start` for a
+    # starting PRICE, and letting that float overwrite this index killed the
+    # whole pass on the next poll with "slice indices must be integers"
+    rot_start = int(DEFEND_CURSOR) % len(order)
+    order = order[rot_start:] + order[:rot_start]
+    scanned = 0
+    for m, sides in order:
+        scanned += 1
+        DEFEND_CURSOR = (rot_start + scanned) % len(cfg)
         ent = tr._BOOK_CACHE.get(m)
         if not ent or now - ent[0] > 300:
             continue  # stale book — never act on old prices
@@ -2885,34 +3141,53 @@ def auto_defend() -> None:
             shares = [o.get("share") for o in all_side]
             share_known = any(s is not None for s in shares)
             my_share = sum(s or 0.0 for s in shares)
-            if side == "BUY":
-                in_front = best_mine["price"] > others + 1e-9
-                if share_known:
-                    # Healthy share → stay put, whether we're alone in front
-                    # or sharing the level with a reasonably sized order.
-                    if my_share >= DEFEND_SHARE_FLOOR:
-                        continue
-                    base = max(best_mine["price"], others)
-                elif in_front:
-                    continue  # share unknown: only retake when matched/beaten
-                else:
-                    base = others
-                target = round(base + tick, 4)
-                blocked = target > cap + 1e-9
-                squeezed = ba is not None and target > ba - 2 * tick + 1e-9
-            else:
-                in_front = best_mine["price"] < others - 1e-9
-                if share_known:
-                    if my_share >= DEFEND_SHARE_FLOOR:
-                        continue
-                    base = min(best_mine["price"], others)
-                elif in_front:
+            want = DEFEND_SHARE_FLOOR
+            try:
+                if scfg.get("share") is not None:
+                    want = float(scfg["share"])
+            except (TypeError, ValueError):
+                pass
+            in_front = (best_mine["price"] > others + 1e-9 if side == "BUY"
+                        else best_mine["price"] < others - 1e-9)
+            if share_known:
+                if my_share >= want:
                     continue
-                else:
-                    base = others
-                target = round(base - tick, 4)
-                blocked = target < cap - 1e-9
-                squeezed = bb is not None and target < bb + 2 * tick - 1e-9
+            elif in_front:
+                continue  # share unknown: only retake when matched/beaten
+            # Where to move to. The old rule always stepped one tick past the
+            # best other order, which can give away far more than the job
+            # needs. Instead, walk out from where we are and stop at the FIRST
+            # price that reaches the wanted share — for an ask that is the
+            # highest such price, so we never cut the offer further than it
+            # takes. Falls back to the one-tick step if the book has no
+            # program to score against.
+            pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
+            df = float(pr.get("df") or 0)
+            tgt_size = float(pr.get("target") or 0)
+            levels = bids if side == "BUY" else asks
+            step = tick if side == "BUY" else -tick
+            target = None
+            if df and tgt_size:
+                start = best_mine["price"] if not in_front else others
+                for k in range(1, int(abs(start - cap) / tick) + 2):
+                    cand = round(start + step * k, 4)
+                    if side == "BUY" and cand > cap + 1e-9:
+                        break
+                    if side == "SELL" and cand < cap - 1e-9:
+                        break
+                    if not 0.001 <= cand <= 0.999:
+                        break
+                    if _defend_share_at(side, levels, best_mine, cand,
+                                        df, tgt_size, tick) >= want:
+                        target = cand
+                        break
+            if target is None:
+                base = ((max if side == "BUY" else min)(best_mine["price"], others)
+                        if share_known else others)
+                target = round(base + step, 4)
+            blocked = (target > cap + 1e-9) if side == "BUY" else (target < cap - 1e-9)
+            squeezed = (ba is not None and target > ba - 2 * tick + 1e-9) if side == "BUY" \
+                else (bb is not None and target < bb + 2 * tick - 1e-9)
             if not 0.001 <= target <= 0.999:
                 continue
             if blocked:
@@ -2925,6 +3200,925 @@ def auto_defend() -> None:
             DEFEND_MOVED[key] = now
             do_reprice(best_mine["id"], round(target * 100, 2), verify=False)
             moves += 1
+
+
+# ---------------------------------------------------------------------------
+# The bid sniper. Somebody keeps parking one- and two-contract bids well above
+# fair value on the 2028 longshots — 15c and up on candidates the market
+# otherwise prices near a cent. Two reasons to take them:
+#
+#   1. it is money. A contract sold at 20c on a name worth 1c is 19c.
+#   2. it unblocks our own scoring. That tiny bid SETS THE TOUCH, and our
+#      10,000-share block at 1c is then twenty-odd ticks behind it, scoring
+#      nothing on a side worth $5-10 a day. Clearing a 1-contract order at
+#      20c can switch a whole bid side back on.
+#
+# This is the one loop here that CROSSES the spread — it is a taker, not a
+# rester, and it pays the taker fee. It is deliberately narrow: only the 2028
+# slate, only touch levels under SNIPE_MAX_LEVEL contracts, only at or above
+# SNIPE_MIN_PRICE, never the three candidates the owner named as real
+# contenders, and bounded per cycle in both count and dollars.
+#
+# Like every other loop that places orders, it does nothing at all until the
+# owner turns its switch on from /map. Off by default, persisted, audit-logged.
+# A touch level strictly under this many contracts is fair game, and the
+# WHOLE level is taken — 4.9 contracts is under five just as much as 1 is,
+# and leaving 0.9 behind would leave the touch exactly where it was.
+SNIPE_MAX_LEVEL = float(os.environ.get("SNIPE_MAX_LEVEL", "5"))
+SNIPE_MIN_PRICE = float(os.environ.get("SNIPE_MIN_PRICE", "0.15"))
+SNIPE_MAX_PER_CYCLE = int(os.environ.get("SNIPE_MAX_PER_CYCLE", "6"))
+SNIPE_MAX_SPEND = float(os.environ.get("SNIPE_MAX_SPEND", "25"))
+SNIPE_COOLDOWN = float(os.environ.get("SNIPE_COOLDOWN", "300"))
+SNIPE_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                  "ewc-usp-2028-11-07-")
+# The owner's own read on who is a real contender. Selling a longshot at 15c+
+# is selling well above fair; selling one of these is not, so the sniper never
+# touches them. Vance, Rubio and Harris were the original three; Ossoff and
+# Buttigieg added 2026-08-14.
+SNIPE_EXCLUDE = {"jdvan", "marrub", "kamhar", "jonoss", "petbut"}
+_SNIPE_LAST: dict = {}
+
+
+def auto_snipe() -> None:
+    """Take the tiny over-priced bids sitting on the 2028 longshots."""
+    if not _auto_on("snipe"):
+        return
+    if os.environ.get("SNIPE_PAUSE", "") == "1":
+        return
+    now = time.time()
+    took = 0
+    spent = 0.0
+    for m, ent in list(tr._BOOK_CACHE.items()):
+        if took >= SNIPE_MAX_PER_CYCLE or spent >= SNIPE_MAX_SPEND:
+            return
+        if not m.startswith(SNIPE_PREFIXES):
+            continue
+        if m.rsplit("-", 1)[-1] in SNIPE_EXCLUDE:
+            continue
+        if now - _SNIPE_LAST.get(m, 0.0) < SNIPE_COOLDOWN:
+            continue
+        if not ent or now - ent[0] > 120:
+            continue          # only ever act on a fresh book
+        bids = (ent[1] or {}).get("bids") or []
+        if not bids:
+            continue
+        px, q = float(bids[0][0]), float(bids[0][1])
+        # only the TOUCH level, and only if it is both small and rich. A big
+        # bid at 20c is somebody's real opinion; a handful of contracts is not.
+        # Sizes here are FRACTIONAL — books carry levels like 0.06 and 273.04.
+        # Rounding them away broke this twice over: a 0.4-contract bid was
+        # skipped entirely as "under one", and a 1.5-contract level was taken
+        # as 1, leaving 0.5 resting and the touch exactly where it was. The
+        # whole point is to CLEAR the level, so work in fractions throughout.
+        if q >= SNIPE_MAX_LEVEL or q <= 0:
+            continue
+        # Overpriced by whose measure? When the Bayesian band is usable
+        # (any real trade, reasonably tight), the bid must clear the band's
+        # TOP plus a margin — which both unlocks snipes below the static
+        # 15c line (a 9c bait bid on a 3c-fair longshot is profit) and
+        # blocks unprofitable ones the static rule would have taken (a 16c
+        # bid when fair is modeled at 15c is no edge). With no usable band
+        # the static floor stands.
+        b = _bayes_fair(m)
+        if b and b.get("med") and b.get("fills", 0) >= 1 and (b["hi"] - b["lo"]) <= 6:
+            if px * 100 < b["hi"] + 2:
+                continue
+        elif px < SNIPE_MIN_PRICE:
+            continue
+        # never trade with ourselves
+        ours = sum(o.get("size") or 0 for o in MONITOR.orders
+                   if o.get("market") == m and o.get("side") == "BUY"
+                   and abs(float(o.get("price") or 0) - px) < 1e-9)
+        qty = round(q - ours, 2)      # the whole level, fractions included
+        if qty <= 0 or spent + px * qty > SNIPE_MAX_SPEND:
+            continue
+        _SNIPE_LAST[m] = now
+        try:
+            r = requests.request(
+                "POST", tr.TRADE_API + "/v1/orders",
+                headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                         "Content-Type": "application/json"},
+                json={"marketSlug": m, "intent": "ORDER_INTENT_BUY_SHORT",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{px:.2f}", "currency": "USD"},
+                      "quantity": qty,                     # may be fractional
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": False},   # crosses on purpose
+                timeout=20)
+            ok = r.status_code < 300
+            ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                            "market": m, "side": "SNIPE sell", "from": "—",
+                            "to": round(px * 100, 1), "size": qty,
+                            "status": r.status_code,
+                            "response": " ".join(r.text.split())[:120],
+                            "verified": ok})
+            del ACTIONS[:-20]
+            if ok:
+                took += 1
+                spent += px * qty
+        except Exception:  # noqa: BLE001 — a sniper must never kill the poll
+            continue
+
+
+# --- price prober (owner, 2026-08-15; reworked same day) --------------------
+# Fair-price discovery by tiny probes, run as a CLOSED LOOP over the owner's
+# existing inventory and its own info fund (state["probe_budget"]):
+#
+#   * SELL scouts are SELL_LONG of shares we ALREADY HOLD (never shorts, no
+#     collateral) — markets with a net long position of at least 2 are the
+#     ammo. A sell that fills credits its proceeds to the fund AND is
+#     information: a real buyer at that price.
+#   * BUY scouts (and flip buy-backs) spend ONLY the fund — no fund, no
+#     bids. A buy that fills debits the fund; its flip sale credits it
+#     back plus the gap. Nothing else in the account touches the fund, in
+#     either direction. When it runs dry, only sell scouts continue (they
+#     refill it); when inventory runs out too, the prober waits.
+#
+# Placement is unchanged: one-share post-only orders at random ticks inside
+# the de-baited spread (levels under 5 shares ignored). Every event lands in
+# the journal and the Bayesian bands. Owner switch: auto["probe"], off by
+# default.
+# Owner, 2026-08-16: extended beyond the 2028 slate to the race families —
+# governor, senate, the ewc singles, seat-count ladders, house — where the
+# tier pools have reconciled ~100% all week, so the earner's deal test runs
+# on validated (small, honest) numbers. Scouts only ever appear in markets
+# the book cache holds, i.e. where we already trade.
+PROBE_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                  "ewc-usp-2028-11-07-",
+                  "ussewc-", "usgubewc-", "ewc-usse-", "ewc-usgub-",
+                  "scc-", "ushrewc-", "enwc-usgubp-", "enwc-ushrp-")
+PROBE_SIZE = 1
+PROBE_REAL_MIN = 5.0          # book levels smaller than this are bait — ignore
+PROBE_MIN_GAP = 3             # need at least this many interior ticks to learn
+PROBE_MAX_PX = 0.60           # never probe-bid above this
+PROBE_FLIP_TICKS = 2
+PROBE_TTL = float(os.environ.get("PROBE_TTL", "2700"))     # rotate after 45 min
+PROBE_ACTIVE_MAX = int(os.environ.get("PROBE_ACTIVE_MAX", "24"))
+PROBE_MAX_PER_POLL = 2
+PROBE_COOLDOWN = 300.0        # per market between new probes
+_PROBE: dict = {"active": {}, "last": {}, "cancelled": set(), "pending": {}}
+PROBE_CONFIRM_WAIT = 300.0   # fills feed lag allowance before "vanished"
+
+
+def _on_book(m: str, side: str, px: float, qty: float,
+             placed_ts: float | None = None):
+    """Layer-three verification: does the PUBLIC book — the only thing that
+    scores — actually show a level at our price big enough to contain our
+    order? True/False, or None when no snapshot can fairly judge: cached
+    book too stale, OR the snapshot predates the order (a book photographed
+    before the order existed cannot contain it — every fresh placement
+    showed a false 'NOT ON BOOK' at 0m until this check, 2026-08-16)."""
+    ent = tr._BOOK_CACHE.get(m)
+    if not ent or time.time() - ent[0] > 300:
+        return None
+    if placed_ts and ent[0] < placed_ts + 8:   # book must postdate the order
+        return None
+    lv = (ent[1] or {}).get("bids" if side == "BUY" else "asks") or []
+    at = sum(q for p, q in lv if abs(p - px) < 0.005)
+    return at >= qty * 0.9
+
+
+def _probe_log(m: str, ev: str, side: str, px: float, note: str = "") -> None:
+    """One line in the prober's own journal, shown on the /map Prober card."""
+    with MONITOR.lock:
+        log = MONITOR.state.setdefault("probe_log", [])
+        log.append({"ts": dt.datetime.now(ET).strftime("%m-%d %I:%M:%S %p"),
+                    "m": m, "ev": ev, "side": side,
+                    "px": round(px * 100, 1), "note": note})
+        del log[:-200]
+
+
+def _probe_real_touches(book: dict):
+    """Best REAL level on each side, with its size: ((px, q) | None) x 2.
+    Levels under PROBE_REAL_MIN shares are bait and ignored."""
+    bb = next(((p, q) for p, q in book.get("bids") or [] if q >= PROBE_REAL_MIN), None)
+    ba = next(((p, q) for p, q in book.get("asks") or [] if q >= PROBE_REAL_MIN), None)
+    return bb, ba
+
+
+def _probe_place(m: str, side: str, px: float, intent: str, note: str) -> str | None:
+    try:
+        r = requests.request(
+            "POST", tr.TRADE_API + "/v1/orders",
+            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                     "Content-Type": "application/json"},
+            json={"marketSlug": m, "intent": intent,
+                  "type": "ORDER_TYPE_LIMIT",
+                  "price": {"value": f"{px:.2f}", "currency": "USD"},
+                  "quantity": PROBE_SIZE,
+                  "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                  "participateDontInitiate": True},
+            timeout=20)
+        ok = r.status_code < 300
+        oid = None
+        if ok:
+            try:
+                j = r.json()
+                o = j.get("order")
+                oid = (o.get("id") if isinstance(o, dict) else None) \
+                      or j.get("id") or j.get("orderId")
+            except Exception:  # noqa: BLE001
+                pass
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": m, "side": f"PROBE {note}", "from": "—",
+                        "to": round(px * 100, 1), "size": PROBE_SIZE,
+                        "status": r.status_code,
+                        "response": " ".join(r.text.split())[:100], "verified": ok})
+        del ACTIONS[:-20]
+        return str(oid) if oid else None
+    except Exception:  # noqa: BLE001 — the prober must never kill the poll
+        return None
+
+
+def auto_probe() -> None:
+    # one-time owner grants into the info fund, applied exactly once each
+    # (the applied list persists with the saved state, surviving restarts)
+    granted = False
+    with MONITOR.lock:
+        grants = MONITOR.state.setdefault("probe_grants", [])
+        if "2026-08-15-owner-10usd" not in grants:
+            grants.append("2026-08-15-owner-10usd")
+            MONITOR.state["probe_budget"] = round(
+                float(MONITOR.state.get("probe_budget") or 0.0) + 10.0, 2)
+            granted = True
+    if granted:   # log outside the lock — _probe_log takes it too
+        _probe_log("[owner]", "grant", "+", 0.0, "+$10.00 into the info fund")
+    # 2026-08-16 owner reset: the pre-classification-fix evidence is poisoned
+    # (phantom fills fed the bands as real trades) and the fund's history is
+    # equally suspect. Discard all of it, set the fund to exactly $20, and
+    # rebuild every band from post-fix, confirmed-only evidence. Applied
+    # once; live resting orders keep their registries — they are real and
+    # verified on the book — only the LEARNING starts over.
+    reset = False
+    with MONITOR.lock:
+        grants = MONITOR.state.setdefault("probe_grants", [])
+        if "2026-08-16-reset-20usd" not in grants:
+            grants.append("2026-08-16-reset-20usd")
+            MONITOR.state["probe_log"] = []
+            MONITOR.state["probe"] = {}
+            MONITOR.state["earn_log"] = []
+            MONITOR.state["earn_stats"] = {}
+            MONITOR.state.pop("probe_credited", None)
+            MONITOR.state["probe_budget"] = 20.0
+            reset = True
+    if reset:
+        _probe_log("[owner]", "reset", "+", 0.0,
+                   "old evidence discarded — fund set to $20.00, learning restarts "
+                   "on confirmed-only data")
+    # After a rebuild the in-memory registry is empty but our scouts still
+    # rest on the exchange. Re-adopt from the mirror saved in state, keeping
+    # only orders that still exist — so fills keep moving the fund and TTLs
+    # keep rotating across container replacements.
+    if not _PROBE["active"]:
+        saved = MONITOR.state.get("probe_active_reg") or {}
+        if saved:
+            live = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
+            for oid, r in saved.items():
+                if oid in live and len(r) == 5:
+                    _PROBE["active"][oid] = (r[0], r[1], float(r[2]), float(r[3]), r[4])
+    if not _auto_on("probe"):
+        return
+    if os.environ.get("PROBE_PAUSE", "") == "1":
+        return
+    now = time.time()
+    open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
+    est = MONITOR.state.setdefault("probe", {})
+    # 0. settle earlier disappearances: back on the list -> flicker, readopt;
+    #    confirmed by the fills feed -> requeue so the fill logic below runs;
+    #    neither, past the wait -> a silent exchange cancel, no fund movement
+    for oid, (rec, ts_gone) in list(_PROBE["pending"].items()):
+        if oid in open_ids or _fill_confirmed(oid):
+            _PROBE["active"][oid] = rec
+            del _PROBE["pending"][oid]
+        elif now - ts_gone > PROBE_CONFIRM_WAIT:
+            del _PROBE["pending"][oid]
+            _probe_log(rec[0], "vanished", rec[1], rec[2],
+                       "gone without a trade — exchange-side cancel")
+    # 1. reconcile: a probe missing from open orders that we did not cancel
+    #    was FILLED — record the price and place the flip
+    for oid, rec in list(_PROBE["active"].items()):
+        m, side, px, ts, kind = rec
+        if oid in open_ids:
+            if now - ts > PROBE_TTL:      # rotate a stale probe
+                try:
+                    requests.request(
+                        "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
+                        headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST",
+                                                   f"/v1/order/{oid}/cancel"),
+                                 "Content-Type": "application/json"},
+                        json={"marketSlug": m}, timeout=15)
+                    _PROBE["cancelled"].add(oid)
+                    del _PROBE["active"][oid]
+                    # untouched for the whole TTL: fair is beyond this price
+                    e = est.setdefault(m, {})
+                    if side == "BUY":
+                        e["rested_bid"] = max(float(e.get("rested_bid") or 0), px)
+                    else:
+                        e["rested_ask"] = min(float(e.get("rested_ask") or 1), px)
+                    _probe_log(m, "rested", side, px,
+                               "no taker for 45 min — rotating")
+                except Exception:  # noqa: BLE001
+                    pass
+            continue
+        del _PROBE["active"][oid]
+        if oid in _PROBE["cancelled"]:
+            _PROBE["cancelled"].discard(oid)
+            continue
+        # disappearance is a claim — the fills feed decides (silent
+        # exchange cancels must not move the fund or feed the model)
+        if not _fill_confirmed(oid):
+            _PROBE["pending"][oid] = (rec, now)
+            continue
+        # filled — a real trade happened at px
+        e = est.setdefault(m, {})
+        e["last_fill"] = {"side": side, "px": px,
+                          "ts": dt.datetime.now(ET).strftime("%m-%d %I:%M %p")}
+        _probe_log(m, "FILLED" if kind == "probe" else "round trip", side, px,
+                   "a real trade at this price" if kind == "probe"
+                   else "flip filled — gap captured")
+        # the info fund moves ONLY on prober activity: its sales and its
+        # scouts' reward earnings in, its buys out
+        with MONITOR.lock:
+            bud = float(MONITOR.state.get("probe_budget") or 0.0)
+            bud += px if side == "SELL" else -px
+            MONITOR.state["probe_budget"] = round(max(0.0, bud), 4)
+        if side == "BUY":
+            e["traded_at_bid"] = px       # a seller exists at px: fair <= px
+            fpx = round(px + PROBE_FLIP_TICKS * 0.01, 2)
+            if kind == "probe" and 0.01 <= fpx <= 0.99:
+                fid = _probe_place(m, "SELL", fpx, "ORDER_INTENT_SELL_LONG",
+                                   f"flip sell (bid {px*100:.0f}c filled)")
+                if fid:
+                    _PROBE["active"][fid] = (m, "SELL", fpx, now, "flip")
+                    _probe_log(m, "flip", "SELL", fpx,
+                               f"reselling the fill from {px*100:.0f}c")
+        else:
+            e["traded_at_ask"] = px       # a buyer exists at px: fair >= px
+            fpx = round(px - PROBE_FLIP_TICKS * 0.01, 2)
+            # buy back the sold share only if the fund can pay for it
+            if kind == "probe" and 0.01 <= fpx <= 0.99 and \
+                    float(MONITOR.state.get("probe_budget") or 0.0) >= fpx:
+                fid = _probe_place(m, "BUY", fpx, "ORDER_INTENT_BUY_LONG",
+                                   f"flip buy-back (sale at {px*100:.0f}c filled)")
+                if fid:
+                    _PROBE["active"][fid] = (m, "BUY", fpx, now, "flip")
+                    _probe_log(m, "flip", "BUY", fpx,
+                               f"re-buying the share sold at {px*100:.0f}c")
+    # 1b. outbid/undercut: a competitor resting REAL size at a better price
+    # than our scout is revealed preference — someone else's money saying
+    # fair is beyond our scout's price (owner, 2026-08-15: "the probe found
+    # a good price but was outbid — that IS the information"). One event
+    # per scout, so a hovering competitor doesn't flood the journal.
+    beaten = _PROBE.setdefault("beaten", set())
+    for oid, rec in list(_PROBE["active"].items()):
+        m, side, px, ts, kind = rec
+        if kind != "probe" or oid in beaten or oid not in open_ids:
+            continue
+        ent = tr._BOOK_CACHE.get(m)
+        if not ent or now - ent[0] > 300:
+            continue
+        rbb, rba = _probe_real_touches(ent[1])
+        if side == "BUY" and rbb and rbb[0] > px + 1e-9:
+            beaten.add(oid)
+            _probe_log(m, "outbid", "BUY", rbb[0],
+                       f"{rbb[1]:,.0f} real shares bidding above our "
+                       f"{px*100:.0f}c scout")
+        elif side == "SELL" and rba and rba[0] < px - 1e-9:
+            beaten.add(oid)
+            _probe_log(m, "undercut", "SELL", rba[0],
+                       f"{rba[1]:,.0f} real shares asking below our "
+                       f"{px*100:.0f}c scout")
+    beaten &= set(_PROBE["active"])   # forget scouts that are gone
+
+    # 2. seed new probes at random interior ticks
+    if len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
+        return
+    placed = 0
+    mkts = [m for m in tr._BOOK_CACHE if m.startswith(PROBE_PREFIXES)]
+    random.shuffle(mkts)
+    for m in mkts:
+        if placed >= PROBE_MAX_PER_POLL or len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
+            break
+        if now - _PROBE["last"].get(m, 0.0) < PROBE_COOLDOWN:
+            continue
+        if any(r[0] == m and r[4] == "probe" for r in _PROBE["active"].values()):
+            continue
+        ent = tr._BOOK_CACHE.get(m)
+        if not ent or now - ent[0] > 300:
+            continue
+        rbb, rba = _probe_real_touches(ent[1])
+        if rbb is None or rba is None:
+            continue
+        bb, ba = rbb[0], rba[0]
+        lo_t = round(bb / 0.01) + 1
+        hi_t = round(ba / 0.01) - 1
+        if hi_t - lo_t + 1 < PROBE_MIN_GAP:
+            continue          # spread too tight to learn anything
+        t = random.randint(lo_t, hi_t)
+        px = round(t * 0.01, 2)
+        # which sides can this market afford?
+        #   SELL: only from inventory we already hold (net long >= 2, keeping
+        #         a share so a scout never zeroes the position)
+        #   BUY : only what the info fund covers, counting scouts resting
+        net = tr._num((MONITOR.positions.get(m) or {}).get("netPosition")) or 0
+        can_sell = net >= PROBE_SIZE + 1
+        fund = float(MONITOR.state.get("probe_budget") or 0.0)
+        resting_buys = sum(r[2] for r in _PROBE["active"].values() if r[1] == "BUY")
+        can_buy = px <= PROBE_MAX_PX and resting_buys + px <= fund
+        if can_sell and can_buy:
+            side = "BUY" if random.random() < 0.5 else "SELL"
+        elif can_sell:
+            side = "SELL"
+        elif can_buy:
+            side = "BUY"
+        else:
+            continue              # no ammo here: no inventory, fund can't cover a bid
+        intent = "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_SELL_LONG"
+        oid = _probe_place(m, side, px, intent,
+                           f"{side.lower()} scout" +
+                           (" (inventory)" if side == "SELL" else " (fund)"))
+        _PROBE["last"][m] = now
+        if oid:
+            _PROBE["active"][oid] = (m, side, px, now, "probe")
+            _probe_log(m, "scout", side, px, "resting inside the gap")
+            placed += 1
+    # mirror the registry so a rebuild can re-adopt (see top of function)
+    with MONITOR.lock:
+        MONITOR.state["probe_active_reg"] = {k: list(v) for k, v in _PROBE["active"].items()}
+
+
+def _silver_fair(m: str) -> float | None:
+    """Model prior for race markets, in cents: the Silver table the map
+    already loads, keyed by state and party. None for anything it doesn't
+    cover — the prior is a nudge, never a requirement."""
+    try:
+        races = (SILVER.get("races") or {})
+        parts = m.split("-")
+        fam = ("senate" if any(t in ("usse", "ussep") for t in parts)
+               else "governor" if any(t in ("usgub", "usgubp") for t in parts)
+               else None)
+        if not fam:
+            return None
+        party = next((t for t in parts if t in ("dem", "rep")), None)
+        st = next((t for t in parts if len(t) == 2 and t.isalpha()
+                   and t not in ("us",)), None)
+        if not party or not st:
+            return None
+        row = (races.get(fam) or {}).get(st.upper()) or {}
+        v = row.get(party)
+        return float(v) * 100.0 if v is not None else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _bayes_fair(m: str) -> dict | None:
+    """A deliberately simple Bayesian read of a market's fair price from the
+    prober's evidence. Grid prior over 1..99c; every journal event is a soft
+    one-sided observation through a logistic likelihood (scale ~2 ticks):
+
+      probe bid FILLED at p   -> a seller accepted p   -> fair likely <= p
+      probe ask FILLED at p   -> a buyer paid p        -> fair likely >= p
+      flip (round trip) fills -> the same, from the flip's side
+      probe rested 45 min     -> weak opposite evidence (thin flow means
+                                 absence of a taker proves little — 0.35x)
+
+    plus the current de-baited real touches as gentle anchors (someone
+    risks actual size there). Returns the posterior median and the 10-90%
+    credible interval, in cents."""
+    evs = [l for l in (MONITOR.state.get("probe_log") or []) if l.get("m") == m]
+    ent = tr._BOOK_CACHE.get(m)
+    bb = ba = None
+    bbw = baw = 0.5
+    if ent and time.time() - ent[0] < 900:
+        rbb, rba = _probe_real_touches(ent[1])
+        # size-weighted anchors: a big resting level is stronger revealed
+        # preference than a small one
+        def _aw(q: float) -> float:
+            return 0.4 if q < 100 else (0.8 if q < 1000 else 1.2)
+        if rbb:
+            bb, bbw = rbb[0], _aw(rbb[1])
+        if rba:
+            ba, baw = rba[0], _aw(rba[1])
+    # scouts still resting are evidence too, growing with age: no taker at
+    # that price for this long pushes fair away from it. Weighted up to the
+    # same 0.35 a completed rotation earns, pro-rated by age/TTL.
+    nowp = time.time()
+    partial = []
+    for r in _PROBE["active"].values():
+        if r[0] != m or r[4] != "probe":
+            continue
+        w = 0.35 * min((nowp - r[3]) / PROBE_TTL, 1.0)
+        if w > 0.02:
+            partial.append((r[1], r[2] * 100, w))
+    sv = _silver_fair(m)
+    if not evs and not partial and bb is None and ba is None and sv is None:
+        return None
+    S = 2.0
+    def sig(x: float) -> float:
+        return 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, x))))
+    def llog(v: float) -> float:
+        return math.log(max(v, 1e-9))
+    logp = [0.0] * 100
+    for f in range(1, 100):
+        lp = 0.0
+        for l in evs:
+            p = float(l.get("px") or 0)
+            side = l.get("side")
+            ev = l.get("ev")
+            if ev == "FILLED":
+                lp += llog(sig((p - f) / S)) if side == "BUY" else llog(sig((f - p) / S))
+            elif ev == "round trip":
+                # the FLIP filled: a SELL flip filling means a buyer at p
+                lp += llog(sig((f - p) / S)) if side == "SELL" else llog(sig((p - f) / S))
+            elif ev == "rested":
+                if side == "BUY":
+                    lp += 0.35 * llog(1.0 - 0.8 * sig((p - f) / S))
+                else:
+                    lp += 0.35 * llog(1.0 - 0.8 * sig((f - p) / S))
+            elif ev == "outbid":     # real money bidding above our scout: fair >= p
+                lp += 0.5 * llog(sig((f - p) / S))
+            elif ev == "undercut":   # real money asking below our scout: fair <= p
+                lp += 0.5 * llog(sig((p - f) / S))
+        for side, p, w in partial:
+            if side == "BUY":
+                lp += w * llog(1.0 - 0.8 * sig((p - f) / S))
+            else:
+                lp += w * llog(1.0 - 0.8 * sig((f - p) / S))
+        if bb is not None:
+            lp += bbw * llog(sig((f - bb * 100) / S))
+        if ba is not None:
+            lp += baw * llog(sig((ba * 100 - f) / S))
+        if sv is not None:
+            # soft ±6c window around the Silver model's number — a prior
+            # that real trades can overrule but bait cannot
+            lp += 0.6 * (llog(sig((f - (sv - 6)) / S))
+                         + llog(sig(((sv + 6) - f) / S)))
+        logp[f] = lp
+    mx = max(logp[1:])
+    ps = [0.0] + [math.exp(l - mx) for l in logp[1:]]
+    tot = sum(ps) or 1.0
+    cum, lo, med, hi = 0.0, None, None, None
+    for i in range(1, 100):
+        cum += ps[i] / tot
+        if lo is None and cum >= 0.10:
+            lo = i
+        if med is None and cum >= 0.50:
+            med = i
+        if hi is None and cum >= 0.90:
+            hi = i
+    n_hard = sum(1 for l in evs if l.get("ev") in ("FILLED", "round trip"))
+    n_rest = sum(1 for l in evs if l.get("ev") == "rested") \
+             + sum(1 for _, _, w in partial if w >= 0.175)   # half-aged or more
+    return {"med": med, "lo": lo, "hi": hi, "n": len(evs), "fills": n_hard,
+            "rested": n_rest,
+            "bb": round(bb * 100, 1) if bb is not None else None,
+            "ba": round(ba * 100, 1) if ba is not None else None}
+
+
+# --- earner: model-confident small bids (owner, 2026-08-15) -----------------
+# When the Bayesian band is TIGHT and built on real trades, rest a small bid
+# at fair-or-better and collect the side's scoring. Bid side only — the ask
+# side is already defender-managed, and two loops steering the same orders
+# would fight. Price = min(posterior median − 1 tick, the de-baited real
+# touch): joining real money when fair supports it, otherwise resting alone
+# BELOW fair, where being picked off is a purchase at better than fair — the
+# opposite of the tuccar trap. Sizes are worst-case-dollar capped per market
+# and in total, far under the buying-power ceiling.
+# INVARIANT (owner, 2026-08-15): the earner and the prober's info fund are
+# SEPARATE BOOKS. state["probe_budget"] moves only on the prober's own
+# fills (its sales in, its buys out — see auto_probe's reconcile). Earner
+# sales and purchases never credit or debit it, and earner journal entries
+# ("earn ...") are deliberately ignored by _bayes_fair — an earn fill sits
+# at fair-1 because the model put it there, so counting it as evidence
+# would let the model confirm itself. Earner sizing stays small: EARN_MAX_USD
+# per market, EARN_TOTAL_USD across all.
+#
+# The /map switches are the OWNER'S controls and the code never overrules
+# them (the short-lived CONSERVE_BP override taught that lesson on
+# 2026-08-15: "I'll turn it off if that is what I want"). Buying-power
+# discipline lives in each loop's own hard caps instead.
+# Aggression raised 2026-08-15 late (owner: "surely there's more value out
+# there based on what the prober is finding"): double the per-market and
+# total budgets, twice the placement cadence, and a GRADUATED confidence
+# gate — one real trade is enough when the band is very tight (<=3 ticks),
+# two when it's merely tight (<=6). The price rule stays: never above
+# median minus a tick, never above the real touch. Aggression buys more
+# coverage, not worse prices.
+# v3 (owner, 2026-08-16): "the earner is not meant to sit — it's meant to
+# earn using what we know." The deal test replaced the fair test: at penny
+# prices an order's INCOME dwarfing its TOTAL-LOSS worst case is the real
+# safety (a 1-share bid at a thin 7c touch earns $2.48/day against a 7c
+# ruin). Price may go through and past the band; size shrinks as
+# confidence does — proven zone gets full exposure, the stretch zone 40%,
+# the speculative zone above the band 15%. The penny ceiling keeps "total
+# loss is trivial" true; expensive markets are not the earner's game.
+EARN_MAX_USD = float(os.environ.get("EARN_MAX_USD", "6.0"))
+EARN_TOTAL_USD = float(os.environ.get("EARN_TOTAL_USD", "100.0"))
+EARN_MAX_SHARES = 200
+EARN_PX_MAX_C = int(os.environ.get("EARN_PX_MAX_C", "10"))
+EARN_MAX_PER_POLL = 4
+EARN_COOLDOWN = 300.0
+_EARN: dict = {"orders": {}, "last": {}, "cancelled": set(), "pending": {}}
+EARN_CONFIRM_WAIT = 300.0    # fills feed lag allowance before "vanished"
+
+
+def _fill_confirmed(oid: str) -> bool:
+    """Is this order id in the exchange's own trade records? Disappearance
+    from the open-order list is NOT a fill — the exchange silently cancels
+    resting orders (the 2026-08-15 floor episode) and the list flickers.
+    Only the fills feed decides."""
+    return any(str(t.get("oid")) == oid for t in (MONITOR.trades or []))
+
+
+
+
+def _earn_log(m: str, ev: str, px: float, qty: int, note: str = "") -> None:
+    """The earner's own journal and tallies — separate from the prober's,
+    like its money. Shown on the /map Earner card."""
+    with MONITOR.lock:
+        log = MONITOR.state.setdefault("earn_log", [])
+        log.append({"ts": dt.datetime.now(ET).strftime("%m-%d %I:%M:%S %p"),
+                    "m": m, "ev": ev, "px": round(px * 100, 1),
+                    "qty": qty, "note": note})
+        del log[:-150]
+        st = MONITOR.state.setdefault("earn_stats", {})
+        st[ev] = int(st.get(ev) or 0) + 1
+        if ev == "filled":
+            st["spent_usd"] = round(float(st.get("spent_usd") or 0) + px * qty, 2)
+
+
+def _earn_outstanding_usd() -> float:
+    return sum(px / 100.0 * q for _, _, px, q, _ in _EARN["orders"].values())
+
+
+def auto_earn() -> None:
+    # accrue what the earner's resting bids are EARNING (reward-scoring
+    # rate integrated over time, same formula as the headline counter but
+    # filtered to the earner's own order ids) — runs even while the switch
+    # is off so a resting order's income is never lost from the tally
+    if _EARN["orders"] or _PROBE["active"]:
+        nowa = time.time()
+        by_id = {str(o.get("id")): o for o in MONITOR.orders if o.get("id")}
+        rate = sum(float((by_id.get(oid) or {}).get("est_day") or 0)
+                   for oid in _EARN["orders"])
+        # the prober's scouts earn rewards too while they rest — counted in
+        # the same tracker, and their share is CREDITED TO THE INFO FUND so
+        # scouting pays for more scouting (owner, 2026-08-16)
+        probe_rate = sum(float((by_id.get(oid) or {}).get("est_day") or 0)
+                         for oid in _PROBE["active"])
+        with MONITOR.lock:
+            st = MONITOR.state.setdefault("earn_stats", {})
+            last = float(st.get("_acc_ts") or 0)
+            if last:
+                dtd = (nowa - last) / 86400.0
+                if rate > 0:
+                    st["earned_usd"] = round(float(st.get("earned_usd") or 0)
+                                             + rate * dtd, 4)
+                if probe_rate > 0:
+                    inc = probe_rate * dtd
+                    st["probe_earned_usd"] = round(
+                        float(st.get("probe_earned_usd") or 0) + inc, 4)
+                    MONITOR.state["probe_budget"] = round(
+                        float(MONITOR.state.get("probe_budget") or 0.0) + inc, 4)
+            st["_acc_ts"] = nowa
+    if not _auto_on("earn"):
+        return
+    if os.environ.get("EARN_PAUSE", "") == "1":
+        return
+    if not _EARN["orders"]:
+        saved = MONITOR.state.get("earn_orders_reg") or {}
+        if saved:
+            live = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
+            for oid, r in saved.items():
+                if oid in live and len(r) == 5:
+                    _EARN["orders"][oid] = (r[0], r[1], int(r[2]), int(r[3]), float(r[4]))
+    now = time.time()
+    open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
+    # settle disappearances: real fill (in the fills feed) vs silent cancel
+    for oid, (rec, ts_gone) in list(_EARN["pending"].items()):
+        m, side, px, qty, ts = rec
+        if oid in open_ids:      # the list flickered — the order is back
+            _EARN["orders"][oid] = rec
+            del _EARN["pending"][oid]
+        elif _fill_confirmed(oid):
+            del _EARN["pending"][oid]
+            _earn_log(m, "filled", px / 100.0, qty, "confirmed by the fills feed")
+            _EARN["last"][m] = now
+        elif now - ts_gone > EARN_CONFIRM_WAIT:
+            del _EARN["pending"][oid]
+            _earn_log(m, "vanished", px / 100.0, qty,
+                      "gone without a trade — exchange-side cancel")
+    # reconcile: fills and drift
+    for oid, rec in list(_EARN["orders"].items()):
+        m, side, px, qty, ts = rec
+        if oid not in open_ids:
+            del _EARN["orders"][oid]
+            if oid in _EARN["cancelled"]:
+                _EARN["cancelled"].discard(oid)
+            else:
+                # disappearance is a CLAIM, not a fill — park it until the
+                # fills feed confirms or denies
+                _EARN["pending"][oid] = (rec, now)
+            continue
+        # Withdrawal is by PERFORMANCE now, not price drift: the monitor
+        # already scores every resting order (est_day). An order that keeps
+        # earning stays put whatever the median does — "the earner is not
+        # meant to sit; it's meant to earn." Withdraw only when its income
+        # no longer justifies its worst case (payback beyond ~4 days), with
+        # a 10-minute grace so fresh orders aren't judged before scoring.
+        if now - ts < 600:
+            continue
+        o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
+        est = float((o or {}).get("est_day") or 0)
+        if est < 0.25 * (px / 100.0) * qty:
+            try:
+                requests.request(
+                    "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
+                    headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST",
+                                               f"/v1/order/{oid}/cancel"),
+                             "Content-Type": "application/json"},
+                    json={"marketSlug": m}, timeout=15)
+                _EARN["cancelled"].add(oid)
+                del _EARN["orders"][oid]
+                _earn_log(m, "withdrawn", px / 100.0, qty,
+                          f"earning ${est:.2f}/d — payback beyond 4 days")
+            except Exception:  # noqa: BLE001
+                pass
+    # place where the model is confident and we hold nothing yet
+    placed = 0
+    have = {rec[0] for rec in _EARN["orders"].values()}
+    cands = sorted({l.get("m") for l in (MONITOR.state.get("probe_log") or [])
+                    if l.get("m")})
+    for m in cands:
+        if placed >= EARN_MAX_PER_POLL:
+            break
+        if m in have or now - _EARN["last"].get(m, 0.0) < EARN_COOLDOWN:
+            continue
+        if _earn_outstanding_usd() >= EARN_TOTAL_USD:
+            break
+        b = _bayes_fair(m)
+        # minimum knowledge: anything real — one trade, two rested scouts,
+        # or three observations. Size, not certainty, carries the risk.
+        if not (b and b.get("med")
+                and (b.get("fills", 0) >= 1 or b.get("rested", 0) >= 2
+                     or b.get("n", 0) >= 3)):
+            continue
+        pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
+        target = float(pr.get("target") or 0)
+        per = (float(pr.get("pool") or 0)
+               / max(int(pr.get("pool_n") or pr.get("event_n") or 1), 1) / 2)
+        df = float(pr.get("df") or 0.2)
+        ent = tr._BOOK_CACHE.get(m)
+        if not target or per <= 0 or not ent or now - ent[0] > 300:
+            continue
+        real_bids = [(round(p_ * 100), q_) for p_, q_ in ent[1].get("bids") or []
+                     if q_ >= PROBE_REAL_MIN]
+        # candidate prices: from the real touch up through the band and two
+        # ticks of stretch, never above the penny ceiling where a total
+        # loss stops being trivial
+        base = real_bids[0][0] if real_bids else max(1, b["lo"])
+        top = min(b["hi"] + 2, EARN_PX_MAX_C)
+        if top < base:
+            continue
+        best = None
+        for pc in range(base, top + 1):
+            # confidence tier sets the exposure: proven / stretch / speculative
+            if pc <= b["med"]:
+                cap = EARN_MAX_USD
+                tier = "proven"
+            elif pc <= b["hi"]:
+                cap = EARN_MAX_USD * 0.4
+                tier = "stretch"
+            else:
+                cap = EARN_MAX_USD * 0.15
+                tier = "speculative"
+            q = max(1, min(EARN_MAX_SHARES, int(cap * 100 / pc)))
+            # score with us resting at pc: merge, walk the window from the
+            # best price, sum discounted takes
+            lv = sorted(real_bids + [(pc, float(q))], key=lambda x: -x[0])
+            anchor = lv[0][0]
+            den = cum = ours_sc = 0.0
+            for p_, q_ in lv:
+                take = min(q_, max(0.0, target - cum))
+                if take <= 0:
+                    break
+                w = df ** (anchor - p_)
+                den += take * w
+                if p_ == pc:
+                    ours_sc += min(take, float(q)) * w
+                cum += q_
+            est = per * ours_sc / den if den else 0.0
+            # the deal test: income must dwarf the worst case — total-loss
+            # payback within two days
+            if est >= 0.5 * (pc / 100.0) * q:
+                if best is None or est > best[0]:
+                    best = (est, pc, q, tier)
+        if best is None:
+            continue
+        est, tgt, qty, tier = best
+        px = round(tgt / 100.0, 2)
+        if px * qty + _earn_outstanding_usd() > EARN_TOTAL_USD:
+            continue
+        try:
+            r = requests.request(
+                "POST", tr.TRADE_API + "/v1/orders",
+                headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                         "Content-Type": "application/json"},
+                json={"marketSlug": m, "intent": "ORDER_INTENT_BUY_LONG",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{px:.2f}", "currency": "USD"},
+                      "quantity": qty,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True},
+                timeout=20)
+            ok = r.status_code < 300
+            oid = None
+            if ok:
+                try:
+                    j = r.json()
+                    o = j.get("order")
+                    oid = (o.get("id") if isinstance(o, dict) else None) \
+                          or j.get("id") or j.get("orderId")
+                except Exception:  # noqa: BLE001
+                    pass
+            ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                            "market": m, "side": "EARN bid", "from": "—",
+                            "to": tgt, "size": qty, "status": r.status_code,
+                            "response": " ".join(r.text.split())[:100],
+                            "verified": ok})
+            del ACTIONS[:-20]
+            if ok and oid:
+                _EARN["orders"][str(oid)] = (m, "BUY", tgt, qty, now)
+                _earn_log(m, "placed", px, qty,
+                          f"{tier}: est ${est:.2f}/d vs ${px*qty:.2f} worst case "
+                          f"(band {b['lo']}–{b['hi']}¢, {b['fills']}t/{b.get('rested',0)}r)")
+                placed += 1
+        except Exception:  # noqa: BLE001 — the earner must never kill the poll
+            continue
+    # mirror the registry so a rebuild can re-adopt (see top of function)
+    with MONITOR.lock:
+        MONITOR.state["earn_orders_reg"] = {k: list(v) for k, v in _EARN["orders"].items()}
+
+
+# --- slate health watch (in-process; replaced the slate_watch.yml cron) ----
+# Moved out of GitHub Actions 2026-08-15: the 30-minute cron was burning
+# ~120 Actions minutes a day against a 2,000/month plan, and the monitor
+# already holds every book, target, and order in memory — the same check
+# here costs nothing and can actually reach ntfy. Alerts when a slate
+# side's TOTAL size drops under Target Size (that side pays nobody) or the
+# open-order count collapses (the mass-cancel signature). OUR size alone
+# below target is the designed state since the chunk cull — not alerted.
+WATCH_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                  "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+WATCH_INTERVAL = float(os.environ.get("WATCH_INTERVAL", "600"))
+WATCH_REALERT = float(os.environ.get("WATCH_REALERT", "21600"))  # per finding
+_WATCH: dict = {"last_run": 0.0, "alerted": {}, "prev_orders": 0}
+
+
+def slate_health_check() -> None:
+    now = time.time()
+    if now - _WATCH["last_run"] < WATCH_INTERVAL:
+        return
+    _WATCH["last_run"] = now
+    progs = tr._PROG_CACHE.get("progs") or {}
+    ours: dict = {}
+    for o in MONITOR.orders:
+        m = o.get("market") or ""
+        if m.startswith(WATCH_PREFIXES):
+            k = (m, o.get("side"))
+            ours[k] = ours.get(k, 0.0) + float(o.get("size") or 0)
+    problems = []
+    for m, ent in list(tr._BOOK_CACHE.items()):
+        if not m.startswith(WATCH_PREFIXES):
+            continue
+        if now - ent[0] > 900:      # stale book — never alarm on old data
+            continue
+        target = float((progs.get(m) or {}).get("target") or 0)
+        if not target:
+            continue
+        for side, key in (("BUY", "bids"), ("SELL", "asks")):
+            # the book lags our own placements; take the larger read
+            tot = max(sum(q for _, q in (ent[1] or {}).get(key) or []),
+                      ours.get((m, side), 0.0))
+            if tot < target:
+                problems.append((f"{m}|{side}",
+                                 f"{m.rsplit('-', 1)[-1]} {side} {tot:,.0f}/{target:,.0f}"))
+    n = len(MONITOR.orders)
+    if _WATCH["prev_orders"] and n < _WATCH["prev_orders"] * 0.85:
+        problems.append(("open-orders",
+                         f"open orders fell {_WATCH['prev_orders']:,} -> {n:,}"))
+    _WATCH["prev_orders"] = n
+    fresh = [(k, txt) for k, txt in problems
+             if now - _WATCH["alerted"].get(k, 0.0) > WATCH_REALERT]
+    if fresh:
+        for k, _ in fresh:
+            _WATCH["alerted"][k] = now
+        body = " | ".join(txt for _, txt in fresh[:6])
+        if len(fresh) > 6:
+            body += f" (+{len(fresh) - 6} more)"
+        with MONITOR.lock:
+            MONITOR.pending_alerts.append(
+                ("Slate watch: sides not paying", body[:900], "high"))
 
 
 def _race_prefix(slug: str) -> str:
@@ -3299,6 +4493,175 @@ def _slug_known(slug: str) -> bool:
     return False
 
 
+# A side pays NOBODY until it holds Target Size in resting contracts — every
+# trader's size counts, not just ours. These bounds apply to the qualify
+# button on the market sheet, which closes that gap on demand.
+#
+# It is a button, not a loop: it acts once, when the owner taps it, and
+# places nothing on its own. The keeper loop has a branch that does the same
+# thing automatically, but turning the keeper on also turns on its second
+# branch (40-share orders near the touch), which is why this exists
+# separately.
+# Buying power is a per-side, per-book ceiling — resting orders do not draw
+# it down, only fills do, and the same balance backs every market at once.
+# So this caps what one side of one book can take, not a budget shared across
+# markets: qualifying market A leaves market B just as fundable.
+QUALIFY_MAX_USD = float(os.environ.get("QUALIFY_MAX_USD", "250"))
+QUALIFY_MAX_ORDERS = int(os.environ.get("QUALIFY_MAX_ORDERS", "60"))
+QUALIFY_RESERVE_USD = float(os.environ.get("QUALIFY_RESERVE_USD", "5"))
+QUALIFY_BID_MAX = int(os.environ.get("QUALIFY_BID_MAX", "10000"))
+# Below this, an order is not worth its own slot in the book. A balance that
+# can only carry a handful of shares per order would otherwise dribble out
+# forty near-empty orders and still leave the side short.
+QUALIFY_MIN_CHUNK = int(os.environ.get("QUALIFY_MIN_CHUNK", "25"))
+
+
+def _qual_per_order(side: str, price: float, bp: float) -> int:
+    """How many shares ONE order can actually carry, at this price, with this
+    buying power.
+
+    The two sides are limited differently, and the ask side is the surprising
+    one: opening a short is capped at one share per DOLLAR of buying power,
+    not by the 1c per share it ties up while resting. A 2,000-share ask at
+    99c came back resting 273.04 — a fractional share count, because it is a
+    balance, not a size limit. Asking for more does not fail; it silently
+    rests short, which is why a gap has to be split into buying-power-sized
+    orders rather than sent as one.
+
+    A bid has no such limit — the whole gap goes in a single order, up to the
+    exchange's per-order ceiling. A 2,000-share bid at 1c rested in full.
+    """
+    if bp <= 0 or price <= 0:
+        return 0
+    if side == "SELL":
+        return int(bp)                                  # one share per dollar
+    return QUALIFY_BID_MAX                              # bids go in one order
+
+
+def _qual_view(slug: str, book: dict) -> dict:
+    """Target Size against what is actually resting on each side, plus the
+    cheapest way to close any gap: the floor bid (one tick) or the ceiling
+    ask (one tick off the top), where a contract ties up the least capital —
+    a bid locks price x size, an ask locks (1 - price) x size."""
+    prog = (tr._PROG_CACHE.get("progs") or {}).get(slug) or {}
+    target = int(prog.get("target") or 0)
+    tick = float(book.get("tick") or 0.01)
+    bid_total = int(sum(q for _, q in (book.get("bids") or [])))
+    ask_total = int(sum(q for _, q in (book.get("asks") or [])))
+    out = {"target": target or None, "pool": prog.get("pool"),
+           "bid_total": bid_total, "ask_total": ask_total,
+           "floor_c": round(tick * 100, 1), "ceil_c": round((1 - tick) * 100, 1),
+           "need_bid": 0, "need_ask": 0, "cost_bid": 0.0, "cost_ask": 0.0}
+    if target:
+        out["need_bid"] = max(0, target - bid_total)
+        out["need_ask"] = max(0, target - ask_total)
+        out["cost_bid"] = round(out["need_bid"] * tick, 2)
+        out["cost_ask"] = round(out["need_ask"] * tick, 2)
+    return out
+
+
+def do_qualify(slug: str, side: str) -> tuple[int, dict]:
+    """Bring ONE side up to Target Size with the cheapest post-only orders.
+
+    The gap is recomputed here from a fresh book — the client sends only the
+    market and the side, never a size or a price, so a stale sheet can never
+    place more than the book currently needs. Bounded by a dollar cap per
+    tap, an order count per tap, and live buying power; an ask placement is
+    capped near 273 by the exchange, so a wide gap closes over several taps
+    and the reply says how much is left.
+    """
+    if not _slug_known(slug):
+        return 400, {"ok": False, "error": "unknown market"}
+    if side not in ("BUY", "SELL"):
+        return 400, {"ok": False, "error": "side must be BUY or SELL"}
+    try:
+        book = tr._fetch_book(slug)
+    except Exception as e:  # noqa: BLE001
+        return 502, {"ok": False, "error": f"book unavailable: {type(e).__name__}"}
+    q = _qual_view(slug, book)
+    name = "bid" if side == "BUY" else "ask"
+    if not q["target"]:
+        return 400, {"ok": False,
+                     "error": "no active reward program here — nothing to qualify"}
+    need = q["need_bid"] if side == "BUY" else q["need_ask"]
+    if need <= 0:
+        return 200, {"ok": True, "placed": 0,
+                     "note": f"{name} side already holds Target Size"}
+    px = (q["floor_c"] if side == "BUY" else q["ceil_c"]) / 100.0
+
+    def live_bp(fallback: float) -> float:
+        try:
+            v = fetch_buying_power(KEY_ID, SECRET_KEY)
+            return float(v) if v is not None else fallback
+        except Exception:  # noqa: BLE001 — fall back rather than stall
+            return fallback
+
+    bp = live_bp(float(MONITOR.buying_power or 0.0))
+    unit = px if side == "BUY" else 1 - px      # notional a share holds while resting
+    # Buying power is NOT drawn down by resting orders — only a fill moves it.
+    # It is a ceiling on ONE side of ONE book, and the same balance backs
+    # every other market at the same time. So the bound here is this side of
+    # this book; there is no budget being shared across a slate of markets,
+    # and nothing to reserve for the next market.
+    room = max(0.0, min(bp, QUALIFY_MAX_USD) - QUALIFY_RESERVE_USD)
+    affordable = int(room / unit) if unit > 0 else 0
+    if affordable < 1:
+        return 400, {"ok": False,
+                     "error": f"no headroom on this side — buying power ${bp:,.2f}"}
+    want = min(need, affordable)
+    placed = 0
+    done = 0
+    errs: list[str] = []
+    # One tap closes the whole gap, in as many orders as that takes: an ask
+    # order can only carry `buying power` shares, so a 1,200-share gap on a
+    # $120 balance is ten orders, not one. A bid goes in one.
+    for _ in range(QUALIFY_MAX_ORDERS):
+        if done >= want:
+            break
+        short = want - done
+        qty = int(min(short, _qual_per_order(side, px, bp)))
+        # finishing the gap is always worth an order; a dribble is not
+        if qty < 1 or (qty < QUALIFY_MIN_CHUNK and qty < short):
+            errs.append(f"buying power ${bp:,.2f} carries only {qty:,} shares per order "
+                        f"— {short:,} still needed, so it would take "
+                        f"{-(-short // max(qty, 1)):,} orders")
+            break
+        code, res = manual_place(slug, side, round(px * 100, 1), qty)
+        if not res.get("ok"):
+            errs.append(str(res.get("detail") or res.get("error") or f"HTTP {code}"))
+            break
+        placed += 1
+        done += qty
+        time.sleep(1.0)
+        # only a fill moves buying power, but one can land mid-run
+        bp = live_bp(bp)
+    if want < need:
+        errs.append(f"this side of this book tops out at {want:,} shares "
+                    f"(${room:,.2f} of room) — {need - want:,} short of Target Size")
+    spent = done * unit
+    remaining = need - done
+    # Report where the side actually ended up, not where we hoped it would.
+    # The public book can lag a placement by a beat, so give it one, then
+    # clamp what we report to what the arithmetic allows: never claim a
+    # bigger gap than (what was missing - what we just placed). A lagging
+    # book that still shows the old depth would otherwise invite a second
+    # tap and place the size twice.
+    left = None
+    try:
+        time.sleep(2.0)
+        after = _qual_view(slug, tr._fetch_book(slug))
+        left = after["need_bid"] if side == "BUY" else after["need_ask"]
+        left = max(0, min(int(left), remaining))
+    except Exception:  # noqa: BLE001 — the placements already happened
+        pass
+    POLL_KICK.set()
+    return (200 if placed else 502), {
+        "ok": bool(placed), "placed": placed, "size": done,
+        "price_cents": round(px * 100, 1), "spent": round(spent, 2),
+        "buying_power": round(bp, 2), "short_of_gap": remaining,
+        "remaining_gap": left, "detail": "; ".join(errs)[:200]}
+
+
 def market_info(slug: str) -> tuple[int, dict]:
     """Book + my orders + position for the tap-a-market action sheet."""
     if not slug or len(slug) > 120:
@@ -3309,13 +4672,25 @@ def market_info(slug: str) -> tuple[int, dict]:
         book = tr._fetch_book(slug)
     except Exception as e:  # noqa: BLE001
         return 502, {"error": f"book unavailable: {type(e).__name__}: {e}"[:200]}
-    mine = [{k: o.get(k) for k in ("id", "side", "price", "size", "est_day", "verdict")}
+    mine = [{k: o.get(k) for k in ("id", "side", "price", "size", "est_day",
+                                   "verdict", "created", "manual")}
             for o in MONITOR.orders if o.get("market") == slug]
+    # Which of our loops placed it, where we know. The prober and earner keep
+    # registries by order id; everything else is either the owner's own tap
+    # (the exchange flags those MANUAL) or one of the placement loops.
+    for o in mine:
+        oid = str(o.get("id") or "")
+        o["src"] = ("prober" if oid in _PROBE["active"] else
+                    "earner" if oid in _EARN["orders"] else
+                    "you" if o.get("manual") == "MANUAL" else "")
     net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
     return 200, {"market": slug, "tick": book.get("tick") or 0.01,
                  "bids": [[p, q] for p, q in (book.get("bids") or [])[:6]],
                  "asks": [[p, q] for p, q in (book.get("asks") or [])[:6]],
                  "orders": mine, "net": net, "buying_power": MONITOR.buying_power,
+                 # depth here is the WHOLE side, not the six levels above —
+                 # Target Size counts every resting contract on the side
+                 "qual": _qual_view(slug, book),
                  "defend": (MONITOR.state.get("defend") or {}).get(slug)}
 
 
@@ -3497,12 +4872,17 @@ def do_maction(body: dict) -> tuple[int, dict]:
                               close_short=bool(body.get("close_short")))
         except (KeyError, TypeError, ValueError):
             return 400, {"ok": False, "error": "bad request"}
+    if op == "qualify":
+        # market + side only: the size and price are computed server-side
+        # from a fresh book, so a stale sheet cannot oversize a placement
+        return do_qualify(str(body.get("market") or ""), str(body.get("side") or ""))
     if op == "auto":
         # The owner's on/off button for a placement loop. Auth and the
         # X-Reprice CSRF header are already enforced by the POST handler.
         which = str(body.get("which") or "")
-        if which not in ("defend", "keeper"):
-            return 400, {"ok": False, "error": "which must be defend or keeper"}
+        if which not in ("defend", "keeper", "snipe", "probe", "earn"):
+            return 400, {"ok": False,
+                         "error": "which must be defend, keeper, snipe, probe or earn"}
         on = bool(body.get("on"))
         with MONITOR.lock:
             auto = MONITOR.state.setdefault("auto", {})
@@ -3551,7 +4931,8 @@ def do_maction(body: dict) -> tuple[int, dict]:
             d.pop(slug, None)
             tr.PRIORITY_SLUGS = set(d)
         return 200, {"ok": True}
-    return 400, {"ok": False, "error": "op must be place, modify, cancel, defend or undefend"}
+    return 400, {"ok": False,
+                 "error": "op must be place, modify, cancel, qualify, defend or undefend"}
 
 
 # ---------------------------------------------------------------------------
@@ -3587,6 +4968,24 @@ MAP_PAY_RATIO = 0.25         # earned this far under the implied take is a flag
 MAP_PAY_MIN_IMPLIED = 0.10   # ignore markets whose implied take is pocket change
 
 
+def _gh_text(path: str, ref: str = "main") -> str:
+    """A file's contents from the repo. The monitor runs from a deploy branch
+    checkout that carries no data/, so anything the daily workflows produce
+    has to be read over the API rather than off disk."""
+    if not GITHUB_TOKEN:
+        return ""
+    try:
+        r = requests.get(
+            f"{GH_API}/repos/{GITHUB_REPO}/contents/{path}",
+            params={"ref": ref},
+            headers={"Authorization": f"Bearer {GITHUB_TOKEN}",
+                     "Accept": "application/vnd.github.raw+json"},
+            timeout=20)
+        return r.text if r.status_code == 200 else ""
+    except Exception:  # noqa: BLE001 — never kill the poll over this
+        return ""
+
+
 def _parse_silver(text: str) -> dict:
     """Datawrapper race table -> {state abbr: {dem, rep, name}} as fractions."""
     out: dict = {}
@@ -3619,6 +5018,20 @@ def _silver_races() -> dict:
                 table = _parse_silver(r.text)
         except Exception as e:  # noqa: BLE001 — the map must never kill the poll
             errs.append(f"{office}: {type(e).__name__}")
+        if not table:
+            # The container has no data/ directory at all — the Dockerfile
+            # copies only live/ and track_rewards.py — so the disk fallback
+            # below could never work in production, and whenever the CDN was
+            # unreachable the map simply had no model. Read the copy the daily
+            # Actions fetch commits to main instead; that is the whole reason
+            # that workflow exists.
+            try:
+                txt = _gh_text(f"data/{Path(fallback).name}")
+                if txt:
+                    table = _parse_silver(txt)
+                    source = "github"
+            except Exception as e:  # noqa: BLE001
+                errs.append(f"{office} github: {type(e).__name__}")
         if not table:
             try:
                 table = _parse_silver(Path(fallback).read_text())
@@ -3855,12 +5268,43 @@ def _map_payload() -> dict:
         # Effective state: the owner's toggle AND the host env veto AND, for
         # defend, whether any market is armed. The page shows the toggles and
         # the reason the loop is not actually running when they disagree.
-        "auto": {"defend": _auto_on("defend"), "keeper": _auto_on("keeper")},
+        # Every switch the page draws must appear here. A key missing from
+        # this dict reads as undefined in the browser, so the button repaints
+        # OFF on the next refresh even though the loop is running.
+        "auto": {"defend": _auto_on("defend"), "keeper": _auto_on("keeper"),
+                 "snipe": _auto_on("snipe"), "probe": _auto_on("probe"),
+                 "earn": _auto_on("earn")},
         "defend_live": bool(_auto_on("defend")
                             and os.environ.get("DEFEND_PAUSE", "") != "1"
                             and (MONITOR.state.get("defend") or {})),
         "keeper_live": bool(_auto_on("keeper")
                             and os.environ.get("KEEP_PAUSE", "") != "1"),
+        "snipe_live": bool(_auto_on("snipe")
+                           and os.environ.get("SNIPE_PAUSE", "") != "1"),
+        "probe_live": bool(_auto_on("probe")
+                           and os.environ.get("PROBE_PAUSE", "") != "1"),
+        "earn_live": bool(_auto_on("earn")
+                          and os.environ.get("EARN_PAUSE", "") != "1"),
+        "probe_budget": round(float(MONITOR.state.get("probe_budget") or 0.0), 2),
+        "earn_active": [{"m": r[0], "px": r[2], "qty": r[3],
+                         "age_m": int((time.time() - r[4]) / 60),
+                         "on_book": _on_book(r[0], "BUY", r[2] / 100.0, r[3], r[4])}
+                        for r in _EARN["orders"].values()],
+        "earn_log": list(reversed((MONITOR.state.get("earn_log") or [])[-30:])),
+        "earn_stats": MONITOR.state.get("earn_stats") or {},
+        "earn_caps": {"per_mkt": EARN_MAX_USD, "total": EARN_TOTAL_USD,
+                      "outstanding": round(_earn_outstanding_usd(), 2)},
+        "probe_est": MONITOR.state.get("probe") or {},
+        "probe_bayes": {m: b for m in sorted(
+                            {l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
+                            | set((MONITOR.state.get("probe") or {}))
+                            | {r[0] for r in _PROBE["active"].values()})
+                        if m and (b := _bayes_fair(m))},
+        "probe_log": list(reversed((MONITOR.state.get("probe_log") or [])[-40:])),
+        "probe_active": [{"m": r[0], "side": r[1], "px": round(r[2] * 100, 1),
+                          "age_m": int((time.time() - r[3]) / 60), "kind": r[4],
+                          "on_book": _on_book(r[0], r[1], r[2], PROBE_SIZE, r[3])}
+                         for r in _PROBE["active"].values()],
         "defend_markets": len(MONITOR.state.get("defend") or {}),
         "defend_note": ("switched off"
                         if not _auto_on("defend") else
@@ -4021,6 +5465,12 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
       <span class="nm">Defender</span><span class="st">loading…</span></button>
     <button class="autosw" id="sw_keeper" onclick="swTap('keeper')" disabled>
       <span class="nm">Keeper</span><span class="st">loading…</span></button>
+    <button class="autosw" id="sw_snipe" onclick="swTap('snipe')" disabled>
+      <span class="nm">Sniper</span><span class="st">loading…</span></button>
+    <button class="autosw" id="sw_probe" onclick="swTap('probe')" disabled>
+      <span class="nm">Prober</span><span class="st">loading…</span></button>
+    <button class="autosw" id="sw_earn" onclick="swTap('earn')" disabled>
+      <span class="nm">Earner</span><span class="st">loading…</span></button>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
   <div class="chips" id="chips"></div>
@@ -4036,6 +5486,16 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     </div>
   </div>
   <div class="card det" id="det" style="display:none"></div>
+  <div class="card" id="probeCard" style="display:none">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--dim);margin-bottom:6px">🔍 Prober — what the scouts found</div>
+    <div id="probeBody"></div>
+  </div>
+  <div class="card" id="earnCard" style="display:none">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--dim);margin-bottom:6px">💰 Earner — model-confident bids</div>
+    <div id="earnBody"></div>
+  </div>
   <div class="card">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--dim);margin-bottom:6px">Needs attention</div>
@@ -4096,6 +5556,8 @@ function render(){
   }).join('')).join('');
 
   swRender();
+  renderProbe();
+  renderEarn();
   const bn=document.getElementById('banner');
   if(DATA.auto && DATA.auto.defend===true && DATA.defend_live===false){
     // switched on but vetoed by something else -- say what
@@ -4147,17 +5609,147 @@ function render(){
 const SWDESC = {
   defend: {on:'repricing orders in armed markets', off:'not placing anything'},
   keeper: {on:'placing size to hold qualification', off:'not placing anything'},
+  snipe: {on:'taking tiny over-priced 2028 bids', off:'not taking anything'},
+  probe: {on:'1-share scouts mapping fair prices', off:'not scouting'},
+  earn: {on:'small bids where the model is confident', off:'not placing'},
 };
 const SWARM = {};
+function renderProbe(){
+  const card = document.getElementById('probeCard'); if(!card) return;
+  const est = DATA.probe_est || {}, act = DATA.probe_active || [], log = DATA.probe_log || [];
+  const on = DATA.auto && DATA.auto.probe === true;
+  if(!on && !Object.keys(est).length && !act.length && !log.length){
+    card.style.display = 'none'; return;
+  }
+  card.style.display = 'block';
+  const nm = m => m.replace(/^enwc-uspres-nom-/, 'nom·').replace(/^ewc-usp-2028-11-07-/, 'win·');
+  const bayes = DATA.probe_bayes || {};
+  // one bar per market: 1-99c scale, shaded 10-90% credible interval,
+  // solid line at the posterior median, ticks at the real (de-baited) touches
+  const fairBar = b => {
+    if(!b || b.med == null) return '';
+    const seg = (x, w, css) => '<div style="position:absolute;top:0;bottom:0;left:' +
+      x + '%;width:' + w + ';' + css + '"></div>';
+    return '<div style="position:relative;height:16px;background:var(--surface2);' +
+      'border-radius:4px;margin:4px 0;overflow:hidden">' +
+      seg(b.lo, (b.hi - b.lo) + '%', 'background:rgba(63,185,80,.30)') +
+      seg(b.med, '2px', 'background:#3fb950') +
+      (b.bb != null ? seg(b.bb, '2px', 'background:#58a6ff;opacity:.8') : '') +
+      (b.ba != null ? seg(b.ba, '2px', 'background:#e5645f;opacity:.8') : '') +
+      '</div><div class="sub" style="font-size:10px">fair ~' + b.med + '¢ (' +
+      b.lo + '–' + b.hi + '¢, ' + b.fills + ' trade' + (b.fills === 1 ? '' : 's') +
+      ', ' + (b.rested || 0) + ' rested, ' + b.n + ' obs)' +
+      (b.bb != null ? ' · <span style="color:#58a6ff">|</span> bid ' + b.bb + '¢' : '') +
+      (b.ba != null ? ' · <span style="color:#e5645f">|</span> ask ' + b.ba + '¢' : '') +
+      '</div>';
+  };
+  // fair bands: what traded vs what rested untouched
+  const mktSet = Object.keys(Object.assign({}, est, bayes));
+  const bands = mktSet.map(m => {
+    const e = est[m] || {};
+    const parts = [];
+    if(e.traded_at_bid != null) parts.push('sold to us @ ' + (e.traded_at_bid*100).toFixed(0) + '¢');
+    if(e.traded_at_ask != null) parts.push('bought from us @ ' + (e.traded_at_ask*100).toFixed(0) + '¢');
+    if(e.rested_bid != null) parts.push('bid ' + (e.rested_bid*100).toFixed(0) + '¢ rested');
+    if(e.rested_ask != null) parts.push('ask ' + (e.rested_ask*100).toFixed(0) + '¢ rested');
+    return '<tr><td class="mkt" style="word-break:normal;vertical-align:top"><b>' + nm(m) + '</b></td>' +
+      '<td style="font-size:11px">' + fairBar(bayes[m]) +
+      (parts.length ? '<div>' + parts.join(' · ') + '</div>' : '') +
+      (e.last_fill ? '<div class="sub" style="font-size:10px">last fill: ' +
+        e.last_fill.side + ' ' + (e.last_fill.px*100).toFixed(0) + '¢ · ' +
+        e.last_fill.ts + '</div>' : '') + '</td></tr>';
+  }).join('');
+  const scouts = act.map(a =>
+    '<span style="display:inline-block;background:var(--surface2);border-radius:6px;' +
+    'padding:2px 8px;margin:2px;font-size:11px">' + nm(a.m) + ' ' +
+    (a.kind === 'flip' ? '↩' : '') + a.side + ' @ ' + a.px + '¢ · ' + a.age_m + 'm' +
+    (a.on_book === false ? ' <b style="color:#e5645f">✗dark</b>'
+     : a.on_book === true ? ' <span style="color:#3fb950">✓</span>' : '') + '</span>').join('');
+  const lines = log.map(l =>
+    '<div style="font-size:11px;padding:3px 0;border-top:1px dashed var(--line)">' +
+    '<span class="sub">' + l.ts + '</span> <b>' + nm(l.m) + '</b> ' +
+    (l.ev === 'FILLED' ? '<span style="color:#f0883e">FILLED</span>' :
+     l.ev === 'round trip' ? '<span style="color:#3fb950">round trip ✓</span>' : l.ev) +
+    ' ' + l.side + ' @ ' + l.px + '¢' +
+    (l.note ? ' <span class="sub">— ' + l.note + '</span>' : '') + '</div>').join('');
+  const wallet =
+    '<div class="sub" style="margin-bottom:4px">info fund: <b style="color:' +
+    ((DATA.probe_budget || 0) > 0.5 ? '#3fb950' : '#ff9d99') + '">$' +
+    (DATA.probe_budget || 0).toFixed(2) +
+    '</b> — prober sales in, prober buys out; sell scouts use your existing shares</div>';
+  document.getElementById('probeBody').innerHTML = wallet +
+    (act.length ? '<div class="sub" style="margin-bottom:4px">' + act.length +
+      ' scout' + (act.length > 1 ? 's' : '') + ' resting</div>' + scouts :
+      '<div class="sub">no scouts resting' + (on ? ' — placing as books allow' : ' — Prober is off') + '</div>') +
+    (bands ? '<table style="width:100%;border-collapse:collapse;margin-top:8px">' + bands + '</table>' : '') +
+    (lines ? '<details style="margin-top:8px"><summary class="sub" style="cursor:pointer">' +
+      'journal (' + log.length + ')</summary>' + lines + '</details>' : '');
+}
+
+function renderEarn(){
+  const card = document.getElementById('earnCard'); if(!card) return;
+  const act = DATA.earn_active || [], log = DATA.earn_log || [];
+  const st = DATA.earn_stats || {}, caps = DATA.earn_caps || {};
+  const on = DATA.auto && DATA.auto.earn === true;
+  if(!on && !act.length && !log.length){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  const nm = m => m.replace(/^enwc-uspres-nom-/, 'nom·').replace(/^ewc-usp-2028-11-07-/, 'win·');
+  const bayes = DATA.probe_bayes || {};
+  const status = !on ? 'switch OFF' :
+    (DATA.earn_live ? '<span style="color:#3fb950">live</span>' : 'paused by host');
+  const rows = act.map(a => {
+    const b = bayes[a.m];
+    const bk = a.on_book === true ? ' <span style="color:#3fb950">on book ✓</span>'
+             : a.on_book === false ? ' <span style="color:#e5645f;font-weight:700">NOT ON BOOK</span>'
+             : a.age_m < 3 ? ' <span class="sub">settling…</span>'
+             : ' <span class="sub">book stale</span>';
+    return '<tr><td class="mkt" style="word-break:normal"><b>' + nm(a.m) + '</b></td>' +
+      '<td class="r" style="font-size:11px">' + a.qty + ' @ ' + a.px + '¢ · ' + a.age_m + 'm' + bk +
+      (b && b.med != null ? '<div class="sub" style="font-size:10px">model now: ~' +
+        b.med + '¢ (' + b.lo + '–' + b.hi + '¢)</div>' : '') + '</td></tr>';
+  }).join('');
+  const lines = log.map(l =>
+    '<div style="font-size:11px;padding:3px 0;border-top:1px dashed var(--line)">' +
+    '<span class="sub">' + l.ts + '</span> <b>' + nm(l.m) + '</b> ' +
+    (l.ev === 'filled' ? '<span style="color:#f0883e">FILLED</span>' :
+     l.ev === 'placed' ? '<span style="color:#3fb950">placed</span>' : l.ev) +
+    ' ' + l.qty + ' @ ' + l.px + '¢' +
+    (l.note ? ' <span class="sub">— ' + l.note + '</span>' : '') + '</div>').join('');
+  document.getElementById('earnBody').innerHTML =
+    (function(){
+      const e = st.earned_usd || 0, p = st.probe_earned_usd || 0, t = e + p;
+      return '<div style="font-size:15px;font-weight:700;margin-bottom:2px">earned $' +
+        (t >= 0.1 ? t.toFixed(2) : t.toFixed(3)) +
+        ' <span class="sub" style="font-weight:400;font-size:11px">in rewards — $' +
+        (e >= 0.1 ? e.toFixed(2) : e.toFixed(3)) + ' its bids, $' +
+        (p >= 0.1 ? p.toFixed(2) : p.toFixed(3)) +
+        ' the prober\\'s scouts (credited to the info fund)</span></div>';
+    })() +
+    '<div class="sub" style="margin-bottom:4px">' + status +
+    ' · resting worst-case $' + (caps.outstanding || 0).toFixed(2) +
+    ' of $' + (caps.total || 0).toFixed(0) + ' cap ($' + (caps.per_mkt || 0).toFixed(0) +
+    '/market) · lifetime: ' + (st.placed || 0) + ' placed, ' + (st.filled || 0) +
+    ' filled ($' + (st.spent_usd || 0).toFixed(2) + '), ' + (st.withdrawn || 0) + ' withdrawn</div>' +
+    (rows ? '<table style="width:100%;border-collapse:collapse">' + rows + '</table>'
+          : '<div class="sub">no bids resting</div>') +
+    (lines ? '<details style="margin-top:8px"><summary class="sub" style="cursor:pointer">' +
+      'journal (' + log.length + ')</summary>' + lines + '</details>' : '');
+}
+
 function swRender(){
   if(!DATA || !DATA.auto) return;
-  ['defend','keeper'].forEach(k=>{
+  ['defend','keeper','snipe','probe','earn'].forEach(k=>{
     const b=document.getElementById('sw_'+k); if(!b) return;
     b.disabled=false;
     const on = DATA.auto[k]===true;
+    // A switch the server does not report at all is NOT off -- it is unknown.
+    // Painting it OFF would hide a running loop, which is how the sniper
+    // switch appeared to snap back the moment it was turned on.
+    const missing = DATA.auto[k]===undefined;
     b.className='autosw'+(SWARM[k]?' arm':(on?' on':''));
     b.querySelector('.st').textContent =
       SWARM[k] ? 'tap again to turn ON' :
+      missing ? 'state not reported — reload' :
       (on ? 'ON — '+SWDESC[k].on : 'OFF — '+SWDESC[k].off);
   });
 }
@@ -5514,12 +7106,25 @@ function renderPositions(){
       const ownTxt = r.short
         ? '<b style="color:#f0883e">No '+Math.abs(r.net).toLocaleString()+'</b>'
         : r.net.toLocaleString();
-      return '<tr style="'+bg+'" onclick="openMkt(\\''+esc(r.market)+'\\')">'+
-        '<td class="mkt"><b style="color:var(--ink);font-size:12px">'+esc(mname(r.market))+'</b><div style="font-size:9px">'+esc(r.market)+'</div></td>'+
-        '<td class="r">'+ownTxt+
-        (r.avg_cents != null ? '<br><span class="sub" style="font-size:10px">@ '+r.avg_cents.toFixed(1)+'¢ avg</span>' : '')+'</td>'+
-        '<td class="r" style="font-size:11px">'+(sells ? esc(sells) : '<span class="sub">no sell resting</span>')+'</td>'+
-        '<td class="r">'+btn+'</td></tr>';
+      // One cell per position, not four columns. On a phone the button column
+      // demands ~300px, and a four-column row answers that by squeezing the
+      // name to a single character per line. Name gets its own full-width
+      // line; the numbers and the buttons share the line below and wrap.
+      return '<tr style="'+bg+'">'+
+        '<td style="padding:8px 0">'+
+        '<div onclick="openMkt(\\''+esc(r.market)+'\\')">'+
+          '<b style="color:var(--ink);font-size:13px;line-height:1.3">'+esc(mname(r.market))+'</b>'+
+          '<div class="sub" style="font-size:9px;word-break:break-all">'+esc(r.market)+'</div>'+
+        '</div>'+
+        '<div style="display:flex;flex-wrap:wrap;align-items:flex-start;'+
+             'justify-content:space-between;gap:10px;margin-top:6px">'+
+          '<div style="flex:1 1 120px;min-width:110px">'+ownTxt+
+            (r.avg_cents != null ? '<span class="sub" style="font-size:10px"> @ '+r.avg_cents.toFixed(1)+'¢ avg</span>' : '')+
+            '<div class="sub" style="font-size:11px;margin-top:2px">'+
+            (sells ? esc(sells) : 'no sell resting')+'</div>'+
+          '</div>'+
+          '<div style="flex:0 0 auto;text-align:right">'+btn+'</div>'+
+        '</div></td></tr>';
     }).join('') || '<tr><td class="sub">no open positions</td></tr>';
 }
 async function posFix(i, ask){
@@ -5965,12 +7570,33 @@ function renderSheet(d){
   const lv = a => (a && a.length ? a : []).map(x =>
     '<tr><td>'+(+(x[0]*100).toFixed(2))+'¢</td><td class="r">'+x[1].toLocaleString()+'</td></tr>').join('')
     || '<tr><td class="sub">empty</td></tr>';
-  const ords = (d.orders || []).map(o =>
-    '<div class="osub">'+
-    '<div style="font-size:14px;font-weight:600">'+o.side+' '+o.size.toLocaleString()+' @ '+
+  // Every order collapses to one line (tap to open its controls), and the
+  // deep qualifier blocks — 1c floor bids and 99c ceiling asks, dozens of
+  // chunks on some markets — fold behind a single count-and-size line.
+  const isQual = o => (o.side === 'BUY' && o.price <= 0.015)
+                   || (o.side !== 'BUY' && o.price >= 0.985);
+  // How long this order has been resting. A reprice replaces the order, so a
+  // small age can mean "the defender just moved an old rung", not "new money".
+  const age = iso => {
+    if (!iso) return '';
+    const s = (Date.now() - Date.parse(iso)) / 1000;
+    if (!isFinite(s) || s < 0) return '';
+    if (s < 90) return Math.round(s)+'s ago';
+    if (s < 5400) return Math.round(s/60)+'m ago';
+    if (s < 172800) return (s/3600).toFixed(s < 36000 ? 1 : 0)+'h ago';
+    return Math.round(s/86400)+'d ago';
+  };
+  const mkOrd = o =>
+    '<details class="osub"><summary style="cursor:pointer;display:flex;align-items:center;gap:10px;list-style:none">'+
+    '<input type="checkbox" class="mck" data-oid="'+o.id+'" onchange="mSelUpd()" '+
+    'onclick="event.stopPropagation()" style="width:22px;height:22px;flex:0 0 auto">'+
+    '<span style="font-size:14px;font-weight:600">'+o.side+' '+o.size.toLocaleString()+' @ '+
     (+(o.price*100).toFixed(2))+'¢ <span class="sub" style="font-weight:400">· '+
-    (o.est_day ? '$'+o.est_day.toFixed(2)+'/day' : '$0/day')+'</span></div>'+
-    '<div class="ctlrow">'+
+    (o.est_day ? '$'+o.est_day.toFixed(2)+'/day' : '$0/day')+
+    (age(o.created) ? ' · placed '+age(o.created) : '')+
+    (o.src ? ' · '+o.src : '')+'</span></span>'+
+    '<span class="sub" style="margin-left:auto">▾</span></summary>'+
+    '<div class="ctlrow" style="margin-top:8px">'+
     '<span class="ctl"><label>price</label><input id="mp'+o.id+'" type="number" step="0.1" min="0.1" max="99.9" value="'+(o.price*100).toFixed(1)+'"><span class="sub">¢</span></span>'+
     '<span class="ctl"><label>qty</label><button class="alt bump" onclick="qBump(\\'mq'+o.id+'\\',-1)">−</button>'+
     '<input id="mq'+o.id+'" type="number" step="1" min="1" max="20000" value="'+Math.round(o.size)+'">'+
@@ -5978,7 +7604,22 @@ function renderSheet(d){
     '<div class="ctlrow rp" style="margin-top:10px">'+
     '<button onclick="mModify(\\''+o.id+'\\',\\''+esc(m)+'\\')">Modify</button>'+
     '<button class="alt" style="background:rgba(229,100,95,.18);color:#ff9d99" onclick="mCancel(\\''+o.id+'\\',\\''+esc(m)+'\\')">Cancel</button>'+
-    '</div></div>').join('') || '<div class="sub">no resting orders here</div>';
+    '</div></details>';
+  const work = (d.orders || []).filter(o => !isQual(o));
+  const qual = (d.orders || []).filter(isQual);
+  const qb = qual.filter(o => o.side === 'BUY').reduce((a, o) => a + o.size, 0);
+  const qa = qual.filter(o => o.side !== 'BUY').reduce((a, o) => a + o.size, 0);
+  const qualParts = [];
+  if(qb) qualParts.push(Math.round(qb).toLocaleString()+' bid @ 1¢');
+  if(qa) qualParts.push(Math.round(qa).toLocaleString()+' ask @ 99¢');
+  const ords =
+    (work.map(mkOrd).join('') || (qual.length ? '' : '<div class="sub">no resting orders here</div>'))+
+    (qual.length ?
+      '<details class="osub"><summary style="cursor:pointer;list-style:none">'+
+      '<span style="font-size:13px;font-weight:600">⚓ '+qual.length+' qualifying order'+
+      (qual.length > 1 ? 's' : '')+'</span> <span class="sub">· '+qualParts.join(' · ')+
+      ' · holds Target Size, earns ~nothing — tap to manage</span></summary>'+
+      qual.map(mkOrd).join('')+'</details>' : '');
   document.getElementById('sheetIn').innerHTML =
     '<div style="font-size:17px;font-weight:700">'+esc(mname(m))+'</div>'+
     '<div class="mkt">'+esc(m)+'</div>'+
@@ -5986,7 +7627,15 @@ function renderSheet(d){
     '<div style="display:flex;gap:18px;margin-top:8px">'+
     '<div style="flex:1"><div class="sub">Bids</div><table class="bk">'+lv(d.bids)+'</table></div>'+
     '<div style="flex:1"><div class="sub">Asks</div><table class="bk">'+lv(d.asks)+'</table></div></div>'+
-    '<h3>Your orders</h3>'+ords+
+    '<h3>Your orders</h3>'+
+    ((d.orders || []).length > 1 ?
+      '<div class="ctlrow" style="margin-bottom:8px;align-items:center">'+
+      '<button class="alt" onclick="mSelAll()">Select all</button>'+
+      '<button class="alt" id="mSelBtn" disabled '+
+      'style="background:rgba(229,100,95,.18);color:#ff9d99" '+
+      'onclick="mCancelSel(\\''+esc(m)+'\\')">Cancel selected</button>'+
+      '<span class="sub" id="mSelNote"></span></div>' : '')+
+    ords+
     '<h3>Place new</h3><div class="osub">'+
     '<div class="ctlrow">'+
     '<span class="ctl"><label>side</label><select id="mSide">'+
@@ -6002,8 +7651,76 @@ function renderSheet(d){
     '<div class="ctlrow rp" style="margin-top:10px"><button onclick="mPlace(\\''+esc(m)+'\\')">Place</button></div>'+
     '</div>'+
     '<div class="mkt">post-only — the order rests or is rejected; it can never cross the spread and fill on arrival</div>'+
+    qualBlock(d)+
     defendBlock(d)+
     '<div class="rp" style="margin-top:12px"><button class="alt" onclick="closeSheet()">Close</button></div>';
+}
+function qualBlock(d){
+  const q = d.qual || null;
+  const m = d.market;
+  if(!q || !q.target){
+    return '<h3>Qualify</h3><div class="mkt">No active reward program on this market — '+
+      'there is no Target Size to reach, so nothing here would earn.</div>';
+  }
+  const tgt = q.target.toLocaleString();
+  const bp = (typeof d.buying_power === 'number') ? d.buying_power : null;
+  function row(side, tot, need, priceC, cost){
+    const nm = side === 'BUY' ? 'Bid' : 'Ask';
+    if(!need){
+      return '<div class="mkt" style="color:#3fb950">'+nm+' side ✓ '+tot.toLocaleString()+
+        ' of '+tgt+' — qualifying, this side pays</div>';
+    }
+    // An ask carries one share per DOLLAR of buying power, so a wide gap is
+    // several orders. A bid goes in one.
+    let per = null, orders = null;
+    if(bp !== null && bp > 0){
+      per = (side === 'SELL') ? Math.floor(bp) : 10000;
+      if(per > 0) orders = Math.ceil(need / per);
+    }
+    const plan = (orders && orders > 1)
+      ? ' in '+orders+' orders of '+per.toLocaleString()
+      : '';
+    return '<div class="mkt" style="color:#ff9d99">'+nm+' side ✗ '+tot.toLocaleString()+' of '+tgt+
+      ' — short '+need.toLocaleString()+', so this side pays nobody</div>'+
+      '<div class="rp" style="margin-bottom:8px"><button onclick="mQualify(\\''+esc(m)+'\\',\\''+side+'\\')">'+
+      '⚓ Qualify '+nm.toLowerCase()+' — '+need.toLocaleString()+' @ '+priceC+'¢ ≈ $'+cost.toFixed(2)+
+      '</button></div>'+
+      (plan ? '<div class="mkt">one tap places it'+plan+'</div>' : '');
+  }
+  return '<h3>Qualify</h3>'+
+    '<div class="mkt">A side pays NOBODY until it holds Target Size ('+tgt+' resting contracts, '+
+    'everyone\\'s size counted, not just yours). This places the cheapest post-only orders that close '+
+    'the gap — floor bid at '+q.floor_c+'¢, ceiling ask at '+q.ceil_c+'¢, where a contract ties up the '+
+    'least capital. It unlocks the pool for the side; on its own it earns you almost nothing, because '+
+    'an order that far from the touch scores about zero. It pays when you also hold an order near the '+
+    'touch on the same side. Size and price are recomputed from the live book when you tap. A bid goes '+
+    'in as one order; an ask can only carry one share per dollar of buying power, so a wide ask gap '+
+    'goes in as several — one tap does them all, re-reading buying power between each.</div>'+
+    row('BUY', q.bid_total, q.need_bid, q.floor_c, q.cost_bid)+
+    row('SELL', q.ask_total, q.need_ask, q.ceil_c, q.cost_ask);
+}
+async function mQualify(m, side){
+  const nm = side === 'BUY' ? 'bid' : 'ask';
+  if(!arm('ql'+m+side, 'Qualify the '+nm+' side — cheapest orders to reach Target Size')) return;
+  try{
+    const r = await fetch('maction', {method:'POST',
+      headers:{'Content-Type':'application/json','X-Reprice':'1'},
+      body: JSON.stringify({op:'qualify', market:m, side:side})});
+    const d = await r.json().catch(() => ({ok:false, error:'HTTP '+r.status}));
+    if(!d.ok){
+      toast('Failed: ' + (d.detail || d.error || ('HTTP '+r.status)));
+    } else if(!d.placed){
+      toast(d.note || 'Nothing to do');
+    } else {
+      let msg = 'Placed '+d.placed+' order'+(d.placed>1?'s':'')+' — '+
+        (d.size||0).toLocaleString()+' @ '+d.price_cents+'¢, ~$'+(d.spent||0).toFixed(2)+' locked';
+      if(d.remaining_gap) msg += ' · '+d.remaining_gap.toLocaleString()+' still short, tap again';
+      else if(d.remaining_gap === 0) msg += ' · side qualifying ✓';
+      if(d.capped_by_budget) msg += ' (capped by buying power)';
+      toast(msg);
+    }
+  }catch(e){ toast('Failed: '+e); }
+  setTimeout(function(){ openMkt(m); refresh(); }, 1500);
 }
 function defendBlock(d){
   const m = d.market;
@@ -6066,6 +7783,44 @@ function mModify(id, m){
 function mCancel(id, m){
   if(!arm('can'+id, 'Cancel this order')) return;
   mact({op:'cancel', order_id:id}, m);
+}
+// --- batch cancel: tick boxes, one armed confirm, sequential cancels ----
+function mSel(){
+  return Array.from(document.querySelectorAll('.mck:checked')).map(c => c.dataset.oid);
+}
+function mSelUpd(){
+  const n = mSel().length;
+  const b = document.getElementById('mSelBtn');
+  if(!b) return;
+  b.disabled = !n;
+  b.textContent = n ? 'Cancel selected ('+n+')' : 'Cancel selected';
+}
+function mSelAll(){
+  const all = document.querySelectorAll('.mck');
+  const on = mSel().length < all.length;   // any unchecked -> check all; else clear
+  all.forEach(c => { c.checked = on; });
+  mSelUpd();
+}
+async function mCancelSel(m){
+  const ids = mSel();
+  if(!ids.length) return;
+  if(!arm('bcx'+m, 'Cancel '+ids.length+' order'+(ids.length>1?'s':''))) return;
+  const b = document.getElementById('mSelBtn');
+  if(b) b.disabled = true;
+  let ok = 0, bad = 0;
+  for(let i = 0; i < ids.length; i++){
+    if(b) b.textContent = 'cancelling '+(i+1)+'/'+ids.length+'…';
+    try{
+      const r = await fetch('maction', {method:'POST',
+        headers:{'Content-Type':'application/json','X-Reprice':'1'},
+        body: JSON.stringify({op:'cancel', order_id:ids[i]})});
+      const d = await r.json().catch(() => ({ok:false}));
+      d.ok ? ok++ : bad++;
+    }catch(e){ bad++; }
+    await new Promise(res => setTimeout(res, 350));
+  }
+  toast('Cancelled '+ok+' ✓'+(bad ? ' · '+bad+' failed' : ''));
+  setTimeout(function(){ openMkt(m); refresh(); }, 1200);
 }
 function mPlace(m){
   const side = document.getElementById('mSide').value;
@@ -6595,6 +8350,22 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     keep_qualified()
                 except Exception as e:  # noqa: BLE001 — keeper never kills the poll
                     MONITOR.error = f"keeper: {type(e).__name__}: {e}"[:150]
+                try:
+                    auto_snipe()
+                except Exception as e:  # noqa: BLE001 — sniper never kills the poll
+                    MONITOR.error = f"snipe: {type(e).__name__}: {e}"[:150]
+                try:
+                    slate_health_check()
+                except Exception:  # noqa: BLE001 — the watch never kills the poll
+                    pass
+                try:
+                    auto_probe()
+                except Exception as e:  # noqa: BLE001 — prober never kills the poll
+                    MONITOR.error = f"probe: {type(e).__name__}: {e}"[:150]
+                try:
+                    auto_earn()
+                except Exception as e:  # noqa: BLE001 — earner never kills the poll
+                    MONITOR.error = f"earn: {type(e).__name__}: {e}"[:150]
             except Exception as e:  # noqa: BLE001 — defense never kills the poll
                 MONITOR.error = f"defend: {type(e).__name__}: {e}"[:150]
             MONITOR.maybe_save_remote()
@@ -6653,6 +8424,7 @@ def main() -> None:
     threading.Thread(target=poll_loop, args=(key_id, secret_key), daemon=True).start()
     threading.Thread(target=ws_stream_loop, args=(key_id, secret_key), daemon=True).start()
     threading.Thread(target=hf_sampler_loop, daemon=True).start()
+    threading.Thread(target=tracker_loop, daemon=True).start()
     server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
     print(f"live monitor on :{PORT}, polling every {POLL_SECONDS}s")
     server.serve_forever()

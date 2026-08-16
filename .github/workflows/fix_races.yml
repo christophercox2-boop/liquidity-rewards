@@ -1,0 +1,265 @@
+name: Fix Senate and Governor races
+
+# ORDER-TOUCHING. Places real orders. Push-path / manual dispatch only.
+#
+# Two approved jobs over the Senate and Governor book:
+#
+#  JOB 1 — the 16 sides we already hold that earn nothing.
+#     11 sit on a side below Target Size, so the side pays nobody. Ten of
+#     those already have our order AT the touch, so simply lifting the side
+#     to Target Size turns them on. Closing the gap costs ~$17 a side.
+#     5 more (plus one of the 11) are on qualifying sides but our order is
+#     5 to 92 ticks off the touch and scores nothing; those get a small
+#     order AT the touch instead. Nothing is repriced or cancelled — new
+#     orders only, so an existing rung is never put at risk.
+#
+#  JOB 3 — sides we hold nothing on. 235 already qualify on other people's
+#     size, so joining is cheap. This takes the best of them by return.
+#
+# Sizing follows the rule set for the 2028 slate: aim for a third of the
+# side's score, cap the order at 50 contracts, floor it at 10 so a rung is
+# not too thin to hold. Everything is recomputed from live books at run
+# time — no stale plan is replayed.
+#
+# Post-only throughout: an order rests or is rejected, never crosses.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/fix_races.yml
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "plan only, place nothing"
+        type: boolean
+        default: false
+      budget:
+        description: "max notional to commit, dollars"
+        default: "900"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fix-races
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          BUDGET: ${{ inputs.budget }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
+          BUDGET = float(os.environ.get("BUDGET") or 900)
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          TICK = 0.01
+          SHARE_TARGET = 0.33
+          SIZE_CAP, SIZE_FLOOR = 50, 10
+          MIN_EST = 0.30            # not worth an order below this
+          FAR_TICKS = 2             # our order counts as adrift beyond this
+          MAX_ORDERS = 200
+
+          def in_scope(s):
+              t = s.split("-")
+              return any(x in ("usse", "usgub", "ussep", "usgubp") for x in t)
+
+          def api(method, path, body=None, params=None):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  json=body, params=params, timeout=30)
+
+          def ours_map():
+              out = {}
+              r = api("GET", "/v1/orders/open"); r.raise_for_status()
+              for o in r.json().get("orders") or []:
+                  if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                                 "ORDER_STATE_PARTIALLY_FILLED"):
+                      continue
+                  s = o.get("marketSlug") or ""
+                  if not in_scope(s):
+                      continue
+                  intent = str(o.get("intent") or "")
+                  side = "BUY" if intent.endswith(("BUY_LONG", "SELL_SHORT")) else "SELL"
+                  px = round(tr._num((o.get("price") or {}).get("value")) or 0, 2)
+                  q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+                  out.setdefault((s, side), {})
+                  out[(s, side)][px] = out[(s, side)].get(px, 0.0) + q
+              return out
+
+          spent = 0.0
+          placed = failed = 0
+          def place(slug, side, px, qty, why):
+              global spent, placed, failed
+              if not in_scope(slug) or not (0.1 <= px * 100 <= 99.9):
+                  return False
+              qty = int(qty)
+              if not (1 <= qty <= 20000):
+                  return False
+              unit = px if side == "BUY" else 1 - px
+              cost = unit * qty
+              if spent + cost > BUDGET:
+                  print(f"    budget ${BUDGET:.0f} reached — stopping")
+                  return None
+              if DRY:
+                  print(f"    would place {side} {qty} @ {px*100:.0f}c  ${cost:.2f}  [{why}]")
+                  spent += cost; placed += 1
+                  return True
+              intent = "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_BUY_SHORT"
+              delay = 2.0
+              for attempt in range(4):
+                  try:
+                      r = api("POST", "/v1/orders",
+                          {"marketSlug": slug, "intent": intent,
+                           "type": "ORDER_TYPE_LIMIT",
+                           "price": {"value": f"{px:.2f}", "currency": "USD"},
+                           "quantity": qty,
+                           "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                           "participateDontInitiate": True})
+                      if r.status_code < 300:
+                          spent += cost; placed += 1
+                          print(f"    {side} {qty} @ {px*100:.0f}c  ${cost:.2f}  [{why}] -> ok")
+                          return True
+                      if r.status_code not in (429, 500, 502, 503, 504):
+                          failed += 1
+                          print(f"    {side} {qty} @ {px*100:.0f}c FAILED "
+                                + " ".join(r.text.split())[:110])
+                          return False
+                  except Exception as e:
+                      if attempt == 3:
+                          failed += 1
+                          print(f"    {side} {qty} @ {px*100:.0f}c FAILED {type(e).__name__}")
+                          return False
+                  time.sleep(delay); delay = min(delay * 2, 20)
+              failed += 1
+              return False
+
+          pol, sizes = tr.fetch_politics_events()
+          scope = sorted(s for s in pol if in_scope(s))
+          mine = ours_map()
+          print(f"Senate/Governor markets: {len(scope)}   budget ${BUDGET:.0f}"
+                + ("   (DRY RUN)" if DRY else "") + "\n")
+
+          progs = {}
+          for i in range(0, len(scope), 25):
+              try:
+                  rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                    params={"symbols": scope[i:i+25], "pageSize": 100}, timeout=30)
+                  for p in rr.json().get("programs") or []:
+                      s = p.get("marketSlug") or ""
+                      tp = tr._pick_period(p.get("timePeriods") or [], s)
+                      if tp is not None and s:
+                          progs[s] = tr._prog_of(tp)
+              except Exception:
+                  pass
+              time.sleep(0.1)
+
+          jobs = {"qualify": [], "touch": [], "join": []}
+          for slug in scope:
+              pr = progs.get(slug) or {}
+              target = float(pr.get("target") or 0)
+              if not target:
+                  continue
+              df = float(pr.get("df") or 0.2)
+              per = float(pr.get("pool") or 0) / max(sizes.get(slug, 1), 1) / 2
+              if per <= 0:
+                  continue
+              try:
+                  bk = tr._fetch_book(slug)
+              except Exception:
+                  continue
+              time.sleep(0.15)
+              for side, lv in (("BUY", bk.get("bids") or []), ("SELL", bk.get("asks") or [])):
+                  if not lv:
+                      continue
+                  tot = sum(q for _, q in lv)
+                  best = lv[0][0]
+                  ours_px = mine.get((slug, side)) or {}
+                  win, cum = [], 0.0
+                  for px, q in lv:
+                      win.append((px, q)); cum += q
+                      if cum >= target:
+                          break
+                  den = sum(q * df ** round(abs(best - px) / TICK) for px, q in win)
+                  my = sum(q * df ** round(abs(best - px) / TICK) for px, q in ours_px.items())
+                  # size that buys the wanted share, bounded both ways
+                  want = max(SIZE_FLOOR, min(SIZE_CAP,
+                             round(den * SHARE_TARGET / (1 - SHARE_TARGET)) or SIZE_FLOOR))
+                  est = per * want / (want + den) if den >= 0 else 0
+                  ticks = (round(abs(best - min(ours_px, key=lambda p: abs(p - best))) / TICK)
+                           if ours_px else None)
+                  if ours_px and tot < target:
+                      # JOB 1: lift the side to Target Size at the cheapest price
+                      qpx = TICK if side == "BUY" else round(1 - TICK, 2)
+                      jobs["qualify"].append((slug, side, qpx, int(target - tot) + 1, per))
+                      if ticks is not None and ticks > FAR_TICKS:
+                          jobs["touch"].append((slug, side, best, want, est))
+                  elif ours_px and ticks is not None and ticks > FAR_TICKS:
+                      jobs["touch"].append((slug, side, best, want, est))
+                  elif not ours_px and tot >= target and est >= MIN_EST:
+                      jobs["join"].append((slug, side, best, want, est))
+
+          jobs["join"].sort(key=lambda j: -(j[4] / max((j[2] if j[1] == "BUY" else 1 - j[2]) * j[3], 0.01)))
+          jobs["touch"].sort(key=lambda j: -j[4])
+
+          for label, key in (("JOB 1a — lift short sides to Target Size", "qualify"),
+                             ("JOB 1b — put an order AT the touch", "touch"),
+                             ("JOB 3 — join qualifying sides we are not in", "join")):
+              print(f"\n=== {label}: {len(jobs[key])} ===")
+              for item in jobs[key]:
+                  if placed >= MAX_ORDERS:
+                      print("  order ceiling reached"); break
+                  slug, side, px, qty = item[0], item[1], item[2], item[3]
+                  print(f"  {slug} {side}")
+                  if place(slug, side, round(px, 2), qty, key) is None:
+                      break
+                  time.sleep(0.7)
+
+          print(f"\nplaced {placed}, failed {failed}, committed ${spent:,.2f} of ${BUDGET:.0f}")
+          os.makedirs("data", exist_ok=True)
+          json.dump({"dry_run": DRY, "placed": placed, "failed": failed,
+                     "spent": round(spent, 2),
+                     "counts": {k: len(v) for k, v in jobs.items()}},
+                    open("data/fix_races.json", "w"), indent=1)
+          with open("data/fix_races.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/fix_races.json data/fix_races.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Fix races [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi

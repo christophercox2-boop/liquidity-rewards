@@ -1,72 +1,48 @@
-markets whose lead 99c ask is under 2000: 29
-  OK   usgubewc-usgub-al-2026-11-03-dem          177.46 -> requested 2000
-  OK   usgubewc-usgub-al-2026-11-03-rep          177.46 -> requested 2000
-  OK   ussewc-usse-al-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-ar-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-ar-2026-11-03-rep             177.46 -> requested 2000
-  OK   ussewc-usse-co-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-co-2026-11-03-rep             177.46 -> requested 2000
-  OK   ussewc-usse-fl-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-fl-2026-11-03-rep             177.46 -> requested 2000
-  OK   ussewc-usse-ky-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-la-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-la-2026-11-03-rep             177.46 -> requested 2000
-  OK   ussewc-usse-ms-2026-11-03-rep             177.46 -> requested 2000
-  OK   ussewc-usse-mt-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-mt-2026-11-03-rep             177.46 -> requested 2000
-  OK   ussewc-usse-nj-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-nj-2026-11-03-rep             177.46 -> requested 2000
-  OK   ussewc-usse-nm-2026-11-03-dem             177.43 -> requested 2000
-  OK   ussewc-usse-nm-2026-11-03-rep             177.46 -> requested 2000
-  OK   ussewc-usse-ok-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-ok-2026-11-03-rep             172.95 -> requested 2000
-  OK   ussewc-usse-or-2026-11-03-rep             177.46 -> requested 2000
-  OK   ussewc-usse-ri-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-sc-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-sc-2026-11-03-rep             177.46 -> requested 2000
-  OK   ussewc-usse-va-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-va-2026-11-03-rep             172.95 -> requested 2000
-  OK   ussewc-usse-wv-2026-11-03-dem             177.46 -> requested 2000
-  OK   ussewc-usse-wv-2026-11-03-rep             177.46 -> requested 2000
+markets whose lead 99c ask is under 2000: 21
+  OK   usgubewc-usgub-ar-2026-11-03-rep          210.41 -> requested 2000
+  OK   usgubewc-usgub-ct-2026-11-03-dem          167.87 -> requested 2000
+  OK   usgubewc-usgub-hi-2026-11-03-dem          191.32 -> requested 2000
+  OK   usgubewc-usgub-id-2026-11-03-rep          206.54 -> requested 2000
+  OK   usgubewc-usgub-il-2026-11-03-dem          206.54 -> requested 2000
+  OK   usgubewc-usgub-mn-2026-11-03-dem          220.92 -> requested 2000
+  OK   usgubewc-usgub-ne-2026-11-03-rep          217.91 -> requested 2000
+  OK   usgubewc-usgub-pa-2026-11-03-dem          134.26 -> requested 2000
+  OK   usgubewc-usgub-pa-2026-11-03-rep          193.91 -> requested 2000
+  OK   usgubewc-usgub-ri-2026-11-03-dem          156.43 -> requested 2000
+  OK   usgubewc-usgub-sd-2026-11-03-dem          272.92 -> requested 2000
+  OK   usgubewc-usgub-sd-2026-11-03-rep          191.60 -> requested 2000
+  OK   usgubewc-usgub-tn-2026-11-03-rep          137.29 -> requested 2000
+  OK   usgubewc-usgub-wy-2026-11-03-dem          132.00 -> requested 2000
+  OK   usgubewc-usgub-wy-2026-11-03-rep          222.43 -> requested 2000
+  OK   ussewc-usse-co-2026-11-03-dem             120.28 -> requested 2000
+  OK   ussewc-usse-il-2026-11-03-dem             222.43 -> requested 2000
+  OK   ussewc-usse-ma-2026-11-03-dem             222.43 -> requested 2000
+  OK   ussewc-usse-ri-2026-11-03-dem             120.28 -> requested 2000
+  OK   ussewc-usse-wv-2026-11-03-rep             222.43 -> requested 2000
+  OK   ussewc-usse-wy-2026-11-03-rep             142.77 -> requested 2000
 
 market                                      total 99c ask now  qualifies?
-usgubewc-usgub-al-2026-11-03-dem                      2000.00         YES
-usgubewc-usgub-al-2026-11-03-rep                      2000.00         YES
-ussewc-usse-al-2026-11-03-dem                         2000.00         YES
-ussewc-usse-al-2026-11-03-rep                         2000.00         YES
-ussewc-usse-ar-2026-11-03-dem                         2000.00         YES
-ussewc-usse-ar-2026-11-03-rep                         2000.00         YES
-ussewc-usse-co-2026-11-03-dem                         2000.00         YES
-ussewc-usse-co-2026-11-03-rep                         2000.00         YES
-ussewc-usse-fl-2026-11-03-dem                         2000.00         YES
-ussewc-usse-fl-2026-11-03-rep                         2000.00         YES
-ussewc-usse-ky-2026-11-03-dem                         2000.00         YES
-ussewc-usse-ky-2026-11-03-rep                         2000.00         YES
-ussewc-usse-la-2026-11-03-dem                         2000.00         YES
-ussewc-usse-la-2026-11-03-rep                         2000.00         YES
-ussewc-usse-ms-2026-11-03-dem                         2000.00         YES
-ussewc-usse-ms-2026-11-03-rep                         2000.00         YES
-ussewc-usse-mt-2026-11-03-dem                         2000.00         YES
-ussewc-usse-mt-2026-11-03-rep                         2177.46         YES
-ussewc-usse-nj-2026-11-03-dem                         2000.00         YES
-ussewc-usse-nj-2026-11-03-rep                         2000.00         YES
-ussewc-usse-nm-2026-11-03-dem                         2000.00         YES
-ussewc-usse-nm-2026-11-03-rep                         2000.00         YES
-ussewc-usse-ok-2026-11-03-dem                         2000.00         YES
-ussewc-usse-ok-2026-11-03-rep                         2000.00         YES
-ussewc-usse-or-2026-11-03-dem                         2000.00         YES
-ussewc-usse-or-2026-11-03-rep                         2000.00         YES
+usgubewc-usgub-ar-2026-11-03-rep                      2159.00         YES
+usgubewc-usgub-ct-2026-11-03-dem                      2066.27         YES
+usgubewc-usgub-hi-2026-11-03-dem                      2388.01         YES
+usgubewc-usgub-id-2026-11-03-rep                      2742.49         YES
+usgubewc-usgub-il-2026-11-03-dem                      2381.54         YES
+usgubewc-usgub-mn-2026-11-03-dem                      2000.00         YES
+usgubewc-usgub-ne-2026-11-03-rep                      2168.35         YES
+usgubewc-usgub-pa-2026-11-03-dem                      2000.00         YES
+usgubewc-usgub-pa-2026-11-03-rep                      2660.10         YES
+usgubewc-usgub-ri-2026-11-03-dem                      3590.30         YES
+usgubewc-usgub-sd-2026-11-03-dem                      3286.09         YES
+usgubewc-usgub-sd-2026-11-03-rep                      2487.79         YES
+usgubewc-usgub-tn-2026-11-03-rep                      2000.00         YES
+usgubewc-usgub-wy-2026-11-03-dem                      3744.00         YES
+usgubewc-usgub-wy-2026-11-03-rep                      4551.02         YES
+ussewc-usse-co-2026-11-03-dem                         2102.78         YES
+ussewc-usse-il-2026-11-03-dem                         2444.86         YES
+ussewc-usse-ma-2026-11-03-dem                         4421.62         YES
 ussewc-usse-ri-2026-11-03-dem                         2000.00         YES
-ussewc-usse-ri-2026-11-03-rep                         2000.00         YES
-ussewc-usse-sc-2026-11-03-dem                         2000.00         YES
-ussewc-usse-sc-2026-11-03-rep                         2000.00         YES
-ussewc-usse-tn-2026-11-03-dem                         2000.00         YES
-ussewc-usse-tn-2026-11-03-rep                         2000.00         YES
-ussewc-usse-va-2026-11-03-dem                         2000.00         YES
-ussewc-usse-va-2026-11-03-rep                         2000.00         YES
-ussewc-usse-wv-2026-11-03-dem                         2000.00         YES
-ussewc-usse-wv-2026-11-03-rep                         2000.00         YES
-ussewc-usse-wy-2026-11-03-rep                         2000.00         YES
+ussewc-usse-wv-2026-11-03-rep                         4793.10         YES
+ussewc-usse-wy-2026-11-03-rep                         3570.47         YES
 
-ask sides now at or above the 2000 target: 37 of 37
-modify accepted: 29 | rejected: 0
+ask sides now at or above the 2000 target: 21 of 21
+modify accepted: 21 | rejected: 0

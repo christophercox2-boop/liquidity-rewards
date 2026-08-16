@@ -1,0 +1,171 @@
+name: Diagnose ask rejections
+
+# ORDER-TOUCHING but deliberately tiny: up to four 5-contract asks, each
+# cancelled again immediately. Purpose is to capture the exchange's actual
+# error text, not to take a position.
+#
+# The defender has been unable to move our asks in the 2028 slate all day.
+# Every attempt returns 2xx and then does not rest, so the reprice alerts
+# fire and the order stays where it is while the touch walks away — six ask
+# sides have decayed to zero score that way.
+#
+# Three candidate causes, and this tells them apart by varying one thing at
+# a time in a single market:
+#   1. short exposure — we hold ~10,000 of short here already
+#   2. price          — post-only refusing something near the touch
+#   3. size           — the per-order cap
+# plus a control market where our short exposure is small.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/diag_ask_reject.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: diag-ask-reject
+  cancel-in-progress: false
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Probe
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          TARGETS = ["enwc-uspres-nom-rep-2028-thomas",      # ask 18 ticks adrift
+                     "enwc-uspres-nom-rep-2028-rondes"]      # ask 6 ticks adrift
+          QTY = 5
+
+          def api(method, path, body=None):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  json=body, timeout=25)
+
+          bp = None
+          r = api("GET", "/v1/account/balances")
+          if r.status_code < 400:
+              for b in r.json().get("balances") or []:
+                  if b.get("buyingPower") is not None:
+                      bp = float(b["buyingPower"])
+          print(f"buying power ${bp:,.2f}\n" if bp else "buying power unknown\n")
+
+          # our short exposure and position per target
+          pos = {}
+          r = api("GET", "/v1/portfolio/positions")
+          if r.status_code < 400:
+              for s, p in (r.json().get("positions") or {}).items():
+                  pos[s] = tr._num((p or {}).get("netPosition"))
+
+          placed_ids = []
+          def attempt(slug, px, qty, label):
+              body = {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_SHORT",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{px:.2f}", "currency": "USD"},
+                      "quantity": int(qty),
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              r = api("POST", "/v1/orders", body)
+              txt = " ".join(r.text.split())[:400]
+              print(f"   {label:26s} ask {qty} @ {px*100:.0f}c -> HTTP {r.status_code}")
+              print(f"      body: {txt}")
+              oid = None
+              if r.status_code < 300:
+                  try:
+                      j = r.json()
+                      oid = ((j.get("order") or {}).get("id") if isinstance(j.get("order"), dict)
+                             else None) or j.get("id") or j.get("orderId")
+                  except Exception:
+                      pass
+                  # did it actually rest?
+                  time.sleep(4)
+                  rr = api("GET", "/v1/orders/open")
+                  rested = 0.0
+                  if rr.status_code < 400:
+                      for o in rr.json().get("orders") or []:
+                          if (o.get("marketSlug") == slug
+                                  and str(o.get("state")) in ("ORDER_STATE_NEW",
+                                                              "ORDER_STATE_PARTIALLY_FILLED")
+                                  and abs((tr._num((o.get("price") or {}).get("value")) or 0) - px) < 0.005
+                                  and (not oid or str(o.get("id")) == str(oid))):
+                              rested += tr._num(o.get("leavesQuantity")) or 0
+                  print(f"      rested after 4s: {rested:,.0f} of {qty}"
+                        + ("  <-- ACCEPTED AND RESTED" if rested > 0 else
+                           "  <-- ACCEPTED BUT DID NOT REST"))
+                  if oid and rested > 0:
+                      placed_ids.append((slug, oid))
+              return r.status_code, txt
+
+          for slug in TARGETS:
+              try:
+                  bk = tr._fetch_book(slug)
+              except Exception as e:
+                  print(f"{slug}: book unavailable ({type(e).__name__})"); continue
+              asks = bk.get("asks") or []
+              bids = bk.get("bids") or []
+              touch = asks[0][0] if asks else None
+              bb = bids[0][0] if bids else None
+              ours = sum(q for _, q in asks)      # not split, just context
+              print(f"=== {slug} ===")
+              print(f"   ask touch {touch*100:.0f}c, best bid {bb*100 if bb else 0:.0f}c, "
+                    f"ask side {ours:,.0f}, our net position {pos.get(slug, 0):,.0f}")
+              # 1. at the touch — what the defender wants to do
+              attempt(slug, round(touch, 2), QTY, "at the touch")
+              time.sleep(1.5)
+              # 2. a tick worse than the touch — rules out post-only crossing
+              attempt(slug, round(touch + 0.02, 2), QTY, "2 ticks above touch")
+              time.sleep(1.5)
+              # 3. at 99c, where we already hold size — isolates price from exposure
+              attempt(slug, 0.99, QTY, "at the 99c ceiling")
+              time.sleep(1.5)
+              print()
+
+          # leave no footprint
+          for slug, oid in placed_ids:
+              rc = api("POST", f"/v1/order/{oid}/cancel", {"marketSlug": slug})
+              print(f"cleanup: cancel {oid} in {slug} -> HTTP {rc.status_code}")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/diag_ask_reject.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/diag_ask_reject.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Diagnose ask rejections [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi

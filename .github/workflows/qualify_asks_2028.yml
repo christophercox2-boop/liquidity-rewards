@@ -1,0 +1,304 @@
+name: Qualify 2028 ask sides
+
+# ORDER-TOUCHING. Places real orders. Push-path / manual dispatch only.
+#
+# Overnight a market maker pulled ~11,000 of ask depth out of nearly every
+# 2028 presidential market, dropping 56 ask sides from ~11,100 to ~250 and
+# so below the 10,000 Target Size. A side under Target Size pays nobody.
+#
+# This rests OUR OWN size at the 99c ceiling on every ask side that is
+# short of the market's LIVE Target Size, so the side no longer depends on
+# anyone else's size staying put — the same reasoning as the flat blocks on
+# the bid sides. It tops up, so a market where we already hold most of the
+# target gets the difference, not another full block.
+#
+# 2026-08-15: Target Size doubled to 20,000 across the slate, putting all
+# 59 self-held ask sides back under the line. The wanted size now comes
+# from the incentives API at run time instead of a hardcoded 10,000, so a
+# future change re-runs with no edit. The single-order top-up attempt
+# (requalify_slate) proved the per-order cap again: every order trimmed to
+# exactly ~322 shares — one share per dollar of buying power.
+#
+# An ask order carries only one share per dollar of buying power, so each
+# side takes ~50 orders and the whole run is a few thousand. Buying power is
+# re-read as it goes. Every order is post-only: it rests or is rejected and
+# can never cross the spread and fill on arrival.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/qualify_asks_2028.yml
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "plan only, place nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: qualify-asks-2028
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, math, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+          CEIL = 0.99
+          # our own resting size on a side must reach the market's live
+          # Target Size (20,000 since 2026-08-15) — read per market below
+          MAX_ORDERS_PER_SIDE = 140
+          BP_FLOOR = 25.0
+          MAX_ORDERS_TOTAL = 2000
+          PAUSE = 0.8
+
+          def bp_now(default=0.0):
+              try:
+                  path = "/v1/account/balances"
+                  r = requests.get(tr.TRADE_API + path,
+                                   headers=tr.auth_headers(kid, sec, "GET", path), timeout=20)
+                  if r.status_code < 400:
+                      for b in r.json().get("balances") or []:
+                          if b.get("buyingPower") is not None:
+                              return float(b["buyingPower"])
+              except Exception:
+                  pass
+              return default
+
+          def open_orders():
+              """our resting ask size per market, at the ceiling and in total"""
+              ours = {}
+              try:
+                  path = "/v1/orders/open"
+                  r = requests.get(tr.TRADE_API + path,
+                                   headers=tr.auth_headers(kid, sec, "GET", path), timeout=30)
+                  if r.status_code < 400:
+                      for o in r.json().get("orders") or []:
+                          if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                                         "ORDER_STATE_PARTIALLY_FILLED"):
+                              continue
+                          s = o.get("marketSlug") or ""
+                          if not s.startswith(PREFIXES):
+                              continue
+                          # asks are BUY_SHORT (opening) or SELL_LONG (closing).
+                          # NOT substring "SHORT" — that swept in SELL_SHORT,
+                          # which is a BID (a buy-back exit resting on the bid
+                          # side), and made 7 sides look full when they were
+                          # 1-19 shares under the target (2026-08-15).
+                          it = str(o.get("intent") or "")
+                          if not (it.endswith("BUY_SHORT") or it.endswith("SELL_LONG")):
+                              continue
+                          q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+                          ours[s] = ours.get(s, 0.0) + q
+              except Exception as e:
+                  print(f"(open orders unavailable: {type(e).__name__})")
+              return ours
+
+          BP = bp_now()
+          print(f"buying power ${BP:,.2f} — an ask order carries {int(BP):,} shares")
+          if BP <= 0:
+              print("no buying power reading — refusing to place"); raise SystemExit(1)
+
+          try:
+              pol, _ = tr.fetch_politics_events()
+          except Exception as e:
+              print(f"politics tag lookup failed: {e}"); raise SystemExit(1)
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+          # richest pool-per-side first, so a partial run finishes
+          # the sides that are worth the most
+          _rank = {"enwc-uspres-nom-rep-2028-": 0, "enwc-uspres-nom-dem-2028-": 1,
+                   "ewc-usp-party-2028-11-07-": 0, "ewc-usp-2028-11-07-": 2}
+          slate.sort(key=lambda s: next((v for k, v in _rank.items()
+                                         if s.startswith(k)), 9))
+          ours = open_orders()
+          print(f"slate: {len(slate)} markets\n")
+
+          def place(slug, qty):
+              body = {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_SHORT",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{CEIL:.2f}", "currency": "USD"},
+                      "quantity": int(qty),
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              delay = 2.0
+              for attempt in range(5):
+                  try:
+                      r = requests.post(tr.TRADE_API + "/v1/orders",
+                                        headers={**tr.auth_headers(kid, sec, "POST", "/v1/orders"),
+                                                 "Content-Type": "application/json"},
+                                        json=body, timeout=25)
+                      if r.status_code < 300:
+                          return True, ""
+                      if r.status_code not in (429, 500, 502, 503, 504):
+                          return False, " ".join(r.text.split())[:120]
+                  except Exception as e:
+                      if attempt == 4:
+                          return False, f"{type(e).__name__}"
+                  time.sleep(delay); delay = min(delay * 2, 30)
+              return False, "rate limited"
+
+          total = 0
+          done_mkts = 0
+          summary = []
+          for i, slug in enumerate(slate, 1):
+              if total >= MAX_ORDERS_TOTAL:
+                  print(f"\nstopped at the {MAX_ORDERS_TOTAL}-order ceiling")
+                  break
+              try:
+                  bk = tr._fetch_book(slug)
+              except Exception as e:
+                  print(f"[{i}/{len(slate)}] {slug}: book unavailable ({type(e).__name__})")
+                  continue
+              asks = bk.get("asks") or []
+              ask_tot = sum(q for _, q in asks)
+              pr = (tr._PROG_CACHE.get("progs") or {}).get(slug) or {}
+              if not pr:
+                  try:
+                      rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                        params={"symbols": [slug], "pageSize": 10}, timeout=20)
+                      for p in rr.json().get("programs") or []:
+                          tp = tr._pick_period(p.get("timePeriods") or [], slug)
+                          if tp is not None:
+                              pr = tr._prog_of(tp)
+                  except Exception:
+                      pass
+              target = float(pr.get("target") or 0)
+              if not target:
+                  print(f"[{i}/{len(slate)}] {slug}: no reward program — skipped")
+                  continue
+              # Target OUR OWN size, not the visible total. A side sitting at
+              # Target Size on someone else's stack was skipped by the earlier
+              # runs, and when they pulled it went straight to zero with no
+              # warning — 14 markets died exactly that way. A side we hold up
+              # ourselves cannot be switched off by anyone leaving.
+              want = target
+              mine = ours.get(slug, 0.0)
+              if mine >= want:
+                  continue
+              print(f"[{i}/{len(slate)}] {slug}: ask {ask_tot:,.0f} of {target:,.0f}, "
+                    f"OURS {mine:,.0f} → adding {int(want - mine):,} to stand alone")
+              # Progress is measured from our OPEN ORDERS, never the public
+              # book and never what we asked for. The book lags placements by
+              # more than the re-check cadence — the 2026-08-15 run tracked
+              # book gains, saw nothing move, stalled out on all 59 sides and
+              # believed 1 side done when open orders later showed 16. Open
+              # orders are authoritative and do not lag.
+              placed = 0
+              stalled = 0
+              sent = 0
+              ours_now = mine
+              while (ours_now < want and placed < MAX_ORDERS_PER_SIDE
+                     and total < MAX_ORDERS_TOTAL):
+                  if BP < BP_FLOOR:
+                      print(f"    stopping: buying power ${BP:,.2f} below the "
+                            f"${BP_FLOOR:.0f} floor")
+                      break
+                  qty = min(int(want - ours_now) + 1, max(1, int(BP)))
+                  if DRY:
+                      ok, why = True, ""
+                  else:
+                      ok, why = place(slug, qty)
+                  if not ok:
+                      print(f"    FAILED after {placed} orders — {why}")
+                      break
+                  placed += 1; total += 1
+                  if not DRY:
+                      time.sleep(PAUSE)
+                  if DRY:
+                      break
+                  # the order rests at qty (already capped to buying power),
+                  # so credit qty — crediting a full BP chunk overshot small
+                  # remainders and left 33 sides 12-26 shares short of the
+                  # line on 2026-08-15. Reconcile against open orders every
+                  # few orders.
+                  ours_now += qty; sent += qty
+                  if placed % 4 == 0:
+                      BP = bp_now(BP)
+                      known = open_orders().get(slug)
+                      if known is None:
+                          continue
+                      # a real ceiling shows up here: orders accepted but
+                      # nothing resting. Two flat rounds and we move on.
+                      stalled = stalled + 1 if known <= ours_now - sent else 0
+                      ours_now = known; sent = 0
+                      if stalled >= 2:
+                          print(f"    stalled — ours {ours_now:,.0f}, orders accepted "
+                                "but not resting; moving on")
+                          break
+              if not DRY and placed:
+                  time.sleep(2)
+                  known = open_orders().get(slug)
+                  if known is not None:
+                      ours_now = known      # settle on the authoritative count
+              try:
+                  after = sum(q for _, q in (tr._fetch_book(slug).get("asks") or []))
+              except Exception:
+                  after = None
+              state = ("?" if after is None
+                       else ("QUALIFYING" if after >= target else f"still {target-after:,.0f} short"))
+              print(f"    {placed} orders placed, ours ~{ours_now:,.0f}, ask side now "
+                    f"{after if after is None else format(after, ',.0f')} → {state}")
+              summary.append({"m": slug, "orders": placed, "after": after,
+                              "ours": round(ours_now),
+                              "self_sufficient": ours_now >= want,
+                              "qualifying": bool(after and after >= target)})
+              done_mkts += 1
+
+          print(f"\n{total} orders across {done_mkts} markets"
+                + ("  (DRY RUN)" if DRY else ""))
+          qual = sum(1 for s in summary if s["qualifying"])
+          print(f"{qual} of {len(summary)} ask sides now at Target Size")
+          os.makedirs("data", exist_ok=True)
+          json.dump({"dry_run": DRY, "orders": total, "summary": summary},
+                    open("data/qualify_asks_2028.json", "w"), indent=1)
+          with open("data/qualify_asks_2028.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/qualify_asks_2028.json data/qualify_asks_2028.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Qualify 2028 ask sides [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi
+
+# top-off 2026-08-15: seven sides drifted 1-19 shares under
+# top-off 2026-08-15 02:00: andbes ask 29 under

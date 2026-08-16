@@ -1,0 +1,8 @@
+buying power $327.80 — an ask order carries 327 shares
+slate: 60 markets
+
+[18/60] enwc-uspres-nom-dem-2028-andbes: ask 36,199 of 20,000, OURS 19,971 → adding 29 to stand alone
+    1 orders placed, ours ~20,001, ask side now 36,199 → QUALIFYING
+
+1 orders across 1 markets
+1 of 1 ask sides now at Target Size

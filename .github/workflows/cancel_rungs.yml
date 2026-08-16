@@ -1,0 +1,121 @@
+name: Cancel bid rungs
+
+# ORDER-TOUCHING: cancels OUR OWN orders only. Places nothing. Runs live
+# on push — this is harm-stopping, and cancelling our own resting bids
+# can never cost more than the spread already at risk.
+#
+# 2026-08-15: the bid-rung design was flawed. It joined the book's touch
+# on the assumption the touch is fair; on thin books the touch is bait —
+# a 25c bid on a longshot winner market that our sniper would have
+# labeled overpriced. One rung was dumped into within minutes. All
+# small near-touch slate bids are withdrawn: every BUY order in a slate
+# market priced 5c or higher with size 150 or less. The 20,000-share 1c
+# qualification floors match neither test and are untouched.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/cancel_rungs.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cancel-rungs
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cancel
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+          MIN_PX, MAX_SIZE = 0.05, 150
+
+          def api(method, path, body=None):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  json=body, timeout=30)
+
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          targets = []
+          for o in r.json().get("orders") or []:
+              if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                             "ORDER_STATE_PARTIALLY_FILLED"):
+                  continue
+              s = o.get("marketSlug") or ""
+              if not s.startswith(PREFIXES):
+                  continue
+              if not str(o.get("intent") or "").endswith("BUY_LONG"):
+                  continue
+              px = tr._num((o.get("price") or {}).get("value")) or 0
+              q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+              if px >= MIN_PX and q <= MAX_SIZE:
+                  targets.append((s, str(o.get("id")), px, q))
+
+          print(f"near-touch slate bids to withdraw: {len(targets)}\n")
+          done = failed = 0
+          for s, oid, px, q in targets:
+              ok = False
+              delay = 2.0
+              for attempt in range(5):
+                  try:
+                      rc = api("POST", f"/v1/order/{oid}/cancel", {"marketSlug": s})
+                      if rc.status_code < 300 or rc.status_code == 404:
+                          ok = True; break
+                      if rc.status_code not in (429, 500, 502, 503, 504):
+                          break
+                  except Exception:
+                      pass
+                  time.sleep(delay); delay = min(delay * 2, 20)
+              done += ok; failed += (not ok)
+              print(f"  {s:44s} {q:7,.1f} @ {px*100:4.1f}c -> "
+                    + ("cancelled" if ok else "FAILED"))
+              time.sleep(0.3)
+
+          print(f"\ncancelled {done}, failed {failed}")
+          os.makedirs("data", exist_ok=True)
+          with open("data/cancel_rungs.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/cancel_rungs.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Cancel bid rungs [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi

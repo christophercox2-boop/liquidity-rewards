@@ -1,10 +1,14 @@
 name: Track liquidity rewards
 
+# 2026-08-15: the hourly tracker now runs INSIDE live/monitor.py (zero
+# Actions minutes) and commits the same files with the same message. This
+# workflow is the independent heartbeat: every 4 hours, so a dead monitor
+# still gets its ❌ freshness banner and failure email. The push trigger is
+# gone — it fired a full run on EVERY commit to main, which on a busy day
+# burned more minutes than the hourly cron itself.
 on:
   schedule:
-    - cron: "23 * * * *" # hourly; keep RUN_EVERY_HOURS in track_rewards.py in sync
-  push:
-    branches: [main] # any push starts a run (the tracker's own data commits carry [skip ci], so no loops)
+    - cron: "23 */4 * * *"
   workflow_dispatch: {} # lets you trigger a run manually from the Actions tab
 
 permissions:

@@ -1,0 +1,246 @@
+name: Cull ask chunks
+
+# ORDER-TOUCHING: cancels OUR OWN deep ask chunks. Places nothing.
+# The first push ran forced-dry; the plan checked out (uniform ~16.2k of
+# others' size per side, kept buffers correct) and the owner had already
+# approved the cull, so push now cancels for real.
+#
+# Owner, 2026-08-15: with pools tripled the slate books have filled in —
+# strict self-sufficiency is no longer worth ~6,400 resting orders and the
+# rate-limiter pressure they cause. Cull the deep 99c qualifier chunks on
+# sides where OTHER participants' size now carries qualification, keeping
+# a safety buffer of total size above the target:
+#
+#   keep our deep size >= MARGIN * target − others − our near-touch size
+#
+# MARGIN is 1.25 on defender-armed sides (the keeper re-stacks them if the
+# crowd ever leaves) and 1.6 on unarmed sides (party markets and the five
+# contenders — no keeper backstop there). A side where the crowd is thin
+# keeps everything. Deep chunks score ~nothing (df^ticks at 90+ ticks is
+# zero), so culling never touches earnings — only qualification depth.
+# Smallest chunks are cancelled first: most order-count relief per share.
+#
+# Books lag placements, so "others" is computed conservatively
+# (max(0, book total − ours from open orders)) — lag makes us keep MORE,
+# never less. Near-touch orders and every bid are never touched.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/cull_chunks.yml
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "plan only, cancel nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cull-chunks
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cull
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+          DEEP_PX = 0.985            # at/above this an ask is a deep qualifier
+          MARGIN_ARMED, MARGIN_BARE = 1.25, 1.6
+          MAX_CANCELS = 4500
+
+          def api(method, path, body=None):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  json=body, timeout=30)
+
+          # armed = markets in the checked-in defend seed (live state can only
+          # have MORE armed, so seed membership is the conservative read)
+          armed = set()
+          try:
+              armed = set((json.load(open("live/defend_seed.json")).get("defend") or {}))
+          except Exception:
+              pass
+
+          # our slate asks from open orders: deep chunks vs near-touch
+          deep: dict = {}      # slug -> [(order_id, qty), ...]
+          near: dict = {}      # slug -> qty
+          ours_all: dict = {}  # slug -> qty
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          for o in r.json().get("orders") or []:
+              if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                             "ORDER_STATE_PARTIALLY_FILLED"):
+                  continue
+              s = o.get("marketSlug") or ""
+              if not s.startswith(PREFIXES):
+                  continue
+              it = str(o.get("intent") or "")
+              if not (it.endswith("BUY_SHORT") or it.endswith("SELL_LONG")):
+                  continue
+              px = tr._num((o.get("price") or {}).get("value")) or 0
+              q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+              ours_all[s] = ours_all.get(s, 0.0) + q
+              if px >= DEEP_PX:
+                  deep.setdefault(s, []).append((str(o.get("id")), q))
+              else:
+                  near[s] = near.get(s, 0.0) + q
+
+          pol, _ = tr.fetch_politics_events()
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+
+          progs = {}
+          for i in range(0, len(slate), 25):
+              try:
+                  rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                    params={"symbols": slate[i:i+25], "pageSize": 100}, timeout=30)
+                  for p in rr.json().get("programs") or []:
+                      s = p.get("marketSlug") or ""
+                      tp = tr._pick_period(p.get("timePeriods") or [], s)
+                      if tp is not None and s:
+                          progs[s] = tr._prog_of(tp)
+              except Exception:
+                  pass
+              time.sleep(0.1)
+
+          def cancel(slug, oid):
+              delay = 2.0
+              for attempt in range(5):
+                  try:
+                      r = api("POST", f"/v1/order/{oid}/cancel", {"marketSlug": slug})
+                      if r.status_code < 300:
+                          return True
+                      if r.status_code == 404:
+                          return True   # already gone — the goal state
+                      if r.status_code not in (429, 500, 502, 503, 504):
+                          return False
+                  except Exception:
+                      pass
+                  time.sleep(delay); delay = min(delay * 2, 20)
+              return False
+
+          print(f"slate: {len(slate)} markets" + ("   (DRY RUN)" if DRY else ""))
+          print(f"{'market':42s} {'tgt':>7s} {'others':>8s} {'near':>6s} "
+                f"{'deep':>8s} {'keep':>8s} {'cut':>8s} {'ords'}")
+          cancelled = failed = kept_orders = 0
+          cut_shares = 0.0
+          out = []
+          for slug in slate:
+              target = float((progs.get(slug) or {}).get("target") or 0)
+              chunks = sorted(deep.get(slug) or [], key=lambda x: x[1])  # smallest first
+              if not target or not chunks:
+                  kept_orders += len(chunks)
+                  continue
+              try:
+                  bk = tr._fetch_book(slug)
+              except Exception:
+                  kept_orders += len(chunks)
+                  continue
+              time.sleep(0.15)
+              book_tot = sum(q for _, q in bk.get("asks") or [])
+              others = max(0.0, book_tot - ours_all.get(slug, 0.0))
+              margin = MARGIN_ARMED if slug in armed else MARGIN_BARE
+              deep_tot = sum(q for _, q in chunks)
+              keep_need = max(0.0, margin * target - others - near.get(slug, 0.0))
+              cut = []
+              remaining = deep_tot
+              for oid, q in chunks:
+                  if remaining - q < keep_need or len(cut) >= MAX_CANCELS - cancelled:
+                      break
+                  cut.append((oid, q)); remaining -= q
+              kept_orders += len(chunks) - len(cut)
+              if not cut:
+                  continue
+              print(f"{slug:42s} {target:7,.0f} {others:8,.0f} {near.get(slug, 0):6,.0f} "
+                    f"{deep_tot:8,.0f} {remaining:8,.0f} {sum(q for _, q in cut):8,.0f} "
+                    f"-{len(cut)}")
+              row = {"m": slug, "cut_orders": len(cut),
+                     "cut_shares": round(sum(q for _, q in cut)),
+                     "keep_deep": round(remaining), "others": round(others)}
+              if not DRY:
+                  okc = 0
+                  for oid, q in cut:
+                      if cancel(slug, oid):
+                          okc += 1; cancelled += 1; cut_shares += q
+                      else:
+                          failed += 1
+                      time.sleep(0.35)
+                  row["cancelled"] = okc
+              else:
+                  cancelled += len(cut); cut_shares += sum(q for _, q in cut)
+              out.append(row)
+
+          print(f"\n{'would cancel' if DRY else 'cancelled'} {cancelled} orders "
+                f"({cut_shares:,.0f} deep shares), failed {failed}, "
+                f"deep orders kept {kept_orders}")
+
+          if not DRY and cancelled:
+              print("\nsettling, then verifying every side still qualifies…")
+              time.sleep(15)
+              bad = 0
+              for slug in slate:
+                  target = float((progs.get(slug) or {}).get("target") or 0)
+                  if not target:
+                      continue
+                  try:
+                      tot = sum(q for _, q in (tr._fetch_book(slug).get("asks") or []))
+                  except Exception:
+                      continue
+                  time.sleep(0.15)
+                  if tot < target:
+                      bad += 1
+                      print(f"   BELOW TARGET after cull: {slug} {tot:,.0f} of {target:,.0f}")
+              print("every side still qualifies ✓" if not bad
+                    else f"{bad} sides below target — keeper will re-stack armed ones")
+
+          os.makedirs("data", exist_ok=True)
+          json.dump({"dry_run": DRY, "cancelled": cancelled, "failed": failed,
+                     "cut_shares": round(cut_shares), "sides": out},
+                    open("data/cull_chunks.json", "w"), indent=1)
+          with open("data/cull_chunks.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/cull_chunks.json data/cull_chunks.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Cull ask chunks [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi

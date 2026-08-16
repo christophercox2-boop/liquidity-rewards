@@ -1,0 +1,276 @@
+name: 2028 president books
+
+# READ-ONLY. GET only. Places nothing.
+#
+# The 2028 presidential slate: party nominee markets and general-election
+# winner markets. NOT the candidacy-announcement ladder (cranc-uspres28-*),
+# which is a different question and is excluded by request.
+#
+# For every market in the slate this reports the three things needed to
+# decide an entry:
+#   1. is there a reward program at all (no program = entering earns $0)
+#   2. what the book looks like, and what it costs to bring each side up to
+#      Target Size — the qualify action, floor bid / ceiling ask
+#   3. what it costs to actually SCORE — an order near the touch, sized for
+#      a real share of the side, with the $/day that implies
+#
+# Ask sizing follows the exchange's real behaviour: one share per dollar of
+# buying power per order, so a wide ask gap is several orders. A bid goes in
+# one.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/pres2028.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pres2028
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Books and entry costs
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, math, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          FAMS = [("Republican nominee 2028", "enwc-uspres-nom-rep-2028-"),
+                  ("Democratic nominee 2028", "enwc-uspres-nom-dem-2028-"),
+                  ("President winner 2028",   "ewc-usp-2028-11-07-"),
+                  ("Winning party 2028",      "ewc-usp-party-2028-11-07-")]
+
+          # Enumerate from the exchange, not from a typed list: the politics
+          # tag is authoritative about which markets exist and are open.
+          try:
+              pol_slugs, event_sizes = tr.fetch_politics_events()
+          except Exception as e:
+              pol_slugs, event_sizes = [], {}
+              print(f"(politics tag lookup failed: {type(e).__name__}: {e})")
+          slugs = sorted(s for s in pol_slugs if any(s.startswith(p) for _, p in FAMS))
+          print(f"markets found in the 2028 slate: {len(slugs)}")
+
+          # buying power — sets how many shares one ask order can carry
+          bp = None
+          try:
+              path = "/v1/account/balances"
+              r = requests.get(tr.TRADE_API + path,
+                               headers=tr.auth_headers(kid, sec, "GET", path), timeout=20)
+              if r.status_code < 400:
+                  for b in r.json().get("balances") or []:
+                      if b.get("buyingPower") is not None:
+                          bp = float(b["buyingPower"])
+          except Exception as e:
+              print(f"(buying power unavailable: {type(e).__name__})")
+          print(f"buying power: {'$%.2f' % bp if bp is not None else 'unknown'}")
+
+          # programs for exactly these slugs
+          progs = {}
+          for i in range(0, len(slugs), 25):
+              chunk = slugs[i:i + 25]
+              try:
+                  rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                    params={"symbols": chunk, "pageSize": 100}, timeout=30)
+                  if rr.status_code >= 400:
+                      continue
+                  for p in rr.json().get("programs") or []:
+                      s = p.get("marketSlug") or ""
+                      tp = tr._pick_period(p.get("timePeriods") or [], s)
+                      if tp is None or not s:
+                          continue
+                      st = str(tp.get("status") or "").lower()
+                      if st and st not in ("active", "live", "status_live"):
+                          continue
+                      progs[s] = tr._prog_of(tp)
+              except Exception:
+                  pass
+              time.sleep(0.1)
+          print(f"of those, carrying an ACTIVE reward program: {len(progs)}")
+
+          # orders we already hold
+          held = {}
+          try:
+              path = "/v1/orders/open"
+              r = requests.get(tr.TRADE_API + path,
+                               headers=tr.auth_headers(kid, sec, "GET", path), timeout=30)
+              if r.status_code < 400:
+                  for o in r.json().get("orders") or []:
+                      if str(o.get("state")) != "ORDER_STATE_NEW":
+                          continue
+                      s = o.get("marketSlug") or ""
+                      if s in slugs:
+                          held.setdefault(s, []).append(o)
+          except Exception:
+              pass
+          print(f"markets in this slate we already have orders in: {len(held)}")
+
+          if not progs:
+              print("\n*** NO market in the 2028 slate carries an active reward program. ***")
+              print("Resting orders here would earn ZERO liquidity rewards. The books")
+              print("below are shown anyway so the position is visible, but nothing in")
+              print("this slate pays until a program appears.")
+
+          def score_of(levels, best, df, tick):
+              return sum(q * df ** round(abs(best - px) / tick) for px, q in levels)
+
+          rows = []
+          for s in slugs:
+              try:
+                  bk = tr._fetch_book(s)
+              except Exception as e:
+                  rows.append({"m": s, "err": f"{type(e).__name__}"}); continue
+              time.sleep(0.25)
+              tick = bk.get("tick") or 0.01
+              bids = bk.get("bids") or []
+              asks = bk.get("asks") or []
+              pr = progs.get(s) or {}
+              target = float(pr.get("target") or 0)
+              df = float(pr.get("df") or 0)
+              pool = float(pr.get("pool") or 0)
+              n = event_sizes.get(s, 1)
+              row = {"m": s, "tick": tick, "pool": pool, "target": target, "df": df,
+                     "event_n": n, "held": len(held.get(s, [])),
+                     "bb": bids[0][0] if bids else None,
+                     "ba": asks[0][0] if asks else None,
+                     "bid_total": sum(q for _, q in bids),
+                     "ask_total": sum(q for _, q in asks),
+                     "bids": bids[:5], "asks": asks[:5]}
+              for side, lv in (("BUY", bids), ("SELL", asks)):
+                  tot = row["bid_total"] if side == "BUY" else row["ask_total"]
+                  gap = max(0.0, target - tot) if target else 0.0
+                  qpx = tick if side == "BUY" else 1 - tick
+                  # cost while resting is ~1c a share on either side
+                  cost = gap * tick
+                  orders = 1
+                  if side == "SELL" and gap and bp:
+                      orders = max(1, math.ceil(gap / max(1, int(bp))))
+                  row[f"gap_{side}"] = gap
+                  row[f"qcost_{side}"] = cost
+                  row[f"qorders_{side}"] = orders
+                  # what it takes to SCORE: join the touch, own a real share
+                  best = lv[0][0] if lv else None
+                  row[f"score_{side}"] = None
+                  if best is not None and df and target:
+                      win, cum = [], 0.0
+                      for px, q in lv:
+                          win.append((px, q)); cum += q
+                          if cum >= target:
+                              break
+                      denom = score_of(win, best, df, tick)
+                      per_side = pool / max(n, 1) / 2
+                      need25 = denom / 3 if denom > 0 else 1
+                      unit = best if side == "BUY" else 1 - best
+                      row[f"score_{side}"] = {
+                          "px": best, "size": max(1, round(need25)),
+                          "cost": round(max(1, need25) * unit, 2),
+                          "est": round(per_side * 0.25, 2),
+                          "qual_at_touch": abs(qpx - best) < tick / 2,
+                          "denom": round(denom, 1), "per_side": round(per_side, 2)}
+              rows.append(row)
+
+          c = lambda v: "  -  " if v is None else f"{v*100:5.1f}"
+          for title, pre in FAMS:
+              fam = [r for r in rows if r["m"].startswith(pre)]
+              if not fam:
+                  continue
+              print(f"\n\n=== {title} — {len(fam)} markets ===")
+              withp = [r for r in fam if r.get("pool")]
+              print(f"    with a reward program: {len(withp)} of {len(fam)}"
+                    + (f"   pool ${withp[0]['pool']:.0f} / target {withp[0]['target']:.0f}"
+                       f" / df {withp[0]['df']} / pool split {withp[0]['event_n']} ways" if withp else ""))
+              print(f"\n{'market':40s} {'bid':>5s} {'ask':>5s} {'bidQ':>8s} {'askQ':>8s} "
+                    f"{'tgt':>6s} {'gapBID':>7s} {'gapASK':>7s} {'in?':>4s}")
+              for r in sorted(fam, key=lambda x: x["m"]):
+                  if r.get("err"):
+                      print(f"{r['m']:40s} book error {r['err']}"); continue
+                  print(f"{r['m']:40s} {c(r['bb'])} {c(r['ba'])} {r['bid_total']:8.0f} "
+                        f"{r['ask_total']:8.0f} {r['target']:6.0f} "
+                        f"{r.get('gap_BUY', 0):7.0f} {r.get('gap_SELL', 0):7.0f} "
+                        f"{r['held'] or '-':>4}")
+
+          print("\n\n=== WHAT ENTRY WOULD COST ===")
+          print("qualify = bring a side to Target Size with the cheapest orders")
+          print("          (floor bid 1c in ONE order; ceiling ask 99c, one share")
+          print("           per dollar of buying power, so several orders)")
+          print("score   = join the touch with enough size for ~25% of the side\n")
+          tq = ts = 0.0
+          for r in sorted(rows, key=lambda x: x["m"]):
+              if r.get("err") or not r.get("pool"):
+                  continue
+              print(f"{r['m']}")
+              for side in ("BUY", "SELL"):
+                  gap = r.get(f"gap_{side}", 0)
+                  sc = r.get(f"score_{side}")
+                  nm = "bid" if side == "BUY" else "ask"
+                  if gap:
+                      tq += r[f"qcost_{side}"]
+                      print(f"   qualify {nm}: {gap:,.0f} short → ${r[f'qcost_{side}']:.2f}"
+                            f" in {r[f'qorders_{side}']} order(s)")
+                  else:
+                      print(f"   qualify {nm}: already at Target Size ✓")
+                  if sc:
+                      note = " (same price as the qualifier — one order does both)" if sc["qual_at_touch"] else ""
+                      ts += sc["cost"]
+                      print(f"   score   {nm}: {sc['size']:,} @ {sc['px']*100:.0f}c ≈ ${sc['cost']:.2f}"
+                            f" → ~${sc['est']:.2f}/day{note}")
+          if tq or ts:
+              print(f"\nslate totals — qualify every short side: ${tq:,.2f}")
+              print(f"               score both sides everywhere: ${ts:,.2f}")
+
+          os.makedirs("data", exist_ok=True)
+          json.dump({"buying_power": bp, "rows": rows, "programs": progs},
+                    open("data/pres2028.json", "w"), indent=1, default=str)
+          with open("data/pres2028.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/pres2028.json data/pres2028.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "2028 president books [skip ci]"
+            # Several workflows push to this repo at once. A lost race used to
+            # fail the step and throw the run's output away — retry instead.
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi
+
+# verify 2026-08-14: confirm the slate entry actually rested at Target Size
+
+# verify 2026-08-14b: did the ranpau top-up and touch join rest
+
+# check 2026-08-14 06:30 ET: are any slate sides no longer qualifying
+
+# check 2026-08-14 after the corrected ask run
+
+# probe 2026-08-15: bid-side dilution — need real touches

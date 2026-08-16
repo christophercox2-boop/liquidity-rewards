@@ -321,12 +321,19 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         # diagnostic only, never applied — see the note above _score_order
         order["depth_ratio"] = round(side_total / target, 1) if target else None
         verdict += f" ≈ {_usd(order['est_day'])}/day"
-        n = prog.get("event_n") or 1
+        n = max(prog.get("pool_n") or prog.get("event_n") or 1, 1)
         order["event_n"] = n
+        # both scope hypotheses recorded until a clean payout day picks one:
+        # the exchange's program sheet says 'Daily (per event)' while Aug-14
+        # actuals fit program-wide almost exactly. scope_x converts this
+        # order's (conservative, program-wide) estimate back to per-event.
+        if prog.get("pool_n"):
+            order["scope_x"] = round(prog["pool_n"] / max(prog.get("event_n") or 1, 1), 2)
         order["siblings"] = prog.get("siblings") or []
         days = _pool_days(prog, slug)
         if n > 1:
-            verdict += f" (pool ÷ {n} markets)"
+            verdict += (f" (program pool ÷ {n} markets)"
+                        if prog.get("pool_n") else f" (pool ÷ {n} markets)")
         if days > 1.001:
             verdict += f" (pre-tournament pool over {days:g}d)"
         side_pool = _daily_pool(prog, slug) / 2
@@ -486,7 +493,11 @@ def _daily_pool(prog: dict, slug: str | None = None) -> float:
     if (slug and slug.startswith(PRETOURNAMENT_PREFIXES)
             and "round" not in str(prog.get("pid") or "")):
         return GOLF_PRETOURNAMENT_DAILY
-    return (prog.get("pool") or 0.0) / _pool_days(prog, slug) / max(prog.get("event_n") or 1, 1)
+    # pool_n: a dedicated (tierless) program's pool spans every market
+    # sharing its programId, not just this market's event — see the scope
+    # note where pool_n is computed
+    n = max(prog.get("pool_n") or prog.get("event_n") or 1, 1)
+    return (prog.get("pool") or 0.0) / _pool_days(prog, slug) / n
 
 
 EVENT_DEBUG: dict[str, str] = {}  # per-slug event lookup outcomes, for live_raw.json
@@ -886,13 +897,30 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     failure here shows a warning in STATUS.md but never fails the run.
     """
     path = "/v1/orders/open"
-    resp = requests.get(
-        TRADE_API + path,
-        headers=auth_headers(key_id, secret_key, "GET", path),
-        timeout=30,
-    )
-    if resp.status_code >= 400:
-        raise RuntimeError(f"{path} -> {_http_err(resp)}")
+    # With ~6,400 resting orders this endpoint draws the rate limiter's
+    # attention (2026-08-15: frequent 429s). One throttled response used to
+    # abort the whole poll cycle — no sample, and the defend/keeper/snipe
+    # loops all sat the cycle out. Retry in place instead: a 429 usually
+    # clears in seconds, and the Retry-After header says exactly when.
+    resp = None
+    delay = 2.0
+    for attempt in range(4):
+        resp = requests.get(
+            TRADE_API + path,
+            headers=auth_headers(key_id, secret_key, "GET", path),
+            timeout=30,
+        )
+        if resp.status_code < 400:
+            break
+        if resp.status_code not in (429, 500, 502, 503, 504) or attempt == 3:
+            raise RuntimeError(f"{path} -> {_http_err(resp)}")
+        ra = resp.headers.get("Retry-After")
+        try:
+            wait = min(float(ra), 30.0) if ra else delay
+        except ValueError:
+            wait = delay
+        time.sleep(wait)
+        delay = min(delay * 2, 15.0)
     payload = resp.json()
     orders: list[dict] = []
     for o in payload.get("orders") or []:
@@ -921,6 +949,20 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                 "price": _num(o.get("price")),
                 "size": size,
                 "intent": str(o.get("intent") or ""),
+                # When the exchange says this order was created, and whether it
+                # came from a human's tap or from an API client.
+                #
+                # We used to drop both. That cost a whole evening on 2026-08-15:
+                # the owner saw ~$45 orders on the race books, asked where they
+                # came from, and nothing in the system could tell a two-day-old
+                # rung from a two-minute-old one. The answer was in the feed the
+                # entire time — createTime put every one of them inside two
+                # workflow runs from the previous afternoon. Note that a reprice
+                # RESETS this: do_reprice places a new order and cancels the old,
+                # so an aged rung that the defender moved reads as brand new.
+                "created": str(o.get("createTime") or ""),
+                "manual": "MANUAL" if str(o.get("manualOrderIndicator") or "")
+                          .endswith("MANUAL") else "auto",
             }
         )
 
@@ -1103,6 +1145,27 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     for slug in progs:
         progs[slug]["siblings"] = RACE_MEMBERS.get(slug, [])[:40]
 
+    # Pool SCOPE (found 2026-08-16, the Aug-14 payout reconciliation):
+    # tier programs (politics_low/mid/high...) fund each EVENT its own pool —
+    # validated at ~100% by the races for a week. But a DEDICATED program
+    # (no tier in its id, e.g. presidential_election_2028) attaches ONE pool
+    # to every market it spans: 60 slate markets each reported the same
+    # $1,000, and dividing by each market's own event size counted that
+    # $1,000 roughly once per event — ~$4,000/day imagined from $1,000 real,
+    # 30x on the two-market party event, ~3.5x on the nominees. Actuals fit
+    # $1,000 ÷ 120 sides almost exactly. So: a tierless program whose id is
+    # shared beyond the market's own event prorates across ALL markets
+    # sharing it.
+    pid_counts: dict[str, int] = {}
+    for pr_ in progs.values():
+        if pr_.get("pid") and not pr_.get("tier"):
+            pid_counts[pr_["pid"]] = pid_counts.get(pr_["pid"], 0) + 1
+    for pr_ in progs.values():
+        if pr_.get("pid") and not pr_.get("tier"):
+            n_share = pid_counts.get(pr_["pid"], 1)
+            if n_share > (pr_.get("event_n") or 1):
+                pr_["pool_n"] = n_share
+
     DATA.mkdir(exist_ok=True)
     (DATA / "live_raw.json").write_text(  # schema + failure reference for debugging
         json.dumps(
@@ -1215,6 +1278,41 @@ def append_estimates(live_orders: list[dict]) -> None:
         writer.writeheader()
         writer.writerows(rows)
     _log_run_trigger(ts)
+    # Per-family rate history for payout calibration. estimates.csv rotates
+    # too fast to reconstruct a day after the fact (30k rows vanished within
+    # hours on 2026-08-15, which is how the slate's inflated pools went
+    # unnoticed until the payout landed at ~25 cents on the tracked dollar).
+    # ~9 tiny rows per run; integrate over a day and divide by what
+    # rewards.csv says the day paid to get each family's true factor.
+    def _fam(m: str) -> str:
+        if m.startswith("ewc-usp-party"): return "party-2028"
+        if m.startswith("ewc-usp-2028"): return "winner-2028"
+        if m.startswith("enwc-uspres-nom"): return "nominee-2028"
+        if "usse" in m: return "senate"
+        if "usgub" in m: return "governor"
+        return "other"
+    fam_tot: dict[str, float] = {}
+    fam_pe: dict[str, float] = {}     # per-event scope (the docs' reading)
+    for o in live_orders:
+        if o.get("est_day"):
+            f = _fam(o["market"])
+            v = float(o["est_day"])
+            fam_tot[f] = fam_tot.get(f, 0.0) + v
+            fam_pe[f] = fam_pe.get(f, 0.0) + v * float(o.get("scope_x") or 1.0)
+    FAMDAY = DATA / "family_day.csv"
+    frows = []
+    if FAMDAY.exists():
+        with FAMDAY.open(newline="") as f:
+            frows = list(csv.DictReader(f))
+    for fam_name, v in sorted(fam_tot.items()):
+        frows.append({"checked_at_utc": ts, "family": fam_name,
+                      "est_day": f"{v:.2f}",
+                      "est_day_perevent": f"{fam_pe.get(fam_name, v):.2f}"})
+    frows = frows[-5000:]
+    with FAMDAY.open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=["checked_at_utc", "family",
+                                          "est_day", "est_day_perevent"])
+        w.writeheader(); w.writerows(frows)
 
 
 # This workflow runs on `push: branches: [main]` as well as hourly, so placing
@@ -1392,6 +1490,21 @@ def write_status(
             f"**If the timestamp above is more than ~{RUN_EVERY_HOURS + 1} hours old, something is broken** — "
             f"check the [Actions tab]({WORKFLOW_URL})."
         )
+    lines.append("")
+
+    # 2026-08-16: the presidential_election_2028 program's pool cadence is
+    # NOT validated. Aug-14 actuals paid ~25% of tracked for nominees, ~10%
+    # for winners, ~1-5% for the party pair, while every pre-existing family
+    # still reconciles ~100%. Until a full clean day (Aug 15) pins the true
+    # divisor, the slate's estimates below are flagged, not trusted.
+    lines.append("> ⚠️ **2028-slate pool scope is UNRESOLVED — estimates shown "
+                 "CONSERVATIVELY (program-wide, ~$8.33/side/day).** The "
+                 "exchange's program sheet says 'Daily (per event)' ($1,000 per "
+                 "event, ~4x more), but Aug-14 actuals fit program-wide almost "
+                 "exactly. If the docs are right, the gap means bait-anchored "
+                 "touches are collecting pools this tracker credits to us. Both "
+                 "readings are logged (family_day.csv); the Aug-15 payout — "
+                 "predictions 4x apart — decides.")
     lines.append("")
 
     # ---- the answer up top; all supporting detail lives below the divider ----

@@ -1,0 +1,11 @@
+{
+ "dry_run": false,
+ "placed": 33,
+ "failed": 0,
+ "spent": 897.32,
+ "counts": {
+  "qualify": 10,
+  "touch": 0,
+  "join": 23
+ }
+}

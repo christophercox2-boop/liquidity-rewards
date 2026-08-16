@@ -119,5 +119,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/probe_hf.jsonl
           git commit -m "High-frequency sampling probe [skip ci]"
-          git pull --rebase origin main
-          git push
+          # Several workflows push to this repo at once. A lost race used to
+          # fail the step and throw the run's output away — retry instead.
+          pushed=""
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push; then pushed=yes; break; fi
+            echo "push race lost (attempt $attempt) — retrying"
+            sleep $((attempt * 3))
+          done
+          if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi

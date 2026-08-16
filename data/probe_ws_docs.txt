@@ -1,268 +1,517 @@
 
 
-===== https://docs.polymarket.us/api-reference/sdks/python/websocket.md =====
+===== https://docs.polymarket.us/concepts/market-data.md =====
 > ## Documentation Index
 > Fetch the complete documentation index at: https://docs.polymarket.us/llms.txt
 > Use this file to discover all available pages before exploring further.
 
-# WebSocket
+# Prices & Market Data
 
-> Real-time streaming data
+> How prices work and how the order book enables trading on Polymarket US.
 
-<Note>WebSocket is async-only. Use `asyncio.run()` or `AsyncPolymarketUS`.</Note>
+## Prices are probabilities
 
-The WebSocket resource provides real-time streaming data for market information and private user data.
+Every contract on Polymarket US is priced between \$0 and \$1. The price represents the market's collective belief about how likely an outcome is.
 
-## Methods
+| Price  | What it means                                  |
+| ------ | ---------------------------------------------- |
+| \$0.25 | The market thinks there's roughly a 25% chance |
+| \$0.50 | Coin flip — the market is undecided            |
+| \$0.75 | The market thinks it's likely (75% chance)     |
 
-| Method      | Endpoint                                | Description                        |
-| ----------- | --------------------------------------- | ---------------------------------- |
-| `private()` | `wss://api.polymarket.us/v1/ws/private` | Orders, positions, balance updates |
-| `markets()` | `wss://api.polymarket.us/v1/ws/markets` | Market data and trades             |
+If you buy a YES contract at \$0.55 and the outcome happens, the contract settles at \$1.00 — you profit \$0.45 per contract. If it doesn't happen, it settles at \$0.00 and you lose your \$0.55.
 
-***
+## The order book
 
-## private
+Polymarket US runs a **central limit order book**. Prices aren't set by Polymarket — they come from traders placing buy and sell orders against each other.
 
-Connect to the private WebSocket for real-time order, position, and balance updates.
+The order book has two sides:
 
-```python theme={null}
-import asyncio
-from polymarket_us import PolymarketUS
+| Side              | What it means                                          |
+| ----------------- | ------------------------------------------------------ |
+| **Bids**          | Buy orders — the prices traders are willing to pay     |
+| **Asks (offers)** | Sell orders — the prices traders are willing to accept |
 
-async def main():
-    client = PolymarketUS(
-        key_id="your-key-id",
-        secret_key="your-secret-key",
-    )
+The **spread** is the gap between the best bid and the best ask. A tight spread means the market is liquid. A wide spread means fewer people are trading.
 
-    ws = client.ws.private()
+The **BBO (best bid and offer)** is the tightest price on each side — the highest bid and the lowest ask. This is the price you'd trade at if you placed a market order right now.
 
-    # Register event handlers
-    ws.on("order_snapshot", lambda d: print(f"Orders: {d}"))
-    ws.on("order_update", lambda d: print(f"Order update: {d}"))
-    ws.on("position_snapshot", lambda d: print(f"Positions: {d}"))
-    ws.on("position_update", lambda d: print(f"Position update: {d}"))
-    ws.on("account_balance_snapshot", lambda d: print(f"Balance: {d}"))
-    ws.on("error", lambda e: print(f"Error: {e}"))
+## How trades happen
 
-    await ws.connect()
-    
-    # Subscribe to order updates
-    await ws.subscribe("my-orders", "SUBSCRIPTION_TYPE_ORDER")
-    
-    # Subscribe to position updates
-    await ws.subscribe("my-positions", "SUBSCRIPTION_TYPE_POSITION")
-    
-    # Subscribe to balance updates
-    await ws.subscribe("my-balance", "SUBSCRIPTION_TYPE_ACCOUNT_BALANCE")
+When you place a **market order**, it fills immediately at the best available price on the other side of the book. You're a **taker** — you're taking liquidity.
 
-    await asyncio.sleep(3600)
-    await ws.close()
+When you place a **limit order** at a specific price and it doesn't fill immediately, it sits on the book waiting. You're a **maker** — you're providing liquidity for others to trade against.
 
-asyncio.run(main())
+If your limit order's price crosses the best available price on the other side, it fills immediately (like a market order). Otherwise, it rests on the book.
+
+## Settlement
+
+When a market resolves, every contract settles at either \$1.00 (YES won) or \$0.00 (NO won). The exchange handles this automatically — winning contracts are credited to your balance, losing contracts go to zero.
+
+## Market states
+
+A market goes through different states during its lifecycle:
+
+| State         | What it means                                       |
+| ------------- | --------------------------------------------------- |
+| **Open**      | The market is accepting orders and actively trading |
+| **Pre-open**  | The market exists but trading hasn't started yet    |
+| **Suspended** | Trading is temporarily paused                       |
+| **Halted**    | Trading has been stopped                            |
+| **Expired**   | The market has ended and settled                    |
+
+
+===== https://docs.polymarket.us/learn/get-started/browse.md =====
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.polymarket.us/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Browse Markets
+
+> Learn how to browse active market categories on Polymarket
+
+Polymarket US currently offers professional football, professional basketball, professional hockey, and college football markets. Additional categories will open as they complete testing and regulatory review.
+
+## How to Browse
+
+Find active markets on your home screen. Scroll across the top section to view the available categories.
+
+Each market shows:
+
+* The **market question**
+* Current **Yes and No prices**
+* The **resolution date**
+
+
+===== https://docs.polymarket.us/api-reference/websocket/overview.md =====
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.polymarket.us/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# WebSocket API Overview
+
+> Real-time streaming data via WebSocket
+
+# WebSocket API
+
+The WebSocket API provides real-time streaming data for market information and private user data.
+
+## Endpoints
+
+| Endpoint         | Description                                | Authentication |
+| ---------------- | ------------------------------------------ | -------------- |
+| `/v1/ws/private` | Orders, positions, account balance updates | API Key        |
+| `/v1/ws/markets` | Market data, order book, trades            | API Key        |
+
+## Connection
+
+Connect to the WebSocket endpoints with your API key credentials:
+
+```
+wss://api.polymarket.us/v1/ws/private
+wss://api.polymarket.us/v1/ws/markets
 ```
 
-### Private Subscription Types
+## Authentication
 
-| Type                                | Description                 |
-| ----------------------------------- | --------------------------- |
-| `SUBSCRIPTION_TYPE_ORDER`           | Order updates and snapshots |
-| `SUBSCRIPTION_TYPE_POSITION`        | Position changes            |
-| `SUBSCRIPTION_TYPE_ACCOUNT_BALANCE` | Balance updates             |
+WebSocket connections use the same API key authentication as the REST API.
 
-### Private Events
+Include these headers in the WebSocket handshake:
 
-| Event                      | Description                       |
-| -------------------------- | --------------------------------- |
-| `order_snapshot`           | Initial snapshot of all orders    |
-| `order_update`             | Order state change                |
-| `position_snapshot`        | Initial snapshot of all positions |
-| `position_update`          | Position change                   |
-| `account_balance_snapshot` | Initial balance snapshot          |
-| `account_balance_update`   | Balance change                    |
-
-***
-
-## markets
-
-Connect to the markets WebSocket for real-time market data and trades.
-
-```python theme={null}
-import asyncio
-from polymarket_us import PolymarketUS
-
-async def main():
-    client = PolymarketUS(
-        key_id="your-key-id",
-        secret_key="your-secret-key",
-    )
-
-    ws = client.ws.markets()
-
-    # Register event handlers
-    ws.on("market_data", lambda d: print(f"Book: {d}"))
-    ws.on("market_data_lite", lambda d: print(f"BBO: {d}"))
-    ws.on("trade", lambda d: print(f"Trade: {d}"))
-
-    await ws.connect()
-    
-    # Subscribe to full order book updates
-    await ws.subscribe("book", "SUBSCRIPTION_TYPE_MARKET_DATA", ["btc-100k-2025"])
-    
-    # Subscribe to lightweight price updates
-    await ws.subscribe("prices", "SUBSCRIPTION_TYPE_MARKET_DATA_LITE", ["btc-100k-2025"])
-    
-    # Subscribe to trade notifications
-    await ws.subscribe("trades", "SUBSCRIPTION_TYPE_TRADE", ["btc-100k-2025"])
-
-    await asyncio.sleep(3600)
-    await ws.close()
-
-asyncio.run(main())
+```
+X-PM-Access-Key: <your-api-key-id>
+X-PM-Timestamp: <timestamp-in-milliseconds>
+X-PM-Signature: <base64-encoded-signature>
 ```
 
-### Market Subscription Types
+The signature is constructed from: `timestamp + "GET" + path` where path is `/v1/ws/private` or `/v1/ws/markets`.
 
-| Type                                 | Description                   |
-| ------------------------------------ | ----------------------------- |
-| `SUBSCRIPTION_TYPE_MARKET_DATA`      | Full order book and stats     |
-| `SUBSCRIPTION_TYPE_MARKET_DATA_LITE` | Lightweight price data (BBO)  |
-| `SUBSCRIPTION_TYPE_TRADE`            | Real-time trade notifications |
+See [Authentication](/api/authentication) for details on request signing.
 
-### Market Events
+## Message Format
 
-| Event              | Description            |
-| ------------------ | ---------------------- |
-| `market_data`      | Full order book update |
-| `market_data_lite` | BBO and price update   |
-| `trade`            | Trade execution        |
+All WebSocket messages are JSON formatted with snake\_case field names.
 
-***
+### Request Format
+
+```json theme={null}
+{
+  "subscribe": {
+    "request_id": "unique-request-id",
+    "subscription_type": 1,
+    "market_slugs": ["market-slug-1", "market-slug-2"]
+  }
+}
+```
+
+### Subscription Types
+
+**Private WebSocket (`/v1/ws/private`):**
+
+| Value | Type             | Description      |
+| ----- | ---------------- | ---------------- |
+| 1     | ORDER            | Order updates    |
+| 3     | POSITION         | Position changes |
+| 4     | ACCOUNT\_BALANCE | Balance updates  |
+
+**Markets WebSocket (`/v1/ws/markets`):**
+
+| Value | Type               | Description                      |
+| ----- | ------------------ | -------------------------------- |
+| 1     | MARKET\_DATA       | Full order book and market stats |
+| 2     | MARKET\_DATA\_LITE | Lightweight price data           |
+| 3     | TRADE              | Real-time trade notifications    |
+
+### Response Format
+
+```json theme={null}
+{
+  "request_id": "unique-request-id",
+  "subscription_type": 1,
+  "order_subscription_snapshot": {
+    "orders": [...],
+    "eof": true
+  }
+}
+```
+
+## Heartbeats
+
+The server sends periodic heartbeat messages to keep the connection alive:
+
+```json theme={null}
+{
+  "heartbeat": {}
+}
+```
+
+Clients should respond to heartbeats or implement their own keep-alive mechanism.
+
+## Error Handling
+
+If a subscription request fails, the response will include an error field:
+
+```json theme={null}
+{
+  "request_id": "unique-request-id",
+  "error": "Error description"
+}
+```
+
+## Unsubscribing
+
+To unsubscribe from a stream:
+
+```json theme={null}
+{
+  "unsubscribe": {
+    "request_id": "original-request-id"
+  }
+}
+```
 
 ## Best Practices
 
 1. **Use unique request IDs** - Track subscriptions with unique identifiers
 2. **Handle reconnection** - Implement automatic reconnection with exponential backoff
 3. **Process messages in order** - Messages are delivered in sequence
-4. **Limit subscriptions** - Only subscribe to markets you need
+4. **Monitor heartbeats** - Reconnect if heartbeats stop
+5. **Limit subscriptions** - Only subscribe to markets you need
 
 
-===== https://docs.polymarket.us/api-reference/sdks/typescript/websocket.md =====
+===== https://docs.polymarket.us/api-reference/websocket/private.md =====
 > ## Documentation Index
 > Fetch the complete documentation index at: https://docs.polymarket.us/llms.txt
 > Use this file to discover all available pages before exploring further.
 
-# WebSocket
+# Private WebSocket
 
-> Real-time streaming data
+> Real-time orders, positions, balances, and RFQ updates
 
-The WebSocket resource provides real-time streaming data for market information and private user data.
+# Private WebSocket
 
-## Methods
+The Private WebSocket endpoint provides real-time updates for user-specific data including orders, positions, account balances, and RFQs.
 
-| Method      | Endpoint                                | Description                        |
-| ----------- | --------------------------------------- | ---------------------------------- |
-| `private()` | `wss://api.polymarket.us/v1/ws/private` | Orders, positions, balance updates |
-| `markets()` | `wss://api.polymarket.us/v1/ws/markets` | Market data and trades             |
+<Warning>
+  **Authentication Required**
 
-***
+  This WebSocket endpoint requires API key authentication in the connection handshake. See the [Authentication guide](/api/authentication) for details.
+</Warning>
 
-## private
+## Endpoint
 
-Connect to the private WebSocket for real-time order, position, and balance updates.
-
-```typescript theme={null}
-import { PolymarketUS } from 'polymarket-us';
-
-const client = new PolymarketUS({
-  keyId: process.env.POLYMARKET_KEY_ID,
-  secretKey: process.env.POLYMARKET_SECRET_KEY,
-});
-
-const ws = client.ws.private();
-
-// Register event handlers
-ws.on('orderSnapshot', (data) => console.log('Orders:', data));
-ws.on('orderUpdate', (data) => console.log('Order update:', data));
-ws.on('positionSnapshot', (data) => console.log('Positions:', data));
-ws.on('positionUpdate', (data) => console.log('Position update:', data));
-ws.on('accountBalanceSnapshot', (data) => console.log('Balance:', data));
-ws.on('error', (e) => console.error('Error:', e));
-
-await ws.connect();
-
-// Subscribe to updates
-ws.subscribeOrders('my-orders');
-ws.subscribePositions('my-positions');
-ws.subscribeAccountBalance('my-balance');
+```
+wss://api.polymarket.us/v1/ws/private
 ```
 
-### Private Subscription Types
+## Subscription Types
 
-| Type                                | Description                 |
-| ----------------------------------- | --------------------------- |
-| `SUBSCRIPTION_TYPE_ORDER`           | Order updates and snapshots |
-| `SUBSCRIPTION_TYPE_POSITION`        | Position changes            |
-| `SUBSCRIPTION_TYPE_ACCOUNT_BALANCE` | Balance updates             |
+| Value                               | Description                                             |
+| ----------------------------------- | ------------------------------------------------------- |
+| `SUBSCRIPTION_TYPE_ORDER`           | Order updates (new, filled, canceled)                   |
+| `SUBSCRIPTION_TYPE_ORDER_SNAPSHOT`  | Initial snapshot of open orders                         |
+| `SUBSCRIPTION_TYPE_POSITION`        | Position changes                                        |
+| `SUBSCRIPTION_TYPE_ACCOUNT_BALANCE` | Account balance changes                                 |
+| `SUBSCRIPTION_TYPE_RFQ`             | Combo RFQ and quote lifecycle events (allowlisted beta) |
 
-### Private Events
+## Order Subscriptions
 
-| Event                    | Description                       |
-| ------------------------ | --------------------------------- |
-| `orderSnapshot`          | Initial snapshot of all orders    |
-| `orderUpdate`            | Order state change                |
-| `positionSnapshot`       | Initial snapshot of all positions |
-| `positionUpdate`         | Position change                   |
-| `accountBalanceSnapshot` | Initial balance snapshot          |
-| `accountBalanceUpdate`   | Balance change                    |
+### Subscribe to Orders
 
-***
-
-## markets
-
-Connect to the markets WebSocket for real-time market data and trades.
-
-```typescript theme={null}
-const ws = client.ws.markets();
-
-// Register event handlers
-ws.on('marketData', (data) => console.log('Book:', data));
-ws.on('marketDataLite', (data) => console.log('BBO:', data));
-ws.on('trade', (data) => console.log('Trade:', data));
-
-await ws.connect();
-
-// Subscribe to market data
-ws.subscribeMarketData('book', ['btc-100k-2025']);
-ws.subscribeMarketDataLite('prices', ['btc-100k-2025']);
-ws.subscribeTrades('trades', ['btc-100k-2025']);
+```json theme={null}
+{
+  "subscribe": {
+    "requestId": "order-sub-1",
+    "subscriptionType": "SUBSCRIPTION_TYPE_ORDER",
+    "marketSlugs": ["market-slug-1"]
+  }
+}
 ```
 
-### Market Subscription Types
+Leave `marketSlugs` empty to subscribe to all markets.
 
-| Type                                 | Description                   |
-| ------------------------------------ | ----------------------------- |
-| `SUBSCRIPTION_TYPE_MARKET_DATA`      | Full order book and stats     |
-| `SUBSCRIPTION_TYPE_MARKET_DATA_LITE` | Lightweight price data (BBO)  |
-| `SUBSCRIPTION_TYPE_TRADE`            | Real-time trade notifications |
+### Order Snapshot Response
 
-### Market Events
+Initial snapshot of open orders:
 
-| Event            | Description            |
-| ---------------- | ---------------------- |
-| `marketData`     | Full order book update |
-| `marketDataLite` | BBO and price update   |
-| `trade`          | Trade execution        |
+```json theme={null}
+{
+  "requestId": "order-sub-1",
+  "subscriptionType": "SUBSCRIPTION_TYPE_ORDER",
+  "orderSubscriptionSnapshot": {
+    "orders": [
+      {
+        "id": "order-123",
+        "marketSlug": "market-slug-1",
+        "side": "ORDER_SIDE_BUY",
+        "type": "ORDER_TYPE_LIMIT",
+        "price": {"value": "0.555", "currency": "USD"},
+        "quantity": 0.5,
+        "leavesQuantity": 0.5,
+        "state": "ORDER_STATE_PENDING_NEW",
+        "intent": "ORDER_INTENT_BUY_LONG",
+        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL"
+      }
+    ],
+    "eof": true
+  }
+}
+```
 
-***
+### Order Update Response
 
-## Best Practices
+Real-time order execution updates:
 
-1. **Use unique request IDs** - Track subscriptions with unique identifiers
-2. **Handle reconnection** - Implement automatic reconnection with exponential backoff
-3. **Process messages in order** - Messages are delivered in sequence
-4. **Limit subscriptions** - Only subscribe to markets you need
+```json theme={null}
+{
+  "requestId": "order-sub-1",
+  "subscriptionType": "SUBSCRIPTION_TYPE_ORDER",
+  "orderSubscriptionUpdate": {
+    "execution": {
+      "id": "exec-456",
+      "order": {...},
+      "lastShares": "0.25",
+      "lastPx": {"value": "0.555", "currency": "USD"},
+      "type": "EXECUTION_TYPE_PARTIAL_FILL",
+      "tradeId": "trade-789"
+    }
+  }
+}
+```
+
+Order quantities can contain decimals for partial-contract markets. `lastShares` is a string and may also contain a decimal quantity.
+
+## Position Subscriptions
+
+### Subscribe to Positions
+
+```json theme={null}
+{
+  "subscribe": {
+    "requestId": "pos-sub-1",
+    "subscriptionType": "SUBSCRIPTION_TYPE_POSITION",
+    "marketSlugs": ["market-slug-1"]
+  }
+}
+```
+
+### Position Update Response
+
+```json theme={null}
+{
+  "requestId": "pos-sub-1",
+  "subscriptionType": "SUBSCRIPTION_TYPE_POSITION",
+  "positionSubscription": {
+    "beforePosition": {
+      "netPosition": "1",
+      "netPositionDecimal": "1.0000",
+      "cost": {"value": "55.00", "currency": "USD"}
+    },
+    "afterPosition": {
+      "netPosition": "2",
+      "netPositionDecimal": "1.5000",
+      "cost": {"value": "82.50", "currency": "USD"}
+    },
+    "updateTime": "2024-01-15T10:30:00Z",
+    "entryType": "LEDGER_ENTRY_TYPE_ORDER_EXECUTION",
+    "tradeId": "trade-789"
+  }
+}
+```
+
+Position messages can include `netPositionDecimal`, `qtyBoughtDecimal`, `qtySoldDecimal`, `bodPositionDecimal`, and `qtyAvailableDecimal`, matching `GET /v1/portfolio/positions`. Use those fields when present; the older integer fields are rounded and remain for backward compatibility.
+
+## Account Balance Subscriptions
+
+### Subscribe to Balances
+
+```json theme={null}
+{
+  "subscribe": {
+    "requestId": "balance-sub-1",
+    "subscriptionType": "SUBSCRIPTION_TYPE_ACCOUNT_BALANCE"
+  }
+}
+```
+
+### Balance Snapshot Response
+
+```json theme={null}
+{
+  "requestId": "balance-sub-1",
+  "subscriptionType": "SUBSCRIPTION_TYPE_ACCOUNT_BALANCE",
+  "accountBalancesSnapshot": {
+    "balances": [
+      {
+        "currentBalance": 1000.00,
+        "currency": "USD",
+        "buyingPower": 850.00
+      }
+    ]
+  }
+}
+```
+
+### Balance Update Response
+
+```json theme={null}
+{
+  "requestId": "balance-sub-1",
+  "subscriptionType": "SUBSCRIPTION_TYPE_ACCOUNT_BALANCE",
+  "accountBalancesUpdate": {
+    "balanceChange": {
+      "beforeBalance": {...},
+      "afterBalance": {...},
+      "description": "Order execution",
+      "updateTime": "2024-01-15T10:30:00Z",
+      "entryType": "LEDGER_ENTRY_TYPE_ORDER_EXECUTION"
+    }
+  }
+}
+```
+
+## RFQ Subscriptions
+
+<Note>
+  **Beta access required.** RFQ subscriptions are available only to Retail API users enabled for the Combo and RFQ beta. The same access gate applies to the [REST RFQ API](/api-reference/rfqs/overview).
+</Note>
+
+Subscribe without `marketSlugs`; the stream is private to the participant associated with the authenticated API key.
+
+```json theme={null}
+{
+  "subscribe": {
+    "requestId": "rfq-sub-1",
+    "subscriptionType": "SUBSCRIPTION_TYPE_RFQ"
+  }
+}
+```
+
+No separate success acknowledgment is sent. Events use the `rfqEvent` envelope, and each message contains exactly one event variant:
+
+```json theme={null}
+{
+  "requestId": "rfq-sub-1",
+  "subscriptionType": "SUBSCRIPTION_TYPE_RFQ",
+  "rfqEvent": {
+    "rfqCreated": {
+      "rfq": {
+        "id": "rfq_...",
+        "symbol": "caoc-...",
+        "status": "RFQ_STATUS_OPEN"
+      }
+    }
+  }
+}
+```
+
+| Event            | Meaning                                                                                                                                                                |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rfqCreated`     | An RFQ became available to quote.                                                                                                                                      |
+| `rfqClosed`      | An RFQ closed or a quote was selected.                                                                                                                                 |
+| `quoteCreated`   | A visible quote was created or replaced.                                                                                                                               |
+| `quoteDeleted`   | A visible quote was deleted or declined.                                                                                                                               |
+| `quoteAccepted`  | The requester selected a quote and maker last look began.                                                                                                              |
+| `quoteConfirmed` | The selected maker confirmed and paired execution was scheduled.                                                                                                       |
+| `quoteExecuted`  | Paired order submission completed and generated order IDs became available. This does not guarantee a fill; track the generated orders with `SUBSCRIPTION_TYPE_ORDER`. |
+
+The stream is live and best effort: it has no replay or durable cursor. Unsubscribing, disconnecting, or an upstream failure ends the corresponding stream. Reconnect and reconcile with `GET /v1/rfqs` and `GET /v1/rfqs/quotes`; do not treat WebSocket delivery as the source of truth.
+
+## Execution Types
+
+| Value                         | Description                    |
+| ----------------------------- | ------------------------------ |
+| `EXECUTION_TYPE_PARTIAL_FILL` | Order partially filled         |
+| `EXECUTION_TYPE_FILL`         | Order fully filled             |
+| `EXECUTION_TYPE_CANCELED`     | Order canceled                 |
+| `EXECUTION_TYPE_REPLACE`      | Order replaced/modified        |
+| `EXECUTION_TYPE_REJECTED`     | Order rejected                 |
+| `EXECUTION_TYPE_EXPIRED`      | Order expired                  |
+| `EXECUTION_TYPE_DONE_FOR_DAY` | Order done for the trading day |
+
+## Ledger Entry Types
+
+| Value                                   | Description               |
+| --------------------------------------- | ------------------------- |
+| `LEDGER_ENTRY_TYPE_ORDER_EXECUTION`     | Trade execution           |
+| `LEDGER_ENTRY_TYPE_DEPOSIT`             | Account deposit           |
+| `LEDGER_ENTRY_TYPE_WITHDRAWAL`          | Account withdrawal        |
+| `LEDGER_ENTRY_TYPE_RESOLUTION`          | Market resolution         |
+| `LEDGER_ENTRY_TYPE_COMMISSION`          | Commission charge         |
+| `LEDGER_ENTRY_TYPE_CORRECTION`          | Balance correction        |
+| `LEDGER_ENTRY_TYPE_NETTING`             | Netting adjustment        |
+| `LEDGER_ENTRY_TYPE_MANUAL_ADJUSTMENT`   | Manual balance adjustment |
+| `LEDGER_ENTRY_TYPE_CONTRACT_EXPIRATION` | Contract expiration       |
+
+## Order States
+
+| Value                          | Description                                |
+| ------------------------------ | ------------------------------------------ |
+| `ORDER_STATE_PENDING_NEW`      | Order received, not yet processed          |
+| `ORDER_STATE_PENDING_REPLACE`  | Modify request received, not yet processed |
+| `ORDER_STATE_PENDING_CANCEL`   | Cancel request received, not yet processed |
+| `ORDER_STATE_PENDING_RISK`     | Order pending risk approval                |
+| `ORDER_STATE_PARTIALLY_FILLED` | Order partially executed                   |
+| `ORDER_STATE_FILLED`           | Order fully executed                       |
+| `ORDER_STATE_CANCELED`         | Order canceled                             |
+| `ORDER_STATE_REPLACED`         | Order replaced                             |
+| `ORDER_STATE_REJECTED`         | Order rejected                             |
+| `ORDER_STATE_EXPIRED`          | Order expired                              |
+
+## Order Intent
+
+| Value                     | Description        |
+| ------------------------- | ------------------ |
+| `ORDER_INTENT_BUY_LONG`   | Buy YES contracts  |
+| `ORDER_INTENT_SELL_LONG`  | Sell YES contracts |
+| `ORDER_INTENT_BUY_SHORT`  | Buy NO contracts   |
+| `ORDER_INTENT_SELL_SHORT` | Sell NO contracts  |
+
+<Tip>
+  **Subscription Limits**
+
+  You can subscribe to a maximum of 100 markets per subscription. Use multiple subscriptions if you need more.
+</Tip>
 
 
 ===== https://docs.polymarket.us/api-reference/websocket/markets.md =====
@@ -479,445 +728,149 @@ The full market data subscription includes the top levels of the order book. Eac
 Order book levels are sorted best-to-worst (highest bid first, lowest ask first).
 
 
-===== https://docs.polymarket.us/api-reference/websocket/overview.md =====
+===== https://docs.polymarket.us/api-reference/sdks/python/websocket.md =====
 > ## Documentation Index
 > Fetch the complete documentation index at: https://docs.polymarket.us/llms.txt
 > Use this file to discover all available pages before exploring further.
 
-# WebSocket API Overview
+# WebSocket
 
-> Real-time streaming data via WebSocket
+> Real-time streaming data
 
-# WebSocket API
+<Note>WebSocket is async-only. Use `asyncio.run()` or `AsyncPolymarketUS`.</Note>
 
-The WebSocket API provides real-time streaming data for market information and private user data.
+The WebSocket resource provides real-time streaming data for market information and private user data.
 
-## Endpoints
+## Methods
 
-| Endpoint         | Description                                | Authentication |
-| ---------------- | ------------------------------------------ | -------------- |
-| `/v1/ws/private` | Orders, positions, account balance updates | API Key        |
-| `/v1/ws/markets` | Market data, order book, trades            | API Key        |
+| Method      | Endpoint                                | Description                        |
+| ----------- | --------------------------------------- | ---------------------------------- |
+| `private()` | `wss://api.polymarket.us/v1/ws/private` | Orders, positions, balance updates |
+| `markets()` | `wss://api.polymarket.us/v1/ws/markets` | Market data and trades             |
 
-## Connection
+***
 
-Connect to the WebSocket endpoints with your API key credentials:
+## private
 
-```
-wss://api.polymarket.us/v1/ws/private
-wss://api.polymarket.us/v1/ws/markets
-```
+Connect to the private WebSocket for real-time order, position, and balance updates.
 
-## Authentication
+```python theme={null}
+import asyncio
+from polymarket_us import PolymarketUS
 
-WebSocket connections use the same API key authentication as the REST API.
+async def main():
+    client = PolymarketUS(
+        key_id="your-key-id",
+        secret_key="your-secret-key",
+    )
 
-Include these headers in the WebSocket handshake:
+    ws = client.ws.private()
 
-```
-X-PM-Access-Key: <your-api-key-id>
-X-PM-Timestamp: <timestamp-in-milliseconds>
-X-PM-Signature: <base64-encoded-signature>
-```
+    # Register event handlers
+    ws.on("order_snapshot", lambda d: print(f"Orders: {d}"))
+    ws.on("order_update", lambda d: print(f"Order update: {d}"))
+    ws.on("position_snapshot", lambda d: print(f"Positions: {d}"))
+    ws.on("position_update", lambda d: print(f"Position update: {d}"))
+    ws.on("account_balance_snapshot", lambda d: print(f"Balance: {d}"))
+    ws.on("error", lambda e: print(f"Error: {e}"))
 
-The signature is constructed from: `timestamp + "GET" + path` where path is `/v1/ws/private` or `/v1/ws/markets`.
+    await ws.connect()
+    
+    # Subscribe to order updates
+    await ws.subscribe("my-orders", "SUBSCRIPTION_TYPE_ORDER")
+    
+    # Subscribe to position updates
+    await ws.subscribe("my-positions", "SUBSCRIPTION_TYPE_POSITION")
+    
+    # Subscribe to balance updates
+    await ws.subscribe("my-balance", "SUBSCRIPTION_TYPE_ACCOUNT_BALANCE")
 
-See [Authentication](/api/authentication) for details on request signing.
+    await asyncio.sleep(3600)
+    await ws.close()
 
-## Message Format
-
-All WebSocket messages are JSON formatted with snake\_case field names.
-
-### Request Format
-
-```json theme={null}
-{
-  "subscribe": {
-    "request_id": "unique-request-id",
-    "subscription_type": 1,
-    "market_slugs": ["market-slug-1", "market-slug-2"]
-  }
-}
-```
-
-### Subscription Types
-
-**Private WebSocket (`/v1/ws/private`):**
-
-| Value | Type             | Description      |
-| ----- | ---------------- | ---------------- |
-| 1     | ORDER            | Order updates    |
-| 3     | POSITION         | Position changes |
-| 4     | ACCOUNT\_BALANCE | Balance updates  |
-
-**Markets WebSocket (`/v1/ws/markets`):**
-
-| Value | Type               | Description                      |
-| ----- | ------------------ | -------------------------------- |
-| 1     | MARKET\_DATA       | Full order book and market stats |
-| 2     | MARKET\_DATA\_LITE | Lightweight price data           |
-| 3     | TRADE              | Real-time trade notifications    |
-
-### Response Format
-
-```json theme={null}
-{
-  "request_id": "unique-request-id",
-  "subscription_type": 1,
-  "order_subscription_snapshot": {
-    "orders": [...],
-    "eof": true
-  }
-}
+asyncio.run(main())
 ```
 
-## Heartbeats
+### Private Subscription Types
 
-The server sends periodic heartbeat messages to keep the connection alive:
+| Type                                | Description                 |
+| ----------------------------------- | --------------------------- |
+| `SUBSCRIPTION_TYPE_ORDER`           | Order updates and snapshots |
+| `SUBSCRIPTION_TYPE_POSITION`        | Position changes            |
+| `SUBSCRIPTION_TYPE_ACCOUNT_BALANCE` | Balance updates             |
 
-```json theme={null}
-{
-  "heartbeat": {}
-}
+### Private Events
+
+| Event                      | Description                       |
+| -------------------------- | --------------------------------- |
+| `order_snapshot`           | Initial snapshot of all orders    |
+| `order_update`             | Order state change                |
+| `position_snapshot`        | Initial snapshot of all positions |
+| `position_update`          | Position change                   |
+| `account_balance_snapshot` | Initial balance snapshot          |
+| `account_balance_update`   | Balance change                    |
+
+***
+
+## markets
+
+Connect to the markets WebSocket for real-time market data and trades.
+
+```python theme={null}
+import asyncio
+from polymarket_us import PolymarketUS
+
+async def main():
+    client = PolymarketUS(
+        key_id="your-key-id",
+        secret_key="your-secret-key",
+    )
+
+    ws = client.ws.markets()
+
+    # Register event handlers
+    ws.on("market_data", lambda d: print(f"Book: {d}"))
+    ws.on("market_data_lite", lambda d: print(f"BBO: {d}"))
+    ws.on("trade", lambda d: print(f"Trade: {d}"))
+
+    await ws.connect()
+    
+    # Subscribe to full order book updates
+    await ws.subscribe("book", "SUBSCRIPTION_TYPE_MARKET_DATA", ["btc-100k-2025"])
+    
+    # Subscribe to lightweight price updates
+    await ws.subscribe("prices", "SUBSCRIPTION_TYPE_MARKET_DATA_LITE", ["btc-100k-2025"])
+    
+    # Subscribe to trade notifications
+    await ws.subscribe("trades", "SUBSCRIPTION_TYPE_TRADE", ["btc-100k-2025"])
+
+    await asyncio.sleep(3600)
+    await ws.close()
+
+asyncio.run(main())
 ```
 
-Clients should respond to heartbeats or implement their own keep-alive mechanism.
+### Market Subscription Types
 
-## Error Handling
+| Type                                 | Description                   |
+| ------------------------------------ | ----------------------------- |
+| `SUBSCRIPTION_TYPE_MARKET_DATA`      | Full order book and stats     |
+| `SUBSCRIPTION_TYPE_MARKET_DATA_LITE` | Lightweight price data (BBO)  |
+| `SUBSCRIPTION_TYPE_TRADE`            | Real-time trade notifications |
 
-If a subscription request fails, the response will include an error field:
+### Market Events
 
-```json theme={null}
-{
-  "request_id": "unique-request-id",
-  "error": "Error description"
-}
-```
+| Event              | Description            |
+| ------------------ | ---------------------- |
+| `market_data`      | Full order book update |
+| `market_data_lite` | BBO and price update   |
+| `trade`            | Trade execution        |
 
-## Unsubscribing
-
-To unsubscribe from a stream:
-
-```json theme={null}
-{
-  "unsubscribe": {
-    "request_id": "original-request-id"
-  }
-}
-```
+***
 
 ## Best Practices
 
 1. **Use unique request IDs** - Track subscriptions with unique identifiers
 2. **Handle reconnection** - Implement automatic reconnection with exponential backoff
 3. **Process messages in order** - Messages are delivered in sequence
-4. **Monitor heartbeats** - Reconnect if heartbeats stop
-5. **Limit subscriptions** - Only subscribe to markets you need
-
-
-===== https://docs.polymarket.us/api-reference/websocket/private.md =====
-> ## Documentation Index
-> Fetch the complete documentation index at: https://docs.polymarket.us/llms.txt
-> Use this file to discover all available pages before exploring further.
-
-# Private WebSocket
-
-> Real-time orders, positions, and balance updates
-
-# Private WebSocket
-
-The Private WebSocket endpoint provides real-time updates for user-specific data including orders, positions, and account balances.
-
-<Warning>
-  **Authentication Required**
-
-  This WebSocket endpoint requires API key authentication in the connection handshake. See the [Authentication guide](/api/authentication) for details.
-</Warning>
-
-## Endpoint
-
-```
-wss://api.polymarket.us/v1/ws/private
-```
-
-## Subscription Types
-
-| Value                               | Description                           |
-| ----------------------------------- | ------------------------------------- |
-| `SUBSCRIPTION_TYPE_ORDER`           | Order updates (new, filled, canceled) |
-| `SUBSCRIPTION_TYPE_ORDER_SNAPSHOT`  | Initial snapshot of open orders       |
-| `SUBSCRIPTION_TYPE_POSITION`        | Position changes                      |
-| `SUBSCRIPTION_TYPE_ACCOUNT_BALANCE` | Account balance changes               |
-
-## Order Subscriptions
-
-### Subscribe to Orders
-
-```json theme={null}
-{
-  "subscribe": {
-    "requestId": "order-sub-1",
-    "subscriptionType": "SUBSCRIPTION_TYPE_ORDER",
-    "marketSlugs": ["market-slug-1"]
-  }
-}
-```
-
-Leave `marketSlugs` empty to subscribe to all markets.
-
-### Order Snapshot Response
-
-Initial snapshot of open orders:
-
-```json theme={null}
-{
-  "requestId": "order-sub-1",
-  "subscriptionType": "SUBSCRIPTION_TYPE_ORDER",
-  "orderSubscriptionSnapshot": {
-    "orders": [
-      {
-        "id": "order-123",
-        "marketSlug": "market-slug-1",
-        "side": "ORDER_SIDE_BUY",
-        "type": "ORDER_TYPE_LIMIT",
-        "price": {"value": "0.555", "currency": "USD"},
-        "quantity": 0.5,
-        "leavesQuantity": 0.5,
-        "state": "ORDER_STATE_PENDING_NEW",
-        "intent": "ORDER_INTENT_BUY_LONG",
-        "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL"
-      }
-    ],
-    "eof": true
-  }
-}
-```
-
-### Order Update Response
-
-Real-time order execution updates:
-
-```json theme={null}
-{
-  "requestId": "order-sub-1",
-  "subscriptionType": "SUBSCRIPTION_TYPE_ORDER",
-  "orderSubscriptionUpdate": {
-    "execution": {
-      "id": "exec-456",
-      "order": {...},
-      "lastShares": "0.25",
-      "lastPx": {"value": "0.555", "currency": "USD"},
-      "type": "EXECUTION_TYPE_PARTIAL_FILL",
-      "tradeId": "trade-789"
-    }
-  }
-}
-```
-
-Order quantities can contain decimals for partial-contract markets. `lastShares` is a string and may also contain a decimal quantity.
-
-## Position Subscriptions
-
-### Subscribe to Positions
-
-```json theme={null}
-{
-  "subscribe": {
-    "requestId": "pos-sub-1",
-    "subscriptionType": "SUBSCRIPTION_TYPE_POSITION",
-    "marketSlugs": ["market-slug-1"]
-  }
-}
-```
-
-### Position Update Response
-
-```json theme={null}
-{
-  "requestId": "pos-sub-1",
-  "subscriptionType": "SUBSCRIPTION_TYPE_POSITION",
-  "positionSubscription": {
-    "beforePosition": {
-      "netPosition": "1",
-      "netPositionDecimal": "1.0000",
-      "cost": {"value": "55.00", "currency": "USD"}
-    },
-    "afterPosition": {
-      "netPosition": "2",
-      "netPositionDecimal": "1.5000",
-      "cost": {"value": "82.50", "currency": "USD"}
-    },
-    "updateTime": "2024-01-15T10:30:00Z",
-    "entryType": "LEDGER_ENTRY_TYPE_ORDER_EXECUTION",
-    "tradeId": "trade-789"
-  }
-}
-```
-
-Position messages can include `netPositionDecimal`, `qtyBoughtDecimal`, `qtySoldDecimal`, `bodPositionDecimal`, and `qtyAvailableDecimal`, matching `GET /v1/portfolio/positions`. Use those fields when present; the older integer fields are rounded and remain for backward compatibility.
-
-## Account Balance Subscriptions
-
-### Subscribe to Balances
-
-```json theme={null}
-{
-  "subscribe": {
-    "requestId": "balance-sub-1",
-    "subscriptionType": "SUBSCRIPTION_TYPE_ACCOUNT_BALANCE"
-  }
-}
-```
-
-### Balance Snapshot Response
-
-```json theme={null}
-{
-  "requestId": "balance-sub-1",
-  "subscriptionType": "SUBSCRIPTION_TYPE_ACCOUNT_BALANCE",
-  "accountBalancesSnapshot": {
-    "balances": [
-      {
-        "currentBalance": 1000.00,
-        "currency": "USD",
-        "buyingPower": 850.00
-      }
-    ]
-  }
-}
-```
-
-### Balance Update Response
-
-```json theme={null}
-{
-  "requestId": "balance-sub-1",
-  "subscriptionType": "SUBSCRIPTION_TYPE_ACCOUNT_BALANCE",
-  "accountBalancesUpdate": {
-    "balanceChange": {
-      "beforeBalance": {...},
-      "afterBalance": {...},
-      "description": "Order execution",
-      "updateTime": "2024-01-15T10:30:00Z",
-      "entryType": "LEDGER_ENTRY_TYPE_ORDER_EXECUTION"
-    }
-  }
-}
-```
-
-## Execution Types
-
-| Value                         | Description                    |
-| ----------------------------- | ------------------------------ |
-| `EXECUTION_TYPE_PARTIAL_FILL` | Order partially filled         |
-| `EXECUTION_TYPE_FILL`         | Order fully filled             |
-| `EXECUTION_TYPE_CANCELED`     | Order canceled                 |
-| `EXECUTION_TYPE_REPLACE`      | Order replaced/modified        |
-| `EXECUTION_TYPE_REJECTED`     | Order rejected                 |
-| `EXECUTION_TYPE_EXPIRED`      | Order expired                  |
-| `EXECUTION_TYPE_DONE_FOR_DAY` | Order done for the trading day |
-
-## Ledger Entry Types
-
-| Value                                   | Description               |
-| --------------------------------------- | ------------------------- |
-| `LEDGER_ENTRY_TYPE_ORDER_EXECUTION`     | Trade execution           |
-| `LEDGER_ENTRY_TYPE_DEPOSIT`             | Account deposit           |
-| `LEDGER_ENTRY_TYPE_WITHDRAWAL`          | Account withdrawal        |
-| `LEDGER_ENTRY_TYPE_RESOLUTION`          | Market resolution         |
-| `LEDGER_ENTRY_TYPE_COMMISSION`          | Commission charge         |
-| `LEDGER_ENTRY_TYPE_CORRECTION`          | Balance correction        |
-| `LEDGER_ENTRY_TYPE_NETTING`             | Netting adjustment        |
-| `LEDGER_ENTRY_TYPE_MANUAL_ADJUSTMENT`   | Manual balance adjustment |
-| `LEDGER_ENTRY_TYPE_CONTRACT_EXPIRATION` | Contract expiration       |
-
-## Order States
-
-| Value                          | Description                                |
-| ------------------------------ | ------------------------------------------ |
-| `ORDER_STATE_PENDING_NEW`      | Order received, not yet processed          |
-| `ORDER_STATE_PENDING_REPLACE`  | Modify request received, not yet processed |
-| `ORDER_STATE_PENDING_CANCEL`   | Cancel request received, not yet processed |
-| `ORDER_STATE_PENDING_RISK`     | Order pending risk approval                |
-| `ORDER_STATE_PARTIALLY_FILLED` | Order partially executed                   |
-| `ORDER_STATE_FILLED`           | Order fully executed                       |
-| `ORDER_STATE_CANCELED`         | Order canceled                             |
-| `ORDER_STATE_REPLACED`         | Order replaced                             |
-| `ORDER_STATE_REJECTED`         | Order rejected                             |
-| `ORDER_STATE_EXPIRED`          | Order expired                              |
-
-## Order Intent
-
-| Value                     | Description        |
-| ------------------------- | ------------------ |
-| `ORDER_INTENT_BUY_LONG`   | Buy YES contracts  |
-| `ORDER_INTENT_SELL_LONG`  | Sell YES contracts |
-| `ORDER_INTENT_BUY_SHORT`  | Buy NO contracts   |
-| `ORDER_INTENT_SELL_SHORT` | Sell NO contracts  |
-
-<Tip>
-  **Subscription Limits**
-
-  You can subscribe to a maximum of 100 markets per subscription. Use multiple subscriptions if you need more.
-</Tip>
-
-
-===== https://docs.polymarket.us/concepts/market-data.md =====
-> ## Documentation Index
-> Fetch the complete documentation index at: https://docs.polymarket.us/llms.txt
-> Use this file to discover all available pages before exploring further.
-
-# Prices & Market Data
-
-> How prices work and how the order book enables trading on Polymarket US.
-
-## Prices are probabilities
-
-Every contract on Polymarket US is priced between \$0 and \$1. The price represents the market's collective belief about how likely an outcome is.
-
-| Price  | What it means                                  |
-| ------ | ---------------------------------------------- |
-| \$0.25 | The market thinks there's roughly a 25% chance |
-| \$0.50 | Coin flip — the market is undecided            |
-| \$0.75 | The market thinks it's likely (75% chance)     |
-
-If you buy a YES contract at \$0.55 and the outcome happens, the contract settles at \$1.00 — you profit \$0.45 per contract. If it doesn't happen, it settles at \$0.00 and you lose your \$0.55.
-
-## The order book
-
-Polymarket US runs a **central limit order book**. Prices aren't set by Polymarket — they come from traders placing buy and sell orders against each other.
-
-The order book has two sides:
-
-| Side              | What it means                                          |
-| ----------------- | ------------------------------------------------------ |
-| **Bids**          | Buy orders — the prices traders are willing to pay     |
-| **Asks (offers)** | Sell orders — the prices traders are willing to accept |
-
-The **spread** is the gap between the best bid and the best ask. A tight spread means the market is liquid. A wide spread means fewer people are trading.
-
-The **BBO (best bid and offer)** is the tightest price on each side — the highest bid and the lowest ask. This is the price you'd trade at if you placed a market order right now.
-
-## How trades happen
-
-When you place a **market order**, it fills immediately at the best available price on the other side of the book. You're a **taker** — you're taking liquidity.
-
-When you place a **limit order** at a specific price and it doesn't fill immediately, it sits on the book waiting. You're a **maker** — you're providing liquidity for others to trade against.
-
-If your limit order's price crosses the best available price on the other side, it fills immediately (like a market order). Otherwise, it rests on the book.
-
-## Settlement
-
-When a market resolves, every contract settles at either \$1.00 (YES won) or \$0.00 (NO won). The exchange handles this automatically — winning contracts are credited to your balance, losing contracts go to zero.
-
-## Market states
-
-A market goes through different states during its lifecycle:
-
-| State         | What it means                                       |
-| ------------- | --------------------------------------------------- |
-| **Open**      | The market is accepting orders and actively trading |
-| **Pre-open**  | The market exists but trading hasn't started yet    |
-| **Suspended** | Trading is temporarily paused                       |
-| **Halted**    | Trading has been stopped                            |
-| **Expired**   | The market has ended and settled                    |
+4. **Limit subscriptions** - Only subscribe to markets you need

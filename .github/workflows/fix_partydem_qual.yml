@@ -1,0 +1,204 @@
+name: Fix party-dem qualifiers
+
+# ORDER-TOUCHING. Owner-directed 2026-08-15: the qualifying asks on the
+# dem party market rested as SELL YES (SELL_LONG — closing orders against
+# the owner's hand-placed long) instead of BUY NO (BUY_SHORT), which does
+# not qualify the side and risks dumping the position. Take them off and
+# replace with the right thing.
+#
+# Empirical about the netting: after cancelling every SELL_LONG ask of
+# ours at the 99c ceiling, replacements are placed as BUY_SHORT in
+# buying-power-sized chunks and each is READ BACK from the open-order
+# list. A chunk that rested as anything but BUY_SHORT is cancelled again
+# immediately and the run stops and says so — never stack orders the
+# exchange keeps converting. The rep party market is inspected and
+# reported but only touched if it has the same disease.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/fix_partydem_qual.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fix-partydem-qual
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fix
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          MARKETS = ["ewc-usp-party-2028-11-07-dem", "ewc-usp-party-2028-11-07-rep"]
+          CEIL = 0.99
+
+          def api(method, path, body=None):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  json=body, timeout=30)
+
+          def bp_now(default=0.0):
+              try:
+                  r = api("GET", "/v1/account/balances")
+                  if r.status_code < 400:
+                      for b in r.json().get("balances") or []:
+                          if b.get("buyingPower") is not None:
+                              return float(b["buyingPower"])
+              except Exception:
+                  pass
+              return default
+
+          def our_orders(slug):
+              out = []
+              r = api("GET", "/v1/orders/open"); r.raise_for_status()
+              for o in r.json().get("orders") or []:
+                  if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                                 "ORDER_STATE_PARTIALLY_FILLED"):
+                      continue
+                  if (o.get("marketSlug") or "") != slug:
+                      continue
+                  px = tr._num((o.get("price") or {}).get("value")) or 0
+                  q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+                  out.append({"id": str(o.get("id")), "intent": str(o.get("intent") or ""),
+                              "px": px, "q": q})
+              return out
+
+          def net_pos(slug):
+              try:
+                  r = api("GET", "/v1/portfolio/positions")
+                  if r.status_code < 400:
+                      p = (r.json().get("positions") or {}).get(slug) or {}
+                      return tr._num(p.get("netPosition")) or 0
+              except Exception:
+                  pass
+              return None
+
+          def cancel(slug, oid):
+              for attempt in range(4):
+                  try:
+                      r = api("POST", f"/v1/order/{oid}/cancel", {"marketSlug": slug})
+                      if r.status_code < 300 or r.status_code == 404:
+                          return True
+                      if r.status_code not in (429, 500, 502, 503, 504):
+                          return False
+                  except Exception:
+                      pass
+                  time.sleep(2)
+              return False
+
+          for slug in MARKETS:
+              print(f"=== {slug} ===")
+              pos = net_pos(slug)
+              print(f"   net position: {pos if pos is not None else 'unknown'}")
+              orders = our_orders(slug)
+              wrong = [o for o in orders
+                       if o["px"] >= 0.985 and o["intent"].endswith("SELL_LONG")]
+              right = sum(o["q"] for o in orders
+                          if o["px"] >= 0.985 and o["intent"].endswith("BUY_SHORT"))
+              print(f"   ceiling asks: {sum(o['q'] for o in orders if o['px'] >= 0.985):,.0f} "
+                    f"({right:,.0f} correctly BUY NO, "
+                    f"{sum(o['q'] for o in wrong):,.0f} wrongly SELL YES in {len(wrong)} orders)")
+              if not wrong:
+                  print("   nothing to fix here\n")
+                  continue
+              removed = 0.0
+              for o in wrong:
+                  if cancel(slug, o["id"]):
+                      removed += o["q"]
+                      print(f"   cancelled SELL YES {o['q']:,.0f} @ {o['px']*100:.0f}c")
+                  time.sleep(0.4)
+              # replace with explicit BUY NO, verifying the resting intent
+              target_add = int(removed) + 1
+              BP = bp_now()
+              print(f"   replacing {target_add:,} as BUY NO — buying power ${BP:,.2f}")
+              added = 0
+              stopped = ""
+              while added < target_add:
+                  qty = min(target_add - added, max(1, int(BP)))
+                  r = api("POST", "/v1/orders",
+                          {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_SHORT",
+                           "type": "ORDER_TYPE_LIMIT",
+                           "price": {"value": f"{CEIL:.2f}", "currency": "USD"},
+                           "quantity": int(qty),
+                           "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                           "participateDontInitiate": True})
+                  if r.status_code >= 300:
+                      stopped = f"placement HTTP {r.status_code}: " + " ".join(r.text.split())[:120]
+                      break
+                  oid = None
+                  try:
+                      j = r.json()
+                      o_ = j.get("order")
+                      oid = (o_.get("id") if isinstance(o_, dict) else None) \
+                            or j.get("id") or j.get("orderId")
+                  except Exception:
+                      pass
+                  time.sleep(4)
+                  now = our_orders(slug)
+                  mine = next((o for o in now if o["id"] == str(oid)), None)
+                  if mine is None:
+                      stopped = "replacement did not rest — stopping"
+                      break
+                  if not mine["intent"].endswith("BUY_SHORT"):
+                      cancel(slug, mine["id"])
+                      stopped = (f"exchange converted the order to {mine['intent']} "
+                                 "(position netting) — cancelled it and stopped; "
+                                 "this side cannot be self-qualified with BUY NO "
+                                 "while the long position stands")
+                      break
+                  added += mine["q"]
+                  print(f"   rested BUY NO {mine['q']:,.0f} @ 99c  ({added:,}/{target_add:,})")
+                  BP = bp_now(BP)
+                  time.sleep(0.6)
+              if stopped:
+                  print(f"   STOPPED: {stopped}")
+              pos2 = net_pos(slug)
+              print(f"   net position after: {pos2 if pos2 is not None else 'unknown'} "
+                    f"(before {pos})\n")
+
+          os.makedirs("data", exist_ok=True)
+          with open("data/fix_partydem_qual.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/fix_partydem_qual.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Fix party-dem qualifiers [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi

@@ -1,0 +1,392 @@
+name: Bid rungs
+
+# ORDER-TOUCHING. Places real orders — but push runs are FORCED DRY.
+#
+# v2, after the 2026-08-15 tuccar lesson. v1 joined the book's touch on
+# the assumption the touch is fair; on thin books the touch is bait — a
+# 25c bid on a longshot winner market got dumped into within minutes.
+#
+# The rules now (owner: "don't put them at the touch alone; find places
+# where they can earn and STAY earning"):
+#   * join a touch only when OTHER people hold at least REAL_MIN shares
+#     at that exact price — we queue BEHIND real money, which fills first
+#     and vouches for the price with its own capital
+#   * fair-value caps: minor candidates never above 15c (the sniper's own
+#     overpriced line), contenders never above 60c, and a winner market
+#     never above its candidate's live nominee touch — you cannot be more
+#     likely to win the presidency than your own nomination
+#   * a side whose touch fails these tests is BAIT and is skipped, listed
+#     in the output; under a bait touch nothing below it earns anyway,
+#     because the discount factor anchors to the book's best bid
+#   * worst-case fill budget $80 total, $12 per market, greedy-allocated
+#     by marginal estimated income per dollar of exposure
+#
+# TIER 2 (owner, 2026-08-15): WALL JOINS. A level holding >= 20,000 of
+# other people's shares within 2 ticks of the touch can be joined with
+# real size, because queue priority puts us BEHIND the wall — a fill
+# would first have to eat through 20,000+ shares of someone else's
+# money. At an oversubscribed level the scoring window's take is split
+# pro-rata, so joining claims our fraction without moving the price or
+# the denominator. This is also how we widen our slice of our own 1c
+# mega-levels. Fair caps still apply — a wall at a silly price can still
+# be dumped through profitably, so we never join above fair. Join size
+# up to 20,000, never more than the wall itself, gain >= $1/day to
+# bother. Fill risk is catastrophic-only; the all-fill notional is
+# reported so the number is never a surprise.
+#
+# Post-only. The 20,000-share 1c qualification floors are never touched.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/bid_rungs.yml
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "plan only, place nothing"
+        type: boolean
+        default: false
+      budget:
+        description: "worst-case fill dollars"
+        default: "80"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bid-rungs
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Place
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          BUDGET: ${{ inputs.budget }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          DRY = str(os.environ.get("DRY_RUN", "")).lower() in ("true", "1")
+          BUDGET = float(os.environ.get("BUDGET") or 80)
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          NOM = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-")
+          WIN = ("ewc-usp-2028-11-07-",)
+          PREFIXES = NOM + WIN
+          CONTENDER = {"jdvan", "marrub", "kamhar", "jonoss", "petbut"}
+          DF = 0.2; TICK = 0.01
+          REAL_MIN = 100        # others' shares required AT the touch price
+          FAIR_MINOR = 0.15     # the sniper's own overpriced line
+          FAIR_CONTENDER = 0.60
+          MIN_RUNG = 5
+          MAX_PER_ORDER_USD = 12.0
+
+          def api(method, path, body=None):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  json=body, timeout=30)
+
+          # every resting bid of OURS, per market and price — needed both to
+          # subtract us from the touch level (others must be real) and to
+          # count what we already have queued there
+          mine: dict = {}
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          for o in r.json().get("orders") or []:
+              if str(o.get("state")) not in ("ORDER_STATE_NEW",
+                                             "ORDER_STATE_PARTIALLY_FILLED"):
+                  continue
+              s = o.get("marketSlug") or ""
+              if not s.startswith(PREFIXES):
+                  continue
+              if not str(o.get("intent") or "").endswith(("BUY_LONG", "SELL_SHORT")):
+                  continue
+              px = round(tr._num((o.get("price") or {}).get("value")) or 0, 2)
+              q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+              mine.setdefault(s, {})
+              mine[s][px] = mine[s].get(px, 0.0) + q
+
+          pol, sizes = tr.fetch_politics_events()
+          # nominee markets FIRST so winner caps can reference their touches
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+
+          progs = {}
+          for i in range(0, len(slate), 25):
+              try:
+                  rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                    params={"symbols": slate[i:i+25], "pageSize": 100}, timeout=30)
+                  for p in rr.json().get("programs") or []:
+                      s = p.get("marketSlug") or ""
+                      tp = tr._pick_period(p.get("timePeriods") or [], s)
+                      if tp is not None and s:
+                          progs[s] = tr._prog_of(tp)
+              except Exception:
+                  pass
+              time.sleep(0.1)
+
+          nom_touch: dict = {}
+          books: dict = {}
+          sides, skipped = [], []
+          for slug in slate:
+              tail = slug.rsplit("-", 1)[-1]
+              pr = progs.get(slug) or {}
+              target = float(pr.get("target") or 0)
+              per = float(pr.get("pool") or 0) / max(sizes.get(slug, 1), 1) / 2
+              if not target or per <= 0:
+                  continue
+              try:
+                  bids = (tr._fetch_book(slug).get("bids") or [])
+              except Exception:
+                  continue
+              time.sleep(0.15)
+              if not bids:
+                  continue
+              bb = round(bids[0][0], 2)
+              if slug.startswith(NOM):
+                  nom_touch[tail] = bb
+              books[slug] = (bids, target, per, tail, bb)   # for the wall tier
+              if bb <= 0.015:
+                  continue      # the touch IS the floor level — tier 1 has nothing to add
+              ours_at = (mine.get(slug) or {}).get(bb, 0.0)
+              others_at = max(0.0, bids[0][1] - ours_at)
+              fair = FAIR_CONTENDER if tail in CONTENDER else FAIR_MINOR
+              if slug.startswith(WIN) and tail in nom_touch:
+                  fair = min(fair, nom_touch[tail])
+              if others_at < REAL_MIN:
+                  skipped.append((slug, bb, others_at, "thin touch — bait"))
+                  continue
+              if bb > fair + 1e-9:
+                  skipped.append((slug, bb, others_at, f"above fair cap {fair*100:.0f}c"))
+                  continue
+              den = ours_in = 0.0; cum = 0.0
+              for p, q in bids:
+                  take = min(q, max(0.0, target - cum))
+                  if take <= 0:
+                      break
+                  w = DF ** round((bb - p) / TICK)
+                  den += take * w
+                  op = (mine.get(slug) or {}).get(round(p, 2), 0.0)
+                  ours_in += min(op, take) * w
+                  cum += q
+              sides.append({"m": slug, "px": bb, "per": per, "den": den,
+                            "ours": ours_in, "have": ours_at, "r": 0.0,
+                            "wall": others_at})
+
+          def gain(s, r):
+              # ours_in already contains anything we hold at the touch; the
+              # added rung r raises both our score and the denominator
+              base = s["per"] * s["ours"] / s["den"] if s["den"] else 0.0
+              return s["per"] * (s["ours"] + r) / (s["den"] + r) - base
+
+          spent = 0.0
+          while spent < BUDGET:
+              best, bi = 0.0, None
+              for i, s in enumerate(sides):
+                  if s["r"] * s["px"] + 1.0 > MAX_PER_ORDER_USD:
+                      continue
+                  dr = 1.0 / s["px"]
+                  mg = gain(s, s["r"] + dr) - gain(s, s["r"])
+                  if mg > best:
+                      best, bi = mg, i
+              if bi is None or best < 0.02:
+                  break
+              sides[bi]["r"] += 1.0 / sides[bi]["px"]
+              spent += 1.0
+
+          # a rung must pay its own worst-case exposure back within ~10 days
+          # or it is not worth the inventory risk; a side where we already
+          # hold a rung at the touch is done — never stack a second one
+          plan = [s for s in sides if s["r"] >= MIN_RUNG
+                  and s["have"] < MIN_RUNG
+                  and gain(s, s["r"]) >= 0.10 * s["r"] * s["px"]]
+          est = sum(gain(s, s["r"]) for s in plan)
+          expo = sum(s["r"] * s["px"] for s in plan)
+          print(f"joinable real touches: {len(sides)}   bait/over-fair skipped: {len(skipped)}")
+          print(f"plan: {len(plan)} rungs, worst-case fills ${expo:,.2f} of ${BUDGET:.0f}, "
+                f"est +${est:,.2f}/day" + ("   (DRY RUN)" if DRY else "") + "\n")
+          print(f"{'market':44s} {'join@':>6s} {'wall':>9s} {'rung':>6s} {'expo$':>6s} {'est+':>6s}")
+
+          placed = failed = 0
+          out = []
+          for s in sorted(plan, key=lambda y: -gain(y, y["r"])):
+              qty = round(s["r"])
+              print(f"{s['m']:44s} {s['px']*100:5.1f}c {s['wall']:9,.0f} {qty:6d} "
+                    f"{qty*s['px']:6.2f} {gain(s, s['r']):6.2f}")
+              row = {"m": s["m"], "px": s["px"], "qty": qty, "wall": round(s["wall"]),
+                     "ok": None}
+              if DRY:
+                  out.append(row); placed += 1
+                  continue
+              body = {"marketSlug": s["m"], "intent": "ORDER_INTENT_BUY_LONG",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{s['px']:.2f}", "currency": "USD"},
+                      "quantity": qty,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              ok, why, delay = False, "", 2.0
+              for attempt in range(4):
+                  try:
+                      rr = api("POST", "/v1/orders", body)
+                      if rr.status_code < 300:
+                          ok = True; break
+                      why = " ".join(rr.text.split())[:120]
+                      if rr.status_code not in (429, 500, 502, 503, 504):
+                          break
+                  except Exception as e:
+                      why = type(e).__name__
+                  time.sleep(delay); delay = min(delay * 2, 20)
+              placed += ok; failed += (not ok)
+              row["ok"] = ok
+              if not ok:
+                  print(f"    FAILED {why}")
+              out.append(row)
+              time.sleep(0.6)
+
+          if skipped:
+              print("\nskipped sides (no real touch to join):")
+              for m, bb, w, why in skipped:
+                  print(f"  {m:44s} {bb*100:5.1f}c others-at-touch {w:7,.0f} — {why}")
+
+          # ---- TIER 2: join big walls from behind ---------------------------
+          WALL_MIN = 20000
+          WALL_TICKS = 2
+          WALL_GAIN_MIN = 1.0
+          WALL_NOTIONAL_CAP = 3000.0
+          WALL_PER_MARKET_USD = 500.0   # one market must never carry more
+          def wall_gain(bids, mine_px, target, per, jp, r):
+              """estimated $/day change from adding r of ours at price jp,
+              with pro-rata attribution at partially included levels"""
+              bb2 = bids[0][0]
+              def calc(extra):
+                  den = c = cum = 0.0
+                  for p, q in bids:
+                      q2 = q + (extra if abs(p - jp) < 0.005 else 0)
+                      take = min(q2, max(0.0, target - cum))
+                      if take <= 0:
+                          break
+                      w = DF ** round((bb2 - p) / TICK)
+                      den += take * w
+                      op = mine_px.get(round(p, 2), 0.0) + \
+                           (extra if abs(p - jp) < 0.005 else 0)
+                      if q2 > 0:
+                          c += take * (min(op, q2) / q2) * w
+                      cum += q2
+                  return (per * c / den) if den else 0.0
+              return calc(r) - calc(0.0)
+
+          walls = []
+          for slug, (bids, target, per, tail, bb) in books.items():
+              mine_px = mine.get(slug) or {}
+              fair = FAIR_CONTENDER if tail in CONTENDER else FAIR_MINOR
+              if slug.startswith(WIN) and tail in nom_touch:
+                  fair = min(fair, nom_touch[tail])
+              best = None
+              for p, q in bids:
+                  p = round(p, 2)
+                  if round((bb - p) / TICK) > WALL_TICKS:
+                      break
+                  others = q - mine_px.get(p, 0.0)
+                  if others < WALL_MIN or p > fair + 1e-9:
+                      continue
+                  gains = []
+                  for r in (2000, 5000, 10000, 20000):
+                      if r > others or r * p > WALL_PER_MARKET_USD:
+                          break
+                      gains.append((r, wall_gain(bids, mine_px, target, per, p, r)))
+                  if not gains:
+                      continue
+                  # gains are sublinear in size — take the smallest join that
+                  # captures at least 85% of the best on offer at this level
+                  gmax = max(g for _, g in gains)
+                  r, g = next((r, g) for r, g in gains if g >= 0.85 * gmax)
+                  if best is None or g > best[0]:
+                      best = (g, slug, p, r, others)
+              if best and best[0] >= WALL_GAIN_MIN:
+                  walls.append(best)
+          walls.sort(key=lambda x: -x[0])
+          print(f"\n=== TIER 2 — wall joins (behind >= {WALL_MIN:,} of others) ===")
+          w_notional = 0.0
+          w_placed = w_failed = 0
+          for g, slug, p, r, others in walls:
+              if w_notional + r * p > WALL_NOTIONAL_CAP:
+                  continue
+              print(f"{slug:44s} {p*100:5.1f}c behind {others:9,.0f} join {r:6,} "
+                    f"notional ${r*p:6.0f}  +${g:5.2f}/d")
+              row = {"m": slug, "px": p, "qty": r, "wall": round(others),
+                     "tier": 2, "ok": None}
+              if DRY:
+                  out.append(row); w_placed += 1; w_notional += r * p
+                  continue
+              body = {"marketSlug": slug, "intent": "ORDER_INTENT_BUY_LONG",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{p:.2f}", "currency": "USD"},
+                      "quantity": int(r),
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True}
+              ok, why, delay = False, "", 2.0
+              for attempt in range(4):
+                  try:
+                      rr = api("POST", "/v1/orders", body)
+                      if rr.status_code < 300:
+                          ok = True; break
+                      why = " ".join(rr.text.split())[:120]
+                      if rr.status_code not in (429, 500, 502, 503, 504):
+                          break
+                  except Exception as e:
+                      why = type(e).__name__
+                  time.sleep(delay); delay = min(delay * 2, 20)
+              w_placed += ok; w_failed += (not ok)
+              w_notional += r * p if ok else 0
+              row["ok"] = ok
+              if not ok:
+                  print(f"    FAILED {why}")
+              out.append(row)
+              time.sleep(0.6)
+          print(f"tier 2: {'would join' if DRY else 'joined'} {w_placed} walls, "
+                f"failed {w_failed}, est +${sum(g for g,*_ in walls[:w_placed]):,.2f}/day, "
+                f"apocalypse-only notional ${w_notional:,.0f}")
+
+          print(f"\n{'would place' if DRY else 'placed'} {placed}, failed {failed}")
+          os.makedirs("data", exist_ok=True)
+          json.dump({"dry_run": DRY, "budget": BUDGET, "exposure": round(expo, 2),
+                     "est_gain": round(est, 2), "orders": out,
+                     "skipped": [{"m": m, "px": bb, "others": round(w), "why": why}
+                                 for m, bb, w, why in skipped]},
+                    open("data/bid_rungs.json", "w"), indent=1)
+          with open("data/bid_rungs.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/bid_rungs.json data/bid_rungs.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Bid rungs [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi

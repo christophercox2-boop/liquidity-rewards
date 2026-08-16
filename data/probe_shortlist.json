@@ -1,0 +1,519 @@
+[
+ {
+  "m": "lawec-saveact-2026-08-31",
+  "program": true,
+  "book": true,
+  "pool": 100.0,
+  "target": 5000.0,
+  "df": 0.2,
+  "event_n": 2,
+  "per_side": 25.0,
+  "BID": {
+   "touch": 0.01,
+   "touch_q": 106430.89,
+   "total": 106430.89,
+   "qual": true,
+   "den": 5000.0,
+   "est50": 0.25
+  },
+  "ASK": {
+   "touch": 0.02,
+   "touch_q": 70874.65,
+   "total": 357168.57999999996,
+   "qual": true,
+   "den": 5000.0,
+   "est50": 0.25
+  }
+ },
+ {
+  "m": "lawec-saveact-2026-12-31",
+  "program": true,
+  "book": true,
+  "pool": 100.0,
+  "target": 5000.0,
+  "df": 0.2,
+  "event_n": 2,
+  "per_side": 25.0,
+  "BID": {
+   "touch": 0.13,
+   "touch_q": 11584.42,
+   "total": 98368.42,
+   "qual": true,
+   "den": 5000.0,
+   "est50": 0.25
+  },
+  "ASK": {
+   "touch": 0.14,
+   "touch_q": 115450.35,
+   "total": 386923.82,
+   "qual": true,
+   "den": 5000.0,
+   "est50": 0.25
+  }
+ },
+ {
+  "m": "enwc-usgubp-fl-2026-08-18-rep-byrdon",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 3,
+  "per_side": 50.0,
+  "BID": {
+   "touch": 0.97,
+   "touch_q": 89978.87,
+   "total": 697650.57,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.25
+  },
+  "ASK": {
+   "touch": 0.98,
+   "touch_q": 2836.88,
+   "total": 48052.7,
+   "qual": true,
+   "den": 4269.5,
+   "est50": 0.58
+  }
+ },
+ {
+  "m": "enwc-usgubp-fl-2026-08-18-rep-jamfis",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 3,
+  "per_side": 50.0,
+  "BID": {
+   "touch": 0.02,
+   "touch_q": 18000.9,
+   "total": 20240.440000000002,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.25
+  },
+  "ASK": {
+   "touch": 0.03,
+   "touch_q": 85366.69,
+   "total": 678530.5599999999,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.25
+  }
+ },
+ {
+  "m": "enwc-usgubp-fl-2026-08-18-rep-jaycol",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 3,
+  "per_side": 50.0,
+  "BID": {
+   "empty": true
+  },
+  "ASK": {
+   "touch": 0.01,
+   "touch_q": 99383.09,
+   "total": 231072.57,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.25
+  }
+ },
+ {
+  "m": "ewc-usgub-ca-2026-11-03-xavbec",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 2,
+  "per_side": 75.0,
+  "BID": {
+   "touch": 0.94,
+   "touch_q": 94917.73,
+   "total": 1109721.25,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  },
+  "ASK": {
+   "touch": 0.95,
+   "touch_q": 17663.19,
+   "total": 61058.31999999999,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  }
+ },
+ {
+  "m": "ewc-usse-ga-2026-11-03-dem",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 2,
+  "per_side": 75.0,
+  "BID": {
+   "touch": 0.91,
+   "touch_q": 61511.0,
+   "total": 124174.0,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  },
+  "ASK": {
+   "touch": 0.92,
+   "touch_q": 78264.0,
+   "total": 127307.0,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  }
+ },
+ {
+  "m": "ewc-usse-ga-2026-11-03-rep",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 2,
+  "per_side": 75.0,
+  "BID": {
+   "touch": 0.07,
+   "touch_q": 81266.0,
+   "total": 147587.0,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  },
+  "ASK": {
+   "touch": 0.08,
+   "touch_q": 26600.0,
+   "total": 101516.0,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  }
+ },
+ {
+  "m": "paccc-usho-midterms-2026-11-03-dem",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 2,
+  "per_side": 75.0,
+  "BID": {
+   "touch": 0.848,
+   "touch_q": 7283.0,
+   "total": 937014.0,
+   "qual": true,
+   "den": 7523.1,
+   "est50": 0.5
+  },
+  "ASK": {
+   "touch": 0.849,
+   "touch_q": 7496.0,
+   "total": 546476.0,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  }
+ },
+ {
+  "m": "paccc-usho-midterms-2026-11-03-rep",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 2,
+  "per_side": 75.0,
+  "BID": {
+   "touch": 0.15,
+   "touch_q": 37369.0,
+   "total": 827900.0,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  },
+  "ASK": {
+   "touch": 0.151,
+   "touch_q": 468.0,
+   "total": 482911.0,
+   "qual": true,
+   "den": 1282.2,
+   "est50": 2.81
+  }
+ },
+ {
+  "m": "paccc-usse-midterms-2026-11-03-dem",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 2,
+  "per_side": 75.0,
+  "BID": {
+   "touch": 0.493,
+   "touch_q": 25571.0,
+   "total": 1045900.0,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  },
+  "ASK": {
+   "touch": 0.494,
+   "touch_q": 72168.0,
+   "total": 784543.0,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  }
+ },
+ {
+  "m": "paccc-usse-midterms-2026-11-03-rep",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 2,
+  "per_side": 75.0,
+  "BID": {
+   "touch": 0.506,
+   "touch_q": 29824.0,
+   "total": 1064171.0,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  },
+  "ASK": {
+   "touch": 0.507,
+   "touch_q": 44360.0,
+   "total": 816950.0,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.37
+  }
+ },
+ {
+  "m": "vmc-ussep-misen-2026-08-04-els0-5",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 10,
+  "per_side": 15.0,
+  "BID": {
+   "touch": 0.93,
+   "touch_q": 15000.0,
+   "total": 522343.0,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.07
+  },
+  "ASK": {
+   "empty": true
+  }
+ },
+ {
+  "m": "vmc-ussep-misen-2026-08-04-els10-15",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 10,
+  "per_side": 15.0,
+  "BID": {
+   "empty": true
+  },
+  "ASK": {
+   "touch": 0.01,
+   "touch_q": 67945.88,
+   "total": 139046.81,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.07
+  }
+ },
+ {
+  "m": "vmc-ussep-misen-2026-08-04-els15-20",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 10,
+  "per_side": 15.0,
+  "BID": {
+   "empty": true
+  },
+  "ASK": {
+   "touch": 0.01,
+   "touch_q": 332750.22,
+   "total": 462793.99,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.07
+  }
+ },
+ {
+  "m": "vmc-ussep-misen-2026-08-04-els5-10",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 10,
+  "per_side": 15.0,
+  "BID": {
+   "empty": true
+  },
+  "ASK": {
+   "touch": 0.01,
+   "touch_q": 1836.0,
+   "total": 96233.45,
+   "qual": true,
+   "den": 3468.8,
+   "est50": 0.21
+  }
+ },
+ {
+  "m": "vmc-ussep-misen-2026-08-04-elsgte20",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 10,
+  "per_side": 15.0,
+  "BID": {
+   "empty": true
+  },
+  "ASK": {
+   "touch": 0.01,
+   "touch_q": 283891.68,
+   "total": 471512.44999999995,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.07
+  }
+ },
+ {
+  "m": "vmc-ussep-misen-2026-08-04-ste0-5",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 10,
+  "per_side": 15.0,
+  "BID": {
+   "empty": true
+  },
+  "ASK": {
+   "touch": 0.01,
+   "touch_q": 283716.73,
+   "total": 479590.67,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.07
+  }
+ },
+ {
+  "m": "vmc-ussep-misen-2026-08-04-ste05-10",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 10,
+  "per_side": 15.0,
+  "BID": {
+   "empty": true
+  },
+  "ASK": {
+   "touch": 0.01,
+   "touch_q": 331555.0,
+   "total": 595221.91,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.07
+  }
+ },
+ {
+  "m": "vmc-ussep-misen-2026-08-04-ste10-15",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 10,
+  "per_side": 15.0,
+  "BID": {
+   "empty": true
+  },
+  "ASK": {
+   "touch": 0.01,
+   "touch_q": 319999.0,
+   "total": 396892.59,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.07
+  }
+ },
+ {
+  "m": "vmc-ussep-misen-2026-08-04-ste15-20",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 10,
+  "per_side": 15.0,
+  "BID": {
+   "empty": true
+  },
+  "ASK": {
+   "touch": 0.01,
+   "touch_q": 13417.28,
+   "total": 343847.51999999996,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.07
+  }
+ },
+ {
+  "m": "vmc-ussep-misen-2026-08-04-stegte20",
+  "program": true,
+  "book": true,
+  "pool": 300.0,
+  "target": 10000.0,
+  "df": 0.2,
+  "event_n": 10,
+  "per_side": 15.0,
+  "BID": {
+   "empty": true
+  },
+  "ASK": {
+   "touch": 0.01,
+   "touch_q": 11817.07,
+   "total": 274389.35,
+   "qual": true,
+   "den": 10000.0,
+   "est50": 0.07
+  }
+ }
+]

@@ -1,7 +1,7 @@
 {
  "rows": [
   {
-   "market": "usgubewc-usgub-al-2026-11-03-dem",
+   "market": "usgubewc-usgub-ak-2026-11-03-adacru",
    "program": {
     "df": 0.1,
     "target": 2000.0,
@@ -46,8 +46,358 @@
    ],
    "best_bid": 0.01,
    "best_ask": 0.5,
-   "bid_depth": 17176.0,
-   "ask_depth": 2565.0,
+   "bid_depth": 11300.0,
+   "ask_depth": 325.0,
+   "event_n": 7
+  },
+  {
+   "market": "usgubewc-usgub-ak-2026-11-03-berwil",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.13,
+   "best_ask": 0.59,
+   "bid_depth": 350.0,
+   "ask_depth": 325.0,
+   "event_n": 7
+  },
+  {
+   "market": "usgubewc-usgub-ak-2026-11-03-bilwal",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.5,
+   "bid_depth": 10300.0,
+   "ask_depth": 2900.0,
+   "event_n": 7
+  },
+  {
+   "market": "usgubewc-usgub-ak-2026-11-03-clibis",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.5,
+   "bid_depth": 10300.0,
+   "ask_depth": 2900.0,
+   "event_n": 7
+  },
+  {
+   "market": "usgubewc-usgub-ak-2026-11-03-davbro",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.49,
+   "bid_depth": 10300.0,
+   "ask_depth": 2892.0,
+   "event_n": 7
+  },
+  {
+   "market": "usgubewc-usgub-ak-2026-11-03-jonkre",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.51,
+   "bid_depth": 10300.0,
+   "ask_depth": 325.0,
+   "event_n": 7
+  },
+  {
+   "market": "usgubewc-usgub-ak-2026-11-03-tombeg",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.21,
+   "best_ask": 0.71,
+   "bid_depth": 2450.0,
+   "ask_depth": 2657.0,
+   "event_n": 7
+  },
+  {
+   "market": "usgubewc-usgub-al-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.04,
+   "best_ask": 0.17,
+   "bid_depth": 44495.0,
+   "ask_depth": 133907.74,
    "event_n": 2
   },
   {
@@ -94,131 +444,2561 @@
      "end": "2026-07-28T00:00:00"
     }
    ],
-   "best_bid": 0.7,
-   "best_ask": 0.99,
-   "bid_depth": 2461.0,
-   "ask_depth": 15648.9,
+   "best_bid": 0.82,
+   "best_ask": 0.91,
+   "bid_depth": 301205.0,
+   "ask_depth": 20307.0,
    "event_n": 2
   },
   {
    "market": "usgubewc-usgub-ar-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.09,
+   "bid_depth": 300.0,
+   "ask_depth": 131648.86,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-ar-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.91,
+   "best_ask": 0.96,
+   "bid_depth": 600904.0,
+   "ask_depth": 674.41,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-co-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.88,
+   "best_ask": 0.96,
+   "bid_depth": 600691.0,
+   "ask_depth": 265.0,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-co-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.02,
+   "best_ask": 0.07,
+   "bid_depth": 5700.0,
+   "ask_depth": 130780.86,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-ct-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.95,
+   "best_ask": 0.96,
+   "bid_depth": 500213.14,
+   "ask_depth": 494.14,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-ct-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.12,
+   "bid_depth": 12406.0,
+   "ask_depth": 200017.37,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-fl-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.15,
+   "best_ask": 0.17,
+   "bid_depth": 10813.0,
+   "ask_depth": 265830.16,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-fl-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.86,
+   "best_ask": 0.87,
+   "bid_depth": 500561.0,
+   "ask_depth": 14501.81,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-hi-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.91,
+   "best_ask": 0.96,
+   "bid_depth": 500818.0,
+   "ask_depth": 4371.31,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-hi-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.1,
+   "bid_depth": 10300.0,
+   "ask_depth": 209034.37,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-id-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.1,
+   "bid_depth": 300.0,
+   "ask_depth": 209021.37,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-id-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.91,
+   "best_ask": 0.96,
+   "bid_depth": 500967.0,
+   "ask_depth": 2138.0299999999997,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-il-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.89,
+   "best_ask": 0.96,
+   "bid_depth": 600956.0,
+   "ask_depth": 18514.08,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-il-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.04,
+   "best_ask": 0.09,
+   "bid_depth": 8008.0,
+   "ask_depth": 208494.37,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-ma-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.86,
+   "best_ask": 0.94,
+   "bid_depth": 792.0,
+   "ask_depth": 3401.66,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-ma-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.06,
+   "best_ask": 0.09,
+   "bid_depth": 3816.0,
+   "ask_depth": 275.0,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-md-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.95,
+   "best_ask": 0.99,
+   "bid_depth": 500256.0,
+   "ask_depth": 24279.0,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-md-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.09,
+   "bid_depth": 10300.0,
+   "ask_depth": 65898.93,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-me-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.85,
+   "best_ask": 0.99,
+   "bid_depth": 500820.0,
+   "ask_depth": 58375.99,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-me-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.14,
+   "bid_depth": 41300.0,
+   "ask_depth": 66229.93,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-mn-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.85,
+   "best_ask": 0.92,
+   "bid_depth": 580642.0,
+   "ask_depth": 24585.08,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-mn-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.06,
+   "best_ask": 0.1,
+   "bid_depth": 9633.89,
+   "ask_depth": 196022.6,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-ne-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.03,
+   "best_ask": 0.09,
+   "bid_depth": 361.0,
+   "ask_depth": 265928.16,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-ne-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.91,
+   "best_ask": 0.94,
+   "bid_depth": 500225.0,
+   "ask_depth": 10085.92,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-nh-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.1,
+   "best_ask": 0.21,
+   "bid_depth": 1025.0,
+   "ask_depth": 2670.0,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-nh-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.81,
+   "best_ask": 0.9,
+   "bid_depth": 2385.0,
+   "ask_depth": 3797.0,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-nm-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.81,
+   "best_ask": 0.99,
+   "bid_depth": 500843.0,
+   "ask_depth": 24744.0,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-nm-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.19,
+   "bid_depth": 10418.0,
+   "ask_depth": 66354.93,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-ny-2026-11-03-dem",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.86,
+   "best_ask": 0.95,
+   "bid_depth": 503240.9,
+   "ask_depth": 11451.99,
+   "event_n": 2
   },
   {
    "market": "usgubewc-usgub-ny-2026-11-03-rep",
-   "program": null
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.13,
+   "bid_depth": 12230.0,
+   "ask_depth": 68196.9,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ok-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.05,
+   "best_ask": 0.08,
+   "bid_depth": 2500.0,
+   "ask_depth": 130752.86,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ok-2026-11-03-rep",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.88,
+   "best_ask": 0.98,
+   "bid_depth": 600843.0,
+   "ask_depth": 227.99,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-or-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.79,
+   "best_ask": 0.95,
+   "bid_depth": 600858.0,
+   "ask_depth": 12269.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-or-2026-11-03-rep",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.06,
+   "best_ask": 0.22,
+   "bid_depth": 3178.52,
+   "ask_depth": 66251.93,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-pa-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.88,
+   "best_ask": 0.99,
+   "bid_depth": 2799.0,
+   "ask_depth": 20459.26,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-pa-2026-11-03-rep",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.06,
+   "best_ask": 0.15,
+   "bid_depth": 6142.66,
+   "ask_depth": 3193.01,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-ri-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.91,
+   "best_ask": 0.94,
+   "bid_depth": 2647.0,
+   "ask_depth": 2039.73,
+   "event_n": 3
+  },
+  {
+   "market": "usgubewc-usgub-ri-2026-11-03-kenblo",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.12,
+   "bid_depth": 10300.0,
+   "ask_depth": 550.0,
+   "event_n": 3
+  },
+  {
+   "market": "usgubewc-usgub-ri-2026-11-03-rep",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.14,
+   "bid_depth": 11450.0,
+   "ask_depth": 465.0,
+   "event_n": 3
+  },
+  {
+   "market": "usgubewc-usgub-sc-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.02,
+   "best_ask": 0.07,
+   "bid_depth": 11700.0,
+   "ask_depth": 196091.79,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-sc-2026-11-03-rep",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.83,
+   "best_ask": 0.94,
+   "bid_depth": 500770.0,
+   "ask_depth": 19820.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-sd-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.11,
+   "bid_depth": 15484.0,
+   "ask_depth": 2597.01,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-sd-2026-11-03-rep",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.93,
+   "best_ask": 0.99,
+   "bid_depth": 2360.0,
+   "ask_depth": 4322.39,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-tn-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.01,
+   "best_ask": 0.1,
+   "bid_depth": 11300.0,
+   "ask_depth": 398.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-tn-2026-11-03-rep",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.88,
+   "best_ask": 0.97,
+   "bid_depth": 2575.0,
+   "ask_depth": 18231.29,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-tx-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.14,
+   "best_ask": 0.23,
+   "bid_depth": 459.01,
+   "ask_depth": 654.99,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-tx-2026-11-03-rep",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.8,
+   "best_ask": 0.91,
+   "bid_depth": 575.0,
+   "ask_depth": 357.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-vt-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.06,
+   "best_ask": 0.12,
+   "bid_depth": 13175.66,
+   "ask_depth": 330248.08999999997,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-vt-2026-11-03-rep",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.85,
+   "best_ask": 0.94,
+   "bid_depth": 200690.0,
+   "ask_depth": 22600.41,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-wy-2026-11-03-dem",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.04,
+   "best_ask": 0.07,
+   "bid_depth": 4757.0,
+   "ask_depth": 2514.0,
+   "event_n": 2
+  },
+  {
+   "market": "usgubewc-usgub-wy-2026-11-03-rep",
+   "program": {
+    "df": 0.1,
+    "target": 2000.0,
+    "pool": 25.0,
+    "start": "2026-07-28T00:00:00Z",
+    "end": null,
+    "pid": "politics_low_20260727",
+    "tier": "low",
+    "status": "active"
+   },
+   "raw": [
+    {
+     "programId": "politics_20260712",
+     "period": "daily",
+     "pool": 250,
+     "df": 0.3,
+     "target": 10000,
+     "status": "closed",
+     "start": "2026-07-13T00:00:00",
+     "end": "2026-07-23T18:00:00"
+    },
+    {
+     "programId": "politics_20260723",
+     "period": "daily_event",
+     "pool": 150,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-23T17:00:00",
+     "end": "2026-07-25T00:00:00"
+    },
+    {
+     "programId": "politics_20260724",
+     "period": "daily_event",
+     "pool": 100,
+     "df": 0.5,
+     "target": 2000,
+     "status": "closed",
+     "start": "2026-07-25T00:00:00",
+     "end": "2026-07-28T00:00:00"
+    }
+   ],
+   "best_bid": 0.95,
+   "best_ask": 0.99,
+   "bid_depth": 2043.0,
+   "ask_depth": 27484.45,
+   "event_n": 2
   }
  ]
 }

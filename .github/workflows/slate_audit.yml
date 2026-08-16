@@ -1,0 +1,202 @@
+name: 2028 slate audit
+
+# READ-ONLY. GET only. Places nothing.
+#
+# The question this answers: for every market in the 2028 slate, how much of
+# each side is OURS and how much is somebody else's?
+#
+# It matters because a side can be at Target Size on depth we do not control.
+# When that depth is pulled the side stops paying, and our order there earns
+# nothing — with no warning, because nothing about OUR order changed. The
+# audit reports, per side:
+#
+#   ours / others / total vs Target Size
+#   whether the side would still qualify if every other participant left
+#   where our best order sits relative to the touch, in ticks
+#   what the tracker's own scoring formula says we earn there
+#
+# "self-sufficient" is the column that matters: a side we hold up ourselves
+# cannot be switched off by someone else pulling.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/slate_audit.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: slate-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Audit
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, json, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
+                      "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-")
+          TICK = 0.01
+
+          pol, sizes = tr.fetch_politics_events()
+          slate = sorted(s for s in pol if s.startswith(PREFIXES))
+
+          # our resting orders, per market and side, keyed by price
+          mine: dict = {}
+          path = "/v1/orders/open"
+          r = requests.get(tr.TRADE_API + path,
+                           headers=tr.auth_headers(kid, sec, "GET", path), timeout=30)
+          r.raise_for_status()
+          for o in r.json().get("orders") or []:
+              if str(o.get("state")) not in ("ORDER_STATE_NEW", "ORDER_STATE_PARTIALLY_FILLED"):
+                  continue
+              s = o.get("marketSlug") or ""
+              if not s.startswith(PREFIXES):
+                  continue
+              intent = str(o.get("intent") or "")
+              side = "BUY" if intent.endswith("BUY_LONG") or intent.endswith("SELL_SHORT") else "SELL"
+              px = round(tr._num((o.get("price") or {}).get("value")) or 0, 2)
+              q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+              mine.setdefault(s, {}).setdefault(side, {})
+              mine[s][side][px] = mine[s][side].get(px, 0.0) + q
+
+          progs = {}
+          for i in range(0, len(slate), 25):
+              try:
+                  rr = requests.get(tr.HOSTS[0] + "/v1/incentives",
+                                    params={"symbols": slate[i:i+25], "pageSize": 100}, timeout=30)
+                  for p in rr.json().get("programs") or []:
+                      s = p.get("marketSlug") or ""
+                      tp = tr._pick_period(p.get("timePeriods") or [], s)
+                      if tp is not None and s:
+                          progs[s] = tr._prog_of(tp)
+              except Exception:
+                  pass
+              time.sleep(0.1)
+
+          rows = []
+          for slug in slate:
+              try:
+                  bk = tr._fetch_book(slug)
+              except Exception:
+                  continue
+              time.sleep(0.2)
+              pr = progs.get(slug) or {}
+              target = float(pr.get("target") or 0)
+              df = float(pr.get("df") or 0.2)
+              per = float(pr.get("pool") or 0) / max(sizes.get(slug, 1), 1) / 2
+              for side, lv in (("BUY", bk.get("bids") or []), ("SELL", bk.get("asks") or [])):
+                  if not lv or not target:
+                      continue
+                  tot = sum(q for _, q in lv)
+                  ours_px = (mine.get(slug, {}).get(side) or {})
+                  ours = sum(ours_px.values())
+                  best = lv[0][0]
+                  # scoring window and our score inside it
+                  win, cum = [], 0.0
+                  for px, q in lv:
+                      win.append((px, q)); cum += q
+                      if cum >= target:
+                          break
+                  den = sum(q * df ** round(abs(best - px) / TICK) for px, q in win)
+                  my_score = sum(q * df ** round(abs(best - px) / TICK) for px, q in ours_px.items())
+                  qual = tot >= target
+                  est = (per * min(my_score, den) / den) if (qual and den) else 0.0
+                  best_ours = min(ours_px, key=lambda p: abs(p - best)) if ours_px else None
+                  rows.append({
+                      "m": slug, "side": side, "target": target, "total": tot,
+                      "ours": ours, "others": tot - ours, "qual": qual,
+                      "self_sufficient": ours >= target,
+                      "best": best, "our_best": best_ours,
+                      "ticks_off": (round(abs(best - best_ours) / TICK)
+                                    if best_ours is not None else None),
+                      "est": round(est, 2), "per_side": round(per, 2),
+                      "levels": [[round(px, 2), round(q, 2)] for px, q in win[:8]],
+                      "denom": round(den, 2), "my_score": round(my_score, 2),
+                      "ours_px": {str(k): round(v, 2) for k, v in ours_px.items()}})
+
+          print(f"{'market':40s} {'side':4s} {'ours':>8s} {'others':>8s} {'total':>8s} "
+                f"{'tgt':>6s} {'qual':>4s} {'self':>4s} {'off':>3s} {'$/day':>6s}")
+          for x in rows:
+              print(f"{x['m']:40s} {x['side']:4s} {x['ours']:8,.0f} {x['others']:8,.0f} "
+                    f"{x['total']:8,.0f} {x['target']:6,.0f} "
+                    f"{'y' if x['qual'] else 'NO':>4s} {'y' if x['self_sufficient'] else 'no':>4s} "
+                    f"{x['ticks_off'] if x['ticks_off'] is not None else '-':>3} {x['est']:6.2f}")
+
+          nq = [x for x in rows if not x["qual"]]
+          risky = [x for x in rows if x["qual"] and not x["self_sufficient"]]
+          print(f"\nsides total: {len(rows)}")
+          print(f"  not qualifying right now      : {len(nq)}")
+          print(f"  qualifying only on OTHERS' size: {len(risky)}  <- can vanish without warning")
+          print(f"  self-sufficient                : {sum(1 for x in rows if x['self_sufficient'])}")
+          print(f"\nestimated total from the slate: ${sum(x['est'] for x in rows):,.2f}/day")
+          for lbl, grp in (("BID", "BUY"), ("ASK", "SELL")):
+              g = [x for x in rows if x["side"] == grp]
+              print(f"   {lbl}: ${sum(x['est'] for x in g):,.2f}/day across {len(g)} sides")
+
+          os.makedirs("data", exist_ok=True)
+          json.dump(rows, open("data/slate_audit.json", "w"), indent=1)
+          with open("data/slate_audit.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/slate_audit.json data/slate_audit.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Slate audit [skip ci]"
+            # Several workflows push to this repo at once. A lost race used to
+            # fail the step and throw the run's output away — retry instead.
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi
+
+# audit 2026-08-14 after the self-sufficiency run
+
+# final audit 2026-08-14
+
+# check 2026-08-14 10:20 ET: defend reprice failures
+
+# check 2026-08-14: what remains and what is earning
+
+# check 2026-08-14 15:00 ET: which bids are missing
+
+# confirm 2026-08-14: bids restored
+
+# drop check 2026-08-14 18:15
+
+# post-fix check 2026-08-14
+
+# check 2026-08-15: ask sides vs the doubled 20,000 target
+# confirm 2026-08-15: all 120 sides self-sufficient at 20,000
