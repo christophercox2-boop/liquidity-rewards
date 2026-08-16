@@ -876,6 +876,14 @@ BOOK_COLD_FETCH_ALL = True  # one-shot runs sweep every book; the monitor sets F
 _BOOK_CACHE: dict[str, tuple[float, dict]] = {}  # slug -> (fetched_at, book)
 _BOOK_VOLATILITY: dict[str, float] = {}  # EWMA of "book changed since last refresh"
 PRIORITY_SLUGS: set[str] = set()  # defended markets: their books refresh every call
+# Markets whose books we want FETCHED even while we hold no orders in them.
+# The slug list below is derived from open orders, which is right for scoring
+# but starves discovery: when the owner cancelled every order, the book cache
+# was pruned to a handful of markets, the prober's universe — "markets with a
+# cached book" — collapsed with it, and scouting silently stopped. The monitor
+# sets this to the probe universe so discovery does not depend on already
+# being invested somewhere.
+EXTRA_SLUGS: set[str] = set()
 
 
 def _http_err(resp) -> str:
@@ -979,7 +987,7 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
             }
         )
 
-    slugs = sorted({o["market"] for o in orders if o["market"]})
+    slugs = sorted({o["market"] for o in orders if o["market"]} | EXTRA_SLUGS)
     debug: dict[str, str] = {}
     if len(slugs) > 500:  # safety bound — never truncate silently
         debug["_slug_cap"] = f"{len(slugs)} markets with orders; scoring the first 500"

@@ -9588,6 +9588,22 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                         MONITOR.note_rewards_total(rew_total)
                 except Exception:  # noqa: BLE001
                     pass
+            # keep the probe universe's books flowing even when no orders
+            # rest there — discovery must not depend on being invested
+            try:
+                # prefix match alone gives 1,173 markets, most resolved or
+                # dead; the ones worth a book are those carrying a reward
+                # program (~176). The program cache knows which those are.
+                progs_ = (tr._PROG_CACHE.get("progs") or {})
+                tr.EXTRA_SLUGS = {
+                    m for m in progs_
+                    if m.startswith(PROBE_PREFIXES)} or {
+                    m for m in ((MONITOR.state.get("known_mkts") or {})
+                                .get("politics") or [])
+                    if m.startswith(PROBE_PREFIXES)
+                    and "2028" in m}      # cold start: the slate alone, bounded
+            except Exception:  # noqa: BLE001 — never let this stop the poll
+                pass
             orders = tr.fetch_live_orders(key_id, secret_key, event_sizes)
             MONITOR.sample(dt.datetime.now(dt.timezone.utc), orders)
             MONITOR.error = None
