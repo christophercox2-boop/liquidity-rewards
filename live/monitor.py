@@ -6714,10 +6714,10 @@ function renderSlate(){
          ' — $' + sub.toFixed(2) + '/day</div><div class="fgrid">' +
       list.map(r => {
         const [c, bd] = tone(r);
-        return '<div class="face" style="border-color:' + bd + '" onclick="openMkt(\'' +
-          esc(r.m) + '\')">' +
+        return '<div class="face" style="border-color:' + bd + '" onclick="openMkt(&#39;' +
+          esc(r.m) + '&#39;)">' +
           '<img src="' + esc(r.img) + '" alt="" loading="lazy" ' +
-          'onerror="this.style.visibility=\'hidden\'">' +
+          'onerror="this.style.visibility=&#39;hidden&#39;">' +
           '<div class="fn">' + esc(r.name) + '</div>' +
           '<div class="fr" style="color:' + c + '">' +
           (r.rate > 0 ? '$' + r.rate.toFixed(2) : (r.orders ? '$0' : '—')) + '</div></div>';
