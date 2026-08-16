@@ -3360,15 +3360,18 @@ _PROBE: dict = {"active": {}, "last": {}, "cancelled": set(), "pending": {}}
 PROBE_CONFIRM_WAIT = 300.0   # fills feed lag allowance before "vanished"
 
 
-def _on_book(m: str, side: str, px: float, qty: float):
+def _on_book(m: str, side: str, px: float, qty: float,
+             placed_ts: float | None = None):
     """Layer-three verification: does the PUBLIC book — the only thing that
     scores — actually show a level at our price big enough to contain our
-    order? True/False, or None when the cached book is too stale to judge.
-    The open-order list saying NEW is necessary but not sufficient; orders
-    have been accepted and never rested (2026-08-14), and only the book
-    pays."""
+    order? True/False, or None when no snapshot can fairly judge: cached
+    book too stale, OR the snapshot predates the order (a book photographed
+    before the order existed cannot contain it — every fresh placement
+    showed a false 'NOT ON BOOK' at 0m until this check, 2026-08-16)."""
     ent = tr._BOOK_CACHE.get(m)
     if not ent or time.time() - ent[0] > 300:
+        return None
+    if placed_ts and ent[0] < placed_ts + 8:   # book must postdate the order
         return None
     lv = (ent[1] or {}).get("bids" if side == "BUY" else "asks") or []
     at = sum(q for p, q in lv if abs(p - px) < 0.005)
@@ -5276,7 +5279,7 @@ def _map_payload() -> dict:
         "probe_budget": round(float(MONITOR.state.get("probe_budget") or 0.0), 2),
         "earn_active": [{"m": r[0], "px": r[2], "qty": r[3],
                          "age_m": int((time.time() - r[4]) / 60),
-                         "on_book": _on_book(r[0], "BUY", r[2] / 100.0, r[3])}
+                         "on_book": _on_book(r[0], "BUY", r[2] / 100.0, r[3], r[4])}
                         for r in _EARN["orders"].values()],
         "earn_log": list(reversed((MONITOR.state.get("earn_log") or [])[-30:])),
         "earn_stats": MONITOR.state.get("earn_stats") or {},
@@ -5291,7 +5294,7 @@ def _map_payload() -> dict:
         "probe_log": list(reversed((MONITOR.state.get("probe_log") or [])[-40:])),
         "probe_active": [{"m": r[0], "side": r[1], "px": round(r[2] * 100, 1),
                           "age_m": int((time.time() - r[3]) / 60), "kind": r[4],
-                          "on_book": _on_book(r[0], r[1], r[2], PROBE_SIZE)}
+                          "on_book": _on_book(r[0], r[1], r[2], PROBE_SIZE, r[3])}
                          for r in _PROBE["active"].values()],
         "defend_markets": len(MONITOR.state.get("defend") or {}),
         "defend_note": ("switched off"
@@ -5689,6 +5692,7 @@ function renderEarn(){
     const b = bayes[a.m];
     const bk = a.on_book === true ? ' <span style="color:#3fb950">on book ✓</span>'
              : a.on_book === false ? ' <span style="color:#e5645f;font-weight:700">NOT ON BOOK</span>'
+             : a.age_m < 3 ? ' <span class="sub">settling…</span>'
              : ' <span class="sub">book stale</span>';
     return '<tr><td class="mkt" style="word-break:normal"><b>' + nm(a.m) + '</b></td>' +
       '<td class="r" style="font-size:11px">' + a.qty + ' @ ' + a.px + '¢ · ' + a.age_m + 'm' + bk +
