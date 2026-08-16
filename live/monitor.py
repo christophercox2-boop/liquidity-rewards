@@ -6501,13 +6501,18 @@ MAP_HTML = """<!doctype html><html><head><meta charset="utf-8">
    the prober and earner read-outs, which are analysis, not controls. One
    template serves both so the renderers and the /map.json payload stay
    single-copy; the route decides which sections are on screen. */
-body.lab #gridCard,body.lab #listCard,body.lab #det,body.lab #chips,
+/* #det is deliberately NOT hidden here: openMkt() opens the market panel by
+   setting display:block, and an !important rule in the stylesheet beats an
+   inline style, so listing it here made every face and row on these routes
+   click into nothing. It starts hidden from its own inline style and only
+   the script ever shows it. */
+body.lab #gridCard,body.lab #listCard,body.lab #chips,
 body.lab .autorow,body.lab #navLab{display:none!important}
 body:not(.lab) #probeCard,body:not(.lab) #earnCard{display:none!important}
 body.lab #navMap{display:inline-block!important}
 .navrow{margin:14px 0 4px;display:flex;gap:10px;flex-wrap:wrap}
 body:not(.slate) #slateCard{display:none!important}
-body.slate #gridCard,body.slate #listCard,body.slate #det,body.slate #chips,
+body.slate #gridCard,body.slate #listCard,body.slate #chips,
 body.slate .autorow,body.slate #probeCard,body.slate #earnCard,
 body.slate #navSlate,body.slate #navLab{display:none!important}
 body.slate #navMap{display:inline-block!important}
