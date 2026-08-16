@@ -3957,6 +3957,10 @@ EARN_PX_MAX_C = int(os.environ.get("EARN_PX_MAX_C", "10"))
 # Without the queue this is just a bid at the touch, which is what the bait
 # anchors farm. With it, the order earns while somebody else absorbs the flow.
 EARN_SAFE_MAX_C = int(os.environ.get("EARN_SAFE_MAX_C", "60"))
+# How far above a Silver forecast the earner may still pay. Reward income can
+# justify a few cents of premium over fair value; it cannot justify sixteen
+# times it.
+EARN_SILVER_MARGIN = float(os.environ.get("EARN_SILVER_MARGIN", "3"))
 EARN_QUEUE_MIN = float(os.environ.get("EARN_QUEUE_MIN", "1000"))
 # A filled earner order is a loss. The market goes quiet for two hours rather
 # than being re-entered at the price that just proved takeable.
@@ -4737,8 +4741,25 @@ def auto_earn() -> None:
         # would be resting behind
         def _queue(pc_: int) -> float:
             return sum(q_ for p_, q_ in real_bids if p_ >= pc_)
+        # WHERE A REAL FORECAST EXISTS, IT CAPS THE PRICE. The earner bought NM
+        # Senate Rep at 10c on a day the Silver model had it at 0.62% — 16x
+        # fair, an expected loss of $7.88 on an $8.40 purchase — because the
+        # fair-value gate only applied ABOVE the penny ceiling. Below it the
+        # only question asked was whether the reward income beat the worst
+        # case, and in a reward-farmed book it always does.
+        #
+        # The Bayesian band is no defence here: it read ~10c because a 9c bid
+        # of ours had rested untouched, and a bid resting in these markets
+        # means people are farming rewards, not that anyone values the
+        # contract at 9c. The band measures the crowd; Silver measures the
+        # race. Where Silver has an opinion it wins, with a few cents of
+        # margin so reward income can still justify a small premium.
+        sv = _silver_fair(m)
+        sv_cap = int(sv + EARN_SILVER_MARGIN) if sv is not None else None
         best = None
         for pc in range(base, top + 1):
+            if sv_cap is not None and pc > sv_cap:
+                continue
             # past the penny ceiling both knowledge conditions must hold
             if pc > EARN_PX_MAX_C and (pc > b["lo"] or _queue(pc) < EARN_QUEUE_MIN):
                 continue
