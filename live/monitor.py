@@ -3331,6 +3331,14 @@ def auto_snipe() -> None:
                 continue
         elif px < SNIPE_MIN_PRICE:
             continue
+        # AND NEVER SHORT INTO A BID THE RACE MODEL SAYS IS CHEAP. Sniping
+        # sells to whoever is bidding above fair; if the forecast puts fair
+        # ABOVE their bid then they are the ones getting the good end and we
+        # are handing over stock below value. This never bound before today
+        # because _silver_fair was returning None for every market.
+        sv_ = _silver_fair(m)
+        if sv_ is not None and px * 100 < sv_ - EARN_SILVER_MARGIN:
+            continue
         # never trade with ourselves
         ours = sum(o.get("size") or 0 for o in MONITOR.orders
                    if o.get("market") == m and o.get("side") == "BUY"
@@ -3481,26 +3489,44 @@ def _bid_allowed(m: str, price_c: float) -> bool:
     return price_c <= MAX_UNBACKED_BID_C
 
 
-def _ask_allowed(m: str, price_c: float) -> bool:
+def _ask_allowed(m: str, price_c: float, opening: bool = False) -> bool:
     """May we rest a SELL here? The mirror of _bid_allowed, which existed
     for hours before this did — every guard shipped today watched the buy
     side while a scout sold a 99.9% favourite at 69c and nothing objected.
-    Selling below fair gives value away exactly as surely as buying above
-    it. Where the model has a number, asks must sit at or above fair minus
-    the margin; a race the model should cover but cannot price gets no
-    asks at all; families the model never covers are left alone, because
-    selling to discover the price is the sell scout's whole job there.
+    Selling below fair gives value away exactly as surely as buying above it.
 
-    Third-candidate races are the deliberate asymmetry. Their bids fail
-    closed at token size, but their asks stay permitted: the flip loop
-    places SELL_LONG without asking this function, so blocking asks here
-    would only make the sweep cancel every flip the flip loop placed, on
-    a loop, and leave us holding stock in the one kind of market we have
-    already decided we cannot price. Getting OUT of an unpriceable market
-    is the safe direction."""
+    `opening` SPLITS TWO TRADES THAT ARE NOT ALIKE, and conflating them cost
+    real money. Selling stock we already hold reduces exposure and gets us out
+    of a position. OPENING A SHORT (BUY_SHORT) takes a brand new position on
+    the other side of the book, and is exactly as dangerous as an unbacked
+    bid — more so, because a short at p risks (1 - p) to win p.
+
+    The Rhode Island governor short is the case. That event has a third
+    candidate, so the party model does not describe it and this function
+    returned True for everything there — a carve-out written so the flip loop
+    could SELL STOCK WE HELD. The prober used the same gate to open a short at
+    52c on the Democrat, in a race Silver reads as ~99% Democratic. Getting out
+    of an unpriceable market is safe; betting 48c against it is not.
+
+    With no model an opening short now has to satisfy the MIRROR of the
+    unbacked bid ceiling: without a forecast we may only ever take the cheap
+    tail of a market, never pay up into a genuinely uncertain one. A bid must
+    be at or under MAX_UNBACKED_BID_C; a short must be at or above
+    100 - MAX_UNBACKED_BID_C, i.e. the No side costs no more than the same few
+    cents. A 52c short fails that by a mile, which is the point."""
     sv = _silver_fair(m)
     if sv is not None:
+        # a short below fair, or an inventory sale below fair, both give value
+        # away — one rule covers them
         return price_c >= sv - EARN_SILVER_MARGIN
+    if opening:
+        # no forecast: a race the model should price gets no new shorts at
+        # all, and anywhere else only the cheap tail
+        if _race_family(m):
+            return False
+        return price_c >= 100.0 - MAX_UNBACKED_BID_C
+    # selling stock we hold. Third-candidate races stay open on purpose so the
+    # flip loop can unwind a position the sweep would otherwise fight it over.
     if _third_candidate_race(m):
         return True
     return not _race_family(m)
@@ -4140,7 +4166,9 @@ def auto_probe() -> None:
             px = px_sell
             if round(px / 0.01) in taken:
                 continue
-            if not _ask_allowed(m, px * 100):
+            # can_sell_inv decides SELL_LONG vs BUY_SHORT below, so the gate
+            # has to be told which of the two it is judging
+            if not _ask_allowed(m, px * 100, opening=not can_sell_inv):
                 continue
         # sell from stock when we have it (free), otherwise open the short
         intent = ("ORDER_INTENT_BUY_LONG" if side == "BUY" else

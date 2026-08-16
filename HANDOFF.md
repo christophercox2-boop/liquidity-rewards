@@ -265,6 +265,44 @@ the SHA it just read — which still refuses if someone else moved deploy. All
 three paths (already in sync, needs updating, does not exist) are tested
 against a stubbed git.
 
+### 2026-08-16 — a SHORT is not a SALE, and my own carve-out let one through
+
+Owner's receipt: "Rhode Island Governor Election Winner / Democratic Party ·
+No", bought at 48c. That is not a sale — it is the prober OPENING A SHORT at
+~52c on the RI Democrat, in a race Silver reads as ~99% Democratic.
+
+It went through a hole I opened hours earlier. `_ask_allowed` returned True
+for every ask in a third-candidate race, and I wrote that carve-out
+explicitly so the flip loop could SELL STOCK WE HOLD without the sweep
+fighting it. But one gate served both trades, and they are opposites:
+
+  * SELL_LONG unwinds a position — risk DOWN, and the right thing to allow in
+    a market we have declared unpriceable;
+  * BUY_SHORT opens a brand new position on the other side — risk UP, and at
+    price p it risks (1 - p) to win p.
+
+`_ask_allowed(m, price_c, opening=False)` now splits them. With a forecast,
+both still need `price >= fair - margin`. With NO forecast an opening short
+gets the MIRROR of the unbacked bid ceiling: a race the model should price
+gets no new shorts at all, and anywhere else the short must sit at or above
+`100 - MAX_UNBACKED_BID_C` (85c). The rule in one line: without a model we may
+only ever take the cheap tail of a market, never pay up into an uncertain one.
+A bid may cost at most 15c a share; so may a short. 48c fails by a mile.
+
+auto_probe passes `opening=not can_sell_inv`, which is the same flag that
+already decided SELL_LONG vs BUY_SHORT two lines later. The sweep only ever
+judges SELL_LONG, so it keeps the inventory semantics.
+
+Also audited, since the owner asked whether anything else goes far afield:
+  * auto_snipe opens shorts and never consulted the model. It now refuses to
+    short into a bid below `fair - margin` — it sells to people bidding ABOVE
+    fair, so a bid UNDER fair means they have the good end. Its own band check
+    only ever bound when the band was tight AND had a fill.
+  * the qualification keeper can open shorts too, but its per-market caps are
+    the OWNER'S hand-set config, and CLAUDE.md is explicit that the code never
+    overrules those. Left alone deliberately — flag it if you want it gated.
+  * manual_place is the owner's own tap and is left alone by design.
+
 ### 2026-08-16 — THE SILVER MODEL WAS NEVER ONCE REACHED (FIXED)
 
 Owner spotted it: the /why page said "no Silver number for this market" for
