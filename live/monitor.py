@@ -6608,6 +6608,16 @@ const RANK = {conflict:0, notpaying:1, idle:2, gap:3, ok:4};
 const LABEL = {conflict:"fix now", notpaying:"not paying", idle:"low estimate",
                gap:"not entered", ok:"fine"};
 let DATA=null, SEL=null, FILTER=null, SHOWGAPS=false;
+let RENDER_ERRS = [];
+// HTML-escape. The dashboard has had one for months; this page used esc() in
+// four places without ever defining it, which threw the moment a code path
+// actually reached one — the face grid was the first that did. Candidate
+// names and market slugs come from the exchange, so they are escaped rather
+// than trusted.
+function esc(v){
+  return String(v == null ? '' : v).replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 // Which route is this? /lab shows the prober and earner read-outs; /map keeps
 // the control surface uncluttered. Set before the first paint so neither page
 // flashes the other's sections.
@@ -6633,6 +6643,7 @@ async function load(){
 }
 
 function render(){
+  RENDER_ERRS = [];
   const st={}; DATA.states.forEach(s=>st[s.abbr]=s);
   const c=DATA.counts;
   document.getElementById('chips').innerHTML = ['conflict','notpaying','idle','gap','ok'].map(k=>
@@ -6649,9 +6660,16 @@ function render(){
   }).join('')).join('');
 
   swRender();
-  renderSlate();
-  renderProbe();
-  renderEarn();
+  // One broken card must not blank the page. These three run after the
+  // fetch and before the status line is updated, so a throw in any of them
+  // used to leave every route stuck on "loading..." with no clue why — and
+  // the clue only existed in a console the owner has no way to open on a
+  // phone. Each is isolated now, and a failure names itself on screen.
+  [['slate', renderSlate], ['prober', renderProbe], ['earner', renderEarn]]
+    .forEach(([nm, fn]) => {
+      try { fn(); }
+      catch (e) { RENDER_ERRS.push(nm + ': ' + ((e && e.message) || e)); }
+    });
   const bn=document.getElementById('banner');
   if(DATA.auto && DATA.auto.defend===true && DATA.defend_live===false){
     // switched on but vetoed by something else -- say what
@@ -6664,9 +6682,14 @@ function render(){
   } else { bn.style.display='none'; }
 
   const m=DATA.model;
-  document.getElementById('meta').textContent =
+  const meta=document.getElementById('meta');
+  meta.textContent =
     `${m.senate} Senate + ${m.governor} Governor races · model from ${m.source==='cdn'?'live feed':'last saved copy'}`
     + (DATA.updated? ` · orders ${DATA.updated}`:'');
+  if (RENDER_ERRS.length) {
+    meta.textContent += ' · ⚠ ' + RENDER_ERRS.join(' | ');
+    meta.style.color = '#ff9d99';
+  } else { meta.style.color = ''; }
 
   // Only things needing a decision get a row. Unentered races are a single
   // collapsed line: they all say the same sentence, and 40 copies of it would
