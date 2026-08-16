@@ -4949,7 +4949,19 @@ def auto_earn() -> None:
         # an ask can rest without crossing.
         bids3 = ent3[1].get("bids") or []
         if now - since3 >= EARN_FLIP_LOSS_AFTER and bids3:
+            # Conceding to the market is for stock we should not be holding.
+            # It is NOT licence to hand over something the model says is
+            # nearly certain: Kentucky Senate Republican went at 72c on a
+            # 99.56% forecast because this floor followed the best bid down
+            # and nothing checked what the thing was worth. The concession
+            # still happens, but never below fair value.
             floor3_ = max(1.0, round(float(bids3[0][0]) * 100) + 1)
+            sv3 = _silver_fair(fm3)
+            if sv3 is None:
+                b3 = _bayes_fair(fm3)
+                sv3 = (b3 or {}).get("med")
+            if sv3 is not None:
+                floor3_ = max(floor3_, float(sv3) - EARN_SILVER_MARGIN)
         else:
             floor3_ = cost3 + 1
         if best3 >= fpc3:
