@@ -29,6 +29,7 @@ import json
 import os
 import math
 import random
+import re
 import sys
 import threading
 import time
@@ -3558,6 +3559,168 @@ def _probe_place(m: str, side: str, px: float, intent: str, note: str) -> str | 
         return None
 
 
+# ---------------------------------------------------------------------------
+# Qualifier: lift a side to Target Size so it pays at all
+# ---------------------------------------------------------------------------
+#
+# A side below Target Size pays NOBODY — not us, not anyone — so the cheapest
+# way to switch a market on is to close that gap at the floor: a 1c bid or a
+# 99c ask, where a contract ties up the least money it possibly can. Those
+# orders earn almost nothing themselves; they exist so that our orders NEAR
+# the touch on that side start scoring.
+#
+# The owner's rule (2026-08-16): for anything resolving November 2026 or
+# later it is fine to do this automatically, because the chance of being
+# filled at the floor that far out is very small. Anything sooner, any
+# PRIMARY, and any job around the $200 mark waits for a tap.
+#
+# Primaries are called out separately because their slugs carry a distinct
+# family marker and their dates arrive fast — a floor order that looks safe
+# in a 2028 market is not safe in a primary three weeks out.
+QUAL_AUTO_MAX_USD = float(os.environ.get("QUAL_AUTO_MAX_USD", "50"))
+QUAL_BP_RESERVE = float(os.environ.get("QUAL_BP_RESERVE", "200"))
+QUAL_MAX_PER_POLL = int(os.environ.get("QUAL_MAX_PER_POLL", "2"))
+QUAL_PRIMARY_MARKS = ("usgubp", "ussep", "ushrp", "uspresp")
+_QUAL: dict = {"last": 0.0}
+
+
+def _is_primary(m: str) -> bool:
+    return any(p in m for p in QUAL_PRIMARY_MARKS)
+
+
+def _far_dated(m: str) -> bool:
+    """Resolving November 2026 or later.
+
+    A full YYYY-MM-DD in the slug decides it. Failing that, a bare four-digit
+    year of 2027 or later does — and that branch is not a nicety: the 2028
+    nomination slugs carry no full date, only "2028", so a date-only parse
+    would send the most obviously far-dated markets on the board into the
+    approval queue.
+    """
+    d = re.search(r"(20\d\d)-(\d\d)-(\d\d)", m)
+    if d:
+        y, mo = int(d.group(1)), int(d.group(2))
+        return y > 2026 or (y == 2026 and mo >= 11)
+    yrs = [int(y) for y in re.findall(r"\b(20\d\d)\b", m)]
+    return bool(yrs) and max(yrs) >= 2027
+
+
+def _qual_gaps(m: str) -> list[dict]:
+    """Sides of m that are short of Target Size, with what closing costs.
+
+    A bid at the floor ties up its price; an ask at the ceiling ties up what
+    is left of the dollar. At 1c and 99c those are the same penny, which is
+    what makes the floor the cheap place to do this.
+    """
+    pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
+    target = int(pr.get("target") or 0)
+    ent = tr._BOOK_CACHE.get(m)
+    if not target or not ent or time.time() - ent[0] > 600:
+        return []
+    tick = float(ent[1].get("tick") or 0.01)
+    out = []
+    for side, key in (("BUY", "bids"), ("SELL", "asks")):
+        tot = sum(q for _, q in (ent[1].get(key) or []))
+        gap = int(target - tot)
+        if gap <= 0:
+            continue
+        px = tick if side == "BUY" else round(1 - tick, 2)
+        out.append({"m": m, "side": side, "gap": gap, "px": px,
+                    "cost": round(gap * (px if side == "BUY" else 1 - px), 2),
+                    "target": target, "have": int(tot)})
+    return out
+
+
+def _qual_route(job: dict) -> str:
+    """auto, ask, or skip — and the reason is the owner's, not a heuristic."""
+    m = job["m"]
+    if _is_primary(m):
+        return "ask"          # dates arrive fast; the owner wants a look
+    if not _far_dated(m):
+        return "ask"
+    if job["cost"] > QUAL_AUTO_MAX_USD:
+        return "ask"          # the ~$200 class waits for a tap
+    return "auto"
+
+
+def _qual_place(job: dict) -> tuple[bool, str]:
+    """Close one side's gap at the floor. Bids go in one order; asks are
+    chunked, because the exchange trims a NEW ask to roughly one share per
+    dollar of buying power and a single big one would come back tiny."""
+    m, side, px = job["m"], job["side"], job["px"]
+    left = int(job["gap"])
+    intent = "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_BUY_SHORT"
+    placed = 0
+    while left > 0 and placed < 40:
+        bp = MONITOR.buying_power or 0.0
+        if bp - QUAL_BP_RESERVE <= 0:
+            return placed > 0, f"stopped: buying power ${bp:,.0f} at the reserve"
+        qty = left if side == "BUY" else min(left, max(1, int(bp - QUAL_BP_RESERVE)))
+        try:
+            r = requests.request(
+                "POST", tr.TRADE_API + "/v1/orders",
+                headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                         "Content-Type": "application/json"},
+                json={"marketSlug": m, "intent": intent,
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{px:.2f}", "currency": "USD"},
+                      "quantity": int(qty),
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True},
+                timeout=20)
+        except Exception as e:  # noqa: BLE001
+            return placed > 0, f"{type(e).__name__}"
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": m, "side": f"QUALIFY {side}", "from": "—",
+                        "to": round(px * 100, 1), "size": int(qty),
+                        "status": r.status_code,
+                        "response": " ".join(r.text.split())[:100],
+                        "verified": r.status_code < 300})
+        del ACTIONS[:-20]
+        if r.status_code >= 300:
+            return placed > 0, f"HTTP {r.status_code}"
+        placed += 1
+        left -= int(qty)
+        time.sleep(0.4)
+    return True, "done" if left <= 0 else f"{left:,} still short"
+
+
+def auto_qualify() -> None:
+    """Close cheap qualification gaps; queue the rest for the owner."""
+    if not _auto_on("qualify") or os.environ.get("QUALIFY_PAUSE", "") == "1":
+        return
+    now = time.time()
+    if now - float(_QUAL.get("last") or 0) < 300:
+        return
+    _QUAL["last"] = now
+    queue = MONITOR.state.setdefault("qual_queue", {})
+    done = 0
+    for m in sorted((tr._PROG_CACHE.get("progs") or {})):
+        if done >= QUAL_MAX_PER_POLL:
+            break
+        if not m.startswith(PROBE_PREFIXES):
+            continue
+        for job in _qual_gaps(m):
+            key = f"{job['m']}|{job['side']}"
+            route = _qual_route(job)
+            if route == "ask":
+                if key not in queue:
+                    queue[key] = {**job, "why": ("primary" if _is_primary(job["m"]) else
+                                                 "resolves before Nov 2026"
+                                                 if not _far_dated(job["m"]) else
+                                                 f"costs ${job['cost']:,.2f}"),
+                                  "asked": now}
+                continue
+            if done >= QUAL_MAX_PER_POLL:
+                break
+            ok, note = _qual_place(job)
+            done += 1
+            _probe_log(job["m"], "qualify", job["side"], job["px"],
+                       f"{job['have']:,} of {job['target']:,} — "
+                       f"{'closed' if ok else 'failed'} {job['gap']:,} at "
+                       f"{job['px']*100:.0f}¢ (${job['cost']:,.2f}) · {note}")
+
+
 def auto_probe() -> None:
     # one-time owner grants into the info fund, applied exactly once each
     # (the applied list persists with the saved state, surviving restarts)
@@ -5999,9 +6162,10 @@ def do_maction(body: dict) -> tuple[int, dict]:
         # The owner's on/off button for a placement loop. Auth and the
         # X-Reprice CSRF header are already enforced by the POST handler.
         which = str(body.get("which") or "")
-        if which not in ("defend", "keeper", "snipe", "probe", "earn"):
+        if which not in ("defend", "keeper", "snipe", "probe", "earn", "qualify"):
             return 400, {"ok": False,
-                         "error": "which must be defend, keeper, snipe, probe or earn"}
+                         "error": "which must be defend, keeper, snipe, probe, "
+                                  "earn or qualify"}
         on = bool(body.get("on"))
         with MONITOR.lock:
             auto = MONITOR.state.setdefault("auto", {})
@@ -6015,6 +6179,31 @@ def do_maction(body: dict) -> tuple[int, dict]:
         del ACTIONS[:-20]
         POLL_KICK.set()   # save + payload refresh promptly
         return 200, {"ok": True, "which": which, "on": on}
+    if op == "qual":
+        # The owner's decision on one queued qualification. Approve places it
+        # immediately regardless of the cost gate that queued it — that gate
+        # exists to ask, not to refuse.
+        key = str(body.get("key") or "")
+        act = str(body.get("act") or "")
+        with MONITOR.lock:
+            job = (MONITOR.state.get("qual_queue") or {}).get(key)
+        if not job:
+            return 400, {"ok": False, "error": "unknown or already-handled job"}
+        if act == "deny":
+            with MONITOR.lock:
+                (MONITOR.state.get("qual_queue") or {}).pop(key, None)
+            return 200, {"ok": True, "acted": "denied"}
+        if act != "approve":
+            return 400, {"ok": False, "error": "act must be approve or deny"}
+        fresh = [g for g in _qual_gaps(job["m"]) if g["side"] == job["side"]]
+        if not fresh:
+            with MONITOR.lock:
+                (MONITOR.state.get("qual_queue") or {}).pop(key, None)
+            return 200, {"ok": True, "acted": "already at target — dropped"}
+        ok, note = _qual_place(fresh[0])
+        with MONITOR.lock:
+            (MONITOR.state.get("qual_queue") or {}).pop(key, None)
+        return 200, {"ok": ok, "acted": note}
     if op == "defend":
         slug = str(body.get("market") or "")
         if not _slug_known(slug):
@@ -6051,7 +6240,8 @@ def do_maction(body: dict) -> tuple[int, dict]:
             tr.PRIORITY_SLUGS = set(d)
         return 200, {"ok": True}
     return 400, {"ok": False,
-                 "error": "op must be place, modify, cancel, qualify, defend or undefend"}
+                 "error": "op must be place, modify, cancel, qualify, qual, "
+                          "defend or undefend"}
 
 
 # ---------------------------------------------------------------------------
@@ -6391,6 +6581,7 @@ def _map_payload() -> dict:
         # this dict reads as undefined in the browser, so the button repaints
         # OFF on the next refresh even though the loop is running.
         "auto": {"defend": _auto_on("defend"), "keeper": _auto_on("keeper"),
+                 "qualify": _auto_on("qualify"),
                  "snipe": _auto_on("snipe"), "probe": _auto_on("probe"),
                  "earn": _auto_on("earn")},
         "defend_live": bool(_auto_on("defend")
@@ -6449,6 +6640,9 @@ def _map_payload() -> dict:
              for m_, v_ in (MONITOR.state.get("mkt_img") or {}).items()
              if "2028" in m_),
             key=lambda r: (r["title"], -r["rate"], r["name"])),
+        "qual_queue": sorted(
+            ({"key": k, **v} for k, v in (MONITOR.state.get("qual_queue") or {}).items()),
+            key=lambda j: -float(j.get("cost") or 0)),
         "probe_est": MONITOR.state.get("probe") or {},
         "probe_bayes": {m: b for m in sorted(
                             {l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
@@ -6512,6 +6706,7 @@ body:not(.lab) #probeCard,body:not(.lab) #earnCard{display:none!important}
 body.lab #navMap{display:inline-block!important}
 .navrow{margin:14px 0 4px;display:flex;gap:10px;flex-wrap:wrap}
 body:not(.slate) #slateCard{display:none!important}
+body.lab #qualCard,body.slate #qualCard{display:none!important}
 body.slate #gridCard,body.slate #listCard,body.slate #chips,
 body.slate .autorow,body.slate #probeCard,body.slate #earnCard,
 body.slate #navSlate,body.slate #navLab{display:none!important}
@@ -6673,6 +6868,8 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
       <span class="nm">Prober</span><span class="st">loading…</span></button>
     <button class="autosw" id="sw_earn" onclick="swTap('earn')" disabled>
       <span class="nm">Earner</span><span class="st">loading…</span></button>
+    <button class="autosw" id="sw_qualify" onclick="swTap('qualify')" disabled>
+      <span class="nm">Qualifier</span><span class="st">loading…</span></button>
   </div>
   <div class="banner" id="banner" style="display:none"></div>
   <div class="chips" id="chips"></div>
@@ -6688,6 +6885,11 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     </div>
   </div>
   <div class="card det" id="det" style="display:none"></div>
+  <div class="card" id="qualCard" style="display:none">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--dim);margin-bottom:6px">⚓ Qualifying — waiting on you</div>
+    <div id="qualBody"></div>
+  </div>
   <div class="card" id="slateCard" style="display:none">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--dim);margin-bottom:6px">🇺🇸 2028 slate — where the money is</div>
@@ -6794,7 +6996,8 @@ function render(){
   // used to leave every route stuck on "loading..." with no clue why — and
   // the clue only existed in a console the owner has no way to open on a
   // phone. Each is isolated now, and a failure names itself on screen.
-  [['slate', renderSlate], ['prober', renderProbe], ['earner', renderEarn]]
+  [['qualify', renderQual], ['slate', renderSlate],
+   ['prober', renderProbe], ['earner', renderEarn]]
     .forEach(([nm, fn]) => {
       try { fn(); }
       catch (e) { RENDER_ERRS.push(nm + ': ' + ((e && e.message) || e)); }
@@ -6858,6 +7061,7 @@ const SWDESC = {
   snipe: {on:'taking tiny over-priced 2028 bids', off:'not taking anything'},
   probe: {on:'1-share scouts mapping fair prices', off:'not scouting'},
   earn: {on:'small bids where the model is confident', off:'not placing'},
+  qualify: {on:'closing cheap Target Size gaps at the floor', off:'not qualifying'},
 };
 const SWARM = {};
 // Tap a face -> the book, our orders there, and what each is earning.
@@ -6925,6 +7129,44 @@ async function openMkt(slug){
       (d.orders || []).length + ', earning $' + totRate.toFixed(2) + '/day</div>' +
     '<table style="width:100%">' + ordRows + '</table>';
   det.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function renderQual(){
+  const card = document.getElementById('qualCard'); if(!card) return;
+  const rows = DATA.qual_queue || [];
+  if(!rows.length){ card.style.display='none'; return; }
+  card.style.display='block';
+  const tot = rows.reduce((t,r)=>t+(r.cost||0),0);
+  document.getElementById('qualBody').innerHTML =
+    '<div class="sub" style="margin-bottom:6px">' + rows.length +
+    ' side' + (rows.length===1?'':'s') + ' below Target Size that I will not do on my own — $' +
+    tot.toFixed(2) + ' to close them all. A side below target pays nobody, so these ' +
+    'markets currently earn us nothing.</div>' +
+    rows.map(r =>
+      '<div style="border-top:1px solid var(--line);padding:7px 0">' +
+      '<div style="display:flex;align-items:baseline;gap:6px">' +
+      '<b style="font-size:13px;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;' +
+      'white-space:nowrap">' + esc((DATA.labels||{})[r.m] || r.m) + '</b>' +
+      '<span style="font-size:13px;font-weight:700">$' + (r.cost||0).toFixed(2) + '</span></div>' +
+      '<div class="sub" style="font-size:10.5px;margin:1px 0 5px">' + r.side + ' side · ' +
+      (r.have||0).toLocaleString() + ' of ' + (r.target||0).toLocaleString() +
+      ' · ' + (r.gap||0).toLocaleString() + ' more at ' + Math.round((r.px||0)*100) + '¢' +
+      ' · held back: ' + esc(r.why||'') + '</div>' +
+      '<div class="ctlrow rp"><button onclick="qualAct(&#39;' + esc(r.key) +
+      '&#39;,&#39;approve&#39;)">Approve $' + (r.cost||0).toFixed(2) + '</button>' +
+      '<button class="alt" style="background:rgba(229,100,95,.18);color:#ff9d99" ' +
+      'onclick="qualAct(&#39;' + esc(r.key) + '&#39;,&#39;deny&#39;)">No</button></div></div>'
+    ).join('');
+}
+
+async function qualAct(key, decision){
+  // goes through act(), the same path every order-touching button uses, so it
+  // inherits the dashboard key, the X-Reprice CSRF header and the /maction
+  // route rather than reinventing any of them
+  if(decision === 'approve' && !confirm('Place the qualifying orders for ' + key + '?')) return;
+  const r = await act({op:'qual', key:key, act:decision});
+  alert(r.ok ? ('done — ' + r.msg) : ('failed — ' + r.msg));
+  load();
 }
 
 function renderSlate(){
@@ -7332,7 +7574,7 @@ function renderEarn(){
 
 function swRender(){
   if(!DATA || !DATA.auto) return;
-  ['defend','keeper','snipe','probe','earn'].forEach(k=>{
+  ['defend','keeper','snipe','probe','earn','qualify'].forEach(k=>{
     const b=document.getElementById('sw_'+k); if(!b) return;
     b.disabled=false;
     const on = DATA.auto[k]===true;
@@ -10000,6 +10242,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     auto_earn()
                 except Exception as e:  # noqa: BLE001 — earner never kills the poll
                     MONITOR.error = f"earn: {type(e).__name__}: {e}"[:150]
+                try:
+                    auto_qualify()
+                except Exception as e:  # noqa: BLE001 — never kills the poll
+                    MONITOR.error = f"qualify: {type(e).__name__}: {e}"[:150]
             except Exception as e:  # noqa: BLE001 — defense never kills the poll
                 MONITOR.error = f"defend: {type(e).__name__}: {e}"[:150]
             MONITOR.maybe_save_remote()
