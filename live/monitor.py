@@ -3900,6 +3900,13 @@ EARN_QUEUE_MIN = float(os.environ.get("EARN_QUEUE_MIN", "1000"))
 # A filled earner order is a loss. The market goes quiet for two hours rather
 # than being re-entered at the price that just proved takeable.
 EARN_FILL_COOLDOWN = float(os.environ.get("EARN_FILL_COOLDOWN", "7200"))
+# Stand-down after an exchange-side cancel, multiplied by how many times it has
+# happened in that market (capped at 6x) — a market that keeps eating orders
+# gets left alone for the night instead of absorbing every attempt.
+EARN_VANISH_COOLDOWN = float(os.environ.get("EARN_VANISH_COOLDOWN", "1800"))
+# Same idea for an order we pulled ourselves: it was not earning, so the market
+# should wait its turn behind untried ones rather than being re-entered at once.
+EARN_WITHDRAW_COOLDOWN = float(os.environ.get("EARN_WITHDRAW_COOLDOWN", "3600"))
 EARN_MAX_PER_POLL = 4
 EARN_COOLDOWN = 300.0
 _EARN: dict = {"orders": {}, "last": {}, "cancelled": set(), "pending": {}}
@@ -3999,8 +4006,17 @@ def auto_earn() -> None:
                                              + px / 100.0 * qty, 4)
         elif now - ts_gone > EARN_CONFIRM_WAIT:
             del _EARN["pending"][oid]
+            # The exchange keeps silently cancelling in some markets. Re-placing
+            # straight back into one is how 41 orders vanished overnight while
+            # four names absorbed every attempt. Count it, and stand the market
+            # down for longer each time rather than feeding it again.
+            nv = _EARN.setdefault("vanished", {})
+            nv[m] = int(nv.get(m, 0)) + 1
+            hold = EARN_VANISH_COOLDOWN * min(nv[m], 6)
+            _EARN["last"][m] = now + hold - EARN_COOLDOWN
             _earn_log(m, "vanished", px / 100.0, qty,
-                      "gone without a trade — exchange-side cancel")
+                      f"gone without a trade — exchange-side cancel "
+                      f"({nv[m]}x here; standing off {hold / 3600:.1f}h)")
     # reconcile: fills and drift
     for oid, rec in list(_EARN["orders"].items()):
         m, side, px, qty, ts = rec
@@ -4033,15 +4049,25 @@ def auto_earn() -> None:
                     json={"marketSlug": m}, timeout=15)
                 _EARN["cancelled"].add(oid)
                 del _EARN["orders"][oid]
+                _EARN["last"][m] = now + EARN_WITHDRAW_COOLDOWN - EARN_COOLDOWN
                 _earn_log(m, "withdrawn", px / 100.0, qty,
-                          f"earning ${est:.2f}/d — payback beyond 4 days")
+                          f"earning ${est:.2f}/d — payback beyond 4 days; "
+                          "moving on for an hour")
             except Exception:  # noqa: BLE001
                 pass
     # place where the model is confident and we hold nothing yet
     placed = 0
     have = {rec[0] for rec in _EARN["orders"].values()}
+    # Work the pool LEAST-RECENTLY-TRIED FIRST. Sorting by name meant the
+    # scan restarted from the same end of the alphabet every poll, so the
+    # 2028 nomination markets were reconsidered forever and the race families
+    # further down were never reached at all: 100 placements landed in 5
+    # markets out of a pool of 76. Ordering by last attempt makes the earner
+    # sweep the whole pool and move on (owner, 2026-08-16: "the earner seems
+    # stuck on these markets, just have it move on to somewhere else").
     cands = sorted({l.get("m") for l in (MONITOR.state.get("probe_log") or [])
-                    if l.get("m")})
+                    if l.get("m")},
+                   key=lambda m_: (_EARN["last"].get(m_, 0.0), m_))
     for m in cands:
         if placed >= EARN_MAX_PER_POLL:
             break
@@ -4151,6 +4177,11 @@ def auto_earn() -> None:
                             "response": " ".join(r.text.split())[:100],
                             "verified": ok})
             del ACTIONS[:-20]
+            # Mark the market TRIED whatever the outcome. This was missing, so
+            # `last` stayed 0 for any market that never filled and the cooldown
+            # test below could never bite — the same names were re-entered on
+            # every poll. It also drives the least-recently-tried ordering.
+            _EARN["last"][m] = now
             if ok and oid:
                 _EARN["orders"][str(oid)] = (m, "BUY", tgt, qty, now)
                 _earn_log(m, "placed", px, qty,
