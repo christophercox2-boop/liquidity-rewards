@@ -3978,6 +3978,20 @@ EARN_FLIP_RETRY = float(os.environ.get("EARN_FLIP_RETRY", "1800"))
 # Ceiling on one market's flip order, so a mis-read position can never turn
 # into an enormous ask in a single step.
 EARN_FLIP_MAX_SHARES = int(os.environ.get("EARN_FLIP_MAX_SHARES", "400"))
+# LADDER DOWN RATHER THAN HOLD OUT. A flip two ticks above a 5c cost is asking
+# for a double, and doubles on a longshot rarely come — meanwhile the capital
+# is idle and the prober has most of the universe still to map (owner,
+# 2026-08-16: "don't sit on all the shares trying to make a 2x profit because
+# that rarely happens... maybe you only sell a portion of them to find out
+# where someone will actually pick them up").
+#
+# So every half hour a flip that has not sold moves HALF its size to the
+# midpoint between its price and its floor. The other half is freed and the
+# normal flip path re-places it at the touch, which turns one stubborn rung
+# into a ladder without any special code for ladders: cheap size that actually
+# transacts, dearer size that keeps the upside. Each rung that sells or holds
+# is also a price observation the prober gets for free.
+EARN_FLIP_STEP_AFTER = float(os.environ.get("EARN_FLIP_STEP_AFTER", "1800"))
 # GRADUATION. The point of the earner is to find where the money is, not to
 # sit on the first thing it finds — but an order that has PROVED it earns and
 # stays put should not keep occupying the search budget while it does so
@@ -4414,9 +4428,25 @@ def auto_earn() -> None:
         if not asks3:
             continue
         best3 = round(float(asks3[0][0]) * 100)
+        floor3_ = cost3 + 1
         if best3 >= fpc3:
+            # Not undercut — but is it just sitting there? Step half of it
+            # down toward the floor so we find out where a buyer actually is
+            # instead of waiting out a double that probably never comes.
+            if now - fts3 >= EARN_FLIP_STEP_AFTER and fpc3 > floor3_ + 1 and fq3 >= 2:
+                step_ = max(floor3_, round((fpc3 + floor3_) / 2))
+                half_ = max(1, int(fq3) // 2)
+                code_, res_ = do_reprice(foid, float(step_), quantity=half_)
+                if code_ == 200 and res_.get("ok"):
+                    del _EARN["flips"][foid]
+                    _EARN.setdefault("adopt", []).append(
+                        [fm3, float(step_), half_, cost3, now])
+                    _earn_log(fm3, "flip laddered", step_ / 100.0, half_,
+                              f"no taker at {fpc3:.0f}¢ for 30m — {half_} moved to "
+                              f"{step_:.0f}¢, the rest goes back at the touch "
+                              f"(cost {cost3:.0f}¢)")
             continue                      # we are at or better than the touch
-        floor3 = cost3 + 1                # a flip must still make money
+        floor3 = floor3_                  # a flip must still make money
         if best3 < floor3:
             _earn_log(fm3, "flip held", fpc3 / 100.0, int(fq3),
                       f"undercut at {best3:.0f}¢ but that is under our "
