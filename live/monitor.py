@@ -5525,6 +5525,21 @@ def _map_payload() -> dict:
                             | set((MONITOR.state.get("probe") or {}))
                             | {r[0] for r in _PROBE["active"].values()})
                         if m and (b := _bayes_fair(m))},
+        # What each charted market is actually WORTH: `rate` is what our
+        # orders there are earning right now ($/day, the same figure the
+        # headline counter integrates), `per_side` is the pool a side can win
+        # in a day. Sorting by confidence in "stable and high earnings" needs
+        # the earnings half measured, not inferred from the price alone.
+        "probe_meta": {
+            m: {"rate": round(float((MONITOR.market_rates or {}).get(m) or 0.0), 3),
+                "per_side": round(
+                    float(((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("pool") or 0.0)
+                    / max(int(((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("pool_n")
+                              or ((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("event_n")
+                              or 1), 1) / 2, 2)}
+            for m in ({l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
+                      | set((MONITOR.state.get("probe") or {}))
+                      | {r[0] for r in _PROBE["active"].values()}) if m},
         "probe_log": list(reversed((MONITOR.state.get("probe_log") or [])[-40:])),
         # `beaten` marks a scout somebody has since outbid or undercut with
         # real size — the chart draws those amber, because a beaten scout is
@@ -5970,30 +5985,89 @@ function renderProbe(){
     '<span style="color:#3fb950">■</span> earner bid<br>' +
     'each chart is zoomed to its own market — the cents at either end say how far' +
     '</div></details>';
-  const mktSet = Object.keys(Object.assign({}, est, bayes))
-    .filter(m => bayes[m] && bayes[m].med != null)
-    .sort((a, c) => {
-      const w = k => (bayes[k].fills || 0) * 3 + (bayes[k].rested || 0) * 2 + (bayes[k].n || 0);
-      return w(c) - w(a);
-    });
-  const bands = mktSet.map(m => {
-    const b = bayes[m], e = est[m] || {};
+  // ORDER BY CONFIDENCE IN STABLE, HIGH EARNINGS. One signed score:
+  //
+  //   +1  we are sure this market pays and our order will sit there
+  //    0  we do not know yet
+  //   -1  we are sure it cannot pay, or cannot pay us
+  //
+  // It is a product of two things, which is what makes the middle behave.
+  // `conf` is how much we actually know — evidence count, sharpened by how
+  // narrow the band is. `good` is what we know, from -1 to +1. A market we
+  // are certain is hopeless scores strongly negative; a market with a great
+  // story and two observations behind it scores near zero and stays in the
+  // middle where it belongs, instead of jumping the queue on a guess.
+  const META = DATA.probe_meta || {};
+  const verdict = m => {
+    const b = bayes[m], e = est[m] || {}, mt = META[m] || {};
     const sc = act.filter(a => a.m === m);
-    const eb = (DATA.earn_active || []).filter(x => x.m === m).map(x => x.px);
-    const span = b.hi - b.lo;
-    const conf = span <= 4 ? ['tight', '#3fb950'] : span <= 10 ? ['fair', '#d9a132']
-                                                              : ['loose', '#93a0b4'];
-    return '<div style="margin:0 0 14px">' +
-      '<div style="display:flex;align-items:baseline;gap:6px">' +
-      '<b style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;' +
-      'flex:1 1 auto;min-width:0">' + nice(m) + '</b>' +
-      '<span style="font-size:14px;color:#3fb950;font-weight:700;flex:0 0 auto">' +
-      b.med + '¢</span></div>' +
-      '<div class="sub" style="font-size:10px;margin-bottom:3px">' +
-      '<span style="color:' + conf[1] + '">' + conf[0] + '</span> ' + b.lo + '–' + b.hi + '¢ · ' +
-      (b.fills || 0) + ' traded · ' + (b.rested || 0) + ' held · ' + b.n + ' obs</div>' +
-      mktChart(b, e, sc, eb) + '</div>';
-  }).join('');
+    const eb_ = (DATA.earn_active || []).filter(x => x.m === m);
+    const beaten = sc.filter(a => a.beaten).length;
+    const fills = (b.fills || 0) + (e.fills || 0);
+    const rested = b.rested || 0;
+    const ev = fills * 3 + rested * 2 + (b.n || 0);
+    const tight = 1 - Math.min(1, (b.hi - b.lo) / 20);
+    const conf = Math.min(1, ev / 12) * (0.35 + 0.65 * tight);
+    const why = [];
+    let good = 0;
+    if (rested) { good += 0.5 * Math.min(1, rested / 3);
+                  why.push(rested + ' held with no taker'); }
+    if (fills)  { good -= 0.9 * Math.min(1, fills);
+                  why.push(fills + ' got traded'); }
+    // HIGH earnings, not merely non-zero. Real rates here run from nothing to
+    // $8.40/day, so the scale is set against $4 rather than $1 — otherwise
+    // every market that earns a few cents claims the top zone and the ranking
+    // stops telling the owner anything.
+    if (mt.rate >= 0.25) { good += 0.6 * Math.min(1, mt.rate / 4);
+                           why.push('earning $' + mt.rate.toFixed(2) + '/day now'); }
+    else if (sc.length || eb_.length) { good -= 0.45;
+                           why.push('we are resting there and earning nothing'); }
+    if (beaten) { good -= 0.4 * Math.min(1, beaten / 2);
+                  why.push('outbid ' + beaten + 'x'); }
+    if (mt.per_side >= 1) { good += 0.2 * Math.min(1, mt.per_side / 10);
+                            why.push('$' + mt.per_side.toFixed(2) + '/side/day on offer'); }
+    else if (mt.per_side != null) { good -= 0.5;
+                                    why.push('only $' + (mt.per_side || 0).toFixed(2) + '/side/day here'); }
+    good = Math.max(-1, Math.min(1, good));
+    return {score: conf * good, conf: conf, why: why};
+  };
+  const V = {};
+  const mktSet = Object.keys(Object.assign({}, est, bayes))
+    .filter(m => bayes[m] && bayes[m].med != null);
+  mktSet.forEach(m => { V[m] = verdict(m); });
+  mktSet.sort((a, c) => V[c].score - V[a].score);
+  const ZONE = sc_ => sc_ >= 0.25 ? 0 : sc_ <= -0.15 ? 2 : 1;
+  const ZHEAD = [
+    ['✅ Worth resting in', 'earns, and our orders stay put', '#3fb950'],
+    ['◻︎ Not sure yet', 'too little evidence to call either way', '#93a0b4'],
+    ['⛔️ Not worth it', 'cannot pay, or will not leave us alone', '#e5645f'],
+  ];
+  const bands = (() => {
+    let out = '', zone = -1;
+    mktSet.forEach(m => {
+      const b = bayes[m], e = est[m] || {}, v = V[m];
+      const z = ZONE(v.score);
+      if (z !== zone) {
+        zone = z;
+        out += '<div style="margin:14px 0 8px;padding-top:8px;border-top:1px solid var(--line)">' +
+          '<b style="font-size:12px;color:' + ZHEAD[z][2] + '">' + ZHEAD[z][0] + '</b>' +
+          '<span class="sub" style="font-size:10px"> — ' + ZHEAD[z][1] + '</span></div>';
+      }
+      const sc = act.filter(a => a.m === m);
+      const eb = (DATA.earn_active || []).filter(x => x.m === m).map(x => x.px);
+      out += '<div style="margin:0 0 14px">' +
+        '<div style="display:flex;align-items:baseline;gap:6px">' +
+        '<b style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;' +
+        'flex:1 1 auto;min-width:0">' + nice(m) + '</b>' +
+        '<span style="font-size:14px;color:#3fb950;font-weight:700;flex:0 0 auto">' +
+        b.med + '¢</span></div>' +
+        '<div class="sub" style="font-size:10px;margin-bottom:3px">' +
+        (v.why.length ? v.why.join(' · ') : 'nothing observed yet') +
+        '<br>fair ' + b.lo + '–' + b.hi + '¢ · ' + Math.round(v.conf * 100) + '% sure</div>' +
+        mktChart(b, e, sc, eb) + '</div>';
+    });
+    return out;
+  })();
   const scouts = act.map(a =>
     '<span style="display:inline-block;background:var(--surface2);border-radius:6px;' +
     'padding:2px 8px;margin:2px;font-size:11px">' + nm(a.m) + ' ' +
@@ -6014,11 +6088,13 @@ function renderProbe(){
     '</b> — prober sales in, prober buys out; sell scouts use your existing shares</div>';
   // Charts first — they are what the page is for. The fund, the scout chips
   // and the journal are supporting detail and fold underneath.
-  const tight = mktSet.filter(m => bayes[m].hi - bayes[m].lo <= 4).length;
+  const nGood = mktSet.filter(m => V[m].score >= 0.25).length;
+  const nBad = mktSet.filter(m => V[m].score <= -0.15).length;
   const headline = mktSet.length
     ? '<div style="font-size:13px;margin-bottom:2px">' + mktSet.length +
       ' market' + (mktSet.length === 1 ? '' : 's') + ' mapped · <b style="color:#3fb950">' +
-      tight + '</b> priced to within 4¢</div>'
+      nGood + '</b> worth resting in · <b style="color:#e5645f">' + nBad +
+      '</b> ruled out · ' + (mktSet.length - nGood - nBad) + ' undecided</div>'
     : '<div class="sub">no market has enough evidence for a fair-price estimate yet' +
       (on ? ' — scouts are out' : ' — Prober is off') + '</div>';
   document.getElementById('probeBody').innerHTML = headline +
