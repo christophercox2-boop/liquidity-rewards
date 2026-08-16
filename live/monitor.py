@@ -6365,8 +6365,13 @@ def _map_payload() -> dict:
         # Flips rest on the ASK side out of stock we already hold, so they are
         # listed apart from the bids and never counted against the dollar cap.
         "earn_flips": [{"m": r[0], "px": r[1], "qty": r[2],
-                        "age_m": int((time.time() - r[3]) / 60)}
-                       for r in (_EARN.get("flips") or {}).values()],
+                        "age_m": int((time.time() - r[3]) / 60),
+                        "cost": (r[4] if len(r) > 4 else r[1] - EARN_FLIP_TICKS),
+                        "rate": round(float(next(
+                            (x.get("est_day") or 0 for x in MONITOR.orders
+                             if str(x.get("id")) == oid), 0) or 0), 2),
+                        "on_book": _on_book(r[0], "SELL", r[1] / 100.0, r[2], r[3])}
+                       for oid, r in (_EARN.get("flips") or {}).items()],
         "earn_toflip": len(_EARN.get("toflip") or []),
         "earn_log": list(reversed((MONITOR.state.get("earn_log") or [])[-30:])),
         "earn_stats": MONITOR.state.get("earn_stats") or {},
@@ -7221,14 +7226,39 @@ function renderEarn(){
       if (!fl.length && !pend) return '';
       const rec = st.recovered_usd || 0;
       const fearn = st.flip_earned_usd || 0;
+      // Listed, not just counted: each flip says what it is selling, what it
+      // cost us, what it earns while it waits and whether the book shows it.
+      const frow = f => {
+        const gain = (f.px - f.cost) / (f.cost || 1) * 100;
+        const bk = f.on_book === true ? '<span style="color:#3fb950">on book ✓</span>'
+                 : f.on_book === false ? '<span style="color:#e5645f">NOT ON BOOK</span>'
+                 : f.age_m < 3 ? '<span class="sub">settling…</span>'
+                               : '<span class="sub">book stale</span>';
+        const age = f.age_m >= 90 ? (f.age_m / 60).toFixed(1) + 'h' : f.age_m + 'm';
+        return '<tr><td class="mkt" style="word-break:normal"><b>' + nm(f.m) + '</b>' +
+          '<div style="font-size:12px;color:' + (f.rate > 0 ? '#3fb950' : 'var(--dim)') +
+          ';font-weight:600">$' + (f.rate || 0).toFixed(2) + '/day</div></td>' +
+          '<td class="r" style="font-size:11px">' + f.qty + ' @ ' + f.px + '¢ · ' + age +
+          ' ' + bk + '<div class="sub" style="font-size:10px">cost ' + f.cost + '¢' +
+          (isFinite(gain) ? ' · ' + (gain >= 0 ? '+' : '') + gain.toFixed(0) + '% if it sells'
+                          : '') + '</div></td></tr>';
+      };
+      const fsum = fl.reduce((t2, f) => t2 + f.qty, 0);
+      const frate = fl.reduce((t2, f) => t2 + (f.rate || 0), 0);
       return '<div style="font-size:11.5px;margin-bottom:4px;color:#f2cd7f">↩ ' +
         (fl.length ? fl.length + ' flip' + (fl.length === 1 ? '' : 's') +
-          ' resting (' + fl.reduce((t2, f) => t2 + f.qty, 0) + ' shares)' : '') +
+          ' resting (' + fsum + ' shares)' : '') +
         (pend ? (fl.length ? ' · ' : '') + pend + ' waiting on the position' : '') +
         (rec ? ' · $' + rec.toFixed(2) + ' recovered' : '') +
         (fearn ? ' · $' + fearn.toFixed(2) + ' earned while waiting' : '') +
         '<br><span class="sub">selling back what fills forced on us — inventory, ' +
-        'so no buying power, and they earn rewards the whole time they rest</span></div>';
+        'so no buying power, and they earn rewards the whole time they rest</span></div>' +
+        (fl.length ? '<details open style="margin-bottom:6px">' +
+          '<summary class="sub" style="cursor:pointer;font-size:11px">↩ flips resting (' +
+          fl.length + ') — $' + frate.toFixed(2) + '/day total</summary>' +
+          '<table style="width:100%;border-collapse:collapse">' +
+          fl.slice().sort((a, b) => (b.rate || 0) - (a.rate || 0)).map(frow).join('') +
+          '</table></details>' : '');
     })() +
     '<div class="sub" style="margin-bottom:4px">' + status +
     ' · searching with $' + (caps.outstanding || 0).toFixed(2) +
