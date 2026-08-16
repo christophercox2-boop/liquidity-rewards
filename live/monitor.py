@@ -4054,6 +4054,54 @@ def auto_earn() -> None:
                            if len(j) == 4]
     now = time.time()
     open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
+    # FILL ACCOUNTING COMES FROM THE FILLS FEED, the only place the truth
+    # lives. The old counters incremented when an order VANISHED from the open
+    # list, and a partial fill never vanishes: a 60-share bid that fills 50
+    # still rests with 10 on it, so $5.00 of stock was bought and booked as
+    # nothing. The card read "2 fills costing $2.77" against $7.77 really
+    # spent. The feed aggregates per order id, carries the true filled
+    # quantity, and _fill_src already says which loop owns each id.
+    #
+    # Totals come from a per-order ledger held in state rather than a sum over
+    # the feed, because the feed is a rolling window and anything ageing out of
+    # it would quietly subtract itself from the totals.
+    with MONITOR.lock:
+        led = MONITOR.state.setdefault("earn_ledger", {})
+        for t in (MONITOR.trades or []):
+            oid_ = str(t.get("oid") or "")
+            if not oid_ or _fill_src(oid_) != "earner":
+                continue
+            q_ = float(t.get("filled") or 0)
+            pc_ = float(t.get("price_cents") or 0)
+            if q_ <= 0 or pc_ <= 0:
+                continue
+            led[oid_] = [t.get("market") or "", pc_, q_,
+                         1 if str(t.get("verb")) == "Bought" else 0]
+        for k_ in list(led)[:max(0, len(led) - 400)]:
+            del led[k_]
+        bought = sum(r[1] / 100.0 * r[2] for r in led.values() if r[3])
+        sold = sum(r[1] / 100.0 * r[2] for r in led.values() if not r[3])
+        st_ = MONITOR.state.setdefault("earn_stats", {})
+        st_["fills"] = sum(1 for r in led.values() if r[3])
+        st_["bought_usd"] = round(bought, 4)
+        st_["recovered_usd"] = round(sold, 4)
+        st_["fill_cost_usd"] = round(bought - sold, 4)
+        # queue a flip for every bought order we have not flipped yet — driven
+        # by the feed, so partial fills are covered and nothing has to disappear
+        fl_done = MONITOR.state.setdefault("earn_flipped_oids", [])
+        seen_ = set(fl_done)
+        newflips = []
+        for oid_, (m_, pc_, q_, isbuy) in list(led.items()):
+            if not isbuy or oid_ in seen_ or not m_ or int(q_) < 1:
+                continue
+            fl_done.append(oid_)
+            seen_.add(oid_)
+            _EARN.setdefault("toflip", []).append([m_, pc_, int(q_), now])
+            newflips.append((m_, pc_, int(q_)))
+        del fl_done[:-500]
+    for m_, pc_, q_ in newflips:          # log outside the lock
+        _earn_log(m_, "to flip", pc_ / 100.0, q_,
+                  "queued to sell back — inventory, so no buying power used")
     # settle disappearances: real fill (in the fills feed) vs silent cancel
     for oid, (rec, ts_gone) in list(_EARN["pending"].items()):
         m, side, px, qty, ts = rec
@@ -4067,16 +4115,9 @@ def auto_earn() -> None:
                       "we did not want; standing off this market")
             # a fill is the outcome to avoid, so the cooldown is hours, not
             # minutes — never straight back in at a price that just got hit
+            # cost, count and the flip all come from the fills feed above;
+            # this branch only journals the disappearance and stands down
             _EARN["last"][m] = now + EARN_FILL_COOLDOWN - EARN_COOLDOWN
-            with MONITOR.lock:
-                st_ = MONITOR.state.setdefault("earn_stats", {})
-                st_["fills"] = int(st_.get("fills") or 0) + 1
-                st_["fill_cost_usd"] = round(float(st_.get("fill_cost_usd") or 0)
-                                             + px / 100.0 * qty, 4)
-            # queue the flip rather than placing it here: the positions
-            # snapshot refreshes on its own timer and may not show the stock
-            # yet, and a flip that is silently skipped is a fill left sitting
-            _EARN.setdefault("toflip", []).append([m, px, qty, now])
         elif now - ts_gone > EARN_CONFIRM_WAIT:
             del _EARN["pending"][oid]
             # The exchange keeps silently cancelling in some markets. Re-placing
@@ -4141,12 +4182,6 @@ def auto_earn() -> None:
                       "exchange-side cancel — still holding the stock")
             _EARN.setdefault("toflip", []).append([fm, fpxc - EARN_FLIP_TICKS, fq, now])
             continue
-        with MONITOR.lock:
-            st_ = MONITOR.state.setdefault("earn_stats", {})
-            st_["recovered_usd"] = round(float(st_.get("recovered_usd") or 0)
-                                         + fpxc / 100.0 * fq, 4)
-            st_["fill_cost_usd"] = round(float(st_.get("fill_cost_usd") or 0)
-                                         - fpxc / 100.0 * fq, 4)
         _earn_log(fm, "recovered", fpxc / 100.0, fq,
                   f"sold the {fq} back at {fpxc:.0f}¢ — position closed")
     # Flip out anything that filled. Retried each poll until the position
