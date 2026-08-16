@@ -4033,6 +4033,24 @@ def _earn_log(m: str, ev: str, px: float, qty: int, note: str = "") -> None:
             st["spent_usd"] = round(float(st.get("spent_usd") or 0) + px * qty, 2)
 
 
+def _rate_trend(m: str) -> tuple[float, float]:
+    """(peak, current) $/day for a market over the stored ~8h window.
+
+    This is the series behind the "Biggest drops" card. A market whose rate has
+    collapsed against its own peak is one somebody else has moved into: the
+    side got diluted, or the touch walked away from our order. It shows up here
+    before our own payback test notices, which is the whole value of watching
+    it (owner, 2026-08-16: "look at this from time to time to see where to look
+    for changes in earning rate").
+
+    Only meaningful where we currently hold something — with no order resting,
+    the rate is zero for the dull reason that we are not there."""
+    ser = (MONITOR.state.get("series") or {}).get(m) or []
+    if len(ser) < 5:
+        return 0.0, 0.0
+    return max(v for _, v in ser), ser[-1][1]
+
+
 def _earn_outstanding_usd() -> float:
     """Money the earner has at risk AND still charged to its search budget.
     Graduates are excluded on purpose — they have proved themselves, so the
@@ -4220,7 +4238,9 @@ def auto_earn() -> None:
             continue
         o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
         est = float((o or {}).get("est_day") or 0)
-        if est < 0.25 * (px / 100.0) * qty:
+        pk_, cur_ = _rate_trend(m)
+        diluted = pk_ >= 1.0 and cur_ < 0.4 * pk_
+        if est < 0.25 * (px / 100.0) * qty or diluted:
             try:
                 requests.request(
                     "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
@@ -4232,8 +4252,10 @@ def auto_earn() -> None:
                 del _EARN["orders"][oid]
                 _EARN["last"][m] = now + EARN_WITHDRAW_COOLDOWN - EARN_COOLDOWN
                 _earn_log(m, "withdrawn", px / 100.0, qty,
-                          f"earning ${est:.2f}/d — payback beyond 4 days; "
-                          "moving on for an hour")
+                          (f"market fell ${pk_:.2f} to ${cur_:.2f}/day — diluted, "
+                           "moving on for an hour") if diluted else
+                          (f"earning ${est:.2f}/d — payback beyond 4 days; "
+                           "moving on for an hour"))
             except Exception:  # noqa: BLE001
                 pass
     # Settle flips. A flip that fills is the good outcome — the stock a fill
@@ -4363,11 +4385,19 @@ def auto_earn() -> None:
         cost = px / 100.0 * qty
         if oid in grad:
             # a graduate that stops paying goes back under the cap and takes
-            # its chances with everything else
+            # its chances with everything else. Two ways to stop paying: our
+            # own order fading, or the whole market being diluted out from
+            # under it — the second shows in the rate series first.
+            pk, cur = _rate_trend(m)
             if est < EARN_GRAD_MIN_RATE / 2:
                 grad.discard(oid)
                 _earn_log(m, "demoted", px / 100.0, qty,
                           f"down to ${est:.2f}/day — back on the search budget")
+            elif pk >= 1.0 and cur < 0.4 * pk:
+                grad.discard(oid)
+                _earn_log(m, "demoted", px / 100.0, qty,
+                          f"market fell ${pk:.2f} to ${cur:.2f}/day — being "
+                          "diluted, back on the search budget")
             continue
         if now - ts < EARN_GRAD_AGE or est < EARN_GRAD_MIN_RATE:
             continue
@@ -5832,6 +5862,7 @@ def _map_payload() -> dict:
         # the earnings half measured, not inferred from the price alone.
         "probe_meta": {
             m: {"rate": round(float((MONITOR.market_rates or {}).get(m) or 0.0), 3),
+                "peak": round(_rate_trend(m)[0], 3),
                 "per_side": round(
                     float(((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("pool") or 0.0)
                     / max(int(((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("pool_n")
@@ -6324,6 +6355,13 @@ function renderProbe(){
                            why.push('we are resting there and earning nothing'); }
     if (beaten) { good -= 0.4 * Math.min(1, beaten / 2);
                   why.push('outbid ' + beaten + 'x'); }
+    // A market well below its own 8h peak is one somebody else has moved
+    // into. Only counted where we still hold something, because with nothing
+    // resting the rate is zero for the dull reason that we are not there.
+    if ((sc.length || eb_.length) && mt.peak >= 1 && mt.rate < 0.4 * mt.peak) {
+      good -= 0.45;
+      why.push('rate fell $' + mt.peak.toFixed(2) + ' → $' + mt.rate.toFixed(2) + '/day');
+    }
     if (mt.per_side >= 1) { good += 0.2 * Math.min(1, mt.per_side / 10);
                             why.push('$' + mt.per_side.toFixed(2) + '/side/day on offer'); }
     else if (mt.per_side != null) { good -= 0.5;
