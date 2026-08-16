@@ -6382,6 +6382,19 @@ body.lab .autorow,body.lab #navLab{display:none!important}
 body:not(.lab) #probeCard,body:not(.lab) #earnCard{display:none!important}
 body.lab #navMap{display:inline-block!important}
 .navrow{margin:14px 0 4px;display:flex;gap:10px;flex-wrap:wrap}
+body:not(.slate) #slateCard{display:none!important}
+body.slate #gridCard,body.slate #listCard,body.slate #det,body.slate #chips,
+body.slate .autorow,body.slate #probeCard,body.slate #earnCard,
+body.slate #navSlate,body.slate #navLab{display:none!important}
+body.slate #navMap{display:inline-block!important}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:9px}
+.face{text-align:center;background:var(--surface2);border-radius:10px;padding:6px 3px;
+border:2px solid transparent;cursor:pointer}
+.face img{width:46px;height:46px;border-radius:50%;object-fit:cover;background:#111826;
+display:block;margin:0 auto 3px}
+.face .fn{font-size:9.5px;line-height:1.15;color:var(--dim);overflow:hidden;
+display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:22px}
+.face .fr{font-size:11px;font-weight:700;margin-top:2px}
 body{margin:0;background:var(--bg);color:var(--ink);
 font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 padding:14px 12px 40px;-webkit-text-size-adjust:100%}
@@ -6546,6 +6559,11 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     </div>
   </div>
   <div class="card det" id="det" style="display:none"></div>
+  <div class="card" id="slateCard" style="display:none">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--dim);margin-bottom:6px">🇺🇸 2028 slate — where the money is</div>
+    <div id="slateBody"></div>
+  </div>
   <div class="card" id="probeCard" style="display:none">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--dim);margin-bottom:6px">🔍 Prober — what the scouts found</div>
@@ -6564,6 +6582,8 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
   <div class="navrow">
     <button class="alt" id="navLab" onclick="location.href='/lab'">
       🔬 Prober &amp; Earner</button>
+    <button class="alt" id="navSlate" onclick="location.href='/slate'">
+      🇺🇸 2028 slate</button>
     <button class="alt" id="navMap" onclick="location.href='/map'"
       style="display:none">🗺 Back to the map</button>
   </div>
