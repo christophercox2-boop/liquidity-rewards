@@ -10308,8 +10308,18 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                 # dead; the ones worth a book are those carrying a reward
                 # program (~176). The program cache knows which those are.
                 progs_ = (tr._PROG_CACHE.get("progs") or {})
+                # Include every program's SIBLINGS. Discovery was circular:
+                # books are fetched for markets in the program cache, and the
+                # program cache is built from the markets we fetch, so a market
+                # we hold nothing in could never get in. 96 markets were
+                # invisible that way — among them all six Florida 19th primary
+                # siblings, which is why only the one we already held showed a
+                # program at all. Siblings are the same event and the same
+                # pool, so they are exactly the right markets to pull in.
+                sibs_ = {sb for p_ in progs_.values()
+                         for sb in (p_.get("siblings") or [])}
                 tr.EXTRA_SLUGS = {
-                    m for m in progs_
+                    m for m in (set(progs_) | sibs_)
                     if m.startswith(PROBE_PREFIXES)} or {
                     m for m in ((MONITOR.state.get("known_mkts") or {})
                                 .get("politics") or [])
