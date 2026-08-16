@@ -949,6 +949,20 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                 "price": _num(o.get("price")),
                 "size": size,
                 "intent": str(o.get("intent") or ""),
+                # When the exchange says this order was created, and whether it
+                # came from a human's tap or from an API client.
+                #
+                # We used to drop both. That cost a whole evening on 2026-08-15:
+                # the owner saw ~$45 orders on the race books, asked where they
+                # came from, and nothing in the system could tell a two-day-old
+                # rung from a two-minute-old one. The answer was in the feed the
+                # entire time — createTime put every one of them inside two
+                # workflow runs from the previous afternoon. Note that a reprice
+                # RESETS this: do_reprice places a new order and cancels the old,
+                # so an aged rung that the defender moved reads as brand new.
+                "created": str(o.get("createTime") or ""),
+                "manual": "MANUAL" if str(o.get("manualOrderIndicator") or "")
+                          .endswith("MANUAL") else "auto",
             }
         )
 
