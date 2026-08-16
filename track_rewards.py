@@ -961,6 +961,14 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                 # RESETS this: do_reprice places a new order and cancels the old,
                 # so an aged rung that the defender moved reads as brand new.
                 "created": str(o.get("createTime") or ""),
+                # The exchange names every market and its subject
+                # ("Colorado Senate Election Winner" / "John Hickenlooper
+                # (D)"). We were throwing that away and rendering raw slugs
+                # like usgubewc-usgub-pa-2026-11-03-rep at the owner, which
+                # wrap over two lines on a phone and cannot be skimmed.
+                "title": str(((o.get("marketMetadata") or {}).get("title")) or ""),
+                "subject": str((((o.get("marketMetadata") or {}).get("subject")
+                                 or {}).get("name")) or ""),
                 "manual": "MANUAL" if str(o.get("manualOrderIndicator") or "")
                           .endswith("MANUAL") else "auto",
             }

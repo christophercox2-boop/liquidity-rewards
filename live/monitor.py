@@ -5513,6 +5513,12 @@ def _map_payload() -> dict:
         "probe_scoreboard": MONITOR.state.get("probe_scoreboard") or {},
         "earn_caps": {"per_mkt": EARN_MAX_USD, "total": EARN_TOTAL_USD,
                       "outstanding": round(_earn_outstanding_usd(), 2)},
+        # slug -> human label, from the exchange's own naming
+        "labels": {o["market"]: (
+                       (o.get("subject") or "").strip()
+                       or (o.get("title") or "").strip())
+                   for o in MONITOR.orders
+                   if o.get("market") and (o.get("subject") or o.get("title"))},
         "probe_est": MONITOR.state.get("probe") or {},
         "probe_bayes": {m: b for m in sorted(
                             {l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
@@ -5881,64 +5887,89 @@ function renderProbe(){
   //
   // Scale is 1 SVG unit = 1 cent, so a price maps straight to an x with no
   // arithmetic to get wrong.
-  const clamp = v => Math.max(0, Math.min(100, +v || 0));
+  // A 0-100c axis was the mistake: these markets live between 2c and 30c, so
+  // every mark landed in the left quarter on top of every other mark. Each
+  // chart now ZOOMS to its own market — the window is whatever that market
+  // has marks in, padded — and both ends are labelled in cents so a zoomed
+  // axis can never be mistaken for the full one.
+  const LB = DATA.labels || {};
+  const nice = m => {
+    if (LB[m]) return LB[m];
+    let r = m.match(/-(usse|usgub|ushr)p?-([a-z]{2})-\d{4}-\d{2}-\d{2}-(dem|rep)$/);
+    if (r) return r[2].toUpperCase() + ' ' +
+      ({usse: 'Senate', usgub: 'Governor', ushr: 'House'}[r[1]]) +
+      ' · ' + r[3].toUpperCase();
+    r = m.match(/^enwc-uspres-nom-(dem|rep)-2028-(\w+)$/);
+    if (r) return r[2] + ' · ' + r[1].toUpperCase() + ' nomination';
+    r = m.match(/^ewc-usp-2028-11-07-(\w+)$/);
+    if (r) return r[1] + ' · president 2028';
+    r = m.match(/^scc-(senate|hrep)-(gop|rep|dem)-\d{4}-\d{2}-\d{2}-(\w+)$/);
+    if (r) return (r[1] === 'senate' ? 'Senate' : 'House') + ' seats · ' + r[3];
+    return m;
+  };
   const mktChart = (b, e, sc, eb) => {
+    // everything this market wants to show, so the window can contain it
+    const pts = [b.lo, b.hi, b.med];
+    if (b.bb != null) pts.push(b.bb);
+    if (b.ba != null) pts.push(b.ba);
+    [e.traded_at_bid, e.traded_at_ask, e.rested_bid, e.rested_ask].forEach(v => {
+      if (v != null) pts.push(v * 100); });
+    sc.forEach(a => pts.push(a.px));
+    eb.forEach(p => pts.push(p));
+    let w0 = Math.min.apply(null, pts), w1 = Math.max.apply(null, pts);
+    const pad = Math.max(1.5, (w1 - w0) * 0.18);
+    w0 = Math.max(0, w0 - pad); w1 = Math.min(100, w1 + pad);
+    if (w1 - w0 < 4) { const c = (w0 + w1) / 2; w0 = Math.max(0, c - 2); w1 = Math.min(100, c + 2); }
+    // cents -> viewBox x. Marks are sized in viewBox units, not cents, so they
+    // stay the same size on screen however tight the zoom is.
+    const X = v => Math.max(0, Math.min(100, (v - w0) / (w1 - w0) * 100));
     const g = [];
-    // the unquoted gap between the real touches
     if (b.bb != null && b.ba != null && b.ba > b.bb)
-      g.push('<rect x="' + b.bb + '" y="6" width="' + (b.ba - b.bb) +
-             '" height="7" fill="#161c26"/>');
-    // posterior: full credible band, then the middle half brighter
-    const w = Math.max(0.7, b.hi - b.lo), q = (b.hi - b.lo) / 4;
-    g.push('<rect x="' + b.lo + '" y="6" width="' + w +
-           '" height="7" fill="rgba(63,185,80,.22)"/>');
-    g.push('<rect x="' + clamp(b.med - q) + '" y="6" width="' + Math.max(0.7, 2 * q) +
-           '" height="7" fill="rgba(63,185,80,.45)"/>');
-    // the median, the single number the model would name
-    g.push('<rect x="' + clamp(b.med - 0.28) + '" y="4" width="0.56" height="11" fill="#3fb950"/>');
-    // real touches
-    if (b.bb != null) g.push('<rect x="' + clamp(b.bb - 0.22) + '" y="5.5" width="0.44" height="8" fill="#58a6ff"/>');
-    if (b.ba != null) g.push('<rect x="' + clamp(b.ba - 0.22) + '" y="5.5" width="0.44" height="8" fill="#e5645f"/>');
-    // a real trade against a scout — the expensive kind of evidence
-    [e.traded_at_bid, e.traded_at_ask].forEach(v => { if (v != null) {
-      const x = clamp(v * 100);
-      g.push('<rect x="' + (x - 0.9) + '" y="0.4" width="1.8" height="1.8" fill="#f0883e"/>');
-      g.push('<rect x="' + (x - 0.2) + '" y="2.2" width="0.4" height="3.4" fill="#f0883e" opacity=".7"/>');
-    }});
-    // prices a scout held without a taker — the cheap kind
-    [e.rested_bid, e.rested_ask].forEach(v => { if (v != null) {
-      const x = clamp(v * 100);
-      g.push('<rect x="' + (x - 0.22) + '" y="13.6" width="0.44" height="1.6" fill="#93a0b4" opacity=".8"/>');
-    }});
-    // live scouts: up-arrow for a bid, down-arrow for an ask
+      g.push('<rect x="' + X(b.bb) + '" y="2.4" width="' + Math.max(0, X(b.ba) - X(b.bb)) +
+             '" height="3.8" fill="#161c26"/>');
+    const bl = X(b.lo), bh = X(b.hi), q = (bh - bl) / 4;
+    g.push('<rect x="' + bl + '" y="2.4" width="' + Math.max(1, bh - bl) +
+           '" height="3.8" fill="rgba(63,185,80,.20)"/>');
+    g.push('<rect x="' + Math.max(0, X(b.med) - q) + '" y="2.4" width="' + Math.max(1, 2 * q) +
+           '" height="3.8" fill="rgba(63,185,80,.42)"/>');
+    g.push('<rect x="' + (X(b.med) - 0.5) + '" y="1.2" width="1" height="6.2" fill="#3fb950"/>');
+    if (b.bb != null) g.push('<rect x="' + (X(b.bb) - 0.4) + '" y="2.2" width="0.8" height="4.2" fill="#58a6ff"/>');
+    if (b.ba != null) g.push('<rect x="' + (X(b.ba) - 0.4) + '" y="2.2" width="0.8" height="4.2" fill="#e5645f"/>');
+    [e.traded_at_bid, e.traded_at_ask].forEach(v => { if (v != null)
+      g.push('<rect x="' + (X(v * 100) - 1) + '" y="0" width="2" height="1.6" fill="#f0883e"/>'); });
+    [e.rested_bid, e.rested_ask].forEach(v => { if (v != null)
+      g.push('<rect x="' + (X(v * 100) - 0.35) + '" y="6.4" width="0.7" height="1.5" fill="#93a0b4"/>'); });
     sc.forEach(a => {
-      const x = clamp(a.px);
+      const x = X(a.px);
       const col = a.beaten ? '#f2cd7f' : a.on_book === false ? '#e5645f' : '#58a6ff';
       g.push(a.side === 'BUY'
-        ? '<path d="M' + (x - 1.1) + ' 18 L' + (x + 1.1) + ' 18 L' + x + ' 14.6 Z" fill="' + col + '"/>'
-        : '<path d="M' + (x - 1.1) + ' 1 L' + (x + 1.1) + ' 1 L' + x + ' 4.4 Z" fill="' + col + '"/>');
+        ? '<path d="M' + (x - 1.7) + ' 10 L' + (x + 1.7) + ' 10 L' + x + ' 6.6 Z" fill="' + col + '"/>'
+        : '<path d="M' + (x - 1.7) + ' 0 L' + (x + 1.7) + ' 0 L' + x + ' 3.4 Z" fill="' + col + '"/>');
     });
-    // where the earner has money working
-    eb.forEach(p => g.push('<rect x="' + (clamp(p) - 0.6) + '" y="15.4" width="1.2" height="2.4" fill="#3fb950"/>'));
-    return '<svg viewBox="0 0 100 19" width="100%" height="58" ' +
+    eb.forEach(p => g.push('<rect x="' + (X(p) - 0.9) + '" y="7.4" width="1.8" height="2.4" fill="#3fb950"/>'));
+    return '<svg viewBox="0 0 100 10" width="100%" height="36" ' +
       'preserveAspectRatio="none" style="display:block">' +
-      '<rect x="0" y="9.2" width="100" height="0.6" fill="#3a4454"/>' + g.join('') + '</svg>';
+      '<rect x="0" y="4.1" width="100" height="0.35" fill="#3a4454"/>' + g.join('') + '</svg>' +
+      '<div class="sub" style="font-size:9.5px;display:flex;justify-content:space-between;' +
+      'margin-top:-1px"><span>' + w0.toFixed(0) + '¢</span><span>' + w1.toFixed(0) + '¢</span></div>';
   };
   const chartLegend =
-    '<div class="sub" style="font-size:10px;display:flex;gap:9px;flex-wrap:wrap;' +
-    'margin:2px 0 8px">' +
-    '<span><b style="color:#3fb950">▌</b> fair estimate</span>' +
-    '<span><span style="color:#3fb950">▓</span> likely range</span>' +
-    '<span><b style="color:#58a6ff">▌</b> best bid</span>' +
-    '<span><b style="color:#e5645f">▌</b> best ask</span>' +
-    '<span><span style="color:#58a6ff">▲▼</span> our scouts</span>' +
-    '<span><span style="color:#f2cd7f">▲</span> outbid</span>' +
-    '<span><span style="color:#f0883e">■</span> got traded</span>' +
-    '<span><span style="color:#93a0b4">▕</span> held, no taker</span>' +
-    '<span><span style="color:#3fb950">■</span> earner bid</span>' +
-    '<span>0¢ left → 100¢ right</span></div>';
-  // Strongest evidence first: a market we have traded in beats one we have
-  // only rested in, which beats one we have merely watched.
+    '<details style="margin:2px 0 8px"><summary class="sub" style="cursor:pointer;' +
+    'font-size:11px">what the marks mean</summary>' +
+    '<div class="sub" style="font-size:10.5px;line-height:1.7;margin-top:4px">' +
+    '<span style="color:#3fb950">▌</span> our fair estimate · ' +
+    '<span style="color:#3fb950">▓</span> its likely range<br>' +
+    '<span style="color:#58a6ff">▌</span> best bid · ' +
+    '<span style="color:#e5645f">▌</span> best ask · between them is the untraded gap<br>' +
+    '<span style="color:#58a6ff">▲</span> our buy scout · ' +
+    '<span style="color:#58a6ff">▼</span> sell scout · ' +
+    '<span style="color:#f2cd7f">▲</span> outbid · ' +
+    '<span style="color:#e5645f">▲</span> not on the book<br>' +
+    '<span style="color:#f0883e">■</span> a scout got traded here · ' +
+    '<span style="color:#93a0b4">▕</span> held with no taker · ' +
+    '<span style="color:#3fb950">■</span> earner bid<br>' +
+    'each chart is zoomed to its own market — the cents at either end say how far' +
+    '</div></details>';
   const mktSet = Object.keys(Object.assign({}, est, bayes))
     .filter(m => bayes[m] && bayes[m].med != null)
     .sort((a, c) => {
@@ -5952,20 +5983,16 @@ function renderProbe(){
     const span = b.hi - b.lo;
     const conf = span <= 4 ? ['tight', '#3fb950'] : span <= 10 ? ['fair', '#d9a132']
                                                               : ['loose', '#93a0b4'];
-    return '<div style="margin:0 0 12px">' +
-      '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:1px">' +
-      '<b style="font-size:13px">' + nm(m) + '</b>' +
-      '<span style="font-size:12px;color:#3fb950;font-weight:600">' + b.med + '¢</span>' +
-      '<span style="font-size:10px;padding:1px 6px;border-radius:4px;' +
-      'background:rgba(147,160,180,.16);color:' + conf[1] + '">' + conf[0] + ' ' +
-      b.lo + '–' + b.hi + '¢</span>' +
-      '<span class="sub" style="font-size:10px;margin-left:auto">' +
-      (b.fills || 0) + ' traded · ' + (b.rested || 0) + ' held · ' + b.n + ' obs</span>' +
-      '</div>' + mktChart(b, e, sc, eb) +
-      (e.last_fill ? '<div class="sub" style="font-size:10px">last trade: ' +
-        e.last_fill.side + ' ' + (e.last_fill.px * 100).toFixed(0) + '¢ · ' +
-        e.last_fill.ts + '</div>' : '') +
-      '</div>';
+    return '<div style="margin:0 0 14px">' +
+      '<div style="display:flex;align-items:baseline;gap:6px">' +
+      '<b style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;' +
+      'flex:1 1 auto;min-width:0">' + nice(m) + '</b>' +
+      '<span style="font-size:14px;color:#3fb950;font-weight:700;flex:0 0 auto">' +
+      b.med + '¢</span></div>' +
+      '<div class="sub" style="font-size:10px;margin-bottom:3px">' +
+      '<span style="color:' + conf[1] + '">' + conf[0] + '</span> ' + b.lo + '–' + b.hi + '¢ · ' +
+      (b.fills || 0) + ' traded · ' + (b.rested || 0) + ' held · ' + b.n + ' obs</div>' +
+      mktChart(b, e, sc, eb) + '</div>';
   }).join('');
   const scouts = act.map(a =>
     '<span style="display:inline-block;background:var(--surface2);border-radius:6px;' +
