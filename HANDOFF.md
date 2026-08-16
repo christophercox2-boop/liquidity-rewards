@@ -85,6 +85,51 @@ reasoning ahead of the data).
 
 ## Open items
 
+### 2026-08-16 — earner stopped by the owner. Read this before restarting it.
+
+The owner cancelled every order by hand and switched all five loops off
+after the earner bought ~133 shares of New Mexico Senate REPUBLICAN at
+10c. Silver has that race at 0.62%. We paid roughly sixteen times fair
+value, and it kept happening while it was being discussed.
+
+What actually went wrong, in the order it matters:
+
+1. **The model was outvoted by the order book.** At 1c vs 10c the
+   bid-touch anchor favoured 10c by 4.25 in log-likelihood; the Silver
+   prior favoured 1c by 1.06. The anchor was heavy because the bid side
+   holds thousands of shares — but those are reward farmers at 1-9c, not
+   people who think a Republican wins New Mexico. DEPTH WAS BEING READ AS
+   BELIEF. In a reward-farmed book that is exactly backwards: the more
+   crowded the farming, the more certain the model became.
+2. **No fair-value gate below 10c at all.** The check only applied above
+   the penny ceiling. Under it the only question was whether reward
+   income beat the worst case, which in a farmed book is always yes.
+3. **Guards that shipped but never ran.** The price cap only gated NEW
+   orders while the bad ones kept resting and filling. The cleanup meant
+   to pull them iterated a registry that is re-adopted AFTER the switch
+   check, so with the earner off it looped over nothing, every poll,
+   silently. A guard that no-ops is worse than no guard: it reads as
+   protection in the log and in the code.
+
+All three are fixed in code (Silver price cap with a 3c margin, prior
+rescaled to sqrt(p(1-p)) and weighted 1.2, size tapering away from the
+forecast, off-model sweep over every resting BUY that runs switch-off).
+None of it is proven, because the owner stopped it before the sweep fired.
+
+**THE THING TO CHECK FIRST when restarting.** Every one of those guards
+calls _silver_fair(), which returns None when the monitor's SILVER table
+is empty — and then all of them pass everything through in silence. The
+daily Silver fetch is a GitHub Action, and Actions have been failing on
+exhausted minutes since 2026-08-15. Before the earner goes back on,
+confirm the monitor has a live Silver table (the /map payload's `model`
+block shows senate/governor counts) and make the earner REFUSE to bid in
+a race where the model has no opinion, rather than proceeding blind.
+
+Still unbuilt, and the better half of the owner's instruction: where our
+side is badly overpriced the edge is on the OTHER side, and the earner
+should rest there rather than simply decline to trade.
+
+
 ### Owner-requested, NOT yet built (2026-08-16)
 - **Auto-qualify markets resolving Nov 2026 or later.** Owner: for anything
   resolving that far out it is fine to qualify BOTH sides automatically,
