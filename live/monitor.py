@@ -1200,6 +1200,15 @@ class Monitor:
                 mkt: [p for p in s if p[0] >= cutoff]
                 for mkt, s in series.items() if s and s[-1][0] >= cutoff
             }
+            # The full series is excluded from the saved state — it is large
+            # and rebuilds in hours. But the dilution signal built on it would
+            # then be blind for hours after every restart, which on a night of
+            # frequent deploys means blind almost always. Peak and current per
+            # market is two floats each, so that much is worth carrying.
+            self.state["rate_peak"] = {
+                mkt: [round(max(v for _, v in s), 4), round(s[-1][1], 4)]
+                for mkt, s in self.state["series"].items() if len(s) >= 5
+            }
             # Cumulative earned-today curve for the overall graph. Plots the
             # same basis as the hero number, so the curve and the figure above
             # it can never disagree.
@@ -4046,9 +4055,13 @@ def _rate_trend(m: str) -> tuple[float, float]:
     Only meaningful where we currently hold something — with no order resting,
     the rate is zero for the dull reason that we are not there."""
     ser = (MONITOR.state.get("series") or {}).get(m) or []
-    if len(ser) < 5:
-        return 0.0, 0.0
-    return max(v for _, v in ser), ser[-1][1]
+    if len(ser) >= 5:
+        return max(v for _, v in ser), ser[-1][1]
+    # fall back to the slim peak/current map, which survives a restart
+    pc = (MONITOR.state.get("rate_peak") or {}).get(m)
+    if pc and len(pc) == 2:
+        return float(pc[0]), float(pc[1])
+    return 0.0, 0.0
 
 
 def _earn_outstanding_usd() -> float:
