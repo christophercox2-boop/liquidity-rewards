@@ -3821,9 +3821,30 @@ def auto_probe() -> None:
                        "gone without a trade — exchange-side cancel")
     # 1. reconcile: a probe missing from open orders that we did not cancel
     #    was FILLED — record the price and place the flip
+    progs_now = tr._PROG_CACHE.get("progs") or {}
+    payable_now = set(progs_now) | {sb for p_ in progs_now.values()
+                                    for sb in (p_.get("siblings") or [])}
     for oid, rec in list(_PROBE["active"].items()):
         m, side, px, ts, kind = rec
         if oid in open_ids:
+            # scouts already resting where no reward program exists earn
+            # nothing however long they sit — pull them now rather than
+            # waiting out a TTL that was only ever about gathering evidence
+            if payable_now and m not in payable_now:
+                try:
+                    requests.request(
+                        "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
+                        headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST",
+                                                   f"/v1/order/{oid}/cancel"),
+                                 "Content-Type": "application/json"},
+                        json={"marketSlug": m}, timeout=15)
+                    _PROBE["cancelled"].add(oid)
+                    del _PROBE["active"][oid]
+                    _probe_log(m, "pulled", side, px,
+                               "no reward program here — nothing to earn")
+                except Exception:  # noqa: BLE001
+                    pass
+                continue
             if now - ts > PROBE_TTL:      # rotate a stale probe
                 try:
                     requests.request(
@@ -3940,7 +3961,20 @@ def auto_probe() -> None:
     # visited at all, so the map filled in slowly and unevenly. Unvisited
     # markets go first, then least-recently-scouted, with the shuffle kept only
     # to break ties so identical-looking markets do not always order the same.
-    mkts = [m for m in tr._BOOK_CACHE if m.startswith(PROBE_PREFIXES)]
+    # ONLY MARKETS THAT CAN ACTUALLY PAY. The prober picked markets by slug
+    # prefix alone and never asked whether a reward program existed, so it was
+    # scouting places where no scout could ever earn anything — the whole
+    # ushrewc house family has no program at all. That spends the info fund
+    # and carries real fill risk for a reward of exactly zero.
+    #
+    # Siblings count as payable: they share the event's pool and are named by
+    # a program even when they carry no entry of their own, which is how the
+    # Florida 19th markets qualify.
+    progs_all = tr._PROG_CACHE.get("progs") or {}
+    payable = set(progs_all) | {sb for p_ in progs_all.values()
+                                for sb in (p_.get("siblings") or [])}
+    mkts = [m for m in tr._BOOK_CACHE
+            if m.startswith(PROBE_PREFIXES) and (not payable or m in payable)]
     random.shuffle(mkts)
     mkts.sort(key=lambda m_: (1 if (est.get(m_) or _PROBE["last"].get(m_)) else 0,
                               _PROBE["last"].get(m_, 0.0)))
