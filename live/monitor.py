@@ -4383,6 +4383,15 @@ EARN_FLIP_STEP_AFTER = float(os.environ.get("EARN_FLIP_STEP_AFTER", "1800"))
 # but not before giving the position a proper run at earning first — and a
 # flip that is still collecting rewards never reaches this at all.
 EARN_FLIP_LOSS_AFTER = float(os.environ.get("EARN_FLIP_LOSS_AFTER", "86400"))
+# What counts as running out of cash: the info fund spent down, or buying
+# power at the qualifier's reserve.
+CASH_LOW_FUND = float(os.environ.get("CASH_LOW_FUND", "25"))
+CASH_LOW_BP = float(os.environ.get("CASH_LOW_BP", "250"))
+
+
+def _cash_short() -> bool:
+    return (float(MONITOR.state.get("probe_budget") or 0.0) < CASH_LOW_FUND
+            or float(MONITOR.buying_power or 0.0) < CASH_LOW_BP)
 # GRADUATION. The point of the earner is to find where the money is, not to
 # sit on the first thing it finds — but an order that has PROVED it earns and
 # stays put should not keep occupying the search budget while it does so
@@ -4959,6 +4968,30 @@ def auto_earn() -> None:
         # giving up on.
         o3 = next((x for x in MONITOR.orders if str(x.get("id")) == foid), None)
         earning3 = float((o3 or {}).get("est_day") or 0) > 0.05
+        # WHEN CASH IS SHORT, ASK — DO NOT SELL. A sale below fair value is a
+        # judgement about whether the money is needed more than the position,
+        # and that is the owner's call, not the loop's (owner, 2026-08-16:
+        # "send me a ntfy and I will approve a sale like the one you just did
+        # if I think it's justified"). So the automatic floor stays at fair
+        # value; running low only changes who is asked, never what is done.
+        if (now - since3 >= EARN_FLIP_LOSS_AFTER and bids3 and not earning3
+                and _cash_short() and bids3):
+            askk = f"{fm3}|{int(fpc3)}"
+            asked = MONITOR.state.setdefault("cash_asks", {})
+            if now - float(asked.get(askk) or 0) > 86400:
+                with MONITOR.lock:
+                    asked[askk] = now
+                bidc = round(float(bids3[0][0]) * 100)
+                notify("Sell below fair to raise cash?",
+                       f"{fm3}: {int(fq3)} held, cost {cost3:.0f}c, resting "
+                       f"{fpc3:.0f}c and earning nothing for a day. Best bid "
+                       f"{bidc}c. Fund ${float(MONITOR.state.get('probe_budget') or 0):.0f}, "
+                       f"buying power ${MONITOR.buying_power or 0:.0f}. "
+                       f"Move it to {bidc + 1}c on /map to take it.",
+                       "high")
+                _earn_log(fm3, "asked to sell low", fpc3 / 100.0, int(fq3),
+                          f"cash is short and this has not earned in a day — "
+                          f"best bid {bidc}¢, waiting on your say-so")
         if now - since3 >= EARN_FLIP_LOSS_AFTER and bids3 and not earning3:
             # Conceding to the market is for stock we should not be holding.
             # It is NOT licence to hand over something the model says is
