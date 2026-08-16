@@ -265,6 +265,53 @@ the SHA it just read — which still refuses if someone else moved deploy. All
 three paths (already in sync, needs updating, does not exist) are tested
 against a stubbed git.
 
+### 2026-08-16 — the flip loop ran away on the 2028 party market (FIXED)
+
+Owner's screenshot: `ewc-usp-party-2028-11-07-rep` repeated a dozen-plus
+times, every row identical — 350 @ 40¢, cost 38¢, age 0m, NOT ON BOOK. The
+list is keyed by ORDER ID, so those were real distinct orders, not a render
+bug: ~4,900 shares of ask against a 350-share position.
+
+Two defects compounding, and a third loop closing the circle:
+
+1. **`committed` was blind to the current pass.** The placement loop summed
+   resting SELL_LONG from `MONITOR.orders`, a snapshot from the last poll. With
+   several jobs queued for one market, every one computed the same
+   `net - committed` and placed the FULL size. Fixed: a per-pass accumulator
+   plus anything in the flips registry the snapshot has not caught up with,
+   and at most one flip per market per pass.
+2. **Vanished flips were re-queued unconditionally.** `place → exchange kills
+   it → seen missing → re-queue → place` had nothing damping it. Fixed with
+   `EARN_FLIP_VANISH_MAX` (3) and a `EARN_FLIP_VANISH_RESET` (1h) forgiveness
+   window, persisted to state so a container replace cannot forgive the market
+   and restart the loop.
+3. The excess-flip puller was cancelling the over-sold asks every poll, which
+   is why they read NOT ON BOOK — so the system was fighting itself, cancel
+   and re-place, burning rate limit. That puller was working correctly; it was
+   cleaning up after a bug rather than causing one.
+
+Reproduced and fixed under test (t_flip): 14 queued jobs for one market now
+place ONE order of 350 rather than fourteen.
+
+### 2026-08-16 — graduated orders can sit at 8% confidence (EXPLAINED, not changed)
+
+Owner noticed a graduated order on `ewc-usp-2028-11-07-andbes` scoring 8%.
+Not a contradiction — the two measure different things. Graduation tests the
+ORDER (an hour old, ≥$0.50/day, payback inside two days, visibly on the book,
+no fill ever taken in that market, under the $150 cap) and never consults the
+model. Confidence measures how well we know what the contract is WORTH.
+
+In a quiet market they anticorrelate: nobody trading means no evidence
+accumulates AND nothing reaches down to take our order. Low confidence there
+is partly a symptom of the same calm that makes the order safe.
+
+The real exposure is narrow but genuine: a graduate is exempt from the dollar
+cap, so the least-understood markets can hold a position indefinitely, and if
+one ever fills we have no idea whether the price was good. The /why page now
+states this in the earner card whenever an order has graduated. Adding a
+confidence floor to graduation would trade earnings for safety — an owner
+decision, not taken.
+
 ### 2026-08-16 — /why, one page per market (SHIPPED)
 
 Owner: "Give me some insight into where the confidence numbers come from. Let

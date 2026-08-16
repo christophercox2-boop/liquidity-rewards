@@ -4653,6 +4653,12 @@ EARN_FLIP_RETRY = float(os.environ.get("EARN_FLIP_RETRY", "1800"))
 # Ceiling on one market's flip order, so a mis-read position can never turn
 # into an enormous ask in a single step.
 EARN_FLIP_MAX_SHARES = int(os.environ.get("EARN_FLIP_MAX_SHARES", "400"))
+# How many times a market may have its flip killed exchange-side before we
+# stop re-placing it. Re-queueing on every vanish is a loop with no damping,
+# and it ran away on the 2028 party market. RESET is how long the market must
+# behave before the counter forgives it.
+EARN_FLIP_VANISH_MAX = int(os.environ.get("EARN_FLIP_VANISH_MAX", "3"))
+EARN_FLIP_VANISH_RESET = float(os.environ.get("EARN_FLIP_VANISH_RESET", "3600"))
 # Smallest position worth listing for sale. Below this the order is noise.
 INV_MIN_SHARES = int(os.environ.get("INV_MIN_SHARES", "20"))
 # LADDER DOWN RATHER THAN HOLD OUT. A flip two ticks above a 5c cost is asking
@@ -5287,6 +5293,10 @@ def auto_earn() -> None:
     if not _EARN.get("toflip"):
         _EARN["toflip"] = [list(j) for j in (MONITOR.state.get("earn_toflip") or [])
                            if len(j) == 4]
+    if not _EARN.get("flip_vanish"):
+        _EARN["flip_vanish"] = {k: (int(v[0]), float(v[1])) for k, v
+                                in (MONITOR.state.get("earn_flip_vanish") or {}).items()
+                                if len(v) >= 2}
     if not _EARN.get("grad"):
         _EARN["grad"] = set(MONITOR.state.get("earn_grad") or [])
     if not _EARN.get("adopt"):
@@ -5505,8 +5515,31 @@ def auto_earn() -> None:
             continue
         del _EARN["flips"][foid]
         if not _fill_confirmed(foid):
+            # RE-QUEUEING A VANISHED FLIP IS NOT FREE, AND IT CAN RUN AWAY.
+            #
+            # This used to re-queue unconditionally, which closed a loop with
+            # nothing to damp it: place a flip -> the exchange kills it -> we
+            # see it gone -> re-queue -> place it again, every poll forever.
+            # On ewc-usp-party-2028-11-07-rep that produced dozens of
+            # identical 350 @ 40c asks, all minutes old, none of them ever on
+            # the book, churning cancel/replace against the rate limit.
+            #
+            # A market that keeps eating our asks is telling us something. Try
+            # a few times, then leave the stock alone rather than hammering
+            # it; the position is still there and a later poll can pick it up
+            # once the market stops rejecting.
+            fails = _EARN.setdefault("flip_vanish", {})
+            n_, last_ = fails.get(fm, (0, 0.0))
+            n_ = 1 if now - last_ > EARN_FLIP_VANISH_RESET else n_ + 1
+            fails[fm] = (n_, now)
+            if n_ > EARN_FLIP_VANISH_MAX:
+                _earn_log(fm, "flip vanished", fpxc / 100.0, fq,
+                          f"exchange killed {n_} flips here in a row — leaving "
+                          f"the stock alone instead of re-placing again")
+                continue
             _earn_log(fm, "flip vanished", fpxc / 100.0, fq,
-                      "exchange-side cancel — still holding the stock")
+                      f"exchange-side cancel ({n_} of {EARN_FLIP_VANISH_MAX}) — "
+                      "still holding the stock, re-queueing")
             _EARN.setdefault("toflip", []).append([fm, fpxc - EARN_FLIP_TICKS, fq, now])
             continue
         # EVIDENCE, not just money. A flip that sells means a real buyer was
@@ -5712,12 +5745,24 @@ def auto_earn() -> None:
     # Flip out anything that filled. Retried each poll until the position
     # snapshot catches up with the fill, then given up on so a stale entry
     # cannot place an order against stock we no longer hold.
+    # What THIS pass has already sold, per market. MONITOR.orders is a
+    # snapshot from the last poll, so an order placed a moment ago in this
+    # same loop is invisible to `committed` below — and with several jobs
+    # queued for one market, every one of them computed the same
+    # `net - committed` and placed the FULL size again. That is how one pass
+    # put dozens of identical 350-share asks into a market holding 350.
+    placed_pass: dict[str, float] = {}
     for job in list(_EARN.get("toflip") or []):
         fm, fpx_c, fqty, fts = job
         if now - fts > EARN_FLIP_RETRY:
             _EARN["toflip"].remove(job)
             _earn_log(fm, "flip missed", fpx_c / 100.0, fqty,
                       "position never showed the stock — left holding it")
+            continue
+        # One flip per market per pass. Even with the accounting below right,
+        # fanning several orders into one market in one go is never what we
+        # want: the next poll re-reads the position and can add more.
+        if fm in placed_pass:
             continue
         net = tr._num((MONITOR.positions.get(fm) or {}).get("netPosition")) or 0
         # Asks we ALREADY have resting against this stock. Without this the
@@ -5729,7 +5774,13 @@ def auto_earn() -> None:
         committed = sum(float(o.get("size") or 0) for o in MONITOR.orders
                         if o.get("market") == fm
                         and str(o.get("intent") or "").endswith("SELL_LONG"))
-        fq = int(min(fqty, net - committed))
+        # plus anything this pass placed but the snapshot cannot know about,
+        # and any flip we have registered that the snapshot has not caught up
+        # with either — double-counting is safe here, under-counting is not
+        reg = sum(r_[2] for oid_, r_ in (_EARN.get("flips") or {}).items()
+                  if r_[0] == fm and not any(str(o.get("id")) == oid_
+                                             for o in MONITOR.orders))
+        fq = int(min(fqty, net - committed - placed_pass.get(fm, 0.0) - reg))
         if fq < 1:
             continue
         out = min(0.99, round((fpx_c + EARN_FLIP_TICKS) / 100.0, 2))
@@ -5770,6 +5821,7 @@ def auto_earn() -> None:
                             "response": " ".join(r.text.split())[:100], "verified": ok})
             del ACTIONS[:-20]
             if ok:
+                placed_pass[fm] = placed_pass.get(fm, 0.0) + fq
                 if fq >= fqty:
                     _EARN["toflip"].remove(job)
                 else:
@@ -5978,6 +6030,10 @@ def auto_earn() -> None:
         MONITOR.state["earn_orders_reg"] = {k: list(v) for k, v in _EARN["orders"].items()}
         MONITOR.state["earn_flips_reg"] = {k: list(v) for k, v in (_EARN.get("flips") or {}).items()}
         MONITOR.state["earn_toflip"] = [list(j) for j in (_EARN.get("toflip") or [])]
+        # the vanish counter has to survive a restart, or a container replace
+        # forgives the market and the re-place loop starts over
+        MONITOR.state["earn_flip_vanish"] = {k: list(v) for k, v
+                                             in (_EARN.get("flip_vanish") or {}).items()}
         MONITOR.state["earn_grad"] = sorted(_EARN.get("grad") or set())
         MONITOR.state["earn_adopt"] = [list(j) for j in (_EARN.get("adopt") or [])]
 
@@ -6652,6 +6708,9 @@ def market_why(slug: str) -> tuple[int, dict]:
         o["src"] = ("prober" if oid in _PROBE["active"] else
                     "earner" if oid in _EARN["orders"] else
                     "you" if o.get("manual") == "MANUAL" else "")
+        o["grad"] = oid in (_EARN.get("grad") or set())
+        o["flip"] = oid in (_EARN.get("flips") or {})
+    graduated = any(o.get("grad") for o in mine)
     last_try = _EARN["last"].get(slug, 0.0)
     return 200, {
         "market": slug,
@@ -6681,6 +6740,7 @@ def market_why(slug: str) -> tuple[int, dict]:
                   "ask_total": sum(q for _, q in (ent[1].get("asks") or []))}
                  if ent else None),
         "earner": {"scan": scan, "rung": _earn_rung(slug),
+                   "graduated": graduated,
                    "rung_size": _earn_rung_size(slug),
                    "on": bool((MONITOR.state.get("auto") or {}).get("earn")),
                    "last_try_min": int((now - last_try) / 60) if last_try else None,
@@ -8891,7 +8951,27 @@ function earnCard(d){
       (sc.back?' Standing off '+sc.back+' tick'+(sc.back===1?'':'s')+' from the '+
         c(sc.touch)+' touch.':' Resting at the touch.')+'</p>';
   }
-  return '<div class="card"><h2>What the earner does '+sw(e.on)+'</h2>'+body+
+  // A graduated order beside a low confidence score reads as a contradiction.
+  // It is not: they answer different questions, and in a quiet market they
+  // pull in opposite directions. Say so where it is seen, not in a comment.
+  var grad = '';
+  if (e.graduated){
+    var lo = d.confidence && d.confidence.score < 0.5;
+    grad = '<p class="sub" style="margin-top:8px;border-top:1px solid var(--line);'+
+      'padding-top:8px"><b>🎓 An order here has graduated.</b> That is about '+
+      'the ORDER, not this market’s value: it rested an hour, stayed '+
+      'visibly on the book, earned its keep, and this market has never taken '+
+      'a fill off us. It keeps earning but stops counting against the search '+
+      'budget.'+
+      (lo? ' Confidence is a different question and it is low here — which is '+
+        'usually the SAME fact seen twice: nobody is trading this market, so '+
+        'no evidence accumulates AND nothing reaches down to take our order. '+
+        'The risk it leaves is narrow but real: if this one ever does fill, '+
+        'we have no idea whether the price was good. Graduation does not '+
+        'currently require any model confidence.' : '')+
+      '</p>';
+  }
+  return '<div class="card"><h2>What the earner does '+sw(e.on)+'</h2>'+body+grad+
     (e.cooldown_s>0?'<p class="sub">Cooling down for another '+
       Math.ceil(e.cooldown_s/60)+' min after the last attempt.</p>':'')+'</div>';
 }
