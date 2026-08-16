@@ -3422,16 +3422,27 @@ PROBE_SILVER_EDGE = float(os.environ.get("PROBE_SILVER_EDGE", "2"))
 # This one fails closed and depends on nothing. Above this price a bid needs
 # POSITIVE model support to exist at all; with no forecast, the answer is no.
 MAX_UNBACKED_BID_C = float(os.environ.get("MAX_UNBACKED_BID_C", "15"))
+# A race the model normally prices but currently has no number for: token
+# bids only. Missing data is a reason to stop, not a license to guess.
+RACE_NO_MODEL_BID_C = float(os.environ.get("RACE_NO_MODEL_BID_C", "2"))
 
 
 def _bid_allowed(m: str, price_c: float) -> bool:
-    """May we rest a BUY here at all? Cheap bids are always fine — a penny
-    longshot cannot hurt much. Above that we need a forecast that supports the
-    price, and 'no forecast' is a refusal, not a shrug."""
-    if price_c <= MAX_UNBACKED_BID_C:
-        return True
+    """May we rest a BUY here at all? One rule for every loop and the sweep.
+
+    Where the model HAS a number it binds at every price — under the old
+    shape a 10c bid on a 0.6% race was 'allowed' merely for being under the
+    unbacked cap, and only a separate earner-only check stood in the way.
+    Where the model SHOULD have a number and does not (a race family with a
+    missing table), that is missing data and it fails closed above token
+    size. Only markets the model was never meant to cover — the 2028 slate,
+    the seat ladders — fall back to the flat unbacked cap."""
     sv = _silver_fair(m)
-    return sv is not None and price_c <= sv + EARN_SILVER_MARGIN
+    if sv is not None:
+        return price_c <= sv + EARN_SILVER_MARGIN
+    if _race_family(m):
+        return price_c <= RACE_NO_MODEL_BID_C
+    return price_c <= MAX_UNBACKED_BID_C
 # Per market between new scouts. At 300s a market took over ten minutes to
 # collect its three scouts; at 90s it takes three, so a market gets bracketed
 # while its book still looks the way it did when the first scout went in.
@@ -3830,12 +3841,31 @@ def auto_probe() -> None:
         MONITOR.state["probe_active_reg"] = {k: list(v) for k, v in _PROBE["active"].items()}
 
 
+def _race_family(m: str) -> bool:
+    """Is this a market the Silver model is SUPPOSED to cover? Used to tell
+    'no forecast because it is a 2028 nomination' (fine, other rules apply)
+    from 'no forecast for a Senate race the model normally prices' (not fine
+    — that is missing data, and missing data must fail closed)."""
+    parts = m.split("-")
+    fam = any(t in ("usse", "ussep", "usgub", "usgubp") for t in parts)
+    party = any(t in ("dem", "rep") for t in parts)
+    st = any(len(t) == 2 and t.isalpha() and t != "us" for t in parts)
+    return fam and party and st
+
+
 def _silver_fair(m: str) -> float | None:
-    """Model prior for race markets, in cents: the Silver table the map
-    already loads, keyed by state and party. None for anything it doesn't
-    cover — the prior is a nudge, never a requirement."""
+    """Model prior for race markets, in cents. None for anything the model
+    does not cover — the callers decide what None means for them.
+
+    Loads its own table. It used to read the SILVER global and the only
+    thing that ever FILLED that global was a /map page render — so after
+    every restart the loops ran with no model until somebody happened to
+    open the map, and every model-based guard quietly became a coin flip.
+    The CO governor scouts bought at 10c and 14c against a 0.2% forecast
+    came from exactly that window. _silver_races() self-throttles on a
+    6-hour TTL, so this costs one fetch per boot, not one per call."""
     try:
-        races = (SILVER.get("races") or {})
+        races = _silver_races() or {}
         parts = m.split("-")
         fam = ("senate" if any(t in ("usse", "ussep") for t in parts)
                else "governor" if any(t in ("usgub", "usgubp") for t in parts)
