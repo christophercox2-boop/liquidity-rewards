@@ -3418,6 +3418,28 @@ def auto_probe() -> None:
             granted = True
     if granted:   # log outside the lock — _probe_log takes it too
         _probe_log("[owner]", "grant", "+", 0.0, "+$10.00 into the info fund")
+    # 2026-08-16 owner reset: the pre-classification-fix evidence is poisoned
+    # (phantom fills fed the bands as real trades) and the fund's history is
+    # equally suspect. Discard all of it, set the fund to exactly $20, and
+    # rebuild every band from post-fix, confirmed-only evidence. Applied
+    # once; live resting orders keep their registries — they are real and
+    # verified on the book — only the LEARNING starts over.
+    reset = False
+    with MONITOR.lock:
+        grants = MONITOR.state.setdefault("probe_grants", [])
+        if "2026-08-16-reset-20usd" not in grants:
+            grants.append("2026-08-16-reset-20usd")
+            MONITOR.state["probe_log"] = []
+            MONITOR.state["probe"] = {}
+            MONITOR.state["earn_log"] = []
+            MONITOR.state["earn_stats"] = {}
+            MONITOR.state.pop("probe_credited", None)
+            MONITOR.state["probe_budget"] = 20.0
+            reset = True
+    if reset:
+        _probe_log("[owner]", "reset", "+", 0.0,
+                   "old evidence discarded — fund set to $20.00, learning restarts "
+                   "on confirmed-only data")
     # After a rebuild the in-memory registry is empty but our scouts still
     # rest on the exchange. Re-adopt from the mirror saved in state, keeping
     # only orders that still exist — so fills keep moving the fund and TTLs
