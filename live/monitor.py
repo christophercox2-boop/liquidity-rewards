@@ -3353,8 +3353,23 @@ PROBE_MIN_GAP = 3             # need at least this many interior ticks to learn
 PROBE_MAX_PX = 0.60           # never probe-bid above this
 PROBE_FLIP_TICKS = 2
 PROBE_TTL = float(os.environ.get("PROBE_TTL", "2700"))     # rotate after 45 min
-PROBE_ACTIVE_MAX = int(os.environ.get("PROBE_ACTIVE_MAX", "24"))
+PROBE_ACTIVE_MAX = int(os.environ.get("PROBE_ACTIVE_MAX", "60"))
 PROBE_MAX_PER_POLL = 2
+# Several scouts may sit in one market at DIFFERENT prices (owner, 2026-08-16:
+# "it can stack the single orders so that it can increase its confidence in the
+# info it is getting"). One scout per market gives one observation per 45-minute
+# TTL; three at different ticks bracket the fair price in the same wait. Same
+# price twice would teach nothing, so distinct ticks are enforced.
+PROBE_PER_MARKET = int(os.environ.get("PROBE_PER_MARKET", "3"))
+# A FILL IS A LOSS, not a success (owner, 2026-08-16: "fills should be seen as
+# bad, high stable earnings are good"). The scout still learns from being taken
+# — that is real evidence about fair value — but the market goes quiet for a
+# while afterwards instead of being probed straight back into the same taker.
+PROBE_FILL_COOLDOWN = float(os.environ.get("PROBE_FILL_COOLDOWN", "5400"))
+# Where in the gap a scout rests. A bid nearer the ask fills sooner; a bid
+# nearer the bid touch rests and earns. Weighting the draw toward the safe half
+# buys information more slowly and much more cheaply than a uniform draw.
+PROBE_SAFE_BIAS = float(os.environ.get("PROBE_SAFE_BIAS", "0.7"))
 PROBE_COOLDOWN = 300.0        # per market between new probes
 _PROBE: dict = {"active": {}, "last": {}, "cancelled": set(), "pending": {}}
 PROBE_CONFIRM_WAIT = 300.0   # fills feed lag allowance before "vanished"
@@ -3465,6 +3480,20 @@ def auto_probe() -> None:
         _probe_log("[owner]", "reset", "+", 0.0,
                    "old evidence discarded — fund set to $20.00, learning restarts "
                    "on confirmed-only data")
+    # 2026-08-16 owner: fund raised to $100 so the prober can stack several
+    # scouts per market and tighten its bands overnight. Sets the fund to
+    # exactly $100 rather than adding to it — "increase the budget to $100".
+    topped = False
+    with MONITOR.lock:
+        grants = MONITOR.state.setdefault("probe_grants", [])
+        if "2026-08-16-owner-100usd" not in grants:
+            grants.append("2026-08-16-owner-100usd")
+            was = float(MONITOR.state.get("probe_budget") or 0.0)
+            MONITOR.state["probe_budget"] = 100.0
+            topped = was
+    if topped is not False:
+        _probe_log("[owner]", "grant", "+", 0.0,
+                   f"info fund set to $100.00 (was ${topped:,.2f})")
     # After a rebuild the in-memory registry is empty but our scouts still
     # rest on the exchange. Re-adopt from the mirror saved in state, keeping
     # only orders that still exist — so fills keep moving the fund and TTLs
@@ -3533,9 +3562,25 @@ def auto_probe() -> None:
         e = est.setdefault(m, {})
         e["last_fill"] = {"side": side, "px": px,
                           "ts": dt.datetime.now(ET).strftime("%m-%d %I:%M %p")}
+        # A fill is a cost, and it is counted as one. The evidence it carries
+        # is still worth having, but the scoreboard the owner reads must show
+        # what the information cost, not just what it taught.
+        e["fill_ts"] = now
+        e["fills"] = int(e.get("fills") or 0) + 1
+        with MONITOR.lock:
+            sp = MONITOR.state.setdefault("probe_scoreboard", {})
+            sp["fills"] = int(sp.get("fills") or 0) + 1
+            if kind == "probe":
+                # opening fills tie up capital at px; the flip below tries to
+                # get it back, and a completed round trip nets out here
+                sp["fill_cost_usd"] = round(float(sp.get("fill_cost_usd") or 0)
+                                            + (px if side == "BUY" else 0.0), 4)
+            else:
+                sp["fill_cost_usd"] = round(float(sp.get("fill_cost_usd") or 0)
+                                            - (px if side == "SELL" else 0.0), 4)
         _probe_log(m, "FILLED" if kind == "probe" else "round trip", side, px,
-                   "a real trade at this price" if kind == "probe"
-                   else "flip filled — gap captured")
+                   f"taken at {px*100:.0f}c — a fill is a loss, not a win"
+                   if kind == "probe" else "flip filled — position closed out")
         # the info fund moves ONLY on prober activity: its sales and its
         # scouts' reward earnings in, its buys out
         with MONITOR.lock:
@@ -3601,7 +3646,11 @@ def auto_probe() -> None:
             break
         if now - _PROBE["last"].get(m, 0.0) < PROBE_COOLDOWN:
             continue
-        if any(r[0] == m and r[4] == "probe" for r in _PROBE["active"].values()):
+        # a fill here cost us money — let the market settle before going back
+        if now - float((est.get(m) or {}).get("fill_ts") or 0) < PROBE_FILL_COOLDOWN:
+            continue
+        here = [r for r in _PROBE["active"].values() if r[0] == m and r[4] == "probe"]
+        if len(here) >= PROBE_PER_MARKET:
             continue
         ent = tr._BOOK_CACHE.get(m)
         if not ent or now - ent[0] > 300:
@@ -3614,8 +3663,22 @@ def auto_probe() -> None:
         hi_t = round(ba / 0.01) - 1
         if hi_t - lo_t + 1 < PROBE_MIN_GAP:
             continue          # spread too tight to learn anything
-        t = random.randint(lo_t, hi_t)
+        # never two scouts of ours at the same tick — a repeated price is a
+        # repeated observation, which adds cost without adding confidence
+        taken = {round(r[2] / 0.01) for r in here}
+        free = [t for t in range(lo_t, hi_t + 1) if t not in taken]
+        if not free:
+            continue
+        # Draw toward the safe end of the gap. Two draws, keep the one further
+        # from the touch that would take us: cheap way to bias without ever
+        # excluding the informative middle entirely.
+        t = random.choice(free)
+        alt = random.choice(free)
+        if random.random() < PROBE_SAFE_BIAS:
+            t = min(t, alt)          # a BUY scout wants the LOWER tick
         px = round(t * 0.01, 2)
+        px_sell = round(max(t, alt) * 0.01, 2) if random.random() < PROBE_SAFE_BIAS \
+            else round(t * 0.01, 2)
         # which sides can this market afford?
         #   SELL: only from inventory we already hold (net long >= 2, keeping
         #         a share so a scout never zeroes the position)
@@ -3633,6 +3696,12 @@ def auto_probe() -> None:
             side = "BUY"
         else:
             continue              # no ammo here: no inventory, fund can't cover a bid
+        # a sell scout's danger is a buyer lifting it, so its safe end is the
+        # HIGH side of the gap — the mirror of the bid case
+        if side == "SELL":
+            px = px_sell
+            if round(px / 0.01) in taken:
+                continue
         intent = "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_SELL_LONG"
         oid = _probe_place(m, side, px, intent,
                            f"{side.lower()} scout" +
@@ -3816,6 +3885,21 @@ EARN_MAX_USD = float(os.environ.get("EARN_MAX_USD", "6.0"))
 EARN_TOTAL_USD = float(os.environ.get("EARN_TOTAL_USD", "100.0"))
 EARN_MAX_SHARES = 200
 EARN_PX_MAX_C = int(os.environ.get("EARN_PX_MAX_C", "10"))
+# Above the penny ceiling the earner may only act on KNOWLEDGE, never on hope
+# (owner, 2026-08-16: "earner should use what probe is learning to place where
+# it can earn"). Two conditions together, and it is the pair that makes it safe:
+#   * the price sits at or under the band's 10th percentile — the model says
+#     fair value is clearly above us, so a taker coming down to us is unlikely
+#   * real size is already queued at or above that price — we rest BEHIND other
+#     people's money, the owner's wall-join rule: "if there is a big wall you
+#     can still join that, it won't get taken because it will be behind the rest"
+# Without the queue this is just a bid at the touch, which is what the bait
+# anchors farm. With it, the order earns while somebody else absorbs the flow.
+EARN_SAFE_MAX_C = int(os.environ.get("EARN_SAFE_MAX_C", "60"))
+EARN_QUEUE_MIN = float(os.environ.get("EARN_QUEUE_MIN", "1000"))
+# A filled earner order is a loss. The market goes quiet for two hours rather
+# than being re-entered at the price that just proved takeable.
+EARN_FILL_COOLDOWN = float(os.environ.get("EARN_FILL_COOLDOWN", "7200"))
 EARN_MAX_PER_POLL = 4
 EARN_COOLDOWN = 300.0
 _EARN: dict = {"orders": {}, "last": {}, "cancelled": set(), "pending": {}}
@@ -3902,8 +3986,17 @@ def auto_earn() -> None:
             del _EARN["pending"][oid]
         elif _fill_confirmed(oid):
             del _EARN["pending"][oid]
-            _earn_log(m, "filled", px / 100.0, qty, "confirmed by the fills feed")
-            _EARN["last"][m] = now
+            _earn_log(m, "filled", px / 100.0, qty,
+                      f"taken at {px:.0f}c — ${px/100.0*qty:.2f} of stock bought "
+                      "we did not want; standing off this market")
+            # a fill is the outcome to avoid, so the cooldown is hours, not
+            # minutes — never straight back in at a price that just got hit
+            _EARN["last"][m] = now + EARN_FILL_COOLDOWN - EARN_COOLDOWN
+            with MONITOR.lock:
+                st_ = MONITOR.state.setdefault("earn_stats", {})
+                st_["fills"] = int(st_.get("fills") or 0) + 1
+                st_["fill_cost_usd"] = round(float(st_.get("fill_cost_usd") or 0)
+                                             + px / 100.0 * qty, 4)
         elif now - ts_gone > EARN_CONFIRM_WAIT:
             del _EARN["pending"][oid]
             _earn_log(m, "vanished", px / 100.0, qty,
@@ -3978,10 +4071,21 @@ def auto_earn() -> None:
         # loss stops being trivial
         base = real_bids[0][0] if real_bids else max(1, b["lo"])
         top = min(b["hi"] + 2, EARN_PX_MAX_C)
+        # Model-backed extension past the penny ceiling: never above the band's
+        # 10th percentile, and never above the hard safety cap.
+        if b["lo"] > top:
+            top = min(b["lo"], EARN_SAFE_MAX_C)
         if top < base:
             continue
+        # queued size at or better than each candidate price — the wall we
+        # would be resting behind
+        def _queue(pc_: int) -> float:
+            return sum(q_ for p_, q_ in real_bids if p_ >= pc_)
         best = None
         for pc in range(base, top + 1):
+            # past the penny ceiling both knowledge conditions must hold
+            if pc > EARN_PX_MAX_C and (pc > b["lo"] or _queue(pc) < EARN_QUEUE_MIN):
+                continue
             # confidence tier sets the exposure: proven / stretch / speculative
             if pc <= b["med"]:
                 cap = EARN_MAX_USD
@@ -5292,6 +5396,7 @@ def _map_payload() -> dict:
                         for r in _EARN["orders"].values()],
         "earn_log": list(reversed((MONITOR.state.get("earn_log") or [])[-30:])),
         "earn_stats": MONITOR.state.get("earn_stats") or {},
+        "probe_scoreboard": MONITOR.state.get("probe_scoreboard") or {},
         "earn_caps": {"per_mkt": EARN_MAX_USD, "total": EARN_TOTAL_USD,
                       "outstanding": round(_earn_outstanding_usd(), 2)},
         "probe_est": MONITOR.state.get("probe") or {},
@@ -5718,12 +5823,22 @@ function renderEarn(){
   document.getElementById('earnBody').innerHTML =
     (function(){
       const e = st.earned_usd || 0, p = st.probe_earned_usd || 0, t = e + p;
+      // Rewards earned against stock we were forced to buy. A fill is the bad
+      // outcome here, so the two numbers sit side by side and the net is what
+      // actually says whether any of this is working.
+      const fc = (st.fill_cost_usd || 0) + ((DATA.probe_scoreboard || {}).fill_cost_usd || 0);
+      const nf = (st.fills || 0) + ((DATA.probe_scoreboard || {}).fills || 0);
       return '<div style="font-size:15px;font-weight:700;margin-bottom:2px">earned $' +
         (t >= 0.1 ? t.toFixed(2) : t.toFixed(3)) +
         ' <span class="sub" style="font-weight:400;font-size:11px">in rewards — $' +
         (e >= 0.1 ? e.toFixed(2) : e.toFixed(3)) + ' its bids, $' +
         (p >= 0.1 ? p.toFixed(2) : p.toFixed(3)) +
-        ' the prober\\'s scouts (credited to the info fund)</span></div>';
+        ' the prober\\'s scouts (credited to the info fund)</span></div>' +
+        '<div style="font-size:13px;margin-bottom:4px;color:' +
+        (t - fc >= 0 ? '#8fe3b8' : '#ff9d99') + '">net $' + (t - fc).toFixed(2) +
+        ' <span class="sub" style="font-weight:400">after ' + nf + ' fill' +
+        (nf === 1 ? '' : 's') + ' costing $' + fc.toFixed(2) +
+        ' — fills are losses, resting income is the win</span></div>';
     })() +
     '<div class="sub" style="margin-bottom:4px">' + status +
     ' · resting worst-case $' + (caps.outstanding || 0).toFixed(2) +
