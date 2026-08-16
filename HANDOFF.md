@@ -265,6 +265,66 @@ the SHA it just read — which still refuses if someone else moved deploy. All
 three paths (already in sync, needs updating, does not exist) are tested
 against a stubbed git.
 
+### 2026-08-16 — Refresh button on the homepage (owner)
+
+"Build a button (like the poke file) that lets me get an updated reading of my
+liquidity rewards manually... prominently featured on the homepage." Then:
+"when I press it, I should see a loading process bar... if everything is
+unchanged, it can say that briefly before disappearing, but if there is an
+update show me what is new in detail."
+
+Full-width button in the hero on `/`. `tracker_loop` now waits on
+`TRACKER_KICK` instead of sleeping, so POST `/track_now` starts a reading
+immediately rather than at the end of the hour. Auth + the X-Reprice CSRF
+header like every other POST; it touches NO orders, it runs the same
+track_rewards.py the hourly loop runs.
+
+The bar is INDETERMINATE on purpose — a reading walks every market's programs
+and has no progress to report, so a percentage would be invented. Elapsed
+seconds beside it give the real scale.
+
+The diff is the interesting part. It snapshots earned today, the rate, order
+and market counts, buying power, per-market earnings and the paid/earned
+history BEFORE kicking, then compares after. Nothing changed → one line that
+clears itself after six seconds. Something changed → a persistent list:
+money first, then newly posted payouts (the thing most worth surfacing), then
+counts, then the eight biggest per-market moves with the rest counted.
+
+t_button drives the real page in node across all three outcomes.
+
+### 2026-08-16 — what makes the loops DUMP orders, and how fast (audit)
+
+Owner asked what can make the earner or prober dump orders and how quickly.
+Every path, with its real trigger and cadence:
+
+EARNER
+  * off-model sweep — EVERY POLL (30s), ignores the switches, because
+    cancelling only reduces exposure. Trigger: `_bid_allowed` / `_ask_allowed`
+    fails. Marks the market untouchable for 24h.
+  * withdrawal — every poll after a 10-minute grace per order. Trigger:
+    income under 25% of the order's cost per day (payback beyond 4 days), or
+    the market diluted to <40% of a >=$1/day peak. 1h stand-down after.
+  * rotation — at most every EARN_ROTATE_EVERY (30 min) AND only at >=85% of
+    the $100 budget. Cancels the worst EARN_ROTATE_N (3) by yield per dollar.
+    Skips graduates and anything under 10 minutes old.
+  * flip over-sell puller — every poll, cancels newest flips beyond the
+    position.
+PROBER
+  * TTL rotation at PROBE_TTL (30 min) per scout.
+  * immediate pull when the market has no reward program, or is a primary.
+  * the same off-model sweep (it judges prober orders too).
+
+THE ANSWER TO "HOW QUICKLY" WAS: everything, inside one 30-second poll. The
+sweep had no limit. That was survivable while the gates barely bound, and is
+not now — `_silver_fair` returned None for every market until today, so every
+loop order is being judged against a real forecast for the FIRST TIME, and a
+wrong model could have emptied the book before anyone saw it.
+
+`EARN_SWEEP_MAX_PER_POLL` (12) now caps it, worst-first by distance from fair,
+with the deferred count written to the journal. A genuine mass problem still
+clears fast — 40 orders in 4 polls, about two minutes — but nothing disappears
+in one go unseen. Tested in t_sweep.
+
 ### 2026-08-16 — can a graduate fall back down? Yes, but two exits were missing
 
 Owner: "Can a graduated market ever fall back down? If it's not based on

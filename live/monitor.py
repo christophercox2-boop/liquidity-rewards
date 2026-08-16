@@ -237,7 +237,13 @@ TRACKER_PUSH = ("STATUS.md", "data/rewards.csv", "data/checks.csv",
                 "data/estimates.csv", "data/estimate_runs.csv",
                 "data/family_day.csv", "data/live_orders.csv",
                 "data/latest_response.json")
-TRACKER_STATUS = {"ok_ts": 0.0, "err": "", "runs": 0}
+TRACKER_STATUS = {"ok_ts": 0.0, "err": "", "runs": 0, "running": False,
+                  "kicked_ts": 0.0}
+# Set to run the tracker NOW instead of waiting out TRACKER_INTERVAL. The
+# owner works from a phone and wanted the same thing the poke.txt files give
+# them in the repo — a way to say "go and look again" without waiting an hour
+# — but as a button rather than a commit (owner, 2026-08-16).
+TRACKER_KICK = threading.Event()
 
 
 def _tracker_commit(files: dict[str, bytes]) -> str:
@@ -317,10 +323,13 @@ def tracker_loop() -> None:
     time.sleep(120)            # let the poll loop warm its caches first
     while True:
         if TRACKER_ENABLED and GITHUB_TOKEN:
+            TRACKER_STATUS["running"] = True
             try:
                 err = _tracker_once()
             except Exception as e:  # noqa: BLE001 — the loop must survive anything
                 err = f"{type(e).__name__}: {e}"[:200]
+            finally:
+                TRACKER_STATUS["running"] = False
             TRACKER_STATUS["runs"] += 1
             TRACKER_STATUS["err"] = err
             if not err:
@@ -338,7 +347,10 @@ def tracker_loop() -> None:
                         MONITOR.note_rewards_total(rew_total)
                 except Exception:  # noqa: BLE001
                     pass
-        time.sleep(TRACKER_INTERVAL)
+        # Interruptible wait: /track_now sets TRACKER_KICK and the next run
+        # starts immediately instead of at the end of the hour.
+        TRACKER_KICK.wait(TRACKER_INTERVAL)
+        TRACKER_KICK.clear()
 
 
 def tracker_day_integral(day_et: str,
@@ -1309,6 +1321,16 @@ class Monitor:
                 "warming": self.warming,
                 "backfilled": self.backfilled,
                 "poll_seconds": POLL_SECONDS,
+                # so the Refresh button can say what the tracker is doing
+                "tracker": {
+                    "running": TRACKER_STATUS.get("running", False),
+                    "runs": TRACKER_STATUS.get("runs", 0),
+                    "err": TRACKER_STATUS.get("err", ""),
+                    "enabled": bool(TRACKER_ENABLED and GITHUB_TOKEN),
+                    "every_s": TRACKER_INTERVAL,
+                    "age_s": (int(time.time() - TRACKER_STATUS["ok_ts"])
+                              if TRACKER_STATUS.get("ok_ts") else None),
+                },
                 "persistence": (
                     f"github — SAVES FAILING ({SAVE_STATUS['err']})"
                     if GITHUB_TOKEN and SAVE_STATUS["err"]
@@ -4892,6 +4914,12 @@ EARN_ROTATE_EVERY = float(os.environ.get("EARN_ROTATE_EVERY", "1800"))
 EARN_ROTATE_N = int(os.environ.get("EARN_ROTATE_N", "3"))
 EARN_FULL_FRAC = float(os.environ.get("EARN_FULL_FRAC", "0.85"))
 EARN_MAX_PER_POLL = 4
+# Ceiling on how many off-model orders the sweep may cancel in ONE poll.
+# The sweep runs every POLL_SECONDS and ignores the switches (cancelling
+# only ever reduces exposure), so without a limit a wrong model empties the
+# book in thirty seconds. At 12 a poll it still clears every loop order the
+# caps allow — ~140 scouts plus the earner's handful — inside a few minutes.
+EARN_SWEEP_MAX_PER_POLL = int(os.environ.get("EARN_SWEEP_MAX_PER_POLL", "12"))
 EARN_COOLDOWN = 300.0
 _EARN: dict = {"orders": {}, "last": {}, "cancelled": set(), "pending": {}}
 EARN_CONFIRM_WAIT = 300.0    # fills feed lag allowance before "vanished"
@@ -5362,6 +5390,34 @@ def auto_earn() -> None:
             if _ask_allowed(m_, px_):
                 continue
         sweep.append((oid_, m_, px_, qty_))
+    # WORST FIRST, AND NOT ALL AT ONCE.
+    #
+    # This pass had no limit: whatever failed the gates was cancelled inside a
+    # single 30-second poll, however much of it there was, switches or no
+    # switches. That was survivable while the gates barely bound. It is not
+    # now — _silver_fair returned None for every market until 2026-08-16, so
+    # every loop order on the board is about to be judged for the first time
+    # against a real forecast, and a model that is wrong (as it was, all day)
+    # could empty the book before anyone saw it happen.
+    #
+    # So: sort by how far past its limit each order is and cancel the worst
+    # EARN_SWEEP_MAX_PER_POLL. A genuine mass problem still clears in a few
+    # minutes, the most egregious orders go first, and the rest show up in the
+    # journal as deferred rather than vanishing silently.
+    def _over(row: tuple) -> float:
+        _oid, m_, px_, _q = row
+        sv_ = _silver_fair(m_)
+        if sv_ is None:
+            return px_
+        return abs(px_ - sv_)
+    sweep.sort(key=_over, reverse=True)
+    if len(sweep) > EARN_SWEEP_MAX_PER_POLL:
+        held = len(sweep) - EARN_SWEEP_MAX_PER_POLL
+        _earn_log(sweep[EARN_SWEEP_MAX_PER_POLL][1], "sweep deferred", 0.0, held,
+                  f"{len(sweep)} orders are off-model; cancelling the "
+                  f"{EARN_SWEEP_MAX_PER_POLL} worst this poll and the other "
+                  f"{held} on the next ones")
+        sweep = sweep[:EARN_SWEEP_MAX_PER_POLL]
     for oid, m, px, qty in sweep:
         sv_ = _silver_fair(m) or 0.0
         try:
@@ -9317,6 +9373,14 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  .chip{background:var(--surface2);border:1px solid var(--line);color:var(--ink2);
   border-radius:99px;padding:6px 12px;font-size:12px;min-height:0}
  .chipon{border-color:var(--good);color:var(--good)}
+ /* Indeterminate on purpose. A reading has no progress to report — it walks
+    every market's programs — so a percentage would be invented. This says
+    "working" honestly and the elapsed seconds beside it give the real scale. */
+ @keyframes trackSlide{0%{margin-left:-35%}100%{margin-left:100%}}
+ .tdrow{display:flex;justify-content:space-between;gap:10px;padding:5px 0;
+  border-bottom:1px solid var(--line,#3a4454);font-size:13px}
+ .tdrow b{white-space:nowrap}
+ .tdup{color:var(--good,#34c07c)} .tddn{color:var(--bad,#e5645f)}
 </style></head><body>
 <div id="login">
  <div class="big">Liquidity rewards</div>
@@ -9382,6 +9446,23 @@ the position. Markets whose spread has closed below 3 ticks are skipped.</div>
 <div class="sub" id="pace" style="margin-top:2px"></div>
 <div class="sub" id="fresh" style="margin-top:2px"></div>
 <div class="err" id="err"></div>
+<!-- The manual reading. Same idea as the poke.txt files in the repo — a way
+     to say "go and look again now" — but a button, because the owner is on a
+     phone and editing a file to trigger a read is a lot of taps. Touches no
+     orders: it runs the same track_rewards.py the hourly loop runs. -->
+<div style="margin:12px 0 2px">
+<button id="trackBtn" onclick="trackNow()"
+ style="width:100%;min-height:52px;font-size:16px;font-weight:700;border:none;
+ border-radius:12px;background:var(--accent,#5aa2ff);color:#0b1220">
+↻ Refresh my rewards now</button>
+<div id="trackBar" style="display:none;height:8px;border-radius:4px;
+ margin-top:8px;background:rgba(255,255,255,.10);overflow:hidden">
+<i id="trackFill" style="display:block;height:100%;width:35%;border-radius:4px;
+ background:var(--accent,#5aa2ff);animation:trackSlide 1.4s ease-in-out infinite"></i>
+</div>
+<div class="sub" id="trackNote" style="margin-top:5px"></div>
+<div id="trackDiff" style="display:none;margin-top:8px"></div>
+</div>
 <div id="ovg" style="margin:10px 0"></div>
 </div>
 <div class="card">
@@ -10667,6 +10748,7 @@ function mrow(m, mid, right){
 }
 function renderHome(d){
   LASTD = d;
+  try{ trackIdle(d); }catch(_){}   // never let the button break the page
   const seen = txnSeen();
   const tx = (d.trades || []).filter(t => t.ts_s > seen);
   document.getElementById('txns').innerHTML = tx.length ? tx.slice(0, 25).map(t => {
@@ -11183,6 +11265,193 @@ async function renderAll(d){
         ' '+a.from+'¢ → '+a.to+'¢ ('+a.size+') · HTTP '+a.status+' · '+esc(a.note||a.response||'')+'</div>').join('') : '';
   }catch(e){}
 }
+// ---- manual rewards reading -------------------------------------------
+// Kicks the in-monitor tracker, then watches data.json until the run count
+// moves. A reading fetches every market's programs and rebuilds STATUS.md,
+// so it takes a minute or two — the button says so rather than looking hung.
+var TRACK_BASE = null, TRACK_T0 = 0, TRACK_POLL = null;
+var TRACK_SNAP = null, TRACK_HIDE = null;
+
+// What a reading can actually change, captured before and after so the button
+// can report the difference rather than just saying "done".
+function trackSnap(d){
+  d = d || {};
+  const paid = {};
+  (d.history || []).forEach(h => { if(h && h.day) paid[h.day] = h.paid; });
+  const earnedByDay = {};
+  (d.history || []).forEach(h => { if(h && h.day) earnedByDay[h.day] = h.earned; });
+  return {
+    earned: d.earned_today || 0,
+    rate: d.rate_per_day || 0,
+    orders: (d.orders || []).length,
+    markets: new Set((d.orders || []).map(o => o.market)).size,
+    bp: d.buying_power || 0,
+    paid: paid,
+    earnedByDay: earnedByDay,
+    perMkt: d.per_market_today || {},
+  };
+}
+function money(v){ return '$' + Number(v || 0).toFixed(2); }
+function signed(v){ return (v >= 0 ? '+' : '\\u2212') + money(Math.abs(v)); }
+
+// Human-readable list of what moved. Money first, then payouts, then the
+// per-market detail — the owner asked for detail, not a headline.
+function trackChanges(a, b){
+  const out = [];
+  const push = (label, txt, up) => out.push(
+    '<div class="tdrow"><span>' + label + '</span>'
+    + '<b class="' + (up == null ? '' : up ? 'tdup' : 'tddn') + '">' + txt + '</b></div>');
+
+  if(Math.abs(b.earned - a.earned) >= 0.005)
+    push('Earned today', money(a.earned) + ' \\u2192 ' + money(b.earned)
+         + ' (' + signed(b.earned - a.earned) + ')', b.earned > a.earned);
+  if(Math.abs(b.rate - a.rate) >= 0.01)
+    push('Earning rate', money(a.rate) + '/day \\u2192 ' + money(b.rate) + '/day'
+         + ' (' + signed(b.rate - a.rate) + ')', b.rate > a.rate);
+
+  // newly posted payouts are the thing most worth surfacing
+  Object.keys(b.paid).forEach(day => {
+    const was = a.paid[day], now = b.paid[day];
+    if(now == null) return;
+    if(was == null) push('Polymarket posted ' + day, money(now) + ' paid', true);
+    else if(Math.abs(now - was) >= 0.005)
+      push('Payout for ' + day, money(was) + ' \\u2192 ' + money(now), now > was);
+  });
+  Object.keys(b.earnedByDay).forEach(day => {
+    if(a.earnedByDay[day] == null && b.earnedByDay[day] != null)
+      push('New day tracked: ' + day, money(b.earnedByDay[day]), true);
+  });
+
+  if(b.orders !== a.orders)
+    push('Resting orders', a.orders + ' \\u2192 ' + b.orders, b.orders > a.orders);
+  if(b.markets !== a.markets)
+    push('Markets', a.markets + ' \\u2192 ' + b.markets, b.markets > a.markets);
+  if(Math.abs(b.bp - a.bp) >= 0.01)
+    push('Buying power', money(a.bp) + ' \\u2192 ' + money(b.bp), b.bp > a.bp);
+
+  // per-market movement, biggest first, capped so it stays readable on a phone
+  const keys = Object.keys(Object.assign({}, a.perMkt, b.perMkt));
+  const moved = keys.map(m => ({m: m, d: (b.perMkt[m] || 0) - (a.perMkt[m] || 0)}))
+                    .filter(x => Math.abs(x.d) >= 0.005)
+                    .sort((x, y) => Math.abs(y.d) - Math.abs(x.d));
+  moved.slice(0, 8).forEach(x =>
+    push(esc(x.m), signed(x.d) + ' today', x.d > 0));
+  if(moved.length > 8)
+    push('<span class="sub">' + (moved.length - 8) + ' smaller market moves</span>',
+         '', null);
+  return out;
+}
+function trackShowDiff(html){
+  const el = document.getElementById('trackDiff');
+  if(!el) return;
+  el.innerHTML = html;
+  el.style.display = html ? 'block' : 'none';
+}
+function trackBar(on){
+  const b = document.getElementById('trackBar');
+  if(b) b.style.display = on ? 'block' : 'none';
+}
+function trackSay(msg, bad){
+  const n = document.getElementById('trackNote');
+  if(n){ n.innerHTML = msg; n.style.color = bad ? '#ff9d99' : ''; }
+}
+function trackBtn(label, on){
+  const b = document.getElementById('trackBtn');
+  if(!b) return;
+  b.textContent = label;
+  b.disabled = !on;
+  b.style.opacity = on ? '1' : '.55';
+}
+async function trackNow(){
+  if(TRACK_POLL) return;
+  if(TRACK_HIDE){ clearTimeout(TRACK_HIDE); TRACK_HIDE = null; }
+  const d0 = LASTD || {};
+  TRACK_BASE = (d0.tracker && d0.tracker.runs) || 0;
+  TRACK_SNAP = trackSnap(d0);          // the "before" to diff against
+  TRACK_T0 = Date.now();
+  trackShowDiff('');
+  trackBar(true);
+  trackBtn('Reading\u2026', false);
+  trackSay('asking the exchange for a fresh reading\u2026');
+  try{
+    const h = {'Content-Type':'application/json','X-Reprice':'1'};
+    try{ const k = localStorage.getItem('dashKey'); if(k) h['X-Dash-Key'] = k; }catch(_){}
+    const r = await fetch('track_now', {method:'POST', headers:h, body:'{}'});
+    const j = await r.json().catch(() => ({}));
+    if(!r.ok || !j.ok){
+      trackBar(false);
+      trackBtn('\u21bb Refresh my rewards now', true);
+      trackSay(esc(j.error || ('HTTP ' + r.status)), true);
+      return;
+    }
+    if(j.already) trackSay('a reading was already running — waiting for it…');
+  }catch(e){
+    trackBar(false);
+    trackBtn('\u21bb Refresh my rewards now', true);
+    trackSay('could not reach the monitor \u2014 ' + esc((e && e.message) || e), true);
+    return;
+  }
+  TRACK_POLL = setInterval(trackWatch, 3000);
+  trackWatch();
+}
+async function trackWatch(){
+  const secs = Math.round((Date.now() - TRACK_T0) / 1000);
+  try{
+    const r = await fetch('data.json');
+    if(r.ok){
+      const d = JSON.parse(await r.text());
+      LASTD = d;
+      const t = d.tracker || {};
+      if(t.runs > TRACK_BASE){
+        clearInterval(TRACK_POLL); TRACK_POLL = null;
+        trackBar(false);
+        trackBtn('\u21bb Refresh my rewards now', true);
+        renderAll(d);
+        if(t.err){
+          trackSay('the reading failed \u2014 ' + esc(t.err), true);
+          return;
+        }
+        const took = Math.round((Date.now() - TRACK_T0) / 1000);
+        const rows = trackChanges(TRACK_SNAP, trackSnap(d));
+        if(rows.length){
+          trackSay('updated in ' + took + 's \u2014 ' + rows.length
+                   + (rows.length === 1 ? ' change:' : ' changes:'));
+          trackShowDiff(rows.join(''));
+        }else{
+          // nothing moved: say so, then get out of the way
+          trackSay('checked in ' + took + 's \u2014 nothing has changed');
+          TRACK_HIDE = setTimeout(function(){
+            trackSay(''); trackShowDiff(''); TRACK_HIDE = null; }, 6000);
+        }
+        return;
+      }
+    }
+  }catch(e){}
+  if(secs > 240){
+    clearInterval(TRACK_POLL); TRACK_POLL = null;
+    trackBar(false);
+    trackBtn('\u21bb Refresh my rewards now', true);
+    trackSay('still running after 4 minutes — it will finish on its own and '
+             + 'the page will pick it up', true);
+    return;
+  }
+  trackSay('reading\u2026 ' + secs + 's (a full pass takes a minute or two)');
+}
+function trackIdle(d){
+  if(TRACK_POLL) return;                      // a run is in flight; leave it
+  const t = (d && d.tracker) || {};
+  if(!t.enabled){
+    trackBtn('\u21bb Refresh my rewards now', false);
+    trackSay('the in-monitor tracker is off, so this button cannot read', true);
+    return;
+  }
+  if(t.running){ trackSay('a scheduled reading is running now…'); return; }
+  const mins = t.age_s == null ? null : Math.round(t.age_s / 60);
+  trackSay(t.err ? 'last reading failed — ' + esc(t.err)
+           : mins == null ? 'no reading yet this session'
+           : 'last reading ' + (mins < 1 ? 'under a minute' : mins + ' min') + ' ago',
+           !!t.err);
+}
 async function refresh(){
   try{
     const r = await fetch('data.json');
@@ -11396,7 +11665,8 @@ class Handler(BaseHTTPRequestHandler):
             self._send(401, "application/json", b'{"error": "key required"}')
             return
         if self.path not in ("/reprice", "/place", "/place_abort", "/cancel_all",
-                             "/reprice_batch", "/cancel_batch", "/maction"):
+                             "/reprice_batch", "/cancel_batch", "/maction",
+                             "/track_now"):
             self._send(404, "text/plain", b"not found")
             return
         # Cross-origin requests can't set custom headers without a CORS
@@ -11409,6 +11679,26 @@ class Handler(BaseHTTPRequestHandler):
             body = json.loads(self.rfile.read(length)) if length else {}
         except Exception:  # noqa: BLE001
             self._send(400, "application/json", b'{"ok": false, "error": "bad request"}')
+            return
+        if self.path == "/track_now":
+            # Refresh the rewards reading NOW. This touches no orders — it
+            # runs the same track_rewards.py the hourly loop runs and pushes
+            # STATUS.md and the data files — so it needs auth and the CSRF
+            # header like everything else here, but no confirmation.
+            if TRACKER_STATUS.get("running"):
+                code, payload = 200, {"ok": True, "already": True,
+                                      "detail": "a reading is already in progress"}
+            elif not (TRACKER_ENABLED and GITHUB_TOKEN):
+                code, payload = 503, {
+                    "ok": False,
+                    "error": ("the in-monitor tracker is switched off"
+                              if not TRACKER_ENABLED else
+                              "no GITHUB_TOKEN, so results could not be saved")}
+            else:
+                TRACKER_STATUS["kicked_ts"] = time.time()
+                TRACKER_KICK.set()
+                code, payload = 200, {"ok": True, "detail": "reading now"}
+            self._send(code, "application/json", json.dumps(payload).encode())
             return
         if self.path == "/place":
             code, payload = start_batch(body)
