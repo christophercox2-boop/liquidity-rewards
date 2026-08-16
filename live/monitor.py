@@ -2693,8 +2693,25 @@ def _ws_apply(text: str) -> str | None:
 
 
 def _ws_slugs() -> set[str]:
-    return ({o.get("market") for o in MONITOR.orders if o.get("market")}
+    """What the live stream subscribes to.
+
+    Markets we hold orders in, markets we defend, and the probe universe —
+    that last one matters and was missing. The stream had the same blind spot
+    the REST fetcher did: it only followed markets we were already invested
+    in, so a market we hold nothing in was never watched in real time, which
+    is exactly the set the prober and qualifier need fresh books for. The
+    subscription is capped at 200 by the exchange, so the markets we actually
+    hold come first and discovery fills whatever room is left.
+    """
+    held = ({o.get("market") for o in MONITOR.orders if o.get("market")}
             | set(MONITOR.state.get("defend") or {}))
+    return held | set(getattr(tr, "EXTRA_SLUGS", set()) or set())
+
+
+def _ws_priority(slugs: list[str]) -> list[str]:
+    held = ({o.get("market") for o in MONITOR.orders if o.get("market")}
+            | set(MONITOR.state.get("defend") or {}))
+    return sorted(slugs, key=lambda m: (m not in held, m))
 
 
 def ws_stream_loop(key_id: str, secret_key: str) -> None:
@@ -2724,7 +2741,10 @@ def ws_stream_loop(key_id: str, secret_key: str) -> None:
                     await ws.send(json.dumps({"subscribe": {
                         "requestId": "books",
                         "subscriptionType": "SUBSCRIPTION_TYPE_MARKET_DATA",
-                        "marketSlugs": slugs[:200]}}))
+                        # held markets first: if the universe exceeds the
+                        # exchange's 200-slug limit, the ones with our money
+                        # in them must not be the ones dropped
+                        "marketSlugs": _ws_priority(slugs)[:200]}}))
                     WS_STATUS.update(state="live", markets=len(slugs), err="")
                     sub_set, last_check = set(slugs), time.time()
                     while True:
@@ -7080,6 +7100,12 @@ function beatTick(){
     (stale ? ' <b style="color:#ff9d99">— nothing since, the monitor may be down</b>' : '') +
     ' · read ' + (BEAT.orders || 0).toLocaleString() + ' orders in ' +
     (BEAT.mkts || 0) + ' markets, ' + (BEAT.books || 0) + ' books cached' +
+    '<br><span class="sub">live price feed: ' +
+    (BEAT.ws === 'live'
+      ? '<span style="color:#3fb950">streaming</span> ' + (BEAT.ws_n || 0) + ' markets' +
+        (BEAT.ws_age != null ? ', last update ' + BEAT.ws_age + 's ago' : '')
+      : '<span style="color:#f2cd7f">' + esc(BEAT.ws || 'off') +
+        '</span> — books refresh on the 30s cycle only') + '</span>' +
     '<br><span class="sub">running: ' + (ran.length ? ran.join(', ') : 'nothing — all switches off') +
     (BEAT.did ? ' · last action: ' + esc(BEAT.did) + ' at ' +
                 esc(String(BEAT.did_ts).slice(11)) : ' · no orders placed yet') +
@@ -10428,6 +10454,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     bt["did"] = (ACTIONS[-1]["side"] + " " + ACTIONS[-1]["market"]
                                  if ACTIONS else "")
                     bt["did_ts"] = ACTIONS[-1]["ts"] if ACTIONS else ""
+                    bt["ws"] = (WS_STATUS.get("state") or "off")
+                    bt["ws_n"] = int(WS_STATUS.get("markets") or 0)
+                    bt["ws_age"] = int(time.time() - float(WS_STATUS.get("last_msg") or 0)) \
+                        if WS_STATUS.get("last_msg") else None
             except Exception:  # noqa: BLE001 — a status line never breaks the loop
                 pass
             MONITOR.maybe_save_remote()
