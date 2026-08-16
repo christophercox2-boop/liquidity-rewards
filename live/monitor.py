@@ -4193,6 +4193,15 @@ def auto_earn() -> None:
                     MONITOR.state["probe_budget"] = round(
                         float(MONITOR.state.get("probe_budget") or 0.0) + inc, 4)
             st["_acc_ts"] = nowa
+    # Re-adopt the registry FIRST. It used to happen after the switch check,
+    # so with the earner off the in-memory registry stayed empty and the
+    # cleanup below iterated nothing at all — it ran every poll and did
+    # nothing, while the bad orders sat on the book filling.
+    if not _EARN["orders"]:
+        for oid_, r_ in (MONITOR.state.get("earn_orders_reg") or {}).items():
+            if len(r_) == 5:
+                _EARN["orders"][oid_] = (r_[0], r_[1], int(r_[2]), int(r_[3]), float(r_[4]))
+
     # WITHDRAW ANYTHING THE MODEL SAYS WE SHOULD NEVER HAVE BID, and do it
     # whether or not the switch is on. The price cap only gated NEW orders, so
     # the bids already resting at 10c on a 0.62% race kept filling after the
@@ -4202,10 +4211,20 @@ def auto_earn() -> None:
     #
     # Cancelling is not placing. It only ever reduces exposure, so it is not
     # gated on the switch.
-    for oid, (m, side, px, qty, ts) in list(_EARN["orders"].items()):
-        sv_ = _silver_fair(m)
-        if sv_ is None or px <= sv_ + EARN_SILVER_MARGIN:
+    sweep = []
+    for o_ in MONITOR.orders:
+        oid_ = str(o_.get("id") or "")
+        m_ = o_.get("market") or ""
+        if not oid_ or not m_ or o_.get("side") != "BUY":
+            continue                      # an ask above fair is a good ask
+        px_ = float(o_.get("price") or 0) * 100
+        qty_ = float(o_.get("size") or 0)
+        sv_ = _silver_fair(m_)
+        if sv_ is None or px_ <= sv_ + EARN_SILVER_MARGIN:
             continue
+        sweep.append((oid_, m_, px_, qty_))
+    for oid, m, px, qty in sweep:
+        sv_ = _silver_fair(m)
         try:
             requests.request(
                 "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
@@ -4214,7 +4233,7 @@ def auto_earn() -> None:
                          "Content-Type": "application/json"},
                 json={"marketSlug": m}, timeout=15)
             _EARN["cancelled"].add(oid)
-            del _EARN["orders"][oid]
+            _EARN["orders"].pop(oid, None)
             (_EARN.get("grad") or set()).discard(oid)
             _EARN["last"][m] = time.time() + 86400          # done with this market
             _earn_log(m, "pulled off-model", px / 100.0, qty,
