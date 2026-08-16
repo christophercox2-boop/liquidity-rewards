@@ -3482,10 +3482,20 @@ def _ask_allowed(m: str, price_c: float) -> bool:
     it. Where the model has a number, asks must sit at or above fair minus
     the margin; a race the model should cover but cannot price gets no
     asks at all; families the model never covers are left alone, because
-    selling to discover the price is the sell scout's whole job there."""
+    selling to discover the price is the sell scout's whole job there.
+
+    Third-candidate races are the deliberate asymmetry. Their bids fail
+    closed at token size, but their asks stay permitted: the flip loop
+    places SELL_LONG without asking this function, so blocking asks here
+    would only make the sweep cancel every flip the flip loop placed, on
+    a loop, and leave us holding stock in the one kind of market we have
+    already decided we cannot price. Getting OUT of an unpriceable market
+    is the safe direction."""
     sv = _silver_fair(m)
     if sv is not None:
         return price_c >= sv - EARN_SILVER_MARGIN
+    if _third_candidate_race(m):
+        return True
     return not _race_family(m)
 # Per market between new scouts. At 300s a market took over ten minutes to
 # collect its three scouts; at 90s it takes three, so a market gets bracketed
@@ -3830,7 +3840,14 @@ def auto_probe() -> None:
             # scouts already resting where no reward program exists earn
             # nothing however long they sit — pull them now rather than
             # waiting out a TTL that was only ever about gathering evidence
-            if payable_now and m not in payable_now:
+            # Primaries are off the prober's list entirely, so scouts already
+            # resting in one come off the same way rather than waiting out a
+            # TTL — a primary can settle inside that window.
+            unwanted = ("no reward program here — nothing to earn"
+                        if payable_now and m not in payable_now
+                        else "primaries are off the prober's list"
+                        if _is_primary(m) else None)
+            if unwanted:
                 try:
                     requests.request(
                         "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
@@ -3840,8 +3857,7 @@ def auto_probe() -> None:
                         json={"marketSlug": m}, timeout=15)
                     _PROBE["cancelled"].add(oid)
                     del _PROBE["active"][oid]
-                    _probe_log(m, "pulled", side, px,
-                               "no reward program here — nothing to earn")
+                    _probe_log(m, "pulled", side, px, unwanted)
                 except Exception:  # noqa: BLE001
                     pass
                 continue
@@ -3973,8 +3989,16 @@ def auto_probe() -> None:
     progs_all = tr._PROG_CACHE.get("progs") or {}
     payable = set(progs_all) | {sb for p_ in progs_all.values()
                                 for sb in (p_.get("siblings") or [])}
+    # AND NEVER A PRIMARY. Owner's call, and the economics agree: a primary
+    # resolves on a known date within weeks, its book is thin, and the
+    # Silver table has nothing to say about who wins a nomination — so every
+    # scout there is an unpriced bet placed for information we cannot use
+    # before the market settles. Primaries are for the qualifier, which
+    # rests token size on both sides and collects the pool; they are not
+    # for the prober, which is trying to get filled.
     mkts = [m for m in tr._BOOK_CACHE
-            if m.startswith(PROBE_PREFIXES) and (not payable or m in payable)]
+            if m.startswith(PROBE_PREFIXES) and (not payable or m in payable)
+            and not _is_primary(m)]
     random.shuffle(mkts)
     mkts.sort(key=lambda m_: (1 if (est.get(m_) or _PROBE["last"].get(m_)) else 0,
                               _PROBE["last"].get(m_, 0.0)))
@@ -4129,6 +4153,56 @@ def auto_probe() -> None:
         MONITOR.state["probe_active_reg"] = {k: list(v) for k, v in _PROBE["active"].items()}
 
 
+_THIRD: dict = {"ts": None, "seen": {}}
+
+
+def _third_candidate_race(m: str) -> bool:
+    """Does this market's event contain a candidate the party model cannot see?
+
+    Rhode Island governor is the case: the event holds dem, rep AND kenblo —
+    an independent with his own market. Silver's table carries only a
+    Democratic and a Republican number for the state, and they sum to 100,
+    so the model has implicitly assumed a two-way race. Every fair value
+    derived from it is then wrong for that event: the Democrat's true chance
+    is lower than the party number by whatever the third candidate holds, and
+    the third candidate has no number at all.
+
+    So the whole event loses its model backing rather than only the market
+    the model forgot.
+
+    Memoised against the program cache's timestamp: _silver_fair calls this
+    first thing, and _silver_fair runs once per order in the sweep and once
+    per market in the earner. Without the cache the fallback scan — every
+    program, every sibling — turns one poll into millions of dict lookups.
+    """
+    progs = tr._PROG_CACHE.get("progs") or {}
+    ts = tr._PROG_CACHE.get("ts") or 0.0
+    if _THIRD.get("ts") != ts:
+        _THIRD.clear()
+        _THIRD["ts"] = ts
+        _THIRD["seen"] = {}
+    memo = _THIRD["seen"]
+    if m in memo:
+        return memo[m]
+    fam = (progs.get(m) or {}).get("siblings") or []
+    if not fam:
+        for p in progs.values():
+            if m in (p.get("siblings") or []):
+                fam = p.get("siblings") or []
+                break
+    hit = False
+    for sib in fam:
+        tail = sib.rsplit("-", 1)[-1]
+        if tail not in ("dem", "rep") and not tail.isdigit():
+            hit = True
+            break
+    # the whole event shares the answer — one scan settles all of its markets
+    for sib in fam or [m]:
+        memo[sib] = hit
+    memo[m] = hit
+    return hit
+
+
 def _race_family(m: str) -> bool:
     """Is this a market the Silver model is SUPPOSED to cover? Used to tell
     'no forecast because it is a 2028 nomination' (fine, other rules apply)
@@ -4138,6 +4212,13 @@ def _race_family(m: str) -> bool:
     fam = any(t in ("usse", "ussep", "usgub", "usgubp") for t in parts)
     party = any(t in ("dem", "rep") for t in parts)
     st = any(len(t) == 2 and t.isalpha() and t != "us" for t in parts)
+    # A named third candidate in a Senate or Governor event is still a race
+    # the model ought to price — it simply cannot. Saying so here is what
+    # makes it fail CLOSED at token size instead of falling through to the
+    # loose unbacked ceiling, which is how a Yes bid at 7c on an unmodelled
+    # independent got placed.
+    if fam and st and not party and _third_candidate_race(m):
+        return True
     return fam and party and st
 
 
@@ -4153,6 +4234,8 @@ def _silver_fair(m: str) -> float | None:
     came from exactly that window. _silver_races() self-throttles on a
     6-hour TTL, so this costs one fetch per boot, not one per call."""
     try:
+        if _third_candidate_race(m):
+            return None       # the party numbers do not describe this event
         races = _silver_races() or {}
         parts = m.split("-")
         fam = ("senate" if any(t in ("usse", "ussep") for t in parts)

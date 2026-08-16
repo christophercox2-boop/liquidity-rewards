@@ -158,6 +158,57 @@ should rest there rather than simply decline to trade.
       house, MA and NH senate, FL vote-share).
   Still to build: the switch, the cost estimate per side, the spend cap
   that routes ~$200-class jobs to the queue, and the approve/deny UI.
+### 2026-08-16 — third-candidate races lost their model backing (SHIPPED)
+
+Owner flagged Rhode Island governor: a third candidate is in the race and
+the Silver model does not know it, and we had bought Yes shares anyway.
+
+What was wrong. `data/silver_gov_races.csv` carries RI as
+`Helena Foulkes 99.2075 / Aaron Guckian 0.7825` — two candidates summing to
+exactly 100. All 36 governor rows sum to 100, so a sum check finds nothing;
+the model normalises to two ways whether or not the race IS two ways. The
+exchange event holds THREE markets: `-dem`, `-rep` and `-kenblo` (Ken Block).
+So `_silver_fair` found no party token in the kenblo slug and returned None,
+`_race_family` also wanted a party token and said False, and kenblo fell
+through to the loose `MAX_UNBACKED_BID_C` = 15c ceiling. That is what let a
+blind 7c Yes bid exist. Worse, the D and R numbers were never valid for the
+`-dem` and `-rep` markets either — they divide a 100% that Block is standing
+inside of.
+
+The fix. `_third_candidate_race(m)` reads the event's siblings and returns
+True if any tail is neither `dem`/`rep` nor a number (seat-ladder rungs).
+`_silver_fair` returns None for the WHOLE event — not just the market the
+model forgot — and `_race_family` returns True for it, so bids fail closed
+at `RACE_NO_MODEL_BID_C` = 2c instead of 15c. Qualifier bids at 1c still fit.
+
+Asks are the deliberate asymmetry: `_ask_allowed` returns True for these
+events. The flip loop places SELL_LONG WITHOUT consulting `_ask_allowed`, so
+blocking asks would only have the sweep cancel every flip the flip loop
+placed, on a loop, and leave us holding stock in the one kind of market we
+had just decided we cannot price. Getting out is the safe direction.
+
+It is not one race. Eight events on the board carry a non-party candidate:
+  CA gov (stehil, xavbec — no party markets at all), MI gov (mikdug),
+  NE sen (danosb), AK gov (SEVEN named candidates, no party markets),
+  RI gov (kenblo), ID sen (todach), MT sen (setbod), SD sen (briben).
+Nebraska matters most — Osborn is the real contender there and the Silver
+D/R split is meaningless. All eight now bid at 2c maximum.
+
+Memoised on `_PROG_CACHE["ts"]`. Without it the fallback sibling scan runs
+per order in the sweep and per market in the earner: 0.33us cached.
+
+Not fixed by this: the 1 kenblo share already held. The guard stops new
+bids; it does not unwind a position.
+
+### 2026-08-16 — prober is off the primaries (SHIPPED)
+
+Owner: "Do not probe the primaries!" `auto_probe` now filters `_is_primary`
+out of its market list, and scouts already resting in one are pulled
+immediately rather than waiting out the 30-minute TTL — a primary can settle
+inside that window. Primaries stay open to the QUALIFIER, which rests token
+size at the floors to collect the pool; what they are closed to is the
+prober, which is trying to get filled.
+
 - **Negative risk.** Owner wants the concept incorporated — remind them.
   In a mutually exclusive event set, holding No on every outcome (or Yes
   across a complete set) caps the downside, because at most one can
