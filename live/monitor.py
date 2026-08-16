@@ -4044,6 +4044,14 @@ def auto_earn() -> None:
             for oid, r in saved.items():
                 if oid in live and len(r) == 5:
                     _EARN["orders"][oid] = (r[0], r[1], int(r[2]), int(r[3]), float(r[4]))
+    if not _EARN.get("flips"):
+        live = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
+        for oid, r in (MONITOR.state.get("earn_flips_reg") or {}).items():
+            if oid in live and len(r) == 4:
+                _EARN.setdefault("flips", {})[oid] = (r[0], float(r[1]), int(r[2]), float(r[3]))
+    if not _EARN.get("toflip"):
+        _EARN["toflip"] = [list(j) for j in (MONITOR.state.get("earn_toflip") or [])
+                           if len(j) == 4]
     now = time.time()
     open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
     # settle disappearances: real fill (in the fills feed) vs silent cancel
@@ -4372,9 +4380,14 @@ def auto_earn() -> None:
                 placed += 1
         except Exception:  # noqa: BLE001 — the earner must never kill the poll
             continue
-    # mirror the registry so a rebuild can re-adopt (see top of function)
+    # mirror the registries so a rebuild can re-adopt (see top of function).
+    # The flip queue and the resting flips belong here too: a container
+    # replacement between a fill and its flip would otherwise leave us holding
+    # stock nobody remembers buying, and an untracked ask resting against it.
     with MONITOR.lock:
         MONITOR.state["earn_orders_reg"] = {k: list(v) for k, v in _EARN["orders"].items()}
+        MONITOR.state["earn_flips_reg"] = {k: list(v) for k, v in (_EARN.get("flips") or {}).items()}
+        MONITOR.state["earn_toflip"] = [list(j) for j in (_EARN.get("toflip") or [])]
 
 
 # --- slate health watch (in-process; replaced the slate_watch.yml cron) ----
