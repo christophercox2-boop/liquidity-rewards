@@ -3443,6 +3443,21 @@ def _bid_allowed(m: str, price_c: float) -> bool:
     if _race_family(m):
         return price_c <= RACE_NO_MODEL_BID_C
     return price_c <= MAX_UNBACKED_BID_C
+
+
+def _ask_allowed(m: str, price_c: float) -> bool:
+    """May we rest a SELL here? The mirror of _bid_allowed, which existed
+    for hours before this did — every guard shipped today watched the buy
+    side while a scout sold a 99.9% favourite at 69c and nothing objected.
+    Selling below fair gives value away exactly as surely as buying above
+    it. Where the model has a number, asks must sit at or above fair minus
+    the margin; a race the model should cover but cannot price gets no
+    asks at all; families the model never covers are left alone, because
+    selling to discover the price is the sell scout's whole job there."""
+    sv = _silver_fair(m)
+    if sv is not None:
+        return price_c >= sv - EARN_SILVER_MARGIN
+    return not _race_family(m)
 # Per market between new scouts. At 300s a market took over ten minutes to
 # collect its three scouts; at 90s it takes three, so a market gets bracketed
 # while its book still looks the way it did when the first scout went in.
@@ -3826,6 +3841,8 @@ def auto_probe() -> None:
         if side == "SELL":
             px = px_sell
             if round(px / 0.01) in taken:
+                continue
+            if not _ask_allowed(m, px * 100):
                 continue
         intent = "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_SELL_LONG"
         oid = _probe_place(m, side, px, intent,
@@ -4298,12 +4315,21 @@ def auto_earn() -> None:
     for o_ in MONITOR.orders:
         oid_ = str(o_.get("id") or "")
         m_ = o_.get("market") or ""
-        if not oid_ or not m_ or o_.get("side") != "BUY":
-            continue                      # an ask above fair is a good ask
+        if not oid_ or not m_:
+            continue
         px_ = float(o_.get("price") or 0) * 100
         qty_ = float(o_.get("size") or 0)
-        if _bid_allowed(m_, px_):
-            continue
+        if o_.get("side") == "BUY":
+            if _bid_allowed(m_, px_):
+                continue
+        else:
+            # inventory asks below model fair give value away — the OK
+            # Senate sell at 69c against a 99.9% forecast was this. Deep
+            # 99c qualifier ceilings pass trivially.
+            if not str(o_.get("intent") or "").endswith("SELL_LONG"):
+                continue
+            if _ask_allowed(m_, px_):
+                continue
         sweep.append((oid_, m_, px_, qty_))
     for oid, m, px, qty in sweep:
         sv_ = _silver_fair(m) or 0.0
@@ -4319,7 +4345,7 @@ def auto_earn() -> None:
             (_EARN.get("grad") or set()).discard(oid)
             _EARN["last"][m] = time.time() + 86400          # done with this market
             _earn_log(m, "pulled off-model", px / 100.0, qty,
-                      f"bid {px:.0f}¢ against a model fair of {sv_:.1f}¢ — "
+                      f"{px:.0f}¢ against a model fair of {sv_:.1f}¢ — "
                       "never should have rested here")
         except Exception:  # noqa: BLE001
             pass
