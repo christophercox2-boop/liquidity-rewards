@@ -265,6 +265,45 @@ the SHA it just read — which still refuses if someone else moved deploy. All
 three paths (already in sync, needs updating, does not exist) are tested
 against a stubbed git.
 
+### 2026-08-16 — THE SILVER MODEL WAS NEVER ONCE REACHED (FIXED)
+
+Owner spotted it: the /why page said "no Silver number for this market" for
+`usgubewc-usgub-ar-2026-11-03-dem` while Silver plainly publishes Arkansas at
+Dem 0.2% / Rep 99.8%.
+
+It was not Arkansas. `_silver_fair` returned None for EVERY market on the
+board. `_parse_silver` keys the table by `abbr.strip().lower()` — `'ar'` — and
+the lookup asked for `st.upper()` — `'AR'` — so it missed every row. One
+character.
+
+It shipped in 0cd7202 at 02:48 UTC on 2026-08-16, the very commit that
+introduced `_silver_fair` for the prober and earner, and was live all day.
+That means every guard built on the forecast was inert for its entire
+existence: the price cap, `EARN_SILVER_MARGIN`, the size taper away from
+fair, the sv_cap in the earner scan, and the third-candidate withdrawal. What
+actually held the line all day was the FALLBACK — `_race_family` sending
+unpriced races to `RACE_NO_MODEL_BID_C` (2c) and everything else to
+`MAX_UNBACKED_BID_C` (15c). Those are why the day was not much worse.
+
+Verified after the fix against the real files: all 72 governor markets and the
+senate table resolve; Arkansas dem reads 0.205c, Arkansas rep 99.795c,
+Kentucky rep 99.5575c.
+
+**Why the tests did not catch it, which matters more than the bug.** Every
+stub built its Silver table by hand with UPPERCASE state keys, so the tests
+encoded my assumption instead of the real contract and agreed with the broken
+code. All of them now run the real `_parse_silver` over the real
+`data/silver_*.csv`, and t_ri asserts outright that a known state resolves to
+a known number. A stub that invents the shape of its input cannot catch a
+disagreement about the shape of that input.
+
+Expect real behavioural change now that the model is actually live: race
+markets move off the flat 2c no-model cap onto fair+3c, which is far tighter
+on longshots (Arkansas dem: 3c, not 2c... but Kentucky rep: 99.9c, not 2c) and
+newly permits sensible bids on heavy favourites. Asks in modelled races are
+now bounded below by fair-3c, so the sweep will pull inventory asks sitting
+under a favourite's forecast.
+
 ### 2026-08-16 — the standoff was measuring the wrong distance (FIXED)
 
 Owner: "couldn't all that be true for buying a few cents closer to fair

@@ -4315,7 +4315,19 @@ def _silver_fair(m: str) -> float | None:
                    and t not in ("us",)), None)
         if not party or not st:
             return None
-        row = (races.get(fam) or {}).get(st.upper()) or {}
+        # LOWERCASE. _parse_silver keys the table by `abbr.strip().lower()`,
+        # and _map_office has always looked it up that way, which is why the
+        # /map page showed the model correctly the whole time. This lookup
+        # asked for st.upper() and therefore MISSED EVERY ROW: from the commit
+        # that introduced it (0cd7202, 02:48 UTC 2026-08-16) until this fix,
+        # _silver_fair returned None for every market on the board, and every
+        # guard built on top of it — the price cap, the margin, the size taper,
+        # the third-candidate withdrawal — was inert. What actually held the
+        # line all day was the fallback: _race_family sending unpriced races to
+        # RACE_NO_MODEL_BID_C. Tests hid it because they stubbed the table with
+        # uppercase keys instead of running the real parser; they now parse the
+        # real CSV so the key convention is part of what is under test.
+        row = (races.get(fam) or {}).get(st.lower()) or {}
         v = row.get(party)
         return float(v) * 100.0 if v is not None else None
     except Exception:  # noqa: BLE001
