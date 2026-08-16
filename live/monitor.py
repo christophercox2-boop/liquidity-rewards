@@ -4109,11 +4109,21 @@ def auto_earn() -> None:
     # rate integrated over time, same formula as the headline counter but
     # filtered to the earner's own order ids) — runs even while the switch
     # is off so a resting order's income is never lost from the tally
-    if _EARN["orders"] or _PROBE["active"]:
+    if _EARN["orders"] or _PROBE["active"] or _EARN.get("flips"):
         nowa = time.time()
         by_id = {str(o.get("id")): o for o in MONITOR.orders if o.get("id")}
         rate = sum(float((by_id.get(oid) or {}).get("est_day") or 0)
                    for oid in _EARN["orders"])
+        # A FLIP EARNS WHILE IT WAITS. It is a resting order on the ask side
+        # and the exchange scores it like any other, but it lived in its own
+        # registry and the accrual only ever summed the bids — so every reward
+        # a flip earned went uncounted, and the earner's economics read worse
+        # than they were (owner, 2026-08-16, asking exactly this). Tallied
+        # separately from the bids because it answers a different question:
+        # the bids say whether hunting for markets pays, the flips say whether
+        # recovering from a fill pays for itself on the way out.
+        flip_rate = sum(float((by_id.get(oid) or {}).get("est_day") or 0)
+                        for oid in (_EARN.get("flips") or {}))
         # the prober's scouts earn rewards too while they rest — counted in
         # the same tracker, and their share is CREDITED TO THE INFO FUND so
         # scouting pays for more scouting (owner, 2026-08-16)
@@ -4127,6 +4137,9 @@ def auto_earn() -> None:
                 if rate > 0:
                     st["earned_usd"] = round(float(st.get("earned_usd") or 0)
                                              + rate * dtd, 4)
+                if flip_rate > 0:
+                    st["flip_earned_usd"] = round(
+                        float(st.get("flip_earned_usd") or 0) + flip_rate * dtd, 4)
                 if probe_rate > 0:
                     inc = probe_rate * dtd
                     st["probe_earned_usd"] = round(
@@ -6558,7 +6571,8 @@ function renderEarn(){
     (l.note ? ' <span class="sub">— ' + l.note + '</span>' : '') + '</div>').join('');
   document.getElementById('earnBody').innerHTML =
     (function(){
-      const e = st.earned_usd || 0, p = st.probe_earned_usd || 0, t = e + p;
+      const e = st.earned_usd || 0, p = st.probe_earned_usd || 0,
+            fe = st.flip_earned_usd || 0, t = e + p + fe;
       // Rewards earned against stock we were forced to buy. A fill is the bad
       // outcome here, so the two numbers sit side by side and the net is what
       // actually says whether any of this is working.
@@ -6569,7 +6583,9 @@ function renderEarn(){
         ' <span class="sub" style="font-weight:400;font-size:11px">in rewards — $' +
         (e >= 0.1 ? e.toFixed(2) : e.toFixed(3)) + ' its bids, $' +
         (p >= 0.1 ? p.toFixed(2) : p.toFixed(3)) +
-        ' the prober\\'s scouts (credited to the info fund)</span></div>' +
+        ' the prober\\'s scouts (credited to the info fund), $' +
+        (fe >= 0.1 ? fe.toFixed(2) : fe.toFixed(3)) +
+        ' its flips while they wait to sell</span></div>' +
         '<div style="font-size:13px;margin-bottom:4px;color:' +
         (t - fc >= 0 ? '#8fe3b8' : '#ff9d99') + '">net $' + (t - fc).toFixed(2) +
         ' <span class="sub" style="font-weight:400">after ' + nf + ' fill' +
@@ -6580,13 +6596,15 @@ function renderEarn(){
       const fl = DATA.earn_flips || [], pend = DATA.earn_toflip || 0;
       if (!fl.length && !pend) return '';
       const rec = st.recovered_usd || 0;
+      const fearn = st.flip_earned_usd || 0;
       return '<div style="font-size:11.5px;margin-bottom:4px;color:#f2cd7f">↩ ' +
         (fl.length ? fl.length + ' flip' + (fl.length === 1 ? '' : 's') +
-          ' resting (' + fl.map(f => f.qty + '@' + f.px + '¢').join(', ') + ')' : '') +
+          ' resting (' + fl.reduce((t2, f) => t2 + f.qty, 0) + ' shares)' : '') +
         (pend ? (fl.length ? ' · ' : '') + pend + ' waiting on the position' : '') +
-        (rec ? ' · $' + rec.toFixed(2) + ' recovered so far' : '') +
+        (rec ? ' · $' + rec.toFixed(2) + ' recovered' : '') +
+        (fearn ? ' · $' + fearn.toFixed(2) + ' earned while waiting' : '') +
         '<br><span class="sub">selling back what fills forced on us — inventory, ' +
-        'so it costs no buying power</span></div>';
+        'so no buying power, and they earn rewards the whole time they rest</span></div>';
     })() +
     '<div class="sub" style="margin-bottom:4px">' + status +
     ' · searching with $' + (caps.outstanding || 0).toFixed(2) +
