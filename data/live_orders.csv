@@ -1,1 +1,7 @@
 market,side,price,size,ticks,share,est_day,pool,verdict
+ewc-usp-2028-11-07-tuccar,SELL,0.05,1.0,0,0.8437394532228516,15.624804689312066,1000.0,"✅ scoring — ~84.4% of ask side (72,144 resting ≥ 20,000 ✓) ≈ $15.62/day (pool ÷ 27 markets)"
+ewc-usp-2028-11-07-jossha,BUY,0.04,1.0,5,0.0016782747335738857,0.031079161732849737,1000.0,"✅ scoring — ~0.2% of bid side (70,451 resting ≥ 20,000 ✓) ≈ $0.03/day (pool ÷ 27 markets)"
+scc-senate-gop-2026-11-03-51,BUY,0.02,1.0,0,1.468519350679484e-05,5.648151348767246e-05,100.0,"✅ scoring — ~0.0% of bid side (340,475 resting ≥ 5,000 ✓) ≈ $0.00/day (pool ÷ 13 markets)"
+ewc-usp-2028-11-07-vivram,BUY,0.05,1.0,0,,,1000.0,"❌ side has 451 of 20,000 Target Size — side not qualifying"
+ewc-usp-2028-11-07-gleyou,BUY,0.09,1.0,0,,,1000.0,"❌ side has 451 of 20,000 Target Size — side not qualifying"
+ewc-usp-2028-11-07-markel,BUY,0.04,1.0,0,,,1000.0,"❌ side has 451 of 20,000 Target Size — side not qualifying"
