@@ -7740,6 +7740,16 @@ function esc(v){
   return String(v == null ? '' : v).replace(/[&<>"']/g, c => (
     {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+// The breakdown page for one market. It belongs on the prober and earner
+// lists, where the question "why that number" actually comes up — NOT on the
+// order sheet, which is for moving and cancelling (owner, 2026-08-16: "just
+// make it on the probe / earner page for each market in the lists").
+function whyLink(m){
+  return '<a href="/why?slug=' + encodeURIComponent(m) + '" ' +
+    'style="flex:0 0 auto;color:var(--accent);text-decoration:none;font-size:11px;' +
+    'padding:1px 6px;border:1px solid var(--line);border-radius:6px;' +
+    'margin-left:6px;white-space:nowrap">why?</a>';
+}
 // Which route is this? /lab shows the prober and earner read-outs; /map keeps
 // the control surface uncluttered. Set before the first paint so neither page
 // flashes the other's sections.
@@ -7915,8 +7925,6 @@ async function openMkt(slug){
     '<div style="display:flex;align-items:baseline;gap:8px">' +
     '<b style="font-size:15px;flex:1 1 auto">' + esc(nm) + '</b>' +
     '<span style="color:#3fb950;font-weight:700">$' + totRate.toFixed(2) + '/day</span>' +
-    '<a class="alt" style="flex:0 0 auto;text-decoration:none;color:var(--accent)" ' +
-      'href="/why?slug=' + encodeURIComponent(slug) + '">why?</a>' +
     '<button class="alt" style="flex:0 0 auto" onclick="document.getElementById(&#39;det&#39;)' +
       '.style.display=&#39;none&#39;">close</button></div>' +
     '<div class="sub" style="font-size:11px;margin:2px 0 8px">' + esc(slug) +
@@ -8206,7 +8214,7 @@ function renderProbe(){
         '<b style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;' +
         'flex:1 1 auto;min-width:0">' + nice(m) + '</b>' +
         '<span style="font-size:14px;color:#3fb950;font-weight:700;flex:0 0 auto">' +
-        b.med + '¢</span></div>' +
+        b.med + '¢</span>' + whyLink(m) + '</div>' +
         '<div class="sub" style="font-size:10px;margin-bottom:3px">' +
         (v.why.length ? v.why.join(' · ') : 'nothing observed yet') +
         '<br>fair ' + b.lo + '–' + b.hi + '¢ · ' + Math.round(v.conf * 100) + '% sure</div>' +
@@ -8275,6 +8283,7 @@ function renderEarn(){
              : ' <span class="sub">book stale</span>';
     const hrs = a.age_m >= 90 ? (a.age_m / 60).toFixed(1) + 'h' : a.age_m + 'm';
     return '<tr><td class="mkt" style="word-break:normal"><b>' + nm(a.m) + '</b>' +
+      whyLink(a.m) +
       '<div style="font-size:12px;color:' + (a.rate > 0 ? '#3fb950' : 'var(--dim)') +
       ';font-weight:600">$' + (a.rate || 0).toFixed(2) + '/day</div></td>' +
       '<td class="r" style="font-size:11px">' + a.qty + ' @ ' + a.px + '¢ · ' + hrs + bk +
@@ -8732,7 +8741,7 @@ button{background:var(--accent);border:none;color:#0b1220;border-radius:8px;
 padding:8px 14px;font-size:14px;font-weight:600}
 tr.no td{opacity:.55}
 </style></head><body>
-<a class="back" href="/map">&larr; map</a>
+<a class="back" href="/lab">&larr; prober &amp; earner</a>
 <div id="root"><p class="sub">loading&hellip;</p></div>
 <script>
 var CENT = '\\u00a2';
@@ -8942,7 +8951,8 @@ function saveKey(){
 function load(){
   var slug = qs('slug');
   if(!slug){ document.getElementById('root').innerHTML =
-    '<div class="err">No market given. Open this page from a market on /map.</div>';
+    '<div class="err">No market given. Tap <b>why?</b> next to a market in the '+
+    'prober or earner list on /lab.</div>';
     return; }
   fetch('/why.json?slug='+encodeURIComponent(slug), {headers:hdrs()})
     .then(function(r){ return r.status===401 ? Promise.reject(new Error('key'))
@@ -10550,9 +10560,6 @@ function renderSheet(d){
   document.getElementById('sheetIn').innerHTML =
     '<div style="font-size:17px;font-weight:700">'+esc(mname(m))+'</div>'+
     '<div class="mkt">'+esc(m)+'</div>'+
-    '<div style="margin:4px 0 2px"><a href="/why?slug='+encodeURIComponent(m)+'" '+
-      'style="color:var(--accent);text-decoration:none;font-size:13px">'+
-      'why this price? &rarr;</a></div>'+
     (d.net ? '<div class="sub">position: '+d.net.toLocaleString()+' contracts</div>' : '')+
     '<div style="display:flex;gap:18px;margin-top:8px">'+
     '<div style="flex:1"><div class="sub">Bids</div><table class="bk">'+lv(d.bids)+'</table></div>'+

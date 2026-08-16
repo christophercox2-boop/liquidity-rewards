@@ -206,7 +206,13 @@ Owner: "Give me some insight into where the confidence numbers come from. Let
 me click and see a whole page for each market that breaks down what's going
 into it. This should be for the probe and the earners."
 
-`/why?slug=...`, linked as "why?" from both market sheets. Eight sections:
+`/why?slug=...`, reached by a "why?" chip on every market row in the PROBER
+and EARNER lists on /lab. Deliberately NOT on the order sheets — owner,
+2026-08-16: "just make it on the probe / earner page for each market in the
+lists. I don't need it on an order modification screen." The sheets are for
+moving and cancelling; the breakdown belongs where the numbers are read. A
+test asserts the link is present on both lists and absent from both sheets.
+Eight sections:
 confidence with every component, fair value with the evidence, the race
 forecast, the reward program, the earner's scan, the prober's gates, and our
 own position. Card rendering is isolated so one failure cannot blank the page.
