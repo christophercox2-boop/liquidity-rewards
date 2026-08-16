@@ -4193,6 +4193,35 @@ def auto_earn() -> None:
                     MONITOR.state["probe_budget"] = round(
                         float(MONITOR.state.get("probe_budget") or 0.0) + inc, 4)
             st["_acc_ts"] = nowa
+    # WITHDRAW ANYTHING THE MODEL SAYS WE SHOULD NEVER HAVE BID, and do it
+    # whether or not the switch is on. The price cap only gated NEW orders, so
+    # the bids already resting at 10c on a 0.62% race kept filling after the
+    # cap shipped — three more while the owner was reading about the first.
+    # Turning the earner off stopped new placements and, until now, also
+    # stopped the cleanup, which left the bad orders resting.
+    #
+    # Cancelling is not placing. It only ever reduces exposure, so it is not
+    # gated on the switch.
+    for oid, (m, side, px, qty, ts) in list(_EARN["orders"].items()):
+        sv_ = _silver_fair(m)
+        if sv_ is None or px <= sv_ + EARN_SILVER_MARGIN:
+            continue
+        try:
+            requests.request(
+                "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
+                headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST",
+                                           f"/v1/order/{oid}/cancel"),
+                         "Content-Type": "application/json"},
+                json={"marketSlug": m}, timeout=15)
+            _EARN["cancelled"].add(oid)
+            del _EARN["orders"][oid]
+            (_EARN.get("grad") or set()).discard(oid)
+            _EARN["last"][m] = time.time() + 86400          # done with this market
+            _earn_log(m, "pulled off-model", px / 100.0, qty,
+                      f"bid {px:.0f}¢ against a model fair of {sv_:.1f}¢ — "
+                      "never should have rested here")
+        except Exception:  # noqa: BLE001
+            pass
     if not _auto_on("earn"):
         return
     if os.environ.get("EARN_PAUSE", "") == "1":
@@ -4321,6 +4350,19 @@ def auto_earn() -> None:
             # cost, count and the flip all come from the fills feed above;
             # this branch only journals the disappearance and stands down
             _EARN["last"][m] = now + EARN_FILL_COOLDOWN - EARN_COOLDOWN
+            # A fill on a price the model calls absurd is not an ordinary cost,
+            # it is evidence the reasoning was wrong — somebody was happy to
+            # sell us something we should not have been bidding for. Shut the
+            # market down for the day and say so loudly.
+            sv2 = _silver_fair(m)
+            if sv2 is not None and px > sv2 + EARN_SILVER_MARGIN:
+                _EARN["last"][m] = now + 86400
+                _earn_log(m, "OFF-MODEL FILL", px / 100.0, qty,
+                          f"filled at {px:.0f}¢ where the model says {sv2:.1f}¢ — "
+                          "someone sold us junk; market closed for the day")
+                notify("Off-model fill",
+                       f"{m}: filled {qty} at {px:.0f}c, model fair {sv2:.1f}c",
+                       "high")
         elif now - ts_gone > EARN_CONFIRM_WAIT:
             del _EARN["pending"][oid]
             # The exchange keeps silently cancelling in some markets. Re-placing
@@ -4786,6 +4828,13 @@ def auto_earn() -> None:
             else:
                 cap = EARN_MAX_USD * 0.15
                 tier = "speculative"
+            # SIZE FALLS AWAY FROM THE MODEL. Even inside the cap, paying
+            # above a forecast is paying a premium, and the premium should buy
+            # a smaller position, not the same one. At the model's own number
+            # the full tier is available; at the cap it is a token.
+            if sv is not None and pc > sv:
+                over = (pc - sv) / max(1.0, EARN_SILVER_MARGIN)
+                cap = cap * max(0.15, 1.0 - 0.85 * min(1.0, over))
             q = max(1, min(EARN_MAX_SHARES, int(cap * 100 / pc)))
             # score with us resting at pc: merge, walk the window from the
             # best price, sum discounted takes
