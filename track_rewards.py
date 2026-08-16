@@ -1232,6 +1232,36 @@ def append_estimates(live_orders: list[dict]) -> None:
         writer.writeheader()
         writer.writerows(rows)
     _log_run_trigger(ts)
+    # Per-family rate history for payout calibration. estimates.csv rotates
+    # too fast to reconstruct a day after the fact (30k rows vanished within
+    # hours on 2026-08-15, which is how the slate's inflated pools went
+    # unnoticed until the payout landed at ~25 cents on the tracked dollar).
+    # ~9 tiny rows per run; integrate over a day and divide by what
+    # rewards.csv says the day paid to get each family's true factor.
+    def _fam(m: str) -> str:
+        if m.startswith("ewc-usp-party"): return "party-2028"
+        if m.startswith("ewc-usp-2028"): return "winner-2028"
+        if m.startswith("enwc-uspres-nom"): return "nominee-2028"
+        if "usse" in m: return "senate"
+        if "usgub" in m: return "governor"
+        return "other"
+    fam_tot: dict[str, float] = {}
+    for o in live_orders:
+        if o.get("est_day"):
+            f = _fam(o["market"])
+            fam_tot[f] = fam_tot.get(f, 0.0) + float(o["est_day"])
+    FAMDAY = DATA / "family_day.csv"
+    frows = []
+    if FAMDAY.exists():
+        with FAMDAY.open(newline="") as f:
+            frows = list(csv.DictReader(f))
+    for fam_name, v in sorted(fam_tot.items()):
+        frows.append({"checked_at_utc": ts, "family": fam_name,
+                      "est_day": f"{v:.2f}"})
+    frows = frows[-5000:]
+    with FAMDAY.open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=["checked_at_utc", "family", "est_day"])
+        w.writeheader(); w.writerows(frows)
 
 
 # This workflow runs on `push: branches: [main]` as well as hourly, so placing
@@ -1409,6 +1439,18 @@ def write_status(
             f"**If the timestamp above is more than ~{RUN_EVERY_HOURS + 1} hours old, something is broken** — "
             f"check the [Actions tab]({WORKFLOW_URL})."
         )
+    lines.append("")
+
+    # 2026-08-16: the presidential_election_2028 program's pool cadence is
+    # NOT validated. Aug-14 actuals paid ~25% of tracked for nominees, ~10%
+    # for winners, ~1-5% for the party pair, while every pre-existing family
+    # still reconciles ~100%. Until a full clean day (Aug 15) pins the true
+    # divisor, the slate's estimates below are flagged, not trusted.
+    lines.append("> ⚠️ **2028-slate estimates are UNCALIBRATED and run HIGH.** "
+                 "Aug-14 actuals: nominees paid ~25% of tracked, winners ~10%, "
+                 "party markets ~1-5%. Every older family (races, Fed, sports) "
+                 "still reconciles ~100%. Divide slate numbers accordingly until "
+                 "the Aug-15 payout calibrates them.")
     lines.append("")
 
     # ---- the answer up top; all supporting detail lives below the divider ----

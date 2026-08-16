@@ -223,10 +223,12 @@ def _estimates_csv_text() -> str | None:
 TRACKER_INTERVAL = float(os.environ.get("TRACKER_INTERVAL", "3600"))
 TRACKER_ENABLED = os.environ.get("TRACKER_IN_MONITOR", "1") != "0"
 APP_DIR = Path(__file__).resolve().parent.parent
-TRACKER_SEED = ("data/estimates.csv", "data/checks.csv", "data/estimate_runs.csv")
+TRACKER_SEED = ("data/estimates.csv", "data/checks.csv", "data/estimate_runs.csv",
+                "data/family_day.csv")
 TRACKER_PUSH = ("STATUS.md", "data/rewards.csv", "data/checks.csv",
                 "data/estimates.csv", "data/estimate_runs.csv",
-                "data/live_orders.csv", "data/latest_response.json")
+                "data/family_day.csv", "data/live_orders.csv",
+                "data/latest_response.json")
 TRACKER_STATUS = {"ok_ts": 0.0, "err": "", "runs": 0}
 
 
@@ -315,6 +317,19 @@ def tracker_loop() -> None:
             TRACKER_STATUS["err"] = err
             if not err:
                 TRACKER_STATUS["ok_ts"] = time.time()
+                # the run just rewrote rewards.csv — refresh the paid-days
+                # table NOW instead of waiting for the hourly sweep (the
+                # owner caught 'not posted yet' beside freshly posted rows)
+                try:
+                    winners, rew_total, day_paid = load_winners()
+                    if winners:
+                        global WINNERS
+                        WINNERS = winners
+                    MONITOR.day_paid = day_paid
+                    if rew_total:
+                        MONITOR.note_rewards_total(rew_total)
+                except Exception:  # noqa: BLE001
+                    pass
         time.sleep(TRACKER_INTERVAL)
 
 
