@@ -218,9 +218,16 @@ def _estimates_csv_text() -> str | None:
 # unchanged, as a subprocess (its own interpreter — no shared module state
 # with the poll loop), then pushes every output to main as ONE commit via the
 # git data API. Append-history files are seeded from main first, so container
-# restarts never reset them. The Actions workflow still runs every 4 hours as
-# an independent heartbeat: if this container dies, that run still stamps the
-# ❌ freshness banner into STATUS.md and emails the owner.
+# restarts never reset them.
+#
+# THIS IS THE ONLY THING TRACKING REWARDS NOW. The 4-hourly Actions workflow
+# was the independent heartbeat — if this container died, that run still
+# stamped the ❌ freshness banner into STATUS.md and emailed the owner. As of
+# 2026-08-16 03:34 UTC no job in the repo reaches a runner at all (Actions
+# minutes / spending limit), so that safety net is gone: if this thread stops,
+# STATUS.md simply stops changing and nothing says so. Do not remove or
+# quietly weaken this loop, and put the heartbeat back the moment Actions runs
+# again. See HANDOFF.md.
 TRACKER_INTERVAL = float(os.environ.get("TRACKER_INTERVAL", "3600"))
 TRACKER_ENABLED = os.environ.get("TRACKER_IN_MONITOR", "1") != "0"
 APP_DIR = Path(__file__).resolve().parent.parent

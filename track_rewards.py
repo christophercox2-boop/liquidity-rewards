@@ -1498,21 +1498,49 @@ def write_status(
     lines: list[str] = []
     lines.append("# Polymarket US — Liquidity Rewards")
     lines.append("")
-    lines.append(f"[![Track liquidity rewards]({WORKFLOW_URL}/badge.svg)]({WORKFLOW_URL})")
-    lines.append("")
+    # WHO ACTUALLY RAN THIS, in the page's own words.
+    #
+    # Since 2026-08-15 this runs inside live/monitor.py on DigitalOcean, not in
+    # Actions. The header kept carrying the Actions badge and telling the owner
+    # to "check the Actions tab" if the timestamp went stale — advice that
+    # points at the wrong place even when Actions is healthy, and that on
+    # 2026-08-16 pinned a permanently RED badge to the top of the front page
+    # while tracking was in fact running perfectly every hour. A status page
+    # whose own status light is wrong is worse than no light.
+    in_actions = os.environ.get("GITHUB_ACTIONS") == "true"
+    runner = "the Actions workflow" if in_actions else "the live monitor"
+    if in_actions:
+        fix = f"Check the [Actions tab]({WORKFLOW_URL})."
+        lines.append(f"[![Track liquidity rewards]({WORKFLOW_URL}/badge.svg)]({WORKFLOW_URL})")
+        lines.append("")
+    else:
+        fix = ("Open /map. If that page will not load at all, the monitor is "
+               "down and needs a restart from DigitalOcean.")
     if error:
         lines.append(f"## ❌ Last check FAILED — {now}")
         lines.append("")
         lines.append(f"```\n{error}\n```")
         lines.append("")
-        lines.append(f"The data below is from the last successful run. See the [Actions tab]({WORKFLOW_URL}) for logs.")
+        lines.append(f"The numbers below are from the last successful run. {fix}")
     else:
         lines.append(f"## ✅ Last successful check: {now}")
         lines.append("")
+        every = "hour" if RUN_EVERY_HOURS == 1 else f"{RUN_EVERY_HOURS} hours"
         lines.append(
-            f"This runs automatically every {'hour' if RUN_EVERY_HOURS == 1 else f'{RUN_EVERY_HOURS} hours'}. "
-            f"**If the timestamp above is more than ~{RUN_EVERY_HOURS + 1} hours old, something is broken** — "
-            f"check the [Actions tab]({WORKFLOW_URL})."
+            f"Written by **{runner}**, every {every}. "
+            f"**If the timestamp above is more than ~{RUN_EVERY_HOURS + 1} hours "
+            f"old, something is broken.** {fix}"
+        )
+    if not in_actions:
+        lines.append("")
+        lines.append(
+            "> ⚠️ **Nothing is watching the watcher.** The 4-hourly Actions run "
+            "used to stamp a ❌ here if the monitor died. No job in this repo "
+            "has reached a runner since 2026-08-16 03:34 UTC — Actions minutes "
+            "or the spending limit, fixable only at "
+            "[billing](https://github.com/settings/billing). Until then a dead "
+            "monitor looks like a timestamp that quietly stops moving, and no "
+            "email arrives. The timestamp above is the check."
         )
     lines.append("")
 

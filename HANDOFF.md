@@ -222,7 +222,30 @@ by `wfco223`, not `github-actions[bot]`: they come from live/monitor.py on
 DigitalOcean, which took over the hourly tracker on 2026-08-15. Actions is
 contributing nothing right now.
 
-What is actually degraded while Actions is down: the 4-hourly heartbeat that
+**Reward tracking itself is NOT affected and needs nothing.** It moved into
+live/monitor.py on 2026-08-15 (`tracker_loop`): the monitor runs the same
+track_rewards.py as a subprocess every hour and commits STATUS.md plus every
+data/*.csv to main through the git data API. Verified 2026-08-16 18:24 UTC —
+STATUS.md stamped 2:12 PM ET, twelve minutes old. That is why data commits keep
+landing authored by `wfco223` while every Actions run fails.
+
+The real casualty is the DEAD-MAN'S SWITCH. The 4-hourly Actions run existed
+to stamp a ❌ into STATUS.md and email if the container died. With Actions
+dead, a dead monitor now looks like a timestamp that quietly stops moving and
+no email arrives. An external watcher is needed — DigitalOcean App Platform
+alerts on the existing health check are the cheapest fix since that account
+already exists; a free uptime pinger against the monitor's health endpoint
+also works. Not built: it needs an owner decision and a signup.
+
+STATUS.md was lying about all of this and is fixed. The header carried the
+Actions badge — permanently RED while tracking ran perfectly — and told the
+owner to "check the Actions tab" if the timestamp went stale, which is the
+wrong place even when Actions is healthy. It now names whoever actually wrote
+it (`GITHUB_ACTIONS` decides), shows the badge ONLY on an Actions-written run
+so it comes back by itself if minutes are restored, points at /map otherwise,
+and carries a standing warning that nothing is watching the watcher.
+
+Other things degraded while Actions is down: the 4-hourly heartbeat that
 posts the ❌ freshness banner, the daily estimator scoreboard, the silver
 report and races jobs, and every manual-dispatch workflow (the poke.txt
 pattern). The Silver MODEL itself is fine — the monitor fetches it from
