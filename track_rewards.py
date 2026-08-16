@@ -979,6 +979,9 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                 # (D)"). We were throwing that away and rendering raw slugs
                 # like usgubewc-usgub-pa-2026-11-03-rep at the owner, which
                 # wrap over two lines on a phone and cannot be skimmed.
+                # the candidate's photo — the exchange sends one per market
+                "image": str((((o.get("marketMetadata") or {}).get("subject")
+                               or {}).get("image")) or ""),
                 "title": str(((o.get("marketMetadata") or {}).get("title")) or ""),
                 "subject": str((((o.get("marketMetadata") or {}).get("subject")
                                  or {}).get("name")) or ""),

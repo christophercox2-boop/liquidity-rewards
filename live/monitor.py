@@ -6316,6 +6316,15 @@ def _map_payload() -> dict:
                        or (o.get("title") or "").strip())
                    for o in MONITOR.orders
                    if o.get("market") and (o.get("subject") or o.get("title"))},
+        # The 2028 slate as a face grid: who we are earning on, and how much.
+        "slate": sorted(
+            ({"m": m_, "img": v_[0], "name": v_[1] or m_.rsplit("-", 1)[-1],
+              "title": v_[2],
+              "rate": round(float((MONITOR.market_rates or {}).get(m_) or 0.0), 2),
+              "orders": sum(1 for o_ in MONITOR.orders if o_.get("market") == m_)}
+             for m_, v_ in (MONITOR.state.get("mkt_img") or {}).items()
+             if "2028" in m_),
+            key=lambda r: (r["title"], -r["rate"], r["name"])),
         "probe_est": MONITOR.state.get("probe") or {},
         "probe_bayes": {m: b for m in sorted(
                             {l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
@@ -6584,6 +6593,8 @@ let DATA=null, SEL=null, FILTER=null, SHOWGAPS=false;
 // flashes the other's sections.
 const LAB = location.pathname.indexOf('/lab') === 0;
 if (LAB) { document.body.classList.add('lab'); document.title = 'Prober & Earner'; }
+const SLATE = location.pathname.indexOf('/slate') === 0;
+if (SLATE) { document.body.classList.add('slate'); document.title = '2028 slate'; }
 
 function hdrs(){ const h=new Headers(); h.set('X-Dash-Key', localStorage.getItem('dashKey')||''); return h; }
 function saveKey(){ localStorage.setItem('dashKey', document.getElementById('k').value); load(); }
@@ -6618,6 +6629,7 @@ function render(){
   }).join('')).join('');
 
   swRender();
+  renderSlate();
   renderProbe();
   renderEarn();
   const bn=document.getElementById('banner');
@@ -6676,6 +6688,44 @@ const SWDESC = {
   earn: {on:'small bids where the model is confident', off:'not placing'},
 };
 const SWARM = {};
+function renderSlate(){
+  const card = document.getElementById('slateCard'); if(!card) return;
+  const rows = DATA.slate || [];
+  if(!rows.length){ card.style.display='none'; return; }
+  card.style.display='block';
+  // colour says what the tile is doing for us, not who the person is
+  const tone = r => r.rate >= 1 ? ['#3fb950','rgba(63,185,80,.45)']
+                  : r.rate > 0  ? ['#d9a132','rgba(217,161,50,.40)']
+                  : r.orders    ? ['#e5645f','rgba(229,100,95,.45)']
+                                : ['#93a0b4','transparent'];
+  const groups = {};
+  rows.forEach(r => (groups[r.title || 'other'] = groups[r.title || 'other'] || []).push(r));
+  const total = rows.reduce((t,r)=>t+r.rate, 0);
+  let h = '<div style="font-size:13px;margin-bottom:6px">$' + total.toFixed(2) +
+    '/day across ' + rows.filter(r=>r.rate>0).length + ' of ' + rows.length + ' markets</div>' +
+    '<div class="sub" style="font-size:10px;margin-bottom:8px">' +
+    '<span style="color:#3fb950">■</span> $1+/day · ' +
+    '<span style="color:#d9a132">■</span> earning a little · ' +
+    '<span style="color:#e5645f">■</span> orders resting, earning nothing · ' +
+    '<span style="color:#93a0b4">■</span> not entered</div>';
+  Object.keys(groups).forEach(g => {
+    const list = groups[g], sub = list.reduce((t,r)=>t+r.rate,0);
+    h += '<div style="font-size:11px;color:var(--dim);margin:10px 0 5px">' + esc(g) +
+         ' — $' + sub.toFixed(2) + '/day</div><div class="fgrid">' +
+      list.map(r => {
+        const [c, bd] = tone(r);
+        return '<div class="face" style="border-color:' + bd + '" onclick="openMkt(\'' +
+          esc(r.m) + '\')">' +
+          '<img src="' + esc(r.img) + '" alt="" loading="lazy" ' +
+          'onerror="this.style.visibility=\'hidden\'">' +
+          '<div class="fn">' + esc(r.name) + '</div>' +
+          '<div class="fr" style="color:' + c + '">' +
+          (r.rate > 0 ? '$' + r.rate.toFixed(2) : (r.orders ? '$0' : '—')) + '</div></div>';
+      }).join('') + '</div>';
+  });
+  document.getElementById('slateBody').innerHTML = h;
+}
+
 function renderProbe(){
   const card = document.getElementById('probeCard'); if(!card) return;
   const est = DATA.probe_est || {}, act = DATA.probe_active || [], log = DATA.probe_log || [];
@@ -9367,7 +9417,7 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, "text/html; charset=utf-8", DASH_HTML.encode())
             return
         if ((self.path.startswith("/map") and not self.path.startswith("/map.json"))
-                or self.path.startswith("/lab")):
+                or self.path.startswith("/lab") or self.path.startswith("/slate")):
             # shell only, no data — same pattern as "/": the page's own login
             # card gates everything underneath it. /lab is the same shell on a
             # different route: the prober and earner read-outs are analysis and
@@ -9643,6 +9693,19 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             except Exception:  # noqa: BLE001 — never let this stop the poll
                 pass
             orders = tr.fetch_live_orders(key_id, secret_key, event_sizes)
+            try:
+                # Faces arrive only alongside open orders, so remember them.
+                # Cancel everything and the grid would otherwise go blank —
+                # which is exactly when the owner wants to look at it.
+                with MONITOR.lock:
+                    imgs = MONITOR.state.setdefault("mkt_img", {})
+                    for o_ in orders:
+                        m_ = o_.get("market")
+                        if m_ and o_.get("image") and m_ not in imgs:
+                            imgs[m_] = [o_["image"], o_.get("subject") or "",
+                                        o_.get("title") or ""]
+            except Exception:  # noqa: BLE001 — never let this stop the poll
+                pass
             MONITOR.sample(dt.datetime.now(dt.timezone.utc), orders)
             MONITOR.error = None
             err_streak = 0
