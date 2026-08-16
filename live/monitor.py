@@ -3879,10 +3879,23 @@ def _bayes_fair(m: str) -> dict | None:
         if ba is not None:
             lp += baw * llog(sig((ba * 100 - f) / S))
         if sv is not None:
-            # soft ±6c window around the Silver model's number — a prior
-            # that real trades can overrule but bait cannot
-            lp += 0.6 * (llog(sig((f - (sv - 6)) / S))
-                         + llog(sig(((sv + 6) - f) / S)))
+            # Window scaled to the forecast's own uncertainty, and weighted to
+            # match the heaviest book anchor.
+            #
+            # A flat +/-6c was wrong at the extremes. On New Mexico Senate,
+            # which Silver puts at 0.62%, it licensed anything from 1c to 6.6c
+            # and left a median of 5c — an order of magnitude out — before the
+            # book was even consulted. The uncertainty of a probability
+            # estimate scales with sqrt(p(1-p)), so the window does too: about
+            # +/-6c near a coin flip, about +/-1.5c on a race nobody thinks is
+            # close. At weight 0.6 against touch anchors at 1.2 the book also
+            # outvoted the model two to one per term; matched at 1.2, a
+            # forecast and a wall of resting size carry equal say, and it takes
+            # real trades to move fair value away from the forecast.
+            sd = math.sqrt(max(0.0, (sv / 100.0) * (1 - sv / 100.0)))
+            win = max(1.5, 6.0 * sd / 0.5)
+            lp += 1.2 * (llog(sig((f - (sv - win)) / S))
+                         + llog(sig(((sv + win) - f) / S)))
         logp[f] = lp
     mx = max(logp[1:])
     ps = [0.0] + [math.exp(l - mx) for l in logp[1:]]
