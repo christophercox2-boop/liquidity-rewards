@@ -4070,6 +4070,34 @@ def _bayes_fair(m: str) -> dict | None:
 EARN_MAX_USD = float(os.environ.get("EARN_MAX_USD", "6.0"))
 EARN_TOTAL_USD = float(os.environ.get("EARN_TOTAL_USD", "100.0"))
 EARN_MAX_SHARES = 200
+# START SMALL AND EARN THE RIGHT TO GROW.
+#
+# The prober tests a price with ONE share and the earner then jumped straight
+# to sixty at the same price, treating "a scout rested here" as proof that a
+# real order would. It is not: a single share is beneath anyone's notice, while
+# sixty at the same price is worth crossing the spread for (owner, 2026-08-16:
+# "someone might not want one contract, but 60 might be more enticing — if
+# you've tested with 1, why not earn with 5 and gradually increase").
+#
+# So size is a ladder. A market starts at five shares, and only an order that
+# has rested untouched AND earned for half an hour promotes the market to the
+# next rung. Any fill knocks it back to the bottom, because a fill is proof
+# the last size was too tempting at that price.
+EARN_START_SHARES = int(os.environ.get("EARN_START_SHARES", "5"))
+EARN_RUNG_MULT = float(os.environ.get("EARN_RUNG_MULT", "3"))
+EARN_RUNG_AFTER = float(os.environ.get("EARN_RUNG_AFTER", "1800"))
+EARN_RUNG_MAX = int(os.environ.get("EARN_RUNG_MAX", "3"))
+# Price climbs the same ladder: the band's 10th percentile at the bottom rung,
+# its median at the next, its top only once a market has held twice. A flat
+# 10c ceiling was far too dear for longshots the model puts at two to eight.
+
+
+def _earn_rung(m: str) -> int:
+    return int((MONITOR.state.get("earn_rung") or {}).get(m) or 0)
+
+
+def _earn_rung_size(m: str) -> int:
+    return int(EARN_START_SHARES * (EARN_RUNG_MULT ** _earn_rung(m)))
 EARN_PX_MAX_C = int(os.environ.get("EARN_PX_MAX_C", "10"))
 # Above the penny ceiling the earner may only act on KNOWLEDGE, never on hope
 # (owner, 2026-08-16: "earner should use what probe is learning to place where
@@ -4493,6 +4521,13 @@ def auto_earn() -> None:
             # it is evidence the reasoning was wrong — somebody was happy to
             # sell us something we should not have been bidding for. Shut the
             # market down for the day and say so loudly.
+            # a fill means that size was tempting at that price — back to the
+            # smallest rung before trying this market again
+            if _earn_rung(m):
+                with MONITOR.lock:
+                    MONITOR.state.setdefault("earn_rung", {})[m] = 0
+                _earn_log(m, "rung reset", px / 100.0, qty,
+                          f"filled at {px:.0f}¢ — back to {EARN_START_SHARES} shares here")
             sv2 = _silver_fair(m)
             if sv2 is not None and px > sv2 + EARN_SILVER_MARGIN:
                 _EARN["last"][m] = now + 86400
@@ -4800,6 +4835,28 @@ def auto_earn() -> None:
                           "inventory, so no buying power used")
         except Exception:  # noqa: BLE001 — a flip never kills the poll
             pass
+    # PROMOTE A MARKET THAT HELD ITS RUNG. An order that has rested untouched
+    # for the promotion window, is visibly on the book and is actually earning
+    # has proved that size is safe at that price — so the next order there may
+    # be three times larger. Nothing is resized in place; the ladder only
+    # decides how big the NEXT order is.
+    rungs = MONITOR.state.setdefault("earn_rung", {})
+    for oid, (m, side, px, qty, ts) in list(_EARN["orders"].items()):
+        if now - ts < EARN_RUNG_AFTER or _earn_rung(m) >= EARN_RUNG_MAX:
+            continue
+        o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
+        if not o or float(o.get("est_day") or 0) <= 0:
+            continue
+        if _on_book(m, "BUY", px / 100.0, qty, ts) is not True:
+            continue
+        if qty < _earn_rung_size(m):
+            continue                      # this order is not at the current rung
+        with MONITOR.lock:
+            rungs[m] = _earn_rung(m) + 1
+        _earn_log(m, "rung up", px / 100.0, qty,
+                  f"{int(qty)} held {int((now - ts) / 60)}m on the book and earned — "
+                  f"next order here may be {_earn_rung_size(m)}")
+
     # Graduate the proven, demote the faded. Runs before rotation so a market
     # that has just earned its place is never picked as one of the worst.
     est_pm = MONITOR.state.get("probe") or {}
@@ -4925,6 +4982,14 @@ def auto_earn() -> None:
         # loss stops being trivial
         base = real_bids[0][0] if real_bids else max(1, b["lo"])
         top = min(b["hi"] + 2, EARN_PX_MAX_C)
+        # PRICE CLIMBS WITH THE LADDER TOO, not just size. Promoting straight
+        # back to the old 10c ceiling would reintroduce exactly the price the
+        # owner called too dear for these longshots; a market has to hold at
+        # the cheap end before it is offered the middle, and hold there before
+        # it is offered the top.
+        rung_ = _earn_rung(m)
+        top = min(top, max(1, b["lo"] if rung_ < 1 else
+                              b["med"] if rung_ < 2 else b["hi"] + 2))
         # Model-backed extension past the penny ceiling: never above the band's
         # 10th percentile, and never above the hard safety cap.
         if b["lo"] > top:
@@ -4976,7 +5041,7 @@ def auto_earn() -> None:
             if sv is not None and pc > sv:
                 over = (pc - sv) / max(1.0, EARN_SILVER_MARGIN)
                 cap = cap * max(0.15, 1.0 - 0.85 * min(1.0, over))
-            q = max(1, min(EARN_MAX_SHARES, int(cap * 100 / pc)))
+            q = max(1, min(EARN_MAX_SHARES, int(cap * 100 / pc), _earn_rung_size(m)))
             # score with us resting at pc: merge, walk the window from the
             # best price, sum discounted takes
             lv = sorted(real_bids + [(pc, float(q))], key=lambda x: -x[0])
