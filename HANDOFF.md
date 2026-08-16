@@ -265,6 +265,49 @@ the SHA it just read — which still refuses if someone else moved deploy. All
 three paths (already in sync, needs updating, does not exist) are tested
 against a stubbed git.
 
+### 2026-08-16 — the standoff was measuring the wrong distance (FIXED)
+
+Owner: "couldn't all that be true for buying a few cents closer to fair
+value? Why be so far off when you're not confident, and there seems to be no
+analysis of alternatives." Both halves were right and both were my bugs.
+
+**The standoff bit in exactly the wrong case.** By the time the touch-standoff
+applied, `top` had ALREADY been capped at the band's 10th percentile by the
+rung ladder. So `min(top, touch - back)` could only bind when the touch sat
+BELOW the 10th percentile — precisely when bidding at the touch means buying
+under the bottom of the fair range, which is the outcome we want. It bought no
+safety and cost about 91% of the reward score (df 0.3, two ticks). Distance
+from the touch was never the protection; distance BELOW FAIR is. The standoff
+now only trims the part of the range reaching ABOVE the value-safe level, and
+at or under `b["lo"]` the price itself is the protection. Measured: 8 of 400
+randomised low-confidence markets now price nearer the touch than the old rule
+allowed, every one of them under the 10th percentile.
+
+**There was no analysis of alternatives.** The scan ranked candidates purely
+by income, so it always took the dearest allowed price and never compared what
+being wrong would cost. Every row now carries the expected edge against the
+posterior MEAN (the mean, not the median — expected profit on a fill is a sum
+over the whole distribution), and a fill that would buy above fair must have
+that overpay paid back by income inside a window that shrinks with confidence
+(`EARN_EDGE_PAYBACK`, scaled by score/EARN_CONF_FULL). The old deal test only
+ever asked whether income beat a TOTAL loss, which in a reward-farmed book it
+always does and which is the wrong risk anyway. Selection now prefers a price
+that buys under fair over a dearer one that scores more. The /why page shows
+the edge per candidate and names the runner-up.
+
+### 2026-08-16 — the flipper is off the 2028 party markets (owner)
+
+"The flipper should ignore the 2028 party markets." `FLIP_SKIP_PREFIXES =
+("ewc-usp-party-2028-",)`, enforced at all three points where the flipper can
+act: it will not queue one, will not place one (and DROPS jobs queued before
+the rule rather than leaving them retrying for the window), and will not
+re-queue one that vanished. Those markets hold size for the owner's own
+reasons, so an automatic sell-back is not recovering a fill, it is liquidating
+inventory that was never the earner's to sell.
+
+NOT done: flip asks already resting in those markets are left alone. Pulling
+them is an order-touching action and needs the owner's yes.
+
 ### 2026-08-16 — the flip loop ran away on the 2028 party market (FIXED)
 
 Owner's screenshot: `ewc-usp-party-2028-11-07-rep` repeated a dozen-plus

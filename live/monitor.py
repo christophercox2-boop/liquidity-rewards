@@ -4510,7 +4510,11 @@ def _bayes_posterior(terms: list[dict]) -> dict | None:
             med = i
         if hi is None and cum >= 0.90:
             hi = i
-    return {"lo": lo, "med": med, "hi": hi,
+    # the MEAN, not just the median: expected profit or loss on a fill is a
+    # sum over the whole distribution, so it is the mean that says whether
+    # buying at p is a good trade in expectation.
+    mean = sum(i * ps[i] for i in range(1, 100)) / tot
+    return {"lo": lo, "med": med, "hi": hi, "mean": round(mean, 2),
             "curve": [round(p / tot, 5) for p in ps]}
 
 
@@ -4543,6 +4547,7 @@ def _bayes_fair(m: str) -> dict | None:
     bb = next((t["px"] for t in terms if t["kind"] == "touch_bid"), None)
     ba = next((t["px"] for t in terms if t["kind"] == "touch_ask"), None)
     return {"med": post["med"], "lo": post["lo"], "hi": post["hi"],
+            "mean": post["mean"],
             "n": n_obs, "fills": len(hard), "rested": len(rest),
             "bb": round(bb, 1) if bb is not None else None,
             "ba": round(ba, 1) if ba is not None else None}
@@ -4632,6 +4637,10 @@ EARN_SAFE_MAX_C = int(os.environ.get("EARN_SAFE_MAX_C", "60"))
 # justify a few cents of premium over fair value; it cannot justify sixteen
 # times it.
 EARN_SILVER_MARGIN = float(os.environ.get("EARN_SILVER_MARGIN", "3"))
+# Days of reward income that must cover the EXPECTED OVERPAY on a fill —
+# scaled down by confidence, so a market we cannot read has to be bought
+# nearer fair, not merely further from the touch.
+EARN_EDGE_PAYBACK = float(os.environ.get("EARN_EDGE_PAYBACK", "2.0"))
 EARN_QUEUE_MIN = float(os.environ.get("EARN_QUEUE_MIN", "1000"))
 # A filled earner order is a loss. The market goes quiet for two hours rather
 # than being re-entered at the price that just proved takeable.
@@ -4657,6 +4666,19 @@ EARN_FLIP_MAX_SHARES = int(os.environ.get("EARN_FLIP_MAX_SHARES", "400"))
 # stop re-placing it. Re-queueing on every vanish is a loop with no damping,
 # and it ran away on the 2028 party market. RESET is how long the market must
 # behave before the counter forgives it.
+# MARKETS THE FLIPPER NEVER TOUCHES (owner, 2026-08-16: "the flipper should
+# ignore the 2028 party markets"). These carry large positions held for the
+# owner's own reasons, so an automatic sell-back is not recovering a fill —
+# it is liquidating inventory that was never the earner's to sell. This is
+# also where the re-place runaway happened. Held stock here is left alone;
+# any selling is the owner's call from /map.
+FLIP_SKIP_PREFIXES = ("ewc-usp-party-2028-",)
+
+
+def _flip_skip(m: str) -> bool:
+    return str(m).startswith(FLIP_SKIP_PREFIXES)
+
+
 EARN_FLIP_VANISH_MAX = int(os.environ.get("EARN_FLIP_VANISH_MAX", "3"))
 EARN_FLIP_VANISH_RESET = float(os.environ.get("EARN_FLIP_VANISH_RESET", "3600"))
 # Smallest position worth listing for sale. Below this the order is noise.
@@ -5026,14 +5048,30 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
             top = min(top, real_bids[0][0])
             base = max(1, min(base, top))
         if back and real_bids:
-            # base is normally the touch and the scan only ever looks UP from
-            # there. Standing off means deliberately looking DOWN, so the
-            # bottom of the range comes off the new ceiling rather than off
-            # the touch — deriving it from the touch pinned base above top and
-            # the scan never ran at all, which read as "no price passed" when
-            # the truth was that no price had been tried.
-            top = min(top, max(1, real_bids[0][0] - back))
-            base = max(1, top - 2)
+            # DISTANCE FROM THE TOUCH IS NOT THE THING THAT PROTECTS US.
+            # DISTANCE BELOW FAIR VALUE IS.
+            #
+            # The first version of this stood off the touch unconditionally,
+            # and the arithmetic made it actively harmful. By the time we get
+            # here `top` has already been capped at the band's 10th percentile
+            # by the rung ladder, so a touch-standoff can only bite when the
+            # touch is BELOW that — which is precisely the case where bidding
+            # at the touch means buying under the bottom of the fair range.
+            # A fill there is a purchase at better than fair, the outcome we
+            # want. Backing two more ticks away from it bought no safety and
+            # cost about 91% of the reward score at a 0.3 discount factor
+            # (owner: "why be so far off when you're not confident... couldn't
+            # all that be true for buying a few cents closer to fair value?").
+            #
+            # So the standoff now only trims the part of the range that
+            # reaches ABOVE the value-safe level. At or below `safe`, being
+            # close to the touch is fine however little we know, because the
+            # price itself is the protection.
+            safe = max(1, int(b["lo"]))
+            ceil_ = max(1, real_bids[0][0] - back)
+            if top > safe:
+                top = min(top, max(ceil_, safe))
+            base = max(1, min(base, top))
         if top < base:
             return [], None, (f"the band puts fair value below the touch — we "
                               f"would have to bid {base}c but the ceiling here "
@@ -5101,8 +5139,19 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
             # place — but only just short, and this rarely applies
             short_side = not (side_total + q >= target)
             est = 0.0 if (not den or short_side) else (per * ours_sc / den)
+            # WHAT A FILL AT THIS PRICE IS ACTUALLY WORTH. Income alone ranks
+            # every candidate by how close it sits to the best price, which is
+            # how the scan ended up choosing the dearest allowed price every
+            # time with no comparison of what it would cost to be wrong. The
+            # posterior MEAN is the right reference: expected profit on a fill
+            # is a sum over the whole distribution, not a test against one
+            # point. edge > 0 means a fill buys under fair — the good case.
+            fair_mean = float(b.get("mean") or b["med"])
+            edge_c = fair_mean - pc
             row.update({"tier": tier, "qty": q, "est": round(est, 4),
                         "cost": round(pc / 100.0 * q, 2),
+                        "edge_c": round(edge_c, 2),
+                        "fill_pnl": round(edge_c / 100.0 * q, 2),
                         "score_w": round(df ** max(0, anchor - pc), 4)})
             if short_side:
                 row["why"] = (f"the bid side holds {side_total:,.0f} of the "
@@ -5116,10 +5165,30 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
                               f"(needs ${0.5 * (pc/100.0) * q:.2f}/day to pay back a "
                               f"total loss inside two days)")
                 continue
+            # PAYING ABOVE FAIR HAS TO EARN ITS KEEP. The old deal test asked
+            # only whether income beat a TOTAL loss — the contract going to
+            # zero — which in a reward-farmed book it always does, and which
+            # is the wrong risk anyway. The realistic cost of a fill is the
+            # overpay, not the whole stake. Where a fill would buy above fair,
+            # the income has to pay that overpay back inside a window that
+            # SHRINKS as confidence falls: two days when we know the market,
+            # well under one when we do not.
+            if edge_c < 0:
+                days = EARN_EDGE_PAYBACK * max(0.2, conf["score"] / EARN_CONF_FULL)
+                if est * days < -edge_c / 100.0 * q:
+                    row["why"] = (f"a fill here buys {-edge_c:.1f}c above fair "
+                                  f"(${-edge_c / 100.0 * q:.2f}), and ${est:.2f}/day "
+                                  f"does not pay that back within {days:.1f} days")
+                    continue
             row["ok"] = True
-            row["why"] = "placeable"
-            if best is None or est > best[0]:
-                best = (est, pc, q, tier)
+            row["why"] = ("placeable" if edge_c < 0 else
+                          f"placeable — a fill buys {edge_c:.1f}c UNDER fair")
+            # Rank by income, but a price that buys under fair beats one that
+            # buys over it even when the dearer one scores more: the cheaper
+            # fill is money made, the dearer one is money lost.
+            key = (est, 1 if edge_c >= 0 else 0)
+            if best is None or (key[1], key[0]) > (best[4], best[0]):
+                best = (est, pc, q, tier, key[1])
         return rows, best, None
 
     back, qmul = conf["back"], conf["qmul"]
@@ -5409,6 +5478,8 @@ def auto_earn() -> None:
             # against it, is the honest figure — and because `committed`
             # includes those asks, this converges instead of re-queueing.
             need = int(min(held - committed - queued, EARN_FLIP_MAX_SHARES))
+            if need >= 1 and _flip_skip(m_):
+                continue          # owner holds these for their own reasons
             if need >= 1:
                 _EARN.setdefault("toflip", []).append([m_, topc, need, now])
                 newflips.append((m_, topc, need))
@@ -5528,6 +5599,10 @@ def auto_earn() -> None:
             # a few times, then leave the stock alone rather than hammering
             # it; the position is still there and a later poll can pick it up
             # once the market stops rejecting.
+            if _flip_skip(fm):
+                _earn_log(fm, "flip vanished", fpxc / 100.0, fq,
+                          "2028 party market — not re-placing, the stock stays put")
+                continue
             fails = _EARN.setdefault("flip_vanish", {})
             n_, last_ = fails.get(fm, (0, 0.0))
             n_ = 1 if now - last_ > EARN_FLIP_VANISH_RESET else n_ + 1
@@ -5764,6 +5839,12 @@ def auto_earn() -> None:
         # want: the next poll re-reads the position and can add more.
         if fm in placed_pass:
             continue
+        if _flip_skip(fm):
+            # drop it rather than leave it retrying for the whole window
+            _EARN["toflip"].remove(job)
+            _earn_log(fm, "flip skipped", fpx_c / 100.0, fqty,
+                      "2028 party market — the flipper leaves these alone")
+            continue
         net = tr._num((MONITOR.positions.get(fm) or {}).get("netPosition")) or 0
         # Asks we ALREADY have resting against this stock. Without this the
         # same shares get sold twice: the pending-queue flipped 60 CT governor
@@ -5966,7 +6047,7 @@ def auto_earn() -> None:
         if best is None:
             continue
         real_bids = scan["real_bids"]
-        est, tgt, qty, tier = best
+        est, tgt, qty, tier, _under = best
         px = round(tgt / 100.0, 2)
         if px * qty + _earn_outstanding_usd() > EARN_TOTAL_USD:
             continue
@@ -8932,19 +9013,40 @@ function earnCard(d){
   else {
     var rows = (sc.rows||[]).map(function(r){
       var best = sc.best && sc.best[1]===r.px;
+      // the value consequence beside the income — the comparison the scan
+      // itself now makes, rather than ranking on income alone
+      var ed = '';
+      if (r.edge_c != null && r.qty)
+        ed = '<div class="sub '+(r.edge_c>=0?'good':'bad')+'">if filled: '+
+             (r.edge_c>=0?'+':'')+r.edge_c+CENT+'/sh vs fair ('+
+             (r.fill_pnl>=0?'+':'')+money(r.fill_pnl).replace('$-','-$')+')</div>';
       return '<tr class="'+(r.ok?'':'no')+'"><td>'+(best?'<b>':'')+c(r.px)+
         (best?'</b> &larr; chosen':'')+
         (r.ticks_back>0?'<div class="sub">'+r.ticks_back+' tick'+
           (r.ticks_back===1?'':'s')+' back, '+Math.round((r.score_w||0)*100)+
           '% score</div>':'')+
         '</td><td>'+(r.tier?esc(r.tier):'&mdash;')+
-        (r.qty?'<div class="sub">'+r.qty+' sh, '+money(r.cost)+'</div>':'')+
+        (r.qty?'<div class="sub">'+r.qty+' sh, '+money(r.cost)+'</div>':'')+ed+
         '</td><td class="r">'+(r.ok?'<b class="good">'+money(r.est)+'/d</b>'
           :'<span class="sub">'+esc(r.why)+'</span>')+'</td></tr>'; }).join('');
-    body = '<p class="lede">Every price the earner considered here, and what '+
-      'happened at each one.</p>'+
-      '<table><tr><th>Price</th><th>Tier / size</th>'+
-      '<th class="r">Income, or the rule that stopped it</th></tr>'+rows+'</table>'+
+    var okrows = (sc.rows||[]).filter(function(r){ return r.ok; });
+    var alt = '';
+    if (sc.best && okrows.length > 1){
+      var runner = okrows.filter(function(r){ return r.px !== sc.best[1]; })
+                         .sort(function(a,b){ return b.est - a.est; })[0];
+      if (runner) alt = '<p class="sub" style="margin-top:6px">Runner-up was '+
+        c(runner.px)+' at '+money(runner.est)+'/day'+
+        (runner.edge_c!=null? ' ('+(runner.edge_c>=0?'+':'')+runner.edge_c+CENT+
+          ' vs fair)':'')+'. Chosen price wins on income, and a price that '+
+        'buys UNDER fair beats one that buys over it even when the dearer '+
+        'one scores more.</p>';
+    }
+    body = '<p class="lede">Every price the earner considered here, what it '+
+      'would earn, and what a fill at that price would be worth against fair '+
+      'value. Both matter: income is what we collect for waiting, the edge is '+
+      'what we gain or lose the moment somebody takes it.</p>'+
+      '<table><tr><th>Price</th><th>Tier / size / edge</th>'+
+      '<th class="r">Income, or the rule that stopped it</th></tr>'+rows+'</table>'+alt+
       '<p class="sub" style="margin-top:8px">Size ladder rung '+e.rung+' = '+
       e.rung_size+' shares at full confidence, '+Math.round((sc.qmul||1)*100)+
       '% of that here.'+
