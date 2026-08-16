@@ -6759,6 +6759,9 @@ def _map_payload() -> dict:
              for m_, v_ in (MONITOR.state.get("mkt_img") or {}).items()
              if "2028" in m_),
             key=lambda r: (r["title"], -r["rate"], r["name"])),
+        "beat": {**(MONITOR.state.get("beat") or {}),
+                 "age_s": int(time.time() - float((MONITOR.state.get("beat") or {})
+                                                  .get("ts") or 0))},
         "qual_queue": sorted(
             ({"key": k, **v} for k, v in (MONITOR.state.get("qual_queue") or {}).items()),
             key=lambda j: -float(j.get("cost") or 0)),
@@ -6990,6 +6993,8 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     <button class="autosw" id="sw_qualify" onclick="swTap('qualify')" disabled>
       <span class="nm">Qualifier</span><span class="st">loading…</span></button>
   </div>
+  <div class="card" id="beat" style="font-size:11.5px;padding:8px 12px;
+    line-height:1.5">starting…</div>
   <div class="banner" id="banner" style="display:none"></div>
   <div class="chips" id="chips"></div>
   <div class="card" id="gridCard">
@@ -7059,6 +7064,28 @@ const LABEL = {conflict:"fix now", notpaying:"not paying", idle:"low estimate",
                gap:"not entered", ok:"fine"};
 let DATA=null, SEL=null, FILTER=null, SHOWGAPS=false;
 let RENDER_ERRS = [];
+let BEAT = null;
+// The monitor wakes about every 30 seconds, reads the account, refreshes a
+// slice of the order books and gives each switched-on loop one turn. That is
+// the "check" counted here; nothing in the app happens between them.
+function beatTick(){
+  const el = document.getElementById('beat'); if(!el || !BEAT) return;
+  const age = Math.round((BEAT.age_s || 0) + (Date.now() - (BEAT.seen || Date.now())) / 1000);
+  const ago = age < 90 ? age + 's ago' : Math.round(age / 60) + 'm ago';
+  const stale = age > 150;
+  const ran = (BEAT.ran || []);
+  el.innerHTML =
+    '<span style="color:' + (stale ? '#ff9d99' : '#3fb950') + '">●</span> check #' +
+    (BEAT.n || 0).toLocaleString() + ' · ' + ago +
+    (stale ? ' <b style="color:#ff9d99">— nothing since, the monitor may be down</b>' : '') +
+    ' · read ' + (BEAT.orders || 0).toLocaleString() + ' orders in ' +
+    (BEAT.mkts || 0) + ' markets, ' + (BEAT.books || 0) + ' books cached' +
+    '<br><span class="sub">running: ' + (ran.length ? ran.join(', ') : 'nothing — all switches off') +
+    (BEAT.did ? ' · last action: ' + esc(BEAT.did) + ' at ' +
+                esc(String(BEAT.did_ts).slice(11)) : ' · no orders placed yet') +
+    '</span>';
+}
+setInterval(beatTick, 1000);
 // HTML-escape. The dashboard has had one for months; this page used esc() in
 // four places without ever defining it, which threw the moment a code path
 // actually reached one — the face grid was the first that did. Candidate
@@ -7132,6 +7159,14 @@ function render(){
     bn.textContent='Defender running across ' + DATA.defend_markets + ' markets.';
   } else { bn.style.display='none'; }
 
+  // A plain-English line about the back end, refreshed every second so it is
+  // obviously alive rather than obviously stale.
+  const bt = DATA.beat || {};
+  const hb = document.getElementById('beat');
+  if (hb && bt.n) {
+    BEAT = bt; BEAT.seen = Date.now();
+    beatTick();
+  }
   const m=DATA.model;
   const meta=document.getElementById('meta');
   meta.textContent =
@@ -10377,6 +10412,24 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     MONITOR.error = f"qualify: {type(e).__name__}: {e}"[:150]
             except Exception as e:  # noqa: BLE001 — defense never kills the poll
                 MONITOR.error = f"defend: {type(e).__name__}: {e}"[:150]
+            # One line of "what the back end just did", because the owner
+            # should not have to take my word for it — or learn the word
+            # "poll" to read a status message.
+            try:
+                with MONITOR.lock:
+                    bt = MONITOR.state.setdefault("beat", {})
+                    bt["n"] = int(bt.get("n") or 0) + 1
+                    bt["ts"] = time.time()
+                    bt["orders"] = len(orders)
+                    bt["books"] = len(tr._BOOK_CACHE)
+                    bt["mkts"] = len({o.get("market") for o in orders if o.get("market")})
+                    bt["ran"] = [k for k in ("defend", "keeper", "snipe", "probe",
+                                             "earn", "qualify") if _auto_on(k)]
+                    bt["did"] = (ACTIONS[-1]["side"] + " " + ACTIONS[-1]["market"]
+                                 if ACTIONS else "")
+                    bt["did_ts"] = ACTIONS[-1]["ts"] if ACTIONS else ""
+            except Exception:  # noqa: BLE001 — a status line never breaks the loop
+                pass
             MONITOR.maybe_save_remote()
             if time.time() - pos_refreshed > POS_REFRESH_SECONDS:  # P/L + Plan tab data
                 pos_refreshed = time.time()
