@@ -3926,7 +3926,7 @@ def auto_earn() -> None:
         pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
         target = float(pr.get("target") or 0)
         per = (float(pr.get("pool") or 0)
-               / max(int(pr.get("event_n") or 1), 1) / 2)
+               / max(int(pr.get("pool_n") or pr.get("event_n") or 1), 1) / 2)
         df = float(pr.get("df") or 0.2)
         ent = tr._BOOK_CACHE.get(m)
         if not target or per <= 0 or not ent or now - ent[0] > 300:

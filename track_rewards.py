@@ -321,12 +321,13 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         # diagnostic only, never applied — see the note above _score_order
         order["depth_ratio"] = round(side_total / target, 1) if target else None
         verdict += f" ≈ {_usd(order['est_day'])}/day"
-        n = prog.get("event_n") or 1
+        n = max(prog.get("pool_n") or prog.get("event_n") or 1, 1)
         order["event_n"] = n
         order["siblings"] = prog.get("siblings") or []
         days = _pool_days(prog, slug)
         if n > 1:
-            verdict += f" (pool ÷ {n} markets)"
+            verdict += (f" (program pool ÷ {n} markets)"
+                        if prog.get("pool_n") else f" (pool ÷ {n} markets)")
         if days > 1.001:
             verdict += f" (pre-tournament pool over {days:g}d)"
         side_pool = _daily_pool(prog, slug) / 2
@@ -486,7 +487,11 @@ def _daily_pool(prog: dict, slug: str | None = None) -> float:
     if (slug and slug.startswith(PRETOURNAMENT_PREFIXES)
             and "round" not in str(prog.get("pid") or "")):
         return GOLF_PRETOURNAMENT_DAILY
-    return (prog.get("pool") or 0.0) / _pool_days(prog, slug) / max(prog.get("event_n") or 1, 1)
+    # pool_n: a dedicated (tierless) program's pool spans every market
+    # sharing its programId, not just this market's event — see the scope
+    # note where pool_n is computed
+    n = max(prog.get("pool_n") or prog.get("event_n") or 1, 1)
+    return (prog.get("pool") or 0.0) / _pool_days(prog, slug) / n
 
 
 EVENT_DEBUG: dict[str, str] = {}  # per-slug event lookup outcomes, for live_raw.json
@@ -1120,6 +1125,27 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     for slug in progs:
         progs[slug]["siblings"] = RACE_MEMBERS.get(slug, [])[:40]
 
+    # Pool SCOPE (found 2026-08-16, the Aug-14 payout reconciliation):
+    # tier programs (politics_low/mid/high...) fund each EVENT its own pool —
+    # validated at ~100% by the races for a week. But a DEDICATED program
+    # (no tier in its id, e.g. presidential_election_2028) attaches ONE pool
+    # to every market it spans: 60 slate markets each reported the same
+    # $1,000, and dividing by each market's own event size counted that
+    # $1,000 roughly once per event — ~$4,000/day imagined from $1,000 real,
+    # 30x on the two-market party event, ~3.5x on the nominees. Actuals fit
+    # $1,000 ÷ 120 sides almost exactly. So: a tierless program whose id is
+    # shared beyond the market's own event prorates across ALL markets
+    # sharing it.
+    pid_counts: dict[str, int] = {}
+    for pr_ in progs.values():
+        if pr_.get("pid") and not pr_.get("tier"):
+            pid_counts[pr_["pid"]] = pid_counts.get(pr_["pid"], 0) + 1
+    for pr_ in progs.values():
+        if pr_.get("pid") and not pr_.get("tier"):
+            n_share = pid_counts.get(pr_["pid"], 1)
+            if n_share > (pr_.get("event_n") or 1):
+                pr_["pool_n"] = n_share
+
     DATA.mkdir(exist_ok=True)
     (DATA / "live_raw.json").write_text(  # schema + failure reference for debugging
         json.dumps(
@@ -1446,11 +1472,12 @@ def write_status(
     # for winners, ~1-5% for the party pair, while every pre-existing family
     # still reconciles ~100%. Until a full clean day (Aug 15) pins the true
     # divisor, the slate's estimates below are flagged, not trusted.
-    lines.append("> ⚠️ **2028-slate estimates are UNCALIBRATED and run HIGH.** "
-                 "Aug-14 actuals: nominees paid ~25% of tracked, winners ~10%, "
-                 "party markets ~1-5%. Every older family (races, Fed, sports) "
-                 "still reconciles ~100%. Divide slate numbers accordingly until "
-                 "the Aug-15 payout calibrates them.")
+    lines.append("> ⚠️ **2028-slate pool bug found and fixed 2026-08-16**: the "
+                 "dedicated presidential program funds ALL 60 markets from ONE "
+                 "$1,000 pool, but each event was counted as having its own — "
+                 "inflating slate estimates ~4x overall (30x on the party pair). "
+                 "Corrected per-side is ~$8.33/day. Slate history before this "
+                 "line ran hot; the Aug-15 payout is the verification.")
     lines.append("")
 
     # ---- the answer up top; all supporting detail lives below the divider ----
