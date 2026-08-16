@@ -4352,6 +4352,8 @@ EARN_FLIP_RETRY = float(os.environ.get("EARN_FLIP_RETRY", "1800"))
 # Ceiling on one market's flip order, so a mis-read position can never turn
 # into an enormous ask in a single step.
 EARN_FLIP_MAX_SHARES = int(os.environ.get("EARN_FLIP_MAX_SHARES", "400"))
+# Smallest position worth listing for sale. Below this the order is noise.
+INV_MIN_SHARES = int(os.environ.get("INV_MIN_SHARES", "20"))
 # LADDER DOWN RATHER THAN HOLD OUT. A flip two ticks above a 5c cost is asking
 # for a double, and doubles on a longshot rarely come — meanwhile the capital
 # is idle and the prober has most of the universe still to map (owner,
@@ -4683,6 +4685,34 @@ def auto_earn() -> None:
                 a[2] = max(a[2], pc_)
             else:
                 a[1] += q_
+        # STOCK WE ALREADY HOLD SHOULD BE FOR SALE TOO. A sale out of inventory
+        # ties up no buying power at all, earns rewards the whole time it
+        # rests, discovers a price no one-share scout can, and returns capital
+        # if it goes (owner, 2026-08-16: "make sure you're listing positions I
+        # hold for sale at reasonable prices to get more info without tying up
+        # buying power").
+        #
+        # For stock the earner bought we know the cost and price from it. For
+        # a position the owner built we do NOT, and cost would be the wrong
+        # anchor anyway — so the floor is the model's fair value instead, and
+        # the ask goes ABOVE it. That is what keeps "listing it" from becoming
+        # "giving it away".
+        for m_ in {o.get("market") for o in MONITOR.orders if o.get("market")} | \
+                  set(MONITOR.positions or {}):
+            if not m_ or m_ in want or not m_.startswith(PROBE_PREFIXES):
+                continue
+            pos_ = MONITOR.positions.get(m_)
+            if pos_ is None:
+                continue
+            held_ = tr._num(pos_.get("netPosition")) or 0
+            if held_ < INV_MIN_SHARES:
+                continue
+            sv_ = _silver_fair(m_)
+            b_ = _bayes_fair(m_)
+            fair_ = sv_ if sv_ is not None else (b_ or {}).get("med")
+            if fair_ is None:
+                continue                  # no idea what it is worth: do not sell
+            want[m_] = [held_, 0.0, float(fair_)]   # "cost" basis = fair value
         newflips = []
         for m_, (bq, sq, topc) in want.items():
             # any recorded buy makes this a market the earner put stock in;
