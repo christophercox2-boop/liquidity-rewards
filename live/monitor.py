@@ -3410,6 +3410,14 @@ PROBE_SAFE_BIAS = float(os.environ.get("PROBE_SAFE_BIAS", "0.7"))
 # How far a candidate price must sit from the Silver forecast before the model
 # decides which side we take rather than the coin.
 PROBE_SILVER_EDGE = float(os.environ.get("PROBE_SILVER_EDGE", "2"))
+# Most a single ask scout may tie up when it has to be opened as a short, and
+# the most the fund may have in shorts at once. Set so the ask side of a 2028
+# longshot is affordable — that is where the slate lives and where the owner
+# saw no asks at all — while the total stays bounded to a fifth of the fund
+# rather than the whole of it. Being conservative about a dear side means
+# fewer of them, not none.
+PROBE_MAX_SHORT_USD = float(os.environ.get("PROBE_MAX_SHORT_USD", "0.95"))
+PROBE_SHORT_BUDGET = float(os.environ.get("PROBE_SHORT_BUDGET", "0.20"))
 # HARD CEILING ON ANY BID, INDEPENDENT OF EVERY MODEL AND LOOKUP.
 #
 # Two 54c and 58c scout bids filled after the model-based guards shipped. Each
@@ -3796,10 +3804,44 @@ def auto_probe() -> None:
         #         a share so a scout never zeroes the position)
         #   BUY : only what the info fund covers, counting scouts resting
         net = tr._num((MONITOR.positions.get(m) or {}).get("netPosition")) or 0
-        can_sell = net >= PROBE_SIZE + 1
+        # BOTH SIDES OF A MARKET, WHEREVER WE CAN AFFORD IT. Scouts have run
+        # 94% bids, because a sell scout could only ever be inventory we
+        # already held and after the position cleanout there was almost none.
+        # One side of a book answers half the question (owner, 2026-08-16:
+        # "might as well try to be on the bid and ask side to get as much info
+        # as possible... a lot of times they are easier to price").
+        #
+        # An ask can also be OPENED as a short, and the cost of that is the
+        # mirror of a bid's: a bid ties up its price, a short ties up what is
+        # left of the dollar. So a 5c longshot is a cheap bid and a dear ask,
+        # a 90c favourite the reverse — which is exactly why the owner sees
+        # asks as expensive "in some cases" rather than always. Both are
+        # charged to the same info fund at their true cost, so the fund
+        # naturally buys the cheap side of each book and is conservative
+        # about the dear one.
         fund = float(MONITOR.state.get("probe_budget") or 0.0)
-        resting_buys = sum(r[2] for r in _PROBE["active"].values() if r[1] == "BUY")
-        can_buy = px <= PROBE_MAX_PX and resting_buys + px <= fund
+        # What the fund actually has tied up. A bid ties up its price; a short
+        # ties up the rest of the dollar; a sell from stock ties up nothing at
+        # all. Charging inventory sells as if they were shorts would have
+        # starved the fund for scouts that cost it nothing.
+        committed = 0.0
+        for r in _PROBE["active"].values():
+            if r[1] == "BUY":
+                committed += r[2]
+            elif (tr._num((MONITOR.positions.get(r[0]) or {}).get("netPosition")) or 0) \
+                    < PROBE_SIZE:
+                committed += 1.0 - r[2]     # no stock behind it: it is a short
+        can_sell_inv = net >= PROBE_SIZE + 1
+        short_cost = 1.0 - px_sell
+        shorts_out = sum(1.0 - r[2] for r in _PROBE["active"].values()
+                         if r[1] == "SELL"
+                         and (tr._num((MONITOR.positions.get(r[0]) or {})
+                                      .get("netPosition")) or 0) < PROBE_SIZE)
+        can_short = (committed + short_cost <= fund
+                     and short_cost <= PROBE_MAX_SHORT_USD
+                     and shorts_out + short_cost <= fund * PROBE_SHORT_BUDGET)
+        can_sell = can_sell_inv or can_short
+        can_buy = px <= PROBE_MAX_PX and committed + px <= fund
         # THE MODEL PICKS THE SIDE WHEN IT HAS A VIEW. A random tick in the gap
         # is fine when we know nothing, but bidding 54c for a contract Silver
         # puts at 0.4c is not a probe, it is a donation — and it is certain to
@@ -3829,7 +3871,15 @@ def auto_probe() -> None:
         elif want is not None:
             continue              # edge is on a side we cannot take — leave it
         elif can_sell and can_buy:
-            side = "BUY" if random.random() < 0.5 else "SELL"
+            # COVER THE SIDE WE ARE MISSING. Two scouts on the bid answer the
+            # same question twice; one on each side brackets the price. Only
+            # falls back to the coin when the market is already covered both
+            # ways or has nothing yet.
+            have_b = any(r[0] == m and r[1] == "BUY" for r in _PROBE["active"].values())
+            have_s = any(r[0] == m and r[1] == "SELL" for r in _PROBE["active"].values())
+            side = ("SELL" if have_b and not have_s else
+                    "BUY" if have_s and not have_b else
+                    "BUY" if random.random() < 0.5 else "SELL")
         elif can_sell:
             side = "SELL"
         elif can_buy:
@@ -3844,10 +3894,14 @@ def auto_probe() -> None:
                 continue
             if not _ask_allowed(m, px * 100):
                 continue
-        intent = "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_SELL_LONG"
+        # sell from stock when we have it (free), otherwise open the short
+        intent = ("ORDER_INTENT_BUY_LONG" if side == "BUY" else
+                  "ORDER_INTENT_SELL_LONG" if can_sell_inv else
+                  "ORDER_INTENT_BUY_SHORT")
         oid = _probe_place(m, side, px, intent,
                            f"{side.lower()} scout" +
-                           (" (inventory)" if side == "SELL" else " (fund)"))
+                           (" (inventory)" if side == "SELL" and can_sell_inv else
+                            " (short)" if side == "SELL" else " (fund)"))
         _PROBE["last"][m] = now
         if oid:
             _PROBE["active"][oid] = (m, side, px, now, "probe")
