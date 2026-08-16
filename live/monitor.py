@@ -4153,6 +4153,66 @@ def auto_probe() -> None:
         MONITOR.state["probe_active_reg"] = {k: list(v) for k, v in _PROBE["active"].items()}
 
 
+def _probe_status(m: str) -> dict:
+    """Why the prober is, or is not, in this market — the gates auto_probe
+    walks, evaluated for one market so /why can print them.
+
+    Mirrors the checks in auto_probe's loop. It is a read-only echo, not a
+    second implementation: nothing here places or prices anything, it only
+    reports which condition currently blocks a scout."""
+    now = time.time()
+    progs_all = tr._PROG_CACHE.get("progs") or {}
+    payable = set(progs_all) | {sb for p_ in progs_all.values()
+                                for sb in (p_.get("siblings") or [])}
+    est = MONITOR.state.get("probe") or {}      # same store auto_probe writes
+    here = [r for r in _PROBE["active"].values() if r[0] == m and r[4] == "probe"]
+    ent = tr._BOOK_CACHE.get(m)
+    out = {"scouts_here": len(here), "max_here": PROBE_PER_MARKET,
+           "fund": round(float(MONITOR.state.get("probe_budget") or 0.0), 2),
+           "gap": None, "min_gap": PROBE_MIN_GAP, "block": None}
+    if not m.startswith(PROBE_PREFIXES):
+        out["block"] = "outside the prober's market list"
+        return out
+    if payable and m not in payable:
+        out["block"] = "no reward program here — a scout would earn nothing"
+        return out
+    if _is_primary(m):
+        out["block"] = ("this is a primary, and the prober does not trade "
+                        "primaries — they settle within weeks on a known date "
+                        "and the race model says nothing about nominations")
+        return out
+    cool = PROBE_COOLDOWN - (now - _PROBE["last"].get(m, 0.0))
+    if cool > 0:
+        out["block"] = f"cooling down for another {int(cool)}s since the last scout"
+        return out
+    fill_cool = PROBE_FILL_COOLDOWN - (now - float((est.get(m) or {}).get("fill_ts") or 0))
+    if fill_cool > 0:
+        out["block"] = (f"a scout FILLED here recently — that cost money, so the "
+                        f"market is left alone for another {int(fill_cool / 60)} min")
+        return out
+    if len(here) >= PROBE_PER_MARKET:
+        out["block"] = (f"already holding {len(here)} scouts here, the most any "
+                        f"one market gets")
+        return out
+    if not ent or now - ent[0] > 300:
+        out["block"] = "no book snapshot from the last 5 minutes"
+        return out
+    rbb, rba = _probe_real_touches(ent[1])
+    if rbb is None or rba is None:
+        out["block"] = ("only one side of the book has real size, so there is no "
+                        "gap to rest inside")
+        return out
+    lo_t = round(rbb[0] / 0.01) + 1
+    hi_t = round(rba[0] / 0.01) - 1
+    out["gap"] = hi_t - lo_t + 1
+    out["gap_lo"], out["gap_hi"] = lo_t, hi_t
+    if out["gap"] < PROBE_MIN_GAP:
+        out["block"] = (f"the spread is {out['gap']} tick(s) wide and needs "
+                        f"{PROBE_MIN_GAP} — too tight to learn anything")
+        return out
+    return out
+
+
 _THIRD: dict = {"ts": None, "seen": {}}
 
 
@@ -4255,23 +4315,119 @@ def _silver_fair(m: str) -> float | None:
         return None
 
 
-def _bayes_fair(m: str) -> dict | None:
-    """A deliberately simple Bayesian read of a market's fair price from the
-    prober's evidence. Grid prior over 1..99c; every journal event is a soft
-    one-sided observation through a logistic likelihood (scale ~2 ticks):
+_S = 2.0        # logistic scale, in ticks, shared by every likelihood below
 
-      probe bid FILLED at p   -> a seller accepted p   -> fair likely <= p
-      probe ask FILLED at p   -> a buyer paid p        -> fair likely >= p
-      flip (round trip) fills -> the same, from the flip's side
-      probe rested 45 min     -> weak opposite evidence (thin flow means
-                                 absence of a taker proves little — 0.35x)
 
-    plus the current de-baited real touches as gentle anchors (someone
-    risks actual size there). Returns the posterior median and the 10-90%
-    credible interval, in cents."""
+def _sig(x: float) -> float:
+    return 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, x))))
+
+
+def _llog(v: float) -> float:
+    return math.log(max(v, 1e-9))
+
+
+def _term_ll(t: dict, f: float) -> float:
+    """The log-likelihood ONE piece of evidence assigns to fair value = f.
+
+    Every term in this model has the same shape: somebody's action was more
+    or less likely depending on where fair value really is, and the term
+    scores f accordingly. Keeping them in one place — rather than inlined in
+    a grid loop — is what lets the /why page print each one, and drop each
+    one, to show what it was actually worth."""
+    k, p, w = t["kind"], float(t.get("px") or 0), float(t.get("w") or 1.0)
+    if k == "fill_buy":        # our bid filled: a seller accepted p
+        return w * _llog(_sig((p - f) / _S))
+    if k == "fill_sell":       # our ask filled: a buyer paid p
+        return w * _llog(_sig((f - p) / _S))
+    if k == "rested_buy":      # our bid sat untouched: fair is probably above
+        return w * _llog(1.0 - 0.8 * _sig((p - f) / _S))
+    if k == "rested_sell":
+        return w * _llog(1.0 - 0.8 * _sig((f - p) / _S))
+    if k == "outbid":          # real money bid above us: fair >= p
+        return w * _llog(_sig((f - p) / _S))
+    if k == "undercut":        # real money asked below us: fair <= p
+        return w * _llog(_sig((p - f) / _S))
+    if k == "touch_bid":
+        return w * _llog(_sig((f - p) / _S))
+    if k == "touch_ask":
+        return w * _llog(_sig((p - f) / _S))
+    if k == "silver":
+        win = float(t.get("win") or 6.0)
+        return w * (_llog(_sig((f - (p - win)) / _S))
+                    + _llog(_sig(((p + win) - f) / _S)))
+    return 0.0
+
+
+def _bayes_terms(m: str) -> list[dict]:
+    """Every observation this model has about one market, as a flat list.
+
+    Split out of _bayes_fair so the /why page can show the evidence one row
+    at a time and re-run the posterior without any single row — the only
+    honest way to answer "where did that number come from", because a term's
+    weight on its own says nothing about whether it CHANGED the answer. A
+    heavy term that agrees with everything else moves the median by zero.
+
+    Each term: kind, px (cents), w (weight), and a plain-English note."""
+    terms: list[dict] = []
     evs = [l for l in (MONITOR.state.get("probe_log") or []) if l.get("m") == m]
-    ent = tr._BOOK_CACHE.get(m)
-    bb = ba = None
+    for l in evs:
+        p = float(l.get("px") or 0)
+        side, ev, ts = l.get("side"), l.get("ev"), l.get("ts")
+        buy = side == "BUY"
+        if ev == "FILLED":
+            terms.append({
+                "kind": "fill_buy" if buy else "fill_sell", "px": p, "w": 1.0,
+                "ts": ts, "src": "trade", "label": f"our {p:g}c {side.lower()} FILLED",
+                "note": (f"a seller accepted {p:g}c, so fair value is at or below it"
+                         if buy else
+                         f"a buyer paid {p:g}c, so fair value is at or above it")})
+        elif ev == "round trip":
+            # a SELL flip filling means a buyer showed up at p
+            terms.append({
+                "kind": "fill_sell" if side == "SELL" else "fill_buy",
+                "px": p, "w": 1.0, "ts": ts, "src": "trade",
+                "label": f"flip {side.lower()} completed at {p:g}c",
+                "note": ("a buyer paid this — fair is at or above it"
+                         if side == "SELL" else
+                         "a seller accepted this — fair is at or below it")})
+        elif ev == "rested":
+            terms.append({
+                "kind": "rested_buy" if buy else "rested_sell", "px": p, "w": 0.35,
+                "ts": ts, "src": "quiet",
+                "label": f"{p:g}c {side.lower()} rested out its 30 min",
+                "note": ("nobody sold to us there — weak sign fair is higher"
+                         if buy else
+                         "nobody bought from us there — weak sign fair is lower")})
+        elif ev == "outbid":
+            terms.append({
+                "kind": "outbid", "px": p, "w": 0.5, "ts": ts, "src": "book",
+                "label": f"outbid at {p:g}c",
+                "note": "real money bid above our scout — fair is at or above it"})
+        elif ev == "undercut":
+            terms.append({
+                "kind": "undercut", "px": p, "w": 0.5, "ts": ts, "src": "book",
+                "label": f"undercut at {p:g}c",
+                "note": "real money asked below our scout — fair is at or below it"})
+    # scouts still resting are evidence too, growing with age: no taker at
+    # that price for this long pushes fair away from it. Weighted up to the
+    # same 0.35 a completed rotation earns, pro-rated by age/TTL.
+    nowp = time.time()
+    for r in _PROBE["active"].values():
+        if r[0] != m or r[4] != "probe":
+            continue
+        w = 0.35 * min((nowp - r[3]) / PROBE_TTL, 1.0)
+        if w <= 0.02:
+            continue
+        mins = int((nowp - r[3]) / 60)
+        # w and win stay at FULL precision — they are multiplied into a
+        # log-likelihood, and rounding them here moved a posterior median by
+        # a cent in the equivalence test. Rounding is the page's job.
+        terms.append({
+            "kind": "rested_buy" if r[1] == "BUY" else "rested_sell",
+            "px": r[2] * 100, "w": w, "ts": r[3], "src": "quiet",
+            "label": f"{r[2] * 100:g}c {r[1].lower()} scout resting {mins} min so far",
+            "note": ("still no seller at that price — counts more the longer "
+                     "it sits, up to the weight a finished rotation earns")})
     # THE BOOK BOUNDS THE PRICE. IT DOES NOT MEASURE THE VALUE.
     #
     # These anchors used to be size-weighted — 0.4 under a hundred shares,
@@ -4288,81 +4444,53 @@ def _bayes_fair(m: str) -> dict | None:
     # the bid and the ask — so it is kept as a weak bound at a FIXED weight.
     # What it can never again do is grow stronger because more people are
     # standing there. Trades move this model now; crowds do not.
-    bbw = baw = 0.3
+    ent = tr._BOOK_CACHE.get(m)
     if ent and time.time() - ent[0] < 900:
         rbb, rba = _probe_real_touches(ent[1])
         if rbb:
-            bb = rbb[0]
+            terms.append({
+                "kind": "touch_bid", "px": rbb[0] * 100, "w": 0.3, "src": "book",
+                "label": f"real bid touch {rbb[0] * 100:g}c",
+                "note": "somebody's money is resting there — a weak floor, at a "
+                        "FIXED weight no matter how much size is stacked behind it"})
         if rba:
-            ba = rba[0]
-    # scouts still resting are evidence too, growing with age: no taker at
-    # that price for this long pushes fair away from it. Weighted up to the
-    # same 0.35 a completed rotation earns, pro-rated by age/TTL.
-    nowp = time.time()
-    partial = []
-    for r in _PROBE["active"].values():
-        if r[0] != m or r[4] != "probe":
-            continue
-        w = 0.35 * min((nowp - r[3]) / PROBE_TTL, 1.0)
-        if w > 0.02:
-            partial.append((r[1], r[2] * 100, w))
+            terms.append({
+                "kind": "touch_ask", "px": rba[0] * 100, "w": 0.3, "src": "book",
+                "label": f"real ask touch {rba[0] * 100:g}c",
+                "note": "somebody is offering there — a weak ceiling, same fixed weight"})
     sv = _silver_fair(m)
-    if not evs and not partial and bb is None and ba is None and sv is None:
+    if sv is not None:
+        # Window scaled to the forecast's own uncertainty, and weighted to
+        # match the heaviest book anchor.
+        #
+        # A flat +/-6c was wrong at the extremes. On New Mexico Senate,
+        # which Silver puts at 0.62%, it licensed anything from 1c to 6.6c
+        # and left a median of 5c — an order of magnitude out — before the
+        # book was even consulted. The uncertainty of a probability
+        # estimate scales with sqrt(p(1-p)), so the window does too: about
+        # +/-6c near a coin flip, about +/-1.5c on a race nobody thinks is
+        # close. At weight 0.6 against touch anchors at 1.2 the book also
+        # outvoted the model two to one per term; matched at 1.2, a
+        # forecast and a wall of resting size carry equal say, and it takes
+        # real trades to move fair value away from the forecast.
+        sd = math.sqrt(max(0.0, (sv / 100.0) * (1 - sv / 100.0)))
+        win = max(1.5, 6.0 * sd / 0.5)
+        terms.append({
+            "kind": "silver", "px": sv, "w": 1.2, "win": win,
+            "src": "model", "label": f"Silver forecast {sv:.2f}c",
+            "note": f"the race model's own number, given a +/-{win:.1f}c window "
+                    f"scaled to how uncertain a forecast at that level is"})
+    return terms
+
+
+def _bayes_posterior(terms: list[dict]) -> dict | None:
+    """Grid over 1..99c: add up every term's log-likelihood at each price,
+    normalise, and read off the 10th / 50th / 90th percentiles."""
+    if not terms:
         return None
-    S = 2.0
-    def sig(x: float) -> float:
-        return 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, x))))
-    def llog(v: float) -> float:
-        return math.log(max(v, 1e-9))
     logp = [0.0] * 100
     for f in range(1, 100):
-        lp = 0.0
-        for l in evs:
-            p = float(l.get("px") or 0)
-            side = l.get("side")
-            ev = l.get("ev")
-            if ev == "FILLED":
-                lp += llog(sig((p - f) / S)) if side == "BUY" else llog(sig((f - p) / S))
-            elif ev == "round trip":
-                # the FLIP filled: a SELL flip filling means a buyer at p
-                lp += llog(sig((f - p) / S)) if side == "SELL" else llog(sig((p - f) / S))
-            elif ev == "rested":
-                if side == "BUY":
-                    lp += 0.35 * llog(1.0 - 0.8 * sig((p - f) / S))
-                else:
-                    lp += 0.35 * llog(1.0 - 0.8 * sig((f - p) / S))
-            elif ev == "outbid":     # real money bidding above our scout: fair >= p
-                lp += 0.5 * llog(sig((f - p) / S))
-            elif ev == "undercut":   # real money asking below our scout: fair <= p
-                lp += 0.5 * llog(sig((p - f) / S))
-        for side, p, w in partial:
-            if side == "BUY":
-                lp += w * llog(1.0 - 0.8 * sig((p - f) / S))
-            else:
-                lp += w * llog(1.0 - 0.8 * sig((f - p) / S))
-        if bb is not None:
-            lp += bbw * llog(sig((f - bb * 100) / S))
-        if ba is not None:
-            lp += baw * llog(sig((ba * 100 - f) / S))
-        if sv is not None:
-            # Window scaled to the forecast's own uncertainty, and weighted to
-            # match the heaviest book anchor.
-            #
-            # A flat +/-6c was wrong at the extremes. On New Mexico Senate,
-            # which Silver puts at 0.62%, it licensed anything from 1c to 6.6c
-            # and left a median of 5c — an order of magnitude out — before the
-            # book was even consulted. The uncertainty of a probability
-            # estimate scales with sqrt(p(1-p)), so the window does too: about
-            # +/-6c near a coin flip, about +/-1.5c on a race nobody thinks is
-            # close. At weight 0.6 against touch anchors at 1.2 the book also
-            # outvoted the model two to one per term; matched at 1.2, a
-            # forecast and a wall of resting size carry equal say, and it takes
-            # real trades to move fair value away from the forecast.
-            sd = math.sqrt(max(0.0, (sv / 100.0) * (1 - sv / 100.0)))
-            win = max(1.5, 6.0 * sd / 0.5)
-            lp += 1.2 * (llog(sig((f - (sv - win)) / S))
-                         + llog(sig(((sv + win) - f) / S)))
-        logp[f] = lp
+        logp[f] = sum(_term_ll(t, float(f)) for t in terms)
     mx = max(logp[1:])
     ps = [0.0] + [math.exp(l - mx) for l in logp[1:]]
     tot = sum(ps) or 1.0
@@ -4375,13 +4503,42 @@ def _bayes_fair(m: str) -> dict | None:
             med = i
         if hi is None and cum >= 0.90:
             hi = i
-    n_hard = sum(1 for l in evs if l.get("ev") in ("FILLED", "round trip"))
-    n_rest = sum(1 for l in evs if l.get("ev") == "rested") \
-             + sum(1 for _, _, w in partial if w >= 0.175)   # half-aged or more
-    return {"med": med, "lo": lo, "hi": hi, "n": len(evs), "fills": n_hard,
-            "rested": n_rest,
-            "bb": round(bb * 100, 1) if bb is not None else None,
-            "ba": round(ba * 100, 1) if ba is not None else None}
+    return {"lo": lo, "med": med, "hi": hi,
+            "curve": [round(p / tot, 5) for p in ps]}
+
+
+def _bayes_fair(m: str) -> dict | None:
+    """A deliberately simple Bayesian read of a market's fair price from the
+    prober's evidence. Grid prior over 1..99c; every journal event is a soft
+    one-sided observation through a logistic likelihood (scale ~2 ticks):
+
+      probe bid FILLED at p   -> a seller accepted p   -> fair likely <= p
+      probe ask FILLED at p   -> a buyer paid p        -> fair likely >= p
+      flip (round trip) fills -> the same, from the flip's side
+      probe rested 45 min     -> weak opposite evidence (thin flow means
+                                 absence of a taker proves little — 0.35x)
+
+    plus the current de-baited real touches as gentle anchors (someone
+    risks actual size there). Returns the posterior median and the 10-90%
+    credible interval, in cents. The evidence itself is assembled by
+    _bayes_terms and scored by _bayes_posterior — see /why for the readout."""
+    terms = _bayes_terms(m)
+    post = _bayes_posterior(terms)
+    if post is None:
+        return None
+    hard = [t for t in terms if t["kind"] in ("fill_buy", "fill_sell")]
+    # "rested" counts finished rotations plus any scout at least half-aged,
+    # which is the weight a finished one earns
+    rest = [t for t in terms
+            if t["kind"] in ("rested_buy", "rested_sell") and t["w"] >= 0.175]
+    n_obs = sum(1 for t in terms if t["src"] in ("trade", "quiet", "book")
+                and t["kind"] not in ("touch_bid", "touch_ask"))
+    bb = next((t["px"] for t in terms if t["kind"] == "touch_bid"), None)
+    ba = next((t["px"] for t in terms if t["kind"] == "touch_ask"), None)
+    return {"med": post["med"], "lo": post["lo"], "hi": post["hi"],
+            "n": n_obs, "fills": len(hard), "rested": len(rest),
+            "bb": round(bb, 1) if bb is not None else None,
+            "ba": round(ba, 1) if ba is not None else None}
 
 
 # --- earner: model-confident small bids (owner, 2026-08-15) -----------------
@@ -4529,6 +4686,100 @@ CASH_LOW_BP = float(os.environ.get("CASH_LOW_BP", "250"))
 def _cash_short() -> bool:
     return (float(MONITOR.state.get("probe_budget") or 0.0) < CASH_LOW_FUND
             or float(MONITOR.buying_power or 0.0) < CASH_LOW_BP)
+# HOW SURE ARE WE, AND WHAT DO WE DO WHEN THE ANSWER IS "NOT VERY".
+#
+# The old gate was a cliff: one trade OR two rested scouts OR three journal
+# rows, and a market either got the full treatment or was skipped outright.
+# That threw away every market sitting just under the bar, which is most of
+# them early on, and it gave a market that scraped over the bar exactly the
+# same exposure as one with a forecast and four fills behind it.
+#
+# Owner, 2026-08-16: "if a market is struggling to get to an adequate
+# confidence level, it can just back down a price level or two or reduce
+# quantity. Likelihood of getting picked off goes down the further you are
+# from the touch." That is the right instinct and it is what a cliff cannot
+# express, so confidence is a score now and it buys two things:
+#
+#   * DISTANCE. Below full confidence the whole price window drops below the
+#     real touch — one tick, or two when we know least. An order behind the
+#     touch is only reachable after the money in front of it is gone, so the
+#     less we know, the more of somebody else's stock has to be eaten before
+#     ours is. That is the pick-off protection, bought directly.
+#   * SIZE. Confidence scales the dollar cap and the rung size together, so a
+#     thin case gets a thin position rather than the same one.
+#
+# Distance is not free and the /why page says so out loud: reward score decays
+# by the program's discount factor per tick from the best price, and df is 0.3
+# in most of these markets. One tick back keeps about 30% of the score, two
+# about 9%. So the standoff often prices itself out through the deal test and
+# nothing gets placed — which is the honest answer for a market we cannot
+# read, and strictly better than the old behaviour of placing at the touch.
+EARN_CONF_FULL = float(os.environ.get("EARN_CONF_FULL", "0.50"))
+EARN_CONF_MIN = float(os.environ.get("EARN_CONF_MIN", "0.15"))
+EARN_CONF_BACK_MAX = int(os.environ.get("EARN_CONF_BACK_MAX", "2"))
+
+
+def _earn_confidence(m: str, b: dict | None, sv: float | None) -> dict:
+    """Score 0..1 for how well we know this market, with the reasons kept.
+
+    Weights are set so the old pass/fail gate lands right about at
+    EARN_CONF_FULL: one real fill plus a fresh two-sided book scores ~0.48,
+    the same case with a Silver forecast behind it ~0.63, and two rested
+    scouts and nothing else ~0.42 — which used to qualify for full size at
+    the touch and now gets a tick of standoff instead."""
+    parts: list[dict] = []
+
+    def add(label: str, pts: float, cap: float, detail: str) -> None:
+        parts.append({"label": label, "pts": round(min(pts, cap), 4),
+                      "max": cap, "detail": detail})
+
+    if not b or not b.get("med"):
+        return {"score": 0.0, "verdict": "no model", "back": EARN_CONF_BACK_MAX,
+                "qmul": 0.0, "parts": parts,
+                "why": "nothing has been observed here yet"}
+    fills = int(b.get("fills") or 0)
+    rested = int(b.get("rested") or 0)
+    n = int(b.get("n") or 0)
+    width = int(b["hi"]) - int(b["lo"])
+    add("real trades", 0.30 * fills, 0.60,
+        f"{fills} fill{'' if fills == 1 else 's'} — the only evidence that "
+        f"moves fair value, because somebody paid or accepted a price")
+    add("rested scouts", 0.12 * rested, 0.36,
+        f"{rested} scout{'' if rested == 1 else 's'} sat untouched — weak: "
+        f"in a thin book nobody trading proves little")
+    add("observations", 0.05 * max(0, n - 2), 0.15,
+        f"{n} pieces of evidence in total")
+    tight = max(0.0, 1.0 - width / 12.0)
+    add("band width", 0.20 * tight, 0.20,
+        f"the 10-90% range is {width} ticks wide ({b['lo']}-{b['hi']}c) — "
+        f"{'tight' if width <= 4 else 'workable' if width <= 8 else 'wide'}")
+    add("race forecast", 0.15 if sv is not None else 0.0, 0.15,
+        f"Silver has this at {sv:.2f}c" if sv is not None
+        else "no Silver number for this market")
+    two_sided = b.get("bb") is not None and b.get("ba") is not None
+    add("live two-sided book", 0.08 if two_sided else 0.0, 0.08,
+        "real size resting on both sides, so the price is bracketed"
+        if two_sided else "the book is one-sided or stale, so it brackets nothing")
+    score = round(min(1.0, sum(p["pts"] for p in parts)), 4)
+    if score >= EARN_CONF_FULL:
+        back, verdict = 0, "confident"
+    elif score >= (EARN_CONF_FULL + EARN_CONF_MIN) / 2:
+        back, verdict = 1, "thin"
+    elif score >= EARN_CONF_MIN:
+        back, verdict = EARN_CONF_BACK_MAX, "very thin"
+    else:
+        back, verdict = EARN_CONF_BACK_MAX, "not enough to act on"
+    qmul = 1.0 if score >= EARN_CONF_FULL else max(0.25, score / EARN_CONF_FULL)
+    why = ("we know this market well enough to rest at the touch"
+           if not back else
+           f"not sure enough to sit at the touch — dropping {back} tick"
+           f"{'' if back == 1 else 's'} behind it and cutting size to "
+           f"{qmul * 100:.0f}%")
+    if score < EARN_CONF_MIN:
+        why = (f"below the {EARN_CONF_MIN:.2f} floor — no order at any price "
+               f"or size until something is observed here")
+    return {"score": score, "verdict": verdict, "back": back,
+            "qmul": round(qmul, 3), "parts": parts, "why": why}
 # GRADUATION. The point of the earner is to find where the money is, not to
 # sit on the first thing it finds — but an order that has PROVED it earns and
 # stays put should not keep occupying the search budget while it does so
@@ -4656,6 +4907,236 @@ def _earn_graduated_usd() -> float:
     grad = _EARN.get("grad") or set()
     return sum(px / 100.0 * q for oid, (_, _, px, q, _) in _EARN["orders"].items()
                if oid in grad)
+
+
+def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
+    """Price the whole candidate range for one market and say what happens at
+    each tick — the earner's actual decision, kept in one function so the
+    /why page reports the real thing rather than a second implementation that
+    can drift away from it. auto_earn takes `best`; the page prints `rows`.
+
+    A row is one candidate price with its tier, its size, the reward income
+    it would earn, and — when it is rejected — the rule that rejected it."""
+    now = time.time()
+    target = float(pr.get("target") or 0)
+    per = (float(pr.get("pool") or 0)
+           / max(int(pr.get("pool_n") or pr.get("event_n") or 1), 1) / 2)
+    df = float(pr.get("df") or 0.2)
+    out: dict = {"rows": [], "best": None, "base": None, "top": None,
+                 "target": target, "per_side_pool": per, "df": df,
+                 "back": conf["back"], "qmul": conf["qmul"], "skip": None}
+    if not target:
+        out["skip"] = "no reward program on this market — nothing to earn"
+        return out
+    if per <= 0:
+        out["skip"] = "the reward pool reads as zero"
+        return out
+    if not ent or now - ent[0] > 300:
+        out["skip"] = "no book snapshot from the last 5 minutes"
+        return out
+    real_bids = [(round(p_ * 100), q_) for p_, q_ in ent[1].get("bids") or []
+                 if q_ >= PROBE_REAL_MIN]
+    # A SIDE BELOW TARGET SIZE PAYS NOBODY, so an order resting on one
+    # earns exactly zero however well placed it is. The scoring walk below
+    # fills its window up to `target` and never asked whether the side
+    # actually HAS that much, so it produced a confident positive estimate
+    # for sides paying nothing: 79 small bids were sitting on sides like
+    # "403 of 2,000" and "10,582 of 20,000" when the owner asked whether
+    # this was being checked. It was not.
+    #
+    # Counted over the WHOLE book, not the de-baited levels — the exchange
+    # counts every resting contract towards Target Size, including the
+    # one- and two-share bait the rest of this function ignores.
+    side_total = sum(q_ for _, q_ in (ent[1].get("bids") or []))
+    out["real_bids"] = real_bids
+    out["side_total"] = side_total
+    out["touch"] = real_bids[0][0] if real_bids else None
+    # candidate prices: from the real touch up through the band and two
+    # ticks of stretch, never above the penny ceiling where a total
+    # loss stops being trivial
+    base = real_bids[0][0] if real_bids else max(1, b["lo"])
+    top = min(b["hi"] + 2, EARN_PX_MAX_C)
+    # PRICE CLIMBS WITH THE LADDER TOO, not just size. Promoting straight
+    # back to the old 10c ceiling would reintroduce exactly the price the
+    # owner called too dear for these longshots; a market has to hold at
+    # the cheap end before it is offered the middle, and hold there before
+    # it is offered the top.
+    rung_ = _earn_rung(m)
+    top = min(top, max(1, b["lo"] if rung_ < 1 else
+                          b["med"] if rung_ < 2 else b["hi"] + 2))
+    # Model-backed extension past the penny ceiling: never above the band's
+    # 10th percentile, and never above the hard safety cap.
+    if b["lo"] > top:
+        top = min(b["lo"], EARN_SAFE_MAX_C)
+    # STAND OFF THE TOUCH WHEN WE ARE NOT SURE. Everything above priced
+    # this market on what we believe it is worth; this prices it on how
+    # well we believe it. Confidence short of full drops the whole window
+    # a tick or two BELOW the best real bid, so somebody else's money has
+    # to be eaten before ours can be — the owner's point that pick-off
+    # risk falls with distance from the touch. Two ticks of room below the
+    # ceiling keeps the scan a real choice rather than a single price.
+    out["rung"] = rung_
+    top0, base0 = top, base
+
+    # queued size at or better than each candidate price — the wall we
+    # would be resting behind
+    def _queue(pc_: int) -> float:
+        return sum(q_ for p_, q_ in real_bids if p_ >= pc_)
+    # WHERE A REAL FORECAST EXISTS, IT CAPS THE PRICE. The earner bought NM
+    # Senate Rep at 10c on a day the Silver model had it at 0.62% — 16x
+    # fair, an expected loss of $7.88 on an $8.40 purchase — because the
+    # fair-value gate only applied ABOVE the penny ceiling. Below it the
+    # only question asked was whether the reward income beat the worst
+    # case, and in a reward-farmed book it always does.
+    #
+    # The Bayesian band is no defence here: it read ~10c because a 9c bid
+    # of ours had rested untouched, and a bid resting in these markets
+    # means people are farming rewards, not that anyone values the
+    # contract at 9c. The band measures the crowd; Silver measures the
+    # race. Where Silver has an opinion it wins, with a few cents of
+    # margin so reward income can still justify a small premium.
+    sv = _silver_fair(m)
+    sv_cap = int(sv + EARN_SILVER_MARGIN) if sv is not None else None
+
+    def _pass(back: int, qmul: float,
+              cap_touch: bool = False) -> tuple[list, tuple | None, str | None]:
+        """One sweep of the candidate prices at a given standoff and size
+        multiplier. Run twice at most — see the fallback below.
+
+        cap_touch pins the ceiling AT the real touch. The fallback needs it:
+        without it a low-confidence market that could not afford the standoff
+        fell back to the ordinary window, which reaches ABOVE the touch, and
+        the market least understood ended up with the most aggressive bid on
+        the board. Reduced size is the concession, never a better price."""
+        top, base = top0, base0
+        if cap_touch and real_bids:
+            top = min(top, real_bids[0][0])
+            base = max(1, min(base, top))
+        if back and real_bids:
+            # base is normally the touch and the scan only ever looks UP from
+            # there. Standing off means deliberately looking DOWN, so the
+            # bottom of the range comes off the new ceiling rather than off
+            # the touch — deriving it from the touch pinned base above top and
+            # the scan never ran at all, which read as "no price passed" when
+            # the truth was that no price had been tried.
+            top = min(top, max(1, real_bids[0][0] - back))
+            base = max(1, top - 2)
+        if top < base:
+            return [], None, (f"the band puts fair value below the touch — we "
+                              f"would have to bid {base}c but the ceiling here "
+                              f"is {top}c")
+        rows: list = []
+        best = None
+        for pc in range(base, top + 1):
+            row = {"px": pc, "ok": False, "why": "", "tier": None, "qty": 0,
+                   "est": 0.0, "ticks_back": (out["touch"] - pc) if out["touch"] else 0}
+            rows.append(row)
+            if not _bid_allowed(m, pc):
+                row["why"] = "blocked: above what the race model allows to be paid"
+                continue
+            if sv_cap is not None and pc > sv_cap:
+                row["why"] = f"above the Silver cap of {sv_cap}c"
+                continue
+            # past the penny ceiling both knowledge conditions must hold
+            if pc > EARN_PX_MAX_C and (pc > b["lo"] or _queue(pc) < EARN_QUEUE_MIN):
+                row["why"] = (f"over the {EARN_PX_MAX_C}c penny ceiling, and "
+                              + ("it is above the band's 10th percentile"
+                                 if pc > b["lo"] else
+                                 f"only {_queue(pc):,.0f} shares are queued at or above "
+                                 f"it (need {EARN_QUEUE_MIN:,.0f} to rest behind)"))
+                continue
+            # confidence tier sets the exposure: proven / stretch / speculative
+            if pc <= b["med"]:
+                cap = EARN_MAX_USD
+                tier = "proven"
+            elif pc <= b["hi"]:
+                cap = EARN_MAX_USD * 0.4
+                tier = "stretch"
+            else:
+                cap = EARN_MAX_USD * 0.15
+                tier = "speculative"
+            # SIZE FALLS AWAY FROM THE MODEL. Even inside the cap, paying
+            # above a forecast is paying a premium, and the premium should buy
+            # a smaller position, not the same one. At the model's own number
+            # the full tier is available; at the cap it is a token.
+            if sv is not None and pc > sv:
+                over = (pc - sv) / max(1.0, EARN_SILVER_MARGIN)
+                cap = cap * max(0.15, 1.0 - 0.85 * min(1.0, over))
+            # ...AND FROM CONFIDENCE. Same principle one level up: a thin case
+            # buys a thin position. Applied to the dollar cap AND the rung so
+            # a low-confidence market cannot climb the size ladder into full
+            # exposure while it is still standing off the touch.
+            cap *= qmul
+            rung_sz = max(1, int(_earn_rung_size(m) * qmul))
+            q = max(1, min(EARN_MAX_SHARES, int(cap * 100 / pc), rung_sz))
+            # score with us resting at pc: merge, walk the window from the
+            # best price, sum discounted takes
+            lv = sorted(real_bids + [(pc, float(q))], key=lambda x: -x[0])
+            anchor = lv[0][0]
+            den = cum = ours_sc = 0.0
+            for p_, q_ in lv:
+                take = min(q_, max(0.0, target - cum))
+                if take <= 0:
+                    break
+                w = df ** (anchor - p_)
+                den += take * w
+                if p_ == pc:
+                    ours_sc += min(take, float(q)) * w
+                cum += q_
+            # our own size counts towards Target Size too, so a side just
+            # short of it can be tipped over by the order we are about to
+            # place — but only just short, and this rarely applies
+            short_side = not (side_total + q >= target)
+            est = 0.0 if (not den or short_side) else (per * ours_sc / den)
+            row.update({"tier": tier, "qty": q, "est": round(est, 4),
+                        "cost": round(pc / 100.0 * q, 2),
+                        "score_w": round(df ** max(0, anchor - pc), 4)})
+            if short_side:
+                row["why"] = (f"the bid side holds {side_total:,.0f} of the "
+                              f"{target:,.0f} Target Size even with our {q} — a side "
+                              f"under Target Size pays NOBODY")
+                continue
+            # the deal test: income must dwarf the worst case — total-loss
+            # payback within two days
+            if est < 0.5 * (pc / 100.0) * q:
+                row["why"] = (f"income ${est:.2f}/day does not clear the deal test "
+                              f"(needs ${0.5 * (pc/100.0) * q:.2f}/day to pay back a "
+                              f"total loss inside two days)")
+                continue
+            row["ok"] = True
+            row["why"] = "placeable"
+            if best is None or est > best[0]:
+                best = (est, pc, q, tier)
+        return rows, best, None
+
+    back, qmul = conf["back"], conf["qmul"]
+    rows, best, skip = _pass(back, qmul)
+    # THE SECOND LEVER. Owner: "back down a price level or two OR reduce
+    # quantity". Standing off is the better of the two when it works, but in a
+    # book where the depth ahead of us already exceeds Target Size it earns
+    # exactly zero — the scoring window fills up before it reaches us — so the
+    # deal test rejects every price and the market silently gets nothing. That
+    # is a worse outcome than the old behaviour, not a safer one. So when the
+    # standoff comes back empty we take the other lever instead: back at the
+    # touch, at half the size the standoff would have used.
+    if best is None and back:
+        rows2, best2, skip2 = _pass(0, max(0.15, qmul * 0.5), cap_touch=True)
+        if best2 is not None:
+            for r_ in rows2:
+                r_["why"] += " (at the touch, half size — the standoff earned nothing)"
+            rows, best, skip = rows2, best2, skip2
+            out["fellback"] = True
+            out["qmul"] = max(0.15, qmul * 0.5)
+            out["back"] = 0
+    out["rows"], out["best"] = rows, best
+    if skip:
+        out["skip"] = skip
+    elif best is None:
+        out["skip"] = "no price in the range passed every rule"
+    if out["rows"]:
+        out["base"] = out["rows"][0]["px"]
+        out["top"] = out["rows"][-1]["px"]
+    return out
 
 
 def auto_earn() -> None:
@@ -5409,124 +5890,23 @@ def auto_earn() -> None:
         if _earn_outstanding_usd() >= EARN_TOTAL_USD:
             break
         b = _bayes_fair(m)
-        # minimum knowledge: anything real — one trade, two rested scouts,
-        # or three observations. Size, not certainty, carries the risk.
-        if not (b and b.get("med")
-                and (b.get("fills", 0) >= 1 or b.get("rested", 0) >= 2
-                     or b.get("n", 0) >= 3)):
+        if not (b and b.get("med")):
             continue
-        pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
-        target = float(pr.get("target") or 0)
-        per = (float(pr.get("pool") or 0)
-               / max(int(pr.get("pool_n") or pr.get("event_n") or 1), 1) / 2)
-        df = float(pr.get("df") or 0.2)
-        ent = tr._BOOK_CACHE.get(m)
-        if not target or per <= 0 or not ent or now - ent[0] > 300:
-            continue
-        real_bids = [(round(p_ * 100), q_) for p_, q_ in ent[1].get("bids") or []
-                     if q_ >= PROBE_REAL_MIN]
-        # A SIDE BELOW TARGET SIZE PAYS NOBODY, so an order resting on one
-        # earns exactly zero however well placed it is. The scoring walk below
-        # fills its window up to `target` and never asked whether the side
-        # actually HAS that much, so it produced a confident positive estimate
-        # for sides paying nothing: 79 small bids were sitting on sides like
-        # "403 of 2,000" and "10,582 of 20,000" when the owner asked whether
-        # this was being checked. It was not.
-        #
-        # Counted over the WHOLE book, not the de-baited levels — the exchange
-        # counts every resting contract towards Target Size, including the
-        # one- and two-share bait the rest of this function ignores.
-        side_total = sum(q_ for _, q_ in (ent[1].get("bids") or []))
-        # candidate prices: from the real touch up through the band and two
-        # ticks of stretch, never above the penny ceiling where a total
-        # loss stops being trivial
-        base = real_bids[0][0] if real_bids else max(1, b["lo"])
-        top = min(b["hi"] + 2, EARN_PX_MAX_C)
-        # PRICE CLIMBS WITH THE LADDER TOO, not just size. Promoting straight
-        # back to the old 10c ceiling would reintroduce exactly the price the
-        # owner called too dear for these longshots; a market has to hold at
-        # the cheap end before it is offered the middle, and hold there before
-        # it is offered the top.
-        rung_ = _earn_rung(m)
-        top = min(top, max(1, b["lo"] if rung_ < 1 else
-                              b["med"] if rung_ < 2 else b["hi"] + 2))
-        # Model-backed extension past the penny ceiling: never above the band's
-        # 10th percentile, and never above the hard safety cap.
-        if b["lo"] > top:
-            top = min(b["lo"], EARN_SAFE_MAX_C)
-        if top < base:
-            continue
-        # queued size at or better than each candidate price — the wall we
-        # would be resting behind
-        def _queue(pc_: int) -> float:
-            return sum(q_ for p_, q_ in real_bids if p_ >= pc_)
-        # WHERE A REAL FORECAST EXISTS, IT CAPS THE PRICE. The earner bought NM
-        # Senate Rep at 10c on a day the Silver model had it at 0.62% — 16x
-        # fair, an expected loss of $7.88 on an $8.40 purchase — because the
-        # fair-value gate only applied ABOVE the penny ceiling. Below it the
-        # only question asked was whether the reward income beat the worst
-        # case, and in a reward-farmed book it always does.
-        #
-        # The Bayesian band is no defence here: it read ~10c because a 9c bid
-        # of ours had rested untouched, and a bid resting in these markets
-        # means people are farming rewards, not that anyone values the
-        # contract at 9c. The band measures the crowd; Silver measures the
-        # race. Where Silver has an opinion it wins, with a few cents of
-        # margin so reward income can still justify a small premium.
+        # Confidence is a dial, not a gate (see _earn_confidence). Below the
+        # floor we still place nothing; between the floor and full confidence
+        # we stand off the touch and shrink instead of skipping.
         sv = _silver_fair(m)
-        sv_cap = int(sv + EARN_SILVER_MARGIN) if sv is not None else None
-        best = None
-        for pc in range(base, top + 1):
-            if not _bid_allowed(m, pc):
-                continue
-            if sv_cap is not None and pc > sv_cap:
-                continue
-            # past the penny ceiling both knowledge conditions must hold
-            if pc > EARN_PX_MAX_C and (pc > b["lo"] or _queue(pc) < EARN_QUEUE_MIN):
-                continue
-            # confidence tier sets the exposure: proven / stretch / speculative
-            if pc <= b["med"]:
-                cap = EARN_MAX_USD
-                tier = "proven"
-            elif pc <= b["hi"]:
-                cap = EARN_MAX_USD * 0.4
-                tier = "stretch"
-            else:
-                cap = EARN_MAX_USD * 0.15
-                tier = "speculative"
-            # SIZE FALLS AWAY FROM THE MODEL. Even inside the cap, paying
-            # above a forecast is paying a premium, and the premium should buy
-            # a smaller position, not the same one. At the model's own number
-            # the full tier is available; at the cap it is a token.
-            if sv is not None and pc > sv:
-                over = (pc - sv) / max(1.0, EARN_SILVER_MARGIN)
-                cap = cap * max(0.15, 1.0 - 0.85 * min(1.0, over))
-            q = max(1, min(EARN_MAX_SHARES, int(cap * 100 / pc), _earn_rung_size(m)))
-            # score with us resting at pc: merge, walk the window from the
-            # best price, sum discounted takes
-            lv = sorted(real_bids + [(pc, float(q))], key=lambda x: -x[0])
-            anchor = lv[0][0]
-            den = cum = ours_sc = 0.0
-            for p_, q_ in lv:
-                take = min(q_, max(0.0, target - cum))
-                if take <= 0:
-                    break
-                w = df ** (anchor - p_)
-                den += take * w
-                if p_ == pc:
-                    ours_sc += min(take, float(q)) * w
-                cum += q_
-            # our own size counts towards Target Size too, so a side just
-            # short of it can be tipped over by the order we are about to
-            # place — but only just short, and this rarely applies
-            est = (per * ours_sc / den) if (den and side_total + q >= target) else 0.0
-            # the deal test: income must dwarf the worst case — total-loss
-            # payback within two days
-            if est >= 0.5 * (pc / 100.0) * q:
-                if best is None or est > best[0]:
-                    best = (est, pc, q, tier)
+        conf = _earn_confidence(m, b, sv)
+        if conf["score"] < EARN_CONF_MIN:
+            continue
+        back, qmul = conf["back"], conf["qmul"]
+        pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
+        ent = tr._BOOK_CACHE.get(m)
+        scan = _earn_scan(m, b, conf, ent, pr)
+        best = scan["best"]
         if best is None:
             continue
+        real_bids = scan["real_bids"]
         est, tgt, qty, tier = best
         px = round(tgt / 100.0, 2)
         if px * qty + _earn_outstanding_usd() > EARN_TOTAL_USD:
@@ -5567,9 +5947,19 @@ def auto_earn() -> None:
             if ok and oid:
                 _EARN["orders"][str(oid)] = (m, "BUY", tgt, qty, now)
                 _own_id("earn", str(oid))
+                # report what the scan ACTUALLY did, which may be the fallback
+                # rather than the standoff confidence asked for
+                sback, sq = scan["back"], scan["qmul"]
+                stand = (f", {sback} tick{'' if sback == 1 else 's'} behind the "
+                         f"{scan['touch']}¢ touch at {sq*100:.0f}% size"
+                         if sback else
+                         f" at the touch on {sq*100:.0f}% size — the standoff "
+                         f"earned nothing" if scan.get("fellback") else
+                         " at the touch")
                 _earn_log(m, "placed", px, qty,
                           f"{tier}: est ${est:.2f}/d vs ${px*qty:.2f} worst case "
-                          f"(band {b['lo']}–{b['hi']}¢, {b['fills']}t/{b.get('rested',0)}r)")
+                          f"(band {b['lo']}–{b['hi']}¢, {b['fills']}t/{b.get('rested',0)}r, "
+                          f"confidence {conf['score']:.2f} {conf['verdict']}{stand})")
                 placed += 1
         except Exception:  # noqa: BLE001 — the earner must never kill the poll
             continue
@@ -6185,6 +6575,118 @@ def do_qualify(slug: str, side: str) -> tuple[int, dict]:
         "price_cents": round(px * 100, 1), "spent": round(spent, 2),
         "buying_power": round(bp, 2), "short_of_gap": remaining,
         "remaining_gap": left, "detail": "; ".join(errs)[:200]}
+
+
+def market_why(slug: str) -> tuple[int, dict]:
+    """Everything behind one market's numbers, for the /why page.
+
+    The owner asked where the confidence numbers come from. A weight on its
+    own does not answer that — a heavy term that agrees with everything else
+    moves the answer by nothing, while a light one at the edge of the
+    evidence can drag the median several cents. So every piece of evidence is
+    re-scored WITH IT REMOVED, and what the page reports is how far fair
+    value moves when it goes. That is the number that means something.
+
+    The earner section replays _earn_scan, the same function auto_earn calls,
+    so the page shows the real decision rather than a description of it."""
+    if not slug or len(slug) > 120:
+        return 400, {"error": "bad slug"}
+    if not _slug_known(slug):
+        return 404, {"error": "unknown market — not in the tracked universe"}
+    now = time.time()
+    terms = _bayes_terms(slug)
+    post = _bayes_posterior(terms)
+    ev = []
+    for i, t in enumerate(terms):
+        row = {"kind": t["kind"], "px": round(float(t.get("px") or 0), 2),
+               "w": round(float(t.get("w") or 0), 3), "src": t.get("src"),
+               "label": t.get("label"), "note": t.get("note"),
+               "ts": t.get("ts"), "shift": None, "med_without": None}
+        if post and len(terms) > 1:
+            alt = _bayes_posterior([x for j, x in enumerate(terms) if j != i])
+            if alt and alt["med"] is not None and post["med"] is not None:
+                row["med_without"] = alt["med"]
+                row["shift"] = post["med"] - alt["med"]
+        ev.append(row)
+    # heaviest movers first — that is the reading order for "why is it 8c"
+    ev.sort(key=lambda r: -abs(r["shift"] or 0))
+    b = _bayes_fair(slug)
+    sv = _silver_fair(slug)
+    conf = _earn_confidence(slug, b, sv)
+    pr = (tr._PROG_CACHE.get("progs") or {}).get(slug) or {}
+    ent = tr._BOOK_CACHE.get(slug)
+    scan = _earn_scan(slug, b, conf, ent, pr) if b and b.get("med") else None
+    # why the model has no forecast, in words, since "no number" has several
+    # quite different causes and they matter differently
+    sv_note = None
+    if sv is None:
+        if _third_candidate_race(slug):
+            sv_note = ("this event has a candidate outside the two parties, so "
+                       "the Silver table — which splits 100% between a Democrat "
+                       "and a Republican — does not describe it. The whole event "
+                       "is treated as unmodelled and bids are capped at "
+                       f"{RACE_NO_MODEL_BID_C:g}c.")
+        elif _race_family(slug):
+            sv_note = ("this is a race the model should cover but currently has "
+                       f"no number for. Missing data, so bids cap at "
+                       f"{RACE_NO_MODEL_BID_C:g}c rather than guessing.")
+        else:
+            sv_note = ("the Silver model was never meant to cover this kind of "
+                       "market (2028 nominations, seat ladders, party markets), "
+                       f"so the flat {MAX_UNBACKED_BID_C:g}c unbacked ceiling applies.")
+    probes = [{"side": r[1], "px": round(r[2] * 100, 1),
+               "age_min": int((now - r[3]) / 60), "kind": r[4]}
+              for r in _PROBE["active"].values() if r[0] == slug]
+    mine = [{k: o.get(k) for k in ("id", "side", "price", "size", "est_day",
+                                   "created", "manual", "intent")}
+            for o in MONITOR.orders if o.get("market") == slug]
+    for o in mine:
+        oid = str(o.get("id") or "")
+        o["src"] = ("prober" if oid in _PROBE["active"] else
+                    "earner" if oid in _EARN["orders"] else
+                    "you" if o.get("manual") == "MANUAL" else "")
+    last_try = _EARN["last"].get(slug, 0.0)
+    return 200, {
+        "market": slug,
+        # human label, from the exchange's own naming where an order or a
+        # cached image record carries it
+        "title": (next(((o.get("subject") or "").strip() or (o.get("title") or "").strip()
+                        for o in MONITOR.orders
+                        if o.get("market") == slug
+                        and (o.get("subject") or o.get("title"))), None)
+                  or ((MONITOR.state.get("mkt_img") or {}).get(slug) or [None, None])[1]),
+        "band": b,
+        "curve": (post or {}).get("curve"),
+        "evidence": ev,
+        "silver": {"value": round(sv, 3) if sv is not None else None,
+                   "note": sv_note,
+                   "third_candidate": _third_candidate_race(slug),
+                   "race_family": _race_family(slug)},
+        "confidence": conf,
+        "program": {"pool": pr.get("pool"), "target": pr.get("target"),
+                    "df": pr.get("df"), "event_n": pr.get("event_n"),
+                    "siblings": (pr.get("siblings") or [])[:12],
+                    "tier": pr.get("tier")},
+        "book": ({"age_s": int(now - ent[0]),
+                  "bids": [[p, q] for p, q in (ent[1].get("bids") or [])[:8]],
+                  "asks": [[p, q] for p, q in (ent[1].get("asks") or [])[:8]],
+                  "bid_total": sum(q for _, q in (ent[1].get("bids") or [])),
+                  "ask_total": sum(q for _, q in (ent[1].get("asks") or []))}
+                 if ent else None),
+        "earner": {"scan": scan, "rung": _earn_rung(slug),
+                   "rung_size": _earn_rung_size(slug),
+                   "on": bool((MONITOR.state.get("auto") or {}).get("earn")),
+                   "last_try_min": int((now - last_try) / 60) if last_try else None,
+                   "cooldown_s": max(0, int(EARN_COOLDOWN - (now - last_try)))
+                   if last_try else 0},
+        "prober": {"active": probes, "on": bool((MONITOR.state.get("auto") or {}).get("probe")),
+                   "primary": _is_primary(slug),
+                   "status": _probe_status(slug),
+                   "last_min": int((now - _PROBE["last"].get(slug, 0.0)) / 60)
+                   if _PROBE["last"].get(slug) else None},
+        "orders": mine,
+        "net": tr._num((MONITOR.positions.get(slug) or {}).get("netPosition")),
+    }
 
 
 def market_info(slug: str) -> tuple[int, dict]:
@@ -7413,6 +7915,8 @@ async function openMkt(slug){
     '<div style="display:flex;align-items:baseline;gap:8px">' +
     '<b style="font-size:15px;flex:1 1 auto">' + esc(nm) + '</b>' +
     '<span style="color:#3fb950;font-weight:700">$' + totRate.toFixed(2) + '/day</span>' +
+    '<a class="alt" style="flex:0 0 auto;text-decoration:none;color:var(--accent)" ' +
+      'href="/why?slug=' + encodeURIComponent(slug) + '">why?</a>' +
     '<button class="alt" style="flex:0 0 auto" onclick="document.getElementById(&#39;det&#39;)' +
       '.style.display=&#39;none&#39;">close</button></div>' +
     '<div class="sub" style="font-size:11px;margin:2px 0 8px">' + esc(slug) +
@@ -8173,6 +8677,288 @@ setInterval(()=>{
   if(Object.keys(ARM).length) return;
   load();
 }, 60000);
+</script></body></html>"""
+
+
+# One market, all the way down: where its fair value came from, how sure we
+# are, and exactly what the earner and prober would do about it. Reached by
+# tapping "why?" on the market sheet (owner, 2026-08-16: "let me click and
+# see a whole page for each market that breaks down what's going into it").
+#
+# No inline onclick carries a quoted argument anywhere on this page. That
+# pattern needs \\' inside an HTML attribute inside a Python string, the
+# escaping collapses to a bare quote, and the whole script block dies — it
+# has cost this dashboard two blank pages already. Handlers are named
+# functions that read their input from the DOM.
+WHY_HTML = """<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why</title>
+<style>
+:root{--bg:#1a202b;--surface:#232b38;--surface2:#2b3442;--line:#3a4454;--ink:#eef2f7;
+--dim:#93a0b4;--good:#34c07c;--bad:#e5645f;--warn:#d9a132;--accent:#5aa2ff;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;padding:12px 12px 60px;background:var(--bg);color:var(--ink);
+font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+h1{font-size:19px;margin:4px 0 2px}
+.slug{font-size:11px;color:var(--dim);word-break:break-all;margin-bottom:12px}
+.card{background:var(--surface);border-radius:var(--r);padding:13px;margin-bottom:12px}
+.card h2{font-size:14px;margin:0 0 4px;letter-spacing:.02em}
+.lede{font-size:13px;color:var(--dim);margin:0 0 10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--dim);font-weight:600;font-size:11px;text-transform:uppercase}
+.r{text-align:right}
+.sub{color:var(--dim);font-size:11.5px}
+.big{font-size:30px;font-weight:700;line-height:1.1}
+.good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;
+font-weight:600;background:var(--surface2);color:var(--dim)}
+.pill.on{color:var(--good)}
+.bar{height:8px;border-radius:4px;background:var(--surface2);overflow:hidden;margin:5px 0}
+.bar i{display:block;height:100%;background:var(--accent)}
+.band{position:relative;height:38px;margin:10px 0 4px}
+.band .track{position:absolute;top:15px;left:0;right:0;height:8px;border-radius:4px;
+background:var(--surface2)}
+.band .rng{position:absolute;top:15px;height:8px;border-radius:4px;background:var(--accent);
+opacity:.45}
+.band .med{position:absolute;top:9px;width:3px;height:20px;border-radius:2px;background:var(--ink)}
+.band .mk{position:absolute;top:9px;width:2px;height:20px;background:var(--warn)}
+.band .lbl{position:absolute;top:0;font-size:10px;color:var(--dim)}
+a.back{color:var(--accent);text-decoration:none;font-size:13px}
+.err{background:#3a2530;color:var(--bad);padding:10px;border-radius:10px}
+input{background:var(--surface2);border:1px solid var(--line);color:var(--ink);
+border-radius:8px;padding:8px;font-size:15px}
+button{background:var(--accent);border:none;color:#0b1220;border-radius:8px;
+padding:8px 14px;font-size:14px;font-weight:600}
+tr.no td{opacity:.55}
+</style></head><body>
+<a class="back" href="/map">&larr; map</a>
+<div id="root"><p class="sub">loading&hellip;</p></div>
+<script>
+var CENT = '\\u00a2';
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,
+  function(ch){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]; }); }
+function qs(n){ return new URLSearchParams(location.search).get(n) || ''; }
+function hdrs(){ var h=new Headers();
+  h.set('X-Dash-Key', localStorage.getItem('dashKey')||''); return h; }
+function c(v){ return (v==null) ? '&mdash;' : (Math.round(v*100)/100)+CENT; }
+function money(v){ return (v==null) ? '&mdash;' : '$'+Number(v).toFixed(2); }
+function num(v){ return (v==null) ? '&mdash;' : Number(v).toLocaleString(); }
+function sw(on){ return on ? '<span class="pill on">switch ON</span>'
+                           : '<span class="pill">switch OFF</span>'; }
+
+// Every component of the confidence score, what it is worth, and what the
+// total buys. Printed rather than summarised, because the question was
+// where the number comes from.
+function confCard(cf){
+  if(!cf) return '';
+  var pct = Math.round(cf.score*100);
+  var col = cf.score>=0.5?'good':cf.score>=0.15?'warn':'bad';
+  var rows = (cf.parts||[]).map(function(p){
+    return '<tr><td>'+esc(p.label)+'<div class="sub">'+esc(p.detail)+'</div></td>'+
+      '<td class="r"><b>'+p.pts.toFixed(2)+'</b>'+
+      '<div class="sub">of '+p.max.toFixed(2)+'</div></td></tr>'; }).join('');
+  return '<div class="card"><h2>How sure are we?</h2>'+
+    '<div class="big '+col+'">'+pct+'%</div>'+
+    '<div class="bar"><i style="width:'+Math.min(100,pct)+'%"></i></div>'+
+    '<p class="lede"><b>'+esc(cf.verdict)+'</b> &mdash; '+esc(cf.why)+'</p>'+
+    '<table>'+rows+'</table>'+
+    '<p class="sub" style="margin-top:8px">Full confidence is 0.50; below 0.15 '+
+    'nothing is placed at any price. In between, the earner drops behind the '+
+    'touch and shrinks rather than skipping the market &mdash; an order behind '+
+    'the touch is only reachable once the money in front of it has been eaten.</p>'+
+    '</div>';
+}
+
+// Fair value, plus the single most useful fact about it: what moves if you
+// take each piece of evidence away.
+function bandCard(d){
+  var b = d.band;
+  if(!b || b.med==null) return '<div class="card"><h2>What is it worth?</h2>'+
+    '<p class="lede">Nothing has been observed in this market yet, so the model '+
+    'has no opinion at all.</p></div>';
+  var lo=b.lo, hi=b.hi, med=b.med;
+  var L=Math.max(0,lo-4), R=Math.min(99,hi+4), span=Math.max(1,R-L);
+  function x(v){ return (v-L)/span*100; }
+  var marks='';
+  if(b.bb!=null) marks+='<i class="mk" style="left:'+x(b.bb)+'%"></i>';
+  if(b.ba!=null) marks+='<i class="mk" style="left:'+x(b.ba)+'%"></i>';
+  var evRows = (d.evidence||[]).map(function(e){
+    var s = e.shift, tag;
+    if(s==null) tag = '<span class="sub">the only evidence</span>';
+    else if(Math.abs(s)<0.5) tag = '<span class="sub">changes nothing</span>';
+    else tag = '<b class="'+(s>0?'good':'bad')+'">'+(s>0?'+':'')+s+CENT+'</b>';
+    return '<tr><td>'+esc(e.label)+'<div class="sub">'+esc(e.note)+'</div></td>'+
+      '<td class="r">'+tag+'<div class="sub">weight '+e.w+'</div></td></tr>';
+  }).join('') || '<tr><td class="sub">no evidence</td></tr>';
+  return '<div class="card"><h2>What is it worth?</h2>'+
+    '<div class="big">'+c(med)+'</div>'+
+    '<p class="lede">The model is 80% sure the true value is between '+c(lo)+
+    ' and '+c(hi)+'.</p>'+
+    '<div class="band"><i class="track"></i>'+
+      '<i class="rng" style="left:'+x(lo)+'%;width:'+(x(hi)-x(lo))+'%"></i>'+
+      marks+'<i class="med" style="left:'+x(med)+'%"></i>'+
+      '<span class="lbl" style="left:0">'+c(L)+'</span>'+
+      '<span class="lbl" style="right:0">'+c(R)+'</span></div>'+
+    '<p class="sub">Blue is the 10&ndash;90% range, white is the median, amber '+
+    'ticks are the real bid and ask.</p>'+
+    '<h2 style="margin-top:16px">Where that came from</h2>'+
+    '<p class="lede">One row per observation. The figure on the right is how far '+
+    'the answer moves if you delete that row &mdash; the honest measure of what '+
+    'it is worth, because a heavy piece of evidence that agrees with everything '+
+    'else changes nothing at all.</p>'+
+    '<table><tr><th>Observation</th><th class="r">Its effect</th></tr>'+evRows+
+    '</table></div>';
+}
+
+function silverCard(d){
+  var s = d.silver || {};
+  var body = (s.value!=null)
+    ? '<div class="big">'+c(s.value)+'</div><p class="lede">The Silver race '+
+      'model&rsquo;s own number for this market. Where it has an opinion it caps '+
+      'what may be paid, whatever the order book says.</p>'
+    : '<p class="lede">'+esc(s.note||'no forecast')+'</p>';
+  return '<div class="card"><h2>Race forecast</h2>'+body+
+    (s.third_candidate ? '<p class="sub bad">This event has a candidate outside '+
+      'the two parties. The forecast is withdrawn from the whole event, not just '+
+      'that one market.</p>' : '')+'</div>';
+}
+
+function progCard(d){
+  var p = d.program||{}, bk = d.book;
+  if(!p.target) return '<div class="card"><h2>Reward program</h2>'+
+    '<p class="lede">No reward program on this market &mdash; an order here earns '+
+    'nothing however well it is placed.</p></div>';
+  function line(lbl,tot){
+    var ok = tot!=null && tot>=p.target;
+    return '<tr><td>'+lbl+' side</td><td class="r"><b class="'+(ok?'good':'bad')+'">'+
+      num(tot)+'</b> <span class="sub">of '+num(p.target)+'</span>'+
+      (ok?'':'<div class="sub bad">under Target Size &mdash; this side pays nobody</div>')+
+      '</td></tr>'; }
+  var df = p.df||0;
+  return '<div class="card"><h2>Reward program</h2>'+
+    '<p class="lede">Score = '+df+' raised to the number of ticks you sit from the '+
+    'best price, times your size. At '+df+', one tick back keeps '+
+    Math.round(df*100)+'% of the score and two ticks keep '+Math.round(df*df*100)+
+    '% &mdash; that is what standing off the touch costs.</p>'+
+    '<table><tr><td>Daily pool</td><td class="r">'+money(p.pool)+
+      (p.event_n>1?' <span class="sub">shared across '+p.event_n+' markets</span>':'')+
+      '</td></tr>'+line('Bid',bk?bk.bid_total:null)+line('Ask',bk?bk.ask_total:null)+
+    '</table></div>';
+}
+
+// The earner's real scan, row by row, rejections included.
+function earnCard(d){
+  var e = d.earner||{}, sc = e.scan, body;
+  if(!sc){ body = '<p class="lede">No model yet, so the earner has nothing to '+
+    'price against.</p>'; }
+  else if(sc.skip){ body = '<p class="lede bad">'+esc(sc.skip)+'</p>'; }
+  else {
+    var rows = (sc.rows||[]).map(function(r){
+      var best = sc.best && sc.best[1]===r.px;
+      return '<tr class="'+(r.ok?'':'no')+'"><td>'+(best?'<b>':'')+c(r.px)+
+        (best?'</b> &larr; chosen':'')+
+        (r.ticks_back>0?'<div class="sub">'+r.ticks_back+' tick'+
+          (r.ticks_back===1?'':'s')+' back, '+Math.round((r.score_w||0)*100)+
+          '% score</div>':'')+
+        '</td><td>'+(r.tier?esc(r.tier):'&mdash;')+
+        (r.qty?'<div class="sub">'+r.qty+' sh, '+money(r.cost)+'</div>':'')+
+        '</td><td class="r">'+(r.ok?'<b class="good">'+money(r.est)+'/d</b>'
+          :'<span class="sub">'+esc(r.why)+'</span>')+'</td></tr>'; }).join('');
+    body = '<p class="lede">Every price the earner considered here, and what '+
+      'happened at each one.</p>'+
+      '<table><tr><th>Price</th><th>Tier / size</th>'+
+      '<th class="r">Income, or the rule that stopped it</th></tr>'+rows+'</table>'+
+      '<p class="sub" style="margin-top:8px">Size ladder rung '+e.rung+' = '+
+      e.rung_size+' shares at full confidence, '+Math.round((sc.qmul||1)*100)+
+      '% of that here.'+
+      (sc.back?' Standing off '+sc.back+' tick'+(sc.back===1?'':'s')+' from the '+
+        c(sc.touch)+' touch.':' Resting at the touch.')+'</p>';
+  }
+  return '<div class="card"><h2>What the earner does '+sw(e.on)+'</h2>'+body+
+    (e.cooldown_s>0?'<p class="sub">Cooling down for another '+
+      Math.ceil(e.cooldown_s/60)+' min after the last attempt.</p>':'')+'</div>';
+}
+
+function probeCard(d){
+  var p = d.prober||{}, st = p.status||{}, body = '';
+  if((p.active||[]).length){
+    body += '<p class="lede">Scouts resting here now. Each is one share, placed '+
+      'to find out what a real price is.</p><table>'+
+      p.active.map(function(a){ return '<tr><td>'+esc(a.side)+' '+c(a.px)+'</td>'+
+        '<td class="r sub">resting '+a.age_min+' min</td></tr>'; }).join('')+'</table>';
+  } else {
+    body += '<p class="lede">No scout resting here right now'+
+      (p.last_min!=null?', last tried '+p.last_min+' min ago':'')+'.</p>';
+  }
+  // the actual gate, in the prober's own words
+  body += '<table style="margin-top:8px">'+
+    '<tr><td>Next scout</td><td class="r">'+
+      (st.block ? '<span class="warn">blocked</span><div class="sub">'+
+        esc(st.block)+'</div>'
+      : '<span class="good">clear to place</span>')+'</td></tr>'+
+    (st.gap!=null ? '<tr><td>Gap to rest inside</td><td class="r">'+st.gap+
+      ' tick'+(st.gap===1?'':'s')+' <span class="sub">('+c(st.gap_lo)+'&ndash;'+
+      c(st.gap_hi)+', needs '+st.min_gap+')</span></td></tr>' : '')+
+    '<tr><td>Scouts here</td><td class="r">'+(st.scouts_here||0)+' of '+
+      (st.max_here||0)+'</td></tr>'+
+    '<tr><td>Info fund</td><td class="r">'+money(st.fund)+'</td></tr>'+
+    '</table>';
+  return '<div class="card"><h2>What the prober does '+sw(p.on)+'</h2>'+body+'</div>';
+}
+
+function ordersCard(d){
+  var os = d.orders||[];
+  if(!os.length && !d.net) return '';
+  return '<div class="card"><h2>Our position here</h2>'+
+    (d.net?'<p class="lede">Holding <b>'+num(d.net)+'</b> shares.</p>':'')+
+    (os.length?'<table><tr><th>Order</th><th class="r">Earning</th></tr>'+
+      os.map(function(o){ return '<tr><td>'+esc(o.side)+' '+num(o.size)+' @ '+
+        c(o.price*100)+'<div class="sub">'+esc(o.src||'')+'</div></td>'+
+        '<td class="r">'+(o.est_day?money(o.est_day)+'/d':'&mdash;')+'</td></tr>';
+      }).join('')+'</table>':'<p class="sub">no resting orders</p>')+'</div>';
+}
+
+var CARDS = [confCard2, bandCard, silverCard, progCard, earnCard, probeCard, ordersCard];
+function confCard2(d){ return confCard(d.confidence); }
+
+// One card throwing must not blank the page — the same isolation /map uses.
+function render(d){
+  var html = '<h1>'+esc(d.title||d.market)+'</h1>'+
+    '<div class="slug">'+esc(d.market)+'</div>';
+  for(var i=0;i<CARDS.length;i++){
+    try { html += CARDS[i](d); }
+    catch(err){ html += '<div class="card"><h2>card failed</h2>'+
+      '<p class="sub">'+esc(err && err.message)+'</p></div>'; }
+  }
+  document.getElementById('root').innerHTML = html;
+}
+
+function saveKey(){
+  localStorage.setItem('dashKey', document.getElementById('k').value);
+  load();
+}
+
+function load(){
+  var slug = qs('slug');
+  if(!slug){ document.getElementById('root').innerHTML =
+    '<div class="err">No market given. Open this page from a market on /map.</div>';
+    return; }
+  fetch('/why.json?slug='+encodeURIComponent(slug), {headers:hdrs()})
+    .then(function(r){ return r.status===401 ? Promise.reject(new Error('key'))
+      : r.json().then(function(j){ return r.ok ? j
+        : Promise.reject(new Error(j.error||'failed')); }); })
+    .then(render)
+    .catch(function(e){
+      document.getElementById('root').innerHTML = (e.message==='key')
+        ? '<div class="card"><h2>Password</h2><p class="lede">This page needs the '+
+          'dashboard key.</p><input id="k" type="password"> '+
+          '<button onclick="saveKey()">save</button></div>'
+        : '<div class="err">'+esc(e.message)+'</div>';
+    });
+}
+load();
+setInterval(load, 60000);
 </script></body></html>"""
 
 
@@ -9764,6 +10550,9 @@ function renderSheet(d){
   document.getElementById('sheetIn').innerHTML =
     '<div style="font-size:17px;font-weight:700">'+esc(mname(m))+'</div>'+
     '<div class="mkt">'+esc(m)+'</div>'+
+    '<div style="margin:4px 0 2px"><a href="/why?slug='+encodeURIComponent(m)+'" '+
+      'style="color:var(--accent);text-decoration:none;font-size:13px">'+
+      'why this price? &rarr;</a></div>'+
     (d.net ? '<div class="sub">position: '+d.net.toLocaleString()+' contracts</div>' : '')+
     '<div style="display:flex;gap:18px;margin-top:8px">'+
     '<div style="flex:1"><div class="sub">Bids</div><table class="bk">'+lv(d.bids)+'</table></div>'+
@@ -10227,6 +11016,11 @@ class Handler(BaseHTTPRequestHandler):
             # do not belong on the control surface (owner, 2026-08-16).
             self._send(200, "text/html; charset=utf-8", MAP_HTML.encode())
             return
+        if self.path.startswith("/why") and not self.path.startswith("/why.json"):
+            # Same shell-only pattern: the page carries no data, and /why.json
+            # underneath it demands the key.
+            self._send(200, "text/html; charset=utf-8", WHY_HTML.encode())
+            return
         if self.path.startswith("/garden"):
             # The garden view: same shell pattern — the page itself is
             # public, every data fetch inside it carries the key header.
@@ -10332,6 +11126,14 @@ class Handler(BaseHTTPRequestHandler):
             from urllib.parse import parse_qs, urlparse
             slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]
             code, payload = market_info(slug)
+            self._send(code, "application/json", json.dumps(payload).encode())
+        elif self.path.startswith("/why.json"):
+            from urllib.parse import parse_qs, urlparse
+            slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]
+            try:
+                code, payload = market_why(slug)
+            except Exception as e:  # noqa: BLE001 — a read-only page, never fatal
+                code, payload = 500, {"error": f"{type(e).__name__}: {e}"[:300]}
             self._send(code, "application/json", json.dumps(payload).encode())
         else:
             self._send(200, "text/html; charset=utf-8", DASH_HTML.encode())

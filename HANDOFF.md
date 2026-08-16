@@ -200,6 +200,75 @@ per order in the sweep and per market in the earner: 0.33us cached.
 Not fixed by this: the 1 kenblo share already held. The guard stops new
 bids; it does not unwind a position.
 
+### 2026-08-16 — /why, one page per market (SHIPPED)
+
+Owner: "Give me some insight into where the confidence numbers come from. Let
+me click and see a whole page for each market that breaks down what's going
+into it. This should be for the probe and the earners."
+
+`/why?slug=...`, linked as "why?" from both market sheets. Eight sections:
+confidence with every component, fair value with the evidence, the race
+forecast, the reward program, the earner's scan, the prober's gates, and our
+own position. Card rendering is isolated so one failure cannot blank the page.
+
+Two things make it honest rather than decorative:
+
+* **Leave-one-out.** Every observation is re-scored WITH IT REMOVED and what
+  the page prints is how far the median moves when it goes. A weight on its
+  own answers nothing — a heavy term agreeing with everything else moves the
+  answer by zero. On a live example the 7c fill was worth -4c and the Silver
+  forecast +4c, while three of the seven terms changed nothing at all.
+* **One code path.** The earner section calls `_earn_scan`, the same function
+  `auto_earn` calls. The page reports the real decision including every
+  rejection reason, not a second implementation that can drift.
+
+`_bayes_fair` was split into `_bayes_terms` (the evidence, each with a
+plain-English note) and `_bayes_posterior` (the grid) to make that possible.
+400 randomised evidence sets confirm the split reproduces the old lo/med/hi
+EXACTLY. Two bugs were caught by that test and both were mine: rounding the
+term weights before they entered the log-likelihood moved a median by a cent.
+Weights stay full precision; rounding is the page's job.
+
+One deliberate difference: `n` used to count every journal row for a market
+including "scout" and "pulled" rows that carry no information, so three
+information-free rows could satisfy the old `n >= 3` gate. It now counts
+actual evidence.
+
+### 2026-08-16 — confidence is a dial, not a cliff (SHIPPED)
+
+Owner: "if a market is struggling to get to an adequate confidence level, it
+can just back down a price level or two or reduce quantity. Likelihood of
+getting picked off goes down the further you are from the touch."
+
+The old gate was pass/fail — one trade OR two rested scouts OR three rows —
+so a market just under the bar got nothing and one just over it got the same
+exposure as a market with a forecast and four fills. `_earn_confidence` scores
+0..1 over six components (real trades, rested scouts, observation count, band
+width, race forecast, two-sided book) and buys two things:
+
+* distance: below 0.50, the whole price window drops 1-2 ticks BELOW the real
+  touch, so somebody else's money must be eaten before ours;
+* size: the dollar cap and the rung size both scale with the score.
+
+Below 0.15 nothing is placed at any price.
+
+**What the numbers actually say about the standoff.** Reward score decays by
+the program's discount factor per tick from the best price, and df is 0.3 in
+most of these markets: one tick back keeps 30% of the score, two keeps 9%.
+Worse, the scoring window walks from the best price and stops at Target Size,
+so if the depth AHEAD of you already exceeds Target Size you score exactly
+zero however close you are. In a deep farmed book the standoff therefore earns
+nothing and the deal test rejects every price. It only pays in a specific
+shape: a thin touch with the deep size sitting BELOW where we rest.
+
+That made the first version worse than what it replaced — it silently stopped
+entering markets. So the owner's second lever is the fallback: when the
+standoff comes back empty, the scan re-runs at the touch on half the size,
+CAPPED AT THE TOUCH. Without that cap the fallback reached above the touch and
+the least-understood markets got the most aggressive bid on the board; a
+400-case randomised invariant now enforces that a low-confidence market never
+bids above the touch by either route.
+
 ### 2026-08-16 — prober is off the primaries (SHIPPED)
 
 Owner: "Do not probe the primaries!" `auto_probe` now filters `_is_primary`
