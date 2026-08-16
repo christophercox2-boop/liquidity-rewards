@@ -3352,10 +3352,19 @@ def auto_snipe() -> None:
 # tier pools have reconciled ~100% all week, so the earner's deal test runs
 # on validated (small, honest) numbers. Scouts only ever appear in markets
 # the book cache holds, i.e. where we already trade.
+# Every US politics family the owner trades: the 2028 presidential slate
+# (nominations, the winner market AND the party market, which was missing and
+# is as much a 2028 market as the rest), the governor and senate races and
+# their primaries, and the house/senate seat-count ladders. Audited against
+# the live program list: this covers 176 of the 181 markets carrying a reward
+# program. The five left out are deliberate — college basketball, a measles
+# market, a pandemic market, and the Powell/Fed governor market, which is an
+# econ market and off limits.
 PROBE_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
-                  "ewc-usp-2028-11-07-",
+                  "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-",
                   "ussewc-", "usgubewc-", "ewc-usse-", "ewc-usgub-",
-                  "scc-", "ushrewc-", "enwc-usgubp-", "enwc-ushrp-")
+                  "scc-", "ushrewc-", "enwc-usgubp-", "enwc-ushrp-",
+                  "enwc-ussep-", "vsc-usgubp-")
 PROBE_SIZE = 1
 PROBE_REAL_MIN = 5.0          # book levels smaller than this are bait — ignore
 PROBE_MIN_GAP = 3             # need at least this many interior ticks to learn
@@ -3650,8 +3659,15 @@ def auto_probe() -> None:
     if len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
         return
     placed = 0
+    # Cover the WHOLE universe rather than sampling it. A random shuffle kept
+    # re-picking markets the prober had already mapped while others were never
+    # visited at all, so the map filled in slowly and unevenly. Unvisited
+    # markets go first, then least-recently-scouted, with the shuffle kept only
+    # to break ties so identical-looking markets do not always order the same.
     mkts = [m for m in tr._BOOK_CACHE if m.startswith(PROBE_PREFIXES)]
     random.shuffle(mkts)
+    mkts.sort(key=lambda m_: (1 if (est.get(m_) or _PROBE["last"].get(m_)) else 0,
+                              _PROBE["last"].get(m_, 0.0)))
     for m in mkts:
         if placed >= PROBE_MAX_PER_POLL or len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
             break
