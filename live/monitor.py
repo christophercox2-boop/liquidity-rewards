@@ -3321,7 +3321,8 @@ PROBE_TTL = float(os.environ.get("PROBE_TTL", "2700"))     # rotate after 45 min
 PROBE_ACTIVE_MAX = int(os.environ.get("PROBE_ACTIVE_MAX", "24"))
 PROBE_MAX_PER_POLL = 2
 PROBE_COOLDOWN = 300.0        # per market between new probes
-_PROBE: dict = {"active": {}, "last": {}, "cancelled": set()}
+_PROBE: dict = {"active": {}, "last": {}, "cancelled": set(), "pending": {}}
+PROBE_CONFIRM_WAIT = 300.0   # fills feed lag allowance before "vanished"
 
 
 def _probe_log(m: str, ev: str, side: str, px: float, note: str = "") -> None:
@@ -3407,6 +3408,17 @@ def auto_probe() -> None:
     now = time.time()
     open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
     est = MONITOR.state.setdefault("probe", {})
+    # 0. settle earlier disappearances: back on the list -> flicker, readopt;
+    #    confirmed by the fills feed -> requeue so the fill logic below runs;
+    #    neither, past the wait -> a silent exchange cancel, no fund movement
+    for oid, (rec, ts_gone) in list(_PROBE["pending"].items()):
+        if oid in open_ids or _fill_confirmed(oid):
+            _PROBE["active"][oid] = rec
+            del _PROBE["pending"][oid]
+        elif now - ts_gone > PROBE_CONFIRM_WAIT:
+            del _PROBE["pending"][oid]
+            _probe_log(rec[0], "vanished", rec[1], rec[2],
+                       "gone without a trade — exchange-side cancel")
     # 1. reconcile: a probe missing from open orders that we did not cancel
     #    was FILLED — record the price and place the flip
     for oid, rec in list(_PROBE["active"].items()):
@@ -3436,6 +3448,11 @@ def auto_probe() -> None:
         del _PROBE["active"][oid]
         if oid in _PROBE["cancelled"]:
             _PROBE["cancelled"].discard(oid)
+            continue
+        # disappearance is a claim — the fills feed decides (silent
+        # exchange cancels must not move the fund or feed the model)
+        if not _fill_confirmed(oid):
+            _PROBE["pending"][oid] = (rec, now)
             continue
         # filled — a real trade happened at px
         e = est.setdefault(m, {})
@@ -3696,7 +3713,16 @@ EARN_MAX_SHARES = 200
 EARN_PX_MAX_C = int(os.environ.get("EARN_PX_MAX_C", "10"))
 EARN_MAX_PER_POLL = 4
 EARN_COOLDOWN = 300.0
-_EARN: dict = {"orders": {}, "last": {}, "cancelled": set()}
+_EARN: dict = {"orders": {}, "last": {}, "cancelled": set(), "pending": {}}
+EARN_CONFIRM_WAIT = 300.0    # fills feed lag allowance before "vanished"
+
+
+def _fill_confirmed(oid: str) -> bool:
+    """Is this order id in the exchange's own trade records? Disappearance
+    from the open-order list is NOT a fill — the exchange silently cancels
+    resting orders (the 2026-08-15 floor episode) and the list flickers.
+    Only the fills feed decides."""
+    return any(str(t.get("oid")) == oid for t in (MONITOR.trades or []))
 
 
 
@@ -3763,6 +3789,20 @@ def auto_earn() -> None:
                     _EARN["orders"][oid] = (r[0], r[1], int(r[2]), int(r[3]), float(r[4]))
     now = time.time()
     open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
+    # settle disappearances: real fill (in the fills feed) vs silent cancel
+    for oid, (rec, ts_gone) in list(_EARN["pending"].items()):
+        m, side, px, qty, ts = rec
+        if oid in open_ids:      # the list flickered — the order is back
+            _EARN["orders"][oid] = rec
+            del _EARN["pending"][oid]
+        elif _fill_confirmed(oid):
+            del _EARN["pending"][oid]
+            _earn_log(m, "filled", px / 100.0, qty, "confirmed by the fills feed")
+            _EARN["last"][m] = now
+        elif now - ts_gone > EARN_CONFIRM_WAIT:
+            del _EARN["pending"][oid]
+            _earn_log(m, "vanished", px / 100.0, qty,
+                      "gone without a trade — exchange-side cancel")
     # reconcile: fills and drift
     for oid, rec in list(_EARN["orders"].items()):
         m, side, px, qty, ts = rec
@@ -3771,9 +3811,9 @@ def auto_earn() -> None:
             if oid in _EARN["cancelled"]:
                 _EARN["cancelled"].discard(oid)
             else:
-                _earn_log(m, "filled", px / 100.0, qty,
-                          "bought at/below modeled fair")
-                _EARN["last"][m] = now
+                # disappearance is a CLAIM, not a fill — park it until the
+                # fills feed confirms or denies
+                _EARN["pending"][oid] = (rec, now)
             continue
         # Withdrawal is by PERFORMANCE now, not price drift: the monitor
         # already scores every resting order (est_day). An order that keeps
