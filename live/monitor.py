@@ -3410,6 +3410,28 @@ PROBE_SAFE_BIAS = float(os.environ.get("PROBE_SAFE_BIAS", "0.7"))
 # How far a candidate price must sit from the Silver forecast before the model
 # decides which side we take rather than the coin.
 PROBE_SILVER_EDGE = float(os.environ.get("PROBE_SILVER_EDGE", "2"))
+# HARD CEILING ON ANY BID, INDEPENDENT OF EVERY MODEL AND LOOKUP.
+#
+# Two 54c and 58c scout bids filled after the model-based guards shipped. Each
+# of those guards asks _silver_fair() first, and it returns None for anything
+# it cannot map to a state-level race — the 2028 slate, the seat ladders, the
+# primaries, and any race whose table is missing. A guard that answers "no
+# opinion" by allowing the trade FAILS OPEN, which is the wrong direction for
+# a control whose whole job is to stop bad trades.
+#
+# This one fails closed and depends on nothing. Above this price a bid needs
+# POSITIVE model support to exist at all; with no forecast, the answer is no.
+MAX_UNBACKED_BID_C = float(os.environ.get("MAX_UNBACKED_BID_C", "15"))
+
+
+def _bid_allowed(m: str, price_c: float) -> bool:
+    """May we rest a BUY here at all? Cheap bids are always fine — a penny
+    longshot cannot hurt much. Above that we need a forecast that supports the
+    price, and 'no forecast' is a refusal, not a shrug."""
+    if price_c <= MAX_UNBACKED_BID_C:
+        return True
+    sv = _silver_fair(m)
+    return sv is not None and price_c <= sv + EARN_SILVER_MARGIN
 # Per market between new scouts. At 300s a market took over ten minutes to
 # collect its three scouts; at 90s it takes three, so a market gets bracketed
 # while its book still looks the way it did when the first scout went in.
@@ -3770,6 +3792,10 @@ def auto_probe() -> None:
                 want = "SELL"
             elif px * 100 < svp - PROBE_SILVER_EDGE:
                 want = "BUY"
+        if not _bid_allowed(m, px * 100):
+            can_buy = False       # too dear to bid without a forecast behind it
+        if want == "BUY" and not can_buy:
+            continue
         if want == "SELL" and can_sell:
             side = "SELL"
         elif want == "BUY" and can_buy:
@@ -4246,12 +4272,11 @@ def auto_earn() -> None:
             continue                      # an ask above fair is a good ask
         px_ = float(o_.get("price") or 0) * 100
         qty_ = float(o_.get("size") or 0)
-        sv_ = _silver_fair(m_)
-        if sv_ is None or px_ <= sv_ + EARN_SILVER_MARGIN:
+        if _bid_allowed(m_, px_):
             continue
         sweep.append((oid_, m_, px_, qty_))
     for oid, m, px, qty in sweep:
-        sv_ = _silver_fair(m)
+        sv_ = _silver_fair(m) or 0.0
         try:
             requests.request(
                 "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
@@ -4859,6 +4884,8 @@ def auto_earn() -> None:
         sv_cap = int(sv + EARN_SILVER_MARGIN) if sv is not None else None
         best = None
         for pc in range(base, top + 1):
+            if not _bid_allowed(m, pc):
+                continue
             if sv_cap is not None and pc > sv_cap:
                 continue
             # past the penny ceiling both knowledge conditions must hold
