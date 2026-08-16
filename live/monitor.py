@@ -3941,6 +3941,24 @@ EARN_VANISH_COOLDOWN = float(os.environ.get("EARN_VANISH_COOLDOWN", "1800"))
 # money at RISK — a flip is money already spent, coming back.
 EARN_FLIP_TICKS = int(os.environ.get("EARN_FLIP_TICKS", "2"))
 EARN_FLIP_RETRY = float(os.environ.get("EARN_FLIP_RETRY", "1800"))
+# GRADUATION. The point of the earner is to find where the money is, not to
+# sit on the first thing it finds — but an order that has PROVED it earns and
+# stays put should not keep occupying the search budget while it does so
+# (owner, 2026-08-16: "once we found it, move on to others while those orders
+# earn"). A proven order graduates: it keeps resting and keeps earning, and it
+# stops counting against the dollar cap, which frees that money to go looking.
+#
+# It has to have earned the label, not merely survived: an hour on the book,
+# still visibly there, paying enough to cover its own worst case inside two
+# days, in a market that has never taken a fill off us. If a graduate stops
+# earning it is demoted back under the cap and judged like anything else.
+#
+# Graduates carry their own ceiling. They are the orders least likely to fill,
+# but "uncapped" and "real money" do not belong in the same sentence.
+EARN_GRAD_AGE = float(os.environ.get("EARN_GRAD_AGE", "3600"))
+EARN_GRAD_MIN_RATE = float(os.environ.get("EARN_GRAD_MIN_RATE", "0.50"))
+EARN_GRAD_PAYBACK = float(os.environ.get("EARN_GRAD_PAYBACK", "2.0"))
+EARN_GRAD_MAX_USD = float(os.environ.get("EARN_GRAD_MAX_USD", "150.0"))
 # Same idea for an order we pulled ourselves: it was not earning, so the market
 # should wait its turn behind untried ones rather than being re-entered at once.
 EARN_WITHDRAW_COOLDOWN = float(os.environ.get("EARN_WITHDRAW_COOLDOWN", "3600"))
@@ -4016,7 +4034,18 @@ def _earn_log(m: str, ev: str, px: float, qty: int, note: str = "") -> None:
 
 
 def _earn_outstanding_usd() -> float:
-    return sum(px / 100.0 * q for _, _, px, q, _ in _EARN["orders"].values())
+    """Money the earner has at risk AND still charged to its search budget.
+    Graduates are excluded on purpose — they have proved themselves, so the
+    budget they were using goes back to looking for the next one."""
+    grad = _EARN.get("grad") or set()
+    return sum(px / 100.0 * q for oid, (_, _, px, q, _) in _EARN["orders"].items()
+               if oid not in grad)
+
+
+def _earn_graduated_usd() -> float:
+    grad = _EARN.get("grad") or set()
+    return sum(px / 100.0 * q for oid, (_, _, px, q, _) in _EARN["orders"].items()
+               if oid in grad)
 
 
 def auto_earn() -> None:
@@ -4068,6 +4097,8 @@ def auto_earn() -> None:
     if not _EARN.get("toflip"):
         _EARN["toflip"] = [list(j) for j in (MONITOR.state.get("earn_toflip") or [])
                            if len(j) == 4]
+    if not _EARN.get("grad"):
+        _EARN["grad"] = set(MONITOR.state.get("earn_grad") or [])
     now = time.time()
     open_ids = {str(o.get("id")) for o in MONITOR.orders if o.get("id")}
     # FILL ACCOUNTING COMES FROM THE FILLS FEED, the only place the truth
@@ -4322,6 +4353,38 @@ def auto_earn() -> None:
                           "inventory, so no buying power used")
         except Exception:  # noqa: BLE001 — a flip never kills the poll
             pass
+    # Graduate the proven, demote the faded. Runs before rotation so a market
+    # that has just earned its place is never picked as one of the worst.
+    est_pm = MONITOR.state.get("probe") or {}
+    grad = _EARN.setdefault("grad", set())
+    for oid, (m, side, px, qty, ts) in list(_EARN["orders"].items()):
+        o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
+        est = float((o or {}).get("est_day") or 0)
+        cost = px / 100.0 * qty
+        if oid in grad:
+            # a graduate that stops paying goes back under the cap and takes
+            # its chances with everything else
+            if est < EARN_GRAD_MIN_RATE / 2:
+                grad.discard(oid)
+                _earn_log(m, "demoted", px / 100.0, qty,
+                          f"down to ${est:.2f}/day — back on the search budget")
+            continue
+        if now - ts < EARN_GRAD_AGE or est < EARN_GRAD_MIN_RATE:
+            continue
+        if cost > 0 and est * EARN_GRAD_PAYBACK < cost:
+            continue                      # cannot cover its own worst case
+        if (est_pm.get(m) or {}).get("fills"):
+            continue                      # this market has taken money off us
+        if _on_book(m, "BUY", px / 100.0, qty, ts) is False:
+            continue                      # not visibly resting, so not proven
+        if _earn_graduated_usd() + cost > EARN_GRAD_MAX_USD:
+            continue
+        grad.add(oid)
+        _earn_log(m, "graduated", px / 100.0, qty,
+                  f"earning ${est:.2f}/day for {int((now - ts) / 60)}m — "
+                  "off the search budget, still earning")
+    grad &= set(_EARN["orders"])          # forget orders that are gone
+
     # Rotation: at capacity, abandon the worst few so the search can continue.
     # Skips anything inside the scoring grace — a fresh order has no rate yet
     # and would rank bottom purely for being new.
@@ -4330,7 +4393,7 @@ def auto_earn() -> None:
         _EARN["rot_ts"] = now
         ranked = []
         for oid, (m, side, px, qty, ts) in _EARN["orders"].items():
-            if now - ts < 600:
+            if now - ts < 600 or oid in (_EARN.get("grad") or set()):
                 continue
             o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
             est = float((o or {}).get("est_day") or 0)
@@ -4497,6 +4560,7 @@ def auto_earn() -> None:
         MONITOR.state["earn_orders_reg"] = {k: list(v) for k, v in _EARN["orders"].items()}
         MONITOR.state["earn_flips_reg"] = {k: list(v) for k, v in (_EARN.get("flips") or {}).items()}
         MONITOR.state["earn_toflip"] = [list(j) for j in (_EARN.get("toflip") or [])]
+        MONITOR.state["earn_grad"] = sorted(_EARN.get("grad") or set())
 
 
 # --- slate health watch (in-process; replaced the slate_watch.yml cron) ----
@@ -5725,10 +5789,17 @@ def _map_payload() -> dict:
         "earn_live": bool(_auto_on("earn")
                           and os.environ.get("EARN_PAUSE", "") != "1"),
         "probe_budget": round(float(MONITOR.state.get("probe_budget") or 0.0), 2),
+        # `rate` is what each bid is earning per day — the owner asked to see
+        # it per market, not just as one total. `grad` marks the proven ones,
+        # which rest on their own ceiling instead of the search budget.
         "earn_active": [{"m": r[0], "px": r[2], "qty": r[3],
                          "age_m": int((time.time() - r[4]) / 60),
+                         "rate": round(float(next(
+                             (x.get("est_day") or 0 for x in MONITOR.orders
+                              if str(x.get("id")) == oid), 0) or 0), 2),
+                         "grad": oid in (_EARN.get("grad") or set()),
                          "on_book": _on_book(r[0], "BUY", r[2] / 100.0, r[3], r[4])}
-                        for r in _EARN["orders"].values()],
+                        for oid, r in _EARN["orders"].items()],
         # Flips rest on the ASK side out of stock we already hold, so they are
         # listed apart from the bids and never counted against the dollar cap.
         "earn_flips": [{"m": r[0], "px": r[1], "qty": r[2],
@@ -5739,7 +5810,9 @@ def _map_payload() -> dict:
         "earn_stats": MONITOR.state.get("earn_stats") or {},
         "probe_scoreboard": MONITOR.state.get("probe_scoreboard") or {},
         "earn_caps": {"per_mkt": EARN_MAX_USD, "total": EARN_TOTAL_USD,
-                      "outstanding": round(_earn_outstanding_usd(), 2)},
+                      "outstanding": round(_earn_outstanding_usd(), 2),
+                      "grad_usd": round(_earn_graduated_usd(), 2),
+                      "grad_max": EARN_GRAD_MAX_USD},
         # slug -> human label, from the exchange's own naming
         "labels": {o["market"]: (
                        (o.get("subject") or "").strip()
@@ -6269,16 +6342,25 @@ function renderProbe(){
     ['◻︎ Not sure yet', 'too little evidence to call either way', '#93a0b4'],
     ['⛔️ Not worth it', 'cannot pay, or will not leave us alone', '#e5645f'],
   ];
+  // Each zone folds. The top one is open — it is the answer to "where is the
+  // money" — and the other two stay shut until asked for, so 176 markets do
+  // not arrive as one endless scroll on a phone.
   const bands = (() => {
     let out = '', zone = -1;
+    const counts = [0, 0, 0];
+    mktSet.forEach(m => { counts[ZONE(V[m].score)]++; });
     mktSet.forEach(m => {
       const b = bayes[m], e = est[m] || {}, v = V[m];
       const z = ZONE(v.score);
       if (z !== zone) {
+        if (zone !== -1) out += '</details>';
         zone = z;
-        out += '<div style="margin:14px 0 8px;padding-top:8px;border-top:1px solid var(--line)">' +
-          '<b style="font-size:12px;color:' + ZHEAD[z][2] + '">' + ZHEAD[z][0] + '</b>' +
-          '<span class="sub" style="font-size:10px"> — ' + ZHEAD[z][1] + '</span></div>';
+        out += '<details' + (z === 0 ? ' open' : '') +
+          ' style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px">' +
+          '<summary style="cursor:pointer;list-style:none">' +
+          '<b style="font-size:12px;color:' + ZHEAD[z][2] + '">' + ZHEAD[z][0] +
+          ' (' + counts[z] + ')</b>' +
+          '<span class="sub" style="font-size:10px"> — ' + ZHEAD[z][1] + '</span></summary>';
       }
       const sc = act.filter(a => a.m === m);
       const eb = (DATA.earn_active || []).filter(x => x.m === m).map(x => x.px);
@@ -6293,7 +6375,7 @@ function renderProbe(){
         '<br>fair ' + b.lo + '–' + b.hi + '¢ · ' + Math.round(v.conf * 100) + '% sure</div>' +
         mktChart(b, e, sc, eb) + '</div>';
     });
-    return out;
+    return out + (zone !== -1 ? '</details>' : '');
   })();
   const scouts = act.map(a =>
     '<span style="display:inline-block;background:var(--surface2);border-radius:6px;' +
@@ -6346,17 +6428,34 @@ function renderEarn(){
   const bayes = DATA.probe_bayes || {};
   const status = !on ? 'switch OFF' :
     (DATA.earn_live ? '<span style="color:#3fb950">live</span>' : 'paused by host');
-  const rows = act.map(a => {
+  // Each bid says what it is earning, because "how much is this one making"
+  // is the question the whole card exists to answer.
+  const mkRow = a => {
     const b = bayes[a.m];
     const bk = a.on_book === true ? ' <span style="color:#3fb950">on book ✓</span>'
              : a.on_book === false ? ' <span style="color:#e5645f;font-weight:700">NOT ON BOOK</span>'
              : a.age_m < 3 ? ' <span class="sub">settling…</span>'
              : ' <span class="sub">book stale</span>';
-    return '<tr><td class="mkt" style="word-break:normal"><b>' + nm(a.m) + '</b></td>' +
-      '<td class="r" style="font-size:11px">' + a.qty + ' @ ' + a.px + '¢ · ' + a.age_m + 'm' + bk +
+    const hrs = a.age_m >= 90 ? (a.age_m / 60).toFixed(1) + 'h' : a.age_m + 'm';
+    return '<tr><td class="mkt" style="word-break:normal"><b>' + nm(a.m) + '</b>' +
+      '<div style="font-size:12px;color:' + (a.rate > 0 ? '#3fb950' : 'var(--dim)') +
+      ';font-weight:600">$' + (a.rate || 0).toFixed(2) + '/day</div></td>' +
+      '<td class="r" style="font-size:11px">' + a.qty + ' @ ' + a.px + '¢ · ' + hrs + bk +
       (b && b.med != null ? '<div class="sub" style="font-size:10px">model now: ~' +
         b.med + '¢ (' + b.lo + '–' + b.hi + '¢)</div>' : '') + '</td></tr>';
-  }).join('');
+  };
+  const byRate = (x, y) => (y.rate || 0) - (x.rate || 0);
+  const gradA = act.filter(a => a.grad).sort(byRate);
+  const searchA = act.filter(a => !a.grad).sort(byRate);
+  const tbl = (arr, label, openIt) => arr.length
+    ? '<details' + (openIt ? ' open' : '') + ' style="margin-top:6px">' +
+      '<summary class="sub" style="cursor:pointer;font-size:11px">' + label +
+      ' — $' + arr.reduce((t, a) => t + (a.rate || 0), 0).toFixed(2) + '/day total</summary>' +
+      '<table style="width:100%;border-collapse:collapse">' +
+      arr.map(mkRow).join('') + '</table></details>'
+    : '';
+  const rows = tbl(gradA, '🎓 graduated (' + gradA.length + ') — proven, off the search budget', true) +
+               tbl(searchA, '🔍 still proving (' + searchA.length + ')', true);
   const lines = log.map(l =>
     '<div style="font-size:11px;padding:3px 0;border-top:1px dashed var(--line)">' +
     '<span class="sub">' + l.ts + '</span> <b>' + nm(l.m) + '</b> ' +
@@ -6397,12 +6496,12 @@ function renderEarn(){
         'so it costs no buying power</span></div>';
     })() +
     '<div class="sub" style="margin-bottom:4px">' + status +
-    ' · resting worst-case $' + (caps.outstanding || 0).toFixed(2) +
-    ' of $' + (caps.total || 0).toFixed(0) + ' cap ($' + (caps.per_mkt || 0).toFixed(0) +
-    '/market) · lifetime: ' + (st.placed || 0) + ' placed, ' + (st.filled || 0) +
-    ' filled ($' + (st.spent_usd || 0).toFixed(2) + '), ' + (st.withdrawn || 0) + ' withdrawn</div>' +
-    (rows ? '<table style="width:100%;border-collapse:collapse">' + rows + '</table>'
-          : '<div class="sub">no bids resting</div>') +
+    ' · searching with $' + (caps.outstanding || 0).toFixed(2) +
+    ' of $' + (caps.total || 0).toFixed(0) + ' ($' + (caps.per_mkt || 0).toFixed(0) +
+    '/market) · graduated $' + (caps.grad_usd || 0).toFixed(2) +
+    ' of $' + (caps.grad_max || 0).toFixed(0) + ' — proven orders keep earning ' +
+    'without using the search budget</div>' +
+    (rows || '<div class="sub">no bids resting</div>') +
     (lines ? '<details style="margin-top:8px"><summary class="sub" style="cursor:pointer">' +
       'journal (' + log.length + ')</summary>' + lines + '</details>' : '');
 }
