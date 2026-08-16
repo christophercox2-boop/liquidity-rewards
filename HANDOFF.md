@@ -265,6 +265,46 @@ the SHA it just read — which still refuses if someone else moved deploy. All
 three paths (already in sync, needs updating, does not exist) are tested
 against a stubbed git.
 
+### 2026-08-16 — pull the rest on a fill (owner)
+
+"If someone fills me, might as well pull the rest, and then evaluate. See if
+something is moving. Get info. Then see whether the confidence level justifies
+going back in at a smaller amount or if it's best to back out and probe some
+more."
+
+On a CONFIRMED earner fill the earner now cancels its other resting orders in
+that market. One fill says a taker was willing to come to our price; the other
+rungs sit at prices no better informed than the one that just got hit, so
+leaving them out is choosing to be filled again before learning anything.
+
+Only the earner's OWN orders — the qualifier's floor bids, the keeper's rungs
+and anything placed by hand are not its to cancel.
+
+The rest of the owner's sequence was already in place and is worth recording
+so it is not rebuilt: the prober is NOT locked out by an earner fill
+(`fill_ts` is set on prober fills only), so it goes and gets the information
+while the earner stands off for EARN_FILL_COOLDOWN (2h). Re-entry is smaller
+by construction — a fill resets the rung to EARN_START_SHARES (5) — and is
+gated by `_earn_confidence`, which is exactly "whether the confidence level
+justifies going back in at a smaller amount".
+
+### 2026-08-16 — the sniper sells inventory before shorting (owner)
+
+"You can add the shares from the sniper to the flipper pool."
+
+The sniper crosses into over-priced bids on the 2028 longshots and had
+`ORDER_INTENT_BUY_SHORT` HARDCODED — so it opened a short even in markets
+where we were already long. Same trade and same price either way, but a short
+ties up (1 - price) per share of buying power and an inventory sale ties up
+nothing. It now sells from stock when the position covers the size, which is
+what makes the sniper and the flipper draw on one pool instead of the sniper
+shorting beside inventory the flipper was trying to sell.
+
+OPEN QUESTION for the owner: the sniper is a SELLER, so its fills leave SHORT
+positions, not shares. If the intent was also that the flipper should unwind
+those shorts (rest SELL_SHORT bids below the sale price to buy them back),
+that is a separate feature and is NOT built — ask before building it.
+
 ### 2026-08-16 — Refresh button on the homepage (owner)
 
 "Build a button (like the poke file) that lets me get an updated reading of my
@@ -289,6 +329,15 @@ history BEFORE kicking, then compares after. Nothing changed → one line that
 clears itself after six seconds. Something changed → a persistent list:
 money first, then newly posted payouts (the thing most worth surfacing), then
 counts, then the eight biggest per-market moves with the rest counted.
+
+REVISED same day, owner: "all I want to see is newly added rows parsed but
+otherwise raw. Then I can click a button and see a summary." So the DEFAULT
+view is now the rows the reading actually appended to data/*.csv — split into
+columns, otherwise untouched — and the computed summary sits behind a Show
+summary button. `_tracker_once` diffs each append-history file as a SET of
+lines (not by index) before and after the run, so a file that is rewritten
+rather than appended still yields only genuinely new rows; capped at
+TRACKER_ROWS_MAX (60).
 
 t_button drives the real page in node across all three outcomes.
 

@@ -233,6 +233,12 @@ TRACKER_ENABLED = os.environ.get("TRACKER_IN_MONITOR", "1") != "0"
 APP_DIR = Path(__file__).resolve().parent.parent
 TRACKER_SEED = ("data/estimates.csv", "data/checks.csv", "data/estimate_runs.csv",
                 "data/family_day.csv")
+# Append-history files worth showing row by row after a reading. STATUS.md,
+# live_orders.csv and latest_response.json are full rewrites, so a line diff
+# on them is noise, not news.
+TRACKER_ROWS = ("data/rewards.csv", "data/checks.csv", "data/estimate_runs.csv",
+                "data/family_day.csv", "data/estimates.csv")
+TRACKER_ROWS_MAX = int(os.environ.get("TRACKER_ROWS_MAX", "60"))
 TRACKER_PUSH = ("STATUS.md", "data/rewards.csv", "data/checks.csv",
                 "data/estimates.csv", "data/estimate_runs.csv",
                 "data/family_day.csv", "data/live_orders.csv",
@@ -295,9 +301,41 @@ def _tracker_once() -> str:
             p = APP_DIR / path
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text(txt)
+    # What each append-history file held BEFORE the run, so the button can
+    # show the rows this reading actually added — parsed into columns but
+    # otherwise untouched (owner, 2026-08-16: "all I want to see is newly
+    # added rows parsed but otherwise raw"). Compared as a set of lines, not
+    # by index, so a file that is rewritten rather than appended still yields
+    # only the genuinely new rows.
+    before: dict[str, set] = {}
+    for path in TRACKER_ROWS:
+        p_ = APP_DIR / path
+        try:
+            before[path] = set(p_.read_text().splitlines())
+        except Exception:  # noqa: BLE001
+            before[path] = set()
     proc = subprocess.run([sys.executable, str(APP_DIR / "track_rewards.py")],
                           cwd=str(APP_DIR), capture_output=True, text=True,
                           timeout=1800)
+    added: dict[str, dict] = {}
+    budget = TRACKER_ROWS_MAX
+    for path in TRACKER_ROWS:
+        if budget <= 0:
+            break
+        try:
+            lines = (APP_DIR / path).read_text().splitlines()
+        except Exception:  # noqa: BLE001
+            continue
+        if not lines:
+            continue
+        seen = before.get(path) or set()
+        fresh = [l for l in lines[1:] if l and l not in seen][:budget]
+        if not fresh:
+            continue
+        budget -= len(fresh)
+        added[path] = {"header": lines[0][:400],
+                       "rows": [l[:400] for l in fresh]}
+    TRACKER_STATUS["new_rows"] = added
     tail = " ".join(((proc.stdout or "") + " " + (proc.stderr or "")).split())[-300:]
     files = {}
     for path in TRACKER_PUSH:
@@ -1330,6 +1368,7 @@ class Monitor:
                     "every_s": TRACKER_INTERVAL,
                     "age_s": (int(time.time() - TRACKER_STATUS["ok_ts"])
                               if TRACKER_STATUS.get("ok_ts") else None),
+                    "new_rows": TRACKER_STATUS.get("new_rows") or {},
                 },
                 "persistence": (
                     f"github — SAVES FAILING ({SAVE_STATUS['err']})"
@@ -3369,12 +3408,22 @@ def auto_snipe() -> None:
         if qty <= 0 or spent + px * qty > SNIPE_MAX_SPEND:
             continue
         _SNIPE_LAST[m] = now
+        # SELL THE STOCK WE HOLD BEFORE OPENING A SHORT. This always opened a
+        # short, even in markets where we were already long — and a short ties
+        # up (1 - price) per share of buying power while an inventory sale ties
+        # up nothing at all. Same trade, same price, one of them free. It also
+        # means the sniper and the flipper now draw on ONE pool of stock
+        # instead of the sniper quietly shorting beside inventory the flipper
+        # was trying to sell (owner, 2026-08-16).
+        net_ = tr._num((MONITOR.positions.get(m) or {}).get("netPosition")) or 0
+        snipe_intent = ("ORDER_INTENT_SELL_LONG" if net_ >= qty
+                        else "ORDER_INTENT_BUY_SHORT")
         try:
             r = requests.request(
                 "POST", tr.TRADE_API + "/v1/orders",
                 headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
                          "Content-Type": "application/json"},
-                json={"marketSlug": m, "intent": "ORDER_INTENT_BUY_SHORT",
+                json={"marketSlug": m, "intent": snipe_intent,
                       "type": "ORDER_TYPE_LIMIT",
                       "price": {"value": f"{px:.2f}", "currency": "USD"},
                       "quantity": qty,                     # may be fractional
@@ -3383,7 +3432,11 @@ def auto_snipe() -> None:
                 timeout=20)
             ok = r.status_code < 300
             ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
-                            "market": m, "side": "SNIPE sell", "from": "—",
+                            "market": m,
+                            "side": ("SNIPE sell (inventory)"
+                                     if snipe_intent.endswith("SELL_LONG")
+                                     else "SNIPE sell (short)"),
+                            "from": "—",
                             "to": round(px * 100, 1), "size": qty,
                             "status": r.status_code,
                             "response": " ".join(r.text.split())[:120],
@@ -5609,6 +5662,36 @@ def auto_earn() -> None:
                     MONITOR.state.setdefault("earn_rung", {})[m] = 0
                 _earn_log(m, "rung reset", px / 100.0, qty,
                           f"filled at {px:.0f}¢ — back to {EARN_START_SHARES} shares here")
+            # PULL THE REST OF OUR ORDERS IN THIS MARKET (owner, 2026-08-16:
+            # "if someone fills me, might as well pull the rest, and then
+            # evaluate"). One fill says a taker was willing to come to our
+            # price; our other rungs here are sitting at prices no better
+            # informed than the one that just got hit, and leaving them out
+            # is choosing to be filled again before we have learned anything.
+            #
+            # Only the EARNER'S OWN orders — the qualifier's floor bids, the
+            # keeper's rungs and anything placed by hand are not its to judge.
+            # The prober is deliberately left alone and is NOT locked out by
+            # this (fill_ts is set on prober fills only), so it can go and
+            # find out what is actually moving while the earner stands off.
+            for oid2, rec2 in list(_EARN["orders"].items()):
+                if rec2[0] != m:
+                    continue
+                try:
+                    requests.request(
+                        "POST", tr.TRADE_API + f"/v1/order/{oid2}/cancel",
+                        headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST",
+                                                   f"/v1/order/{oid2}/cancel"),
+                                 "Content-Type": "application/json"},
+                        json={"marketSlug": m}, timeout=15)
+                    _EARN["cancelled"].add(oid2)
+                    _EARN["orders"].pop(oid2, None)
+                    (_EARN.get("grad") or set()).discard(oid2)
+                    _earn_log(m, "pulled after fill", rec2[2] / 100.0, rec2[3],
+                              f"a taker came to {px:.0f}¢ here — standing the rest "
+                              "down too until the prober says what is moving")
+                except Exception:  # noqa: BLE001 — never kill the poll
+                    pass
             sv2 = _silver_fair(m)
             if sv2 is not None and px > sv2 + EARN_SILVER_MARGIN:
                 _EARN["last"][m] = now + 86400
@@ -11341,6 +11424,48 @@ function trackChanges(a, b){
          '', null);
   return out;
 }
+// THE ROWS THE READING ADDED, parsed into columns and otherwise untouched
+// (owner: "all I want to see is newly added rows parsed but otherwise raw.
+// Then I can click a button and see a summary"). Raw is the default view; the
+// interpretation is one tap away and never in the way.
+function trackRawRows(t){
+  const files = (t && t.new_rows) || {};
+  const names = Object.keys(files);
+  if(!names.length) return '';
+  let out = '';
+  names.forEach(function(f){
+    const blk = files[f] || {};
+    const head = String(blk.header || '').split(',');
+    const rows = blk.rows || [];
+    if(!rows.length) return;
+    out += '<div style="margin-top:10px"><div class="sub" style="font-weight:600">'
+        + esc(f) + ' &mdash; ' + rows.length + ' new row'
+        + (rows.length === 1 ? '' : 's') + '</div>'
+        + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;'
+        + 'font-size:11.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace">'
+        + '<tr>' + head.map(function(h){
+            return '<th style="text-align:left;padding:3px 6px;white-space:nowrap;'
+                 + 'color:var(--dim,#93a0b4);font-weight:600">' + esc(h) + '</th>'; }).join('')
+        + '</tr>'
+        + rows.map(function(r){
+            return '<tr>' + String(r).split(',').map(function(c){
+              return '<td style="padding:3px 6px;white-space:nowrap;border-top:1px solid '
+                   + 'var(--line,#3a4454)">' + esc(c) + '</td>'; }).join('') + '</tr>';
+          }).join('')
+        + '</table></div></div>';
+  });
+  return out;
+}
+var TRACK_SUMMARY = '';
+function trackToggleSummary(){
+  const el = document.getElementById('trackSum');
+  if(!el) return;
+  const open = el.style.display !== 'none' && el.innerHTML;
+  el.style.display = open ? 'none' : 'block';
+  el.innerHTML = open ? '' : TRACK_SUMMARY;
+  const b = document.getElementById('trackSumBtn');
+  if(b) b.textContent = open ? 'Show summary' : 'Hide summary';
+}
 function trackShowDiff(html){
   const el = document.getElementById('trackDiff');
   if(!el) return;
@@ -11413,10 +11538,21 @@ async function trackWatch(){
         }
         const took = Math.round((Date.now() - TRACK_T0) / 1000);
         const rows = trackChanges(TRACK_SNAP, trackSnap(d));
-        if(rows.length){
-          trackSay('updated in ' + took + 's \u2014 ' + rows.length
-                   + (rows.length === 1 ? ' change:' : ' changes:'));
-          trackShowDiff(rows.join(''));
+        const raw = trackRawRows(t);
+        TRACK_SUMMARY = rows.join('');
+        if(raw || rows.length){
+          const nrows = Object.keys((t.new_rows) || {}).reduce(
+            function(n, f){ return n + ((t.new_rows[f].rows || []).length); }, 0);
+          trackSay('read in ' + took + 's \u2014 '
+                   + (nrows ? nrows + ' new row' + (nrows === 1 ? '' : 's')
+                            : 'no new rows written')
+                   + (rows.length ? ' \u00b7 ' + rows.length + ' figure'
+                       + (rows.length === 1 ? '' : 's') + ' moved' : ''));
+          trackShowDiff(raw
+            + (rows.length ? '<button id="trackSumBtn" class="tab" '
+                 + 'style="margin-top:10px;font-size:12px" '
+                 + 'onclick="trackToggleSummary()">Show summary</button>'
+                 + '<div id="trackSum" style="display:none;margin-top:6px"></div>' : ''));
         }else{
           // nothing moved: say so, then get out of the way
           trackSay('checked in ' + took + 's \u2014 nothing has changed');
