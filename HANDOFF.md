@@ -93,6 +93,26 @@ reasoning ahead of the data).
   goes into a pending list the owner approves or denies by hand. Needs its
   own /map switch (nothing places orders without one), a resolution-date
   parse per market, a buying-power reserve, and an approve/deny queue.
+
+  Owner settled the open questions 2026-08-16: watch out for PRIMARIES,
+  which carry a distinct slug, and it is fine to hold the ~$200 qualifiers
+  aside for manual approval.
+
+  Classification is written and verified against the live program list —
+  172 auto, 9 to approval:
+    * primary = slug contains usgubp / ussep / ushrp / uspresp. Catches all
+      9, including the two vsc-usgubp Florida vote-share markets that carry
+      no date at all.
+    * far-dated = a full YYYY-MM-DD in the slug at 2026-11 or later, ELSE a
+      bare 4-digit year >= 2027. The bare-year branch matters: the 31 2028
+      nomination slugs have no YYYY-MM-DD, only "2028", and a naive date
+      parse sends the most obviously far-dated markets on the board to the
+      approval queue.
+    * auto covers 60 of the 2028 slate, 46 senate, 42 governor, 19 seat
+      ladders; the 9 needing approval are all primaries (OK governor, FL
+      house, MA and NH senate, FL vote-share).
+  Still to build: the switch, the cost estimate per side, the spend cap
+  that routes ~$200-class jobs to the queue, and the approve/deny UI.
 - **Negative risk.** Owner wants the concept incorporated — remind them.
   In a mutually exclusive event set, holding No on every outcome (or Yes
   across a complete set) caps the downside, because at most one can
