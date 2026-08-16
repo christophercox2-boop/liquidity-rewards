@@ -3907,6 +3907,21 @@ EARN_VANISH_COOLDOWN = float(os.environ.get("EARN_VANISH_COOLDOWN", "1800"))
 # Same idea for an order we pulled ourselves: it was not earning, so the market
 # should wait its turn behind untried ones rather than being re-entered at once.
 EARN_WITHDRAW_COOLDOWN = float(os.environ.get("EARN_WITHDRAW_COOLDOWN", "3600"))
+# Continual search. The scarce resource is DOLLARS, not slots — the earner can
+# hold EARN_TOTAL_USD of worst case and no more — so once it is close to full,
+# a mediocre order that merely clears the entry test would otherwise squat on
+# capital forever while better markets go untried. Every half hour at capacity,
+# the worst few by yield are abandoned to free the money for somewhere better
+# (owner, 2026-08-16: "there should be a continual search to try and find
+# something better; if we get full on earners, periodically take the three or
+# four worst and abandon them").
+#
+# Ranked by earnings per dollar committed, not by raw $/day: the cap is a
+# dollar budget, so a small order earning well is worth more of it than a big
+# one earning slightly more in absolute terms.
+EARN_ROTATE_EVERY = float(os.environ.get("EARN_ROTATE_EVERY", "1800"))
+EARN_ROTATE_N = int(os.environ.get("EARN_ROTATE_N", "3"))
+EARN_FULL_FRAC = float(os.environ.get("EARN_FULL_FRAC", "0.85"))
 EARN_MAX_PER_POLL = 4
 EARN_COOLDOWN = 300.0
 _EARN: dict = {"orders": {}, "last": {}, "cancelled": set(), "pending": {}}
@@ -4054,6 +4069,37 @@ def auto_earn() -> None:
                           f"earning ${est:.2f}/d — payback beyond 4 days; "
                           "moving on for an hour")
             except Exception:  # noqa: BLE001
+                pass
+    # Rotation: at capacity, abandon the worst few so the search can continue.
+    # Skips anything inside the scoring grace — a fresh order has no rate yet
+    # and would rank bottom purely for being new.
+    if (now - float(_EARN.get("rot_ts") or 0) >= EARN_ROTATE_EVERY
+            and _earn_outstanding_usd() >= EARN_FULL_FRAC * EARN_TOTAL_USD):
+        _EARN["rot_ts"] = now
+        ranked = []
+        for oid, (m, side, px, qty, ts) in _EARN["orders"].items():
+            if now - ts < 600:
+                continue
+            o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
+            est = float((o or {}).get("est_day") or 0)
+            usd = px / 100.0 * qty
+            ranked.append((est / usd if usd > 0 else 0.0, oid, m, px, qty, est))
+        ranked.sort(key=lambda r: r[0])
+        for yld, oid, m, px, qty, est in ranked[:EARN_ROTATE_N]:
+            try:
+                requests.request(
+                    "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
+                    headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST",
+                                               f"/v1/order/{oid}/cancel"),
+                             "Content-Type": "application/json"},
+                    json={"marketSlug": m}, timeout=15)
+                _EARN["cancelled"].add(oid)
+                del _EARN["orders"][oid]
+                _EARN["last"][m] = now + EARN_WITHDRAW_COOLDOWN - EARN_COOLDOWN
+                _earn_log(m, "rotated", px / 100.0, qty,
+                          f"worst of the book at ${est:.2f}/d on ${px/100.0*qty:.2f} "
+                          f"({yld*100:.1f}%/day) — freeing the capital to look elsewhere")
+            except Exception:  # noqa: BLE001 — rotation never kills the poll
                 pass
     # place where the model is confident and we hold nothing yet
     placed = 0
