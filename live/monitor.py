@@ -3407,6 +3407,9 @@ PROBE_FILL_COOLDOWN = float(os.environ.get("PROBE_FILL_COOLDOWN", "5400"))
 # nearer the bid touch rests and earns. Weighting the draw toward the safe half
 # buys information more slowly and much more cheaply than a uniform draw.
 PROBE_SAFE_BIAS = float(os.environ.get("PROBE_SAFE_BIAS", "0.7"))
+# How far a candidate price must sit from the Silver forecast before the model
+# decides which side we take rather than the coin.
+PROBE_SILVER_EDGE = float(os.environ.get("PROBE_SILVER_EDGE", "2"))
 # Per market between new scouts. At 300s a market took over ten minutes to
 # collect its three scouts; at 90s it takes three, so a market gets bracketed
 # while its book still looks the way it did when the first scout went in.
@@ -3749,7 +3752,31 @@ def auto_probe() -> None:
         fund = float(MONITOR.state.get("probe_budget") or 0.0)
         resting_buys = sum(r[2] for r in _PROBE["active"].values() if r[1] == "BUY")
         can_buy = px <= PROBE_MAX_PX and resting_buys + px <= fund
-        if can_sell and can_buy:
+        # THE MODEL PICKS THE SIDE WHEN IT HAS A VIEW. A random tick in the gap
+        # is fine when we know nothing, but bidding 54c for a contract Silver
+        # puts at 0.4c is not a probe, it is a donation — and it is certain to
+        # be taken, because the other side of that trade is free money (owner,
+        # 2026-08-16: "just go on the other side if the gap is that big, it's
+        # better to be on the side with an edge").
+        #
+        # Above the forecast we want to be SELLING, below it BUYING. If the
+        # edge is on a side we cannot take — no inventory to sell, or no fund
+        # to buy — we skip the market rather than take the losing side of our
+        # own analysis.
+        svp = _silver_fair(m)
+        want = None
+        if svp is not None:
+            if px * 100 > svp + PROBE_SILVER_EDGE:
+                want = "SELL"
+            elif px * 100 < svp - PROBE_SILVER_EDGE:
+                want = "BUY"
+        if want == "SELL" and can_sell:
+            side = "SELL"
+        elif want == "BUY" and can_buy:
+            side = "BUY"
+        elif want is not None:
+            continue              # edge is on a side we cannot take — leave it
+        elif can_sell and can_buy:
             side = "BUY" if random.random() < 0.5 else "SELL"
         elif can_sell:
             side = "SELL"
