@@ -4218,7 +4218,16 @@ def auto_earn() -> None:
                             if o.get("market") == m_
                             and str(o.get("intent") or "").endswith("SELL_LONG"))
             queued = sum(j[2] for j in (_EARN.get("toflip") or []) if j[0] == m_)
-            need = int(min(outstanding, held - committed - queued))
+            # Flips ALREADY RESTING count against what still needs flipping.
+            # Without this, `outstanding` only fell when a flip actually SOLD,
+            # so in a market where we hold a big position for other reasons the
+            # position bound never bit and the same 60 shares were re-queued
+            # every poll: 361 shares of ask piled up against 60 the earner had
+            # bought, selling the owner's own inventory out from under them.
+            resting_fl = sum(r[2] for r in (_EARN.get("flips") or {}).values()
+                             if r[0] == m_)
+            need = int(min(outstanding - resting_fl - queued,
+                           held - committed - queued))
             if need >= 1:
                 _EARN.setdefault("toflip", []).append([m_, topc, need, now])
                 newflips.append((m_, topc, need))
@@ -4320,8 +4329,15 @@ def auto_earn() -> None:
         if pos_ is None:
             continue          # an absent reading is not a zero position
         net_ = tr._num(pos_.get("netPosition")) or 0
+        # A flip may sell only what a fill forced on us, and only what we own.
+        # The second bound alone was not enough: where the owner holds a large
+        # position anyway, asks far beyond anything the earner bought looked
+        # perfectly affordable, and were quietly liquidating that position.
+        led_ = MONITOR.state.get("earn_ledger") or {}
+        owed_ = (sum(v[2] for v in led_.values() if v[0] == fm_ and v[3])
+                 - sum(v[2] for v in led_.values() if v[0] == fm_ and not v[3]))
         mine_ = [(o_, r_) for o_, r_ in (_EARN.get("flips") or {}).items() if r_[0] == fm_]
-        excess = sum(r_[2] for _, r_ in mine_) - net_
+        excess = sum(r_[2] for _, r_ in mine_) - max(0.0, min(net_, owed_))
         if excess <= 0:
             continue
         for o_, r_ in sorted(mine_, key=lambda x: -x[1][3]):
@@ -4337,7 +4353,8 @@ def auto_earn() -> None:
                 _EARN["flips"].pop(o_, None)
                 excess -= r_[2]
                 _earn_log(fm_, "flip pulled", r_[1] / 100.0, int(r_[2]),
-                          f"would have sold {int(excess + r_[2])} more than we hold")
+                          f"selling {int(excess + r_[2])} more than the "
+                          f"{int(max(0.0, min(net_, owed_)))} a fill actually left us")
             except Exception:  # noqa: BLE001
                 pass
     # Flip out anything that filled. Retried each poll until the position
