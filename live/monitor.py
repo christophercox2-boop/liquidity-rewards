@@ -5541,6 +5541,15 @@ MAP_HTML = """<!doctype html><html><head><meta charset="utf-8">
 :root{--bg:#1a202b;--surface:#232b38;--surface2:#2b3442;--line:#3a4454;--ink:#eef2f7;
 --dim:#93a0b4;--good:#34c07c;--bad:#e5645f;--warn:#d9a132;--accent:#5aa2ff;--r:14px}
 *{box-sizing:border-box}
+/* /map is the control surface — tiles, order actions, switches. /lab carries
+   the prober and earner read-outs, which are analysis, not controls. One
+   template serves both so the renderers and the /map.json payload stay
+   single-copy; the route decides which sections are on screen. */
+body.lab #gridCard,body.lab #listCard,body.lab #det,body.lab #chips,
+body.lab .autorow,body.lab #navLab{display:none!important}
+body:not(.lab) #probeCard,body:not(.lab) #earnCard{display:none!important}
+body.lab #navMap{display:inline-block!important}
+.navrow{margin:14px 0 4px;display:flex;gap:10px;flex-wrap:wrap}
 body{margin:0;background:var(--bg);color:var(--ink);
 font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 padding:14px 12px 40px;-webkit-text-size-adjust:100%}
@@ -5693,7 +5702,7 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
   </div>
   <div class="banner" id="banner" style="display:none"></div>
   <div class="chips" id="chips"></div>
-  <div class="card">
+  <div class="card" id="gridCard">
     <div class="grid" id="grid"></div>
     <div class="leg">
       <span><i style="background:var(--bad)"></i>fix now</span>
@@ -5715,10 +5724,16 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     color:var(--dim);margin-bottom:6px">💰 Earner — model-confident bids</div>
     <div id="earnBody"></div>
   </div>
-  <div class="card">
+  <div class="card" id="listCard">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--dim);margin-bottom:6px">Needs attention</div>
     <div id="list"></div>
+  </div>
+  <div class="navrow">
+    <button class="alt" id="navLab" onclick="location.href='/lab'">
+      🔬 Prober &amp; Earner</button>
+    <button class="alt" id="navMap" onclick="location.href='/map'"
+      style="display:none">🗺 Back to the map</button>
   </div>
 </div>
 <script>
@@ -5741,6 +5756,11 @@ const RANK = {conflict:0, notpaying:1, idle:2, gap:3, ok:4};
 const LABEL = {conflict:"fix now", notpaying:"not paying", idle:"low estimate",
                gap:"not entered", ok:"fine"};
 let DATA=null, SEL=null, FILTER=null, SHOWGAPS=false;
+// Which route is this? /lab shows the prober and earner read-outs; /map keeps
+// the control surface uncluttered. Set before the first paint so neither page
+// flashes the other's sections.
+const LAB = location.pathname.indexOf('/lab') === 0;
+if (LAB) { document.body.classList.add('lab'); document.title = 'Prober & Earner'; }
 
 function hdrs(){ const h=new Headers(); h.set('X-Dash-Key', localStorage.getItem('dashKey')||''); return h; }
 function saveKey(){ localStorage.setItem('dashKey', document.getElementById('k').value); load(); }
@@ -6390,6 +6410,7 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  <button onclick="showTab('S')">↔️ Spreads</button>
  <button onclick="showTab('E')">🏛 Seats</button>
  <button onclick="location.href='/map'">🗺 Map</button>
+ <button onclick="location.href='/lab'">🔬 Prober &amp; Earner</button>
 </div>
 <div id="viewE" style="display:none">
 <div class="sub">Seat-count ladders — House &amp; Senate, in seat order</div>
@@ -8314,9 +8335,12 @@ class Handler(BaseHTTPRequestHandler):
             # The page's own login card gates the data underneath.
             self._send(200, "text/html; charset=utf-8", DASH_HTML.encode())
             return
-        if self.path.startswith("/map") and not self.path.startswith("/map.json"):
+        if ((self.path.startswith("/map") and not self.path.startswith("/map.json"))
+                or self.path.startswith("/lab")):
             # shell only, no data — same pattern as "/": the page's own login
-            # card gates everything underneath it
+            # card gates everything underneath it. /lab is the same shell on a
+            # different route: the prober and earner read-outs are analysis and
+            # do not belong on the control surface (owner, 2026-08-16).
             self._send(200, "text/html; charset=utf-8", MAP_HTML.encode())
             return
         if self.path.startswith("/garden"):
