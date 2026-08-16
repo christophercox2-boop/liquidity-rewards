@@ -3975,6 +3975,9 @@ EARN_VANISH_COOLDOWN = float(os.environ.get("EARN_VANISH_COOLDOWN", "1800"))
 # money at RISK — a flip is money already spent, coming back.
 EARN_FLIP_TICKS = int(os.environ.get("EARN_FLIP_TICKS", "2"))
 EARN_FLIP_RETRY = float(os.environ.get("EARN_FLIP_RETRY", "1800"))
+# Ceiling on one market's flip order, so a mis-read position can never turn
+# into an enormous ask in a single step.
+EARN_FLIP_MAX_SHARES = int(os.environ.get("EARN_FLIP_MAX_SHARES", "400"))
 # GRADUATION. The point of the earner is to find where the money is, not to
 # sit on the first thing it finds — but an order that has PROVED it earns and
 # stays put should not keep occupying the search budget while it does so
@@ -4220,8 +4223,9 @@ def auto_earn() -> None:
                 a[1] += q_
         newflips = []
         for m_, (bq, sq, topc) in want.items():
-            outstanding = bq - sq
-            if outstanding < 1:
+            # any recorded buy makes this a market the earner put stock in;
+            # the SIZE comes from the position below, never from this count
+            if bq < 1:
                 continue
             pos_ = MONITOR.positions.get(m_)
             if pos_ is None:
@@ -4237,10 +4241,15 @@ def auto_earn() -> None:
             # position bound never bit and the same 60 shares were re-queued
             # every poll: 361 shares of ask piled up against 60 the earner had
             # bought, selling the owner's own inventory out from under them.
-            resting_fl = sum(r[2] for r in (_EARN.get("flips") or {}).values()
-                             if r[0] == m_)
-            need = int(min(outstanding - resting_fl - queued,
-                           held - committed - queued))
+            # THE POSITION IS THE TRUTH, NOT THE LEDGER. The ledger only knows
+            # fills it happened to see: it was introduced part-way through the
+            # night and rebuilds from a rolling feed, so it read 60 shares in a
+            # market where the earner had actually bought 364. Capping flips by
+            # it pulled 301 shares of correct asks off stock we were still
+            # holding. What we hold, less the inventory asks already standing
+            # against it, is the honest figure — and because `committed`
+            # includes those asks, this converges instead of re-queueing.
+            need = int(min(held - committed - queued, EARN_FLIP_MAX_SHARES))
             if need >= 1:
                 _EARN.setdefault("toflip", []).append([m_, topc, need, now])
                 newflips.append((m_, topc, need))
@@ -4331,8 +4340,39 @@ def auto_earn() -> None:
                       "exchange-side cancel — still holding the stock")
             _EARN.setdefault("toflip", []).append([fm, fpxc - EARN_FLIP_TICKS, fq, now])
             continue
+        # EVIDENCE, not just money. A flip that sells means a real buyer was
+        # willing to pay that price, which is exactly what a sell scout goes
+        # looking for — and this one cost nothing to run and was far bigger
+        # than the prober's one-share probes, so it is better evidence than
+        # anything the prober can buy (owner, 2026-08-16, asking for it).
+        with MONITOR.lock:
+            e_ = MONITOR.state.setdefault("probe", {}).setdefault(fm, {})
+            e_["traded_at_ask"] = fpxc / 100.0
+            e_["last_fill"] = {"side": "SELL", "px": fpxc / 100.0,
+                               "ts": dt.datetime.now(ET).strftime("%m-%d %I:%M %p")}
+        _probe_log(fm, "round trip", "SELL", fpxc / 100.0,
+                   f"the earner's flip of {fq} sold here — a real buyer at this price")
         _earn_log(fm, "recovered", fpxc / 100.0, fq,
                   f"sold the {fq} back at {fpxc:.0f}¢ — position closed")
+    # A flip that has rested a long time without a taker says fair value is
+    # BELOW its price, the same thing the prober learns from a sell scout
+    # ageing out — and this one is free and much larger. Recorded once per
+    # market per price so a long-lived flip does not shout.
+    for foid, (fm2, fpc2, fq2, fts2) in list((_EARN.get("flips") or {}).items()):
+        if now - fts2 < PROBE_TTL:
+            continue
+        with MONITOR.lock:
+            e2 = MONITOR.state.setdefault("probe", {}).setdefault(fm2, {})
+            prev = e2.get("rested_ask")
+            if prev is None or fpc2 / 100.0 < prev - 1e-9:
+                e2["rested_ask"] = fpc2 / 100.0
+                fresh_ = True
+            else:
+                fresh_ = False
+        if fresh_:
+            _probe_log(fm2, "rested", "SELL", fpc2 / 100.0,
+                       f"the earner's flip of {int(fq2)} held here with no buyer")
+
     # Self-correct an over-sold market: if our inventory asks exceed what we
     # actually hold, pull the newest until they do not. Cancelling here only
     # ever REDUCES exposure, and leaves the oldest flip — the one nearest the
@@ -4346,11 +4386,10 @@ def auto_earn() -> None:
         # The second bound alone was not enough: where the owner holds a large
         # position anyway, asks far beyond anything the earner bought looked
         # perfectly affordable, and were quietly liquidating that position.
-        led_ = MONITOR.state.get("earn_ledger") or {}
-        owed_ = (sum(v[2] for v in led_.values() if v[0] == fm_ and v[3])
-                 - sum(v[2] for v in led_.values() if v[0] == fm_ and not v[3]))
+        # Bounded by the POSITION only. Bounding by the ledger's idea of what
+        # we bought was the mistake that pulled good asks off held stock.
         mine_ = [(o_, r_) for o_, r_ in (_EARN.get("flips") or {}).items() if r_[0] == fm_]
-        excess = sum(r_[2] for _, r_ in mine_) - max(0.0, min(net_, owed_))
+        excess = sum(r_[2] for _, r_ in mine_) - max(0.0, net_)
         if excess <= 0:
             continue
         for o_, r_ in sorted(mine_, key=lambda x: -x[1][3]):
@@ -4367,7 +4406,7 @@ def auto_earn() -> None:
                 excess -= r_[2]
                 _earn_log(fm_, "flip pulled", r_[1] / 100.0, int(r_[2]),
                           f"selling {int(excess + r_[2])} more than the "
-                          f"{int(max(0.0, min(net_, owed_)))} a fill actually left us")
+                          f"{int(max(0.0, net_))} we hold")
             except Exception:  # noqa: BLE001
                 pass
     # Flip out anything that filled. Retried each poll until the position
