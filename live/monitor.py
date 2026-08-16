@@ -4672,8 +4672,17 @@ def market_info(slug: str) -> tuple[int, dict]:
         book = tr._fetch_book(slug)
     except Exception as e:  # noqa: BLE001
         return 502, {"error": f"book unavailable: {type(e).__name__}: {e}"[:200]}
-    mine = [{k: o.get(k) for k in ("id", "side", "price", "size", "est_day", "verdict")}
+    mine = [{k: o.get(k) for k in ("id", "side", "price", "size", "est_day",
+                                   "verdict", "created", "manual")}
             for o in MONITOR.orders if o.get("market") == slug]
+    # Which of our loops placed it, where we know. The prober and earner keep
+    # registries by order id; everything else is either the owner's own tap
+    # (the exchange flags those MANUAL) or one of the placement loops.
+    for o in mine:
+        oid = str(o.get("id") or "")
+        o["src"] = ("prober" if oid in _PROBE["active"] else
+                    "earner" if oid in _EARN["orders"] else
+                    "you" if o.get("manual") == "MANUAL" else "")
     net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
     return 200, {"market": slug, "tick": book.get("tick") or 0.01,
                  "bids": [[p, q] for p, q in (book.get("bids") or [])[:6]],
@@ -7566,13 +7575,26 @@ function renderSheet(d){
   // chunks on some markets — fold behind a single count-and-size line.
   const isQual = o => (o.side === 'BUY' && o.price <= 0.015)
                    || (o.side !== 'BUY' && o.price >= 0.985);
+  // How long this order has been resting. A reprice replaces the order, so a
+  // small age can mean "the defender just moved an old rung", not "new money".
+  const age = iso => {
+    if (!iso) return '';
+    const s = (Date.now() - Date.parse(iso)) / 1000;
+    if (!isFinite(s) || s < 0) return '';
+    if (s < 90) return Math.round(s)+'s ago';
+    if (s < 5400) return Math.round(s/60)+'m ago';
+    if (s < 172800) return (s/3600).toFixed(s < 36000 ? 1 : 0)+'h ago';
+    return Math.round(s/86400)+'d ago';
+  };
   const mkOrd = o =>
     '<details class="osub"><summary style="cursor:pointer;display:flex;align-items:center;gap:10px;list-style:none">'+
     '<input type="checkbox" class="mck" data-oid="'+o.id+'" onchange="mSelUpd()" '+
     'onclick="event.stopPropagation()" style="width:22px;height:22px;flex:0 0 auto">'+
     '<span style="font-size:14px;font-weight:600">'+o.side+' '+o.size.toLocaleString()+' @ '+
     (+(o.price*100).toFixed(2))+'¢ <span class="sub" style="font-weight:400">· '+
-    (o.est_day ? '$'+o.est_day.toFixed(2)+'/day' : '$0/day')+'</span></span>'+
+    (o.est_day ? '$'+o.est_day.toFixed(2)+'/day' : '$0/day')+
+    (age(o.created) ? ' · placed '+age(o.created) : '')+
+    (o.src ? ' · '+o.src : '')+'</span></span>'+
     '<span class="sub" style="margin-left:auto">▾</span></summary>'+
     '<div class="ctlrow" style="margin-top:8px">'+
     '<span class="ctl"><label>price</label><input id="mp'+o.id+'" type="number" step="0.1" min="0.1" max="99.9" value="'+(o.price*100).toFixed(1)+'"><span class="sub">¢</span></span>'+
