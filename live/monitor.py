@@ -1306,7 +1306,16 @@ class Monitor:
                        "state": WS_STATUS["state"],
                        "err": WS_STATUS["err"]},
                 "actions": ACTIONS[-10:][::-1],
-                "trades": self.trades[:60],
+                # Every fill carries WHOSE order it was. Owner, 2026-08-16:
+                # "I'm getting fills but don't know if they are from the earner
+                # or others — I'm tempted to just cancel all my orders so I can
+                # be sure." Cancelling everything to identify a fill is an
+                # expensive way to ask a question the feed can already answer,
+                # so each loop keeps the ids it placed and the answer is
+                # attached here. Registries are cleared when an order retires,
+                # so this reads the durable id sets, not the live registries.
+                "trades": [{**t, "src": _fill_src(str(t.get("oid") or ""))}
+                           for t in self.trades[:60]],
                 "drops": self._drops(),
                 "winners": self._missed_winners(),
                 "new_mkts": (self.state.get("new_mkts") or [])[::-1],
@@ -3434,6 +3443,8 @@ def _probe_place(m: str, side: str, px: float, intent: str, note: str) -> str | 
                       or j.get("id") or j.get("orderId")
             except Exception:  # noqa: BLE001
                 pass
+        if ok and oid:
+            _own_id("probe", str(oid))
         ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
                         "market": m, "side": f"PROBE {note}", "from": "—",
                         "to": round(px * 100, 1), "size": PROBE_SIZE,
@@ -3928,6 +3939,31 @@ _EARN: dict = {"orders": {}, "last": {}, "cancelled": set(), "pending": {}}
 EARN_CONFIRM_WAIT = 300.0    # fills feed lag allowance before "vanished"
 
 
+def _own_id(bucket: str, oid: str) -> None:
+    """Remember that `bucket` (earn/probe) placed this order id, for as long as
+    it might turn up in the fills feed. Kept in state so the answer survives a
+    rebuild, and capped so it cannot grow without bound."""
+    if not oid:
+        return
+    with MONITOR.lock:
+        ids = MONITOR.state.setdefault("loop_ids", {}).setdefault(bucket, [])
+        ids.append(str(oid))
+        del ids[:-3000]
+
+
+def _fill_src(oid: str) -> str:
+    """Which of our loops placed the order behind a fill — '' if none did,
+    which means it was one of the resting rungs or a hand-placed order."""
+    if not oid:
+        return ""
+    li = MONITOR.state.get("loop_ids") or {}
+    if oid in _EARN["orders"] or oid in set(li.get("earn") or []):
+        return "earner"
+    if oid in _PROBE["active"] or oid in set(li.get("probe") or []):
+        return "prober"
+    return ""
+
+
 def _fill_confirmed(oid: str) -> bool:
     """Is this order id in the exchange's own trade records? Disappearance
     from the open-order list is NOT a fill — the exchange silently cancels
@@ -4230,6 +4266,7 @@ def auto_earn() -> None:
             _EARN["last"][m] = now
             if ok and oid:
                 _EARN["orders"][str(oid)] = (m, "BUY", tgt, qty, now)
+                _own_id("earn", str(oid))
                 _earn_log(m, "placed", px, qty,
                           f"{tier}: est ${est:.2f}/d vs ${px*qty:.2f} worst case "
                           f"(band {b['lo']}–{b['hi']}¢, {b['fills']}t/{b.get('rested',0)}r)")
@@ -7693,9 +7730,16 @@ function renderHome(d){
              n+' <b>'+esc(t.yesno || '')+'</b>'+px+
              (t.pnl ? '<br><span class="'+(t.pnl > 0 ? 'pos' : 'neg')+'">'+
                (t.pnl > 0 ? 'profit +$' : 'loss −$')+Math.abs(t.pnl).toFixed(2)+'</span>' : '');
+      // whose order this was — the whole point of the question "is this the
+      // earner or something else"; blank means one of the resting rungs
+      const src = t.src ? '<span style="font-size:10px;padding:1px 5px;border-radius:4px;'+
+            'background:'+(t.src === 'earner' ? 'rgba(90,162,255,.18);color:#9cc7ff'
+                                              : 'rgba(217,161,50,.20);color:#f2cd7f')+
+            '">'+esc(t.src)+'</span> '
+          : '<span class="sub" style="font-size:10px">resting order</span> ';
       return mrow(t.market,
         '<td class="r">'+line+'</td>',
-        '<span class="sub" style="font-size:11px">'+esc(t.when || '')+'</span>');
+        src+'<span class="sub" style="font-size:11px">'+esc(t.when || '')+'</span>');
     }).join('') + (tx.length > 25 ? '<tr><td class="sub">+' + (tx.length - 25) + ' more</td></tr>' : '')
     : '<tr><td class="sub">no fills since you last cleared ✓</td></tr>';
   document.getElementById('drops').innerHTML = (d.drops || []).length ?
