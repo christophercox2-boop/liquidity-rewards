@@ -1,8 +1,4 @@
 checked_at_utc,market,est_day
-2026-08-16 02:35:19,ewc-usp-2028-11-07-thomas,1.7875
-2026-08-16 02:35:19,vsc-usgubp-fl-fshbck-atl-30pct,0.4792
-2026-08-16 02:35:19,scc-senate-gop-2026-11-03-gte57,0.3651
-2026-08-16 02:35:19,ewc-usse-ia-2026-11-03-dem,0.5904
 2026-08-16 02:35:19,enwc-uspres-nom-rep-2028-rondes,3.2822
 2026-08-16 02:35:19,ussewc-usse-or-2026-11-03-rep,0.5682
 2026-08-16 02:35:19,ewc-usse-ne-2026-11-03-rep,0.3744
@@ -29999,3 +29995,7 @@ checked_at_utc,market,est_day
 2026-08-16 14:18:51,ewc-usp-2028-11-07-tuccar,15.6248
 2026-08-16 14:18:51,ewc-usp-2028-11-07-jossha,0.0311
 2026-08-16 14:18:51,scc-senate-gop-2026-11-03-51,0.0001
+2026-08-16 14:22:29,usgubewc-usgub-pa-2026-11-03-dem,0.0148
+2026-08-16 14:22:29,enwc-uspres-nom-dem-2028-jonste,0.0139
+2026-08-16 14:22:29,ewc-usp-2028-11-07-andbes,0.0032
+2026-08-16 14:22:29,scc-senate-gop-2026-11-03-51,0.0003
