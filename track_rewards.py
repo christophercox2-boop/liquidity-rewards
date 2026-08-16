@@ -323,6 +323,12 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         verdict += f" ≈ {_usd(order['est_day'])}/day"
         n = max(prog.get("pool_n") or prog.get("event_n") or 1, 1)
         order["event_n"] = n
+        # both scope hypotheses recorded until a clean payout day picks one:
+        # the exchange's program sheet says 'Daily (per event)' while Aug-14
+        # actuals fit program-wide almost exactly. scope_x converts this
+        # order's (conservative, program-wide) estimate back to per-event.
+        if prog.get("pool_n"):
+            order["scope_x"] = round(prog["pool_n"] / max(prog.get("event_n") or 1, 1), 2)
         order["siblings"] = prog.get("siblings") or []
         days = _pool_days(prog, slug)
         if n > 1:
@@ -1272,10 +1278,13 @@ def append_estimates(live_orders: list[dict]) -> None:
         if "usgub" in m: return "governor"
         return "other"
     fam_tot: dict[str, float] = {}
+    fam_pe: dict[str, float] = {}     # per-event scope (the docs' reading)
     for o in live_orders:
         if o.get("est_day"):
             f = _fam(o["market"])
-            fam_tot[f] = fam_tot.get(f, 0.0) + float(o["est_day"])
+            v = float(o["est_day"])
+            fam_tot[f] = fam_tot.get(f, 0.0) + v
+            fam_pe[f] = fam_pe.get(f, 0.0) + v * float(o.get("scope_x") or 1.0)
     FAMDAY = DATA / "family_day.csv"
     frows = []
     if FAMDAY.exists():
@@ -1283,10 +1292,12 @@ def append_estimates(live_orders: list[dict]) -> None:
             frows = list(csv.DictReader(f))
     for fam_name, v in sorted(fam_tot.items()):
         frows.append({"checked_at_utc": ts, "family": fam_name,
-                      "est_day": f"{v:.2f}"})
+                      "est_day": f"{v:.2f}",
+                      "est_day_perevent": f"{fam_pe.get(fam_name, v):.2f}"})
     frows = frows[-5000:]
     with FAMDAY.open("w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["checked_at_utc", "family", "est_day"])
+        w = csv.DictWriter(f, fieldnames=["checked_at_utc", "family",
+                                          "est_day", "est_day_perevent"])
         w.writeheader(); w.writerows(frows)
 
 
@@ -1472,12 +1483,14 @@ def write_status(
     # for winners, ~1-5% for the party pair, while every pre-existing family
     # still reconciles ~100%. Until a full clean day (Aug 15) pins the true
     # divisor, the slate's estimates below are flagged, not trusted.
-    lines.append("> ⚠️ **2028-slate pool bug found and fixed 2026-08-16**: the "
-                 "dedicated presidential program funds ALL 60 markets from ONE "
-                 "$1,000 pool, but each event was counted as having its own — "
-                 "inflating slate estimates ~4x overall (30x on the party pair). "
-                 "Corrected per-side is ~$8.33/day. Slate history before this "
-                 "line ran hot; the Aug-15 payout is the verification.")
+    lines.append("> ⚠️ **2028-slate pool scope is UNRESOLVED — estimates shown "
+                 "CONSERVATIVELY (program-wide, ~$8.33/side/day).** The "
+                 "exchange's program sheet says 'Daily (per event)' ($1,000 per "
+                 "event, ~4x more), but Aug-14 actuals fit program-wide almost "
+                 "exactly. If the docs are right, the gap means bait-anchored "
+                 "touches are collecting pools this tracker credits to us. Both "
+                 "readings are logged (family_day.csv); the Aug-15 payout — "
+                 "predictions 4x apart — decides.")
     lines.append("")
 
     # ---- the answer up top; all supporting detail lives below the divider ----
