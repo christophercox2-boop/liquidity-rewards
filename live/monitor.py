@@ -5276,7 +5276,7 @@ EARN_RUNG_MAX = int(os.environ.get("EARN_RUNG_MAX", "3"))
 # only do it when the allowance is a multiple of what is resting, and never
 # more than a couple a poll.
 EARN_UPSIZE_RATIO = float(os.environ.get("EARN_UPSIZE_RATIO", "3"))
-EARN_UPSIZE_PER_POLL = int(os.environ.get("EARN_UPSIZE_PER_POLL", "2"))
+EARN_UPSIZE_PER_POLL = int(os.environ.get("EARN_UPSIZE_PER_POLL", "6"))
 # Price climbs the same ladder: the band's 10th percentile at the bottom rung,
 # its median at the next, its top only once a market has held twice. A flat
 # 10c ceiling was far too dear for longshots the model puts at two to eight.
@@ -5596,6 +5596,9 @@ EARN_ROTATE_EVERY = float(os.environ.get("EARN_ROTATE_EVERY", "1800"))
 EARN_ROTATE_N = int(os.environ.get("EARN_ROTATE_N", "3"))
 EARN_FULL_FRAC = float(os.environ.get("EARN_FULL_FRAC", "0.85"))
 EARN_MAX_PER_POLL = 4
+# The preferred board's own placement allowance, kept separate from the
+# line above so the two boards never queue behind one another.
+EARN_PREF_PER_POLL = int(os.environ.get("EARN_PREF_PER_POLL", "6"))
 # Rotation frees capital on a timer whether or not anything better is waiting.
 # Displacement is the other half: when the budget is full and a candidate is
 # worth far more per dollar than the weakest holding, the capital moves at
@@ -7406,9 +7409,20 @@ def auto_earn() -> None:
                  for o in MONITOR.orders}
     displaced = 0
     _EARN["waiting"] = []
+    # TWO PER-POLL ALLOWANCES, NOT ONE. The preferred board is off the dollar
+    # budget already; sharing a four-a-poll placement slot with the 2026 races
+    # put it back on a queue anyway. Measured 2026-08-17: 32 of the 59 markets
+    # on the 2028 board had no order at all. Preferred entries now draw on
+    # their own count, so a full 2026 poll cannot hold them up, and a full
+    # 2028 poll cannot hold up the races (owner: "move a little quicker").
+    placed_pref = 0
     for cand in scored:
-        if placed >= EARN_MAX_PER_POLL:
-            break
+        pref_c = _preferred(cand["m"]) and EARN_PREF_OFF_BUDGET
+        if (placed_pref if pref_c else placed) >= (EARN_PREF_PER_POLL if pref_c
+                                                   else EARN_MAX_PER_POLL):
+            if placed >= EARN_MAX_PER_POLL and placed_pref >= EARN_PREF_PER_POLL:
+                break
+            continue
         m, est, tgt, qty = cand["m"], cand["est"], cand["tgt"], cand["qty"]
         b, conf, scan, tier = cand["b"], cand["conf"], cand["scan"], cand["tier"]
         side_ = cand.get("side", "BUY")
@@ -7548,7 +7562,10 @@ def auto_earn() -> None:
                           f"= ${cand['yield']*100:.1f}/day per $100 at risk "
                           f"(band {b['lo']}–{b['hi']}¢, {b['fills']}t/{b.get('rested',0)}r, "
                           f"confidence {conf['score']:.2f} {conf['verdict']}{stand}){note}")
-                placed += 1
+                if pref_c:
+                    placed_pref += 1
+                else:
+                    placed += 1
         except Exception:  # noqa: BLE001 — the earner must never kill the poll
             continue
     # An ask that stopped being true has to leave the card. The loop above only
