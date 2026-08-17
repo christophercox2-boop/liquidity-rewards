@@ -6548,12 +6548,35 @@ def auto_earn() -> None:
                 with MONITOR.lock:
                     asked[askk] = now
                 bidc = round(float(bids3[0][0]) * 100)
+                # THE ASK NEEDS SOMEWHERE TO BE ANSWERED (owner, 2026-08-17:
+                # "this is working but I don't see where to go to accept this
+                # proposal"). It had none: ntfy carries no buttons, and the
+                # advice it gave — "move it to bid+1" — was usually a no-op,
+                # because a flip laddered down to the market's floor is ALREADY
+                # resting at bid+1. That is the point it is stuck at.
+                #
+                # Selling into the bid cannot be done by moving a resting
+                # order at all: an ask at the bid price crosses, and every
+                # order this app places is post-only, so the exchange would
+                # reject it. It takes the one deliberately aggressive path,
+                # take_close, which is why it is the owner's decision and why
+                # it now goes on a queue with a button rather than into a
+                # notification that cannot be acted on.
+                with MONITOR.lock:
+                    MONITOR.state.setdefault("sell_queue", {})[askk] = {
+                        "m": fm3, "qty": int(fq3), "cost_c": round(cost3, 1),
+                        "resting_c": round(fpc3, 1), "bid_c": bidc,
+                        "loss_c": round(cost3 - bidc, 1),
+                        "loss_usd": round((cost3 - bidc) / 100.0 * int(fq3), 2),
+                        "asked": now}
                 notify("Sell below fair to raise cash?",
                        f"{fm3}: {int(fq3)} held, cost {cost3:.0f}c, resting "
                        f"{fpc3:.0f}c and earning nothing for a day. Best bid "
-                       f"{bidc}c. Fund ${float(MONITOR.state.get('probe_budget') or 0):.0f}, "
+                       f"{bidc}c — taking it loses "
+                       f"${(cost3 - bidc) / 100.0 * int(fq3):.2f}. "
+                       f"Fund ${float(MONITOR.state.get('probe_budget') or 0):.0f}, "
                        f"buying power ${MONITOR.buying_power or 0:.0f}. "
-                       f"Move it to {bidc + 1}c on /map to take it.",
+                       f"Open /map — it is waiting under 'Sell below fair?'.",
                        "high")
                 _earn_log(fm3, "asked to sell low", fpc3 / 100.0, int(fq3),
                           f"cash is short and this has not earned in a day — "
@@ -8351,6 +8374,37 @@ def do_maction(body: dict) -> tuple[int, dict]:
         del ACTIONS[:-20]
         POLL_KICK.set()   # save + payload refresh promptly
         return 200, {"ok": True, "which": which, "on": on}
+    if op == "sell":
+        # The owner's answer to a "sell below fair?" ask. Approve TAKES the
+        # standing bid — the one path in this app that is not post-only, which
+        # is exactly why it needs a person to say so. The client sends the key
+        # and the decision, never a size or a price: both come from the queued
+        # job and the live book, so a stale phone cannot sell more than was
+        # asked about.
+        key = str(body.get("key") or "")
+        act_ = str(body.get("act") or "")
+        with MONITOR.lock:
+            job = (MONITOR.state.get("sell_queue") or {}).get(key)
+        if not job:
+            return 400, {"ok": False, "error": "unknown or already-handled ask"}
+        if act_ == "deny":
+            with MONITOR.lock:
+                (MONITOR.state.get("sell_queue") or {}).pop(key, None)
+            _earn_log(job["m"], "sale declined", job["resting_c"] / 100.0,
+                      int(job["qty"]), "owner said no — it keeps resting")
+            POLL_KICK.set()
+            return 200, {"ok": True, "note": "left alone, still resting"}
+        if act_ != "approve":
+            return 400, {"ok": False, "error": "act must be approve or deny"}
+        code, res = take_close(str(job["m"]), int(job["qty"]))
+        if res.get("ok"):
+            with MONITOR.lock:
+                (MONITOR.state.get("sell_queue") or {}).pop(key, None)
+            _earn_log(job["m"], "sold below fair", job["bid_c"] / 100.0,
+                      int(job["qty"]),
+                      f"owner approved taking the {job['bid_c']:.0f}¢ bid — "
+                      f"about ${job['loss_usd']:.2f} against cost")
+        return code, res
     if op == "rescout":
         # Make the preferred families eligible for a fresh scout RIGHT NOW.
         # The prober skips a market for PROBE_COOLDOWN after it last looked,
@@ -8505,7 +8559,7 @@ def do_maction(body: dict) -> tuple[int, dict]:
         return 200, {"ok": True}
     return 400, {"ok": False,
                  "error": "op must be place, modify, cancel, qualify, qual, "
-                          "budget, fair, rescout, defend or undefend"}
+                          "budget, fair, rescout, sell, defend or undefend"}
 
 
 # ---------------------------------------------------------------------------
@@ -9022,6 +9076,9 @@ def _map_payload() -> dict:
         "beat": {**(MONITOR.state.get("beat") or {}),
                  "age_s": int(time.time() - float((MONITOR.state.get("beat") or {})
                                                   .get("ts") or 0))},
+        "sell_queue": sorted(
+            ({"key": k, **v} for k, v in (MONITOR.state.get("sell_queue") or {}).items()),
+            key=lambda j: -float(j.get("loss_usd") or 0)),
         "qual_queue": sorted(
             ({"key": k, **v} for k, v in (MONITOR.state.get("qual_queue") or {}).items()),
             key=lambda j: -float(j.get("cost") or 0)),
@@ -9278,6 +9335,11 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     </div>
   </div>
   <div class="card det" id="det" style="display:none"></div>
+  <div class="card" id="sellCard" style="display:none">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--dim);margin-bottom:6px">💸 Sell below fair? — waiting on you</div>
+    <div id="sellBody"></div>
+  </div>
   <div class="card" id="qualCard" style="display:none">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--dim);margin-bottom:6px">⚓ Qualifying — waiting on you</div>
@@ -9477,7 +9539,7 @@ function renderInner(){
   // used to leave every route stuck on "loading..." with no clue why — and
   // the clue only existed in a console the owner has no way to open on a
   // phone. Each is isolated now, and a failure names itself on screen.
-  [['qualify', renderQual], ['slate', renderSlate],
+  [['sell', renderSell], ['qualify', renderQual], ['slate', renderSlate],
    ['prober', renderProbe], ['earner', renderEarn]]
     .forEach(([nm, fn]) => {
       try { fn(); }
@@ -9693,6 +9755,45 @@ async function dplace(){
   if(g){ g.disabled = false; g.textContent = 'Place'; }
   say(r.ok ? ('placed — ' + r.msg) : ('failed — ' + r.msg));
   if(r.ok) setTimeout(() => openMkt(DSLUG), 1500);
+}
+
+function renderSell(){
+  const card = document.getElementById('sellCard'); if(!card) return;
+  const rows = DATA.sell_queue || [];
+  if(!rows.length){ card.style.display='none'; return; }
+  card.style.display='block';
+  const tot = rows.reduce((t,r)=>t+(r.loss_usd||0),0);
+  document.getElementById('sellBody').innerHTML =
+    '<div class="sub" style="margin-bottom:6px">' + rows.length + ' position' +
+    (rows.length===1?' that has not':'s that have not') + ' earned in a day, with cash short. ' +
+    'Approving TAKES the standing bid — the one thing here that is not ' +
+    'post-only, so it sells immediately at a loss against what we paid. ' +
+    'Total if you approve them all: <b>$' + tot.toFixed(2) + '</b>.</div>' +
+    rows.map(r =>
+      '<div style="border-top:1px solid var(--line);padding:7px 0">' +
+      '<div style="display:flex;align-items:baseline;gap:6px">' +
+      '<b style="font-size:13px;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;' +
+      'white-space:nowrap">' + esc((DATA.labels||{})[r.m] || r.m) + '</b>' +
+      '<span style="font-size:13px;font-weight:700;color:#ff9d99">−$' +
+      (r.loss_usd||0).toFixed(2) + '</span></div>' +
+      '<div class="sub" style="font-size:10.5px;margin:1px 0 5px">' +
+      (r.qty||0).toLocaleString() + ' held · cost ' + (r.cost_c||0).toFixed(0) +
+      '¢ · resting ' + (r.resting_c||0).toFixed(0) + '¢ · best bid <b>' +
+      (r.bid_c||0).toFixed(0) + '¢</b> — moving the ask cannot reach it, ' +
+      'taking the bid can</div>' +
+      '<div class="ctlrow rp"><button onclick="sellAct(&#39;' + esc(r.key) +
+      '&#39;,&#39;approve&#39;)">Sell ' + (r.qty||0).toLocaleString() +
+      ' at ' + (r.bid_c||0).toFixed(0) + '¢</button>' +
+      '<button class="alt" onclick="sellAct(&#39;' + esc(r.key) +
+      '&#39;,&#39;deny&#39;)">Keep it</button></div></div>').join('');
+}
+
+async function sellAct(key, decision){
+  if(decision === 'approve' &&
+     !confirm('Take the standing bid? This sells immediately at a loss.')) return;
+  const r = await act({op:'sell', key:key, act:decision});
+  alert(r.ok ? ('done — ' + r.msg) : ('failed — ' + r.msg));
+  load();
 }
 
 function renderQual(){

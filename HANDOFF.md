@@ -1333,3 +1333,29 @@ helpers. Every one was fixed by exec'ing the REAL function from source into the
 namespace, never by stubbing it. `t_offbudget.py` also read as an exemption leak
 until the victims were given a real `est_day` — with `MONITOR.orders` empty
 every holding yields 0 and any candidate displaces it.
+
+### 2026-08-17 — "Sell below fair?" now has somewhere to be answered
+
+Owner: "this is working but I don't see where to go to accept this proposal."
+There was nowhere. The ntfy carried no buttons, and the advice it gave — "move
+it to bid+1¢ on /map" — was a NO-OP in the exact case that triggers the alert:
+a flip that has laddered down to the market's floor is already resting at
+bid+1. That is the price it is stuck at.
+
+**The reason it is stuck is worth knowing.** An ask AT the bid price crosses,
+and every order this app places is post-only, so the exchange rejects it.
+Moving a resting order can never reach the bid. Only `take_close` can — the one
+deliberately aggressive, non-post-only path in the app. That is why this is a
+decision and not a loop, and why the alert needed a button rather than better
+wording.
+
+`state["sell_queue"]` now holds each ask (market, qty, cost, resting price, best
+bid, and the dollar loss against cost). `/map` renders it as a "💸 Sell below
+fair?" card above the qualification card, with a button that names the size and
+the price — "Sell 120 at 40¢" — and a "Keep it". `op: "sell"` takes only the key
+and approve/deny: the size and price come from the queued job and the live book,
+so a stale phone cannot sell more than was asked about. A failed take leaves the
+ask on the queue rather than dropping it silently.
+
+The notification now says what taking the bid costs and points at /map instead
+of naming a price to move to.
