@@ -124,9 +124,33 @@ NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "").strip()
 NTFY_SERVER = os.environ.get("NTFY_SERVER", "https://ntfy.sh").rstrip("/")
 
 
-def notify(title: str, message: str, priority: str = "default") -> None:
+# The same alert, over and over, is not more information — it is less. Any
+# repeating condition sent one push per poll until now: a refused upsize put
+# six identical alerts on the owner's phone in three minutes (2026-08-17,
+# "don't need a notification every minute"). Identical title+message is held
+# for NOTIFY_REPEAT; anything genuinely new still goes straight through.
+NOTIFY_REPEAT = float(os.environ.get("NOTIFY_REPEAT", "1800"))
+_NOTIFY_SEEN: dict = {}
+
+
+def notify(title: str, message: str, priority: str = "default",
+           dedupe: bool = True) -> None:
     if not NTFY_TOPIC:
         return
+    if dedupe:
+        key = f"{title}|{message}"
+        now_ = time.time()
+        # "never sent" is ABSENT, not zero. Treating it as a timestamp of 0
+        # means the first alert only escapes because the epoch happens to be
+        # a big number — true today, and a silent first-alert drop the moment
+        # anything hands this a small clock.
+        last_ = _NOTIFY_SEEN.get(key)
+        if last_ is not None and now_ - float(last_) < NOTIFY_REPEAT:
+            return
+        _NOTIFY_SEEN[key] = now_
+        for k_ in [k for k, t_ in _NOTIFY_SEEN.items()
+                   if now_ - t_ > NOTIFY_REPEAT * 4]:
+            del _NOTIFY_SEEN[k_]
     try:
         requests.request(
             "POST", f"{NTFY_SERVER}/{NTFY_TOPIC}", data=message.encode(),
@@ -2739,7 +2763,7 @@ def do_cancel_all() -> tuple[int, dict]:
 
 
 def do_reprice(order_id: str, price_cents: float, verify: bool = True,
-               quantity: int | None = None) -> tuple[int, dict]:
+               quantity: int | None = None, quiet: bool = False) -> tuple[int, dict]:
     """Move one of OUR resting orders to a new price — WITHOUT /modify.
 
     The exchange's modify endpoint is cancel-and-replace, and since the
@@ -2854,8 +2878,13 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
                               if keep_both else
                               f"replacement did not rest ({note}) — original untouched;"
                               + (orphan or " no id to withdraw"))
-            notify("Reprice replacement did not rest",
-                   f"{o['market']} → {price_cents}¢: {note}", "high")
+            # quiet=True for housekeeping callers. A failed reprice the OWNER
+            # asked for is worth a phone alert; the earner's own upsize retrying
+            # a market is not, and it sent one a minute on the same market
+            # until asked to stop (2026-08-17).
+            if not quiet:
+                notify("Reprice replacement did not rest",
+                       f"{o['market']} → {price_cents}¢: {note}", "high")
             return 502, {"ok": False, "status": r.status_code,
                          "detail": (record["note"] if keep_both else note)[:250]}
         # 3) only now retire the original
@@ -5305,6 +5334,9 @@ EARN_RUNG_MAX = int(os.environ.get("EARN_RUNG_MAX", "3"))
 # more than a couple a poll.
 EARN_UPSIZE_RATIO = float(os.environ.get("EARN_UPSIZE_RATIO", "3"))
 EARN_UPSIZE_PER_POLL = int(os.environ.get("EARN_UPSIZE_PER_POLL", "6"))
+# How long to leave a market alone after a refused upsize. The order that is
+# already there keeps working; only the attempt to grow it stands down.
+EARN_UPSIZE_BACKOFF = float(os.environ.get("EARN_UPSIZE_BACKOFF", "3600"))
 # Price climbs the same ladder: the band's 10th percentile at the bottom rung,
 # its median at the next, its top only once a market has held twice. A flat
 # 10c ceiling was far too dear for longshots the model puts at two to eight.
@@ -7238,6 +7270,8 @@ def auto_earn() -> None:
             continue
         if now - ts < EARN_RUNG_AFTER or oid not in open_ids:
             continue
+        if now < float((_EARN.get("upsize_off") or {}).get(m) or 0):
+            continue                      # refused recently; leave it be
         o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
         if not o or float(o.get("est_day") or 0) <= 0:
             continue
@@ -7253,11 +7287,18 @@ def auto_earn() -> None:
                          conf["qmul"])
         if want < qty * EARN_UPSIZE_RATIO:
             continue
-        code_, res_ = do_reprice(oid, float(px), quantity=int(want))
+        code_, res_ = do_reprice(oid, float(px), quantity=int(want), quiet=True)
         if code_ != 200:
+            # STAND OFF, DO NOT RETRY. Without this the pass re-attempts the
+            # same market every poll: the order is still on the book, still
+            # earning, still under its cap, so it qualifies again immediately.
+            # That loop sent the owner an alert a minute on one market.
+            _EARN.setdefault("upsize_off", {})[m] = now + EARN_UPSIZE_BACKOFF
             _earn_log(m, "upsize failed", px / 100.0, qty,
                       f"{int(qty)} -> {want} refused: "
-                      f"{str(res_.get('detail') or res_.get('error'))[:90]}")
+                      f"{str(res_.get('detail') or res_.get('error'))[:90]} — "
+                      f"leaving it alone for "
+                      f"{EARN_UPSIZE_BACKOFF / 3600:.0f}h")
             ups += 1
             continue
         ups += 1
