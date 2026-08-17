@@ -354,6 +354,18 @@ summary button. `_tracker_once` diffs each append-history file as a SET of
 lines (not by index) before and after the run, so a file that is rewritten
 rather than appended still yields only genuinely new rows.
 
+REWARDS ONLY (owner, 2026-08-17: "the only rewards I care about for the
+button is the rewards.csv. Just run the program to update that"). The button
+no longer runs the full pass. `_rewards_once` refreshes data/rewards.csv
+alone: it seeds from main so the diff is against the COMMITTED state, calls
+`tr.fetch_all_rewards` (one authenticated endpoint, no book fetching, no
+STATUS.md rebuild), writes with the real `write_rewards_csv`, and commits ONLY
+when rows actually changed — a push with no new rows is noise. Seconds instead
+of a minute or two. The hourly wake still runs the full `_tracker_once`; the
+loop tells them apart because `Event.wait()` returns True when the flag was
+SET and False on timeout, and that has to be captured at the wait, since the
+flag is cleared before the pass runs.
+
 NO CAP (owner, 2026-08-17: "I'll need a lot more than 60 lines. I'll want to
 see whatever is added no matter how long"). Neither the row count nor the line
 length is limited — a shortened line is not the raw row. That is exactly why

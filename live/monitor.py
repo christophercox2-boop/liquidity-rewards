@@ -233,11 +233,12 @@ TRACKER_ENABLED = os.environ.get("TRACKER_IN_MONITOR", "1") != "0"
 APP_DIR = Path(__file__).resolve().parent.parent
 TRACKER_SEED = ("data/estimates.csv", "data/checks.csv", "data/estimate_runs.csv",
                 "data/family_day.csv")
-# Append-history files worth showing row by row after a reading. STATUS.md,
-# live_orders.csv and latest_response.json are full rewrites, so a line diff
-# on them is noise, not news.
-TRACKER_ROWS = ("data/rewards.csv", "data/checks.csv", "data/estimate_runs.csv",
-                "data/family_day.csv", "data/estimates.csv")
+# The button reads REWARDS ONLY (owner, 2026-08-17: "the only rewards I care
+# about for the button is the rewards.csv. Just run the program to update
+# that"). That file is built purely from /v1/incentives/earnings — no book
+# fetching, no STATUS.md rebuild — so this is seconds rather than the minute
+# or two a full pass takes, and the hourly loop still does everything else.
+TRACKER_ROWS = ("data/rewards.csv",)
 TRACKER_PUSH = ("STATUS.md", "data/rewards.csv", "data/checks.csv",
                 "data/estimates.csv", "data/estimate_runs.csv",
                 "data/family_day.csv", "data/live_orders.csv",
@@ -357,13 +358,69 @@ def _tracker_once() -> str:
     return "" if proc.returncode == 0 else (f"tracker exit {proc.returncode}: {tail}")[:250]
 
 
+def _rewards_once() -> str:
+    """Refresh data/rewards.csv ALONE and push it. What the button runs.
+
+    rewards.csv is the paid/pending history and comes from one authenticated
+    endpoint, so there is no reason to walk every market's order book and
+    rebuild STATUS.md to find out whether Polymarket has posted anything new.
+    Returns "" on success or a short error.
+    """
+    path = "data/rewards.csv"
+    p = APP_DIR / path
+    # start from what main holds, so the diff is against the committed state
+    # rather than against whatever this container happened to write last
+    txt = _gh_text(path, ref="main")
+    if txt:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(txt)
+    try:
+        before = set(p.read_text().splitlines())
+    except Exception:  # noqa: BLE001
+        before = set()
+    try:
+        rows, _raw = tr.fetch_all_rewards(KEY_ID, SECRET_KEY)
+    except Exception as e:  # noqa: BLE001
+        return f"{type(e).__name__}: {e}"[:250]
+    if not rows:
+        return "the earnings endpoint returned no rows"
+    tr.write_rewards_csv(rows)
+    lines = p.read_text().splitlines()
+    fresh = [l for l in lines[1:] if l and l not in before]
+    TRACKER_STATUS["new_rows"] = ({path: {"header": lines[0], "rows": fresh}}
+                                  if fresh else {})
+    if fresh:
+        err = _tracker_commit({path: p.read_bytes()})
+        if err:
+            return err[:250]
+    # the paid-days table is what this file feeds
+    try:
+        winners, rew_total, day_paid = load_winners()
+        if winners:
+            global WINNERS
+            WINNERS = winners
+        MONITOR.day_paid = day_paid
+        if rew_total:
+            MONITOR.note_rewards_total(rew_total)
+    except Exception:  # noqa: BLE001
+        pass
+    return ""
+
+
 def tracker_loop() -> None:
     time.sleep(120)            # let the poll loop warm its caches first
+    # Event.wait() returns True when the flag was SET and False on timeout, so
+    # it tells us whether the next pass was asked for by hand. It has to be
+    # captured there and carried into the loop, because the flag is cleared
+    # before the pass runs — checking is_set() inside would always be False.
+    by_hand = False
     while True:
         if TRACKER_ENABLED and GITHUB_TOKEN:
             TRACKER_STATUS["running"] = True
+            # A button press refreshes rewards.csv only; the hourly wake still
+            # runs the full pass that rebuilds STATUS.md and the estimates.
             try:
-                err = _tracker_once()
+                err = _rewards_once() if by_hand else _tracker_once()
             except Exception as e:  # noqa: BLE001 — the loop must survive anything
                 err = f"{type(e).__name__}: {e}"[:200]
             finally:
@@ -387,7 +444,7 @@ def tracker_loop() -> None:
                     pass
         # Interruptible wait: /track_now sets TRACKER_KICK and the next run
         # starts immediately instead of at the end of the hour.
-        TRACKER_KICK.wait(TRACKER_INTERVAL)
+        by_hand = TRACKER_KICK.wait(TRACKER_INTERVAL)
         TRACKER_KICK.clear()
 
 
@@ -9634,7 +9691,7 @@ the position. Markets whose spread has closed below 3 ticks are skipped.</div>
 <button id="trackBtn" onclick="trackNow()"
  style="width:100%;min-height:52px;font-size:16px;font-weight:700;border:none;
  border-radius:12px;background:var(--accent,#5aa2ff);color:#0b1220">
-↻ Refresh my rewards now</button>
+↻ Check for new rewards</button>
 <div id="trackBar" style="display:none;height:8px;border-radius:4px;
  margin-top:8px;background:rgba(255,255,255,.10);overflow:hidden">
 <i id="trackFill" style="display:block;height:100%;width:35%;border-radius:4px;
@@ -11611,7 +11668,7 @@ async function trackNow(){
   trackShowDiff('');
   trackBar(true);
   trackBtn('Reading\u2026', false);
-  trackSay('asking the exchange for a fresh reading\u2026');
+  trackSay('asking Polymarket for the reward history\u2026');
   try{
     const h = {'Content-Type':'application/json','X-Reprice':'1'};
     try{ const k = localStorage.getItem('dashKey'); if(k) h['X-Dash-Key'] = k; }catch(_){}
@@ -11619,14 +11676,14 @@ async function trackNow(){
     const j = await r.json().catch(() => ({}));
     if(!r.ok || !j.ok){
       trackBar(false);
-      trackBtn('\u21bb Refresh my rewards now', true);
+      trackBtn('\u21bb Check for new rewards', true);
       trackSay(esc(j.error || ('HTTP ' + r.status)), true);
       return;
     }
     if(j.already) trackSay('a reading was already running — waiting for it…');
   }catch(e){
     trackBar(false);
-    trackBtn('\u21bb Refresh my rewards now', true);
+    trackBtn('\u21bb Check for new rewards', true);
     trackSay('could not reach the monitor \u2014 ' + esc((e && e.message) || e), true);
     return;
   }
@@ -11644,7 +11701,7 @@ async function trackWatch(){
       if(t.runs > TRACK_BASE){
         clearInterval(TRACK_POLL); TRACK_POLL = null;
         trackBar(false);
-        trackBtn('\u21bb Refresh my rewards now', true);
+        trackBtn('\u21bb Check for new rewards', true);
         renderAll(d);
         if(t.err){
           trackSay('the reading failed \u2014 ' + esc(t.err), true);
@@ -11660,8 +11717,8 @@ async function trackWatch(){
           const nrows = Object.keys(counts).reduce(
             function(n, f){ return n + (counts[f] || 0); }, 0);
           trackSay('read in ' + took + 's \u2014 '
-                   + (nrows ? nrows.toLocaleString() + ' new row' + (nrows === 1 ? '' : 's')
-                            : 'no new rows written')
+                   + (nrows ? nrows.toLocaleString() + ' new reward row' + (nrows === 1 ? '' : 's')
+                            : 'no new reward rows')
                    + (rows.length ? ' \u00b7 ' + rows.length + ' figure'
                        + (rows.length === 1 ? '' : 's') + ' moved' : ''));
           trackShowDiff(raw
@@ -11671,7 +11728,7 @@ async function trackWatch(){
                  + '<div id="trackSum" style="display:none;margin-top:6px"></div>' : ''));
         }else{
           // nothing moved: say so, then get out of the way
-          trackSay('checked in ' + took + 's \u2014 nothing has changed');
+          trackSay('checked in ' + took + 's \u2014 no new reward rows');
           TRACK_HIDE = setTimeout(function(){
             trackSay(''); trackShowDiff(''); TRACK_HIDE = null; }, 6000);
         }
@@ -11682,26 +11739,26 @@ async function trackWatch(){
   if(secs > 240){
     clearInterval(TRACK_POLL); TRACK_POLL = null;
     trackBar(false);
-    trackBtn('\u21bb Refresh my rewards now', true);
+    trackBtn('\u21bb Check for new rewards', true);
     trackSay('still running after 4 minutes — it will finish on its own and '
              + 'the page will pick it up', true);
     return;
   }
-  trackSay('reading\u2026 ' + secs + 's (a full pass takes a minute or two)');
+  trackSay('checking rewards\u2026 ' + secs + 's');
 }
 function trackIdle(d){
   if(TRACK_POLL) return;                      // a run is in flight; leave it
   const t = (d && d.tracker) || {};
   if(!t.enabled){
-    trackBtn('\u21bb Refresh my rewards now', false);
+    trackBtn('\u21bb Check for new rewards', false);
     trackSay('the in-monitor tracker is off, so this button cannot read', true);
     return;
   }
-  if(t.running){ trackSay('a scheduled reading is running now…'); return; }
+  if(t.running){ trackSay('a reading is running now…'); return; }
   const mins = t.age_s == null ? null : Math.round(t.age_s / 60);
   trackSay(t.err ? 'last reading failed — ' + esc(t.err)
-           : mins == null ? 'no reading yet this session'
-           : 'last reading ' + (mins < 1 ? 'under a minute' : mins + ' min') + ' ago',
+           : mins == null ? 'no check yet this session'
+           : 'last full reading ' + (mins < 1 ? 'under a minute' : mins + ' min') + ' ago',
            !!t.err);
 }
 async function refresh(){
