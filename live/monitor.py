@@ -3666,6 +3666,7 @@ PROBE_REAL_MIN = 5.0          # book levels smaller than this are bait — ignor
 PREFER_PREFIXES = tuple(
     p.strip() for p in os.environ.get(
         "PREFER_PREFIXES",
+        "erac-usgubp-ak-adv-,"
         "enwc-uspres-nom-dem-2028-,enwc-uspres-nom-rep-2028-,"
         "ewc-usp-2028-11-07-,ewc-usp-party-2028-11-07-").split(",") if p.strip())
 
@@ -5240,7 +5241,7 @@ EARN_MAX_USD = float(os.environ.get("EARN_MAX_USD", "6.0"))
 # ceilings, the deal test, the Silver and owner-fair caps and the Target Size
 # check all still apply — this changes how much money may sit behind them, not
 # whether they run.
-EARN_PREF_USD = float(os.environ.get("EARN_PREF_USD", "15.0"))
+EARN_PREF_USD = float(os.environ.get("EARN_PREF_USD", "5.0"))
 # ...and it grows with confidence, up to this multiple of the initial.
 EARN_PREF_GROW = float(os.environ.get("EARN_PREF_GROW", "3.0"))
 EARN_PREF_OFF_BUDGET = os.environ.get("EARN_PREF_OFF_BUDGET", "1") != "0"
@@ -5277,6 +5278,10 @@ EARN_RUNG_MAX = int(os.environ.get("EARN_RUNG_MAX", "3"))
 # more than a couple a poll.
 EARN_UPSIZE_RATIO = float(os.environ.get("EARN_UPSIZE_RATIO", "3"))
 EARN_UPSIZE_PER_POLL = int(os.environ.get("EARN_UPSIZE_PER_POLL", "6"))
+# What the scope card prices: a block at the floor, the size the owner named
+# for the Alaska longshots (2026-08-17). Scope only — nothing places this.
+SCOPE_BID_C = float(os.environ.get("SCOPE_BID_C", "1"))
+SCOPE_BID_QTY = float(os.environ.get("SCOPE_BID_QTY", "10000"))
 # Price climbs the same ladder: the band's 10th percentile at the bottom rung,
 # its median at the next, its top only once a market has held twice. A flat
 # 10c ceiling was far too dear for longshots the model puts at two to eight.
@@ -5288,6 +5293,98 @@ def _earn_rung(m: str) -> int:
 
 def _earn_rung_size(m: str) -> int:
     return int(EARN_START_SHARES * (EARN_RUNG_MULT ** _earn_rung(m)))
+
+
+def _block_scope(m: str, px_c: float, qty: float, side: str = "BUY") -> dict:
+    """What a BLOCK order would do to one side of one book, before placing it.
+
+    The owner's Alaska play (2026-08-17): "scope out where it is likely safe to
+    bid 10,000 shares on the long shots at 1 cent just to get the other side of
+    the book. As long as a candidate hasn't dropped out, they have a chance."
+
+    A side holding less than Target Size pays NOBODY, so on an unloved market
+    a block at the floor can qualify a dead side single-handed and take almost
+    all of it. This answers, per market: does the side qualify without us, does
+    it qualify WITH us, what share would we hold, and what is the worst case.
+    It places nothing.
+    """
+    out = {"m": m, "px": px_c, "qty": qty, "side": side, "ok": False, "why": ""}
+    pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
+    ent = tr._BOOK_CACHE.get(m)
+    target = float(pr.get("target") or 0)
+    per = (float(pr.get("pool") or 0)
+           / max(int(pr.get("event_n") or pr.get("pool_n") or 1), 1) / 2)
+    df = float(pr.get("df") or 0.2)
+    out.update({"target": target, "per_side": round(per, 2)})
+    if not target or per <= 0:
+        out["why"] = "no reward program on this market"
+        return out
+    if not ent or time.time() - ent[0] > 300:
+        out["why"] = "no book snapshot from the last 5 minutes"
+        return out
+    bk = ent[1] or {}
+    bids = [(round(p_ * 100), q_) for p_, q_ in (bk.get("bids") or [])]
+    asks = [(round(p_ * 100), q_) for p_, q_ in (bk.get("asks") or [])]
+    ours_side = bids if side == "BUY" else asks
+    other = asks if side == "BUY" else bids
+    side_total = sum(q_ for _, q_ in ours_side)
+    out.update({
+        "bid": max((p_ for p_, q_ in bids), default=None),
+        "ask": min((p_ for p_, q_ in asks), default=None),
+        "side_total": round(side_total),
+        "other_total": round(sum(q_ for _, q_ in other)),
+        "at_px": round(sum(q_ for p_, q_ in ours_side if p_ == round(px_c))),
+        "qualified_now": side_total >= target,
+        "qualified_with_us": side_total + qty >= target,
+    })
+    # never cross: a bid must stay under the best ask, an ask over the best bid
+    if side == "BUY" and out["ask"] is not None and px_c >= out["ask"]:
+        out["why"] = f"{px_c:g}c would cross the {out['ask']}c ask"
+        return out
+    if side == "SELL" and out["bid"] is not None and px_c <= out["bid"]:
+        out["why"] = f"{px_c:g}c would cross the {out['bid']}c bid"
+        return out
+    if not out["qualified_with_us"]:
+        out["why"] = (f"even with our {qty:,.0f} the side holds "
+                      f"{side_total + qty:,.0f} of {target:,.0f} Target Size — "
+                      f"a side under it pays nobody")
+        return out
+    # OUR share of the scoring window — and only ours. Size already resting at
+    # our price belongs to whoever put it there, and we queue BEHIND it, so of
+    # whatever the window takes from our level the first slice is theirs. The
+    # levels are merged first: appending our order as a second entry at the
+    # same price counts our quantity twice and reports 100% of a window we
+    # hold a seventh of, which is precisely the case the owner asked about —
+    # "join bids where they are already placed by others" (2026-08-17).
+    pxr = round(px_c)
+    merged: dict = {}
+    for p_, q_ in ours_side:
+        merged[p_] = merged.get(p_, 0.0) + q_
+    theirs_at = merged.get(pxr, 0.0)
+    merged[pxr] = theirs_at + float(qty)
+    lv = sorted(merged.items(), key=lambda x: (-x[0] if side == "BUY" else x[0]))
+    anchor_ = lv[0][0]
+    den = cum = ours = 0.0
+    for p_, q_ in lv:
+        take = min(q_, max(0.0, target - cum))
+        if take <= 0:
+            break
+        w = df ** (abs(anchor_ - p_))
+        den += take * w
+        if p_ == pxr:
+            ours += max(0.0, take - theirs_at) * w
+        cum += q_
+    out["ahead_at_px"] = round(theirs_at)
+    est = 0.0 if not den else per * ours / den
+    cost = _earn_cost(side, px_c, qty)
+    out.update({"est": round(est, 2), "cost": round(cost, 2),
+                "share": round(100 * ours / den, 1) if den else 0.0,
+                "ok": True})
+    out["why"] = (f"{out['share']:.0f}% of the {side.lower()} window for "
+                  f"${cost:,.2f} at risk"
+                  + ("" if out["qualified_now"]
+                     else " — and OUR block is what qualifies the side"))
+    return out
 
 
 def _earn_qty(m: str, side: str, px_c: float, cap_usd: float,
@@ -5598,7 +5695,7 @@ EARN_FULL_FRAC = float(os.environ.get("EARN_FULL_FRAC", "0.85"))
 EARN_MAX_PER_POLL = 4
 # The preferred board's own placement allowance, kept separate from the
 # line above so the two boards never queue behind one another.
-EARN_PREF_PER_POLL = int(os.environ.get("EARN_PREF_PER_POLL", "6"))
+EARN_PREF_PER_POLL = int(os.environ.get("EARN_PREF_PER_POLL", "3"))
 # Rotation frees capital on a timer whether or not anything better is waiting.
 # Displacement is the other half: when the budget is full and a candidate is
 # worth far more per dollar than the weakest holding, the capital moves at
@@ -5790,7 +5887,7 @@ def _earn_graduated_usd() -> float:
 # and the ask carries a separate, deliberately small cap: the same dollars buy
 # a twentieth of the shares there, and this is the first time the earner has
 # been able to open a short at all.
-EARN_ASK_USD = float(os.environ.get("EARN_ASK_USD", "5.0"))
+EARN_ASK_USD = float(os.environ.get("EARN_ASK_USD", "3.0"))
 # How far under the band's own number a short may ever be opened, whatever the
 # reward income says. The mirror of EARN_SILVER_MARGIN on the bid side.
 EARN_ASK_MARGIN = float(os.environ.get("EARN_ASK_MARGIN", "3.0"))
@@ -9516,6 +9613,15 @@ def _map_payload() -> dict:
         "qual_queue": sorted(
             ({"key": k, **v} for k, v in (MONITOR.state.get("qual_queue") or {}).items()),
             key=lambda j: -float(j.get("cost") or 0)),
+        # SCOPE, NOT ORDERS. Every preferred market that has a book, priced
+        # for a block at the floor on the bid and at the touch on the ask, so
+        # the owner can see where a big cheap order qualifies a dead side
+        # before any money moves. Nothing here places anything.
+        "scope": [r for r in (
+            _block_scope(m_, SCOPE_BID_C, SCOPE_BID_QTY, "BUY")
+            for m_ in sorted(tr._BOOK_CACHE) if _preferred(m_))
+            if r.get("target")],
+        "scope_cfg": {"px": SCOPE_BID_C, "qty": SCOPE_BID_QTY},
         "probe_est": MONITOR.state.get("probe") or {},
         "probe_bayes": {m: b for m in sorted(
                             {l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
@@ -9774,6 +9880,11 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     color:var(--dim);margin-bottom:6px">💸 Sell below fair? — waiting on you</div>
     <div id="sellBody"></div>
   </div>
+  <div class="card" id="scopeCard" style="display:none">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--dim);margin-bottom:6px">🔎 Block scope — nothing placed</div>
+    <div id="scopeBody"></div>
+  </div>
   <div class="card" id="qualCard" style="display:none">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--dim);margin-bottom:6px">⚓ Qualifying — waiting on you</div>
@@ -9974,7 +10085,7 @@ function renderInner(){
   // the clue only existed in a console the owner has no way to open on a
   // phone. Each is isolated now, and a failure names itself on screen.
   [['sell', renderSell], ['qualify', renderQual], ['slate', renderSlate],
-   ['prober', renderProbe], ['earner', renderEarn]]
+   ['scope', renderScope], ['prober', renderProbe], ['earner', renderEarn]]
     .forEach(([nm, fn]) => {
       try { fn(); }
       catch (e) { RENDER_ERRS.push(nm + ': ' + ((e && e.message) || e)); }
@@ -10439,6 +10550,50 @@ async function rescout2028(){
   RESCOUT = {msg: r.ok ? r.msg : ('failed — ' + r.msg), ok: r.ok, ts: Date.now()};
   renderProbe();
   setTimeout(load, 2000);
+}
+
+function renderScope(){
+  const card = document.getElementById('scopeCard'); if(!card) return;
+  const rows = DATA.scope || [];
+  if(!rows.length){ card.style.display='none'; return; }
+  card.style.display='block';
+  const cfg = DATA.scope_cfg || {px:1, qty:10000};
+  const nm = m => m.replace(/^erac-usgubp-ak-adv-2026-08-18-/, 'AK·')
+                   .replace(/^enwc-uspres-nom-/, 'nom·')
+                   .replace(/^ewc-usp-2028-11-07-/, 'win·');
+  // Sorted by what the block would earn, because that is the decision.
+  const ok = rows.filter(r => r.ok).sort((x,y) => (y.est||0) - (x.est||0));
+  const no = rows.filter(r => !r.ok);
+  const row = r =>
+    '<tr style="border-top:1px solid #222a38">' +
+    '<td style="padding:3px 0;font-size:12px"><b>' + esc(nm(r.m)) + '</b>' +
+    '<div class="sub" style="font-size:10px">' + esc(r.why || '') + '</div></td>' +
+    '<td class="r" style="font-size:11px;white-space:nowrap">' +
+    (r.bid == null ? '—' : r.bid + '¢') + ' / ' +
+    (r.ask == null ? '—' : r.ask + '¢') +
+    '<div class="sub" style="font-size:10px">side ' +
+    (r.side_total||0).toLocaleString() + ' of ' +
+    (r.target||0).toLocaleString() +
+    (r.qualified_now ? '' : ' <span style="color:#d29922">DEAD</span>') +
+    '</div></td>' +
+    '<td class="r" style="font-size:12px;white-space:nowrap">' +
+    (r.ok ? '<b style="color:#3fb950">$' + (r.est||0).toFixed(2) + '</b>/day' +
+            '<div class="sub" style="font-size:10px">$' +
+            (r.cost||0).toFixed(2) + ' at risk</div>'
+          : '<span class="sub">—</span>') + '</td></tr>';
+  document.getElementById('scopeBody').innerHTML =
+    '<div class="sub" style="font-size:11px;margin-bottom:4px">' +
+    'What a <b>' + (cfg.qty||0).toLocaleString() + ' share bid at ' +
+    (cfg.px) + '¢</b> would do to each preferred book right now. ' +
+    'DEAD means that side is under Target Size and pays nobody today — ' +
+    'our block would be what qualifies it. This card places nothing.</div>' +
+    '<table style="width:100%;border-collapse:collapse">' +
+    ok.map(row).join('') + no.map(row).join('') + '</table>' +
+    '<div class="sub" style="font-size:11px;margin-top:5px">' +
+    ok.length + ' of ' + rows.length + ' would rest and score — ' +
+    '$' + ok.reduce((t,r)=>t+(r.est||0),0).toFixed(2) + '/day for $' +
+    ok.reduce((t,r)=>t+(r.cost||0),0).toFixed(2) + ' at risk if you took ' +
+    'every one.</div>';
 }
 
 function renderProbe(){
