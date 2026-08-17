@@ -5699,6 +5699,32 @@ def _earn_log(m: str, ev: str, px: float, qty: int, note: str = "") -> None:
             st["spent_usd"] = round(float(st.get("spent_usd") or 0) + px * qty, 2)
 
 
+EARN_FADE_FRAC = float(os.environ.get("EARN_FADE_FRAC", "0.4"))
+# How far the bar may be relaxed when the whole board is down. At 0.25 a board
+# that has halved still lets a market fall to 20% of its own peak before we
+# give up on it; without a floor a collapsed board would switch the test off
+# entirely and we would sit in markets that really had died.
+EARN_FADE_BOARD_FLOOR = float(os.environ.get("EARN_FADE_BOARD_FLOOR", "0.25"))
+
+
+def _board_ratio() -> float:
+    """What the WHOLE book is earning now against its own peak, 0.25..1.
+
+    The denominator for "has this market faded". Every market we score has a
+    peak and a current rate; summing both and dividing says how much of the
+    fall in any one of them is just the tide. 1.0 means the board is at its
+    best and a fallen market fell on its own.
+    """
+    peak = cur = 0.0
+    for m_ in (MONITOR.market_rates or {}):
+        p_, c_ = _rate_trend(m_)
+        peak += p_
+        cur += c_
+    if peak <= 0:
+        return 1.0
+    return max(EARN_FADE_BOARD_FLOOR, min(1.0, cur / peak))
+
+
 def _rate_trend(m: str) -> tuple[float, float]:
     """(peak, current) $/day for a market over the stored ~8h window.
 
@@ -6656,7 +6682,19 @@ def auto_earn() -> None:
         o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
         est = float((o or {}).get("est_day") or 0)
         pk_, cur_ = _rate_trend(m)
-        diluted = pk_ >= 1.0 and cur_ < 0.4 * pk_
+        # MEASURED AGAINST THE BOARD, NOT ONLY ITSELF. Withdrawing on a fall
+        # from a market's own peak assumes the fall is idiosyncratic — this
+        # market got crowded, so go somewhere else. When the WHOLE board falls
+        # together there is no somewhere else, and the test fires everywhere at
+        # once. That happened on 2026-08-17: markets we had never placed an
+        # order in fell 76% between 14:22 and 16:09 UTC, so every market we
+        # were in tripped the same rule inside 90 seconds and the earner
+        # cancelled 65 of its 66 orders and locked itself out of all of them
+        # for an hour. A 76% board became a 92% one because of the reaction.
+        # So the bar moves with the board: a market must have fallen well
+        # beyond what the board's own move explains before we give up on it.
+        bratio = _board_ratio()
+        diluted = pk_ >= 1.0 and cur_ < EARN_FADE_FRAC * pk_ * bratio
         if est < 0.25 * (px / 100.0) * qty or diluted:
             try:
                 requests.request(
