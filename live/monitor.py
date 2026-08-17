@@ -5308,10 +5308,18 @@ def _qualify_rows(prefix: str = "") -> list[dict]:
     Read-only. Placing is a separate, confirmed tap.
     """
     pref = prefix or AK_PREFIX
+    # EVERY market in the family, not only the ones a book has arrived for.
+    # Sourcing the list from the book cache showed 3 of 19 and looked like the
+    # family was that small (owner, 2026-08-17: "this is all I see"). The
+    # catalogue is the same known_mkts the placer whitelists against, so a row
+    # here is always something the place button will accept; the ones still
+    # waiting on a book say so instead of being left out.
+    with MONITOR.lock:
+        catalogue = list((MONITOR.state.get("known_mkts") or {}).get("politics") or [])
+    universe = sorted({m for m in catalogue if m.startswith(pref)}
+                      | {m for m in tr._BOOK_CACHE if m.startswith(pref)})
     rows = []
-    for m in sorted(tr._BOOK_CACHE):
-        if not m.startswith(pref):
-            continue
+    for m in universe:
         ent = tr._BOOK_CACHE.get(m)
         pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
         bk = (ent[1] if ent else {}) or {}
@@ -5329,6 +5337,10 @@ def _qualify_rows(prefix: str = "") -> list[dict]:
                "ask_total": round(at),
                "bid": (max(p_ for p_, _ in bids) if bids else None),
                "ask": (min(p_ for p_, _ in asks) if asks else None)}
+        if ent is None:
+            row["waiting"] = "no book yet — the prober has not reached this one"
+            rows.append(row)
+            continue
         for side in ("BUY", "SELL"):
             tot = bt if side == "BUY" else at
             # join the touch on that side; with no touch, start at the floor
@@ -9965,6 +9977,7 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
       🎯 Worst prices</button>
     <button class="alt" id="navMap" onclick="location.href='/map'"
       style="display:none">🗺 Back to the map</button>
+    <button class="alt" onclick="location.href='/ak'">⚓ Qualify</button>
   </div>
 </div>
 <script>
@@ -11429,6 +11442,8 @@ background:var(--bg);color:var(--ink)}
 .ctl{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px}
 .note{font-size:11.5px;color:var(--dim);margin-top:3px}
 </style></head><body>
+<div class="sub" style="margin-bottom:2px"><a href="/">&larr; home</a>
+ &nbsp;·&nbsp; <a href="/map">map</a></div>
 <h1>Qualify a side</h1>
 <div class="sub" id="hd">loading…</div>
 <div id="list"></div>
@@ -11448,7 +11463,8 @@ function load(){
 
 function render(j){
   document.getElementById('hd').innerHTML =
-    esc(DATA.length) + ' markets · pool $' + (j.pool == null ? '?' : j.pool) +
+    esc(DATA.filter(function(r){ return !r.waiting; }).length) + ' of ' +
+    esc(DATA.length) + ' with books · pool $' + (j.pool == null ? '?' : j.pool) +
     ' a day for the event · <b>$' + (j.per_side == null ? '?' : j.per_side) +
     '</b> a side · tap a name for its book';
   document.getElementById('list').innerHTML = DATA.map(function(r){
@@ -11457,13 +11473,17 @@ function render(j){
       '<div><span class="nm">' + esc(r.name) + '</span>' +
       '<div class="note">' + (r.target ? ('target ' + r.target.toLocaleString()) :
         '<span class="dead">no reward program</span>') +
-      (r.age_s == null ? ' · no book' : ' · book ' + r.age_s + 's old') + '</div></div>' +
+      (r.age_s == null ? ' · <span class="dead">waiting for a book</span>'
+                       : ' · book ' + r.age_s + 's old') + '</div></div>' +
       '<div class="px">' +
       '<span class="b">' + (r.bid == null ? '—' : r.bid + '¢') + '</span> / ' +
       '<span class="a">' + (r.ask == null ? '—' : r.ask + '¢') + '</span>' +
       '<div class="note">' + r.bid_total.toLocaleString() + ' / ' +
       r.ask_total.toLocaleString() + '</div></div></div>';
-    if(open) h += bookHtml(r) + sideHtml(r, 'BUY') + sideHtml(r, 'SELL');
+    if(open){
+      h += r.waiting ? '<div class="note">' + esc(r.waiting) + '</div>'
+                     : bookHtml(r) + sideHtml(r, 'BUY') + sideHtml(r, 'SELL');
+    }
     if(MSG[r.m]) h += '<div class="note">' + esc(MSG[r.m]) + '</div>';
     return h + '</div>';
   }).join('');
@@ -12144,6 +12164,7 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  <button onclick="showTab('S')">↔️ Spreads</button>
  <button onclick="showTab('E')">🏛 Seats</button>
  <button onclick="location.href='/map'">🗺 Map</button>
+ <button onclick="location.href='/ak'">⚓ Qualify a side</button>
  <button onclick="location.href='/lab'">🔬 Prober &amp; Earner</button>
 </div>
 <div id="viewE" style="display:none">
