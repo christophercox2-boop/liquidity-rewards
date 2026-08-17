@@ -389,6 +389,24 @@ def _rewards_once() -> str:
     fresh = [l for l in lines[1:] if l and l not in before]
     TRACKER_STATUS["new_rows"] = ({path: {"header": lines[0], "rows": fresh}}
                                   if fresh else {})
+    # WHERE THE HISTORY ENDS, reported whether or not anything is new (owner,
+    # 2026-08-17: "when it says there is nothing new, just print the date of
+    # the last line so I can verify I didn't miss anything"). "Nothing new" is
+    # only reassuring if you can see WHICH day it is nothing new since — the
+    # same message would appear if the fetch were quietly returning stale
+    # history. rows.sort() upstream is by (date, market, program_type), so the
+    # last line is the latest day.
+    latest = {}
+    if len(lines) > 1:
+        cols = lines[0].split(",")
+        vals = lines[-1].split(",")
+        row = dict(zip(cols, vals))
+        day = row.get("date") or vals[0]
+        latest = {"date": day,
+                  "rows_on_date": sum(1 for l in lines[1:] if l.startswith(day + ",")),
+                  "total": len(lines) - 1,
+                  "last_line": lines[-1]}
+    TRACKER_STATUS["latest"] = latest
     if fresh:
         err = _tracker_commit({path: p.read_bytes()})
         if err:
@@ -1428,6 +1446,7 @@ class Monitor:
                     # counts only — the rows themselves are served by
                     # /track_rows.json so this payload stays small on the
                     # 30-second refresh every open page runs
+                    "latest": TRACKER_STATUS.get("latest") or {},
                     "new_row_counts": {
                         f: len((v or {}).get("rows") or [])
                         for f, v in (TRACKER_STATUS.get("new_rows") or {}).items()},
@@ -3717,9 +3736,32 @@ def _probe_log(m: str, ev: str, side: str, px: float, note: str = "") -> None:
     with MONITOR.lock:
         log = MONITOR.state.setdefault("probe_log", [])
         log.append({"ts": dt.datetime.now(ET).strftime("%m-%d %I:%M:%S %p"),
+                    # ts is a HUMAN string for the journal; ts_s is the epoch.
+                    # Anything doing arithmetic must use ts_s — float(ts) on
+                    # "08-17 09:06:12 AM" raises, and doing that inside the
+                    # /map.json payload took the whole page down.
+                    "ts_s": time.time(),
                     "m": m, "ev": ev, "side": side,
                     "px": round(px * 100, 1), "note": note})
         del log[:-200]
+
+
+def _watched_h(m: str) -> float:
+    """Hours since the first journal entry for this market, 0 if unknown.
+
+    Reads ts_s (epoch) and IGNORES rows without one — older rows predate the
+    field, and the human `ts` string is not a number. Deliberately total: it
+    feeds the /map payload, and an exception in there blanks the whole page.
+    """
+    try:
+        first = min((float(l["ts_s"]) for l in (MONITOR.state.get("probe_log") or [])
+                     if l.get("m") == m and isinstance(l.get("ts_s"), (int, float))),
+                    default=0.0)
+        if not first:
+            return 0.0
+        return round(max(0.0, (time.time() - first) / 3600.0), 2)
+    except Exception:  # noqa: BLE001
+        return 0.0
 
 
 def _probe_real_touches(book: dict):
@@ -7974,10 +8016,7 @@ def _map_payload() -> dict:
                 # rule-out test needs
                 "fill_loss": round(float(((MONITOR.state.get("probe") or {})
                                           .get(m) or {}).get("fill_loss") or 0.0), 3),
-                "watched_h": round(max(0.0, (time.time() - min(
-                    [float(l.get("ts") or 0) for l in
-                     (MONITOR.state.get("probe_log") or []) if l.get("m") == m]
-                    or [time.time()])) / 3600.0), 2),
+                "watched_h": _watched_h(m),
                 "per_side": round(
                     float(((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("pool") or 0.0)
                     / max(int(((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("pool_n")
@@ -8328,14 +8367,47 @@ async function load(){
   catch(e){ document.getElementById('meta').textContent='offline'; return; }
   if(r.status===401){ document.getElementById('login').style.display='block';
                       document.getElementById('app').style.display='none'; return; }
-  DATA = await r.json();
+  // A 500 from /map.json used to land here as an unhandled throw out of
+  // r.json(), leaving the page on "loading..." forever with nothing to read.
+  // One bad field in the payload should never be indistinguishable from a
+  // dead monitor.
+  try { DATA = await r.json(); }
+  catch(e){
+    document.getElementById('meta').textContent =
+      'the monitor returned HTTP ' + r.status + ' instead of data — the /map '
+      + 'payload is failing to build; the loops are unaffected';
+    return;
+  }
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='block';
   render();
 }
 
+// A throw ANYWHERE in the render used to leave the page on "loading..." with
+// nothing to read, on a phone with no console. The cards have been isolated
+// for a while; everything around them was not, and a single unexpected field
+// in /map.json — DATA.model, DATA.counts — was enough. Whatever manages to
+// render now stays on screen, and the status line says what broke.
 function render(){
   RENDER_ERRS = [];
+  try { renderInner(); }
+  catch(e){
+    RENDER_ERRS.push('page: ' + ((e && e.message) || e));
+    const m = document.getElementById('meta');
+    if (m) m.textContent = 'partial render — ' + RENDER_ERRS.join(' | ');
+  }
+}
+
+function renderInner(){
+  // The map grid runs BEFORE the isolated cards, so a payload missing states
+  // or counts threw here and blanked everything below the header. Say so
+  // instead, and carry on to the cards, which may well be fine.
+  if(!DATA || !Array.isArray(DATA.states) || !DATA.counts){
+    RENDER_ERRS.push('map grid: payload has no states/counts');
+    DATA = DATA || {};
+    DATA.states = Array.isArray(DATA.states) ? DATA.states : [];
+    DATA.counts = DATA.counts || {};
+  }
   const st={}; DATA.states.forEach(s=>st[s.abbr]=s);
   const c=DATA.counts;
   document.getElementById('chips').innerHTML = ['conflict','notpaying','idle','gap','ok'].map(k=>
@@ -11819,7 +11891,15 @@ async function trackWatch(){
                  + '<div id="trackSum" style="display:none;margin-top:6px"></div>' : ''));
         }else{
           // nothing moved: say so, then get out of the way
-          trackSay('checked in ' + took + 's \u2014 no new reward rows');
+          // "nothing new" is only worth reading if it says nothing new SINCE
+          // WHEN, so the end of the history comes with it
+          const lt = t.latest || {};
+          trackSay('checked in ' + took + 's \u2014 no new reward rows'
+                   + (lt.date ? '. History ends <b>' + esc(lt.date) + '</b>'
+                        + (lt.rows_on_date ? ' (' + lt.rows_on_date + ' row'
+                             + (lt.rows_on_date === 1 ? '' : 's') + ' that day, '
+                             + Number(lt.total || 0).toLocaleString() + ' in total)' : '')
+                      : ''));
           TRACK_HIDE = setTimeout(function(){
             trackSay(''); trackShowDiff(''); TRACK_HIDE = null; }, 6000);
         }

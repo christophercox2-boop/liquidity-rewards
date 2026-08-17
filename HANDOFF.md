@@ -321,6 +321,42 @@ is precisely when we most want out, and the close loop would have re-placed it
 SELL_SHORT outright: closing a short reduces exposure, so the bid cap has no
 business judging it.
 
+### 2026-08-17 — /map blanked on "loading…" — MY BUG, and the real lesson
+
+Owner: "this is happening again." The page showed its header and
+`loading…` and nothing else.
+
+Cause: I had just added `watched_h` to the /map payload and computed it with
+`float(l.get("ts"))` over probe_log rows. `ts` is a HUMAN string —
+`"08-17 09:06:12 AM"` — so float() raised, /map.json returned 500, and the
+page's `r.json()` threw unhandled. probe_log rows now also carry `ts_s`, a
+real epoch, and `_watched_h()` reads only that, ignores rows without it (older
+rows predate the field), and cannot raise.
+
+The lesson is the second fault, not the first. The card renderers had been
+isolated for a while — but everything AROUND them was not, so one unexpected
+field anywhere in /map.json blanked the page, and a phone has no console to
+read. Fixed in two places:
+  * `load()` catches a failed `r.json()` and says the monitor returned HTTP
+    N instead of data, so a server-side problem is distinguishable from a dead
+    monitor;
+  * `render()` is now a try/catch wrapper around `renderInner()`, so whatever
+    managed to draw stays on screen and the status line names what broke.
+Both are covered by t_mapload, which drives the real page against a 500 and
+against a payload missing `states`/`counts`.
+
+### 2026-08-17 — "nothing new" now says nothing new SINCE WHEN
+
+Owner: "when I check rewards, when it says there is nothing new, just print
+the date of the last line so I can verify I didn't miss anything."
+
+`_rewards_once` records `TRACKER_STATUS["latest"]` on EVERY run — the last
+line's date, how many rows carry that date, and the total row count — and the
+no-change message reads: "checked in 8s — no new reward rows. History ends
+2026-08-16 (4 rows that day, 1,532 in total)." It matters beyond convenience:
+a silently stale fetch would otherwise produce the same reassuring "nothing
+new" as a genuinely up-to-date one.
+
 ### 2026-08-17 — being outbid is not a verdict, and what "ruled out" means
 
 Owner, in three parts: "a lot of the markets the prober has ruled out are ones
