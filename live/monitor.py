@@ -14020,28 +14020,35 @@ class Handler(BaseHTTPRequestHandler):
         if not DASH_PASSWORD:
             self._send(503, "text/plain", b"Set the DASH_PASSWORD environment variable to enable the dashboard.")
             return
-        if self.path == "/" or self.path.startswith("/index"):
+        # Route on the path WITHOUT the query string. `self.path == "/"` was an
+        # exact match, so "/?v=2" — the ordinary way to make a phone fetch a
+        # page instead of serving its cached copy — missed the dashboard
+        # entirely and fell through to the auth gate as {"error": "key
+        # required"} (owner, 2026-08-17). Query parsing below still reads
+        # self.path: ?key= and ?slug= must keep working.
+        route = self.path.split("?", 1)[0]
+        if route == "/" or route.startswith("/index"):
             # The shell holds no data — serve it instantly, unauthenticated.
             # The page's own login card gates the data underneath.
             self._send(200, "text/html; charset=utf-8", DASH_HTML.encode())
             return
-        if ((self.path.startswith("/map") and not self.path.startswith("/map.json"))
-                or self.path.startswith("/lab") or self.path.startswith("/slate")):
+        if ((route.startswith("/map") and not route.startswith("/map.json"))
+                or route.startswith("/lab") or route.startswith("/slate")):
             # shell only, no data — same pattern as "/": the page's own login
             # card gates everything underneath it. /lab is the same shell on a
             # different route: the prober and earner read-outs are analysis and
             # do not belong on the control surface (owner, 2026-08-16).
             self._send(200, "text/html; charset=utf-8", MAP_HTML.encode())
             return
-        if self.path.startswith("/hunt") and not self.path.startswith("/hunt.json"):
+        if route.startswith("/hunt") and not route.startswith("/hunt.json"):
             self._send(200, "text/html; charset=utf-8", HUNT_HTML.encode())
             return
-        if self.path.startswith("/why") and not self.path.startswith("/why.json"):
+        if route.startswith("/why") and not route.startswith("/why.json"):
             # Same shell-only pattern: the page carries no data, and /why.json
             # underneath it demands the key.
             self._send(200, "text/html; charset=utf-8", WHY_HTML.encode())
             return
-        if self.path.startswith("/garden"):
+        if route.startswith("/garden"):
             # The garden view: same shell pattern — the page itself is
             # public, every data fetch inside it carries the key header.
             try:
@@ -14052,7 +14059,7 @@ class Handler(BaseHTTPRequestHandler):
                 body = b"garden view not deployed"
             self._send(200, "text/html; charset=utf-8", body)
             return
-        if self.path.startswith("/assets/"):
+        if route.startswith("/assets/"):
             # Static sprite art for the garden (CC0, see ATTRIBUTION.txt).
             name = os.path.basename(self.path.split("?")[0])
             p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", name)
@@ -14068,7 +14075,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._send(404, "text/plain", b"not found")
             return
-        if self.path.startswith("/manifest.json"):
+        if route.startswith("/manifest.json"):
             self._send(200, "application/json", json.dumps({
                 "name": "Liquidity Rewards", "short_name": "Rewards",
                 "display": "standalone", "start_url": "/",
@@ -14076,10 +14083,10 @@ class Handler(BaseHTTPRequestHandler):
                 "icons": [{"src": "/icon.png", "sizes": "180x180",
                            "type": "image/png"}]}).encode())
             return
-        if self.path.startswith("/icon.png"):
+        if route.startswith("/icon.png"):
             self._send(200, "image/png", _icon_png())
             return
-        if self.path.startswith("/widget.json"):
+        if route.startswith("/widget.json"):
             if not self._authed():
                 self._send(401, "application/json", b'{"error": "key required"}')
                 return
@@ -14099,12 +14106,12 @@ class Handler(BaseHTTPRequestHandler):
             # card instead of the browser interrupting with a popup
             self._send(401, "application/json", b'{"error": "key required"}')
             return
-        if self.path.startswith("/map.json"):
+        if route.startswith("/map.json"):
             self._send(200, "application/json", json.dumps(_map_payload()).encode())
             return
-        if self.path.startswith("/data.json"):
+        if route.startswith("/data.json"):
             self._send(200, "application/json", json.dumps(MONITOR.snapshot()).encode())
-        elif self.path.startswith("/plan.json"):
+        elif route.startswith("/plan.json"):
             try:
                 from urllib.parse import parse_qs, urlparse
                 q = parse_qs(urlparse(self.path).query)
@@ -14158,7 +14165,7 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, "application/json", json.dumps(
                 {"new_rows": TRACKER_STATUS.get("new_rows") or {},
                  "runs": TRACKER_STATUS.get("runs", 0)}).encode())
-        elif self.path.startswith("/why.json"):
+        elif route.startswith("/why.json"):
             from urllib.parse import parse_qs, urlparse
             slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]
             try:
