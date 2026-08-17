@@ -1492,6 +1492,9 @@ class Monitor:
                 "warming": self.warming,
                 "backfilled": self.backfilled,
                 "poll_seconds": POLL_SECONDS,
+                # families no automatic loop places in; the markets list turns
+                # each into its own filter button
+                "no_auto": [{"p": p_, "label": l_} for p_, l_ in NO_AUTO],
                 # which code is serving this page, and for how long. A switch
                 # flip changes state, not code — only a restart loads a deploy.
                 "build": BUILD,
@@ -3676,9 +3679,18 @@ PREFER_PREFIXES = tuple(
 # placing anything in those markets"). This is a placement rule, not a
 # visibility one: the markets still appear everywhere, still get books, still
 # get scored. Nothing automatic reaches for them.
-NO_AUTO_PREFIXES = tuple(
-    p.strip() for p in os.environ.get(
-        "NO_AUTO_PREFIXES", "erac-usgubp-ak-adv-").split(",") if p.strip())
+# Entries are "prefix|Label". The label is what the markets list calls the
+# filter button for that family, so adding a family here gives it both the
+# hands-off rule and its own button — no second edit, no drift between what
+# is blocked and what can be looked at.
+NO_AUTO = tuple(
+    (e.split("|")[0].strip(), (e.split("|") + [""])[1].strip()
+     or e.split("|")[0].strip())
+    for e in os.environ.get(
+        "NO_AUTO_PREFIXES",
+        "erac-usgubp-ak-adv-|AK primary,"
+        "vsc-usgubp-fl-|FL margin").split(",") if e.strip())
+NO_AUTO_PREFIXES = tuple(p for p, _ in NO_AUTO)
 
 
 def _hands_off(m: str) -> bool:
@@ -13149,17 +13161,20 @@ function is2028(m){
       || s.indexOf('ewc-usp-2028-11-07-') === 0
       || s.indexOf('ewc-usp-party-2028-11-07-') === 0;
 }
-function isAK(s){ return String(s).indexOf('erac-usgubp-ak-adv-') === 0; }
-function onlyAK(){ return localStorage.getItem('onlyAK') === '1'; }
-function tglAK(){
-  localStorage.setItem('onlyAK', onlyAK() ? '0' : '1');
-  if(onlyAK()) localStorage.setItem('only2028', '0');   // the two exclude each other
+// Family filters come from the server's hands-off list, so a family added
+// there gets its button here with no second edit.
+function famOn(){ return localStorage.getItem('onlyFam') || ''; }
+function tglFam(i){
+  const f = ((LASTD && LASTD.no_auto) || [])[i];
+  const p = f ? f.p : '';
+  localStorage.setItem('onlyFam', (!p || famOn() === p) ? '' : p);
+  if(famOn()) localStorage.setItem('only2028', '0');   // the filters exclude each other
   refresh();
 }
 function only2028(){ return localStorage.getItem('only2028') === '1'; }
 function tgl2028(){
   localStorage.setItem('only2028', only2028() ? '0' : '1');
-  if(only2028()) localStorage.setItem('onlyAK', '0');   // the two exclude each other
+  if(only2028()) localStorage.setItem('onlyFam', '');   // the filters exclude each other
   refresh();
 }
 function hidCats(){ try{ return JSON.parse(localStorage.getItem('hidCats') || '{}'); }catch(e){ return {}; } }
@@ -13770,9 +13785,11 @@ async function renderAll(d){
       '<label class="sub" style="margin-right:8px;color:'+(only2028()?'#f2cd7f':'var(--dim)')+
       '"><input type="checkbox" '+(only2028()?'checked':'')+
       ' onchange="tgl2028()"> 2028 races only</label>' +
-      '<label class="sub" style="margin-right:8px;color:'+(onlyAK()?'#f2cd7f':'var(--dim)')+
-      '"><input type="checkbox" '+(onlyAK()?'checked':'')+
-      ' onchange="tglAK()"> AK primary only</label>' +
+      (d.no_auto || []).map((f, fi) =>
+        '<label class="sub" style="margin-right:8px;color:'+
+        (famOn()===f.p?'#f2cd7f':'var(--dim)')+
+        '"><input type="checkbox" '+(famOn()===f.p?'checked':'')+
+        ' onchange="tglFam('+fi+')"> '+esc(f.label)+' only</label>').join('') +
       '<label class="sub" style="margin-right:8px"><input type="checkbox" '+(pctMode()?'checked':'')+
       ' onchange="tglPct()"> % of rewards</label>' +
       '<select onchange="setMSort(this.value)" style="background:var(--surface2);color:var(--ink2);'+
@@ -13788,8 +13805,8 @@ async function renderAll(d){
         (hc[c]?' ✕':'')+'</button>').join('');
     document.getElementById('markets').innerHTML =
       Object.entries(allMarkets)
-        .filter(([m]) => onlyAK() ? isAK(m)
-                                  : (!hc[mcat(m)] && (!only2028() || is2028(m))))
+        .filter(([m]) => famOn() ? m.indexOf(famOn()) === 0
+                                 : (!hc[mcat(m)] && (!only2028() || is2028(m))))
         .sort((a,b) => {
           if(sortCat() && mcat(a[0]) !== mcat(b[0])) return mcat(a[0]) < mcat(b[0]) ? -1 : 1;
           if(mSort() === 'chg-desc') return pctChg(b[0]) - pctChg(a[0]);
