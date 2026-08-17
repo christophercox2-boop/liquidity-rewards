@@ -1370,3 +1370,28 @@ the ntfy, and `SELL_ASK_STALE` (15 min) drops any ask the loop stops
 re-confirming — the stock sold, the position earning again, cash no longer
 short — so the card clears itself rather than offering to sell what we no
 longer hold. `t_sellask.py` asserts the ordering of the two blocks directly.
+
+### 2026-08-17 — the prober was starving its own queue (my bug)
+
+Owner: "reverse the order that the prober goes through the 2028 market. I think
+some are getting left out." They were, and it was the `_width` key I added when
+spread stopped being a gate. Width is STABLE and recency is not, so the widest
+markets sorted to the front on every pass and the narrow tail never came up
+while the scout slots were full.
+
+Simulated on 12 markets with 3 slots over 8 passes:
+
+| ordering | visits per market |
+|---|---|
+| width above recency (what shipped) | 5,5,5,1,1,1,1,1,1,1,1,1 |
+| recency above width (the fix) | 2,2,2,2,2,2,2,2,2,2,2,2 |
+
+Two changes. Width is now the tie-break BELOW `_PROBE["last"]`, which is what
+"a factor, not a gate" was supposed to mean. And the sweep ALTERNATES direction
+each pass (`_PROBE["sweep_rev"]`), each tier reversed independently so preferred
+markets never fall behind the rest — reversing once would only have moved the
+starvation to the other end, which is the same complaint a day later.
+
+`t_prefer.py` now runs the real sweep block over 8 passes and fails if any
+market goes unvisited, and separately asserts that the widest market does NOT
+lead when it was just scouted.

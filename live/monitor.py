@@ -4516,10 +4516,27 @@ def auto_probe() -> None:
         if not rb or not ra:
             return 0
         return -max(0, round(ra[0] / 0.01) - round(rb[0] / 0.01) - 1)
+    # RECENCY BEATS WIDTH. Putting _width above the last-scouted time was a
+    # mistake I made when spread stopped being a gate: width is stable and
+    # recency is not, so the widest markets sorted to the front every pass and
+    # the narrow tail was never reached while the scout slots were full. Some
+    # markets were simply never visited (owner, 2026-08-17: "I think some are
+    # getting left out"). Width is now the tie-break BELOW recency, which is
+    # what "a factor, not a gate" was supposed to mean.
     mkts.sort(key=lambda m_: (0 if _preferred(m_) else 1,
                               1 if (est.get(m_) or _PROBE["last"].get(m_)) else 0,
-                              _width(m_),
-                              _PROBE["last"].get(m_, 0.0)))
+                              _PROBE["last"].get(m_, 0.0),
+                              _width(m_)))
+    # ...AND THE SWEEP ALTERNATES DIRECTION. Owner: "reverse the order that the
+    # prober goes through the 2028 market." Reversing once would only move the
+    # starvation to the other end, so it reverses on every other pass: the tail
+    # of one sweep is the head of the next, and no position in the queue is
+    # permanently unlucky. Each tier is reversed independently, so preferred
+    # markets never fall behind the rest.
+    if _PROBE.get("sweep_rev"):
+        mkts = ([m_ for m_ in mkts if _preferred(m_)][::-1]
+                + [m_ for m_ in mkts if not _preferred(m_)][::-1])
+    _PROBE["sweep_rev"] = not _PROBE.get("sweep_rev")
     for m in mkts:
         if placed >= PROBE_MAX_PER_POLL or len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
             break
