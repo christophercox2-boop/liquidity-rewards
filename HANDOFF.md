@@ -85,6 +85,79 @@ reasoning ahead of the data).
 
 ## Open items
 
+### 2026-08-17 — the bottleneck was the search budget, not the universe
+
+Owner: "there are a lot of juicy markets out there... what is a way to
+eliminate the bottleneck". The universe widening the day before took the
+earner's candidate list from 40 markets to 225 and changed nothing, because
+the placement loop spent the budget in candidate order and `break`ed the
+moment it was full. Measured on the board, from real files on disk:
+
+- 181 markets in the newest `data/books_log.jsonl` snapshot; every one has an
+  active program in `data/new_pools.json`.
+- 93 of those 181 are priced by the Silver model (35 senate rows + 36 governor
+  rows in `data/silver_*.csv`). Model coverage is NOT the bottleneck.
+- `EARN_TOTAL_USD` = $100 of allowed worst case, `EARN_MAX_USD` = $6 a market.
+  That is the number that decides how many markets we can be in.
+
+Two changes, both in `auto_earn`:
+
+1. **Entry is an auction.** Every candidate is priced first and ranked by
+   `est / cost` — income per dollar of worst case — and the budget is spent
+   from the top. Cheap markets win on this measure for a real reason: reward
+   score is `df^ticks x size` and does not care what a share cost, while
+   worst case is `price x size`. A 3c market and a 40c market with the same
+   size score the same and risk 13x apart.
+2. **Displacement.** When the budget is full, a candidate worth
+   `EARN_DISPLACE_RATIO` (1.6x) more per dollar than the weakest non-graduated
+   holding takes its place, subject to `EARN_DISPLACE_MIN_AGE` (30 min on the
+   book) and `EARN_DISPLACE_PER_POLL` (2). Rotation still runs on its timer as
+   the backstop; displacement only fires when something better is actually
+   waiting. Graduates are never displaced — they are off the search budget.
+
+The turned-away candidates are published as `earn_caps.waiting` and listed on
+the /map earner card, best first, with what each would earn and why it did not
+get in. That list IS the bottleneck, priced.
+
+The budget itself is now a dial the owner can reach: `state["earn_budget"]`,
+moved by `{"op":"budget","dir":"up"|"down"}` in `$EARN_BUDGET_STEP` steps up to
+`EARN_BUDGET_MAX` ($500). The client sends a DIRECTION, never an amount — the
+server owns the step and the ceiling. Raising takes two taps, lowering one.
+Moving it places nothing by itself; the earn switch still has to be on and
+every rule still applies.
+
+### 2026-08-17 — the 2028 pool scope question is SETTLED: per event, not program-wide
+
+The Aug-15 payout landed (written 08-16 22:55–23:00 in five commits) and it
+decides the question STATUS.md had been flagging. The two predictions and what
+arrived, for the day:
+
+| family | program-wide est | per-event est | actual Aug-15 |
+|---|---|---|---|
+| nominee-2028 | ~$108/day | ~$400/day | **$683.74** |
+| winner-2028 | ~$140/day | ~$310/day | **$412.29** |
+| party-2028 | ~$4.35/day | ~$130/day | **$147.55** |
+
+Program-wide is wrong by 6x, 3x and 34x. Per-event is right to within 1.1–1.7x
+and errs LOW. The exchange's program sheet ("Daily, per event", $1,000 per
+event) is correct and `_daily_pool`'s `/ (pool_n or event_n)` divisor should
+not apply to the 2028 slate.
+
+Aug-15 is still PARTIAL: 95 of an expected ~182 rows. The slate is complete
+(31 nominee + 27 winner + 2 party rows, identical counts to Aug-14); the
+senate and governor rows have not landed yet. Do not read Aug-15 senate
+($9.36) or governor ($17.06) as real — they are unwritten, not zero.
+
+Aug-15 is NOT an accumulator bucket, whatever `accum_day` says. Every earlier
+day appears in a burst ~1–1.5 days late, fills over a few fetches, then
+freezes: 08-13 froze at 147 rows/$223.24, 08-14 at 182 rows/$274.92. The
+`accum_day` heuristic (all-PENDING + `days_since >= 2`) misfires here.
+
+Consequence not yet applied: `_earn_scan` uses the same divisor
+(`per = pool / max(pool_n or event_n, 1) / 2`), so the earner values every
+2028 slate market at about a quarter of what it is worth — which now feeds
+directly into the yield ranking above.
+
 ### 2026-08-16 — earner stopped by the owner. Read this before restarting it.
 
 The owner cancelled every order by hand and switched all five loops off

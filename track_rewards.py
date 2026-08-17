@@ -128,6 +128,37 @@ def fetch_all_rewards(key_id: str, secret_key: str) -> tuple[list[dict], dict]:
     raise RuntimeError("\n".join(errors))
 
 
+# One slow page must not throw away the whole walk. The history is ~2,700 rows
+# over several 500-row pages, and a single ReadTimeout used to raise out of the
+# pagination loop — which sent fetch_all_rewards to the next host, restarting
+# from page one, and when that timed out too the owner got a bare
+# "ReadTimeout: ... read timeout=30" under the Check-for-new-rewards button
+# (2026-08-17). Transient network faults are now retried in place with a
+# backoff; anything the server actually ANSWERS (an HTTP 4xx/5xx) still fails
+# immediately, because that is a real answer and retrying it just wastes time.
+REWARDS_READ_TIMEOUT = float(os.environ.get("REWARDS_READ_TIMEOUT", "60"))
+REWARDS_PAGE_TRIES = int(os.environ.get("REWARDS_PAGE_TRIES", "4"))
+
+
+def _get_page(host: str, params: dict, key_id: str, secret_key: str):
+    last: Exception | None = None
+    for attempt in range(REWARDS_PAGE_TRIES):
+        try:
+            return requests.get(
+                host + EARNINGS_PATH,
+                params=params,
+                headers=auth_headers(key_id, secret_key, "GET", EARNINGS_PATH),
+                timeout=(10, REWARDS_READ_TIMEOUT),
+            )
+        except (requests.Timeout, requests.ConnectionError) as e:
+            last = e
+            if attempt < REWARDS_PAGE_TRIES - 1:
+                time.sleep(2 ** attempt)      # 1s, 2s, 4s
+    raise RuntimeError(
+        f"{host}{EARNINGS_PATH}: {type(last).__name__} on every one of "
+        f"{REWARDS_PAGE_TRIES} tries — {last}")
+
+
 def _fetch_from_host(host: str, key_id: str, secret_key: str) -> tuple[list[dict], dict]:
     rows: list[dict] = []
     # Explicit big pages: the server default (~31/page) times the old 50-page
@@ -137,12 +168,7 @@ def _fetch_from_host(host: str, key_id: str, secret_key: str) -> tuple[list[dict
     raw: dict = {}
     token = None
     for _ in range(200):  # bounded pagination
-        resp = requests.get(
-            host + EARNINGS_PATH,
-            params=params,
-            headers=auth_headers(key_id, secret_key, "GET", EARNINGS_PATH),
-            timeout=30,
-        )
+        resp = _get_page(host, params, key_id, secret_key)
         if resp.status_code >= 400:
             body = " ".join(resp.text.split())[:300]
             raise RuntimeError(f"{host}{EARNINGS_PATH} -> HTTP {resp.status_code}: {body}")

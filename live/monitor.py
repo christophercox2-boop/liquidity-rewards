@@ -5141,6 +5141,45 @@ EARN_ROTATE_EVERY = float(os.environ.get("EARN_ROTATE_EVERY", "1800"))
 EARN_ROTATE_N = int(os.environ.get("EARN_ROTATE_N", "3"))
 EARN_FULL_FRAC = float(os.environ.get("EARN_FULL_FRAC", "0.85"))
 EARN_MAX_PER_POLL = 4
+# Rotation frees capital on a timer whether or not anything better is waiting.
+# Displacement is the other half: when the budget is full and a candidate is
+# worth far more per dollar than the weakest holding, the capital moves at
+# once instead of waiting out the half hour. The ratio is the whole safety
+# margin — at 1.6 a newcomer has to be worth 60% more per dollar at risk, which
+# no amount of estimate noise bridges — and the age floor stops an order being
+# thrown off the book before it has had a chance to earn its estimate.
+EARN_DISPLACE_RATIO = float(os.environ.get("EARN_DISPLACE_RATIO", "1.6"))
+EARN_DISPLACE_MIN_AGE = float(os.environ.get("EARN_DISPLACE_MIN_AGE", "1800"))
+EARN_DISPLACE_PER_POLL = int(os.environ.get("EARN_DISPLACE_PER_POLL", "2"))
+# How many priced-but-unfunded candidates to keep for the dashboard. This is
+# the bottleneck made visible: markets that passed every rule and got nothing
+# but a queue position, with what each would have earned.
+EARN_WAITING_KEEP = int(os.environ.get("EARN_WAITING_KEEP", "40"))
+# THE SEARCH BUDGET IS A DIAL THE OWNER CAN REACH.
+#
+# EARN_TOTAL_USD is the total worst case the earner may have resting, and it
+# is the single number that decides how many markets we can be in — 93 modelled
+# markets on the board against $100 of allowed exposure. It lived only in an
+# environment variable, which on this setup means a redeploy from a desktop:
+# not a lever the owner has. So the live figure is state-backed and movable
+# from /map, with the env value as its starting point and a hard ceiling that
+# the dashboard cannot talk its way past.
+#
+# Moving this does NOT place anything by itself. Every rule still applies and
+# the earn switch still has to be on. It only says how much money the search
+# is allowed to have at risk at once.
+EARN_BUDGET_MAX = float(os.environ.get("EARN_BUDGET_MAX", "500.0"))
+EARN_BUDGET_STEP = float(os.environ.get("EARN_BUDGET_STEP", "50.0"))
+
+
+def _earn_budget() -> float:
+    """The live search budget in dollars of worst case."""
+    v = (MONITOR.state or {}).get("earn_budget")
+    try:
+        v = float(v)
+    except (TypeError, ValueError):
+        return EARN_TOTAL_USD
+    return max(0.0, min(v, EARN_BUDGET_MAX))
 # Ceiling on how many off-model orders the sweep may cancel in ONE poll.
 # The sweep runs every POLL_SECONDS and ignores the switches (cancelling
 # only ever reduces exposure), so without a limit a wrong model empties the
@@ -6438,7 +6477,7 @@ def auto_earn() -> None:
     # Skips anything inside the scoring grace — a fresh order has no rate yet
     # and would rank bottom purely for being new.
     if (now - float(_EARN.get("rot_ts") or 0) >= EARN_ROTATE_EVERY
-            and _earn_outstanding_usd() >= EARN_FULL_FRAC * EARN_TOTAL_USD):
+            and _earn_outstanding_usd() >= EARN_FULL_FRAC * _earn_budget()):
         _EARN["rot_ts"] = now
         ranked = []
         for oid, (m, side, px, qty, ts) in _EARN["orders"].items():
@@ -6499,13 +6538,30 @@ def auto_earn() -> None:
     pool |= {m_ for m_ in tr._BOOK_CACHE
              if (not payable or m_ in payable) and not _is_primary(m_)}
     cands = sorted(pool, key=lambda m_: (_EARN["last"].get(m_, 0.0), m_))
+    # THE BUDGET IS THE BOTTLENECK, SO SPEND IT ON THE BEST MARKETS.
+    #
+    # Widening the universe to every payable book took the candidate list from
+    # 40 markets to 225 and changed nothing, because the loop below used to
+    # place in candidate order and `break` the moment the search budget was
+    # full. Whichever markets happened to be asked first kept their slot for
+    # as long as the order rested, however little it earned, and the other two
+    # hundred were never compared against them. First come, first served.
+    #
+    # So price every candidate first and rank them by what a dollar of worst
+    # case actually buys — est income per dollar at risk — then spend the
+    # budget from the top. Two markets are equally affordable at $2 of
+    # exposure; the one earning $0.90/day belongs in the book ahead of the one
+    # earning $0.05/day, whatever order they were scanned in.
+    #
+    # Nothing here relaxes a rule: every candidate has already passed the
+    # confidence floor, the Silver cap, the deal test, the overpay payback and
+    # the Target Size check inside _earn_scan. This only decides who gets the
+    # money when there is not enough of it to go round — which is the whole
+    # problem when the board has 93 modelled markets and the budget is $100.
+    scored = []
     for m in cands:
-        if placed >= EARN_MAX_PER_POLL:
-            break
         if m in have or now - _EARN["last"].get(m, 0.0) < EARN_COOLDOWN:
             continue
-        if _earn_outstanding_usd() >= EARN_TOTAL_USD:
-            break
         b = _bayes_fair(m)
         if not (b and b.get("med")):
             continue
@@ -6516,18 +6572,101 @@ def auto_earn() -> None:
         conf = _earn_confidence(m, b, sv)
         if conf["score"] < EARN_CONF_MIN:
             continue
-        back, qmul = conf["back"], conf["qmul"]
         pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
         ent = tr._BOOK_CACHE.get(m)
         scan = _earn_scan(m, b, conf, ent, pr)
         best = scan["best"]
         if best is None:
             continue
-        real_bids = scan["real_bids"]
         est, tgt, qty, tier, _under = best
-        px = round(tgt / 100.0, 2)
-        if px * qty + _earn_outstanding_usd() > EARN_TOTAL_USD:
+        cost = round(tgt / 100.0 * qty, 4)
+        if cost <= 0:
             continue
+        scored.append({"m": m, "yield": est / cost, "est": est, "cost": cost,
+                       "tgt": tgt, "qty": qty, "tier": tier, "scan": scan,
+                       "b": b, "conf": conf})
+    scored.sort(key=lambda c_: -c_["yield"])
+    # What a holding is earning per dollar tied up, so a candidate can be
+    # compared against the weakest thing already in the book. Graduates are
+    # not in the running: they are off the search budget entirely.
+    est_by_id = {str(o.get("id")): float(o.get("est_day") or 0)
+                 for o in MONITOR.orders}
+    displaced = 0
+    _EARN["waiting"] = []
+    for cand in scored:
+        if placed >= EARN_MAX_PER_POLL:
+            break
+        m, est, tgt, qty = cand["m"], cand["est"], cand["tgt"], cand["qty"]
+        b, conf, scan, tier = cand["b"], cand["conf"], cand["scan"], cand["tier"]
+        px = round(tgt / 100.0, 2)
+        room = _earn_budget() - _earn_outstanding_usd()
+        note = ""
+        if cand["cost"] > room:
+            # NO ROOM — SO TAKE IT FROM THE WORST HOLDING, OR WAIT.
+            #
+            # The old code stopped here. Stopping is right only if everything
+            # already in the book is better than everything outside it, and
+            # nothing ever checked that. A market that got in early on a $0.02
+            # /day estimate held its slot against a market worth twenty times
+            # as much simply for being first.
+            #
+            # Displacement is deliberately hard to trigger: the newcomer has to
+            # beat the weakest holding by a wide margin, the holding has to have
+            # had a real run on the book first, and only a couple can change
+            # hands in a poll. Churn costs queue position, which is worth money.
+            grad = _EARN.get("grad") or set()
+            victims = sorted(
+                ((est_by_id.get(oid, 0.0) / max(1e-9, r_[2] / 100.0 * r_[3]),
+                  oid, r_[0], r_[2], r_[3])
+                 for oid, r_ in _EARN["orders"].items()
+                 if oid not in grad and now - r_[4] >= EARN_DISPLACE_MIN_AGE),
+                key=lambda v_: v_[0])
+            v = victims[0] if victims else None
+            if (v is None or displaced >= EARN_DISPLACE_PER_POLL
+                    or cand["yield"] < EARN_DISPLACE_RATIO * v[0]
+                    or room + v[3] / 100.0 * v[4] < cand["cost"]):
+                # Keep the queue visible: the owner asked what the bottleneck
+                # is, and this list IS the bottleneck — priced, in order.
+                if len(_EARN["waiting"]) < EARN_WAITING_KEEP:
+                    if v is None:
+                        why = ("no holding is old enough to displace yet — "
+                               f"they all went on the book inside the last "
+                               f"{EARN_DISPLACE_MIN_AGE/60:.0f} minutes")
+                    elif displaced >= EARN_DISPLACE_PER_POLL:
+                        why = "the book already changed hands twice this poll"
+                    elif cand["yield"] < EARN_DISPLACE_RATIO * v[0]:
+                        why = (f"the weakest holding ({v[2]}) earns "
+                               f"${v[0]*100:.1f}/day per $100 at risk and this "
+                               f"offers ${cand['yield']*100:.1f} — not the "
+                               f"{EARN_DISPLACE_RATIO:g}x it takes to be worth "
+                               f"the churn")
+                    else:
+                        why = (f"displacing {v[2]} would still leave "
+                               f"${cand['cost'] - room - v[3]/100.0*v[4]:.2f} "
+                               f"short of the ${cand['cost']:.2f} this needs")
+                    _EARN["waiting"].append(
+                        {"m": m, "est": round(est, 3), "cost": round(cand["cost"], 2),
+                         "ypd": round(cand["yield"], 3), "px": tgt, "qty": qty,
+                         "tier": tier, "why": why})
+                continue
+            vyld, void, vm, vpx, vqty = v
+            try:
+                requests.request(
+                    "POST", tr.TRADE_API + f"/v1/order/{void}/cancel",
+                    headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST",
+                                               f"/v1/order/{void}/cancel"),
+                             "Content-Type": "application/json"},
+                    json={"marketSlug": vm}, timeout=15)
+            except Exception:  # noqa: BLE001 — a failed cancel just means no room
+                continue
+            _EARN["cancelled"].add(void)
+            _EARN["orders"].pop(void, None)
+            _EARN["last"][vm] = now + EARN_WITHDRAW_COOLDOWN - EARN_COOLDOWN
+            displaced += 1
+            _earn_log(vm, "displaced", vpx / 100.0, vqty,
+                      f"${vyld*100:.1f}/day per $100 at risk — {m} offers "
+                      f"${cand['yield']*100:.1f}, so the capital moves there")
+            note = f" (displacing {vm})"
         try:
             r = requests.request(
                 "POST", tr.TRADE_API + "/v1/orders",
@@ -6575,8 +6714,9 @@ def auto_earn() -> None:
                          " at the touch")
                 _earn_log(m, "placed", px, qty,
                           f"{tier}: est ${est:.2f}/d vs ${px*qty:.2f} worst case "
+                          f"= ${cand['yield']*100:.1f}/day per $100 at risk "
                           f"(band {b['lo']}–{b['hi']}¢, {b['fills']}t/{b.get('rested',0)}r, "
-                          f"confidence {conf['score']:.2f} {conf['verdict']}{stand})")
+                          f"confidence {conf['score']:.2f} {conf['verdict']}{stand}){note}")
                 placed += 1
         except Exception:  # noqa: BLE001 — the earner must never kill the poll
             continue
@@ -7767,6 +7907,33 @@ def do_maction(body: dict) -> tuple[int, dict]:
         del ACTIONS[:-20]
         POLL_KICK.set()   # save + payload refresh promptly
         return 200, {"ok": True, "which": which, "on": on}
+    if op == "budget":
+        # Move the earner's search budget. The client sends a DIRECTION, never
+        # a dollar figure — the same reason do_qualify computes its own size —
+        # so a stale or tampered page cannot name an amount, only nudge by the
+        # server's own step, and the ceiling is enforced here.
+        d = str(body.get("dir") or "")
+        if d not in ("up", "down"):
+            return 400, {"ok": False, "error": "dir must be up or down"}
+        with MONITOR.lock:
+            was = _earn_budget()
+            now_v = max(0.0, min(EARN_BUDGET_MAX,
+                                 was + (EARN_BUDGET_STEP if d == "up"
+                                        else -EARN_BUDGET_STEP)))
+            MONITOR.state["earn_budget"] = round(now_v, 2)
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": "[earn budget]", "side": "budget",
+                        "from": f"${was:,.0f}", "to": f"${now_v:,.0f}", "size": "",
+                        "status": 200, "response": "owner adjustment",
+                        "verified": True})
+        del ACTIONS[:-20]
+        _earn_log("[owner]", "budget", 0.0, 0,
+                  f"search budget ${was:,.0f} -> ${now_v:,.0f} of worst case"
+                  + (f" (ceiling ${EARN_BUDGET_MAX:,.0f})"
+                     if now_v >= EARN_BUDGET_MAX else ""))
+        POLL_KICK.set()
+        return 200, {"ok": True, "budget": round(now_v, 2),
+                     "max": EARN_BUDGET_MAX, "was": round(was, 2)}
     if op == "qual":
         # The owner's decision on one queued qualification. Approve places it
         # immediately regardless of the cost gate that queued it — that gate
@@ -7829,7 +7996,7 @@ def do_maction(body: dict) -> tuple[int, dict]:
         return 200, {"ok": True}
     return 400, {"ok": False,
                  "error": "op must be place, modify, cancel, qualify, qual, "
-                          "defend or undefend"}
+                          "budget, defend or undefend"}
 
 
 # ---------------------------------------------------------------------------
@@ -8245,10 +8412,18 @@ def _map_payload() -> dict:
         "earn_log": list(reversed((MONITOR.state.get("earn_log") or [])[-30:])),
         "earn_stats": MONITOR.state.get("earn_stats") or {},
         "probe_scoreboard": MONITOR.state.get("probe_scoreboard") or {},
-        "earn_caps": {"per_mkt": EARN_MAX_USD, "total": EARN_TOTAL_USD,
+        "earn_caps": {"per_mkt": EARN_MAX_USD, "total": round(_earn_budget(), 2),
+                      "total_max": EARN_BUDGET_MAX, "step": EARN_BUDGET_STEP,
                       "outstanding": round(_earn_outstanding_usd(), 2),
                       "grad_usd": round(_earn_graduated_usd(), 2),
-                      "grad_max": EARN_GRAD_MAX_USD},
+                      "grad_max": EARN_GRAD_MAX_USD,
+                      # markets that passed every rule and were turned away for
+                      # want of budget, best first — the bottleneck, priced
+                      "waiting": list(_EARN.get("waiting") or []),
+                      "waiting_est": round(sum(w.get("est") or 0
+                                               for w in (_EARN.get("waiting") or [])), 2),
+                      "waiting_cost": round(sum(w.get("cost") or 0
+                                                for w in (_EARN.get("waiting") or [])), 2)},
         # slug -> human label, from the exchange's own naming
         "labels": {o["market"]: (
                        (o.get("subject") or "").strip()
@@ -9328,6 +9503,48 @@ function renderEarn(){
     '/market) · graduated $' + (caps.grad_usd || 0).toFixed(2) +
     ' of $' + (caps.grad_max || 0).toFixed(0) + ' — proven orders keep earning ' +
     'without using the search budget</div>' +
+    // The dial itself. Raising it takes two taps like every other control that
+    // puts money at risk; lowering it takes one. Neither places an order — the
+    // earner still has to be switched on and every rule still applies.
+    (function(){
+      const step = caps.step || 50, mx = caps.total_max || 0, cur = caps.total || 0;
+      return '<div style="margin:2px 0 8px">' +
+        '<button class="btn" onclick="budTap(1)"' +
+        (cur >= mx ? ' disabled' : '') + '>' +
+        (BUDARM ? 'tap again — raise to $' + Math.min(mx, cur + step).toFixed(0)
+                : '+$' + step.toFixed(0) + ' search budget') + '</button> ' +
+        '<button class="btn" onclick="budTap(-1)"' +
+        (cur <= 0 ? ' disabled' : '') + '>&minus;$' + step.toFixed(0) + '</button>' +
+        '<span class="sub" style="margin-left:8px">ceiling $' + mx.toFixed(0) +
+        '</span><div id="budMsg" class="sub"></div></div>';
+    })() +
+    // THE BOTTLENECK, PRICED. Every market here passed the confidence floor,
+    // the Silver cap, the deal test and the Target Size check, and got nothing
+    // but a place in the queue because the budget ran out. The total is what
+    // raising EARN_TOTAL_USD would actually buy.
+    (function(){
+      const w = caps.waiting || [];
+      if(!w.length) return '';
+      const rowsW = w.map(x =>
+        '<tr><td class="mkt" style="word-break:normal"><b>' + nm(x.m) + '</b>' +
+        whyLink(x.m) +
+        '<div class="sub" style="font-size:10px">' + (x.why || '') + '</div></td>' +
+        '<td class="r" style="font-size:11px"><span style="color:#3fb950;' +
+        'font-weight:600">$' + (x.est || 0).toFixed(2) + '/day</span><br>' +
+        x.qty + ' @ ' + x.px + '¢ = $' + (x.cost || 0).toFixed(2) + ' at risk' +
+        '<div class="sub" style="font-size:10px">$' +
+        ((x.ypd || 0) * 100).toFixed(0) + '/day per $100</div></td></tr>').join('');
+      return '<details style="margin-top:8px"><summary style="cursor:pointer;' +
+        'font-size:12px;color:#f2cd7f">⏳ ' + w.length + ' market' +
+        (w.length === 1 ? '' : 's') + ' waiting on budget — $' +
+        (caps.waiting_est || 0).toFixed(2) + '/day for $' +
+        (caps.waiting_cost || 0).toFixed(2) + ' more exposure</summary>' +
+        '<div class="sub" style="font-size:11px;margin:4px 0">These passed ' +
+        'every rule and were turned away for want of money, best first. ' +
+        'Raising the search budget is what puts them on the book.</div>' +
+        '<table style="width:100%;border-collapse:collapse">' + rowsW +
+        '</table></details>';
+    })() +
     (rows || '<div class="sub">no bids resting</div>') +
     (lines ? '<details style="margin-top:8px"><summary class="sub" style="cursor:pointer">' +
       'journal (' + log.length + ')</summary>' + lines + '</details>' : '');
@@ -9364,6 +9581,23 @@ async function swTap(k){
   swRender();
   if(!r.ok && b){ b.querySelector('.st').textContent='failed: '+r.msg; b.disabled=false; }
   setTimeout(load, 1500);
+}
+// The search budget dial. The client sends a direction only; the server owns
+// the step and the ceiling, so a stale page cannot name an amount.
+let BUDARM = 0, BUDT = null;
+async function budTap(d){
+  if(d > 0 && !BUDARM){
+    BUDARM = 1; renderEarn();
+    BUDT = setTimeout(()=>{ BUDARM = 0; renderEarn(); }, 5000);
+    return;
+  }
+  if(BUDT) clearTimeout(BUDT);
+  BUDARM = 0;
+  const r = await act({op:'budget', dir: d > 0 ? 'up' : 'down'});
+  renderEarn();
+  const el = document.getElementById('budMsg');
+  if(el && !r.ok) el.textContent = 'failed: ' + r.msg;
+  setTimeout(load, 1200);
 }
 function tglGaps(){ SHOWGAPS=!SHOWGAPS; render(); }
 // --- new order ----------------------------------------------------------
