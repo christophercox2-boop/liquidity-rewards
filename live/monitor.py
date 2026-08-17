@@ -8239,6 +8239,34 @@ def do_maction(body: dict) -> tuple[int, dict]:
         del ACTIONS[:-20]
         POLL_KICK.set()   # save + payload refresh promptly
         return 200, {"ok": True, "which": which, "on": on}
+    if op == "rescout":
+        # Make the preferred families eligible for a fresh scout RIGHT NOW.
+        # The prober skips a market for PROBE_COOLDOWN after it last looked,
+        # and orders its queue by how long ago that was, so a board whose fair
+        # values just changed still waits its turn behind markets nothing has
+        # changed about (owner, 2026-08-17: "do three or four runs of the
+        # prober for the 2028 slate so it can really evaluate them with the new
+        # numbers").
+        #
+        # This places nothing. It clears a timer. The prober still has to be
+        # switched on, and every scout it then places faces the same rules —
+        # which now include the owner's own fair values, since that is the
+        # point of re-looking.
+        freed = [m_ for m_ in list(_PROBE.get("last") or {}) if _preferred(m_)]
+        for m_ in freed:
+            _PROBE["last"][m_] = 0.0
+        n_pref = sum(1 for m_ in tr._BOOK_CACHE if _preferred(m_))
+        _probe_log("[owner]", "rescout", "+", 0.0,
+                   f"{len(freed)} preferred market(s) cleared for an immediate "
+                   f"re-scout of {n_pref} on the board")
+        POLL_KICK.set()
+        return 200, {"ok": True, "freed": len(freed), "board": n_pref,
+                     "on": _auto_on("probe"),
+                     "note": (f"{len(freed)} cleared — the prober will work "
+                              f"through them over the next few polls"
+                              if _auto_on("probe") else
+                              "cleared, but the Prober switch is OFF so nothing "
+                              "will go out until you turn it on")}
     if op == "fair":
         # The owner's hand-set fair value for a market no forecast covers.
         # Places nothing by itself — but it feeds _bid_allowed, _ask_allowed and
@@ -8365,7 +8393,7 @@ def do_maction(body: dict) -> tuple[int, dict]:
         return 200, {"ok": True}
     return 400, {"ok": False,
                  "error": "op must be place, modify, cancel, qualify, qual, "
-                          "budget, fair, defend or undefend"}
+                          "budget, fair, rescout, defend or undefend"}
 
 
 # ---------------------------------------------------------------------------
@@ -9656,8 +9684,26 @@ function renderSlate(){
     '<span style="color:#93a0b4">■</span> not entered</div>';
   Object.keys(groups).forEach(g => {
     const list = groups[g], sub = list.reduce((t,r)=>t+r.rate,0);
+    // ODDS IN AN EVENT SUM TO ONE. Only one of these people wins the
+    // nomination, so the hand-set numbers across a group should add to about
+    // 100c. They are typed one market at a time with nothing tying them
+    // together, so the total is the only thing that catches a slate priced
+    // 140c — every number individually plausible, the set impossible.
+    const priced = list.filter(r => r.fair != null);
+    const tot = priced.reduce((t,r) => t + r.fair, 0);
+    const totCol = priced.length < 2 ? 'var(--dim)'
+                 : Math.abs(tot - 100) <= 8 ? '#8fe3b8'
+                 : Math.abs(tot - 100) <= 25 ? '#f2cd7f' : '#ff9d99';
     h += '<div style="font-size:11px;color:var(--dim);margin:10px 0 5px">' + esc(g) +
-         ' — $' + sub.toFixed(2) + '/day</div><div class="fgrid">' +
+         ' — $' + sub.toFixed(2) + '/day' +
+         (priced.length ? ' · <span style="color:' + totCol + '">your odds total ' +
+            tot.toFixed(1) + '¢' + (priced.length < list.length
+              ? ' across ' + priced.length + ' of ' + list.length : '') +
+            (priced.length >= 2 && Math.abs(tot - 100) > 8
+              ? (tot > 100 ? ' — over 100¢, someone is priced too high'
+                           : ' — under 100¢, room left on the board') : '') +
+            '</span>' : '') +
+         '</div><div class="fgrid">' +
       list.map(r => {
         const [c, bd] = tone(r);
         // The fair-value chip. Silver prices no 2028 market, so without a
@@ -9678,6 +9724,11 @@ function renderSlate(){
           (r.fair == null ? 'var(--dim)' : '#f2cd7f') + '">' +
           (r.fair == null ? 'set fair'
              : r.fair.toFixed(1) + '¢' + gapTag(r.fair, mid)) + '</div>' +
+          // the same number as a share of the group, so a slate that adds to
+          // 140c still says what each person is really being given
+          (r.fair != null && tot > 0 && priced.length > 1
+            ? '<div class="sub" style="font-size:9.5px">' +
+              (r.fair / tot * 100).toFixed(1) + '% of your board</div>' : '') +
           (FVOPEN[r.m] ?
             '<div class="ctlrow" style="margin-top:3px;gap:3px">' +
             '<input id="fv_' + esc(r.m) + '" type="number" step="0.1" min="0.1" ' +
@@ -9697,6 +9748,16 @@ function renderSlate(){
       }).join('') + '</div>';
   });
   document.getElementById('slateBody').innerHTML = h;
+}
+
+async function rescout2028(){
+  const b = document.getElementById('rescoutBtn');
+  const n = document.getElementById('rescoutNote');
+  if(b){ b.disabled = true; b.textContent = 'clearing…'; }
+  const r = await act({op:'rescout'});
+  if(b){ b.disabled = false; b.textContent = '↻ Re-scout the 2028 board'; }
+  if(n) n.textContent = r.ok ? r.msg : ('failed — ' + r.msg);
+  setTimeout(load, 2000);
 }
 
 function renderProbe(){
@@ -9964,6 +10025,13 @@ function renderProbe(){
     : '<div class="sub">no market has enough evidence for a fair-price estimate yet' +
       (on ? ' — scouts are out' : ' — Prober is off') + '</div>';
   document.getElementById('probeBody').innerHTML = headline +
+    // Re-scout the 2028 board on demand. The prober queues by how long ago it
+    // last looked at a market, so a board whose fair values just changed still
+    // waits its turn. This clears that timer for the preferred families; it
+    // places nothing on its own and the Prober switch still governs.
+    '<div style="margin:6px 0"><button class="alt" id="rescoutBtn" ' +
+    'onclick="rescout2028()">↻ Re-scout the 2028 board</button>' +
+    '<span class="sub" id="rescoutNote" style="margin-left:8px"></span></div>' +
     (bands ? chartLegend + bands : '') +
     '<details style="margin-top:2px"><summary class="sub" style="cursor:pointer">' +
     'fund, scouts and journal</summary>' + wallet +

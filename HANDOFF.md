@@ -1242,3 +1242,27 @@ filtered array, which renumbered every row: with the filter on, "Sell NOW" on
 the first row would have acted on `POSD[0]`, a different market entirely. The
 index is now looked up against the unfiltered array (`ALL.indexOf(r)`), and
 `t_filter2028.py` asserts that the one filtered row still carries index 1.
+
+### 2026-08-17 — odds totals on the slate, and re-scout on demand
+
+**Totals.** Only one candidate wins a nomination, so the hand-set numbers across
+an event should add to about 100c. They are typed one market at a time with
+nothing tying them together, so the group total is the only thing that catches a
+slate priced at 140c — every number individually plausible, the set impossible.
+Each group heading now carries "your odds total N¢", green within 8c of 100,
+amber to 25c, red beyond, and says which way it is off. Each face carries its
+own number as a share of the group, so a slate adding to 140c still says what
+each person is really being given.
+
+**Re-scout.** `op: "rescout"` zeroes `_PROBE["last"]` for the preferred families
+and nothing else, with a button on the prober card. It places NOTHING — it
+clears a timer. The prober orders its queue by how long ago it last looked at a
+market, so a board whose fair values just changed still waits its turn behind
+markets nothing has changed about; this puts the 2028 families at the front
+immediately. The reply says plainly when the Prober switch is off, because
+otherwise a cleared timer looks like nothing happened.
+
+Coverage maths, for expectations: `PROBE_MAX_PER_POLL` 5 at a 30s poll,
+`PROBE_PER_MARKET` 3, `PROBE_ACTIVE_MAX` 140. Sixty 2028 markets wanting three
+scouts each is 180, over the 140 cap, and it fills at 5 a poll — so roughly
+half an hour to saturate, not minutes. Each scout is one share.
