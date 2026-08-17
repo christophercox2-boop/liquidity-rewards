@@ -1163,3 +1163,21 @@ Not built: a prior source for the 2028 board. Silver covers senate and governor
 only, so every 2028 market is "unmodelled" and capped at 15c — which is why the
 party pair at 36c/53c stays out of reach whatever happens to this ceiling. The
 owner asked for a source; nothing has been chosen yet.
+
+### 2026-08-17 — prober fund $200, and placing from the slate
+
+**Info fund set to $200**, once, keyed `2026-08-17-owner-200usd` in
+`probe_grants`. Owner: "make the prober budget just 200 dollars and don't worry
+about adding to it. It looks like it will grow too anyways" — it does; probe
+rewards are credited straight back into the fund. **This is the last scheduled
+grant.** Do not add another that re-applies per poll: a grant that refills
+faster than the prober spends is not a budget, which is why every one of these
+blocks is one-shot and keyed by name.
+
+**Order form on the market detail panel** the slate opens (`openMkt`). Same
+/maction `place` route as every other order-touching control, so it inherits
+the dashboard key, the X-Reprice header, the known-market whitelist, the
+0.1–99.9c bounds and post-only. Price defaults to the touch on the chosen side,
+from the book already drawn above it. Two taps: the first arms and states side,
+size, price and dollars committed; the second sends. `t_slateorder.py` drives
+the real page in node and asserts that one tap sends nothing.

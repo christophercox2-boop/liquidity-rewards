@@ -4175,6 +4175,27 @@ def auto_probe() -> None:
     if topped is not False:
         _probe_log("[owner]", "grant", "+", 0.0,
                    f"info fund set to $100.00 (was ${topped:,.2f})")
+    # 2026-08-17 owner: "make the prober budget just 200 dollars and don't worry
+    # about adding to it. It looks like it will grow too anyways." Sets the fund
+    # to exactly $200 once, and that is the last scheduled grant — from here the
+    # fund lives on what the scouts themselves earn, which it does: probe
+    # rewards are credited straight back into it (see the accrual above).
+    #
+    # These blocks are deliberately one-shot and keyed by name in probe_grants.
+    # A grant that re-applied on every poll would refill the fund faster than
+    # the prober could spend it, which is not a budget at all.
+    topped200 = False
+    with MONITOR.lock:
+        grants = MONITOR.state.setdefault("probe_grants", [])
+        if "2026-08-17-owner-200usd" not in grants:
+            grants.append("2026-08-17-owner-200usd")
+            was = float(MONITOR.state.get("probe_budget") or 0.0)
+            MONITOR.state["probe_budget"] = 200.0
+            topped200 = was
+    if topped200 is not False:
+        _probe_log("[owner]", "grant", "+", 0.0,
+                   f"info fund set to $200.00 (was ${topped200:,.2f}) — the last "
+                   f"scheduled grant; it grows on what the scouts earn from here")
     # After a rebuild the in-memory registry is empty but our scouts still
     # rest on the exchange. Re-adopt from the mirror saved in state, keeping
     # only orders that still exist — so fills keep moving the fund and TTLs
@@ -9286,6 +9307,9 @@ async function openMkt(slug){
       '<td class="r sub">' + (mine ? mine.toLocaleString() + ' ours' : '') + '</td></tr>';
   }).join('') || '<tr><td class="sub">empty</td></tr>';
   const totRate = (d.orders || []).reduce((t, o) => t + (o.est_day || 0), 0);
+  const bestBid = (d.bids && d.bids.length) ? +(d.bids[0][0] * 100).toFixed(1) : null;
+  const bestAsk = (d.asks && d.asks.length) ? +(d.asks[0][0] * 100).toFixed(1) : null;
+  const bestPx = bestBid || bestAsk || 1;
   const ordRows = (d.orders || []).sort((a,b) => (b.est_day||0)-(a.est_day||0)).map(o =>
     '<tr><td>' + o.side + ' <b>' + (o.size||0).toLocaleString() + '</b> @ ' +
       cents(o.price) + (o.src ? ' <span class="sub">' + esc(o.src) + '</span>' : '') + '</td>' +
@@ -9315,8 +9339,79 @@ async function openMkt(slug){
       side(d.asks, 'SELL', '#e5645f') + '</table></div>' +
     '<div class="sub" style="margin:10px 0 4px">our orders — ' +
       (d.orders || []).length + ', earning $' + totRate.toFixed(2) + '/day</div>' +
-    '<table style="width:100%">' + ordRows + '</table>';
+    '<table style="width:100%">' + ordRows + '</table>' +
+    // PLACE FROM HERE. The slate opened this panel to look at a candidate and
+    // then gave you nowhere to act (owner, 2026-08-17: "add the ability to
+    // place orders from the slate page"). Same /maction route as every other
+    // order-touching control, so it inherits the dashboard key, the X-Reprice
+    // header, the known-market whitelist, the 0.1-99.9c bounds and post-only.
+    // Prices default to the touch on each side, since that is what the panel
+    // above is showing and re-typing a number off a chart is how a phone
+    // fat-fingers a price.
+    '<div style="border-top:1px solid var(--line);margin-top:10px;padding-top:8px">' +
+    '<div class="sub" style="margin-bottom:5px">place an order here</div>' +
+    '<div class="ctlrow rp" style="flex-wrap:wrap;gap:6px">' +
+    '<button class="alt" id="nsB" onclick="dside(&#39;BUY&#39;)">Buy</button>' +
+    '<button class="alt" id="nsS" onclick="dside(&#39;SELL&#39;)">Sell</button>' +
+    '<input id="dpx" type="number" step="0.1" min="0.1" max="99.9" ' +
+      'style="width:5.5em" value="' + (bestPx || 1) + '">' +
+    '<span class="sub">¢ ×</span>' +
+    '<input id="dqty" type="number" step="1" min="1" max="20000" ' +
+      'style="width:6em" value="10">' +
+    '<button id="dgo" onclick="dplace()">Place</button></div>' +
+    '<div class="sub" id="dmsg" style="margin-top:5px"></div></div>';
+  DSIDE = 'BUY';
+  DSLUG = slug;
+  DTOUCH = {BUY: bestBid, SELL: bestAsk};
+  dside('BUY');
   det.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+// The detail panel's order form. Two taps like every other control that puts
+// money on the exchange: the first arms and says exactly what will be sent,
+// the second sends it.
+let DSIDE = 'BUY', DSLUG = '', DTOUCH = {}, DARM = null, DARMT = null;
+function dside(s){
+  DSIDE = s;
+  const b = document.getElementById('nsB'), x = document.getElementById('nsS');
+  if(b) b.className = (s === 'BUY' ? '' : 'alt');
+  if(x) x.className = (s === 'SELL' ? '' : 'alt');
+  const px = document.getElementById('dpx');
+  if(px && DTOUCH[s]) px.value = DTOUCH[s];
+  darm(null);
+}
+function darm(v){
+  DARM = v;
+  if(DARMT) clearTimeout(DARMT);
+  const g = document.getElementById('dgo');
+  if(!g) return;
+  g.textContent = v ? 'Tap again to send' : 'Place';
+  g.className = v ? 'arm' : '';
+  if(v) DARMT = setTimeout(() => darm(null), 6000);
+}
+async function dplace(){
+  const c = parseFloat((document.getElementById('dpx') || {}).value);
+  const q = parseInt((document.getElementById('dqty') || {}).value, 10);
+  const msg = document.getElementById('dmsg');
+  const say = t => { if(msg) msg.textContent = t; };
+  if(!(c >= 0.1 && c <= 99.9)) return say('price must be between 0.1 and 99.9¢');
+  if(!(q >= 1 && q <= 20000)) return say('size must be between 1 and 20,000');
+  const key = DSIDE + ':' + c + ':' + q;
+  if(DARM !== key){
+    darm(key);
+    say(DSIDE + ' ' + q.toLocaleString() + ' @ ' + c + '¢ = $' +
+        (DSIDE === 'BUY' ? c / 100 * q : (100 - c) / 100 * q).toFixed(2) +
+        ' committed. Tap again to send.');
+    return;
+  }
+  darm(null);
+  const g = document.getElementById('dgo');
+  if(g){ g.disabled = true; g.textContent = 'sending…'; }
+  const r = await act({op:'place', market: DSLUG, side: DSIDE,
+                       price_cents: c, size: q});
+  if(g){ g.disabled = false; g.textContent = 'Place'; }
+  say(r.ok ? ('placed — ' + r.msg) : ('failed — ' + r.msg));
+  if(r.ok) setTimeout(() => openMkt(DSLUG), 1500);
 }
 
 function renderQual(){
