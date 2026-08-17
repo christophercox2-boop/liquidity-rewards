@@ -1288,3 +1288,48 @@ with `{}`, so `renderProbe` early-returned and `probeBody` was written exactly
 once — the "identical snapshots" were the pre-press render three times over.
 The stub now SERVES the payload from `fetch` and the test calls `load()` where
 the page calls it. Any DASH/MAP test that sets `DATA` by hand has this trap.
+
+### 2026-08-17 — the gap gate is gone, and the 2028 board runs off-budget
+
+Four owner instructions, one commit.
+
+**1. `PROBE_MIN_GAP` 3 -> 0.** Owner: "eliminate the gap limit. Obviously it is
+more attractive the larger the gap, but that is just a factor." At 3 it excluded
+79 of 180 markets outright (45 with no interior tick, 19 with one, 15 with two).
+Width is now a SORT KEY in the prober's queue — wider first — not a filter.
+Where there is no room between the touches the scout JOINS the touch: resting
+behind it never fills and teaches nothing, while joining measures the one thing
+a tight book has left to say, which is whether resting there gets you taken.
+
+**2. The 2028 board is outside every budget.** `_earn_outstanding_usd` and
+`_earn_graduated_usd` both skip preferred markets, the placement loop treats
+their room as unlimited, they are never displacement victims, and the
+graduation cap does not apply. A preferred market is no longer rationed against
+the 2026 board.
+
+**3. Per-market cap $15, growing to 3x with confidence.** `_earn_cap_usd`:
+`EARN_PREF_USD` (15) x `1 + (EARN_PREF_GROW-1) * min(1, conf/EARN_CONF_FULL)`,
+so $15 at zero confidence and $45 at full. The `cap *= qmul` confidence shrink
+is SKIPPED for preferred markets — confidence is already in the cap, and
+applying it twice would put a new market below the $15 the owner set as its
+starting size. Every other market keeps $6 and the shrink.
+
+**WHAT THIS COSTS, and nothing bounds it any more:** 43 reachable markets at $15
+is $645 of worst case, against a $100 budget for everything else. At full
+confidence the ceiling is $45 x 43 = $1,935. The earner card now prints the live
+figure — "2028 board: $X at risk across N markets - outside every budget" — and
+`earn_caps.pref_usd` carries it in the payload. That line is the check.
+
+**4. The flipper is much more aggressive on the 2028 board.** `_flip_ticks` /
+`_flip_step_after` / `_flip_loss_after` return preferred-specific values: sell
+one tick over cost instead of two, step the ladder down every 5 minutes instead
+of 30, stop anchoring to what we paid after an hour instead of a day. The
+reasoning is the same as the off-budget change — we are there to rest, a fill is
+the failure mode, and held stock ties up a per-market cap meant to be working.
+`FLIP_SKIP_PREFIXES` is untouched: the party markets are still never flipped.
+
+**Harness note, again.** Seven test files broke, all NameErrors for the new
+helpers. Every one was fixed by exec'ing the REAL function from source into the
+namespace, never by stubbing it. `t_offbudget.py` also read as an exemption leak
+until the victims were given a real `est_day` — with `MONITOR.orders` empty
+every holding yields 0 and any candidate displaces it.

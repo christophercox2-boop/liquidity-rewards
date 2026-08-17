@@ -3607,7 +3607,16 @@ PREFER_PREFIXES = tuple(
 
 def _preferred(m: str) -> bool:
     return bool(PREFER_PREFIXES) and m.startswith(PREFER_PREFIXES)
-PROBE_MIN_GAP = 3             # need at least this many interior ticks to learn
+# A WIDE SPREAD IS A FACTOR, NOT A GATE (owner, 2026-08-17: "eliminate the gap
+# limit. Obviously it is more attractive the larger the gap, but that is just a
+# factor"). At 3 it excluded 79 of 180 markets outright — 45 with no interior
+# tick at all, 19 with one, 15 with two — including both party markets and the
+# Trump nomination markets. A tight book is not uninformative; it is a book
+# where the price question is already answered and the open question is whether
+# resting there gets you taken. So the prober now works every two-sided market
+# and simply prefers the wider ones, and where there is no room between the
+# touches it joins the touch instead of skipping.
+PROBE_MIN_GAP = int(os.environ.get("PROBE_MIN_GAP", "0"))
 PROBE_MAX_PX = 0.60           # never probe-bid above this
 PROBE_FLIP_TICKS = 2
 # PACE. The binding limit was never the placement rate — it was turnover.
@@ -4497,8 +4506,19 @@ def auto_probe() -> None:
     # no forecast means the evidence has to come from our own scouts — so
     # putting the 2028 board at the front of this queue is what actually gets
     # the earner into it.
+    def _width(m_):
+        """Interior ticks between the real touches — negative so wider sorts
+        first. A factor in the ordering now, never a filter."""
+        ent_ = tr._BOOK_CACHE.get(m_)
+        if not ent_:
+            return 0
+        rb, ra = _probe_real_touches(ent_[1])
+        if not rb or not ra:
+            return 0
+        return -max(0, round(ra[0] / 0.01) - round(rb[0] / 0.01) - 1)
     mkts.sort(key=lambda m_: (0 if _preferred(m_) else 1,
                               1 if (est.get(m_) or _PROBE["last"].get(m_)) else 0,
+                              _width(m_),
                               _PROBE["last"].get(m_, 0.0)))
     for m in mkts:
         if placed >= PROBE_MAX_PER_POLL or len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
@@ -4521,7 +4541,16 @@ def auto_probe() -> None:
         lo_t = round(bb / 0.01) + 1
         hi_t = round(ba / 0.01) - 1
         if hi_t - lo_t + 1 < PROBE_MIN_GAP:
-            continue          # spread too tight to learn anything
+            continue          # only bites if the owner sets a floor again
+        # NO ROOM BETWEEN THE TOUCHES — JOIN ONE. There is nowhere to rest
+        # inside a 48/49 book, and resting BEHIND the touch teaches nothing
+        # because it never fills. Joining does: what a tight market has left to
+        # tell us is not where fair value is (the book already says, within a
+        # tick) but whether resting there gets us taken, and that is measured
+        # by sitting at the touch and seeing.
+        touch_join = hi_t < lo_t
+        if touch_join:
+            lo_t = hi_t = round(bb / 0.01)
         # never two scouts of ours at the same tick — a repeated price is a
         # repeated observation, which adds cost without adding confidence
         taken = {round(r[2] / 0.01) for r in here}
@@ -4710,6 +4739,10 @@ def _probe_status(m: str) -> dict:
         out["block"] = (f"the spread is {out['gap']} tick(s) wide and needs "
                         f"{PROBE_MIN_GAP} — too tight to learn anything")
         return out
+    if out["gap"] <= 0:
+        out["note"] = ("no room between the touches — a scout here joins the "
+                       "touch and measures whether it gets taken, rather than "
+                       "testing a price")
     return out
 
 
@@ -5110,6 +5143,34 @@ def _bayes_fair(m: str) -> dict | None:
 # the speculative zone above the band 15%. The penny ceiling keeps "total
 # loss is trivial" true; expensive markets are not the earner's game.
 EARN_MAX_USD = float(os.environ.get("EARN_MAX_USD", "6.0"))
+# THE 2028 BOARD IS OFF THE BUDGET AND ON ITS OWN CAP (owner, 2026-08-17:
+# "don't count 2028 markets in any budget or limit for now and just limit per
+# market to $15 for initial that can increase as it becomes more confident").
+#
+# Both halves matter. Off-budget means a preferred market never competes with a
+# 2026 race for the search dollars and never gets displaced by one — the board
+# the owner wants to be in stops being rationed. And $15 initial rather than $6
+# means a market enters at a size worth having instead of climbing to it.
+#
+# What it costs, stated where it will be read: 43 reachable markets at $15 is
+# $645 of worst case, against a $100 budget for everything else. That is the
+# number to check if this ever needs winding back. The rung ladder, the price
+# ceilings, the deal test, the Silver and owner-fair caps and the Target Size
+# check all still apply — this changes how much money may sit behind them, not
+# whether they run.
+EARN_PREF_USD = float(os.environ.get("EARN_PREF_USD", "15.0"))
+# ...and it grows with confidence, up to this multiple of the initial.
+EARN_PREF_GROW = float(os.environ.get("EARN_PREF_GROW", "3.0"))
+EARN_PREF_OFF_BUDGET = os.environ.get("EARN_PREF_OFF_BUDGET", "1") != "0"
+
+
+def _earn_cap_usd(m: str, conf_score: float) -> float:
+    """Dollars of worst case allowed in ONE market, before the tier and the
+    confidence multiplier trim it further."""
+    if not (_preferred(m) and EARN_PREF_OFF_BUDGET):
+        return EARN_MAX_USD
+    grow = 1.0 + (EARN_PREF_GROW - 1.0) * min(1.0, conf_score / EARN_CONF_FULL)
+    return EARN_PREF_USD * grow
 EARN_TOTAL_USD = float(os.environ.get("EARN_TOTAL_USD", "100.0"))
 EARN_MAX_SHARES = 200
 # START SMALL AND EARN THE RIGHT TO GROW.
@@ -5236,6 +5297,36 @@ EARN_FLIP_STEP_AFTER = float(os.environ.get("EARN_FLIP_STEP_AFTER", "1800"))
 # but not before giving the position a proper run at earning first — and a
 # flip that is still collecting rewards never reaches this at all.
 EARN_FLIP_LOSS_AFTER = float(os.environ.get("EARN_FLIP_LOSS_AFTER", "86400"))
+# THE 2028 BOARD FLIPS HARD (owner, 2026-08-17: "for 2028 markets the flipper
+# should be much much more aggressive").
+#
+# The reason it should is the same reason the board is off the budget: we are
+# there to rest and collect, and a fill is the failure mode, not a trade we
+# wanted. Holding the stock afterwards ties up the per-market cap that is
+# supposed to be working as a resting order, and a longshot bought at 10c does
+# not drift back up while we wait — the patient ladder above was written for a
+# board where inventory was rare.
+#
+# So on the preferred families: sell one tick over cost instead of two, step
+# the ladder down every five minutes instead of every thirty, and stop
+# anchoring to what we paid after an hour instead of a day. Everything else
+# about the flipper is unchanged — same guards, same skip list, same vanish
+# damping.
+EARN_FLIP_TICKS_PREF = int(os.environ.get("EARN_FLIP_TICKS_PREF", "1"))
+EARN_FLIP_STEP_PREF = float(os.environ.get("EARN_FLIP_STEP_PREF", "300"))
+EARN_FLIP_LOSS_PREF = float(os.environ.get("EARN_FLIP_LOSS_PREF", "3600"))
+
+
+def _flip_ticks(m: str) -> int:
+    return EARN_FLIP_TICKS_PREF if _preferred(m) else EARN_FLIP_TICKS
+
+
+def _flip_step_after(m: str) -> float:
+    return EARN_FLIP_STEP_PREF if _preferred(m) else EARN_FLIP_STEP_AFTER
+
+
+def _flip_loss_after(m: str) -> float:
+    return EARN_FLIP_LOSS_PREF if _preferred(m) else EARN_FLIP_LOSS_AFTER
 # What counts as running out of cash: the info fund spent down, or buying
 # power at the qualifier's reserve.
 CASH_LOW_FUND = float(os.environ.get("CASH_LOW_FUND", "25"))
@@ -5508,14 +5599,18 @@ def _earn_outstanding_usd() -> float:
     Graduates are excluded on purpose — they have proved themselves, so the
     budget they were using goes back to looking for the next one."""
     grad = _EARN.get("grad") or set()
-    return sum(px / 100.0 * q for oid, (_, _, px, q, _) in _EARN["orders"].items()
-               if oid not in grad)
+    return sum(px / 100.0 * q
+               for oid, (m_, _, px, q, _) in _EARN["orders"].items()
+               if oid not in grad
+               and not (_preferred(m_) and EARN_PREF_OFF_BUDGET))
 
 
 def _earn_graduated_usd() -> float:
     grad = _EARN.get("grad") or set()
-    return sum(px / 100.0 * q for oid, (_, _, px, q, _) in _EARN["orders"].items()
-               if oid in grad)
+    return sum(px / 100.0 * q
+               for oid, (m_, _, px, q, _) in _EARN["orders"].items()
+               if oid in grad
+               and not (_preferred(m_) and EARN_PREF_OFF_BUDGET))
 
 
 def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
@@ -5736,14 +5831,15 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
                                  f"it (need {EARN_QUEUE_MIN:,.0f} to rest behind)"))
                 continue
             # confidence tier sets the exposure: proven / stretch / speculative
+            mcap = _earn_cap_usd(m, conf["score"])
             if pc <= b["med"]:
-                cap = EARN_MAX_USD
+                cap = mcap
                 tier = "proven"
             elif pc <= b["hi"]:
-                cap = EARN_MAX_USD * 0.4
+                cap = mcap * 0.4
                 tier = "stretch"
             else:
-                cap = EARN_MAX_USD * 0.15
+                cap = mcap * 0.15
                 tier = "speculative"
             # SIZE FALLS AWAY FROM THE MODEL. Even inside the cap, paying
             # above a forecast is paying a premium, and the premium should buy
@@ -5756,7 +5852,13 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
             # buys a thin position. Applied to the dollar cap AND the rung so
             # a low-confidence market cannot climb the size ladder into full
             # exposure while it is still standing off the touch.
-            cap *= qmul
+            # Confidence is already IN the preferred cap — _earn_cap_usd grows
+            # it from the initial as confidence rises — so applying qmul on top
+            # would shrink a new 2028 market below the $15 the owner set as its
+            # starting size, which is the opposite of the instruction. Every
+            # other market keeps the shrink.
+            if not (_preferred(m) and EARN_PREF_OFF_BUDGET):
+                cap *= qmul
             rung_sz = max(1, int(_earn_rung_size(m) * qmul))
             q = max(1, min(EARN_MAX_SHARES, int(cap * 100 / pc), rung_sz))
             # score with us resting at pc: merge, walk the window from the
@@ -6345,7 +6447,8 @@ def auto_earn() -> None:
             _earn_log(fm, "flip vanished", fpxc / 100.0, fq,
                       f"exchange-side cancel ({n_} of {EARN_FLIP_VANISH_MAX}) — "
                       "still holding the stock, re-queueing")
-            _EARN.setdefault("toflip", []).append([fm, fpxc - EARN_FLIP_TICKS, fq, now])
+            _EARN.setdefault("toflip", []).append(
+                [fm, fpxc - _flip_ticks(fm), fq, now])
             continue
         # EVIDENCE, not just money. A flip that sells means a real buyer was
         # willing to pay that price, which is exactly what a sell scout goes
@@ -6408,7 +6511,7 @@ def auto_earn() -> None:
     # for peanuts, but the goal is to get money back").
     for foid, rec_ in list((_EARN.get("flips") or {}).items()):
         fm3, fpc3, fq3, fts3 = rec_[0], rec_[1], rec_[2], rec_[3]
-        cost3 = rec_[4] if len(rec_) > 4 else fpc3 - EARN_FLIP_TICKS
+        cost3 = rec_[4] if len(rec_) > 4 else fpc3 - _flip_ticks(fm3)
         since3 = rec_[5] if len(rec_) > 5 else fts3
         if now - fts3 < 300 or foid not in open_ids:
             continue                      # let a fresh flip settle first
@@ -6437,7 +6540,7 @@ def auto_earn() -> None:
         # "send me a ntfy and I will approve a sale like the one you just did
         # if I think it's justified"). So the automatic floor stays at fair
         # value; running low only changes who is asked, never what is done.
-        if (now - since3 >= EARN_FLIP_LOSS_AFTER and bids3 and not earning3
+        if (now - since3 >= _flip_loss_after(fm3) and bids3 and not earning3
                 and _cash_short() and bids3):
             askk = f"{fm3}|{int(fpc3)}"
             asked = MONITOR.state.setdefault("cash_asks", {})
@@ -6455,7 +6558,7 @@ def auto_earn() -> None:
                 _earn_log(fm3, "asked to sell low", fpc3 / 100.0, int(fq3),
                           f"cash is short and this has not earned in a day — "
                           f"best bid {bidc}¢, waiting on your say-so")
-        if now - since3 >= EARN_FLIP_LOSS_AFTER and bids3 and not earning3:
+        if now - since3 >= _flip_loss_after(fm3) and bids3 and not earning3:
             # Conceding to the market is for stock we should not be holding.
             # It is NOT licence to hand over something the model says is
             # nearly certain: Kentucky Senate Republican went at 72c on a
@@ -6475,7 +6578,7 @@ def auto_earn() -> None:
             # Not undercut — but is it just sitting there? Step half of it
             # down toward the floor so we find out where a buyer actually is
             # instead of waiting out a double that probably never comes.
-            if now - fts3 >= EARN_FLIP_STEP_AFTER and fpc3 > floor3_ + 1 and fq3 >= 2:
+            if now - fts3 >= _flip_step_after(fm3) and fpc3 > floor3_ + 1 and fq3 >= 2:
                 step_ = max(floor3_, round((fpc3 + floor3_) / 2))
                 half_ = max(1, int(fq3) // 2)
                 code_, res_ = do_reprice(foid, float(step_), quantity=half_)
@@ -6599,7 +6702,7 @@ def auto_earn() -> None:
         fq = int(min(fqty, net - committed - placed_pass.get(fm, 0.0) - reg))
         if fq < 1:
             continue
-        out = min(0.99, round((fpx_c + EARN_FLIP_TICKS) / 100.0, 2))
+        out = min(0.99, round((fpx_c + _flip_ticks(fm)) / 100.0, 2))
         ent_ = tr._BOOK_CACHE.get(fm)
         asks_ = (ent_[1].get("asks") or []) if ent_ else []
         if asks_:
@@ -6792,7 +6895,10 @@ def auto_earn() -> None:
             continue                      # this market has taken money off us
         if _on_book(m, "BUY", px / 100.0, qty, ts) is False:
             continue                      # not visibly resting, so not proven
-        if _earn_graduated_usd() + cost > EARN_GRAD_MAX_USD:
+        # a preferred market is off the graduate budget as well — it was never
+        # charged to the search budget, so graduating it moves nothing
+        if (not (_preferred(m) and EARN_PREF_OFF_BUDGET)
+                and _earn_graduated_usd() + cost > EARN_GRAD_MAX_USD):
             continue
         grad.add(oid)
         _earn_log(m, "graduated", px / 100.0, qty,
@@ -6932,6 +7038,9 @@ def auto_earn() -> None:
         px = round(tgt / 100.0, 2)
         room = _earn_budget() - _earn_outstanding_usd()
         note = ""
+        off_budget = _preferred(m) and EARN_PREF_OFF_BUDGET
+        if off_budget:
+            room = float("inf")      # not rationed against the 2026 board
         if cand["cost"] > room:
             # NO ROOM — SO TAKE IT FROM THE WORST HOLDING, OR WAIT.
             #
@@ -6946,11 +7055,14 @@ def auto_earn() -> None:
             # had a real run on the book first, and only a couple can change
             # hands in a poll. Churn costs queue position, which is worth money.
             grad = _EARN.get("grad") or set()
+            # Preferred holdings are not on the budget, so freeing one frees
+            # nothing — displacing it would be pure churn.
             victims = sorted(
                 ((est_by_id.get(oid, 0.0) / max(1e-9, r_[2] / 100.0 * r_[3]),
                   oid, r_[0], r_[2], r_[3])
                  for oid, r_ in _EARN["orders"].items()
-                 if oid not in grad and now - r_[4] >= EARN_DISPLACE_MIN_AGE),
+                 if oid not in grad and now - r_[4] >= EARN_DISPLACE_MIN_AGE
+                 and not (_preferred(r_[0]) and EARN_PREF_OFF_BUDGET)),
                 key=lambda v_: v_[0])
             v = victims[0] if victims else None
             if (v is None or displaced >= EARN_DISPLACE_PER_POLL
@@ -8872,6 +8984,15 @@ def _map_payload() -> dict:
                       "outstanding": round(_earn_outstanding_usd(), 2),
                       "grad_usd": round(_earn_graduated_usd(), 2),
                       "grad_max": EARN_GRAD_MAX_USD,
+                      # money resting in preferred markets, which no budget
+                      # bounds any more — the number to watch instead
+                      "pref_usd": round(sum(
+                          r_[2] / 100.0 * r_[3]
+                          for r_ in _EARN["orders"].values()
+                          if _preferred(r_[0])), 2),
+                      "pref_n": len({r_[0] for r_ in _EARN["orders"].values()
+                                     if _preferred(r_[0])}),
+                      "pref_cap": EARN_PREF_USD,
                       # markets that passed every rule and were turned away for
                       # want of budget, best first — the bottleneck, priced
                       "waiting": list(_EARN.get("waiting") or []),
@@ -10183,6 +10304,14 @@ function renderEarn(){
     '/market) · graduated $' + (caps.grad_usd || 0).toFixed(2) +
     ' of $' + (caps.grad_max || 0).toFixed(0) + ' — proven orders keep earning ' +
     'without using the search budget</div>' +
+    // The 2028 board is outside both budgets now, so the only thing that says
+    // how much is at risk there is this line. Nothing caps the total — only
+    // the per-market figure and how many markets there are.
+    (caps.pref_n ? '<div class="sub" style="margin-bottom:4px;color:#f2cd7f">' +
+      '2028 board: <b>$' + (caps.pref_usd || 0).toFixed(2) + '</b> at risk across ' +
+      caps.pref_n + ' market' + (caps.pref_n === 1 ? '' : 's') +
+      ' · $' + (caps.pref_cap || 0).toFixed(0) + '/market to start, growing with ' +
+      'confidence · <b>outside every budget</b></div>' : '') +
     // The dial itself. Raising it takes two taps like every other control that
     // puts money at risk; lowering it takes one. Neither places an order — the
     // earner still has to be switched on and every rule still applies.
