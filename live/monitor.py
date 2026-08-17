@@ -238,7 +238,6 @@ TRACKER_SEED = ("data/estimates.csv", "data/checks.csv", "data/estimate_runs.csv
 # on them is noise, not news.
 TRACKER_ROWS = ("data/rewards.csv", "data/checks.csv", "data/estimate_runs.csv",
                 "data/family_day.csv", "data/estimates.csv")
-TRACKER_ROWS_MAX = int(os.environ.get("TRACKER_ROWS_MAX", "60"))
 TRACKER_PUSH = ("STATUS.md", "data/rewards.csv", "data/checks.csv",
                 "data/estimates.csv", "data/estimate_runs.csv",
                 "data/family_day.csv", "data/live_orders.csv",
@@ -317,11 +316,15 @@ def _tracker_once() -> str:
     proc = subprocess.run([sys.executable, str(APP_DIR / "track_rewards.py")],
                           cwd=str(APP_DIR), capture_output=True, text=True,
                           timeout=1800)
+    # EVERY new row, whole, however many there are (owner, 2026-08-17: "I'll
+    # need a lot more than 60 lines. I'll want to see whatever is added no
+    # matter how long"). Nothing is capped and nothing is truncated — a
+    # shortened line is not the raw row. This is why the rows do NOT ride on
+    # data.json, which every open page refetches every POLL_SECONDS: the
+    # payload carries counts only and /track_rows.json serves the rows once,
+    # when a reading finishes.
     added: dict[str, dict] = {}
-    budget = TRACKER_ROWS_MAX
     for path in TRACKER_ROWS:
-        if budget <= 0:
-            break
         try:
             lines = (APP_DIR / path).read_text().splitlines()
         except Exception:  # noqa: BLE001
@@ -329,12 +332,9 @@ def _tracker_once() -> str:
         if not lines:
             continue
         seen = before.get(path) or set()
-        fresh = [l for l in lines[1:] if l and l not in seen][:budget]
-        if not fresh:
-            continue
-        budget -= len(fresh)
-        added[path] = {"header": lines[0][:400],
-                       "rows": [l[:400] for l in fresh]}
+        fresh = [l for l in lines[1:] if l and l not in seen]
+        if fresh:
+            added[path] = {"header": lines[0], "rows": fresh}
     TRACKER_STATUS["new_rows"] = added
     tail = " ".join(((proc.stdout or "") + " " + (proc.stderr or "")).split())[-300:]
     files = {}
@@ -1368,7 +1368,12 @@ class Monitor:
                     "every_s": TRACKER_INTERVAL,
                     "age_s": (int(time.time() - TRACKER_STATUS["ok_ts"])
                               if TRACKER_STATUS.get("ok_ts") else None),
-                    "new_rows": TRACKER_STATUS.get("new_rows") or {},
+                    # counts only — the rows themselves are served by
+                    # /track_rows.json so this payload stays small on the
+                    # 30-second refresh every open page runs
+                    "new_row_counts": {
+                        f: len((v or {}).get("rows") or [])
+                        for f, v in (TRACKER_STATUS.get("new_rows") or {}).items()},
                 },
                 "persistence": (
                     f"github — SAVES FAILING ({SAVE_STATUS['err']})"
@@ -3445,6 +3450,17 @@ def auto_snipe() -> None:
             if ok:
                 took += 1
                 spent += px * qty
+                # A SHORT IS A POSITION, AND IT WANTS CLOSING. Selling into an
+                # over-priced bid leaves us short at px; the profit is only
+                # realised by buying it back cheaper. That buy-back is a
+                # SELL_SHORT, which CLOSES a short and rests as a BID — the
+                # mirror of the flip, which sells stock as an ask (owner,
+                # 2026-08-17: "yes, what I mean is sell short bids").
+                if snipe_intent.endswith("BUY_SHORT"):
+                    _EARN.setdefault("toclose", []).append(
+                        [m, round(px * 100), qty, now])
+                    _earn_log(m, "to close", px, qty,
+                              f"sold short at {px*100:.0f}¢ — queued to buy back")
         except Exception:  # noqa: BLE001 — a sniper must never kill the poll
             continue
 
@@ -5432,6 +5448,13 @@ def auto_earn() -> None:
         px_ = float(o_.get("price") or 0) * 100
         qty_ = float(o_.get("size") or 0)
         if o_.get("side") == "BUY":
+            # A SELL_SHORT rests as a BID but CLOSES a short — it reduces
+            # exposure, so the model's bid cap has no business judging it.
+            # Without this the sweep would cancel every sniper buy-back the
+            # moment the price sat above fair, which is exactly when we most
+            # want out, and the close loop would just re-place it.
+            if str(o_.get("intent") or "").endswith("SELL_SHORT"):
+                continue
             if _bid_allowed(m_, px_):
                 continue
         else:
@@ -5511,6 +5534,9 @@ def auto_earn() -> None:
     if not _EARN.get("toflip"):
         _EARN["toflip"] = [list(j) for j in (MONITOR.state.get("earn_toflip") or [])
                            if len(j) == 4]
+    if not _EARN.get("toclose"):
+        _EARN["toclose"] = [list(j) for j in (MONITOR.state.get("earn_toclose") or [])
+                            if len(j) == 4]
     if not _EARN.get("flip_vanish"):
         _EARN["flip_vanish"] = {k: (int(v[0]), float(v[1])) for k, v
                                 in (MONITOR.state.get("earn_flip_vanish") or {}).items()
@@ -6095,6 +6121,76 @@ def auto_earn() -> None:
                           "inventory, so no buying power used")
         except Exception:  # noqa: BLE001 — a flip never kills the poll
             pass
+    # Buy back what the sniper sold short. The exact mirror of the flip loop
+    # above: that one sells stock we hold as an ask, this one buys back stock
+    # we owe as a bid, and neither may ever exceed the position.
+    placed_close: dict[str, float] = {}
+    for job in list(_EARN.get("toclose") or []):
+        cm, cpx_c, cqty, cts = job
+        if now - cts > EARN_FLIP_RETRY:
+            _EARN["toclose"].remove(job)
+            _earn_log(cm, "close missed", cpx_c / 100.0, cqty,
+                      "position never showed the short — left holding it")
+            continue
+        if cm in placed_close:
+            continue
+        net_c = tr._num((MONITOR.positions.get(cm) or {}).get("netPosition")) or 0
+        short_held = max(0.0, -net_c)          # a short is a NEGATIVE position
+        # buy-backs already resting against this short, plus anything this
+        # pass placed that the snapshot cannot know about yet
+        committed_c = sum(float(o.get("size") or 0) for o in MONITOR.orders
+                          if o.get("market") == cm
+                          and str(o.get("intent") or "").endswith("SELL_SHORT"))
+        cq = int(min(cqty, short_held - committed_c - placed_close.get(cm, 0.0)))
+        if cq < 1:
+            continue
+        # never pay more than we sold for: the buy-back is a profit or it is
+        # not worth doing. Join the touch when it sits under our target.
+        out_c = max(0.01, round((cpx_c - EARN_FLIP_TICKS) / 100.0, 2))
+        ent_c = tr._BOOK_CACHE.get(cm)
+        bids_c = (ent_c[1].get("bids") or []) if ent_c else []
+        if bids_c:
+            bb_c = float(bids_c[0][0])
+            if out_c < bb_c <= (cpx_c - 1) / 100.0:
+                out_c = round(bb_c, 2)
+        if out_c * 100 >= cpx_c:
+            continue                            # no room to profit
+        try:
+            r = requests.request(
+                "POST", tr.TRADE_API + "/v1/orders",
+                headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                         "Content-Type": "application/json"},
+                json={"marketSlug": cm, "intent": "ORDER_INTENT_SELL_SHORT",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{out_c:.2f}", "currency": "USD"},
+                      "quantity": cq,
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True},
+                timeout=20)
+            ok_c = r.status_code < 300
+            ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                            "market": cm, "side": "SNIPE close", "from": cpx_c,
+                            "to": round(out_c * 100, 1), "size": cq,
+                            "status": r.status_code,
+                            "response": " ".join(r.text.split())[:100],
+                            "verified": ok_c})
+            del ACTIONS[:-20]
+            if ok_c:
+                placed_close[cm] = placed_close.get(cm, 0.0) + cq
+                if cq >= cqty:
+                    _EARN["toclose"].remove(job)
+                else:
+                    job[2] = cqty - cq
+                try:
+                    oid_c = (r.json().get("order") or {}).get("id")
+                    if oid_c:
+                        _own_id("earn", str(oid_c))
+                except Exception:  # noqa: BLE001
+                    pass
+                _earn_log(cm, "closing", out_c, cq,
+                          f"buying back the {cq} sold short at {cpx_c:.0f}¢")
+        except Exception:  # noqa: BLE001 — a buy-back never kills the poll
+            pass
     # PROMOTE A MARKET THAT HELD ITS RUNG. An order that has rested untouched
     # for the promotion window, is visibly on the book and is actually earning
     # has proved that size is safe at that price — so the next order there may
@@ -6307,6 +6403,7 @@ def auto_earn() -> None:
         MONITOR.state["earn_orders_reg"] = {k: list(v) for k, v in _EARN["orders"].items()}
         MONITOR.state["earn_flips_reg"] = {k: list(v) for k, v in (_EARN.get("flips") or {}).items()}
         MONITOR.state["earn_toflip"] = [list(j) for j in (_EARN.get("toflip") or [])]
+        MONITOR.state["earn_toclose"] = [list(j) for j in (_EARN.get("toclose") or [])]
         # the vanish counter has to survive a restart, or a container replace
         # forgives the market and the re-place loop starts over
         MONITOR.state["earn_flip_vanish"] = {k: list(v) for k, v
@@ -11428,9 +11525,8 @@ function trackChanges(a, b){
 // (owner: "all I want to see is newly added rows parsed but otherwise raw.
 // Then I can click a button and see a summary"). Raw is the default view; the
 // interpretation is one tap away and never in the way.
-function trackRawRows(t){
-  const files = (t && t.new_rows) || {};
-  const names = Object.keys(files);
+function trackRawRows(files){
+  const names = Object.keys(files || {});
   if(!names.length) return '';
   let out = '';
   names.forEach(function(f){
@@ -11438,13 +11534,19 @@ function trackRawRows(t){
     const head = String(blk.header || '').split(',');
     const rows = blk.rows || [];
     if(!rows.length) return;
+    // Every row, however many — the owner asked to see whatever was added.
+    // Each file scrolls in its own pane so ten thousand rows cannot bury the
+    // page; both axes scroll, so nothing is cut off either.
     out += '<div style="margin-top:10px"><div class="sub" style="font-weight:600">'
-        + esc(f) + ' &mdash; ' + rows.length + ' new row'
+        + esc(f) + ' &mdash; ' + rows.length.toLocaleString() + ' new row'
         + (rows.length === 1 ? '' : 's') + '</div>'
-        + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;'
-        + 'font-size:11.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace">'
+        + '<div style="overflow:auto;max-height:60vh;border:1px solid '
+        + 'var(--line,#3a4454);border-radius:8px">'
+        + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;'
+        + 'font-family:ui-monospace,SFMono-Regular,Menlo,monospace">'
         + '<tr>' + head.map(function(h){
             return '<th style="text-align:left;padding:3px 6px;white-space:nowrap;'
+                 + 'position:sticky;top:0;background:var(--surface,#232b38);'
                  + 'color:var(--dim,#93a0b4);font-weight:600">' + esc(h) + '</th>'; }).join('')
         + '</tr>'
         + rows.map(function(r){
@@ -11455,6 +11557,18 @@ function trackRawRows(t){
         + '</table></div></div>';
   });
   return out;
+}
+// The rows are NOT on data.json — that payload is refetched every 30s by every
+// open page and an unbounded row dump does not belong on it. Fetch them once,
+// here, when a reading has just landed.
+async function trackFetchRows(){
+  try{
+    const h = {};
+    try{ const k = localStorage.getItem('dashKey'); if(k) h['X-Dash-Key'] = k; }catch(_){}
+    const r = await fetch('track_rows.json', {headers: h});
+    if(!r.ok) return {};
+    return (await r.json()).new_rows || {};
+  }catch(e){ return {}; }
 }
 var TRACK_SUMMARY = '';
 function trackToggleSummary(){
@@ -11538,13 +11652,15 @@ async function trackWatch(){
         }
         const took = Math.round((Date.now() - TRACK_T0) / 1000);
         const rows = trackChanges(TRACK_SNAP, trackSnap(d));
-        const raw = trackRawRows(t);
+        const files = await trackFetchRows();
+        const raw = trackRawRows(files);
         TRACK_SUMMARY = rows.join('');
         if(raw || rows.length){
-          const nrows = Object.keys((t.new_rows) || {}).reduce(
-            function(n, f){ return n + ((t.new_rows[f].rows || []).length); }, 0);
+          const counts = t.new_row_counts || {};
+          const nrows = Object.keys(counts).reduce(
+            function(n, f){ return n + (counts[f] || 0); }, 0);
           trackSay('read in ' + took + 's \u2014 '
-                   + (nrows ? nrows + ' new row' + (nrows === 1 ? '' : 's')
+                   + (nrows ? nrows.toLocaleString() + ' new row' + (nrows === 1 ? '' : 's')
                             : 'no new rows written')
                    + (rows.length ? ' \u00b7 ' + rows.length + ' figure'
                        + (rows.length === 1 ? '' : 's') + ' moved' : ''));
@@ -11785,6 +11901,11 @@ class Handler(BaseHTTPRequestHandler):
             slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]
             code, payload = market_info(slug)
             self._send(code, "application/json", json.dumps(payload).encode())
+        elif self.path.startswith("/track_rows.json"):
+            # the full set from the last reading, fetched once when it lands
+            self._send(200, "application/json", json.dumps(
+                {"new_rows": TRACKER_STATUS.get("new_rows") or {},
+                 "runs": TRACKER_STATUS.get("runs", 0)}).encode())
         elif self.path.startswith("/why.json"):
             from urllib.parse import parse_qs, urlparse
             slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]

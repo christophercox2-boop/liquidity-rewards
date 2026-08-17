@@ -300,10 +300,26 @@ nothing. It now sells from stock when the position covers the size, which is
 what makes the sniper and the flipper draw on one pool instead of the sniper
 shorting beside inventory the flipper was trying to sell.
 
-OPEN QUESTION for the owner: the sniper is a SELLER, so its fills leave SHORT
-positions, not shares. If the intent was also that the flipper should unwind
-those shorts (rest SELL_SHORT bids below the sale price to buy them back),
-that is a separate feature and is NOT built — ask before building it.
+ANSWERED and BUILT (owner, 2026-08-17: "yes, what I mean is sell short bids").
+The sniper's shorts are now closed the way the flipper closes longs, mirrored:
+the flip sells stock we HOLD as an ask, the close buys back stock we OWE as a
+bid, using ORDER_INTENT_SELL_SHORT which closes a short and rests as a BID.
+
+Queue is `_EARN["toclose"]`, persisted as `earn_toclose`. Same guards as the
+flip loop, because it can go wrong the same ways: bounded by the actual SHORT
+position (a negative netPosition), minus buy-backs already resting, minus what
+this pass placed; one order per market per pass; dropped after
+EARN_FLIP_RETRY. It also never pays at or above the sale price — the buy-back
+exists to realise the profit — and joins a bid that sits between our target
+and that ceiling.
+
+One thing that had to change with it: a SELL_SHORT rests as a BID, so the
+off-model sweep saw it as a buy and judged it with `_bid_allowed`. It would
+have cancelled every buy-back the moment the price sat above model fair, which
+is precisely when we most want out, and the close loop would have re-placed it
+— the same fight the 2028 party flips were losing. The sweep now skips
+SELL_SHORT outright: closing a short reduces exposure, so the bid cap has no
+business judging it.
 
 ### 2026-08-16 — Refresh button on the homepage (owner)
 
@@ -336,8 +352,16 @@ view is now the rows the reading actually appended to data/*.csv — split into
 columns, otherwise untouched — and the computed summary sits behind a Show
 summary button. `_tracker_once` diffs each append-history file as a SET of
 lines (not by index) before and after the run, so a file that is rewritten
-rather than appended still yields only genuinely new rows; capped at
-TRACKER_ROWS_MAX (60).
+rather than appended still yields only genuinely new rows.
+
+NO CAP (owner, 2026-08-17: "I'll need a lot more than 60 lines. I'll want to
+see whatever is added no matter how long"). Neither the row count nor the line
+length is limited — a shortened line is not the raw row. That is exactly why
+the rows do NOT ride on data.json, which every open page refetches every 30
+seconds: that payload carries per-file COUNTS only, and /track_rows.json
+serves the rows once, when a reading lands. Each file renders in its own
+scrollable pane with a sticky header so ten thousand rows cannot bury the
+page. Tested at 901 rows with a 900-character cell, nothing dropped or cut.
 
 t_button drives the real page in node across all three outcomes.
 
