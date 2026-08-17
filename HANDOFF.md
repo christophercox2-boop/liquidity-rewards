@@ -1359,3 +1359,14 @@ ask on the queue rather than dropping it silently.
 
 The notification now says what taking the bid costs and points at /map instead
 of naming a price to move to.
+
+**Shipped broken and fixed straight after.** Owner: "I'm still not seeing a
+card." The queue was written INSIDE the once-a-day notify guard, so an ask that
+had already fired — which is every ask you get a notification about — left
+nothing to approve, and would not come round again for 24 hours. The queue is
+LIVE STATE and the notification is an EVENT; they need separate conditions. It
+is now rebuilt from the live test on every pass, with the dedupe applied only to
+the ntfy, and `SELL_ASK_STALE` (15 min) drops any ask the loop stops
+re-confirming — the stock sold, the position earning again, cash no longer
+short — so the card clears itself rather than offering to sell what we no
+longer hold. `t_sellask.py` asserts the ordering of the two blocks directly.

@@ -5312,6 +5312,10 @@ EARN_FLIP_LOSS_AFTER = float(os.environ.get("EARN_FLIP_LOSS_AFTER", "86400"))
 # anchoring to what we paid after an hour instead of a day. Everything else
 # about the flipper is unchanged — same guards, same skip list, same vanish
 # damping.
+# How long a "sell below fair?" ask survives without being re-confirmed by the
+# live condition. Longer than a poll by a wide margin, short enough that a
+# stale offer to sell stock we no longer hold cannot linger on the card.
+SELL_ASK_STALE = float(os.environ.get("SELL_ASK_STALE", "900"))
 EARN_FLIP_TICKS_PREF = int(os.environ.get("EARN_FLIP_TICKS_PREF", "1"))
 EARN_FLIP_STEP_PREF = float(os.environ.get("EARN_FLIP_STEP_PREF", "300"))
 EARN_FLIP_LOSS_PREF = float(os.environ.get("EARN_FLIP_LOSS_PREF", "3600"))
@@ -6540,35 +6544,35 @@ def auto_earn() -> None:
         # "send me a ntfy and I will approve a sale like the one you just did
         # if I think it's justified"). So the automatic floor stays at fair
         # value; running low only changes who is asked, never what is done.
+        # THE QUEUE IS LIVE STATE, THE NOTIFICATION IS AN EVENT. Getting this
+        # backwards is why the card was empty (owner, 2026-08-17: "I'm still
+        # not seeing a card"): the queue was written inside the once-a-day
+        # notify guard, so an ask that had already fired left nothing to
+        # approve and would not come round again for 24 hours.
+        #
+        # So the queue is rebuilt from the live condition on every pass and the
+        # dedupe applies only to the ntfy. An ask that stops being true — the
+        # stock sold, the position earning again, cash no longer short —
+        # disappears from the card by itself on the next poll.
         if (now - since3 >= _flip_loss_after(fm3) and bids3 and not earning3
-                and _cash_short() and bids3):
+                and _cash_short()):
             askk = f"{fm3}|{int(fpc3)}"
+            bidc = round(float(bids3[0][0]) * 100)
+            # Selling into the bid cannot be done by moving a resting order:
+            # an ask at the bid price crosses, and every order this app places
+            # is post-only, so the exchange rejects it. Only take_close can,
+            # which is why this is the owner's decision and needs a button.
+            with MONITOR.lock:
+                MONITOR.state.setdefault("sell_queue", {})[askk] = {
+                    "m": fm3, "qty": int(fq3), "cost_c": round(cost3, 1),
+                    "resting_c": round(fpc3, 1), "bid_c": bidc,
+                    "loss_c": round(cost3 - bidc, 1),
+                    "loss_usd": round((cost3 - bidc) / 100.0 * int(fq3), 2),
+                    "seen": now}
             asked = MONITOR.state.setdefault("cash_asks", {})
             if now - float(asked.get(askk) or 0) > 86400:
                 with MONITOR.lock:
                     asked[askk] = now
-                bidc = round(float(bids3[0][0]) * 100)
-                # THE ASK NEEDS SOMEWHERE TO BE ANSWERED (owner, 2026-08-17:
-                # "this is working but I don't see where to go to accept this
-                # proposal"). It had none: ntfy carries no buttons, and the
-                # advice it gave — "move it to bid+1" — was usually a no-op,
-                # because a flip laddered down to the market's floor is ALREADY
-                # resting at bid+1. That is the point it is stuck at.
-                #
-                # Selling into the bid cannot be done by moving a resting
-                # order at all: an ask at the bid price crosses, and every
-                # order this app places is post-only, so the exchange would
-                # reject it. It takes the one deliberately aggressive path,
-                # take_close, which is why it is the owner's decision and why
-                # it now goes on a queue with a button rather than into a
-                # notification that cannot be acted on.
-                with MONITOR.lock:
-                    MONITOR.state.setdefault("sell_queue", {})[askk] = {
-                        "m": fm3, "qty": int(fq3), "cost_c": round(cost3, 1),
-                        "resting_c": round(fpc3, 1), "bid_c": bidc,
-                        "loss_c": round(cost3 - bidc, 1),
-                        "loss_usd": round((cost3 - bidc) / 100.0 * int(fq3), 2),
-                        "asked": now}
                 notify("Sell below fair to raise cash?",
                        f"{fm3}: {int(fq3)} held, cost {cost3:.0f}c, resting "
                        f"{fpc3:.0f}c and earning nothing for a day. Best bid "
@@ -7186,6 +7190,16 @@ def auto_earn() -> None:
                 placed += 1
         except Exception:  # noqa: BLE001 — the earner must never kill the poll
             continue
+    # An ask that stopped being true has to leave the card. The loop above only
+    # visits markets that still have a flip resting, so an entry whose market
+    # has gone quiet is never revisited to be cleared — it would sit on the
+    # card forever offering to sell stock we no longer hold. Anything not
+    # refreshed within SELL_ASK_STALE goes.
+    with MONITOR.lock:
+        sq = MONITOR.state.get("sell_queue") or {}
+        for k_ in [k_ for k_, v_ in sq.items()
+                   if now - float(v_.get("seen") or 0) > SELL_ASK_STALE]:
+            sq.pop(k_, None)
     # mirror the registries so a rebuild can re-adopt (see top of function).
     # The flip queue and the resting flips belong here too: a container
     # replacement between a fill and its flip would otherwise leave us holding
