@@ -44,6 +44,33 @@ import track_rewards as tr  # noqa: E402 — reuse the tracker's scoring code
 
 POLL_SECONDS = int(os.environ.get("POLL_SECONDS", "30"))
 POS_REFRESH_SECONDS = int(os.environ.get("POS_REFRESH_SECONDS", "120"))  # P/L tab data
+
+# WHICH CODE IS ACTUALLY RUNNING. The monitor only loads new code when the
+# process restarts, and until now there was no way to tell from the phone
+# whether a deploy had landed — flipping an automation switch reloads
+# nothing. BUILD is a hash of this file as it sits on disk; the same hash can
+# be computed from any commit, so "is the new code live?" has an answer
+# instead of an assumption (owner asked after flipping the earner, 2026-08-17).
+BOOT_TS = time.time()
+try:
+    import hashlib as _hl
+    _self = Path(__file__).resolve()
+    BUILD = _hl.sha256(_self.read_bytes()).hexdigest()[:8]
+    BUILD_TS = _self.stat().st_mtime
+except Exception:  # noqa: BLE001 — a missing stamp must never stop the monitor
+    BUILD, BUILD_TS = "unknown", 0.0
+
+
+def _short_age(sec: float) -> str:
+    """'3m', '4h', '2d' — how long ago, for a phone screen."""
+    sec = max(0.0, float(sec))
+    if sec < 90:
+        return f"{sec:.0f}s"
+    if sec < 5400:
+        return f"{sec/60:.0f}m"
+    if sec < 172800:
+        return f"{sec/3600:.0f}h"
+    return f"{sec/86400:.0f}d"
 PORT = int(os.environ.get("PORT", "8080"))
 DASH_PASSWORD = os.environ.get("DASH_PASSWORD", "")
 STATE_PATH = Path(os.environ.get("STATE_PATH", "state.json"))
@@ -1435,6 +1462,10 @@ class Monitor:
                 "warming": self.warming,
                 "backfilled": self.backfilled,
                 "poll_seconds": POLL_SECONDS,
+                # which code is serving this page, and for how long. A switch
+                # flip changes state, not code — only a restart loads a deploy.
+                "build": BUILD,
+                "uptime": _short_age(time.time() - BOOT_TS),
                 # so the Refresh button can say what the tracker is doing
                 "tracker": {
                     "running": TRACKER_STATUS.get("running", False),
@@ -9229,13 +9260,17 @@ def _map_payload() -> dict:
         # `rate` is what each bid is earning per day — the owner asked to see
         # it per market, not just as one total. `grad` marks the proven ones,
         # which rest on their own ceiling instead of the search budget.
-        "earn_active": [{"m": r[0], "px": r[2], "qty": r[3],
+        # side comes from the registry, NOT hardcoded: since the earner can
+        # rest on the ask, checking an ask against the BIDS finds nothing at
+        # our price and reports a false NOT ON BOOK on every one of them
+        # (owner's screenshot, 2026-08-17 — ten healthy asks all flagged red).
+        "earn_active": [{"m": r[0], "px": r[2], "qty": r[3], "side": r[1],
                          "age_m": int((time.time() - r[4]) / 60),
                          "rate": round(float(next(
                              (x.get("est_day") or 0 for x in MONITOR.orders
                               if str(x.get("id")) == oid), 0) or 0), 2),
                          "grad": oid in (_EARN.get("grad") or set()),
-                         "on_book": _on_book(r[0], "BUY", r[2] / 100.0, r[3], r[4])}
+                         "on_book": _on_book(r[0], r[1], r[2] / 100.0, r[3], r[4])}
                         for oid, r in _EARN["orders"].items()],
         # Flips rest on the ASK side out of stock we already hold, so they are
         # listed apart from the bids and never counted against the dollar cap.
@@ -10532,7 +10567,12 @@ function renderEarn(){
       whyLink(a.m) +
       '<div style="font-size:12px;color:' + (a.rate > 0 ? '#3fb950' : 'var(--dim)') +
       ';font-weight:600">$' + (a.rate || 0).toFixed(2) + '/day</div></td>' +
-      '<td class="r" style="font-size:11px">' + a.qty + ' @ ' + a.px + '¢ · ' + hrs + bk +
+      '<td class="r" style="font-size:11px">' +
+      // An ask here is an opening SHORT, not stock being sold. It is worth
+      // saying so on the row: the risk is (1-price) a share, not price.
+      (String(a.side || 'BUY')[0] === 'S'
+        ? '<span style="color:#d29922;font-weight:700">SHORT</span> ' : '') +
+      a.qty + ' @ ' + a.px + '¢ · ' + hrs + bk +
       (b && b.med != null ? '<div class="sub" style="font-size:10px">model now: ~' +
         b.med + '¢ (' + b.lo + '–' + b.hi + '¢)</div>' : '') + '</td></tr>';
   };
@@ -13468,7 +13508,7 @@ async function renderAll(d){
     document.getElementById('rate').textContent =
       'current rate ~$' + d.rate_per_day.toFixed(2) + '/day across ' + nMkts +
       ' markets (' + d.orders.length + ' orders)';
-    document.getElementById('updated').textContent = 'updated ' + d.updated + ' · day resets midnight ET · saves: ' + d.persistence + ' · alerts: ' + d.alerts +
+    document.getElementById('updated').textContent = 'updated ' + d.updated + ' · build ' + (d.build || '?') + ' · running ' + (d.uptime || '?') + ' · day resets midnight ET · saves: ' + d.persistence + ' · alerts: ' + d.alerts +
       ' · books: ' + (d.ws && d.ws.live ? '⚡ streaming ('+d.ws.markets+')'
                       : 'polling' + (d.ws && d.ws.err ? ' — stream ' + d.ws.state + ': ' + d.ws.err : '')) +
       (d.warming ? ' · ⏳ warming up: ' + d.warming + ' markets on saved rates' : '') +
