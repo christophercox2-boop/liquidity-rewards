@@ -5288,8 +5288,13 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
     it would earn, and — when it is rejected — the rule that rejected it."""
     now = time.time()
     target = float(pr.get("target") or 0)
+    # EVENT_N, NOT POOL_N — the pool belongs to the event, settled by the
+    # Aug-15 payout (see the scope note in track_rewards._daily_pool). While
+    # this divided by pool_n the earner valued every 2028 slate market at about
+    # a quarter of its worth, which since the yield auction below is not just a
+    # display error: it decided which markets got the budget.
     per = (float(pr.get("pool") or 0)
-           / max(int(pr.get("pool_n") or pr.get("event_n") or 1), 1) / 2)
+           / max(int(pr.get("event_n") or pr.get("pool_n") or 1), 1) / 2)
     df = float(pr.get("df") or 0.2)
     out: dict = {"rows": [], "best": None, "base": None, "top": None,
                  "target": target, "per_side_pool": per, "df": df,
@@ -8465,10 +8470,11 @@ def _map_payload() -> dict:
                 "fill_loss": round(float(((MONITOR.state.get("probe") or {})
                                           .get(m) or {}).get("fill_loss") or 0.0), 3),
                 "watched_h": _watched_h(m),
+                # event_n, not pool_n — the pool is per event (Aug-15 payout)
                 "per_side": round(
                     float(((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("pool") or 0.0)
-                    / max(int(((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("pool_n")
-                              or ((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("event_n")
+                    / max(int(((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("event_n")
+                              or ((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("pool_n")
                               or 1), 1) / 2, 2)}
             for m in ({l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
                       | set((MONITOR.state.get("probe") or {}))

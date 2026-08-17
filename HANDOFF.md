@@ -153,10 +153,35 @@ day appears in a burst ~1–1.5 days late, fills over a few fetches, then
 freezes: 08-13 froze at 147 rows/$223.24, 08-14 at 182 rows/$274.92. The
 `accum_day` heuristic (all-PENDING + `days_since >= 2`) misfires here.
 
-Consequence not yet applied: `_earn_scan` uses the same divisor
-(`per = pool / max(pool_n or event_n, 1) / 2`), so the earner values every
-2028 slate market at about a quarter of what it is worth — which now feeds
-directly into the yield ranking above.
+**APPLIED 2026-08-17.** Every divisor now prefers `event_n` over `pool_n`:
+`_daily_pool` and `_score_order` in track_rewards.py, `_earn_scan`'s
+`per_side_pool` and the `/map` `probe_meta.per_side` in monitor.py. `pool_n` is
+still computed and still written to live_raw.json — it is a diagnostic now, and
+`scope_x` (pool_n / event_n) records how far the old reading was out per market.
+
+60 of 181 programs changed value; the other 121 are untouched, which is why the
+race families reconciled at ~100% throughout. The headline rate goes from
+~$522/day to ~$987/day on the same book — that is the fix, not new earnings.
+
+The proof is arithmetic, not a fit: **35 markets were paid more on Aug 15 than
+the old convention says their entire daily pool contained.** The party pair took
+$147.55 against an old ceiling of $33.33 for both sides and every participant
+combined. Under per-event no market exceeds its pool. (`t_scope.py` runs this
+check against the real live_raw.json and rewards.csv.)
+
+Two behavioural consequences of the corrected numbers, both intended but worth
+watching:
+- Slate markets clear `EARN_GRAD_MIN_RATE` far more easily, so they graduate
+  off the search budget onto the $150 graduate budget faster.
+- The deal test (`est >= 0.5 x worst case`) passes at prices it used to reject
+  there, and the yield auction now ranks slate markets near the top.
+
+**Still blocked, and it is now the expensive one:** `MAX_UNBACKED_BID_C` = 15c.
+Silver prices no party-control market, so `ewc-usp-party-2028-11-07-*` is
+"unbacked" and the earner may not bid above 15c — while the books touch at 36c
+and 53c. Those two markets are the richest on the board at $500/side/day each.
+The cap is the guard that stopped the NM Senate 10c purchase, so do NOT just
+raise it; the market needs a model or an explicit owner exception.
 
 ### 2026-08-16 — earner stopped by the owner. Read this before restarting it.
 

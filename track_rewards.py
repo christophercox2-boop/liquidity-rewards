@@ -347,19 +347,19 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
         # diagnostic only, never applied — see the note above _score_order
         order["depth_ratio"] = round(side_total / target, 1) if target else None
         verdict += f" ≈ {_usd(order['est_day'])}/day"
-        n = max(prog.get("pool_n") or prog.get("event_n") or 1, 1)
+        n = max(prog.get("event_n") or prog.get("pool_n") or 1, 1)
         order["event_n"] = n
-        # both scope hypotheses recorded until a clean payout day picks one:
-        # the exchange's program sheet says 'Daily (per event)' while Aug-14
-        # actuals fit program-wide almost exactly. scope_x converts this
-        # order's (conservative, program-wide) estimate back to per-event.
+        # scope_x: how many times wider the programId's span is than this
+        # market's event. It was the conversion factor between the two scope
+        # hypotheses; since Aug-15 settled it (per event), it is kept as a
+        # diagnostic — a market where this is large is one where the old,
+        # disproven divisor would have understated us by that factor.
         if prog.get("pool_n"):
             order["scope_x"] = round(prog["pool_n"] / max(prog.get("event_n") or 1, 1), 2)
         order["siblings"] = prog.get("siblings") or []
         days = _pool_days(prog, slug)
         if n > 1:
-            verdict += (f" (program pool ÷ {n} markets)"
-                        if prog.get("pool_n") else f" (pool ÷ {n} markets)")
+            verdict += f" (event pool ÷ {n} markets)"
         if days > 1.001:
             verdict += f" (pre-tournament pool over {days:g}d)"
         side_pool = _daily_pool(prog, slug) / 2
@@ -519,10 +519,11 @@ def _daily_pool(prog: dict, slug: str | None = None) -> float:
     if (slug and slug.startswith(PRETOURNAMENT_PREFIXES)
             and "round" not in str(prog.get("pid") or "")):
         return GOLF_PRETOURNAMENT_DAILY
-    # pool_n: a dedicated (tierless) program's pool spans every market
-    # sharing its programId, not just this market's event — see the scope
-    # note where pool_n is computed
-    n = max(prog.get("pool_n") or prog.get("event_n") or 1, 1)
+    # EVENT_N, NOT POOL_N. The pool belongs to the event; a programId shared
+    # across several events does not make it smaller. Settled by the Aug-15
+    # payout — see the scope note where pool_n is computed. pool_n survives as
+    # the fallback only for a program with no event size at all.
+    n = max(prog.get("event_n") or prog.get("pool_n") or 1, 1)
     return (prog.get("pool") or 0.0) / _pool_days(prog, slug) / n
 
 
@@ -1195,17 +1196,33 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     for slug in progs:
         progs[slug]["siblings"] = RACE_MEMBERS.get(slug, [])[:40]
 
-    # Pool SCOPE (found 2026-08-16, the Aug-14 payout reconciliation):
-    # tier programs (politics_low/mid/high...) fund each EVENT its own pool —
-    # validated at ~100% by the races for a week. But a DEDICATED program
-    # (no tier in its id, e.g. presidential_election_2028) attaches ONE pool
-    # to every market it spans: 60 slate markets each reported the same
-    # $1,000, and dividing by each market's own event size counted that
-    # $1,000 roughly once per event — ~$4,000/day imagined from $1,000 real,
-    # 30x on the two-market party event, ~3.5x on the nominees. Actuals fit
-    # $1,000 ÷ 120 sides almost exactly. So: a tierless program whose id is
-    # shared beyond the market's own event prorates across ALL markets
-    # sharing it.
+    # Pool SCOPE — SETTLED 2026-08-17 by the Aug-15 payout. EVERY program funds
+    # each EVENT its own pool. pool_n is still computed here, but it is a
+    # diagnostic now, not a divisor (see _daily_pool).
+    #
+    # The history, because this was expensive to learn twice. On 2026-08-16 the
+    # Aug-14 reconciliation suggested that a DEDICATED program (no tier in its
+    # id, e.g. presidential_election_2028) attached ONE pool across every market
+    # it spans — 60 slate markets each reporting the same $1,000 — and the
+    # estimator was switched to prorate those across ALL markets sharing the
+    # programId. Aug-14 fit that almost exactly.
+    #
+    # Aug-14 was a bad sample: the slate had only just been entered, so our
+    # share was still climbing all day and a snapshot estimate overshot the
+    # day's average by roughly the same factor the wrong divisor introduced.
+    # Two errors cancelling looked like a confirmation.
+    #
+    # Aug-15 is a full day at steady size and it separates them cleanly:
+    #
+    #   family         program-wide    per-event    ACTUAL Aug-15
+    #   nominee-2028      ~$108/day    ~$400/day       $683.74
+    #   winner-2028       ~$140/day    ~$310/day       $412.29
+    #   party-2028       ~$4.35/day    ~$130/day       $147.55
+    #
+    # Program-wide is out by 6x, 3x and 34x. Per-event lands within 1.1-1.7x
+    # and errs LOW. The two-market party event is the decisive one: the
+    # readings are 30x apart there and the actual sits next to per-event.
+    # The exchange's own program sheet ("Daily, per event") was right.
     pid_counts: dict[str, int] = {}
     for pr_ in progs.values():
         if pr_.get("pid") and not pr_.get("tier"):
@@ -1341,14 +1358,20 @@ def append_estimates(live_orders: list[dict]) -> None:
         if "usse" in m: return "senate"
         if "usgub" in m: return "governor"
         return "other"
+    # THE TWO COLUMNS CONVERGE FROM 2026-08-17. est_day used to be the
+    # conservative program-wide reading and est_day_perevent the alternative;
+    # the Aug-15 payout picked per-event, so est_day now IS the per-event
+    # figure and the columns are equal. Rows BEFORE that date still carry the
+    # old meaning — do not read the file as one continuous series across the
+    # changeover. The header is left alone so the history stays parseable.
     fam_tot: dict[str, float] = {}
-    fam_pe: dict[str, float] = {}     # per-event scope (the docs' reading)
+    fam_pe: dict[str, float] = {}
     for o in live_orders:
         if o.get("est_day"):
             f = _fam(o["market"])
             v = float(o["est_day"])
             fam_tot[f] = fam_tot.get(f, 0.0) + v
-            fam_pe[f] = fam_pe.get(f, 0.0) + v * float(o.get("scope_x") or 1.0)
+            fam_pe[f] = fam_pe.get(f, 0.0) + v
     FAMDAY = DATA / "family_day.csv"
     frows = []
     if FAMDAY.exists():
@@ -1570,19 +1593,18 @@ def write_status(
         )
     lines.append("")
 
-    # 2026-08-16: the presidential_election_2028 program's pool cadence is
-    # NOT validated. Aug-14 actuals paid ~25% of tracked for nominees, ~10%
-    # for winners, ~1-5% for the party pair, while every pre-existing family
-    # still reconciles ~100%. Until a full clean day (Aug 15) pins the true
-    # divisor, the slate's estimates below are flagged, not trusted.
-    lines.append("> ⚠️ **2028-slate pool scope is UNRESOLVED — estimates shown "
-                 "CONSERVATIVELY (program-wide, ~$8.33/side/day).** The "
-                 "exchange's program sheet says 'Daily (per event)' ($1,000 per "
-                 "event, ~4x more), but Aug-14 actuals fit program-wide almost "
-                 "exactly. If the docs are right, the gap means bait-anchored "
-                 "touches are collecting pools this tracker credits to us. Both "
-                 "readings are logged (family_day.csv); the Aug-15 payout — "
-                 "predictions 4x apart — decides.")
+    # 2026-08-17: the Aug-15 payout settled the 2028-slate pool scope. Kept as
+    # a note rather than deleted, because the estimates before that date read
+    # about 4x low for the slate and anyone comparing old numbers needs to know.
+    lines.append("> ✅ **2028-slate pool scope: SETTLED — the pool is per "
+                 "EVENT.** The Aug-15 payout decided it. Predicted "
+                 "program-wide vs per-event vs what actually paid: nominees "
+                 "$108 / $400 / **$684**, winners $140 / $310 / **$412**, the "
+                 "party pair $4 / $130 / **$148**. Program-wide was out by up "
+                 "to 34x; per-event lands within 1.1–1.7x and errs low. "
+                 "Estimates from 2026-08-17 use per event, so slate figures "
+                 "here are ~4x higher than in earlier runs — that is the fix, "
+                 "not a windfall.")
     lines.append("")
 
     # ---- the answer up top; all supporting detail lives below the divider ----
