@@ -11992,12 +11992,31 @@ function renderRaces(){
     : '<tr><td class="sub">no race with positions in 2+ outcomes</td></tr>';
 }
 function renderPositions(){
-  const nFix = POSD.filter(r => r.status === 'fix').length;
-  document.getElementById('posSub').textContent =
-    POSD.length + ' positions · ' + (nFix ? nFix + ' need attention' : 'all priced to sell ✓');
+  // Same filter as the Markets tab, same switch — it is one preference, so
+  // turning it on in one place and finding the other still full would just be
+  // confusing (owner, 2026-08-17: "give me a filter on the markets pages for
+  // just the 2028 races").
+  const ALL = POSD, SHOWN = only2028() ? POSD.filter(r => is2028(r.market)) : POSD;
+  const nFix = SHOWN.filter(r => r.status === 'fix').length;
+  document.getElementById('posSub').innerHTML =
+    '<label style="margin-right:10px;color:' + (only2028() ? '#f2cd7f' : 'var(--dim)') +
+    '"><input type="checkbox" ' + (only2028() ? 'checked' : '') +
+    ' onchange="tgl2028()"> 2028 races only</label>' +
+    SHOWN.length + ' position' + (SHOWN.length === 1 ? '' : 's') +
+    (only2028() && ALL.length !== SHOWN.length
+      ? ' <span class="sub">of ' + ALL.length + '</span>' : '') +
+    ' · ' + (nFix ? nFix + ' need attention' : 'all priced to sell ✓');
   renderRaces();
   document.getElementById('posList').innerHTML =
-    POSD.map((r, i) => {
+    SHOWN.length === 0 && ALL.length ?
+      '<tr><td class="sub">no 2028 positions — untick the filter to see the other '
+      + ALL.length + '</td></tr>' :
+    // i MUST stay the index into POSD: posTake(i) and the qty boxes are keyed
+    // by it, and they place orders. Renumbering the filtered list would have
+    // pointed "Sell NOW" at whatever position happened to sit at that index in
+    // the unfiltered array.
+    SHOWN.map((r) => {
+      const i = ALL.indexOf(r);
       const bg = r.status === 'good' ? 'background:rgba(63,185,80,.08)'
                : r.status === 'fix' ? 'background:rgba(248,81,73,.09)'
                : r.status === 'wait' ? 'background:rgba(152,163,179,.06)' : '';
@@ -12335,6 +12354,22 @@ function mcat(m){
   if(s.indexOf('tec-') === 0) return 'Other sports';
   if(s.indexOf('aec-') === 0) return 'Table tennis';
   return 'Politics';
+}
+// The 2028 board: both nomination slugs (the primary), the winner markets and
+// party control (the general) — the same four families the loops prefer. Kept
+// as one predicate so the filter here and PREFER_PREFIXES on the server cannot
+// drift into disagreeing about what "the 2028 races" means.
+function is2028(m){
+  const s = String(m);
+  return s.indexOf('enwc-uspres-nom-dem-2028-') === 0
+      || s.indexOf('enwc-uspres-nom-rep-2028-') === 0
+      || s.indexOf('ewc-usp-2028-11-07-') === 0
+      || s.indexOf('ewc-usp-party-2028-11-07-') === 0;
+}
+function only2028(){ return localStorage.getItem('only2028') === '1'; }
+function tgl2028(){
+  localStorage.setItem('only2028', only2028() ? '0' : '1');
+  refresh();
 }
 function hidCats(){ try{ return JSON.parse(localStorage.getItem('hidCats') || '{}'); }catch(e){ return {}; } }
 function tglCat(c){
@@ -12941,6 +12976,9 @@ async function renderAll(d){
     const hc = hidCats();
     const DEFENDED = new Set(d.defend || []);
     document.getElementById('catBar').innerHTML =
+      '<label class="sub" style="margin-right:8px;color:'+(only2028()?'#f2cd7f':'var(--dim)')+
+      '"><input type="checkbox" '+(only2028()?'checked':'')+
+      ' onchange="tgl2028()"> 2028 races only</label>' +
       '<label class="sub" style="margin-right:8px"><input type="checkbox" '+(pctMode()?'checked':'')+
       ' onchange="tglPct()"> % of rewards</label>' +
       '<select onchange="setMSort(this.value)" style="background:var(--surface2);color:var(--ink2);'+
@@ -12956,7 +12994,7 @@ async function renderAll(d){
         (hc[c]?' ✕':'')+'</button>').join('');
     document.getElementById('markets').innerHTML =
       Object.entries(allMarkets)
-        .filter(([m]) => !hc[mcat(m)])
+        .filter(([m]) => !hc[mcat(m)] && (!only2028() || is2028(m)))
         .sort((a,b) => {
           if(sortCat() && mcat(a[0]) !== mcat(b[0])) return mcat(a[0]) < mcat(b[0]) ? -1 : 1;
           if(mSort() === 'chg-desc') return pctChg(b[0]) - pctChg(a[0]);

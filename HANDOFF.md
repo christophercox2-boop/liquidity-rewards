@@ -1226,3 +1226,19 @@ for it — bait-sized levels excluded, same as everywhere.
 and the fix was to exec the REAL `_owner_fair`/`_any_fair` into each against an
 empty table rather than stub them. Stubbing is exactly what hid the Silver
 uppercase bug for a day; do not stub these.
+
+### 2026-08-17 — 2028-only filter on the market lists
+
+One preference, `localStorage.only2028`, with a checkbox on both the Markets
+tab (in `#catBar`, alongside the category chips) and the Positions tab (in
+`#posSub`). Ticking it in one place applies in the other. `is2028()` in the page
+names the same four families `PREFER_PREFIXES` names on the server, kept as a
+single predicate so the two cannot drift apart.
+
+**The trap, for whoever touches this next.** The Positions rows are rendered
+with an index that `posTake(i)` and the qty boxes (`pq<i>`) use to reach into
+`POSD` — and `posTake` PLACES AN ORDER. The first version mapped over the
+filtered array, which renumbered every row: with the filter on, "Sell NOW" on
+the first row would have acted on `POSD[0]`, a different market entirely. The
+index is now looked up against the unfiltered array (`ALL.indexOf(r)`), and
+`t_filter2028.py` asserts that the one filtered row still carries index 1.
