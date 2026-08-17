@@ -3584,6 +3584,29 @@ PROBE_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
                   "enwc-ussep-", "vsc-usgubp-")
 PROBE_SIZE = 1
 PROBE_REAL_MIN = 5.0          # book levels smaller than this are bait — ignore
+# PREFERRED FAMILIES — worked first by the prober and the earner (owner,
+# 2026-08-17: "give the 2028 candidate markets both general and primary
+# preference... I'd like to try and get some of the low-vol overnight money").
+#
+# Both halves of the 2028 board: the nomination markets, which are the primary,
+# and the winner and party-control markets, which are the general. They are the
+# right place to be overnight for a reason the yield number alone does not say
+# — they resolve years out, so there is no news that has to be priced before
+# morning, and a resting order there is not racing anybody's headline.
+#
+# Preference is ORDERING, not permission. Every one of these markets still
+# faces the confidence floor, the price ceilings, the deal test and the Target
+# Size check, and preference never displaces a holding on its own — the 1.6x
+# yield rule still decides that.
+PREFER_PREFIXES = tuple(
+    p.strip() for p in os.environ.get(
+        "PREFER_PREFIXES",
+        "enwc-uspres-nom-dem-2028-,enwc-uspres-nom-rep-2028-,"
+        "ewc-usp-2028-11-07-,ewc-usp-party-2028-11-07-").split(",") if p.strip())
+
+
+def _preferred(m: str) -> bool:
+    return bool(PREFER_PREFIXES) and m.startswith(PREFER_PREFIXES)
 PROBE_MIN_GAP = 3             # need at least this many interior ticks to learn
 PROBE_MAX_PX = 0.60           # never probe-bid above this
 PROBE_FLIP_TICKS = 2
@@ -3989,6 +4012,120 @@ def auto_qualify() -> None:
                        f"{job['px']*100:.0f}¢ (${job['cost']:,.2f}) · {note}")
 
 
+# --- idle inventory: shares that are held but not working -------------------
+# Owner, 2026-08-17: "you can liberally place sell orders on any of the shares I
+# have just sitting around... you won't get that much for them though so it may
+# be better to use them to earn."
+#
+# That last clause is the whole design. This is NOT a selling loop trying to get
+# out of a position — it rests held stock where it SCORES, and a fill is the
+# side effect rather than the goal. A SELL_LONG against inventory costs no
+# buying power, so score earned this way is free: the shares are already bought
+# and already at risk, and resting them changes neither.
+#
+# Which is also why the price rule is the mirror of the earner's, not looser.
+# _ask_allowed is what stops this quietly dumping a position below fair — the
+# same guard that caught a scout selling a 99.9% favourite at 69c. Where the
+# best ask sits below what the model will let us accept, this rests at the
+# model's floor instead and earns less, rather than joining a touch that is
+# giving value away.
+INV_INTERVAL = float(os.environ.get("INV_INTERVAL", "300"))
+INV_MIN_SHARES = int(os.environ.get("INV_MIN_SHARES", "5"))
+INV_MAX_PER_POLL = int(os.environ.get("INV_MAX_PER_POLL", "3"))
+INV_MAX_SHARES = int(os.environ.get("INV_MAX_SHARES", "273"))  # exchange ask cap
+_INV: dict = {"last": 0.0, "done": {}}
+
+
+def _inv_free(slug: str) -> int:
+    """Shares held here that are not already resting or queued to be sold."""
+    net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition")) or 0
+    if net < 1:
+        return 0
+    resting = sum(float(o.get("size") or 0) for o in MONITOR.orders
+                  if o.get("market") == slug
+                  and str(o.get("intent") or "").endswith("SELL_LONG"))
+    queued = sum(j[2] for j in (_EARN.get("toflip") or []) if j[0] == slug)
+    return max(0, int(net - resting - queued))
+
+
+def _inv_price(slug: str, ent: tuple) -> float | None:
+    """Where to rest, in cents: the best real ask if the model allows it,
+    otherwise the cheapest price the model does allow. None when nothing
+    legal is worth resting at."""
+    asks = [(round(p_ * 100), q_) for p_, q_ in (ent[1].get("asks") or [])
+            if q_ >= PROBE_REAL_MIN]
+    if not asks:
+        return None
+    touch = min(a[0] for a in asks)
+    if _ask_allowed(slug, float(touch)):
+        return float(touch)
+    # walk up until the model is content; a legal price further from the touch
+    # scores less but is still worth more than the shares doing nothing
+    for pc in range(touch + 1, 100):
+        if _ask_allowed(slug, float(pc)):
+            return float(pc)
+    return None
+
+
+def auto_inventory() -> None:
+    """Rest idle held shares as asks so they earn while they sit."""
+    if not _auto_on("inventory"):
+        return
+    now = time.time()
+    if now - float(_INV.get("last") or 0) < INV_INTERVAL:
+        return
+    _INV["last"] = now
+    placed = 0
+    for slug in sorted(MONITOR.positions):
+        if placed >= INV_MAX_PER_POLL:
+            break
+        if now - float(_INV["done"].get(slug) or 0) < INV_INTERVAL * 4:
+            continue
+        if _hunt_held(slug):
+            continue          # cleared for the owner to trade by hand
+        free = _inv_free(slug)
+        if free < INV_MIN_SHARES:
+            continue
+        ent = tr._BOOK_CACHE.get(slug)
+        if not ent or now - ent[0] > 300:
+            continue
+        px = _inv_price(slug, ent)
+        if px is None:
+            continue
+        qty = min(free, INV_MAX_SHARES)
+        try:
+            r = requests.request(
+                "POST", tr.TRADE_API + "/v1/orders",
+                headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                         "Content-Type": "application/json"},
+                json={"marketSlug": slug, "intent": "ORDER_INTENT_SELL_LONG",
+                      "type": "ORDER_TYPE_LIMIT",
+                      "price": {"value": f"{px / 100.0:.2f}", "currency": "USD"},
+                      "quantity": int(qty),
+                      "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                      "participateDontInitiate": True},
+                timeout=20)
+        except Exception as e:  # noqa: BLE001 — inventory never kills the poll
+            _earn_log(slug, "inventory failed", px / 100.0, qty,
+                      f"{type(e).__name__}")
+            continue
+        ok = r.status_code < 300
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": slug, "side": "INVENTORY ask", "from": "—",
+                        "to": px, "size": int(qty), "status": r.status_code,
+                        "response": " ".join(r.text.split())[:100],
+                        "verified": ok})
+        del ACTIONS[:-20]
+        _INV["done"][slug] = now
+        placed += 1
+        sv = _silver_fair(slug)
+        _earn_log(slug, "inventory" if ok else "inventory failed", px / 100.0, qty,
+                  f"{qty:,} idle share{'' if qty == 1 else 's'} rested at "
+                  f"{px:.0f}¢ to earn while they sit"
+                  + (f" (model fair {sv:.0f}¢)" if sv is not None else "")
+                  + ("" if ok else f" — HTTP {r.status_code}"))
+
+
 def auto_probe() -> None:
     # one-time owner grants into the info fund, applied exactly once each
     # (the applied list persists with the saved state, surviving restarts)
@@ -4283,7 +4420,14 @@ def auto_probe() -> None:
             if m.startswith(PROBE_PREFIXES) and (not payable or m in payable)
             and not _is_primary(m)]
     random.shuffle(mkts)
-    mkts.sort(key=lambda m_: (1 if (est.get(m_) or _PROBE["last"].get(m_)) else 0,
+    # Preferred families first (see PREFER_PREFIXES), then unvisited, then
+    # least-recently-scouted. The prober is the only thing that can lift a
+    # market the Silver table says nothing about over the confidence floor —
+    # no forecast means the evidence has to come from our own scouts — so
+    # putting the 2028 board at the front of this queue is what actually gets
+    # the earner into it.
+    mkts.sort(key=lambda m_: (0 if _preferred(m_) else 1,
+                              1 if (est.get(m_) or _PROBE["last"].get(m_)) else 0,
                               _PROBE["last"].get(m_, 0.0)))
     for m in mkts:
         if placed >= PROBE_MAX_PER_POLL or len(_PROBE["active"]) >= PROBE_ACTIVE_MAX:
@@ -6591,7 +6735,11 @@ def auto_earn() -> None:
         scored.append({"m": m, "yield": est / cost, "est": est, "cost": cost,
                        "tgt": tgt, "qty": qty, "tier": tier, "scan": scan,
                        "b": b, "conf": conf})
-    scored.sort(key=lambda c_: -c_["yield"])
+    # Preferred families first, then income per dollar at risk within each tier.
+    # On tonight's board this changes very little on its own — the 2028 markets
+    # already top the yield ranking by two orders of magnitude — but it makes
+    # the ordering say what it means rather than depending on that staying true.
+    scored.sort(key=lambda c_: (0 if _preferred(c_["m"]) else 1, -c_["yield"]))
     # What a holding is earning per dollar tied up, so a candidate can be
     # compared against the weakest thing already in the book. Graduates are
     # not in the running: they are off the search budget entirely.
@@ -7896,10 +8044,11 @@ def do_maction(body: dict) -> tuple[int, dict]:
         # The owner's on/off button for a placement loop. Auth and the
         # X-Reprice CSRF header are already enforced by the POST handler.
         which = str(body.get("which") or "")
-        if which not in ("defend", "keeper", "snipe", "probe", "earn", "qualify"):
+        if which not in ("defend", "keeper", "snipe", "probe", "earn",
+                         "qualify", "inventory"):
             return 400, {"ok": False,
                          "error": "which must be defend, keeper, snipe, probe, "
-                                  "earn or qualify"}
+                                  "earn, qualify or inventory"}
         on = bool(body.get("on"))
         with MONITOR.lock:
             auto = MONITOR.state.setdefault("auto", {})
@@ -8423,7 +8572,7 @@ def _map_payload() -> dict:
         # this dict reads as undefined in the browser, so the button repaints
         # OFF on the next refresh even though the loop is running.
         "auto": {"defend": _auto_on("defend"), "keeper": _auto_on("keeper"),
-                 "qualify": _auto_on("qualify"),
+                 "qualify": _auto_on("qualify"), "inventory": _auto_on("inventory"),
                  "snipe": _auto_on("snipe"), "probe": _auto_on("probe"),
                  "earn": _auto_on("earn")},
         "defend_live": bool(_auto_on("defend")
@@ -8730,6 +8879,8 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
       <span class="nm">Earner</span><span class="st">loading…</span></button>
     <button class="autosw" id="sw_qualify" onclick="swTap('qualify')" disabled>
       <span class="nm">Qualifier</span><span class="st">loading…</span></button>
+    <button class="autosw" id="sw_inventory" onclick="swTap('inventory')" disabled>
+      <span class="nm">Inventory</span><span class="st">loading…</span></button>
   </div>
   <div class="card" id="beat" style="font-size:11.5px;padding:8px 12px;
     line-height:1.5">starting…</div>
@@ -9020,6 +9171,7 @@ const SWDESC = {
   probe: {on:'1-share scouts mapping fair prices', off:'not scouting'},
   earn: {on:'small bids where the model is confident', off:'not placing'},
   qualify: {on:'closing cheap Target Size gaps at the floor', off:'not qualifying'},
+  inventory: {on:'resting idle shares so they earn', off:'idle shares just sitting'},
 };
 const SWARM = {};
 // Tap a face -> the book, our orders there, and what each is earning.
@@ -9604,7 +9756,7 @@ function renderEarn(){
 
 function swRender(){
   if(!DATA || !DATA.auto) return;
-  ['defend','keeper','snipe','probe','earn','qualify'].forEach(k=>{
+  ['defend','keeper','snipe','probe','earn','qualify','inventory'].forEach(k=>{
     const b=document.getElementById('sw_'+k); if(!b) return;
     b.disabled=false;
     const on = DATA.auto[k]===true;
@@ -13182,6 +13334,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     auto_qualify()
                 except Exception as e:  # noqa: BLE001 — never kills the poll
                     MONITOR.error = f"qualify: {type(e).__name__}: {e}"[:150]
+                try:
+                    auto_inventory()
+                except Exception as e:  # noqa: BLE001 — never kills the poll
+                    MONITOR.error = f"inventory: {type(e).__name__}: {e}"[:150]
             except Exception as e:  # noqa: BLE001 — defense never kills the poll
                 MONITOR.error = f"defend: {type(e).__name__}: {e}"[:150]
             # One line of "what the back end just did", because the owner

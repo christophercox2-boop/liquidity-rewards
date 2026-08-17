@@ -1070,3 +1070,50 @@ Both running is safe — the monitor commits only on a real change.
 Note for whoever tries to verify this from a Claude session: the agent egress
 proxy blocks static.dwcdn.net, so a curl from the session will fail while the
 droplet is fine. Check `/map`'s model block, not your own network.
+
+### 2026-08-17 — 2028 preference, and idle shares put to work
+
+**Preference.** `PREFER_PREFIXES` (env-overridable, default the four 2028
+families: both nomination slugs, winner, party control) sorts first in the
+prober's scouting queue and in the earner's auction. Preference is ORDERING,
+not permission — every rule still applies and preference never displaces a
+holding on its own; the 1.6x yield rule still decides that.
+
+The prober half is the part that does the work. The 2028 board has no Silver
+forecast, so the only way a market there clears `EARN_CONF_MIN` is evidence our
+own scouts gather. Putting it at the front of the prober's queue is what
+eventually lets the earner in.
+
+Dry run against the newest book snapshot, with the corrected per-event pools:
+of the 60 2028 markets, **43 can be rested at the touch right now** and every
+side is qualified (all hold 20,000+ against a 20,000 Target Size). 17 are
+blocked by `EARN_PX_MAX_C` (10c), including both party markets at 36c and 53c —
+the owner declined an exception for those on 2026-08-17.
+
+The rich ones are thin books, not big ones: 5 shares at the touch in
+`enwc-uspres-nom-dem-2028-micoba` estimates $10.14/day against 50 cents of
+worst case. 43 markets at the starting rung costs about $21 of exposure, so the
+$100 budget is NOT the constraint on this board — `EARN_MAX_PER_POLL` (4) is,
+and that clears the whole list in about eleven polls.
+
+**Idle inventory** — new loop `auto_inventory`, new switch `inventory`, OFF by
+default like every other. Owner: "place sell orders on any of the shares I have
+just sitting around... you won't get that much for them though so it may be
+better to use them to earn."
+
+It rests held shares that are not already resting or queued, as SELL_LONG,
+post-only. Inventory costs no buying power, so the score is free — the shares
+are already bought and already at risk. It is NOT a selling loop: a fill is a
+side effect, not the goal.
+
+`_ask_allowed` is the guard that matters. Where the best ask is below the
+model's floor it rests AT THE FLOOR instead of joining the touch — it earns
+less rather than giving the position away. Caps: 5 shares minimum, 273 an order
+(the exchange's ask ceiling), 3 markets a pass, 20 minutes per market, and it
+never touches a market `_hunt_held` has cleared for the owner.
+
+**NOT built, deliberately:** moving EXISTING far-out asks closer to the touch.
+The 99c stacks are the position (see the hard-won facts above) and they are
+also what holds ask-side Target Size in the slate. Repricing them turns "will
+never fill" into "might fill" AND can un-qualify the side, which pays nobody.
+That needs its own decision, not a loop.
