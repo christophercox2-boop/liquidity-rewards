@@ -153,6 +153,30 @@ def _gh(method: str, path: str, **kw):
     )
 
 
+def _gh_why(r) -> str:
+    """Why GitHub said no, in words, from the phone.
+
+    A bare 'HTTP 403' does not distinguish a rate limit from an expired token
+    from a permission the token never had — three problems with three
+    different fixes. GitHub always says which in the body and the rate-limit
+    headers; this pulls it out (owner saw 'head HTTP 403' for an hour with
+    nothing to act on, 2026-08-17)."""
+    try:
+        msg = str((r.json() or {}).get("message") or "")[:90]
+    except Exception:  # noqa: BLE001 — an error page is not always JSON
+        msg = " ".join((r.text or "").split())[:90]
+    rem = r.headers.get("x-ratelimit-remaining")
+    if rem is not None and rem.isdigit() and int(rem) == 0:
+        reset = r.headers.get("x-ratelimit-reset") or ""
+        mins = ""
+        if reset.isdigit():
+            mins = f", resets in {max(0, int(reset) - time.time()) / 60:.0f}m"
+        return f"GitHub rate limit spent{mins}"
+    if r.status_code == 401:
+        return "GitHub token rejected — expired or revoked"
+    return msg or f"HTTP {r.status_code}"
+
+
 SAVE_STATUS = {"ok_ts": 0.0, "err": ""}  # surfaced in the dashboard footer
 SLIM_EXCLUDE = ("series",)  # per-market graph history: huge, rebuilds in hours
 
@@ -198,7 +222,7 @@ def save_remote_state(state: dict) -> bool:
         r = _gh("POST", f"/repos/{GITHUB_REPO}/git/blobs",
                 json={"content": payload, "encoding": "base64"})
         if r.status_code >= 300:
-            SAVE_STATUS["err"] = f"blob HTTP {r.status_code}"
+            SAVE_STATUS["err"] = f"save blob: {_gh_why(r)}"
             return False
         blob = r.json()["sha"]
         r = _gh("POST", f"/repos/{GITHUB_REPO}/git/trees",
@@ -215,7 +239,7 @@ def save_remote_state(state: dict) -> bool:
         if r.status_code < 300:
             SAVE_STATUS.update(ok_ts=time.time(), err="")
             return True
-        SAVE_STATUS["err"] = f"ref HTTP {r.status_code}"
+        SAVE_STATUS["err"] = f"save ref: {_gh_why(r)}"
         return False
     except Exception as e:  # noqa: BLE001
         SAVE_STATUS["err"] = f"{type(e).__name__}: {e}"[:120]
@@ -285,11 +309,11 @@ def _tracker_commit(files: dict[str, bytes],
     for attempt in range(2):
         r = _gh("GET", f"/repos/{GITHUB_REPO}/git/ref/heads/main")
         if r.status_code >= 300:
-            return f"head HTTP {r.status_code}"
+            return f"read main: {_gh_why(r)}"
         head = r.json()["object"]["sha"]
         r = _gh("GET", f"/repos/{GITHUB_REPO}/git/commits/{head}")
         if r.status_code >= 300:
-            return f"head commit HTTP {r.status_code}"
+            return f"read commit: {_gh_why(r)}"
         base_tree = r.json()["tree"]["sha"]
         tree = []
         for path, data in files.items():
@@ -297,7 +321,7 @@ def _tracker_commit(files: dict[str, bytes],
                      json={"content": base64.b64encode(data).decode(),
                            "encoding": "base64"})
             if rb.status_code >= 300:
-                return f"blob {path} HTTP {rb.status_code}"
+                return f"upload {path}: {_gh_why(rb)}"
             tree.append({"path": path, "mode": "100644", "type": "blob",
                          "sha": rb.json()["sha"]})
         rt = _gh("POST", f"/repos/{GITHUB_REPO}/git/trees",
@@ -14210,6 +14234,18 @@ class Handler(BaseHTTPRequestHandler):
     def _send(self, code: int, ctype: str, body: bytes) -> None:
         self.send_response(code)
         self.send_header("Content-Type", ctype)
+        # NOTHING HERE IS EVER CACHEABLE. The pages carry their own
+        # JavaScript, so a cached page runs OLD code against a LIVE payload:
+        # every field added since the cached copy reads as missing, and the
+        # page looks like a deploy that never landed. On a home-screen web
+        # app that can persist for days. (Owner: "not seeing new status
+        # line", with the new build already on the server, 2026-08-17. The
+        # same shape as "all the numbers look the same in the app".)
+        if "image" not in ctype:
+            self.send_header("Cache-Control",
+                             "no-store, no-cache, must-revalidate, max-age=0")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
         # gzip everything sizeable — data.json shrinks ~10x, the single
         # biggest first-load win on a phone connection
         if len(body) > 500 and "gzip" in (self.headers.get("Accept-Encoding") or ""):
