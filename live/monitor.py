@@ -3672,6 +3672,48 @@ MAX_UNBACKED_BID_C = float(os.environ.get("MAX_UNBACKED_BID_C", "15"))
 # A race the model normally prices but currently has no number for: token
 # bids only. Missing data is a reason to stop, not a license to guess.
 RACE_NO_MODEL_BID_C = float(os.environ.get("RACE_NO_MODEL_BID_C", "2"))
+# THE OWNER'S OWN NUMBER, for markets no forecast covers.
+#
+# Silver prices senate and governor races and nothing else, so the entire 2028
+# board — nominations, winner, party control — is "unbacked" and capped at
+# MAX_UNBACKED_BID_C whatever else changes. That cap is arbitrary; it is a
+# refusal to guess, not an estimate. The owner typing a number IS an estimate,
+# and a poor estimate beats a blanket refusal in a market we would otherwise
+# have to sit out entirely (owner, 2026-08-17: "I'll set the fair value by hand
+# for now... we really need to get in these markets because we're leaving money
+# on the table").
+#
+# It is deliberately worth LESS than the model, at the owner's own instruction:
+# a wider margin before a bid is refused, a wider band in the posterior, less
+# weight against the book, and only partial credit toward confidence. It sets a
+# floor under how much we can be wrong, not a licence to be certain.
+OWNER_FAIR_MARGIN = float(os.environ.get("OWNER_FAIR_MARGIN", "6"))
+OWNER_FAIR_W = float(os.environ.get("OWNER_FAIR_W", "0.7"))     # Silver is 1.2
+OWNER_FAIR_WIN = float(os.environ.get("OWNER_FAIR_WIN", "8"))   # Silver: 1.5-6
+# partial credit toward the confidence dial, against the 0.15 a real
+# forecast earns — enough to lift a 2028 market over the floor, not enough
+# to let a guess buy full size
+OWNER_FAIR_CONF = float(os.environ.get("OWNER_FAIR_CONF", "0.08"))
+
+
+def _owner_fair(m: str) -> float | None:
+    """The owner's hand-set fair value for a market, in cents, or None."""
+    try:
+        v = ((MONITOR.state.get("owner_fair") or {}).get(m) or {}).get("c")
+        return float(v) if v is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _any_fair(m: str) -> tuple[float | None, str]:
+    """(fair in cents, source). The forecast wins wherever it has an opinion —
+    the owner's number is a stand-in for a missing model, never an override of
+    a live one."""
+    sv = _silver_fair(m)
+    if sv is not None:
+        return sv, "silver"
+    ov = _owner_fair(m)
+    return (ov, "owner") if ov is not None else (None, "none")
 
 
 def _bid_allowed(m: str, price_c: float) -> bool:
@@ -3687,6 +3729,11 @@ def _bid_allowed(m: str, price_c: float) -> bool:
     sv = _silver_fair(m)
     if sv is not None:
         return price_c <= sv + EARN_SILVER_MARGIN
+    ov = _owner_fair(m)
+    if ov is not None:
+        # a hand-set number binds like the model, with a wider margin because
+        # it is worth less
+        return price_c <= ov + OWNER_FAIR_MARGIN
     if _race_family(m):
         return price_c <= RACE_NO_MODEL_BID_C
     return price_c <= MAX_UNBACKED_BID_C
@@ -3722,6 +3769,9 @@ def _ask_allowed(m: str, price_c: float, opening: bool = False) -> bool:
         # a short below fair, or an inventory sale below fair, both give value
         # away — one rule covers them
         return price_c >= sv - EARN_SILVER_MARGIN
+    ov = _owner_fair(m)
+    if ov is not None:
+        return price_c >= ov - OWNER_FAIR_MARGIN
     if opening:
         # no forecast: a race the model should price gets no new shorts at
         # all, and anywhere else only the cheap tail
@@ -4942,6 +4992,20 @@ def _bayes_terms(m: str) -> list[dict]:
             "src": "model", "label": f"Silver forecast {sv:.2f}c",
             "note": f"the race model's own number, given a +/-{win:.1f}c window "
                     f"scaled to how uncertain a forecast at that level is"})
+    else:
+        # NO FORECAST — take the owner's number if they have set one. Weighted
+        # below the model and given a wider window, because a hand estimate is
+        # a starting point rather than a fit. It still beats the alternative,
+        # which on the 2028 board is no opinion at all and a flat 15c refusal.
+        ov = _owner_fair(m)
+        if ov is not None:
+            terms.append({
+                "kind": "owner", "px": ov, "w": OWNER_FAIR_W,
+                "win": OWNER_FAIR_WIN, "src": "owner",
+                "label": f"your fair value {ov:.1f}c",
+                "note": f"set by hand — carried at weight {OWNER_FAIR_W:g} "
+                        f"against the model's 1.2, with a wider "
+                        f"+/-{OWNER_FAIR_WIN:.0f}c window"})
     return terms
 
 
@@ -5248,9 +5312,14 @@ def _earn_confidence(m: str, b: dict | None, sv: float | None) -> dict:
     add("band width", 0.20 * tight, 0.20,
         f"the 10-90% range is {width} ticks wide ({b['lo']}-{b['hi']}c) — "
         f"{'tight' if width <= 4 else 'workable' if width <= 8 else 'wide'}")
-    add("race forecast", 0.15 if sv is not None else 0.0, 0.15,
+    ov = _owner_fair(m) if sv is None else None
+    add("race forecast",
+        0.15 if sv is not None else (OWNER_FAIR_CONF if ov is not None else 0.0),
+        0.15,
         f"Silver has this at {sv:.2f}c" if sv is not None
-        else "no Silver number for this market")
+        else f"your hand-set fair value of {ov:.1f}c — worth {OWNER_FAIR_CONF:.2f} "
+             f"of the 0.15 a real forecast earns" if ov is not None
+        else "no forecast and no hand-set number here")
     two_sided = b.get("bb") is not None and b.get("ba") is not None
     add("live two-sided book", 0.08 if two_sided else 0.0, 0.08,
         "real size resting on both sides, so the price is bracketed"
@@ -5531,10 +5600,13 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
     # markets. Where NO forecast exists nothing has changed: _bid_allowed still
     # holds those to MAX_UNBACKED_BID_C, or to RACE_NO_MODEL_BID_C for a race
     # the model should price and does not.
-    sv_early = _silver_fair(m)
+    # A hand-set number counts as a model HERE: it is the whole point of having
+    # one. Without it the 2028 board is capped at MAX_UNBACKED_BID_C and every
+    # market on it is unreachable however good the book looks.
+    fair_early, fair_src = _any_fair(m)
     # int(): MAX_UNBACKED_BID_C is a float and the candidate walk below is a
     # range(), which will not take one
-    hard = int(EARN_SAFE_MAX_C if sv_early is not None else MAX_UNBACKED_BID_C)
+    hard = int(EARN_SAFE_MAX_C if fair_early is not None else MAX_UNBACKED_BID_C)
     top = min(top, hard)
     if b["lo"] > top:
         top = min(b["lo"], hard)
@@ -5577,8 +5649,14 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
     # contract at 9c. The band measures the crowd; Silver measures the
     # race. Where Silver has an opinion it wins, with a few cents of
     # margin so reward income can still justify a small premium.
+    # The price cap follows whichever number we have, the owner's carrying the
+    # wider margin. `sv` stays the SILVER value alone: the size taper below
+    # tightens around a real forecast and should not tighten around a guess.
     sv = _silver_fair(m)
-    sv_cap = int(sv + EARN_SILVER_MARGIN) if sv is not None else None
+    out["fair_src"] = fair_src
+    sv_cap = (int(fair_early + (EARN_SILVER_MARGIN if fair_src == "silver"
+                                else OWNER_FAIR_MARGIN))
+              if fair_early is not None else None)
 
     def _pass(back: int, qmul: float,
               cap_touch: bool = False) -> tuple[list, tuple | None, str | None]:
@@ -8161,6 +8239,43 @@ def do_maction(body: dict) -> tuple[int, dict]:
         del ACTIONS[:-20]
         POLL_KICK.set()   # save + payload refresh promptly
         return 200, {"ok": True, "which": which, "on": on}
+    if op == "fair":
+        # The owner's hand-set fair value for a market no forecast covers.
+        # Places nothing by itself — but it feeds _bid_allowed, _ask_allowed and
+        # the scan's ceiling, so it decides what the loops may pay, and it is
+        # audit-logged like anything else that moves a limit.
+        mk = str(body.get("market") or "")
+        if not _slug_known(mk):
+            return 400, {"ok": False, "error": "unknown market"}
+        raw = body.get("cents")
+        with MONITOR.lock:
+            book = MONITOR.state.setdefault("owner_fair", {})
+            was = (book.get(mk) or {}).get("c")
+            if raw in (None, ""):
+                book.pop(mk, None)
+                now_c = None
+            else:
+                try:
+                    now_c = round(float(raw), 1)
+                except (TypeError, ValueError):
+                    return 400, {"ok": False, "error": "cents must be a number"}
+                if not (0.1 <= now_c <= 99.9):
+                    return 400, {"ok": False,
+                                 "error": "fair value out of range (0.1-99.9c)"}
+                book[mk] = {"c": now_c, "ts": time.time()}
+        ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                        "market": mk, "side": "FAIR VALUE",
+                        "from": f"{was:.1f}c" if was is not None else "—",
+                        "to": f"{now_c:.1f}c" if now_c is not None else "cleared",
+                        "size": "", "status": 200,
+                        "response": "owner estimate", "verified": True})
+        del ACTIONS[:-20]
+        _probe_log(mk, "fair", "=", (now_c or 0) / 100.0,
+                   (f"owner set fair value to {now_c:.1f}c"
+                    if now_c is not None else "owner cleared the fair value")
+                   + (f" (was {was:.1f}c)" if was is not None else ""))
+        POLL_KICK.set()
+        return 200, {"ok": True, "market": mk, "cents": now_c}
     if op == "budget":
         # Move the earner's search budget. The client sends a DIRECTION, never
         # a dollar figure — the same reason do_qualify computes its own size —
@@ -8250,7 +8365,7 @@ def do_maction(body: dict) -> tuple[int, dict]:
         return 200, {"ok": True}
     return 400, {"ok": False,
                  "error": "op must be place, modify, cancel, qualify, qual, "
-                          "budget, defend or undefend"}
+                          "budget, fair, defend or undefend"}
 
 
 # ---------------------------------------------------------------------------
@@ -8450,6 +8565,19 @@ def _map_office(slug: str) -> tuple[str, str] | None:
             if len(parts) > 2 and len(parts[2]) == 2:
                 return office, parts[2].lower()
     return None
+
+
+def _slate_touch(m: str) -> tuple[float | None, float | None]:
+    """(best real bid, best real ask) in cents from the cached book, or Nones.
+    Bait-sized levels are ignored, same as everywhere else."""
+    ent = tr._BOOK_CACHE.get(m)
+    if not ent:
+        return None, None
+    bk = ent[1] or {}
+    bb = [p_ * 100 for p_, q_ in (bk.get("bids") or []) if q_ >= PROBE_REAL_MIN]
+    ba = [p_ * 100 for p_, q_ in (bk.get("asks") or []) if q_ >= PROBE_REAL_MIN]
+    return (round(max(bb), 1) if bb else None,
+            round(min(ba), 1) if ba else None)
 
 
 def _map_payload() -> dict:
@@ -8734,7 +8862,11 @@ def _map_payload() -> dict:
             ({"m": m_, "img": v_[0], "name": v_[1] or m_.rsplit("-", 1)[-1],
               "title": v_[2],
               "rate": round(float((MONITOR.market_rates or {}).get(m_) or 0.0), 2),
-              "orders": sum(1 for o_ in MONITOR.orders if o_.get("market") == m_)}
+              "orders": sum(1 for o_ in MONITOR.orders if o_.get("market") == m_),
+              # the owner's hand-set fair value and the live touch, so the page
+              # can say how far the estimate sits from where it is trading
+              "fair": _owner_fair(m_),
+              **dict(zip(("bb", "ba"), _slate_touch(m_)))}
              for m_, v_ in (MONITOR.state.get("mkt_img") or {}).items()
              if "2028" in m_),
             key=lambda r: (r["title"], -r["rate"], r["name"])),
@@ -9452,6 +9584,56 @@ async function qualAct(key, decision){
   load();
 }
 
+// --- owner-set fair values -----------------------------------------------
+// The distance from the midpoint is the sanity check the owner asked for: a
+// number typed 30c away from where the market is trading is usually a typo or
+// a strong opinion, and the two want telling apart before it becomes a price
+// cap the loops obey.
+const FVOPEN = {};
+function midOf(r){
+  if(r.bb != null && r.ba != null) return (r.bb + r.ba) / 2;
+  if(r.bb != null) return r.bb;
+  if(r.ba != null) return r.ba;
+  return null;
+}
+function gapTag(fair, mid){
+  if(mid == null || fair == null) return '';
+  const d = fair - mid;
+  if(Math.abs(d) < 0.05) return ' <span class="sub">= mid</span>';
+  const col = Math.abs(d) >= 10 ? '#ff9d99' : Math.abs(d) >= 4 ? '#f2cd7f' : '#8fe3b8';
+  return ' <span style="color:' + col + '">' + (d > 0 ? '+' : '') +
+         d.toFixed(1) + '¢ vs mid</span>';
+}
+function fvTap(m){ FVOPEN[m] = !FVOPEN[m]; renderSlate(); }
+function fvPreview(m){
+  const row = (DATA.slate || []).find(x => x.m === m);
+  const el = document.getElementById('fv_' + m);
+  const note = document.getElementById('fvn_' + m);
+  if(!row || !el || !note) return;
+  const mid = midOf(row);
+  const v = parseFloat(el.value);
+  if(mid == null){ note.innerHTML = 'no two-sided book to compare against'; return; }
+  if(!(v >= 0.1 && v <= 99.9)){ note.innerHTML = 'mid ' + mid.toFixed(1) + '¢'; return; }
+  const d = v - mid;
+  note.innerHTML = 'mid ' + mid.toFixed(1) + '¢ · your ' + v.toFixed(1) + '¢ is ' +
+    (Math.abs(d) < 0.05 ? 'right on it'
+      : Math.abs(d).toFixed(1) + '¢ ' + (d > 0 ? 'ABOVE' : 'BELOW') + ' it') +
+    (Math.abs(d) >= 10 ? ' — that is a long way, check it' : '');
+}
+async function fvSave(m, clear){
+  const el = document.getElementById('fv_' + m);
+  const v = clear ? null : parseFloat((el || {}).value);
+  if(!clear && !(v >= 0.1 && v <= 99.9)){
+    const n = document.getElementById('fvn_' + m);
+    if(n) n.innerHTML = '<span style="color:#ff9d99">0.1–99.9¢ please</span>';
+    return;
+  }
+  const r = await act({op:'fair', market:m, cents: clear ? null : v});
+  const n = document.getElementById('fvn_' + m);
+  if(n && !r.ok) n.innerHTML = '<span style="color:#ff9d99">' + esc(r.msg) + '</span>';
+  if(r.ok){ FVOPEN[m] = false; setTimeout(load, 800); }
+}
+
 function renderSlate(){
   const card = document.getElementById('slateCard'); if(!card) return;
   const rows = DATA.slate || [];
@@ -9478,13 +9660,40 @@ function renderSlate(){
          ' — $' + sub.toFixed(2) + '/day</div><div class="fgrid">' +
       list.map(r => {
         const [c, bd] = tone(r);
-        return '<div class="face" style="border-color:' + bd + '" onclick="openMkt(&#39;' +
-          esc(r.m) + '&#39;)">' +
+        // The fair-value chip. Silver prices no 2028 market, so without a
+        // number typed here the whole board is "unmodelled" and capped at 15c
+        // — which is why we are out of markets that are paying. Tapping the
+        // chip opens a box; the number feeds the same guards the forecast
+        // feeds, at lower weight (see OWNER_FAIR_W).
+        const mid = midOf(r);
+        return '<div class="face" style="border-color:' + bd + '">' +
+          '<div onclick="openMkt(&#39;' + esc(r.m) + '&#39;)">' +
           '<img src="' + esc(r.img) + '" alt="" loading="lazy" ' +
           'onerror="this.style.visibility=&#39;hidden&#39;">' +
           '<div class="fn">' + esc(r.name) + '</div>' +
           '<div class="fr" style="color:' + c + '">' +
-          (r.rate > 0 ? '$' + r.rate.toFixed(2) : (r.orders ? '$0' : '—')) + '</div></div>';
+          (r.rate > 0 ? '$' + r.rate.toFixed(2) : (r.orders ? '$0' : '—')) + '</div></div>' +
+          '<div class="fv" onclick="fvTap(&#39;' + esc(r.m) + '&#39;)" ' +
+          'style="font-size:10.5px;margin-top:2px;cursor:pointer;color:' +
+          (r.fair == null ? 'var(--dim)' : '#f2cd7f') + '">' +
+          (r.fair == null ? 'set fair'
+             : r.fair.toFixed(1) + '¢' + gapTag(r.fair, mid)) + '</div>' +
+          (FVOPEN[r.m] ?
+            '<div class="ctlrow" style="margin-top:3px;gap:3px">' +
+            '<input id="fv_' + esc(r.m) + '" type="number" step="0.1" min="0.1" ' +
+            'max="99.9" value="' + (r.fair == null ? '' : r.fair) + '" ' +
+            'placeholder="' + (mid == null ? '¢' : mid.toFixed(1)) + '" ' +
+            'style="width:4.2em;font-size:11px" ' +
+            'oninput="fvPreview(&#39;' + esc(r.m) + '&#39;)" ' +
+            'onclick="event.stopPropagation()">' +
+            '<button style="font-size:11px;min-height:30px;padding:2px 7px" ' +
+            'onclick="fvSave(&#39;' + esc(r.m) + '&#39;)">save</button>' +
+            '<button class="alt" style="font-size:11px;min-height:30px;padding:2px 6px" ' +
+            'onclick="fvSave(&#39;' + esc(r.m) + '&#39;,true)">×</button></div>' +
+            '<div class="sub" id="fvn_' + esc(r.m) + '" style="font-size:10px">' +
+            (mid == null ? 'no two-sided book to compare against'
+                         : 'mid ' + mid.toFixed(1) + '¢') + '</div>' : '') +
+          '</div>';
       }).join('') + '</div>';
   });
   document.getElementById('slateBody').innerHTML = h;
@@ -12328,6 +12537,31 @@ function mBest(){
   if(!lv.length){ toast('That side of the book is empty — no best price to match.'); return; }
   document.getElementById('mPrice').value = +(lv[0][0]*100).toFixed(2);
 }
+// Join the touch on either side. Size comes from the box beside the buttons;
+// where we are SHORT a bid buys the short back, so it is capped at the short
+// and sent as close_short — a plain BUY_LONG against our own short is how you
+// end up holding both sides of the same contract.
+function mJoin(side){
+  if(!MSHEET) return;
+  const lv = side === 'BUY' ? (MSHEET.bids || []) : (MSHEET.asks || []);
+  if(!lv.length){ toast('That side of the book is empty — nothing to join.'); return; }
+  const c = +(lv[0][0]*100).toFixed(1);
+  let q = parseInt((document.getElementById('mJoinQty') || {}).value, 10);
+  if(!(q >= 1 && q <= 20000)){ toast('Size must be between 1 and 20,000'); return; }
+  const net = MSHEET.net || 0;
+  const closing = (side === 'BUY' && net < 0);
+  if(closing) q = Math.min(q, -net);
+  const cost = (side === 'BUY' ? c / 100 * q : (100 - c) / 100 * q);
+  if(!arm('join' + side + c + q,
+          'Join the ' + (side === 'BUY' ? 'bid' : 'ask') + ' — ' + side + ' ' +
+          q.toLocaleString() + ' @ ' + c + '¢, $' + cost.toFixed(2) + ' committed' +
+          (closing ? ' (buys back ' + q.toLocaleString() + ' of your ' +
+                     (-net).toLocaleString() + ' short)' : ''))) return;
+  const body = {op:'place', market: MSHEET.market, side: side,
+                price_cents: c, size: q};
+  if(closing) body.close_short = true;
+  mact(body, MSHEET.market);
+}
 async function openMkt(m){
   document.getElementById('sheet').style.display = 'block';
   const el = document.getElementById('sheetIn');
@@ -12345,7 +12579,7 @@ async function openMkt(m){
   }
 }
 function renderSheet(d){
-  MSHEET = d;
+  MSHEET = d;               // carries .market — mJoin reads the slug from it
   const m = d.market;
   const lv = a => (a && a.length ? a : []).map(x =>
     '<tr><td>'+(+(x[0]*100).toFixed(2))+'¢</td><td class="r">'+x[1].toLocaleString()+'</td></tr>').join('')
@@ -12407,6 +12641,28 @@ function renderSheet(d){
     '<div style="display:flex;gap:18px;margin-top:8px">'+
     '<div style="flex:1"><div class="sub">Bids</div><table class="bk">'+lv(d.bids)+'</table></div>'+
     '<div style="flex:1"><div class="sub">Asks</div><table class="bk">'+lv(d.asks)+'</table></div></div>'+
+    // JOIN THE TOUCH FROM HERE. "Place new" already has a match-best button,
+    // but it sits below every resting order — on a market with a dozen of them
+    // that is a long scroll away from the book you just read the price off
+    // (owner, 2026-08-17: "give me a way to join the best price from this
+    // screen"). Same /maction place route, same two taps, same post-only.
+    // Joining means resting AT the touch, not through it: a BUY goes on the
+    // best bid and a SELL on the best ask, so neither can cross.
+    '<div class="ctlrow" style="margin-top:10px;align-items:center;flex-wrap:wrap;gap:6px">'+
+    (d.bids && d.bids.length ?
+      '<button class="alt" onclick="mJoin(\\'BUY\\')">Join bid '+
+      (+(d.bids[0][0]*100).toFixed(1))+'¢</button>' : '')+
+    (d.asks && d.asks.length ?
+      '<button class="alt" onclick="mJoin(\\'SELL\\')">Join ask '+
+      (+(d.asks[0][0]*100).toFixed(1))+'¢</button>' : '')+
+    '<span class="ctl"><label>qty</label>'+
+    '<button class="alt bump" onclick="qBump(\\'mJoinQty\\',-1)">−</button>'+
+    '<input id="mJoinQty" type="number" step="1" min="1" max="20000" value="'+
+    (d.net < 0 ? Math.min(20000, -d.net) : 10)+'" style="width:6em">'+
+    '<button class="alt bump" onclick="qBump(\\'mJoinQty\\',1)">+</button></span>'+
+    (d.net < 0 ? '<span class="sub">a bid here buys back your '+
+      (-d.net).toLocaleString()+' short</span>' : '')+
+    '</div>'+
     '<h3>Your orders</h3>'+
     ((d.orders || []).length > 1 ?
       '<div class="ctlrow" style="margin-bottom:8px;align-items:center">'+

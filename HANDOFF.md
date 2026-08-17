@@ -1181,3 +1181,48 @@ the dashboard key, the X-Reprice header, the known-market whitelist, the
 from the book already drawn above it. Two taps: the first arms and states side,
 size, price and dollars committed; the second sends. `t_slateorder.py` drives
 the real page in node and asserts that one tap sends nothing.
+
+### 2026-08-17 — owner-set fair values, the 2028 prior source
+
+Silver prices senate and governor races and nothing else, so the whole 2028
+board is "unbacked" and capped at `MAX_UNBACKED_BID_C` (15c) whatever else
+changes. That cap is a refusal to guess, not an estimate. Owner: "I'll set the
+fair value by hand for now. My numbers should not get the same weight as the
+Nate silver model, but it can get us started."
+
+`state["owner_fair"] = {slug: {"c": cents, "ts": epoch}}`, set from a chip under
+each face on the slate. `_owner_fair(m)` reads it; `_any_fair(m)` returns
+`(cents, source)` and **the forecast always wins** — a hand number stands in for
+a missing model, it never overrides a live one.
+
+Worth LESS than the model everywhere, deliberately:
+
+| | Silver | owner |
+|---|---|---|
+| margin before a bid/ask is refused | 3c | `OWNER_FAIR_MARGIN` 6c |
+| weight in the posterior | 1.2 | `OWNER_FAIR_W` 0.7 |
+| window in the posterior | 1.5–6c | `OWNER_FAIR_WIN` 8c |
+| credit toward confidence | 0.15 | `OWNER_FAIR_CONF` 0.08 |
+
+What it DOES unlock: `_bid_allowed` / `_ask_allowed` bind to it instead of the
+15c blanket, and `_earn_scan`'s hard ceiling becomes `EARN_SAFE_MAX_C` rather
+than `MAX_UNBACKED_BID_C`. That is the whole point — without a number the board
+is unreachable however good the book looks. The size taper still keys off
+`sv` (Silver alone): it tightens around a real forecast and must not tighten
+around a guess.
+
+`op: "fair"` on /maction, audit-logged in Recent actions and the probe journal,
+0.1–99.9c bounds, known-market whitelist, `cents: null` clears it. Places
+nothing by itself — but it decides what the loops may pay, which is why it is
+logged like an order.
+
+The chip shows the distance from the midpoint (owner: "when I set the number
+show me how far it is from the current midpoint"), live as you type and on the
+tile afterwards: green under 4c, amber to 10c, red beyond, with "that is a long
+way, check it" past 10c. `_slate_touch` puts the real bid/ask on each slate row
+for it — bait-sized levels excluded, same as everywhere.
+
+**Harness note.** Five test files broke on this because they stub namespaces,
+and the fix was to exec the REAL `_owner_fair`/`_any_fair` into each against an
+empty table rather than stub them. Stubbing is exactly what hid the Silver
+uppercase bug for a day; do not stub these.
