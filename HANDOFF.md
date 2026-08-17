@@ -321,6 +321,40 @@ is precisely when we most want out, and the close loop would have re-placed it
 SELL_SHORT outright: closing a short reduces exposure, so the bid cap has no
 business judging it.
 
+### 2026-08-17 — /hunt: worst prices on the board, worked BY HAND
+
+Owner: "set up a big sniper with the worst positions you can find so that I
+can go after them by hand. Give me a button to press for me to tell the
+program to clear the area so I don't buy my own shares."
+
+`/hunt`, linked from the map nav as "Worst prices". It PLACES NOTHING — the
+automatic sniper stays as it was, small and narrow with its own switch. This
+is a ranked list.
+
+`hunt_targets()` walks every cached book and reports resting orders far from
+model fair: a BID above fair is someone paying too much (we could sell to
+them), an ASK below fair is someone selling too cheap (we could buy from
+them). Edge per share, value = edge x the size actually there, sorted by
+value. Defaults HUNT_MIN_EDGE_C 5c, HUNT_MIN_USD $1. Silver first; a market
+without a forecast is only included when the posterior is TIGHT (<=6 ticks)
+and built on at least one real trade — a wide guess is not a basis for telling
+the owner to attack. Built entirely from caches, because it is a web request.
+
+OUR OWN SIZE IS SUBTRACTED FROM EVERY LEVEL. A level that is entirely ours
+disappears from the list; a level that is half ours reports only their half.
+Without that the list would cheerfully point at our own qualifying stacks.
+Each card also states how much of ours is resting in that market, and at that
+exact price.
+
+"Clear the area" cancels EVERY order of ours in that market — loop orders,
+qualifier floors, keeper rungs, and the owner's own. The usual "automation
+never touches the owner's orders" rule is inverted here on purpose: the owner
+is the one clearing the room. Two taps, and the first tap says how many orders
+will go. Then `state["hunt_hold"][market]` keeps every PLACING loop out for
+HUNT_CLEAR_HOLD (30 min) — earner, prober, keeper, qualifier and sniper all
+check `_hunt_held` — so nothing wanders back in behind them. Cancelling is
+still allowed during a hold; that only ever helps.
+
 ### 2026-08-17 — /map 504: a web request was doing a blocking CDN fetch
 
 Follow-on from the blank page above. With the error reporting fixed, the page

@@ -3115,6 +3115,8 @@ _KEEP_LAST: dict = {}
 
 
 def _keep_place(m: str, side: str, px: float, qty: int) -> bool:
+    if _hunt_held(m):
+        return False          # the owner is working this market by hand
     body = {"marketSlug": m,
             "intent": "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_BUY_SHORT",
             "type": "ORDER_TYPE_LIMIT",
@@ -3440,6 +3442,8 @@ def auto_snipe() -> None:
         if took >= SNIPE_MAX_PER_CYCLE or spent >= SNIPE_MAX_SPEND:
             return
         if not m.startswith(SNIPE_PREFIXES):
+            continue
+        if _hunt_held(m):
             continue
         if m.rsplit("-", 1)[-1] in SNIPE_EXCLUDE:
             continue
@@ -3909,6 +3913,8 @@ def _qual_place(job: dict) -> tuple[bool, str]:
     chunked, because the exchange trims a NEW ask to roughly one share per
     dollar of buying power and a single big one would come back tiny."""
     m, side, px = job["m"], job["side"], job["px"]
+    if _hunt_held(m):
+        return False, "cleared for the owner to trade by hand"
     left = int(job["gap"])
     intent = "ORDER_INTENT_BUY_LONG" if side == "BUY" else "ORDER_INTENT_BUY_SHORT"
     placed = 0
@@ -7481,11 +7487,161 @@ def take_close(slug: str, size: int, close_short: bool = False) -> tuple[int, di
         return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
 
 
+# --- the hunt: worst prices on the board, for the owner to take by hand ----
+# The automatic sniper is deliberately small and narrow — 2028 longshots, tiny
+# size, its own switch. This is the opposite: EVERY market we have a book for,
+# ranked by how far someone's resting order sits from what the model says the
+# contract is worth, with no automation attached (owner, 2026-08-17: "set up a
+# big sniper with the worst positions you can find so that I can go after them
+# by hand"). It places nothing. It is a list.
+HUNT_MIN_EDGE_C = float(os.environ.get("HUNT_MIN_EDGE_C", "5"))
+HUNT_MIN_USD = float(os.environ.get("HUNT_MIN_USD", "1.0"))
+HUNT_MAX = int(os.environ.get("HUNT_MAX", "60"))
+# How long every loop stays out of a market after the owner clears it. Long
+# enough to trade without something re-entering behind you.
+HUNT_CLEAR_HOLD = float(os.environ.get("HUNT_CLEAR_HOLD", "1800"))
+
+
+def hunt_targets() -> dict:
+    """Resting orders priced far from model fair, best opportunity first.
+
+    A BID above fair is someone paying too much — we could sell to them.
+    An ASK below fair is someone selling too cheap — we could buy from them.
+    Edge is per share; value is edge x the size actually available.
+
+    OUR OWN SIZE IS SUBTRACTED FROM EVERY LEVEL. Without that the list would
+    happily point at our own qualifying stacks and invite the owner to trade
+    with themselves, which is the whole reason the clear button exists.
+    Built entirely from caches — this is a web request and must not fetch.
+    """
+    now = time.time()
+    mine: dict = {}
+    for o in MONITOR.orders:
+        m_ = o.get("market")
+        if not m_:
+            continue
+        key = (m_, "BUY" if o.get("side") == "BUY" else "SELL",
+               round(float(o.get("price") or 0) * 100))
+        mine[key] = mine.get(key, 0.0) + float(o.get("size") or 0)
+    out = []
+    stale = 0
+    for m, ent in list(tr._BOOK_CACHE.items()):
+        if not ent or now - ent[0] > 600:
+            stale += 1
+            continue
+        sv = _silver_fair(m)
+        band = None
+        if sv is None:
+            b = _bayes_fair(m)
+            # only trust the posterior when it is tight AND built on trades;
+            # a wide guess is not a basis for telling the owner to attack
+            if b and b.get("med") and b.get("fills", 0) >= 1 and \
+                    (b["hi"] - b["lo"]) <= 6:
+                sv = float(b.get("mean") if b.get("mean") is not None else b["med"])
+                band = [b["lo"], b["hi"]]
+        if sv is None:
+            continue
+        bk = ent[1] or {}
+        for side, levels in (("BUY", bk.get("bids") or []),
+                             ("SELL", bk.get("asks") or [])):
+            for px, qty in levels[:4]:
+                pc = round(float(px) * 100, 1)
+                theirs = float(qty) - mine.get((m, side, round(pc)), 0.0)
+                if theirs <= 0.5:
+                    continue          # the level is ours, or all but ours
+                edge = (pc - sv) if side == "BUY" else (sv - pc)
+                if edge < HUNT_MIN_EDGE_C:
+                    continue
+                # taking a bid means SELLING at pc; taking an ask means BUYING
+                usd = round(edge / 100.0 * theirs, 2)
+                if usd < HUNT_MIN_USD:
+                    continue
+                out.append({
+                    "market": m, "take": side, "you": "sell" if side == "BUY" else "buy",
+                    "price_c": pc, "their_size": round(theirs, 1),
+                    "fair_c": round(sv, 2), "band": band,
+                    "edge_c": round(edge, 2), "value_usd": usd,
+                    "ours_here": round(mine.get((m, side, round(pc)), 0.0), 1),
+                    "ours_in_market": round(sum(
+                        v for (mm, _s, _p), v in mine.items() if mm == m), 1),
+                    "modelled": band is None,
+                })
+    out.sort(key=lambda r: -r["value_usd"])
+    return {"targets": out[:HUNT_MAX], "found": len(out), "stale_books": stale,
+            "min_edge_c": HUNT_MIN_EDGE_C, "min_usd": HUNT_MIN_USD}
+
+
+def do_clear_market(slug: str) -> tuple[int, dict]:
+    """Pull EVERY order of ours out of one market so the owner can trade there
+    by hand without hitting their own book (owner: "a button to press for me
+    to tell the program to clear the area so I don't buy my own shares").
+
+    Everything means everything — loop orders, qualifier floors, the keeper's
+    rungs, and orders placed by hand. This is the owner asking, not automation
+    cleaning up after itself, so the usual "never touch the owner's orders"
+    rule does not apply; they are the one clearing the room. Every loop is
+    also stood down in that market for HUNT_CLEAR_HOLD so nothing wanders back
+    in behind them.
+    """
+    if not _slug_known(slug):
+        return 400, {"ok": False, "error": "unknown market"}
+    ids = [str(o.get("id")) for o in MONITOR.orders
+           if o.get("market") == slug and o.get("id")]
+    done, failed = 0, []
+    for oid in ids:
+        path = f"/v1/order/{oid}/cancel"
+        try:
+            r = requests.request(
+                "POST", tr.TRADE_API + path,
+                headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", path),
+                         "Content-Type": "application/json"},
+                json={"marketSlug": slug}, timeout=20)
+            if r.status_code < 300:
+                done += 1
+                _EARN["cancelled"].add(oid)
+                _EARN["orders"].pop(oid, None)
+                (_EARN.get("grad") or set()).discard(oid)
+                _PROBE["active"].pop(oid, None)
+                (_EARN.get("flips") or {}).pop(oid, None)
+            else:
+                failed.append(f"{oid}: {tr._http_err(r)[:60]}")
+        except Exception as e:  # noqa: BLE001
+            failed.append(f"{oid}: {type(e).__name__}")
+    hold = time.time() + HUNT_CLEAR_HOLD
+    _EARN["last"][slug] = hold
+    _PROBE["last"][slug] = hold
+    with MONITOR.lock:
+        MONITOR.state.setdefault("hunt_hold", {})[slug] = hold
+    ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                    "market": slug, "side": "CLEAR the area", "from": "—",
+                    "to": "—", "size": done, "status": 200 if not failed else 207,
+                    "response": f"cancelled {done} of {len(ids)}",
+                    "verified": not failed})
+    del ACTIONS[:-20]
+    POLL_KICK.set()
+    return (200 if not failed else 207), {
+        "ok": not failed, "cancelled": done, "of": len(ids),
+        "hold_min": int(HUNT_CLEAR_HOLD / 60),
+        "detail": "; ".join(failed)[:200]}
+
+
+def _hunt_held(m: str) -> bool:
+    """Has the owner cleared this market to trade it by hand? Checked by every
+    loop that PLACES, so nothing wanders back in behind them. Cancelling is
+    still fine — that only ever helps them."""
+    try:
+        return time.time() < float((MONITOR.state.get("hunt_hold") or {}).get(m) or 0)
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def do_maction(body: dict) -> tuple[int, dict]:
     """Single-order actions from the tap-a-market sheet."""
     op = body.get("op")
     if op == "cancel":
         return do_cancel_order(str(body.get("order_id") or ""))
+    if op == "clear":
+        return do_clear_market(str(body.get("market") or ""))
     if op == "modify":
         try:
             return do_reprice(str(body["order_id"]), float(body["price_cents"]),
@@ -8313,6 +8469,8 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
       🔬 Prober &amp; Earner</button>
     <button class="alt" id="navSlate" onclick="location.href='/slate'">
       🇺🇸 2028 slate</button>
+    <button class="alt" id="navHunt" onclick="location.href='/hunt'">
+      🎯 Worst prices</button>
     <button class="alt" id="navMap" onclick="location.href='/map'"
       style="display:none">🗺 Back to the map</button>
   </div>
@@ -9411,6 +9569,166 @@ setInterval(()=>{
 # escaping collapses to a bare quote, and the whole script block dies — it
 # has cost this dashboard two blank pages already. Handlers are named
 # functions that read their input from the DOM.
+# The hunt list: the worst-priced resting orders on the board, for the owner
+# to take by hand. No automation is attached and nothing here places an order.
+# The only button that touches the exchange is Clear, which CANCELS ours.
+#
+# No inline onclick carries a quoted argument — that pattern has blanked this
+# dashboard twice. Handlers read their market from a data attribute.
+HUNT_HTML = """<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hunt</title>
+<style>
+:root{--bg:#1a202b;--surface:#232b38;--surface2:#2b3442;--line:#3a4454;--ink:#eef2f7;
+--dim:#93a0b4;--good:#34c07c;--bad:#e5645f;--warn:#d9a132;--accent:#5aa2ff;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;padding:12px 12px 60px;background:var(--bg);color:var(--ink);
+font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+h1{font-size:19px;margin:4px 0 2px}
+a{color:var(--accent);text-decoration:none}
+.sub{color:var(--dim);font-size:12px}
+.card{background:var(--surface);border-radius:var(--r);padding:12px;margin:10px 0}
+.hdr{display:flex;align-items:baseline;gap:8px}
+.hdr b{font-size:15px;flex:1 1 auto;min-width:0;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.val{font-size:19px;font-weight:800;color:var(--good);flex:0 0 auto}
+.act{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;
+font-weight:700;margin:6px 0 2px}
+.buy{background:rgba(52,192,124,.16);color:var(--good)}
+.sell{background:rgba(229,100,95,.16);color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+td{padding:3px 0;border-top:1px solid var(--line)}
+td.r{text-align:right}
+button{border:none;border-radius:10px;padding:10px 14px;font-size:14px;
+font-weight:700;background:var(--surface2);color:var(--ink);min-height:44px}
+button.arm{background:var(--bad);color:#fff}
+button:disabled{opacity:.5}
+.warn{color:var(--warn)}
+.err{background:#3a2530;color:var(--bad);padding:10px;border-radius:10px}
+.mine{color:var(--warn);font-size:12px}
+</style></head><body>
+<a href="/map">&larr; map</a>
+<h1>Worst prices on the board</h1>
+<div class="sub" id="meta">loading&hellip;</div>
+<div id="list"></div>
+<script>
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,
+  function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function hdrs(){ var h={}; try{ var k=localStorage.getItem('dashKey');
+  if(k) h['X-Dash-Key']=k; }catch(e){} return h; }
+function money(v){ return '$'+Number(v||0).toFixed(2); }
+function c(v){ return (Math.round(Number(v)*100)/100)+'\\u00a2'; }
+
+var ARMED = null, ARMT = null;
+
+// Clearing cancels real orders, so it takes two taps like every other
+// order-touching control here. The first arms it and says exactly how many
+// orders will go; the second does it.
+function clearArea(ev){
+  var b = ev.currentTarget, m = b.getAttribute('data-m'),
+      n = b.getAttribute('data-n');
+  if(ARMED !== m){
+    if(ARMT) clearTimeout(ARMT);
+    document.querySelectorAll('button[data-m]').forEach(function(x){
+      x.classList.remove('arm');
+      x.textContent = 'Clear the area';
+    });
+    ARMED = m;
+    b.classList.add('arm');
+    b.textContent = 'Tap again — cancels ' + n + ' of our orders here';
+    ARMT = setTimeout(function(){
+      ARMED = null; b.classList.remove('arm'); b.textContent = 'Clear the area';
+    }, 6000);
+    return;
+  }
+  if(ARMT) clearTimeout(ARMT);
+  ARMED = null;
+  b.disabled = true;
+  b.textContent = 'clearing\\u2026';
+  var h = hdrs();
+  h['Content-Type'] = 'application/json';
+  h['X-Reprice'] = '1';
+  fetch('maction', {method:'POST', headers:h,
+                    body: JSON.stringify({op:'clear', market:m})})
+    .then(function(r){ return r.json().catch(function(){ return {}; }); })
+    .then(function(j){
+      b.classList.remove('arm');
+      if(j.ok || j.cancelled){
+        b.textContent = 'cleared ' + j.cancelled + ' of ' + j.of
+                      + ' \\u00b7 loops out for ' + (j.hold_min||30) + ' min';
+      } else {
+        b.disabled = false;
+        b.textContent = 'failed \\u2014 ' + (j.error || j.detail || 'try again');
+      }
+      setTimeout(load, 2500);
+    })
+    .catch(function(e){
+      b.disabled = false;
+      b.textContent = 'failed \\u2014 ' + ((e && e.message) || e);
+    });
+}
+
+function row(t){
+  var act = t.you === 'buy'
+    ? '<span class="act buy">BUY from them at ' + c(t.price_c) + '</span>'
+    : '<span class="act sell">SELL to them at ' + c(t.price_c) + '</span>';
+  return '<div class="card">'
+    + '<div class="hdr"><b>' + esc(t.market) + '</b>'
+    + '<span class="val">' + money(t.value_usd) + '</span></div>'
+    + act
+    + '<table>'
+    + '<tr><td>Their size</td><td class="r">' + t.their_size.toLocaleString()
+      + ' shares</td></tr>'
+    + '<tr><td>Model fair</td><td class="r">' + c(t.fair_c)
+      + (t.modelled ? '' : ' <span class="sub">(from our own trades'
+          + (t.band ? ', ' + t.band[0] + '\\u2013' + t.band[1] + '\\u00a2' : '')
+          + ')</span>') + '</td></tr>'
+    + '<tr><td>Edge</td><td class="r"><b>' + c(t.edge_c) + '</b> a share</td></tr>'
+    + '</table>'
+    + (t.ours_in_market
+        ? '<div class="mine">\\u26a0 ' + t.ours_in_market.toLocaleString()
+          + ' shares of ours resting in this market'
+          + (t.ours_here ? ', ' + t.ours_here + ' at this very price' : '')
+          + ' \\u2014 clear before you trade</div>'
+        : '<div class="sub">nothing of ours resting here</div>')
+    + '<div style="margin-top:8px"><button data-m="' + esc(t.market)
+      + '" data-n="' + (t.ours_in_market || 0) + '" onclick="clearArea(event)">'
+      + 'Clear the area</button></div>'
+    + '</div>';
+}
+
+function load(){
+  fetch('hunt.json', {headers: hdrs()})
+    .then(function(r){
+      if(r.status === 401) return Promise.reject(new Error('key'));
+      return r.json().then(function(j){
+        return r.ok ? j : Promise.reject(new Error(j.error || ('HTTP ' + r.status)));
+      });
+    })
+    .then(function(d){
+      var ts = d.targets || [];
+      document.getElementById('meta').innerHTML =
+        ts.length
+          ? '<b>' + d.found + '</b> resting order' + (d.found === 1 ? '' : 's')
+            + ' priced at least ' + c(d.min_edge_c) + ' away from what the model '
+            + 'says the contract is worth. Biggest first. Nothing here is '
+            + 'automated \\u2014 this is a list to work by hand.'
+          : 'nothing on the board is more than ' + c(d.min_edge_c) + ' from fair '
+            + 'right now'
+            + (d.stale_books ? ' (' + d.stale_books + ' books too stale to judge)' : '');
+      document.getElementById('list').innerHTML = ts.map(row).join('');
+    })
+    .catch(function(e){
+      document.getElementById('meta').innerHTML = (e.message === 'key')
+        ? 'this page needs the dashboard key \\u2014 open /map first and sign in'
+        : '<span class="err">' + esc(e.message) + '</span>';
+    });
+}
+load();
+setInterval(load, 30000);
+</script></body></html>"""
+
+
 WHY_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why</title>
@@ -12069,6 +12387,9 @@ class Handler(BaseHTTPRequestHandler):
             # do not belong on the control surface (owner, 2026-08-16).
             self._send(200, "text/html; charset=utf-8", MAP_HTML.encode())
             return
+        if self.path.startswith("/hunt") and not self.path.startswith("/hunt.json"):
+            self._send(200, "text/html; charset=utf-8", HUNT_HTML.encode())
+            return
         if self.path.startswith("/why") and not self.path.startswith("/why.json"):
             # Same shell-only pattern: the page carries no data, and /why.json
             # underneath it demands the key.
@@ -12180,6 +12501,12 @@ class Handler(BaseHTTPRequestHandler):
             slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]
             code, payload = market_info(slug)
             self._send(code, "application/json", json.dumps(payload).encode())
+        elif self.path.startswith("/hunt.json"):
+            try:
+                self._send(200, "application/json", json.dumps(hunt_targets()).encode())
+            except Exception as e:  # noqa: BLE001 — a read-only list, never fatal
+                self._send(500, "application/json",
+                           json.dumps({"error": f"{type(e).__name__}: {e}"[:200]}).encode())
         elif self.path.startswith("/track_rows.json"):
             # the full set from the last reading, fetched once when it lands
             self._send(200, "application/json", json.dumps(
