@@ -5278,10 +5278,6 @@ EARN_RUNG_MAX = int(os.environ.get("EARN_RUNG_MAX", "3"))
 # more than a couple a poll.
 EARN_UPSIZE_RATIO = float(os.environ.get("EARN_UPSIZE_RATIO", "3"))
 EARN_UPSIZE_PER_POLL = int(os.environ.get("EARN_UPSIZE_PER_POLL", "6"))
-# What the scope card prices: a block at the floor, the size the owner named
-# for the Alaska longshots (2026-08-17). Scope only — nothing places this.
-SCOPE_BID_C = float(os.environ.get("SCOPE_BID_C", "1"))
-SCOPE_BID_QTY = float(os.environ.get("SCOPE_BID_QTY", "10000"))
 # Price climbs the same ladder: the band's 10th percentile at the bottom rung,
 # its median at the next, its top only once a market has held twice. A flat
 # 10c ceiling was far too dear for longshots the model puts at two to eight.
@@ -5293,6 +5289,70 @@ def _earn_rung(m: str) -> int:
 
 def _earn_rung_size(m: str) -> int:
     return int(EARN_START_SHARES * (EARN_RUNG_MULT ** _earn_rung(m)))
+
+
+AK_PREFIX = os.environ.get("AK_PREFIX", "erac-usgubp-ak-adv-")
+
+
+def _qualify_rows(prefix: str = "") -> list[dict]:
+    """One row per market in a family: the book, and what it would take to
+    QUALIFY each side.
+
+    A side holding less than Target Size pays nobody, so the useful number on
+    an unloved market is not "what shall I bid" but "how much does this side
+    need before it pays anything at all". That is the shortfall, and it is the
+    size this offers. Where a side already holds Target Size the shortfall is
+    zero and the offer is a quarter of the window instead — enough to take a
+    real share without pretending we can move a deep book.
+
+    Read-only. Placing is a separate, confirmed tap.
+    """
+    pref = prefix or AK_PREFIX
+    rows = []
+    for m in sorted(tr._BOOK_CACHE):
+        if not m.startswith(pref):
+            continue
+        ent = tr._BOOK_CACHE.get(m)
+        pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
+        bk = (ent[1] if ent else {}) or {}
+        bids = [[round(p_ * 100, 1), q_] for p_, q_ in (bk.get("bids") or [])][:8]
+        asks = [[round(p_ * 100, 1), q_] for p_, q_ in (bk.get("asks") or [])][:8]
+        target = float(pr.get("target") or 0)
+        per = (float(pr.get("pool") or 0)
+               / max(int(pr.get("event_n") or pr.get("pool_n") or 1), 1) / 2)
+        bt = sum(q_ for _, q_ in bids)
+        at = sum(q_ for _, q_ in asks)
+        row = {"m": m, "name": m.rsplit("-", 1)[-1],
+               "age_s": int(time.time() - ent[0]) if ent else None,
+               "bids": bids, "asks": asks, "target": target,
+               "per_side": round(per, 2), "bid_total": round(bt),
+               "ask_total": round(at),
+               "bid": (max(p_ for p_, _ in bids) if bids else None),
+               "ask": (min(p_ for p_, _ in asks) if asks else None)}
+        for side in ("BUY", "SELL"):
+            tot = bt if side == "BUY" else at
+            # join the touch on that side; with no touch, start at the floor
+            # (a bid) or the ceiling (an ask) rather than inventing a price
+            if side == "BUY":
+                px = row["bid"] if row["bid"] is not None else 1.0
+                if row["ask"] is not None and px >= row["ask"]:
+                    px = max(1.0, row["ask"] - 1)
+            else:
+                px = row["ask"] if row["ask"] is not None else 99.0
+                if row["bid"] is not None and px <= row["bid"]:
+                    px = min(99.0, row["bid"] + 1)
+            short = max(0.0, target - tot)
+            qty = int(short) if short > 0 else int(max(1, target * 0.25))
+            sc = _block_scope(m, px, qty, side) if target and per > 0 else {}
+            row[side.lower()] = {
+                "px": px, "qty": qty,
+                "shortfall": int(short),
+                "cost": round(_earn_cost(side, px, qty), 2),
+                "est": sc.get("est"), "share": sc.get("share"),
+                "ok": bool(sc.get("ok")), "why": sc.get("why") or "",
+                "ahead": sc.get("ahead_at_px")}
+        rows.append(row)
+    return rows
 
 
 def _block_scope(m: str, px_c: float, qty: float, side: str = "BUY") -> dict:
@@ -9613,15 +9673,6 @@ def _map_payload() -> dict:
         "qual_queue": sorted(
             ({"key": k, **v} for k, v in (MONITOR.state.get("qual_queue") or {}).items()),
             key=lambda j: -float(j.get("cost") or 0)),
-        # SCOPE, NOT ORDERS. Every preferred market that has a book, priced
-        # for a block at the floor on the bid and at the touch on the ask, so
-        # the owner can see where a big cheap order qualifies a dead side
-        # before any money moves. Nothing here places anything.
-        "scope": [r for r in (
-            _block_scope(m_, SCOPE_BID_C, SCOPE_BID_QTY, "BUY")
-            for m_ in sorted(tr._BOOK_CACHE) if _preferred(m_))
-            if r.get("target")],
-        "scope_cfg": {"px": SCOPE_BID_C, "qty": SCOPE_BID_QTY},
         "probe_est": MONITOR.state.get("probe") or {},
         "probe_bayes": {m: b for m in sorted(
                             {l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
@@ -9880,11 +9931,6 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     color:var(--dim);margin-bottom:6px">💸 Sell below fair? — waiting on you</div>
     <div id="sellBody"></div>
   </div>
-  <div class="card" id="scopeCard" style="display:none">
-    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
-    color:var(--dim);margin-bottom:6px">🔎 Block scope — nothing placed</div>
-    <div id="scopeBody"></div>
-  </div>
   <div class="card" id="qualCard" style="display:none">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--dim);margin-bottom:6px">⚓ Qualifying — waiting on you</div>
@@ -10085,7 +10131,7 @@ function renderInner(){
   // the clue only existed in a console the owner has no way to open on a
   // phone. Each is isolated now, and a failure names itself on screen.
   [['sell', renderSell], ['qualify', renderQual], ['slate', renderSlate],
-   ['scope', renderScope], ['prober', renderProbe], ['earner', renderEarn]]
+   ['prober', renderProbe], ['earner', renderEarn]]
     .forEach(([nm, fn]) => {
       try { fn(); }
       catch (e) { RENDER_ERRS.push(nm + ': ' + ((e && e.message) || e)); }
@@ -10550,50 +10596,6 @@ async function rescout2028(){
   RESCOUT = {msg: r.ok ? r.msg : ('failed — ' + r.msg), ok: r.ok, ts: Date.now()};
   renderProbe();
   setTimeout(load, 2000);
-}
-
-function renderScope(){
-  const card = document.getElementById('scopeCard'); if(!card) return;
-  const rows = DATA.scope || [];
-  if(!rows.length){ card.style.display='none'; return; }
-  card.style.display='block';
-  const cfg = DATA.scope_cfg || {px:1, qty:10000};
-  const nm = m => m.replace(/^erac-usgubp-ak-adv-2026-08-18-/, 'AK·')
-                   .replace(/^enwc-uspres-nom-/, 'nom·')
-                   .replace(/^ewc-usp-2028-11-07-/, 'win·');
-  // Sorted by what the block would earn, because that is the decision.
-  const ok = rows.filter(r => r.ok).sort((x,y) => (y.est||0) - (x.est||0));
-  const no = rows.filter(r => !r.ok);
-  const row = r =>
-    '<tr style="border-top:1px solid #222a38">' +
-    '<td style="padding:3px 0;font-size:12px"><b>' + esc(nm(r.m)) + '</b>' +
-    '<div class="sub" style="font-size:10px">' + esc(r.why || '') + '</div></td>' +
-    '<td class="r" style="font-size:11px;white-space:nowrap">' +
-    (r.bid == null ? '—' : r.bid + '¢') + ' / ' +
-    (r.ask == null ? '—' : r.ask + '¢') +
-    '<div class="sub" style="font-size:10px">side ' +
-    (r.side_total||0).toLocaleString() + ' of ' +
-    (r.target||0).toLocaleString() +
-    (r.qualified_now ? '' : ' <span style="color:#d29922">DEAD</span>') +
-    '</div></td>' +
-    '<td class="r" style="font-size:12px;white-space:nowrap">' +
-    (r.ok ? '<b style="color:#3fb950">$' + (r.est||0).toFixed(2) + '</b>/day' +
-            '<div class="sub" style="font-size:10px">$' +
-            (r.cost||0).toFixed(2) + ' at risk</div>'
-          : '<span class="sub">—</span>') + '</td></tr>';
-  document.getElementById('scopeBody').innerHTML =
-    '<div class="sub" style="font-size:11px;margin-bottom:4px">' +
-    'What a <b>' + (cfg.qty||0).toLocaleString() + ' share bid at ' +
-    (cfg.px) + '¢</b> would do to each preferred book right now. ' +
-    'DEAD means that side is under Target Size and pays nobody today — ' +
-    'our block would be what qualifies it. This card places nothing.</div>' +
-    '<table style="width:100%;border-collapse:collapse">' +
-    ok.map(row).join('') + no.map(row).join('') + '</table>' +
-    '<div class="sub" style="font-size:11px;margin-top:5px">' +
-    ok.length + ' of ' + rows.length + ' would rest and score — ' +
-    '$' + ok.reduce((t,r)=>t+(r.est||0),0).toFixed(2) + '/day for $' +
-    ok.reduce((t,r)=>t+(r.cost||0),0).toFixed(2) + ' at risk if you took ' +
-    'every one.</div>';
 }
 
 function renderProbe(){
@@ -11394,6 +11396,160 @@ setInterval(()=>{
 #
 # No inline onclick carries a quoted argument — that pattern has blanked this
 # dashboard twice. Handlers read their market from a data attribute.
+AK_HTML = """<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qualify</title>
+<style>
+:root{--bg:#1a202b;--surface:#232b38;--surface2:#2b3442;--line:#3a4454;--ink:#eef2f7;
+--dim:#93a0b4;--good:#34c07c;--bad:#e5645f;--warn:#d9a132;--accent:#5aa2ff;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;padding:12px 12px 60px;background:var(--bg);color:var(--ink);
+font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+h1{font-size:19px;margin:4px 0 2px}
+a{color:var(--accent);text-decoration:none}
+.sub{color:var(--dim);font-size:12px}
+.card{background:var(--surface);border-radius:var(--r);padding:10px;margin:8px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;
+cursor:pointer}
+.nm{font-weight:600}
+.px{font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}
+.dead{color:var(--warn);font-weight:700}
+.book{display:flex;gap:10px;margin:8px 0}
+.book table{width:50%;border-collapse:collapse;font-size:12px;
+font-variant-numeric:tabular-nums}
+.book th{color:var(--dim);font-weight:500;text-align:left;font-size:11px}
+.book td{padding:1px 0}
+.b{color:var(--good)} .a{color:var(--bad)}
+button{font:inherit;border:0;border-radius:10px;padding:9px 12px;
+background:var(--surface2);color:var(--ink)}
+button.go{background:var(--accent);color:#06101f;font-weight:700}
+button:disabled{opacity:.4}
+input{font:inherit;width:88px;padding:7px;border-radius:9px;border:1px solid var(--line);
+background:var(--bg);color:var(--ink)}
+.ctl{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.note{font-size:11.5px;color:var(--dim);margin-top:3px}
+</style></head><body>
+<h1>Qualify a side</h1>
+<div class="sub" id="hd">loading…</div>
+<div id="list"></div>
+<script>
+var KEY = localStorage.getItem('dashkey') || '';
+if(!KEY){ KEY = prompt('dashboard password') || ''; localStorage.setItem('dashkey', KEY); }
+function hdrs(){ return {'X-Dash-Key': KEY}; }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g,
+  function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+var DATA = [], OPEN = {}, BUSY = false, MSG = {};
+
+function load(){
+  fetch('ak.json', {headers: hdrs()}).then(function(r){ return r.json(); })
+    .then(function(j){ DATA = j.rows || []; render(j); })
+    .catch(function(e){ document.getElementById('hd').textContent = 'load failed: ' + e; });
+}
+
+function render(j){
+  document.getElementById('hd').innerHTML =
+    esc(DATA.length) + ' markets · pool $' + (j.pool == null ? '?' : j.pool) +
+    ' a day for the event · <b>$' + (j.per_side == null ? '?' : j.per_side) +
+    '</b> a side · tap a name for its book';
+  document.getElementById('list').innerHTML = DATA.map(function(r){
+    var open = !!OPEN[r.m];
+    var h = '<div class="card"><div class="row" data-m="' + esc(r.m) + '">' +
+      '<div><span class="nm">' + esc(r.name) + '</span>' +
+      '<div class="note">' + (r.target ? ('target ' + r.target.toLocaleString()) :
+        '<span class="dead">no reward program</span>') +
+      (r.age_s == null ? ' · no book' : ' · book ' + r.age_s + 's old') + '</div></div>' +
+      '<div class="px">' +
+      '<span class="b">' + (r.bid == null ? '—' : r.bid + '¢') + '</span> / ' +
+      '<span class="a">' + (r.ask == null ? '—' : r.ask + '¢') + '</span>' +
+      '<div class="note">' + r.bid_total.toLocaleString() + ' / ' +
+      r.ask_total.toLocaleString() + '</div></div></div>';
+    if(open) h += bookHtml(r) + sideHtml(r, 'BUY') + sideHtml(r, 'SELL');
+    if(MSG[r.m]) h += '<div class="note">' + esc(MSG[r.m]) + '</div>';
+    return h + '</div>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('.row'), function(el){
+    el.onclick = function(){ var m = el.getAttribute('data-m');
+      OPEN[m] = !OPEN[m]; render(j); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('button[data-go]'), function(el){
+    el.onclick = function(){ place(el.getAttribute('data-go'), el.getAttribute('data-side')); };
+  });
+}
+
+function bookHtml(r){
+  var n = Math.max(r.bids.length, r.asks.length, 1), i, h = '';
+  for(i = 0; i < n; i++){
+    var b = r.bids[i], a = r.asks[i];
+    h += '<tr><td class="b">' + (b ? b[0] + '¢' : '') + '</td>' +
+         '<td class="b">' + (b ? Math.round(b[1]).toLocaleString() : '') + '</td></tr>';
+  }
+  var h2 = '';
+  for(i = 0; i < n; i++){
+    var a2 = r.asks[i];
+    h2 += '<tr><td class="a">' + (a2 ? a2[0] + '¢' : '') + '</td>' +
+          '<td class="a">' + (a2 ? Math.round(a2[1]).toLocaleString() : '') + '</td></tr>';
+  }
+  return '<div class="book"><table><tr><th>bid</th><th>size</th></tr>' + h +
+         '</table><table><tr><th>ask</th><th>size</th></tr>' + h2 + '</table></div>';
+}
+
+function sideHtml(r, side){
+  var d = side === 'BUY' ? r.buy : r.sell;
+  if(!d) return '';
+  var lbl = side === 'BUY' ? 'BID side' : 'ASK side';
+  var tot = side === 'BUY' ? r.bid_total : r.ask_total;
+  var dead = r.target && tot < r.target;
+  return '<div style="border-top:1px solid var(--line);padding-top:7px;margin-top:5px">' +
+    '<b style="font-size:13px">' + lbl + '</b> ' +
+    (dead ? '<span class="dead">under target — pays nobody</span>'
+          : '<span class="sub">qualified</span>') +
+    '<div class="ctl">' +
+    '<input id="p_' + esc(r.m) + '_' + side + '" type="number" step="0.1" min="0.1" ' +
+    'max="99.9" value="' + d.px + '">' +
+    '<input id="q_' + esc(r.m) + '_' + side + '" type="number" step="1" min="1" ' +
+    'value="' + d.qty + '">' +
+    '<button class="go" data-go="' + esc(r.m) + '" data-side="' + side + '">place</button>' +
+    '</div>' +
+    '<div class="note">' +
+    (d.shortfall > 0 ? ('needs ' + d.shortfall.toLocaleString() +
+      ' more to reach target — that is the size offered') :
+      'side already qualifies; offering a quarter of the window') +
+    (d.est == null ? '' : ' · <b>$' + d.est.toFixed(2) + '/day</b> for $' +
+      d.cost.toFixed(2) + ' at risk (' + d.share + '% of the window)') +
+    (d.ahead ? ' · ' + d.ahead.toLocaleString() + ' already ahead of you at that price' : '') +
+    (d.ok ? '' : ' · <span class="dead">' + esc(d.why) + '</span>') +
+    '</div></div>';
+}
+
+function place(m, side){
+  if(BUSY) return;
+  var px = parseFloat(document.getElementById('p_' + m + '_' + side).value);
+  var q = parseInt(document.getElementById('q_' + m + '_' + side).value, 10);
+  if(!(px > 0) || !(q > 0)) return;
+  var what = side === 'BUY' ? 'BID' : 'ASK';
+  var risk = (side === 'BUY' ? px : (100 - px)) / 100 * q;
+  if(!confirm(what + ' ' + q.toLocaleString() + ' @ ' + px + '¢ on ' + m +
+      ' — worst case $' + risk.toFixed(2) + '. Post-only: it rests or it is ' +
+      'rejected, it can never cross and fill on arrival.')) return;
+  BUSY = true; MSG[m] = 'placing…'; render({});
+  fetch('maction', {method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-Reprice': '1', 'X-Dash-Key': KEY},
+    body: JSON.stringify({op: 'place', market: m, side: side,
+                          price_cents: px, size: q})})
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      MSG[m] = j.ok ? ('placed ✓ ' + (j.detail || '')) :
+                      ('refused: ' + (j.error || j.detail || 'unknown'));
+      BUSY = false; load();
+    })
+    .catch(function(e){ MSG[m] = 'failed: ' + e; BUSY = false; render({}); });
+}
+
+load();
+setInterval(function(){ if(!BUSY) load(); }, 20000);
+</script></body></html>"""
+
+
 HUNT_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hunt</title>
@@ -14352,6 +14508,11 @@ class Handler(BaseHTTPRequestHandler):
             # do not belong on the control surface (owner, 2026-08-16).
             self._send(200, "text/html; charset=utf-8", MAP_HTML.encode())
             return
+        if route.startswith("/ak") and not route.startswith("/ak.json"):
+            # Same shell-only pattern as every other page: no data in the
+            # HTML, and /ak.json underneath it demands the key.
+            self._send(200, "text/html; charset=utf-8", AK_HTML.encode())
+            return
         if route.startswith("/hunt") and not route.startswith("/hunt.json"):
             self._send(200, "text/html; charset=utf-8", HUNT_HTML.encode())
             return
@@ -14466,6 +14627,19 @@ class Handler(BaseHTTPRequestHandler):
             slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]
             code, payload = market_info(slug)
             self._send(code, "application/json", json.dumps(payload).encode())
+        elif route.startswith("/ak.json"):
+            try:
+                rows = _qualify_rows()
+                pr0 = next(((tr._PROG_CACHE.get("progs") or {}).get(r["m"]) or {}
+                            for r in rows), {})
+                self._send(200, "application/json", json.dumps({
+                    "rows": rows,
+                    "pool": float(pr0.get("pool") or 0) or None,
+                    "per_side": (rows[0]["per_side"] if rows else None),
+                }).encode())
+            except Exception as e:  # noqa: BLE001 — a read-only page, never fatal
+                self._send(500, "application/json", json.dumps(
+                    {"error": f"{type(e).__name__}: {e}"[:200], "rows": []}).encode())
         elif self.path.startswith("/hunt.json"):
             try:
                 self._send(200, "application/json", json.dumps(hunt_targets()).encode())
