@@ -2859,7 +2859,11 @@ def do_reprice(order_id: str, price_cents: float, verify: bool = True,
             "" if rc.status_code < 300 else
             f" (old order cancel HTTP {rc.status_code} — both resting, harmless)")
         POLL_KICK.set()
-        return 200, {"ok": True, "status": r.status_code, "detail": record["note"][:250]}
+        # new_id goes back to the caller so a registry keyed by order id can
+        # follow the order across the replacement instead of losing track of
+        # it until some later rebuild (the earner's upsize pass needs this).
+        return 200, {"ok": True, "status": r.status_code, "new_id": new_id,
+                     "detail": record["note"][:250]}
     except Exception as e:  # noqa: BLE001
         record["status"] = "error"
         record["response"] = f"{type(e).__name__}: {e}"[:300]
@@ -5262,6 +5266,11 @@ EARN_START_SHARES = int(os.environ.get("EARN_START_SHARES", "5"))
 EARN_RUNG_MULT = float(os.environ.get("EARN_RUNG_MULT", "3"))
 EARN_RUNG_AFTER = float(os.environ.get("EARN_RUNG_AFTER", "1800"))
 EARN_RUNG_MAX = int(os.environ.get("EARN_RUNG_MAX", "3"))
+# Replacing a working order costs a round trip and a moment off the book, so
+# only do it when the allowance is a multiple of what is resting, and never
+# more than a couple a poll.
+EARN_UPSIZE_RATIO = float(os.environ.get("EARN_UPSIZE_RATIO", "3"))
+EARN_UPSIZE_PER_POLL = int(os.environ.get("EARN_UPSIZE_PER_POLL", "2"))
 # Price climbs the same ladder: the band's 10th percentile at the bottom rung,
 # its median at the next, its top only once a market has held twice. A flat
 # 10c ceiling was far too dear for longshots the model puts at two to eight.
@@ -5273,6 +5282,39 @@ def _earn_rung(m: str) -> int:
 
 def _earn_rung_size(m: str) -> int:
     return int(EARN_START_SHARES * (EARN_RUNG_MULT ** _earn_rung(m)))
+
+
+def _earn_qty(m: str, side: str, px_c: float, cap_usd: float,
+              qmul: float) -> int:
+    """How many shares one earner order may be, in ONE place.
+
+    Two limits and a ceiling: the dollar cap for this market, the share rung
+    it has climbed to, and EARN_MAX_SHARES. Confidence shrinks both — a thin
+    case buys a thin position — EXCEPT on the preferred board.
+
+    That exception is the owner's instruction of 2026-08-17: "limit per market
+    to $15 for initial that can increase as it becomes more confident." The
+    dollar cap already carries confidence (_earn_cap_usd grows it), so
+    shrinking the rung by qmul on top was a second, much tighter limit nobody
+    asked for. Measured 2026-08-17: it held 28 live 2028 orders to one or two
+    shares — $23.83 of capital against the $15 A MARKET that was authorised,
+    because qmul floors at 0.25 and rung 0 is 5 shares, so int(5 x 0.3) = 1.
+
+    Confidence still decides WHERE we rest — the standoff in ticks is
+    untouched. This is only how much.
+    """
+    ask = str(side).upper().startswith("S")
+    unit = ((100.0 - px_c) if ask else px_c) / 100.0
+    if unit <= 0:
+        return 1
+    if _preferred(m) and EARN_PREF_OFF_BUDGET:
+        rung = _earn_rung_size(m)
+    else:
+        cap_usd *= qmul
+        rung = max(1, int(_earn_rung_size(m) * qmul))
+    return max(1, min(EARN_MAX_SHARES, int(cap_usd / unit), rung))
+
+
 EARN_PX_MAX_C = int(os.environ.get("EARN_PX_MAX_C", "10"))
 # Above the penny ceiling the earner may only act on KNOWLEDGE, never on hope
 # (owner, 2026-08-16: "earner should use what probe is learning to place where
@@ -5781,10 +5823,8 @@ def _earn_ask_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
                           f"contract is worth ({fair_mean:.1f}c) — no amount of "
                           f"reward income buys that")
             continue
-        cap = EARN_ASK_USD * conf["qmul"]
         unit = (100.0 - pc) / 100.0
-        q = max(1, min(EARN_MAX_SHARES, int(cap / max(unit, 1e-6)),
-                       max(1, int(_earn_rung_size(m) * conf["qmul"]))))
+        q = _earn_qty(m, "SELL", pc, EARN_ASK_USD, conf["qmul"])
         if side_total + q < target:
             row["why"] = (f"the ask side holds {side_total:,.0f} of the "
                           f"{target:,.0f} Target Size even with our {q} — a side "
@@ -6077,10 +6117,7 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
             # would shrink a new 2028 market below the $15 the owner set as its
             # starting size, which is the opposite of the instruction. Every
             # other market keeps the shrink.
-            if not (_preferred(m) and EARN_PREF_OFF_BUDGET):
-                cap *= qmul
-            rung_sz = max(1, int(_earn_rung_size(m) * qmul))
-            q = max(1, min(EARN_MAX_SHARES, int(cap * 100 / pc), rung_sz))
+            q = _earn_qty(m, "BUY", pc, cap, qmul)
             # score with us resting at pc: merge, walk the window from the
             # best price, sum discounted takes
             lv = sorted(real_bids + [(pc, float(q))], key=lambda x: -x[0])
@@ -7102,6 +7139,65 @@ def auto_earn() -> None:
         _earn_log(m, "rung up", px / 100.0, qty,
                   f"{int(qty)} held {int((now - ts) / 60)}m on the book and earned — "
                   f"next order here may be {_earn_rung_size(m)}")
+
+    # UPSIZE WHAT IS ALREADY WORKING — preferred board only.
+    #
+    # The ladder above only decides how big the NEXT order is; nothing is
+    # resized in place. So a market entered under a tighter size rule stays
+    # tiny for as long as its order survives, and rotation will never free it:
+    # a 1-share bid earning $0.20/day on 2c of risk has an enormous yield per
+    # dollar, so it looks like the best thing on the book. That is how the
+    # whole 2028 board sat at one and two shares — $23.83 of capital against
+    # the $15 A MARKET the owner authorised (owner, 2026-08-17: "basically no
+    # activity on any of these").
+    #
+    # The replacement is do_reprice at the SAME price, which places the bigger
+    # order, verifies it by order id AND minimum size, and only then cancels
+    # the original. Never /modify. An order is only upsized once it has proved
+    # itself: on the book, earning, and past the rung window.
+    ups = 0
+    for oid, (m, side, px, qty, ts) in list(_EARN["orders"].items()):
+        if ups >= EARN_UPSIZE_PER_POLL:
+            break
+        if not (_preferred(m) and EARN_PREF_OFF_BUDGET):
+            continue
+        if now - ts < EARN_RUNG_AFTER or oid not in open_ids:
+            continue
+        o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
+        if not o or float(o.get("est_day") or 0) <= 0:
+            continue
+        if _on_book(m, side, px / 100.0, qty, ts) is not True:
+            continue
+        b = _bayes_fair(m)
+        if not (b and b.get("med")):
+            continue
+        conf = _earn_confidence(m, b, _silver_fair(m))
+        ask_ = str(side).upper().startswith("S")
+        want = _earn_qty(m, side, px,
+                         EARN_ASK_USD if ask_ else _earn_cap_usd(m, conf["score"]),
+                         conf["qmul"])
+        if want < qty * EARN_UPSIZE_RATIO:
+            continue
+        code_, res_ = do_reprice(oid, float(px), quantity=int(want))
+        if code_ != 200:
+            _earn_log(m, "upsize failed", px / 100.0, qty,
+                      f"{int(qty)} -> {want} refused: "
+                      f"{str(res_.get('detail') or res_.get('error'))[:90]}")
+            ups += 1
+            continue
+        ups += 1
+        nid = str(res_.get("new_id") or "")
+        with MONITOR.lock:
+            _EARN["orders"].pop(oid, None)
+            if nid:
+                _EARN["orders"][nid] = (m, side, px, int(want), now)
+        if nid:
+            _own_id("earn", nid)
+        _earn_log(m, "upsized", px / 100.0, want,
+                  f"{int(qty)} -> {want} shares at {px}c "
+                  f"(${_earn_cost(side, px, want):.2f} at risk, inside the "
+                  f"${EARN_ASK_USD if ask_ else _earn_cap_usd(m, conf['score']):.0f} "
+                  f"this market is allowed)")
 
     # Graduate the proven, demote the faded. Runs before rotation so a market
     # that has just earned its place is never picked as one of the worst.
