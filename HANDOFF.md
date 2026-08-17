@@ -321,6 +321,51 @@ is precisely when we most want out, and the close loop would have re-placed it
 SELL_SHORT outright: closing a short reduces exposure, so the bid cap has no
 business judging it.
 
+### 2026-08-17 — being outbid is not a verdict, and what "ruled out" means
+
+Owner, in three parts: "a lot of the markets the prober has ruled out are ones
+where it just got outbid. More examination might still find a fruitful
+position"; "the markets that should be ruled out are those that are so
+volatile that getting filled at bad prices outweighs the potential benefits";
+"because you want to compete, just not in a way that is going to get
+exploited."
+
+WHAT WAS WRONG. The /lab verdict docked a market up to 0.4 for being outbid —
+comparable to the penalty for a FILL — which dropped contested markets into
+"Not worth it". That was incoherent with the model right next to it:
+`_bayes_fair` treats an outbid as evidence fair value is HIGHER (someone's
+real money is bidding above us). One half of the system read it as
+information, the other as a black mark. And behaviourally nothing happened:
+the beaten scout sat out its full 30-minute TTL at a price the touch had
+already passed, holding one of the market's three slots while testing nothing
+— "nobody took it at 6c" says nothing once the best bid is 8c.
+
+RULING OUT is now the owner's test, computed rather than felt:
+
+    cost    = what fills here have lost against fair, per day
+    benefit = the reward income on offer, per day
+    ruled out  <=>  cost > benefit
+
+`e["fill_loss"]` accumulates the SIGNED loss per fill — (px - fair) on a buy,
+(fair - px) on a sell — so fills that went in our favour count as negative,
+and a market that fills us WELL is not punished for it. It needs two fills or
+a loss already past a day's income, since one expensive fill is not a pattern.
+Everything else was removed from the verdict: none of it was evidence of
+danger. Income is now scaled by the DRAG fills impose rather than by whether
+any fill happened, so a nickel lost against $15/day is correctly noise.
+
+Zones are: worth resting in / worth another look / fills cost more than it
+pays. The middle one is deliberately not a rejection.
+
+COMPETING WITHOUT BEING WALKED. Outbid now sets the market eligible for an
+immediate re-scout into the NEW gap, and a beaten scout rotates at
+PROBE_BEATEN_TTL (5 min) instead of 30 so the slot is freed. But the chase is
+COUNTED: after PROBE_CHASE_MAX (3) consecutive outbids in a market we stop
+jumping the queue for it and let it take its turn in the ordinary rotation.
+Otherwise someone with a one-tick order walks us up the book a tick at a time
+and leaves us holding the top — which is precisely the exploitation the owner
+named. An hour of quiet (PROBE_CHASE_RESET) forgives the counter.
+
 ### 2026-08-16 — Refresh button on the homepage (owner)
 
 "Build a button (like the poke file) that lets me get an updated reading of my

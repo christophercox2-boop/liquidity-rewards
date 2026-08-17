@@ -3574,6 +3574,14 @@ PROBE_FLIP_TICKS = 2
 # the model already weights a resting scout by how long it has sat, so a
 # shorter sit simply counts for less rather than counting wrongly.
 PROBE_TTL = float(os.environ.get("PROBE_TTL", "1800"))     # rotate after 30 min
+# A scout the market has moved past gets a much shorter leash: it is no longer
+# measuring its own price, and it is occupying a slot a fresh scout could use.
+PROBE_BEATEN_TTL = float(os.environ.get("PROBE_BEATEN_TTL", "300"))
+# How many times in a row we will re-price into a market that keeps outbidding
+# us before we stop chasing and let it wait its turn. Competing is the point;
+# being walked up the book by someone who steps in front every time is not.
+PROBE_CHASE_MAX = int(os.environ.get("PROBE_CHASE_MAX", "3"))
+PROBE_CHASE_RESET = float(os.environ.get("PROBE_CHASE_RESET", "3600"))
 PROBE_ACTIVE_MAX = int(os.environ.get("PROBE_ACTIVE_MAX", "140"))
 PROBE_MAX_PER_POLL = 5
 # Several scouts may sit in one market at DIFFERENT prices (owner, 2026-08-16:
@@ -4042,7 +4050,17 @@ def auto_probe() -> None:
                 except Exception:  # noqa: BLE001
                     pass
                 continue
-            if now - ts > PROBE_TTL:      # rotate a stale probe
+            # BEING OUTBID IS NOT A VERDICT ON THE MARKET, IT IS NEWS ABOUT
+            # OUR PRICE (owner, 2026-08-17: "a lot of the markets the prober
+            # has ruled out are ones where it just got outbid. More
+            # examination might still find a fruitful position"). Once the
+            # touch has moved past a scout, that scout has stopped testing
+            # anything: "nobody took it at 6c" says nothing while the best bid
+            # is 8c and ours is buried behind it. Worse, it holds one of the
+            # three slots this market gets. Retire it early and let a fresh
+            # one go into the NEW gap, which is where the question now is.
+            ttl = PROBE_BEATEN_TTL if oid in _PROBE.get("beaten", set()) else PROBE_TTL
+            if now - ts > ttl:            # rotate a stale probe
                 try:
                     requests.request(
                         "POST", tr.TRADE_API + f"/v1/order/{oid}/cancel",
@@ -4081,6 +4099,21 @@ def auto_probe() -> None:
         # what the information cost, not just what it taught.
         e["fill_ts"] = now
         e["fills"] = int(e.get("fills") or 0) + 1
+        # HOW BAD THE PRICE WAS, not just that a fill happened. The owner's
+        # test for ruling a market out is "so volatile that getting filled at
+        # bad prices outweighs the potential benefits" — which needs the SIZE
+        # of the mistake, not a count. A buy scout filled at px against a fair
+        # of f loses (px - f); a sell filled at px loses (f - px). Both are
+        # zero or negative when the fill was actually a good trade, and those
+        # are kept as negatives so a market that fills us WELL is not punished.
+        if kind == "probe":
+            _b = _bayes_fair(m) or {}
+            _f = _b.get("mean") if _b.get("mean") is not None else _b.get("med")
+            if _f is not None:
+                _loss = ((px * 100 - float(_f)) if side == "BUY"
+                         else (float(_f) - px * 100)) / 100.0
+                e["fill_loss"] = round(float(e.get("fill_loss") or 0.0) + _loss, 4)
+                e["fill_loss_n"] = int(e.get("fill_loss_n") or 0) + 1
         with MONITOR.lock:
             sp = MONITOR.state.setdefault("probe_scoreboard", {})
             sp["fills"] = int(sp.get("fills") or 0) + 1
@@ -4137,16 +4170,36 @@ def auto_probe() -> None:
         if not ent or now - ent[0] > 300:
             continue
         rbb, rba = _probe_real_touches(ent[1])
+        hit = None
         if side == "BUY" and rbb and rbb[0] > px + 1e-9:
-            beaten.add(oid)
-            _probe_log(m, "outbid", "BUY", rbb[0],
-                       f"{rbb[1]:,.0f} real shares bidding above our "
-                       f"{px*100:.0f}c scout")
+            hit = ("outbid", "BUY", rbb[0], rbb[1], "bidding above")
         elif side == "SELL" and rba and rba[0] < px - 1e-9:
+            hit = ("undercut", "SELL", rba[0], rba[1], "asking below")
+        if hit:
+            ev_, sd_, tpx_, tq_, word_ = hit
             beaten.add(oid)
-            _probe_log(m, "undercut", "SELL", rba[0],
-                       f"{rba[1]:,.0f} real shares asking below our "
-                       f"{px*100:.0f}c scout")
+            # COMPETE, BUT DO NOT BE WALKED (owner, 2026-08-17: "because you
+            # want to compete, just not in a way that is going to get
+            # exploited"). Re-pricing into the new gap is the right answer to
+            # being outbid ONCE. Doing it every time is how somebody with a
+            # one-tick order walks us up the book a tick at a time and then
+            # lets us hold the top. So the chase is counted, and after
+            # PROBE_CHASE_MAX in a market we stop jumping the queue for it and
+            # let it take its turn in the ordinary rotation — the market is
+            # still scouted, just not on the competitor's schedule.
+            ch = _PROBE.setdefault("chase", {})
+            n_, last_ = ch.get(m, (0, 0.0))
+            n_ = 1 if now - last_ > PROBE_CHASE_RESET else n_ + 1
+            ch[m] = (n_, now)
+            if n_ <= PROBE_CHASE_MAX:
+                _PROBE["last"][m] = 0.0      # eligible for a fresh look NOW
+                tail = "re-scouting the new gap"
+            else:
+                tail = (f"{n_} times in a row here — leaving it to the normal "
+                        f"rotation rather than being walked up the book")
+            _probe_log(m, ev_, sd_, tpx_,
+                       f"{tq_:,.0f} real shares {word_} our "
+                       f"{px*100:.0f}c scout — {tail}")
     beaten &= set(_PROBE["active"])   # forget scouts that are gone
 
     # 2. seed new probes at random interior ticks
@@ -7916,6 +7969,15 @@ def _map_payload() -> dict:
         "probe_meta": {
             m: {"rate": round(float((MONITOR.market_rates or {}).get(m) or 0.0), 3),
                 "peak": round(_rate_trend(m)[0], 3),
+                # what fills here have actually cost us against fair, and over
+                # how many hours we have been watching — the two numbers the
+                # rule-out test needs
+                "fill_loss": round(float(((MONITOR.state.get("probe") or {})
+                                          .get(m) or {}).get("fill_loss") or 0.0), 3),
+                "watched_h": round(max(0.0, (time.time() - min(
+                    [float(l.get("ts") or 0) for l in
+                     (MONITOR.state.get("probe_log") or []) if l.get("m") == m]
+                    or [time.time()])) / 3600.0), 2),
                 "per_side": round(
                     float(((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("pool") or 0.0)
                     / max(int(((tr._PROG_CACHE.get("progs") or {}).get(m) or {}).get("pool_n")
@@ -8634,56 +8696,85 @@ function renderProbe(){
   // story and two observations behind it scores near zero and stays in the
   // middle where it belongs, instead of jumping the queue on a guess.
   const META = DATA.probe_meta || {};
+  // WHAT RULES A MARKET OUT (owner, 2026-08-17): "those that are so volatile
+  // that getting filled at bad prices outweighs the potential benefits."
+  // That is a comparison, not a mood, so it is computed as one:
+  //
+  //     cost of being here  =  what fills have lost us, per day
+  //     benefit of being here =  the reward income on offer, per day
+  //
+  // Ruled out when the cost wins. Everything else that used to drag a market
+  // down has been taken out of the verdict, because none of it was evidence
+  // of danger — most of all being OUTBID, which the owner rightly pointed out
+  // was burying markets that were merely contested. Someone bidding over us
+  // says our PRICE was stale and that real money wants that spot; it says
+  // nothing about whether the market will fill us badly. It is now a note,
+  // and the prober re-scouts the new gap instead of shelving the market.
   const verdict = m => {
     const b = bayes[m], e = est[m] || {}, mt = META[m] || {};
     const sc = act.filter(a => a.m === m);
-    const eb_ = (DATA.earn_active || []).filter(x => x.m === m);
     const beaten = sc.filter(a => a.beaten).length;
     const fills = (b.fills || 0) + (e.fills || 0);
-    const rested = b.rested || 0;
-    const ev = fills * 3 + rested * 2 + (b.n || 0);
-    const tight = 1 - Math.min(1, (b.hi - b.lo) / 20);
-    const conf = Math.min(1, ev / 12) * (0.35 + 0.65 * tight);
     const why = [];
-    let good = 0;
-    if (rested) { good += 0.5 * Math.min(1, rested / 3);
-                  why.push(rested + ' held with no taker'); }
-    if (fills)  { good -= 0.9 * Math.min(1, fills);
-                  why.push(fills + ' got traded'); }
-    // HIGH earnings, not merely non-zero. Real rates here run from nothing to
-    // $8.40/day, so the scale is set against $4 rather than $1 — otherwise
-    // every market that earns a few cents claims the top zone and the ranking
-    // stops telling the owner anything.
-    if (mt.rate >= 0.25) { good += 0.6 * Math.min(1, mt.rate / 4);
-                           why.push('earning $' + mt.rate.toFixed(2) + '/day now'); }
-    else if (sc.length || eb_.length) { good -= 0.45;
-                           why.push('we are resting there and earning nothing'); }
-    if (beaten) { good -= 0.4 * Math.min(1, beaten / 2);
-                  why.push('outbid ' + beaten + 'x'); }
-    // A market well below its own 8h peak is one somebody else has moved
-    // into. Only counted where we still hold something, because with nothing
-    // resting the rate is zero for the dull reason that we are not there.
-    if ((sc.length || eb_.length) && mt.peak >= 1 && mt.rate < 0.4 * mt.peak) {
-      good -= 0.45;
-      why.push('rate fell $' + mt.peak.toFixed(2) + ' → $' + mt.rate.toFixed(2) + '/day');
+    // --- the cost side -------------------------------------------------
+    // fill_loss is signed: positive means fills here bought high or sold low.
+    const hrs = Math.max(0.5, mt.watched_h || 0.5);
+    const lossPerDay = (mt.fill_loss || 0) / hrs * 24;
+    // A wide band is the volatility we cannot yet price. It does not condemn
+    // a market on its own, but it does mean a fill is more likely to land far
+    // from fair, so it scales what we should expect a future fill to cost.
+    const width = (b.hi != null && b.lo != null) ? (b.hi - b.lo) : 0;
+    const expected = fills ? lossPerDay : 0;
+    // --- the benefit side ----------------------------------------------
+    const income = Math.max(mt.rate || 0, mt.per_side || 0);
+    if (fills) why.push(fills + ' fill' + (fills === 1 ? '' : 's')
+      + (Math.abs(mt.fill_loss || 0) >= 0.01
+         ? ' costing $' + Math.abs(mt.fill_loss).toFixed(2)
+           + (mt.fill_loss < 0 ? ' in our favour' : ' against fair') : ''));
+    if (income >= 0.25) why.push('$' + income.toFixed(2) + '/day on offer');
+    else why.push('only $' + income.toFixed(2) + '/day here');
+    if (width >= 12) why.push('fair is still a ' + width + '-tick guess');
+    if (beaten) why.push('outbid ' + beaten + 'x — our price was stale, '
+                         + 're-scouting the new gap');
+    // --- the comparison -------------------------------------------------
+    // Ruled out only when fills have actually cost more than the market pays.
+    // One expensive fill is not a pattern, so it needs either two fills or a
+    // loss that already exceeds a day of income.
+    const dangerous = expected > income
+                      && (fills >= 2 || (mt.fill_loss || 0) > Math.max(0.5, income));
+    // A fill is not automatically a mark against a market — what matters is
+    // what it COST next to what the market pays. A nickel lost against $15 a
+    // day is noise; fills that went in our favour are not a cost at all. So
+    // the income score is scaled by the drag the fills actually impose,
+    // rather than by whether any fill happened.
+    const drag = Math.max(0, expected) / Math.max(0.25, income);
+    let score = 0;
+    if (dangerous) score = -1;
+    else if (income >= 0.25)
+      score = Math.min(1, 0.35 + income / 8) * Math.max(0, 1 - drag);
+    // confidence still only decides how much the score is trusted, so a
+    // market with one observation cannot leap to the top of the list
+    const ev = fills * 3 + (b.rested || 0) * 2 + (b.n || 0);
+    const conf = Math.min(1, ev / 12) * (0.35 + 0.65 * (1 - Math.min(1, width / 20)));
+    if (dangerous) {
+      why.unshift('fills cost ~$' + expected.toFixed(2) + '/day against $'
+                  + income.toFixed(2) + '/day of reward');
     }
-    if (mt.per_side >= 1) { good += 0.2 * Math.min(1, mt.per_side / 10);
-                            why.push('$' + mt.per_side.toFixed(2) + '/side/day on offer'); }
-    else if (mt.per_side != null) { good -= 0.5;
-                                    why.push('only $' + (mt.per_side || 0).toFixed(2) + '/side/day here'); }
-    good = Math.max(-1, Math.min(1, good));
-    return {score: conf * good, conf: conf, why: why};
+    return {score: dangerous ? -1 : score * conf, conf: conf, why: why,
+            dangerous: dangerous};
   };
   const V = {};
   const mktSet = Object.keys(Object.assign({}, est, bayes))
     .filter(m => bayes[m] && bayes[m].med != null);
   mktSet.forEach(m => { V[m] = verdict(m); });
   mktSet.sort((a, c) => V[c].score - V[a].score);
-  const ZONE = sc_ => sc_ >= 0.25 ? 0 : sc_ <= -0.15 ? 2 : 1;
+  const ZONE = m_ => V[m_].dangerous ? 2 : (V[m_].score >= 0.25 ? 0 : 1);
   const ZHEAD = [
-    ['✅ Worth resting in', 'earns, and our orders stay put', '#3fb950'],
-    ['◻︎ Not sure yet', 'too little evidence to call either way', '#93a0b4'],
-    ['⛔️ Not worth it', 'cannot pay, or will not leave us alone', '#e5645f'],
+    ['✅ Worth resting in', 'pays, and has not filled us badly', '#3fb950'],
+    ['◻︎ Worth another look', 'not ruled out — contested, quiet or not yet priced',
+     '#93a0b4'],
+    ['⛔️ Fills cost more than it pays', 'we get picked off here for more than '
+     + 'the rewards are worth', '#e5645f'],
   ];
   // Each zone folds. The top one is open — it is the answer to "where is the
   // money" — and the other two stay shut until asked for, so 176 markets do
@@ -8691,10 +8782,10 @@ function renderProbe(){
   const bands = (() => {
     let out = '', zone = -1;
     const counts = [0, 0, 0];
-    mktSet.forEach(m => { counts[ZONE(V[m].score)]++; });
+    mktSet.forEach(m => { counts[ZONE(m)]++; });
     mktSet.forEach(m => {
       const b = bayes[m], e = est[m] || {}, v = V[m];
-      const z = ZONE(v.score);
+      const z = ZONE(m);
       if (z !== zone) {
         if (zone !== -1) out += '</details>';
         zone = z;
@@ -8740,8 +8831,8 @@ function renderProbe(){
     '</b> — prober sales in, prober buys out; sell scouts use your existing shares</div>';
   // Charts first — they are what the page is for. The fund, the scout chips
   // and the journal are supporting detail and fold underneath.
-  const nGood = mktSet.filter(m => V[m].score >= 0.25).length;
-  const nBad = mktSet.filter(m => V[m].score <= -0.15).length;
+  const nGood = mktSet.filter(m => ZONE(m) === 0).length;
+  const nBad = mktSet.filter(m => ZONE(m) === 2).length;
   const headline = mktSet.length
     ? '<div style="font-size:13px;margin-bottom:2px">' + mktSet.length +
       ' market' + (mktSet.length === 1 ? '' : 's') + ' mapped · <b style="color:#3fb950">' +
