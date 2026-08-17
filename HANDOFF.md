@@ -1042,3 +1042,31 @@ prober, which is trying to get filled.
   maint_restore, enter_* ... all push-path/dispatch only, never cron).
 - Caps-vs-model reference page (artifact):
   https://claude.ai/code/artifact/95365720-2d1c-4641-b948-5871dca83699
+
+### 2026-08-17 — the app fetches its own Silver model; the Action is optional
+
+`fetch_silver.yml` has not dispatched since 2026-08-16 03:34 UTC (Actions
+minutes / spending limit) and the copy of `data/silver_*_races.csv` on main
+froze at 08-15 12:56. The monitor was already reading the CDN live every six
+hours, so the TABLE was fine — but the moment a CDN fetch failed it fell back
+to that frozen copy, and every guard built on the model went on arguing from
+a two-day-old forecast with nothing saying so.
+
+`_silver_fetch` now commits what the CDN returned back to main, so the fallback
+is at most six hours old whether or not Actions ever runs again. Rules:
+
+- Commits ONLY when the CDN answered AND the bytes differ from main. A failed
+  fetch commits nothing — a stale fallback beats one overwritten with nothing.
+- `SILVER["cdn_ts"]` is when the forecast itself last moved, as distinct from
+  `SILVER["ts"]`, when we last looked at our copy. `/map`'s `model` block
+  carries both (`cdn_age_s` and `age_s`) plus any commit error.
+- Over `SILVER_STALE_H` (18h) without a successful CDN fetch, one ntfy a day.
+  Never before the first successful fetch, so a cold start is quiet.
+
+The workflow is left in place: it also pulls the four senate-WIDE series the
+monitor does not, and it is the recovery path if the droplet loses CDN egress.
+Both running is safe — the monitor commits only on a real change.
+
+Note for whoever tries to verify this from a Claude session: the agent egress
+proxy blocks static.dwcdn.net, so a curl from the session will fail while the
+droplet is fine. Check `/map`'s model block, not your own network.

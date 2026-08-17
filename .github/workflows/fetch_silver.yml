@@ -13,6 +13,18 @@ name: Fetch Silver model
 # informative than either number alone.
 #
 # Read-only with respect to the exchange: touches no orders.
+#
+# 2026-08-17: THIS IS NO LONGER LOAD-BEARING. The monitor fetches the two
+# per-race series from the CDN itself every six hours and commits them back to
+# main (live/monitor.py, _silver_fetch), so the guards keep a fresh fallback
+# whether or not Actions ever dispatches again. It stopped dispatching on
+# 2026-08-16 03:34 and the committed copy froze at 08-15 12:56 while every
+# guard reading it carried on unaware — which is the reason for the change.
+#
+# Left in place because it still pulls the four SENATE-WIDE series (win
+# probability variants and the seat mean) that the monitor does not, and
+# because it is the recovery path if the droplet ever loses CDN egress. When
+# both run, the monitor commits only on a real change, so there is no fight.
 
 on:
   schedule:

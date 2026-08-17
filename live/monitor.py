@@ -252,7 +252,8 @@ TRACKER_STATUS = {"ok_ts": 0.0, "err": "", "runs": 0, "running": False,
 TRACKER_KICK = threading.Event()
 
 
-def _tracker_commit(files: dict[str, bytes]) -> str:
+def _tracker_commit(files: dict[str, bytes],
+                    message: str = "Liquidity rewards check [skip ci]") -> str:
     """One fast-forward commit on main. Returns '' or a short error."""
     for attempt in range(2):
         r = _gh("GET", f"/repos/{GITHUB_REPO}/git/ref/heads/main")
@@ -279,7 +280,7 @@ def _tracker_commit(files: dict[str, bytes]) -> str:
         if rt.json()["sha"] == base_tree:
             return ""          # nothing actually changed — no empty commit
         rc = _gh("POST", f"/repos/{GITHUB_REPO}/git/commits",
-                 json={"message": "Liquidity rewards check [skip ci]",
+                 json={"message": message,
                        "tree": rt.json()["sha"], "parents": [head]})
         if rc.status_code >= 300:
             return f"commit HTTP {rc.status_code}"
@@ -8021,8 +8022,14 @@ SILVER_SOURCES = {
                  tr.DATA / "silver_gov_races.csv"),
 }
 SILVER_TTL = 6 * 3600
+# Hours without a successful CDN fetch before the owner is told. The table
+# itself keeps working off the committed fallback; what goes wrong silently is
+# that it stops MOVING, and every guard built on it quietly starts arguing from
+# last week's forecast.
+SILVER_STALE_H = float(os.environ.get("SILVER_STALE_H", "18"))
 SILVER: dict = {"races": {}, "ts": 0.0, "source": "none", "err": "",
-                "loading": False}
+                "loading": False, "cdn_ts": 0.0, "commit_ts": 0.0,
+                "commit_err": "", "stale_alert_ts": 0.0}
 
 # a fill this far the wrong side of the model is real money, not rounding
 MAP_CONFLICT = 0.10
@@ -8114,6 +8121,7 @@ def _silver_refresh() -> None:
 def _silver_fetch() -> dict:
     now = time.time()
     races, source, errs = {}, "cdn", []
+    fresh: dict[str, bytes] = {}     # CDN text worth committing back to main
     for office, (url, fallback) in SILVER_SOURCES.items():
         table = {}
         try:
@@ -8121,6 +8129,8 @@ def _silver_fetch() -> dict:
                              headers={"User-Agent": "liquidity-rewards monitor"})
             if r.status_code < 400:
                 table = _parse_silver(r.text)
+                if table:
+                    fresh[f"data/{Path(fallback).name}"] = r.text.encode()
         except Exception as e:  # noqa: BLE001 — the map must never kill the poll
             errs.append(f"{office}: {type(e).__name__}")
         if not table:
@@ -8146,6 +8156,37 @@ def _silver_fetch() -> dict:
         races[office] = table
     SILVER.update({"races": races, "ts": now, "source": source,
                    "err": "; ".join(errs)})
+    # THE APP KEEPS ITS OWN FALLBACK FRESH NOW — fetch_silver.yml is no longer
+    # load-bearing. That workflow committed these two CSVs daily, and it has
+    # not run since 2026-08-16 03:34 UTC (Actions minutes/spending limit), so
+    # the copy on main froze at 08-15 12:56 while the guards that read it —
+    # the Silver price cap, the margin, the size taper, the third-candidate
+    # withdrawal — went on trusting it.
+    #
+    # The monitor already reads the CDN directly every SILVER_TTL, so the live
+    # table was never the problem; the FALLBACK was. When the CDN answers, the
+    # bytes it returned are committed straight back to main, which means the
+    # github fallback below is at most six hours old whether or not Actions
+    # ever runs again. Nothing is committed when the CDN fails — a stale
+    # fallback is better than one overwritten with nothing.
+    if fresh:
+        SILVER["cdn_ts"] = now
+        cur = {p: (_gh_text(p) or "").encode() for p in fresh}
+        changed = {p: b for p, b in fresh.items() if cur.get(p) != b}
+        if changed:
+            err = _tracker_commit(changed, "Silver model refresh [skip ci]")
+            SILVER["commit_err"] = err
+            if not err:
+                SILVER["commit_ts"] = now
+    # A model that stops moving is the failure that hides. Say so once a day.
+    stale_h = (now - float(SILVER.get("cdn_ts") or 0)) / 3600.0
+    if (SILVER.get("cdn_ts") and stale_h > SILVER_STALE_H
+            and now - float(SILVER.get("stale_alert_ts") or 0) > 86400):
+        SILVER["stale_alert_ts"] = now
+        notify("Silver model is stale",
+               f"no successful CDN fetch in {stale_h:.0f}h — the guards are "
+               f"running on the copy committed to main. {SILVER['err']}",
+               "high")
     return races
 
 
@@ -8368,7 +8409,12 @@ def _map_payload() -> dict:
         "model": {"source": SILVER["source"], "err": SILVER["err"],
                   "senate": len(races.get("senate") or {}),
                   "governor": len(races.get("governor") or {}),
-                  "age_s": int(time.time() - SILVER["ts"]) if SILVER["ts"] else None},
+                  "age_s": int(time.time() - SILVER["ts"]) if SILVER["ts"] else None,
+                  # how long since the forecast itself last MOVED, as opposed
+                  # to how long since we last looked at our copy of it
+                  "cdn_age_s": (int(time.time() - SILVER["cdn_ts"])
+                                if SILVER.get("cdn_ts") else None),
+                  "commit_err": SILVER.get("commit_err") or ""},
         "thresholds": {"conflict": MAP_CONFLICT, "idle_rate": MAP_IDLE_RATE},
         # Effective state: the owner's toggle AND the host env veto AND, for
         # defend, whether any market is armed. The page shows the toggles and
