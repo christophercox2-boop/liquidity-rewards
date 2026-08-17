@@ -3666,9 +3666,23 @@ PROBE_REAL_MIN = 5.0          # book levels smaller than this are bait — ignor
 PREFER_PREFIXES = tuple(
     p.strip() for p in os.environ.get(
         "PREFER_PREFIXES",
-        "erac-usgubp-ak-adv-,"
         "enwc-uspres-nom-dem-2028-,enwc-uspres-nom-rep-2028-,"
         "ewc-usp-2028-11-07-,ewc-usp-party-2028-11-07-").split(",") if p.strip())
+
+
+# HANDS OFF. Families no automatic loop may place in — the prober, the
+# earner, the qualifier: nothing. The owner keeps these for manual orders
+# only (2026-08-17, on the Alaska primary: "stop the prober or earner from
+# placing anything in those markets"). This is a placement rule, not a
+# visibility one: the markets still appear everywhere, still get books, still
+# get scored. Nothing automatic reaches for them.
+NO_AUTO_PREFIXES = tuple(
+    p.strip() for p in os.environ.get(
+        "NO_AUTO_PREFIXES", "erac-usgubp-ak-adv-").split(",") if p.strip())
+
+
+def _hands_off(m: str) -> bool:
+    return bool(NO_AUTO_PREFIXES) and str(m).startswith(NO_AUTO_PREFIXES)
 
 
 def _preferred(m: str) -> bool:
@@ -4114,7 +4128,7 @@ def auto_qualify() -> None:
     for m in sorted((tr._PROG_CACHE.get("progs") or {})):
         if done >= QUAL_MAX_PER_POLL:
             break
-        if not m.startswith(PROBE_PREFIXES):
+        if not m.startswith(PROBE_PREFIXES) or _hands_off(m):
             continue
         for job in _qual_gaps(m):
             key = f"{job['m']}|{job['side']}"
@@ -4206,7 +4220,7 @@ def auto_inventory() -> None:
             break
         if now - float(_INV["done"].get(slug) or 0) < INV_INTERVAL * 4:
             continue
-        if _hunt_held(slug):
+        if _hunt_held(slug) or _hands_off(slug):
             continue          # cleared for the owner to trade by hand
         free = _inv_free(slug)
         if free < INV_MIN_SHARES:
@@ -4589,6 +4603,7 @@ def auto_probe() -> None:
     # markets were simply never visited (owner, 2026-08-17: "I think some are
     # getting left out"). Width is now the tie-break BELOW recency, which is
     # what "a factor, not a gate" was supposed to mean.
+    mkts = [m_ for m_ in mkts if not _hands_off(m_)]   # manual-only families
     mkts.sort(key=lambda m_: (0 if _preferred(m_) else 1,
                               1 if (est.get(m_) or _PROBE["last"].get(m_)) else 0,
                               _PROBE["last"].get(m_, 0.0),
@@ -5289,174 +5304,6 @@ def _earn_rung(m: str) -> int:
 
 def _earn_rung_size(m: str) -> int:
     return int(EARN_START_SHARES * (EARN_RUNG_MULT ** _earn_rung(m)))
-
-
-AK_PREFIX = os.environ.get("AK_PREFIX", "erac-usgubp-ak-adv-")
-
-
-def _qualify_rows(prefix: str = "") -> list[dict]:
-    """One row per market in a family: the book, and what it would take to
-    QUALIFY each side.
-
-    A side holding less than Target Size pays nobody, so the useful number on
-    an unloved market is not "what shall I bid" but "how much does this side
-    need before it pays anything at all". That is the shortfall, and it is the
-    size this offers. Where a side already holds Target Size the shortfall is
-    zero and the offer is a quarter of the window instead — enough to take a
-    real share without pretending we can move a deep book.
-
-    Read-only. Placing is a separate, confirmed tap.
-    """
-    pref = prefix or AK_PREFIX
-    # EVERY market in the family, not only the ones a book has arrived for.
-    # Sourcing the list from the book cache showed 3 of 19 and looked like the
-    # family was that small (owner, 2026-08-17: "this is all I see"). The
-    # catalogue is the same known_mkts the placer whitelists against, so a row
-    # here is always something the place button will accept; the ones still
-    # waiting on a book say so instead of being left out.
-    with MONITOR.lock:
-        catalogue = list((MONITOR.state.get("known_mkts") or {}).get("politics") or [])
-    universe = sorted({m for m in catalogue if m.startswith(pref)}
-                      | {m for m in tr._BOOK_CACHE if m.startswith(pref)})
-    rows = []
-    for m in universe:
-        ent = tr._BOOK_CACHE.get(m)
-        pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
-        bk = (ent[1] if ent else {}) or {}
-        bids = [[round(p_ * 100, 1), q_] for p_, q_ in (bk.get("bids") or [])][:8]
-        asks = [[round(p_ * 100, 1), q_] for p_, q_ in (bk.get("asks") or [])][:8]
-        target = float(pr.get("target") or 0)
-        per = (float(pr.get("pool") or 0)
-               / max(int(pr.get("event_n") or pr.get("pool_n") or 1), 1) / 2)
-        bt = sum(q_ for _, q_ in bids)
-        at = sum(q_ for _, q_ in asks)
-        row = {"m": m, "name": m.rsplit("-", 1)[-1],
-               "age_s": int(time.time() - ent[0]) if ent else None,
-               "bids": bids, "asks": asks, "target": target,
-               "per_side": round(per, 2), "bid_total": round(bt),
-               "ask_total": round(at),
-               "bid": (max(p_ for p_, _ in bids) if bids else None),
-               "ask": (min(p_ for p_, _ in asks) if asks else None)}
-        if ent is None:
-            row["waiting"] = "no book yet — the prober has not reached this one"
-            rows.append(row)
-            continue
-        for side in ("BUY", "SELL"):
-            tot = bt if side == "BUY" else at
-            # join the touch on that side; with no touch, start at the floor
-            # (a bid) or the ceiling (an ask) rather than inventing a price
-            if side == "BUY":
-                px = row["bid"] if row["bid"] is not None else 1.0
-                if row["ask"] is not None and px >= row["ask"]:
-                    px = max(1.0, row["ask"] - 1)
-            else:
-                px = row["ask"] if row["ask"] is not None else 99.0
-                if row["bid"] is not None and px <= row["bid"]:
-                    px = min(99.0, row["bid"] + 1)
-            short = max(0.0, target - tot)
-            qty = int(short) if short > 0 else int(max(1, target * 0.25))
-            sc = _block_scope(m, px, qty, side) if target and per > 0 else {}
-            row[side.lower()] = {
-                "px": px, "qty": qty,
-                "shortfall": int(short),
-                "cost": round(_earn_cost(side, px, qty), 2),
-                "est": sc.get("est"), "share": sc.get("share"),
-                "ok": bool(sc.get("ok")), "why": sc.get("why") or "",
-                "ahead": sc.get("ahead_at_px")}
-        rows.append(row)
-    return rows
-
-
-def _block_scope(m: str, px_c: float, qty: float, side: str = "BUY") -> dict:
-    """What a BLOCK order would do to one side of one book, before placing it.
-
-    The owner's Alaska play (2026-08-17): "scope out where it is likely safe to
-    bid 10,000 shares on the long shots at 1 cent just to get the other side of
-    the book. As long as a candidate hasn't dropped out, they have a chance."
-
-    A side holding less than Target Size pays NOBODY, so on an unloved market
-    a block at the floor can qualify a dead side single-handed and take almost
-    all of it. This answers, per market: does the side qualify without us, does
-    it qualify WITH us, what share would we hold, and what is the worst case.
-    It places nothing.
-    """
-    out = {"m": m, "px": px_c, "qty": qty, "side": side, "ok": False, "why": ""}
-    pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
-    ent = tr._BOOK_CACHE.get(m)
-    target = float(pr.get("target") or 0)
-    per = (float(pr.get("pool") or 0)
-           / max(int(pr.get("event_n") or pr.get("pool_n") or 1), 1) / 2)
-    df = float(pr.get("df") or 0.2)
-    out.update({"target": target, "per_side": round(per, 2)})
-    if not target or per <= 0:
-        out["why"] = "no reward program on this market"
-        return out
-    if not ent or time.time() - ent[0] > 300:
-        out["why"] = "no book snapshot from the last 5 minutes"
-        return out
-    bk = ent[1] or {}
-    bids = [(round(p_ * 100), q_) for p_, q_ in (bk.get("bids") or [])]
-    asks = [(round(p_ * 100), q_) for p_, q_ in (bk.get("asks") or [])]
-    ours_side = bids if side == "BUY" else asks
-    other = asks if side == "BUY" else bids
-    side_total = sum(q_ for _, q_ in ours_side)
-    out.update({
-        "bid": max((p_ for p_, q_ in bids), default=None),
-        "ask": min((p_ for p_, q_ in asks), default=None),
-        "side_total": round(side_total),
-        "other_total": round(sum(q_ for _, q_ in other)),
-        "at_px": round(sum(q_ for p_, q_ in ours_side if p_ == round(px_c))),
-        "qualified_now": side_total >= target,
-        "qualified_with_us": side_total + qty >= target,
-    })
-    # never cross: a bid must stay under the best ask, an ask over the best bid
-    if side == "BUY" and out["ask"] is not None and px_c >= out["ask"]:
-        out["why"] = f"{px_c:g}c would cross the {out['ask']}c ask"
-        return out
-    if side == "SELL" and out["bid"] is not None and px_c <= out["bid"]:
-        out["why"] = f"{px_c:g}c would cross the {out['bid']}c bid"
-        return out
-    if not out["qualified_with_us"]:
-        out["why"] = (f"even with our {qty:,.0f} the side holds "
-                      f"{side_total + qty:,.0f} of {target:,.0f} Target Size — "
-                      f"a side under it pays nobody")
-        return out
-    # OUR share of the scoring window — and only ours. Size already resting at
-    # our price belongs to whoever put it there, and we queue BEHIND it, so of
-    # whatever the window takes from our level the first slice is theirs. The
-    # levels are merged first: appending our order as a second entry at the
-    # same price counts our quantity twice and reports 100% of a window we
-    # hold a seventh of, which is precisely the case the owner asked about —
-    # "join bids where they are already placed by others" (2026-08-17).
-    pxr = round(px_c)
-    merged: dict = {}
-    for p_, q_ in ours_side:
-        merged[p_] = merged.get(p_, 0.0) + q_
-    theirs_at = merged.get(pxr, 0.0)
-    merged[pxr] = theirs_at + float(qty)
-    lv = sorted(merged.items(), key=lambda x: (-x[0] if side == "BUY" else x[0]))
-    anchor_ = lv[0][0]
-    den = cum = ours = 0.0
-    for p_, q_ in lv:
-        take = min(q_, max(0.0, target - cum))
-        if take <= 0:
-            break
-        w = df ** (abs(anchor_ - p_))
-        den += take * w
-        if p_ == pxr:
-            ours += max(0.0, take - theirs_at) * w
-        cum += q_
-    out["ahead_at_px"] = round(theirs_at)
-    est = 0.0 if not den else per * ours / den
-    cost = _earn_cost(side, px_c, qty)
-    out.update({"est": round(est, 2), "cost": round(cost, 2),
-                "share": round(100 * ours / den, 1) if den else 0.0,
-                "ok": True})
-    out["why"] = (f"{out['share']:.0f}% of the {side.lower()} window for "
-                  f"${cost:,.2f} at risk"
-                  + ("" if out["qualified_now"]
-                     else " — and OUR block is what qualifies the side"))
-    return out
 
 
 def _earn_qty(m: str, side: str, px_c: float, cap_usd: float,
@@ -7562,6 +7409,8 @@ def auto_earn() -> None:
     # problem when the board has 93 modelled markets and the budget is $100.
     scored = []
     for m in cands:
+        if _hands_off(m):
+            continue              # manual-only family
         if m in have or now - _EARN["last"].get(m, 0.0) < EARN_COOLDOWN:
             continue
         b = _bayes_fair(m)
@@ -7624,6 +7473,8 @@ def auto_earn() -> None:
     # 2028 poll cannot hold up the races (owner: "move a little quicker").
     placed_pref = 0
     for cand in scored:
+        if _hands_off(cand["m"]):
+            continue              # manual-only family
         pref_c = _preferred(cand["m"]) and EARN_PREF_OFF_BUDGET
         if (placed_pref if pref_c else placed) >= (EARN_PREF_PER_POLL if pref_c
                                                    else EARN_MAX_PER_POLL):
@@ -9977,7 +9828,6 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
       🎯 Worst prices</button>
     <button class="alt" id="navMap" onclick="location.href='/map'"
       style="display:none">🗺 Back to the map</button>
-    <button class="alt" onclick="location.href='/ak'">⚓ Qualify</button>
   </div>
 </div>
 <script>
@@ -11409,167 +11259,6 @@ setInterval(()=>{
 #
 # No inline onclick carries a quoted argument — that pattern has blanked this
 # dashboard twice. Handlers read their market from a data attribute.
-AK_HTML = """<!doctype html><html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Qualify</title>
-<style>
-:root{--bg:#1a202b;--surface:#232b38;--surface2:#2b3442;--line:#3a4454;--ink:#eef2f7;
---dim:#93a0b4;--good:#34c07c;--bad:#e5645f;--warn:#d9a132;--accent:#5aa2ff;--r:14px}
-*{box-sizing:border-box}
-body{margin:0;padding:12px 12px 60px;background:var(--bg);color:var(--ink);
-font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-h1{font-size:19px;margin:4px 0 2px}
-a{color:var(--accent);text-decoration:none}
-.sub{color:var(--dim);font-size:12px}
-.card{background:var(--surface);border-radius:var(--r);padding:10px;margin:8px 0}
-.row{display:flex;justify-content:space-between;align-items:center;gap:8px;
-cursor:pointer}
-.nm{font-weight:600}
-.px{font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}
-.dead{color:var(--warn);font-weight:700}
-.book{display:flex;gap:10px;margin:8px 0}
-.book table{width:50%;border-collapse:collapse;font-size:12px;
-font-variant-numeric:tabular-nums}
-.book th{color:var(--dim);font-weight:500;text-align:left;font-size:11px}
-.book td{padding:1px 0}
-.b{color:var(--good)} .a{color:var(--bad)}
-button{font:inherit;border:0;border-radius:10px;padding:9px 12px;
-background:var(--surface2);color:var(--ink)}
-button.go{background:var(--accent);color:#06101f;font-weight:700}
-button:disabled{opacity:.4}
-input{font:inherit;width:88px;padding:7px;border-radius:9px;border:1px solid var(--line);
-background:var(--bg);color:var(--ink)}
-.ctl{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px}
-.note{font-size:11.5px;color:var(--dim);margin-top:3px}
-</style></head><body>
-<div class="sub" style="margin-bottom:2px"><a href="/">&larr; home</a>
- &nbsp;·&nbsp; <a href="/map">map</a></div>
-<h1>Qualify a side</h1>
-<div class="sub" id="hd">loading…</div>
-<div id="list"></div>
-<script>
-var KEY = localStorage.getItem('dashkey') || '';
-if(!KEY){ KEY = prompt('dashboard password') || ''; localStorage.setItem('dashkey', KEY); }
-function hdrs(){ return {'X-Dash-Key': KEY}; }
-function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g,
-  function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-var DATA = [], OPEN = {}, BUSY = false, MSG = {};
-
-function load(){
-  fetch('ak.json', {headers: hdrs()}).then(function(r){ return r.json(); })
-    .then(function(j){ DATA = j.rows || []; render(j); })
-    .catch(function(e){ document.getElementById('hd').textContent = 'load failed: ' + e; });
-}
-
-function render(j){
-  document.getElementById('hd').innerHTML =
-    esc(DATA.filter(function(r){ return !r.waiting; }).length) + ' of ' +
-    esc(DATA.length) + ' with books · pool $' + (j.pool == null ? '?' : j.pool) +
-    ' a day for the event · <b>$' + (j.per_side == null ? '?' : j.per_side) +
-    '</b> a side · tap a name for its book';
-  document.getElementById('list').innerHTML = DATA.map(function(r){
-    var open = !!OPEN[r.m];
-    var h = '<div class="card"><div class="row" data-m="' + esc(r.m) + '">' +
-      '<div><span class="nm">' + esc(r.name) + '</span>' +
-      '<div class="note">' + (r.target ? ('target ' + r.target.toLocaleString()) :
-        '<span class="dead">no reward program</span>') +
-      (r.age_s == null ? ' · <span class="dead">waiting for a book</span>'
-                       : ' · book ' + r.age_s + 's old') + '</div></div>' +
-      '<div class="px">' +
-      '<span class="b">' + (r.bid == null ? '—' : r.bid + '¢') + '</span> / ' +
-      '<span class="a">' + (r.ask == null ? '—' : r.ask + '¢') + '</span>' +
-      '<div class="note">' + r.bid_total.toLocaleString() + ' / ' +
-      r.ask_total.toLocaleString() + '</div></div></div>';
-    if(open){
-      h += r.waiting ? '<div class="note">' + esc(r.waiting) + '</div>'
-                     : bookHtml(r) + sideHtml(r, 'BUY') + sideHtml(r, 'SELL');
-    }
-    if(MSG[r.m]) h += '<div class="note">' + esc(MSG[r.m]) + '</div>';
-    return h + '</div>';
-  }).join('');
-  Array.prototype.forEach.call(document.querySelectorAll('.row'), function(el){
-    el.onclick = function(){ var m = el.getAttribute('data-m');
-      OPEN[m] = !OPEN[m]; render(j); };
-  });
-  Array.prototype.forEach.call(document.querySelectorAll('button[data-go]'), function(el){
-    el.onclick = function(){ place(el.getAttribute('data-go'), el.getAttribute('data-side')); };
-  });
-}
-
-function bookHtml(r){
-  var n = Math.max(r.bids.length, r.asks.length, 1), i, h = '';
-  for(i = 0; i < n; i++){
-    var b = r.bids[i], a = r.asks[i];
-    h += '<tr><td class="b">' + (b ? b[0] + '¢' : '') + '</td>' +
-         '<td class="b">' + (b ? Math.round(b[1]).toLocaleString() : '') + '</td></tr>';
-  }
-  var h2 = '';
-  for(i = 0; i < n; i++){
-    var a2 = r.asks[i];
-    h2 += '<tr><td class="a">' + (a2 ? a2[0] + '¢' : '') + '</td>' +
-          '<td class="a">' + (a2 ? Math.round(a2[1]).toLocaleString() : '') + '</td></tr>';
-  }
-  return '<div class="book"><table><tr><th>bid</th><th>size</th></tr>' + h +
-         '</table><table><tr><th>ask</th><th>size</th></tr>' + h2 + '</table></div>';
-}
-
-function sideHtml(r, side){
-  var d = side === 'BUY' ? r.buy : r.sell;
-  if(!d) return '';
-  var lbl = side === 'BUY' ? 'BID side' : 'ASK side';
-  var tot = side === 'BUY' ? r.bid_total : r.ask_total;
-  var dead = r.target && tot < r.target;
-  return '<div style="border-top:1px solid var(--line);padding-top:7px;margin-top:5px">' +
-    '<b style="font-size:13px">' + lbl + '</b> ' +
-    (dead ? '<span class="dead">under target — pays nobody</span>'
-          : '<span class="sub">qualified</span>') +
-    '<div class="ctl">' +
-    '<input id="p_' + esc(r.m) + '_' + side + '" type="number" step="0.1" min="0.1" ' +
-    'max="99.9" value="' + d.px + '">' +
-    '<input id="q_' + esc(r.m) + '_' + side + '" type="number" step="1" min="1" ' +
-    'value="' + d.qty + '">' +
-    '<button class="go" data-go="' + esc(r.m) + '" data-side="' + side + '">place</button>' +
-    '</div>' +
-    '<div class="note">' +
-    (d.shortfall > 0 ? ('needs ' + d.shortfall.toLocaleString() +
-      ' more to reach target — that is the size offered') :
-      'side already qualifies; offering a quarter of the window') +
-    (d.est == null ? '' : ' · <b>$' + d.est.toFixed(2) + '/day</b> for $' +
-      d.cost.toFixed(2) + ' at risk (' + d.share + '% of the window)') +
-    (d.ahead ? ' · ' + d.ahead.toLocaleString() + ' already ahead of you at that price' : '') +
-    (d.ok ? '' : ' · <span class="dead">' + esc(d.why) + '</span>') +
-    '</div></div>';
-}
-
-function place(m, side){
-  if(BUSY) return;
-  var px = parseFloat(document.getElementById('p_' + m + '_' + side).value);
-  var q = parseInt(document.getElementById('q_' + m + '_' + side).value, 10);
-  if(!(px > 0) || !(q > 0)) return;
-  var what = side === 'BUY' ? 'BID' : 'ASK';
-  var risk = (side === 'BUY' ? px : (100 - px)) / 100 * q;
-  if(!confirm(what + ' ' + q.toLocaleString() + ' @ ' + px + '¢ on ' + m +
-      ' — worst case $' + risk.toFixed(2) + '. Post-only: it rests or it is ' +
-      'rejected, it can never cross and fill on arrival.')) return;
-  BUSY = true; MSG[m] = 'placing…'; render({});
-  fetch('maction', {method: 'POST',
-    headers: {'Content-Type': 'application/json', 'X-Reprice': '1', 'X-Dash-Key': KEY},
-    body: JSON.stringify({op: 'place', market: m, side: side,
-                          price_cents: px, size: q})})
-    .then(function(r){ return r.json(); })
-    .then(function(j){
-      MSG[m] = j.ok ? ('placed ✓ ' + (j.detail || '')) :
-                      ('refused: ' + (j.error || j.detail || 'unknown'));
-      BUSY = false; load();
-    })
-    .catch(function(e){ MSG[m] = 'failed: ' + e; BUSY = false; render({}); });
-}
-
-load();
-setInterval(function(){ if(!BUSY) load(); }, 20000);
-</script></body></html>"""
-
-
 HUNT_HTML = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hunt</title>
@@ -12164,7 +11853,6 @@ DASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
  <button onclick="showTab('S')">↔️ Spreads</button>
  <button onclick="showTab('E')">🏛 Seats</button>
  <button onclick="location.href='/map'">🗺 Map</button>
- <button onclick="location.href='/ak'">⚓ Qualify a side</button>
  <button onclick="location.href='/lab'">🔬 Prober &amp; Earner</button>
 </div>
 <div id="viewE" style="display:none">
@@ -13461,9 +13149,17 @@ function is2028(m){
       || s.indexOf('ewc-usp-2028-11-07-') === 0
       || s.indexOf('ewc-usp-party-2028-11-07-') === 0;
 }
+function isAK(s){ return String(s).indexOf('erac-usgubp-ak-adv-') === 0; }
+function onlyAK(){ return localStorage.getItem('onlyAK') === '1'; }
+function tglAK(){
+  localStorage.setItem('onlyAK', onlyAK() ? '0' : '1');
+  if(onlyAK()) localStorage.setItem('only2028', '0');   // the two exclude each other
+  refresh();
+}
 function only2028(){ return localStorage.getItem('only2028') === '1'; }
 function tgl2028(){
   localStorage.setItem('only2028', only2028() ? '0' : '1');
+  if(only2028()) localStorage.setItem('onlyAK', '0');   // the two exclude each other
   refresh();
 }
 function hidCats(){ try{ return JSON.parse(localStorage.getItem('hidCats') || '{}'); }catch(e){ return {}; } }
@@ -14074,6 +13770,9 @@ async function renderAll(d){
       '<label class="sub" style="margin-right:8px;color:'+(only2028()?'#f2cd7f':'var(--dim)')+
       '"><input type="checkbox" '+(only2028()?'checked':'')+
       ' onchange="tgl2028()"> 2028 races only</label>' +
+      '<label class="sub" style="margin-right:8px;color:'+(onlyAK()?'#f2cd7f':'var(--dim)')+
+      '"><input type="checkbox" '+(onlyAK()?'checked':'')+
+      ' onchange="tglAK()"> AK primary only</label>' +
       '<label class="sub" style="margin-right:8px"><input type="checkbox" '+(pctMode()?'checked':'')+
       ' onchange="tglPct()"> % of rewards</label>' +
       '<select onchange="setMSort(this.value)" style="background:var(--surface2);color:var(--ink2);'+
@@ -14089,7 +13788,8 @@ async function renderAll(d){
         (hc[c]?' ✕':'')+'</button>').join('');
     document.getElementById('markets').innerHTML =
       Object.entries(allMarkets)
-        .filter(([m]) => !hc[mcat(m)] && (!only2028() || is2028(m)))
+        .filter(([m]) => onlyAK() ? isAK(m)
+                                  : (!hc[mcat(m)] && (!only2028() || is2028(m))))
         .sort((a,b) => {
           if(sortCat() && mcat(a[0]) !== mcat(b[0])) return mcat(a[0]) < mcat(b[0]) ? -1 : 1;
           if(mSort() === 'chg-desc') return pctChg(b[0]) - pctChg(a[0]);
@@ -14529,11 +14229,6 @@ class Handler(BaseHTTPRequestHandler):
             # do not belong on the control surface (owner, 2026-08-16).
             self._send(200, "text/html; charset=utf-8", MAP_HTML.encode())
             return
-        if route.startswith("/ak") and not route.startswith("/ak.json"):
-            # Same shell-only pattern as every other page: no data in the
-            # HTML, and /ak.json underneath it demands the key.
-            self._send(200, "text/html; charset=utf-8", AK_HTML.encode())
-            return
         if route.startswith("/hunt") and not route.startswith("/hunt.json"):
             self._send(200, "text/html; charset=utf-8", HUNT_HTML.encode())
             return
@@ -14648,19 +14343,6 @@ class Handler(BaseHTTPRequestHandler):
             slug = (parse_qs(urlparse(self.path).query).get("slug") or [""])[0]
             code, payload = market_info(slug)
             self._send(code, "application/json", json.dumps(payload).encode())
-        elif route.startswith("/ak.json"):
-            try:
-                rows = _qualify_rows()
-                pr0 = next(((tr._PROG_CACHE.get("progs") or {}).get(r["m"]) or {}
-                            for r in rows), {})
-                self._send(200, "application/json", json.dumps({
-                    "rows": rows,
-                    "pool": float(pr0.get("pool") or 0) or None,
-                    "per_side": (rows[0]["per_side"] if rows else None),
-                }).encode())
-            except Exception as e:  # noqa: BLE001 — a read-only page, never fatal
-                self._send(500, "application/json", json.dumps(
-                    {"error": f"{type(e).__name__}: {e}"[:200], "rows": []}).encode())
         elif self.path.startswith("/hunt.json"):
             try:
                 self._send(200, "application/json", json.dumps(hunt_targets()).encode())
