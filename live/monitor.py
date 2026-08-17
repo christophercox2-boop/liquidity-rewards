@@ -7612,7 +7612,8 @@ SILVER_SOURCES = {
                  tr.DATA / "silver_gov_races.csv"),
 }
 SILVER_TTL = 6 * 3600
-SILVER: dict = {"races": {}, "ts": 0.0, "source": "none", "err": ""}
+SILVER: dict = {"races": {}, "ts": 0.0, "source": "none", "err": "",
+                "loading": False}
 
 # a fill this far the wrong side of the model is real money, not rounding
 MAP_CONFLICT = 0.10
@@ -7664,10 +7665,45 @@ def _parse_silver(text: str) -> dict:
 
 
 def _silver_races() -> dict:
-    """{'senate': {...}, 'governor': {...}}, refreshed at most every SILVER_TTL."""
+    """{'senate': {...}, 'governor': {...}}, refreshed at most every SILVER_TTL.
+
+    NEVER BLOCKS. This is called from _silver_fair, which is called from the
+    guards, the sweep, the earner AND from _map_payload — which is to say,
+    from inside a web request. On a cold cache it used to fetch inline: two
+    Datawrapper sources, each with a GitHub and a disk fallback, up to 20s a
+    piece. After a deploy the first person to open /map paid for all of it and
+    got an HTTP 504 from the gateway instead of a page.
+
+    So the refresh happens on a background thread and callers get whatever is
+    cached right now, even if that is nothing. An empty table means the guards
+    fail CLOSED (no forecast -> the no-model ceilings), which is the correct
+    way to be wrong while the model is still loading.
+    """
     now = time.time()
     if SILVER["races"] and now - SILVER["ts"] < SILVER_TTL:
         return SILVER["races"]
+    if not SILVER.get("loading"):
+        SILVER["loading"] = True
+        threading.Thread(target=_silver_refresh, name="silver",
+                         daemon=True).start()
+    return SILVER["races"] or {}
+
+
+def _silver_refresh() -> None:
+    """The blocking part, off the request path. Swallows everything: this runs
+    on a bare thread, so an escape would print a traceback nobody reads and
+    the flag below is what actually matters — leaving it set would mean no
+    further refresh, ever."""
+    try:
+        _silver_fetch()
+    except Exception as e:  # noqa: BLE001
+        SILVER["err"] = f"{type(e).__name__}: {e}"[:200]
+    finally:
+        SILVER["loading"] = False
+
+
+def _silver_fetch() -> dict:
+    now = time.time()
     races, source, errs = {}, "cdn", []
     for office, (url, fallback) in SILVER_SOURCES.items():
         table = {}
@@ -8302,6 +8338,7 @@ const LABEL = {conflict:"fix now", notpaying:"not paying", idle:"low estimate",
                gap:"not entered", ok:"fine"};
 let DATA=null, SEL=null, FILTER=null, SHOWGAPS=false;
 let RENDER_ERRS = [];
+let MAPTRY = 0;
 let BEAT = null;
 // The monitor wakes about every 30 seconds, reads the account, refreshes a
 // slice of the order books and gives each switched-on loop one turn. That is
@@ -8373,11 +8410,25 @@ async function load(){
   // dead monitor.
   try { DATA = await r.json(); }
   catch(e){
-    document.getElementById('meta').textContent =
-      'the monitor returned HTTP ' + r.status + ' instead of data — the /map '
-      + 'payload is failing to build; the loops are unaffected';
+    // 504/502/503 come from the gateway, not the monitor: the request took
+    // too long or the container is restarting. That is a DIFFERENT fault from
+    // a 500, where the payload genuinely failed to build, and saying the
+    // wrong one sends you looking in the wrong place. A timeout usually
+    // clears itself — after a deploy the caches are cold — so retry quietly
+    // a few times before leaving it on screen.
+    const gw = r.status === 502 || r.status === 503 || r.status === 504;
+    MAPTRY = (MAPTRY || 0) + 1;
+    document.getElementById('meta').textContent = gw
+      ? ('the monitor did not answer in time (HTTP ' + r.status + ') — it is '
+         + 'busy or restarting, and the loops are unaffected'
+         + (MAPTRY < 5 ? '. Retrying…' : '. Still not answering after '
+            + MAPTRY + ' tries'))
+      : ('the monitor returned HTTP ' + r.status + ' instead of data — the '
+         + '/map payload is failing to build; the loops are unaffected');
+    if (gw && MAPTRY < 5) setTimeout(load, 4000 * MAPTRY);
     return;
   }
+  MAPTRY = 0;
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='block';
   render();

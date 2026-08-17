@@ -321,6 +321,33 @@ is precisely when we most want out, and the close loop would have re-placed it
 SELL_SHORT outright: closing a short reduces exposure, so the bid cap has no
 business judging it.
 
+### 2026-08-17 — /map 504: a web request was doing a blocking CDN fetch
+
+Follow-on from the blank page above. With the error reporting fixed, the page
+stopped hanging and started SAYING what was wrong — HTTP 504, a gateway
+timeout, not the 500 I had assumed.
+
+Root cause: `_map_payload` opens with `_silver_races()`, and on a cold cache
+that fetched two Datawrapper sources INLINE, each with a GitHub and a disk
+fallback at up to 20s apiece. `_silver_races` is reached from `_silver_fair`,
+which the guards, the sweep and the earner all call — so it sits on the
+request path. After every deploy the caches are cold, and the first person to
+open /map paid for the whole fetch and got a gateway timeout instead of a
+page. A web request must never do that.
+
+`_silver_races()` now NEVER BLOCKS: it returns whatever is cached, even if
+that is nothing, and kicks a background refresh with an in-flight guard so
+fifty callers start one fetch, not fifty. `_silver_refresh` swallows
+everything and always clears the flag — leaving it set would mean no further
+refresh ever. An empty table means the guards fail CLOSED onto the no-model
+ceilings, which is the right way to be wrong while the model loads.
+
+The page also stopped lying about which fault it was: 502/503/504 come from
+the gateway and now read "did not answer in time — busy or restarting", with
+a quiet retry (4s, 8s, 12s…) since a cold start clears itself; only a 500 is
+reported as the payload failing to build. Saying the wrong one sends the next
+person looking in the wrong place.
+
 ### 2026-08-17 — /map blanked on "loading…" — MY BUG, and the real lesson
 
 Owner: "this is happening again." The page showed its header and
