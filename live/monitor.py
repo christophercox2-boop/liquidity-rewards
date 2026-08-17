@@ -5615,23 +5615,167 @@ def _rate_trend(m: str) -> tuple[float, float]:
     return 0.0, 0.0
 
 
+def _earn_cost(side: str, px_c: float, qty: float) -> float:
+    """Worst case in dollars for ONE earner order.
+
+    A bid loses what it paid: price x size. An ask is a SHORT — it loses the
+    other side of the contract, (1 - price) x size — so a 5c ask risks 95c a
+    share where a 5c bid risks 5c. Every place the earner prices its own
+    exposure has to go through this, or the ask side reads as almost free and
+    the budget quietly funds twenty times the risk it thinks it does.
+    """
+    return ((100.0 - px_c) if str(side).upper().startswith("S") else px_c) / 100.0 * qty
+
+
 def _earn_outstanding_usd() -> float:
     """Money the earner has at risk AND still charged to its search budget.
     Graduates are excluded on purpose — they have proved themselves, so the
     budget they were using goes back to looking for the next one."""
     grad = _EARN.get("grad") or set()
-    return sum(px / 100.0 * q
-               for oid, (m_, _, px, q, _) in _EARN["orders"].items()
+    return sum(_earn_cost(sd_, px, q)
+               for oid, (m_, sd_, px, q, _) in _EARN["orders"].items()
                if oid not in grad
                and not (_preferred(m_) and EARN_PREF_OFF_BUDGET))
 
 
 def _earn_graduated_usd() -> float:
     grad = _EARN.get("grad") or set()
-    return sum(px / 100.0 * q
-               for oid, (m_, _, px, q, _) in _EARN["orders"].items()
+    return sum(_earn_cost(sd_, px, q)
+               for oid, (m_, sd_, px, q, _) in _EARN["orders"].items()
                if oid in grad
                and not (_preferred(m_) and EARN_PREF_OFF_BUDGET))
+
+
+# THE ASK SIDE, WITH ITS OWN AND MUCH SMALLER CAP.
+#
+# Measured on the 2028 board at ten shares a side: the bid side earns $324/day
+# on $58 of worst case (559%/day), the ask side $237/day on $489 (48%/day). The
+# ask is NOT generally better — it is 8x the risk for similar income, because a
+# 5c ask is a short risking 95c a share. But in about ten markets the bid side
+# is dead and the ask pays 230-365%/day, and no blanket rule gets both right.
+#
+# So the auction prices BOTH sides per market and takes whichever yields more,
+# and the ask carries a separate, deliberately small cap: the same dollars buy
+# a twentieth of the shares there, and this is the first time the earner has
+# been able to open a short at all.
+EARN_ASK_USD = float(os.environ.get("EARN_ASK_USD", "5.0"))
+# How far under the band's own number a short may ever be opened, whatever the
+# reward income says. The mirror of EARN_SILVER_MARGIN on the bid side.
+EARN_ASK_MARGIN = float(os.environ.get("EARN_ASK_MARGIN", "3.0"))
+EARN_ASK_ENABLED = os.environ.get("EARN_ASK_ENABLED", "1") != "0"
+
+
+def _earn_ask_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
+    """What an OPENING SHORT would earn here, priced like the bid scan.
+
+    Mirrors _earn_scan's arithmetic on the other side of the book: the window
+    walks from the best real ask upward, our size is merged into the ask-side
+    scoring window, and the same three tests apply — the model must allow the
+    price, the side must hold Target Size, and reward income must clear the
+    expected loss. What differs is what a loss IS. A short at pc loses
+    (100 - pc) a share if the contract resolves YES, and the chance of that is
+    what the model says the contract is worth. Selling a 5c longshot risks 95c
+    to win 5c and is a good trade only because the model says YES is unlikely.
+    """
+    now = time.time()
+    out = {"rows": [], "best": None, "skip": None, "side": "SELL"}
+    if not EARN_ASK_ENABLED:
+        out["skip"] = "the ask side is switched off"
+        return out
+    target = float(pr.get("target") or 0)
+    per = (float(pr.get("pool") or 0)
+           / max(int(pr.get("event_n") or pr.get("pool_n") or 1), 1) / 2)
+    df = float(pr.get("df") or 0.2)
+    if not target or per <= 0:
+        out["skip"] = "no reward program on this market"
+        return out
+    if not ent or now - ent[0] > 300:
+        out["skip"] = "no book snapshot from the last 5 minutes"
+        return out
+    bk = ent[1] or {}
+    real_asks = [(round(p_ * 100), q_) for p_, q_ in (bk.get("asks") or [])
+                 if q_ >= PROBE_REAL_MIN]
+    real_bids = [(round(p_ * 100), q_) for p_, q_ in (bk.get("bids") or [])
+                 if q_ >= PROBE_REAL_MIN]
+    if not real_asks:
+        out["skip"] = "no real size on the ask side to rest behind"
+        return out
+    side_total = sum(q_ for _, q_ in (bk.get("asks") or []))
+    touch = min(a_[0] for a_ in real_asks)
+    out["touch"] = touch
+    # never through the bid — post-only would reject it, and we are resting
+    floor_ = (max(p_ for p_, _ in real_bids) + 1) if real_bids else 1
+    base = max(touch, floor_)
+    fair_mean = float(b.get("mean") or b["med"])
+    trust = min(1.0, conf["score"] / EARN_CONF_FULL)
+    for pc in range(int(base), min(int(base) + 3, 100)):
+        row = {"px": pc, "ok": False, "why": "", "qty": 0, "est": 0.0}
+        out["rows"].append(row)
+        if not _ask_allowed(m, float(pc), opening=True):
+            row["why"] = "blocked: the model will not open a short at this price"
+            continue
+        # A HARD FLOOR THAT INCOME CANNOT ARGUE WITH. The tests below weigh
+        # reward income against the expected loss, and on this board the income
+        # is enormous — $22/day on five shares — so they will justify almost any
+        # price. That is the same shape as the New Mexico Senate purchase: in a
+        # reward-farmed book the deal test always passes. So the band's own
+        # number caps the price outright, exactly as sv_cap does on the bid
+        # side, before any income is considered.
+        if pc < fair_mean - EARN_ASK_MARGIN:
+            row["why"] = (f"{fair_mean - pc:.1f}c below what the band says the "
+                          f"contract is worth ({fair_mean:.1f}c) — no amount of "
+                          f"reward income buys that")
+            continue
+        cap = EARN_ASK_USD * conf["qmul"]
+        unit = (100.0 - pc) / 100.0
+        q = max(1, min(EARN_MAX_SHARES, int(cap / max(unit, 1e-6)),
+                       max(1, int(_earn_rung_size(m) * conf["qmul"]))))
+        if side_total + q < target:
+            row["why"] = (f"the ask side holds {side_total:,.0f} of the "
+                          f"{target:,.0f} Target Size even with our {q} — a side "
+                          f"under Target Size pays NOBODY")
+            continue
+        lv = sorted(real_asks + [(pc, float(q))], key=lambda x: x[0])
+        anchor = lv[0][0]
+        den = cum = ours = 0.0
+        for p_, q_ in lv:
+            take = min(q_, max(0.0, target - cum))
+            if take <= 0:
+                break
+            w = df ** (p_ - anchor)
+            den += take * w
+            if p_ == pc:
+                ours += min(take, float(q)) * w
+            cum += q_
+        est = 0.0 if not den else per * ours / den
+        cost = unit * q
+        # selling ABOVE fair is the good case here, the mirror of the bid side
+        edge_c = pc - fair_mean
+        p_lose = max(0.0, min(1.0, fair_mean / 100.0))
+        p_eff = p_lose * trust + (1.0 - trust)
+        exp_loss = p_eff * cost
+        row.update({"qty": q, "est": round(est, 4), "cost": round(cost, 2),
+                    "edge_c": round(edge_c, 2)})
+        if est < 0.5 * exp_loss:
+            row["why"] = (f"income ${est:.2f}/day does not clear the deal test "
+                          f"(needs ${0.5 * exp_loss:.2f}/day to pay back the "
+                          f"${exp_loss:.2f} expected loss inside two days)")
+            continue
+        if edge_c < 0:
+            days = EARN_EDGE_PAYBACK * max(0.2, conf["score"] / EARN_CONF_FULL)
+            if est * days < -edge_c / 100.0 * q:
+                row["why"] = (f"a fill here sells {-edge_c:.1f}c BELOW fair "
+                              f"and ${est:.2f}/day does not pay that back "
+                              f"within {days:.1f} days")
+                continue
+        row["ok"] = True
+        row["why"] = ("placeable" if edge_c < 0 else
+                      f"placeable — a fill sells {edge_c:.1f}c ABOVE fair")
+        if out["best"] is None or est > out["best"][0]:
+            out["best"] = (est, pc, q, "short", 1 if edge_c >= 0 else 0)
+    if out["best"] is None and not out["skip"]:
+        out["skip"] = "no ask price passed every rule"
+    return out
 
 
 def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
@@ -6894,7 +7038,7 @@ def auto_earn() -> None:
         o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
         if not o or float(o.get("est_day") or 0) <= 0:
             continue
-        if _on_book(m, "BUY", px / 100.0, qty, ts) is not True:
+        if _on_book(m, side, px / 100.0, qty, ts) is not True:
             continue
         if qty < _earn_rung_size(m):
             continue                      # this order is not at the current rung
@@ -6911,7 +7055,7 @@ def auto_earn() -> None:
     for oid, (m, side, px, qty, ts) in list(_EARN["orders"].items()):
         o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
         est = float((o or {}).get("est_day") or 0)
-        cost = px / 100.0 * qty
+        cost = _earn_cost(side, px, qty)
         if oid in grad:
             # a graduate that stops paying goes back under the cap and takes
             # its chances with everything else. Two ways to stop paying: our
@@ -6939,7 +7083,7 @@ def auto_earn() -> None:
                 _earn_log(m, "demoted", px / 100.0, qty,
                           "this market has taken a fill off us since it "
                           "graduated — back under the cap")
-            elif _on_book(m, "BUY", px / 100.0, qty, ts) is False:
+            elif _on_book(m, side, px / 100.0, qty, ts) is False:
                 # only an explicit False; an unknown reading is not evidence
                 grad.discard(oid)
                 _earn_log(m, "demoted", px / 100.0, qty,
@@ -6951,7 +7095,7 @@ def auto_earn() -> None:
             continue                      # cannot cover its own worst case
         if (est_pm.get(m) or {}).get("fills"):
             continue                      # this market has taken money off us
-        if _on_book(m, "BUY", px / 100.0, qty, ts) is False:
+        if _on_book(m, side, px / 100.0, qty, ts) is False:
             continue                      # not visibly resting, so not proven
         # a preferred market is off the graduate budget as well — it was never
         # charged to the search budget, so graduating it moves nothing
@@ -6976,7 +7120,7 @@ def auto_earn() -> None:
                 continue
             o = next((x for x in MONITOR.orders if str(x.get("id")) == oid), None)
             est = float((o or {}).get("est_day") or 0)
-            usd = px / 100.0 * qty
+            usd = _earn_cost(side, px, qty)
             ranked.append((est / usd if usd > 0 else 0.0, oid, m, px, qty, est))
         ranked.sort(key=lambda r: r[0])
         for yld, oid, m, px, qty, est in ranked[:EARN_ROTATE_N]:
@@ -7065,17 +7209,34 @@ def auto_earn() -> None:
             continue
         pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
         ent = tr._BOOK_CACHE.get(m)
+        # BOTH SIDES, THEN THE BETTER ONE. The ask is not generally better —
+        # it is roughly eight times the risk for similar income — but in the
+        # markets where the bid side is dead it pays 230-365%/day against
+        # single digits. Ranking them together picks per market, which no
+        # blanket rule can (owner, 2026-08-17: "the earner/probe should be
+        # prioritizing the ask side").
+        cands_here = []
         scan = _earn_scan(m, b, conf, ent, pr)
-        best = scan["best"]
-        if best is None:
+        if scan["best"] is not None:
+            est, tgt, qty, tier, _u = scan["best"]
+            c_ = round(_earn_cost("BUY", tgt, qty), 4)
+            if c_ > 0:
+                cands_here.append({"m": m, "side": "BUY", "yield": est / c_,
+                                   "est": est, "cost": c_, "tgt": tgt,
+                                   "qty": qty, "tier": tier, "scan": scan,
+                                   "b": b, "conf": conf})
+        ascan = _earn_ask_scan(m, b, conf, ent, pr)
+        if ascan["best"] is not None:
+            est, tgt, qty, tier, _u = ascan["best"]
+            c_ = round(_earn_cost("SELL", tgt, qty), 4)
+            if c_ > 0:
+                cands_here.append({"m": m, "side": "SELL", "yield": est / c_,
+                                   "est": est, "cost": c_, "tgt": tgt,
+                                   "qty": qty, "tier": tier, "scan": ascan,
+                                   "b": b, "conf": conf})
+        if not cands_here:
             continue
-        est, tgt, qty, tier, _under = best
-        cost = round(tgt / 100.0 * qty, 4)
-        if cost <= 0:
-            continue
-        scored.append({"m": m, "yield": est / cost, "est": est, "cost": cost,
-                       "tgt": tgt, "qty": qty, "tier": tier, "scan": scan,
-                       "b": b, "conf": conf})
+        scored.append(max(cands_here, key=lambda c_: c_["yield"]))
     # Preferred families first, then income per dollar at risk within each tier.
     # On tonight's board this changes very little on its own — the 2028 markets
     # already top the yield ranking by two orders of magnitude — but it makes
@@ -7093,6 +7254,7 @@ def auto_earn() -> None:
             break
         m, est, tgt, qty = cand["m"], cand["est"], cand["tgt"], cand["qty"]
         b, conf, scan, tier = cand["b"], cand["conf"], cand["scan"], cand["tier"]
+        side_ = cand.get("side", "BUY")
         px = round(tgt / 100.0, 2)
         room = _earn_budget() - _earn_outstanding_usd()
         note = ""
@@ -7116,8 +7278,9 @@ def auto_earn() -> None:
             # Preferred holdings are not on the budget, so freeing one frees
             # nothing — displacing it would be pure churn.
             victims = sorted(
-                ((est_by_id.get(oid, 0.0) / max(1e-9, r_[2] / 100.0 * r_[3]),
-                  oid, r_[0], r_[2], r_[3])
+                ((est_by_id.get(oid, 0.0)
+                  / max(1e-9, _earn_cost(r_[1], r_[2], r_[3])),
+                  oid, r_[0], r_[2], r_[3], r_[1])
                  for oid, r_ in _EARN["orders"].items()
                  if oid not in grad and now - r_[4] >= EARN_DISPLACE_MIN_AGE
                  and not (_preferred(r_[0]) and EARN_PREF_OFF_BUDGET)),
@@ -7125,7 +7288,7 @@ def auto_earn() -> None:
             v = victims[0] if victims else None
             if (v is None or displaced >= EARN_DISPLACE_PER_POLL
                     or cand["yield"] < EARN_DISPLACE_RATIO * v[0]
-                    or room + v[3] / 100.0 * v[4] < cand["cost"]):
+                    or room + _earn_cost(v[5], v[3], v[4]) < cand["cost"]):
                 # Keep the queue visible: the owner asked what the bottleneck
                 # is, and this list IS the bottleneck — priced, in order.
                 if len(_EARN["waiting"]) < EARN_WAITING_KEEP:
@@ -7143,14 +7306,14 @@ def auto_earn() -> None:
                                f"the churn")
                     else:
                         why = (f"displacing {v[2]} would still leave "
-                               f"${cand['cost'] - room - v[3]/100.0*v[4]:.2f} "
+                               f"${cand['cost'] - room - _earn_cost(v[5], v[3], v[4]):.2f} "
                                f"short of the ${cand['cost']:.2f} this needs")
                     _EARN["waiting"].append(
                         {"m": m, "est": round(est, 3), "cost": round(cand["cost"], 2),
                          "ypd": round(cand["yield"], 3), "px": tgt, "qty": qty,
                          "tier": tier, "why": why})
                 continue
-            vyld, void, vm, vpx, vqty = v
+            vyld, void, vm, vpx, vqty, vside = v
             try:
                 requests.request(
                     "POST", tr.TRADE_API + f"/v1/order/{void}/cancel",
@@ -7165,15 +7328,22 @@ def auto_earn() -> None:
             _EARN["last"][vm] = now + EARN_WITHDRAW_COOLDOWN - EARN_COOLDOWN
             displaced += 1
             _earn_log(vm, "displaced", vpx / 100.0, vqty,
-                      f"${vyld*100:.1f}/day per $100 at risk — {m} offers "
-                      f"${cand['yield']*100:.1f}, so the capital moves there")
+                      f"{'ask' if str(vside).upper().startswith('S') else 'bid'} "
+                      f"earning ${vyld*100:.1f}/day per $100 at risk — {m} "
+                      f"offers ${cand['yield']*100:.1f}, so the capital moves "
+                      f"there")
             note = f" (displacing {vm})"
         try:
             r = requests.request(
                 "POST", tr.TRADE_API + "/v1/orders",
                 headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
                          "Content-Type": "application/json"},
-                json={"marketSlug": m, "intent": "ORDER_INTENT_BUY_LONG",
+                json={"marketSlug": m,
+                      # BUY_SHORT opens a short and rests as an ASK. SELL_SHORT
+                      # would rest as a BID and is for CLOSING one — getting
+                      # this backwards is the bidding-against-yourself bug.
+                      "intent": ("ORDER_INTENT_BUY_SHORT" if side_ == "SELL"
+                                 else "ORDER_INTENT_BUY_LONG"),
                       "type": "ORDER_TYPE_LIMIT",
                       "price": {"value": f"{px:.2f}", "currency": "USD"},
                       "quantity": qty,
@@ -7191,7 +7361,9 @@ def auto_earn() -> None:
                 except Exception:  # noqa: BLE001
                     pass
             ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
-                            "market": m, "side": "EARN bid", "from": "—",
+                            "market": m,
+                            "side": "EARN " + ("ask" if side_ == "SELL" else "bid"),
+                            "from": "—",
                             "to": tgt, "size": qty, "status": r.status_code,
                             "response": " ".join(r.text.split())[:100],
                             "verified": ok})
@@ -7202,19 +7374,20 @@ def auto_earn() -> None:
             # every poll. It also drives the least-recently-tried ordering.
             _EARN["last"][m] = now
             if ok and oid:
-                _EARN["orders"][str(oid)] = (m, "BUY", tgt, qty, now)
+                _EARN["orders"][str(oid)] = (m, side_, tgt, qty, now)
                 _own_id("earn", str(oid))
                 # report what the scan ACTUALLY did, which may be the fallback
                 # rather than the standoff confidence asked for
-                sback, sq = scan["back"], scan["qmul"]
+                sback, sq = scan.get("back", 0), scan.get("qmul", 1.0)
                 stand = (f", {sback} tick{'' if sback == 1 else 's'} behind the "
                          f"{scan['touch']}¢ touch at {sq*100:.0f}% size"
                          if sback else
                          f" at the touch on {sq*100:.0f}% size — the standoff "
                          f"earned nothing" if scan.get("fellback") else
                          " at the touch")
-                _earn_log(m, "placed", px, qty,
-                          f"{tier}: est ${est:.2f}/d vs ${px*qty:.2f} worst case "
+                _earn_log(m, "placed " + ("ask" if side_ == "SELL" else "bid"),
+                          px, qty,
+                          f"{tier}: est ${est:.2f}/d vs ${cand['cost']:.2f} worst case "
                           f"= ${cand['yield']*100:.1f}/day per $100 at risk "
                           f"(band {b['lo']}–{b['hi']}¢, {b['fills']}t/{b.get('rested',0)}r, "
                           f"confidence {conf['score']:.2f} {conf['verdict']}{stand}){note}")
@@ -9086,7 +9259,7 @@ def _map_payload() -> dict:
                       # money resting in preferred markets, which no budget
                       # bounds any more — the number to watch instead
                       "pref_usd": round(sum(
-                          r_[2] / 100.0 * r_[3]
+                          _earn_cost(r_[1], r_[2], r_[3])
                           for r_ in _EARN["orders"].values()
                           if _preferred(r_[0])), 2),
                       "pref_n": len({r_[0] for r_ in _EARN["orders"].values()
