@@ -1395,3 +1395,52 @@ starvation to the other end, which is the same complaint a day later.
 `t_prefer.py` now runs the real sweep block over 8 passes and fails if any
 market goes unvisited, and separately asserts that the widest market does NOT
 lead when it was just scouted.
+
+### 2026-08-17 — the flip ladder was selling the best orders we own
+
+Owner: "there are shares that got filled that are being flipped, especially in
+the 2028 markets." They are, and the data reframes what a flip IS on that board.
+
+From `data/live_orders.csv`: the 2028 board's SELL side earns **$369/day against
+$191 on the BUY side — 66% of everything the board earns**. The top ask-side
+orders are flipped fills of 45–61 shares making $22–24/day EACH. A fill there is
+not the failure mode I assumed when I made the flipper aggressive that morning;
+it is how we get onto the side that pays.
+
+**The bug:** the ladder that steps a flip down toward the floor had NO earning
+check. Its whole justification is idle capital — "waiting out a double that
+probably never comes" — and an ask collecting $23/day is not idle. The
+aggression added the same day made it fire every 5 minutes instead of every 30.
+It now requires `not earning3`, like the other two decisions that give up price.
+`t_flipaggr.py` asserts all three.
+
+Self-cross check on the same data: 0 markets where our best bid is at or above
+our own best ask. Nothing is trading with itself.
+
+### 2026-08-17 — hand-set fair values are BLOCKING the 2028 bid side
+
+Owner: "these markets seem to be left out because they don't seem to be earning
+much at all." Not a bug — it is `OWNER_FAIR_MARGIN` doing exactly what it was
+built to do. Every fair value on the slate sits 5–12c BELOW the midpoint, and
+the bid cap is fair + 6c:
+
+| | your fair | market mid | bid cap | |
+|---|---|---|---|---|
+| Ro Khanna | 2.0c | 13.5c | 8.0c | blocked |
+| J.B. Pritzker | 2.0c | 14.5c | 8.0c | blocked |
+| Jon Ossoff | 13.0c | 24.0c | 19.0c | blocked |
+| Michelle Obama | 6.0c | 7.5c | 12.0c | reaches |
+
+**13 of the 15 visible markets cannot be bid anywhere near the touch**, and a
+bid 5–12c back scores `df^ticks` — essentially zero.
+
+The owner's board is internally coherent (the "% of your board" figures imply
+~123c across the full slate, normal for a nomination field). The market's mids
+for the same 15 names sum to 3.5x the owner's numbers for those names. So either
+the field is grossly overpriced or the estimates are systematically low.
+
+**The trap worth knowing:** setting a LOW fair value makes a market less
+reachable than setting NONE. With no number, `MAX_UNBACKED_BID_C` caps at 15c —
+which for mids of 6.5–14.5c reaches the touch fine. With a 2c number, the cap is
+8c and the market is shut. Clearing a fair value can therefore INCREASE what we
+can earn there, which is the opposite of what anyone would expect.

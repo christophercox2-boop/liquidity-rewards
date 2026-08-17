@@ -6622,7 +6622,20 @@ def auto_earn() -> None:
             # Not undercut — but is it just sitting there? Step half of it
             # down toward the floor so we find out where a buyer actually is
             # instead of waiting out a double that probably never comes.
-            if now - fts3 >= _flip_step_after(fm3) and fpc3 > floor3_ + 1 and fq3 >= 2:
+            # NEVER LADDER A FLIP THAT IS EARNING. The justification for the
+            # ladder is idle capital — "waiting out a double that probably
+            # never comes" — and an ask collecting rewards is not idle. It is
+            # the opposite: on the 2028 board the ask side is 66% of what the
+            # whole board earns, because a flipped fill is how we get onto the
+            # side that pays, and the top flips were making $22-24/day EACH.
+            # Stepping those down toward the touch sells the best orders we
+            # own to recover a couple of cents of stock (owner, 2026-08-17:
+            # "there are shares that got filled that are being flipped").
+            #
+            # This gate was missing entirely, and the aggression added to the
+            # preferred families the same day made it fire six times as often.
+            if (now - fts3 >= _flip_step_after(fm3) and fpc3 > floor3_ + 1
+                    and fq3 >= 2 and not earning3):
                 step_ = max(floor3_, round((fpc3 + floor3_) / 2))
                 half_ = max(1, int(fq3) // 2)
                 code_, res_ = do_reprice(foid, float(step_), quantity=half_)
@@ -6631,8 +6644,9 @@ def auto_earn() -> None:
                     _EARN.setdefault("adopt", []).append(
                         [fm3, float(step_), half_, cost3, now, since3])
                     _earn_log(fm3, "flip laddered", step_ / 100.0, half_,
-                              f"no taker at {fpc3:.0f}¢ for 30m — {half_} moved to "
-                              f"{step_:.0f}¢" +
+                              f"no taker at {fpc3:.0f}¢ for "
+                              f"{_flip_step_after(fm3) / 60:.0f}m and earning "
+                              f"nothing — {half_} moved to {step_:.0f}¢" +
                               (f", BELOW the {cost3:.0f}¢ it cost, to get the "
                                "money back" if step_ < cost3 else
                                f" (cost {cost3:.0f}¢)"))
