@@ -1266,3 +1266,25 @@ Coverage maths, for expectations: `PROBE_MAX_PER_POLL` 5 at a 30s poll,
 `PROBE_PER_MARKET` 3, `PROBE_ACTIVE_MAX` 140. Sixty 2028 markets wanting three
 scouts each is 180, over the 140 cap, and it fills at 5 a poll — so roughly
 half an hour to saturate, not minutes. Each scout is one share.
+
+### 2026-08-17 — the re-scout note vanished (shipped broken, fixed same hour)
+
+Owner: "I pressed the button and the status bar went away immediately." It did.
+`rescout2028` wrote the confirmation into `#rescoutNote` and then scheduled
+`load()`, and two seconds later `renderProbe` rebuilt the whole card from the
+new payload, span and all. The page had already learnt this once — see `MSG`
+in MAP_HTML, "results must outlive the re-render that a successful action
+triggers" — and the new button did not use it.
+
+The result now lives in `RESCOUT` (message, ok, timestamp) and `rescoutNote()`
+re-emits it on every render for 45 minutes, with live progress appended: how
+many 2028 markets have scouts resting right now. So the note answers "is it
+working" rather than flashing "done".
+
+**Harness lesson, worth more than the fix.** The first version of the test
+assigned `DATA` directly and reported the bug still present after the fix. It
+was not: the page's own startup `load()` resolved mid-await and replaced `DATA`
+with `{}`, so `renderProbe` early-returned and `probeBody` was written exactly
+once — the "identical snapshots" were the pre-press render three times over.
+The stub now SERVES the payload from `fetch` and the test calls `load()` where
+the page calls it. Any DASH/MAP test that sets `DATA` by hand has this trap.

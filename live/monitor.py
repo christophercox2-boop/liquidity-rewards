@@ -9750,13 +9750,38 @@ function renderSlate(){
   document.getElementById('slateBody').innerHTML = h;
 }
 
+// THE RESULT HAS TO OUTLIVE THE RELOAD IT TRIGGERS. Writing the confirmation
+// into the span and then calling load() wiped it about two seconds later, when
+// renderProbe rebuilt the card from the new payload — the owner pressed the
+// button and watched the status disappear immediately. The page already learnt
+// this once (see MSG, above); this keeps the note in a variable that survives
+// the re-render, and turns it into live progress rather than a flash.
+let RESCOUT = null;
+function is2028m(m){
+  const s = String(m);
+  return s.indexOf('enwc-uspres-nom-dem-2028-') === 0
+      || s.indexOf('enwc-uspres-nom-rep-2028-') === 0
+      || s.indexOf('ewc-usp-2028-11-07-') === 0
+      || s.indexOf('ewc-usp-party-2028-11-07-') === 0;
+}
+function rescoutNote(){
+  if(!RESCOUT) return '';
+  const mins = (Date.now() - RESCOUT.ts) / 60000;
+  if(mins > 45) return '';                       // stop nagging eventually
+  if(!RESCOUT.ok) return '<span style="color:#ff9d99">' + esc(RESCOUT.msg) + '</span>';
+  const outNow = new Set((DATA.probe_active || [])
+    .filter(a => is2028m(a.m)).map(a => a.m)).size;
+  return esc(RESCOUT.msg) + ' · <b>' + outNow + '</b> 2028 market' +
+    (outNow === 1 ? '' : 's') + ' with scouts out right now' +
+    (mins >= 1 ? ' · ' + mins.toFixed(0) + ' min ago' : '');
+}
 async function rescout2028(){
   const b = document.getElementById('rescoutBtn');
-  const n = document.getElementById('rescoutNote');
   if(b){ b.disabled = true; b.textContent = 'clearing…'; }
   const r = await act({op:'rescout'});
   if(b){ b.disabled = false; b.textContent = '↻ Re-scout the 2028 board'; }
-  if(n) n.textContent = r.ok ? r.msg : ('failed — ' + r.msg);
+  RESCOUT = {msg: r.ok ? r.msg : ('failed — ' + r.msg), ok: r.ok, ts: Date.now()};
+  renderProbe();
   setTimeout(load, 2000);
 }
 
@@ -10031,7 +10056,8 @@ function renderProbe(){
     // places nothing on its own and the Prober switch still governs.
     '<div style="margin:6px 0"><button class="alt" id="rescoutBtn" ' +
     'onclick="rescout2028()">↻ Re-scout the 2028 board</button>' +
-    '<span class="sub" id="rescoutNote" style="margin-left:8px"></span></div>' +
+    '<span class="sub" id="rescoutNote" style="margin-left:8px">' +
+    rescoutNote() + '</span></div>' +
     (bands ? chartLegend + bands : '') +
     '<details style="margin-top:2px"><summary class="sub" style="cursor:pointer">' +
     'fund, scouts and journal</summary>' + wallet +
