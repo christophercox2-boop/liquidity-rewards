@@ -5690,8 +5690,9 @@ def auto_earn() -> None:
                     float(r[4]) if len(r) > 4 else float(r[1]) - EARN_FLIP_TICKS,
                     float(r[5]) if len(r) > 5 else float(r[3]))
     if not _EARN.get("toflip"):
+        # >= 4: donated jobs carry a 5th element
         _EARN["toflip"] = [list(j) for j in (MONITOR.state.get("earn_toflip") or [])
-                           if len(j) == 4]
+                           if len(j) >= 4]
     if not _EARN.get("toclose"):
         _EARN["toclose"] = [list(j) for j in (MONITOR.state.get("earn_toclose") or [])
                             if len(j) == 4]
@@ -6191,7 +6192,9 @@ def auto_earn() -> None:
     # put dozens of identical 350-share asks into a market holding 350.
     placed_pass: dict[str, float] = {}
     for job in list(_EARN.get("toflip") or []):
-        fm, fpx_c, fqty, fts = job
+        # 5th element, when present, marks a job the OWNER donated by hand
+        fm, fpx_c, fqty, fts = job[0], job[1], job[2], job[3]
+        donated = len(job) > 4 and job[4] == "owner"
         if now - fts > EARN_FLIP_RETRY:
             _EARN["toflip"].remove(job)
             _earn_log(fm, "flip missed", fpx_c / 100.0, fqty,
@@ -6202,8 +6205,11 @@ def auto_earn() -> None:
         # want: the next poll re-reads the position and can add more.
         if fm in placed_pass:
             continue
-        if _flip_skip(fm):
-            # drop it rather than leave it retrying for the whole window
+        if _flip_skip(fm) and not donated:
+            # drop it rather than leave it retrying for the whole window. A
+            # DONATED job is exempt: the ban exists because those positions
+            # are the owner's own, and a donation is the owner saying to sell
+            # this one.
             _EARN["toflip"].remove(job)
             _earn_log(fm, "flip skipped", fpx_c / 100.0, fqty,
                       "2028 party market — the flipper leaves these alone")
@@ -7625,6 +7631,54 @@ def do_clear_market(slug: str) -> tuple[int, dict]:
         "detail": "; ".join(failed)[:200]}
 
 
+def do_donate_flip(slug: str, price_cents: float, size: int) -> tuple[int, dict]:
+    """Hand a position the owner bought by hand to the flip loop, so it rests
+    an ask and tries to sell it back (owner, 2026-08-17: "occasionally I'll buy
+    some shares I think are mis-priced by hand — give me the option to donate
+    those to the flipper to make some money back").
+
+    The flipper is built for stock a FILL forced on us; this is the same job
+    with a different origin, so it reuses the same queue and every guard on
+    it. Two differences: the job is tagged `owner`, which lets it through the
+    markets automatic flipping is banned from (the ban exists because those
+    positions are the owner's own — a donation IS the owner saying otherwise),
+    and the size is checked against the live position here so a mistake is
+    refused on the spot rather than silently trimmed to nothing later.
+    """
+    if not _slug_known(slug):
+        return 400, {"ok": False, "error": "unknown market"}
+    if not (0.1 <= price_cents <= 99.9):
+        return 400, {"ok": False, "error": "price out of range (0.1-99.9c)"}
+    if not (1 <= size <= 20000):
+        return 400, {"ok": False, "error": "size out of range (1-20,000)"}
+    net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition")) or 0
+    if net < 1:
+        return 400, {"ok": False,
+                     "error": "no long position here to sell — nothing to flip"}
+    resting = sum(float(o.get("size") or 0) for o in MONITOR.orders
+                  if o.get("market") == slug
+                  and str(o.get("intent") or "").endswith("SELL_LONG"))
+    queued = sum(j[2] for j in (_EARN.get("toflip") or []) if j[0] == slug)
+    free = int(net - resting - queued)
+    if free < 1:
+        return 400, {"ok": False,
+                     "error": (f"all {int(net)} shares here are already being sold "
+                               f"({int(resting)} resting, {int(queued)} queued)")}
+    qty = min(int(size), free)
+    now = time.time()
+    _EARN.setdefault("toflip", []).append(
+        [slug, round(float(price_cents)), qty, now, "owner"])
+    with MONITOR.lock:
+        MONITOR.state["earn_toflip"] = [list(j) for j in _EARN["toflip"]]
+    _earn_log(slug, "donated", price_cents / 100.0, qty,
+              f"owner handed {qty} shares bought at {price_cents:.0f}c to the "
+              f"flipper — it will rest an ask at {price_cents + EARN_FLIP_TICKS:.0f}c")
+    POLL_KICK.set()
+    return 200, {"ok": True, "queued": qty, "asked": int(size),
+                 "free": free, "at_c": round(price_cents + EARN_FLIP_TICKS, 1),
+                 "trimmed": qty < int(size)}
+
+
 def _hunt_held(m: str) -> bool:
     """Has the owner cleared this market to trade it by hand? Checked by every
     loop that PLACES, so nothing wanders back in behind them. Cancelling is
@@ -7642,6 +7696,12 @@ def do_maction(body: dict) -> tuple[int, dict]:
         return do_cancel_order(str(body.get("order_id") or ""))
     if op == "clear":
         return do_clear_market(str(body.get("market") or ""))
+    if op == "flip":
+        try:
+            return do_donate_flip(str(body["market"]), float(body["price_cents"]),
+                                  int(body["size"]))
+        except (KeyError, TypeError, ValueError):
+            return 400, {"ok": False, "error": "bad request"}
     if op == "modify":
         try:
             return do_reprice(str(body["order_id"]), float(body["price_cents"]),
@@ -11511,6 +11571,49 @@ function mname(m){
 function mcell(m){
   return '<td class="mkt"><b style="color:var(--ink);font-size:12px">'+esc(mname(m))+'</b></td>';
 }
+// Donating stock to the flipper places a real SELL order, so it takes two
+// taps like every other order-touching control, and the first tap says
+// exactly what will rest and at what price.
+var DNT = null, DNTT = null;
+function donateFlip(ev){
+  ev.stopPropagation();                 // the row itself opens the market
+  const b = ev.currentTarget;
+  const m = b.getAttribute('data-m');
+  const q = +b.getAttribute('data-q');
+  const p = +b.getAttribute('data-p');
+  const key = m + '|' + q + '|' + p;
+  if(DNT !== key){
+    if(DNTT) clearTimeout(DNTT);
+    document.querySelectorAll('button.dnt').forEach(function(x){
+      x.textContent = 'Flip it'; });
+    DNT = key;
+    b.textContent = 'Tap again — rest ' + q + ' at ' + (p + 2).toFixed(1) + '¢';
+    DNTT = setTimeout(function(){ DNT = null; b.textContent = 'Flip it'; }, 6000);
+    return;
+  }
+  if(DNTT) clearTimeout(DNTT);
+  DNT = null;
+  b.disabled = true;
+  b.textContent = 'queueing…';
+  const h = {'Content-Type':'application/json','X-Reprice':'1'};
+  try{ const k = localStorage.getItem('dashKey'); if(k) h['X-Dash-Key'] = k; }catch(_){}
+  fetch('maction', {method:'POST', headers:h,
+                    body: JSON.stringify({op:'flip', market:m, price_cents:p, size:q})})
+    .then(function(r){ return r.json().catch(function(){ return {}; }); })
+    .then(function(j){
+      if(j.ok){
+        b.textContent = 'flipping ' + j.queued + ' at ' + j.at_c + '¢'
+                      + (j.trimmed ? ' (only ' + j.free + ' free)' : '');
+      } else {
+        b.disabled = false;
+        b.textContent = (j.error || 'failed').slice(0, 46);
+      }
+    })
+    .catch(function(e){
+      b.disabled = false;
+      b.textContent = 'failed — ' + ((e && e.message) || e);
+    });
+}
 function mrow(m, mid, right){
   return '<tr onclick="openMkt(\\''+esc(m)+'\\')">'+mcell(m)+
          (mid||'')+'<td class="r" style="white-space:nowrap">'+right+'</td></tr>';
@@ -11535,9 +11638,20 @@ function renderHome(d){
                                               : 'rgba(217,161,50,.20);color:#f2cd7f')+
             '">'+esc(t.src)+'</span> '
           : '<span class="sub" style="font-size:10px">resting order</span> ';
+      // Hand a bought position to the flipper. Only on BUYS, and only where
+      // there is a price and a size to work with — the flipper's whole job is
+      // resting an ask a couple of ticks above what the stock cost.
+      const canFlip = (t.verb === 'Bought') && t.filled > 0 && t.price_cents > 0;
+      const flipBtn = canFlip
+        ? ' <button class="tab dnt" style="font-size:11px;padding:3px 9px;'
+          + 'min-height:0;margin-left:6px" data-m="'+esc(t.market)+'" data-q="'
+          + (+t.filled)+'" data-p="'+(+t.price_cents).toFixed(1)
+          + '" onclick="donateFlip(event)">Flip it</button>'
+        : '';
       return mrow(t.market,
         '<td class="r">'+line+'</td>',
-        src+'<span class="sub" style="font-size:11px">'+esc(t.when || '')+'</span>');
+        src+'<span class="sub" style="font-size:11px">'+esc(t.when || '')+'</span>'
+          +flipBtn);
     }).join('') + (tx.length > 25 ? '<tr><td class="sub">+' + (tx.length - 25) + ' more</td></tr>' : '')
     : '<tr><td class="sub">no fills since you last cleared ✓</td></tr>';
   document.getElementById('drops').innerHTML = (d.drops || []).length ?

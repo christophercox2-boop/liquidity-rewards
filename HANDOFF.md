@@ -321,6 +321,32 @@ is precisely when we most want out, and the close loop would have re-placed it
 SELL_SHORT outright: closing a short reduces exposure, so the bid cap has no
 business judging it.
 
+### 2026-08-17 — "Flip it": donate a hand-bought position to the flipper
+
+Owner: "occasionally I'll buy some shares I think are mis-priced by hand.
+Give me the option on the since you last checked to donate those to the
+flipper to make some money back."
+
+A "Flip it" button on every BOUGHT row of the since-you-last-checked list on
+the homepage. Two taps, and the first says exactly what will rest — "Tap again
+— rest 40 at 10.0c". It calls `stopPropagation` because the row itself opens
+the market sheet.
+
+`do_donate_flip` puts the job on the SAME `_EARN["toflip"]` queue the fill
+path uses, so it inherits every guard already on it — position-bounded, one
+order per market per pass, dropped after EARN_FLIP_RETRY, never selling more
+than we hold. Two things are specific to a donation:
+
+  * the size is checked against the LIVE position at donate time — net long,
+    minus inventory asks already resting, minus anything already queued — so a
+    mistake is refused on the spot with a reason instead of being silently
+    trimmed to nothing half an hour later. Asking for more than is free
+    queues the free part and says so;
+  * the job carries a 5th element, `"owner"`, and a tagged job is EXEMPT from
+    FLIP_SKIP_PREFIXES. Automatic flipping is banned in the 2028 party markets
+    because those positions are the owner's own — a donation is the owner
+    saying to sell this one. Re-adoption now accepts `len(j) >= 4`.
+
 ### 2026-08-17 — /hunt: worst prices on the board, worked BY HAND
 
 Owner: "set up a big sniper with the worst positions you can find so that I
