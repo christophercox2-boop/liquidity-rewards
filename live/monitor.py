@@ -1423,6 +1423,12 @@ class Monitor:
                 del self.order_snaps[:-720]  # ~24h
             self.updated = now_utc
             self.state["saved_at"] = now_utc.timestamp()
+            # WHICH CODE WROTE THIS. state.json is pushed to the live-state
+            # branch every couple of minutes, so stamping the build here means
+            # "did the deploy land?" can be answered from the repo in seconds
+            # instead of from the phone. Half of 2026-08-17 went on guessing.
+            self.state["build"] = BUILD
+            self.state["boot_ts"] = BOOT_TS
             self.state["rate"] = self.rate
             self.state["market_rates"] = self.market_rates
             self.state["ts"] = now_utc.isoformat()
