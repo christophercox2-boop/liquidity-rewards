@@ -321,6 +321,45 @@ is precisely when we most want out, and the close loop would have re-placed it
 SELL_SHORT outright: closing a short reduces exposure, so the bid cap has no
 business judging it.
 
+### 2026-08-17 — the earner's universe was the prober's journal (FIXED)
+
+Owner: "there are a lot of juicy markets out there for the probe/earner to get
+into. What is a way to eliminate the bottleneck so that we're in more markets
+where money can be made."
+
+MEASURED, not guessed. The earner's candidate list was
+`{l["m"] for l in probe_log}` — and `_probe_log` keeps only the last 200 lines
+(`del log[:-200]`). So the earner's entire world was whatever markets the
+prober had touched most recently, and a burst of events in a few markets
+evicted the rest. On a 225-market board with the prober having touched 40, the
+earner could consider 40. It now considers 225.
+
+WHY THE COUPLING WAS UNNECESSARY. The prober visit stood in for "we know
+something here". Since the Silver lookup was fixed (see above) we know
+something about every modelled race with or without a scout: an unvisited
+Texas Senate dem prices at 51-56-62c and scores 0.25 confidence off the
+forecast plus a live two-sided book — comfortably over the 0.15 floor. Nothing
+downstream was relaxed; every market still faces the confidence floor, the
+model price cap, the overpay payback, the deal test, Target Size and the
+dollar caps. The change only decides which markets get ASKED.
+
+Cost checked before shipping, because not checking is what caused the 504: a
+full 225-market scan is 47 ms, 0.2% of one 30-second poll.
+
+THE NEXT BOTTLENECK, measured over the 142 modelled race markets with a spread
+of realistic book shapes — 14% would place, and what blocks the rest:
+
+     74  the side is under Target Size   <- 52%, and it pays NOBODY
+     31  deal test (income too small for the worst case)
+     17  penny ceiling / the 1000-share queue rule
+
+So the single biggest remaining lever is not the earner at all: it is the
+QUALIFIER. Half the board cannot pay us anything until the side reaches Target
+Size, and the qualifier exists precisely to close that gap with 1c/99c orders.
+Turning it on converts those 74 markets from unpayable to payable; the earner
+then has somewhere to rest. The other 48 are the value guards doing their job
+and should not be touched.
+
 ### 2026-08-17 — "Flip it": donate a hand-bought position to the flipper
 
 Owner: "occasionally I'll buy some shares I think are mis-priced by hand.

@@ -6475,9 +6475,30 @@ def auto_earn() -> None:
     # markets out of a pool of 76. Ordering by last attempt makes the earner
     # sweep the whole pool and move on (owner, 2026-08-16: "the earner seems
     # stuck on these markets, just have it move on to somewhere else").
-    cands = sorted({l.get("m") for l in (MONITOR.state.get("probe_log") or [])
-                    if l.get("m")},
-                   key=lambda m_: (_EARN["last"].get(m_, 0.0), m_))
+    # THE UNIVERSE IS NOT THE PROBER'S JOURNAL ANY MORE.
+    #
+    # This used to be exactly the markets appearing in probe_log — which is
+    # capped at 200 lines, so the earner's entire world was whatever the
+    # prober happened to have touched most recently, and a burst of events in
+    # a handful of markets evicted everything else. The prober visit was
+    # standing in for "we know something about this market". Since the Silver
+    # lookup was fixed we know something about every modelled race whether or
+    # not a scout has been there: an unvisited Texas Senate dem prices at
+    # 51-56-62c and scores 0.25 confidence off the forecast and a live
+    # two-sided book, comfortably over the 0.15 floor.
+    #
+    # So the candidate set is now every PAYABLE market we have a book for,
+    # plus anything the journal knows about. Nothing downstream is relaxed —
+    # every market still faces the confidence floor, the model price cap, the
+    # deal test, the Target Size check and the per-market and total dollar
+    # caps. This only decides which markets get ASKED.
+    progs_all = tr._PROG_CACHE.get("progs") or {}
+    payable = set(progs_all) | {sb for p_ in progs_all.values()
+                                for sb in (p_.get("siblings") or [])}
+    pool = {l.get("m") for l in (MONITOR.state.get("probe_log") or []) if l.get("m")}
+    pool |= {m_ for m_ in tr._BOOK_CACHE
+             if (not payable or m_ in payable) and not _is_primary(m_)}
+    cands = sorted(pool, key=lambda m_: (_EARN["last"].get(m_, 0.0), m_))
     for m in cands:
         if placed >= EARN_MAX_PER_POLL:
             break
