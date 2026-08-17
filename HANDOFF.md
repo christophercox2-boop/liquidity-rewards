@@ -1117,3 +1117,49 @@ The 99c stacks are the position (see the hard-won facts above) and they are
 also what holds ask-side Target Size in the slate. Repricing them turns "will
 never fill" into "might fill" AND can un-qualify the side, which pays nobody.
 That needs its own decision, not a loop.
+
+### 2026-08-17 — the penny ceiling is gone as a price cap
+
+Owner: "the 10 cent ceiling doesn't make any sense." It didn't. It was
+justified as keeping a total loss trivial, and that inverts the real risk:
+buying Tennessee governor at 87c against a 99.7% forecast risks 0.26c a share
+in expectation, while a 5c longshot the model puts at 2c risks 3c a share.
+
+What was true underneath it is that expensive markets buy less reward score per
+dollar — score is `df^ticks x size` and ignores what a share cost. That is a
+RANKING question and the yield auction now measures it directly.
+
+The census that settled it, from the newest snapshot: 93 modelled markets have
+a live bid; 34 touch at or under 10c; of the 59 above it only 12 carried the
+1,000-share wall, so **47 were blocked outright**, and 51 of the 59 have bid
+sides already holding Target Size — they would have paid.
+
+Four changes in `_earn_scan`:
+
+1. `EARN_PX_MAX_C` no longer caps the price window. It survives as the level
+   above which a LOSING fill must rest behind a wall.
+2. The deal test prices the loss it insures against: `(1 - fair_mean/100) x
+   stake` instead of the whole stake, with trust scaled by confidence so a
+   market we cannot read still faces the old total-loss version verbatim.
+   **This, not the ceiling, was what really excluded favourites.** It relaxes
+   nothing for longshots — a 2c fair value means a 98% chance of losing the
+   stake and the bar is unchanged.
+3. The wall is required only where `edge_c < 0`. Below `EARN_PX_MAX_C` nothing
+   changed and that is deliberate: the richest 2028 markets carry 24-33 shares
+   at the touch, which is exactly why our size scores there, and a blanket wall
+   test would have shut 25 of the 43 enterable ones.
+4. `EARN_SAFE_MAX_C` 60 -> 95, MODELLED markets only. 49 of the 126 markets the
+   owner armed for the defender allow BUY up to 95c, so a 60c stop on the
+   earner contradicted the owner's own posture in the same races. Unmodelled
+   markets are untouched, held at `MAX_UNBACKED_BID_C`.
+
+**New guard, and it is not optional.** The scan never checked the ask side.
+While the ceiling held the window under 10c almost nothing offered that low, so
+it never bit; the first run of the favourite case after removing the ceiling
+produced a 95c bid against a 90c offer, which post-only would reject outright.
+The window now stops one tick under the best real ask.
+
+Not built: a prior source for the 2028 board. Silver covers senate and governor
+only, so every 2028 market is "unmodelled" and capped at 15c — which is why the
+party pair at 36c/53c stays out of reach whatever happens to this ceiling. The
+owner asked for a source; nothing has been chosen yet.

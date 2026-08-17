@@ -5066,7 +5066,12 @@ EARN_PX_MAX_C = int(os.environ.get("EARN_PX_MAX_C", "10"))
 #     can still join that, it won't get taken because it will be behind the rest"
 # Without the queue this is just a bid at the touch, which is what the bait
 # anchors farm. With it, the order earns while somebody else absorbs the flow.
-EARN_SAFE_MAX_C = int(os.environ.get("EARN_SAFE_MAX_C", "60"))
+# The hard stop where a race forecast exists. Raised 60 -> 95 on 2026-08-17 to
+# match the owner's own defend caps: 49 of the 126 armed markets allow BUY up to
+# 95c, so a 60c stop meant the earner refused prices the owner was separately
+# paying in the same races. Markets with NO forecast are unaffected — they are
+# held to MAX_UNBACKED_BID_C by _bid_allowed and by the ceiling in _earn_scan.
+EARN_SAFE_MAX_C = int(os.environ.get("EARN_SAFE_MAX_C", "95"))
 # How far above a Silver forecast the earner may still pay. Reward income can
 # justify a few cents of premium over fair value; it cannot justify sixteen
 # times it.
@@ -5474,7 +5479,22 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
     # ticks of stretch, never above the penny ceiling where a total
     # loss stops being trivial
     base = real_bids[0][0] if real_bids else max(1, b["lo"])
-    top = min(b["hi"] + 2, EARN_PX_MAX_C)
+    # THE PENNY CEILING IS GONE AS A PRICE CAP (owner, 2026-08-17: "the 10 cent
+    # ceiling doesn't make any sense"). It was justified as keeping a total loss
+    # trivial, and that inverts the actual risk: buying Tennessee governor at
+    # 87c against a 99.7% forecast risks 0.26c a share in expectation, while a
+    # 5c longshot the model puts at 2c risks 3c a share — sixty per cent of the
+    # stake. The cheap contract was the dangerous one all along.
+    #
+    # What was TRUE underneath it is that expensive markets buy less reward
+    # score per dollar, because score is df^ticks x size and takes no interest
+    # in what a share cost. That is a ranking question, not a permission one,
+    # and the yield auction in auto_earn now measures it directly.
+    #
+    # EARN_PX_MAX_C survives below, but only as the level above which a LOSING
+    # fill has to be resting behind somebody else's money. That is a statement
+    # about absolute damage per share, which really does scale with price.
+    top = b["hi"] + 2
     # PRICE CLIMBS WITH THE LADDER TOO, not just size. Promoting straight
     # back to the old 10c ceiling would reintroduce exactly the price the
     # owner called too dear for these longshots; a market has to hold at
@@ -5483,10 +5503,32 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
     rung_ = _earn_rung(m)
     top = min(top, max(1, b["lo"] if rung_ < 1 else
                           b["med"] if rung_ < 2 else b["hi"] + 2))
-    # Model-backed extension past the penny ceiling: never above the band's
-    # 10th percentile, and never above the hard safety cap.
+    # THE HARD STOP IS THE MODEL'S. Where a race forecast exists the earner may
+    # go as high as the owner's own defend ceiling — 49 of the 126 markets armed
+    # for the defender carry BUY caps above 60c, most at 95c, so a 60c stop on
+    # the earner was inconsistent with the owner's stated posture in the same
+    # markets. Where NO forecast exists nothing has changed: _bid_allowed still
+    # holds those to MAX_UNBACKED_BID_C, or to RACE_NO_MODEL_BID_C for a race
+    # the model should price and does not.
+    sv_early = _silver_fair(m)
+    # int(): MAX_UNBACKED_BID_C is a float and the candidate walk below is a
+    # range(), which will not take one
+    hard = int(EARN_SAFE_MAX_C if sv_early is not None else MAX_UNBACKED_BID_C)
+    top = min(top, hard)
     if b["lo"] > top:
-        top = min(b["lo"], EARN_SAFE_MAX_C)
+        top = min(b["lo"], hard)
+    # AND NEVER INTO THE ASK. We are a resting order, not a taker: a bid at or
+    # above the best offer either crosses — and post-only means the exchange
+    # rejects it rather than filling it — or, one tick under, leads the whole
+    # book straight into whatever is coming. This was latent while the penny
+    # ceiling held the window under 10c and almost nothing offered that low;
+    # dropping the ceiling made a 95c bid against a 90c ask reachable, which
+    # the first run of the favourite case duly produced.
+    real_asks = [round(p_ * 100) for p_, q_ in (ent[1].get("asks") or [])
+                 if q_ >= PROBE_REAL_MIN]
+    if real_asks:
+        out["ask_touch"] = min(real_asks)
+        top = min(top, out["ask_touch"] - 1)
     # STAND OFF THE TOUCH WHEN WE ARE NOT SURE. Everything above priced
     # this market on what we believe it is worth; this prices it on how
     # well we believe it. Confidence short of full drops the whole window
@@ -5572,9 +5614,23 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
             if sv_cap is not None and pc > sv_cap:
                 row["why"] = f"above the Silver cap of {sv_cap}c"
                 continue
-            # past the penny ceiling both knowledge conditions must hold
-            if pc > EARN_PX_MAX_C and (pc > b["lo"] or _queue(pc) < EARN_QUEUE_MIN):
-                row["why"] = (f"over the {EARN_PX_MAX_C}c penny ceiling, and "
+            # A WALL IS PROTECTION AGAINST A BAD FILL, SO IT IS ONLY NEEDED
+            # WHEN A FILL WOULD BE BAD. This used to apply above the penny
+            # ceiling regardless of price against fair, which meant the better
+            # the deal the harder it was to take: Delaware Senate dem at 86c
+            # under a 99.9% forecast was refused for want of a wall, when a
+            # fill there is thirteen cents of profit and we WANT to be filled.
+            #
+            # Below the ceiling nothing changes — no wall has ever been asked
+            # for there and none is asked for now. That matters: the richest
+            # 2028 markets carry 24 to 33 shares at the touch, which is exactly
+            # why our size scores in them, and a wall test would have shut 25
+            # of the 43 enterable ones.
+            fair_mean = float(b.get("mean") or b["med"])
+            edge_c = fair_mean - pc
+            if (pc > EARN_PX_MAX_C and edge_c < 0
+                    and (pc > b["lo"] or _queue(pc) < EARN_QUEUE_MIN)):
+                row["why"] = (f"a fill here buys {-edge_c:.1f}c ABOVE fair and "
                               + ("it is above the band's 10th percentile"
                                  if pc > b["lo"] else
                                  f"only {_queue(pc):,.0f} shares are queued at or above "
@@ -5630,8 +5686,6 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
             # posterior MEAN is the right reference: expected profit on a fill
             # is a sum over the whole distribution, not a test against one
             # point. edge > 0 means a fill buys under fair — the good case.
-            fair_mean = float(b.get("mean") or b["med"])
-            edge_c = fair_mean - pc
             row.update({"tier": tier, "qty": q, "est": round(est, 4),
                         "cost": round(pc / 100.0 * q, 2),
                         "edge_c": round(edge_c, 2),
@@ -5642,12 +5696,36 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
                               f"{target:,.0f} Target Size even with our {q} — a side "
                               f"under Target Size pays NOBODY")
                 continue
-            # the deal test: income must dwarf the worst case — total-loss
-            # payback within two days
-            if est < 0.5 * (pc / 100.0) * q:
+            # THE DEAL TEST NOW PRICES THE LOSS IT IS INSURING AGAINST.
+            #
+            # It used to demand that reward income repay a TOTAL loss inside two
+            # days — the contract going to zero, at full face value, whatever
+            # the model said the odds of that were. For a 99.7% favourite that
+            # is insuring a one-in-three-hundred event at par, and it overstated
+            # the risk by about 334x. It is what actually kept the earner out of
+            # the safest markets on the board, not the penny ceiling.
+            #
+            # The expected loss is the stake times the chance we lose it, and
+            # for a long that chance is what the model says the OTHER side is
+            # worth. A market we cannot read gets the old harsh version: trust
+            # scales with confidence, and at zero confidence this is exactly the
+            # total-loss test it replaces.
+            #
+            # Note what this does NOT relax. A 5c longshot the model puts at 2c
+            # has a 98% chance of losing the stake, so its expected loss is
+            # essentially the whole stake and its bar is essentially unchanged.
+            # The relief goes to favourites, which is where the old test was
+            # wrong.
+            trust = min(1.0, conf["score"] / EARN_CONF_FULL)
+            p_lose = max(0.0, min(1.0, 1.0 - fair_mean / 100.0))
+            p_eff = p_lose * trust + (1.0 - trust)
+            exp_loss = p_eff * (pc / 100.0) * q
+            if est < 0.5 * exp_loss:
                 row["why"] = (f"income ${est:.2f}/day does not clear the deal test "
-                              f"(needs ${0.5 * (pc/100.0) * q:.2f}/day to pay back a "
-                              f"total loss inside two days)")
+                              f"(needs ${0.5 * exp_loss:.2f}/day to pay back the "
+                              f"${exp_loss:.2f} expected loss inside two days — "
+                              f"{p_eff*100:.0f}% chance of losing "
+                              f"${(pc/100.0)*q:.2f})")
                 continue
             # PAYING ABOVE FAIR HAS TO EARN ITS KEEP. The old deal test asked
             # only whether income beat a TOTAL loss — the contract going to
