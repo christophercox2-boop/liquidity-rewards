@@ -1,6 +1,6 @@
 # Polymarket US — Liquidity Rewards
 
-## ✅ Last successful check: 2026-08-18 7:09 PM ET
+## ✅ Last successful check: 2026-08-18 7:12 PM ET
 
 Written by **the live monitor**, every hour. **If the timestamp above is more than ~2 hours old, something is broken.** Open /map. If that page will not load at all, the monitor is down and needs a restart from DigitalOcean.
 
@@ -10,11 +10,11 @@ Written by **the live monitor**, every hour. **If the timestamp above is more th
 
 ## 📌 Summary
 
-**Earning right now:** ~$257.23/day estimated (ceiling, not promise — details below)
+**Earning right now:** ~$252.72/day estimated (ceiling, not promise — details below)
 
 **Earned:** $5,117.59 lifetime ($4,919.08 paid). Last three recorded days — 2026-08-16: **$197.03** ⚠️ pending bucket — covers every day since then, still growing · 2026-08-15: **$1,352.63** · 2026-08-14: **$274.92** _(Polymarket reports ~1–2 days behind)_
 
-**What else to join:** `enwc-usgubp-ok-2026-06-16-rep-gendru` — BUY at the best price, ~$20.93/day for 200 contracts. Runners-up: `ewc-usgub-ga-2026-11-03-dem` (~$10.67/day), `enwc-usgubp-ok-2026-06-16-rep-mikmaz` (~$10.48/day)
+**What else to join:** `enwc-usgubp-ok-2026-06-16-rep-gendru` — BUY at the best price, ~$20.93/day for 200 contracts. Runners-up: `ewc-usgub-ga-2026-11-03-dem` (~$10.88/day), `enwc-usgubp-ok-2026-06-16-rep-mikmaz` (~$10.32/day)
 
 ---
 
@@ -22,34 +22,32 @@ Written by **the live monitor**, every hour. **If the timestamp above is more th
 
 ## 📍 Right now — your resting orders
 
-### Estimated earning rate: ~$257.23/day (~$10.72/hour)
+### Estimated earning rate: ~$252.72/day (~$10.53/hour)
 
 Rough estimate — assumes the books, pools, and your orders stay as they are, both sides keep qualifying, each pool covers its whole event/race (so it's divided across that race's open markets), and splits evenly between bid and ask. Scored with the official formula: `DiscountFactor ^ (ticks from best price) × size`, counting only orders inside the Target Size window. Earning orders first.
 
 | Market | Side | Price | Size | Ticks off best | Reward pool | Earning? |
 |---|---|---:|---:|---:|---:|---|
-| `usgubewc-usgub-ok-2026-11-03-rep` | BUY | 94.0¢ | 3 | 0 | $25.00 | ✅ scoring — ~100.0% of bid side (600,268 resting ≥ 2,000 ✓) ≈ $6.25/day (event pool ÷ 2 markets) |
-| `ussewc-usse-la-2026-11-03-rep` | BUY | 90.0¢ | 3 | 0 | $25.00 | ✅ scoring — ~100.0% of bid side (500,257 resting ≥ 2,000 ✓) ≈ $6.25/day (event pool ÷ 2 markets) |
-| `usgubewc-usgub-tx-2026-11-03-dem` | BUY | 14.0¢ | 3 | 0 | $25.00 | ✅ scoring — ~100.0% of bid side (17,117 resting ≥ 2,000 ✓) ≈ $6.25/day (event pool ÷ 2 markets) |
-| `enwc-uspres-nom-dem-2028-jonoss` | BUY | 25.0¢ | 1 | 0 | $200.00 | ✅ scoring — ~99.9% of bid side (104,163 resting ≥ 20,000 ✓) ≈ $5.88/day (event pool ÷ 17 markets) |
+| `usgubewc-usgub-tx-2026-11-03-dem` | BUY | 14.0¢ | 3 | 0 | $25.00 | ✅ scoring — ~100.0% of bid side (17,125 resting ≥ 2,000 ✓) ≈ $6.25/day (event pool ÷ 2 markets) |
+| `enwc-uspres-nom-dem-2028-jonoss` | BUY | 25.0¢ | 1 | 0 | $200.00 | ✅ scoring — ~99.9% of bid side (104,301 resting ≥ 20,000 ✓) ≈ $5.88/day (event pool ÷ 17 markets) |
 | `scc-senate-gop-2026-11-03-49` | BUY | 20.0¢ | 5 | 0 | $100.00 | ✅ scoring — ~99.8% of bid side (203,268 resting ≥ 5,000 ✓) ≈ $3.84/day (event pool ÷ 13 markets) |
-| `ussewc-usse-ms-2026-11-03-dem` | SELL | 8.0¢ | 2 | 0 | $25.00 | ✅ scoring — ~99.5% of ask side (66,186 resting ≥ 2,000 ✓) ≈ $6.22/day (event pool ÷ 2 markets) |
-| `usgubewc-usgub-ma-2026-11-03-dem` | BUY | 94.0¢ | 3 | 0 | $25.00 | ✅ scoring — ~98.4% of bid side (2,265 resting ≥ 2,000 ✓) ≈ $6.15/day (event pool ÷ 2 markets) |
+| `ussewc-usse-ms-2026-11-03-dem` | SELL | 8.0¢ | 2 | 0 | $25.00 | ✅ scoring — ~99.5% of ask side (66,187 resting ≥ 2,000 ✓) ≈ $6.22/day (event pool ÷ 2 markets) |
+| `ewc-usp-2028-11-07-rokha` | SELL | 4.0¢ | 3 | 0 | $200.00 | ✅ scoring — ~98.7% of ask side (50,954 resting ≥ 20,000 ✓) ≈ $3.65/day (event pool ÷ 27 markets) |
+| `usgubewc-usgub-tn-2026-11-03-rep` | BUY | 94.0¢ | 3 | 0 | $25.00 | ✅ scoring — ~98.4% of bid side (2,107 resting ≥ 2,000 ✓) ≈ $6.15/day (event pool ÷ 2 markets) |
 | `scc-hrep-rep-2026-11-03-gte215` | BUY | 37.0¢ | 1 | 0 | $100.00 | ✅ scoring — ~95.2% of bid side (400,604 resting ≥ 5,000 ✓) ≈ $3.97/day (event pool ÷ 12 markets) |
 | `scc-hrep-rep-2026-11-03-gte210` | BUY | 44.0¢ | 1 | 0 | $100.00 | ✅ scoring — ~90.9% of bid side (400,529 resting ≥ 5,000 ✓) ≈ $3.79/day (event pool ÷ 12 markets) |
-| `usgubewc-usgub-ne-2026-11-03-dem` | SELL | 8.0¢ | 1 | 0 | $25.00 | ✅ scoring — ~90.8% of ask side (265,907 resting ≥ 2,000 ✓) ≈ $5.68/day (event pool ÷ 2 markets) |
+| `usgubewc-usgub-ne-2026-11-03-dem` | SELL | 8.0¢ | 1 | 0 | $25.00 | ✅ scoring — ~90.8% of ask side (265,908 resting ≥ 2,000 ✓) ≈ $5.68/day (event pool ÷ 2 markets) |
 | `scc-senate-gop-2026-11-03-52` | SELL | 18.0¢ | 1 | 1 | $100.00 | ✅ scoring — ~86.9% of ask side (91,719 resting ≥ 5,000 ✓) ≈ $3.34/day (event pool ÷ 13 markets) |
 | `usgubewc-usgub-md-2026-11-03-rep` | BUY | 1.0¢ | 1,799 | 0 | $25.00 | ✅ scoring — ~85.7% of bid side (2,100 resting ≥ 2,000 ✓) ≈ $5.35/day (event pool ÷ 2 markets) |
-| `scc-senate-gop-2026-11-03-52` | BUY | 11.0¢ | 1 | 0 | $100.00 | ✅ scoring — ~81.7% of bid side (305,766 resting ≥ 5,000 ✓) ≈ $3.14/day (event pool ÷ 13 markets) |
+| `scc-senate-gop-2026-11-03-52` | BUY | 11.0¢ | 1 | 0 | $100.00 | ✅ scoring — ~81.7% of bid side (305,764 resting ≥ 5,000 ✓) ≈ $3.14/day (event pool ÷ 13 markets) |
 | `enwc-uspres-nom-rep-2028-rondes` | BUY | 9.0¢ | 135 | 2 | $200.00 | ✅ scoring — ~81.7% of bid side (63,769 resting ≥ 20,000 ✓) ≈ $5.83/day (event pool ÷ 14 markets) |
-| `ussewc-usse-sc-2026-11-03-dem` | BUY | 12.0¢ | 10 | 0 | $25.00 | ✅ scoring — ~79.7% of bid side (2,048 resting ≥ 2,000 ✓) ≈ $4.98/day (event pool ÷ 2 markets) |
+| `ussewc-usse-sc-2026-11-03-dem` | BUY | 12.0¢ | 10 | 0 | $25.00 | ✅ scoring — ~81.1% of bid side (2,053 resting ≥ 2,000 ✓) ≈ $5.07/day (event pool ÷ 2 markets) |
 | `scc-senate-gop-2026-11-03-54` | BUY | 9.0¢ | 1 | 0 | $100.00 | ✅ scoring — ~78.8% of bid side (15,650 resting ≥ 5,000 ✓) ≈ $3.03/day (event pool ÷ 13 markets) |
 | `ussewc-usse-la-2026-11-03-dem` | BUY | 7.0¢ | 2 | 0 | $25.00 | ✅ scoring — ~78.6% of bid side (4,291 resting ≥ 2,000 ✓) ≈ $4.91/day (event pool ÷ 2 markets) |
 | `usgubewc-usgub-nm-2026-11-03-rep` | BUY | 1.0¢ | 1,799 | 1 | $25.00 | ✅ scoring — ~78.3% of bid side (2,029 resting ≥ 2,000 ✓) ≈ $4.89/day (event pool ÷ 2 markets) |
 | `usgubewc-usgub-ri-2026-11-03-rep` | BUY | 1.0¢ | 1,799 | 1 | $25.00 | ✅ scoring — ~76.6% of bid side (2,035 resting ≥ 2,000 ✓) ≈ $3.19/day (event pool ÷ 3 markets) |
 | `enwc-uspres-nom-dem-2028-gavnew` | BUY | 22.0¢ | 63 | 0 | $200.00 | ✅ scoring — ~73.7% of bid side (218,657 resting ≥ 20,000 ✓) ≈ $4.34/day (event pool ÷ 17 markets) |
-| `enwc-uspres-nom-dem-2028-jamtal` | SELL | 5.0¢ | 25 | 0 | $200.00 | ✅ scoring — ~71.4% of ask side (38,381 resting ≥ 20,000 ✓) ≈ $4.20/day (event pool ÷ 17 markets) |
-| `usgubewc-usgub-wy-2026-11-03-rep` | BUY | 95.0¢ | 3 | 0 | $25.00 | ✅ scoring — ~66.7% of bid side (2,055 resting ≥ 2,000 ✓) ≈ $4.17/day (event pool ÷ 2 markets) |
+| `usgubewc-usgub-ct-2026-11-03-rep` | SELL | 3.0¢ | 2 | 0 | $25.00 | ✅ scoring — ~66.4% of ask side (199,623 resting ≥ 2,000 ✓) ≈ $4.15/day (event pool ÷ 2 markets) |
 | `usgubewc-usgub-md-2026-11-03-dem` | BUY | 95.0¢ | 3 | 0 | $25.00 | ✅ scoring — ~62.4% of bid side (500,317 resting ≥ 2,000 ✓) ≈ $3.90/day (event pool ÷ 2 markets) |
 | `enwc-uspres-nom-dem-2028-aleocc` | BUY | 21.0¢ | 20 | 0 | $200.00 | ✅ scoring — ~60.5% of bid side (71,008 resting ≥ 20,000 ✓) ≈ $3.56/day (event pool ÷ 17 markets) |
 | `usgubewc-usgub-tx-2026-11-03-rep` | SELL | 87.0¢ | 2 | 0 | $25.00 | ✅ scoring — ~50.0% of ask side (27,350 resting ≥ 2,000 ✓) ≈ $3.12/day (event pool ÷ 2 markets) |
@@ -58,63 +56,19 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 | `usgubewc-usgub-ct-2026-11-03-dem` | BUY | 95.0¢ | 4 | 0 | $25.00 | ✅ scoring — ~49.9% of bid side (500,289 resting ≥ 2,000 ✓) ≈ $3.12/day (event pool ÷ 2 markets) |
 | `scc-senate-gop-2026-11-03-47` | BUY | 12.0¢ | 1 | 0 | $100.00 | ✅ scoring — ~49.0% of bid side (105,655 resting ≥ 5,000 ✓) ≈ $1.88/day (event pool ÷ 13 markets) |
 | `scc-senate-gop-2026-11-03-47` | BUY | 12.0¢ | 1 | 0 | $100.00 | ✅ scoring — ~49.0% of bid side (105,655 resting ≥ 5,000 ✓) ≈ $1.88/day (event pool ÷ 13 markets) |
+| `ussewc-usse-tn-2026-11-03-dem` | SELL | 5.0¢ | 2 | 0 | $25.00 | ✅ scoring — ~43.7% of ask side (527,398 resting ≥ 2,000 ✓) ≈ $2.73/day (event pool ÷ 2 markets) |
+| `ussewc-usse-tn-2026-11-03-rep` | BUY | 95.0¢ | 35 | 0 | $25.00 | ✅ scoring — ~41.2% of bid side (500,471 resting ≥ 2,000 ✓) ≈ $2.58/day (event pool ÷ 2 markets) |
 | …and 1515 more | | | | | | |
 
 **Tap an order for its book window and the math:**
 
-<details><summary><code>usgubewc-usgub-ok-2026-11-03-rep</code> BUY 3 @ 94¢ → $6.25/day</summary>
-
-| | Bids | Resting | Score |
-|---|---:|---:|---:|
-| ▶ | 94¢ | 3 (3 yours) | ×0.1^0 = 3.0 |
-|  | 86¢ | 50 | ×0.1^8 = 0.0 |
-|  | 74¢ | 3 | ×0.1^20 = 0.0 |
-|  | 56¢ | 5 | ×0.1^38 = 0.0 |
-|  | 35¢ | 1 | ×0.1^59 = 0.0 |
-|  | 13¢ | 1 | ×0.1^81 = 0.0 |
-|  | 10¢ | 5 | ×0.1^84 = 0.0 |
-|  | 2¢ | 600,000 | ×0.1^92 = 0.0 |
-| | | **Σ** | **3.0** |
-
-`yours 3.0 / Σ 3.0 = 100.0%`  
-`$25 ÷ 2 ÷ 2 = $6.25 × 100.0% = $6.25/day`  
-
-<details><summary>÷ 2 markets in this race — tap to list</summary>
-
-1. `usgubewc-usgub-ok-2026-11-03-dem`
-2. `usgubewc-usgub-ok-2026-11-03-rep` ← this one
-
-</details>
-
-</details>
-<details><summary><code>ussewc-usse-la-2026-11-03-rep</code> BUY 3 @ 90¢ → $6.25/day</summary>
-
-| | Bids | Resting | Score |
-|---|---:|---:|---:|
-| ▶ | 90¢ | 3 (3 yours) | ×0.1^0 = 3.0 |
-|  | 83¢ | 50 | ×0.1^7 = 0.0 |
-|  | 15¢ | 4 | ×0.1^75 = 0.0 |
-|  | 2¢ | 500,000 | ×0.1^88 = 0.0 |
-| | | **Σ** | **3.0** |
-
-`yours 3.0 / Σ 3.0 = 100.0%`  
-`$25 ÷ 2 ÷ 2 = $6.25 × 100.0% = $6.25/day`  
-
-<details><summary>÷ 2 markets in this race — tap to list</summary>
-
-1. `ussewc-usse-la-2026-11-03-dem`
-2. `ussewc-usse-la-2026-11-03-rep` ← this one
-
-</details>
-
-</details>
 <details><summary><code>usgubewc-usgub-tx-2026-11-03-dem</code> BUY 3 @ 14¢ → $6.25/day</summary>
 
 | | Bids | Resting | Score |
 |---|---:|---:|---:|
 | ▶ | 14¢ | 3 (3 yours) | ×0.1^0 = 3.4 |
 |  | 10¢ | 1 | ×0.1^4 = 0.0 |
-|  | 7¢ | 16 | ×0.1^7 = 0.0 |
+|  | 7¢ | 24 | ×0.1^7 = 0.0 |
 |  | 2¢ | 15,000 | ×0.1^12 = 0.0 |
 | | | **Σ** | **3.4** |
 
@@ -208,6 +162,7 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 |---|---:|---:|---:|
 | ▶ | 8¢ | 2 (2 yours) | ×0.1^0 = 2.0 |
 |  | 10¢ | 1 | ×0.1^2 = 0.0 |
+|  | 13¢ | 1 | ×0.1^5 = 0.0 |
 |  | 14¢ | 1 | ×0.1^6 = 0.0 |
 |  | 15¢ | 157 | ×0.1^7 = 0.0 |
 |  | 18¢ | 50 | ×0.1^10 = 0.0 |
@@ -226,26 +181,77 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
-<details><summary><code>usgubewc-usgub-ma-2026-11-03-dem</code> BUY 3 @ 94¢ → $6.15/day</summary>
+<details><summary><code>ewc-usp-2028-11-07-rokha</code> SELL 3 @ 4¢ → $3.65/day</summary>
+
+| | Asks | Resting | Score |
+|---|---:|---:|---:|
+| ▶ | 4¢ | 3 (3 yours) | ×0.2^0 = 3.0 |
+|  | 6¢ | 1 | ×0.2^2 = 0.0 |
+|  | 9¢ | 1 | ×0.2^5 = 0.0 |
+|  | 12¢ | 5 | ×0.2^8 = 0.0 |
+|  | 14¢ | 64 | ×0.2^10 = 0.0 |
+|  | 20¢ | 314 | ×0.2^16 = 0.0 |
+|  | 21¢ | 50 | ×0.2^17 = 0.0 |
+|  | 25¢ | 30,266 | ×0.2^21 = 0.0 |
+| | | **Σ** | **3.0** |
+
+`yours 3.0 / Σ 3.0 = 98.7%`  
+`$200 ÷ 27 ÷ 2 = $3.70 × 98.7% = $3.65/day`  
+
+<details><summary>÷ 27 markets in this race — tap to list</summary>
+
+1. `ewc-usp-2028-11-07-aleocc`
+2. `ewc-usp-2028-11-07-andbes`
+3. `ewc-usp-2028-11-07-dontru`
+4. `ewc-usp-2028-11-07-dontrujr`
+5. `ewc-usp-2028-11-07-dwajoh`
+6. `ewc-usp-2028-11-07-elomus`
+7. `ewc-usp-2028-11-07-gavnew`
+8. `ewc-usp-2028-11-07-gleyou`
+9. `ewc-usp-2028-11-07-jamtal`
+10. `ewc-usp-2028-11-07-jbpri`
+11. `ewc-usp-2028-11-07-jdvan`
+12. `ewc-usp-2028-11-07-jonoss`
+13. `ewc-usp-2028-11-07-jossha`
+14. `ewc-usp-2028-11-07-kamhar`
+15. `ewc-usp-2028-11-07-markel`
+16. `ewc-usp-2028-11-07-marrub`
+17. `ewc-usp-2028-11-07-micoba`
+18. `ewc-usp-2028-11-07-petbut`
+19. `ewc-usp-2028-11-07-rahema`
+20. `ewc-usp-2028-11-07-rokha` ← this one
+21. `ewc-usp-2028-11-07-rondes`
+22. `ewc-usp-2028-11-07-stasmi`
+23. `ewc-usp-2028-11-07-thomas`
+24. `ewc-usp-2028-11-07-tuccar`
+25. `ewc-usp-2028-11-07-tulgab`
+26. `ewc-usp-2028-11-07-vivram`
+27. `ewc-usp-2028-11-07-wesmoo`
+
+</details>
+
+</details>
+<details><summary><code>usgubewc-usgub-tn-2026-11-03-rep</code> BUY 3 @ 94¢ → $6.15/day</summary>
 
 | | Bids | Resting | Score |
 |---|---:|---:|---:|
 | ▶ | 94¢ | 3 (3 yours) | ×0.1^0 = 3.0 |
 |  | 91¢ | 50 | ×0.1^3 = 0.1 |
-|  | 54¢ | 1 | ×0.1^40 = 0.0 |
-|  | 43¢ | 5 | ×0.1^51 = 0.0 |
-|  | 31¢ | 1 | ×0.1^63 = 0.0 |
+|  | 84¢ | 47 | ×0.1^10 = 0.0 |
+|  | 83¢ | 3 | ×0.1^11 = 0.0 |
+|  | 64¢ | 4 | ×0.1^30 = 0.0 |
+|  | 32¢ | 1 | ×0.1^62 = 0.0 |
 |  | 10¢ | 5 | ×0.1^84 = 0.0 |
-|  | 1¢ | 2,200 | ×0.1^93 = 0.0 |
-| | | **Σ** | **3.0** |
+|  | 1¢ | 1,994 | ×0.1^93 = 0.0 |
+| | | **Σ** | **3.1** |
 
-`yours 3.0 / Σ 3.0 = 98.4%`  
+`yours 3.0 / Σ 3.1 = 98.4%`  
 `$25 ÷ 2 ÷ 2 = $6.25 × 98.4% = $6.15/day`  
 
 <details><summary>÷ 2 markets in this race — tap to list</summary>
 
-1. `usgubewc-usgub-ma-2026-11-03-dem` ← this one
-2. `usgubewc-usgub-ma-2026-11-03-rep`
+1. `usgubewc-usgub-tn-2026-11-03-dem`
+2. `usgubewc-usgub-tn-2026-11-03-rep` ← this one
 
 </details>
 
@@ -320,6 +326,7 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 | ▶ | 8¢ | 1 (1 yours) | ×0.1^0 = 1.0 |
 |  | 9¢ | 1 | ×0.1^1 = 0.1 |
 |  | 11¢ | 1 | ×0.1^3 = 0.0 |
+|  | 15¢ | 1 | ×0.1^7 = 0.0 |
 |  | 16¢ | 59 | ×0.1^8 = 0.0 |
 |  | 17¢ | 1 | ×0.1^9 = 0.0 |
 |  | 25¢ | 52 | ×0.1^17 = 0.0 |
@@ -403,7 +410,7 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 |  | 9¢ | 0 | ×0.2^2 = 0.0 |
 |  | 8¢ | 2 | ×0.2^3 = 0.0 |
 |  | 7¢ | 1 | ×0.2^4 = 0.0 |
-|  | 5¢ | 3 | ×0.2^6 = 0.0 |
+|  | 5¢ | 1 | ×0.2^6 = 0.0 |
 |  | 4¢ | 5 | ×0.2^7 = 0.0 |
 |  | 3¢ | 2 | ×0.2^8 = 0.0 |
 |  | 2¢ | 5,200 | ×0.2^9 = 0.0 |
@@ -466,18 +473,18 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
-<details><summary><code>ussewc-usse-sc-2026-11-03-dem</code> BUY 10 @ 12¢ → $4.98/day</summary>
+<details><summary><code>ussewc-usse-sc-2026-11-03-dem</code> BUY 10 @ 12¢ → $5.07/day</summary>
 
 | | Bids | Resting | Score |
 |---|---:|---:|---:|
 | ▶ | 12¢ | 10 (10 yours) | ×0.1^0 = 10.0 |
-|  | 11¢ | 24 | ×0.1^1 = 2.4 |
-|  | 10¢ | 15 | ×0.1^2 = 0.2 |
+|  | 11¢ | 21 | ×0.1^1 = 2.1 |
+|  | 10¢ | 23 | ×0.1^2 = 0.2 |
 |  | 1¢ | 1,999 | ×0.1^11 = 0.0 |
-| | | **Σ** | **12.6** |
+| | | **Σ** | **12.3** |
 
-`yours 10.0 / Σ 12.6 = 79.7%`  
-`$25 ÷ 2 ÷ 2 = $6.25 × 79.7% = $4.98/day`  
+`yours 10.0 / Σ 12.3 = 81.1%`  
+`$25 ÷ 2 ÷ 2 = $6.25 × 81.1% = $5.07/day`  
 
 <details><summary>÷ 2 markets in this race — tap to list</summary>
 
@@ -622,62 +629,25 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
-<details><summary><code>enwc-uspres-nom-dem-2028-jamtal</code> SELL 25 @ 5¢ → $4.20/day</summary>
+<details><summary><code>usgubewc-usgub-ct-2026-11-03-rep</code> SELL 2 @ 3¢ → $4.15/day</summary>
 
 | | Asks | Resting | Score |
 |---|---:|---:|---:|
-| ▶ | 5¢ | 35 (25 yours) | ×0.2^0 = 35.0 |
-|  | 13¢ | 4 | ×0.2^8 = 0.0 |
-|  | 15¢ | 9 | ×0.2^10 = 0.0 |
-|  | 18¢ | 3 | ×0.2^13 = 0.0 |
-|  | 19¢ | 3 | ×0.2^14 = 0.0 |
-|  | 20¢ | 20,528 | ×0.2^15 = 0.0 |
-| | | **Σ** | **35.0** |
+| ▶ | 3¢ | 3 (2 yours) | ×0.1^0 = 3.0 |
+|  | 5¢ | 1 | ×0.1^2 = 0.0 |
+|  | 7¢ | 1 | ×0.1^4 = 0.0 |
+|  | 10¢ | 50 | ×0.1^7 = 0.0 |
+|  | 12¢ | 168 | ×0.1^9 = 0.0 |
+|  | 98¢ | 199,175 | ×0.1^95 = 0.0 |
+| | | **Σ** | **3.0** |
 
-`yours 25.0 / Σ 35.0 = 71.4%`  
-`$200 ÷ 17 ÷ 2 = $5.88 × 71.4% = $4.20/day`  
-
-<details><summary>÷ 17 markets in this race — tap to list</summary>
-
-1. `enwc-uspres-nom-dem-2028-aleocc`
-2. `enwc-uspres-nom-dem-2028-andbes`
-3. `enwc-uspres-nom-dem-2028-dwajoh`
-4. `enwc-uspres-nom-dem-2028-gavnew`
-5. `enwc-uspres-nom-dem-2028-jamtal` ← this one
-6. `enwc-uspres-nom-dem-2028-jbpri`
-7. `enwc-uspres-nom-dem-2028-jonoss`
-8. `enwc-uspres-nom-dem-2028-jonste`
-9. `enwc-uspres-nom-dem-2028-jossha`
-10. `enwc-uspres-nom-dem-2028-kamhar`
-11. `enwc-uspres-nom-dem-2028-markel`
-12. `enwc-uspres-nom-dem-2028-micoba`
-13. `enwc-uspres-nom-dem-2028-petbut`
-14. `enwc-uspres-nom-dem-2028-rahema`
-15. `enwc-uspres-nom-dem-2028-rokha`
-16. `enwc-uspres-nom-dem-2028-stasmi`
-17. `enwc-uspres-nom-dem-2028-wesmoo`
-
-</details>
-
-</details>
-<details><summary><code>usgubewc-usgub-wy-2026-11-03-rep</code> BUY 3 @ 95¢ → $4.17/day</summary>
-
-| | Bids | Resting | Score |
-|---|---:|---:|---:|
-| ▶ | 95¢ | 4 (3 yours) | ×0.1^0 = 4.0 |
-|  | 93¢ | 50 | ×0.1^2 = 0.5 |
-|  | 39¢ | 1 | ×0.1^56 = 0.0 |
-|  | 9¢ | 1 | ×0.1^86 = 0.0 |
-|  | 1¢ | 1,999 | ×0.1^94 = 0.0 |
-| | | **Σ** | **4.5** |
-
-`yours 3.0 / Σ 4.5 = 66.7%`  
-`$25 ÷ 2 ÷ 2 = $6.25 × 66.7% = $4.17/day`  
+`yours 2.0 / Σ 3.0 = 66.4%`  
+`$25 ÷ 2 ÷ 2 = $6.25 × 66.4% = $4.15/day`  
 
 <details><summary>÷ 2 markets in this race — tap to list</summary>
 
-1. `usgubewc-usgub-wy-2026-11-03-dem`
-2. `usgubewc-usgub-wy-2026-11-03-rep` ← this one
+1. `usgubewc-usgub-ct-2026-11-03-dem`
+2. `usgubewc-usgub-ct-2026-11-03-rep` ← this one
 
 </details>
 
@@ -890,6 +860,49 @@ Rough estimate — assumes the books, pools, and your orders stay as they are, b
 </details>
 
 </details>
+<details><summary><code>ussewc-usse-tn-2026-11-03-dem</code> SELL 2 @ 5¢ → $2.73/day</summary>
+
+| | Asks | Resting | Score |
+|---|---:|---:|---:|
+| ▶ | 5¢ | 4 (2 yours) | ×0.1^0 = 4.0 |
+|  | 7¢ | 58 | ×0.1^2 = 0.6 |
+|  | 98¢ | 132,784 | ×0.1^93 = 0.0 |
+| | | **Σ** | **4.6** |
+
+`yours 2.0 / Σ 4.6 = 43.7%`  
+`$25 ÷ 2 ÷ 2 = $6.25 × 43.7% = $2.73/day`  
+
+<details><summary>÷ 2 markets in this race — tap to list</summary>
+
+1. `ussewc-usse-tn-2026-11-03-dem` ← this one
+2. `ussewc-usse-tn-2026-11-03-rep`
+
+</details>
+
+</details>
+<details><summary><code>ussewc-usse-tn-2026-11-03-rep</code> BUY 35 @ 95¢ → $2.58/day</summary>
+
+| | Bids | Resting | Score |
+|---|---:|---:|---:|
+| ▶ | 95¢ | 84 (35 yours) | ×0.1^0 = 84.0 |
+|  | 94¢ | 4 | ×0.1^1 = 0.4 |
+|  | 93¢ | 50 | ×0.1^2 = 0.5 |
+|  | 58¢ | 1 | ×0.1^37 = 0.0 |
+|  | 12¢ | 132 | ×0.1^83 = 0.0 |
+|  | 2¢ | 500,000 | ×0.1^93 = 0.0 |
+| | | **Σ** | **84.9** |
+
+`yours 35.0 / Σ 84.9 = 41.2%`  
+`$25 ÷ 2 ÷ 2 = $6.25 × 41.2% = $2.58/day`  
+
+<details><summary>÷ 2 markets in this race — tap to list</summary>
+
+1. `ussewc-usse-tn-2026-11-03-dem`
+2. `ussewc-usse-tn-2026-11-03-rep` ← this one
+
+</details>
+
+</details>
 
 ## 📊 Estimate vs. actual — where the gap is
 
@@ -902,17 +915,17 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 | Market | Reward pool | Discount | Target Size | Best entry | Est. share | Est. $/day |
 |---|---:|---:|---:|---|---:|---:|
 | `enwc-usgubp-ok-2026-06-16-rep-gendru` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (25,966 resting) | ~83.7% | ~$20.93 |
-| `ewc-usgub-ga-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | SELL side (79,897 resting) | ~14.2% | ~$10.67 |
-| `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (28,801 resting) | ~41.9% | ~$10.48 |
-| `ewc-usgub-ks-2026-11-03-rep` | $25.00 ÷ 2 | 0.10 | 2,000 | BUY side (74,492 resting) | ~99.0% | ~$6.18 |
-| `ewc-usgub-oh-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (284,486 resting) | ~3.6% | ~$2.67 |
-| `ewc-usse-oh-2026-11-03-rep` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (632,356 resting) | ~9.6% | ~$2.40 |
-| `ewc-usgub-wi-2026-11-03-dem` | $25.00 ÷ 2 | 0.10 | 2,000 | BUY side (1,241,028 resting) | ~26.2% | ~$1.64 |
-| `ewc-usse-nc-2026-11-03-rep` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (67,168 resting) | ~6.3% | ~$1.56 |
+| `ewc-usgub-ga-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | SELL side (78,909 resting) | ~14.5% | ~$10.88 |
+| `enwc-usgubp-ok-2026-06-16-rep-mikmaz` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (28,808 resting) | ~41.3% | ~$10.32 |
+| `ewc-usgub-ks-2026-11-03-rep` | $25.00 ÷ 2 | 0.10 | 2,000 | BUY side (74,535 resting) | ~81.6% | ~$5.10 |
+| `ewc-usgub-oh-2026-11-03-dem` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (284,487 resting) | ~3.6% | ~$2.67 |
+| `ewc-usse-oh-2026-11-03-rep` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (632,343 resting) | ~9.3% | ~$2.32 |
+| `ewc-usgub-wi-2026-11-03-dem` | $25.00 ÷ 2 | 0.10 | 2,000 | BUY side (1,241,060 resting) | ~25.2% | ~$1.57 |
+| `ewc-usse-nc-2026-11-03-rep` | $100.00 ÷ 2 | 0.20 | 5,000 | BUY side (67,169 resting) | ~6.3% | ~$1.56 |
 | `ewc-usgub-ga-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | SELL side (83,879 resting) | ~1.9% | ~$1.43 |
 | `ewc-usse-ak-2026-11-03-rep` | $25.00 ÷ 2 | 0.10 | 2,000 | BUY side (375,750 resting) | ~21.5% | ~$1.34 |
-| `ewc-usgub-oh-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (282,130 resting) | ~1.7% | ~$1.26 |
-| `ewc-usgub-ca-2026-11-03-stehil` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (67,251 resting) | ~1.7% | ~$1.25 |
+| `ewc-usgub-oh-2026-11-03-rep` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (282,183 resting) | ~1.7% | ~$1.26 |
+| `ewc-usgub-ca-2026-11-03-stehil` | $300.00 ÷ 2 | 0.20 | 10,000 | BUY side (67,257 resting) | ~1.7% | ~$1.25 |
 
 ## Totals
 
@@ -975,6 +988,7 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 
 | Checked (ET) | Result | Rows | Total |
 |---|---|---:|---:|
+| 2026-08-18 7:12 PM ET | ✅ ok | 2859 | $5117.59 |
 | 2026-08-18 7:09 PM ET | ✅ ok | 2859 | $5117.59 |
 | 2026-08-18 7:05 PM ET | ✅ ok | 2859 | $5117.59 |
 | 2026-08-18 7:02 PM ET | ✅ ok | 2859 | $5117.59 |
@@ -984,6 +998,5 @@ U.S. politics only. Ranked by what a **200-contract order at the best price** wo
 | 2026-08-18 6:47 PM ET | ✅ ok | 2859 | $5117.59 |
 | 2026-08-18 6:43 PM ET | ✅ ok | 2859 | $5117.59 |
 | 2026-08-18 6:40 PM ET | ✅ ok | 2859 | $5117.59 |
-| 2026-08-18 6:37 PM ET | ✅ ok | 2859 | $5117.59 |
 
 Full history: [`data/rewards.csv`](data/rewards.csv) · every check: [`data/checks.csv`](data/checks.csv)
