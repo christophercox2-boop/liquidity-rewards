@@ -51,7 +51,7 @@ class TestWebServer(unittest.TestCase):
         status, ctype, body = self.get("/")
         self.assertEqual(status, 200)
         self.assertIn("text/html", ctype)
-        self.assertIn(b"read-only", body)
+        self.assertIn(b'href="switch"', body)   # nav links to the sections
         self.assertNotIn(b"1.23", body)      # data never baked into the shell
 
     def test_data_requires_the_key(self):

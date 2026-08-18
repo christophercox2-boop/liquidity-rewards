@@ -3445,6 +3445,8 @@ def keep_qualified() -> None:
         # keeper was stacking 1c and 99c size into books the owner had never
         # armed -- pandc-anydis and enwc-usgubp-wi among them on 2026-08-12.
         # That is activity nobody asked for, in markets nobody chose.
+        if _hands_off(m):
+            continue  # 2.0's exclusive families included — even armed ones
         if m not in cfg:
             continue
         pr = progs.get(m)
@@ -3563,6 +3565,8 @@ def auto_defend() -> None:
         asks = book.get("asks") or []
         bb = float(bids[0][0]) if bids else None
         ba = float(asks[0][0]) if asks else None
+        if _hands_off(m):
+            continue  # armed defend config survives, but hands-off wins
         mine_all = [o for o in MONITOR.orders if o.get("market") == m]
         for side, scfg in (sides or {}).items():
             if moves >= DEFEND_MAX_PER_POLL:
@@ -3704,6 +3708,8 @@ def auto_snipe() -> None:
         if took >= SNIPE_MAX_PER_CYCLE or spent >= SNIPE_MAX_SPEND:
             return
         if not m.startswith(SNIPE_PREFIXES):
+            continue
+        if _hands_off(m):
             continue
         if _hunt_held(m):
             continue
