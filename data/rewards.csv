@@ -1701,6 +1701,7 @@ date,market,program_type,reward_usd,status
 2026-08-06,scc-senate-gop-2026-11-03-gte57,liquidityProgram,0.38,PAID
 2026-08-06,scc-senate-gop-2026-11-03-lte45,liquidityProgram,0.34,PAID
 2026-08-06,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.19,PAID
+2026-08-06,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.01,PENDING
 2026-08-07,apdc-alito-2026-12-31,liquidityProgram,3.12,PAID
 2026-08-07,apdc-jerpowgov-2026-12-31,liquidityProgram,7.23,PAID
 2026-08-07,dccc-cyclo-us-2026-08-31-gt10000,liquidityProgram,0.19,PAID
