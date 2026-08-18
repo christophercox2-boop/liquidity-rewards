@@ -146,7 +146,7 @@ NOTIFY_MIN_GAP = float(os.environ.get("NOTIFY_MIN_GAP", "300"))
 NOTIFY_ALWAYS = tuple(
     p.strip().lower() for p in os.environ.get(
         "NOTIFY_ALWAYS",
-        "order filled,orders filled,sell below fair,"
+        "order filled,orders filled,sell below fair,reward pool,"
         "live monitor failing,cancel all sent").split(",") if p.strip())
 _NOTIFY_SEEN: dict = {}
 _NOTIFY_RATE: dict = {"last": 0.0, "held": 0, "titles": []}
@@ -3278,18 +3278,26 @@ def watch_program_arrivals(pol_slugs: list[str]) -> None:
         MONITOR.state["prog_seen"] = known
     if not arrived:
         return
-    arrived.sort()
-    for slug in arrived[:6]:
+    # ONE ALERT, RICHEST FIRST. This used to emit up to seven separate pushes
+    # for a single sweep — 43 markets gained a pool at once on 2026-08-18 and
+    # it queued six per-market alerts plus a rollup. The owner wants these
+    # immediately and never held (2026-08-18), which only works if a burst is
+    # one buzz. Sorted by pool so the ones worth acting on lead, not the ones
+    # that sort first alphabetically.
+    arrived.sort(key=lambda sl: -float((live.get(sl) or {}).get("pool") or 0))
+    lines = []
+    for slug in arrived[:8]:
         pr = live.get(slug) or {}
-        MONITOR.pending_alerts.append((
-            "Reward pool attached",
-            f"{slug} — ${pr.get('pool', 0):,.0f}/day pool, target "
-            f"{pr.get('target', 0):,.0f}, df {pr.get('df')}",
-            "high"))
-    if len(arrived) > 6:
-        MONITOR.pending_alerts.append((
-            "Reward pools attached",
-            f"…and {len(arrived) - 6} more markets gained a pool", "high"))
+        lines.append(f"{slug} — ${pr.get('pool', 0):,.0f}/day, target "
+                     f"{pr.get('target', 0):,.0f}")
+    if len(arrived) > 8:
+        lines.append(f"+{len(arrived) - 8} more")
+    total = sum(float((live.get(sl) or {}).get("pool") or 0) for sl in arrived)
+    title = ("Reward pool attached" if len(arrived) == 1
+             else f"{len(arrived)} reward pools attached")
+    MONITOR.pending_alerts.append(
+        (title, "\n".join(lines) + f"\n\n${total:,.0f}/day of new pool in all",
+         "high"))
     print(f"[prog-watch] {len(arrived)} market(s) gained a pool: "
           f"{', '.join(arrived[:8])}", flush=True)
 
