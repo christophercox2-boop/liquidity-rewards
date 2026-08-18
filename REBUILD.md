@@ -203,9 +203,10 @@ income per dollar at risk, consider both sides of every book rather than
 assuming the bid, and size according to how sure the prober is.
 
 **The seller** unwinds. Anything that fills gets sold back; anything sitting
-idle gets rested as an ask so it earns while it waits. The owner is frequently
-"out of a market except for selling what I hold", so the seller must be able
-to work in markets that are otherwise closed to automation.
+idle gets rested as an ask so it earns while it waits. The owner regularly
+wants to be out of a market entirely apart from selling the stock he already
+holds there, so the seller has to keep working in markets that are otherwise
+closed to automation.
 
 ### What 1.0 got wrong here, so 2.0 does not repeat it
 

@@ -1,7 +1,13 @@
 # Owner preferences — read before doing anything
 
-This file loads automatically in every session. For current state, learned
-facts, and open items, read HANDOFF.md next.
+This file loads automatically in every session.
+
+**Building version 2.0? Read REBUILD.md next.** It is the brief: what the
+system does, what state each part is in, what is actually broken, and the
+decisions already made about the rebuild. Start there, not in the code.
+
+Working on the running 1.0? HANDOFF.md has the operational history — it is
+long and accreted, so search it rather than reading it through.
 
 ## How to talk to the owner
 - Plainly. No characterizing, no hype, no hedging language. Lead with the
