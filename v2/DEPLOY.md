@@ -1,9 +1,9 @@
-# Shipping the read-only 2.0 — what happens and what to check
+# Shipping 2.0 — what happens and what to check
 
 One page for the deploy that puts 2.0 in the container next to 1.0.
-2.0 in this phase **watches and measures only** — it has no code path
-to an order endpoint, so nothing about this deploy can place, move or
-cancel anything.
+2.0 ships with the engine included but **everything that can place an
+order sits behind the master switch on /v2/switch, which starts OFF**.
+Until you arm and confirm it (two taps), 2.0 watches and measures only.
 
 ## What changes when this branch reaches the deployed branch
 
@@ -34,16 +34,37 @@ cancel anything.
    unaffected; the launcher's logs (DigitalOcean → Runtime Logs) say
    why 2.0 didn't start.
 
-## What 2.0 does while read-only
+## What 2.0 does with the switch OFF (the state it deploys in)
 
 Every 30 seconds it reads the same open orders 1.0 is managing, keeps
 its own books (WebSocket + rotation), tracks reward terms with change
 alerts, and integrates ONE earned-today number — sampled on its own
 clock, never woken by order activity, no correction factor. State
-survives redeploys on the `v2-state` branch.
+(including the switch) survives redeploys on the `v2-state` branch.
 
-The point of the phase: compare 2.0's number against 1.0's and, two
-days later, against the actual payouts in `data/rewards.csv`. When the
-number has proven itself, the engine phase starts — probe -> earn ->
-sell on the two seats families, behind the master switch, under the
-$100 buying-power ceiling.
+Let this run a few days: compare 2.0's number against 1.0's and, two
+days later, against the actual payouts in `data/rewards.csv`.
+
+## The seats test (when you're ready — two taps)
+
+Open **/v2/switch**, tap ARM, tap CONFIRM. From then on the engine
+works the two seats families only, under the **$100 ceiling**:
+
+- **Where**: near the touch where the Silver seat model and the market
+  agree; 1-share scouts where they disagree (the tails, and all House
+  rungs — no per-district model exists for the House ladder).
+- **How much**: every placement fits inside $100 of capital at risk,
+  shown on the switch page as used / ceiling / headroom.
+- **Sell side**: anything that fills is relisted as an ask at
+  max(break-even + a tick, the ask touch) so it earns while it waits.
+- **Exits**: a market whose program stops paying, or that resolves
+  today, gets our orders pulled.
+- **EXP-1**: every placement where the window-boundary readings
+  disagree records both predictions, pooled for grading against
+  `rewards.csv` — small payouts included.
+- Repricing is always place -> verify by order id -> cancel; the
+  modify endpoint does not exist in this codebase.
+
+One tap on TURN OFF stops all placement immediately. Every flip is
+logged and pushed to your phone. If a new build ever boots with the
+switch on, you get one push saying so.

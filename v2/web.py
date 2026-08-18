@@ -106,6 +106,66 @@ load();setInterval(load,30000);
 </script></body></html>"""
 
 
+SWITCH_SHELL = """<!doctype html><html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2.0 switch</title>
+<style>
+ body{background:#1a202b;color:#e6e9ef;font:16px/1.5 -apple-system,system-ui,sans-serif;
+      margin:0;padding:16px;max-width:480px;margin:auto}
+ h1{font-size:19px} .muted{color:#8a93a5;font-size:13px}
+ .state{font-size:30px;font-weight:800;margin:10px 0}
+ .on{color:#5dd39e}.off{color:#8a93a5}.armed{color:#ffce6b}
+ .card{background:#212a38;border-radius:10px;padding:12px;margin:12px 0}
+ button{font-size:18px;padding:14px 18px;border-radius:10px;border:0;width:100%;
+        margin:6px 0;font-weight:700}
+ .b-arm{background:#3a4456;color:#fff}.b-go{background:#2d9d5c;color:#fff}
+ .b-off{background:#c0392b;color:#fff}
+ input{font-size:16px;padding:8px;border-radius:8px;background:#141a24;
+       color:#e6e9ef;border:1px solid #394456;width:60%}
+ table{border-collapse:collapse;width:100%;font-size:13px}
+ td{padding:3px 6px;border-bottom:1px solid #2a3242}
+</style></head><body>
+<h1>2.0 master switch</h1>
+<div id="login" class="card" style="display:none">
+ <div class="muted">password</div>
+ <input id="k" type="password"><button class="b-arm" style="width:36%;display:inline-block"
+  onclick="saveKey()">open</button>
+</div>
+<div id="view" class="card">loading&hellip;</div>
+<div class="muted">ON takes two taps. OFF takes one. Every flip is logged and pushed
+to your phone. The state survives deploys; a new build booting with the switch on
+sends one push saying so.</div>
+<script>
+function hdrs(json){const h=new Headers();h.set('X-Dash-Key',localStorage.getItem('dashKey')||'');
+ h.set('X-Reprice','1');if(json)h.set('Content-Type','application/json');return h;}
+function saveKey(){localStorage.setItem('dashKey',document.getElementById('k').value);load();}
+function op(o){fetch('switch',{method:'POST',headers:hdrs(true),body:JSON.stringify({op:o})})
+ .then(function(r){if(r.status===401){document.getElementById('login').style.display='block';return null;}
+  return r.json();}).then(function(d){if(d)render(d.sw,d.engine);});}
+function usd(x){return '$'+(x||0).toFixed(2);}
+function render(sw,eng){
+ document.getElementById('login').style.display='none';
+ var h='';
+ if(sw.on){h+='<div class="state on">ON</div><button class="b-off" onclick="op(\\'off\\')">TURN OFF</button>';}
+ else if(sw.armed){h+='<div class="state armed">ARMED &middot; '+sw.arm_expires_in+'s</div>'+
+  '<button class="b-go" onclick="op(\\'confirm\\')">CONFIRM &mdash; TURN ON</button>'+
+  '<button class="b-arm" onclick="op(\\'off\\')">cancel</button>';}
+ else{h+='<div class="state off">OFF</div><button class="b-arm" onclick="op(\\'arm\\')">ARM (tap 1 of 2)</button>';}
+ if(eng){h+='<div class="muted" style="margin-top:8px">at risk '+usd(eng.used)+' of '+usd(eng.ceiling)+
+  ' ceiling &middot; headroom '+usd(eng.headroom)+' &middot; '+
+  (eng.orders||[]).length+' orders resting'+
+  (eng.silent_cancels?' &middot; '+eng.silent_cancels+' silent cancels':'')+'</div>';}
+ if(sw.log&&sw.log.length){h+='<table>';sw.log.slice().reverse().forEach(function(l){
+  h+='<tr><td>'+new Date(l.ts*1000).toLocaleString()+'</td><td>'+l.action+'</td></tr>';});h+='</table>';}
+ document.getElementById('view').innerHTML=h;
+}
+function load(){fetch('data.json',{headers:hdrs(false),cache:'no-store'}).then(function(r){
+ if(r.status===401){document.getElementById('login').style.display='block';return null;}
+ return r.json();}).then(function(d){if(d)render(d.switch||{},d.engine);});}
+load();setInterval(load,15000);
+</script></body></html>"""
+
+
 class _Handler(BaseHTTPRequestHandler):
     def log_message(self, *a):  # noqa: N802 — quiet; the loop logs what matters
         pass
@@ -124,6 +184,9 @@ class _Handler(BaseHTTPRequestHandler):
         if route in ("", "/"):
             self._send(200, "text/html; charset=utf-8", SHELL.encode())
             return
+        if route == "/switch":
+            self._send(200, "text/html; charset=utf-8", SWITCH_SHELL.encode())
+            return
         if route == "/data.json":
             qs = urlparse(self.path).query
             if not authed(self.headers.get, qs, self.server.password):
@@ -134,13 +197,42 @@ class _Handler(BaseHTTPRequestHandler):
             return
         self._send(404, "text/plain", b"not found")
 
+    def do_POST(self) -> None:  # noqa: N802 — http.server API
+        route = self.path.split("?", 1)[0]
+        if route != "/switch" or self.server.switch_op is None:
+            self._send(404, "text/plain", b"not found")
+            return
+        if not authed(self.headers.get, urlparse(self.path).query, self.server.password):
+            self._send(401, "application/json", b'{"error": "key required"}')
+            return
+        # a cross-origin request cannot set a custom header without a CORS
+        # preflight that is never granted — the same CSRF rail as 1.0
+        if self.headers.get("X-Reprice") != "1":
+            self._send(403, "text/plain", b"missing X-Reprice header")
+            return
+        try:
+            body = self.rfile.read(int(self.headers.get("Content-Length") or 0))
+            op = str(json.loads(body or b"{}").get("op") or "")
+        except ValueError:
+            self._send(400, "text/plain", b"bad body")
+            return
+        if op not in ("arm", "confirm", "off"):
+            self._send(400, "text/plain", b"op must be arm/confirm/off")
+            return
+        sw = self.server.switch_op(op)
+        state = self.server.get_state() or {}
+        self._send(200, "application/json",
+                   json.dumps({"sw": sw, "engine": state.get("engine")}).encode())
+
 
 class WebServer(ThreadingHTTPServer):
     daemon_threads = True
 
     def __init__(self, get_state, password: str | None = None,
-                 port: int | None = None, bind: str | None = None):
+                 port: int | None = None, bind: str | None = None,
+                 switch_op=None):
         self.get_state = get_state
+        self.switch_op = switch_op
         self.password = (password if password is not None
                          else os.environ.get("DASH_PASSWORD", ""))
         port = port if port is not None else int(os.environ.get("V2_PORT", DEFAULT_PORT))

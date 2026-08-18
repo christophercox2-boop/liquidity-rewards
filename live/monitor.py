@@ -14695,6 +14695,27 @@ class Handler(BaseHTTPRequestHandler):
         if not DASH_PASSWORD or not self._authed():
             self._send(401, "application/json", b'{"error": "key required"}')
             return
+        if self.path.split("?", 1)[0].startswith("/v2/"):
+            # forward to the 2.0 process (see the /v2 GET route above); it
+            # enforces its own auth and CSRF header again on arrival
+            import urllib.error
+            import urllib.request
+            raw = self.rfile.read(int(self.headers.get("Content-Length") or 0))
+            req = urllib.request.Request(
+                f"http://127.0.0.1:{os.environ.get('V2_PORT', '8091')}"
+                f"{self.path[len('/v2'):]}", data=raw, method="POST")
+            for h in ("X-Dash-Key", "Authorization", "X-Reprice", "Content-Type"):
+                if self.headers.get(h):
+                    req.add_header(h, self.headers[h])
+            try:
+                with urllib.request.urlopen(req, timeout=10) as r:
+                    self._send(getattr(r, "status", 200) or 200,
+                               r.headers.get("Content-Type", "text/plain"), r.read())
+            except urllib.error.HTTPError as e:
+                self._send(e.code, e.headers.get("Content-Type", "text/plain"), e.read())
+            except Exception:  # noqa: BLE001 — 2.0 down must not hurt 1.0
+                self._send(502, "text/plain", b"2.0 is not running in this container")
+            return
         if self.path not in ("/reprice", "/place", "/place_abort", "/cancel_all",
                              "/reprice_batch", "/cancel_batch", "/maction",
                              "/track_now"):

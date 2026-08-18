@@ -165,16 +165,33 @@ class Client:
                 if b.get("buyingPower") is not None]
         return max(vals) if vals else None
 
-    def positions(self, max_pages: int = 20) -> list[dict]:
-        out: list[dict] = []
-        params: dict = {"pageSize": 100}
+    def positions(self, max_pages: int = 20) -> dict[str, dict]:
+        """All portfolio positions keyed by market slug. This endpoint
+        paginates with cursor/eof (not pageToken) and returns a DICT —
+        both confirmed by 1.0's working reader."""
+        out: dict[str, dict] = {}
+        cursor = None
         for _ in range(max_pages):
+            params: dict = {"limit": 100}
+            if cursor:
+                params["cursor"] = cursor
             j = self.get(TRADE_API + "/v1/portfolio/positions", signed=True, params=params)
-            out.extend(j.get("positions") or [])
-            token = j.get("nextPageToken")
-            if not token:
+            out.update(j.get("positions") or {})
+            cursor = j.get("nextCursor")
+            if j.get("eof") or not cursor:
                 break
-            params["pageToken"] = token
+        return out
+
+    def positions_net(self) -> dict[str, tuple[float, float]]:
+        """slug -> (net contracts, cost $) for every non-flat position.
+        Positive net = long. Field shapes per 1.0: netPosition, cost.value."""
+        out: dict[str, tuple[float, float]] = {}
+        for slug, p in self.positions().items():
+            net = to_num(p.get("netPosition"))
+            cost = to_num((p.get("cost") or {}).get("value") if isinstance(p.get("cost"), dict)
+                          else p.get("cost"))
+            if net or cost:
+                out[slug] = (net, round(cost, 2))
         return out
 
     def recent_trades(self, limit: int = 25) -> list[dict]:
