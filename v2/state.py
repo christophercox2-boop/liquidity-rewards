@@ -1,0 +1,152 @@
+"""State persistence: local JSON plus a GitHub branch that survives
+redeploys.
+
+The container's disk is replaced on every deploy, so state that matters
+(the earned-today integral, the terms history, the switch, the audit
+log) is saved two ways:
+
+* locally, atomic-write JSON, every sample — free, survives process
+  restarts;
+* remotely, gzipped JSON force-pushed as a PARENTLESS commit to a state
+  branch every couple of minutes — 1.0's trick, kept: no history
+  accrues however often it saves, the gzip dodges the API's ~1 MB
+  request cap, and a redeploy costs at most the save interval.
+
+2.0 uses its own branch (`v2-state`) so it can never collide with the
+running 1.0's `live-state`. Boot takes whichever copy — local or remote
+— was saved last.
+"""
+
+from __future__ import annotations
+
+import base64
+import gzip
+import json
+import os
+import time
+
+import requests
+
+API = "https://api.github.com"
+
+
+class StateStore:
+    def __init__(self, local_path: str, repo: str | None = None,
+                 token: str | None = None, branch: str = "v2-state",
+                 session=None, clock=None, save_interval: float = 120.0):
+        self.local_path = local_path
+        self.repo = repo or os.environ.get("GITHUB_REPOSITORY", "wfco223/Liquidity-rewards")
+        self.token = token if token is not None else os.environ.get("GITHUB_TOKEN", "")
+        self.branch = branch
+        self.session = session or requests.Session()
+        self._clock = clock or time.time
+        self.save_interval = save_interval
+        self._last_remote_save = 0.0
+        self.last_error = ""
+
+    # -- local ---------------------------------------------------------------
+
+    def save_local(self, state: dict) -> bool:
+        """Atomic local write; a read-only disk is reported, never fatal."""
+        try:
+            tmp = self.local_path + ".tmp"
+            with open(tmp, "w") as f:
+                json.dump(state, f, separators=(",", ":"))
+            os.replace(tmp, self.local_path)
+            return True
+        except OSError as e:
+            self.last_error = f"local save: {e}"
+            return False
+
+    def load_local(self) -> dict | None:
+        try:
+            with open(self.local_path) as f:
+                return json.load(f)
+        except (OSError, ValueError):
+            return None
+
+    # -- remote ----------------------------------------------------------------
+
+    def _gh(self, method: str, path: str, body: dict | None = None,
+            raw: bool = False):
+        headers = {"Authorization": f"Bearer {self.token}",
+                   "Accept": ("application/vnd.github.raw+json" if raw
+                              else "application/vnd.github+json")}
+        r = self.session.request(method, API + path, json=body,
+                                 headers=headers, timeout=30)
+        return r
+
+    def save_remote(self, state: dict) -> bool:
+        """Gzip + parentless commit + force ref update. Any failure is
+        recorded and swallowed — persistence must never take the loop down."""
+        if not self.token:
+            self.last_error = "no GITHUB_TOKEN — saves are local only"
+            return False
+        try:
+            payload = gzip.compress(json.dumps(state, separators=(",", ":")).encode())
+            r = self._gh("POST", f"/repos/{self.repo}/git/blobs",
+                         {"content": base64.b64encode(payload).decode(),
+                          "encoding": "base64"})
+            if r.status_code >= 400:
+                raise RuntimeError(f"blob: HTTP {r.status_code}")
+            blob = r.json()["sha"]
+            r = self._gh("POST", f"/repos/{self.repo}/git/trees",
+                         {"tree": [{"path": "state.json", "mode": "100644",
+                                    "type": "blob", "sha": blob}]})
+            if r.status_code >= 400:
+                raise RuntimeError(f"tree: HTTP {r.status_code}")
+            tree = r.json()["sha"]
+            r = self._gh("POST", f"/repos/{self.repo}/git/commits",
+                         {"message": "v2 state save", "tree": tree})
+            if r.status_code >= 400:
+                raise RuntimeError(f"commit: HTTP {r.status_code}")
+            sha = r.json()["sha"]
+            r = self._gh("PATCH", f"/repos/{self.repo}/git/refs/heads/{self.branch}",
+                         {"sha": sha, "force": True})
+            if r.status_code == 404 or (r.status_code == 422 and "does not exist"
+                                        in (r.text or "").lower()):
+                r = self._gh("POST", f"/repos/{self.repo}/git/refs",
+                             {"ref": f"refs/heads/{self.branch}", "sha": sha})
+            if r.status_code >= 400:
+                raise RuntimeError(f"ref: HTTP {r.status_code}")
+            self.last_error = ""
+            return True
+        except Exception as e:  # noqa: BLE001 — never fatal
+            self.last_error = f"remote save: {e}"
+            return False
+
+    def maybe_save_remote(self, state: dict) -> bool:
+        """Throttled remote save — at most one per save_interval."""
+        now = self._clock()
+        if now - self._last_remote_save < self.save_interval:
+            return False
+        ok = self.save_remote(state)
+        if ok:
+            self._last_remote_save = now
+        return ok
+
+    def load_remote(self) -> dict | None:
+        if not self.token:
+            return None
+        try:
+            r = self._gh("GET", f"/repos/{self.repo}/contents/state.json"
+                                f"?ref={self.branch}", raw=True)
+            if r.status_code >= 400:
+                return None
+            data = r.content
+            if data[:2] == b"\x1f\x8b":
+                data = gzip.decompress(data)
+            return json.loads(data)
+        except Exception as e:  # noqa: BLE001
+            self.last_error = f"remote load: {e}"
+            return None
+
+    # -- boot ----------------------------------------------------------------------
+
+    def load_best(self) -> dict | None:
+        """Whichever copy was saved last — a redeploy has a stale disk and a
+        fresh branch; an ordinary restart usually the reverse."""
+        candidates = [s for s in (self.load_local(), self.load_remote()) if s]
+        if not candidates:
+            return None
+        return max(candidates, key=lambda s: s.get("saved_at") or 0)
