@@ -121,13 +121,31 @@ combines three things:
 
 Integrating that rate over the day gives "earned today".
 
-**What to fix in 2.0:** the estimate must be built from correct inputs rather
-than wrong inputs with a correction applied. 1.0 drifted toward the latter —
-reward terms were cached, sometimes stale, and for a long time only a yes/no
-flag was stored rather than the numbers. When the pool was cut on 2026-08-18
-the estimate carried on using the old figure. **No fudge factor. Read the real
-terms, refresh them, and if the pool changes the estimate should move the same
-minute.**
+**Two separate sources of error, and they need different treatment.**
+
+*Error we control.* Stale or missing reward terms, a wrong pool divisor, and
+the queue-position bug described further down. When the pool was cut on
+2026-08-18 the estimate carried on using the old figure, which is entirely our
+fault. Fix these properly — read the real terms, refresh them, and if a pool
+changes the estimate should move the same minute. Never use a correction
+factor to cover for an input you could simply get right.
+
+*Error we do not control.* The exchange appears to be inconsistent in how it
+actually awards incentive payments. The clearest evidence: on 14 and 15 August
+the same 60 markets were scored by the same code, and the estimate came in at
+0.27 times actual on one day and 1.03 times on the next. Per market, the
+second day paid roughly eleven times the first. Nothing on our side changed by
+that magnitude. Some of the gap between a correctly computed score and the
+money that arrives is simply the exchange behaving differently day to day.
+
+**So a calibration term is legitimate, and 1.0 was not wrong to use one.** It
+probably made the number more accurate than raw arithmetic would have been.
+The rule for 2.0 is about where it sits: apply it on top of inputs that are
+already correct, keep it visible rather than buried, and derive it from the
+recent record of estimate against actual — which `data/rewards.csv` and the
+saved state history already contain. A correction that quietly compensates for
+a stale pool is a bug in disguise. A correction that accounts for genuine
+exchange variance is doing real work.
 
 Also: 1.0 keeps three separate "earned" figures — the plain integration, the
 high-frequency one, and a sparse fallback — and they disagree. That is a
@@ -135,9 +153,7 @@ symptom of nobody deciding which is authoritative. 2.0 should produce one
 number, with the sampling done properly underneath it.
 
 **How accurate is it today?** Against 23 days of published payouts, between
-0.27 and 1.22 times what was actually paid, usually within about 10%. The
-worst misses trace back to bad inputs, not bad arithmetic — a wrong pool
-divisor, stale terms, and the queue-position bug described further down.
+0.27 and 1.22 times what was actually paid, usually within about 10%.
 
 ### 6. Collect the published rewards data
 
@@ -351,7 +367,8 @@ daily pool contained, which disproved it. Do not re-open this.
   that changed before the feature shipped is invisible.
 - **The estimate runs on partly stale inputs.** Reward terms were cached and
   under-recorded, so the live figure can keep using a pool that has already
-  changed. Fixing the inputs matters more than anything downstream of them.
+  changed. This is the half of the error we control, and it should be fixed at
+  the source rather than corrected downstream.
 - **The map page is overloaded.** Acknowledged, not addressed.
 
 ### Environmental
