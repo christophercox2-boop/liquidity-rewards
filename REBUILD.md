@@ -98,20 +98,34 @@ and reports changes. **2.0 should treat reward terms as first-class data that
 is tracked over time**, not as a flag. A pool change is the single largest
 thing that can happen to daily income.
 
-### 5. Estimate what we are earning right now
+### 5. Report what we are earning
 
-A live estimate of dollars per day, integrated into a running "earned today"
-number.
+The owner wants the **raw numbers the exchange reports**, not a number the
+system invented.
 
-**Where it stands:** works, and it is the number the owner looks at most. But
-be honest about its accuracy. Measured against 23 days of actual payouts, the
-estimate has landed anywhere between 0.27× and 1.22× of what was really paid.
-Most days it is within about 10%. Some days it is not remotely close.
+**Where it stands, and why it needs replacing:** 1.0 computes its own estimate.
+It reads each order book, applies the reward formula itself, and integrates
+that rate over the day into a running "earned today" figure. It is the number
+the owner looks at most, and it is a model of what the exchange will pay
+rather than a measurement of it. Across 23 days it has landed anywhere between
+0.27 and 1.22 times what was actually paid.
 
-**What 2.0 should do differently:** show the estimate next to its own track
-record. If the system knew that its recent estimates had been running 35%
-high, the owner would have known to discount today's number. Right now the
-calibration data exists but nothing uses it.
+**What 2.0 should do:** take the numbers from the incentives endpoint. The
+exchange reports per-market reward amounts, marked pending during the day and
+paid once settled — that is the real figure, and it is what
+`data/rewards.csv` already stores. Report that. If the exchange says $197.03,
+the owner sees $197.03.
+
+This removes a large amount of 1.0: the rate sampler, the high-frequency
+sampler that exists to correct the first one's timing bias, the coverage
+accounting, and three parallel "earned" figures that disagree with each other.
+
+**One thing to establish early, because the design depends on it:** how often
+the pending numbers refresh. If they update through the day, the live counter
+becomes a straight read of exchange data and everything is simple. If they
+only appear after settlement, there is no intraday number to show and 2.0
+needs a deliberate answer for what the owner sees before then — which might
+legitimately be nothing but yesterday's total and today's resting position.
 
 ### 6. Collect the published rewards data
 
@@ -323,8 +337,9 @@ daily pool contained, which disproved it. Do not re-open this.
   joins a crowded level. Fixed in one helper, not in the scan itself.
 - **Reward-term tracking only sees changes from first run forward.** Anything
   that changed before the feature shipped is invisible.
-- **Estimate accuracy is not surfaced.** The data to calibrate exists; nothing
-  uses it.
+- **Income is modelled rather than measured.** 1.0 computes its own estimate
+  instead of reading what the exchange reports. 2.0 replaces this outright —
+  see function 5 above.
 - **The map page is overloaded.** Acknowledged, not addressed.
 
 ### Environmental
@@ -368,11 +383,13 @@ Three ways to handle it, in the order I would try them:
 1. **Split by market.** 2.0 gets an exclusive set of markets that 1.0 is
    blocked from. 1.0 already has a hands-off mechanism that does exactly this,
    so the plumbing exists. Cheapest and safest.
-2. **Separate credentials**, if the exchange allows a second key with its own
-   balance. Cleanest, but unknown whether it is possible.
-3. **Cancel everything in 1.0 for a defined test window.** The owner has
-   already raised this. It gives 2.0 a clean read but stops all income for the
-   duration, so it should be a short, deliberate test rather than the default.
+2. **Cancel everything in 1.0 for a defined test window.** The owner has
+   already raised this. It gives 2.0 a completely clean read but stops all
+   income for the duration, so it suits a short deliberate test rather than
+   being the default arrangement.
+3. **Separate credentials with their own balance.** The owner's expectation is
+   that the exchange does not support this, and he is checking. Treat it as
+   unlikely and plan around option 1.
 
 The owner is willing to allocate money to 2.0 separately for real-world
 testing. Decide the amount before the first order, and make it the total
@@ -394,9 +411,10 @@ rather than a technical limit.
 
 ## Questions for the owner
 
-1. How much money should 2.0 have for its real-world test?
-2. Does the exchange support a second set of API credentials with a separate
-   balance? If so, that is the cleanest way to run both versions at once.
-3. Which markets, if any, should 2.0 get exclusively while 1.0 keeps running?
-4. Is the Silver forecast model still wanted as an input to fair value, or
+1. How much money should 2.0 have for its real-world test? This becomes its
+   total capital-at-risk ceiling.
+2. Which markets should 2.0 get exclusively while 1.0 keeps running? The
+   owner is separately checking whether a second API key with its own balance
+   is possible, but expects not, so plan on splitting by market.
+3. Is the Silver forecast model still wanted as an input to fair value, or
    should 2.0's own evidence model stand alone?
