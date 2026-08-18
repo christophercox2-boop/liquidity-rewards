@@ -98,34 +98,46 @@ and reports changes. **2.0 should treat reward terms as first-class data that
 is tracked over time**, not as a flag. A pool change is the single largest
 thing that can happen to daily income.
 
-### 5. Report what we are earning
+### 5. Estimate what we are earning, from real reward data
 
-The owner wants the **raw numbers the exchange reports**, not a number the
-system invented.
+A live figure for what the resting book is earning, updated through the day.
+The owner needs this in something close to real time. Waiting a day and a half
+for the exchange to publish is not an option — that is quoting blind.
 
-**Where it stands, and why it needs replacing:** 1.0 computes its own estimate.
-It reads each order book, applies the reward formula itself, and integrates
-that rate over the day into a running "earned today" figure. It is the number
-the owner looks at most, and it is a model of what the exchange will pay
-rather than a measurement of it. Across 23 days it has landed anywhere between
-0.27 and 1.22 times what was actually paid.
+**How it is built, and this is the part that must be right.** The estimate
+combines three things:
 
-**What 2.0 should do:** take the numbers from the incentives endpoint. The
-exchange reports per-market reward amounts, marked pending during the day and
-paid once settled — that is the real figure, and it is what
-`data/rewards.csv` already stores. Report that. If the exchange says $197.03,
-the owner sees $197.03.
+1. **The reward terms from the incentives endpoint** — the actual pool, Target
+   Size and discount factor for each market, read from the exchange and kept
+   fresh.
+2. **The rate sampler** — periodically scores every resting order against the
+   live book and the terms above, giving a dollars-per-day rate.
+3. **The high-frequency sampler** — samples the same thing on an independent
+   clock and is not optional. The plain sampler is woken whenever we place,
+   move or cancel an order, so its sample times line up with the moments we
+   have just tidied our own book, which is exactly when our share looks best.
+   Left alone it reads high. The high-frequency sampler exists to measure the
+   rate at times uncorrelated with our own activity.
 
-This removes a large amount of 1.0: the rate sampler, the high-frequency
-sampler that exists to correct the first one's timing bias, the coverage
-accounting, and three parallel "earned" figures that disagree with each other.
+Integrating that rate over the day gives "earned today".
 
-**One thing to establish early, because the design depends on it:** how often
-the pending numbers refresh. If they update through the day, the live counter
-becomes a straight read of exchange data and everything is simple. If they
-only appear after settlement, there is no intraday number to show and 2.0
-needs a deliberate answer for what the owner sees before then — which might
-legitimately be nothing but yesterday's total and today's resting position.
+**What to fix in 2.0:** the estimate must be built from correct inputs rather
+than wrong inputs with a correction applied. 1.0 drifted toward the latter —
+reward terms were cached, sometimes stale, and for a long time only a yes/no
+flag was stored rather than the numbers. When the pool was cut on 2026-08-18
+the estimate carried on using the old figure. **No fudge factor. Read the real
+terms, refresh them, and if the pool changes the estimate should move the same
+minute.**
+
+Also: 1.0 keeps three separate "earned" figures — the plain integration, the
+high-frequency one, and a sparse fallback — and they disagree. That is a
+symptom of nobody deciding which is authoritative. 2.0 should produce one
+number, with the sampling done properly underneath it.
+
+**How accurate is it today?** Against 23 days of published payouts, between
+0.27 and 1.22 times what was actually paid, usually within about 10%. The
+worst misses trace back to bad inputs, not bad arithmetic — a wrong pool
+divisor, stale terms, and the queue-position bug described further down.
 
 ### 6. Collect the published rewards data
 
@@ -337,9 +349,9 @@ daily pool contained, which disproved it. Do not re-open this.
   joins a crowded level. Fixed in one helper, not in the scan itself.
 - **Reward-term tracking only sees changes from first run forward.** Anything
   that changed before the feature shipped is invisible.
-- **Income is modelled rather than measured.** 1.0 computes its own estimate
-  instead of reading what the exchange reports. 2.0 replaces this outright —
-  see function 5 above.
+- **The estimate runs on partly stale inputs.** Reward terms were cached and
+  under-recorded, so the live figure can keep using a pool that has already
+  changed. Fixing the inputs matters more than anything downstream of them.
 - **The map page is overloaded.** Acknowledged, not addressed.
 
 ### Environmental
