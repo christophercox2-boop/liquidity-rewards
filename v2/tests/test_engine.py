@@ -159,6 +159,43 @@ class TestFillsAndSeller(unittest.TestCase):
         self.assertAlmostEqual(sells[0]["price"], 0.26)
         self.assertAlmostEqual(sells[0]["qty"], bid.qty)
 
+    def test_account_positions_are_not_adopted_as_our_inventory(self):
+        # The account is shared with 1.0, which holds seats stock of its
+        # own. None of it belongs inside 2.0's ceiling, and the seller
+        # must never act on it. (This happened: $34 of 1.0's positions
+        # appeared as 2.0's "used" on day one.)
+        r = Rig()
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        r.positions = {SEN: (17.0, 0.95),
+                       "scc-senate-gop-2026-11-03-51": (-27.0, 23.64)}
+        s = r.cycle(terms)
+        self.assertEqual(r.engine.inventory, {})
+        self.assertFalse(any(o["purpose"] in ("sell", "close")
+                             for o in s["orders"]))
+        # used counts only our own resting orders
+        own = sum(0 if o["side"] == "SELL" else o["price"] * o["qty"]
+                  for o in s["orders"])
+        self.assertLessEqual(s["used"], own + 25.0)
+
+    def test_own_fill_builds_inventory_from_the_ledger(self):
+        r = Rig()
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        # a pre-existing 1.0 position sits in the market the whole time
+        r.positions = {SEN: (100.0, 20.0)}
+        r.cycle(terms)
+        bid = next(o for o in r.engine.orders.values() if o.side == "BUY")
+        r.exchange.live.pop(bid.id)
+        # the position grows by exactly our fill
+        r.positions = {SEN: (100.0 + bid.qty, 20.0 + bid.price * bid.qty)}
+        r.now += 400
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        r.cycle(terms)
+        inv = r.engine.inventory[SEN]
+        self.assertAlmostEqual(inv["qty"], bid.qty)
+        self.assertAlmostEqual(inv["cost"], round(bid.price * bid.qty, 4), places=4)
+
     def test_vanish_without_delta_is_a_silent_cancel_not_a_fill(self):
         r = Rig()
         terms = seats_terms([SEN])
