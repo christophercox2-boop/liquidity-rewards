@@ -1,13 +1,15 @@
-"""2.0 entry point — READ-ONLY phase.
+"""2.0 entry point.
 
     python -m v2.main          # run the loop
     python -m v2.main --once   # one full cycle, print the snapshot, exit
 
-This process watches, scores, integrates and persists. It places
-NOTHING: v2.orders is not imported here, so there is no code path from
-this loop to an order-touching endpoint. The engine arrives behind the
-master switch in a later phase, after the read-only estimate has been
-compared against published payouts.
+Watches, scores, integrates, persists — and runs the probe->earn->sell
+engine on its whitelisted markets (the two seats families) BEHIND THE
+MASTER SWITCH. The switch starts off and every flip is two taps on
+/v2/switch; with it off the engine only reconciles reality and the
+process is exactly the read-only monitor it was in the first phase.
+Every order-touching call goes through the OrderDesk rails; nothing
+else in this process imports them.
 
 Env: POLYMARKET_KEY_ID / POLYMARKET_SECRET_KEY (required),
 GITHUB_TOKEN (state survives redeploys; optional),
@@ -26,8 +28,12 @@ from pathlib import Path
 from .alerts import Alerts
 from .api import ApiError, Client
 from .books import BookCache, ws_priority
+from .engine import Engine, EngineConfig
 from .estimator import Estimator
+from .orders import OrderDesk
+from .silver import SilverFairs
 from .state import StateStore
+from .switch import MasterSwitch
 from .terms import TermsStore
 from .web import WebServer
 from .ws import Stream
@@ -99,13 +105,26 @@ class Monitor:
         self.store = StateStore(os.environ.get("V2_STATE_PATH", "v2_state.json"))
         self.universe: list[str] = []
         self.held: list[str] = []
+        self.family_slugs: list[str] = []      # the whitelisted families' markets
         self.event_sizes: dict[str, int] = {}
         self.last_terms = 0.0
         self.last_events = 0.0
         self.boot_ts = time.time()
         self.build = build_hash()
         self.errors: list[str] = []
+        self.audit: list[dict] = []            # every OrderDesk decision
         self.last_state: dict = {}
+        self.switch = MasterSwitch(alert=self.alerts.notify)
+        self.silver = SilverFairs(client=self.client)
+        cfg = EngineConfig()
+        self.desk = OrderDesk(
+            client=self.client,
+            whitelist=lambda s: s.startswith(cfg.whitelist_prefixes),
+            switch_on=lambda: self.switch.on,
+            fresh_book=lambda s: self.cache.fresh(s, 120.0, time.time()),
+            log=self._audit,
+        )
+        self.engine = Engine(self.desk, cfg, alert=self.alerts.notify)
         self.stream = Stream(self.cache, self._ws_slugs,
                              self.client.key_id, self.client.secret_key)
         self._restore()
@@ -114,8 +133,12 @@ class Monitor:
         self.terms_history.append(row)
         del self.terms_history[:-TERMS_HISTORY_KEEP]
 
+    def _audit(self, row: dict) -> None:
+        self.audit.append(row)
+        del self.audit[:-200]
+
     def _ws_slugs(self) -> list[str]:
-        return ws_priority(self.held, [], self.universe)
+        return ws_priority(self.held, self.family_slugs, self.universe)
 
     def _restore(self) -> None:
         saved = self.store.load_best()
@@ -127,23 +150,39 @@ class Monitor:
         if saved.get("estimator"):
             self.estimator = Estimator.from_dict(saved["estimator"])
         self.terms_history = list(saved.get("terms_history") or [])
+        if saved.get("switch"):
+            self.switch.restore(saved["switch"])
+        if saved.get("engine_saved"):
+            self.engine.restore(saved["engine_saved"])
+        if self.switch.on and saved.get("build") != self.build:
+            # the owner chose persistence over off-after-deploy; the guard
+            # that replaces it is this one push
+            self.alerts.notify("New build with switch ON",
+                               f"build {self.build} booted; 2.0 may place orders")
 
     # -- one poll cycle -------------------------------------------------------
 
     def cycle(self, now: float | None = None) -> dict:
         now = now or time.time()
         orders = self.client.open_orders()
-        self.universe = sorted({o["market"] for o in orders if o["market"]})
+        held = sorted({o["market"] for o in orders if o["market"]})
+        # the engine needs books and terms for its whole families, orders or
+        # not — discovery must not depend on already being invested somewhere
+        self.universe = sorted(set(held) | set(self.family_slugs)
+                               | set(self.engine.inventory))
         if len(self.universe) > UNIVERSE_CAP:
             self._note(f"{len(self.universe)} markets — scoring the first {UNIVERSE_CAP}")
             self.universe = self.universe[:UNIVERSE_CAP]
-        self.held = self.universe
+        self.held = held
         self.cache.prune(self.universe)
 
         if now - self.last_events > EVENTS_EVERY_S:
             self.last_events = now
             try:
                 self.event_sizes = politics_event_sizes(self.client)
+                self.family_slugs = sorted(
+                    s for s in self.event_sizes
+                    if s.startswith(self.engine.cfg.whitelist_prefixes))
             except ApiError as e:
                 self._note(f"event sizes: {e}")
 
@@ -165,9 +204,30 @@ class Monitor:
 
         snap = self.estimator.sample(now, orders, self.cache, self.terms)
 
+        # the engine: silver fairs on a slow TTL, positions for fill
+        # detection, then one decision cycle behind the switch
+        engine_summary = {"mode": "skipped"}
+        try:
+            self.silver.refresh(now)
+        except Exception as e:  # noqa: BLE001 — engine runs on cached fairs
+            self._note(f"silver: {type(e).__name__}: {e}")
+        try:
+            positions = self.client.positions_net()
+        except ApiError as e:
+            # stale positions would misread vanished orders as silent
+            # cancels — skip the engine this round rather than guess
+            self._note(f"positions: {e} — engine cycle skipped")
+            positions = None
+        if positions is not None:
+            engine_summary = self.engine.cycle(
+                now, orders, positions, self.cache, self.terms,
+                self.silver, self.switch.on)
+            for a in engine_summary.get("actions") or []:
+                print(f"engine: {a}", flush=True)
+
         state = {
             "saved_at": now, "boot_ts": self.boot_ts, "build": self.build,
-            "mode": "read-only",
+            "mode": f"engine {engine_summary.get('mode')}",
             "estimator": self.estimator.to_dict(),
             "terms": self.terms.to_dict(),
             "terms_history": self.terms_history[-200:],
@@ -176,6 +236,15 @@ class Monitor:
             "alert_log": self.alerts.log[-50:],
             "errors": self.errors[-20:],
             "orders_n": len(orders), "markets_n": len(self.universe),
+            "switch": self.switch.state(),
+            "engine": engine_summary,
+            "engine_saved": self.engine.to_dict(),
+            "audit": self.audit[-50:],
+            "silver": {"age_s": (round(self.silver.age(now)) if self.silver.fetched_at
+                                 else None),
+                       "source": self.silver.source, "note": self.silver.note,
+                       "gop_control": (round(self.silver.gop_control(), 3)
+                                       if self.silver.pmf else None)},
         }
         self.last_state = state
         self.store.save_local(state)
@@ -191,7 +260,8 @@ class Monitor:
     def run(self) -> None:
         self.stream.start()
         try:
-            WebServer(get_state=lambda: self.last_state).start_background()
+            WebServer(get_state=lambda: self.last_state,
+                      switch_op=self.switch.op).start_background()
         except OSError as e:  # port taken: measuring still works, the page doesn't
             self._note(f"web server: {e}")
         streak = 0
