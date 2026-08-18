@@ -27,9 +27,12 @@ Target Size window. Four gates decide whether an order earns at all:
    That settles BETWEEN levels. It is AMBIGUOUS about an order at the
    level where the target is reached mid-level: does the whole level
    score (level reading) or only the size that fits before the cutoff
-   (queue reading)? Unconfirmed either way — see EXP-1 in DESIGN.md.
-   Until the experiment settles it, join estimates report BOTH readings
-   and anything sizing real money uses the conservative (queue) one.
+   (queue reading)? Owner's decision 2026-08-18: **act on the level
+   reading until evidence rules it out** — sizing by the cautious
+   reading would keep us out of exactly the spots that answer the
+   question. Both readings are computed on every estimate, both
+   predictions get registered, and rewards.csv actuals decide
+   (EXP-1 in DESIGN.md).
 
 Separate from the boundary question, share DILUTION at a shared level is
 not ambiguous: your score is your own size times df^ticks, never the
@@ -132,12 +135,11 @@ def score_resting(
     """Score one resting order. Ported from 1.0's _score_order.
 
     `size_ahead`: contracts resting at OUR price level that were there
-    before us. Pass it when known (the engine records the level's size at
-    placement time) to apply the QUEUE reading of the window boundary —
-    the order is outside the window if the window fills before reaching
-    it. That reading is UNCONFIRMED (see EXP-1); when None, the whole
-    level is in or out together — the documented example's convention,
-    and 1.0's.
+    before us. Leave it None for decisions — the acting convention is the
+    LEVEL reading (whole level in or out together; the documented
+    example's convention, 1.0's, and the owner's call until evidence says
+    otherwise). Pass it only to compute the QUEUE-reading comparison
+    figure that EXP-1 tracks against payouts.
 
     The caller is responsible for the book already containing this
     order's remaining size at its level (1.0 topped levels up before
@@ -214,20 +216,20 @@ class JoinEstimate:
     """What a new order of `qty` at `price` would earn, under both readings
     of the window-boundary rule (see the module docstring and EXP-1).
 
-    `share`/`in_window` use the conservative QUEUE reading: everyone
-    already at our level is ahead of us, and if the window fills before
-    reaching us we earn nothing. `share_if_level`/`in_window_level` use
-    the LEVEL reading: a level the walk reaches scores whole. Size real
-    money by `share`; the gap between the two is the measured stake of
-    the open question."""
+    `share`/`in_window` use the LEVEL reading — a level the walk reaches
+    scores whole — which is what decisions act on (owner's call, until
+    payout evidence rules it out). `share_if_queue`/`in_window_queue`
+    track the stricter reading — everyone already at our level is ahead
+    of us, and if the window fills before reaching us we earn nothing.
+    The gap between the two is the pre-registered stake of EXP-1."""
 
     qualifies: bool         # side (including our qty) reaches Target Size
     gap: float              # contracts still missing when not qualifying, else 0
     ticks: int              # from the merged book's best on our side
-    in_window: bool         # queue reading
-    share: float            # queue reading; 0 when out of window / not qualifying
-    in_window_level: bool   # level reading
-    share_if_level: float   # level reading
+    in_window: bool         # level reading — the acting one
+    share: float            # level reading; 0 when out of window / not qualifying
+    in_window_queue: bool   # queue reading — tracked for EXP-1
+    share_if_queue: float   # queue reading
 
 
 def estimate_join(
@@ -245,17 +247,17 @@ def estimate_join(
     generalization of 1.0's _probe_share, which only handled the best
     price; the level merge is what kills the credit-others'-size bug).
 
-    Both boundary readings are computed: queue (our order is in the
-    window only if all closer levels PLUS the size already resting at our
-    level sum below Target Size) and level (our level is in the window if
-    the closer levels alone sum below Target Size)."""
+    Both boundary readings are computed: level (our level is in the
+    window if the closer levels alone sum below Target Size — the acting
+    reading) and queue (our order is in the window only if all closer
+    levels PLUS the size already resting at our level sum below it)."""
     if not levels:
         qualifies = not target or qty >= target
         share = 1.0 if qualifies else 0.0
         return JoinEstimate(
             qualifies=qualifies, gap=0.0 if qualifies else target - qty, ticks=0,
             in_window=qualifies, share=share,
-            in_window_level=qualifies, share_if_level=share,
+            in_window_queue=qualifies, share_if_queue=share,
         )
     existing_at_price = sum(q for px, q in levels if abs(px - price) < tick / 2)
     merged = [(px, q) for px, q in levels if abs(px - price) >= tick / 2]
@@ -266,7 +268,7 @@ def estimate_join(
     if target and total < target:
         return JoinEstimate(qualifies=False, gap=target - total, ticks=0,
                             in_window=False, share=0.0,
-                            in_window_level=False, share_if_level=0.0)
+                            in_window_queue=False, share_if_queue=0.0)
 
     best = merged[0][0]
     ticks = ticks_from_best(best, price, tick)
@@ -279,6 +281,6 @@ def estimate_join(
     raw = (qty * df ** ticks / denom) if denom else 0.0
     return JoinEstimate(
         qualifies=True, gap=0.0, ticks=ticks,
-        in_window=in_queue, share=raw if in_queue else 0.0,
-        in_window_level=in_level, share_if_level=raw if in_level else 0.0,
+        in_window=in_level, share=raw if in_level else 0.0,
+        in_window_queue=in_queue, share_if_queue=raw if in_queue else 0.0,
     )

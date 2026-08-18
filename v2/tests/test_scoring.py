@@ -128,21 +128,22 @@ class TestEstimateJoin(unittest.TestCase):
         self.assertTrue(j.in_window_level)
         want = 1.0 / (7.0 + 100.0 * 0.2)
         self.assertAlmostEqual(j.share, want, places=6)
-        self.assertAlmostEqual(j.share_if_level, want, places=6)
+        self.assertAlmostEqual(j.share_if_queue, want, places=6)
 
     def test_boundary_inside_our_level_is_where_the_readings_disagree(self):
         # 6 contracts already at our level, target 5: the target is reached
-        # INSIDE our level. Queue reading: the window fills before reaching
-        # us — zero. Level reading: the walk reaches our level, the whole
-        # level scores. This is exactly what EXP-1 tests with real orders.
+        # INSIDE our level. Level reading (the acting one, per the owner):
+        # the walk reaches our level, the whole level scores. Queue
+        # reading: the window fills before reaching us — zero. EXP-1
+        # places real orders exactly here and lets payouts decide.
         levels = [(0.50, 6.0), (0.49, 100.0)]
         j = estimate_join("BUY", levels, tick=0.01, df=0.2, target=5,
                           price=0.50, qty=1000.0)
         self.assertTrue(j.qualifies)
-        self.assertFalse(j.in_window)
-        self.assertEqual(j.share, 0.0)
-        self.assertTrue(j.in_window_level)
-        self.assertAlmostEqual(j.share_if_level, 1000.0 / 1006.0, places=6)
+        self.assertTrue(j.in_window)
+        self.assertAlmostEqual(j.share, 1000.0 / 1006.0, places=6)
+        self.assertFalse(j.in_window_queue)
+        self.assertEqual(j.share_if_queue, 0.0)
 
     def test_documented_example_second_best_scores_zero_under_both_readings(self):
         # Straight from the exchange docs: target 20,000 with 25,000 at the
@@ -153,19 +154,23 @@ class TestEstimateJoin(unittest.TestCase):
                           price=0.49, qty=10.0)
         self.assertTrue(j.qualifies)
         self.assertFalse(j.in_window)
-        self.assertFalse(j.in_window_level)
+        self.assertFalse(j.in_window_queue)
         self.assertEqual(j.share, 0.0)
-        self.assertEqual(j.share_if_level, 0.0)
+        self.assertEqual(j.share_if_queue, 0.0)
 
-    def test_join_full_level_earns_nothing(self):
-        # 5000 already rest at best against a 2000 target: everyone there
-        # is ahead of us and the window fills before reaching us.
+    def test_join_full_level_dilutes_under_level_reading_zero_under_queue(self):
+        # 5000 already rest at best against a 2000 target. Level reading:
+        # the level is the window, we join it heavily diluted. Queue
+        # reading: everyone there is ahead of us and the window fills
+        # before reaching us. Another EXP-1 disagreement setup.
         levels = [(0.50, 5000.0)]
         j = estimate_join("BUY", levels, tick=0.01, df=0.2, target=2000,
                           price=0.50, qty=100.0)
         self.assertTrue(j.qualifies)
-        self.assertFalse(j.in_window)
-        self.assertEqual(j.share, 0.0)
+        self.assertTrue(j.in_window)
+        self.assertAlmostEqual(j.share, 100.0 / 5100.0, places=6)
+        self.assertFalse(j.in_window_queue)
+        self.assertEqual(j.share_if_queue, 0.0)
 
     def test_improving_the_touch_beats_joining_a_full_level(self):
         levels = [(0.50, 5000.0)]

@@ -133,11 +133,14 @@ fresh.
   the docs confirm that a level entirely past Target Size scores zero,
   but are ambiguous about an order at the level where the target is
   reached mid-level (owner's reading of the documentation, 2026-08-18).
-  `estimate_join` therefore returns both readings; money is sized on
-  the conservative one until EXP-1 settles it. Either way, improving
-  the touch also raises fill risk, so reward is always weighed against
-  the expected cost of getting filled — reward math alone never decides
-  a placement.
+  `estimate_join` therefore returns both readings, and **decisions act
+  on the generous (level) reading until evidence rules it out** —
+  owner's call: sizing by the cautious reading would keep money out of
+  exactly the spots that answer the question, and if we don't try it we
+  won't know. Both predictions are registered per placement so payouts
+  grade them. Either way, improving the touch also raises fill risk, so
+  reward is always weighed against the expected cost of getting filled —
+  reward math alone never decides a placement.
 - **Qualifying is just another opportunity**: "this side is dead, $X
   revives it and we take most of the pool" ranks in the same list.
 - **Board-relative decay, absolute-zero exit.** A market is only
@@ -275,25 +278,30 @@ Traced every file to what reads it. Nothing deleted yet — the plan:
 
 **Question.** When Target Size is reached in the middle of a price
 level, does an order later in that level score (level reading) or not
-(queue reading)? The docs settle only the between-levels case; both
-readings are live in `estimate_join`, and real sizing uses the
-conservative one until this answers.
+(queue reading)? The docs settle only the between-levels case.
 
-**Method.** The prober looks for natural setups where the readings
-disagree: closer levels alone sum under Target Size, closer levels plus
-the size already at the candidate level reach it. It places one small
-order there (≤ $10 nominal, low-volatility market, wings preferred) and
-one control order in the same family where the readings agree, and
-pre-registers both predictions: level reading says ~$X/day, queue
-reading says $0. Setups only qualify if the level-reading prediction is
-at least ~$0.25/day — below that a one-day payout cannot distinguish
-the hypotheses. Hold 2–3 reward days; read the answer from
-`rewards.csv` actuals per market per day, control-normalized. The
-1.0 precedent for pre-registered order experiments is
+**Stance while open (owner's decision):** act on the generous LEVEL
+reading — place and size as if a reached level scores whole — because
+sizing cautiously would keep money out of exactly the spots that
+answer the question. If we don't try it we won't know. Both readings
+are computed on every estimate and both appear on `/opps`, so the
+stake of the open question stays visible.
+
+**Method.** Every placement in a disagreement setup (closer levels
+alone under Target Size, closer levels plus the size already at our
+level over it) is automatically an experiment: both predictions are
+registered at placement time — level reading ~$X/day, queue reading $0
+— and graded against `rewards.csv` actuals per market per day, with
+same-family placements where the readings agree as controls. Setups
+where the level-reading prediction is under ~$0.25/day can't be graded
+by a one-day payout and don't count as evidence either way. The 1.0
+precedent for pre-registered order experiments is
 `experiment_touch.yml` + `analyse_touch.py`.
 
-**While open:** engine sizes by the queue reading; both readings appear
-on `/opps` so the cost of the uncertainty stays visible.
+**Resolution:** if graded payouts repeatedly come in at the queue
+prediction, the level reading is ruled out and sizing flips; if they
+match the level prediction, it is confirmed and the queue tracking
+stops. Either answer retires the experiment.
 
 ## Answers from the owner (2026-08-18)
 
