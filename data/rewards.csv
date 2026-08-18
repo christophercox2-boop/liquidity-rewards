@@ -1784,6 +1784,7 @@ date,market,program_type,reward_usd,status
 2026-08-08,tec-cbb-champ-2027-04-05-w-iowast,liquidityProgram,0.01,PAID
 2026-08-08,tec-cbb-champ-2027-04-05-w-lou,liquidityProgram,0.1,PAID
 2026-08-08,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.56,PAID
+2026-08-08,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.05,PENDING
 2026-08-09,apdc-alito-2026-12-31,liquidityProgram,6.91,PAID
 2026-08-09,apdc-jerpowgov-2026-12-31,liquidityProgram,22.67,PAID
 2026-08-09,enwc-usgubp-mn-2026-08-11-rep-lisdem,liquidityProgram,0.02,PAID
