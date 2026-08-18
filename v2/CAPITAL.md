@@ -39,11 +39,26 @@ bands, not promises.
 events.** That is everything, for everyone, at 100% share of every side
 — the theoretical maximum the whole game currently pays per day.
 
+## Correction from the owner (2026-08-18, after first publication)
+
+"At risk" in this document means **nominal resting cost** — what the
+orders would cost if they all filled. That is not cash at risk: the
+exchange cancels orders it cannot fund, so the worst case is bounded by
+**buying power**, and the owner has run the entire operation on under
+$300 of buying power throughout. Read the goal table's capital column as
+the nominal near-touch cost a strategy needs to rest, not as money that
+must be deposited or can be lost in one stroke. The self-cancel has its
+own cost — a cancelled order can silently unqualify a side — which 2.0
+watches as a ratio (nominal cost vs buying power) rather than capping.
+
+**Decision: the seats test runs on $100 of buying power.**
+
 ## The verified anchors
 
-- The whole 1.0 book right now: **$6,950 at risk → estimated $247/day**.
-  Most of that capital is 1¢/99¢ qualifier walls; the near-touch orders
-  that drive the estimate are a small fraction of it.
+- The whole 1.0 book right now: **$6,950 nominal resting cost →
+  estimated $247/day**, carried on ~$209 of buying power. Most of the
+  nominal cost is 1¢/99¢ qualifier walls; the near-touch orders that
+  drive the estimate are a small fraction of it.
 - Actually paid: **$274.92** (Aug 14), **$1,352.63** (Aug 15, the
   outlier), **$197.03** (Aug 16, still-growing pending bucket that
   covers the days since). Historical run-rate $150–550/day.
@@ -98,13 +113,17 @@ sides of every market, on the Aug-16 ladders):
   what actually pays, and settle whether deep sides really pay below
   formula.
 
-**Recommendation:** give 2.0 a **$200–300 ceiling** for the seats test.
-That covers both families' near-touch coverage with room to defend, and
-the wings (cheap 3–8¢ markets) carry low fill risk while the mid-ladder
-gets sized by the prober's confidence, not by the formula's enthusiasm.
-Expected honest outcome: Senate $10–25/day, House unknown until the
-payouts answer — measured against `rewards.csv` within two days of each
-reward day.
+**Decision: $100 of buying power** (owner, 2026-08-18 — this document
+originally recommended $200–300 of nominal cost, before the owner's
+correction that buying power, not nominal cost, is the real constraint).
+$100 of buying power comfortably funds both families' near-touch
+coverage (~$185 nominal), since only fills draw it down. The wings
+(cheap 3–8¢ markets) carry low fill risk; the mid-ladder gets sized by
+the prober's confidence, not by the formula's enthusiasm. Expected
+honest outcome: Senate $10–25/day, House unknown until the payouts
+answer — measured against `rewards.csv` within two days of each reward
+day. The seats books are also where EXP-1 (the window-boundary
+experiment in DESIGN.md) finds its natural setups.
 
 ## Fill risk, so it is never forgotten
 

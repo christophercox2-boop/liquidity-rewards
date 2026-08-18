@@ -111,18 +111,33 @@ fresh.
 
 ### The engine
 
-- **One risk number.** `capital at risk = Σ capital_at_risk(intent,
-  price, qty)` over every resting opening order. It must stay under the
-  ceiling the owner sets. Every placement is sized to fit inside it.
-  No per-market caps, ladders, or graduated budgets unless the owner asks.
+- **One risk number: the buying power given to 2.0.** The owner's
+  correction, and it simplifies everything: the exchange cancels orders
+  it cannot fund, so the worst case a book of resting orders can lose is
+  the buying power behind it (plus positions already held) — 1.0 rested
+  ~$7,000 of nominal orders on under $300 of buying power the whole
+  time. So the ceiling is the buying power allocated to 2.0, the number
+  on the `/switch` page. Nominal resting cost (`Σ capital_at_risk`) is
+  still tracked, for two reasons: it is what draws the buying power down
+  when fills come, and when nominal cost runs far ahead of buying power
+  the exchange's self-cancel can quietly remove orders — which may be
+  the "silent cancels" 1.0 kept observing, worth confirming — and a
+  removed order can unqualify a side without warning. 2.0 alerts on
+  that ratio instead of capping it. No per-market caps, ladders, or
+  graduated budgets unless the owner asks.
 - **Confidence decides where, the ceiling decides how much.** Never both.
-- **Both sides, queue-aware.** Every opportunity is scored with
-  `estimate_join`, which assumes we rest last at our level (everyone
-  already there is ahead of us — if the scoring window fills before it
-  reaches us, we earn nothing). That often makes a one-tick improvement
-  score better than joining a crowded level; but improving the touch also
-  raises fill risk, so the reward is always weighed against the expected
-  cost of getting filled. Reward math alone never decides a placement.
+- **Both sides, queue-aware, honestly uncertain at the boundary.** Every
+  opportunity is scored with `estimate_join`. Share dilution at a shared
+  level is settled math (your score is your own size, never the
+  level's). What is NOT settled is the window boundary inside a level:
+  the docs confirm that a level entirely past Target Size scores zero,
+  but are ambiguous about an order at the level where the target is
+  reached mid-level (owner's reading of the documentation, 2026-08-18).
+  `estimate_join` therefore returns both readings; money is sized on
+  the conservative one until EXP-1 settles it. Either way, improving
+  the touch also raises fill risk, so reward is always weighed against
+  the expected cost of getting filled — reward math alone never decides
+  a placement.
 - **Qualifying is just another opportunity**: "this side is dead, $X
   revives it and we take most of the pool" ranks in the same list.
 - **Board-relative decay, absolute-zero exit.** A market is only
@@ -254,11 +269,40 @@ Traced every file to what reads it. Nothing deleted yet — the plan:
 
 ---
 
+## Experiments
+
+### EXP-1 — the window boundary inside a price level
+
+**Question.** When Target Size is reached in the middle of a price
+level, does an order later in that level score (level reading) or not
+(queue reading)? The docs settle only the between-levels case; both
+readings are live in `estimate_join`, and real sizing uses the
+conservative one until this answers.
+
+**Method.** The prober looks for natural setups where the readings
+disagree: closer levels alone sum under Target Size, closer levels plus
+the size already at the candidate level reach it. It places one small
+order there (≤ $10 nominal, low-volatility market, wings preferred) and
+one control order in the same family where the readings agree, and
+pre-registers both predictions: level reading says ~$X/day, queue
+reading says $0. Setups only qualify if the level-reading prediction is
+at least ~$0.25/day — below that a one-day payout cannot distinguish
+the hypotheses. Hold 2–3 reward days; read the answer from
+`rewards.csv` actuals per market per day, control-normalized. The
+1.0 precedent for pre-registered order experiments is
+`experiment_touch.yml` + `analyse_touch.py`.
+
+**While open:** engine sizes by the queue reading; both readings appear
+on `/opps` so the cost of the uncertainty stays visible.
+
 ## Answers from the owner (2026-08-18)
 
-1. **Capital**: decide from an earning goal, not the other way round.
-   The analysis is in `v2/CAPITAL.md` — the owner picks the goal, the
-   goal picks the ceiling.
+1. **Capital**: decide from an earning goal, not the other way round —
+   the analysis is `v2/CAPITAL.md`. For the seats test the owner set
+   **$100** of buying power as 2.0's ceiling. Context that reframes the
+   analysis: the whole 1.0 operation has run on under $300 of buying
+   power, because the exchange self-cancels orders it cannot fund —
+   nominal resting cost is not cash at risk.
 2. **2.0's first exclusive markets: the two seats families** —
    `scc-senate-gop-2026-11-03-*` and `scc-hrep-rep-2026-11-03-gte*`.
    Seats-market state as of 2026-08-18 is in `v2/CAPITAL.md`.

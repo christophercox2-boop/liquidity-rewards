@@ -118,23 +118,44 @@ class TestEstimateJoin(unittest.TestCase):
         # The 1.0 earner-scan bug: joining an occupied level credited us
         # the other participants' size too, as though we were first in
         # line. Correct: our 1 contract scores 1, in a window whose score
-        # sum includes the 6 ahead of us and the level behind.
+        # sum includes the 6 sharing our level and the level behind.
+        # Away from the boundary, both readings agree.
         levels = [(0.50, 6.0), (0.49, 100.0)]
         j = estimate_join("BUY", levels, tick=0.01, df=0.2, target=50,
                           price=0.50, qty=1.0)
         self.assertTrue(j.qualifies)
         self.assertTrue(j.in_window)
-        self.assertAlmostEqual(j.share, 1.0 / (7.0 + 100.0 * 0.2), places=6)
+        self.assertTrue(j.in_window_level)
+        want = 1.0 / (7.0 + 100.0 * 0.2)
+        self.assertAlmostEqual(j.share, want, places=6)
+        self.assertAlmostEqual(j.share_if_level, want, places=6)
 
-    def test_join_level_that_straddles_the_window_boundary_earns_nothing(self):
-        # 6 contracts ahead of us at our level, target 5: the window fills
-        # before it reaches us, however large our order is.
+    def test_boundary_inside_our_level_is_where_the_readings_disagree(self):
+        # 6 contracts already at our level, target 5: the target is reached
+        # INSIDE our level. Queue reading: the window fills before reaching
+        # us — zero. Level reading: the walk reaches our level, the whole
+        # level scores. This is exactly what EXP-1 tests with real orders.
         levels = [(0.50, 6.0), (0.49, 100.0)]
         j = estimate_join("BUY", levels, tick=0.01, df=0.2, target=5,
                           price=0.50, qty=1000.0)
         self.assertTrue(j.qualifies)
         self.assertFalse(j.in_window)
         self.assertEqual(j.share, 0.0)
+        self.assertTrue(j.in_window_level)
+        self.assertAlmostEqual(j.share_if_level, 1000.0 / 1006.0, places=6)
+
+    def test_documented_example_second_best_scores_zero_under_both_readings(self):
+        # Straight from the exchange docs: target 20,000 with 25,000 at the
+        # best price — an order at the second-best price scores zero. The
+        # two readings agree here; only the mid-level boundary is open.
+        levels = [(0.50, 25000.0), (0.49, 10.0)]
+        j = estimate_join("BUY", levels, tick=0.01, df=0.2, target=20000,
+                          price=0.49, qty=10.0)
+        self.assertTrue(j.qualifies)
+        self.assertFalse(j.in_window)
+        self.assertFalse(j.in_window_level)
+        self.assertEqual(j.share, 0.0)
+        self.assertEqual(j.share_if_level, 0.0)
 
     def test_join_full_level_earns_nothing(self):
         # 5000 already rest at best against a 2000 target: everyone there
