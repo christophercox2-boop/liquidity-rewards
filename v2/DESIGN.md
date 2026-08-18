@@ -117,23 +117,41 @@ fresh.
   No per-market caps, ladders, or graduated budgets unless the owner asks.
 - **Confidence decides where, the ceiling decides how much.** Never both.
 - **Both sides, queue-aware.** Every opportunity is scored with
-  `estimate_join`, which assumes we rest last at our level. Improving the
-  touch by a tick therefore beats joining a crowded level on its merits.
+  `estimate_join`, which assumes we rest last at our level (everyone
+  already there is ahead of us — if the scoring window fills before it
+  reaches us, we earn nothing). That often makes a one-tick improvement
+  score better than joining a crowded level; but improving the touch also
+  raises fill risk, so the reward is always weighed against the expected
+  cost of getting filled. Reward math alone never decides a placement.
 - **Qualifying is just another opportunity**: "this side is dead, $X
   revives it and we take most of the pool" ranks in the same list.
-- **Board-relative decay.** A market is only "fading" relative to the
-  median of the board — a pool cut moves everything at once and must not
-  trigger a mass withdrawal (2026-08-17).
-- **Resolution-day exclusion.** The slug carries the date; markets
-  resolving today are excluded from placement and flagged for exit.
+- **Board-relative decay, absolute-zero exit.** A market is only
+  "fading" relative to the median of the board — a pool cut moves
+  everything at once and must not trigger a mass withdrawal (2026-08-17).
+  But a market whose own program closed or whose pool went to zero earns
+  nothing by arithmetic, and leaving it is correct whatever the board is
+  doing. The general rule underneath both: stay only where the reward
+  earned exceeds the expected cost of getting filled.
+- **Resolution-day exclusion.** Markets resolving today are excluded
+  from placement and flagged for exit. The date comes from the slug when
+  it carries one; when it does not, from the market's own rules/end date
+  on the exchange; if it is still unclear, the market is held out and
+  the owner is asked — never guessed.
 - **The seller works everywhere**, including markets otherwise closed to
   automation: fills get resold, idle stock rests as asks.
 
 ### The master switch
 
-One switch instead of seven. Off after every deploy. Turning on takes two
-deliberate taps, off takes one, every flip is logged with a timestamp.
-It lives on its own page (`/switch`), not on any status page. The rails
+One switch instead of seven. Turning on takes two deliberate taps, off
+takes one, every flip is logged with a timestamp. It lives on its own
+page (`/switch`), not on any status page.
+
+The switch **persists across deploys** (owner's decision — it is saved
+state, like everything else). Two guards replace off-by-default: when a
+new build boots with the switch on, the owner gets one push saying so
+("new build <hash> running, switch is ON"); and a build that changes
+order-touching behavior in a way worth a pause can declare itself
+breaking in code, which starts that one build switched off. The rails
 that do not depend on the switch (auth, CSRF header, whitelist, price
 bounds, post-only) hold on every endpoint regardless.
 
@@ -145,10 +163,24 @@ Each answers one question, phone-first:
 |---|---|
 | `/` | am I earning right now, and is the data fresh? |
 | `/orders` | what is resting where, and what is each order worth? |
+| `/markets` | the browser: what exists and what state is it in? |
 | `/market?slug=` | one market: book, my orders, terms, move/cancel |
 | `/opps` | what is worth joining or qualifying next? |
 | `/switch` | the master switch, the risk ceiling, one line of usage |
 | `/log` | what did the system do and alert recently? |
+
+`/markets` is not one flat list — a list is often the worst way to see
+these markets (owner's request). It offers views fitted to the market's
+shape, drawn from what already worked in 1.0:
+
+- **map** — state-by-state tiles for Senate/Governor races, colored by
+  status (earning / idle / gap / conflict);
+- **slate** — candidate grids with faces for nominee/winner fields
+  (the exchange sends a photo per market; 1.0 already used them);
+- **ladder** — seat-count families in ascending numeric order, so the
+  distribution reads left to right (House ≥N seats, Senate seat counts);
+- **list** — the fallback, filterable by market type (senate / governor /
+  seats / 2028 / other), searchable.
 
 Same auth as 1.0 (password header + custom CSRF header on every mutating
 route, no-store caching everywhere).
@@ -163,10 +195,17 @@ sets never overlap, so neither system sees the other's orders as foreign
 liquidity in a market it trades. 2.0's capital allowance is the risk
 ceiling, set before its first order.
 
-Deploy: 2.0 runs as a second ~$5 DigitalOcean app on this repo with run
-command `python -m v2.main`, tracking `main` with autodeploy on — safe
-because the master switch is off after every deploy by design. This also
-sidesteps the stuck `deploy` branch entirely.
+Deploy: **no second subscription** (owner's decision). Both run in the
+one existing DigitalOcean app: the container's start command becomes a
+small launcher that starts 1.0's monitor and the 2.0 process side by
+side. The app exposes one HTTP port, so 1.0's server stays the front
+door and gains one ~20-line route that forwards `/v2/*` to the 2.0
+process on localhost — 1.0 is the battle-tested one, so it holds the
+door while 2.0 is young. When 2.0 has earned trust the roles flip, and
+eventually 1.0 drops out of the launcher. Getting this live requires one
+deploy, which first requires unsticking the deploy path (point the app
+at `main`). The 512 MB instance is shared; 2.0 stays lean and its memory
+use gets checked before the flip.
 
 ---
 
@@ -215,12 +254,15 @@ Traced every file to what reads it. Nothing deleted yet — the plan:
 
 ---
 
-## Questions for the owner (from REBUILD.md, still open)
+## Answers from the owner (2026-08-18)
 
-1. **How much money for 2.0's real-world test?** Becomes the risk
-   ceiling.
-2. **Which markets does 2.0 get exclusively** while 1.0 keeps running?
-3. **Is the Silver forecast model still wanted as a fair-value input**,
-   or does 2.0's own evidence model stand alone? (Found during review:
-   `silver_model.py` never actually fed the monitor — monitor grew its
-   own copy. Whichever answer, there will be one implementation, not two.)
+1. **Capital**: decide from an earning goal, not the other way round.
+   The analysis is in `v2/CAPITAL.md` — the owner picks the goal, the
+   goal picks the ceiling.
+2. **2.0's first exclusive markets: the two seats families** —
+   `scc-senate-gop-2026-11-03-*` and `scc-hrep-rep-2026-11-03-gte*`.
+   Seats-market state as of 2026-08-18 is in `v2/CAPITAL.md`.
+3. **The Silver model stays** as a fair-value input (it updates with
+   polling). One implementation in 2.0 — the monitor's Datawrapper
+   fetch survives, `silver_model.py`'s seat-CDF/ladder logic gets
+   extracted into it, and the duplicate dies.
