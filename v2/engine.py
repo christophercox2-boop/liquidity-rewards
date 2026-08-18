@@ -339,6 +339,22 @@ class Engine:
                     del self.orders[rec.id]
                     actions_left -= 1
 
+        # 1b) orphaned exits: a sell/close order must be backed by our own
+        # inventory — if the ledger holds nothing there (sold elsewhere, or
+        # the ledger migration dropped inherited stock), pull the order.
+        for rec in list(self.orders.values()):
+            if actions_left <= 0:
+                break
+            if rec.purpose not in ("sell", "close"):
+                continue
+            if not self.inventory.get(rec.market):
+                r = self.desk.cancel(rec.id, rec.market)
+                if r.ok:
+                    self._log(event="orphan_exit_pulled", market=rec.market,
+                              side=rec.side, price=rec.price, qty=rec.qty)
+                    del self.orders[rec.id]
+                    actions_left -= 1
+
         # 2) maintenance: an order out of the window or outside its band moves
         for rec in list(self.orders.values()):
             if actions_left <= 0:
@@ -534,6 +550,7 @@ class Engine:
             "orders": {oid: vars(o) for oid, o in self.orders.items()},
             "inventory": self.inventory,
             "positions_seen": self.positions_seen,
+            "ledger_v": 2,
             "silent_cancels": self.silent_cancels,
             "family_sweep_done": self.family_sweep_done,
             "sweep_count": self.sweep_count,
@@ -542,13 +559,25 @@ class Engine:
         }
 
     def restore(self, d: dict) -> None:
+        self.log = list(d.get("log") or [])   # first: migrations below log too
         for oid, v in (d.get("orders") or {}).items():
             self.orders[oid] = OwnOrder(**v)
-        self.inventory = dict(d.get("inventory") or {})
+        if d.get("ledger_v") == 2:
+            self.inventory = dict(d.get("inventory") or {})
+        else:
+            # Migration, once: state written before 2026-08-18 evening had
+            # adopted the ACCOUNT's positions (1.0's stock) as engine
+            # inventory, and the seller acted on it — four orders against
+            # positions nobody gave 2.0, inside its ceiling. The ledger
+            # starts clean; the orphan rule in cycle() pulls any resting
+            # sell/close orders left over from that inventory.
+            self.inventory = {}
+            if d.get("inventory"):
+                self._log(event="ledger_reset",
+                          dropped=sorted(d["inventory"].keys()))
         self.positions_seen = dict(d.get("positions_seen") or {})
         self.silent_cancels = d.get("silent_cancels") or 0
         self.family_sweep_done = bool(d.get("family_sweep_done"))
         self.sweep_count = d.get("sweep_count") or 0
         self.exp1 = list(d.get("exp1") or [])
-        self.log = list(d.get("log") or [])
         self.last_action = dict(d.get("last_action") or {})

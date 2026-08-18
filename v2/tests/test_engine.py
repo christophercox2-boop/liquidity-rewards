@@ -324,10 +324,37 @@ class TestPersistence(unittest.TestCase):
         terms = seats_terms([SEN])
         put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
         r.cycle(terms)
+        r.engine.inventory[SEN] = {"qty": 5.0, "cost": 1.0}   # own ledger
         e2 = Engine(r.desk, r.engine.cfg, clock=lambda: r.now)
         e2.restore(r.engine.to_dict())
         self.assertEqual(set(e2.orders), set(r.engine.orders))
         self.assertEqual(e2.last_action, r.engine.last_action)
+        self.assertEqual(e2.inventory, r.engine.inventory)    # ledger_v 2 kept
+
+    def test_pre_migration_inventory_is_dropped_and_its_orders_pulled(self):
+        # State written by the build that adopted the account's positions:
+        # inventory full of 1.0's stock, sell/close orders resting on it.
+        r = Rig(switch=True)
+        old = {
+            "orders": {"s1": {"id": "s1", "market": SEN, "side": "SELL",
+                              "price": 0.20, "qty": 17.0, "intent": SELL_LONG,
+                              "placed_ts": 1.0, "purpose": "sell"}},
+            "inventory": {SEN: {"qty": 17.0, "cost": 0.95}},
+            "family_sweep_done": True, "sweep_count": 31,
+        }
+        r.engine.restore(old)
+        self.assertEqual(r.engine.inventory, {})              # dropped
+        self.assertTrue(any(e.get("event") == "ledger_reset"
+                            for e in r.engine.log))
+        # the orphaned sell order rests on the exchange; next cycle pulls it
+        r.exchange.live["s1"] = foreign("s1", SELL_LONG, price=0.20, size=17.0)
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        r.cycle(terms)
+        self.assertNotIn("s1", r.exchange.live)
+        self.assertNotIn("s1", r.engine.orders)
+        self.assertTrue(any(e.get("event") == "orphan_exit_pulled"
+                            for e in r.engine.log))
 
 
 if __name__ == "__main__":
