@@ -61,7 +61,8 @@ SHELL = """<!doctype html><html><head>
  input{background:#141a24;color:#e6e9ef;border:1px solid #394456;width:60%}
  button{background:#2d6cdf;color:#fff;border:0;margin-left:6px}
  .nav{margin:2px 0 10px}
- .nav a{color:#9ecbff;text-decoration:none;margin-right:14px;font-size:15px}
+ .nav a,.nav span{margin-right:14px;font-size:15px}
+ .nav a{color:#9ecbff;text-decoration:none}
  .nav .here{color:#e6e9ef;font-weight:700}
 </style></head><body>
 <h1>2.0</h1>
