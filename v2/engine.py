@@ -46,7 +46,7 @@ import time
 from dataclasses import dataclass, field
 
 from .books import BookCache
-from .intents import BUY_LONG, SELL_LONG, SELL_SHORT, capital_at_risk
+from .intents import BUY_LONG, BUY_SHORT, SELL_LONG, SELL_SHORT, capital_at_risk
 from .orders import OrderDesk
 from .programs import daily_side_pool, slug_event_date
 from .scoring import estimate_join
@@ -179,15 +179,31 @@ class Engine:
                           price=rec.price, qty=rec.qty, id=oid)
             del self.orders[oid]
         self.positions_seen = {m: v[0] for m, v in positions.items()}
-        # inventory follows the exchange's own numbers for our markets
-        for slug, (net, cost) in positions.items():
-            if self.whitelisted(slug):
-                self.inventory[slug] = {"qty": net, "cost": cost}
-        for slug in list(self.inventory):
-            if slug not in positions:
-                del self.inventory[slug]
 
     def _on_fill(self, rec: OwnOrder, qty: float, now: float) -> None:
+        """Book the fill into OUR OWN ledger. The account's positions are
+        shared with 1.0 (which holds seats inventory of its own), so the
+        engine's inventory is built strictly from its own fills — adopting
+        account positions wholesale once put $34 of 1.0's stock inside
+        2.0's ceiling and would have had the seller acting on positions
+        nobody gave it."""
+        inv = self.inventory.setdefault(rec.market, {"qty": 0.0, "cost": 0.0})
+        if rec.intent == BUY_LONG:
+            inv["qty"] += qty
+            inv["cost"] += qty * rec.price
+        elif rec.intent == SELL_LONG:
+            share = qty / max(inv["qty"], qty)
+            inv["cost"] -= inv["cost"] * share
+            inv["qty"] -= qty
+        elif rec.intent == BUY_SHORT:
+            inv["qty"] -= qty
+            inv["cost"] += qty * (1.0 - rec.price)
+        elif rec.intent == SELL_SHORT:
+            share = qty / max(-inv["qty"], qty)
+            inv["cost"] -= inv["cost"] * share
+            inv["qty"] += qty
+        if abs(inv["qty"]) < 0.01:
+            del self.inventory[rec.market]
         self._log(event="fill", market=rec.market, side=rec.side,
                   price=rec.price, qty=qty, purpose=rec.purpose)
         self.alert("Order filled",

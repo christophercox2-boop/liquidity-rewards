@@ -3882,7 +3882,12 @@ NO_AUTO = tuple(
     for e in os.environ.get(
         "NO_AUTO_PREFIXES",
         "erac-usgubp-ak-adv-|AK primary,"
-        "vsc-usgubp-fl-|FL margin").split(",") if e.strip())
+        "vsc-usgubp-fl-|FL margin,"
+        # the seats ladders are 2.0's exclusive markets (owner, 2026-08-18):
+        # no 1.0 loop places there; the sell/flip loops can still reduce
+        # what 1.0 already holds, per the rule below
+        "scc-senate-gop-|Senate seats (2.0),"
+        "scc-hrep-rep-|House seats (2.0)").split(",") if e.strip())
 NO_AUTO_PREFIXES = tuple(p for p, _ in NO_AUTO)
 
 

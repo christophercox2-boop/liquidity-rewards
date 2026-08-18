@@ -154,11 +154,38 @@ class Monitor:
             self.switch.restore(saved["switch"])
         if saved.get("engine_saved"):
             self.engine.restore(saved["engine_saved"])
+        # errors survive restarts, and every boot leaves a visible marker —
+        # a container restart-loop must show on the page, not vanish
+        self.errors = list(saved.get("errors") or [])
+        age = time.time() - (saved.get("saved_at") or 0)
+        self._note(f"booted build {self.build}; restored state {age:.0f}s old"
+                   f"{'; SWITCH IS ON' if self.switch.on else ''}")
         if self.switch.on and saved.get("build") != self.build:
             # the owner chose persistence over off-after-deploy; the guard
             # that replaces it is this one push
             self.alerts.notify("New build with switch ON",
                                f"build {self.build} booted; 2.0 may place orders")
+
+    def switch_tap(self, op: str) -> dict:
+        """An owner tap on /v2/switch. The flip is persisted IMMEDIATELY —
+        local and remote, no throttle — because a container restart between
+        a flip and the next cycle's save once quietly turned the switch
+        back off (2026-08-18, the owner's first ON lasted seconds)."""
+        s = self.switch.op(op)
+        st = dict(self.last_state) if self.last_state else {}
+        st["switch"] = s
+        st["saved_at"] = time.time()
+        self.last_state = st
+        self.store.save_local(st)
+        self.store.save_remote(st)
+        return s
+
+    def public_state(self) -> dict:
+        """What the page sees: the last cycle's state with the LIVE switch
+        overlaid, so the display can never show a stale flip."""
+        st = dict(self.last_state) if self.last_state else {"saved_at": 0}
+        st["switch"] = self.switch.state()
+        return st
 
     # -- one poll cycle -------------------------------------------------------
 
@@ -205,25 +232,35 @@ class Monitor:
         snap = self.estimator.sample(now, orders, self.cache, self.terms)
 
         # the engine: silver fairs on a slow TTL, positions for fill
-        # detection, then one decision cycle behind the switch
+        # detection, then one decision cycle behind the switch. NOTHING in
+        # this block may prevent the state save below — a cycle that dies
+        # before saving is how the first switch flip got lost.
         engine_summary = {"mode": "skipped"}
         try:
             self.silver.refresh(now)
         except Exception as e:  # noqa: BLE001 — engine runs on cached fairs
             self._note(f"silver: {type(e).__name__}: {e}")
         try:
-            positions = self.client.positions_net()
-        except ApiError as e:
-            # stale positions would misread vanished orders as silent
-            # cancels — skip the engine this round rather than guess
-            self._note(f"positions: {e} — engine cycle skipped")
-            positions = None
-        if positions is not None:
-            engine_summary = self.engine.cycle(
-                now, orders, positions, self.cache, self.terms,
-                self.silver, self.switch.on)
-            for a in engine_summary.get("actions") or []:
-                print(f"engine: {a}", flush=True)
+            # positions are only needed when the engine can act or holds
+            # anything; while idle, poll them gently — the container is
+            # shared with 1.0 and every request costs its CPU and rate limit
+            engaged = (self.switch.on or self.engine.orders or self.engine.inventory)
+            self._pos_tick = getattr(self, "_pos_tick", 0) + 1
+            if engaged or self._pos_tick % 4 == 1:
+                positions = self.client.positions_net()
+            else:
+                positions = None
+            if positions is not None:
+                engine_summary = self.engine.cycle(
+                    now, orders, positions, self.cache, self.terms,
+                    self.silver, self.switch.on)
+                for a in engine_summary.get("actions") or []:
+                    print(f"engine: {a}", flush=True)
+            else:
+                engine_summary = {"mode": "idle"}
+        except Exception as e:  # noqa: BLE001 — never lose the save below
+            self._note(f"engine: {type(e).__name__}: {e}")
+            engine_summary = {"mode": f"error: {type(e).__name__}"}
 
         state = {
             "saved_at": now, "boot_ts": self.boot_ts, "build": self.build,
@@ -260,8 +297,8 @@ class Monitor:
     def run(self) -> None:
         self.stream.start()
         try:
-            WebServer(get_state=lambda: self.last_state,
-                      switch_op=self.switch.op).start_background()
+            WebServer(get_state=self.public_state,
+                      switch_op=self.switch_tap).start_background()
         except OSError as e:  # port taken: measuring still works, the page doesn't
             self._note(f"web server: {e}")
         streak = 0
