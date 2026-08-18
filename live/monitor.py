@@ -147,6 +147,7 @@ NOTIFY_ALWAYS = tuple(
     p.strip().lower() for p in os.environ.get(
         "NOTIFY_ALWAYS",
         "order filled,orders filled,sell below fair,reward pool,"
+        "changed terms,pools changed,"
         "live monitor failing,cancel all sent").split(",") if p.strip())
 _NOTIFY_SEEN: dict = {}
 _NOTIFY_RATE: dict = {"last": 0.0, "held": 0, "titles": []}
@@ -3266,16 +3267,73 @@ def watch_program_arrivals(pol_slugs: list[str]) -> None:
             continue
         time.sleep(0.05)
 
-    arrived = []
+    # THE TERMS, NOT JUST A FLAG. prog_seen only ever recorded whether a pool
+    # existed, so a pool being CUT was invisible — the owner found the drop
+    # from $500 to $200 an event by reading the exchange himself on
+    # 2026-08-18. Keeping pool/target/df per market makes that a diff, and the
+    # snapshot doubles as the listing of what every market is currently
+    # paying.
+    with MONITOR.lock:
+        terms = dict(MONITOR.state.get("prog_terms") or {})
+    arrived, changed = [], []
     for slug in cands:
         had = bool(known.get(slug))
         has = slug in live
-        if has and not had and seeded:
-            arrived.append(slug)
+        if has:
+            pr = live[slug]
+            now_t = [round(float(pr.get("pool") or 0), 2),
+                     round(float(pr.get("target") or 0)),
+                     round(float(pr.get("df") or 0), 3)]
+            was = terms.get(slug)
+            if not had and seeded:
+                arrived.append(slug)
+            elif was and was != now_t and seeded:
+                changed.append((slug, was, now_t))
+            terms[slug] = now_t
+        elif had and seeded:
+            # the pool went away entirely — worth knowing, it is a market to
+            # stop working, not one to enter
+            changed.append((slug, terms.get(slug) or [0, 0, 0], [0, 0, 0]))
+            terms.pop(slug, None)
         known[slug] = bool(has)
 
     with MONITOR.lock:
         MONITOR.state["prog_seen"] = known
+        MONITOR.state["prog_terms"] = terms
+        MONITOR.state["prog_terms_ts"] = round(time.time(), 1)
+
+    # WHAT AM I ALREADY IN. A pool arriving on a market we have never touched
+    # is an opportunity; the same news on a market we are already working is
+    # not — there, the only thing worth saying is what CHANGED (owner,
+    # 2026-08-18: "if it's a market I'm already in, just send me what
+    # changed").
+    mine = {o.get("market") for o in (MONITOR.orders or []) if o.get("market")}
+    mine |= {sl for sl, p_ in (MONITOR.positions or {}).items()
+             if tr._num(p_.get("netPosition"))}
+
+    def _fmt(sl, was, now_):
+        bits = []
+        for i_, lab in ((0, "pool"), (1, "target"), (2, "df")):
+            if was[i_] != now_[i_]:
+                a_ = f"{was[i_]:,.0f}" if i_ < 2 else f"{was[i_]:g}"
+                b_ = f"{now_[i_]:,.0f}" if i_ < 2 else f"{now_[i_]:g}"
+                bits.append(f"{lab} {a_} -> {b_}"
+                            + (" GONE" if i_ == 0 and not now_[i_] else ""))
+        return f"{sl}: " + ", ".join(bits)
+
+    if changed:
+        # markets we hold first — those are the ones that change what we earn
+        changed.sort(key=lambda c_: (c_[0] not in mine, c_[0]))
+        held = [c_ for c_ in changed if c_[0] in mine]
+        lines = [_fmt(*c_) for c_ in changed[:8]]
+        if len(changed) > 8:
+            lines.append(f"+{len(changed) - 8} more")
+        MONITOR.pending_alerts.append((
+            (f"{len(held)} of your markets changed terms" if held
+             else f"{len(changed)} pools changed terms"),
+            "\n".join(lines), "high"))
+
+    arrived = [sl for sl in arrived if sl not in mine]
     if not arrived:
         return
     # ONE ALERT, RICHEST FIRST. This used to emit up to seven separate pushes
