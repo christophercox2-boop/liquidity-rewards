@@ -1501,6 +1501,20 @@ class Monitor:
             # "did the deploy land?" can be answered from the repo in seconds
             # instead of from the phone. Half of 2026-08-17 went on guessing.
             self.state["build"] = BUILD
+            # POSITIONS, so they can be read without the dashboard. The
+            # monitor has always held these in memory and never written them
+            # anywhere durable; the only copy in the repo came from a GitHub
+            # Action that stopped running on 2026-08-16, so "what am I
+            # holding" had no answer off the phone. Net, cost and realised
+            # only — the raw payload carries icons and metadata worth
+            # kilobytes a market.
+            self.state["positions"] = {
+                slug: [tr._num(p_.get("netPosition")),
+                       round(tr._num((p_.get("cost") or {}).get("value")), 2),
+                       round(tr._num((p_.get("realized") or {}).get("value")), 2)]
+                for slug, p_ in (self.positions or {}).items()
+                if tr._num(p_.get("netPosition")) or
+                tr._num((p_.get("cost") or {}).get("value"))}
             self.state["boot_ts"] = BOOT_TS
             self.state["rate"] = self.rate
             self.state["market_rates"] = self.market_rates
