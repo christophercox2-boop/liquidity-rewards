@@ -130,7 +130,34 @@ NTFY_SERVER = os.environ.get("NTFY_SERVER", "https://ntfy.sh").rstrip("/")
 # "don't need a notification every minute"). Identical title+message is held
 # for NOTIFY_REPEAT; anything genuinely new still goes straight through.
 NOTIFY_REPEAT = float(os.environ.get("NOTIFY_REPEAT", "1800"))
+# A HARD CEILING ON TOTAL PUSHES, whatever they say. Deduping identical text
+# only helps when the text repeats; a loop whose message carries a changing
+# number defeats it completely, and the owner was still getting one a minute
+# after the dedupe shipped (2026-08-17). This caps the rate no matter what is
+# firing or why. Anything held back is counted and reported on the next push
+# that gets through, so nothing disappears silently.
+NOTIFY_MIN_GAP = float(os.environ.get("NOTIFY_MIN_GAP", "300"))
 _NOTIFY_SEEN: dict = {}
+_NOTIFY_RATE: dict = {"last": 0.0, "held": 0, "titles": []}
+
+
+def _notify_log(title: str, message: str, sent: bool, why: str = "") -> None:
+    """Every push and every suppression, kept in state.
+
+    When the owner says "it is still sending every minute" there was no way to
+    find out WHAT without their phone. This is that record: it rides along in
+    the state file that already goes to the repo every couple of minutes.
+    """
+    try:
+        with MONITOR.lock:
+            log = MONITOR.state.setdefault("notify_log", [])
+            log.append({"ts": dt.datetime.now(ET).strftime("%m-%d %I:%M:%S %p"),
+                        "ts_s": round(time.time(), 1), "title": title[:60],
+                        "msg": " ".join(message.split())[:120],
+                        "sent": bool(sent), "why": why})
+            del log[:-120]
+    except Exception:  # noqa: BLE001 — never let bookkeeping break an alert
+        pass
 
 
 def notify(title: str, message: str, priority: str = "default",
@@ -146,11 +173,33 @@ def notify(title: str, message: str, priority: str = "default",
         # anything hands this a small clock.
         last_ = _NOTIFY_SEEN.get(key)
         if last_ is not None and now_ - float(last_) < NOTIFY_REPEAT:
+            _NOTIFY_RATE["held"] += 1
+            _notify_log(title, message, False, "same alert again")
             return
         _NOTIFY_SEEN[key] = now_
+        # ...and the ceiling, which does not care what the message says
+        if now_ - float(_NOTIFY_RATE["last"] or 0) < NOTIFY_MIN_GAP:
+            _NOTIFY_RATE["held"] += 1
+            # Keep the NAMES, not just a count. The ceiling delays a genuinely
+            # new alert as readily as a repeating one, so the next push has to
+            # say what it sat on or something real disappears into a number.
+            ts_ = _NOTIFY_RATE["titles"]
+            if title not in ts_:
+                ts_.append(title)
+                del ts_[:-5]
+            _notify_log(title, message, False,
+                        f"under the {NOTIFY_MIN_GAP / 60:.0f}-minute floor")
+            return
+        held = int(_NOTIFY_RATE["held"])
+        names = list(_NOTIFY_RATE["titles"])
+        _NOTIFY_RATE.update(last=now_, held=0, titles=[])
+        if held:
+            message = (f"{message}\n\n(+{held} held back"
+                       + (": " + ", ".join(names) if names else "") + ")")
         for k_ in [k for k, t_ in _NOTIFY_SEEN.items()
                    if now_ - t_ > NOTIFY_REPEAT * 4]:
             del _NOTIFY_SEEN[k_]
+    _notify_log(title, message, True)
     try:
         requests.request(
             "POST", f"{NTFY_SERVER}/{NTFY_TOPIC}", data=message.encode(),
