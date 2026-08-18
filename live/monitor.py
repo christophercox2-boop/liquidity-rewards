@@ -1508,6 +1508,29 @@ class Monitor:
             # holding" had no answer off the phone. Net, cost and realised
             # only — the raw payload carries icons and metadata worth
             # kilobytes a market.
+            # The touch for anything we hold or quote, so a position can be
+            # PRICED off the dashboard, not just counted. Two numbers and two
+            # sizes a market; the full book is far too big for the state file.
+            try:
+                want = set(self.positions or {}) | {
+                    o.get("market") for o in (self.orders or []) if o.get("market")}
+                tch = {}
+                for slug in want:
+                    ent = tr._BOOK_CACHE.get(slug)
+                    if not ent or time.time() - ent[0] > 600:
+                        continue
+                    bk = ent[1] or {}
+                    bd = [(p_, q_) for p_, q_ in (bk.get("bids") or [])]
+                    ak = [(p_, q_) for p_, q_ in (bk.get("asks") or [])]
+                    tch[slug] = [
+                        round(max((p_ for p_, _ in bd), default=0) * 100, 1),
+                        round(min((p_ for p_, _ in ak), default=0) * 100, 1),
+                        round(sum(q_ for _, q_ in bd)),
+                        round(sum(q_ for _, q_ in ak)),
+                        int(time.time() - ent[0])]
+                self.state["touch"] = tch
+            except Exception:  # noqa: BLE001 — a price snapshot never breaks the save
+                pass
             self.state["positions"] = {
                 slug: [tr._num(p_.get("netPosition")),
                        round(tr._num((p_.get("cost") or {}).get("value")), 2),
