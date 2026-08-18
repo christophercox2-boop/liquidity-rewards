@@ -102,6 +102,8 @@ class Engine:
         self.orders: dict[str, OwnOrder] = {}      # our resting orders by id
         self.inventory: dict[str, dict] = {}       # slug -> {qty, cost} (net of side)
         self.positions_seen: dict[str, float] = {} # last cycle's net per market
+        self.family_sweep_done = False             # the one-time 1.0 handover
+        self.sweep_count = 0
         self.silent_cancels = 0
         self.exp1: list[dict] = []
         self.log: list[dict] = []
@@ -269,6 +271,32 @@ class Engine:
               silver: SilverFairs, switch_on: bool) -> dict:
         self.reconcile(open_orders, positions, now)
 
+        # The owner-approved handover sweep (2026-08-18, "clear them out"):
+        # 1.0's resting orders in the seats families are cancelled so the
+        # families become fully 2.0's. OPENING orders only — exits
+        # (SELL_LONG asks unwinding held stock, SELL_SHORT bids closing
+        # shorts) stay and finish their job, per the standing rule that
+        # 1.0 may still reduce what it already holds. Runs once, a few
+        # cancels per cycle for the rate limiter, works with the switch
+        # off (cancelling only reduces exposure), then never again.
+        if not self.family_sweep_done:
+            foreign = [o for o in open_orders
+                       if self.whitelisted(o.get("market", ""))
+                       and o["id"] not in self.orders
+                       and o.get("intent") in (BUY_LONG, BUY_SHORT)]
+            for o in foreign[:8]:
+                r = self.desk.cancel(o["id"], o["market"])
+                if r.ok:
+                    self.sweep_count += 1
+                    self._log(event="handover_cancel", market=o["market"],
+                              side=o.get("side"), price=o.get("price"),
+                              qty=o.get("size"), id=o["id"])
+            if not foreign:
+                self.family_sweep_done = True
+                self.alert("Seats handover done",
+                           f"cleared {self.sweep_count} 1.0 orders from the seats "
+                           f"families; exit orders were left to finish")
+
         s = Summary(mode="on" if switch_on else "observing")
         s.used = self.used_capital()
         s.headroom = round(self.cfg.ceiling_usd - s.used, 2)
@@ -276,6 +304,26 @@ class Engine:
             return self._summary(s)
 
         actions_left = self.cfg.max_actions_per_cycle
+
+        # exclusivity, continuously: automation that slips back into our
+        # families is removed; an owner hand-placed order is left alone
+        # and only recorded
+        if self.family_sweep_done:
+            for o in open_orders:
+                if actions_left <= 0:
+                    break
+                if (not self.whitelisted(o.get("market", ""))
+                        or o["id"] in self.orders
+                        or o.get("intent") not in (BUY_LONG, BUY_SHORT)):
+                    continue
+                if o.get("manual"):
+                    self._log(event="foreign_manual_order", market=o["market"],
+                              id=o["id"])
+                    continue
+                r = self.desk.cancel(o["id"], o["market"])
+                if r.ok:
+                    self._log(event="evict", market=o["market"], id=o["id"])
+                    actions_left -= 1
 
         # 1) absolute-zero exit + resolution day: pull our orders out
         for rec in list(self.orders.values()):
@@ -475,6 +523,7 @@ class Engine:
             "inventory": self.inventory,
             "silent_cancels": self.silent_cancels,
             "exp1_open": len(self.exp1),
+            "sweep": {"done": self.family_sweep_done, "cancelled": self.sweep_count},
             "actions": s.actions,
         }
 
@@ -486,6 +535,8 @@ class Engine:
             "inventory": self.inventory,
             "positions_seen": self.positions_seen,
             "silent_cancels": self.silent_cancels,
+            "family_sweep_done": self.family_sweep_done,
+            "sweep_count": self.sweep_count,
             "exp1": self.exp1, "log": self.log[-self.cfg.log_keep:],
             "last_action": self.last_action,
         }
@@ -496,6 +547,8 @@ class Engine:
         self.inventory = dict(d.get("inventory") or {})
         self.positions_seen = dict(d.get("positions_seen") or {})
         self.silent_cancels = d.get("silent_cancels") or 0
+        self.family_sweep_done = bool(d.get("family_sweep_done"))
+        self.sweep_count = d.get("sweep_count") or 0
         self.exp1 = list(d.get("exp1") or [])
         self.log = list(d.get("log") or [])
         self.last_action = dict(d.get("last_action") or {})

@@ -46,7 +46,7 @@ def authed(get_header, query_string: str, password: str) -> bool:
 
 SHELL = """<!doctype html><html><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>2.0 read-only</title>
+<title>2.0</title>
 <style>
  body{background:#1a202b;color:#e6e9ef;font:16px/1.45 -apple-system,system-ui,sans-serif;
       margin:0;padding:14px;max-width:640px;margin:auto}
@@ -60,8 +60,12 @@ SHELL = """<!doctype html><html><head>
  input,button{font-size:16px;padding:8px;border-radius:8px}
  input{background:#141a24;color:#e6e9ef;border:1px solid #394456;width:60%}
  button{background:#2d6cdf;color:#fff;border:0;margin-left:6px}
+ .nav{margin:2px 0 10px}
+ .nav a{color:#9ecbff;text-decoration:none;margin-right:14px;font-size:15px}
+ .nav .here{color:#e6e9ef;font-weight:700}
 </style></head><body>
-<h1>2.0 &mdash; read-only</h1>
+<h1>2.0</h1>
+<div class="nav"><span class="here">status</span><a href="switch">master switch</a></div>
 <div id="login" class="card" style="display:none">
  <div class="muted">password</div>
  <input id="k" type="password"><button onclick="saveKey()">open</button>
@@ -88,6 +92,22 @@ function load(){
     '<div class="big">'+usd(e.earned)+'<span class="muted" style="font-size:15px"> earned today ('+(e.day||'')+')</span></div>'+
     '<div>'+usd(e.rate)+'/day now'+
     (e.stale_s>60?' <span class="warn">&middot; '+Math.round(e.stale_s/60)+' min unmeasured</span>':'')+'</div></div>';
+  var g=d.engine||{};
+  var sw=d.switch||{};
+  h+='<div class="card"><b>Engine</b> <span class="muted">'+(g.mode||'?')+
+    ' &middot; switch '+(sw.on?'<span class="ok">ON</span>':'<span class="muted">off</span>')+'</span>'+
+    '<div>at risk '+usd(g.used)+' of '+usd(g.ceiling)+' &middot; headroom '+usd(g.headroom)+'</div>';
+  if(g.sweep&&!g.sweep.done){h+='<div class="warn">handover sweep running &middot; '+
+    (g.sweep.cancelled||0)+' 1.0 orders cleared so far</div>';}
+  else if(g.sweep&&g.sweep.cancelled){h+='<div class="muted">handover done: '+
+    g.sweep.cancelled+' 1.0 orders cleared</div>';}
+  var go=g.orders||[];
+  if(go.length){h+='<table><tr><th>market</th><th class="r">order</th><th class="r">why</th></tr>';
+   go.forEach(function(o){h+=row(['<code>'+o.market+'</code>',
+     o.side+' '+o.qty+' @ '+(o.price*100).toFixed(1)+'c',o.purpose]);});
+   h+='</table>';}
+  if(g.silent_cancels){h+='<div class="warn muted">'+g.silent_cancels+' silent cancels seen</div>';}
+  h+='</div>';
   var mr=Object.entries(e.market_rates||{}).sort(function(a,b){return b[1]-a[1];});
   if(mr.length){h+='<div class="card"><b>Where the rate comes from</b><table><tr><th>market</th><th class="r">$/day</th><th class="r">earned</th></tr>';
    mr.slice(0,40).forEach(function(kv){h+=row(['<code>'+kv[0]+'</code>',usd(kv[1]),usd((e.per_market||{})[kv[0]])]);});
@@ -126,6 +146,7 @@ SWITCH_SHELL = """<!doctype html><html><head>
  td{padding:3px 6px;border-bottom:1px solid #2a3242}
 </style></head><body>
 <h1>2.0 master switch</h1>
+<div style="margin:2px 0 10px"><a href="." style="color:#9ecbff;text-decoration:none">&larr; status</a></div>
 <div id="login" class="card" style="display:none">
  <div class="muted">password</div>
  <input id="k" type="password"><button class="b-arm" style="width:36%;display:inline-block"

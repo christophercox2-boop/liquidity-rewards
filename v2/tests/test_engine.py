@@ -254,6 +254,70 @@ class TestExp1(unittest.TestCase):
             self.assertGreater(row["pred_level_day"], 0.0)
 
 
+def foreign(oid, intent, market=SEN, price=0.10, size=45.0, manual=False):
+    from v2.intents import REST_SIDE
+    return {"id": oid, "market": market, "side": REST_SIDE[intent],
+            "price": price, "size": size, "intent": intent, "manual": manual}
+
+
+class TestHandoverSweep(unittest.TestCase):
+    def test_clears_opening_orders_keeps_exits_even_with_switch_off(self):
+        from v2.intents import BUY_LONG, BUY_SHORT, SELL_SHORT
+        r = Rig(switch=False)
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        r.exchange.live["f1"] = foreign("f1", BUY_LONG, price=0.19)
+        r.exchange.live["f2"] = foreign("f2", BUY_SHORT, price=0.30)
+        r.exchange.live["f3"] = foreign("f3", SELL_LONG, price=0.27)
+        r.exchange.live["f4"] = foreign("f4", SELL_SHORT, price=0.18)
+        r.cycle(terms)
+        live = set(r.exchange.live)
+        self.assertNotIn("f1", live)    # opening bid: cleared
+        self.assertNotIn("f2", live)    # opening short: cleared
+        self.assertIn("f3", live)       # exit ask: left to finish
+        self.assertIn("f4", live)       # short buy-back: left to finish
+        self.assertEqual(r.engine.sweep_count, 2)
+        self.assertFalse(r.engine.family_sweep_done)   # done on the clean pass
+        # switch off: nothing was PLACED
+        self.assertFalse(any(u.endswith("/v1/orders") for u, _ in r.exchange.posts))
+        r.now += 60
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        r.cycle(terms)
+        self.assertTrue(r.engine.family_sweep_done)
+        self.assertTrue(any("Seats handover done" in t for t, _ in r.alerts))
+
+    def test_sweep_respects_the_per_cycle_budget(self):
+        from v2.intents import BUY_LONG
+        r = Rig(switch=False)
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        for i in range(20):
+            r.exchange.live[f"f{i}"] = foreign(f"f{i}", BUY_LONG, price=0.19)
+        r.cycle(terms)
+        self.assertEqual(r.engine.sweep_count, 8)      # 8 per cycle, no burst
+        r.now += 60
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        r.cycle(terms)
+        self.assertEqual(r.engine.sweep_count, 16)
+
+    def test_after_handover_automation_is_evicted_but_manual_orders_stay(self):
+        from v2.intents import BUY_LONG
+        r = Rig(switch=True)
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        r.cycle(terms)                                  # sweep completes (no foreign)
+        self.assertTrue(r.engine.family_sweep_done)
+        r.exchange.live["bot"] = foreign("bot", BUY_LONG, price=0.19)
+        r.exchange.live["hand"] = foreign("hand", BUY_LONG, price=0.18, manual=True)
+        r.now += 400
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        r.cycle(terms)
+        self.assertNotIn("bot", r.exchange.live)
+        self.assertIn("hand", r.exchange.live)
+        self.assertTrue(any(e.get("event") == "foreign_manual_order"
+                            for e in r.engine.log))
+
+
 class TestPersistence(unittest.TestCase):
     def test_engine_state_roundtrip(self):
         r = Rig()
