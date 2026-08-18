@@ -137,6 +137,17 @@ NOTIFY_REPEAT = float(os.environ.get("NOTIFY_REPEAT", "1800"))
 # firing or why. Anything held back is counted and reported on the next push
 # that gets through, so nothing disappears silently.
 NOTIFY_MIN_GAP = float(os.environ.get("NOTIFY_MIN_GAP", "300"))
+# ...but not for these. The ceiling was blunt enough to hold 17 fill alerts in
+# a day (2026-08-18): money actually changed hands and the phone never said
+# so. A fill and a question that needs an answer are not noise, and holding
+# them for five minutes to spare the owner a buzz is the wrong trade. They
+# still dedupe — an identical alert is still one alert — they just do not
+# queue behind the rate floor.
+NOTIFY_ALWAYS = tuple(
+    p.strip().lower() for p in os.environ.get(
+        "NOTIFY_ALWAYS",
+        "order filled,orders filled,sell below fair,"
+        "live monitor failing,cancel all sent").split(",") if p.strip())
 _NOTIFY_SEEN: dict = {}
 _NOTIFY_RATE: dict = {"last": 0.0, "held": 0, "titles": []}
 
@@ -178,7 +189,8 @@ def notify(title: str, message: str, priority: str = "default",
             return
         _NOTIFY_SEEN[key] = now_
         # ...and the ceiling, which does not care what the message says
-        if now_ - float(_NOTIFY_RATE["last"] or 0) < NOTIFY_MIN_GAP:
+        urgent = any(k in title.lower() for k in NOTIFY_ALWAYS)
+        if not urgent and now_ - float(_NOTIFY_RATE["last"] or 0) < NOTIFY_MIN_GAP:
             _NOTIFY_RATE["held"] += 1
             # Keep the NAMES, not just a count. The ceiling delays a genuinely
             # new alert as readily as a repeating one, so the next push has to
@@ -9675,6 +9687,8 @@ def _map_payload() -> dict:
         "qual_queue": sorted(
             ({"key": k, **v} for k, v in (MONITOR.state.get("qual_queue") or {}).items()),
             key=lambda j: -float(j.get("cost") or 0)),
+        # every alert the monitor decided about, sent or held, newest first
+        "notify_log": list(reversed((MONITOR.state.get("notify_log") or [])[-60:])),
         "probe_est": MONITOR.state.get("probe") or {},
         "probe_bayes": {m: b for m in sorted(
                             {l.get("m") for l in (MONITOR.state.get("probe_log") or [])}
@@ -9933,6 +9947,11 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     color:var(--dim);margin-bottom:6px">💸 Sell below fair? — waiting on you</div>
     <div id="sellBody"></div>
   </div>
+  <div class="card" id="alertCard" style="display:none">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--dim);margin-bottom:6px">🔔 Alerts — including the ones held back</div>
+    <div id="alertBody"></div>
+  </div>
   <div class="card" id="qualCard" style="display:none">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--dim);margin-bottom:6px">⚓ Qualifying — waiting on you</div>
@@ -9989,6 +10008,7 @@ const RANK = {conflict:0, notpaying:1, idle:2, gap:3, ok:4};
 const LABEL = {conflict:"fix now", notpaying:"not paying", idle:"low estimate",
                gap:"not entered", ok:"fine"};
 let DATA=null, SEL=null, FILTER=null, SHOWGAPS=false;
+let ALERTS_ALL=false;
 let RENDER_ERRS = [];
 let MAPTRY = 0;
 let BEAT = null;
@@ -10133,7 +10153,7 @@ function renderInner(){
   // the clue only existed in a console the owner has no way to open on a
   // phone. Each is isolated now, and a failure names itself on screen.
   [['sell', renderSell], ['qualify', renderQual], ['slate', renderSlate],
-   ['prober', renderProbe], ['earner', renderEarn]]
+   ['alerts', renderAlerts], ['prober', renderProbe], ['earner', renderEarn]]
     .forEach(([nm, fn]) => {
       try { fn(); }
       catch (e) { RENDER_ERRS.push(nm + ': ' + ((e && e.message) || e)); }
@@ -10599,6 +10619,34 @@ async function rescout2028(){
   renderProbe();
   setTimeout(load, 2000);
 }
+
+function renderAlerts(){
+  const card = document.getElementById('alertCard'); if(!card) return;
+  const log = DATA.notify_log || [];
+  if(!log.length){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  const held = log.filter(e => !e.sent).length;
+  const rows = (ALERTS_ALL ? log : log.slice(0, 20)).map(e =>
+    '<tr style="border-top:1px solid #222a38">' +
+    '<td style="padding:3px 0;font-size:11px;white-space:nowrap;color:' +
+    (e.sent ? '#3fb950' : 'var(--dim)') + '">' +
+    (e.sent ? 'sent' : 'held') + '</td>' +
+    '<td style="padding:3px 6px;font-size:11.5px"><b>' + esc(e.title) + '</b>' +
+    '<div class="sub" style="font-size:10px">' + esc(e.msg) +
+    (e.why ? ' &middot; <i>' + esc(e.why) + '</i>' : '') + '</div></td>' +
+    '<td class="r sub" style="font-size:10px;white-space:nowrap">' +
+    esc(String(e.ts).slice(6)) + '</td></tr>').join('');
+  document.getElementById('alertBody').innerHTML =
+    '<div class="sub" style="font-size:11px;margin-bottom:4px">' +
+    log.length + ' recent &middot; <b>' + held + ' held back</b> so your phone ' +
+    'is not buzzing every minute. Fills and anything needing your answer are ' +
+    'never held.</div>' +
+    '<table style="width:100%;border-collapse:collapse">' + rows + '</table>' +
+    (log.length > 20 ? '<button class="alt" style="margin-top:6px;font-size:11px" ' +
+      'onclick="alertsAll()">' + (ALERTS_ALL ? 'show fewer' : 'show all ' +
+      log.length) + '</button>' : '');
+}
+function alertsAll(){ ALERTS_ALL = !ALERTS_ALL; renderAlerts(); }
 
 function renderProbe(){
   const card = document.getElementById('probeCard'); if(!card) return;
