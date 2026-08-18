@@ -1,0 +1,304 @@
+"""Exchange API: signing, one disciplined HTTP client, read endpoints.
+
+READ-ONLY on purpose. Everything that places, moves or cancels orders
+lives in orders.py behind the safety rails; this module only knows how
+to sign, retry, and parse. The quirks encoded here were all paid for in
+1.0 — each one is commented where it is handled.
+
+Auth: Ed25519 signature over ``timestamp + METHOD + path`` (the query
+string is NOT signed), sent as X-PM-Access-Key / X-PM-Timestamp (ms) /
+X-PM-Signature. The secret is base64 of a 32-byte seed (or a 64-byte
+key, of which the first 32 bytes are the seed). Matches the official
+polymarket-us SDK.
+"""
+
+from __future__ import annotations
+
+import base64
+import os
+import time
+
+import requests
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+from .programs import to_num
+from .scoring import Book, normalize_book
+
+TRADE_API = "https://api.polymarket.us"          # authenticated
+GATEWAY = "https://gateway.polymarket.us"        # public
+# The documented incentives host first, the trade host as fallback.
+INCENTIVES_HOSTS = ("https://api.prod.polymarketexchange.com", TRADE_API)
+EARNINGS_PATH = "/v1/incentives/earnings"
+
+# /v1/orders/open keeps returning finished orders (a modify used to mint a
+# permanent REPLACED ghost per call). They are not resting and must not be
+# counted, scored, or matched by verification. Denylist on purpose:
+# dropping a state that is actually live would make us re-place a
+# duplicate; keeping an unknown state merely over-counts — the cheaper
+# mistake.
+DEAD_ORDER_STATES = frozenset({
+    "ORDER_STATE_REPLACED", "ORDER_STATE_CANCELED", "ORDER_STATE_CANCELLED",
+    "ORDER_STATE_FILLED", "ORDER_STATE_EXPIRED", "ORDER_STATE_REJECTED",
+    "ORDER_STATE_DONE_FOR_DAY",
+})
+
+RETRYABLE_STATUSES = (429, 500, 502, 503, 504)
+
+
+def auth_headers(key_id: str, secret_key: str, method: str, path: str,
+                 now_ms: int | None = None) -> dict:
+    """Sign ``timestamp+method+path`` with the account's Ed25519 key."""
+    timestamp = str(now_ms if now_ms is not None else int(time.time() * 1000))
+    seed = base64.b64decode(secret_key)
+    if len(seed) == 64:
+        seed = seed[:32]
+    key = Ed25519PrivateKey.from_private_bytes(seed)
+    signature = key.sign(f"{timestamp}{method}{path}".encode())
+    return {
+        "X-PM-Access-Key": key_id,
+        "X-PM-Timestamp": timestamp,
+        "X-PM-Signature": base64.b64encode(signature).decode(),
+    }
+
+
+def err_text(resp) -> str:
+    """Readable one-line HTTP error — never a raw Cloudflare HTML page."""
+    body = " ".join((resp.text or "").split())[:300]
+    return f"HTTP {resp.status_code}: {body}"
+
+
+class ApiError(RuntimeError):
+    def __init__(self, message: str, status: int | None = None):
+        super().__init__(message)
+        self.status = status
+
+
+class Client:
+    """One HTTP client with the retry discipline 1.0 learned the hard way:
+    429/5xx retried in place honouring Retry-After (a throttled response
+    must not abort a whole cycle), network faults retried with backoff,
+    but any other 4xx raised immediately — a real answer, retrying it
+    wastes time. All timestamps the exchange needs come from this box's
+    clock; all money numbers are parsed with to_num (protobuf shapes)."""
+
+    def __init__(self, key_id: str | None = None, secret_key: str | None = None,
+                 session=None, timeout: float = 30.0, sleep=None):
+        self.key_id = key_id if key_id is not None else os.environ.get("POLYMARKET_KEY_ID", "")
+        self.secret_key = (secret_key if secret_key is not None
+                           else os.environ.get("POLYMARKET_SECRET_KEY", ""))
+        self.session = session or requests.Session()
+        self.timeout = timeout
+        self._sleep = sleep if sleep is not None else time.sleep
+
+    # -- plumbing ----------------------------------------------------------
+
+    def _headers(self, method: str, path: str) -> dict:
+        if not (self.key_id and self.secret_key):
+            raise ApiError("no API credentials configured")
+        return auth_headers(self.key_id, self.secret_key, method, path)
+
+    def get(self, url: str, *, path: str | None = None, signed: bool = False,
+            params: dict | None = None, timeout: float | None = None, tries: int = 4):
+        """GET with retries; returns parsed JSON. `path` is the signed path
+        (defaults to the URL's path)."""
+        if path is None:
+            path = "/" + url.split("://", 1)[-1].split("/", 1)[-1].split("?")[0]
+        delay = 2.0
+        last_exc: Exception | None = None
+        for attempt in range(tries):
+            try:
+                resp = self.session.request(
+                    "GET", url, params=params,
+                    headers=self._headers("GET", path) if signed else {},
+                    timeout=timeout or self.timeout,
+                )
+            except (requests.Timeout, requests.ConnectionError) as e:
+                last_exc = e
+                if attempt < tries - 1:
+                    self._sleep(delay)
+                    delay = min(delay * 2, 15.0)
+                continue
+            if resp.status_code < 400:
+                return resp.json()
+            if resp.status_code not in RETRYABLE_STATUSES or attempt == tries - 1:
+                raise ApiError(f"{url} -> {err_text(resp)}", status=resp.status_code)
+            ra = resp.headers.get("Retry-After")
+            try:
+                wait = min(float(ra), 30.0) if ra else delay
+            except ValueError:
+                wait = delay
+            self._sleep(wait)
+            delay = min(delay * 2, 15.0)
+        raise ApiError(f"{url}: {type(last_exc).__name__} on every one of {tries} tries — {last_exc}")
+
+    # -- account -----------------------------------------------------------
+
+    def balances_raw(self) -> list[dict]:
+        j = self.get(TRADE_API + "/v1/account/balances", signed=True)
+        return list(j.get("balances") or [])
+
+    def buying_power(self) -> float | None:
+        """1.0's bug was returning the FIRST balance row carrying a
+        buyingPower key — with several rows (a zero row before the funded
+        one) that reads $0 while the account holds money, and it silently
+        blocked the qualifier for weeks. Parse every row through to_num
+        (the API nests numbers) and take the largest. The first read-only
+        run logs balances_raw so the true payload shape gets confirmed."""
+        vals = [to_num(b.get("buyingPower")) for b in self.balances_raw()
+                if b.get("buyingPower") is not None]
+        return max(vals) if vals else None
+
+    def positions(self, max_pages: int = 20) -> list[dict]:
+        out: list[dict] = []
+        params: dict = {"pageSize": 100}
+        for _ in range(max_pages):
+            j = self.get(TRADE_API + "/v1/portfolio/positions", signed=True, params=params)
+            out.extend(j.get("positions") or [])
+            token = j.get("nextPageToken")
+            if not token:
+                break
+            params["pageToken"] = token
+        return out
+
+    def recent_trades(self, limit: int = 25) -> list[dict]:
+        """Latest trade activities. The feed returns BOTH sides of every
+        trade — treating that as a self-cross once dropped 1,623 of 1,623
+        real fills. Deduplication is the caller's job; this returns raw."""
+        j = self.get(TRADE_API + "/v1/portfolio/activities", signed=True,
+                     params={"types": ["ACTIVITY_TYPE_TRADE"], "pageSize": limit})
+        return list(j.get("activities") or [])
+
+    # -- orders (read only here) --------------------------------------------
+
+    def open_orders(self) -> list[dict]:
+        """Live resting orders, normalized, dead states filtered."""
+        j = self.get(TRADE_API + "/v1/orders/open", signed=True)
+        orders = []
+        for o in j.get("orders") or []:
+            if str(o.get("state") or "") in DEAD_ORDER_STATES:
+                continue
+            md = o.get("marketMetadata") or {}
+            size = to_num(o.get("leavesQuantity")) or to_num(o.get("quantity"))
+            orders.append({
+                "id": str(o.get("id") or ""),
+                "market": o.get("marketSlug") or md.get("slug") or "",
+                "side": "BUY" if str(o.get("side", "")).upper().endswith("BUY") else "SELL",
+                "price": to_num(o.get("price")),
+                "size": size,
+                "intent": str(o.get("intent") or ""),
+                "state": str(o.get("state") or ""),
+                "created": str(o.get("createTime") or ""),
+                "title": str(md.get("title") or ""),
+                "subject": str(((md.get("subject") or {}).get("name")) or ""),
+                "image": str(((md.get("subject") or {}).get("image")) or ""),
+                "manual": str(o.get("manualOrderIndicator") or "").endswith("MANUAL"),
+            })
+        return orders
+
+    # -- market data (public) ------------------------------------------------
+
+    def book(self, slug: str, fetched_at: float | None = None) -> Book:
+        j = self.get(f"{GATEWAY}/v1/markets/{slug}/book")
+        md = j.get("book") or j.get("marketData") or j
+        bids = [(to_num(l.get("px")), to_num(l.get("qty"))) for l in md.get("bids") or []]
+        asks = [(to_num(l.get("px")), to_num(l.get("qty")))
+                for l in md.get("offers") or md.get("asks") or []]
+        return normalize_book(bids, asks,
+                              fetched_at if fetched_at is not None else time.time())
+
+    def programs(self, slugs: list[str]) -> dict[str, dict]:
+        """Raw incentive programs for the given markets, keyed by slug.
+        Batched (hundreds of symbols overflow the URL); each batch tries
+        each host — api.polymarket.us needs the signed headers, the prod
+        host does not. Picking the paying period from timePeriods is
+        programs.pick_period's job, at the caller. Raises if EVERY batch
+        fails; a partial result never silently stands in for a full one."""
+        out: dict[str, dict] = {}
+        errors: list[str] = []
+        for i in range(0, len(slugs), 40):
+            batch = slugs[i:i + 40]
+            got = None
+            for host in INCENTIVES_HOSTS:
+                try:
+                    j = self.get(host + "/v1/incentives", signed=(host == TRADE_API),
+                                 path="/v1/incentives",
+                                 params={"symbols": batch, "pageSize": 100}, timeout=20)
+                    got = {}
+                    for p in j.get("programs") or []:
+                        if p.get("marketSlug"):
+                            got[p["marketSlug"]] = p
+                    break
+                except ApiError as e:
+                    errors.append(str(e))
+            if got is None:
+                raise ApiError("programs fetch failed on every host: " + " | ".join(errors[-2:]))
+            out.update(got)
+            self._sleep(0.05)
+        return out
+
+    def earnings(self, start_date: str) -> list[dict]:
+        """The published-payout ground truth, complete from start_date.
+        Explicit big pages (the server default ~31/page once silently
+        capped history while the heartbeat stayed green); bounded
+        pagination that RAISES rather than truncating silently."""
+        errors: list[str] = []
+        for host in INCENTIVES_HOSTS:
+            try:
+                return self._earnings_from(host, start_date)
+            except ApiError as e:
+                errors.append(str(e))
+        raise ApiError("earnings failed on every host: " + " | ".join(errors))
+
+    def _earnings_from(self, host: str, start_date: str) -> list[dict]:
+        rows: list[dict] = []
+        params: dict = {"startDate": start_date, "pageSize": 500}
+        token = None
+        for _ in range(200):
+            j = self.get(host + EARNINGS_PATH, signed=True, path=EARNINGS_PATH,
+                         params=params, timeout=60)
+            for r in j.get("rewards") or []:
+                rows.append({
+                    "date": str(r.get("date", ""))[:10],
+                    "market": r.get("marketSlug", ""),
+                    "program_type": r.get("programType", ""),
+                    "reward_usd": float(r.get("reward", 0) or 0),
+                    "status": str(r.get("status", "")).upper(),
+                })
+            token = j.get("nextPageToken")
+            if not token:
+                break
+            params["pageToken"] = token
+        else:
+            if token:
+                raise ApiError(f"{host}{EARNINGS_PATH}: still more pages after the bound "
+                               f"({len(rows)} rows) — raise the limit")
+        rows.sort(key=lambda r: (r["date"], r["market"], r["program_type"]))
+        return rows
+
+    # -- discovery (public) ---------------------------------------------------
+
+    def events_by_tag(self, tag: str, max_pages: int = 30) -> list[dict]:
+        """Events under a tag (paginates with limit/offset, not pageToken)."""
+        out: list[dict] = []
+        offset = 0
+        for _ in range(max_pages):
+            j = self.get(GATEWAY + "/v1/events",
+                         params={"tagSlug": tag, "active": "true",
+                                 "limit": 100, "offset": offset})
+            events = j.get("events") or []
+            out.extend(events)
+            if len(events) < 100:
+                break
+            offset += 100
+        return out
+
+    def market_details(self, slug: str) -> dict:
+        j = self.get(f"{GATEWAY}/v1/market/slug/{slug}")
+        return j.get("market") or j.get("marketData") or j
+
+    def event_by_slug(self, event_slug: str) -> dict:
+        j = self.get(f"{GATEWAY}/v1/events/slug/{event_slug}")
+        return j.get("event") or j
+
+    def search(self, query: str, limit: int = 20) -> dict:
+        return self.get(GATEWAY + "/v1/search", params={"query": query, "limit": limit})
