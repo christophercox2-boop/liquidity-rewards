@@ -14509,6 +14509,39 @@ class Handler(BaseHTTPRequestHandler):
         # required"} (owner, 2026-08-17). Query parsing below still reads
         # self.path: ?key= and ?slug= must keep working.
         route = self.path.split("?", 1)[0]
+        if route == "/v2" or route.startswith("/v2/"):
+            # 2.0 runs as a second process in this container (read-only
+            # phase, see v2/DESIGN.md); this front door forwards /v2/* to
+            # it on localhost. Its shell is public like every other shell
+            # here — auth for the data underneath happens inside the 2.0
+            # process, same DASH_PASSWORD, same dashKey header. 2.0 being
+            # down must never hurt 1.0: any failure is a plain 502.
+            if route == "/v2":
+                # the page fetches 'data.json' relative to its URL, which
+                # only resolves under /v2/ with the trailing slash
+                q = ("?" + self.path.split("?", 1)[1]) if "?" in self.path else ""
+                self.send_response(301)
+                self.send_header("Location", "/v2/" + q)
+                self.end_headers()
+                return
+            import urllib.error
+            import urllib.request
+            sub = self.path[len("/v2"):]  # keeps the query string
+            req = urllib.request.Request(
+                f"http://127.0.0.1:{os.environ.get('V2_PORT', '8091')}{sub}")
+            for h in ("X-Dash-Key", "Authorization"):
+                if self.headers.get(h):
+                    req.add_header(h, self.headers[h])
+            try:
+                with urllib.request.urlopen(req, timeout=6) as r:
+                    self._send(getattr(r, "status", 200) or 200,
+                               r.headers.get("Content-Type", "text/plain"), r.read())
+            except urllib.error.HTTPError as e:
+                # pass 2.0's own 401 through — it drives the login card
+                self._send(e.code, e.headers.get("Content-Type", "text/plain"), e.read())
+            except Exception:  # noqa: BLE001
+                self._send(502, "text/plain", b"2.0 is not running in this container")
+            return
         if route == "/" or route.startswith("/index"):
             # The shell holds no data — serve it instantly, unauthenticated.
             # The page's own login card gates the data underneath.

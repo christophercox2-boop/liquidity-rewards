@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""Runs 1.0 and 2.0 side by side in the one container (one $5 app —
+owner's decision, no second subscription).
+
+1.0's monitor keeps the public HTTP port and stays the front door; its
+/v2/* route forwards to the 2.0 process on localhost. 2.0 runs
+read-only — it has no code path to an order endpoint in this phase.
+
+A child that exits is restarted with backoff (5s doubling to 60s,
+reset after ten healthy minutes). SIGTERM stops both and exits, so
+platform redeploys stay clean. 2.0 is skipped, with a line saying so,
+when V2_ENABLED=0 or the exchange keys are missing — 1.0 alone must
+keep working no matter what.
+"""
+
+from __future__ import annotations
+
+import os
+import signal
+import subprocess
+import sys
+import time
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+HEALTHY_RESET_S = 600.0
+BACKOFF_MIN_S, BACKOFF_MAX_S = 5.0, 60.0
+
+
+def children() -> dict[str, list[str]]:
+    procs = {"1.0": [sys.executable, "-u", os.path.join(HERE, "live", "monitor.py")]}
+    if os.environ.get("V2_ENABLED", "1") == "0":
+        print("launcher: 2.0 disabled by V2_ENABLED=0", flush=True)
+    elif not (os.environ.get("POLYMARKET_KEY_ID") and os.environ.get("POLYMARKET_SECRET_KEY")):
+        print("launcher: 2.0 skipped — exchange keys not set", flush=True)
+    else:
+        procs["2.0"] = [sys.executable, "-u", "-m", "v2.main"]
+    return procs
+
+
+def main() -> int:
+    cmds = children()
+    procs: dict[str, subprocess.Popen] = {}
+    started: dict[str, float] = {}
+    backoff: dict[str, float] = {n: BACKOFF_MIN_S for n in cmds}
+    stopping = False
+
+    def stop(signum, frame):  # noqa: ARG001
+        nonlocal stopping
+        stopping = True
+        for p in procs.values():
+            if p.poll() is None:
+                p.terminate()
+
+    signal.signal(signal.SIGTERM, stop)
+    signal.signal(signal.SIGINT, stop)
+
+    def start(name: str) -> None:
+        print(f"launcher: starting {name}", flush=True)
+        procs[name] = subprocess.Popen(cmds[name], cwd=HERE)
+        started[name] = time.time()
+
+    for name in cmds:
+        start(name)
+
+    while not stopping:
+        time.sleep(5)
+        for name, p in list(procs.items()):
+            if p.poll() is None:
+                if time.time() - started[name] > HEALTHY_RESET_S:
+                    backoff[name] = BACKOFF_MIN_S
+                continue
+            print(f"launcher: {name} exited with {p.returncode}; "
+                  f"restarting in {backoff[name]:.0f}s", flush=True)
+            time.sleep(backoff[name])
+            backoff[name] = min(backoff[name] * 2, BACKOFF_MAX_S)
+            if not stopping:
+                start(name)
+
+    for p in procs.values():
+        try:
+            p.wait(timeout=15)
+        except subprocess.TimeoutExpired:
+            p.kill()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -29,6 +29,7 @@ from .books import BookCache, ws_priority
 from .estimator import Estimator
 from .state import StateStore
 from .terms import TermsStore
+from .web import WebServer
 from .ws import Stream
 
 POLL_S = 30.0
@@ -104,6 +105,7 @@ class Monitor:
         self.boot_ts = time.time()
         self.build = build_hash()
         self.errors: list[str] = []
+        self.last_state: dict = {}
         self.stream = Stream(self.cache, self._ws_slugs,
                              self.client.key_id, self.client.secret_key)
         self._restore()
@@ -175,6 +177,7 @@ class Monitor:
             "errors": self.errors[-20:],
             "orders_n": len(orders), "markets_n": len(self.universe),
         }
+        self.last_state = state
         self.store.save_local(state)
         self.store.maybe_save_remote(state)
         return snap
@@ -187,6 +190,10 @@ class Monitor:
 
     def run(self) -> None:
         self.stream.start()
+        try:
+            WebServer(get_state=lambda: self.last_state).start_background()
+        except OSError as e:  # port taken: measuring still works, the page doesn't
+            self._note(f"web server: {e}")
         streak = 0
         while True:
             try:
