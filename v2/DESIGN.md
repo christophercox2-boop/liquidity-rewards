@@ -292,11 +292,17 @@ alone under Target Size, closer levels plus the size already at our
 level over it) is automatically an experiment: both predictions are
 registered at placement time — level reading ~$X/day, queue reading $0
 — and graded against `rewards.csv` actuals per market per day, with
-same-family placements where the readings agree as controls. Setups
-where the level-reading prediction is under ~$0.25/day can't be graded
-by a one-day payout and don't count as evidence either way. The 1.0
-precedent for pre-registered order experiments is
-`experiment_touch.yml` + `analyse_touch.py`.
+same-family placements where the readings agree as controls. Small
+predictions are NOT discarded (owner's instruction — many payouts are
+under $0.25/day and still carry signal): a single small setup can't
+decide anything on its own, so they are pooled — predicted and paid
+summed across all open setups per day, and the ratio read on the pool,
+where a persistent pattern shows even when each member is pennies. The
+grading needs care with the two known blurs: pending-bucket days (a
+payout row that still grows) are graded only once finalized, and every
+registered prediction is stamped with the placement time so partial
+first days are pro-rated. The 1.0 precedent for pre-registered order
+experiments is `experiment_touch.yml` + `analyse_touch.py`.
 
 **Resolution:** if graded payouts repeatedly come in at the queue
 prediction, the level reading is ruled out and sizing flips; if they

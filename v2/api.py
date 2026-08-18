@@ -97,10 +97,13 @@ class Client:
             raise ApiError("no API credentials configured")
         return auth_headers(self.key_id, self.secret_key, method, path)
 
-    def get(self, url: str, *, path: str | None = None, signed: bool = False,
-            params: dict | None = None, timeout: float | None = None, tries: int = 4):
-        """GET with retries; returns parsed JSON. `path` is the signed path
-        (defaults to the URL's path)."""
+    def _request(self, method: str, url: str, *, path: str | None = None,
+                 signed: bool = False, params: dict | None = None,
+                 json_body: dict | None = None, timeout: float | None = None,
+                 tries: int = 4):
+        """One HTTP call with the retry discipline; returns parsed JSON.
+        `path` is the signed path (defaults to the URL's path — the query
+        string is never part of the signature)."""
         if path is None:
             path = "/" + url.split("://", 1)[-1].split("/", 1)[-1].split("?")[0]
         delay = 2.0
@@ -108,8 +111,8 @@ class Client:
         for attempt in range(tries):
             try:
                 resp = self.session.request(
-                    "GET", url, params=params,
-                    headers=self._headers("GET", path) if signed else {},
+                    method, url, params=params, json=json_body,
+                    headers=self._headers(method, path) if signed else {},
                     timeout=timeout or self.timeout,
                 )
             except (requests.Timeout, requests.ConnectionError) as e:
@@ -130,6 +133,20 @@ class Client:
             self._sleep(wait)
             delay = min(delay * 2, 15.0)
         raise ApiError(f"{url}: {type(last_exc).__name__} on every one of {tries} tries — {last_exc}")
+
+    def get(self, url: str, *, path: str | None = None, signed: bool = False,
+            params: dict | None = None, timeout: float | None = None, tries: int = 4):
+        return self._request("GET", url, path=path, signed=signed, params=params,
+                             timeout=timeout, tries=tries)
+
+    def post(self, url: str, json_body: dict, *, path: str | None = None,
+             timeout: float | None = None, tries: int = 1):
+        """Signed POST. Default tries=1 on purpose: order-touching calls must
+        never be blindly re-sent — a timed-out placement may have landed,
+        and re-posting it doubles the order. The caller (orders.py) decides
+        how to recover, by looking at the book, never by resending."""
+        return self._request("POST", url, signed=True, path=path,
+                             json_body=json_body, timeout=timeout, tries=tries)
 
     # -- account -----------------------------------------------------------
 
