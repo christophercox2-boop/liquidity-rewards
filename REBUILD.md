@@ -121,31 +121,25 @@ combines three things:
 
 Integrating that rate over the day gives "earned today".
 
-**Two separate sources of error, and they need different treatment.**
+**No correction factor. The estimate is the arithmetic on real inputs, and
+nothing else.** This is the owner's explicit instruction. The estimate may be
+inaccurate on some days; that is accepted, and he or a future model will
+adjust for it deliberately at the time rather than having a fudge baked in.
 
-*Error we control.* Stale or missing reward terms, a wrong pool divisor, and
-the queue-position bug described further down. When the pool was cut on
-2026-08-18 the estimate carried on using the old figure, which is entirely our
-fault. Fix these properly — read the real terms, refresh them, and if a pool
-changes the estimate should move the same minute. Never use a correction
-factor to cover for an input you could simply get right.
+Two things follow from that.
 
-*Error we do not control.* The exchange appears to be inconsistent in how it
-actually awards incentive payments. The clearest evidence: on 14 and 15 August
-the same 60 markets were scored by the same code, and the estimate came in at
-0.27 times actual on one day and 1.03 times on the next. Per market, the
-second day paid roughly eleven times the first. Nothing on our side changed by
-that magnitude. Some of the gap between a correctly computed score and the
-money that arrives is simply the exchange behaving differently day to day.
+*Fix the inputs, because they are the only lever.* Stale or missing reward
+terms, a wrong pool divisor, and the queue-position bug described further
+down. When the pool was cut on 2026-08-18 the estimate carried on using the
+old figure, which was entirely our fault and is exactly the kind of error a
+correction factor would have hidden.
 
-**So a calibration term is legitimate, and 1.0 was not wrong to use one.** It
-probably made the number more accurate than raw arithmetic would have been.
-The rule for 2.0 is about where it sits: apply it on top of inputs that are
-already correct, keep it visible rather than buried, and derive it from the
-recent record of estimate against actual — which `data/rewards.csv` and the
-saved state history already contain. A correction that quietly compensates for
-a stale pool is a bug in disguise. A correction that accounts for genuine
-exchange variance is doing real work.
+*Expect a residual gap, and do not treat it as a bug.* The exchange appears
+inconsistent in how it awards incentive payments. On 14 and 15 August the same
+60 markets were scored by the same code; the estimate came in at 0.27 times
+actual on one day and 1.03 times on the next, and per market the second day
+paid roughly eleven times the first. Nothing on our side moved by that much.
+So a correctly built estimate will still miss sometimes. Report it as it is.
 
 Also: 1.0 keeps three separate "earned" figures — the plain integration, the
 high-frequency one, and a sparse fallback — and they disagree. That is a
@@ -367,8 +361,8 @@ daily pool contained, which disproved it. Do not re-open this.
   that changed before the feature shipped is invisible.
 - **The estimate runs on partly stale inputs.** Reward terms were cached and
   under-recorded, so the live figure can keep using a pool that has already
-  changed. This is the half of the error we control, and it should be fixed at
-  the source rather than corrected downstream.
+  changed. Fix it at the source — no correction factor is permitted, so the
+  inputs are the only lever there is.
 - **The map page is overloaded.** Acknowledged, not addressed.
 
 ### Environmental
