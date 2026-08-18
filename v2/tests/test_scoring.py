@@ -125,7 +125,7 @@ class TestEstimateJoin(unittest.TestCase):
                           price=0.50, qty=1.0)
         self.assertTrue(j.qualifies)
         self.assertTrue(j.in_window)
-        self.assertTrue(j.in_window_level)
+        self.assertTrue(j.in_window_queue)
         want = 1.0 / (7.0 + 100.0 * 0.2)
         self.assertAlmostEqual(j.share, want, places=6)
         self.assertAlmostEqual(j.share_if_queue, want, places=6)
