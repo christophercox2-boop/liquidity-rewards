@@ -3886,8 +3886,39 @@ NO_AUTO = tuple(
 NO_AUTO_PREFIXES = tuple(p for p, _ in NO_AUTO)
 
 
+_SLUG_DATE = re.compile(r"(20\d\d-\d\d-\d\d)")
+
+
+def _ends_today(m: str) -> bool:
+    """Does this market resolve today or earlier?
+
+    Every slug carries its resolution date — ...-2026-08-18-jonkre, and a
+    2026-11-03 senate race is months out. A market settling today is the worst
+    thing to open new exposure in: the price moves on the result, not on
+    anything the model knows, and a reward day that ends at settlement pays
+    for a fraction of the risk taken (owner, 2026-08-18: "no earner or prober
+    on anything ending today").
+    """
+    mt = _SLUG_DATE.search(str(m))
+    if not mt:
+        return False
+    try:
+        return (dt.date.fromisoformat(mt.group(1))
+                <= dt.datetime.now(ET).date())
+    except ValueError:  # a date-shaped string that is not a date
+        return False
+
+
 def _hands_off(m: str) -> bool:
-    return bool(NO_AUTO_PREFIXES) and str(m).startswith(NO_AUTO_PREFIXES)
+    """No NEW exposure here — the earner, the prober, the qualifier.
+
+    Selling what we already hold is deliberately NOT covered: the owner is out
+    of the primaries "except for selling open positions", so the inventory
+    loop and the flip ladder still work those markets. They only ever reduce a
+    position; they cannot open one.
+    """
+    return ((bool(NO_AUTO_PREFIXES) and str(m).startswith(NO_AUTO_PREFIXES))
+            or _ends_today(m))
 
 
 def _preferred(m: str) -> bool:
@@ -4425,8 +4456,12 @@ def auto_inventory() -> None:
             break
         if now - float(_INV["done"].get(slug) or 0) < INV_INTERVAL * 4:
             continue
-        if _hunt_held(slug) or _hands_off(slug):
+        if _hunt_held(slug):
             continue          # cleared for the owner to trade by hand
+        # NOT gated on _hands_off. This loop rests idle shares we already own
+        # as asks — it sells, it never buys, and "except for selling open
+        # positions I'm out of the primary markets" means exactly that the
+        # selling should carry on (owner, 2026-08-18).
         free = _inv_free(slug)
         if free < INV_MIN_SHARES:
             continue
