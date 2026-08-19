@@ -116,6 +116,10 @@ _CSS = """
  .chips{margin:4px 0} .chip{display:inline-block;background:#2a3242;
    border-radius:6px;padding:1px 8px;font-size:12px;margin:2px 4px 2px 0;color:#c6cddb}
  svg.spark{vertical-align:middle;margin-left:10px}
+ .mtrack{height:10px;background:#2b3d5c;border-radius:5px;margin:8px 0 2px;
+         position:relative;overflow:hidden}
+ .mfill{position:absolute;left:0;top:0;bottom:0;background:var(--s1);
+        border-radius:5px}
 """
 
 _PLUMBING = """
@@ -225,7 +229,10 @@ STATUS_JS = """
    '<div class="stat"><div class="lab">worst case at risk</div><div class="val">'+usd(g.used)+
      '<span class="u"> of '+usd(g.ceiling)+'</span></div></div>'+
    '<div class="stat"><div class="lab">orders resting</div><div class="val">'+(g.orders||[]).length+'</div></div>'+
-   '</div>'+(rfs?'<div class="chips">'+rfs+'</div>':'');
+   '</div>'+
+   '<div class="mtrack"><div class="mfill" style="width:'+
+     Math.min(100*(g.used||0)/(g.ceiling||100),100)+'%"></div></div>'+
+   (rfs?'<div class="chips">'+rfs+'</div>':'');
  if(g.mode&&g.mode!=='on')h+='<div class="hint">engine: '+g.mode+'</div>';
  if(g.sweep&&!g.sweep.done)h+='<div class="warn">handover sweep running &middot; '+(g.sweep.cancelled||0)+' cleared so far</div>';
  var rw=d.rewards_status||{};
@@ -251,43 +258,65 @@ STATUS_JS = """
 
 ORDERS_JS = """
  var g=d.engine||{};var fx={};(d.forecasts||[]).forEach(function(f){if(f.id)fx[f.id]=f;});
- function m(x,f){return x==null?'<span class="muted">&ndash;</span>':f(x);}
  var go=(g.orders||[]).slice().sort(function(a,b){return (b.live_est||0)-(a.live_est||0);});
- var tot=0;go.forEach(function(o){tot+=o.live_est||0;});
- var h='<div class="card"><b>Resting now</b>'+
-  '<div class="sub">'+go.length+' orders, earning about '+usd(tot)+' per day together at the current books.</div>';
- if(go.length){h+='<table>'+hrow(['market','order','earns','fill odds']);
-  go.forEach(function(o){var f=fx[o.id]||{};
-   h+=row([mshort(o.market)+'<br><span class="muted">'+pwhy(o.purpose)+'</span>',
+ var grp={earn:[],scout:[],exp1:[],stock:[]};
+ go.forEach(function(o){
+  var k=o.purpose==='earn'?'earn':o.purpose==='exp1'?'exp1':
+        (o.purpose==='sell'||o.purpose==='close'||o.purpose==='exit')?'stock':'scout';
+  grp[k].push(o);});
+ function dsum(l){var t=0;l.forEach(function(o){t+=o.live_est||0;});return t;}
+ var tot=dsum(go);
+ function tbl(list){
+  var t='<table>'+hrow(['market','order','earns','fill odds']);
+  list.forEach(function(o){var f=fx[o.id]||{};
+   t+=row([mshort(o.market),
      '<span style="white-space:nowrap">'+(o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+pc(o.price)+'</span>',
      (o.live_est!=null?usd(o.live_est)+'/d':'<span class="muted">&ndash;</span>')+
        '<br><span class="muted">'+(o.live_ev!=null?usd(o.live_ev)+' after risk':'&ndash;')+'</span>',
      f.p_fill!=null?pct(f.p_fill)+'/d':'<span class="muted">&ndash;</span>']);});
-  h+='</table>';}
- else{h+='<div class="muted">nothing resting</div>';}
+  return t+'</table>';}
+ var h='<div class="card"><b>Resting now</b>'+
+  '<div class="sub">'+go.length+' orders earning about '+usd(tot)+'/day &mdash; '+
+  usd(dsum(grp.earn))+' of it from the '+grp.earn.length+' sized orders.</div>';
+ if(grp.earn.length)h+=tbl(grp.earn);
+ else h+='<div class="muted">no sized orders resting</div>';
+ if(grp.scout.length)h+='<details class="how"><summary>'+grp.scout.length+
+  ' scouts &middot; '+usd(dsum(grp.scout))+'/d &mdash; 1-share feelers where model and market disagree</summary>'+
+  tbl(grp.scout)+'</details>';
+ if(grp.exp1.length)h+='<details class="how"><summary>'+grp.exp1.length+
+  ' experiments &middot; probing the scoring-window rule</summary>'+tbl(grp.exp1)+'</details>';
+ if(grp.stock.length)h+='<details class="how"><summary>'+grp.stock.length+
+  ' selling stock &middot; re-offering filled shares at break-even +1 tick</summary>'+tbl(grp.stock)+'</details>';
  h+='<details class="how"><summary>how to read this</summary>'+
-  '<b>$/day</b> is what the order earns from the reward pool at this book, right now. '+
-  '<b>after risk</b> subtracts the expected cost of getting filled (fills are usually '+
-  'losses here, not wins) &mdash; the engine only keeps orders whose after-risk number '+
-  'stays positive, except 1-share scouts and experiments, which pay for information. '+
-  '<b>fill odds</b> is the chance of being filled within a day, learned from how often '+
-  'each market&rsquo;s best price actually gets run over. A dash means the book was too '+
-  'stale to score this cycle.</details></div>';
+  '<b>earns</b> is what the order makes from the reward pool at this book right now; the line '+
+  'under it subtracts the expected cost of getting filled (fills are usually losses here, not '+
+  'wins). The engine only keeps sized orders whose after-risk number stays positive; scouts and '+
+  'experiments pay pennies for information. <b>fill odds</b> is the chance of being filled '+
+  'within a day, learned from how often each ladder&rsquo;s best price gets run over. '+
+  'A dash means the book was too stale to score this cycle.</details></div>';
  var closed=(d.forecasts||[]).filter(function(f){return f.how;}).reverse();
  if(closed.length){
-  var OMAP={silent_cancel:'cancelled by the exchange',pulled:'pulled (price left the safe band)',
-    repriced:'repriced',rotated_out:'swapped for a better idea',cancelled:'cancelled'};
+  var OMAP={fill:'filled',silent_cancel:'exchange cancelled',pulled:'pulled',
+    repriced:'repriced',rotated_out:'swapped out',cancelled:'cancelled'};
+  var counts={};closed.slice(0,40).forEach(function(f){
+    var k=OMAP[f.how]||f.how;counts[k]=(counts[k]||0)+1;});
   h+='<div class="card"><b>What happened to recent orders</b>'+
-  '<div class="hint">Every placement is a recorded prediction; the outcome lands on the same row. '+
-  'This is how the engine&rsquo;s guesses stay honest.</div>'+
-  '<table>'+hrow(['market','order','we predicted','what happened']);
-  closed.slice(0,25).forEach(function(f){
+  '<div class="chips">'+Object.keys(counts).map(function(k){
+    return '<span class="chip">'+counts[k]+' '+k+'</span>';}).join('')+'</div>';
+  function orow(f){
    var out=(OMAP[f.how]||f.how)+(f.rested_s?' after '+Math.round(f.rested_s/60)+'m':'');
    if(f.how==='fill'){out='<span class="warn">filled</span> '+(f.filled_qty||'')+
-     (f.adverse!=null?' &middot; cost '+pc(f.adverse)+'/share vs the mid an hour later':' &middot; grading in ~1h');}
-   h+=row([mshort(f.market),f.side.toLowerCase()+' '+f.qty+' @ '+pc(f.price),
-     pct(f.p_fill)+' fill odds<br>'+usd(f.ev)+'/d after risk',out]);});
-  h+='</table></div>';}
+     (f.adverse!=null?' &middot; cost '+pc(f.adverse)+'/share an hour later':' &middot; grading in ~1h');}
+   return row([mshort(f.market),
+     '<span style="white-space:nowrap">'+f.side.toLowerCase()+' '+f.qty+' @ '+pc(f.price)+'</span>',
+     pct(f.p_fill)+' odds<br><span class="muted">'+usd(f.ev)+'/d</span>',out]);}
+  h+='<table>'+hrow(['market','order','predicted','outcome']);
+  closed.slice(0,8).forEach(function(f){h+=orow(f);});
+  h+='</table>';
+  if(closed.length>8){h+='<details class="how"><summary>'+(closed.length-8)+' older</summary><table>';
+   closed.slice(8,40).forEach(function(f){h+=orow(f);});h+='</table></details>';}
+  h+='<div class="hint">Every placement is a recorded prediction; its outcome lands on the '+
+   'same row. That record is what keeps the engine&rsquo;s guesses honest.</div></div>';}
  return h;
 """
 
@@ -328,10 +357,10 @@ MARKETS_JS = """
   if(mk!=null)h+='<div class="stat"><div class="lab">Senate &middot; market</div><div class="val">'+Math.round(mk*100)+'%</div></div>';
   if(hou)h+='<div class="stat"><div class="lab">House &middot; model</div><div class="val">'+pctRange(hou)+'</div></div>';
   h+='</div>'+
-   (so?'<div class="hint">Silver Bulletin run of '+(so.date||'?')+
-     (so.run_age_d!=null?' ('+so.run_age_d+'d old, '+(so.sims||'?')+' simulations, fetched live)':'')+
-     '. The range in brackets is their three model flavors disagreeing with each other.'+
-     (so.run_age_d>5?' <span class="warn">Stale run &mdash; bands below are widened with the poll-driven model.</span>':'')+'</div>':'')+
+   (so?'<div class="hint">Silver run of '+(so.date||'?')+
+     (so.run_age_d!=null?', '+so.run_age_d+'d old':'')+
+     ' &middot; brackets = their three model flavors disagreeing.'+
+     (so.run_age_d>5?' <span class="warn">Stale run &mdash; bands widened with the poll model.</span>':'')+'</div>':'')+
    '</div>';}
  // ---- per-rung charts: model band + dots vs market ----
  var LEG='<span style="white-space:nowrap"><span class="leg" style="background:var(--s1)"></span><span class="muted">model</span>'
@@ -351,12 +380,10 @@ MARKETS_JS = """
   var mx=4*step;
   if(!dist.length)return;
   h+='<div class="card"><b>'+fam[0]+'</b> '+LEG;
-  if(fi===0)h+='<div class="hint">Each row is one rung of the ladder. The blue band is where '+
-   'Silver&rsquo;s three model flavors land; the orange dot is the market&rsquo;s price. '+
-   'Blue and orange together = everyone agrees, and the engine earns at size. '+
-   'Far apart = someone is wrong, and the engine only sends 1-share scouts. Tap a row for detail.</div>';
-  if(fi===1)h+='<div class="hint">These rungs are cumulative &mdash; each row is the chance of '+
-   'AT LEAST that many GOP seats, so the numbers must step downhill. Tap a row for detail.</div>';
+  if(fi===0)h+='<div class="hint">Blue = the model, orange = the market. Together, the engine '+
+   'earns at size; apart, it only scouts. Tap a row for the numbers.</div>';
+  if(fi===1)h+='<div class="hint">Cumulative rungs &mdash; each row is AT LEAST that many seats, '+
+   'so the values step downhill. Tap a row for the numbers.</div>';
   // axis
   var ticks=[0,1,2,3,4].map(function(i){return i*step;});
   h+='<div class="axisr"><span class="axisl"></span><div class="axist">'+
@@ -433,14 +460,17 @@ OPPS_JS = """
  var g=d.engine||{};var h='';
  var cands=g.cands||[];
  h+='<div class="card"><b>What the engine wants next</b>'+
-  '<div class="sub">Every idea it liked this cycle, best first. It places the top ones as '+
+  '<div class="sub">Ideas it liked this cycle, best first. It places the top ones as '+
   'actions and headroom allow.</div>';
- if(cands.length){h+='<table>'+hrow(['market','order','$/day','after risk','uses']);
-  cands.forEach(function(c){h+=row([mshort(c.market)+'<br><span class="muted">'+
+ function crow(c){return row([mshort(c.market)+'<br><span class="muted">'+
     pwhy(c.purpose)+(c.exp1_gap?' &middot; boundary':'')+'</span>',
     '<span style="white-space:nowrap">'+(c.side==='BUY'?'bid':'ask')+' '+c.qty+' @ '+pc(c.price)+'</span>',
-    usd(c.exp_earn),usd(c.ev),usd(c.cost)]);});
-  h+='</table>';}else{h+='<div class="muted">nothing above the bar right now</div>';}
+    usd(c.exp_earn),usd(c.ev),usd(c.cost)]);}
+ if(cands.length){h+='<table>'+hrow(['market','order','$/day','after risk','uses']);
+  cands.slice(0,8).forEach(function(c){h+=crow(c);});h+='</table>';
+  if(cands.length>8){h+='<details class="how"><summary>'+(cands.length-8)+' more ideas</summary><table>';
+   cands.slice(8).forEach(function(c){h+=crow(c);});h+='</table></details>';}
+ }else{h+='<div class="muted">nothing above the bar right now</div>';}
  h+='<details class="how"><summary>how ideas are scored</summary>'+
   'For each price level: what it would earn from the pool per day, minus '+
   '(chance of being filled) &times; (what that fill usually costs). Only positive '+
@@ -448,11 +478,16 @@ OPPS_JS = """
   ' ceiling the order would consume &mdash; measured as what it adds to the worst case, '+
   'so an ask sheltered by a bigger short on a sibling rung can be nearly free.</details></div>';
  var rej=g.rejected||[];
- if(rej.length){h+='<div class="card"><b>Turned down</b> <span class="muted">closest misses &mdash; the risk math said no</span>'+
+ if(rej.length){
+  function rrow(c){return row([mshort(c.market),
+    '<span style="white-space:nowrap">'+(c.side==='BUY'?'bid':'ask')+' '+c.qty+' @ '+pc(c.price)+'</span>',
+    usd(c.exp_earn),usd(c.p_fill*c.fill_cost*c.qty),usd(c.ev)]);}
+  h+='<div class="card"><b>Turned down</b> <span class="muted">closest misses &mdash; the risk math said no</span>'+
   '<table>'+hrow(['market','order','$/day','risk cost/d','after risk']);
-  rej.forEach(function(c){h+=row([mshort(c.market),(c.side==='BUY'?'bid':'ask')+' '+c.qty+' @ '+pc(c.price),
-    usd(c.exp_earn),usd(c.p_fill*c.fill_cost*c.qty),usd(c.ev)]);});
-  h+='</table></div>';}
+  rej.slice(0,5).forEach(function(c){h+=rrow(c);});h+='</table>';
+  if(rej.length>5){h+='<details class="how"><summary>'+(rej.length-5)+' more</summary><table>';
+   rej.slice(5).forEach(function(c){h+=rrow(c);});h+='</table></details>';}
+  h+='</div>';}
  var fm=d.fillmodel||{};var hz=fm.hazards||{};
  var BL={0:'at the touch',1:'1 tick back',2:'2 ticks back',3:'3+ back'};
  var famlab=function(k){var f=k.split('|')[0];
@@ -506,8 +541,12 @@ LOG_JS = """
  var h='';var es=d.engine_saved||{};
  function card(title,rows,fmt){
   h+='<div class="card"><b>'+title+'</b>';
-  if(rows&&rows.length){h+='<table>';rows.slice(-30).reverse().forEach(function(x){h+=fmt(x);});h+='</table>';}
-  else{h+='<div class="muted">nothing yet</div>';}
+  if(rows&&rows.length){
+   var rev=rows.slice().reverse();
+   h+='<table>';rev.slice(0,8).forEach(function(x){h+=fmt(x);});h+='</table>';
+   if(rev.length>8){h+='<details class="how"><summary>'+(Math.min(rev.length,40)-8)+
+    ' older</summary><table>';rev.slice(8,40).forEach(function(x){h+=fmt(x);});h+='</table></details>';}
+  }else{h+='<div class="muted">nothing yet</div>';}
   h+='</div>';}
  var EMAP={place:'placed',fill:'FILLED',silent_cancel:'exchange cancelled',pull:'pulled',
    reprice:'repriced',rotate_out:'swapped out',evict:'evicted foreign order',
