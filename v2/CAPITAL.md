@@ -52,6 +52,9 @@ own cost — a cancelled order can silently unqualify a side — which 2.0
 watches as a ratio (nominal cost vs buying power) rather than capping.
 
 **Decision: the seats test runs on $100 of buying power.**
+*(Raised to $300 on 2026-08-19 after the first day — with negative-risk
+netting the ceiling now measures true worst-case loss, and the exchange's
+own funding check remains the hard backstop.)*
 
 ## The verified anchors
 

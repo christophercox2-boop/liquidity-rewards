@@ -68,7 +68,12 @@ BOOK_MAX_AGE = 120.0
 class EngineConfig:
     whitelist_prefixes: tuple[str, ...] = ("scc-senate-gop-2026-11-03-",
                                            "scc-hrep-rep-2026-11-03-")
-    ceiling_usd: float = 100.0       # the one risk number (owner: $100 seats test)
+    ceiling_usd: float = 300.0       # the one risk number (owner raised the
+                                     # $100 seats-test ceiling to $300,
+                                     # 2026-08-19 morning). The exchange's own
+                                     # funding check stays the hard backstop:
+                                     # orders it can't fund self-cancel and
+                                     # show up as silent cancels.
     max_actions_per_cycle: int = 4   # rate-limit manners; the book moves slowly
     max_order_usd: float = 12.0      # one order's nominal cost, high confidence
     scout_qty: float = 1.0           # low-confidence probe size

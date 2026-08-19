@@ -48,13 +48,15 @@ days later, against the actual payouts in `data/rewards.csv`.
 ## The seats test (when you're ready — two taps)
 
 Open **/v2/switch**, tap ARM, tap CONFIRM. From then on the engine
-works the two seats families only, under the **$100 ceiling**:
+works the two seats families only, under the risk ceiling
+(**raised from $100 to $300** on the owner's instruction, 2026-08-19):
 
 - **Where**: near the touch where the Silver seat model and the market
   agree; 1-share scouts where they disagree (the tails, and all House
   rungs — no per-district model exists for the House ladder).
-- **How much**: every placement fits inside $100 of capital at risk,
-  shown on the switch page as used / ceiling / headroom.
+- **How much**: every placement fits inside the ceiling's capital at
+  risk (worst case, negative-risk netted), shown on the switch page as
+  used / ceiling / headroom.
 - **Sell side**: anything that fills is relisted as an ask at
   max(break-even + a tick, the ask touch) so it earns while it waits.
 - **Exits**: a market whose program stops paying, or that resolves
