@@ -49,6 +49,11 @@ reasoning ahead of the data).
   since main's newest STATUS.md commit before its first pass, so a boot
   resumes the hourly cadence instead of resetting it. Don't add anything
   that commits to main on a boot path without the same guard.
+  Second fix, same night: the DO app tracks the `deploy` branch again
+  (owner flipped it back 21:55 ET Aug 19). Releases are now an explicit
+  `git push origin origin/main:deploy` — merges and data commits to main
+  no longer restart anything. Keep deploy a fast-forward of main; if the
+  push refuses, someone released out of order — reconcile, don't force.
 - The exchange /modify endpoint DESTROYS orders (200, cancels, never
   replaces). Never call it. do_reprice = place replacement → verify by the
   returned ORDER ID and MINIMUM QUANTITY → only then cancel the original.
