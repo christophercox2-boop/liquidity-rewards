@@ -132,9 +132,11 @@ STATUS_JS = """
  var e=d.estimator||{};var g=d.engine||{};var sw=d.switch||{};
  var h='<div class="card">'+fresh+' <span class="muted">build '+(d.build||'?')+
    ' &middot; ws '+((d.ws||{}).state||'?')+' &middot; '+(d.orders_n||0)+' orders in '+(d.markets_n||0)+' markets</span>'+
-   '<div class="big">'+usd(e.earned)+'<span class="muted" style="font-size:15px"> earned today ('+(e.day||'')+')</span></div>'+
+   '<div class="big">'+usd(e.earned)+'<span class="muted" style="font-size:15px"> earned today on 2.0&rsquo;s markets ('+(e.day||'')+')</span></div>'+
    '<div>'+usd(e.rate)+'/day now'+
-   (e.stale_s>60?' <span class="warn">&middot; '+Math.round(e.stale_s/60)+' min unmeasured</span>':'')+'</div></div>';
+   (e.stale_s>60?' <span class="warn">&middot; '+Math.round(e.stale_s/60)+' min unmeasured</span>':'')+'</div>'+
+   (d.restart_loop>=5?'<div class="bad">restarting repeatedly: '+d.restart_loop+
+     ' boots in the last hour &mdash; the box is killing the process (memory or health checks); runtime logs have the exit codes</div>':'')+'</div>';
  h+='<div class="card"><b>Engine</b> <span class="muted">'+(g.mode||'?')+
    ' &middot; switch '+(sw.on?'<span class="ok">ON</span>':'<span class="muted">off</span>')+'</span>'+
    '<div>at risk '+usd(g.used)+' of '+usd(g.ceiling)+' &middot; headroom '+usd(g.headroom)+'</div>';

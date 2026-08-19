@@ -38,10 +38,10 @@ from .terms import TermsStore
 from .web import WebServer
 from .ws import Stream
 
-POLL_S = 30.0
+POLL_S = 45.0
 TERMS_EVERY_S = 300.0
 EVENTS_EVERY_S = 900.0
-BOOK_BUDGET = 28          # REST book fetches per poll (rate-limit budget)
+BOOK_BUDGET = 10          # REST book fetches per poll (rate-limit budget)
 UNIVERSE_CAP = 500        # never score more markets than this, loudly
 TERMS_HISTORY_KEEP = 2000
 ERROR_BACKOFF_CAP_S = 600.0
@@ -127,7 +127,10 @@ class Monitor:
         self.engine = Engine(self.desk, cfg, alert=self.alerts.notify)
         self.stream = Stream(self.cache, self._ws_slugs,
                              self.client.key_id, self.client.secret_key)
+        self.boots: list[float] = []
         self._restore()
+        self.boots = [b for b in self.boots if time.time() - b < 86400]
+        self.boots.append(time.time())
 
     def _sink_terms(self, row: dict) -> None:
         self.terms_history.append(row)
@@ -157,6 +160,7 @@ class Monitor:
         # errors survive restarts, and every boot leaves a visible marker —
         # a container restart-loop must show on the page, not vanish
         self.errors = list(saved.get("errors") or [])
+        self.boots = list(saved.get("boots") or [])
         age = time.time() - (saved.get("saved_at") or 0)
         self._note(f"booted build {self.build}; restored state {age:.0f}s old"
                    f"{'; SWITCH IS ON' if self.switch.on else ''}")
@@ -192,16 +196,22 @@ class Monitor:
     def cycle(self, now: float | None = None) -> dict:
         now = now or time.time()
         orders = self.client.open_orders()
-        held = sorted({o["market"] for o in orders if o["market"]})
-        # the engine needs books and terms for its whole families, orders or
-        # not — discovery must not depend on already being invested somewhere
-        self.universe = sorted(set(held) | set(self.family_slugs)
+        # 2.0's world is its whitelisted families plus wherever it actually
+        # has orders or stock — NOT the whole account's 150+ markets. It
+        # measured everything for a day (useful for the first comparison);
+        # doing so forever meant two systems fetching and scoring the whole
+        # board on one small box, which is what the restart loop fed on.
+        # 1.0 keeps publishing its own whole-board estimate for comparison.
+        engine_mkts = {o.market for o in self.engine.orders.values()}
+        self.universe = sorted(set(self.family_slugs) | engine_mkts
                                | set(self.engine.inventory))
         if len(self.universe) > UNIVERSE_CAP:
             self._note(f"{len(self.universe)} markets — scoring the first {UNIVERSE_CAP}")
             self.universe = self.universe[:UNIVERSE_CAP]
-        self.held = held
+        self.held = sorted(engine_mkts)
         self.cache.prune(self.universe)
+        in_scope = set(self.universe)
+        scoped_orders = [o for o in orders if o["market"] in in_scope]
 
         if now - self.last_events > EVENTS_EVERY_S:
             self.last_events = now
@@ -229,7 +239,7 @@ class Monitor:
             except ApiError as e:
                 self._note(f"book {slug}: {e}")
 
-        snap = self.estimator.sample(now, orders, self.cache, self.terms)
+        snap = self.estimator.sample(now, scoped_orders, self.cache, self.terms)
 
         # every touch the feed delivered teaches the fill model (dt=0
         # samples are ignored inside, so unchanged books cost nothing)
@@ -273,8 +283,17 @@ class Monitor:
             self._note(f"engine: {type(e).__name__}: {e}")
             engine_summary = {"mode": f"error: {type(e).__name__}"}
 
+        recent_boots = [b for b in self.boots if now - b < 3600]
+        if len(recent_boots) >= 5:
+            # title includes "monitor failing" so it skips the alert floor
+            self.alerts.notify("v2 monitor failing: restart loop",
+                               f"{len(recent_boots)} boots in the last hour — "
+                               f"likely memory or health checks on the shared "
+                               f"box; DigitalOcean runtime logs show exit codes")
+
         state = {
             "saved_at": now, "boot_ts": self.boot_ts, "build": self.build,
+            "boots": self.boots[-50:], "restart_loop": len(recent_boots),
             "mode": f"engine {engine_summary.get('mode')}",
             "estimator": self.estimator.to_dict(),
             "terms": self.terms.to_dict(),

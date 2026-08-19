@@ -33,7 +33,7 @@ API = "https://api.github.com"
 class StateStore:
     def __init__(self, local_path: str, repo: str | None = None,
                  token: str | None = None, branch: str = "v2-state",
-                 session=None, clock=None, save_interval: float = 120.0):
+                 session=None, clock=None, save_interval: float = 60.0):
         self.local_path = local_path
         self.repo = repo or os.environ.get("GITHUB_REPOSITORY", "wfco223/Liquidity-rewards")
         self.token = token if token is not None else os.environ.get("GITHUB_TOKEN", "")
