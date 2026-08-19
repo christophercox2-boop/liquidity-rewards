@@ -203,6 +203,7 @@ class Engine:
         earnings, expected fill cost. Outcomes land on the same row, which
         is what makes calibration possible."""
         self.forecasts[order_id] = {
+            "id": order_id,
             "ts": round(now, 1), "market": c["market"], "side": c["side"],
             "price": c["price"], "qty": c["qty"], "ticks": c.get("ticks"),
             "p_fill": c.get("p_fill"), "exp_earn": c.get("exp_earn"),
