@@ -162,6 +162,53 @@ class TestSwitchAndCeiling(unittest.TestCase):
             self.assertIn(o["purpose"], ("scout", "probe", "exp1"), o)
             self.assertEqual(o["qty"], 1.0)
 
+    def test_size_stops_at_the_ev_peak_not_at_the_cap(self):
+        """Owner, 2026-08-19: "at some point, increasing size has no
+        marginal earnings benefit on only marginal fill cost, correct?"
+        Correct — our share saturates at the whole side pool while fill
+        risk stays linear. Improving the touch makes us ~100% of the side
+        immediately, so past a small size every extra share is pure risk."""
+        r = Rig()
+        r.engine.cfg.size_safety = 1.0        # test the peak itself
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
+        book, prog = r.cache.fresh(SEN, 120, r.now), terms.get(SEN)
+        b = r.engine.band(SEN, book, r.silver)
+        best = max((c for c in r.engine._candidates(SEN, book, prog, b, r.now)
+                    if c["side"] == "BUY"), key=lambda c: c["ev"])
+        cap_qty = r.engine.cfg.max_order_usd / best["price"]
+        self.assertLess(best["qty"], cap_qty * 0.5,
+                        "the cap should not be what decides the size")
+        # and it really is a peak: more size is worse, not better
+        j_big = estimate_join("BUY", list(book.side("BUY")), book.tick,
+                              prog.df, prog.target, best["price"],
+                              best["qty"] * 4)
+        pool = 100 / 13 / 2
+        p_f = r.engine.model.p_fill(SEN, "BUY", j_big.ticks, 86400.0)
+        f_c = r.engine.model.fill_cost(SEN, "BUY", best["price"], b[0])
+        ev_big = j_big.share * pool - p_f * f_c * best["qty"] * 4
+        self.assertLess(ev_big, best["ev"])
+
+    def test_unproven_fill_cost_takes_only_a_fraction_of_the_peak(self):
+        # q* scales as 1/sqrt(fill_cost) and fill_cost is still the 2c seed,
+        # so until real fills grade it we take half the optimum
+        terms = seats_terms([SEN])
+        full = Rig(); full.engine.cfg.size_safety = 1.0
+        put_book(full.cache, SEN, 0.12, 0.14, now=full.now)
+        half = Rig()                          # default 0.5, no graded fills
+        put_book(half.cache, SEN, 0.12, 0.14, now=half.now)
+        def best(rig):
+            book, prog = rig.cache.fresh(SEN, 120, rig.now), terms.get(SEN)
+            b = rig.engine.band(SEN, book, rig.silver)
+            return max((c for c in rig.engine._candidates(SEN, book, prog, b, rig.now)
+                        if c["side"] == "BUY"), key=lambda c: c["ev"])
+        self.assertAlmostEqual(best(half)["qty"], best(full)["qty"] / 2, delta=1.0)
+        # a family with graded fills behind it gets the full size
+        proven = Rig(); proven.engine.cfg.size_safety = 1.0
+        proven.engine.model.marks_n["senate-seats"] = 50
+        put_book(proven.cache, SEN, 0.12, 0.14, now=proven.now)
+        self.assertAlmostEqual(best(proven)["qty"], best(full)["qty"], delta=0.5)
+
     def test_a_wall_offers_size_but_the_ev_math_still_rules(self):
         """Owner, 2026-08-19: "the size of the walls is also evidence that
         an order won't get filled. That could warrant ramping up spend."
@@ -199,8 +246,13 @@ class TestSwitchAndCeiling(unittest.TestCase):
         r.cycle(terms)
         rec = next(o for o in r.engine.orders.values()
                    if o.side == "BUY" and o.purpose == "earn")
+        # the real book contains our own order; the fixture must too, or
+        # subtracting our size erases other people's depth with it
         r.now += 60          # maintenance runs before placement: the live
-        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)   # numbers land next cycle
+        r.cache.put(SEN, Book(bids=((rec.price, rec.qty + 30.0),
+                                    (0.02, 600000.0)),
+                              asks=((0.14, 30.0), (0.98, 600000.0)),
+                              tick=0.01, fetched_at=r.now))
         r.cycle(terms)
         thin = rec.live_parts["p_fill"]
         self.assertEqual(rec.live_parts["shield"], 30.0)   # just the thin touch
@@ -503,8 +555,8 @@ class TestRotation(unittest.TestCase):
         SEN2 = "scc-senate-gop-2026-11-03-50"
         r = Rig(ceiling=13.0)
         r.engine.cfg.max_order_usd = 12.0   # this test is about rotation, not
-                                            # the size cap: pin it so raising
-                                            # the cap can't quietly break it
+        r.engine.cfg.size_safety = 1.0      # sizing: pin both so the sizing
+                                            # rules can't quietly break it
         terms = seats_terms([SEN])
         put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)                       # ~$12 lands in SEN
