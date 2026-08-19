@@ -77,6 +77,16 @@ class EngineConfig:
     # much expected value per day, with at most this many open at once.
     exp1_max_cost_day: float = 0.02
     exp1_max_open: int = 6
+    # During a deploy rollover two 2.0 instances briefly coexist; each saw
+    # the other's fresh orders as foreign automation and they evicted each
+    # other's book in a loop (2026-08-19). A foreign order must be at least
+    # this old before eviction touches it — twins never overlap this long.
+    evict_grace_s: float = 600.0
+    # Rotation: free the worst resting order when an unaffordable candidate
+    # beats it by this factor (and by a real absolute margin) — capital
+    # sits where EV says, not where it happened to land first.
+    rotate_factor: float = 2.0
+    rotate_min_gain_day: float = 0.02
     action_cooldown_s: float = 300.0 # per market+side: no churn, queue position is capital
     exp1_keep: int = 500
     log_keep: int = 300
@@ -91,7 +101,24 @@ class OwnOrder:
     qty: float
     intent: str
     placed_ts: float
-    purpose: str     # earn / scout / sell / close
+    purpose: str     # earn / scout / sell / close / exp1
+    # live evaluation, recomputed every cycle against the fresh book —
+    # what the order is worth NOW, not what was predicted at placement
+    live_est: float | None = None    # $/day earning at current book
+    live_ev: float | None = None     # EV/day of leaving it where it is
+    live_yield: float | None = None  # live_ev per dollar at risk
+
+
+def _order_age_s(o: dict, now: float) -> float | None:
+    """Age of an exchange order from its createTime; None if unparseable."""
+    raw = str(o.get("created") or "")
+    if not raw:
+        return None
+    try:
+        ts = dt.datetime.fromisoformat(raw.replace("Z", "+00:00")).timestamp()
+        return max(now - ts, 0.0)
+    except ValueError:
+        return None
 
 
 @dataclass
@@ -408,9 +435,15 @@ class Engine:
                     self._log(event="foreign_manual_order", market=o["market"],
                               id=o["id"])
                     continue
+                age = _order_age_s(o, now)
+                if age is None or age < self.cfg.evict_grace_s:
+                    # a fresh foreign order is probably our rollover twin's —
+                    # the mutual-eviction loop of 2026-08-19 must not repeat
+                    continue
                 r = self.desk.cancel(o["id"], o["market"])
                 if r.ok:
-                    self._log(event="evict", market=o["market"], id=o["id"])
+                    self._log(event="evict", market=o["market"], id=o["id"],
+                              age_s=round(age))
                     actions_left -= 1
 
         # 1) absolute-zero exit + resolution day: pull our orders out
@@ -445,26 +478,40 @@ class Engine:
                     del self.orders[rec.id]
                     actions_left -= 1
 
-        # 2) maintenance: an order out of the window or outside its band moves
+        # 2) maintenance: every order is re-evaluated against the live book
+        # (that's what /orders shows), and one out of the window or outside
+        # its band moves
         for rec in list(self.orders.values()):
-            if actions_left <= 0:
-                break
             if rec.purpose in ("sell", "close"):
                 continue
             book = books.fresh(rec.market, BOOK_MAX_AGE, now)
             prog = terms.get(rec.market)
-            if book is None or prog is None or not self._cooldown_ok(
-                    rec.market, rec.side, now):
+            if book is None or prog is None:
                 continue
             b = self.band(rec.market, book, silver)
             if b is None:
                 continue
-            cands = [c for c in self._candidates(rec.market, book, prog, b, now)
-                     if c["side"] == rec.side]
             here = estimate_join(rec.side, list(book.side(rec.side)), book.tick,
-                                 prog.df, prog.target, rec.price, 0.01)
+                                 prog.df, prog.target, rec.price, rec.qty)
             earning_here = here.qualifies and here.in_window
             self.model.observe_scoring(rec.market, earning_here)
+            # live evaluation: what this order earns and risks RIGHT NOW
+            live_est = (here.share * daily_side_pool(prog, rec.market)
+                        if earning_here else 0.0)
+            lo, hi, _src = b
+            fair_ref = lo if rec.side == "BUY" else hi
+            p_f = self.model.p_fill(rec.market, rec.side, here.ticks,
+                                    self.cfg.horizon_s)
+            f_cost = self.model.fill_cost(rec.market, rec.side, rec.price, fair_ref)
+            rec.live_est = round(live_est, 4)
+            rec.live_ev = round(live_est * self.model.scoring_fraction(rec.market)
+                                - p_f * f_cost * rec.qty, 4)
+            risk = capital_at_risk(rec.intent, rec.price, rec.qty)
+            rec.live_yield = round(rec.live_ev / risk, 4) if risk else None
+            if actions_left <= 0 or not self._cooldown_ok(rec.market, rec.side, now):
+                continue
+            cands = [c for c in self._candidates(rec.market, book, prog, b, now)
+                     if c["side"] == rec.side]
             best = max(cands, key=lambda c: c["yield"], default=None)
             lo, hi, _src = b
             guard_broken = (rec.price > hi + self.cfg.fair_margin
@@ -613,6 +660,39 @@ class Engine:
                 self._log(event="refused", market=c["market"], side=c["side"],
                           note=r.note)
 
+        # 5) rotation — the answer to "opps has good ideas, is anything
+        # cycling out?": when the best idea we could not afford beats the
+        # worst thing we hold decisively, free the worst. The better one
+        # places next cycle with the freed capital. One per cycle, and only
+        # decisive wins move — queue position is capital too.
+        if actions_left > 0:
+            headroom = self.cfg.ceiling_usd - self.used_capital()
+            unafford = [c for c in cands
+                        if (c["market"], c["side"]) not in placed_keys
+                        and c["purpose"] != "exp1" and c["cost"] > headroom]
+            resting = [r for r in self.orders.values()
+                       if r.purpose in ("earn", "scout")
+                       and r.live_yield is not None
+                       and self._cooldown_ok(r.market, r.side, now)]
+            if unafford and resting:
+                best_c = max(unafford, key=lambda c: c["yield"])
+                worst = min(resting, key=lambda r: r.live_yield)
+                decisive = (best_c["yield"] > worst.live_yield * self.cfg.rotate_factor
+                            and best_c["ev"] > (worst.live_ev or 0)
+                            + self.cfg.rotate_min_gain_day)
+                if decisive:
+                    r = self.desk.cancel(worst.id, worst.market)
+                    if r.ok:
+                        self._close_forecast(worst.id, "rotated_out", now)
+                        self._log(event="rotate_out", market=worst.market,
+                                  side=worst.side, price=worst.price,
+                                  live_ev=worst.live_ev,
+                                  for_market=best_c["market"],
+                                  for_ev=best_c["ev"])
+                        del self.orders[worst.id]
+                        self._mark_action(worst.market, worst.side, now)
+                        actions_left -= 1
+
         s.used = self.used_capital()
         s.headroom = round(self.cfg.ceiling_usd - s.used, 2)
         return self._summary(s)
@@ -658,7 +738,9 @@ class Engine:
             "mode": s.mode, "used": s.used, "headroom": s.headroom,
             "ceiling": self.cfg.ceiling_usd,
             "orders": [{"id": o.id, "market": o.market, "side": o.side,
-                        "price": o.price, "qty": o.qty, "purpose": o.purpose}
+                        "price": o.price, "qty": o.qty, "purpose": o.purpose,
+                        "live_est": o.live_est, "live_ev": o.live_ev,
+                        "live_yield": o.live_yield}
                        for o in self.orders.values()],
             "inventory": self.inventory,
             "silent_cancels": self.silent_cancels,

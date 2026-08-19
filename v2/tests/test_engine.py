@@ -263,10 +263,17 @@ class TestExp1(unittest.TestCase):
         self.assertGreater(f["p_fill"], 0.0)
 
 
-def foreign(oid, intent, market=SEN, price=0.10, size=45.0, manual=False):
+def foreign(oid, intent, market=SEN, price=0.10, size=45.0, manual=False,
+            created=""):
     from v2.intents import REST_SIDE
     return {"id": oid, "market": market, "side": REST_SIDE[intent],
-            "price": price, "size": size, "intent": intent, "manual": manual}
+            "price": price, "size": size, "intent": intent, "manual": manual,
+            "created": created}
+
+
+def iso_ago(now, seconds):
+    import datetime as dt
+    return dt.datetime.fromtimestamp(now - seconds, tz=dt.timezone.utc).isoformat()
 
 
 class TestHandoverSweep(unittest.TestCase):
@@ -316,8 +323,10 @@ class TestHandoverSweep(unittest.TestCase):
         put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
         r.cycle(terms)                                  # sweep completes (no foreign)
         self.assertTrue(r.engine.family_sweep_done)
-        r.exchange.live["bot"] = foreign("bot", BUY_LONG, price=0.19)
-        r.exchange.live["hand"] = foreign("hand", BUY_LONG, price=0.18, manual=True)
+        r.exchange.live["bot"] = foreign("bot", BUY_LONG, price=0.19,
+                                         created=iso_ago(r.now, 3600))
+        r.exchange.live["hand"] = foreign("hand", BUY_LONG, price=0.18, manual=True,
+                                          created=iso_ago(r.now, 3600))
         r.now += 400
         put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
         r.cycle(terms)
@@ -325,6 +334,47 @@ class TestHandoverSweep(unittest.TestCase):
         self.assertIn("hand", r.exchange.live)
         self.assertTrue(any(e.get("event") == "foreign_manual_order"
                             for e in r.engine.log))
+
+    def test_fresh_foreign_orders_get_rollover_grace(self):
+        # The 2026-08-19 twin fight: during a deploy rollover the other
+        # instance's just-placed orders looked foreign and were evicted,
+        # and it evicted ours back. Inside the grace window nothing moves.
+        from v2.intents import BUY_LONG
+        r = Rig(switch=True)
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        r.cycle(terms)
+        r.exchange.live["twin"] = foreign("twin", BUY_LONG, price=0.19,
+                                          created=iso_ago(r.now, 60))
+        r.exchange.live["nodate"] = foreign("nodate", BUY_LONG, price=0.17)
+        r.now += 400
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        r.cycle(terms)
+        self.assertIn("twin", r.exchange.live)      # too young to evict
+        self.assertIn("nodate", r.exchange.live)    # unknown age: never evict
+
+
+class TestRotation(unittest.TestCase):
+    def test_worst_holding_is_freed_for_a_decisively_better_idea(self):
+        SEN2 = "scc-senate-gop-2026-11-03-50"
+        r = Rig(ceiling=13.0)
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        r.cycle(terms)                       # ~$12 lands in SEN
+        self.assertTrue(any(o.purpose == "earn"
+                            for o in r.engine.orders.values()))
+        # SEN's touch gets crowded (our spot dilutes to crumbs) while a
+        # thin, juicy book appears in SEN2 — unaffordable at $1 headroom
+        terms = seats_terms([SEN, SEN2])
+        r.now += 400
+        put_book(r.cache, SEN, 0.20, 0.26, bid_qty=6000.0, now=r.now)
+        put_book(r.cache, SEN2, 0.20, 0.26, now=r.now)
+        r.cycle(terms)
+        self.assertTrue(any(e.get("event") == "rotate_out"
+                            and e.get("for_market") == SEN2
+                            for e in r.engine.log))
+        self.assertFalse(any(o.market == SEN and o.purpose == "earn"
+                             for o in r.engine.orders.values()))
 
 
 class TestPersistence(unittest.TestCase):

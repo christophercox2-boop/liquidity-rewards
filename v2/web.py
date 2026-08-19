@@ -73,6 +73,15 @@ _CSS = """
  .pill{display:inline-block;background:#2a3242;border-radius:6px;padding:1px 7px;
        font-size:12px;margin:1px 3px 1px 0;color:#c6cddb;border:0}
  .pill.on{background:#2d6cdf;color:#fff}
+ body{--s1:#3987e5;--s2:#d95926}  /* validated categorical pair on this surface */
+ .brow{display:flex;align-items:center;gap:6px;margin:3px 0;font-size:12px}
+ .blab{width:54px;color:#8a93a5;text-align:right;flex:none}
+ .btrack{flex:1;min-width:0}
+ .bar{height:8px;border-radius:0 4px 4px 0;min-width:1px}
+ .bval{color:#e6e9ef;font-size:11px;margin-left:4px;flex:none;white-space:nowrap}
+ .leg{display:inline-block;width:10px;height:10px;border-radius:3px;
+      margin:0 4px 0 8px;vertical-align:-1px}
+ summary{cursor:pointer}
 """
 
 _PLUMBING = """
@@ -163,14 +172,17 @@ STATUS_JS = """
 
 ORDERS_JS = """
  var g=d.engine||{};var fx={};(d.forecasts||[]).forEach(function(f){if(f.id)fx[f.id]=f;});
- var h='<div class="card"><b>Resting now</b> <span class="muted">what the engine expects of each order</span>';
+ function m(x,f){return x==null?'<span class="muted">&ndash;</span>':f(x);}
+ var h='<div class="card"><b>Resting now</b> <span class="muted">live numbers, recomputed against the current book every cycle</span>';
  var go=g.orders||[];
- if(go.length){h+='<table>'+hrow(['market','order','why','earn/d','p(fill)/d','fill cost','EV/d']);
+ if(go.length){h+='<table>'+hrow(['market','order','why','earn/d now','EV/d now','p(fill)/d']);
   go.forEach(function(o){var f=fx[o.id]||{};
    h+=row(['<code>'+o.market+'</code>',o.side+' '+o.qty+' @ '+pc(o.price),o.purpose,
-     usd(f.exp_earn),f.p_fill!=null?pct(f.p_fill):'?',
-     f.fill_cost!=null?pc(f.fill_cost):'?',f.ev!=null?usd(f.ev):'?']);});
-  h+='</table>';}else{h+='<div class="muted">nothing resting</div>';}
+     m(o.live_est,usd),m(o.live_ev,usd),
+     f.p_fill!=null?pct(f.p_fill):'<span class="muted">&ndash;</span>']);});
+  h+='</table><div class="muted">earn/d = what the order earns at this book; EV/d subtracts fill risk. '
+   +'A dash means the sell side or a book too stale to score this cycle.</div>';}
+ else{h+='<div class="muted">nothing resting</div>';}
  h+='</div>';
  var closed=(d.forecasts||[]).filter(function(f){return f.how;}).reverse();
  if(closed.length){h+='<div class="card"><b>Recent outcomes</b> <span class="muted">predictions vs what happened</span>'+
@@ -193,6 +205,36 @@ MARKETS_JS = """
   if(t.indexOf('lte')===0)return parseInt(t.slice(3))-0.5;
   if(t.indexOf('gte')===0)return parseInt(t.slice(3))+0.5;
   return parseInt(t);}
+ // the picture of the fair-value model: P(seats) vs what the market pays
+ var senS=Object.keys(lad).filter(function(s){return s.indexOf('scc-senate-gop-')===0;})
+   .sort(function(a,b){return rungKey(a)-rungKey(b);});
+ var dist=senS.map(function(s){var L=lad[s];
+   var mid=(L.bids[0]&&L.asks[0])?(L.bids[0][0]+L.asks[0][0])/2:null;
+   return {r:s.split('-').pop(),model:fairs[s],mid:mid};});
+ var mx=0;dist.forEach(function(x){mx=Math.max(mx,x.model||0,x.mid||0);});
+ if(dist.length&&mx>0){
+  h+='<div class="card"><b>Senate seats: model vs market</b>'
+   +'<span class="leg" style="background:var(--s1)"></span><span class="muted">model</span>'
+   +'<span class="leg" style="background:var(--s2)"></span><span class="muted">market mid</span>'
+   +'<div class="muted">The model bar is P(exactly this seat count) computed from Silver&rsquo;s 35 race odds. '
+   +'Where the orange market bar towers over blue (the tails), correlation the model ignores is priced in &mdash; the engine treats those as low-confidence.</div>';
+  dist.forEach(function(x){
+   h+='<div class="brow"><span class="blab">'+x.r+'</span><div class="btrack">'
+    +'<div class="bar" style="background:var(--s1);width:'+(100*(x.model||0)/mx)+'%"></div>'
+    +'<div class="bar" style="background:var(--s2);width:'+(100*(x.mid||0)/mx)+'%;margin-top:2px"></div>'
+    +'</div><span class="bval">'+(x.model!=null?pc(x.model):'&ndash;')+' / '+(x.mid!=null?pc(x.mid):'&ndash;')+'</span></div>';});
+  h+='</div>';}
+ var races=d.silver_races||{};
+ var rk=Object.keys(races).sort(function(a,b){return races[b]-races[a];});
+ if(rk.length){
+  h+='<div class="card"><details><summary><b>What feeds the model</b> <span class="muted">'
+   +rk.length+' Silver race odds &rarr; the seat distribution</span></summary>'
+   +'<div class="muted" style="margin:6px 0">P(GOP win) per race, updated with polling. '
+   +'31 GOP seats are not on the ballot; every ladder fair is the exact distribution over these races as independent coins.</div>';
+  rk.forEach(function(a){h+='<div class="brow"><span class="blab">'+a.toUpperCase()+'</span>'
+   +'<div class="btrack"><div class="bar" style="background:var(--s1);width:'+(races[a]*100)+'%"></div></div>'
+   +'<span class="bval">'+Math.round(races[a]*100)+'%</span></div>';});
+  h+='</details></div>';}
  [['Senate seats (GOP count)','scc-senate-gop-'],['House seats (GOP &ge; N)','scc-hrep-rep-']]
  .forEach(function(fam){
   var slugs=Object.keys(lad).filter(function(s){return s.indexOf(fam[1])===0;})
@@ -243,13 +285,22 @@ OPPS_JS = """
     usd(c.exp_earn),usd(c.p_fill*c.fill_cost*c.qty),usd(c.ev)]);});
   h+='</table></div>';}
  var fm=d.fillmodel||{};var hz=fm.hazards||{};
- h+='<div class="card"><b>Calibration</b> <span class="muted">fills/day by distance from the touch &middot; learned from the feed</span><table>'+
-  hrow(['family &amp; side','touch','1 back','2 back','3+','hours seen']);
+ h+='<div class="card"><b>What feeds p(fill)</b>'
+  +'<div class="muted">Every touch move teaches it: hazard = crossings &divide; hours watched, blended with a prior that fades as hours pile up. '
+  +'p(fill in a day) = 1 &minus; e<sup>&minus;hazard</sup>. The counts on each bar are the actual inputs.</div>';
  Object.keys(hz).forEach(function(k){var r=hz[k];
-  h+=row([k,(r[0]||{}).per_day,(r[1]||{}).per_day,(r[2]||{}).per_day,(r[3]||{}).per_day,
-    (r[0]||{}).hours_observed]);});
- h+='</table><div class="muted">adverse fill markdown: '+JSON.stringify(fm.markdown||{})+
-  ' &middot; scoring fraction: '+JSON.stringify(fm.scoring_frac||{})+'</div></div>';
+  var mx=0;[0,1,2,3].forEach(function(b){mx=Math.max(mx,(r[b]||{}).per_day||0);});
+  h+='<div style="margin:8px 0 2px;font-size:13px"><b>'+k+'</b> <span class="muted">'
+    +((r[0]||{}).hours_observed||0)+'h watched</span></div>';
+  [0,1,2,3].forEach(function(b){var c=r[b]||{};
+   h+='<div class="brow"><span class="blab">'+(b===3?'3+ back':b===0?'touch':b+' back')+'</span>'
+    +'<div class="btrack"><div class="bar" style="background:var(--s1);width:'+(mx?100*(c.per_day||0)/mx:0)+'%"></div></div>'
+    +'<span class="bval">'+((c.per_day||0)).toFixed(2)+'/d <span class="muted">'+(c.crossings||0)+' crossings</span></span></div>';});
+ });
+ h+='<div class="muted" style="margin-top:6px">Fill cost: adverse markdown per family (each real fill graded against the mid an hour later) '
+  +JSON.stringify(fm.markdown||{})+' from '+JSON.stringify(fm.marks_n||{})+' graded fills'
+  +' &middot; scoring fraction (share of resting life actually inside the window): '
+  +JSON.stringify(fm.scoring_frac||{})+'</div></div>';
  var ex=((d.engine_saved||{}).exp1||[]).slice(-15).reverse();
  h+='<div class="card"><b>EXP-1 pool</b> <span class="muted">the window-boundary experiment: level says it earns, queue says zero &middot; graded against payouts</span>';
  if(ex.length){h+='<table>'+hrow(['placed','market','order','level says','queue says']);
