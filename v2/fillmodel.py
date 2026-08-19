@@ -66,6 +66,25 @@ def family_of(slug: str) -> str:
     return "other"
 
 
+# A wall of resting contracts in front of an order is protection: the
+# taker has to eat through it first. Scaled by Target Size — the
+# exchange's own declared depth unit for the market, so the same ratio
+# means the same thing on a 2,000-contract book and a 20,000 one — and
+# FLOORED, because a wall can vanish in a single print and an order
+# sized as if a fill were impossible is exactly the risky spend the
+# owner warned against.
+SHIELD_FLOOR = 0.25
+
+
+def shield_discount(shield: float, target: float) -> float:
+    """Multiplier on the learned hazard for depth ahead of our price.
+    No wall -> 1.0 (unchanged). A wall of one Target Size -> 0.5.
+    Five -> the 0.25 floor."""
+    if shield <= 0 or target <= 0:
+        return 1.0
+    return max(SHIELD_FLOOR, 1.0 / (1.0 + shield / target))
+
+
 def _bucket(ticks_back: int) -> int:
     return min(max(int(ticks_back), 0), DIST_BUCKETS[-1])
 
@@ -146,8 +165,15 @@ class FillModel:
         return ((cell[1] + prior) / (cell[0] + PRIOR_EXPOSURE_S)) * DAY_S
 
     def p_fill(self, slug: str, side: str, ticks_back: int,
-               horizon_s: float = DAY_S) -> float:
+               horizon_s: float = DAY_S, shield: float = 0.0,
+               target: float = 0.0) -> float:
+        """Chance of a fill over the horizon. `shield` is the contracts a
+        taker must consume before reaching us — direct evidence against a
+        fill that the distance-only hazard cannot see (owner, 2026-08-19:
+        "the size of the walls is also evidence that an order won't get
+        filled")."""
         h = self.hazard_per_day(family_of(slug), side, ticks_back)
+        h *= shield_discount(shield, target)
         return 1.0 - math.exp(-h * horizon_s / DAY_S)
 
     def fill_cost(self, slug: str, side: str, price: float,
