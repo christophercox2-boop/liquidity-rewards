@@ -94,6 +94,14 @@ class EngineConfig:
     # this many graded fills, take only this fraction of the EV-optimal size.
     size_safety: float = 0.5
     size_proven_marks: int = 10
+    # An order that is EARNING was never touched before 2026-08-19, so the
+    # size it was born with was the size it died with — new sizing rules
+    # only ever reached new placements, and with every market-side occupied
+    # that meant they never bit at all. The optimal size moves with the
+    # book, so an earning order is now resized when the optimum has moved
+    # materially and the gain clears churn.
+    resize_ratio: float = 1.5
+    resize_min_gain_day: float = 0.02
     # Depth ahead of our price is evidence in its own right: a taker must
     # consume it before reaching us. Size is justified when the model and
     # market agree (a fill would not cost much) OR when this many Target
@@ -915,7 +923,7 @@ class Engine:
                 r = self.desk.reprice(
                     {"id": rec.id, "market": rec.market, "side": rec.side,
                      "price": rec.price, "size": rec.qty, "intent": rec.intent},
-                    best["price"])
+                    best["price"], new_qty=best["qty"])
                 if r.ok:
                     if r.two_orders:
                         self.alert("Two orders resting",
@@ -925,14 +933,50 @@ class Engine:
                     del self.orders[rec.id]
                     self.orders[r.order_id] = OwnOrder(
                         id=r.order_id, market=rec.market, side=rec.side,
-                        price=best["price"], qty=rec.qty, intent=rec.intent,
-                        placed_ts=now, purpose=rec.purpose)
+                        price=best["price"], qty=best["qty"], intent=rec.intent,
+                        placed_ts=now, purpose=best.get("purpose", rec.purpose))
                     self._record_forecast(best, r.order_id, now)
                     self._register_exp1(best, now)
                     self._log(event="reprice", market=rec.market, side=rec.side,
                               frm=rec.price, to=best["price"])
                     self._mark_action(rec.market, rec.side, now)
                     actions_left -= 1
+            elif (earning_here and best is not None
+                  and rec.purpose in ("earn", "scout")
+                  and abs(best["price"] - rec.price) < 1e-9
+                  and best["qty"] > 0):
+                # same price, different size: the EV optimum moves with the
+                # book, and an order sitting at its birth size is leaving
+                # money (or risk) on the table
+                moved = (best["qty"] >= rec.qty * self.cfg.resize_ratio
+                         or best["qty"] <= rec.qty / self.cfg.resize_ratio)
+                gain = (best.get("ev") or 0.0) - (rec.live_ev or 0.0)
+                fits = best["cost"] <= self.cfg.ceiling_usd - self.used_capital()
+                if moved and gain >= self.cfg.resize_min_gain_day and fits:
+                    r = self.desk.reprice(
+                        {"id": rec.id, "market": rec.market, "side": rec.side,
+                         "price": rec.price, "size": rec.qty,
+                         "intent": rec.intent},
+                        rec.price, new_qty=best["qty"])
+                    if r.ok:
+                        if r.two_orders:
+                            self.alert("Two orders resting",
+                                       f"{rec.market} {rec.side}: replacement "
+                                       f"{r.order_id} rests, original didn't cancel")
+                        self._close_forecast(rec.id, "resized", now)
+                        del self.orders[rec.id]
+                        self.orders[r.order_id] = OwnOrder(
+                            id=r.order_id, market=rec.market, side=rec.side,
+                            price=rec.price, qty=best["qty"], intent=rec.intent,
+                            placed_ts=now,
+                            purpose=best.get("purpose", rec.purpose))
+                        self._record_forecast(best, r.order_id, now)
+                        self._log(event="resize", market=rec.market,
+                                  side=rec.side, price=rec.price,
+                                  frm=rec.qty, to=best["qty"],
+                                  gain=round(gain, 3))
+                        self._mark_action(rec.market, rec.side, now)
+                        actions_left -= 1
 
         # 3) the seller: longs rest as asks at max(break-even + tick, the touch)
         for slug, inv in self.inventory.items():

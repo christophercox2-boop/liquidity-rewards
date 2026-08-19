@@ -162,6 +162,51 @@ class TestSwitchAndCeiling(unittest.TestCase):
             self.assertIn(o["purpose"], ("scout", "probe", "exp1"), o)
             self.assertEqual(o["qty"], 1.0)
 
+    def test_an_earning_order_is_resized_when_the_optimum_moves(self):
+        """Before 2026-08-19 reprice only fired when an order STOPPED
+        earning, and it carried the old size forward — so an earning order
+        kept its birth size for life. With every market-side occupied, new
+        sizing rules never bit at all: the book sat at $12 an order while
+        the ceiling was $300."""
+        r = Rig()
+        r.engine.cfg.max_order_usd = 3.0      # born small
+        r.engine.cfg.size_safety = 1.0
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
+        r.cycle(terms)
+        born = next(o for o in r.engine.orders.values()
+                    if o.side == "BUY" and o.purpose == "earn")
+        self.assertLess(born.qty * born.price, 3.5)
+        # the cap lifts; the EV optimum is now far above the birth size
+        r.engine.cfg.max_order_usd = 75.0
+        r.now += 400                          # clear the action cooldown
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
+        r.cycle(terms)
+        now_resting = [o for o in r.engine.orders.values()
+                       if o.side == "BUY" and o.purpose == "earn"]
+        self.assertEqual(len(now_resting), 1)   # replaced, not duplicated
+        self.assertGreater(now_resting[0].qty, born.qty * 1.5)
+        self.assertTrue(any(e.get("event") == "resize"
+                            for e in r.engine.log))
+
+    def test_resize_holds_still_when_the_optimum_has_not_moved(self):
+        # churn costs queue position; only a material move earns a reprice
+        r = Rig()
+        r.engine.cfg.size_safety = 1.0
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
+        r.cycle(terms)
+        before = {o.id: o.qty for o in r.engine.orders.values()}
+        for _ in range(3):
+            r.now += 400
+            put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
+            r.cycle(terms)
+        after = {o.id: o.qty for o in r.engine.orders.values()}
+        kept = set(before) & set(after)
+        self.assertTrue(kept, "orders should survive an unchanged book")
+        for oid in kept:
+            self.assertEqual(before[oid], after[oid])
+
     def test_size_stops_at_the_ev_peak_not_at_the_cap(self):
         """Owner, 2026-08-19: "at some point, increasing size has no
         marginal earnings benefit on only marginal fill cost, correct?"
