@@ -156,6 +156,14 @@ STATUS_JS = """
   h+='</table>';}else{h+='<div class="muted">no engine orders resting</div>';}
  if(g.silent_cancels){h+='<div class="warn muted">'+g.silent_cancels+' silent cancels seen</div>';}
  h+='<div class="muted" style="margin-top:4px"><a href="orders" style="color:#9ecbff">orders &rarr;</a></div></div>';
+ var rw=d.rewards_status||{};
+ if(rw.checked_ago_s!=null||rw.err){
+  h+='<div class="card"><b>Rewards watch</b> <span class="muted">checks Polymarket every 5 min and pushes your phone the moment anything posts</span>'+
+   '<div>last check '+(rw.checked_ago_s!=null?Math.round(rw.checked_ago_s/60)+' min ago':'never')+
+   (rw.latest_day?' &middot; latest posted day <b>'+rw.latest_day+'</b> '+usd(rw.latest_usd)+
+     (rw.latest_paid_usd>=rw.latest_usd?' (paid)':' (pending)'):'')+'</div>'+
+   (rw.err?'<div class="warn">last fetch failed: '+rw.err+'</div>':'')+'</div>';
+ }
  var mr=Object.entries(e.market_rates||{}).sort(function(a,b){return b[1]-a[1];});
  if(mr.length){h+='<div class="card"><b>Where the rate comes from</b><table>'+hrow(['market','$/day','earned']);
   mr.slice(0,25).forEach(function(kv){h+=row(['<code>'+kv[0]+'</code>',usd(kv[1]),usd((e.per_market||{})[kv[0]])]);});

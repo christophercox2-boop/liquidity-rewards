@@ -33,8 +33,8 @@ LOG_KEEP = 200
 # (still deduped). Keep this list short — everything on it can page the
 # owner's phone at any hour.
 ALWAYS_THROUGH = (
-    "order filled", "orders filled", "rewards paid", "reward pool",
-    "changed terms", "pools changed", "program gone",
+    "order filled", "orders filled", "rewards paid", "rewards posted",
+    "reward pool", "changed terms", "pools changed", "program gone",
     "monitor failing", "cancel all sent", "two orders",
 )
 

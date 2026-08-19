@@ -31,6 +31,7 @@ from .books import BookCache, ws_priority
 from .engine import Engine, EngineConfig
 from .estimator import Estimator
 from .orders import OrderDesk
+from .rewardswatch import RewardsWatch
 from .silver import SilverFairs
 from .state import StateStore
 from .switch import MasterSwitch
@@ -116,6 +117,7 @@ class Monitor:
         self.last_state: dict = {}
         self.switch = MasterSwitch(alert=self.alerts.notify)
         self.silver = SilverFairs(client=self.client)
+        self.rewards_watch = RewardsWatch()
         cfg = EngineConfig()
         self.desk = OrderDesk(
             client=self.client,
@@ -157,6 +159,8 @@ class Monitor:
             self.switch.restore(saved["switch"])
         if saved.get("engine_saved"):
             self.engine.restore(saved["engine_saved"])
+        if saved.get("rewards_watch"):
+            self.rewards_watch = RewardsWatch.from_dict(saved["rewards_watch"])
         # errors survive restarts, and every boot leaves a visible marker —
         # a container restart-loop must show on the page, not vanish
         self.errors = list(saved.get("errors") or [])
@@ -283,6 +287,14 @@ class Monitor:
             self._note(f"engine: {type(e).__name__}: {e}")
             engine_summary = {"mode": f"error: {type(e).__name__}"}
 
+        # the rewards watcher: cheap (one windowed earnings fetch every 5
+        # minutes), fenced like the engine, and pushes the phone the moment
+        # Polymarket posts anything new
+        try:
+            self.rewards_watch.check(self.client, self.alerts.notify, now)
+        except Exception as e:  # noqa: BLE001 — never lose the save below
+            self._note(f"rewards watch: {type(e).__name__}: {e}")
+
         recent_boots = [b for b in self.boots if now - b < 3600]
         if len(recent_boots) >= 5:
             # title includes "monitor failing" so it skips the alert floor
@@ -327,6 +339,8 @@ class Monitor:
                        "source": self.silver.source, "note": self.silver.note,
                        "gop_control": (round(self.silver.gop_control(), 3)
                                        if self.silver.pmf else None)},
+            "rewards_watch": self.rewards_watch.to_dict(),
+            "rewards_status": self.rewards_watch.status(now),
         }
         self.last_state = state
         self.store.save_local(state)
