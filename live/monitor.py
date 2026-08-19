@@ -563,6 +563,26 @@ def _rewards_once() -> str:
     return ""
 
 
+def _last_tracker_commit_ts() -> float:
+    """When a tracker check last committed, from main's newest STATUS.md
+    commit. Only the tracker writes STATUS.md, so that timestamp survives
+    container replacement — unlike TRACKER_STATUS, which is process memory
+    and dies with every deploy. Returns 0.0 when it can't be read (no token,
+    API error); the caller then runs a check right away, as before."""
+    if not GITHUB_TOKEN:
+        return 0.0
+    try:
+        r = _gh("GET", f"/repos/{GITHUB_REPO}/commits",
+                params={"sha": "main", "path": "STATUS.md", "per_page": 1})
+        if r.status_code != 200:
+            return 0.0
+        iso = r.json()[0]["commit"]["committer"]["date"]
+        return dt.datetime.strptime(iso, "%Y-%m-%dT%H:%M:%SZ").replace(
+            tzinfo=dt.timezone.utc).timestamp()
+    except Exception:  # noqa: BLE001 — a failed read must not stop the tracker
+        return 0.0
+
+
 def tracker_loop() -> None:
     time.sleep(120)            # let the poll loop warm its caches first
     # Event.wait() returns True when the flag was SET and False on timeout, so
@@ -570,6 +590,18 @@ def tracker_loop() -> None:
     # captured there and carried into the loop, because the flag is cleared
     # before the pass runs — checking is_set() inside would always be False.
     by_hand = False
+    # RESUME the hourly cadence across restarts — never reset it. DigitalOcean
+    # rebuilds this app on every push to main, so a tracker that checks on
+    # every boot restarts itself forever: boot → check → commit → rebuild →
+    # boot, one lap every ~3.6 minutes (this ran all of 2026-08-18 and is why
+    # both monitors kept restarting). The last STATUS.md commit on main says
+    # when a check truly last finished, whichever container ran it; wait out
+    # the rest of the hour before the first pass. The /track_now button still
+    # cuts the wait short — that's what the interruptible wait is for.
+    left = TRACKER_INTERVAL - (time.time() - _last_tracker_commit_ts())
+    if left > 0:
+        by_hand = TRACKER_KICK.wait(min(left, TRACKER_INTERVAL))
+        TRACKER_KICK.clear()
     while True:
         if TRACKER_ENABLED and GITHUB_TOKEN:
             TRACKER_STATUS["running"] = True
