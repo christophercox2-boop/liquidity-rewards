@@ -96,7 +96,7 @@ class TestSwitchAndCeiling(unittest.TestCase):
     def test_switch_off_means_observe_only(self):
         r = Rig(switch=False)
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         s = r.cycle(terms)
         self.assertEqual(s["mode"], "observing")
         self.assertEqual(r.exchange.posts, [])
@@ -105,7 +105,7 @@ class TestSwitchAndCeiling(unittest.TestCase):
         r = Rig()
         terms = seats_terms([SEN])
         # model ~25.7c, market 20/26 -> mid 23c: tight envelope, earn size
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         s = r.cycle(terms)
         self.assertEqual(s["mode"], "on")
         self.assertGreater(len(s["orders"]), 0)
@@ -125,7 +125,7 @@ class TestSwitchAndCeiling(unittest.TestCase):
     def test_ceiling_binds(self):
         r = Rig(ceiling=0.30)   # 30 cents: a bid scout fits, nothing else
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         s = r.cycle(terms)
         self.assertLessEqual(s["used"], 0.30 + 1e-9)
 
@@ -145,20 +145,20 @@ class TestFillsAndSeller(unittest.TestCase):
     def test_fill_detected_by_position_delta_then_resold(self):
         r = Rig()
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         bid = next(o for o in r.engine.orders.values() if o.side == "BUY")
         # the exchange fills our bid: order gone, position appears
         r.exchange.live.pop(bid.id)
         r.positions = {SEN: (bid.qty, round(bid.price * bid.qty, 2))}
         r.now += 400
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         s = r.cycle(terms)
         self.assertTrue(any("Order filled" in t for t, _ in r.alerts))
         sells = [o for o in s["orders"] if o["purpose"] == "sell"]
         self.assertEqual(len(sells), 1)
         # listed at max(break-even + tick, the ask touch); here the touch
-        self.assertAlmostEqual(sells[0]["price"], 0.26)
+        self.assertAlmostEqual(sells[0]["price"], 0.14)
         self.assertAlmostEqual(sells[0]["qty"], bid.qty)
 
     def test_account_positions_are_not_adopted_as_our_inventory(self):
@@ -168,7 +168,7 @@ class TestFillsAndSeller(unittest.TestCase):
         # appeared as 2.0's "used" on day one.)
         r = Rig()
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.positions = {SEN: (17.0, 0.95),
                        "scc-senate-gop-2026-11-03-51": (-27.0, 23.64)}
         s = r.cycle(terms)
@@ -183,7 +183,7 @@ class TestFillsAndSeller(unittest.TestCase):
     def test_own_fill_builds_inventory_from_the_ledger(self):
         r = Rig()
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         # a pre-existing 1.0 position sits in the market the whole time
         r.positions = {SEN: (100.0, 20.0)}
         r.cycle(terms)
@@ -192,7 +192,7 @@ class TestFillsAndSeller(unittest.TestCase):
         # the position grows by exactly our fill
         r.positions = {SEN: (100.0 + bid.qty, 20.0 + bid.price * bid.qty)}
         r.now += 400
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         inv = r.engine.inventory[SEN]
         self.assertAlmostEqual(inv["qty"], bid.qty)
@@ -201,12 +201,12 @@ class TestFillsAndSeller(unittest.TestCase):
     def test_vanish_without_delta_is_a_silent_cancel_not_a_fill(self):
         r = Rig()
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         victim = next(iter(r.engine.orders.values()))
         r.exchange.live.pop(victim.id)
         r.now += 400
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         self.assertEqual(r.engine.silent_cancels, 1)
         self.assertFalse(any("Order filled" in t for t, _ in r.alerts))
@@ -216,24 +216,24 @@ class TestExitsAndMaintenance(unittest.TestCase):
     def test_dead_program_pulls_our_orders(self):
         r = Rig()
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         self.assertGreater(len(r.engine.orders), 0)
         # the market's program closes
         terms.refresh({SEN: {"timePeriods": []}}, {}, now=r.now)
         r.now += 400
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         s = r.cycle(terms)
         self.assertEqual(len(s["orders"]), 0)
 
     def test_cooldown_stops_churn(self):
         r = Rig()
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         n_posts = len(r.exchange.posts)
         r.now += 30      # well inside the 300s cooldown
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         self.assertEqual(len(r.exchange.posts), n_posts)
 
@@ -242,14 +242,15 @@ class TestExp1(unittest.TestCase):
     def test_boundary_placements_become_scout_experiments(self):
         r = Rig()
         terms = seats_terms([SEN])
-        # 6000 resting at the 25c touch vs 5000 target, ask one tick above:
+        # 6000 resting at the 15c touch (inside the model band, so the
+        # information is cheap) vs 5000 target, ask one tick above:
         # improving would cross, deeper is out of window, and joining the
         # fat level is EV-negative at size — pure EV would never test the
         # boundary. The information budget places a 1-share scout instead.
-        put_book(r.cache, SEN, 0.25, 0.26, bid_qty=6000.0, now=r.now)
+        put_book(r.cache, SEN, 0.15, 0.16, bid_qty=6000.0, now=r.now)
         r.cycle(terms)
         joined = [o for o in r.engine.orders.values()
-                  if o.side == "BUY" and abs(o.price - 0.25) < 1e-9]
+                  if o.side == "BUY" and abs(o.price - 0.15) < 1e-9]
         self.assertEqual(len(joined), 1)
         self.assertEqual(joined[0].purpose, "exp1")
         self.assertEqual(joined[0].qty, 1.0)
@@ -281,7 +282,7 @@ class TestHandoverSweep(unittest.TestCase):
         from v2.intents import BUY_LONG, BUY_SHORT, SELL_SHORT
         r = Rig(switch=False)
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.exchange.live["f1"] = foreign("f1", BUY_LONG, price=0.19)
         r.exchange.live["f2"] = foreign("f2", BUY_SHORT, price=0.30)
         r.exchange.live["f3"] = foreign("f3", SELL_LONG, price=0.27)
@@ -297,7 +298,7 @@ class TestHandoverSweep(unittest.TestCase):
         # switch off: nothing was PLACED
         self.assertFalse(any(u.endswith("/v1/orders") for u, _ in r.exchange.posts))
         r.now += 60
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         self.assertTrue(r.engine.family_sweep_done)
         self.assertTrue(any("Seats handover done" in t for t, _ in r.alerts))
@@ -306,13 +307,13 @@ class TestHandoverSweep(unittest.TestCase):
         from v2.intents import BUY_LONG
         r = Rig(switch=False)
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         for i in range(20):
             r.exchange.live[f"f{i}"] = foreign(f"f{i}", BUY_LONG, price=0.19)
         r.cycle(terms)
         self.assertEqual(r.engine.sweep_count, 8)      # 8 per cycle, no burst
         r.now += 60
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         self.assertEqual(r.engine.sweep_count, 16)
 
@@ -320,7 +321,7 @@ class TestHandoverSweep(unittest.TestCase):
         from v2.intents import BUY_LONG
         r = Rig(switch=True)
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)                                  # sweep completes (no foreign)
         self.assertTrue(r.engine.family_sweep_done)
         r.exchange.live["bot"] = foreign("bot", BUY_LONG, price=0.19,
@@ -328,7 +329,7 @@ class TestHandoverSweep(unittest.TestCase):
         r.exchange.live["hand"] = foreign("hand", BUY_LONG, price=0.18, manual=True,
                                           created=iso_ago(r.now, 3600))
         r.now += 400
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         self.assertNotIn("bot", r.exchange.live)
         self.assertIn("hand", r.exchange.live)
@@ -342,13 +343,13 @@ class TestHandoverSweep(unittest.TestCase):
         from v2.intents import BUY_LONG
         r = Rig(switch=True)
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         r.exchange.live["twin"] = foreign("twin", BUY_LONG, price=0.19,
                                           created=iso_ago(r.now, 60))
         r.exchange.live["nodate"] = foreign("nodate", BUY_LONG, price=0.17)
         r.now += 400
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         self.assertIn("twin", r.exchange.live)      # too young to evict
         self.assertIn("nodate", r.exchange.live)    # unknown age: never evict
@@ -359,16 +360,18 @@ class TestRotation(unittest.TestCase):
         SEN2 = "scc-senate-gop-2026-11-03-50"
         r = Rig(ceiling=13.0)
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)                       # ~$12 lands in SEN
         self.assertTrue(any(o.purpose == "earn"
                             for o in r.engine.orders.values()))
-        # SEN's touch gets crowded (our spot dilutes to crumbs) while a
-        # thin, juicy book appears in SEN2 — unaffordable at $1 headroom
+        # SEN's book gets crowded on both sides (our spot dilutes to
+        # crumbs) while a thin, juicy book appears in SEN2 — unaffordable
+        # at $1 headroom
         terms = seats_terms([SEN, SEN2])
         r.now += 400
-        put_book(r.cache, SEN, 0.20, 0.26, bid_qty=6000.0, now=r.now)
-        put_book(r.cache, SEN2, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, bid_qty=6000.0, ask_qty=6000.0,
+                 now=r.now)
+        put_book(r.cache, SEN2, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         self.assertTrue(any(e.get("event") == "rotate_out"
                             and e.get("for_market") == SEN2
@@ -381,7 +384,7 @@ class TestPersistence(unittest.TestCase):
     def test_engine_state_roundtrip(self):
         r = Rig()
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         r.engine.inventory[SEN] = {"qty": 5.0, "cost": 1.0}   # own ledger
         e2 = Engine(r.desk, r.engine.cfg, clock=lambda: r.now)
@@ -408,7 +411,7 @@ class TestPersistence(unittest.TestCase):
         # the orphaned sell order rests on the exchange; next cycle pulls it
         r.exchange.live["s1"] = foreign("s1", SELL_LONG, price=0.20, size=17.0)
         terms = seats_terms([SEN])
-        put_book(r.cache, SEN, 0.20, 0.26, now=r.now)
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         self.assertNotIn("s1", r.exchange.live)
         self.assertNotIn("s1", r.engine.orders)

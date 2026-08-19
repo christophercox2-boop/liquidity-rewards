@@ -177,20 +177,24 @@ class Engine:
     # ------------------------------------------------------------- fair bands
 
     def band(self, slug: str, book, silver: SilverFairs):
-        """(lo, hi, source): the envelope of the model's rung value and the
-        market's own mid. Tight envelope = the two agree = confidence."""
-        model = silver.fair(slug)
+        """(lo, hi, source): the envelope of the model's OWN uncertainty
+        interval (its fair across the swing-correlation range — races are
+        far from independent, and how far is itself uncertain) and the
+        market's mid. Tight envelope = model insensitive to its unknown
+        AND agreeing with the market = confidence. Anything else scouts."""
+        rng = silver.fair_range(slug)
         mid = None
         if book and book.bids and book.asks:
             mid = (book.bids[0][0] + book.asks[0][0]) / 2
-        vals = [v for v in (model, mid) if v is not None]
+        vals = ([rng[0], rng[1]] if rng is not None else []) + \
+               ([mid] if mid is not None else [])
         if not vals:
             return None
         lo, hi = min(vals), max(vals)
-        if len(vals) == 1:           # one voice is never confident
+        if rng is None or mid is None:   # one voice is never confident
             lo, hi = max(lo - 0.10, 0.001), min(hi + 0.10, 0.999)
-        src = ("model+market" if model is not None and mid is not None
-               else "model" if model is not None else "market")
+        src = ("model+market" if rng is not None and mid is not None
+               else "model" if rng is not None else "market")
         return lo, hi, src
 
     # -------------------------------------------------------------- reconcile
