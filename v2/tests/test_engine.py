@@ -57,8 +57,10 @@ def seats_terms(slugs, pool=100, target=5000):
     return st
 
 
-def put_book(cache, slug, bid, ask, bid_qty=6000.0, ask_qty=6000.0, now=0.0):
-    cache.put(slug, Book(bids=((bid, bid_qty),), asks=((ask, ask_qty),),
+def put_book(cache, slug, bid, ask, bid_qty=30.0, ask_qty=30.0, now=0.0):
+    # the realistic seats shape: a thin touch, the qualifying wall far back
+    cache.put(slug, Book(bids=((bid, bid_qty), (0.02, 600000.0)),
+                         asks=((ask, ask_qty), (0.98, 600000.0)),
                          tick=0.01, fetched_at=now))
 
 
@@ -237,21 +239,28 @@ class TestExitsAndMaintenance(unittest.TestCase):
 
 
 class TestExp1(unittest.TestCase):
-    def test_boundary_placements_register_both_predictions(self):
+    def test_boundary_placements_become_scout_experiments(self):
         r = Rig()
         terms = seats_terms([SEN])
         # 6000 resting at the 25c touch vs 5000 target, ask one tick above:
-        # improving the bid would cross, so joining the full level is the
-        # only candidate — exactly the level-vs-queue disagreement
-        put_book(r.cache, SEN, 0.25, 0.26, now=r.now)
+        # improving would cross, deeper is out of window, and joining the
+        # fat level is EV-negative at size — pure EV would never test the
+        # boundary. The information budget places a 1-share scout instead.
+        put_book(r.cache, SEN, 0.25, 0.26, bid_qty=6000.0, now=r.now)
         r.cycle(terms)
         joined = [o for o in r.engine.orders.values()
                   if o.side == "BUY" and abs(o.price - 0.25) < 1e-9]
         self.assertEqual(len(joined), 1)
+        self.assertEqual(joined[0].purpose, "exp1")
+        self.assertEqual(joined[0].qty, 1.0)
         self.assertGreater(len(r.engine.exp1), 0)
         for row in r.engine.exp1:
             self.assertEqual(row["pred_queue_day"], 0.0)
             self.assertGreater(row["pred_level_day"], 0.0)
+        # and the forecast for it is on the record
+        f = r.engine.forecasts[joined[0].id]
+        self.assertEqual(f["purpose"], "exp1")
+        self.assertGreater(f["p_fill"], 0.0)
 
 
 def foreign(oid, intent, market=SEN, price=0.10, size=45.0, manual=False):
