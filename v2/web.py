@@ -49,7 +49,8 @@ def authed(get_header, query_string: str, password: str) -> bool:
 
 
 NAV = (("status", "."), ("orders", "orders"), ("markets", "markets"),
-       ("opps", "opps"), ("log", "log"), ("switch", "switch"))
+       ("opps", "opps"), ("calib", "calib"), ("log", "log"),
+       ("switch", "switch"))
 
 _CSS = """
  body{background:#1a202b;color:#e6e9ef;font:16px/1.45 -apple-system,system-ui,sans-serif;
@@ -120,6 +121,11 @@ _CSS = """
          position:relative;overflow:hidden}
  .mfill{position:absolute;left:0;top:0;bottom:0;background:var(--s1);
         border-radius:5px}
+ .you{position:absolute;top:0;bottom:0;width:2px;background:#e6e9ef}
+ .wf{display:flex;justify-content:space-between;gap:10px;margin:3px 0;
+     font-size:14px;font-variant-numeric:tabular-nums}
+ .wf .wl{color:#aab3c5} .wf .wv{white-space:nowrap}
+ .wf.tot{border-top:1px solid #2a3242;padding-top:5px;font-weight:700}
 """
 
 _PLUMBING = """
@@ -269,7 +275,8 @@ ORDERS_JS = """
  function tbl(list){
   var t='<table>'+hrow(['market','order','earns','fill odds']);
   list.forEach(function(o){var f=fx[o.id]||{};
-   t+=row([mshort(o.market),
+   t+=row(['<a href="order?id='+encodeURIComponent(o.id)+'" style="color:#9ecbff;text-decoration:none">'+
+       mshort(o.market)+' &rsaquo;</a>',
      '<span style="white-space:nowrap">'+(o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+pc(o.price)+'</span>',
      (o.live_est!=null?usd(o.live_est)+'/d':'<span class="muted">&ndash;</span>')+
        '<br><span class="muted">'+(o.live_ev!=null?usd(o.live_ev)+' after risk':'&ndash;')+'</span>',
@@ -307,7 +314,8 @@ ORDERS_JS = """
    var out=(OMAP[f.how]||f.how)+(f.rested_s?' after '+Math.round(f.rested_s/60)+'m':'');
    if(f.how==='fill'){out='<span class="warn">filled</span> '+(f.filled_qty||'')+
      (f.adverse!=null?' &middot; cost '+pc(f.adverse)+'/share an hour later':' &middot; grading in ~1h');}
-   return row([mshort(f.market),
+   return row(['<a href="order?id='+encodeURIComponent(f.id)+'" style="color:#9ecbff;text-decoration:none">'+
+     mshort(f.market)+' &rsaquo;</a>',
      '<span style="white-space:nowrap">'+f.side.toLowerCase()+' '+f.qty+' @ '+pc(f.price)+'</span>',
      pct(f.p_fill)+' odds<br><span class="muted">'+usd(f.ev)+'/d</span>',out]);}
   h+='<table>'+hrow(['market','order','predicted','outcome']);
@@ -490,9 +498,9 @@ OPPS_JS = """
   h+='</div>';}
  var fm=d.fillmodel||{};var hz=fm.hazards||{};
  var BL={0:'at the touch',1:'1 tick back',2:'2 ticks back',3:'3+ back'};
- var famlab=function(k){var f=k.split('|')[0];
+ var famlab=function(k){var f=k.split(' ')[0];
    return f.indexOf('senate')>=0?'Senate':(f.indexOf('house')>=0||f.indexOf('hrep')>=0)?'House':f;};
- var hzlab=function(k){var p=k.split('|');
+ var hzlab=function(k){var p=k.split(' ');
    return famlab(k)+(p[1]?' &middot; '+(p[1]==='BUY'?'bids':'asks'):'');};
  var anyCross=0,hours=0;Object.keys(hz).forEach(function(k){
    hours=Math.max(hours,(hz[k][0]||{}).hours_observed||0);
@@ -537,6 +545,165 @@ OPPS_JS = """
  return h;
 """
 
+ORDER_JS = """
+ var id=decodeURIComponent((location.search.match(/[?&]id=([^&]+)/)||[])[1]||'');
+ var g=d.engine||{};var o=null;(g.orders||[]).forEach(function(x){if(x.id===id)o=x;});
+ var f=null;(d.forecasts||[]).forEach(function(x){if(x.id===id)f=x;});
+ if(!o&&!f)return '<div class="card">This order is not in the last 100 records. '+
+  '<a href="orders" style="color:#9ecbff">&larr; back to orders</a></div>';
+ var src=o||f;var mkt=src.market,side=src.side,price=src.price,qty=src.qty;
+ var purpose=src.purpose||(f||{}).purpose||'';
+ var OMAP={fill:'filled',silent_cancel:'cancelled by the exchange',pulled:'pulled (left the safe band)',
+   repriced:'repriced',rotated_out:'swapped for a better idea',cancelled:'cancelled'};
+ var h='<div class="card"><b>'+mtitle(mkt)+'</b>'+
+  '<div class="sub">'+(side==='BUY'?'bid':'ask')+' '+qty+' @ '+pc(price)+' &middot; '+pwhy(purpose)+
+  (o&&o.placed_ts&&d.saved_at?' &middot; resting '+Math.round((d.saved_at-o.placed_ts)/60)+'m':'')+
+  (o?'':' &middot; <span class="warn">closed</span>')+'</div>';
+ if(!o&&f&&f.how){
+  h+='<div class="hint"><b>Outcome:</b> '+(OMAP[f.how]||f.how)+
+   (f.rested_s?' after '+Math.round(f.rested_s/60)+' minutes resting':'')+
+   (f.how==='fill'&&f.adverse!=null?'. The fill cost '+pc(f.adverse)+'/share, graded against the mid an hour later (it predicted '+pc(f.fill_cost)+').':'.')+'</div>';}
+ // where the price sits: band, market, and this order on one strip
+ var fr=(d.fairs||{})[mkt];var fl=(d.silver_flavors||{})[mkt]||{};var L=(d.ladders||{})[mkt];
+ var mid=(L&&L.bids[0]&&L.asks[0])?(L.bids[0][0]+L.asks[0][0])/2:null;
+ var mx0=Math.max(fr?fr[1]:0,mid||0,price,0.01);
+ var step=[0.01,0.02,0.025,0.05,0.1,0.25].filter(function(s){return 4*s>=mx0;})[0]||0.25;
+ var mx=4*step;var track='';
+ [1,2,3].forEach(function(i){track+='<div class="gline" style="left:'+(25*i)+'%"></div>';});
+ if(fr)track+='<div class="range" style="left:'+(100*fr[0]/mx)+'%;width:'+Math.max(100*(fr[1]-fr[0])/mx,1)+'%"></div>';
+ if(fl.deluxe!=null)track+='<div class="dot mdl" style="left:'+(100*fl.deluxe/mx)+'%"></div>';
+ if(mid!=null)track+='<div class="dot mkt" style="left:'+(100*mid/mx)+'%"></div>';
+ track+='<div class="you" style="left:'+Math.min(100*price/mx,100)+'%"></div>';
+ var offband=fr&&((side==='BUY'&&price>fr[1]+0.011)||(side==='SELL'&&price<fr[0]-0.011));
+ h+='<div class="drow" style="cursor:default"><span class="dlab">0</span><div class="dtrack">'+track+
+  '</div><span class="dval">'+Math.round(mx*100)+'&cent;</span></div>'+
+  '<div class="hint"><span class="leg" style="background:var(--s1)"></span>model band'+
+  '<span class="leg" style="background:var(--s2)"></span>market mid &middot; the white line is this order'+
+  (offband?' <span class="warn">&middot; outside the band &mdash; the guard pulls it unless the band moves</span>':'')+'</div></div>';
+ var lp=o?o.live_parts:null;
+ if(lp){
+  var earn=lp.share*lp.side_pool;var sf=lp.scoring_frac;
+  h+='<div class="card"><b>What it earns</b>';
+  if(L){
+   var lv=(side==='BUY'?L.bids:L.asks)||[];
+   var tgt=(((d.terms||{}).current||{})[mkt]||[])[1]||null;
+   var mq=1;lv.forEach(function(x){mq=Math.max(mq,x[1]);});
+   var cum=0;
+   h+='<div class="hint">The '+(side==='BUY'?'bid':'ask')+' book, best price first. Only the window scores: '+
+    'the first levels that together hold the '+(tgt?tgt.toLocaleString():'?')+'-share target.</div>';
+   lv.forEach(function(x){
+    var inw=tgt?cum<tgt:true;cum+=x[1];
+    var yours=Math.abs(x[0]-price)<1e-9;
+    h+='<div class="brow"><span class="blab">'+pc(x[0])+'</span>'+
+     '<div class="btrack"><div class="bar" style="background:'+(yours?'var(--s1)':'#3a4456')+
+     ';width:'+(100*Math.sqrt(x[1])/Math.sqrt(mq))+'%"></div></div>'+
+     '<span class="bval">'+Math.round(x[1]).toLocaleString()+
+     (yours?' &middot; <b>yours: '+qty+'</b>':'')+
+     (inw?'':' <span class="muted">outside</span>')+'</span></div>';});
+  }
+  h+='<div class="wf"><span class="wl">share of the scoring '+(side==='BUY'?'bid':'ask')+' side</span><span class="wv">'+pct(lp.share)+'</span></div>'+
+   '<div class="wf"><span class="wl">&times; this market&rsquo;s daily side pool</span><span class="wv">'+usd(lp.side_pool)+'</span></div>'+
+   '<div class="wf"><span class="wl">&times; time actually scoring</span><span class="wv">'+pct(sf)+'</span></div>'+
+   '<div class="wf tot"><span class="wl">earns</span><span class="wv ok">+'+usd(earn*sf)+'/d</span></div>'+
+   (lp.in_window?'':'<div class="hint warn">Currently OUTSIDE the scoring window &mdash; earning $0 until the book shifts or the engine moves it.</div>')+
+   '</div>';
+  var fam=mkt.indexOf('scc-senate-gop-')===0?'senate-seats':mkt.indexOf('scc-hrep-rep-')===0?'house-seats':'other';
+  var fm=d.fillmodel||{};var hzr=(fm.hazards||{})[fam+' '+side]||{};
+  var bi=Math.min(lp.ticks==null?0:lp.ticks,3);var cell=hzr[bi]||{};
+  var BL={0:'at the touch',1:'1 tick back',2:'2 ticks back',3:'3+ ticks back'};
+  var md=(fm.markdown||{})[fam];var nm=(fm.marks_n||{})[fam]||0;
+  var conc=md!=null?Math.max((lp.fill_cost||0)-md,0):0;
+  var risk=lp.p_fill*lp.fill_cost*qty;
+  h+='<div class="card"><b>What a fill would cost</b>'+
+   '<div class="wf"><span class="wl">chance of a fill today ('+BL[bi]+')</span><span class="wv">'+pct(lp.p_fill)+'</span></div>'+
+   '<div class="wf"><span class="wl">&times; cost per share if filled</span><span class="wv">'+pc(lp.fill_cost)+'</span></div>'+
+   '<div class="wf"><span class="wl">&times; '+qty+' shares</span><span class="wv"></span></div>'+
+   '<div class="wf tot"><span class="wl">fill risk</span><span class="wv bad">&minus;'+usd(risk)+'/d</span></div>'+
+   '<div class="hint"><b>Evidence for the odds:</b> watched this ladder&rsquo;s '+(side==='BUY'?'bid':'ask')+
+   ' side for '+(cell.hours_observed||0)+' hours and saw the price run over '+BL[bi]+' '+(cell.crossings||0)+
+   ((cell.crossings||0)===1?' time':' times')+
+   ((cell.crossings||0)<3?' &mdash; mostly the cautious starting guess until more hours pile up':'')+'.</div>'+
+   '<div class="hint"><b>Evidence for the cost:</b> '+
+   (nm?nm+' real fills, graded against the mid an hour later, average '+pc(md):'no graded fills yet &mdash; using the cautious 2&cent; starting guess')+
+   (conc>0.001?'; plus this price sits '+pc(conc)+' past the band edge, conceded the moment it fills':'')+'.</div></div>';
+  var after=earn*sf-risk;
+  h+='<div class="card"><b>The verdict</b>'+
+   '<div class="wf"><span class="wl">earns</span><span class="wv ok">+'+usd(earn*sf)+'/d</span></div>'+
+   '<div class="wf"><span class="wl">fill risk</span><span class="wv bad">&minus;'+usd(risk)+'/d</span></div>'+
+   '<div class="wf tot"><span class="wl">after risk</span><span class="wv '+(after>=0?'ok':'bad')+'">'+usd(after)+'/d</span></div>'+
+   (f?'<div class="hint">At placement it predicted '+pct(f.p_fill)+' fill odds and '+usd(f.ev)+'/d after risk. '+
+     'Scouts and experiments are allowed to run slightly negative &mdash; they buy information.</div>':'')+'</div>';
+ } else if(o){
+  h+='<div class="card hint">Re-evaluating against the live book &mdash; the components appear within a cycle (~45 seconds).</div>';
+ } else if(f){
+  h+='<div class="card"><b>The prediction it was placed with</b>'+
+   '<div class="wf"><span class="wl">expected earnings</span><span class="wv">+'+usd(f.exp_earn)+'/d</span></div>'+
+   '<div class="wf"><span class="wl">fill odds &times; cost &times; size</span><span class="wv">&minus;'+usd((f.p_fill||0)*(f.fill_cost||0)*qty)+'/d</span></div>'+
+   '<div class="wf tot"><span class="wl">after risk</span><span class="wv">'+usd(f.ev)+'/d</span></div></div>';
+ }
+ h+='<div class="muted"><a href="orders" style="color:#9ecbff">&larr; all orders</a> &nbsp; '+
+  '<a href="calib" style="color:#9ecbff">how honest are these predictions? &rarr;</a></div>';
+ return h;
+"""
+
+CALIB_JS = """
+ var fx=d.forecasts||[];
+ var closed=fx.filter(function(f){return f.how&&f.p_fill!=null&&f.rested_s!=null;});
+ var open=fx.filter(function(f){return !f.how;}).length;
+ function pAt(f){return 1-Math.pow(1-f.p_fill,Math.max(f.rested_s,60)/86400);}
+ var BINS=[[0,0.01,'<1%'],[0.01,0.03,'1\\u20133%'],[0.03,0.08,'3\\u20138%'],
+           [0.08,0.2,'8\\u201320%'],[0.2,1.01,'20%+']];
+ var h='<div class="card"><b>Fill odds: predicted vs what happened</b>'+
+  '<div class="sub">'+closed.length+' resolved predictions'+(open?' &middot; '+open+' still open':'')+
+  '. Each order carried a predicted chance of filling over the time it actually rested.</div>'+
+  '<span class="leg" style="background:var(--s1)"></span><span class="muted">predicted</span>'+
+  '<span class="leg" style="background:var(--s2)"></span><span class="muted">happened</span>';
+ if(closed.length<8)h+='<div class="hint warn">Small sample &mdash; a sketch, not a verdict, until this grows.</div>';
+ var rows=[],wp=0,wr=0,mxr=0.01;
+ BINS.forEach(function(b){
+  var sel=closed.filter(function(f){var p=pAt(f);return p>=b[0]&&p<b[1];});
+  if(!sel.length)return;
+  var ap=0,hits=0;sel.forEach(function(f){ap+=pAt(f);if(f.how==='fill')hits++;});
+  ap/=sel.length;var real=hits/sel.length;
+  wp+=ap*sel.length;wr+=hits;
+  mxr=Math.max(mxr,ap,real);
+  rows.push({lab:b[2],p:ap,r:real,n:sel.length});});
+ rows.forEach(function(x){
+  h+='<div class="brow"><span class="blab" style="width:56px">'+x.lab+'</span><div class="btrack">'+
+   '<div class="bar" style="background:var(--s1);width:'+(100*x.p/mxr)+'%"></div>'+
+   '<div class="bar" style="background:var(--s2);width:'+Math.max(100*x.r/mxr,0.5)+'%;margin-top:2px"></div>'+
+   '</div><span class="bval">'+Math.round(x.p*100)+'% &rarr; '+Math.round(x.r*100)+'% <span class="muted">n='+x.n+'</span></span></div>';});
+ if(closed.length){
+  wp/=closed.length;var wrf=wr/closed.length;
+  var verdict=wrf<wp*0.6?'<b>Overconfident about fills</b> &mdash; they happen less than predicted. The safe direction to err, but it may be resting farther back than it needs to.'
+   :wrf>wp*1.5?'<b>Underconfident about fills</b> &mdash; they happen more than predicted. Fill risk is being underpriced; expect the engine to pull back as this feeds in.'
+   :'<b>Roughly calibrated</b> so far.';
+  h+='<div class="hint">Overall: predicted '+Math.round(wp*100)+'%, happened '+Math.round(wrf*100)+'%. '+verdict+'</div>';}
+ h+='<details class="how"><summary>how to read this</summary>'+
+  'Blue = the engine&rsquo;s predicted fill chance, orange = how often those orders really filled, '+
+  'bucketed by confidence. Equal bars = honest odds. Orange shorter = overconfident; longer = '+
+  'underconfident. A cancelled order counts as no-fill over the time it rested &mdash; the fair '+
+  'comparison, since it never got its full day.</details></div>';
+ var marked=fx.filter(function(f){return f.adverse!=null;});
+ h+='<div class="card"><b>Fill cost: predicted vs measured</b>';
+ if(marked.length){
+  var fams={};marked.forEach(function(f){var k=f.market.indexOf('senate')>=0?'Senate':'House';
+   (fams[k]=fams[k]||[]).push(f);});
+  h+='<table>'+hrow(['ladder','predicted','measured','fills']);
+  Object.keys(fams).forEach(function(k){var l=fams[k];var ap=0,ar=0;
+   l.forEach(function(x){ap+=x.fill_cost||0;ar+=x.adverse;});
+   h+=row([k,pc(ap/l.length)+'/share',pc(ar/l.length)+'/share',l.length]);});
+  h+='</table><div class="hint">Measured = each real fill graded against the market&rsquo;s mid an hour '+
+   'later. Predicted above measured = the engine charges itself too much for fills and is too shy; '+
+   'below = too little, too bold.</div>';
+ }else{h+='<div class="muted">No graded fills yet &mdash; each fill grades about an hour after it happens.</div>';}
+ h+='</div>';
+ h+='<div class="card hint">The scoring-window experiment (generous vs strict readings of the reward '+
+  'rule) grades against real payouts as they post &mdash; it lives on '+
+  '<a href="opps" style="color:#9ecbff">opps</a>.</div>';
+ return h;
+"""
+
 LOG_JS = """
  var h='';var es=d.engine_saved||{};
  function card(title,rows,fmt){
@@ -578,6 +745,8 @@ def build_shells() -> dict[str, str]:
         "/orders": _page("orders", "2.0 orders", ORDERS_JS),
         "/markets": _page("markets", "2.0 markets", MARKETS_JS),
         "/opps": _page("opps", "2.0 opportunities", OPPS_JS),
+        "/order": _page("orders", "2.0 order", ORDER_JS),
+        "/calib": _page("calib", "2.0 calibration", CALIB_JS),
         "/log": _page("log", "2.0 log", LOG_JS),
     }
 

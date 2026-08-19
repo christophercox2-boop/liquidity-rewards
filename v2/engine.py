@@ -114,6 +114,9 @@ class OwnOrder:
     live_est: float | None = None    # $/day earning at current book
     live_ev: float | None = None     # EV/day of leaving it where it is
     live_yield: float | None = None  # live_ev per dollar at risk
+    live_parts: dict | None = None   # the EV's components, for /order —
+                                     # share, ticks, p_fill, fill_cost,
+                                     # scoring_frac, side_pool, band
 
 
 def _order_age_s(o: dict, now: float) -> float | None:
@@ -613,16 +616,25 @@ class Engine:
             earning_here = here.qualifies and here.in_window
             self.model.observe_scoring(rec.market, earning_here)
             # live evaluation: what this order earns and risks RIGHT NOW
-            live_est = (here.share * daily_side_pool(prog, rec.market)
-                        if earning_here else 0.0)
+            side_pool = daily_side_pool(prog, rec.market)
+            live_est = here.share * side_pool if earning_here else 0.0
             lo, hi, _src = b
             fair_ref = lo if rec.side == "BUY" else hi
             p_f = self.model.p_fill(rec.market, rec.side, here.ticks,
                                     self.cfg.horizon_s)
             f_cost = self.model.fill_cost(rec.market, rec.side, rec.price, fair_ref)
+            sc_frac = self.model.scoring_fraction(rec.market)
             rec.live_est = round(live_est, 4)
-            rec.live_ev = round(live_est * self.model.scoring_fraction(rec.market)
-                                - p_f * f_cost * rec.qty, 4)
+            rec.live_ev = round(live_est * sc_frac - p_f * f_cost * rec.qty, 4)
+            # every component, so /order can show the working, not just the sum
+            rec.live_parts = {
+                "share": round(here.share, 4), "ticks": here.ticks,
+                "in_window": here.in_window, "qualifies": here.qualifies,
+                "p_fill": round(p_f, 4), "fill_cost": round(f_cost, 4),
+                "scoring_frac": round(sc_frac, 3),
+                "side_pool": round(side_pool, 4),
+                "band": [round(lo, 3), round(hi, 3), _src],
+            }
             risk = self.order_marginal(rec)
             rec.live_yield = round(rec.live_ev / max(risk, 0.05), 4)
             if actions_left <= 0 or not self._cooldown_ok(rec.market, rec.side, now):
@@ -860,7 +872,8 @@ class Engine:
             "orders": [{"id": o.id, "market": o.market, "side": o.side,
                         "price": o.price, "qty": o.qty, "purpose": o.purpose,
                         "live_est": o.live_est, "live_ev": o.live_ev,
-                        "live_yield": o.live_yield}
+                        "live_yield": o.live_yield, "live_parts": o.live_parts,
+                        "placed_ts": o.placed_ts}
                        for o in self.orders.values()],
             "inventory": self.inventory,
             "silent_cancels": self.silent_cancels,
@@ -892,7 +905,8 @@ class Engine:
     def restore(self, d: dict) -> None:
         self.log = list(d.get("log") or [])   # first: migrations below log too
         for oid, v in (d.get("orders") or {}).items():
-            self.orders[oid] = OwnOrder(**v)
+            self.orders[oid] = OwnOrder(**{k: x for k, x in v.items()
+                                           if k in OwnOrder.__dataclass_fields__})
         if d.get("ledger_v") == 2:
             self.inventory = dict(d.get("inventory") or {})
         else:
