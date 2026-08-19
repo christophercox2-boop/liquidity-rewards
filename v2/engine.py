@@ -74,7 +74,8 @@ class EngineConfig:
                                      # funding check stays the hard backstop:
                                      # orders it can't fund self-cancel and
                                      # show up as silent cancels.
-    max_actions_per_cycle: int = 4   # rate-limit manners; the book moves slowly
+    max_actions_per_cycle: int = 10  # rate-limit manners (owner raised 4 -> 10
+                                     # alongside the $300 ceiling, 2026-08-19)
     max_order_usd: float = 12.0      # one order's nominal cost, high confidence
     scout_qty: float = 1.0           # low-confidence probe size
     min_ev_day: float = 0.005        # don't rest for under half a cent/day of EV
