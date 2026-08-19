@@ -77,6 +77,7 @@ class FillModel:
         # market -> (bid, ask, tick, ts) — last touch seen
         self._last: dict[str, tuple] = {}
         self.markdown: dict[str, float] = {}       # family -> $/share EWMA
+        self.marks_n: dict[str, int] = {}          # family -> graded fills count
         self.scoring_frac: dict[str, float] = {}   # family -> EWMA 0..1
 
     @staticmethod
@@ -126,6 +127,7 @@ class FillModel:
         cur = self.markdown.get(fam, MARKDOWN_SEED)
         self.markdown[fam] = round(cur * (1 - MARKDOWN_ALPHA)
                                    + adverse * MARKDOWN_ALPHA, 4)
+        self.marks_n[fam] = self.marks_n.get(fam, 0) + 1
         return adverse
 
     def observe_scoring(self, slug: str, in_window: bool) -> None:
@@ -167,7 +169,8 @@ class FillModel:
 
     def summary(self) -> dict:
         out: dict = {"hazards": {}, "markdown": self.markdown,
-                     "scoring_frac": self.scoring_frac}
+                     "marks_n": self.marks_n, "scoring_frac": self.scoring_frac,
+                     "prior_per_day": dict(PRIOR_HAZARD_PER_DAY)}
         fams = {k.split("|")[0] for k in self.obs} | {"senate-seats", "house-seats"}
         for fam in sorted(fams):
             for side in ("BUY", "SELL"):
@@ -175,18 +178,21 @@ class FillModel:
                 for b in DIST_BUCKETS:
                     cell = self.obs.get(self._key(fam, side, b))
                     row[b] = {"per_day": round(self.hazard_per_day(fam, side, b), 4),
-                              "hours_observed": round((cell or [0.0])[0] / 3600, 1)}
+                              "hours_observed": round((cell or [0.0])[0] / 3600, 1),
+                              "crossings": int((cell or [0.0, 0.0])[1])}
                 out["hazards"][f"{fam} {side}"] = row
         return out
 
     def to_dict(self) -> dict:
         return {"obs": {k: [round(v[0], 1), v[1]] for k, v in self.obs.items()},
-                "markdown": self.markdown, "scoring_frac": self.scoring_frac}
+                "markdown": self.markdown, "marks_n": self.marks_n,
+                "scoring_frac": self.scoring_frac}
 
     @classmethod
     def from_dict(cls, d: dict) -> "FillModel":
         m = cls()
         m.obs = {k: [float(v[0]), float(v[1])] for k, v in (d.get("obs") or {}).items()}
         m.markdown = dict(d.get("markdown") or {})
+        m.marks_n = dict(d.get("marks_n") or {})
         m.scoring_frac = dict(d.get("scoring_frac") or {})
         return m

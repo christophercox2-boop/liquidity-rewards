@@ -311,6 +311,8 @@ class Monitor:
             "forecasts": list(self.engine.forecasts.values())[-100:],
             "fairs": {s: round(f, 4) for s in self.family_slugs
                       if (f := self.silver.fair(s)) is not None},
+            "silver_races": {a: round(r["rep"], 4)
+                             for a, r in self.silver.races.items()},
             "ladders": {
                 s: {"bids": [[p, q] for p, q in b.bids[:6]],
                     "asks": [[p, q] for p, q in b.asks[:6]],
