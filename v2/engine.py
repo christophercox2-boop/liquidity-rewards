@@ -49,7 +49,7 @@ import time
 from dataclasses import dataclass, field, replace
 
 from .books import BookCache
-from .fillmodel import FillModel
+from .fillmodel import FillModel, family_of
 from .intents import BUY_LONG, BUY_SHORT, SELL_LONG, SELL_SHORT, capital_at_risk
 from .orders import OrderDesk
 from .programs import daily_side_pool, slug_event_date
@@ -80,8 +80,20 @@ class EngineConfig:
                                      # show up as silent cancels.
     max_actions_per_cycle: int = 10  # rate-limit manners (owner raised 4 -> 10
                                      # alongside the $300 ceiling, 2026-08-19)
-    max_order_usd: float = 40.0      # one order's nominal cost, high confidence
-                                     # (owner raised 12 -> 40, 2026-08-19)
+    # Size is chosen to MAXIMISE EV, not by a flat cap (owner, 2026-08-19:
+    # "at some point, increasing size has no marginal earnings benefit on
+    # only marginal fill cost, correct?" — correct: our share saturates at
+    # the whole side pool while fill risk stays linear, so EV has a single
+    # peak). max_order_usd is now only a concentration backstop — no one
+    # order may risk more than max_order_frac of the ceiling.
+    # A quarter of the ceiling: concentration backstop, not the sizing rule.
+    # (Was a flat 40 for a few hours this morning; EV sizing supersedes it.)
+    max_order_usd: float = 75.0
+    # The peak sits at q* proportional to 1/sqrt(fill_cost), and fill_cost is
+    # still the cautious 2c seed until real fills grade it. Until a family has
+    # this many graded fills, take only this fraction of the EV-optimal size.
+    size_safety: float = 0.5
+    size_proven_marks: int = 10
     # Depth ahead of our price is evidence in its own right: a taker must
     # consume it before reaching us. Size is justified when the model and
     # market agree (a fill would not cost much) OR when this many Target
@@ -382,6 +394,66 @@ class Engine:
                 and hi <= self.cfg.tight_ratio * max(lo, 0.01)
                 and (1.0 - lo) <= self.cfg.tight_ratio * max(1.0 - hi, 0.01))
 
+    def _best_size(self, slug, side, px, levels, book, prog, side_pool,
+                   fair_ref, shield, max_usd):
+        """The EV-maximising size for this order, and its numbers.
+
+        Earnings are concave in size — our share is q.d/(W + q.d), which
+        saturates at the whole side pool — while fill risk is linear in
+        size. So EV rises, peaks, and falls, and past the peak every extra
+        share costs more in expected fill than it earns (owner, 2026-08-19).
+
+        Searched numerically against the real scoring function rather than
+        solved in closed form: our own size moves the Target Size window
+        boundary, so the analytic optimum is only locally right and can
+        recommend a size that scores nothing.
+
+        Returns (qty, estimate, p_fill, fill_cost, ev) for the best size,
+        or None when no size scores.
+        """
+        cost_ps = px if side == "BUY" else 1.0 - px
+        if cost_ps <= 0:
+            return None
+        ceiling_qty = max_usd / cost_ps
+        sf = self.model.scoring_fraction(slug)
+        f_cost = self.model.fill_cost(slug, side, px, fair_ref)
+        sizes, q = [], float(self.cfg.scout_qty)
+        while q < ceiling_qty:
+            sizes.append(q)
+            q *= 1.5
+        sizes.append(ceiling_qty)
+        best = None
+        for q in sizes:
+            q = round(q, 2)
+            if q < self.cfg.scout_qty:
+                continue
+            j = estimate_join(side, list(levels), book.tick, prog.df,
+                              prog.target, px, q)
+            if not (j.qualifies and j.in_window):
+                continue
+            p_f = self.model.p_fill(slug, side, j.ticks, self.cfg.horizon_s,
+                                    shield=shield, target=prog.target)
+            ev = j.share * side_pool * sf - p_f * f_cost * q
+            if best is None or ev > best[4]:
+                best = (q, j, p_f, f_cost, ev)
+        if best is None:
+            return None
+        # Until real fills have graded the cost side, take only a fraction
+        # of the peak: q* scales as 1/sqrt(fill_cost), so an optimistic
+        # cost seed overstates the right size.
+        proven = (self.model.marks_n.get(family_of(slug), 0)
+                  >= self.cfg.size_proven_marks)
+        if not proven and best[0] > self.cfg.scout_qty:
+            q = max(round(best[0] * self.cfg.size_safety, 2), self.cfg.scout_qty)
+            j = estimate_join(side, list(levels), book.tick, prog.df,
+                              prog.target, px, q)
+            if j.qualifies and j.in_window:
+                p_f = self.model.p_fill(slug, side, j.ticks, self.cfg.horizon_s,
+                                        shield=shield, target=prog.target)
+                best = (q, j, p_f, best[3],
+                        j.share * side_pool * sf - p_f * best[3] * q)
+        return best
+
     @staticmethod
     def _shield(book, side: str, price: float, own_qty: float = 0.0) -> float:
         """Contracts a taker must consume before reaching our price:
@@ -590,18 +662,27 @@ class Engine:
                 walled = (prog.target
                           and shield >= self.cfg.shield_size_x * prog.target)
                 confident = tight or walled
-                usd = (self.cfg.max_order_usd if confident
-                       else self.cfg.scout_qty * cost_ps)
-                qty = max(round(usd / cost_ps, 2), self.cfg.scout_qty)
-                j = estimate_join(side, list(levels), book.tick, prog.df,
-                                  prog.target, px, qty)
-                if not (j.qualifies and j.in_window):
-                    continue
+                if confident:
+                    # size to the EV peak, not to a flat dollar cap
+                    got = self._best_size(slug, side, px, levels, book, prog,
+                                          side_pool, fair_ref, shield,
+                                          self.cfg.max_order_usd)
+                    if got is None:
+                        continue
+                    qty, j, p_f, f_cost, ev = got
+                else:
+                    qty = self.cfg.scout_qty
+                    j = estimate_join(side, list(levels), book.tick, prog.df,
+                                      prog.target, px, qty)
+                    if not (j.qualifies and j.in_window):
+                        continue
+                    p_f = self.model.p_fill(slug, side, j.ticks,
+                                            self.cfg.horizon_s, shield=shield,
+                                            target=prog.target)
+                    f_cost = self.model.fill_cost(slug, side, px, fair_ref)
+                    ev = (j.share * side_pool * self.model.scoring_fraction(slug)
+                          - p_f * f_cost * qty)
                 earn = j.share * side_pool * self.model.scoring_fraction(slug)
-                p_f = self.model.p_fill(slug, side, j.ticks, self.cfg.horizon_s,
-                                        shield=shield, target=prog.target)
-                f_cost = self.model.fill_cost(slug, side, px, fair_ref)
-                ev = earn - p_f * f_cost * qty
                 # the cost that gates the ceiling and ranks candidates is
                 # MARGINAL family risk — an ask already dominated by a
                 # bigger short on an exclusive sibling rung is nearly free
