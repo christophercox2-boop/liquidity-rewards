@@ -441,3 +441,16 @@ class SilverFairs:
         if not self.pmf:
             return None
         return sum(v for k, v in self.pmf.items() if k >= 50)
+
+    def control(self, chamber: str) -> dict[str, float] | None:
+        """P(GOP controls the chamber) per flavor: R >= 50 in the Senate
+        (the VP breaks 50-50), R >= 218 in the House. For the headline
+        card, so the page never has to interpolate rungs."""
+        need = 50 if chamber == "senate" else 218
+        flavors = self.official.get(chamber) or {}
+        out = {f: round(sum(v for k, v in pmf.items() if k >= need), 4)
+               for f, pmf in flavors.items()}
+        if not out and chamber == "senate" and self.pmf:
+            out = {"swing": round(sum(v for k, v in self.pmf.items()
+                                      if k >= need), 4)}
+        return out or None

@@ -365,6 +365,8 @@ class Monitor:
                        } if self.silver.official else None},
             "silver_flavors": {s: fv for s in self.family_slugs
                                if (fv := self.silver.flavors_fair(s)) is not None},
+            "control": {c: cv for c in ("senate", "house")
+                        if (cv := self.silver.control(c)) is not None},
             "rewards_watch": self.rewards_watch.to_dict(),
             "rewards_status": self.rewards_watch.status(now),
         }
