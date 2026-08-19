@@ -481,6 +481,11 @@ OPPS_JS = """
    cands.slice(8).forEach(function(c){h+=crow(c);});h+='</table></details>';}
  }else{h+='<div class="muted">nothing above the bar right now</div>';}
  h+='<details class="how"><summary>how ideas are scored</summary>'+
+  'Size is chosen to maximise value, not filled to a cap: your share of a side '+
+  'saturates as the order grows (you can never earn more than the whole side pool), '+
+  'while fill risk keeps rising in a straight line &mdash; so there is a peak, and the '+
+  'engine stops there. While fill costs are still an estimate rather than measured, it '+
+  'takes half that peak. '+
   'For each price level: what it would earn from the pool per day, minus '+
   '(chance of being filled) &times; (what that fill usually costs). Only positive '+
   'after-risk ideas qualify, and <b>uses</b> is how much of the $'+((g.ceiling||0))+
