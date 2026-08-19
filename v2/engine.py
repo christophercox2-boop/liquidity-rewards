@@ -4,9 +4,12 @@ Built to the owner's brief (REBUILD.md), on the two seats families
 first, under one risk number, with every 1.0 lesson encoded:
 
 * **One risk number.** The buying power allocated to 2.0 ($100 for the
-  seats test). `used` = capital at risk of our resting opening orders
-  plus what our inventory cost; every placement must fit in the
-  headroom. No per-market caps, ladders or graduated budgets.
+  seats test). `used` = the worst-case loss of the whole book, with
+  negative-risk netting inside each seats family (v2/risk.py — the
+  Senate's exact rungs are mutually exclusive, so shorts across them
+  mostly share one collateral); every placement must fit its MARGINAL
+  risk in the headroom. No per-market caps, ladders or graduated
+  budgets.
 * **Confidence decides where, the ceiling decides how much — never
   both.** Confidence comes from agreement: the fair band is the ENVELOPE
   of the Silver model's rung value and the market's own mid. Where they
@@ -50,6 +53,10 @@ from .fillmodel import FillModel
 from .intents import BUY_LONG, BUY_SHORT, SELL_LONG, SELL_SHORT, capital_at_risk
 from .orders import OrderDesk
 from .programs import daily_side_pool, slug_event_date
+from .risk import (
+    Leg, family_risk, leg_for_inventory, leg_for_order, marginal_risk,
+    parse_rung,
+)
 from .scoring import estimate_join
 from .silver import SilverFairs
 from .terms import TermsStore
@@ -161,12 +168,88 @@ class Engine:
         self.log.append(row)
         del self.log[:-self.cfg.log_keep]
 
+    def _family_legs(self, skip_order_id: str | None = None
+                     ) -> tuple[dict[str, list[Leg]], float]:
+        """The whole book as risk legs grouped by family, plus the
+        per-order fallback total for anything that isn't a seats rung."""
+        fams: dict[str, list[Leg]] = {}
+        flat = 0.0
+        for oid, o in self.orders.items():
+            if oid == skip_order_id:
+                continue
+            fr = parse_rung(o.market)
+            leg = (leg_for_order(fr[1], o.intent, o.price, o.qty)
+                   if fr is not None else None)
+            if fr is not None and leg is not None:
+                fams.setdefault(fr[0], []).append(leg)
+            elif fr is None:
+                flat += capital_at_risk(o.intent, o.price, o.qty)
+        for slug, inv in self.inventory.items():
+            fr = parse_rung(slug)
+            leg = (leg_for_inventory(fr[1], inv.get("qty", 0.0),
+                                     inv.get("cost", 0.0))
+                   if fr is not None else None)
+            if fr is not None and leg is not None:
+                fams.setdefault(fr[0], []).append(leg)
+            elif fr is None:
+                flat += max(inv.get("cost", 0.0), 0.0)
+        return fams, flat
+
     def used_capital(self) -> float:
-        used = sum(capital_at_risk(o.intent, o.price, o.qty)
-                   for o in self.orders.values())
-        for inv in self.inventory.values():
-            used += max(inv.get("cost", 0.0), 0.0)
-        return round(used, 2)
+        """Worst-case dollars the whole book can lose — negative-risk
+        netting inside each seats family (owner, 2026-08-19), families
+        summed because their seat counts are separate unknowns."""
+        fams, flat = self._family_legs()
+        return round(sum(family_risk(legs) for legs in fams.values()) + flat, 2)
+
+    def risk_by_family(self) -> dict[str, float]:
+        """The worst case per family, for the page."""
+        fams, flat = self._family_legs()
+        out = {fam: round(family_risk(legs), 2) for fam, legs in fams.items()}
+        if flat:
+            out["other"] = round(flat, 2)
+        return out
+
+    def _candidate_leg(self, slug: str, side: str, price: float,
+                       qty: float) -> Leg | None:
+        """The leg a would-be order adds, with the intent the desk would
+        actually use: an ask sells held stock (no new risk) when there is
+        enough of it, otherwise it opens a short."""
+        fr = parse_rung(slug)
+        if fr is None:
+            return None
+        net = (self.inventory.get(slug) or {}).get("qty", 0.0)
+        if side == "SELL":
+            intent = SELL_LONG if net >= qty else BUY_SHORT
+        else:
+            intent = BUY_LONG
+        return leg_for_order(fr[1], intent, price, qty)
+
+    def marginal_cost(self, slug: str, side: str, price: float,
+                      qty: float) -> float:
+        """What one more order adds to the worst case — the honest cost of
+        a candidate. An ask on an exact-count rung already dominated by a
+        bigger short elsewhere in the family adds nothing; a short on a
+        nested House rung in a red-wave book adds its full collateral."""
+        fr = parse_rung(slug)
+        if fr is None:
+            cost_ps = price if side == "BUY" else 1.0 - price
+            return round(cost_ps * qty, 2)
+        leg = self._candidate_leg(slug, side, price, qty)
+        fams, _ = self._family_legs()
+        return round(marginal_risk(fams.get(fr[0], []), leg), 2)
+
+    def order_marginal(self, rec: "OwnOrder") -> float:
+        """What one RESTING order contributes to the worst case — the
+        capital freed if it were cancelled. The denominator live yields
+        divide by."""
+        fr = parse_rung(rec.market)
+        if fr is None:
+            return round(capital_at_risk(rec.intent, rec.price, rec.qty), 2)
+        fams, _ = self._family_legs(skip_order_id=rec.id)
+        leg = (leg_for_order(fr[1], rec.intent, rec.price, rec.qty)
+               if fr is not None else None)
+        return round(marginal_risk(fams.get(fr[0], []), leg), 2)
 
     def _cooldown_ok(self, slug: str, side: str, now: float) -> bool:
         return now - self.last_action.get(f"{slug}|{side}", 0.0) >= self.cfg.action_cooldown_s
@@ -347,12 +430,15 @@ class Engine:
                 p_f = self.model.p_fill(slug, side, j.ticks, self.cfg.horizon_s)
                 f_cost = self.model.fill_cost(slug, side, px, fair_ref)
                 ev = earn - p_f * f_cost * qty
-                cost = cost_ps * qty
+                # the cost that gates the ceiling and ranks candidates is
+                # MARGINAL family risk — an ask already dominated by a
+                # bigger short on an exclusive sibling rung is nearly free
+                cost = self.marginal_cost(slug, side, px, qty)
                 cand = {"market": slug, "side": side, "price": px, "qty": qty,
                         "est_day": round(j.share * side_pool, 4),
                         "exp_earn": round(earn, 4), "p_fill": round(p_f, 4),
                         "fill_cost": round(f_cost, 4), "ev": round(ev, 4),
-                        "cost": round(cost, 2), "yield": ev / cost if cost else 0.0,
+                        "cost": cost, "yield": ev / max(cost, 0.05),
                         "ticks": j.ticks,
                         "purpose": "earn" if tight else "scout",
                         "exp1_gap": j.in_window and not j.in_window_queue,
@@ -372,7 +458,8 @@ class Engine:
                         out.append({**cand, "qty": self.cfg.scout_qty,
                                     "exp_earn": round(earn1, 4),
                                     "ev": round(ev1, 4),
-                                    "cost": round(cost_ps * self.cfg.scout_qty, 2),
+                                    "cost": self.marginal_cost(
+                                        slug, side, px, self.cfg.scout_qty),
                                     "yield": ev1,
                                     "pred_level": round(j1.share * side_pool, 4),
                                     "pred_queue": round(j1.share_if_queue * side_pool, 4),
@@ -512,8 +599,8 @@ class Engine:
             rec.live_est = round(live_est, 4)
             rec.live_ev = round(live_est * self.model.scoring_fraction(rec.market)
                                 - p_f * f_cost * rec.qty, 4)
-            risk = capital_at_risk(rec.intent, rec.price, rec.qty)
-            rec.live_yield = round(rec.live_ev / risk, 4) if risk else None
+            risk = self.order_marginal(rec)
+            rec.live_yield = round(rec.live_ev / max(risk, 0.05), 4)
             if actions_left <= 0 or not self._cooldown_ok(rec.market, rec.side, now):
                 continue
             cands = [c for c in self._candidates(rec.market, book, prog, b, now)
@@ -743,6 +830,7 @@ class Engine:
         return {
             "mode": s.mode, "used": s.used, "headroom": s.headroom,
             "ceiling": self.cfg.ceiling_usd,
+            "risk_families": self.risk_by_family(),
             "orders": [{"id": o.id, "market": o.market, "side": o.side,
                         "price": o.price, "qty": o.qty, "purpose": o.purpose,
                         "live_est": o.live_est, "live_ev": o.live_ev,
