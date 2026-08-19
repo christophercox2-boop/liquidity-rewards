@@ -217,60 +217,34 @@ STATUS_JS = """
      ' minutes of today could not be measured (restarts or stale books) &mdash; the real number can only be higher</div>':'')+
    (d.restart_loop>=5?'<div class="bad">Restarting repeatedly: '+d.restart_loop+
      ' boots in the last hour. DigitalOcean runtime logs have the exit codes.</div>':'')+
-   '<details class="how"><summary>what this number is</summary>'+
-   'An estimate, integrated minute by minute from your resting orders and the official '+
-   'scoring formula. Polymarket posts the real number 1&ndash;2 days later &mdash; the '+
-   'phone push and rewards.csv are the truth; this is the live preview. The little '+
-   'line is the last '+hist.length+' finished day'+(hist.length===1?'':'s')+' plus today.</details></div>';
+   '';
  var rf=g.risk_families||{};var rfs=Object.keys(rf).map(function(k){
    var lab=k.indexOf('senate')>=0?'Senate book':k.indexOf('hrep')>=0?'House book':k;
    return '<span class="chip">'+lab+' '+usd(rf[k])+'</span>';}).join('');
- var modeTxt=g.mode==='on'?'':g.mode==='off'?'switch off &mdash; watching only':(g.mode||'');
- h+='<div class="card"><b>Money at work</b> <span class="muted">'+modeTxt+'</span>'+
-   '<div class="stats">'+
+ h+='<div class="stats">'+
    '<div class="stat"><div class="lab">worst case at risk</div><div class="val">'+usd(g.used)+
      '<span class="u"> of '+usd(g.ceiling)+'</span></div></div>'+
-   '<div class="stat"><div class="lab">headroom</div><div class="val">'+usd(g.headroom)+'</div></div>'+
    '<div class="stat"><div class="lab">orders resting</div><div class="val">'+(g.orders||[]).length+'</div></div>'+
-   '</div>'+(rfs?'<div class="chips">'+rfs+'</div>':'')+
-   '<details class="how"><summary>how risk is counted</summary>'+
-   'The worst case is priced against the seat count itself: the Senate rungs are '+
-   'mutually exclusive, so short orders across them mostly share ONE collateral '+
-   'instead of stacking. $'+(g.used||0)+' is the most this book can actually lose, '+
-   'not the sum of every order&rsquo;s margin.</details>';
- if(g.sweep&&!g.sweep.done){h+='<div class="warn">handover sweep running &middot; '+(g.sweep.cancelled||0)+' cleared so far</div>';}
- if(g.silent_cancels){h+='<div class="hint">'+g.silent_cancels+' orders vanished without a fill so far &mdash; '+
-   'the exchange quietly cancels what buying power can&rsquo;t fund; the engine re-places them when it can.</div>';}
- h+='<div class="muted" style="margin-top:6px"><a href="orders" style="color:#9ecbff">every order, with its live numbers &rarr;</a></div></div>';
+   '</div>'+(rfs?'<div class="chips">'+rfs+'</div>':'');
+ if(g.mode&&g.mode!=='on')h+='<div class="hint">engine: '+g.mode+'</div>';
+ if(g.sweep&&!g.sweep.done)h+='<div class="warn">handover sweep running &middot; '+(g.sweep.cancelled||0)+' cleared so far</div>';
  var rw=d.rewards_status||{};
- if(rw.checked_ago_s!=null||rw.err){
-  h+='<div class="card"><b>Rewards watch</b>'+
-   '<div class="sub">Checks Polymarket every 5 minutes; pushes your phone and refreshes '+
-   'rewards.csv on GitHub the moment anything posts.</div>'+
-   '<div>last check '+(rw.checked_ago_s!=null?Math.round(rw.checked_ago_s/60)+' min ago':'never')+
-   (rw.latest_day?' &middot; latest posted day <b>'+rw.latest_day+'</b> '+usd(rw.latest_usd)+
-     (rw.latest_paid_usd>=rw.latest_usd?' <span class="ok">(paid)</span>':' (pending)'):'')+'</div>'+
-   (rw.kick&&rw.kick!=='ok'?'<div class="warn">last csv refresh kick failed &mdash; the hourly pass covers it</div>':'')+
-   (rw.err?'<div class="warn">last fetch failed: '+rw.err+'</div>':'')+'</div>';
- }
- var mr=Object.entries(e.market_rates||{}).sort(function(a,b){return b[1]-a[1];});
- if(mr.length){
-  var mmx=mr[0][1]||1;
-  h+='<div class="card"><b>Where today&rsquo;s earning comes from</b>';
-  function mrow(kv){return '<div class="brow"><span class="blab" style="width:88px">'+mshort(kv[0])+'</span>'+
-    '<div class="btrack"><div class="bar" style="background:var(--s1);width:'+(100*kv[1]/mmx)+'%"></div></div>'+
-    '<span class="bval">'+usd(kv[1])+'/d</span></div>';}
-  mr.slice(0,8).forEach(function(kv){h+=mrow(kv);});
-  if(mr.length>8){h+='<details class="how"><summary>'+(mr.length-8)+' smaller earners</summary>';
-   mr.slice(8).forEach(function(kv){h+=mrow(kv);});h+='</details>';}
-  h+='</div>';}
- var th=(d.terms_history||[]).slice(-10).reverse();
- if(th.length){h+='<div class="card"><b>Reward terms changes</b>'+
-  '<div class="hint">Polymarket moving the goalposts &mdash; pools, target sizes, new or vanished programs.</div><table>';
-  th.forEach(function(t){h+=row([when(t.ts),mshort(t.slug),
-    t.why+(t.pool!=null?(' $'+t.pool+' pool / '+t.target+' target / &divide;'+t.event_n+' markets'):'')]);});
-  h+='</table></div>';}
- var er=(d.errors||[]).slice(-6).reverse();
+ if(rw.checked_ago_s!=null){h+='<div class="hint">Rewards watch: checked '+
+   Math.round(rw.checked_ago_s/60)+'m ago &middot; latest posted <b>'+(rw.latest_day||'?')+'</b> '+
+   usd(rw.latest_usd)+(rw.latest_paid_usd>=rw.latest_usd?' <span class="ok">paid</span>':' pending')+
+   ' &middot; new postings push your phone and refresh rewards.csv'+
+   (rw.err?' &middot; <span class="warn">last check failed</span>':'')+'</div>';}
+ h+='<details class="how"><summary>how these numbers work</summary>'+
+   'Earned today is a live preview, integrated minute by minute from your resting orders '+
+   'and the official scoring formula; Polymarket posts the real number 1&ndash;2 days later, '+
+   'and the little line is recent days plus today. The risk number is the most the whole '+
+   'book can actually lose, priced against the seat count itself &mdash; Senate rungs are '+
+   'mutually exclusive, so shorts across them mostly share one collateral instead of stacking.'+
+   (g.silent_cancels?' ('+g.silent_cancels+' orders so far vanished unfilled: the exchange '+
+   'quietly cancels what buying power can&rsquo;t fund; the engine re-places them.)':'')+'</details>'+
+   '<div class="muted" style="margin-top:6px"><a href="orders" style="color:#9ecbff">every order &rarr;</a>'+
+   ' &nbsp; <a href="opps" style="color:#9ecbff">what it wants next &rarr;</a></div></div>';
+ var er=(d.errors||[]).filter(function(x){return x.indexOf('booted build')<0;}).slice(-5).reverse();
  if(er.length){h+='<div class="card"><b class="warn">Recent trouble</b><div class="muted">'+er.join('<br>')+'</div></div>';}
  return h;
 """
@@ -420,12 +394,11 @@ MARKETS_JS = """
     .sort(function(a,b){return Math.abs(races[a]-0.5)-Math.abs(races[b]-0.5);});
   var safeR=rk.filter(function(a){return races[a]>=0.90;}).length;
   var safeD=rk.filter(function(a){return races[a]<=0.10;}).length;
-  h+='<div class="card"><b>The races that decide it</b>'+
-   '<div class="sub">'+comp.length+' Senate races are competitive; '+safeR+' look safe GOP and '+safeD+' safe Dem. '+
-   '31 GOP seats aren&rsquo;t on the ballot at all.</div>'+
-   '<div class="hint">Chance the Republican wins each race, from Silver&rsquo;s poll-driven table '+
-   '(updates with every poll). The gray line is 50/50. These feed the fallback model that takes over '+
-   'if the simulation sheet goes stale.</div>';
+  h+='<div class="card"><details><summary><b>The races behind it</b> <span class="muted">'+
+   comp.length+' competitive &middot; '+safeR+' safe GOP &middot; '+safeD+' safe Dem</span></summary>'+
+   '<div class="hint">Chance the Republican wins each race, from Silver&rsquo;s poll-driven table. '+
+   'The gray line is 50/50. These feed the fallback model that takes over if the simulation '+
+   'sheet goes stale. 31 GOP seats aren&rsquo;t on the ballot at all.</div>';
   function racerow(a){return '<div class="brow"><span class="blab">'+a.toUpperCase()+'</span>'+
    '<div class="btrack"><div class="bar" style="background:var(--s1);width:'+(races[a]*100)+'%"></div>'+
    '<div class="m50" style="left:50%"></div></div>'+
@@ -435,7 +408,7 @@ MARKETS_JS = """
     .sort(function(a,b){return races[b]-races[a];});
   if(rest.length){h+='<details class="how"><summary>the '+rest.length+' safe seats</summary>';
    rest.forEach(function(a){h+=racerow(a);});h+='</details>';}
-  h+='</div>';}
+  h+='</details></div>';}
  h+='<div class="card"><details><summary><b>The same ladders as numbers</b> '+
   '<span class="muted">every rung, model band, book, and our orders</span></summary>';
  [['Senate','scc-senate-gop-'],['House','scc-hrep-rep-']].forEach(function(fam){
@@ -453,24 +426,6 @@ MARKETS_JS = """
  });
  h+='<div class="muted">model = the spread across Silver&rsquo;s Classic/Deluxe/Lite runs '
   +'(widened by the poll-driven model when the run is stale); blank = no model</div></details></div>';
- var t=d.touch||{};var q=window._q||'';
- var f=window._filter||'all';
- var rows=Object.keys(t).filter(function(s){
-   if(f==='senate')return s.indexOf('scc-senate-gop-')===0;
-   if(f==='house')return s.indexOf('scc-hrep-rep-')===0;
-   if(f==='other')return s.indexOf('scc-')!==0;
-   return true;
- }).filter(function(s){return s.indexOf(q)>=0;})
- .sort(function(a,b){return ((e.market_rates||{})[b]||0)-((e.market_rates||{})[a]||0);});
- h+='<div class="card"><b>All measured markets</b> <span class="muted">'+f+
-  (q?' &middot; \\u201c'+q+'\\u201d':'')+'</span>'+
-  '<table>'+hrow(['market','bid/ask','resting behind','$/day']);
- rows.slice(0,60).forEach(function(s){var v=t[s];
-  h+=row([mshort(s),(v[0]||'?')+' / '+(v[1]||'?')+'&cent;',
-    (v[2]||0).toLocaleString()+' / '+(v[3]||0).toLocaleString(),
-    usd((e.market_rates||{})[s])]);});
- h+='</table><div class="muted">'+rows.length+' markets match &middot; '+
-  '&ldquo;resting behind&rdquo; = shares already queued on each side&rsquo;s book</div></div>';
  return h;
 """
 
@@ -504,12 +459,18 @@ OPPS_JS = """
    return f.indexOf('senate')>=0?'Senate':(f.indexOf('house')>=0||f.indexOf('hrep')>=0)?'House':f;};
  var hzlab=function(k){var p=k.split('|');
    return famlab(k)+(p[1]?' &middot; '+(p[1]==='BUY'?'bids':'asks'):'');};
- var anyCross=0;Object.keys(hz).forEach(function(k){[0,1,2,3].forEach(function(b){
-   anyCross+=((hz[k][b]||{}).crossings||0);});});
- h+='<div class="card"><b>How often does the best price get run over?</b>'+
-  '<div class="hint">This is what the fill odds are built from &mdash; watched hours and actual '+
-  'price crossings per ladder, side, and distance from the touch. Fewer crossings farther back = '+
-  'resting deeper is safer but earns less.'+
+ var anyCross=0,hours=0;Object.keys(hz).forEach(function(k){
+   hours=Math.max(hours,(hz[k][0]||{}).hours_observed||0);
+   [0,1,2,3].forEach(function(b){anyCross+=((hz[k][b]||{}).crossings||0);});});
+ var md=fm.markdown||{};var mn=fm.marks_n||{};var sf=fm.scoring_frac||{};
+ var costRows=Object.keys(md).map(function(k){
+   return famlab(k)+': '+pc(md[k])+' per share <span class="muted">('+(mn[k]||0)+' graded fills)</span>';});
+ var sfRows=Object.keys(sf).map(function(k){return famlab(k)+' '+pct(sf[k]);});
+ h+='<div class="card"><details><summary><b>What the odds are learned from</b> <span class="muted">'+
+  hours+'h watched &middot; '+anyCross+' price crossings</span></summary>'+
+  '<div class="hint">Fill odds come from how often each ladder&rsquo;s best price actually gets '+
+  'run over, per side and distance from the touch. Fewer crossings farther back = resting deeper '+
+  'is safer but earns less.'+
   (anyCross<5?' Almost no real crossings yet, so the bars are mostly the cautious '+
    'starting guesses; they sharpen as watched hours pile up.':'')+'</div>';
  Object.keys(hz).forEach(function(k){var r=hz[k];
@@ -521,17 +482,14 @@ OPPS_JS = """
     +'<div class="btrack"><div class="bar" style="background:var(--s1);width:'+(mx?100*(c.per_day||0)/mx:0)+'%"></div></div>'
     +'<span class="bval">'+((c.per_day||0)).toFixed(2)+'/day <span class="muted">'+(c.crossings||0)+' seen</span></span></div>';});
  });
- var md=fm.markdown||{};var mn=fm.marks_n||{};var sf=fm.scoring_frac||{};
- var costRows=Object.keys(md).map(function(k){
-   return famlab(k)+': '+pc(md[k])+' per share <span class="muted">('+(mn[k]||0)+' graded fills)</span>';});
- var sfRows=Object.keys(sf).map(function(k){return famlab(k)+' '+pct(sf[k]);});
  h+='<div class="hint" style="margin-top:8px"><b>When a fill does happen, what does it cost?</b> '+
   (costRows.length?costRows.join(' &middot; '):'no graded fills yet &mdash; using the cautious starting guess of 2&cent;/share')+
   '. Each real fill is graded against the market&rsquo;s mid an hour later.</div>'+
   (sfRows.length?'<div class="hint"><b>Share of resting time that actually scores:</b> '+sfRows.join(' &middot; ')+'</div>':'')+
-  '</div>';
+  '</details></div>';
  var ex=((d.engine_saved||{}).exp1||[]).slice(-15).reverse();
- h+='<div class="card"><b>The window experiment</b>'+
+ h+='<div class="card"><details><summary><b>The window experiment</b> <span class="muted">'+
+  ex.length+' edge cases on record</span></summary>'+
   '<div class="hint">Polymarket&rsquo;s rules are ambiguous about orders at the edge of the scoring '+
   'window: the generous reading says the whole price level earns, the strict one says late joiners '+
   'earn nothing. We act on the generous reading and record BOTH predictions for every edge case; '+
@@ -540,7 +498,7 @@ OPPS_JS = """
   ex.forEach(function(x){h+=row([when(x.ts),mshort(x.market),
     x.side.toLowerCase()+' '+x.qty+' @ '+pc(x.price),usd(x.pred_level_day)+'/d',usd(x.pred_queue_day)+'/d']);});
   h+='</table>';}else{h+='<div class="muted">no edge cases placed yet</div>';}
- h+='</div>';
+ h+='</details></div>';
  return h;
 """
 
@@ -566,6 +524,9 @@ LOG_JS = """
  card('Alerts',d.alert_log,function(x){
   return row([when(x.ts),(x.sent?'&#128276;':'<span class="muted">held</span>'),
     x.title+' <span class="muted">'+(x.msg||'')+(x.why?' ('+x.why+')':'')+'</span>']);});
+ card('Reward terms changes',d.terms_history,function(t){
+  return row([when(t.ts),mshort(t.slug),'<span class="muted">'+t.why+
+    (t.pool!=null?(' $'+t.pool+' pool / '+t.target+' target / &divide;'+t.event_n+' markets'):'')+'</span>']);});
  card('Trouble',(d.errors||[]).map(function(e){return {ts:0,line:e};}),function(x){
   return row(['<span class="muted">'+x.line+'</span>']);});
  return h;
@@ -576,15 +537,7 @@ def build_shells() -> dict[str, str]:
     return {
         "/": _page("status", "2.0", STATUS_JS),
         "/orders": _page("orders", "2.0 orders", ORDERS_JS),
-        "/markets": _page(
-            "markets", "2.0 markets", MARKETS_JS,
-            controls='<div style="margin:0 0 8px">'
-                     '<button class="pill" onclick="setF(\'all\')">all</button>'
-                     '<button class="pill" onclick="setF(\'senate\')">senate seats</button>'
-                     '<button class="pill" onclick="setF(\'house\')">house seats</button>'
-                     '<button class="pill" onclick="setF(\'other\')">other</button>'
-                     ' <input id="q" placeholder="search slug" style="width:38%"'
-                     ' oninput="window._q=this.value;rerender()"></div>'),
+        "/markets": _page("markets", "2.0 markets", MARKETS_JS),
         "/opps": _page("opps", "2.0 opportunities", OPPS_JS),
         "/log": _page("log", "2.0 log", LOG_JS),
     }
