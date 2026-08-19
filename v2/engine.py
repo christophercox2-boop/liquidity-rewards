@@ -80,7 +80,15 @@ class EngineConfig:
                                      # show up as silent cancels.
     max_actions_per_cycle: int = 10  # rate-limit manners (owner raised 4 -> 10
                                      # alongside the $300 ceiling, 2026-08-19)
-    max_order_usd: float = 12.0      # one order's nominal cost, high confidence
+    max_order_usd: float = 40.0      # one order's nominal cost, high confidence
+                                     # (owner raised 12 -> 40, 2026-08-19)
+    # Depth ahead of our price is evidence in its own right: a taker must
+    # consume it before reaching us. Size is justified when the model and
+    # market agree (a fill would not cost much) OR when this many Target
+    # Sizes of wall sit in front (a fill is unlikely in the first place) —
+    # owner, 2026-08-19. Both routes still face the EV bar and the band
+    # rails; neither can bid above the band or ask below it.
+    shield_size_x: float = 2.0
     scout_qty: float = 1.0           # low-confidence probe size
     min_ev_day: float = 0.005        # don't rest for under half a cent/day of EV
     tight_band: float = 0.06         # model & market within this = high confidence
@@ -375,6 +383,20 @@ class Engine:
                 and (1.0 - lo) <= self.cfg.tight_ratio * max(1.0 - hi, 0.01))
 
     @staticmethod
+    def _shield(book, side: str, price: float, own_qty: float = 0.0) -> float:
+        """Contracts a taker must consume before reaching our price:
+        everything resting at a better price than ours, plus whatever
+        already sits at our own level (queue priority ahead of a new
+        order). For a bid, "better" is higher; for an ask, lower."""
+        total = 0.0
+        for px, qty in book.side(side):
+            if (px > price + 1e-9) if side == "BUY" else (px < price - 1e-9):
+                total += qty
+            elif abs(px - price) < 1e-9:
+                total += max(qty - own_qty, 0.0)
+        return total
+
+    @staticmethod
     def _book_less_own(book, rec: "OwnOrder"):
         """The book as it would look without this resting order: its own
         size subtracted from its price level (level dropped if nothing
@@ -560,14 +582,24 @@ class Engine:
                 if side == "SELL" and px < lo - self.cfg.fair_margin:
                     continue
                 cost_ps = px if side == "BUY" else 1.0 - px
-                usd = self.cfg.max_order_usd if tight else self.cfg.scout_qty * cost_ps
+                # two independent routes to size: the model and market agree
+                # on VALUE (a fill would not cost much), or a wall of resting
+                # contracts sits in front of us (a fill is unlikely at all).
+                # Either way the EV bar and the band rails still apply.
+                shield = self._shield(book, side, px)
+                walled = (prog.target
+                          and shield >= self.cfg.shield_size_x * prog.target)
+                confident = tight or walled
+                usd = (self.cfg.max_order_usd if confident
+                       else self.cfg.scout_qty * cost_ps)
                 qty = max(round(usd / cost_ps, 2), self.cfg.scout_qty)
                 j = estimate_join(side, list(levels), book.tick, prog.df,
                                   prog.target, px, qty)
                 if not (j.qualifies and j.in_window):
                     continue
                 earn = j.share * side_pool * self.model.scoring_fraction(slug)
-                p_f = self.model.p_fill(slug, side, j.ticks, self.cfg.horizon_s)
+                p_f = self.model.p_fill(slug, side, j.ticks, self.cfg.horizon_s,
+                                        shield=shield, target=prog.target)
                 f_cost = self.model.fill_cost(slug, side, px, fair_ref)
                 ev = earn - p_f * f_cost * qty
                 # the cost that gates the ceiling and ranks candidates is
@@ -580,7 +612,8 @@ class Engine:
                         "fill_cost": round(f_cost, 4), "ev": round(ev, 4),
                         "cost": cost, "yield": ev / max(cost, 0.05),
                         "ticks": j.ticks,
-                        "purpose": "earn" if tight else "scout",
+                        "shield": round(shield, 1),
+                        "purpose": "earn" if confident else "scout",
                         "exp1_gap": j.in_window and not j.in_window_queue,
                         "pred_level": round(j.share * side_pool, 4),
                         "pred_queue": round(j.share_if_queue * side_pool, 4),
@@ -740,8 +773,10 @@ class Engine:
             live_est = here.share * side_pool if earning_here else 0.0
             lo, hi, _src = b
             fair_ref = lo if rec.side == "BUY" else hi
+            shield = self._shield(unbooked, rec.side, rec.price)
             p_f = self.model.p_fill(rec.market, rec.side, here.ticks,
-                                    self.cfg.horizon_s)
+                                    self.cfg.horizon_s, shield=shield,
+                                    target=prog.target)
             f_cost = self.model.fill_cost(rec.market, rec.side, rec.price, fair_ref)
             sc_frac = self.model.scoring_fraction(rec.market)
             rec.live_est = round(live_est, 4)
@@ -751,6 +786,7 @@ class Engine:
                 "share": round(here.share, 4), "ticks": here.ticks,
                 "in_window": here.in_window, "qualifies": here.qualifies,
                 "p_fill": round(p_f, 4), "fill_cost": round(f_cost, 4),
+                "shield": round(shield, 1), "target": prog.target,
                 "scoring_frac": round(sc_frac, 3),
                 "side_pool": round(side_pool, 4),
                 "band": [round(lo, 3), round(hi, 3), _src],
@@ -771,16 +807,20 @@ class Engine:
             # size belongs only where model and market agree; an earn-sized
             # order whose band no longer qualifies gets pulled the same way
             # (a scout may replace it next cycle)
+            walled_now = (prog.target
+                          and shield >= self.cfg.shield_size_x * prog.target)
             detightened = (rec.purpose == "earn"
                            and rec.qty > self.cfg.scout_qty
-                           and not self.band_tight(lo, hi))
+                           and not self.band_tight(lo, hi)
+                           and not walled_now)
             if guard_broken or detightened:
                 r = self.desk.cancel(rec.id, rec.market)
                 if r.ok:
                     self._close_forecast(rec.id, "pulled", now)
                     self._log(event="pull", market=rec.market, side=rec.side,
                               why=("fair band moved" if guard_broken
-                                   else "band no longer tight — size withdrawn"),
+                                   else "no longer tight and the wall is gone"
+                                        " — size withdrawn"),
                               price=rec.price)
                     del self.orders[rec.id]
                     self._mark_action(rec.market, rec.side, now)

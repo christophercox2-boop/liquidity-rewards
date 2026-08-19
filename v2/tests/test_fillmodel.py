@@ -97,3 +97,30 @@ class TestCalibration(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestShieldDiscount(unittest.TestCase):
+    """A wall of resting contracts in front of an order is evidence
+    against a fill (owner, 2026-08-19)."""
+
+    def test_no_wall_leaves_the_hazard_alone(self):
+        from v2.fillmodel import shield_discount
+        self.assertEqual(shield_discount(0, 5000), 1.0)
+        self.assertEqual(shield_discount(5000, 0), 1.0)   # no target: unknown scale
+
+    def test_one_target_size_of_wall_halves_it(self):
+        from v2.fillmodel import shield_discount
+        self.assertAlmostEqual(shield_discount(5000, 5000), 0.5)
+        self.assertAlmostEqual(shield_discount(15000, 5000), 0.25)
+
+    def test_floored_because_a_wall_can_vanish(self):
+        from v2.fillmodel import shield_discount, SHIELD_FLOOR
+        self.assertEqual(shield_discount(10_000_000, 5000), SHIELD_FLOOR)
+
+    def test_p_fill_falls_behind_a_wall_but_never_to_zero(self):
+        m = FillModel()
+        bare = m.p_fill("scc-senate-gop-2026-11-03-49", "BUY", 0)
+        walled = m.p_fill("scc-senate-gop-2026-11-03-49", "BUY", 0,
+                          shield=50_000, target=5_000)
+        self.assertLess(walled, bare)
+        self.assertGreater(walled, 0.2 * bare)

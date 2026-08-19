@@ -162,6 +162,59 @@ class TestSwitchAndCeiling(unittest.TestCase):
             self.assertIn(o["purpose"], ("scout", "probe", "exp1"), o)
             self.assertEqual(o["qty"], 1.0)
 
+    def test_a_wall_offers_size_but_the_ev_math_still_rules(self):
+        """Owner, 2026-08-19: "the size of the walls is also evidence that
+        an order won't get filled. That could warrant ramping up spend."
+        Depth now opens the size gate on its own — but a wall at our own
+        price also dilutes our share of the pool, so the EV bar refuses
+        the spot anyway. Both halves matter: the gate opens, the math
+        closes it. This is the "not too much on risky decisions" rail
+        doing its job."""
+        r = Rig()
+        terms = seats_terms([TAIL])
+        deep = Book(bids=((0.12, 30000.0), (0.02, 600000.0)),
+                    asks=((0.14, 30.0), (0.98, 600000.0)),
+                    tick=0.01, fetched_at=r.now)
+        r.cache.put(TAIL, deep)
+        book, prog = r.cache.fresh(TAIL, 120, r.now), terms.get(TAIL)
+        b = r.engine.band(TAIL, book, r.silver)
+        self.assertFalse(r.engine.band_tight(b[0], b[1]))   # wide: no size by agreement
+        # the wall is real and the gate sees it
+        self.assertGreaterEqual(
+            r.engine._shield(book, "BUY", 0.12),
+            r.engine.cfg.shield_size_x * prog.target)
+        # ...yet nothing sized survives: our slice of a 30,000 queue is
+        # worth pennies while a fill would cost the concession on every share
+        for c in r.engine._candidates(TAIL, book, prog, b, r.now):
+            if c["side"] == "BUY":
+                self.assertEqual(c["qty"], 1.0, c)
+
+    def test_depth_ahead_lowers_the_live_fill_odds(self):
+        """The half of the owner's point that always bites: a queue in
+        front of an order is evidence against a fill, and the live numbers
+        must show it."""
+        r = Rig()
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
+        r.cycle(terms)
+        rec = next(o for o in r.engine.orders.values()
+                   if o.side == "BUY" and o.purpose == "earn")
+        r.now += 60          # maintenance runs before placement: the live
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)   # numbers land next cycle
+        r.cycle(terms)
+        thin = rec.live_parts["p_fill"]
+        self.assertEqual(rec.live_parts["shield"], 30.0)   # just the thin touch
+        # same order, now with a 50,000-contract queue ahead of it
+        r.now += 60
+        r.cache.put(SEN, Book(bids=((rec.price, rec.qty + 50000.0),
+                                    (0.02, 600000.0)),
+                              asks=((0.14, 30.0), (0.98, 600000.0)),
+                              tick=0.01, fetched_at=r.now))
+        r.cycle(terms)
+        self.assertEqual(rec.live_parts["shield"], 50000.0)
+        self.assertLess(rec.live_parts["p_fill"], thin)
+        self.assertGreater(rec.live_parts["p_fill"], 0.0)  # never certainty
+
     def test_sized_order_withdrawn_when_band_detightens(self):
         r = Rig()
         terms = seats_terms([SEN])
@@ -449,6 +502,9 @@ class TestRotation(unittest.TestCase):
     def test_worst_holding_is_freed_for_a_decisively_better_idea(self):
         SEN2 = "scc-senate-gop-2026-11-03-50"
         r = Rig(ceiling=13.0)
+        r.engine.cfg.max_order_usd = 12.0   # this test is about rotation, not
+                                            # the size cap: pin it so raising
+                                            # the cap can't quietly break it
         terms = seats_terms([SEN])
         put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)                       # ~$12 lands in SEN
