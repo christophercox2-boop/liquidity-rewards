@@ -12,18 +12,18 @@ REAL_CSV = Path(__file__).resolve().parent.parent.parent / "data" / "silver_sena
 
 class TestSeatPmf(unittest.TestCase):
     def test_two_coins_exact(self):
-        pmf = seat_pmf([0.5, 0.5], not_up=10)
+        pmf = seat_pmf([0.5, 0.5], not_up=10, rho=0.0)
         self.assertAlmostEqual(pmf[10], 0.25)
         self.assertAlmostEqual(pmf[11], 0.50)
         self.assertAlmostEqual(pmf[12], 0.25)
         self.assertAlmostEqual(sum(pmf.values()), 1.0)
 
     def test_certain_races_just_shift(self):
-        pmf = seat_pmf([1.0, 1.0, 0.0], not_up=31)
+        pmf = seat_pmf([1.0, 1.0, 0.0], not_up=31, rho=0.0)
         self.assertAlmostEqual(pmf[33], 1.0)
 
     def test_rungs_read_off_the_distribution(self):
-        pmf = seat_pmf([0.5, 0.5], not_up=45)   # mass on 45/46/47
+        pmf = seat_pmf([0.5, 0.5], not_up=45, rho=0.0)   # mass on 45/46/47
         self.assertAlmostEqual(rung_fair(pmf, "46"), 0.50)
         self.assertAlmostEqual(rung_fair(pmf, "gte46"), 0.75)
         self.assertAlmostEqual(rung_fair(pmf, "lte45"), 0.25)

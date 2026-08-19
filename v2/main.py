@@ -309,8 +309,9 @@ class Monitor:
             "audit": self.audit[-50:],
             "fillmodel": self.engine.model.summary(),
             "forecasts": list(self.engine.forecasts.values())[-100:],
-            "fairs": {s: round(f, 4) for s in self.family_slugs
-                      if (f := self.silver.fair(s)) is not None},
+            "fairs": {s: [round(r[0], 4), round(r[1], 4)]
+                      for s in self.family_slugs
+                      if (r := self.silver.fair_range(s)) is not None},
             "silver_races": {a: round(r["rep"], 4)
                              for a, r in self.silver.races.items()},
             "ladders": {
