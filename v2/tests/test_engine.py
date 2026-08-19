@@ -8,7 +8,7 @@ from v2.books import BookCache
 from v2.engine import Engine, EngineConfig
 from v2.intents import REST_SIDE, SELL_LONG
 from v2.orders import OrderDesk
-from v2.scoring import Book
+from v2.scoring import Book, estimate_join
 from v2.silver import SilverFairs
 from v2.terms import TermsStore
 
@@ -111,6 +111,32 @@ class TestSwitchAndCeiling(unittest.TestCase):
         self.assertGreater(len(s["orders"]), 0)
         self.assertLessEqual(s["used"], 100.0)
         self.assertTrue(any(o["purpose"] == "earn" for o in s["orders"]))
+
+    def test_live_reeval_counts_own_size_once(self):
+        # a resting order appears IN the fetched book; re-scoring it as a
+        # fresh join counted it twice and halved its share (/orders read
+        # $7.84/d while the estimator said $12.27/d for the same books)
+        r = Rig()
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
+        r.cycle(terms)
+        rec = next(o for o in r.engine.orders.values()
+                   if o.side == "BUY" and o.purpose == "earn")
+        # the next snapshot carries our order plus one other share at our level
+        r.now += 60                          # inside the action cooldown:
+        stranger = 1.0                       # re-eval runs, nothing moves
+        r.cache.put(SEN, Book(bids=((rec.price, rec.qty + stranger),
+                                    (0.02, 600000.0)),
+                              asks=((0.14, 30.0), (0.98, 600000.0)),
+                              tick=0.01, fetched_at=r.now))
+        r.cycle(terms)
+        expect = estimate_join("BUY", [(rec.price, stranger), (0.02, 600000.0)],
+                               0.01, 0.2, 5000, rec.price, rec.qty)
+        pool = 100 / 13 / 2                  # event pool / markets / sides
+        self.assertAlmostEqual(rec.live_est, expect.share * pool, places=3)
+        # sanity: counted once, our share of the level dwarfs the stranger's
+        self.assertGreater(rec.live_est,
+                           0.9 * (rec.qty / (rec.qty + stranger)) * pool * 0.2 ** 0)
 
     def test_disagreement_sends_scouts_not_size(self):
         r = Rig()

@@ -46,7 +46,7 @@ from __future__ import annotations
 
 import datetime as dt
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from .books import BookCache
 from .fillmodel import FillModel
@@ -250,6 +250,23 @@ class Engine:
         leg = (leg_for_order(fr[1], rec.intent, rec.price, rec.qty)
                if fr is not None else None)
         return round(marginal_risk(fams.get(fr[0], []), leg), 2)
+
+    @staticmethod
+    def _book_less_own(book, rec: "OwnOrder"):
+        """The book as it would look without this resting order: its own
+        size subtracted from its price level (level dropped if nothing
+        else rests there). Books are fetched after placement, so they
+        carry our size; any re-scoring must not count it twice."""
+        levels = []
+        for p, q in book.side(rec.side):
+            if abs(p - rec.price) < 1e-9:
+                q -= rec.qty
+                if q <= 1e-9:
+                    continue
+            levels.append((p, q))
+        if rec.side == "BUY":
+            return replace(book, bids=tuple(levels))
+        return replace(book, asks=tuple(levels))
 
     def _cooldown_ok(self, slug: str, side: str, now: float) -> bool:
         return now - self.last_action.get(f"{slug}|{side}", 0.0) >= self.cfg.action_cooldown_s
@@ -584,8 +601,15 @@ class Engine:
             b = self.band(rec.market, book, silver)
             if b is None:
                 continue
-            here = estimate_join(rec.side, list(book.side(rec.side)), book.tick,
-                                 prog.df, prog.target, rec.price, rec.qty)
+            # score against the book WITHOUT this order — the fetched book
+            # already contains it, and estimate_join adds its size back as
+            # the join; leaving it in counted the order twice and roughly
+            # halved its share (/orders read $7.84/d while the estimator
+            # said $12.27/d for the same books, 2026-08-19)
+            unbooked = self._book_less_own(book, rec)
+            here = estimate_join(rec.side, list(unbooked.side(rec.side)),
+                                 book.tick, prog.df, prog.target,
+                                 rec.price, rec.qty)
             earning_here = here.qualifies and here.in_window
             self.model.observe_scoring(rec.market, earning_here)
             # live evaluation: what this order earns and risks RIGHT NOW
@@ -603,7 +627,9 @@ class Engine:
             rec.live_yield = round(rec.live_ev / max(risk, 0.05), 4)
             if actions_left <= 0 or not self._cooldown_ok(rec.market, rec.side, now):
                 continue
-            cands = [c for c in self._candidates(rec.market, book, prog, b, now)
+            # reprice candidates ask "where would this size rest best?" —
+            # also a question about the book without the order that would move
+            cands = [c for c in self._candidates(rec.market, unbooked, prog, b, now)
                      if c["side"] == rec.side]
             best = max(cands, key=lambda c: c["yield"], default=None)
             lo, hi, _src = b
