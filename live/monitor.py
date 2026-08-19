@@ -3961,6 +3961,7 @@ def _hands_off(m: str) -> bool:
     position; they cannot open one.
     """
     return ((bool(NO_AUTO_PREFIXES) and str(m).startswith(NO_AUTO_PREFIXES))
+            or str(m) in (MONITOR.state.get("unwind_no_new") or ())
             or _ends_today(m))
 
 
@@ -8786,6 +8787,235 @@ def manual_place(slug: str, side: str, price_cents: float, size: int,
                                       "detail": "" if ok else tr._http_err(r)[:200]}
     except Exception as e:  # noqa: BLE001
         return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:200]}
+
+
+# --- the unwind pick list (owner, 2026-08-19: "make a pick list on the v1
+# app... it can be a partial unwind of some of them as well") -----------------
+#
+# /unwind lists every NON-seats position with its live numbers; each row has a
+# quantity box and two owner buttons. "Rest exit" places ONE post-only order
+# at the front of the queue (ask a tick over the bid for longs, buy-back bid a
+# tick under the ask for shorts) — patient, pays no spread. "Take now" calls
+# take_close below — instant, crosses. Both only ever REDUCE the position,
+# both are owner taps (no automation, no loop), and picking a market puts it
+# on the no-new-exposure list so the earner/prober/qualifier stop opening
+# there while the exit works (a resume button undoes that).
+
+def _unwind_no_new() -> list:
+    return list(MONITOR.state.get("unwind_no_new") or [])
+
+
+def _unwind_mark(slug: str, on: bool) -> None:
+    with MONITOR.lock:
+        cur = set(MONITOR.state.get("unwind_no_new") or [])
+        (cur.add if on else cur.discard)(slug)
+        MONITOR.state["unwind_no_new"] = sorted(cur)
+
+
+def unwind_rows() -> list[dict]:
+    """Every non-seats position, with the numbers a pick needs."""
+    touch = MONITOR.state.get("touch") or {}
+    rates = MONITOR.state.get("market_rates") or {}
+    no_new = set(_unwind_no_new())
+    own_asks: dict[str, float] = {}
+    own_close_bids: dict[str, float] = {}
+    for o in MONITOR.orders:
+        m = o.get("market") or ""
+        if o.get("side") == "SELL":
+            own_asks[m] = own_asks.get(m, 0.0) + float(o.get("size") or 0)
+        elif o.get("intent") == "ORDER_INTENT_SELL_SHORT":
+            own_close_bids[m] = own_close_bids.get(m, 0.0) + float(o.get("size") or 0)
+    rows = []
+    for slug, p in (MONITOR.positions or {}).items():
+        if str(slug).startswith(("scc-senate-gop-", "scc-hrep-rep-")):
+            continue
+        net = tr._num(p.get("netPosition"))
+        if abs(net) < 0.01:
+            continue
+        cost = tr._num((p.get("cost") or {}).get("value"))
+        t = touch.get(slug) or []
+        bid_c = float(t[0]) if len(t) > 0 and t[0] else None
+        ask_c = float(t[1]) if len(t) > 1 and t[1] else None
+        row = {"market": slug, "net": round(net, 2), "cost": round(cost, 2),
+               "bid_c": bid_c, "ask_c": ask_c,
+               "earn_day": round(float(rates.get(slug) or 0.0), 2),
+               "no_new": slug in no_new}
+        if net > 0:
+            row["value"] = round(net * (bid_c or 0) / 100.0, 2)
+            row["exit_resting"] = round(own_asks.get(slug, 0.0), 2)
+        else:
+            close_cost = -net * (ask_c or 0) / 100.0
+            row["locked"] = round(cost, 2)
+            row["frees"] = round(cost - close_cost, 2) if ask_c else None
+            row["exit_resting"] = round(own_close_bids.get(slug, 0.0), 2)
+        rows.append(row)
+    rows.sort(key=lambda r: -(r.get("frees") or r.get("value") or 0))
+    return rows
+
+
+def unwind_rest(payload: dict) -> tuple[int, dict]:
+    """Rest ONE post-only exit order at the front of the queue. Only ever
+    reduces: quantity is capped at the position minus exits already resting."""
+    slug = str(payload.get("market") or "")
+    if not _slug_known(slug):
+        return 400, {"ok": False, "error": "unknown market"}
+    try:
+        qty = round(float(payload.get("qty") or 0), 2)
+    except (TypeError, ValueError):
+        return 400, {"ok": False, "error": "bad quantity"}
+    net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
+    if abs(net) < 0.01:
+        return 400, {"ok": False, "error": "no position here"}
+    resting = 0.0
+    for o in MONITOR.orders:
+        if o.get("market") != slug:
+            continue
+        if net > 0 and o.get("side") == "SELL":
+            resting += float(o.get("size") or 0)
+        if net < 0 and o.get("intent") == "ORDER_INTENT_SELL_SHORT":
+            resting += float(o.get("size") or 0)
+    avail = round((net if net > 0 else -net) - resting, 2)
+    if avail < 0.01:
+        return 400, {"ok": False,
+                     "error": f"exits for the whole position already rest ({resting:g})"}
+    qty = min(qty if qty > 0 else avail, avail)
+    try:
+        book = tr._fetch_book(slug)
+    except Exception as e:  # noqa: BLE001
+        return 502, {"ok": False, "error": f"book unavailable: {type(e).__name__}"[:150]}
+    bids, asks = book.get("bids") or [], book.get("asks") or []
+    tick = float(book.get("tick") or 0.01)
+    if not bids or not asks:
+        return 400, {"ok": False, "error": "book is one-sided — use Take now instead"}
+    if net > 0:   # sell stock: undercut the ask queue without crossing the bid
+        side, intent = "SELL", "ORDER_INTENT_SELL_LONG"
+        price = max(round(bids[0][0] + tick, 4), 0.001)
+        price = min(price, asks[0][0])          # 1-tick spread: join the ask
+    else:         # buy back a short: top the bid queue without crossing the ask
+        side, intent = "BUY", "ORDER_INTENT_SELL_SHORT"
+        price = min(round(asks[0][0] - tick, 4), 0.999)
+        price = max(price, bids[0][0])          # 1-tick spread: join the bid
+    value = f"{price:.3f}".rstrip("0").rstrip(".")
+    try:
+        r = requests.request(
+            "POST", tr.TRADE_API + "/v1/orders",
+            headers={**tr.auth_headers(KEY_ID, SECRET_KEY, "POST", "/v1/orders"),
+                     "Content-Type": "application/json"},
+            json={"marketSlug": slug, "intent": intent,
+                  "type": "ORDER_TYPE_LIMIT",
+                  "price": {"value": value, "currency": "USD"},
+                  "quantity": qty, "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
+                  "participateDontInitiate": True},
+            timeout=20)
+    except Exception as e:  # noqa: BLE001
+        return 502, {"ok": False, "error": f"{type(e).__name__}: {e}"[:150]}
+    if r.status_code >= 300:
+        return 502, {"ok": False,
+                     "error": f"HTTP {r.status_code}: {' '.join(r.text.split())[:150]}"}
+    _unwind_mark(slug, True)
+    ACTIONS.append({"ts": dt.datetime.now(ET).strftime("%Y-%m-%d %I:%M:%S %p ET"),
+                    "market": slug, "side": f"{side} (unwind)", "from": "—",
+                    "to": round(price * 100, 1), "size": qty,
+                    "status": "placed", "response": "owner pick-list exit",
+                    "verified": True})
+    POLL_KICK.set()
+    return 200, {"ok": True, "price_cents": round(price * 100, 1), "qty": qty}
+
+
+def unwind_take(payload: dict) -> tuple[int, dict]:
+    """Instant exit: cross the spread with take_close, capped at the position."""
+    slug = str(payload.get("market") or "")
+    try:
+        qty = int(float(payload.get("qty") or 0))
+    except (TypeError, ValueError):
+        return 400, {"ok": False, "error": "bad quantity"}
+    net = tr._num((MONITOR.positions.get(slug) or {}).get("netPosition"))
+    if abs(net) < 0.01:
+        return 400, {"ok": False, "error": "no position here"}
+    if qty <= 0:
+        qty = int(abs(net))
+    code, resp = take_close(slug, min(qty, int(abs(net))), close_short=net < 0)
+    if code == 200:
+        _unwind_mark(slug, True)
+    return code, resp
+
+
+def unwind_resume(payload: dict) -> tuple[int, dict]:
+    slug = str(payload.get("market") or "")
+    _unwind_mark(slug, False)
+    return 200, {"ok": True, "no_new": _unwind_no_new()}
+
+
+UNWIND_SHELL = """<!doctype html><html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>unwind</title><style>
+ body{background:#1a202b;color:#e6e9ef;font:15px/1.45 -apple-system,system-ui,sans-serif;
+      margin:0;padding:12px;max-width:680px;margin:auto}
+ h1{font-size:18px;margin:4px 0 8px} .muted{color:#8a93a5;font-size:12.5px}
+ .card{background:#212a38;border-radius:10px;padding:10px 12px;margin:8px 0}
+ .row1{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+ code{color:#9ecbff;font-size:12px;word-break:break-all}
+ input.q{width:64px;font-size:15px;padding:6px;border-radius:8px;background:#141a24;
+      color:#e6e9ef;border:1px solid #394456}
+ button{font-size:13px;padding:8px 10px;border-radius:8px;border:0;margin-left:6px}
+ .b-rest{background:#2d6cdf;color:#fff}.b-take{background:#c0392b;color:#fff}
+ .b-res{background:#3a4456;color:#c6cddb}
+ .ok{color:#5dd39e}.warn{color:#ffce6b}
+ .tag{display:inline-block;background:#2a3242;border-radius:6px;padding:0 6px;
+      font-size:11px;color:#ffce6b;margin-left:6px}
+ input#k{font-size:16px;padding:8px;border-radius:8px;background:#141a24;
+      color:#e6e9ef;border:1px solid #394456;width:60%}
+</style></head><body>
+<h1>Unwind — non-seats positions</h1>
+<div class="muted">Rest exit = post-only order at the front of the queue (free, waits).
+Take now = crosses the spread (instant, pays it). Both only reduce. Picking a market
+stops 1.0 opening NEW exposure there until you tap resume.</div>
+<div id="login" class="card" style="display:none">
+ <div class="muted">password</div>
+ <input id="k" type="password"><button class="b-rest" onclick="saveKey()">open</button>
+</div>
+<div id="view" class="muted">loading&hellip;</div>
+<script>
+function hdrs(j){const h=new Headers();h.set('X-Dash-Key',localStorage.getItem('dashKey')||'');
+ h.set('X-Reprice','1');if(j)h.set('Content-Type','application/json');return h;}
+function saveKey(){localStorage.setItem('dashKey',document.getElementById('k').value);load();}
+function usd(x){var v=x||0;return (v<0?'\\u2212$':'$')+Math.abs(v).toFixed(2);}
+function act(path,m,qi){var q=parseFloat(document.getElementById(qi).value)||0;
+ if(path==='unwind_take'&&!confirm('Cross the spread on '+m+' for '+(q||'ALL')+' now?'))return;
+ fetch(path,{method:'POST',headers:hdrs(1),body:JSON.stringify({market:m,qty:q})})
+ .then(function(r){return r.json();}).then(function(d){
+  alert(d.ok?('done: '+JSON.stringify(d).slice(0,120)):('refused: '+(d.error||'')));load();})
+ .catch(function(){alert('unreachable');});}
+function resume(m){fetch('unwind_resume',{method:'POST',headers:hdrs(1),
+ body:JSON.stringify({market:m})}).then(function(){load();});}
+function load(){
+ fetch('unwind.json',{headers:hdrs(0),cache:'no-store'}).then(function(r){
+  if(r.status===401){document.getElementById('login').style.display='block';
+   document.getElementById('view').innerHTML='';return null;}
+  return r.json();}).then(function(d){
+  if(!d)return;
+  document.getElementById('login').style.display='none';
+  var h='';var i=0;
+  (d.rows||[]).forEach(function(r){i++;var qi='q'+i;
+   var head,line;
+   if(r.net>0){head='long '+r.net+' &middot; worth '+usd(r.value)+' at bid';
+    line='cost '+usd(r.cost)+' &middot; bid/ask '+(r.bid_c||'?')+'/'+(r.ask_c||'?')+'&cent;';}
+   else{head='short '+(-r.net)+' &middot; frees '+(r.frees!=null?usd(r.frees):'?')+' if closed';
+    line='locked '+usd(r.locked)+' &middot; bid/ask '+(r.bid_c||'?')+'/'+(r.ask_c||'?')+'&cent;';}
+   line+=' &middot; this market earns '+usd(r.earn_day)+'/day';
+   if(r.exit_resting)line+=' &middot; <span class="ok">exit for '+r.exit_resting+' already resting</span>';
+   h+='<div class="card"><div class="row1"><code>'+r.market+'</code>'+
+    (r.no_new?'<span class="tag">no new 1.0 exposure</span>':'')+'</div>'+
+    '<div>'+head+'</div><div class="muted">'+line+'</div>'+
+    '<div style="margin-top:6px">qty <input class="q" id="'+qi+'" placeholder="all">'+
+    '<button class="b-rest" onclick="act(\\'unwind_rest\\',\\''+r.market+'\\',\\''+qi+'\\')">Rest exit</button>'+
+    '<button class="b-take" onclick="act(\\'unwind_take\\',\\''+r.market+'\\',\\''+qi+'\\')">Take now</button>'+
+    (r.no_new?'<button class="b-res" onclick="resume(\\''+r.market+'\\')">resume 1.0</button>':'')+
+    '</div></div>';});
+  document.getElementById('view').innerHTML=h||'<div class="card">no non-seats positions</div>';
+ }).catch(function(){document.getElementById('view').innerHTML='<div class="card">unreachable</div>';});}
+load();
+</script></body></html>"""
 
 
 def take_close(slug: str, size: int, close_short: bool = False) -> tuple[int, dict]:
@@ -14552,6 +14782,16 @@ class Handler(BaseHTTPRequestHandler):
         # required"} (owner, 2026-08-17). Query parsing below still reads
         # self.path: ?key= and ?slug= must keep working.
         route = self.path.split("?", 1)[0]
+        if route == "/unwind":
+            self._send(200, "text/html; charset=utf-8", UNWIND_SHELL.encode())
+            return
+        if route == "/unwind.json":
+            if not self._authed():
+                self._send(401, "application/json", b'{"error": "key required"}')
+                return
+            self._send(200, "application/json",
+                       json.dumps({"rows": unwind_rows()}).encode())
+            return
         if route == "/v2" or route.startswith("/v2/"):
             # 2.0 runs as a second process in this container (read-only
             # phase, see v2/DESIGN.md); this front door forwards /v2/* to
@@ -14761,7 +15001,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         if self.path not in ("/reprice", "/place", "/place_abort", "/cancel_all",
                              "/reprice_batch", "/cancel_batch", "/maction",
-                             "/track_now"):
+                             "/track_now", "/unwind_rest", "/unwind_take",
+                             "/unwind_resume"):
             self._send(404, "text/plain", b"not found")
             return
         # Cross-origin requests can't set custom headers without a CORS
@@ -14793,6 +15034,12 @@ class Handler(BaseHTTPRequestHandler):
                 TRACKER_STATUS["kicked_ts"] = time.time()
                 TRACKER_KICK.set()
                 code, payload = 200, {"ok": True, "detail": "reading now"}
+            self._send(code, "application/json", json.dumps(payload).encode())
+            return
+        if self.path in ("/unwind_rest", "/unwind_take", "/unwind_resume"):
+            fn = {"/unwind_rest": unwind_rest, "/unwind_take": unwind_take,
+                  "/unwind_resume": unwind_resume}[self.path]
+            code, payload = fn(body)
             self._send(code, "application/json", json.dumps(payload).encode())
             return
         if self.path == "/place":
