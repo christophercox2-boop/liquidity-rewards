@@ -63,6 +63,10 @@ from .terms import TermsStore
 
 BOOK_MAX_AGE = 120.0
 
+# calibration-probe bins over predicted p(fill in a day) — the reliability
+# page uses finer bins, but for aiming probes five coarse ones suffice
+PROBE_BINS = ((0.0, 0.05), (0.05, 0.15), (0.15, 0.35), (0.35, 0.65), (0.65, 1.01))
+
 
 @dataclass
 class EngineConfig:
@@ -80,6 +84,10 @@ class EngineConfig:
     scout_qty: float = 1.0           # low-confidence probe size
     min_ev_day: float = 0.005        # don't rest for under half a cent/day of EV
     tight_band: float = 0.06         # model & market within this = high confidence
+    tight_ratio: float = 3.0         # ...and within this RATIO: at a 5c tail,
+                                     # "model 0.5c vs market 5c" is six cents of
+                                     # width but a 10x disagreement — scouts only
+                                     # (caught live 2026-08-19: sized tail bids)
     fair_margin: float = 0.01        # one cent beyond the band is still "at fair"
     horizon_s: float = 86400.0       # the day the EV is computed over
     mark_after_s: float = 3600.0     # grade each fill against the mid this much later
@@ -90,6 +98,13 @@ class EngineConfig:
     # much expected value per day, with at most this many open at once.
     exp1_max_cost_day: float = 0.02
     exp1_max_open: int = 6
+    # Calibration probes: the odds model only learns the bins we visit, and
+    # pure EV keeps every order at near-zero fill odds (owner, 2026-08-19:
+    # "we won't get a full picture of the odds if we just stick on the safe
+    # side"). One-share orders aimed at the least-evidenced fill-odds bin,
+    # each allowed to cost at most probe_max_cost_day of EV — bounded tuition.
+    probe_max_open: int = 6
+    probe_max_cost_day: float = 0.05
     # During a deploy rollover two 2.0 instances briefly coexist; each saw
     # the other's fresh orders as foreign automation and they evicted each
     # other's book in a loop (2026-08-19). A foreign order must be at least
@@ -260,6 +275,105 @@ class Engine:
                if fr is not None else None)
         return round(marginal_risk(fams.get(fr[0], []), leg), 2)
 
+    def _probe_candidate(self, books: BookCache, terms: TermsStore,
+                         silver: SilverFairs, now: float,
+                         busy: set | None = None) -> dict | None:
+        """One 1-share order aimed at the fill-odds bin with the least
+        evidence on record. Same rails as everything else — the band, the
+        never-cross check, the whitelist at the desk — only the EV bar is
+        relaxed to -probe_max_cost_day: the price of a labeled data point
+        the calibration page can grade. `busy` is the set of (market, side)
+        slots real candidates want this cycle: a probe must never squat on
+        a side that size is waiting to use (it once blocked a rotation)."""
+        busy = busy or set()
+        counts = [0] * len(PROBE_BINS)
+        for fc in self.forecasts.values():
+            p = fc.get("p_fill")
+            if p is None:
+                continue
+            for i, (a, z) in enumerate(PROBE_BINS):
+                if a <= p < z:
+                    counts[i] += 1
+                    break
+        emptiness = sorted(range(len(PROBE_BINS)), key=lambda i: counts[i])
+        have = {(o.market, o.side) for o in self.orders.values()}
+        best: dict | None = None
+        best_rank = None
+        for slug in terms.current:
+            if not self.whitelisted(slug) or self._ends_today(slug, now):
+                continue
+            prog = terms.get(slug)
+            if prog is None or not prog.is_live() or not prog.pool:
+                continue
+            book = books.fresh(slug, BOOK_MAX_AGE, now)
+            if book is None:
+                continue
+            b = self.band(slug, book, silver)
+            if b is None:
+                continue
+            lo, hi, _src = b
+            side_pool = daily_side_pool(prog, slug)
+            for side in ("BUY", "SELL"):
+                if ((slug, side) in have or (slug, side) in busy
+                        or not self._cooldown_ok(slug, side, now)):
+                    continue
+                levels = book.side(side)
+                if not levels:
+                    continue
+                touch = levels[0][0]
+                sign = 1.0 if side == "BUY" else -1.0
+                other = book.side("SELL" if side == "BUY" else "BUY")
+                fair_ref = lo if side == "BUY" else hi
+                for i, px in enumerate([touch + sign * book.tick, touch,
+                                        touch - sign * book.tick,
+                                        touch - 2 * sign * book.tick]):
+                    px = round(px, 3)
+                    if not (0.001 <= px <= 0.999):
+                        continue
+                    if i == 0 and other and (px >= other[0][0] - 1e-9 if side == "BUY"
+                                             else px <= other[0][0] + 1e-9):
+                        continue
+                    if side == "BUY" and px > hi + self.cfg.fair_margin:
+                        continue
+                    if side == "SELL" and px < lo - self.cfg.fair_margin:
+                        continue
+                    j = estimate_join(side, list(levels), book.tick, prog.df,
+                                      prog.target, px, self.cfg.scout_qty)
+                    if not j.qualifies:
+                        continue
+                    p_f = self.model.p_fill(slug, side, j.ticks, self.cfg.horizon_s)
+                    f_cost = self.model.fill_cost(slug, side, px, fair_ref)
+                    earn = (j.share * side_pool * self.model.scoring_fraction(slug)
+                            if j.in_window else 0.0)
+                    ev = earn - p_f * f_cost * self.cfg.scout_qty
+                    if ev < -self.cfg.probe_max_cost_day:
+                        continue
+                    bin_i = next(k for k, (a, z) in enumerate(PROBE_BINS)
+                                 if a <= p_f < z)
+                    rank = (emptiness.index(bin_i), -ev)
+                    if best_rank is None or rank < best_rank:
+                        best_rank = rank
+                        best = {"market": slug, "side": side, "price": px,
+                                "qty": self.cfg.scout_qty,
+                                "est_day": round(earn, 4),
+                                "exp_earn": round(earn, 4),
+                                "p_fill": round(p_f, 4),
+                                "fill_cost": round(f_cost, 4),
+                                "ev": round(ev, 4),
+                                "cost": self.marginal_cost(
+                                    slug, side, px, self.cfg.scout_qty),
+                                "ticks": j.ticks, "purpose": "probe"}
+        return best
+
+    def band_tight(self, lo: float, hi: float) -> bool:
+        """Agreement means close in cents AND close proportionally, at both
+        ends of the price range. Absolute width alone lets a tail pass —
+        model 0.5c vs market 5c is under six cents of width but a tenfold
+        disagreement, and sizing there is exactly what scouts are for."""
+        return ((hi - lo) <= self.cfg.tight_band
+                and hi <= self.cfg.tight_ratio * max(lo, 0.01)
+                and (1.0 - lo) <= self.cfg.tight_ratio * max(1.0 - hi, 0.01))
+
     @staticmethod
     def _book_less_own(book, rec: "OwnOrder"):
         """The book as it would look without this resting order: its own
@@ -420,7 +534,7 @@ class Engine:
         fill risk pushes away; the calibrated model arbitrates and the
         best EV wins. Fair-band rails stay as hard limits on top."""
         lo, hi, src = band
-        tight = (hi - lo) <= self.cfg.tight_band
+        tight = self.band_tight(lo, hi)
         side_pool = daily_side_pool(prog, slug)
         out = []
         for side in ("BUY", "SELL"):
@@ -654,16 +768,27 @@ class Engine:
             guard_broken = (rec.price > hi + self.cfg.fair_margin
                             if rec.side == "BUY"
                             else rec.price < lo - self.cfg.fair_margin)
-            if guard_broken:
+            # size belongs only where model and market agree; an earn-sized
+            # order whose band no longer qualifies gets pulled the same way
+            # (a scout may replace it next cycle)
+            detightened = (rec.purpose == "earn"
+                           and rec.qty > self.cfg.scout_qty
+                           and not self.band_tight(lo, hi))
+            if guard_broken or detightened:
                 r = self.desk.cancel(rec.id, rec.market)
                 if r.ok:
                     self._close_forecast(rec.id, "pulled", now)
                     self._log(event="pull", market=rec.market, side=rec.side,
-                              why="fair band moved", price=rec.price)
+                              why=("fair band moved" if guard_broken
+                                   else "band no longer tight — size withdrawn"),
+                              price=rec.price)
                     del self.orders[rec.id]
                     self._mark_action(rec.market, rec.side, now)
                     actions_left -= 1
                 continue
+            if rec.purpose == "probe":
+                continue   # a probe must REST where it was aimed — moving it
+                           # to the EV-optimal spot destroys the data point
             if not earning_here and best is not None and abs(
                     best["price"] - rec.price) > 1e-9:
                 r = self.desk.reprice(
@@ -796,6 +921,36 @@ class Engine:
             else:
                 self._log(event="refused", market=c["market"], side=c["side"],
                           note=r.note)
+
+        # 4b) calibration probes — after the earners, inside leftover actions:
+        # the odds model only learns the bins we visit
+        if actions_left > 0:
+            probes_open = sum(1 for o in self.orders.values()
+                              if o.purpose == "probe")
+            if probes_open < self.cfg.probe_max_open:
+                busy = {(c["market"], c["side"]) for c in cands} | placed_keys
+                c = self._probe_candidate(books, terms, silver, now, busy)
+                if (c is not None
+                        and (c["market"], c["side"]) not in placed_keys
+                        and c["cost"] <= self.cfg.ceiling_usd - self.used_capital()):
+                    net = (self.inventory.get(c["market"]) or {}).get("qty", 0.0)
+                    r = self.desk.place_resting(c["market"], c["side"],
+                                                c["price"], c["qty"],
+                                                net_position=net)
+                    if r.ok:
+                        self.orders[r.order_id] = OwnOrder(
+                            id=r.order_id, market=c["market"], side=c["side"],
+                            price=c["price"], qty=c["qty"], intent=r.intent,
+                            placed_ts=now, purpose="probe")
+                        self._record_forecast(c, r.order_id, now)
+                        self._log(event="place", **{k: c[k] for k in
+                                  ("market", "side", "price", "qty",
+                                   "est_day", "purpose")})
+                        s.actions.append(f"probe {c['market']} {c['side']} "
+                                         f"{c['qty']:g} @ {c['price'] * 100:g}c")
+                        self._mark_action(c["market"], c["side"], now)
+                        placed_keys.add((c["market"], c["side"]))
+                        actions_left -= 1
 
         # 5) rotation — the answer to "opps has good ideas, is anything
         # cycling out?": when the best idea we could not afford beats the

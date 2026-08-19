@@ -148,6 +148,70 @@ class TestSwitchAndCeiling(unittest.TestCase):
             self.assertEqual(o["purpose"], "scout")
             self.assertEqual(o["qty"], 1.0)
 
+    def test_cheap_tail_is_a_ratio_disagreement_not_a_tight_band(self):
+        # copula band for this rung is ~[1.9c, 4.4c]; a market at 6/7c makes
+        # the envelope under six CENTS wide but more than 3x proportionally —
+        # the absolute test alone once sized 400 shares into a tail like
+        # this (live, 2026-08-19)
+        r = Rig()
+        terms = seats_terms([TAIL])
+        put_book(r.cache, TAIL, 0.06, 0.07, now=r.now)
+        s = r.cycle(terms)
+        self.assertTrue(s["orders"])
+        for o in s["orders"]:
+            self.assertIn(o["purpose"], ("scout", "probe", "exp1"), o)
+            self.assertEqual(o["qty"], 1.0)
+
+    def test_sized_order_withdrawn_when_band_detightens(self):
+        r = Rig()
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)      # tight: earn size
+        r.cycle(terms)
+        earns = [o for o in r.engine.orders.values() if o.purpose == "earn"]
+        self.assertTrue(earns)
+        # the market runs away to the tail: band still contains the mid but
+        # agreement is gone — the size must come off
+        r.now += 400
+        put_book(r.cache, SEN, 0.31, 0.33, now=r.now)
+        r.cycle(terms)
+        left = [o for o in r.engine.orders.values()
+                if o.purpose == "earn" and o.id in {e.id for e in earns}]
+        self.assertEqual(left, [])
+        pulls = [x for x in r.engine.log if x.get("event") == "pull"]
+        self.assertTrue(any("tight" in (x.get("why") or "") or
+                            "band" in (x.get("why") or "") for x in pulls))
+
+    def test_probe_visits_the_empty_odds_bins(self):
+        r = Rig()
+        r.engine.cfg.min_ev_day = 999.0        # no normal order clears the bar
+        terms = seats_terms([SEN])
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
+        r.cycle(terms)
+        probes = [o for o in r.engine.orders.values() if o.purpose == "probe"]
+        self.assertEqual(len(probes), 1)          # one per cycle, budgeted
+        self.assertEqual(probes[0].qty, 1.0)
+        fc = r.engine.forecasts[probes[0].id]
+        self.assertIsNotNone(fc.get("p_fill"))    # the labeled data point
+        # probes rest where they were aimed: unchanged book, same order id
+        r.now += 400
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
+        r.cycle(terms)
+        self.assertIn(probes[0].id, r.engine.orders)
+
+    def test_probe_budget_is_bounded(self):
+        SEN2 = "scc-senate-gop-2026-11-03-50"
+        r = Rig()
+        r.engine.cfg.min_ev_day = 999.0
+        r.engine.cfg.probe_max_open = 1
+        terms = seats_terms([SEN, SEN2])
+        for _ in range(2):
+            put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
+            put_book(r.cache, SEN2, 0.20, 0.22, now=r.now)
+            r.cycle(terms)
+            r.now += 400
+        probes = [o for o in r.engine.orders.values() if o.purpose == "probe"]
+        self.assertLessEqual(len(probes), 1)
+
     def test_ceiling_binds(self):
         r = Rig(ceiling=0.30)   # 30 cents: a bid scout fits, nothing else
         terms = seats_terms([SEN])

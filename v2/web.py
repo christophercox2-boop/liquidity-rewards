@@ -168,7 +168,7 @@ function mtitle(s){var t=s.split('-').pop();
   if(t.indexOf('gte')===0)return 'House: '+t.slice(3)+' or more GOP seats';
   if(t.indexOf('lte')===0)return 'House: '+t.slice(3)+' GOP seats or fewer';}
  return s;}
-var PMAP={earn:'earning',scout:'scout',exp1:'experiment',
+var PMAP={earn:'earning',scout:'scout',exp1:'experiment',probe:'odds probe',
           sell:'selling stock',exit:'exiting'};
 function pwhy(p){return PMAP[p]||p;}
 function tip(el){var t=el.nextElementSibling;
@@ -288,7 +288,7 @@ ORDERS_JS = """
  if(grp.earn.length)h+=tbl(grp.earn);
  else h+='<div class="muted">no sized orders resting</div>';
  if(grp.scout.length)h+='<details class="how"><summary>'+grp.scout.length+
-  ' scouts &middot; '+usd(dsum(grp.scout))+'/d &mdash; 1-share feelers where model and market disagree</summary>'+
+  ' scouts &amp; probes &middot; '+usd(dsum(grp.scout))+'/d &mdash; 1-share feelers testing prices and odds</summary>'+
   tbl(grp.scout)+'</details>';
  if(grp.exp1.length)h+='<details class="how"><summary>'+grp.exp1.length+
   ' experiments &middot; probing the scoring-window rule</summary>'+tbl(grp.exp1)+'</details>';
@@ -655,7 +655,8 @@ CALIB_JS = """
            [0.08,0.2,'8\\u201320%'],[0.2,1.01,'20%+']];
  var h='<div class="card"><b>Fill odds: predicted vs what happened</b>'+
   '<div class="sub">'+closed.length+' resolved predictions'+(open?' &middot; '+open+' still open':'')+
-  '. Each order carried a predicted chance of filling over the time it actually rested.</div>'+
+  '. Each order carried a predicted chance of filling over the time it actually rested; '+
+  '1-share probes deliberately visit the under-tested buckets so every row fills in.</div>'+
   '<span class="leg" style="background:var(--s1)"></span><span class="muted">predicted</span>'+
   '<span class="leg" style="background:var(--s2)"></span><span class="muted">happened</span>';
  if(closed.length<8)h+='<div class="hint warn">Small sample &mdash; a sketch, not a verdict, until this grows.</div>';
