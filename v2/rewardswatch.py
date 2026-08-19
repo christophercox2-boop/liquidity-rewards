@@ -8,9 +8,13 @@ module the only checks were 1.0's hourly tracker pass and the button.
 
 This polls /v1/incentives/earnings for the last WINDOW_DAYS every
 CHECK_S and alerts on any change: a new day appearing, a day's total
-growing, or pending money flipping to paid. It never touches git or
-rewards.csv — the hourly tracker still owns the committed history — so
-this loop cannot restart the app no matter how often it runs.
+growing, or pending money flipping to paid. It writes no git itself —
+on a change it KICKS 1.0's own rewards refresh (the same /track_now
+run the dashboard button starts, owner's ask 2026-08-19: "make it
+refresh the csv when there is a change"), so rewards.csv on GitHub is
+current within about a minute of the push and the file keeps exactly
+one writer. Commits to main no longer restart the app (it deploys from
+the `deploy` branch), so this is safe at any frequency.
 
 First run with no saved signature baselines silently: alerting "new
 rewards!" about rows that were already days old on the first boot would
@@ -59,8 +63,10 @@ class RewardsWatch:
         self.primed = False
         self.sig: dict[str, list[int]] = {}
         self.last_err = ""
+        self.last_kick = ""    # ""=never needed, "ok"/"failed": the last one
 
-    def check(self, client, notify, now: float | None = None) -> bool:
+    def check(self, client, notify, now: float | None = None,
+              kick=None) -> bool:
         """One poll if due. Returns whether an alert went out."""
         now = now if now is not None else self._clock()
         if now - self.last_check < CHECK_S:
@@ -96,8 +102,17 @@ class RewardsWatch:
         self.sig = sig
         if not posted and not paid:
             return False
+        # refresh rewards.csv on GitHub BEFORE the push goes out, so the
+        # message can honestly say the full list is on its way
+        if kick is not None:
+            try:
+                self.last_kick = "ok" if kick() else "failed"
+            except Exception:  # noqa: BLE001 — the alert matters more
+                self.last_kick = "failed"
         title = "Rewards paid" if paid else "Rewards posted"
         message = " · ".join(paid + posted)
+        if self.last_kick == "ok":
+            message += " · full list updating in rewards.csv on GitHub"
         return bool(notify(title, message))
 
     def status(self, now: float | None = None) -> dict:
@@ -110,11 +125,13 @@ class RewardsWatch:
             "latest_usd": round(self.sig[latest][1] / 100.0, 2) if latest else None,
             "latest_paid_usd": round(self.sig[latest][2] / 100.0, 2) if latest else None,
             "err": self.last_err,
+            "kick": self.last_kick,
         }
 
     def to_dict(self) -> dict:
         return {"last_check": self.last_check, "primed": self.primed,
-                "sig": self.sig, "err": self.last_err}
+                "sig": self.sig, "err": self.last_err,
+                "kick": self.last_kick}
 
     @classmethod
     def from_dict(cls, d: dict, clock=None) -> "RewardsWatch":
@@ -124,4 +141,5 @@ class RewardsWatch:
         w.sig = {str(k): [int(x) for x in v]
                  for k, v in (d.get("sig") or {}).items()}
         w.last_err = str(d.get("err") or "")
+        w.last_kick = str(d.get("kick") or "")
         return w

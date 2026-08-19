@@ -134,6 +134,20 @@ class Monitor:
         self.boots = [b for b in self.boots if time.time() - b < 86400]
         self.boots.append(time.time())
 
+    def _kick_tracker(self) -> bool:
+        """Ask 1.0 (same container) to refresh rewards.csv on GitHub NOW —
+        the exact run the dashboard button starts, so the file keeps one
+        writer. Auth is the shared dashboard password plus the CSRF header
+        1.0's POST endpoints require."""
+        pw = os.environ.get("DASH_PASSWORD", "")
+        if not pw:
+            return False
+        import requests
+        r = requests.post(
+            f"http://127.0.0.1:{os.environ.get('PORT', '8080')}/track_now",
+            json={}, headers={"X-Dash-Key": pw, "X-Reprice": "1"}, timeout=5)
+        return r.status_code == 200
+
     def _sink_terms(self, row: dict) -> None:
         self.terms_history.append(row)
         del self.terms_history[:-TERMS_HISTORY_KEEP]
@@ -291,7 +305,8 @@ class Monitor:
         # minutes), fenced like the engine, and pushes the phone the moment
         # Polymarket posts anything new
         try:
-            self.rewards_watch.check(self.client, self.alerts.notify, now)
+            self.rewards_watch.check(self.client, self.alerts.notify, now,
+                                     kick=self._kick_tracker)
         except Exception as e:  # noqa: BLE001 — never lose the save below
             self._note(f"rewards watch: {type(e).__name__}: {e}")
 

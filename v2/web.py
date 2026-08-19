@@ -162,6 +162,8 @@ STATUS_JS = """
    '<div>last check '+(rw.checked_ago_s!=null?Math.round(rw.checked_ago_s/60)+' min ago':'never')+
    (rw.latest_day?' &middot; latest posted day <b>'+rw.latest_day+'</b> '+usd(rw.latest_usd)+
      (rw.latest_paid_usd>=rw.latest_usd?' (paid)':' (pending)'):'')+'</div>'+
+   (rw.kick?'<div class="muted">on change it refreshes rewards.csv on GitHub &mdash; last refresh kick: '+
+     (rw.kick==='ok'?'<span class="ok">ok</span>':'<span class="warn">failed (hourly pass covers it)</span>')+'</div>':'')+
    (rw.err?'<div class="warn">last fetch failed: '+rw.err+'</div>':'')+'</div>';
  }
  var mr=Object.entries(e.market_rates||{}).sort(function(a,b){return b[1]-a[1];});

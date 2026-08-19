@@ -130,6 +130,33 @@ class TestWatch(unittest.TestCase):
         self.tick()
         self.assertFalse(w3.check(self.client, self.notify))
 
+    def test_kick_fires_on_change_only_and_feeds_the_message(self):
+        kicks = []
+        self.client.rows = [row("2026-08-16", 100.0)]
+        self.w.check(self.client, self.notify, kick=lambda: kicks.append(1) or True)
+        self.assertEqual(kicks, [])                 # baseline: no kick
+        self.tick()
+        self.w.check(self.client, self.notify, kick=lambda: kicks.append(1) or True)
+        self.assertEqual(kicks, [])                 # no change: no kick
+        self.client.rows += [row("2026-08-17", 60.0)]
+        self.tick()
+        self.w.check(self.client, self.notify, kick=lambda: kicks.append(1) or True)
+        self.assertEqual(kicks, [1])                # change: one kick
+        self.assertIn("rewards.csv on GitHub", self.notify.sent[-1][1])
+        self.assertEqual(self.w.last_kick, "ok")
+
+    def test_kick_failure_never_blocks_the_alert(self):
+        self.client.rows = [row("2026-08-16", 100.0)]
+        self.w.check(self.client, self.notify)
+        self.client.rows += [row("2026-08-17", 60.0)]
+        self.tick()
+
+        def boom():
+            raise OSError("1.0 is down")
+        self.assertTrue(self.w.check(self.client, self.notify, kick=boom))
+        self.assertEqual(self.w.last_kick, "failed")
+        self.assertNotIn("rewards.csv", self.notify.sent[-1][1])
+
     def test_status_reads_the_latest_day(self):
         self.client.rows = [row("2026-08-16", 197.03), row("2026-08-15", 1352.63, "PAID")]
         self.w.check(self.client, self.notify)
