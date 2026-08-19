@@ -337,8 +337,19 @@ class Monitor:
             "silver": {"age_s": (round(self.silver.age(now)) if self.silver.fetched_at
                                  else None),
                        "source": self.silver.source, "note": self.silver.note,
-                       "gop_control": (round(self.silver.gop_control(), 3)
-                                       if self.silver.pmf else None)},
+                       "gop_control": (gc := self.silver.gop_control()) and round(gc, 3),
+                       "official": {
+                           "run": (self.silver.official_meta or {}).get("run", ""),
+                           "date": (self.silver.official_meta or {}).get("date", ""),
+                           "sims": (self.silver.official_meta or {}).get("sims", 0),
+                           "source": self.silver.official_source,
+                           "note": self.silver.official_note,
+                           "run_age_d": (round(a / 86400.0, 1)
+                                         if (a := self.silver.official_run_age_s(now))
+                                         != float("inf") else None),
+                       } if self.silver.official else None},
+            "silver_flavors": {s: fv for s in self.family_slugs
+                               if (fv := self.silver.flavors_fair(s)) is not None},
             "rewards_watch": self.rewards_watch.to_dict(),
             "rewards_status": self.rewards_watch.status(now),
         }

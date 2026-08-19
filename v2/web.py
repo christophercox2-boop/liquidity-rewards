@@ -214,37 +214,49 @@ MARKETS_JS = """
   if(t.indexOf('gte')===0)return parseInt(t.slice(3))+0.5;
   return parseInt(t);}
  // the picture of the fair-value model: the model's own interval vs the market
- var senS=Object.keys(lad).filter(function(s){return s.indexOf('scc-senate-gop-')===0;})
-   .sort(function(a,b){return rungKey(a)-rungKey(b);});
- var dist=senS.map(function(s){var L=lad[s];var fr=fairs[s]||null;
-   var mid=(L.bids[0]&&L.asks[0])?(L.bids[0][0]+L.asks[0][0])/2:null;
-   return {r:s.split('-').pop(),flo:fr?fr[0]:null,fhi:fr?fr[1]:null,mid:mid};});
- var mx=0;dist.forEach(function(x){mx=Math.max(mx,x.fhi||0,x.mid||0);});
- if(dist.length&&mx>0){
-  h+='<div class="card"><b>Senate seats: model band vs market</b>'
-   +'<span class="leg" style="background:var(--s1)"></span><span class="muted">model band</span>'
-   +'<span class="leg" style="background:var(--s2)"></span><span class="muted">market mid</span>'
-   +'<div class="muted">Races move together &mdash; a polling miss swings many at once &mdash; and how strongly is itself '
-   +'uncertain. The blue band is each rung&rsquo;s fair across that correlation range (0.2&ndash;0.6), with '
-   +'Silver&rsquo;s race odds held exactly. A narrow band that agrees with orange = the engine earns at size; '
-   +'a wide band = the model admits it doesn&rsquo;t know, and the engine only scouts.</div>';
-  dist.forEach(function(x){
-   var l=100*(x.flo||0)/mx, w=Math.max(100*((x.fhi||0)-(x.flo||0))/mx, 1);
-   h+='<div class="brow"><span class="blab">'+x.r+'</span><div class="btrack">'
-    +'<div class="bar" style="background:var(--s1);margin-left:'+l+'%;width:'+w+'%;border-radius:4px"></div>'
-    +'<div class="bar" style="background:var(--s2);width:'+(100*(x.mid||0)/mx)+'%;margin-top:2px"></div>'
-    +'</div><span class="bval">'+(x.flo!=null?pc(x.flo)+'&ndash;'+pc(x.fhi):'&ndash;')
-    +' / '+(x.mid!=null?pc(x.mid):'&ndash;')+'</span></div>';});
-  h+='</div>';}
+ var so=(d.silver||{}).official||null;
+ var bandWhy=so
+  ?('The blue band is the spread across Silver Bulletin&rsquo;s own simulated seat distributions &mdash; '
+    +'its Classic, Deluxe and Lite models, run '+(so.date||'?')
+    +(so.run_age_d!=null?' ('+so.run_age_d+' days ago)':'')+'. Where the three flavors agree the band is '
+    +'narrow and the engine earns at size when the market agrees too; where they split, the model admits '
+    +'it doesn&rsquo;t know and the engine only scouts.'
+    +(so.run_age_d!=null&&so.run_age_d>5?' <span class="warn">Run is stale &mdash; the band is widened with the poll-driven swing model.</span>':''))
+  :('Races move together &mdash; a polling miss swings many at once &mdash; and how strongly is itself '
+    +'uncertain. The blue band is each rung&rsquo;s fair across that correlation range (0.2&ndash;0.6), with '
+    +'Silver&rsquo;s race odds held exactly. A narrow band that agrees with orange = the engine earns at size; '
+    +'a wide band = the model admits it doesn&rsquo;t know, and the engine only scouts.');
+ [['Senate seats: model band vs market','scc-senate-gop-'],
+  ['House seats: model band vs market','scc-hrep-rep-']].forEach(function(fam,fi){
+  var senS=Object.keys(lad).filter(function(s){return s.indexOf(fam[1])===0;})
+    .sort(function(a,b){return rungKey(a)-rungKey(b);});
+  var dist=senS.map(function(s){var L=lad[s];var fr=fairs[s]||null;
+    var mid=(L.bids[0]&&L.asks[0])?(L.bids[0][0]+L.asks[0][0])/2:null;
+    return {r:s.split('-').pop(),flo:fr?fr[0]:null,fhi:fr?fr[1]:null,mid:mid};});
+  var mx=0;dist.forEach(function(x){mx=Math.max(mx,x.fhi||0,x.mid||0);});
+  if(dist.length&&mx>0){
+   h+='<div class="card"><b>'+fam[0]+'</b>'
+    +'<span class="leg" style="background:var(--s1)"></span><span class="muted">model band</span>'
+    +'<span class="leg" style="background:var(--s2)"></span><span class="muted">market mid</span>'
+    +(fi===0?'<div class="muted">'+bandWhy+'</div>':'')
+    +(fi===1&&so?'<div class="muted">Same three-flavor band, from the House seat histograms &mdash; '
+      +'no per-district reconstruction, Silver&rsquo;s own simulations.</div>':'');
+   dist.forEach(function(x){
+    var l=100*(x.flo||0)/mx, w=Math.max(100*((x.fhi||0)-(x.flo||0))/mx, 1);
+    h+='<div class="brow"><span class="blab">'+x.r+'</span><div class="btrack">'
+     +'<div class="bar" style="background:var(--s1);margin-left:'+l+'%;width:'+w+'%;border-radius:4px"></div>'
+     +'<div class="bar" style="background:var(--s2);width:'+(100*(x.mid||0)/mx)+'%;margin-top:2px"></div>'
+     +'</div><span class="bval">'+(x.flo!=null?pc(x.flo)+'&ndash;'+pc(x.fhi):'&ndash;')
+     +' / '+(x.mid!=null?pc(x.mid):'&ndash;')+'</span></div>';});
+   h+='</div>';}});
  var races=d.silver_races||{};
  var rk=Object.keys(races).sort(function(a,b){return races[b]-races[a];});
  if(rk.length){
-  h+='<div class="card"><details><summary><b>What feeds the model</b> <span class="muted">'
-   +rk.length+' Silver race odds &rarr; the seat distribution</span></summary>'
-   +'<div class="muted" style="margin:6px 0">P(GOP win) per race, updated with polling. '
-   +'31 GOP seats are not on the ballot. The ladder is the exact seat distribution over these races '
-   +'moved together by a shared national swing &mdash; the band on the chart is how much the answer '
-   +'depends on that correlation.</div>';
+  h+='<div class="card"><details><summary><b>What else feeds the model</b> <span class="muted">'
+   +rk.length+' Silver race odds &mdash; the poll-driven cross-check</span></summary>'
+   +'<div class="muted" style="margin:6px 0">P(GOP win) per race, updated with polling &mdash; fresher than '
+   +'the simulation runs above. 31 GOP seats are not on the ballot. These feed the swing-correlation model '
+   +'that prices the Senate ladder whenever the official run is stale or missing.</div>';
   rk.forEach(function(a){h+='<div class="brow"><span class="blab">'+a.toUpperCase()+'</span>'
    +'<div class="btrack"><div class="bar" style="background:var(--s1);width:'+(races[a]*100)+'%"></div></div>'
    +'<span class="bval">'+Math.round(races[a]*100)+'%</span></div>';});
@@ -261,7 +273,8 @@ MARKETS_JS = """
      fr?pc(fr[0])+'&ndash;'+pc(fr[1]):'<span class="muted">&mdash;</span>',
      bb+' / '+ba,(ours[s]||[]).join('<br>')||'<span class="muted">&middot;</span>',
      usd((e.market_rates||{})[s])]);});
-  h+='</table><div class="muted">model = the fair band across swing correlation; blank = no model</div></div>';
+  h+='</table><div class="muted">model = the band across Silver&rsquo;s Classic/Deluxe/Lite runs '
+   +'(swing-correlation fallback when stale); blank = no model</div></div>';
  });
  var t=d.touch||{};var q=window._q||'';
  var f=window._filter||'all';

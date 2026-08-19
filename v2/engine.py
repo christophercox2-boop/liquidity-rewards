@@ -178,10 +178,12 @@ class Engine:
 
     def band(self, slug: str, book, silver: SilverFairs):
         """(lo, hi, source): the envelope of the model's OWN uncertainty
-        interval (its fair across the swing-correlation range — races are
-        far from independent, and how far is itself uncertain) and the
-        market's mid. Tight envelope = model insensitive to its unknown
-        AND agreeing with the market = confidence. Anything else scouts."""
+        interval and the market's mid. The interval is the spread across
+        Silver's Classic/Deluxe/Lite simulated seat histograms (both
+        chambers), widened by the swing-correlation fallback when the
+        official run is stale — see silver.fair_range. Tight envelope =
+        the flavors agree AND the market agrees = confidence. Anything
+        else scouts."""
         rng = silver.fair_range(slug)
         mid = None
         if book and book.bids and book.asks:

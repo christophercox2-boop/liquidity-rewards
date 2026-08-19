@@ -346,3 +346,16 @@ stops. Either answer retires the experiment.
    polling). One implementation in 2.0 — the monitor's Datawrapper
    fetch survives, `silver_model.py`'s seat-CDF/ladder logic gets
    extracted into it, and the duplicate dies.
+   *Updated 2026-08-19 (owner supplied the forecast embed source):*
+   the primary model is now **Silver Bulletin's own simulated seat
+   distributions** — the embed's public Google-Sheets CSVs publish the
+   seat histogram per chamber in three flavors (Classic/Deluxe/Lite),
+   in Democratic seats (GOP = 100−D Senate, R = 435−D House). Each
+   rung's fair band is the min/max across the three flavors — Silver's
+   own model disagreement — and the House ladder is priced directly,
+   which no reconstruction here could do. The swing-correlation copula
+   over the per-race table remains as the Senate fallback and widens
+   the band whenever the official run is older than 5 days (races
+   update with every poll; the histograms only when Silver reruns).
+   Fallback fixtures from the 2026-08-10 run live in `data/` and
+   `v2/tests/fixtures/`.
