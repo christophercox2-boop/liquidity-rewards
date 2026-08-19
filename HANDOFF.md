@@ -41,9 +41,10 @@ reasoning ahead of the data).
   tracker's own "Liquidity rewards check" commits and [skip ci] does not
   stop it. A tracker that runs a check on boot therefore restarts itself:
   boot → check at +2min → commit → rebuild → boot, one lap every ~3.6
-  minutes. All of Aug 18 looped this way (v1 AND v2 restarting together,
-  ~400 restarts) and it looked like memory pressure until the boot times
-  were laid beside the commit times — they matched one to one, ~70s apart.
+  minutes. It ran from 17:30 ET Aug 18 (ten minutes after the first
+  one-container deploy) to 21:43 ET — 68 laps, v1 AND v2 restarting
+  together — and looked like memory pressure until the boot times were
+  laid beside the commit times: they matched one to one, ~70s apart.
   Fix (Aug 19): tracker_loop waits out the remainder of TRACKER_INTERVAL
   since main's newest STATUS.md commit before its first pass, so a boot
   resumes the hourly cadence instead of resetting it. Don't add anything
