@@ -220,7 +220,7 @@ STATUS_JS = """
  var hist=(e.history||[]).map(function(x){return x.earned||0;});
  var h='<div class="card">'+fresh+' <span class="muted">updated '+when(d.saved_at)+
    ' &middot; switch '+(sw.on?'<span class="ok">ON</span>':'off')+'</span>'+
-   '<div class="big">'+usd(e.earned)+spark(hist,e.earned)+'</div>'+
+   '<div class="big">'+usd(e.earned)+spark(hist,null)+'</div>'+
    '<div class="sub">estimated rewards so far today &middot; earning '+usd(e.rate)+
    ' per day at this minute</div>'+
    (e.stale_s>60?'<div class="hint warn">'+Math.round(e.stale_s/60)+
@@ -249,8 +249,9 @@ STATUS_JS = """
    (rw.err?' &middot; <span class="warn">last check failed</span>':'')+'</div>';}
  h+='<details class="how"><summary>how these numbers work</summary>'+
    'Earned today is a live preview, integrated minute by minute from your resting orders '+
-   'and the official scoring formula; Polymarket posts the real number 1&ndash;2 days later, '+
-   'and the little line is recent days plus today. The risk number is the most the whole '+
+   'and the official scoring formula; Polymarket posts the real number 1&ndash;2 days later. '+
+   'The little line (once two days have finished) shows completed days only &mdash; '+
+   'today is the big number, never a point on the line. The risk number is the most the whole '+
    'book can actually lose, priced against the seat count itself &mdash; Senate rungs are '+
    'mutually exclusive, so shorts across them mostly share one collateral instead of stacking.'+
    (g.silent_cancels?' ('+g.silent_cancels+' orders so far vanished unfilled: the exchange '+

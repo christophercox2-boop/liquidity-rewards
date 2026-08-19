@@ -44,7 +44,7 @@ import time
 from dataclasses import dataclass
 
 from .api import TRADE_API, ApiError, Client
-from .intents import REST_SIDE, intent_for
+from .intents import REST_SIDE, SELL_LONG, SELL_SHORT, intent_for
 
 PRICE_MIN, PRICE_MAX = 0.001, 0.999
 QTY_MIN, QTY_MAX = 0.01, 20000.0
@@ -85,7 +85,7 @@ class OrderDesk:
     """
 
     def __init__(self, client: Client, whitelist, switch_on, fresh_book, log,
-                 sleep=None, clock=None):
+                 sleep=None, clock=None, closing_only=None):
         self.client = client
         self.whitelist = whitelist
         self.switch_on = switch_on
@@ -93,6 +93,10 @@ class OrderDesk:
         self.log = log
         self._sleep = sleep if sleep is not None else time.sleep
         self._clock = clock if clock is not None else time.time
+        # markets OFF the whitelist where REDUCING exposure is allowed —
+        # the unwind list. Only SELL_LONG (sell held stock) and SELL_SHORT
+        # (buy back a short) pass here; opening anything stays refused.
+        self.closing_only = set(closing_only or ())
 
     # -- rails ---------------------------------------------------------------
 
@@ -101,11 +105,13 @@ class OrderDesk:
         return OrderResult(ok=False, note=f"refused: {note}")
 
     def _check(self, op: str, slug: str, side: str, price: float, qty: float,
-               initiator: str) -> str | None:
+               initiator: str, intent: str | None = None) -> str | None:
         """The rail checks shared by place and reprice. Returns a refusal
         reason or None. Order matters: cheap checks first, the book last."""
         if not self.whitelist(slug):
-            return f"market {slug} is not on the whitelist"
+            if not (slug in self.closing_only
+                    and intent in (SELL_LONG, SELL_SHORT)):
+                return f"market {slug} is not on the whitelist"
         if initiator != "owner" and not self.switch_on():
             return "master switch is off"
         if not (PRICE_MIN - 1e-12 <= price <= PRICE_MAX + 1e-12):
@@ -136,11 +142,12 @@ class OrderDesk:
         is derived from the position unless the caller pins it (a reprice
         keeps the original's)."""
         qty = round(qty, 2)
-        reason = self._check("place", slug, side, price, qty, initiator)
-        if reason:
-            return self._refuse("place", slug, reason)
         if intent is None:
             intent = intent_for(side, net_position, qty, close_short)
+        reason = self._check("place", slug, side, price, qty, initiator,
+                             intent=intent)
+        if reason:
+            return self._refuse("place", slug, reason)
         if REST_SIDE[intent] != side:
             return self._refuse("place", slug,
                                 f"intent {intent} rests on {REST_SIDE[intent]}, not {side}")

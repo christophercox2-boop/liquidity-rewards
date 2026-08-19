@@ -51,7 +51,8 @@ def resting(oid="new1", market="scc-x", side="BUY", price=0.08, size=45.0,
             "size": size, "intent": intent}
 
 
-def make_desk(client=None, whitelisted=True, switch=True, book="normal"):
+def make_desk(client=None, whitelisted=True, switch=True, book="normal",
+              closing_only=None):
     client = client or StubClient()
     books = {
         "normal": Book(bids=((0.44, 100.0),), asks=((0.46, 50.0),), tick=0.01),
@@ -67,6 +68,7 @@ def make_desk(client=None, whitelisted=True, switch=True, book="normal"):
         log=logs.append,
         sleep=clock.sleep,
         clock=clock.clock,
+        closing_only=closing_only,
     )
     return desk, client, logs
 
@@ -87,6 +89,24 @@ class TestRails(unittest.TestCase):
         self.assertFalse(r.ok)
         self.assertIn("whitelist", r.note)
         self.assertEqual(client.posts, [])
+
+    def test_closing_only_lets_exits_through_but_never_opens(self):
+        # unwind markets sit OFF the whitelist: reducing is allowed there,
+        # opening anything is not
+        desk, client, _ = make_desk(whitelisted=False,
+                                    closing_only={"old-market"})
+        r = desk.place_resting("old-market", "BUY", 0.05, 10)   # BUY_LONG opens
+        self.assertFalse(r.ok)
+        self.assertIn("whitelist", r.note)
+        client.open_orders_script = [[resting(market="old-market", side="SELL",
+                                              price=0.45, size=10.0,
+                                              intent=SELL_LONG)]]
+        r = desk.place_resting("old-market", "SELL", 0.45, 10,
+                               net_position=10)                  # SELL_LONG exits
+        self.assertTrue(r.ok, r.note)
+        # and a market not on the closing list stays fully refused
+        r = desk.place_resting("other-market", "SELL", 0.45, 10, net_position=10)
+        self.assertFalse(r.ok)
 
     def test_switch_gates_auto_but_not_owner(self):
         desk, client, _ = make_desk(switch=False)
