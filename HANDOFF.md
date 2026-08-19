@@ -37,6 +37,17 @@ reasoning ahead of the data).
   seed from main every 60s; version-gated.
 
 ## Hard-won facts (violating these has cost real money)
+- DigitalOcean rebuilds the app on EVERY push to main — including the
+  tracker's own "Liquidity rewards check" commits and [skip ci] does not
+  stop it. A tracker that runs a check on boot therefore restarts itself:
+  boot → check at +2min → commit → rebuild → boot, one lap every ~3.6
+  minutes. All of Aug 18 looped this way (v1 AND v2 restarting together,
+  ~400 restarts) and it looked like memory pressure until the boot times
+  were laid beside the commit times — they matched one to one, ~70s apart.
+  Fix (Aug 19): tracker_loop waits out the remainder of TRACKER_INTERVAL
+  since main's newest STATUS.md commit before its first pass, so a boot
+  resumes the hourly cadence instead of resetting it. Don't add anything
+  that commits to main on a boot path without the same guard.
 - The exchange /modify endpoint DESTROYS orders (200, cancels, never
   replaces). Never call it. do_reprice = place replacement → verify by the
   returned ORDER ID and MINIMUM QUANTITY → only then cancel the original.
