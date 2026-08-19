@@ -76,19 +76,53 @@ _CSS = """
  body{--s1:#3987e5;--s2:#d95926}  /* validated categorical pair on this surface */
  .brow{display:flex;align-items:center;gap:6px;margin:3px 0;font-size:12px}
  .blab{width:54px;color:#8a93a5;text-align:right;flex:none}
- .btrack{flex:1;min-width:0}
+ .btrack{flex:1;min-width:0;position:relative}
  .bar{height:8px;border-radius:0 4px 4px 0;min-width:1px}
  .bval{color:#e6e9ef;font-size:11px;margin-left:4px;flex:none;white-space:nowrap}
  .leg{display:inline-block;width:10px;height:10px;border-radius:3px;
       margin:0 4px 0 8px;vertical-align:-1px}
  summary{cursor:pointer}
+ .sub{color:#aab3c5;font-size:14px;margin:3px 0}
+ .hint{color:#8a93a5;font-size:12.5px;margin:5px 0 2px;line-height:1.5}
+ details.how{margin:6px 0 0;font-size:12.5px;color:#8a93a5;line-height:1.5}
+ details.how summary{color:#6f7a90;font-size:12px}
+ .stats{display:flex;gap:20px;flex-wrap:wrap;margin:8px 0 2px}
+ .stat .lab{color:#8a93a5;font-size:12px}
+ .stat .val{font-size:22px;font-weight:700}
+ .stat .val .u{font-size:13px;font-weight:400;color:#8a93a5}
+ .drow{display:flex;align-items:center;gap:8px;margin:2px 0;min-height:20px;cursor:pointer}
+ .dlab{width:40px;color:#aab3c5;text-align:right;flex:none;font-size:12px;
+       font-variant-numeric:tabular-nums}
+ .dtrack{flex:1;min-width:0;position:relative;height:20px}
+ .gline{position:absolute;top:0;bottom:0;width:1px;background:#2a3242}
+ .range{position:absolute;top:6px;height:8px;background:var(--s1);
+        border-radius:4px;min-width:2px;opacity:.5}
+ .dot{position:absolute;top:4px;width:8px;height:8px;border-radius:50%;
+      border:2px solid #212a38;margin-left:-6px}
+ .dot.mdl{background:var(--s1)} .dot.mkt{background:var(--s2)}
+ .dval{flex:none;font-size:11px;color:#aab3c5;width:92px;text-align:right;
+       font-variant-numeric:tabular-nums;white-space:nowrap}
+ .axisr{display:flex;gap:8px;margin:0 0 2px}
+ .axisl{width:40px;flex:none} .axisv{width:92px;flex:none}
+ .axist{flex:1;position:relative;height:14px;color:#6f7a90;font-size:10.5px}
+ .axist span{position:absolute;transform:translateX(-50%)}
+ .thresh{display:flex;align-items:center;gap:8px;margin:5px 0;
+         color:#ffce6b;font-size:11.5px}
+ .thresh:before,.thresh:after{content:"";flex:1;border-top:1px dashed #55482a}
+ .tipbox{display:none;background:#1a2230;border-radius:8px;padding:6px 9px;
+         font-size:12px;color:#aab3c5;margin:2px 0 6px;line-height:1.55}
+ .tipbox.open{display:block}
+ .m50{position:absolute;top:-2px;bottom:-2px;width:1px;background:#5b667a}
+ .chips{margin:4px 0} .chip{display:inline-block;background:#2a3242;
+   border-radius:6px;padding:1px 8px;font-size:12px;margin:2px 4px 2px 0;color:#c6cddb}
+ svg.spark{vertical-align:middle;margin-left:10px}
 """
 
 _PLUMBING = """
 function hdrs(){const h=new Headers();h.set('X-Dash-Key',localStorage.getItem('dashKey')||'');return h;}
 function saveKey(){localStorage.setItem('dashKey',document.getElementById('k').value);load();}
-function usd(x){return '$'+(x||0).toFixed(2);}
-function pc(x){return ((x||0)*100).toFixed(1)+'c';}
+function usd(x){var v=x||0;return (v<0?'\\u2212$':'$')+Math.abs(v).toFixed(2);}
+function pc(x){var v=Math.round((x||0)*1000)/10;return (v%1?v.toFixed(1):''+Math.round(v))+'\\u00A2';}
 function pct(x){return ((x||0)*100).toFixed(0)+'%';}
 function when(t){return new Date(t*1000).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});}
 function row(c){return '<tr>'+c.map(function(x,i){return '<td class="'+(i?'r':'')+'">'+x+'</td>';}).join('')+'</tr>';}
@@ -107,6 +141,40 @@ function load(){
 }
 function rerender(){if(window._d)document.getElementById('view').innerHTML=render(window._d);}
 function setF(x){window._filter=x;rerender();}
+function rlab(s){var t=s.split('-').pop();
+ if(t.indexOf('lte')===0)return '\\u2264'+t.slice(3);
+ if(t.indexOf('gte')===0)return t.slice(3)+'+';
+ return t;}
+function mshort(s){
+ if(s.indexOf('scc-senate-gop-')===0)return 'Senate '+rlab(s);
+ if(s.indexOf('scc-hrep-rep-')===0)return 'House '+rlab(s);
+ return '<code>'+s+'</code>';}
+function mtitle(s){var t=s.split('-').pop();
+ if(s.indexOf('scc-senate-gop-')===0){
+  if(t.indexOf('lte')===0)return 'Senate: '+t.slice(3)+' GOP seats or fewer';
+  if(t.indexOf('gte')===0)return 'Senate: '+t.slice(3)+' or more GOP seats';
+  return 'Senate: exactly '+t+' GOP seats';}
+ if(s.indexOf('scc-hrep-rep-')===0){
+  if(t.indexOf('gte')===0)return 'House: '+t.slice(3)+' or more GOP seats';
+  if(t.indexOf('lte')===0)return 'House: '+t.slice(3)+' GOP seats or fewer';}
+ return s;}
+var PMAP={earn:'earning',scout:'scout',exp1:'experiment',
+          sell:'selling stock',exit:'exiting'};
+function pwhy(p){return PMAP[p]||p;}
+function tip(el){var t=el.nextElementSibling;
+ if(t&&t.className.indexOf('tipbox')>=0)t.classList.toggle('open');}
+function spark(vals,cur){
+ var all=vals.concat(cur!=null?[cur]:[]);
+ if(all.length<2)return '';
+ var W=96,H=26,P=3,mx=Math.max.apply(null,all),mn=Math.min(0,Math.min.apply(null,all));
+ if(mx<=mn)mx=mn+1;
+ function X(i){return P+(W-2*P)*i/(all.length-1);}
+ function Y(v){return H-P-(H-2*P)*(v-mn)/(mx-mn);}
+ var pts=all.map(function(v,i){return X(i).toFixed(1)+','+Y(v).toFixed(1);}).join(' ');
+ var last=all[all.length-1];
+ return '<svg class="spark" width="'+W+'" height="'+H+'" aria-hidden="true">'
+  +'<polyline points="'+pts+'" fill="none" stroke="#5b667a" stroke-width="2" stroke-linejoin="round"/>'
+  +'<circle cx="'+X(all.length-1).toFixed(1)+'" cy="'+Y(last).toFixed(1)+'" r="4" fill="var(--s1)" stroke="#212a38" stroke-width="2"/></svg>';}
 """
 
 
@@ -139,41 +207,68 @@ STATUS_JS = """
  var age=Math.round(Date.now()/1000-d.saved_at);
  var fresh=age<120?'<span class="ok">&#9679; live</span>':'<span class="bad">&#9679; stale '+age+'s</span>';
  var e=d.estimator||{};var g=d.engine||{};var sw=d.switch||{};
- var h='<div class="card">'+fresh+' <span class="muted">build '+(d.build||'?')+
-   ' &middot; ws '+((d.ws||{}).state||'?')+' &middot; '+(d.orders_n||0)+' orders in '+(d.markets_n||0)+' markets</span>'+
-   '<div class="big">'+usd(e.earned)+'<span class="muted" style="font-size:15px"> earned today on 2.0&rsquo;s markets ('+(e.day||'')+')</span></div>'+
-   '<div>'+usd(e.rate)+'/day now'+
-   (e.stale_s>60?' <span class="warn">&middot; '+Math.round(e.stale_s/60)+' min unmeasured</span>':'')+'</div>'+
-   (d.restart_loop>=5?'<div class="bad">restarting repeatedly: '+d.restart_loop+
-     ' boots in the last hour &mdash; the box is killing the process (memory or health checks); runtime logs have the exit codes</div>':'')+'</div>';
- h+='<div class="card"><b>Engine</b> <span class="muted">'+(g.mode||'?')+
-   ' &middot; switch '+(sw.on?'<span class="ok">ON</span>':'<span class="muted">off</span>')+'</span>'+
-   '<div>at risk '+usd(g.used)+' of '+usd(g.ceiling)+' &middot; headroom '+usd(g.headroom)+'</div>';
+ var hist=(e.history||[]).map(function(x){return x.earned||0;});
+ var h='<div class="card">'+fresh+' <span class="muted">updated '+when(d.saved_at)+
+   ' &middot; switch '+(sw.on?'<span class="ok">ON</span>':'off')+'</span>'+
+   '<div class="big">'+usd(e.earned)+spark(hist,e.earned)+'</div>'+
+   '<div class="sub">estimated rewards so far today &middot; earning '+usd(e.rate)+
+   ' per day at this minute</div>'+
+   (e.stale_s>60?'<div class="hint warn">'+Math.round(e.stale_s/60)+
+     ' minutes of today could not be measured (restarts or stale books) &mdash; the real number can only be higher</div>':'')+
+   (d.restart_loop>=5?'<div class="bad">Restarting repeatedly: '+d.restart_loop+
+     ' boots in the last hour. DigitalOcean runtime logs have the exit codes.</div>':'')+
+   '<details class="how"><summary>what this number is</summary>'+
+   'An estimate, integrated minute by minute from your resting orders and the official '+
+   'scoring formula. Polymarket posts the real number 1&ndash;2 days later &mdash; the '+
+   'phone push and rewards.csv are the truth; this is the live preview. The little '+
+   'line is the last '+hist.length+' finished day'+(hist.length===1?'':'s')+' plus today.</details></div>';
+ var rf=g.risk_families||{};var rfs=Object.keys(rf).map(function(k){
+   var lab=k.indexOf('senate')>=0?'Senate book':k.indexOf('hrep')>=0?'House book':k;
+   return '<span class="chip">'+lab+' '+usd(rf[k])+'</span>';}).join('');
+ var modeTxt=g.mode==='on'?'':g.mode==='off'?'switch off &mdash; watching only':(g.mode||'');
+ h+='<div class="card"><b>Money at work</b> <span class="muted">'+modeTxt+'</span>'+
+   '<div class="stats">'+
+   '<div class="stat"><div class="lab">worst case at risk</div><div class="val">'+usd(g.used)+
+     '<span class="u"> of '+usd(g.ceiling)+'</span></div></div>'+
+   '<div class="stat"><div class="lab">headroom</div><div class="val">'+usd(g.headroom)+'</div></div>'+
+   '<div class="stat"><div class="lab">orders resting</div><div class="val">'+(g.orders||[]).length+'</div></div>'+
+   '</div>'+(rfs?'<div class="chips">'+rfs+'</div>':'')+
+   '<details class="how"><summary>how risk is counted</summary>'+
+   'The worst case is priced against the seat count itself: the Senate rungs are '+
+   'mutually exclusive, so short orders across them mostly share ONE collateral '+
+   'instead of stacking. $'+(g.used||0)+' is the most this book can actually lose, '+
+   'not the sum of every order&rsquo;s margin.</details>';
  if(g.sweep&&!g.sweep.done){h+='<div class="warn">handover sweep running &middot; '+(g.sweep.cancelled||0)+' cleared so far</div>';}
- var go=g.orders||[];
- if(go.length){h+='<table>'+hrow(['market','order','why']);
-  go.forEach(function(o){h+=row(['<code>'+o.market+'</code>',o.side+' '+o.qty+' @ '+pc(o.price),o.purpose]);});
-  h+='</table>';}else{h+='<div class="muted">no engine orders resting</div>';}
- if(g.silent_cancels){h+='<div class="warn muted">'+g.silent_cancels+' silent cancels seen</div>';}
- h+='<div class="muted" style="margin-top:4px"><a href="orders" style="color:#9ecbff">orders &rarr;</a></div></div>';
+ if(g.silent_cancels){h+='<div class="hint">'+g.silent_cancels+' orders vanished without a fill so far &mdash; '+
+   'the exchange quietly cancels what buying power can&rsquo;t fund; the engine re-places them when it can.</div>';}
+ h+='<div class="muted" style="margin-top:6px"><a href="orders" style="color:#9ecbff">every order, with its live numbers &rarr;</a></div></div>';
  var rw=d.rewards_status||{};
  if(rw.checked_ago_s!=null||rw.err){
-  h+='<div class="card"><b>Rewards watch</b> <span class="muted">checks Polymarket every 5 min and pushes your phone the moment anything posts</span>'+
+  h+='<div class="card"><b>Rewards watch</b>'+
+   '<div class="sub">Checks Polymarket every 5 minutes; pushes your phone and refreshes '+
+   'rewards.csv on GitHub the moment anything posts.</div>'+
    '<div>last check '+(rw.checked_ago_s!=null?Math.round(rw.checked_ago_s/60)+' min ago':'never')+
    (rw.latest_day?' &middot; latest posted day <b>'+rw.latest_day+'</b> '+usd(rw.latest_usd)+
-     (rw.latest_paid_usd>=rw.latest_usd?' (paid)':' (pending)'):'')+'</div>'+
-   (rw.kick?'<div class="muted">on change it refreshes rewards.csv on GitHub &mdash; last refresh kick: '+
-     (rw.kick==='ok'?'<span class="ok">ok</span>':'<span class="warn">failed (hourly pass covers it)</span>')+'</div>':'')+
+     (rw.latest_paid_usd>=rw.latest_usd?' <span class="ok">(paid)</span>':' (pending)'):'')+'</div>'+
+   (rw.kick&&rw.kick!=='ok'?'<div class="warn">last csv refresh kick failed &mdash; the hourly pass covers it</div>':'')+
    (rw.err?'<div class="warn">last fetch failed: '+rw.err+'</div>':'')+'</div>';
  }
  var mr=Object.entries(e.market_rates||{}).sort(function(a,b){return b[1]-a[1];});
- if(mr.length){h+='<div class="card"><b>Where the rate comes from</b><table>'+hrow(['market','$/day','earned']);
-  mr.slice(0,25).forEach(function(kv){h+=row(['<code>'+kv[0]+'</code>',usd(kv[1]),usd((e.per_market||{})[kv[0]])]);});
-  h+='</table></div>';}
+ if(mr.length){
+  var mmx=mr[0][1]||1;
+  h+='<div class="card"><b>Where today&rsquo;s earning comes from</b>';
+  function mrow(kv){return '<div class="brow"><span class="blab" style="width:88px">'+mshort(kv[0])+'</span>'+
+    '<div class="btrack"><div class="bar" style="background:var(--s1);width:'+(100*kv[1]/mmx)+'%"></div></div>'+
+    '<span class="bval">'+usd(kv[1])+'/d</span></div>';}
+  mr.slice(0,8).forEach(function(kv){h+=mrow(kv);});
+  if(mr.length>8){h+='<details class="how"><summary>'+(mr.length-8)+' smaller earners</summary>';
+   mr.slice(8).forEach(function(kv){h+=mrow(kv);});h+='</details>';}
+  h+='</div>';}
  var th=(d.terms_history||[]).slice(-10).reverse();
- if(th.length){h+='<div class="card"><b>Reward terms log</b><table>';
-  th.forEach(function(t){h+=row([when(t.ts),'<code>'+t.slug+'</code>',
-    t.why+(t.pool!=null?(' $'+t.pool+' / '+t.target+' / df '+t.df+' / &divide;'+t.event_n):'')]);});
+ if(th.length){h+='<div class="card"><b>Reward terms changes</b>'+
+  '<div class="hint">Polymarket moving the goalposts &mdash; pools, target sizes, new or vanished programs.</div><table>';
+  th.forEach(function(t){h+=row([when(t.ts),mshort(t.slug),
+    t.why+(t.pool!=null?(' $'+t.pool+' pool / '+t.target+' target / &divide;'+t.event_n+' markets'):'')]);});
   h+='</table></div>';}
  var er=(d.errors||[]).slice(-6).reverse();
  if(er.length){h+='<div class="card"><b class="warn">Recent trouble</b><div class="muted">'+er.join('<br>')+'</div></div>';}
@@ -183,26 +278,41 @@ STATUS_JS = """
 ORDERS_JS = """
  var g=d.engine||{};var fx={};(d.forecasts||[]).forEach(function(f){if(f.id)fx[f.id]=f;});
  function m(x,f){return x==null?'<span class="muted">&ndash;</span>':f(x);}
- var h='<div class="card"><b>Resting now</b> <span class="muted">live numbers, recomputed against the current book every cycle</span>';
- var go=g.orders||[];
- if(go.length){h+='<table>'+hrow(['market','order','why','earn/d now','EV/d now','p(fill)/d']);
+ var go=(g.orders||[]).slice().sort(function(a,b){return (b.live_est||0)-(a.live_est||0);});
+ var tot=0;go.forEach(function(o){tot+=o.live_est||0;});
+ var h='<div class="card"><b>Resting now</b>'+
+  '<div class="sub">'+go.length+' orders, earning about '+usd(tot)+' per day together at the current books.</div>';
+ if(go.length){h+='<table>'+hrow(['market','order','earns','fill odds']);
   go.forEach(function(o){var f=fx[o.id]||{};
-   h+=row(['<code>'+o.market+'</code>',o.side+' '+o.qty+' @ '+pc(o.price),o.purpose,
-     m(o.live_est,usd),m(o.live_ev,usd),
-     f.p_fill!=null?pct(f.p_fill):'<span class="muted">&ndash;</span>']);});
-  h+='</table><div class="muted">earn/d = what the order earns at this book; EV/d subtracts fill risk. '
-   +'A dash means the sell side or a book too stale to score this cycle.</div>';}
+   h+=row([mshort(o.market)+'<br><span class="muted">'+pwhy(o.purpose)+'</span>',
+     '<span style="white-space:nowrap">'+(o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+pc(o.price)+'</span>',
+     (o.live_est!=null?usd(o.live_est)+'/d':'<span class="muted">&ndash;</span>')+
+       '<br><span class="muted">'+(o.live_ev!=null?usd(o.live_ev)+' after risk':'&ndash;')+'</span>',
+     f.p_fill!=null?pct(f.p_fill)+'/d':'<span class="muted">&ndash;</span>']);});
+  h+='</table>';}
  else{h+='<div class="muted">nothing resting</div>';}
- h+='</div>';
+ h+='<details class="how"><summary>how to read this</summary>'+
+  '<b>$/day</b> is what the order earns from the reward pool at this book, right now. '+
+  '<b>after risk</b> subtracts the expected cost of getting filled (fills are usually '+
+  'losses here, not wins) &mdash; the engine only keeps orders whose after-risk number '+
+  'stays positive, except 1-share scouts and experiments, which pay for information. '+
+  '<b>fill odds</b> is the chance of being filled within a day, learned from how often '+
+  'each market&rsquo;s best price actually gets run over. A dash means the book was too '+
+  'stale to score this cycle.</details></div>';
  var closed=(d.forecasts||[]).filter(function(f){return f.how;}).reverse();
- if(closed.length){h+='<div class="card"><b>Recent outcomes</b> <span class="muted">predictions vs what happened</span>'+
-  '<table>'+hrow(['market','order','predicted','outcome']);
+ if(closed.length){
+  var OMAP={silent_cancel:'cancelled by the exchange',pulled:'pulled (price left the safe band)',
+    repriced:'repriced',rotated_out:'swapped for a better idea',cancelled:'cancelled'};
+  h+='<div class="card"><b>What happened to recent orders</b>'+
+  '<div class="hint">Every placement is a recorded prediction; the outcome lands on the same row. '+
+  'This is how the engine&rsquo;s guesses stay honest.</div>'+
+  '<table>'+hrow(['market','order','we predicted','what happened']);
   closed.slice(0,25).forEach(function(f){
-   var out=f.how+(f.rested_s?' after '+Math.round(f.rested_s/60)+'m':'');
+   var out=(OMAP[f.how]||f.how)+(f.rested_s?' after '+Math.round(f.rested_s/60)+'m':'');
    if(f.how==='fill'){out='<span class="warn">filled</span> '+(f.filled_qty||'')+
-     (f.adverse!=null?' &middot; adverse '+pc(f.adverse):' &middot; mark pending');}
-   h+=row(['<code>'+f.market+'</code>',f.side+' '+f.qty+' @ '+pc(f.price),
-     'p(fill) '+pct(f.p_fill)+' &middot; EV '+usd(f.ev),out]);});
+     (f.adverse!=null?' &middot; cost '+pc(f.adverse)+'/share vs the mid an hour later':' &middot; grading in ~1h');}
+   h+=row([mshort(f.market),f.side.toLowerCase()+' '+f.qty+' @ '+pc(f.price),
+     pct(f.p_fill)+' fill odds<br>'+usd(f.ev)+'/d after risk',out]);});
   h+='</table></div>';}
  return h;
 """
@@ -215,69 +325,134 @@ MARKETS_JS = """
   if(t.indexOf('lte')===0)return parseInt(t.slice(3))-0.5;
   if(t.indexOf('gte')===0)return parseInt(t.slice(3))+0.5;
   return parseInt(t);}
- // the picture of the fair-value model: the model's own interval vs the market
- var so=(d.silver||{}).official||null;
- var bandWhy=so
-  ?('The blue band is the spread across Silver Bulletin&rsquo;s own simulated seat distributions &mdash; '
-    +'its Classic, Deluxe and Lite models, run '+(so.date||'?')
-    +(so.run_age_d!=null?' ('+so.run_age_d+' days ago)':'')+'. Where the three flavors agree the band is '
-    +'narrow and the engine earns at size when the market agrees too; where they split, the model admits '
-    +'it doesn&rsquo;t know and the engine only scouts.'
-    +(so.run_age_d!=null&&so.run_age_d>5?' <span class="warn">Run is stale &mdash; the band is widened with the poll-driven swing model.</span>':''))
-  :('Races move together &mdash; a polling miss swings many at once &mdash; and how strongly is itself '
-    +'uncertain. The blue band is each rung&rsquo;s fair across that correlation range (0.2&ndash;0.6), with '
-    +'Silver&rsquo;s race odds held exactly. A narrow band that agrees with orange = the engine earns at size; '
-    +'a wide band = the model admits it doesn&rsquo;t know, and the engine only scouts.');
- [['Senate seats: model band vs market','scc-senate-gop-'],
-  ['House seats: model band vs market','scc-hrep-rep-']].forEach(function(fam,fi){
-  var senS=Object.keys(lad).filter(function(s){return s.indexOf(fam[1])===0;})
+ var so=(d.silver||{}).official||null;var fl=d.silver_flavors||{};
+ var ctl=d.control||{};
+ // ---- headline: who controls Congress, model vs market ----
+ function mktControl(){  // market-implied P(GOP Senate control), from the ladder
+  var over=0,tot=0,seen=0;
+  Object.keys(lad).forEach(function(s){
+   if(s.indexOf('scc-senate-gop-')!==0)return;
+   var t=s.split('-').pop();var n=t.indexOf('gte')===0?parseInt(t.slice(3)):
+     t.indexOf('lte')===0?-1:parseInt(t);
+   var L=lad[s];if(!(L.bids[0]&&L.asks[0]))return;
+   var mid=(L.bids[0][0]+L.asks[0][0])/2;
+   tot+=mid;seen++;if(n>=50)over+=mid;});
+  // thin books oversum badly; normalize by the whole ladder so the answer
+  // is a probability, and refuse to answer when the ladder is junk
+  if(seen<8||tot<0.7||tot>1.6)return null;
+  return over/tot;}
+ function ctlRange(ch){var c=ctl[ch];if(!c)return null;
+  var vs=Object.values(c);return [Math.min.apply(null,vs),Math.max.apply(null,vs)];}
+ function pctRange(r){var a=Math.round(r[0]*100),b=Math.round(r[1]*100);
+  return Math.round(100*(r[0]+r[1])/2)+'%'+(a===b?'':'<span class="u"> ('+a+'&ndash;'+b+')</span>');}
+ var sen=ctlRange('senate'),hou=ctlRange('house'),mk=mktControl();
+ if(sen||hou){
+  h+='<div class="card"><b>Who keeps Congress?</b>'+
+   '<div class="sub">Chance Republicans keep control &mdash; Silver&rsquo;s simulations vs what the market charges.</div>'+
+   '<div class="stats">';
+  if(sen)h+='<div class="stat"><div class="lab">Senate &middot; model</div><div class="val">'+pctRange(sen)+'</div></div>';
+  if(mk!=null)h+='<div class="stat"><div class="lab">Senate &middot; market</div><div class="val">'+Math.round(mk*100)+'%</div></div>';
+  if(hou)h+='<div class="stat"><div class="lab">House &middot; model</div><div class="val">'+pctRange(hou)+'</div></div>';
+  h+='</div>'+
+   (so?'<div class="hint">Silver Bulletin run of '+(so.date||'?')+
+     (so.run_age_d!=null?' ('+so.run_age_d+'d old, '+(so.sims||'?')+' simulations, fetched live)':'')+
+     '. The range in brackets is their three model flavors disagreeing with each other.'+
+     (so.run_age_d>5?' <span class="warn">Stale run &mdash; bands below are widened with the poll-driven model.</span>':'')+'</div>':'')+
+   '</div>';}
+ // ---- per-rung charts: model band + dots vs market ----
+ var LEG='<span style="white-space:nowrap"><span class="leg" style="background:var(--s1)"></span><span class="muted">model</span>'
+  +'<span class="leg" style="background:var(--s2)"></span><span class="muted">market</span></span>';
+ [['Senate: how many GOP seats?','scc-senate-gop-',49.5,'50+ = GOP keeps the Senate (VP breaks the tie)'],
+  ['House: chance of reaching each seat count','scc-hrep-rep-',217.5,'218 = a House majority']]
+ .forEach(function(fam,fi){
+  var slugs=Object.keys(lad).filter(function(s){return s.indexOf(fam[1])===0;})
     .sort(function(a,b){return rungKey(a)-rungKey(b);});
-  var dist=senS.map(function(s){var L=lad[s];var fr=fairs[s]||null;
+  var dist=slugs.map(function(s){var L=lad[s];var fr=fairs[s]||null;var fv=fl[s]||{};
     var mid=(L.bids[0]&&L.asks[0])?(L.bids[0][0]+L.asks[0][0])/2:null;
-    return {r:s.split('-').pop(),flo:fr?fr[0]:null,fhi:fr?fr[1]:null,mid:mid};});
-  var mx=0;dist.forEach(function(x){mx=Math.max(mx,x.fhi||0,x.mid||0);});
-  if(dist.length&&mx>0){
-   h+='<div class="card"><b>'+fam[0]+'</b>'
-    +'<span class="leg" style="background:var(--s1)"></span><span class="muted">model band</span>'
-    +'<span class="leg" style="background:var(--s2)"></span><span class="muted">market mid</span>'
-    +(fi===0?'<div class="muted">'+bandWhy+'</div>':'')
-    +(fi===1&&so?'<div class="muted">Same three-flavor band, from the House seat histograms &mdash; '
-      +'no per-district reconstruction, Silver&rsquo;s own simulations.</div>':'');
-   dist.forEach(function(x){
-    var l=100*(x.flo||0)/mx, w=Math.max(100*((x.fhi||0)-(x.flo||0))/mx, 1);
-    h+='<div class="brow"><span class="blab">'+x.r+'</span><div class="btrack">'
-     +'<div class="bar" style="background:var(--s1);margin-left:'+l+'%;width:'+w+'%;border-radius:4px"></div>'
-     +'<div class="bar" style="background:var(--s2);width:'+(100*(x.mid||0)/mx)+'%;margin-top:2px"></div>'
-     +'</div><span class="bval">'+(x.flo!=null?pc(x.flo)+'&ndash;'+pc(x.fhi):'&ndash;')
-     +' / '+(x.mid!=null?pc(x.mid):'&ndash;')+'</span></div>';});
-   h+='</div>';}});
+    return {s:s,k:rungKey(s),lab:rlab(s),flo:fr?fr[0]:null,fhi:fr?fr[1]:null,
+            dx:fv.deluxe!=null?fv.deluxe:null,cl:fv.classic,li:fv.lite,mid:mid,
+            bb:L.bids[0]?L.bids[0][0]:null,ba:L.asks[0]?L.asks[0][0]:null};});
+  var mx0=0.01;dist.forEach(function(x){mx0=Math.max(mx0,x.fhi||0,x.mid||0);});
+  var step=[0.01,0.02,0.025,0.05,0.1,0.25].filter(function(s){return 4*s>=mx0;})[0]||0.25;
+  var mx=4*step;
+  if(!dist.length)return;
+  h+='<div class="card"><b>'+fam[0]+'</b> '+LEG;
+  if(fi===0)h+='<div class="hint">Each row is one rung of the ladder. The blue band is where '+
+   'Silver&rsquo;s three model flavors land; the orange dot is the market&rsquo;s price. '+
+   'Blue and orange together = everyone agrees, and the engine earns at size. '+
+   'Far apart = someone is wrong, and the engine only sends 1-share scouts. Tap a row for detail.</div>';
+  if(fi===1)h+='<div class="hint">These rungs are cumulative &mdash; each row is the chance of '+
+   'AT LEAST that many GOP seats, so the numbers must step downhill. Tap a row for detail.</div>';
+  // axis
+  var ticks=[0,1,2,3,4].map(function(i){return i*step;});
+  h+='<div class="axisr"><span class="axisl"></span><div class="axist">'+
+   ticks.map(function(t,i){var last=i===ticks.length-1;
+    return '<span style="left:'+(100*t/mx)+'%'+(last?';transform:translateX(-100%)':'')+'">'+
+     Math.round(t*100)+(last?'&cent;':'')+'</span>';}).join('')+
+   '</div><span class="axisv"></span></div>';
+  var glines=ticks.slice(1,4).map(function(t){return '<div class="gline" style="left:'+(100*t/mx)+'%"></div>';}).join('');
+  var shown=false;
+  dist.forEach(function(x){
+   if(!shown&&x.k>fam[2]){h+='<div class="thresh">'+fam[3]+'</div>';shown=true;}
+   var track=glines;
+   if(x.flo!=null)track+='<div class="range" style="left:'+(100*x.flo/mx)+'%;width:'+
+     Math.max(100*(x.fhi-x.flo)/mx,1)+'%"></div>';
+   if(x.dx!=null)track+='<div class="dot mdl" style="left:'+(100*x.dx/mx)+'%"></div>';
+   if(x.mid!=null)track+='<div class="dot mkt" style="left:'+(100*x.mid/mx)+'%"></div>';
+   var val=(x.dx!=null?Math.round(x.dx*100):'&ndash;')+' / '+(x.mid!=null?Math.round(x.mid*100):'&ndash;')+'&cent;';
+   h+='<div class="drow" onclick="tip(this)"><span class="dlab">'+x.lab+'</span>'+
+    '<div class="dtrack">'+track+'</div><span class="dval">'+val+'</span></div>';
+   var tips=[];
+   tips.push('<b>'+mtitle(x.s)+'</b>');
+   if(x.dx!=null)tips.push('model: Classic '+(x.cl!=null?pc(x.cl):'&ndash;')
+     +' &middot; Deluxe '+pc(x.dx)+' &middot; Lite '+(x.li!=null?pc(x.li):'&ndash;'));
+   else if(x.flo!=null)tips.push('model band '+pc(x.flo)+'&ndash;'+pc(x.fhi));
+   if(x.bb!=null||x.ba!=null)tips.push('market: bid '+(x.bb!=null?pc(x.bb):'&ndash;')+' / ask '+(x.ba!=null?pc(x.ba):'&ndash;'));
+   if((ours[x.s]||[]).length)tips.push('ours: '+ours[x.s].join(', '));
+   var rate=(e.market_rates||{})[x.s];if(rate)tips.push('earning '+usd(rate)+'/day here');
+   h+='<div class="tipbox">'+tips.join('<br>')+'</div>';});
+  h+='</div>';});
+ // ---- race odds: competitive first ----
  var races=d.silver_races||{};
- var rk=Object.keys(races).sort(function(a,b){return races[b]-races[a];});
+ var rk=Object.keys(races);
  if(rk.length){
-  h+='<div class="card"><details><summary><b>What else feeds the model</b> <span class="muted">'
-   +rk.length+' Silver race odds &mdash; the poll-driven cross-check</span></summary>'
-   +'<div class="muted" style="margin:6px 0">P(GOP win) per race, updated with polling &mdash; fresher than '
-   +'the simulation runs above. 31 GOP seats are not on the ballot. These feed the swing-correlation model '
-   +'that prices the Senate ladder whenever the official run is stale or missing.</div>';
-  rk.forEach(function(a){h+='<div class="brow"><span class="blab">'+a.toUpperCase()+'</span>'
-   +'<div class="btrack"><div class="bar" style="background:var(--s1);width:'+(races[a]*100)+'%"></div></div>'
-   +'<span class="bval">'+Math.round(races[a]*100)+'%</span></div>';});
-  h+='</details></div>';}
- [['Senate seats (GOP count)','scc-senate-gop-'],['House seats (GOP &ge; N)','scc-hrep-rep-']]
- .forEach(function(fam){
+  var comp=rk.filter(function(a){return races[a]>0.10&&races[a]<0.90;})
+    .sort(function(a,b){return Math.abs(races[a]-0.5)-Math.abs(races[b]-0.5);});
+  var safeR=rk.filter(function(a){return races[a]>=0.90;}).length;
+  var safeD=rk.filter(function(a){return races[a]<=0.10;}).length;
+  h+='<div class="card"><b>The races that decide it</b>'+
+   '<div class="sub">'+comp.length+' Senate races are competitive; '+safeR+' look safe GOP and '+safeD+' safe Dem. '+
+   '31 GOP seats aren&rsquo;t on the ballot at all.</div>'+
+   '<div class="hint">Chance the Republican wins each race, from Silver&rsquo;s poll-driven table '+
+   '(updates with every poll). The gray line is 50/50. These feed the fallback model that takes over '+
+   'if the simulation sheet goes stale.</div>';
+  function racerow(a){return '<div class="brow"><span class="blab">'+a.toUpperCase()+'</span>'+
+   '<div class="btrack"><div class="bar" style="background:var(--s1);width:'+(races[a]*100)+'%"></div>'+
+   '<div class="m50" style="left:50%"></div></div>'+
+   '<span class="bval">'+Math.round(races[a]*100)+'%</span></div>';}
+  comp.forEach(function(a){h+=racerow(a);});
+  var rest=rk.filter(function(a){return comp.indexOf(a)<0;})
+    .sort(function(a,b){return races[b]-races[a];});
+  if(rest.length){h+='<details class="how"><summary>the '+rest.length+' safe seats</summary>';
+   rest.forEach(function(a){h+=racerow(a);});h+='</details>';}
+  h+='</div>';}
+ h+='<div class="card"><details><summary><b>The same ladders as numbers</b> '+
+  '<span class="muted">every rung, model band, book, and our orders</span></summary>';
+ [['Senate','scc-senate-gop-'],['House','scc-hrep-rep-']].forEach(function(fam){
   var slugs=Object.keys(lad).filter(function(s){return s.indexOf(fam[1])===0;})
     .sort(function(a,b){return rungKey(a)-rungKey(b);});
   if(!slugs.length)return;
-  h+='<div class="card"><b>'+fam[0]+'</b><table>'+hrow(['rung','model','bid/ask','ours','$/day']);
+  h+='<div style="margin-top:6px"><b>'+fam[0]+'</b></div><table>'+hrow(['rung','model band','bid/ask','ours','$/day']);
   slugs.forEach(function(s){var L=lad[s];var bb=L.bids[0]?pc(L.bids[0][0]):'&mdash;';
    var ba=L.asks[0]?pc(L.asks[0][0]):'&mdash;';var fr=fairs[s]||null;
-   h+=row([s.split('-').pop(),
+   h+=row([rlab(s),
      fr?pc(fr[0])+'&ndash;'+pc(fr[1]):'<span class="muted">&mdash;</span>',
      bb+' / '+ba,(ours[s]||[]).join('<br>')||'<span class="muted">&middot;</span>',
      usd((e.market_rates||{})[s])]);});
-  h+='</table><div class="muted">model = the band across Silver&rsquo;s Classic/Deluxe/Lite runs '
-   +'(swing-correlation fallback when stale); blank = no model</div></div>';
+  h+='</table>';
  });
+ h+='<div class="muted">model = the spread across Silver&rsquo;s Classic/Deluxe/Lite runs '
+  +'(widened by the poll-driven model when the run is stale); blank = no model</div></details></div>';
  var t=d.touch||{};var q=window._q||'';
  var f=window._filter||'all';
  var rows=Object.keys(t).filter(function(s){
@@ -289,54 +464,82 @@ MARKETS_JS = """
  .sort(function(a,b){return ((e.market_rates||{})[b]||0)-((e.market_rates||{})[a]||0);});
  h+='<div class="card"><b>All measured markets</b> <span class="muted">'+f+
   (q?' &middot; \\u201c'+q+'\\u201d':'')+'</span>'+
-  '<table>'+hrow(['market','bid/ask','depth b/a','$/day']);
+  '<table>'+hrow(['market','bid/ask','resting behind','$/day']);
  rows.slice(0,60).forEach(function(s){var v=t[s];
-  h+=row(['<code>'+s+'</code>',(v[0]||'?')+' / '+(v[1]||'?')+'c',
+  h+=row([mshort(s),(v[0]||'?')+' / '+(v[1]||'?')+'&cent;',
     (v[2]||0).toLocaleString()+' / '+(v[3]||0).toLocaleString(),
     usd((e.market_rates||{})[s])]);});
- h+='</table><div class="muted">'+rows.length+' markets match</div></div>';
+ h+='</table><div class="muted">'+rows.length+' markets match &middot; '+
+  '&ldquo;resting behind&rdquo; = shares already queued on each side&rsquo;s book</div></div>';
  return h;
 """
 
 OPPS_JS = """
  var g=d.engine||{};var h='';
  var cands=g.cands||[];
- h+='<div class="card"><b>What the engine wants next</b> <span class="muted">ranked by EV per dollar</span>';
- if(cands.length){h+='<table>'+hrow(['market','order','earn/d','p(fill)','fill cost','EV/d','why']);
-  cands.forEach(function(c){h+=row(['<code>'+c.market+'</code>',
-    c.side+' '+c.qty+' @ '+pc(c.price),usd(c.exp_earn),pct(c.p_fill),
-    pc(c.fill_cost),usd(c.ev),c.purpose+(c.exp1_gap?' &middot; EXP-1':'')]);});
+ h+='<div class="card"><b>What the engine wants next</b>'+
+  '<div class="sub">Every idea it liked this cycle, best first. It places the top ones as '+
+  'actions and headroom allow.</div>';
+ if(cands.length){h+='<table>'+hrow(['market','order','$/day','after risk','uses']);
+  cands.forEach(function(c){h+=row([mshort(c.market)+'<br><span class="muted">'+
+    pwhy(c.purpose)+(c.exp1_gap?' &middot; boundary':'')+'</span>',
+    '<span style="white-space:nowrap">'+(c.side==='BUY'?'bid':'ask')+' '+c.qty+' @ '+pc(c.price)+'</span>',
+    usd(c.exp_earn),usd(c.ev),usd(c.cost)]);});
   h+='</table>';}else{h+='<div class="muted">nothing above the bar right now</div>';}
- h+='</div>';
+ h+='<details class="how"><summary>how ideas are scored</summary>'+
+  'For each price level: what it would earn from the pool per day, minus '+
+  '(chance of being filled) &times; (what that fill usually costs). Only positive '+
+  'after-risk ideas qualify, and <b>uses</b> is how much of the $'+((g.ceiling||0))+
+  ' ceiling the order would consume &mdash; measured as what it adds to the worst case, '+
+  'so an ask sheltered by a bigger short on a sibling rung can be nearly free.</details></div>';
  var rej=g.rejected||[];
- if(rej.length){h+='<div class="card"><b>Turned down</b> <span class="muted">best of the rejected — EV under the bar</span>'+
-  '<table>'+hrow(['market','order','earn/d','risk cost/d','EV/d']);
-  rej.forEach(function(c){h+=row(['<code>'+c.market+'</code>',c.side+' '+c.qty+' @ '+pc(c.price),
+ if(rej.length){h+='<div class="card"><b>Turned down</b> <span class="muted">closest misses &mdash; the risk math said no</span>'+
+  '<table>'+hrow(['market','order','$/day','risk cost/d','after risk']);
+  rej.forEach(function(c){h+=row([mshort(c.market),(c.side==='BUY'?'bid':'ask')+' '+c.qty+' @ '+pc(c.price),
     usd(c.exp_earn),usd(c.p_fill*c.fill_cost*c.qty),usd(c.ev)]);});
   h+='</table></div>';}
  var fm=d.fillmodel||{};var hz=fm.hazards||{};
- h+='<div class="card"><b>What feeds p(fill)</b>'
-  +'<div class="muted">Every touch move teaches it: hazard = crossings &divide; hours watched, blended with a prior that fades as hours pile up. '
-  +'p(fill in a day) = 1 &minus; e<sup>&minus;hazard</sup>. The counts on each bar are the actual inputs.</div>';
+ var BL={0:'at the touch',1:'1 tick back',2:'2 ticks back',3:'3+ back'};
+ var famlab=function(k){var f=k.split('|')[0];
+   return f.indexOf('senate')>=0?'Senate':(f.indexOf('house')>=0||f.indexOf('hrep')>=0)?'House':f;};
+ var hzlab=function(k){var p=k.split('|');
+   return famlab(k)+(p[1]?' &middot; '+(p[1]==='BUY'?'bids':'asks'):'');};
+ var anyCross=0;Object.keys(hz).forEach(function(k){[0,1,2,3].forEach(function(b){
+   anyCross+=((hz[k][b]||{}).crossings||0);});});
+ h+='<div class="card"><b>How often does the best price get run over?</b>'+
+  '<div class="hint">This is what the fill odds are built from &mdash; watched hours and actual '+
+  'price crossings per ladder, side, and distance from the touch. Fewer crossings farther back = '+
+  'resting deeper is safer but earns less.'+
+  (anyCross<5?' Almost no real crossings yet, so the bars are mostly the cautious '+
+   'starting guesses; they sharpen as watched hours pile up.':'')+'</div>';
  Object.keys(hz).forEach(function(k){var r=hz[k];
   var mx=0;[0,1,2,3].forEach(function(b){mx=Math.max(mx,(r[b]||{}).per_day||0);});
-  h+='<div style="margin:8px 0 2px;font-size:13px"><b>'+k+'</b> <span class="muted">'
+  h+='<div style="margin:8px 0 2px;font-size:13px"><b>'+hzlab(k)+'</b> <span class="muted">'
     +((r[0]||{}).hours_observed||0)+'h watched</span></div>';
   [0,1,2,3].forEach(function(b){var c=r[b]||{};
-   h+='<div class="brow"><span class="blab">'+(b===3?'3+ back':b===0?'touch':b+' back')+'</span>'
+   h+='<div class="brow"><span class="blab" style="width:70px">'+BL[b]+'</span>'
     +'<div class="btrack"><div class="bar" style="background:var(--s1);width:'+(mx?100*(c.per_day||0)/mx:0)+'%"></div></div>'
-    +'<span class="bval">'+((c.per_day||0)).toFixed(2)+'/d <span class="muted">'+(c.crossings||0)+' crossings</span></span></div>';});
+    +'<span class="bval">'+((c.per_day||0)).toFixed(2)+'/day <span class="muted">'+(c.crossings||0)+' seen</span></span></div>';});
  });
- h+='<div class="muted" style="margin-top:6px">Fill cost: adverse markdown per family (each real fill graded against the mid an hour later) '
-  +JSON.stringify(fm.markdown||{})+' from '+JSON.stringify(fm.marks_n||{})+' graded fills'
-  +' &middot; scoring fraction (share of resting life actually inside the window): '
-  +JSON.stringify(fm.scoring_frac||{})+'</div></div>';
+ var md=fm.markdown||{};var mn=fm.marks_n||{};var sf=fm.scoring_frac||{};
+ var costRows=Object.keys(md).map(function(k){
+   return famlab(k)+': '+pc(md[k])+' per share <span class="muted">('+(mn[k]||0)+' graded fills)</span>';});
+ var sfRows=Object.keys(sf).map(function(k){return famlab(k)+' '+pct(sf[k]);});
+ h+='<div class="hint" style="margin-top:8px"><b>When a fill does happen, what does it cost?</b> '+
+  (costRows.length?costRows.join(' &middot; '):'no graded fills yet &mdash; using the cautious starting guess of 2&cent;/share')+
+  '. Each real fill is graded against the market&rsquo;s mid an hour later.</div>'+
+  (sfRows.length?'<div class="hint"><b>Share of resting time that actually scores:</b> '+sfRows.join(' &middot; ')+'</div>':'')+
+  '</div>';
  var ex=((d.engine_saved||{}).exp1||[]).slice(-15).reverse();
- h+='<div class="card"><b>EXP-1 pool</b> <span class="muted">the window-boundary experiment: level says it earns, queue says zero &middot; graded against payouts</span>';
- if(ex.length){h+='<table>'+hrow(['placed','market','order','level says','queue says']);
-  ex.forEach(function(x){h+=row([when(x.ts),'<code>'+x.market+'</code>',
-    x.side+' '+x.qty+' @ '+pc(x.price),usd(x.pred_level_day)+'/d',usd(x.pred_queue_day)+'/d']);});
-  h+='</table>';}else{h+='<div class="muted">no boundary setups placed yet</div>';}
+ h+='<div class="card"><b>The window experiment</b>'+
+  '<div class="hint">Polymarket&rsquo;s rules are ambiguous about orders at the edge of the scoring '+
+  'window: the generous reading says the whole price level earns, the strict one says late joiners '+
+  'earn nothing. We act on the generous reading and record BOTH predictions for every edge case; '+
+  'the real payouts will crown one.</div>';
+ if(ex.length){h+='<table>'+hrow(['placed','market','order','generous says','strict says']);
+  ex.forEach(function(x){h+=row([when(x.ts),mshort(x.market),
+    x.side.toLowerCase()+' '+x.qty+' @ '+pc(x.price),usd(x.pred_level_day)+'/d',usd(x.pred_queue_day)+'/d']);});
+  h+='</table>';}else{h+='<div class="muted">no edge cases placed yet</div>';}
  h+='</div>';
  return h;
 """
@@ -348,10 +551,14 @@ LOG_JS = """
   if(rows&&rows.length){h+='<table>';rows.slice(-30).reverse().forEach(function(x){h+=fmt(x);});h+='</table>';}
   else{h+='<div class="muted">nothing yet</div>';}
   h+='</div>';}
+ var EMAP={place:'placed',fill:'FILLED',silent_cancel:'exchange cancelled',pull:'pulled',
+   reprice:'repriced',rotate_out:'swapped out',evict:'evicted foreign order',
+   sweep:'handover sweep',refused:'desk refused'};
  card('Engine events',es.log,function(x){
-  var rest=Object.keys(x).filter(function(k){return k!=='ts'&&k!=='event';})
+  var rest=Object.keys(x).filter(function(k){return k!=='ts'&&k!=='event'&&k!=='market';})
    .map(function(k){return k+'='+x[k];}).join(' ');
-  return row([when(x.ts),x.event,'<span class="muted">'+rest+'</span>']);});
+  return row([when(x.ts),(EMAP[x.event]||x.event)+(x.market?' &middot; '+mshort(x.market):''),
+   '<span class="muted">'+rest+'</span>']);});
  card('Order desk',d.audit,function(x){
   var rest=Object.keys(x).filter(function(k){return k!=='ts';})
    .map(function(k){return k+'='+x[k];}).join(' ');
