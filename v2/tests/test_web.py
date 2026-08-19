@@ -64,6 +64,18 @@ class TestWebServer(unittest.TestCase):
     def test_unknown_route_is_404(self):
         self.assertEqual(self.get("/nope")[0], 404)
 
+    def test_every_section_page_serves_a_public_shell(self):
+        for route in ("/", "/orders", "/markets", "/opps", "/log", "/switch"):
+            status, ctype, body = self.get(route)
+            self.assertEqual(status, 200, route)
+            self.assertIn("text/html", ctype, route)
+            self.assertNotIn(b"1.23", body, route)   # never any data in a shell
+        # the nav reaches every section from the status page
+        _, _, body = self.get("/")
+        for href in (b'href="orders"', b'href="markets"', b'href="opps"',
+                     b'href="log"', b'href="switch"'):
+            self.assertIn(href, body)
+
 
 if __name__ == "__main__":
     unittest.main()

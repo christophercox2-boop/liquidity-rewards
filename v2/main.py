@@ -231,6 +231,17 @@ class Monitor:
 
         snap = self.estimator.sample(now, orders, self.cache, self.terms)
 
+        # every touch the feed delivered teaches the fill model (dt=0
+        # samples are ignored inside, so unchanged books cost nothing)
+        for slug in self.universe:
+            b = self.cache.any_age(slug)
+            if b is not None:
+                self.engine.model.observe_touch(
+                    slug,
+                    b.bids[0][0] if b.bids else None,
+                    b.asks[0][0] if b.asks else None,
+                    b.tick, b.fetched_at)
+
         # the engine: silver fairs on a slow TTL, positions for fill
         # detection, then one decision cycle behind the switch. NOTHING in
         # this block may prevent the state save below — a cycle that dies
@@ -277,6 +288,18 @@ class Monitor:
             "engine": engine_summary,
             "engine_saved": self.engine.to_dict(),
             "audit": self.audit[-50:],
+            "fillmodel": self.engine.model.summary(),
+            "forecasts": list(self.engine.forecasts.values())[-100:],
+            "fairs": {s: round(f, 4) for s in self.family_slugs
+                      if (f := self.silver.fair(s)) is not None},
+            "ladders": {
+                s: {"bids": [[p, q] for p, q in b.bids[:6]],
+                    "asks": [[p, q] for p, q in b.asks[:6]],
+                    "tick": b.tick, "age": int(now - b.fetched_at)}
+                for s in self.family_slugs
+                if (b := self.cache.any_age(s)) is not None
+                and now - b.fetched_at < 900
+            },
             "silver": {"age_s": (round(self.silver.age(now)) if self.silver.fetched_at
                                  else None),
                        "source": self.silver.source, "note": self.silver.note,

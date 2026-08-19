@@ -125,7 +125,29 @@ fresh.
   removed order can unqualify a side without warning. 2.0 alerts on
   that ratio instead of capping it. No per-market caps, ladders, or
   graduated budgets unless the owner asks.
-- **Confidence decides where, the ceiling decides how much.** Never both.
+- **Every placement is an expected-value decision** (owner's directive,
+  2026-08-19). For each candidate price — improve the touch, join it,
+  or stand back a tick or two:
+
+      EV/day = earn_rate x scoring_fraction
+               - p(fill) x cost_of_that_fill x size
+
+  Fill probability is learned from every touch move the feed delivers
+  (hazards per family and distance bucket); fill cost is the calibrated
+  adverse markdown from grading real fills against the mid an hour
+  later, plus anything conceded past fair; scoring fraction is the
+  observed share of resting life our orders spend in the window. Every
+  placement records these predictions and every ending grades them —
+  the calibration is continuous and inspectable on /opps. The engine
+  takes the best EV per dollar, inside the ceiling.
+- **The objective is earnings per second of the owner's attention.**
+  Most days the owner should not need to look at all: the engine
+  decides, the calibration corrects it, alerts carry only what matters,
+  and the pages exist for when he does look — not because he must.
+- **Confidence still decides size** (tight model-market agreement earns
+  at full order size, disagreement scouts with 1 share), and the
+  ceiling decides the total. Never compounded onto distance — distance
+  is EV's job now.
 - **Both sides, queue-aware, honestly uncertain at the boundary.** Every
   opportunity is scored with `estimate_join`. Share dilution at a shared
   level is settled math (your score is your own size, never the
@@ -177,15 +199,15 @@ bounds, post-only) hold on every endpoint regardless.
 
 Each answers one question, phone-first:
 
-| page | question |
-|---|---|
-| `/` | am I earning right now, and is the data fresh? |
-| `/orders` | what is resting where, and what is each order worth? |
-| `/markets` | the browser: what exists and what state is it in? |
-| `/market?slug=` | one market: book, my orders, terms, move/cancel |
-| `/opps` | what is worth joining or qualifying next? |
-| `/switch` | the master switch, the risk ceiling, one line of usage |
-| `/log` | what did the system do and alert recently? |
+| page | question | state |
+|---|---|---|
+| `/` | am I earning right now, and is the data fresh? | built |
+| `/orders` | what is resting, and what does the engine expect of each order — with recent outcomes vs predictions | built |
+| `/markets` | the ladder view (rung / model fair / market / ours) plus the filterable list | built |
+| `/market?slug=` | one market's book with move/cancel controls | next |
+| `/opps` | what the engine wants next, what it turned down, and its calibration | built |
+| `/switch` | the master switch, the risk ceiling, one line of usage | built |
+| `/log` | engine events, desk actions, alerts, trouble | built |
 
 `/markets` is not one flat list — a list is often the worst way to see
 these markets (owner's request). It offers views fitted to the market's
