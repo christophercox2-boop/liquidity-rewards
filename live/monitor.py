@@ -5634,17 +5634,6 @@ def _earn_qty(m: str, side: str, px_c: float, cap_usd: float,
     return max(1, min(EARN_MAX_SHARES, int(cap_usd / unit), rung))
 
 
-# BEING PRESENT IS NOT BEING COMPETITIVE (owner, 2026-08-19: "so many
-# markets earning nothing or next to nothing ... make sure I'm competitive
-# most of the time"). Reward income is proportional to our SHARE of the
-# side's discounted score, so a token order in a crowded book earns a token:
-# a census on 2026-08-19 found 2,947 resting orders of which 42% earned
-# under half a cent a day, 143 of them sitting AT the best price with a
-# ~0.1% share because one share was standing next to somebody's thousands.
-# Capital spread that thin is not diversification, it is noise. A candidate
-# whose share would land under this floor is refused, and the reason names
-# the number so the /why page can show it.
-EARN_MIN_SHARE = float(os.environ.get("EARN_MIN_SHARE", "0.02"))
 EARN_PX_MAX_C = int(os.environ.get("EARN_PX_MAX_C", "10"))
 # Above the penny ceiling the earner may only act on KNOWLEDGE, never on hope
 # (owner, 2026-08-16: "earner should use what probe is learning to place where
@@ -6510,12 +6499,6 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
                         "edge_c": round(edge_c, 2),
                         "fill_pnl": round(edge_c / 100.0 * q, 2),
                         "score_w": round(df ** max(0, anchor - pc), 4)})
-            if not short_side and den and share < EARN_MIN_SHARE:
-                row["why"] = (f"{q} share(s) here would be {share * 100:.2f}% of the "
-                              f"side's score — under the {EARN_MIN_SHARE * 100:.0f}% "
-                              f"floor, so it earns a token and ties up the money "
-                              f"that could be competitive somewhere else")
-                continue
             if short_side:
                 row["why"] = (f"the bid side holds {side_total:,.0f} of the "
                               f"{target:,.0f} Target Size even with our {q} — a side "
