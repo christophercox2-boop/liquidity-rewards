@@ -15451,6 +15451,33 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:  # noqa: BLE001
                 self._send(502, "text/plain", b"2.0 is not running in this container")
             return
+        if route == "/v3" or route.startswith("/v3/"):
+            # 3.0 (politics-first, v3/DESIGN.md) — same forwarding pattern
+            # as /v2 above: shells are public, auth happens inside 3.0,
+            # 3.0 being down must never hurt 1.0.
+            if route == "/v3":
+                q = ("?" + self.path.split("?", 1)[1]) if "?" in self.path else ""
+                self.send_response(301)
+                self.send_header("Location", "/v3/" + q)
+                self.end_headers()
+                return
+            import urllib.error
+            import urllib.request
+            sub = self.path[len("/v3"):]  # keeps the query string
+            req = urllib.request.Request(
+                f"http://127.0.0.1:{os.environ.get('V3_PORT', '8092')}{sub}")
+            for h in ("X-Dash-Key", "Authorization"):
+                if self.headers.get(h):
+                    req.add_header(h, self.headers[h])
+            try:
+                with urllib.request.urlopen(req, timeout=6) as r:
+                    self._send(getattr(r, "status", 200) or 200,
+                               r.headers.get("Content-Type", "text/plain"), r.read())
+            except urllib.error.HTTPError as e:
+                self._send(e.code, e.headers.get("Content-Type", "text/plain"), e.read())
+            except Exception:  # noqa: BLE001
+                self._send(502, "text/plain", b"3.0 is not running in this container")
+            return
         if route == "/" or route.startswith("/index"):
             # The shell holds no data — serve it instantly, unauthenticated.
             # The page's own login card gates the data underneath.
@@ -15624,6 +15651,26 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(e.code, e.headers.get("Content-Type", "text/plain"), e.read())
             except Exception:  # noqa: BLE001 — 2.0 down must not hurt 1.0
                 self._send(502, "text/plain", b"2.0 is not running in this container")
+            return
+        if self.path.split("?", 1)[0].startswith("/v3/"):
+            # forward to the 3.0 process; it enforces its own auth and CSRF
+            import urllib.error
+            import urllib.request
+            raw = self.rfile.read(int(self.headers.get("Content-Length") or 0))
+            req = urllib.request.Request(
+                f"http://127.0.0.1:{os.environ.get('V3_PORT', '8092')}"
+                f"{self.path[len('/v3'):]}", data=raw, method="POST")
+            for h in ("X-Dash-Key", "Authorization", "X-Reprice", "Content-Type"):
+                if self.headers.get(h):
+                    req.add_header(h, self.headers[h])
+            try:
+                with urllib.request.urlopen(req, timeout=10) as r:
+                    self._send(getattr(r, "status", 200) or 200,
+                               r.headers.get("Content-Type", "text/plain"), r.read())
+            except urllib.error.HTTPError as e:
+                self._send(e.code, e.headers.get("Content-Type", "text/plain"), e.read())
+            except Exception:  # noqa: BLE001 — 3.0 down must not hurt 1.0
+                self._send(502, "text/plain", b"3.0 is not running in this container")
             return
         if self.path not in ("/reprice", "/place", "/place_abort", "/cancel_all",
                              "/reprice_batch", "/cancel_batch", "/maction",

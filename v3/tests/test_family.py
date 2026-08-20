@@ -1,0 +1,355 @@
+"""The 3.0 engine, end to end against a fake exchange: discovery with the
+divisor built in, observing vs armed, resting styles, reviving, the one
+risk number, leaving dead markets entirely, fills -> exits, the accrual."""
+
+import unittest
+
+from v3 import politics
+from v3.books import BookCache
+from v3.family import Family, FamilyConfig, resting_ok
+from v3.intents import REST_SIDE
+from v3.names import Names
+from v3.orders import OrderDesk
+from v3.scoring import Book
+
+A = "vmc-ussemov-ga-2026-11-03-d4-7"
+B = "vmc-ussemov-ga-2026-11-03-r0-3"
+C = "paccc-usho-midterms-2026-11-03-rep"
+
+
+class FakeClient:
+    """Plays the exchange: placements rest, cancels remove, plus the read
+    APIs the family calls."""
+
+    def __init__(self):
+        self.next_id = 1
+        self.live: dict[str, dict] = {}
+        self.books: dict[str, Book] = {}
+        self.prog_raw: dict[str, dict] = {}
+        self.events: list[dict] = []
+        self.programs_fail = False
+
+    # -- desk side ----------------------------------------------------------
+    def post(self, url, body, path=None, **kw):
+        if url.endswith("/v1/orders"):
+            oid = f"o{self.next_id}"
+            self.next_id += 1
+            self.live[oid] = {
+                "id": oid, "market": body["marketSlug"],
+                "side": REST_SIDE[body["intent"]],
+                "price": float(body["price"]["value"]),
+                "size": float(body["quantity"]), "intent": body["intent"],
+            }
+            return {"order": {"id": oid}}
+        if "/cancel" in url:
+            self.live.pop(url.rstrip("/cancel").rsplit("/", 1)[-1], None)
+            return {}
+        return {}
+
+    def open_orders(self):
+        return [dict(o) for o in self.live.values()]
+
+    # -- read side ----------------------------------------------------------
+    def book(self, slug, fetched_at=None):
+        b = self.books[slug]
+        return Book(bids=b.bids, asks=b.asks, tick=b.tick,
+                    fetched_at=fetched_at or b.fetched_at)
+
+    def programs(self, slugs):
+        if self.programs_fail:
+            raise RuntimeError("incentives down")
+        return {s: dict(self.prog_raw[s]) for s in slugs if s in self.prog_raw}
+
+    def events_by_tag(self, tag, max_pages=30):
+        return list(self.events) if tag == "politics" else []
+
+
+def politics_book(now, bid=0.44, ask=0.47, bid_q=20.0, ask_q=20.0):
+    # the politics shape: a thin touch, the qualifying wall far behind
+    return Book(bids=((bid, bid_q), (0.02, 60000.0)),
+                asks=((ask, ask_q), (0.98, 60000.0)),
+                tick=0.01, fetched_at=now)
+
+
+LIVE_PROG = {"timePeriods": [{"programId": "politics_mid_1", "rewardPool": 100.0,
+                              "targetSize": 5000, "discountFactor": 0.2,
+                              "status": "LIVE"}]}
+DEAD_PROG = {"timePeriods": [{"programId": "politics_mid_1", "rewardPool": 0,
+                              "targetSize": 5000, "discountFactor": 0.2,
+                              "status": "LIVE"}]}
+
+
+class Rig:
+    def __init__(self, cfg=None, switch=True):
+        self.now = 1_000_000.0
+        self.exchange = FakeClient()
+        self.cache = BookCache()
+        self.switch = switch
+        self.alerts = []
+        self.names = Names()
+        cfg = cfg or FamilyConfig(
+            name="Politics", tag="POL", known_ground=True,
+            rest_style="join_quiet", revive=True,
+            capital_usd=100.0, per_market_usd=2.0, revive_max_usd=5.0,
+            min_days_out=3)
+        self.fam = Family(None, self.cache, politics.discover, config=cfg,
+                          alert=lambda t, m: self.alerts.append((t, m)),
+                          names=self.names, clock=lambda: self.now)
+        self.desk = OrderDesk(
+            client=self.exchange,
+            whitelist=self.fam.knows,
+            switch_on=lambda: self.switch,
+            fresh_book=lambda s: self.cache.fresh(s, 120, self.now),
+            log=lambda e: None,
+            sleep=lambda s: None, clock=lambda: self.now,
+        )
+        self.fam.desk = self.desk
+        self.positions: dict[str, tuple] = {}
+
+    def add_market(self, slug, book=None, event="Georgia Senate margin",
+                   siblings=None, prog=LIVE_PROG):
+        rows = [{"slug": s, "question": f"Q for {s}"}
+                for s in ([slug] + list(siblings or []))]
+        self.exchange.events.append({"title": event, "markets": rows})
+        self.exchange.books[slug] = book or politics_book(self.now)
+        self.exchange.prog_raw[slug] = dict(prog)
+
+    def cycle(self, advance=60.0):
+        self.now += advance
+        return self.fam.cycle(self.now, self.exchange.open_orders(),
+                              self.positions, self.exchange, self.switch)
+
+
+class TestDiscovery(unittest.TestCase):
+    def test_universe_carries_divisor_and_names(self):
+        r = Rig()
+        r.add_market(A, siblings=[B])
+        r.cycle()
+        self.assertEqual(r.fam.universe[A]["event_n"], 2)
+        self.assertTrue(r.names.label(A).startswith("Q for"))
+
+    def test_econ_is_refused_at_the_door(self):
+        r = Rig()
+        r.exchange.events.append({"title": "CPI", "markets": [
+            {"slug": "usacpi-2026-09-0", "question": "CPI above 3%?"}]})
+        r.add_market(A)
+        r.cycle()
+        self.assertNotIn("usacpi-2026-09-0", r.fam.universe)
+
+    def test_race_grouping_raises_the_divisor(self):
+        # two single-market events whose slugs share one race prefix
+        n1 = "enwc-uspres-nom-dem-2028-petbut"
+        n2 = "enwc-uspres-nom-dem-2028-gavnew"
+        r = Rig()
+        r.add_market(n1, event="Dem nominee — Pete")
+        r.add_market(n2, event="Dem nominee — Gavin")
+        r.cycle()
+        self.assertEqual(r.fam.universe[n1]["event_n"], 2)
+
+
+class TestModes(unittest.TestCase):
+    def test_observing_scores_but_never_places(self):
+        r = Rig(switch=False)
+        r.add_market(A)
+        s = r.cycle()
+        self.assertEqual(s["mode"], "observing")
+        self.assertTrue(s["best_idle"])          # it found the opportunity
+        self.assertEqual(r.exchange.live, {})    # and touched nothing
+
+    def test_armed_places_behind_the_touch_first(self):
+        r = Rig()
+        r.add_market(A)
+        s = r.cycle()
+        self.assertEqual(len(r.exchange.live), 2)  # both sides
+        for o in r.fam.orders.values():
+            # no volatility evidence yet -> never ON the touch
+            self.assertNotIn(o.price, (0.44, 0.47))
+            self.assertTrue(o.why)
+        self.assertLessEqual(s["spent"], r.fam.cfg.capital_usd)
+
+    def test_join_needs_evidence_of_quiet(self):
+        r = Rig()
+        r.add_market(A)
+        for _ in range(6):                       # same book, six sightings
+            r.cache.put(A, politics_book(r.now))
+        self.assertLessEqual(r.cache.volatility_of(A), r.fam.cfg.vol_quiet)
+        r.cycle()
+        prices = {round(o.price, 2) for o in r.fam.orders.values()}
+        self.assertIn(0.44, prices)              # joined the quiet touch
+
+    def test_busy_book_stays_behind(self):
+        r = Rig()
+        r.add_market(A)
+        for i in range(6):                       # touch moves every sighting
+            r.cache.put(A, politics_book(r.now, bid=0.40 + i * 0.01))
+        self.assertGreater(r.cache.volatility_of(A), r.fam.cfg.vol_quiet)
+        r.exchange.books[A] = politics_book(r.now, bid=0.45)
+        r.cycle()
+        for o in r.fam.orders.values():
+            if o.side == "BUY":
+                self.assertLess(o.price, 0.45)
+
+
+class TestRevive(unittest.TestCase):
+    def bare_book(self, now):
+        # bid side holds 10 of a 60 Target Size: pays NOBODY
+        return Book(bids=((0.03, 10.0),), asks=((0.97, 50.0),),
+                    tick=0.01, fetched_at=now)
+
+    def prog(self, target=60):
+        return {"timePeriods": [{"programId": "politics_mid_1",
+                                 "rewardPool": 10.0, "targetSize": target,
+                                 "discountFactor": 0.2, "status": "LIVE"}]}
+
+    def test_known_ground_revives_a_dead_side(self):
+        r = Rig()
+        r.add_market(A, book=self.bare_book(r.now), prog=self.prog())
+        r.cycle()
+        # BOTH thin sides get revived — each side's target is its own
+        revs = [o for o in r.fam.orders.values() if o.purpose == "revive"]
+        self.assertEqual(len(revs), 2)
+        bid = next(o for o in revs if o.side == "BUY")
+        self.assertGreaterEqual(bid.qty, 50.0)       # fills the bid gap
+        self.assertIn("revives", bid.why)
+
+    def test_new_ground_never_revives(self):
+        cfg = FamilyConfig(name="X", known_ground=False, revive=False,
+                           capital_usd=100.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A, book=self.bare_book(r.now), prog=self.prog())
+        r.cycle()
+        self.assertEqual([o for o in r.fam.orders.values()
+                          if o.purpose == "revive"], [])
+
+    def test_revive_respects_its_own_cap(self):
+        r = Rig()
+        # gap of ~5000 at 3c = $150 collateral >> revive_max_usd
+        r.add_market(A, book=Book(bids=((0.03, 10.0),), asks=((0.97, 50.0),),
+                                  tick=0.01, fetched_at=r.now),
+                     prog=self.prog(target=5000))
+        r.cycle()
+        self.assertEqual([o for o in r.fam.orders.values()
+                          if o.purpose == "revive"], [])
+
+
+class TestDeadMarkets(unittest.TestCase):
+    def test_program_gone_leaves_entirely_exits_included(self):
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        self.assertTrue(r.exchange.live)
+        # hand the family some stock so a sell exit rests too
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 4.0}
+        r.positions[A] = (10.0, 4.0)
+        r.fam.positions_seen[A] = 10.0
+        r.cycle(advance=r.fam.cfg.cooldown_s + 1)
+        self.assertTrue(any(o.purpose == "sell" for o in r.fam.orders.values()))
+        # the pool dies
+        r.exchange.prog_raw[A] = dict(DEAD_PROG)
+        r.cycle(advance=r.fam.cfg.terms_active_s + 1)
+        self.assertEqual(r.exchange.live, {})        # every order pulled
+        self.assertEqual(r.fam.orders, {})
+        # and the seller does not come back while it stays dead
+        r.cycle(advance=r.fam.cfg.cooldown_s + 1)
+        self.assertEqual(r.exchange.live, {})
+
+    def test_absent_from_incentives_reads_as_gone(self):
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        self.assertTrue(r.exchange.live)
+        del r.exchange.prog_raw[A]                   # not in the response at all
+        r.cycle(advance=r.fam.cfg.terms_active_s + 1)
+        self.assertEqual(r.exchange.live, {})
+
+    def test_failed_terms_fetch_changes_nothing(self):
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        n = len(r.exchange.live)
+        r.exchange.programs_fail = True
+        r.cycle(advance=r.fam.cfg.terms_active_s + 1)
+        self.assertEqual(len(r.exchange.live), n)    # no data, no verdict
+
+
+class TestMoney(unittest.TestCase):
+    def test_the_one_risk_number_binds(self):
+        cfg = FamilyConfig(name="P", known_ground=True, rest_style="join_quiet",
+                           revive=True, capital_usd=0.5, per_market_usd=2.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        r.add_market(C, event="House control")
+        r.cycle()
+        self.assertLessEqual(r.fam.family_spent(), 0.5 + 1e-9)
+
+    def test_no_estimate_without_the_divisor(self):
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        # forget the divisor: the market fell out of discovery but the
+        # order still rests
+        r.fam.universe[A] = {}
+        r.fam._read_live(r.now)
+        rec = next(iter(r.fam.orders.values()))
+        self.assertIsNone(rec.live_est)
+        self.assertIn("holding the estimate", rec.verdict)
+
+    def test_fill_becomes_stock_and_an_exit_that_earns(self):
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        bid = next(o for o in r.fam.orders.values() if o.side == "BUY")
+        # the bid fills entirely
+        del r.exchange.live[bid.id]
+        r.positions[A] = (bid.qty, bid.qty * bid.price)
+        s = r.cycle(advance=r.fam.cfg.cooldown_s + 1)
+        self.assertIn(A, r.fam.inventory)
+        self.assertTrue(any("filled" in t for t, _ in r.alerts))
+        sells = [o for o in r.fam.orders.values() if o.purpose == "sell"]
+        self.assertEqual(len(sells), 1)
+        self.assertGreaterEqual(sells[0].price,
+                                r.fam.inventory[A]["cost"] / bid.qty)
+
+    def test_foreign_fills_are_not_adopted(self):
+        # 1.0 fills in a market 3.0 has no orders in must not become stock
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        r.positions["some-v1-market"] = (500.0, 100.0)
+        r.cycle()
+        self.assertNotIn("some-v1-market", r.fam.inventory)
+
+    def test_earned_today_accrues_and_rolls(self):
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        r.cycle()
+        rate = sum(o.live_est or 0 for o in r.fam.orders.values())
+        self.assertGreater(rate, 0)
+        before = r.fam.earned_today
+        r.cycle()
+        self.assertAlmostEqual(r.fam.earned_today - before,
+                               rate * 60 / 86400.0, places=4)
+        r.cycle(advance=86400.0)                     # next ET day
+        self.assertTrue(r.fam.earned_history)
+
+    def test_restore_round_trip(self):
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        d = r.fam.to_dict()
+        r2 = Rig()
+        r2.fam.restore(d)
+        self.assertEqual(set(r2.fam.orders), set(r.fam.orders))
+        self.assertEqual(r2.fam.universe.keys(), r.fam.universe.keys())
+        self.assertEqual(r2.fam.terms.get(A).pool, 100.0)
+
+
+class TestWindow(unittest.TestCase):
+    def test_no_window_means_always_resting(self):
+        self.assertTrue(resting_ok(0.0, FamilyConfig(rest_from=None)))
+        self.assertTrue(resting_ok(1e9, politics.config()))
+
+
+if __name__ == "__main__":
+    unittest.main()

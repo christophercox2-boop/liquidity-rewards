@@ -2,6 +2,9 @@
 
 This file loads automatically in every session.
 
+**Working on 3.0 (the politics-first merge of both versions)? Read
+v3/DESIGN.md.** It is short and states what 3.0 keeps from each parent.
+
 **Building version 2.0? Read REBUILD.md next.** It is the brief: what the
 system does, what state each part is in, what is actually broken, and the
 decisions already made about the rebuild. Start there, not in the code.

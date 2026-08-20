@@ -34,6 +34,12 @@ def children() -> dict[str, list[str]]:
         print("launcher: 2.0 skipped — exchange keys not set", flush=True)
     else:
         procs["2.0"] = [sys.executable, "-u", "-m", "v2.main"]
+    if os.environ.get("V3_ENABLED", "1") == "0":
+        print("launcher: 3.0 disabled by V3_ENABLED=0", flush=True)
+    elif not (os.environ.get("POLYMARKET_KEY_ID") and os.environ.get("POLYMARKET_SECRET_KEY")):
+        print("launcher: 3.0 skipped — exchange keys not set", flush=True)
+    else:
+        procs["3.0"] = [sys.executable, "-u", "-m", "v3.main"]
     return procs
 
 
