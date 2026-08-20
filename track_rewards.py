@@ -255,8 +255,12 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     calc: list[str] = []       # bare arithmetic, no prose
     order["calc"] = calc
     if book is None:
-        order["verdict"] = "⚠️ book unavailable"
-        calc.append("no book data → can't score")
+        if _is_v2_owned(order.get("market") or ""):
+            order["verdict"] = "2.0's family — scored on the 2.0 pages"
+            calc.append("2.0 scores this market; 1.0 does not fetch its book")
+        else:
+            order["verdict"] = "⚠️ book unavailable"
+            calc.append("no book data → can't score")
         return
     levels = book["bids"] if order["side"] == "BUY" else book["asks"]
     side_name = "bid" if order["side"] == "BUY" else "ask"
@@ -918,6 +922,23 @@ LAST_DEBUG: dict[str, str] = {}  # diagnostics from the most recent fetch, for t
 # window without a big jump in calls against the exchange.
 BOOK_REFRESH_PER_CALL = 28
 BOOK_COLD_FETCH_ALL = True  # one-shot runs sweep every book; the monitor sets False
+
+# MARKETS 2.0 OWNS. 2.0 keeps its own book cache for these and scores them on
+# its own pages; 1.0 sees the orders because the account is shared, but it
+# neither trades them nor needs their books. Fetching them anyway was starving
+# the thing 1.0 IS responsible for: on 2026-08-20 the football families put
+# 1.0 into 503 markets, and 299 of the 356 books it could hold were 2.0's —
+# politics, its actual job, was down to 57 books out of a 28-per-call
+# rotation, while the owner's markets page filled with hundreds of
+# "no book data → can't score" rows ("There are so many of these. What is
+# going on?"). PROGRAMS are still fetched for every market — they are batched
+# and cheap, and the dead-market scan depends on them.
+V2_OWNED_PREFIXES = ("scc-senate-gop-", "scc-hrep-rep-", "aachc-cfb-wins-",
+                     "tec-nfl-", "aqc-nfl-", "ftsc-nfl-", "fptc-nfl-")
+
+
+def _is_v2_owned(slug: str) -> bool:
+    return str(slug or "").startswith(V2_OWNED_PREFIXES)
 _BOOK_CACHE: dict[str, tuple[float, dict]] = {}  # slug -> (fetched_at, book)
 _BOOK_VOLATILITY: dict[str, float] = {}  # EWMA of "book changed since last refresh"
 PRIORITY_SLUGS: set[str] = set()  # defended markets: their books refresh every call
@@ -1060,8 +1081,10 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     def _staleness(s: str) -> float:
         age = now_books - _BOOK_CACHE.get(s, (0.0,))[0]
         return age * (1.0 + 3.0 * _BOOK_VOLATILITY.get(s, 0.5))
-    stalest_first = sorted(slugs, key=_staleness, reverse=True)
-    prio = PRIORITY_SLUGS & set(slugs)
+    # the book rotation covers only what 1.0 is responsible for
+    book_slugs = [s for s in slugs if not _is_v2_owned(s)]
+    stalest_first = sorted(book_slugs, key=_staleness, reverse=True)
+    prio = PRIORITY_SLUGS & set(book_slugs)
     if cold_all:
         to_fetch = set(stalest_first)
     else:

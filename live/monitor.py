@@ -3935,7 +3935,14 @@ NO_AUTO = tuple(
         # no 1.0 loop places there; the sell/flip loops can still reduce
         # what 1.0 already holds, per the rule below
         "scc-senate-gop-|Senate seats (2.0),"
-        "scc-hrep-rep-|House seats (2.0)").split(",") if e.strip())
+        "scc-hrep-rep-|House seats (2.0),"
+        # the football families are 2.0's too (owner, 2026-08-20: "keep
+        # everything very separate") — 1.0 shows the orders, places nothing
+        "aachc-cfb-wins-|College football (2.0),"
+        "tec-nfl-|NFL awards (2.0),"
+        "aqc-nfl-|NFL playoffs (2.0),"
+        "ftsc-nfl-|NFL team stats (2.0),"
+        "fptc-nfl-|NFL player stats (2.0)").split(",") if e.strip())
 NO_AUTO_PREFIXES = tuple(p for p, _ in NO_AUTO)
 
 
@@ -4885,6 +4892,10 @@ def auto_inventory() -> None:
         # replace those if necessary"), so re-listing there only fights it —
         # the same place/cancel loop 2.0's seller fell into the same day.
         if _no_live_program(slug):
+            continue
+        # 2.0's families run their own seller against their own book cache;
+        # two apps resting asks on one position is how orders start fighting
+        if tr._is_v2_owned(slug):
             continue
         free = _inv_free(slug)
         if free < INV_MIN_SHARES:

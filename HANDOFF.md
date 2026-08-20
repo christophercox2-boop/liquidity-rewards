@@ -1708,3 +1708,27 @@ question the scan had been asking since the race board went dark:
 The trade the owner accepted, stated once: a wrong reading costs queue
 position and a re-place, which the loops do by themselves; sitting in a
 market that pays nothing is the worse side.
+
+## 2026-08-20 evening — 1.0 stops scoring 2.0's markets
+
+The owner, on a markets page full of "⚠️ $0.00/day … no book data → can't
+score" rows: "There are so many of these. What is going on?"
+
+Measured: the football families had put 1.0 into 503 markets. Of the 356
+books it could hold, 299 were 2.0's and only 57 were politics — 1.0's own
+job — against a 28-books-per-call rotation. So 1.0 was spending ~84% of its
+book budget on markets it does not trade, could not score the rest, and was
+starving the politics books its earner, prober and estimate actually run on.
+
+* `V2_OWNED_PREFIXES` in track_rewards (seats + the four NFL prefixes +
+  college win totals). Their books are no longer fetched; the rotation is
+  1.0's own markets again. PROGRAMS are still fetched for everything —
+  batched, cheap, and the dead-market scan needs them.
+* An order in one of those markets reads "2.0's family — scored on the 2.0
+  pages" instead of a warning. 2.0 already scores them properly against its
+  own cache, with per-order est/day on its /orders page.
+* The football families joined NO_AUTO, so no 1.0 placing loop can enter
+  them, and each gets its own filter button. `auto_inventory` — which is
+  deliberately NOT gated on hands-off so selling continues in the
+  primaries — now skips them explicitly: two apps resting asks against one
+  position is how orders start fighting.
