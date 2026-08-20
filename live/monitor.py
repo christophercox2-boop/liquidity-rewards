@@ -4308,11 +4308,10 @@ QUAL_PRIMARY_MARKS = ("usgubp", "ussep", "ushrp", "uspresp")
 QUAL_BOOKS_PER_PASS = int(os.environ.get("QUAL_BOOKS_PER_PASS", "6"))
 QUAL_BOOK_TTL = float(os.environ.get("QUAL_BOOK_TTL", "3600"))
 QUAL_QUEUE_MAX = int(os.environ.get("QUAL_QUEUE_MAX", "12"))
-QUAL_AUTO_DAY_USD = float(os.environ.get("QUAL_AUTO_DAY_USD", "300"))
 QUAL_MIN_DAYS_OUT = int(os.environ.get("QUAL_MIN_DAYS_OUT", "2"))
 QUAL_REDO_S = float(os.environ.get("QUAL_REDO_S", "21600"))
 QUAL_DENY_TTL = float(os.environ.get("QUAL_DENY_TTL", str(7 * 86400)))
-_QUAL: dict = {"last": 0.0, "books": {}, "done": {}, "day": ["", 0.0]}
+_QUAL: dict = {"last": 0.0, "books": {}, "done": {}}
 
 
 def _is_primary(m: str) -> bool:
@@ -4489,11 +4488,16 @@ def auto_qualify(event_sizes: dict[str, int] | None = None) -> None:
     from THEIR best, so ours would round to zero and the collateral would
     subsidize strangers.
 
-    The routing is unchanged and the owner's (2026-08-16): far-dated,
-    non-primary, <= $50 places itself; everything else waits for a tap on
-    the map. Two additions bound the wider scope: a per-day auto budget,
-    and a queue cap so the phone card stays readable — richest side pool
-    first, so what shows is what pays."""
+    NOTHING on new ground places itself (owner, 2026-08-20: "don't auto
+    set for now, especially in families where I'm not familiar. The
+    existing systems should remain unchanged."). "New ground" is a market
+    whose book only the qualifier's own rotation has seen — the tracker's
+    cache covers exactly the markets 1.0 already works, so gating on it
+    keeps the status quo flows (including the 2026-08-16 far-dated/<=$50
+    auto rule) bit-for-bit unchanged while every newly visible side waits
+    for a tap on the map. New ground also only ever takes an EMPTY side.
+    The queue is capped so the phone card stays readable — richest side
+    pool first, so what shows is what pays."""
     if not _auto_on("qualify") or os.environ.get("QUALIFY_PAUSE", "") == "1":
         return
     now = time.time()
@@ -4501,9 +4505,6 @@ def auto_qualify(event_sizes: dict[str, int] | None = None) -> None:
         return
     _QUAL["last"] = now
     ev = event_sizes or {}
-    today = dt.datetime.now(ET).strftime("%Y-%m-%d")
-    if _QUAL["day"][0] != today:
-        _QUAL["day"] = [today, 0.0]
     # every politics market with paying terms; hands-off (the 2.0 seats
     # families, unwind markets, anything resolving today) and econ stay
     # out, and so does anything resolving within QUAL_MIN_DAYS_OUT days —
@@ -4531,9 +4532,10 @@ def auto_qualify(event_sizes: dict[str, int] | None = None) -> None:
     done = 0
     placed_notes = []
     for est, m in ranked:
-        wide = not m.startswith(PROBE_PREFIXES)
+        ent_tr = tr._BOOK_CACHE.get(m)
+        known = bool(ent_tr and ent_tr[1] and now - ent_tr[0] <= QUAL_BOOK_TTL)
         for job in _qual_gaps(m):
-            if wide and job["have"] > 0:
+            if not known and job["have"] > 0:
                 continue     # someone already quotes this side — earner turf
             key = f"{job['m']}|{job['side']}"
             if key in denied:
@@ -4543,9 +4545,9 @@ def auto_qualify(event_sizes: dict[str, int] | None = None) -> None:
             job["est"] = est
             job["days"] = _qual_days_out(m)
             route = _qual_route(job)
-            if route == "auto" and _QUAL["day"][1] + job["cost"] > QUAL_AUTO_DAY_USD:
+            if route == "auto" and not known:
                 route = "ask"
-                job["why"] = f"today's ${QUAL_AUTO_DAY_USD:,.0f} auto budget is used"
+                job["why"] = "new ground — I don't place here on my own"
             if route == "ask":
                 if key not in queue and len(queue) < QUAL_QUEUE_MAX:
                     queue[key] = {**job, "why": job.get("why") or
@@ -4561,7 +4563,6 @@ def auto_qualify(event_sizes: dict[str, int] | None = None) -> None:
             done += 1
             _QUAL["done"][key] = now
             if ok:
-                _QUAL["day"][1] += job["cost"]
                 placed_notes.append(f"{job['m']} {job['side']} {job['gap']:,} "
                                     f"at {job['px']*100:g}¢ (${job['cost']:,.2f})")
             _probe_log(job["m"], "qualify", job["side"], job["px"],

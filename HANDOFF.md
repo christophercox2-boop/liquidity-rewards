@@ -1466,43 +1466,52 @@ can earn there, which is the opposite of what anyone would expect.
 
 The owner: "massive spread in the governor, senate, and slate markets where
 there is definitely money to be made, but I'm not even probing it," then "Do
-the unprobed markets first." Diagnosis from the live state: 138 of 223
-program-carrying US-politics markets had NO book in the tracker's cache —
-`fetch_live_orders` only fetches books for markets with orders, and
-`auto_qualify` only scanned `PROBE_PREFIXES` (the 2028 nomination families).
-So a side below Target Size in an OH/GA/CA governor race, a midterms-control
-slate, or the 2028 presidential slate was invisible: it paid nobody, and
-nothing of ours could ever see it.
+the unprobed markets first," then — on being shown the deploy plan — "don't
+auto set for now, especially in families where I'm not familiar. The
+existing systems should remain unchanged."
+
+Diagnosis from the live state: 138 of 223 program-carrying US-politics
+markets had NO book in the tracker's cache — `fetch_live_orders` only
+fetches books for markets with orders, and `auto_qualify` only computed gaps
+from that cache, so it could only ever act where 1.0 already was. A side
+below Target Size in an OH/GA/CA governor race, a midterms-control slate, or
+the 2028 presidential slate was invisible: it paid nobody, and nothing of
+ours could ever see it.
 
 What changed in `auto_qualify` (live/monitor.py):
 
 * **Scope**: every market in `prog_terms` (the program watcher's whole-board
-  snapshot) plus the tracker's cache — not just PROBE_PREFIXES. Hands-off
-  (2.0's seats families, unwind markets, resolving today), econ, and anything
-  resolving within `QUAL_MIN_DAYS_OUT` (2) days stay out.
+  snapshot) plus the tracker's cache — not just what happens to have orders.
+  Hands-off (2.0's seats families, unwind markets, resolving today), econ,
+  and anything resolving within `QUAL_MIN_DAYS_OUT` (2) days stay out.
 * **Books**: the qualifier fetches its own (`QUAL_BOOKS_PER_PASS` = 6 per
   5-minute pass, least-recently-tried first, own cache — the tracker's cache
   evicts anything without orders). Whole board rotates in ~3h.
-* **Empty sides only, outside the nomination families.** A side someone else
-  already quotes is the earner's problem: a floor block behind their price
-  scores `df^ticks` from THEIR best ≈ zero, and the collateral would qualify
-  the side for strangers.
-* **Routing unchanged** (owner 2026-08-16): far-dated + non-primary + ≤$50
-  places itself, everything else queues for a tap on /map. New bounds:
-  `QUAL_AUTO_DAY_USD` ($300/day auto budget), queue capped at
-  `QUAL_QUEUE_MAX` (12) rows sorted richest side pool first, denials stick
-  for 7 days (`qual_denied`), a placed side is not re-tried for 6h.
+* **"New ground" never places itself.** A market whose book only the
+  qualifier's own rotation has seen routes to the /map queue no matter how
+  cheap — the tracker's cache covers exactly the markets 1.0 already works,
+  so gating on it keeps the status quo flows (including the 2026-08-16
+  far-dated/non-primary/≤$50 auto rule) unchanged. New ground also only
+  takes EMPTY sides: a floor block behind someone else's quote scores
+  `df^ticks` from THEIR best ≈ zero and would qualify the side for
+  strangers.
+* **Queue mechanics**: capped at `QUAL_QUEUE_MAX` (12) rows sorted richest
+  side pool first (each row shows side pool $/day and days out), denials
+  stick for 7 days (`qual_denied`), a placed side is not re-tried for 6h,
+  and Approve re-checks against a book fetched AT TAP TIME.
 * **Bug fixes that only bit at sub-cent ticks**: prices serialized `:.2f`
   (a 0.1c floor became "0.00") and the ask ceiling rounded to 2 decimals
   (1 − 0.001 became 1.0). Now `:.3f` with trailing zeros stripped, ceiling
   rounded to 3. NOTE: an empty book's tick is unknowable from levels, so it
-  defaults to 0.01 — floors go in at 1c ($50 per 5,000-target side), which
-  routes most first entries through the queue, where the cost is on the card.
-* Approve on /map now re-checks against a book fetched AT TAP TIME, not the
-  rotation's cache; map card rows show the side pool $/day and days out.
+  defaults to 0.01 — a 5,000-target side shows as $50 on the card; if the
+  market's real tick turns out to be 0.001 the same side costs $5.
 
-Verified with a stubbed-network harness driving the real state snapshot:
-routing gates, day budget, redo guard, deny stickiness, queue hygiene,
-sub-cent serialization, ask chunking under low buying power (existing
-behavior: ~$bp−reserve shares per chunk, 40 chunks max, retried after the
-redo window). v2 untouched; its 210 tests still green.
+The stakes, measured from the live snapshot: 258 empty sides across 129
+paying markets; if the scoring formula pays a lone floor block as written,
+~$2,990/day gross (~$1,500–1,940/day at the measured 50–65% realization).
+Whether it DOES pay a lone block is unproven — the first queue approvals
+answer it for the cost of their collateral, graded by rewards.csv within
+days. Verified with a stubbed-network harness driving the real state
+snapshot: new-ground hold, status-quo auto path, redo guard, deny
+stickiness, queue hygiene, sub-cent serialization, ask chunking under low
+buying power. v2 untouched; its 210 tests still green.
