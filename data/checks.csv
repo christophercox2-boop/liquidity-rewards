@@ -1,5 +1,4 @@
 checked_at_utc,result,reward_rows,total_usd,note
-2026-07-22 14:28:47,ok,186,299.40,
 2026-07-22 16:51:38,ok,186,299.40,
 2026-07-22 18:36:45,ok,186,299.40,
 2026-07-22 20:34:05,error,186,299.40,"RuntimeError: https://api.prod.polymarketexchange.com/v1/incentives/earnings -> HTTP 401: {""message"":""Unauthorized""} https://api.polymarket.us/v1/incentives/earnings -> HTTP 500: {""code"":2, ""message"":""The server was unable to process your request."", ""details"":[]} probe https://api.prod.polymarketexchange.com/v1/incentives (no auth) -> HTTP 503 probe https://api.polymarket.us/v1/incentives (no auth"
@@ -999,3 +998,4 @@ checked_at_utc,result,reward_rows,total_usd,note
 2026-08-20 10:13:20,ok,2859,5117.59,
 2026-08-20 11:30:37,ok,2859,5117.59,
 2026-08-20 12:31:41,ok,2859,5117.59,
+2026-08-20 13:32:40,ok,2859,5117.59,
