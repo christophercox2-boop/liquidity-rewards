@@ -2351,7 +2351,14 @@ def start_batch(payload: dict) -> tuple[int, dict]:
 def compute_dead_orders() -> list[dict]:
     """Resting orders earning ~nothing for a DEFINITIVE reason — scored
     against a real book (no program, outside the window, ~0% share). Orders
-    whose book simply hasn't been fetched yet are never flagged."""
+    whose book simply hasn't been fetched yet are never flagged.
+
+    AN EXIT IS NEVER DEAD WEIGHT. An ask on stock we hold, or a bid buying
+    back a short, is doing a job that has nothing to do with reward income,
+    and it earns ~nothing precisely because it sits out of the money waiting
+    for its price. On 2026-08-19 this list offered 1,474 orders of which 432
+    were exits covering 41,917 shares — cancelling them would have abandoned
+    the way out of those positions to tidy up an earnings number."""
     out = []
     for o in MONITOR.orders:
         if not o.get("id"):
@@ -2361,6 +2368,9 @@ def compute_dead_orders() -> list[dict]:
         v = o.get("verdict") or ""
         if not (v.startswith("❌") or v.startswith("✅")):
             continue  # book unavailable/pending — can't judge, leave alone
+        net = tr._num((MONITOR.positions.get(o["market"]) or {}).get("netPosition"))
+        if (o["side"] == "SELL" and net > 0) or (o["side"] == "BUY" and net < 0):
+            continue  # reducing a position, not chasing rewards
         locked = o["price"] * o["size"] if o["side"] == "BUY" else (1 - o["price"]) * o["size"]
         out.append({"id": o["id"], "market": o["market"], "side": o["side"],
                     "price_cents": round(o["price"] * 100, 1), "size": o["size"],
@@ -5624,6 +5634,17 @@ def _earn_qty(m: str, side: str, px_c: float, cap_usd: float,
     return max(1, min(EARN_MAX_SHARES, int(cap_usd / unit), rung))
 
 
+# BEING PRESENT IS NOT BEING COMPETITIVE (owner, 2026-08-19: "so many
+# markets earning nothing or next to nothing ... make sure I'm competitive
+# most of the time"). Reward income is proportional to our SHARE of the
+# side's discounted score, so a token order in a crowded book earns a token:
+# a census on 2026-08-19 found 2,947 resting orders of which 42% earned
+# under half a cent a day, 143 of them sitting AT the best price with a
+# ~0.1% share because one share was standing next to somebody's thousands.
+# Capital spread that thin is not diversification, it is noise. A candidate
+# whose share would land under this floor is refused, and the reason names
+# the number so the /why page can show it.
+EARN_MIN_SHARE = float(os.environ.get("EARN_MIN_SHARE", "0.02"))
 EARN_PX_MAX_C = int(os.environ.get("EARN_PX_MAX_C", "10"))
 # Above the penny ceiling the earner may only act on KNOWLEDGE, never on hope
 # (owner, 2026-08-16: "earner should use what probe is learning to place where
@@ -6474,6 +6495,7 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
             # short of it can be tipped over by the order we are about to
             # place — but only just short, and this rarely applies
             short_side = not (side_total + q >= target)
+            share = (ours_sc / den) if den else 0.0
             est = 0.0 if (not den or short_side) else (per * ours_sc / den)
             # WHAT A FILL AT THIS PRICE IS ACTUALLY WORTH. Income alone ranks
             # every candidate by how close it sits to the best price, which is
@@ -6483,10 +6505,17 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
             # is a sum over the whole distribution, not a test against one
             # point. edge > 0 means a fill buys under fair — the good case.
             row.update({"tier": tier, "qty": q, "est": round(est, 4),
+                        "share": round(share, 5),
                         "cost": round(pc / 100.0 * q, 2),
                         "edge_c": round(edge_c, 2),
                         "fill_pnl": round(edge_c / 100.0 * q, 2),
                         "score_w": round(df ** max(0, anchor - pc), 4)})
+            if not short_side and den and share < EARN_MIN_SHARE:
+                row["why"] = (f"{q} share(s) here would be {share * 100:.2f}% of the "
+                              f"side's score — under the {EARN_MIN_SHARE * 100:.0f}% "
+                              f"floor, so it earns a token and ties up the money "
+                              f"that could be competitive somewhere else")
+                continue
             if short_side:
                 row["why"] = (f"the bid side holds {side_total:,.0f} of the "
                               f"{target:,.0f} Target Size even with our {q} — a side "
