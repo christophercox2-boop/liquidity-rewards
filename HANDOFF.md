@@ -1546,3 +1546,33 @@ capped at 40 markets (cfb_max via CfbConfig.max_markets).
 Tests: v2/tests/test_cfb.py (11) through the real desk rails against the
 fake exchange; whole suite 222 green. Switch page, status card, and orders
 fold verified in a headless phone-width browser.
+
+## 2026-08-20 — NFL futures family; the family engine generalizes
+
+Owner: "Go ahead with NFL, but I'm seeing that a lot of these college
+orders are being placed alone. I thought the idea was to place them behind
+the touch because of the df. The collateral is low, so I wouldn't change
+anything for now, but maybe going forward with the new families you can
+model that way."
+
+The college module became v2/family.py (Family + FamilyConfig, one engine,
+one config per family; v2/cfb.py is now a shim keeping the old names and
+the college behavior bit-for-bit — its `allow_improve` stays ON, which is
+the documented reason some college orders rest alone in front of junk
+walls). Every newer family sets `allow_improve=False`: join the touch or
+rest behind it, never in front, so a side with no real competition is
+skipped instead of colonized.
+
+NFL futures (family.nfl): prefixes tec-nfl- (MVP/DPOY/OPOY/ROY awards,
+division/conference/champ winners — 335 markets, ~$8/side/day, target
+15,000, df 0.3), aqc-nfl- (makes-the-playoffs, 32 markets all measured
+alive at $4.6-4.7/day), ftsc-/fptc-nfl- (586 season stat futures, books
+unpriced at build time). Resting window Tuesday 06:00 -> Thursday 17:00 ET
+(NFL plays Thu/Sun/Mon; preseason weekends too). Own switch (off), own
+desk/whitelist/cache/terms, $1/market, share <= 10%, 40-market first
+tranche. /v2/switch shows all three switches; status and orders pages
+render each live family's card/fold.
+
+Suite: 227 tests green (college's 11 unchanged on the shared engine; NFL's
+behind-the-touch rule pinned: wall-only books skipped entirely, no plan
+ever prices in front of the touch).

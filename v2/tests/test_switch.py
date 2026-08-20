@@ -98,7 +98,7 @@ class TestSwitchRoute(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertTrue(json.loads(body)["sw"]["armed"])
         self.assertFalse(self.sw.on)          # the seats switch never moved
-        status, _ = self.post({"op": "arm", "which": "nfl"},
+        status, _ = self.post({"op": "arm", "which": "mlb"},
                               {"X-Dash-Key": "pw", "X-Reprice": "1"})
         self.assertEqual(status, 400)
 

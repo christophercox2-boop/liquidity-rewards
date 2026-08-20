@@ -258,17 +258,19 @@ STATUS_JS = """
    'quietly cancels what buying power can&rsquo;t fund; the engine re-places them.)':'')+'</details>'+
    '<div class="muted" style="margin-top:6px"><a href="orders" style="color:#9ecbff">every order &rarr;</a>'+
    ' &nbsp; <a href="opps" style="color:#9ecbff">what it wants next &rarr;</a></div></div>';
- var cv=d.cfb_view||{};var cs=d.cfb_switch||{};
- if(cs.on||(cv.orders||[]).length){
-  h+='<div class="card"><b>College football</b> <span class="muted">separate family &middot; switch '+
+ [['College football',d.cfb_view,d.cfb_switch,'out Thu 5pm&ndash;Sun 6am ET'],
+  ['NFL futures',d.nfl_view,d.nfl_switch,'in Tue 6am&ndash;Thu 5pm ET only']].forEach(function(fd){
+  var cv=fd[1]||{};var cs=fd[2]||{};
+  if(!(cs.on||(cv.orders||[]).length))return;
+  h+='<div class="card"><b>'+fd[0]+'</b> <span class="muted">separate family &middot; switch '+
     (cs.on?'<span class="ok">ON</span>':'off')+(cv.mode&&cv.mode!=='on'?' &middot; '+cv.mode:'')+'</span>'+
     '<div class="stats"><div class="stat"><div class="lab">orders resting</div><div class="val">'+
     (cv.orders||[]).length+'</div></div>'+
     '<div class="stat"><div class="lab">earning</div><div class="val">'+usd(cv.est_day)+'<span class="u">/day</span></div></div>'+
     '<div class="stat"><div class="lab">collateral</div><div class="val">'+usd(cv.spent)+'</div></div></div>'+
-    '<div class="sub">'+(cv.active||0)+' of '+(cv.markets||0)+' paying win-total markets &middot; '+
-    (cv.resting_ok===false?'game window &mdash; orders pulled until Sunday 6am ET':'resting week (out Thu 5pm&ndash;Sun 6am ET)')+'</div></div>';
- }
+    '<div class="sub">'+(cv.active||0)+' of '+(cv.markets||0)+' paying markets &middot; '+
+    (cv.resting_ok===false?'game window &mdash; orders pulled':'resting week')+' ('+fd[3]+')</div></div>';
+ });
  var er=(d.errors||[]).filter(function(x){return x.indexOf('booted build')<0;}).slice(-5).reverse();
  if(er.length){h+='<div class="card"><b class="warn">Recent trouble</b><div class="muted">'+er.join('<br>')+'</div></div>';}
  return h;
@@ -306,18 +308,21 @@ ORDERS_JS = """
   ' experiments &middot; probing the scoring-window rule</summary>'+tbl(grp.exp1)+'</details>';
  if(grp.stock.length)h+='<details class="how"><summary>'+grp.stock.length+
   ' selling stock &middot; re-offering filled shares at break-even +1 tick</summary>'+tbl(grp.stock)+'</details>';
- var cv=d.cfb_view||{};
- var co=(cv.orders||[]).slice().sort(function(a,b){return ((b.live_est!=null?b.live_est:b.est_day)||0)-((a.live_est!=null?a.live_est:a.est_day)||0);});
- if(co.length){
-  var cfbName=function(m){var p=m.split('-');
-   return p[p.length-2].toUpperCase()+' '+p[p.length-1].replace('pt5wins','.5+ wins');};
-  h+='<details class="how"><summary>'+co.length+' college football &middot; '+usd(cv.est_day)+
+ var famName=function(m){
+  if(m.indexOf('aachc-cfb-wins-')===0){var p=m.split('-');
+   return p[p.length-2].toUpperCase()+' '+p[p.length-1].replace('pt5wins','.5+ wins');}
+  return m.replace(/^(tec|aqc|ftsc|fptc)-nfl-/,'').replace(/-20\d\d-\d\d-\d\d/,'').replace(/-w-/,' ');};
+ [['college football',d.cfb_view],['NFL futures',d.nfl_view]].forEach(function(fd){
+  var cv=fd[1]||{};
+  var co=(cv.orders||[]).slice().sort(function(a,b){return ((b.live_est!=null?b.live_est:b.est_day)||0)-((a.live_est!=null?a.live_est:a.est_day)||0);});
+  if(!co.length)return;
+  h+='<details class="how"><summary>'+co.length+' '+fd[0]+' &middot; '+usd(cv.est_day)+
    '/d &mdash; separate family, max $1 a market</summary><table>'+hrow(['market','order','earns','share']);
-  co.forEach(function(o){h+=row([cfbName(o.market),
+  co.forEach(function(o){h+=row([famName(o.market),
    '<span style="white-space:nowrap">'+(o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+pc(o.price)+'</span>',
    usd(o.live_est!=null?o.live_est:o.est_day)+'/d',
    pct(o.live_share!=null?o.live_share:o.share)]);});
-  h+='</table></details>';}
+  h+='</table></details>';});
  h+='<details class="how"><summary>how to read this</summary>'+
   '<b>earns</b> is what the order makes from the reward pool at this book right now; the line '+
   'under it subtracts the expected cost of getting filled (fills are usually losses here, not '+
@@ -885,12 +890,17 @@ function render(d){
   ' ceiling &middot; headroom '+usd(eng.headroom)+' &middot; '+
   (eng.orders||[]).length+' orders resting'+
   (eng.silent_cancels?' &middot; '+eng.silent_cancels+' silent cancels':'')+'</div>';}
+ function famline(v,windowNote){return '<div class="muted" style="margin-top:8px">max $1 a market &middot; '+
+  ((v.orders||[]).length)+' orders &middot; '+usd(v.est_day)+'/day est &middot; '+
+  usd(v.spent)+' collateral &middot; '+
+  (v.resting_ok===false?'game window (orders pulled'+windowNote+')':'resting week')+'</div>';}
  h+='<hr style="border:0;border-top:1px solid #2a3242;margin:14px 0">';
  h+=card(d.cfb_switch||{},'cfb','College football &mdash; separate family');
- h+='<div class="muted" style="margin-top:8px">win totals only &middot; max $1 a market &middot; '+
-  ((cv.orders||[]).length)+' orders &middot; '+usd(cv.est_day)+'/day est &middot; '+
-  usd(cv.spent)+' collateral &middot; '+
-  (cv.resting_ok===false?'game window (orders pulled until Sun 6am ET)':'resting week')+'</div>';
+ h+=famline(cv,' until Sun 6am ET');
+ var nv=d.nfl_view||{};
+ h+='<hr style="border:0;border-top:1px solid #2a3242;margin:14px 0">';
+ h+=card(d.nfl_switch||{},'nfl','NFL futures &mdash; separate family');
+ h+=famline(nv,' until Tue 6am ET');
  document.getElementById('view').innerHTML=h;
 }
 function load(){fetch('data.json',{headers:hdrs(false),cache:'no-store'}).then(function(r){
@@ -958,8 +968,8 @@ class _Handler(BaseHTTPRequestHandler):
         if op not in ("arm", "confirm", "off"):
             self._send(400, "text/plain", b"op must be arm/confirm/off")
             return
-        if which not in ("master", "cfb"):
-            self._send(400, "text/plain", b"which must be master/cfb")
+        if which not in ("master", "cfb", "nfl"):
+            self._send(400, "text/plain", b"which must be master/cfb/nfl")
             return
         sw = self.server.switch_op(op, which)
         state = self.server.get_state() or {}
