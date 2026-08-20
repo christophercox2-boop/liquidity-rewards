@@ -1689,3 +1689,22 @@ to know. If you miss a few seconds that is fine." So:
 
 2.0 was already safe: the seats engine's sizes come from the politics event
 map and the families' from the survey's real event membership.
+
+Owner, 2026-08-20 late afternoon: "Don't hold the dead market scan. I don't
+want to be in markets if there are no rewards." That answers the dry-run
+question the scan had been asking since the race board went dark:
+
+* `DEAD_SCAN_ARMED` now defaults to 1 — the scan cancels rather than
+  reporting. `DEAD_SCAN_ARMED=0` parks it again without a deploy.
+* The two-consecutive-readings requirement and the >70%-of-board hold are
+  gone. Both existed to guard against partial or garbage program data,
+  which track_rewards already prevents: a failed batch discards the WHOLE
+  refresh and the previous cache stands, so the scan only ever sees one
+  complete successful response. What remains is the requirement to HAVE
+  data (orders, positions, a cache covering the order book).
+* A batch that clears more than half the markets we hold orders in still
+  says so in the push, but it acts first.
+
+The trade the owner accepted, stated once: a wrong reading costs queue
+position and a re-place, which the loops do by themselves; sitting in a
+market that pays nothing is the worse side.
