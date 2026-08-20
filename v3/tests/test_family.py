@@ -307,8 +307,11 @@ class TestMoney(unittest.TestCase):
         self.assertIn(A, r.fam.inventory)
         self.assertTrue(any("filled" in t for t, _ in r.alerts))
         sells = [o for o in r.fam.orders.values() if o.purpose == "sell"]
-        self.assertEqual(len(sells), 1)
-        self.assertGreaterEqual(sells[0].price,
+        # the seller's exit, plus the market's old earn-ask which the
+        # reclassifier now (correctly) counts as an exit while stock is held
+        seller_asks = [o for o in sells if "selling filled stock" in o.why]
+        self.assertEqual(len(seller_asks), 1)
+        self.assertGreaterEqual(seller_asks[0].price,
                                 r.fam.inventory[A]["cost"] / bid.qty)
 
     def test_foreign_fills_are_not_adopted(self):

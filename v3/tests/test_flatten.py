@@ -275,3 +275,61 @@ class TestExitProtection(unittest.TestCase):
         self.assertAlmostEqual(c.qty, 100.0)
         from v3.intents import capital_at_risk
         self.assertEqual(capital_at_risk(c.intent, c.price, c.qty), 0.0)
+
+
+class TestStalePlansAndPriorities(unittest.TestCase):
+    """23:53Z lessons: plans scored under old knobs must not place, and
+    the seller outranks new entries for the action budget."""
+
+    def test_stale_scoreboard_cleared_on_config_change(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        d = r.fam.to_dict()
+        self.assertTrue(d["scoreboard"])
+        from v3.family import FamilyConfig
+        from v3.books import BookCache
+        from v3.names import Names
+        from v3 import politics
+        from v3.family import Family
+        fam2 = Family(None, BookCache(), politics.discover,
+                      config=FamilyConfig(name="P", per_market_usd=20.0,
+                                          min_est_day=0.10),
+                      names=Names())
+        fam2.restore(d)
+        self.assertEqual(fam2.scoreboard, {})        # different knobs: rescan
+
+    def test_under_bar_plan_never_places(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           min_est_day=0.10, capital_usd=100.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        # a stale crumb plan sneaks into the scoreboard directly
+        r.fam.scoreboard[A] = {"ts": r.now, "est": 0.03, "plans": [
+            {"side": "BUY", "px": 0.43, "qty": 1.0, "share": 0.01,
+             "est": 0.03, "cost": 0.43, "why": "old config"}]}
+        r.fam.last_terms_active = r.now
+        r.fam.last_terms_full = r.now
+        r.fam.cycle(r.now + 1, r.exchange.open_orders(), r.positions,
+                    r.exchange, True)
+        self.assertNotIn(A, {o.market for o in r.fam.orders.values()})
+
+    def test_seller_outranks_new_entries(self):
+        from v3.tests.test_family import Rig, A, C
+        from v3.family import FamilyConfig
+        from v3.intents import SELL_SHORT
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=100.0, max_actions_per_cycle=1)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        r.add_market(C, event="House control")
+        r.positions[C] = (-100.0, -40.0)             # a short needs its exit
+        r.cycle()
+        placed = list(r.fam.orders.values())
+        self.assertEqual(len(placed), 1)             # one action, and it went...
+        self.assertEqual(placed[0].purpose, "sell")  # ...to the cover, not entry
+        self.assertEqual(placed[0].intent, SELL_SHORT)

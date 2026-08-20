@@ -709,11 +709,12 @@ class Family:
         # 2) maintenance: reprice or pull against fresh books
         actions = self._maintain(now, actions)
 
-        # 3) new entries, best scoreboard candidates first
-        actions = self._enter(now, positions, actions)
+        # 3) the seller first — getting the owner OUT always outranks new
+        # risk (starving it behind entries left shorts uncovered, 23:53Z)
+        actions = self._sell(now, actions)
 
-        # 4) the seller: filled stock rests as exits that earn while they wait
-        self._sell(now, actions)
+        # 4) new entries, best scoreboard candidates first
+        self._enter(now, positions, actions)
         return self._finish(summary)
 
     def _read_live(self, now: float) -> None:
@@ -843,6 +844,8 @@ class Family:
             for plan in sb["plans"]:
                 if actions <= 0:
                     break
+                if plan["est"] < self.cfg.min_est_day:
+                    continue    # a plan scored under an older, looser config
                 if (slug, plan["side"]) in have:
                     continue
                 if not self._cooldown_ok(slug, plan["side"], now):
@@ -882,7 +885,7 @@ class Family:
                     self._mark(slug, plan["side"], now)
         return actions
 
-    def _sell(self, now: float, actions: int) -> None:
+    def _sell(self, now: float, actions: int) -> int:
         for slug, inv in list(self.inventory.items()):
             if actions <= 0:
                 break
@@ -938,6 +941,7 @@ class Family:
                           qty=rest_qty, side=side)
                 self._mark(slug, side, now)
                 actions -= 1
+        return actions
 
     # --------------------------------------------------------------- books
 
@@ -1055,8 +1059,15 @@ class Family:
 
     # ------------------------------------------------------------ persistence
 
+    def _cfg_sig(self) -> str:
+        c = self.cfg
+        return "|".join(str(x) for x in (
+            c.per_market_usd, c.min_est_day, c.share_hi, c.rest_style,
+            c.allow_improve, c.revive, c.revive_max_usd, c.vol_quiet))
+
     def to_dict(self) -> dict:
         return {
+            "cfg_sig": self._cfg_sig(),
             "orders": {oid: vars(o) for oid, o in self.orders.items()},
             "inventory": self.inventory,
             "positions_seen": self.positions_seen,
@@ -1081,7 +1092,13 @@ class Family:
         self.silent_cancels = d.get("silent_cancels") or 0
         self.last_action = dict(d.get("last_action") or {})
         self.known_dead = set(d.get("known_dead") or ())
-        self.scoreboard = dict(d.get("scoreboard") or {})
+        if d.get("cfg_sig") == self._cfg_sig():
+            self.scoreboard = dict(d.get("scoreboard") or {})
+        else:
+            # the plans were scored under different knobs — the 2026-08-20
+            # 23:53Z lesson: stale $1-era crumbs placed under a $20 config.
+            # Rescan everything under the config actually running.
+            self.scoreboard = {}
         self.universe = dict(d.get("universe") or {})
         if d.get("terms"):
             self.terms = TermsStore.from_dict(d["terms"])
