@@ -1628,3 +1628,21 @@ impossible" — and "There should be no market limit."
   turns AT RISK, repeated at most every 6h per block.
 * Family `max_markets` is now None (no limit); pacing, the $1/market cap,
   and the share band are the bounds.
+
+Owner, 2026-08-20 midday: "Go through and cancel all the orders in markets
+that recently lost their rewards program" and "limit the access to any sort
+of automated probing or placing of orders on any markets without rewards."
+
+* **cancel_dead_programs workflow** (.github/workflows/): fetches every
+  resting order, batch-checks live programs with the same period-picking
+  the estimates trust, cancels reward-seeking orders in markets that pay
+  nothing, KEEPS position exits (the 2026-08-19 lesson), and aborts on a
+  sanity rail if the API claims most of the board is dead. Report lands in
+  data/cancel_dead_programs.txt. Push-path + manual dispatch.
+* **1.0**: `_no_live_program(m)` folded into `_hands_off` — every placing
+  loop (defend, snipe, probe, earn, qualify) now refuses markets known to
+  pay nothing, in one place.
+* **2.0 families**: the live-terms refresh also covers the scan's next ~20
+  picks, and a candidate whose fresh terms read dead is dropped from the
+  scoreboard before anything places. Seats engine and calibration probes
+  already required a live pool.

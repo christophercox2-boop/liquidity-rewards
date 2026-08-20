@@ -380,8 +380,13 @@ class Family:
             return self._finish(summary)
         actions = self.cfg.max_actions_per_cycle
 
-        # live terms for markets we're actually in (batched, gentle)
-        active = sorted(self.active_markets() | set(self.inventory))
+        # live terms for markets we're in AND the scan's next picks, so a
+        # pool cut is known before the first order goes in, not after
+        # (owner, 2026-08-20: no placing in markets without rewards)
+        soon = [s for s, sb in sorted(self.scoreboard.items(),
+                                      key=lambda kv: -(kv[1].get("est") or 0))[:20]
+                if sb.get("plans")]
+        active = sorted(self.active_markets() | set(self.inventory) | set(soon))
         if active and now - self.last_terms > self.cfg.terms_every_s:
             self.last_terms = now
             try:
@@ -505,6 +510,10 @@ class Family:
                 continue
             days = slug_days_out(slug, now)
             if days is not None and days < self.cfg.min_days_out:
+                continue
+            prog = self.terms.get(slug)
+            if prog is not None and (not prog.is_live() or not prog.pool):
+                self.scoreboard.pop(slug, None)   # known dead: never place
                 continue
             fresh_new = slug in self.active_markets()
             if (self.cfg.max_markets is not None and not fresh_new

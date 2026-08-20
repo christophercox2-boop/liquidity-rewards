@@ -3962,6 +3962,20 @@ def _ends_today(m: str) -> bool:
         return False
 
 
+def _no_live_program(m: str) -> bool:
+    """True when we KNOW this market pays nothing — its program is gone or
+    its pool is zero in the tracker's cache or the whole-board terms
+    snapshot. Unknown markets read False: the loops that place all target
+    known-program markets anyway, and hands-off must stay cheap."""
+    pr = (tr._PROG_CACHE.get("progs") or {}).get(m)
+    if pr is not None:
+        return not pr.get("pool")
+    row = (MONITOR.state.get("prog_terms") or {}).get(m)
+    if isinstance(row, (list, tuple)) and row:
+        return not row[0]
+    return False
+
+
 def _hands_off(m: str) -> bool:
     """No NEW exposure here — the earner, the prober, the qualifier.
 
@@ -3969,10 +3983,15 @@ def _hands_off(m: str) -> bool:
     of the primaries "except for selling open positions", so the inventory
     loop and the flip ladder still work those markets. They only ever reduce a
     position; they cannot open one.
+
+    2026-08-20, owner: "limit the access to any sort of automated probing or
+    placing of orders on any markets without rewards" — a market known to
+    pay nothing is hands-off for every placing loop, in this one place.
     """
     return ((bool(NO_AUTO_PREFIXES) and str(m).startswith(NO_AUTO_PREFIXES))
             or str(m) in (MONITOR.state.get("unwind_no_new") or ())
-            or _ends_today(m))
+            or _ends_today(m)
+            or _no_live_program(m))
 
 
 def _preferred(m: str) -> bool:

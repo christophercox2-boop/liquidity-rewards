@@ -1,0 +1,179 @@
+name: Cancel orders in dead-program markets
+
+# ORDER-TOUCHING: cancels OUR OWN orders only. Places nothing.
+#
+# Owner, 2026-08-20: "Go through and cancel all the orders in markets that
+# recently lost their rewards program." A market whose program is gone or
+# whose pool is zero pays nobody — reward-seeking orders there are pure
+# fill risk with no income. Exits are NOT touched: an ask on stock we hold
+# or a bid buying back a short is doing a job that has nothing to do with
+# rewards (the 2026-08-19 lesson: 432 of 1,474 "dead" orders were the way
+# out of 41,917 shares).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/cancel_dead_programs.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cancel-dead-programs
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cancel
+        env:
+          POLYMARKET_KEY_ID: ${{ secrets.POLYMARKET_KEY_ID }}
+          POLYMARKET_SECRET_KEY: ${{ secrets.POLYMARKET_SECRET_KEY }}
+        run: |
+          pip install -q -r requirements.txt
+          python3 - <<'EOF'
+          import io, os, time, requests
+          import track_rewards as tr
+
+          kid = os.environ["POLYMARKET_KEY_ID"]; sec = os.environ["POLYMARKET_SECRET_KEY"]
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k, flush=True); _p(*a, **{**k, "file": BUF})
+
+          def api(method, path, body=None, params=None):
+              return requests.request(method, tr.TRADE_API + path,
+                  headers={**tr.auth_headers(kid, sec, method, path),
+                           "Content-Type": "application/json"},
+                  json=body, params=params, timeout=30)
+
+          # -- every resting order, grouped by market --------------------------
+          r = api("GET", "/v1/orders/open"); r.raise_for_status()
+          orders = [o for o in r.json().get("orders") or []
+                    if str(o.get("state")) in ("ORDER_STATE_NEW",
+                                               "ORDER_STATE_PARTIALLY_FILLED")]
+          markets = sorted({o.get("marketSlug") or "" for o in orders} - {""})
+          print(f"{len(orders):,} resting orders across {len(markets)} markets")
+
+          # -- which of those markets still carry a LIVE paying program --------
+          # (same period-picking every estimate in this repo trusts; a market
+          # absent from the incentives response has no program at all)
+          alive: set[str] = set()
+          for i in range(0, len(markets), 40):
+              batch = markets[i:i + 40]
+              got = None
+              for host in tr.HOSTS:
+                  try:
+                      rr = requests.get(host + "/v1/incentives",
+                                        params={"symbols": batch, "pageSize": 100},
+                                        timeout=25)
+                      if rr.status_code < 400:
+                          got = rr.json(); break
+                  except Exception:
+                      continue
+              if got is None:
+                  raise RuntimeError(f"incentives batch {i//40} failed on both hosts")
+              for p in got.get("programs") or []:
+                  slug = p.get("marketSlug") or ""
+                  tp = tr._pick_period(p.get("timePeriods") or [], slug)
+                  if tp is None:
+                      continue
+                  prog = tr._prog_of(tp)
+                  if float(prog.get("pool") or 0) > 0:
+                      alive.add(slug)
+              time.sleep(0.2)
+          dead = [m for m in markets if m not in alive]
+          print(f"{len(alive)} markets still pay; {len(dead)} lost their program")
+          # SANITY RAIL: the whole strategy rests in paying markets. If the
+          # incentives API says most of the board is dead, that's an API
+          # problem, not a program apocalypse — abort rather than mass-cancel.
+          if len(markets) >= 20 and len(alive) < 0.3 * len(markets):
+              raise RuntimeError(
+                  f"sanity: only {len(alive)}/{len(markets)} markets read as "
+                  f"paying — refusing to cancel on data this strange")
+
+          # -- positions: an exit is never dead weight -------------------------
+          path = "/v1/portfolio/positions"; positions = {}; cursor = None
+          for _ in range(30):
+              params = {"limit": 100}
+              if cursor: params["cursor"] = cursor
+              rr = api("GET", path, params=params); rr.raise_for_status()
+              j = rr.json(); positions.update(j.get("positions") or {})
+              cursor = j.get("nextCursor")
+              if j.get("eof") or not cursor: break
+
+          targets, kept_exits = [], 0
+          for o in orders:
+              m = o.get("marketSlug") or ""
+              if m not in dead:
+                  continue
+              # BOOK side from intent: BUY_LONG and SELL_SHORT rest as bids,
+              # BUY_SHORT and SELL_LONG as asks
+              intent = str(o.get("intent") or "")
+              side = "BUY" if intent.endswith(("BUY_LONG", "SELL_SHORT")) else "SELL"
+              net = tr._num((positions.get(m) or {}).get("netPosition"))
+              if (side == "SELL" and net > 0) or (side == "BUY" and net < 0):
+                  kept_exits += 1
+                  continue          # reducing a position, not chasing rewards
+              px = tr._num((o.get("price") or {}).get("value")) or 0
+              q = tr._num(o.get("leavesQuantity")) or tr._num(o.get("quantity")) or 0
+              targets.append((m, str(o.get("id")), side, px, q))
+
+          print(f"cancelling {len(targets)} reward-seeking orders; "
+                f"keeping {kept_exits} position exits\n")
+          by_m: dict = {}
+          for m, oid, side, px, q in targets:
+              by_m.setdefault(m, []).append((oid, side, px, q))
+          done = failed = 0
+          for m in sorted(by_m):
+              rows = by_m[m]
+              print(f"{m} — {len(rows)} order(s)")
+              for oid, side, px, q in rows:
+                  ok = False; delay = 2.0
+                  for attempt in range(5):
+                      try:
+                          rc = api("POST", f"/v1/order/{oid}/cancel",
+                                   {"marketSlug": m})
+                          if rc.status_code < 300 or rc.status_code == 404:
+                              ok = True; break
+                          if rc.status_code not in (429, 500, 502, 503, 504):
+                              break
+                      except Exception:
+                          pass
+                      time.sleep(delay); delay = min(delay * 2, 20)
+                  done += ok; failed += (not ok)
+                  print(f"  {side:4s} {q:9,.1f} @ {px*100:5.1f}c -> "
+                        + ("cancelled" if ok else "FAILED"))
+                  time.sleep(0.3)
+
+          print(f"\ncancelled {done}, failed {failed}, exits kept {kept_exits}, "
+                f"dead markets {len(dead)}")
+          os.makedirs("data", exist_ok=True)
+          with open("data/cancel_dead_programs.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/cancel_dead_programs.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Cancel dead-program orders [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi

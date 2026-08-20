@@ -320,3 +320,24 @@ class TestFastPlacement(unittest.TestCase):
         self.assertEqual(cfg.books_per_cycle, 10)
         self.assertEqual(cfg.scan_reserve, 4)
         self.assertFalse(cfg.verify_resting)
+
+
+class TestNoRewardsNoOrders(unittest.TestCase):
+    def test_known_dead_candidate_never_places(self):
+        # owner, 2026-08-20: "limit the access to any sort of automated
+        # probing or placing of orders on any markets without rewards" —
+        # a market whose live terms read dead places nothing even while
+        # the (slower) survey row still shows a pool
+        r = Rig()
+        r.add_market(ALA, polite_book(r.now))
+        r.exchange.prog_raw[ALA]["timePeriods"][0]["rewardPool"] = 0
+        r.cycle()                        # scan sees the survey row, plans
+        r.fam.last_terms = 0.0           # force the live-terms refresh
+        r.now += 3600
+        r.exchange.books[ALA] = polite_book(r.now)
+        r.cycle()                        # terms arrive dead -> candidate dropped
+        r.now += 3600
+        r.exchange.books[ALA] = polite_book(r.now)
+        s = r.cycle()
+        self.assertEqual(s["orders"], [])
+        self.assertNotIn(ALA, r.fam.scoreboard)
