@@ -838,6 +838,31 @@ class Engine:
         # its band moves
         for rec in list(self.orders.values()):
             if rec.purpose in ("sell", "close"):
+                # exits are the seller's to manage, never repriced here —
+                # but waiting stock EARNS while it rests (owner, 2026-08-20:
+                # "how much the stock that is being sold is earning per
+                # day?"), so they get the same live reading as everything
+                # else. No fill-cost side: an exit's fill is the goal.
+                book = books.fresh(rec.market, BOOK_MAX_AGE, now)
+                prog = terms.get(rec.market)
+                if book is None or prog is None:
+                    continue
+                unbooked = self._book_less_own(book, rec)
+                here = estimate_join(rec.side, list(unbooked.side(rec.side)),
+                                     book.tick, prog.df, prog.target,
+                                     rec.price, rec.qty)
+                earning_here = here.qualifies and here.in_window
+                side_pool = daily_side_pool(prog, rec.market)
+                sc_frac = self.model.scoring_fraction(rec.market)
+                rec.live_est = round(here.share * side_pool
+                                     if earning_here else 0.0, 4)
+                rec.live_ev = round((rec.live_est or 0.0) * sc_frac, 4)
+                rec.live_parts = {
+                    "share": round(here.share, 4), "ticks": here.ticks,
+                    "in_window": here.in_window, "qualifies": here.qualifies,
+                    "scoring_frac": round(sc_frac, 3),
+                    "side_pool": round(side_pool, 4), "exit": True,
+                }
                 continue
             book = books.fresh(rec.market, BOOK_MAX_AGE, now)
             prog = terms.get(rec.market)

@@ -400,6 +400,16 @@ class TestFillsAndSeller(unittest.TestCase):
         # listed at max(break-even + tick, the ask touch); here the touch
         self.assertAlmostEqual(sells[0]["price"], 0.14)
         self.assertAlmostEqual(sells[0]["qty"], bid.qty)
+        # and the NEXT pass reads what the waiting stock earns (owner,
+        # 2026-08-20: "how much the stock that is being sold is earning
+        # per day?") — an ask at the touch is inside the window here
+        r.now += 400
+        put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
+        s = r.cycle(terms)
+        sells = [o for o in s["orders"] if o["purpose"] == "sell"]
+        self.assertIsNotNone(sells[0]["live_est"])
+        self.assertGreater(sells[0]["live_est"], 0.0)
+        self.assertTrue(sells[0]["live_parts"].get("exit"))
 
     def test_account_positions_are_not_adopted_as_our_inventory(self):
         # The account is shared with 1.0, which holds seats stock of its

@@ -307,7 +307,8 @@ ORDERS_JS = """
  if(grp.exp1.length)h+='<details class="how"><summary>'+grp.exp1.length+
   ' experiments &middot; probing the scoring-window rule</summary>'+tbl(grp.exp1)+'</details>';
  if(grp.stock.length)h+='<details class="how"><summary>'+grp.stock.length+
-  ' selling stock &middot; re-offering filled shares at break-even +1 tick</summary>'+tbl(grp.stock)+'</details>';
+  ' selling stock &middot; earning '+usd(dsum(grp.stock))+'/d while it waits &mdash; '+
+  're-offered at break-even +1 tick</summary>'+tbl(grp.stock)+'</details>';
  var famName=function(m){
   if(m.indexOf('aachc-cfb-wins-')===0){var p=m.split('-');
    return p[p.length-2].toUpperCase()+' '+p[p.length-1].replace('pt5wins','.5+ wins');}

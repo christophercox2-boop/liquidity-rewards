@@ -418,11 +418,22 @@ class Family:
         # 2) maintenance: re-evaluate resting orders against fresh books
         refreshed = self._refresh_books(client, cat, now)
         for rec in list(self.orders.values()):
-            if rec.purpose == "sell":
-                continue
             book = self.cache.fresh(rec.market, BOOK_MAX_AGE * 4, now)
             row = cat.get(rec.market)
             if book is None or row is None:
+                continue
+            if rec.purpose == "sell":
+                # exits wait for their price, and they EARN while they wait
+                # (owner, 2026-08-20) — read it, never reprice it here
+                lv = [(p, q - rec.qty if abs(p - rec.price) < 1e-9 else q)
+                      for p, q in book.side(rec.side)]
+                lv = [(p, q) for p, q in lv if q > 1e-9]
+                j = estimate_join(rec.side, lv, book.tick, float(row["df"]),
+                                  float(row["target"]), rec.price, rec.qty)
+                sp = float(row.get("side_pool") or 0.0)
+                rec.live_share = round(j.share, 4)
+                rec.live_est = round(j.share * sp
+                                     if j.qualifies and j.in_window else 0.0, 4)
                 continue
             levels = [(p, q - rec.qty if abs(p - rec.price) < 1e-9 else q)
                       for p, q in book.side(rec.side)]
@@ -608,6 +619,9 @@ class Family:
                                        else o.est_day
                                        for o in self.orders.values()
                                        if o.purpose != "sell"), 2)
+        summary["stock_day"] = round(sum(o.live_est or 0.0
+                                         for o in self.orders.values()
+                                         if o.purpose == "sell"), 2)
         summary["spent"] = round(sum(capital_at_risk(o.intent, o.price, o.qty)
                                      for o in self.orders.values()
                                      if o.purpose != "sell"), 2)

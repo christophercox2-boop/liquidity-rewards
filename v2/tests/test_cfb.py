@@ -268,3 +268,27 @@ class TestScanNeverStarves(unittest.TestCase):
         r2 = Rig()
         r2.fam.restore(r.fam.to_dict())
         self.assertEqual(set(r2.fam.scoreboard), set(r.fam.scoreboard))
+
+
+class TestStockEarnsWhileWaiting(unittest.TestCase):
+    def test_exit_ask_gets_a_live_earning_reading(self):
+        # owner, 2026-08-20: "how much the stock that is being sold is
+        # earning per day?" — an exit resting in the window reads its share
+        r = Rig()
+        r.add_market(ALA, polite_book(r.now))
+        r.cycle()
+        r.cycle()
+        bid = next(o for o in r.fam.orders.values() if o.side == "BUY")
+        del r.exchange.live[bid.id]
+        r.positions[ALA] = (bid.qty, bid.qty * bid.price)
+        r.now += 3600
+        r.exchange.books[ALA] = polite_book(r.now)
+        r.cycle()                              # rests the exit at the touch
+        r.now += 3600
+        r.exchange.books[ALA] = polite_book(r.now)
+        s = r.cycle()                          # next pass reads its earnings
+        exits = [o for o in s["orders"] if o["purpose"] == "sell"]
+        self.assertEqual(len(exits), 1)
+        self.assertIsNotNone(exits[0]["live_est"])
+        self.assertGreater(exits[0]["live_est"], 0.0)
+        self.assertAlmostEqual(s["stock_day"], exits[0]["live_est"], delta=0.011)
