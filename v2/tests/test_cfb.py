@@ -223,3 +223,41 @@ class TestCycle(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestScanNeverStarves(unittest.TestCase):
+    def test_actives_leave_scan_slots(self):
+        # first night's bug: with more active markets than the book budget,
+        # active refreshes ate every fetch, the scoreboard never filled,
+        # and the family stopped placing — "on but not doing anything"
+        r = Rig()
+        slugs = [PREFIX + f"2026-11-28-tm{i}-5pt5wins" for i in range(10)]
+        for s in slugs:
+            r.add_market(s, polite_book(r.now))
+        # make all ten active by hand (placement caps don't matter here) —
+        # resting on the fake exchange too, or reconcile calls them vanished
+        from v2.cfb import CfbOrder
+        for i, s in enumerate(slugs):
+            r.fam.orders[f"x{i}"] = CfbOrder(
+                id=f"x{i}", market=s, side="BUY", price=0.44, qty=1.0,
+                intent="ORDER_INTENT_BUY_LONG", placed_ts=r.now, purpose="earn")
+            r.exchange.live[f"x{i}"] = {
+                "id": f"x{i}", "market": s, "side": "BUY", "price": 0.44,
+                "size": 1.0, "intent": "ORDER_INTENT_BUY_LONG"}
+        fresh = PREFIX + "2026-11-28-newteam-6pt5wins"
+        r.add_market(fresh, polite_book(r.now))
+        r.now += 300
+        for s in r.exchange.books:
+            r.exchange.books[s] = polite_book(r.now)
+        r.cycle()
+        self.assertIn(fresh, r.fam.scoreboard, "scan starved by active refreshes")
+        self.assertTrue(r.fam.scoreboard[fresh].get("plans"))
+
+    def test_scoreboard_survives_restart(self):
+        r = Rig()
+        r.add_market(ALA, polite_book(r.now))
+        r.cycle()
+        self.assertTrue(r.fam.scoreboard)
+        r2 = Rig()
+        r2.fam.restore(r.fam.to_dict())
+        self.assertEqual(set(r2.fam.scoreboard), set(r.fam.scoreboard))

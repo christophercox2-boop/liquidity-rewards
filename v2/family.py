@@ -541,15 +541,24 @@ class Family:
 
     def _refresh_books(self, client, cat: dict, now: float) -> int:
         """Fetch a few books: active markets by staleness first, then the
-        candidate scan rotation. All through this family's own cache."""
+        candidate scan rotation. All through this family's own cache.
+
+        The scan keeps a reserved slice of the budget. Without it, the
+        first night's 15 active markets ate all six fetches every cycle
+        (every book is older than one 60s poll) and the family stopped
+        discovering anything new — the owner found it "on but not doing
+        anything" (2026-08-20 morning). Maintenance only needs a book
+        fresher than 4x BOOK_MAX_AGE, so actives can wait 150s between
+        refreshes and still stay well inside that."""
         budget = self.cfg.books_per_cycle
+        scan_reserve = min(2, budget)
         done = 0
         active = sorted(self.active_markets() | set(self.inventory),
                         key=lambda s: self.cache.age(s, now), reverse=True)
         for slug in active:
-            if done >= budget:
+            if done >= budget - scan_reserve:
                 break
-            if self.cache.age(slug, now) > 60.0:
+            if self.cache.age(slug, now) > 150.0:
                 try:
                     self.cache.put(slug, client.book(slug, fetched_at=now))
                     done += 1
@@ -608,6 +617,9 @@ class Family:
             "positions_seen": self.positions_seen,
             "silent_cancels": self.silent_cancels,
             "last_action": self.last_action,
+            # the scan pipeline survives restarts — losing it silenced the
+            # family for hours on 2026-08-20 (placements come FROM it)
+            "scoreboard": self.scoreboard,
             "log": self.log[-self.cfg.log_keep:],
         }
 
@@ -619,6 +631,7 @@ class Family:
         self.positions_seen = dict(d.get("positions_seen") or {})
         self.silent_cancels = d.get("silent_cancels") or 0
         self.last_action = dict(d.get("last_action") or {})
+        self.scoreboard = dict(d.get("scoreboard") or {})
         self.log = list(d.get("log") or [])
 
 
