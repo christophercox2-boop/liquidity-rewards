@@ -1515,3 +1515,34 @@ days. Verified with a stubbed-network harness driving the real state
 snapshot: new-ground hold, status-quo auto path, redo guard, deny
 stickiness, queue hygiene, sub-cent serialization, ask chunking under low
 buying power. v2 untouched; its 210 tests still green.
+
+## 2026-08-20 — college football win totals: the second family (v2/cfb.py)
+
+Owner: "I like the football idea... max $1 per market... 5-10% per side on
+average" / "Just make college football for now." Universe measured by the
+survey: `aachc-cfb-wins-*` — 375 paying team-season win-total markets, every
+one $25/day pool per team-event of 5 lines (side pool $2.50/day), Target
+Size 5,000, df 0.5.
+
+Fully separate by construction: its own switch (OFF by default, two-tap arm
+on /v2/switch which now shows both switches), its own OrderDesk whitelisted
+to exactly that prefix, its own BookCache and TermsStore, its own $1/market
+budget. The seats engine and 1.0 cannot touch these markets and this module
+can touch nothing else. Hosted inside the 2.0 process to spare the shared
+box another Python process.
+
+Behavior: only sides that already hold Target Size are entered (a tiny
+order can't qualify a side, and topping one up gifts the pool to closer
+quotes). Price ladder steps back from the touch; in junk-wall books it may
+step in FRONT of the wall, capped 5 ticks clear of the other side's touch —
+df 0.5 means a wall 1 tick back still scores half, so share only exists
+several ticks in front. Size is the largest on a small grid keeping share
+<= 10% (share_hi) and cost <= $0.50/side; with no opposing quote the spend
+is clamped to probe money ($0.05). Game days belong to others: every
+non-exit order is pulled Thursday 17:00 ET - Sunday 06:00 ET. Fills ping
+the phone and the exit seller re-offers at break-even+tick. First tranche
+capped at 40 markets (cfb_max via CfbConfig.max_markets).
+
+Tests: v2/tests/test_cfb.py (11) through the real desk rails against the
+fake exchange; whole suite 222 green. Switch page, status card, and orders
+fold verified in a headless phone-width browser.

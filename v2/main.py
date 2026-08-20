@@ -25,6 +25,7 @@ import sys
 import time
 from pathlib import Path
 
+from . import cfb as cfbmod
 from .alerts import Alerts
 from .api import ApiError, Client
 from .books import BookCache, ws_priority
@@ -130,6 +131,23 @@ class Monitor:
             log=self._audit,
         )
         self.engine = Engine(self.desk, cfg, alert=self.alerts.notify)
+        # college football win totals: a separate family with its own
+        # switch, desk, whitelist, book cache and terms — the seats engine
+        # and 1.0 never see these markets, and vice versa (owner: "keep
+        # everything very separate", "Just make college football for now")
+        self.cfb_switch = MasterSwitch(alert=self.alerts.notify,
+                                       name="CFB switch",
+                                       scope="college football")
+        self.cfb_cache = BookCache()
+        self.cfb_desk = OrderDesk(
+            client=self.client,
+            whitelist=lambda s: s.startswith(cfbmod.PREFIX),
+            switch_on=lambda: self.cfb_switch.on,
+            fresh_book=lambda s: self.cfb_cache.fresh(s, 120.0, time.time()),
+            log=self._audit,
+        )
+        self.cfb = cfbmod.CfbFamily(self.cfb_desk, self.cfb_cache,
+                                    alert=self.alerts.notify)
         self.stream = Stream(self.cache, self._ws_slugs,
                              self.client.key_id, self.client.secret_key)
         self.boots: list[float] = []
@@ -174,8 +192,12 @@ class Monitor:
         self.terms_history = list(saved.get("terms_history") or [])
         if saved.get("switch"):
             self.switch.restore(saved["switch"])
+        if saved.get("cfb_switch"):
+            self.cfb_switch.restore(saved["cfb_switch"])
         if saved.get("engine_saved"):
             self.engine.restore(saved["engine_saved"])
+        if saved.get("cfb"):
+            self.cfb.restore(saved["cfb"])
         if saved.get("rewards_watch"):
             self.rewards_watch = RewardsWatch.from_dict(saved["rewards_watch"])
         if saved.get("survey"):
@@ -193,14 +215,16 @@ class Monitor:
             self.alerts.notify("New build with switch ON",
                                f"build {self.build} booted; 2.0 may place orders")
 
-    def switch_tap(self, op: str) -> dict:
+    def switch_tap(self, op: str, which: str = "master") -> dict:
         """An owner tap on /v2/switch. The flip is persisted IMMEDIATELY —
         local and remote, no throttle — because a container restart between
         a flip and the next cycle's save once quietly turned the switch
         back off (2026-08-18, the owner's first ON lasted seconds)."""
-        s = self.switch.op(op)
+        sw = self.cfb_switch if which == "cfb" else self.switch
+        s = sw.op(op)
         st = dict(self.last_state) if self.last_state else {}
-        st["switch"] = s
+        st["switch"] = self.switch.state()
+        st["cfb_switch"] = self.cfb_switch.state()
         st["saved_at"] = time.time()
         self.last_state = st
         self.store.save_local(st)
@@ -212,6 +236,7 @@ class Monitor:
         overlaid, so the display can never show a stale flip."""
         st = dict(self.last_state) if self.last_state else {"saved_at": 0}
         st["switch"] = self.switch.state()
+        st["cfb_switch"] = self.cfb_switch.state()
         return st
 
     # -- one poll cycle -------------------------------------------------------
@@ -288,7 +313,8 @@ class Monitor:
             # positions are only needed when the engine can act or holds
             # anything; while idle, poll them gently — the container is
             # shared with 1.0 and every request costs its CPU and rate limit
-            engaged = (self.switch.on or self.engine.orders or self.engine.inventory)
+            engaged = (self.switch.on or self.engine.orders or self.engine.inventory
+                       or self.cfb_switch.on or self.cfb.engaged())
             self._pos_tick = getattr(self, "_pos_tick", 0) + 1
             if engaged or self._pos_tick % 4 == 1:
                 positions = self.client.positions_net()
@@ -305,6 +331,20 @@ class Monitor:
         except Exception as e:  # noqa: BLE001 — never lose the save below
             self._note(f"engine: {type(e).__name__}: {e}")
             engine_summary = {"mode": f"error: {type(e).__name__}"}
+
+        # college football: fully separate family, fenced the same way —
+        # nothing in this block may prevent the state save below
+        cfb_summary = {"mode": "skipped"}
+        try:
+            if positions is not None:
+                cfb_summary = self.cfb.cycle(now, orders, positions, self.client,
+                                             self.survey.terms,
+                                             self.cfb_switch.on)
+            else:
+                cfb_summary = {"mode": "idle"}
+        except Exception as e:  # noqa: BLE001 — never lose the save below
+            self._note(f"cfb: {type(e).__name__}: {e}")
+            cfb_summary = {"mode": f"error: {type(e).__name__}"}
 
         # the rewards watcher: cheap (one windowed earnings fetch every 5
         # minutes), fenced like the engine, and pushes the phone the moment
@@ -381,6 +421,9 @@ class Monitor:
                                if (fv := self.silver.flavors_fair(s)) is not None},
             "control": {c: cv for c in ("senate", "house")
                         if (cv := self.silver.control(c)) is not None},
+            "cfb": self.cfb.to_dict(),
+            "cfb_view": cfb_summary,
+            "cfb_switch": self.cfb_switch.state(),
             "rewards_watch": self.rewards_watch.to_dict(),
             "survey": self.survey.to_dict(),
             "survey_view": {"status": self.survey.status(now),

@@ -23,12 +23,18 @@ ARM_WINDOW_S = 120.0
 
 
 class MasterSwitch:
-    def __init__(self, alert=None, clock=None):
+    def __init__(self, alert=None, clock=None, name: str = "Master switch",
+                 scope: str = "2.0"):
         self.on = False
         self.armed_at = 0.0
         self.log: list[dict] = []
         self.alert = alert or (lambda title, msg: None)
         self._clock = clock or time.time
+        # one class, many loops: each family gets its own instance with its
+        # own name, so a flip's push says WHICH switch moved (the owner's
+        # per-loop switch rule)
+        self.name = name
+        self.scope = scope
 
     def _note(self, action: str) -> None:
         self.log.append({"ts": round(self._clock(), 1), "action": action})
@@ -41,7 +47,7 @@ class MasterSwitch:
             if self.on:
                 self.on = False
                 self._note("OFF")
-                self.alert("Master switch OFF", "2.0 will not place orders")
+                self.alert(f"{self.name} OFF", f"{self.scope} will not place orders")
             self.armed_at = 0.0
         elif op == "arm":
             if not self.on:
@@ -54,7 +60,7 @@ class MasterSwitch:
                 self.on = True
                 self.armed_at = 0.0
                 self._note("ON")
-                self.alert("Master switch ON", "2.0 may now place orders")
+                self.alert(f"{self.name} ON", f"{self.scope} may now place orders")
             else:
                 self.armed_at = 0.0
                 self._note("confirm expired")

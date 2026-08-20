@@ -58,9 +58,12 @@ class TestSwitchRoute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.sw = MasterSwitch()
+        cls.cfb_sw = MasterSwitch(name="CFB switch", scope="college football")
+        # same shape as main.switch_tap: op plus which switch
         cls.srv = WebServer(get_state=lambda: {"engine": {"used": 1.0}},
                             password="pw", port=0, bind="127.0.0.1",
-                            switch_op=cls.sw.op)
+                            switch_op=lambda op, which="master":
+                                (cls.cfb_sw if which == "cfb" else cls.sw).op(op))
         cls.srv.start_background()
         cls.port = cls.srv.server_address[1]
 
@@ -89,12 +92,24 @@ class TestSwitchRoute(unittest.TestCase):
                               {"X-Dash-Key": "pw", "X-Reprice": "1"})
         self.assertEqual(status, 400)
 
+    def test_cfb_switch_is_its_own(self):
+        status, body = self.post({"op": "arm", "which": "cfb"},
+                                 {"X-Dash-Key": "pw", "X-Reprice": "1"})
+        self.assertEqual(status, 200)
+        self.assertTrue(json.loads(body)["sw"]["armed"])
+        self.assertFalse(self.sw.on)          # the seats switch never moved
+        status, _ = self.post({"op": "arm", "which": "nfl"},
+                              {"X-Dash-Key": "pw", "X-Reprice": "1"})
+        self.assertEqual(status, 400)
+
     def test_switch_shell_served(self):
         c = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
         c.request("GET", "/switch")
         r = c.getresponse()
         self.assertEqual(r.status, 200)
-        self.assertIn(b"master switch", r.read())
+        page = r.read()
+        self.assertIn(b"2.0 switches", page)
+        self.assertIn(b"College football", page)
         c.close()
 
 

@@ -258,6 +258,17 @@ STATUS_JS = """
    'quietly cancels what buying power can&rsquo;t fund; the engine re-places them.)':'')+'</details>'+
    '<div class="muted" style="margin-top:6px"><a href="orders" style="color:#9ecbff">every order &rarr;</a>'+
    ' &nbsp; <a href="opps" style="color:#9ecbff">what it wants next &rarr;</a></div></div>';
+ var cv=d.cfb_view||{};var cs=d.cfb_switch||{};
+ if(cs.on||(cv.orders||[]).length){
+  h+='<div class="card"><b>College football</b> <span class="muted">separate family &middot; switch '+
+    (cs.on?'<span class="ok">ON</span>':'off')+(cv.mode&&cv.mode!=='on'?' &middot; '+cv.mode:'')+'</span>'+
+    '<div class="stats"><div class="stat"><div class="lab">orders resting</div><div class="val">'+
+    (cv.orders||[]).length+'</div></div>'+
+    '<div class="stat"><div class="lab">earning</div><div class="val">'+usd(cv.est_day)+'<span class="u">/day</span></div></div>'+
+    '<div class="stat"><div class="lab">collateral</div><div class="val">'+usd(cv.spent)+'</div></div></div>'+
+    '<div class="sub">'+(cv.active||0)+' of '+(cv.markets||0)+' paying win-total markets &middot; '+
+    (cv.resting_ok===false?'game window &mdash; orders pulled until Sunday 6am ET':'resting week (out Thu 5pm&ndash;Sun 6am ET)')+'</div></div>';
+ }
  var er=(d.errors||[]).filter(function(x){return x.indexOf('booted build')<0;}).slice(-5).reverse();
  if(er.length){h+='<div class="card"><b class="warn">Recent trouble</b><div class="muted">'+er.join('<br>')+'</div></div>';}
  return h;
@@ -295,6 +306,18 @@ ORDERS_JS = """
   ' experiments &middot; probing the scoring-window rule</summary>'+tbl(grp.exp1)+'</details>';
  if(grp.stock.length)h+='<details class="how"><summary>'+grp.stock.length+
   ' selling stock &middot; re-offering filled shares at break-even +1 tick</summary>'+tbl(grp.stock)+'</details>';
+ var cv=d.cfb_view||{};
+ var co=(cv.orders||[]).slice().sort(function(a,b){return ((b.live_est!=null?b.live_est:b.est_day)||0)-((a.live_est!=null?a.live_est:a.est_day)||0);});
+ if(co.length){
+  var cfbName=function(m){var p=m.split('-');
+   return p[p.length-2].toUpperCase()+' '+p[p.length-1].replace('pt5wins','.5+ wins');};
+  h+='<details class="how"><summary>'+co.length+' college football &middot; '+usd(cv.est_day)+
+   '/d &mdash; separate family, max $1 a market</summary><table>'+hrow(['market','order','earns','share']);
+  co.forEach(function(o){h+=row([cfbName(o.market),
+   '<span style="white-space:nowrap">'+(o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+pc(o.price)+'</span>',
+   usd(o.live_est!=null?o.live_est:o.est_day)+'/d',
+   pct(o.live_share!=null?o.live_share:o.share)]);});
+  h+='</table></details>';}
  h+='<details class="how"><summary>how to read this</summary>'+
   '<b>earns</b> is what the order makes from the reward pool at this book right now; the line '+
   'under it subtracts the expected cost of getting filled (fills are usually losses here, not '+
@@ -823,7 +846,7 @@ SWITCH_SHELL = """<!doctype html><html><head>
  td{padding:3px 6px;border-bottom:1px solid #2a3242}
  a{color:#9ecbff;text-decoration:none}
 </style></head><body>
-<h1>2.0 master switch</h1>
+<h1>2.0 switches</h1>
 <div style="margin:2px 0 10px"><a href=".">status</a> &middot; <a href="orders">orders</a>
  &middot; <a href="markets">markets</a> &middot; <a href="opps">opps</a> &middot; <a href="log">log</a></div>
 <div id="login" class="card" style="display:none">
@@ -839,29 +862,40 @@ sends one push saying so.</div>
 function hdrs(json){const h=new Headers();h.set('X-Dash-Key',localStorage.getItem('dashKey')||'');
  h.set('X-Reprice','1');if(json)h.set('Content-Type','application/json');return h;}
 function saveKey(){localStorage.setItem('dashKey',document.getElementById('k').value);load();}
-function op(o){fetch('switch',{method:'POST',headers:hdrs(true),body:JSON.stringify({op:o})})
+function op(o,w){fetch('switch',{method:'POST',headers:hdrs(true),body:JSON.stringify({op:o,which:w})})
  .then(function(r){if(r.status===401){document.getElementById('login').style.display='block';return null;}
-  return r.json();}).then(function(d){if(d)render(d.sw,d.engine);});}
+  return r.json();}).then(function(){load();});}
 function usd(x){return '$'+(x||0).toFixed(2);}
-function render(sw,eng){
- document.getElementById('login').style.display='none';
- var h='';
- if(sw.on){h+='<div class="state on">ON</div><button class="b-off" onclick="op(\\'off\\')">TURN OFF</button>';}
+function card(sw,w,label){
+ var h='<div style="font-weight:700">'+label+'</div>';
+ if(sw.on){h+='<div class="state on">ON</div><button class="b-off" onclick="op(\\'off\\',\\''+w+'\\')">TURN OFF</button>';}
  else if(sw.armed){h+='<div class="state armed">ARMED &middot; '+sw.arm_expires_in+'s</div>'+
-  '<button class="b-go" onclick="op(\\'confirm\\')">CONFIRM &mdash; TURN ON</button>'+
-  '<button class="b-arm" onclick="op(\\'off\\')">cancel</button>';}
- else{h+='<div class="state off">OFF</div><button class="b-arm" onclick="op(\\'arm\\')">ARM (tap 1 of 2)</button>';}
- if(eng){h+='<div class="muted" style="margin-top:8px">at risk '+usd(eng.used)+' of '+usd(eng.ceiling)+
+  '<button class="b-go" onclick="op(\\'confirm\\',\\''+w+'\\')">CONFIRM &mdash; TURN ON</button>'+
+  '<button class="b-arm" onclick="op(\\'off\\',\\''+w+'\\')">cancel</button>';}
+ else{h+='<div class="state off">OFF</div><button class="b-arm" onclick="op(\\'arm\\',\\''+w+'\\')">ARM (tap 1 of 2)</button>';}
+ if(sw.log&&sw.log.length){h+='<table>';sw.log.slice(-4).reverse().forEach(function(l){
+  h+='<tr><td>'+new Date(l.ts*1000).toLocaleString()+'</td><td>'+l.action+'</td></tr>';});h+='</table>';}
+ return h;
+}
+function render(d){
+ document.getElementById('login').style.display='none';
+ var eng=d.engine||{};var cv=d.cfb_view||{};
+ var h=card(d.switch||{},'master','Seats engine');
+ if(eng){h+='<div class="muted" style="margin:8px 0 2px">at risk '+usd(eng.used)+' of '+usd(eng.ceiling)+
   ' ceiling &middot; headroom '+usd(eng.headroom)+' &middot; '+
   (eng.orders||[]).length+' orders resting'+
   (eng.silent_cancels?' &middot; '+eng.silent_cancels+' silent cancels':'')+'</div>';}
- if(sw.log&&sw.log.length){h+='<table>';sw.log.slice().reverse().forEach(function(l){
-  h+='<tr><td>'+new Date(l.ts*1000).toLocaleString()+'</td><td>'+l.action+'</td></tr>';});h+='</table>';}
+ h+='<hr style="border:0;border-top:1px solid #2a3242;margin:14px 0">';
+ h+=card(d.cfb_switch||{},'cfb','College football &mdash; separate family');
+ h+='<div class="muted" style="margin-top:8px">win totals only &middot; max $1 a market &middot; '+
+  ((cv.orders||[]).length)+' orders &middot; '+usd(cv.est_day)+'/day est &middot; '+
+  usd(cv.spent)+' collateral &middot; '+
+  (cv.resting_ok===false?'game window (orders pulled until Sun 6am ET)':'resting week')+'</div>';
  document.getElementById('view').innerHTML=h;
 }
 function load(){fetch('data.json',{headers:hdrs(false),cache:'no-store'}).then(function(r){
  if(r.status===401){document.getElementById('login').style.display='block';return null;}
- return r.json();}).then(function(d){if(d)render(d.switch||{},d.engine);});}
+ return r.json();}).then(function(d){if(d)render(d);});}
 load();setInterval(load,15000);
 </script></body></html>"""
 
@@ -914,15 +948,20 @@ class _Handler(BaseHTTPRequestHandler):
             self._send(403, "text/plain", b"missing X-Reprice header")
             return
         try:
-            body = self.rfile.read(int(self.headers.get("Content-Length") or 0))
-            op = str(json.loads(body or b"{}").get("op") or "")
+            body = json.loads(self.rfile.read(
+                int(self.headers.get("Content-Length") or 0)) or b"{}")
+            op = str(body.get("op") or "")
+            which = str(body.get("which") or "master")
         except ValueError:
             self._send(400, "text/plain", b"bad body")
             return
         if op not in ("arm", "confirm", "off"):
             self._send(400, "text/plain", b"op must be arm/confirm/off")
             return
-        sw = self.server.switch_op(op)
+        if which not in ("master", "cfb"):
+            self._send(400, "text/plain", b"which must be master/cfb")
+            return
+        sw = self.server.switch_op(op, which)
         state = self.server.get_state() or {}
         self._send(200, "application/json",
                    json.dumps({"sw": sw, "engine": state.get("engine")}).encode())
