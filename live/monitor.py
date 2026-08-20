@@ -4501,7 +4501,12 @@ BLOCK_MIN_SHARES = int(os.environ.get("BLOCK_MIN_SHARES", "100"))
 
 
 _DEAD_SWEEP = {"running": False, "last_try": 0.0}
-DEAD_SWEEP_MARK = "2026-08-20"     # bump the date to run the sweep again
+# Bump the mark to run the sweep again. Pass 1 (2026-08-20) cancelled 1,691
+# reward-seeking orders and kept 446 exits; the owner then said "You can
+# remove the unwinding positions as well. I'll replace those if necessary"
+# — so pass 2 takes the exits in dead markets too.
+DEAD_SWEEP_MARK = "2026-08-20-exits-too"
+DEAD_SWEEP_KEEP_EXITS = False
 
 
 def cancel_dead_sweep() -> None:
@@ -4546,7 +4551,8 @@ def cancel_dead_sweep() -> None:
         if m not in dead or not o.get("id"):
             continue
         net = tr._num((MONITOR.positions.get(m) or {}).get("netPosition"))
-        if (o["side"] == "SELL" and net > 0) or (o["side"] == "BUY" and net < 0):
+        if DEAD_SWEEP_KEEP_EXITS and ((o["side"] == "SELL" and net > 0)
+                                      or (o["side"] == "BUY" and net < 0)):
             kept_exits += 1
             continue                 # an exit is never dead weight
         targets.append(o)
@@ -4578,8 +4584,10 @@ def cancel_dead_sweep() -> None:
                     "ts": time.time(), "dead_markets": len(dead),
                     "cancelled": done, "failed": failed,
                     "kept_exits": kept_exits, "rows": rows[-60:]}
+            what = ("reward-seeking orders" if DEAD_SWEEP_KEEP_EXITS
+                    else "orders (exits included, per your word)")
             notify("Dead-market sweep finished",
-                   f"{done} reward-seeking orders cancelled across "
+                   f"{done} {what} cancelled across "
                    f"{len(dead)} markets that no longer pay; {failed} failed; "
                    f"{kept_exits} position exits left working.")
 
