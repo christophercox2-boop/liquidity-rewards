@@ -71,12 +71,18 @@ class FamilyConfig:
     per_market_usd: float = 1.00     # owner's cap, both sides combined
     share_hi: float = 0.10           # the not-drawing-attention ceiling
     max_markets: int = 40            # first tranche; scales on the owner's word
-    max_actions_per_cycle: int = 4   # rate-limit manners
-    books_per_cycle: int = 8         # REST fetches: active first, then the scan
+    max_actions_per_cycle: int = 3   # rate-limit manners
+    books_per_cycle: int = 6         # REST fetches: active first, then the scan
     rescan_s: float = 4 * 3600.0     # re-score an idle candidate this often
-    cooldown_s: float = 1800.0       # per market-side between our own moves
+    # Live tuning, 2026-08-20 early hours: the first cfb deploy repriced a
+    # dozen orders per pass chasing 1-tick touch wobbles for +$0.02/day
+    # gains, and the box started catching HTTP 429s — each reprice is a
+    # place-verify-cancel of several API calls. A move now has to be worth
+    # ~30% of a typical order's est before it clears the bar, and each
+    # market-side moves at most hourly.
+    cooldown_s: float = 3600.0       # per market-side between our own moves
     min_est_day: float = 0.02        # don't rest for under 2c/day
-    reprice_gain_day: float = 0.02   # a move must clear churn
+    reprice_gain_day: float = 0.06   # a move must clear real churn
     drift_share: float = 0.15        # live share above this = too visible, replan
     min_days_out: int = 3            # nothing resolving this week
     terms_every_s: float = 600.0     # live terms refresh for active markets

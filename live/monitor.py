@@ -4512,7 +4512,12 @@ def auto_qualify(event_sizes: dict[str, int] | None = None) -> None:
     ranked = []
     for m in set(tr._PROG_CACHE.get("progs") or {}) | set(
             MONITOR.state.get("prog_terms") or {}):
-        if _hands_off(m) or tr._is_econ(m):
+        # POLITICS ONLY. The tracker's prog cache covers every market the
+        # ACCOUNT has orders in — which now includes 2.0's sports families —
+        # and on 2026-08-20 the qualifier auto-closed a college-football ask
+        # side ($45.52) through that door. 1.0 is the politics app; the
+        # sports families are 2.0's alone.
+        if not tr._is_us_politics(m) or _hands_off(m) or tr._is_econ(m):
             continue
         d = _qual_days_out(m)
         if d is not None and d < QUAL_MIN_DAYS_OUT:

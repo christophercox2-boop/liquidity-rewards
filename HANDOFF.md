@@ -1576,3 +1576,31 @@ render each live family's card/fold.
 Suite: 227 tests green (college's 11 unchanged on the shared engine; NFL's
 behind-the-touch rule pinned: wall-only books skipped entirely, no plan
 ever prices in front of the touch).
+
+## 2026-08-20 early hours — two live fixes from the first family night
+
+1. **The qualifier leaked into a 2.0 family.** The widened scan's sources
+   include `tr._PROG_CACHE` — every market the ACCOUNT has orders in. When
+   the owner turned the CFB switch on, its markets gained tracker books,
+   which made them "known ground," and at 02:12 ET the qualifier
+   auto-closed the ask side of `aachc-cfb-wins-2026-11-28-ala-8pt5wins`
+   (4,552 at 99c, $45.52 collateral) under the far-dated/<=$50 rule. Fixed:
+   the qualifier scan now requires `tr._is_us_politics(m)` — 1.0 is the
+   politics app; the sports families are 2.0's alone. The stray order was
+   left resting pending the owner's word (bounded $45.52, currently
+   earning most of that market's ask-side pool).
+
+2. **CFB repriced too eagerly and the box caught HTTP 429s.** First night:
+   ~a dozen reprices per pass chasing 1-tick touch wobbles for +$0.02/day,
+   each a multi-call place-verify-cancel; /v1/orders/open returned 429
+   twice. FamilyConfig manners tightened: reprice_gain_day 0.02 -> 0.06,
+   cooldown 30m -> 60m per market-side, actions 4 -> 3/cycle, books 8 -> 6.
+
+Also learned: the "258 empty sides" claimable estimate was wrong in the
+happy direction it hoped for — v1's missing books were CACHE gaps, not
+exchange gaps. After the full sweep, exactly ONE truly empty new-ground
+side exists (ewc-usse-ne-2026-11-03-dem, ~$4.17/day side pool, $20 to
+claim at 1c) plus one known-market partial (ewc-usp-party-2028-11-07-rep,
+~$50/day side, $192.43 to finish at 1c). The governor/slate books all
+carry real quotes; presence there is an earner/prober problem, not a
+qualification one.
