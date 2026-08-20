@@ -41,7 +41,11 @@ from .terms import TermsStore
 from .web import WebServer
 from .ws import Stream
 
-POLL_S = 45.0
+# Was 45. Slowed 2026-08-20 morning alongside the survey throttle: every
+# cycle fetches the account's open orders (3,300+ rows now) and positions;
+# 60s cuts all of 2.0's steady API load by a quarter, and nothing in the
+# engine or the families acts faster than half-hour cooldowns anyway.
+POLL_S = 60.0
 TERMS_EVERY_S = 300.0
 EVENTS_EVERY_S = 900.0
 BOOK_BUDGET = 10          # REST book fetches per poll (rate-limit budget)

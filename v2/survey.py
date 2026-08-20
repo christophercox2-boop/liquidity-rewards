@@ -51,7 +51,13 @@ STAKE_USD = 25.0        # the standard stake every row is measured at
 BACK_TICKS = 3          # "safe" means this far behind the touch
 MIN_DAYS_OUT = 14       # anything settling sooner is not a resting market
 CATALOGUE_TTL_S = 12 * 3600.0
-BOOKS_PER_PASS = 6      # gentle: the box is small and shares its rate limit
+# Was 6. Throttled 2026-08-20 morning: with two live trading families and
+# the account past 3,300 resting orders, the box started catching HTTP 429s
+# and DigitalOcean restarted it on failed health checks (the owner met a
+# 503). The survey is the biggest steady load that ISN'T earning money —
+# the families the owner picked are already priced, so the remaining sweep
+# can take days instead of hours.
+BOOKS_PER_PASS = 2      # gentle: the box is small and shares its rate limit
 TERM_BATCHES_PER_PASS = 3   # 40 slugs per batched call — pools are cheap to learn
 # Learning WHICH markets pay is cheap (one batched call per 40 slugs);
 # pricing one is expensive (a book fetch each). So the sweep does them in
