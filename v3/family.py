@@ -632,13 +632,13 @@ class Family:
         and pull the owner's exits (2026-08-20 23:12Z) and counted their
         collateral against the rebuild ceiling. Idempotent, every cycle."""
         for rec in self.orders.values():
-            if rec.purpose == "sell" or not rec.why.startswith("adopted"):
+            if rec.purpose == "sell":
                 continue
             net = (positions.get(rec.market) or (0.0, 0.0))[0]
             if ((rec.side == "SELL" and net > 0.005)
                     or (rec.side == "BUY" and net < -0.005)):
                 rec.purpose = "sell"
-                rec.why = "adopted exit — reduces the position it sits on"
+                rec.why = "an exit — its fill reduces the position it sits on"
 
     def cycle(self, now: float, open_orders: list[dict], positions: dict,
               client, switch_on: bool, foreign_ids=(),
