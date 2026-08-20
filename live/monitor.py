@@ -4875,6 +4875,14 @@ def auto_inventory() -> None:
         # as asks — it sells, it never buys, and "except for selling open
         # positions I'm out of the primary markets" means exactly that the
         # selling should carry on (owner, 2026-08-18).
+        #
+        # It IS gated on the pool. The continual dead-market scan pulls every
+        # order out of a market that pays nothing, exits included (owner,
+        # 2026-08-20: "You can remove the unwinding positions as well. I'll
+        # replace those if necessary"), so re-listing there only fights it —
+        # the same place/cancel loop 2.0's seller fell into the same day.
+        if _no_live_program(slug):
+            continue
         free = _inv_free(slug)
         if free < INV_MIN_SHARES:
             continue

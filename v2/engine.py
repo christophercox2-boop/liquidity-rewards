@@ -1011,6 +1011,19 @@ class Engine:
             book = books.fresh(slug, BOOK_MAX_AGE, now)
             if book is None or abs(qty) < 1.0:
                 continue
+            # NOTHING RESTS IN A MARKET THAT PAYS NOTHING — not even an exit.
+            # Step 1 above pulls every order out of a dead-program market, so
+            # a seller that keeps re-listing there just fights it: when the
+            # seats programs vanished on 2026-08-20 this pair looped
+            # place->cancel every six minutes across nine markets for two
+            # hours (~85 order calls per half hour, feeding the rate limits)
+            # and the owner watched fresh orders keep appearing: "This is
+            # still going on." The position stays, visible, and is the
+            # owner's to unwind — his call, same day: "You can remove the
+            # unwinding positions as well. I'll replace those if necessary."
+            prog_here = terms.get(slug)
+            if prog_here is None or not prog_here.is_live() or not prog_here.pool:
+                continue
             covered = sum(o.qty for o in self.orders.values()
                           if o.market == slug and o.purpose in ("sell", "close"))
             if qty > 0:

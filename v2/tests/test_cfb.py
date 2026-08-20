@@ -341,3 +341,36 @@ class TestNoRewardsNoOrders(unittest.TestCase):
         s = r.cycle()
         self.assertEqual(s["orders"], [])
         self.assertNotIn(ALA, r.fam.scoreboard)
+
+
+class TestNoChurnInDeadMarkets(unittest.TestCase):
+    def test_seller_does_not_relist_where_the_program_died(self):
+        # 2026-08-20: the seats engine pulled exits from dead-program
+        # markets and its seller re-listed them every cycle — place/cancel
+        # every six minutes for two hours. Nothing may rest in a market
+        # that pays nothing, exits included.
+        r = Rig()
+        r.add_market(ALA, polite_book(r.now))
+        r.cycle()
+        r.cycle()
+        bid = next(o for o in r.fam.orders.values() if o.side == "BUY")
+        del r.exchange.live[bid.id]
+        r.positions[ALA] = (bid.qty, bid.qty * bid.price)
+        r.now += 3600
+        r.exchange.books[ALA] = polite_book(r.now)
+        r.cycle()                                  # fill seen, exit rested
+        self.assertTrue([o for o in r.fam.orders.values() if o.purpose == "sell"])
+        # now the program dies
+        r.exchange.prog_raw[ALA]["timePeriods"][0]["rewardPool"] = 0
+        r.survey_terms.pop(ALA)
+        r.fam.last_terms = 0.0
+        for _ in range(4):
+            r.now += 3600
+            r.exchange.books[ALA] = polite_book(r.now)
+            r.cycle()
+        placed_after = [b for b in r.exchange.posts
+                        if b[1].get("marketSlug") == ALA][-1]
+        self.assertTrue(r.fam.inventory.get(ALA), "position must be kept")
+        # no new sell listings once the pool is gone
+        sells = [o for o in r.fam.orders.values() if o.purpose == "sell"]
+        self.assertLessEqual(len(sells), 1, "seller re-listed in a dead market")

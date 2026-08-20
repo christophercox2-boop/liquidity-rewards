@@ -560,6 +560,14 @@ class Family:
             qty = inv.get("qty") or 0.0
             if qty < 0.01:
                 continue
+            # not in a market that pays nothing — see the same guard in
+            # engine.py, where a seller re-listing against the dead-program
+            # pull looped for two hours on 2026-08-20
+            prog_here = self.terms.get(slug)
+            if slug not in cat or (prog_here is not None
+                                   and (not prog_here.is_live()
+                                        or not prog_here.pool)):
+                continue
             covered = sum(o.qty for o in self.orders.values()
                           if o.market == slug and o.purpose == "sell")
             rest = qty - covered
