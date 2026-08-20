@@ -74,8 +74,10 @@ class FamilyConfig:
     allow_improve: bool = True
     per_market_usd: float = 1.00     # owner's cap, both sides combined
     share_hi: float = 0.10           # the not-drawing-attention ceiling
-    max_markets: int = 400           # owner, 2026-08-20: "a 40 market cap
-                                     # leaves out 90% of what's available"
+    # owner, 2026-08-20: "There should be no market limit." None = every
+    # paying market the planner finds worth resting in; the real bounds are
+    # the $1/market cap, the share band, and the placement/scan pacing.
+    max_markets: int | None = None
     max_actions_per_cycle: int = 3   # rate-limit manners
     books_per_cycle: int = 6         # REST fetches: active first, then the scan
     rescan_s: float = 4 * 3600.0     # re-score an idle candidate this often
@@ -482,7 +484,8 @@ class Family:
             if days is not None and days < self.cfg.min_days_out:
                 continue
             fresh_new = slug in self.active_markets()
-            if not fresh_new and len(self.active_markets()) >= self.cfg.max_markets:
+            if (self.cfg.max_markets is not None and not fresh_new
+                    and len(self.active_markets()) >= self.cfg.max_markets):
                 continue
             for plan in sb["plans"]:
                 if actions <= 0:

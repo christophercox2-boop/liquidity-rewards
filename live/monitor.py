@@ -4478,6 +4478,77 @@ def _qual_place(job: dict) -> tuple[bool, str]:
     return True, "done" if left <= 0 else f"{left:,} still short"
 
 
+BLOCK_MIN_SHARES = int(os.environ.get("BLOCK_MIN_SHARES", "100"))
+
+
+def block_exposure() -> list[dict]:
+    """Every deep floor/ceiling block resting on the account, with a danger
+    reading. Owner (2026-08-20): "I'm fine with the qualifier bringing
+    sides of the markets over their target size, I just need a list of
+    where I'm exposed so that I can get out if there is ever a risk of
+    those positions becoming impossible."
+
+    A block "becomes impossible" when its market walks toward the side that
+    fills it: a ceiling ask is in danger as YES approaches certainty (best
+    bid high), a floor bid as NO does (best ask low). Origin doesn't matter
+    — v1 qualifier, old batch entries, or a 2.0 family — if it rests deep
+    and big on this account, it is on the list."""
+    out = []
+    for o in MONITOR.orders:
+        px = float(o.get("price") or 0)
+        size = float(o.get("size") or 0)
+        side = o.get("side")
+        if not o.get("id") or size < BLOCK_MIN_SHARES:
+            continue
+        if not ((side == "BUY" and px <= 0.02) or (side == "SELL" and px >= 0.98)):
+            continue
+        m = o["market"]
+        ent = tr._BOOK_CACHE.get(m) or _QUAL["books"].get(m)
+        bid = ask = None
+        if ent and ent[1]:
+            bids, asks = ent[1].get("bids") or [], ent[1].get("asks") or []
+            bid = float(bids[0][0]) if bids else None
+            ask = float(asks[0][0]) if asks else None
+        locked = px * size if side == "BUY" else (1 - px) * size
+        risk = "ok"
+        if side == "SELL" and bid is not None:
+            risk = "RISK" if bid >= 0.90 else ("watch" if bid >= 0.80 else "ok")
+        elif side == "BUY" and ask is not None:
+            risk = "RISK" if ask <= 0.10 else ("watch" if ask <= 0.20 else "ok")
+        days = _qual_days_out(m)
+        if days is not None and days <= 7 and risk == "ok":
+            risk = "watch"          # resolution week: certainty arrives fast
+        out.append({"id": o["id"], "m": m, "side": side,
+                    "px_c": round(px * 100, 1), "size": round(size),
+                    "locked": round(locked, 2),
+                    "bid_c": round(bid * 100, 1) if bid is not None else None,
+                    "ask_c": round(ask * 100, 1) if ask is not None else None,
+                    "risk": risk, "days": days})
+    rank = {"RISK": 0, "watch": 1, "ok": 2}
+    out.sort(key=lambda r: (rank[r["risk"]], -r["locked"]))
+    return out
+
+
+def block_risk_alerts() -> None:
+    """One push per block per six hours while it reads RISK — the list is
+    for looking, the push is for not having to."""
+    seen = MONITOR.state.setdefault("block_risk_seen", {})
+    now = time.time()
+    for r in block_exposure():
+        if r["risk"] != "RISK":
+            continue
+        key = f"{r['m']}|{r['side']}"
+        if now - float(seen.get(key) or 0) < 6 * 3600:
+            continue
+        seen[key] = now
+        notify("Deep block at risk",
+               f"{r['m']} {r['side']} {r['size']:,} at {r['px_c']:g}c — the "
+               f"market is walking toward it (bid {r['bid_c']}c / ask "
+               f"{r['ask_c']}c, {r['days']}d out). ${r['locked']:,.2f} on the "
+               f"line; the Deep blocks card on the map cancels it in one tap.",
+               priority="high")
+
+
 def auto_qualify(event_sizes: dict[str, int] | None = None) -> None:
     """Close cheap qualification gaps; queue the rest for the owner.
 
@@ -10229,6 +10300,7 @@ def _map_payload() -> dict:
         "sell_queue": sorted(
             ({"key": k, **v} for k, v in (MONITOR.state.get("sell_queue") or {}).items()),
             key=lambda j: -float(j.get("loss_usd") or 0)),
+        "blocks": block_exposure(),
         "qual_queue": sorted(
             ({"key": k, **v} for k, v in (MONITOR.state.get("qual_queue") or {}).items()),
             key=lambda j: (-float(j.get("est") or 0), float(j.get("cost") or 0))),
@@ -10304,7 +10376,7 @@ body:not(.lab) #probeCard,body:not(.lab) #earnCard{display:none!important}
 body.lab #navMap{display:inline-block!important}
 .navrow{margin:14px 0 4px;display:flex;gap:10px;flex-wrap:wrap}
 body:not(.slate) #slateCard{display:none!important}
-body.lab #qualCard,body.slate #qualCard{display:none!important}
+body.lab #qualCard,body.slate #qualCard,body.lab #blockCard,body.slate #blockCard{display:none!important}
 body.slate #gridCard,body.slate #listCard,body.slate #chips,
 body.slate .autorow,body.slate #probeCard,body.slate #earnCard,
 body.slate #navSlate,body.slate #navLab{display:none!important}
@@ -10502,6 +10574,11 @@ padding:10px 14px;font-weight:700;font-size:14px;margin-top:8px;cursor:pointer}
     color:var(--dim);margin-bottom:6px">⚓ Qualifying — waiting on you</div>
     <div id="qualBody"></div>
   </div>
+  <div class="card" id="blockCard" style="display:none">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--dim);margin-bottom:6px">🧱 Deep blocks — where you're exposed</div>
+    <div id="blockBody"></div>
+  </div>
   <div class="card" id="slateCard" style="display:none">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--dim);margin-bottom:6px">🇺🇸 2028 slate — where the money is</div>
@@ -10697,7 +10774,8 @@ function renderInner(){
   // used to leave every route stuck on "loading..." with no clue why — and
   // the clue only existed in a console the owner has no way to open on a
   // phone. Each is isolated now, and a failure names itself on screen.
-  [['sell', renderSell], ['qualify', renderQual], ['slate', renderSlate],
+  [['sell', renderSell], ['qualify', renderQual], ['blocks', renderBlocks],
+   ['slate', renderSlate],
    ['alerts', renderAlerts], ['prober', renderProbe], ['earner', renderEarn]]
     .forEach(([nm, fn]) => {
       try { fn(); }
@@ -10951,6 +11029,46 @@ async function sellAct(key, decision){
      !confirm('Take the standing bid? This sells immediately at a loss.')) return;
   const r = await act({op:'sell', key:key, act:decision});
   alert(r.ok ? ('done — ' + r.msg) : ('failed — ' + r.msg));
+  load();
+}
+
+function renderBlocks(){
+  const card = document.getElementById('blockCard'); if(!card) return;
+  const rows = DATA.blocks || [];
+  if(!rows.length){ card.style.display='none'; return; }
+  card.style.display='block';
+  const tot = rows.reduce((t,r)=>t+(r.locked||0),0);
+  const hot = rows.filter(r=>r.risk!=='ok').length;
+  const badge = r => r.risk==='RISK'
+    ? '<span style="background:rgba(229,100,95,.25);color:#ff9d99;font-weight:700;padding:1px 7px;border-radius:8px">AT RISK</span>'
+    : r.risk==='watch'
+    ? '<span style="background:rgba(255,206,107,.18);color:#ffce6b;padding:1px 7px;border-radius:8px">watch</span>'
+    : '<span style="color:var(--dim)">ok</span>';
+  document.getElementById('blockBody').innerHTML =
+    '<div class="sub" style="margin-bottom:6px">' + rows.length +
+    ' big floor/ceiling blocks holding sides over Target Size — $' + tot.toFixed(2) +
+    ' locked in all. A block is safe until its market walks toward it: AT RISK means the book is ' +
+    'within 10¢ of filling it, watch within 20¢ or resolving this week. Cancel gets you out whole.</div>' +
+    rows.map(r =>
+      '<div style="border-top:1px solid var(--line);padding:7px 0">' +
+      '<div style="display:flex;align-items:baseline;gap:6px">' +
+      '<b style="font-size:13px;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;' +
+      'white-space:nowrap">' + esc((DATA.labels||{})[r.m] || r.m) + '</b>' + badge(r) + '</div>' +
+      '<div class="sub" style="font-size:10.5px;margin:1px 0 5px">' +
+      (r.side==='BUY'?'bid':'ask') + ' ' + (r.size||0).toLocaleString() + ' at ' + r.px_c + '¢ · $' +
+      (r.locked||0).toFixed(2) + ' locked · book ' +
+      (r.bid_c!=null?r.bid_c:'–') + '¢ / ' + (r.ask_c!=null?r.ask_c:'–') + '¢' +
+      (r.days!=null?' · '+r.days+'d out':'') + '</div>' +
+      '<div class="ctlrow rp"><button class="alt" style="background:rgba(229,100,95,.18);color:#ff9d99" ' +
+      'onclick="blockCancel(&#39;' + esc(r.id) + '&#39;,&#39;' + esc(r.m) + '&#39;)">Cancel — get out</button></div></div>'
+    ).join('') +
+    (hot? '' : '<div class="sub" style="margin-top:6px">Nothing is close to filling. A phone push fires the moment any of these turns AT RISK.</div>');
+}
+
+async function blockCancel(id, m){
+  if(!confirm('Cancel the deep block on ' + m + '? The side may drop under Target Size and stop paying.')) return;
+  const r = await act({op:'cancel', order_id:id});
+  alert(r.ok ? 'cancelled' : ('failed — ' + r.msg));
   load();
 }
 
@@ -15425,6 +15543,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     auto_qualify(event_sizes)
                 except Exception as e:  # noqa: BLE001 — never kills the poll
                     MONITOR.error = f"qualify: {type(e).__name__}: {e}"[:150]
+                try:
+                    block_risk_alerts()
+                except Exception as e:  # noqa: BLE001 — never kills the poll
+                    MONITOR.error = f"blocks: {type(e).__name__}: {e}"[:150]
                 try:
                     auto_inventory()
                 except Exception as e:  # noqa: BLE001 — never kills the poll

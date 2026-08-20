@@ -1612,3 +1612,19 @@ first Thursday-evening pull would otherwise have fired on a weekend with no
 games. (2) max_markets 40 -> 400 ("a 40 market cap leaves out 90% of
 what's available") — college can now cover all ~375 paying win-total
 markets; ramp is bounded by 3 actions and 2 scan books per 60s cycle.
+
+Owner, 2026-08-20: "I'm fine with the qualifier bringing sides of the
+markets over their target size, I just need a list of where I'm exposed so
+that I can get out if there is ever a risk of those positions becoming
+impossible" — and "There should be no market limit."
+
+* **Deep blocks card** on /map (`block_exposure()` in live/monitor.py):
+  every resting order >= 100 shares at <= 2c (bid) or >= 98c (ask),
+  whatever placed it, with $ locked, the live book, days out, and a danger
+  read — AT RISK when the opposing touch is within 10c of the block (the
+  market walking toward certainty on the side that fills it), watch within
+  20c or resolution week. One-tap Cancel per row through the existing
+  /maction rails. A high-priority phone push fires when a block first
+  turns AT RISK, repeated at most every 6h per block.
+* Family `max_markets` is now None (no limit); pacing, the $1/market cap,
+  and the share band are the bounds.
