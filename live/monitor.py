@@ -4503,6 +4503,15 @@ BLOCK_MIN_SHARES = int(os.environ.get("BLOCK_MIN_SHARES", "100"))
 _DEAD_SWEEP = {"running": False, "last_try": 0.0, "suspect": set(),
                "done_ids": set()}
 DEAD_SWEEP_EVERY_S = float(os.environ.get("DEAD_SWEEP_EVERY_S", "600"))
+# ARMED or DRY RUN. 2026-08-20 afternoon: the incentives API stopped
+# returning programs for the whole 2026 race board (senate, governor, the
+# 2.0 seats ladders) within minutes, and both apps believed it — 2.0 pulled
+# every seats order, the scan cleared 1,919. It may be true (pools were
+# being cut all day) or it may be the API answering 200-with-nothing while
+# it was throttling us. Cancelling is irreversible and re-entering is not
+# free, so until the owner confirms from the exchange app the scan REPORTS
+# what it would pull and cancels nothing. Flip DEAD_SCAN_ARMED=1 to arm.
+DEAD_SCAN_ARMED = os.environ.get("DEAD_SCAN_ARMED", "0") == "1"
 
 
 def cancel_dead_sweep() -> None:
@@ -4553,6 +4562,24 @@ def cancel_dead_sweep() -> None:
             prev = MONITOR.state.get("cancel_dead") or {}
             MONITOR.state["cancel_dead"] = {**prev, "ts": now,
                                             "dead_markets": len(dead)}
+        return
+    if not DEAD_SCAN_ARMED:
+        with MONITOR.lock:
+            MONITOR.state["cancel_dead_dry"] = {
+                "ts": now, "would_cancel": len(targets),
+                "markets": sorted({o["market"] for o in targets})[:40],
+                "dead_markets": len(dead)}
+        seen = MONITOR.state.setdefault("dead_dry_seen", {})
+        key = ",".join(sorted({o["market"] for o in targets}))[:200]
+        if now - float(seen.get(key) or 0) > 3600:
+            seen[key] = now
+            notify("Dead-market scan is HOLDING (not cancelling)",
+                   f"{len(targets)} orders in {len({o['market'] for o in targets})} "
+                   f"markets read as paying nothing twice in a row. Nothing was "
+                   f"cancelled — the whole 2026 race board went dark at once "
+                   f"today and that may be bad data, not real. Check one of "
+                   f"these in the app; if the rewards really are gone, say so "
+                   f"and I'll arm the scan.")
         return
     _DEAD_SWEEP["running"] = True
 

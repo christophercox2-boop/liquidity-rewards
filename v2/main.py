@@ -302,8 +302,23 @@ class Monitor:
             self.last_terms = now
             try:
                 raw = self.client.programs(self.universe)
-                for c in self.terms.refresh(raw, self.event_sizes, now=now):
-                    self.alerts.notify("Reward terms changed", str(c))
+                # A 200 carrying no programs is indistinguishable from "every
+                # program ended" — and on 2026-08-20 one such response made
+                # the engine pull all 25 seats markets inside a minute. A
+                # response that drops most of a previously-populated store is
+                # treated as a data failure: keep the aged store, say so.
+                had = sum(1 for s in self.universe if self.terms.get(s))
+                if had >= 5 and len(raw) < 0.3 * had:
+                    self._note(f"terms: {len(raw)} programs for {had} known "
+                               f"markets — ignoring as a bad response")
+                    self.alerts.notify(
+                        "Reward terms look wrong — ignored",
+                        f"The incentives API returned {len(raw)} programs for "
+                        f"{had} markets that had them. 2.0 kept the older "
+                        f"reading rather than treating the board as dead.")
+                else:
+                    for c in self.terms.refresh(raw, self.event_sizes, now=now):
+                        self.alerts.notify("Reward terms changed", str(c))
             except ApiError as e:
                 self._note(f"terms: {e}")  # the store keeps serving, aged
 
