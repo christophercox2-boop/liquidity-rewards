@@ -57,7 +57,8 @@ ET = ZoneInfo("America/New_York")
 BOOK_MAX_AGE = 120.0
 
 # size grid the planner walks (contracts); fractional sizes are live rails
-QTY_GRID = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0)
+QTY_GRID = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0,
+            50.0, 100.0, 200.0, 500.0)
 
 
 @dataclass
@@ -102,6 +103,12 @@ class FamilyConfig:
     terms_slice: int = 120              # universe terms slugs per full-refresh pass
     cooldown_s: float = 3600.0
     min_est_day: float = 0.02
+    # Cycle-out rule (owner, 2026-08-20: "be very picky... and if
+    # something's not working cycle out of it"): an order measured under
+    # min_est_day for this long, with no plan at this market that clears
+    # the bar either, is pulled so the capital can go to the next best
+    # market. 0 disables.
+    weak_pull_s: float = 0.0
     reprice_gain_day: float = 0.06
     drift_share: float = 0.15
     terms_active_s: float = 600.0       # live terms for markets we're in
@@ -125,6 +132,7 @@ class FamilyOrder:
     share: float = 0.0
     live_est: float | None = None
     live_share: float | None = None
+    weak_since: float = 0.0   # measuring under the bar since (0 = fine)
     verdict: str = ""    # plain-English live state, refreshed each cycle
 
 
@@ -740,11 +748,25 @@ class Family:
             drifted = ((rec.live_share or 0.0) > self.cfg.drift_share
                        and rec.purpose not in ("revive", "solo"))
             gain = (best["est"] if best else 0.0) - (rec.live_est or 0.0)
-            if best is None and (rec.live_est or 0.0) <= 0.0:
+            below = (rec.live_est is not None
+                     and rec.live_est < self.cfg.min_est_day)
+            if below and not rec.weak_since:
+                rec.weak_since = now
+            elif not below:
+                rec.weak_since = 0.0
+            weak = (self.cfg.weak_pull_s > 0 and rec.weak_since
+                    and now - rec.weak_since > self.cfg.weak_pull_s
+                    and (best is None
+                         or best["est"] < self.cfg.min_est_day))
+            if (best is None and (rec.live_est or 0.0) <= 0.0) or weak:
                 r = self.desk.cancel(rec.id, rec.market)
                 if r.ok:
+                    why = (f"under {self.cfg.min_est_day * 100:.0f}c/day for "
+                           f"{(now - rec.weak_since) / 3600:.1f}h — cycling "
+                           f"out to the next best market" if weak else
+                           "earning nothing and no better spot")
                     self._log(event="pull", market=rec.market, side=rec.side,
-                              why="earning nothing and no better spot")
+                              why=why)
                     del self.orders[rec.id]
                     self._mark(rec.market, rec.side, now)
                     actions -= 1

@@ -135,3 +135,39 @@ class TestHistoryRanking(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCycleOut(unittest.TestCase):
+    def rig(self):
+        from v3.tests.test_family import Rig, A, politics_book
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=100.0, per_market_usd=20.0,
+                           min_est_day=0.10, weak_pull_s=7200.0,
+                           cooldown_s=60.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        return r, A
+
+    def test_weak_order_is_pulled_after_the_window(self):
+        r, A = self.rig()
+        r.cycle()
+        self.assertTrue(r.fam.orders)
+        # the pool collapses to almost nothing: orders now earn ~0.4c/day
+        for o in r.exchange.prog_raw.values():
+            o["timePeriods"][0]["rewardPool"] = 0.5
+        r.cycle(advance=r.fam.cfg.terms_active_s + 1)   # terms re-read, weak starts
+        self.assertTrue(any(o.weak_since for o in r.fam.orders.values()))
+        r.cycle(advance=7300.0)                          # past the window
+        pulls = [l for l in r.fam.log if l.get("event") == "pull"]
+        self.assertTrue(any("cycling out" in l.get("why", "") for l in pulls))
+
+    def test_healthy_order_is_not_cycled(self):
+        r, A = self.rig()
+        r.cycle()
+        r.cycle(advance=7300.0)
+        pulls = [l for l in r.fam.log if "cycling out" in l.get("why", "")]
+        self.assertEqual(pulls, [])
+        self.assertTrue(all(not o.weak_since for o in r.fam.orders.values()
+                            if o.purpose != "sell"))

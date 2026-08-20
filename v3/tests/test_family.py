@@ -112,7 +112,8 @@ class Rig:
                 for s in ([slug] + list(siblings or []))]
         self.exchange.events.append({"title": event, "markets": rows})
         self.exchange.books[slug] = book or politics_book(self.now)
-        self.exchange.prog_raw[slug] = dict(prog)
+        import copy
+        self.exchange.prog_raw[slug] = copy.deepcopy(prog)
 
     def cycle(self, advance=60.0):
         self.now += advance

@@ -71,9 +71,16 @@ def config() -> FamilyConfig:
         known_ground=True, rest_style="join_quiet", revive=True,
         vol_quiet=0.15,
         # Owner, 2026-08-20 (the flatten rebuild): "increase the budget
-        # to 100" — one hundred dollars of collateral at risk, total.
-        capital_usd=100.0, per_market_usd=2.0, revive_max_usd=5.0,
+        # to 100" — one hundred dollars of collateral at risk, total —
+        # then "It shouldn't be necessarily two dollars per market, feel
+        # free to do up to $20 per market. Just be very picky with which
+        # ones you're into and if something's not working cycle out."
+        # Picky = a 10c/day entry bar (5x the old one) on a $100 book
+        # ranked by what actually paid; not-working = measured under that
+        # bar for two hours with nothing better at the market.
+        capital_usd=100.0, per_market_usd=20.0, revive_max_usd=5.0,
         share_hi=0.10,
+        min_est_day=0.10, weak_pull_s=2 * 3600.0,
         rest_from=None, rest_until=None,      # politics rests every day
         min_days_out=3,
         books_per_cycle=36, scan_reserve=8,
