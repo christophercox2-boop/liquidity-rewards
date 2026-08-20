@@ -47,7 +47,7 @@ from dataclasses import dataclass, field
 from zoneinfo import ZoneInfo
 
 from .books import BookCache
-from .intents import BUY_LONG, SELL_LONG, capital_at_risk
+from .intents import BUY_LONG, SELL_LONG, SELL_SHORT, capital_at_risk
 from .orders import OrderDesk
 from .scoring import estimate_join
 from .terms import TermsStore
@@ -87,8 +87,19 @@ class FamilyConfig:
     max_actions_per_cycle: int = 6
     books_per_cycle: int = 16
     scan_reserve: int = 6
+    book_stale_s: float = 150.0         # refresh an active market's book this often
+    read_age_s: float = 480.0           # oldest book maintenance will read
     verify_resting: bool = False        # next cycle's reconcile checks by id anyway
     rescan_s: float = 4 * 3600.0
+    # College only: may price IN FRONT of a junk touch (wall-only books).
+    # The owner kept college's launch behavior ("I wouldn't change anything
+    # for now"); every other family leaves this off.
+    allow_improve: bool = False
+    # Take over resting orders already on the account in this family's
+    # markets (the 1.0/2.0 handover). Owner-placed manual orders are never
+    # claimed.
+    adopt: bool = True
+    terms_slice: int = 120              # universe terms slugs per full-refresh pass
     cooldown_s: float = 3600.0
     min_est_day: float = 0.02
     reprice_gain_day: float = 0.06
@@ -286,7 +297,7 @@ class Family:
             batch += sorted(self.active_markets() | set(self.inventory))
         if now - self.last_terms_full >= self.cfg.terms_full_s and self.universe:
             slugs = sorted(self.universe)
-            take = 120
+            take = self.cfg.terms_slice
             lo = self._terms_rotor % max(len(slugs), 1)
             batch += (slugs[lo:lo + take] + slugs[:max(0, lo + take - len(slugs))])
             self._terms_rotor = (lo + take) % max(len(slugs), 1)
@@ -400,7 +411,32 @@ class Family:
                 continue
             if px not in cands:
                 cands.append(px)
-        pick = None
+        if self.cfg.allow_improve:
+            # College's launch quirk, kept on the owner's word: in a book
+            # whose touch is a junk wall far from any opposing quote, a
+            # small order may price in front of it. The improve rungs stay
+            # 5 ticks clear of the other side's touch; with no opposing
+            # quote at all there is no value anchor, so the rungs stay
+            # short and size is clamped to probe money (in the qty grid).
+            if other:
+                cap_improve = other[0][0] - sign * 5 * tick
+                improve = (1, 5, 10, 15, 20)
+            else:
+                cap_improve = touch + sign * 10 * tick
+                improve = (1, 5, 10)
+                budget = min(budget, 0.05)
+            for k in improve:
+                px = round(touch + k * sign * tick, 3)
+                if not (0.001 <= px <= 0.999):
+                    continue
+                if (px - cap_improve) * sign > 1e-9:
+                    continue
+                if other and (px >= other[0][0] - 1e-9 if side == "BUY"
+                              else px <= other[0][0] + 1e-9):
+                    continue
+                if px not in cands:
+                    cands.append(px)
+        pick, solo = None, None
         for px in cands:
             cost_ps = px if side == "BUY" else 1.0 - px
             for qty in QTY_GRID:
@@ -409,22 +445,33 @@ class Family:
                 j = estimate_join(side, levels, tick, df, target, px, qty)
                 if not (j.qualifies and j.in_window):
                     break
-                if j.share > self.cfg.share_hi:
-                    break     # louder than the courtesy band — step away
                 est = j.share * side_pool
                 k = round(abs(touch - px) / tick)
+                in_front = (px - touch) * sign > 1e-9
                 row = {"side": side, "px": px, "qty": qty,
                        "share": round(j.share, 4), "est": round(est, 4),
                        "cost": round(qty * cost_ps, 2),
                        "why": ("joins the touch — the book has been quiet"
-                               if k == 0 else
+                               if k == 0 and not in_front else
+                               f"{k} tick{'s' if k != 1 else ''} in front of "
+                               f"a junk wall — nothing real to stand behind"
+                               if in_front else
                                f"{k} tick{'s' if k != 1 else ''} behind the "
                                f"touch, ~{j.share * 100:.1f}% of the "
                                f"{side_name} side")}
+                if j.share > self.cfg.share_hi:
+                    # louder than the courtesy band: acceptable only as a
+                    # minimum-size solo in front of a wall (college)
+                    if in_front and qty == QTY_GRID[0]:
+                        if solo is None or est > solo["est"] + 1e-9:
+                            solo = {**row, "solo": True}
+                    break
                 if pick is None or est > pick["est"] + 1e-9:
                     pick = row
         if pick is not None and pick["est"] >= self.cfg.min_est_day:
             return pick
+        if solo is not None and solo["est"] >= self.cfg.min_est_day:
+            return solo
         return None
 
     def plan_market(self, book, slug: str) -> tuple[list[dict], str]:
@@ -508,23 +555,80 @@ class Family:
                    f"{rec.price * 100:g}c — fills are usually losses here; "
                    f"the exit seller takes over")
 
+    # ---------------------------------------------------------------- adoption
+
+    def adoptable(self, open_orders: list[dict], foreign_ids=()) -> list[dict]:
+        """Resting account orders this family would take over: in its
+        universe, not already claimed (by it or a sibling family), and
+        never the owner's own manual orders."""
+        out = []
+        for o in open_orders:
+            if o["id"] in self.orders or o["id"] in foreign_ids:
+                continue
+            if o.get("manual"):
+                continue
+            if o["market"] not in self.universe:
+                continue
+            if not o.get("size") or not o.get("price"):
+                continue
+            out.append(o)
+        return out
+
+    def _adopt(self, adoptable: list[dict], positions: dict, now: float) -> None:
+        """The 1.0/2.0 handover: claim their resting orders as our own and
+        take their long stock onto the exit seller's book. Runs only once
+        the floor is ours (cycle gates it), so nothing else is still
+        maintaining these orders when we start."""
+        for o in adoptable:
+            purpose = "sell" if o["intent"] in (SELL_LONG, SELL_SHORT) else "earn"
+
+            self.orders[o["id"]] = FamilyOrder(
+                id=o["id"], market=o["market"], side=o["side"],
+                price=o["price"], qty=o["size"], intent=o["intent"],
+                placed_ts=now, purpose=purpose,
+                why="adopted from the earlier versions")
+            self.positions_seen.setdefault(
+                o["market"], (positions.get(o["market"]) or (0.0,))[0])
+            # a cooldown from the moment of adoption: the inherited book is
+            # already earning, so it converges to 3.0's shape at the usual
+            # measured pace instead of being rearranged in a burst
+            self._mark(o["market"], o["side"], now)
+        for m, pv in positions.items():
+            net, cost = ((list(pv) + [0.0, 0.0])[:2]
+                         if isinstance(pv, (tuple, list)) else (float(pv), 0.0))
+            if m in self.universe and net > 0.005 and m not in self.inventory:
+                self.inventory[m] = {"qty": net, "cost": max(cost, 0.0)}
+                self.positions_seen[m] = net
+        if adoptable:
+            self._log(event="adopted", n=len(adoptable))
+            self.alert(f"{self.cfg.tag}: took over the resting book",
+                       f"{len(adoptable)} orders adopted from the earlier "
+                       f"versions — maintained under 3.0's rules from here")
+
     # ------------------------------------------------------------------ cycle
 
     def cycle(self, now: float, open_orders: list[dict], positions: dict,
-              client, switch_on: bool) -> dict:
+              client, switch_on: bool, foreign_ids=()) -> dict:
         self.reconcile(open_orders, positions, now)
         self.refresh_universe(client, now)
         self.refresh_terms(client, now)
         refreshed = self._refresh_books(client, now)
         self._read_live(now)
         self._accrue(now)
+        pending = (self.adoptable(open_orders, foreign_ids)
+                   if self.cfg.adopt else [])
         summary = {"mode": "on" if switch_on else "observing",
                    "markets": len(self.universe),
                    "active": len(self.active_markets()),
                    "resting_ok": resting_ok(now, self.cfg),
-                   "refreshed": refreshed}
+                   "refreshed": refreshed,
+                   "would_adopt": len(pending)}
         if not switch_on:
             return self._finish(summary)
+        if pending:
+            self._adopt(pending, positions, now)
+            summary["would_adopt"] = 0
+            summary["active"] = len(self.active_markets())
         actions = self.cfg.max_actions_per_cycle
 
         # game window: pull everything that isn't an exit
@@ -573,7 +677,7 @@ class Family:
         happens whether or not the switch is on (the observing mode's
         whole point)."""
         for rec in self.orders.values():
-            book = self.cache.fresh(rec.market, BOOK_MAX_AGE * 4, now)
+            book = self.cache.fresh(rec.market, self.cfg.read_age_s, now)
             prog, why = self._prog_row(rec.market)
             if book is None:
                 rec.verdict = "no fresh book — can't read this one right now"
@@ -612,7 +716,7 @@ class Family:
                 break
             if rec.purpose == "sell":
                 continue
-            book = self.cache.fresh(rec.market, BOOK_MAX_AGE * 4, now)
+            book = self.cache.fresh(rec.market, self.cfg.read_age_s, now)
             prog, _why = self._prog_row(rec.market)
             if book is None or prog is None:
                 continue
@@ -625,7 +729,7 @@ class Family:
                                    side_pool,
                                    self.cfg.per_market_usd / 2.0, own=rec)
             drifted = ((rec.live_share or 0.0) > self.cfg.drift_share
-                       and rec.purpose != "revive")
+                       and rec.purpose not in ("revive", "solo"))
             gain = (best["est"] if best else 0.0) - (rec.live_est or 0.0)
             if best is None and (rec.live_est or 0.0) <= 0.0:
                 r = self.desk.cancel(rec.id, rec.market)
@@ -651,7 +755,8 @@ class Family:
                         id=r.order_id, market=rec.market, side=rec.side,
                         price=best["px"], qty=best["qty"], intent=rec.intent,
                         placed_ts=now,
-                        purpose="revive" if best.get("revive") else "earn",
+                        purpose=("revive" if best.get("revive")
+                                 else "solo" if best.get("solo") else "earn"),
                         why=best["why"], est_day=best["est"], share=best["share"])
                     self._mark(rec.market, rec.side, now)
                     actions -= 1
@@ -698,7 +803,8 @@ class Family:
                         id=r.order_id, market=slug, side=plan["side"],
                         price=plan["px"], qty=plan["qty"], intent=r.intent,
                         placed_ts=now,
-                        purpose="revive" if plan.get("revive") else "earn",
+                        purpose=("revive" if plan.get("revive")
+                                 else "solo" if plan.get("solo") else "earn"),
                         why=plan["why"], est_day=plan["est"],
                         share=plan["share"])
                     self._log(event="place", market=slug, side=plan["side"],
@@ -756,7 +862,7 @@ class Family:
         for slug in active:
             if done >= budget - scan_reserve:
                 break
-            if self.cache.age(slug, now) > 150.0:
+            if self.cache.age(slug, now) > self.cfg.book_stale_s:
                 try:
                     self.cache.put(slug, client.book(slug, fetched_at=now))
                 except Exception as e:  # noqa: BLE001
@@ -777,6 +883,15 @@ class Family:
             if self._dead_here(slug):
                 self.scoreboard[slug] = {"ts": now, "plans": [],
                                          "why": "program pays nothing"}
+                continue
+            prog, no_prog_why = self._prog_row(slug)
+            if prog is None:
+                # no terms yet: no book fetch spent; retry in ~15 minutes
+                # rather than a full rescan interval, because the terms
+                # rotor may confirm a pool for it within the hour
+                self.scoreboard[slug] = {
+                    "ts": now - self.cfg.rescan_s + 900.0, "plans": [],
+                    "why": no_prog_why}
                 continue
             try:
                 book = client.book(slug, fetched_at=now)
@@ -816,7 +931,7 @@ class Family:
                 if o.live_est is not None}
         if not mkts:
             return
-        if self.cache.coverage(mkts, BOOK_MAX_AGE * 4, now) < 0.6:
+        if self.cache.coverage(mkts, self.cfg.read_age_s, now) < 0.6:
             return
         rate = sum(o.live_est or 0.0 for o in self.orders.values())
         self.earned_today += rate * dt_s / 86400.0

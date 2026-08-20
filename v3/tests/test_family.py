@@ -353,3 +353,82 @@ class TestWindow(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestAdoption(unittest.TestCase):
+    def foreign(self, oid, market, intent="ORDER_INTENT_BUY_LONG",
+                price=0.30, size=5.0, manual=False):
+        from v3.intents import REST_SIDE
+        return {"id": oid, "market": market, "side": REST_SIDE[intent],
+                "price": price, "size": size, "intent": intent,
+                "manual": manual}
+
+    def rig_with_foreign(self, switch=True):
+        r = Rig(switch=switch)
+        r.add_market(A)
+        r.exchange.live["v1a"] = self.foreign("v1a", A)
+        r.exchange.live["v1x"] = self.foreign(
+            "v1x", A, intent="ORDER_INTENT_SELL_LONG", price=0.60)
+        r.exchange.live["own"] = self.foreign("own", A, manual=True)
+        r.exchange.live["far"] = self.foreign("far", "not-our-market")
+        return r
+
+    def test_observing_previews_but_claims_nothing(self):
+        r = self.rig_with_foreign(switch=False)
+        s = r.cycle()
+        self.assertEqual(s["would_adopt"], 2)        # v1a + v1x, not manual/far
+        self.assertEqual(set(r.fam.orders), set())
+
+    def test_armed_adopts_with_the_right_purposes(self):
+        r = self.rig_with_foreign()
+        r.positions[A] = (10.0, 4.0)                 # held stock too
+        s = r.cycle()
+        self.assertIn("v1a", r.fam.orders)
+        self.assertEqual(r.fam.orders["v1a"].purpose, "earn")
+        self.assertIn("v1x", r.fam.orders)
+        self.assertEqual(r.fam.orders["v1x"].purpose, "sell")
+        self.assertNotIn("own", r.fam.orders)        # the owner's manual order
+        self.assertNotIn("far", r.fam.orders)        # not our ground
+        self.assertEqual(s["would_adopt"], 0)
+        self.assertEqual(r.fam.inventory[A]["qty"], 10.0)
+        self.assertTrue(any("took over" in t for t, _ in r.alerts))
+        # adopted orders are not phantom-filled on the next cycle
+        n = len(r.fam.orders)
+        r.cycle()
+        self.assertEqual(len(r.fam.orders), n)
+
+    def test_sibling_family_claims_are_respected(self):
+        r = self.rig_with_foreign()
+        s = r.fam.cycle(r.now + 60, r.exchange.open_orders(), r.positions,
+                        r.exchange, True, foreign_ids={"v1a"})
+        self.assertNotIn("v1a", r.fam.orders)
+        self.assertIn("v1x", r.fam.orders)
+
+
+class TestImprove(unittest.TestCase):
+    def wall_book(self, now):
+        # college shape: a junk wall as the only bid, a real ask far away
+        return Book(bids=((0.01, 6000.0),), asks=((0.47, 20.0),),
+                    tick=0.01, fetched_at=now)
+
+    def cfg(self, improve):
+        return FamilyConfig(name="CFB", tag="CFB", known_ground=False,
+                            rest_style="behind", revive=False,
+                            allow_improve=improve,
+                            capital_usd=150.0, per_market_usd=1.0)
+
+    def test_college_may_front_a_junk_wall(self):
+        r = Rig(cfg=self.cfg(True))
+        r.add_market(A, book=self.wall_book(r.now))
+        r.cycle()
+        bids = [o for o in r.fam.orders.values() if o.side == "BUY"]
+        self.assertTrue(bids)
+        self.assertGreater(bids[0].price, 0.011)     # in FRONT of the wall
+        self.assertLessEqual(bids[0].price * bids[0].qty, 0.51)  # inside caps
+
+    def test_everyone_else_skips_the_wall(self):
+        r = Rig(cfg=self.cfg(False))
+        r.add_market(A, book=self.wall_book(r.now))
+        r.cycle()
+        self.assertEqual([o for o in r.fam.orders.values()
+                          if o.side == "BUY"], [])

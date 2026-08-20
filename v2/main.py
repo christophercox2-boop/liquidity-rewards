@@ -47,6 +47,30 @@ from .ws import Stream
 # engine or the families acts faster than half-hour cooldowns anyway.
 POLL_S = 60.0
 TERMS_EVERY_S = 300.0
+# The 3.0 floor (owner, 2026-08-20): when 3.0's master switch is on it
+# writes v3_floor.json, and 2.0 must halt every order-touching loop before
+# 3.0 moves. Forcing the cycles' switch argument to False puts the engine
+# and both families in observing mode — reconcile-only, no touches — while
+# their own switches stay untouched for when the floor comes back.
+import json as _json
+
+
+def _v3_floor_wants() -> bool:
+    try:
+        with open(os.environ.get("V3_FLOOR_PATH") or "v3_floor.json") as fh:
+            return bool((_json.load(fh) or {}).get("want"))
+    except (OSError, ValueError):
+        return False
+
+
+def _v3_floor_ack(halted: bool) -> None:
+    try:
+        tmp = "v2_halted.json.tmp"
+        with open(tmp, "w") as fh:
+            _json.dump({"halted": bool(halted), "ts": round(time.time(), 1)}, fh)
+        os.replace(tmp, "v2_halted.json")
+    except OSError:
+        pass
 EVENTS_EVERY_S = 900.0
 BOOK_BUDGET = 10          # REST book fetches per poll (rate-limit budget)
 UNIVERSE_CAP = 500        # never score more markets than this, loudly
@@ -355,6 +379,12 @@ class Monitor:
             # positions are only needed when the engine can act or holds
             # anything; while idle, poll them gently — the container is
             # shared with 1.0 and every request costs its CPU and rate limit
+            halted = _v3_floor_wants()
+            _v3_floor_ack(halted)
+            if halted != getattr(self, "_floor_halted", False):
+                self._floor_halted = halted
+                self._note("3.0 has the floor — standing down" if halted
+                           else "3.0 gave the floor back — resuming")
             engaged = (self.switch.on or self.engine.orders or self.engine.inventory
                        or self.cfb_switch.on or self.cfb.engaged()
                        or self.nfl_switch.on or self.nfl.engaged())
@@ -366,7 +396,7 @@ class Monitor:
             if positions is not None:
                 engine_summary = self.engine.cycle(
                     now, orders, positions, self.cache, self.terms,
-                    self.silver, self.switch.on)
+                    self.silver, self.switch.on and not halted)
                 for a in engine_summary.get("actions") or []:
                     print(f"engine: {a}", flush=True)
             else:
@@ -383,7 +413,7 @@ class Monitor:
             if positions is not None:
                 cfb_summary = self.cfb.cycle(now, orders, positions, self.client,
                                              self.survey.terms,
-                                             self.cfb_switch.on)
+                                             self.cfb_switch.on and not halted)
             else:
                 cfb_summary = {"mode": "idle"}
         except Exception as e:  # noqa: BLE001 — never lose the save below
@@ -394,7 +424,7 @@ class Monitor:
             if positions is not None:
                 nfl_summary = self.nfl.cycle(now, orders, positions, self.client,
                                              self.survey.terms,
-                                             self.nfl_switch.on)
+                                             self.nfl_switch.on and not halted)
             else:
                 nfl_summary = {"mode": "idle"}
         except Exception as e:  # noqa: BLE001 — never lose the save below

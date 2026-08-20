@@ -62,19 +62,32 @@ event never shows a dollar figure.
   time, accruing only while book coverage clears a quorum. No correction
   factor, ever.
 
-## Coexistence and cutover
+## Coexistence and the floor (the cutover mechanism)
 
 1.0 and 2.0 keep running and earning; 3.0 boots alongside them (launcher
 runs three processes; the front door proxies `/v3/*`). Every 3.0 switch is
-OFF until the owner arms it. Politics cutover is the owner's move, family
-by family: turn 1.0's politics loops off on /map, then arm 3.0's politics
-switch — never both at once, or the two systems read each other as
-competition. Until then 3.0 runs read-only: it discovers, scores, and
-shows what it WOULD do, so its plan can be judged against 1.0's live
-behavior before any money moves.
+OFF until the owner arms it, and until then 3.0 runs read-only: it
+discovers, scores, and shows what it WOULD do.
 
-2.0 keeps the published-rewards watcher and STATUS.md duties for now —
-3.0 does not duplicate pollers.
+The cutover is one switch, not a checklist (owner, 2026-08-20: "when I
+turn on v3, the other versions will immediately halt before anything v3
+related happens"). The mechanism is the FLOOR — v3/floor.py:
+
+* 3.0's master switch ON writes a floor request file. 1.0 and 2.0 read
+  it every loop, halt every automated order-touching loop (their own
+  switches untouched), and write acknowledgements.
+* 3.0 takes no order-touching action until BOTH acknowledgements are in
+  and fresh. Armed-but-unacknowledged shows as "waiting for the floor".
+* Once acknowledged, each armed family ADOPTS the account's resting
+  orders on its ground — owner-placed manual orders excepted — takes
+  long stock onto its exit seller, and maintains the inherited book at
+  its usual measured pace (adoption starts each order's cooldown).
+* Master OFF hands the floor straight back; 1.0/2.0 resume under their
+  own switches.
+
+2.0 keeps the published-rewards watcher and 1.0 keeps the tracker,
+STATUS.md, the front door, and the owner's manual map controls — those
+run with or without the floor.
 
 ## Standing rules (unchanged, non-negotiable)
 

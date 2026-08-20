@@ -749,7 +749,11 @@ class Engine:
         # 1.0 may still reduce what it already holds. Runs once, a few
         # cancels per cycle for the rate limiter, works with the switch
         # off (cancelling only reduces exposure), then never again.
-        if not self.family_sweep_done:
+        # (2026-08-20, the 3.0 floor:) the sweep now also requires the
+        # switch argument, which main forces False while 3.0 has the floor
+        # — under the interlock 2.0 must touch nothing, and 3.0's adopted
+        # seats orders must never read as "1.0 leftovers" to clear.
+        if not self.family_sweep_done and switch_on:
             foreign = [o for o in open_orders
                        if self.whitelisted(o.get("market", ""))
                        and o["id"] not in self.orders

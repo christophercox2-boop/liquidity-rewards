@@ -66,10 +66,14 @@ def config() -> FamilyConfig:
         name="Politics", tag="POL",
         known_ground=True, rest_style="join_quiet", revive=True,
         vol_quiet=0.15,
-        capital_usd=100.0, per_market_usd=2.0, revive_max_usd=5.0,
+        # Sized for the handover: the account's politics book runs to a
+        # thousand-plus resting orders across hundreds of markets.
+        capital_usd=400.0, per_market_usd=2.0, revive_max_usd=5.0,
         share_hi=0.10,
         rest_from=None, rest_until=None,      # politics rests every day
         min_days_out=3,
-        books_per_cycle=16, scan_reserve=6,
-        max_actions_per_cycle=6,
+        books_per_cycle=36, scan_reserve=8,
+        book_stale_s=300.0, read_age_s=900.0,
+        max_actions_per_cycle=10,
+        terms_slice=300, terms_full_s=1800.0,
     )

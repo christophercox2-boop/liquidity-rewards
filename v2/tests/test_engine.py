@@ -528,9 +528,13 @@ def iso_ago(now, seconds):
 
 
 class TestHandoverSweep(unittest.TestCase):
-    def test_clears_opening_orders_keeps_exits_even_with_switch_off(self):
+    def test_clears_opening_orders_keeps_exits(self):
+        # Since the 3.0 floor (2026-08-20) the sweep needs the switch ON:
+        # main forces it off while 3.0 holds the floor, and 2.0 must touch
+        # nothing then — 3.0's adopted seats orders must not read as
+        # leftovers to clear.
         from v2.intents import BUY_LONG, BUY_SHORT, SELL_SHORT
-        r = Rig(switch=False)
+        r = Rig(switch=True)
         terms = seats_terms([SEN])
         put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.exchange.live["f1"] = foreign("f1", BUY_LONG, price=0.19)
@@ -545,17 +549,27 @@ class TestHandoverSweep(unittest.TestCase):
         self.assertIn("f4", live)       # short buy-back: left to finish
         self.assertEqual(r.engine.sweep_count, 2)
         self.assertFalse(r.engine.family_sweep_done)   # done on the clean pass
-        # switch off: nothing was PLACED
-        self.assertFalse(any(u.endswith("/v1/orders") for u, _ in r.exchange.posts))
         r.now += 60
         put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         r.cycle(terms)
         self.assertTrue(r.engine.family_sweep_done)
         self.assertTrue(any("Seats handover done" in t for t, _ in r.alerts))
 
+    def test_sweep_waits_while_the_switch_is_forced_off(self):
+        # the floor case: foreign opening orders present, switch forced off
+        # -> the sweep must NOT run
+        from v2.intents import BUY_LONG
+        r0 = Rig(switch=False)
+        terms0 = seats_terms([SEN])
+        put_book(r0.cache, SEN, 0.12, 0.14, now=r0.now)
+        r0.exchange.live["f1"] = foreign("f1", BUY_LONG, price=0.19)
+        r0.cycle(terms0)
+        self.assertIn("f1", r0.exchange.live)
+        self.assertEqual(r0.engine.sweep_count, 0)
+
     def test_sweep_respects_the_per_cycle_budget(self):
         from v2.intents import BUY_LONG
-        r = Rig(switch=False)
+        r = Rig(switch=True)
         terms = seats_terms([SEN])
         put_book(r.cache, SEN, 0.12, 0.14, now=r.now)
         for i in range(20):

@@ -26,11 +26,12 @@ import sys
 import time
 from pathlib import Path
 
-from . import politics
+from . import football, politics
 from .alerts import Alerts
 from .api import ApiError, Client
 from .books import BookCache
 from .family import Family
+from .floor import Floor
 from .names import Names
 from .orders import OrderDesk
 from .state import StateStore
@@ -40,8 +41,11 @@ POLL_S = 60.0
 ERROR_BACKOFF_CAP_S = 600.0
 
 # name -> (config fn, discover fn). Adding a family = adding a line.
+# Politics first — it gets the capital, the book budget, and the page.
 FAMILIES = {
     "politics": (politics.config, politics.discover),
+    "cfb": (football.cfb, football.cfb_discover),
+    "nfl": (football.nfl, football.nfl_discover),
 }
 
 
@@ -83,6 +87,12 @@ class Monitor:
         self.boots: list[float] = []
         self.master = MasterSwitch(alert=self.alerts.notify,
                                    name="3.0 master switch", scope="all of 3.0")
+        # The floor handshake (v3/floor.py): master ON asks 1.0 and 2.0 to
+        # halt their automation; nothing here touches an order until both
+        # have acknowledged. _floor_ok is refreshed every cycle and read by
+        # every desk's switch closure.
+        self.floor = Floor()
+        self._floor_ok = False
         self.families: dict[str, Family] = {}
         self.switches: dict[str, MasterSwitch] = {}
         for key, (cfg_fn, discover) in FAMILIES.items():
@@ -95,7 +105,8 @@ class Monitor:
             desk = OrderDesk(
                 client=self.client,
                 whitelist=fam.knows,
-                switch_on=lambda s=sw: self.master.on and s.on,
+                switch_on=lambda s=sw: (self.master.on and s.on
+                                        and self._floor_ok),
                 fresh_book=lambda slug, c=cache: c.fresh(slug, 120.0, time.time()),
                 log=self._audit,
             )
@@ -152,6 +163,7 @@ class Monitor:
             "master_switch": self.master.to_dict(),
             "names": self.names.to_dict(),
             "summaries": summaries,
+            "floor": self.floor.status(now),
             "alerts_log": self.alerts.log[-30:],
         }
         for key, fam in self.families.items():
@@ -167,6 +179,7 @@ class Monitor:
         a restart between a flip and the next save must not undo it."""
         sw = self.switches.get(which, self.master)
         s = sw.op(op)
+        self.floor.write_want(self.master.on)
         st = dict(self.last_state) if self.last_state else {}
         st["master_switch"] = self.master.to_dict()
         for key in self.families:
@@ -217,15 +230,23 @@ class Monitor:
 
     def cycle(self, now: float | None = None) -> dict:
         now = now or time.time()
+        self.floor.write_want(self.master.on)
+        self._floor_ok = self.floor.acked(now)
         orders = self.client.open_orders()
         positions = self.client.positions_net()
         summaries = {}
         for key, fam in self.families.items():
-            on = self.master.on and self.switches[key].on
+            on = self.master.on and self.switches[key].on and self._floor_ok
+            foreign = {oid for k2, f2 in self.families.items() if k2 != key
+                       for oid in f2.orders}
             try:
                 summaries[key] = fam.cycle(now, orders, positions,
-                                           self.client, on)
+                                           self.client, on,
+                                           foreign_ids=foreign)
                 summaries[key]["name"] = fam.cfg.name
+                if (self.master.on and self.switches[key].on
+                        and not self._floor_ok):
+                    summaries[key]["mode"] = "waiting for the floor"
             except ApiError as e:
                 self._note(f"{key}: {e}")
                 summaries[key] = {"name": fam.cfg.name, "error": str(e)[:120]}

@@ -157,13 +157,19 @@ function render(d){
    +'<span class="pill'+(m.on?' on':'')+'">master '+(m.on?'ON':'off')+'</span>';
  for(var k in sv){if(k==='master')continue;
   out+='<span class="pill'+(sv[k].on?' on':'')+'">'+esc(k)+' '+(sv[k].on?'ON':'off')+'</span>';}
- out+='</div><div class="hint">Nothing places orders unless the master switch AND that family\\u2019s own switch are on. Flips happen on the switch page, never here.</div></div>';
+ out+='</div>';
+ var fl=(d.floor||{});
+ if(m.on&&!fl.acked){out+='<div class="warn" style="margin-top:6px">Armed \\u2014 waiting for 1.0 and 2.0 to stand down (they halt within a minute; nothing is touched until both confirm).</div>';}
+ else if(m.on&&fl.acked){out+='<div class="ok" style="margin-top:6px">3.0 has the floor \\u2014 1.0 and 2.0 automation is standing down.</div>';}
+ out+='<div class="hint">Nothing places orders unless the master switch AND that family\\u2019s own switch are on. Master ON hands ALL automation to 3.0: 1.0 and 2.0 halt first, then 3.0 takes over their resting orders and runs them under its own rules. Master OFF hands it back. Flips happen on the switch page, never here.</div></div>';
  fams(d).forEach(function(kv){
   var k=kv[0],s=kv[1];
   out+='<div class="card"><b>'+esc(s.name||k)+'</b> ';
   if(s.error){out+='<div class="bad">cycle error: '+esc(s.error)+'</div></div>';return;}
   out+='<span class="pill">'+esc(s.mode)+'</span>';
   if(s.mode==='observing'){out+='<div class="hint">The switch is off, so this family is watching only \\u2014 scoring the board and showing what it WOULD do on the plan page. Nothing is placed.</div>';}
+  if(s.mode==='waiting for the floor'){out+='<div class="warn">Armed, but 1.0/2.0 have not yet confirmed they\\u2019ve stood down \\u2014 acting the moment they do.</div>';}
+  if(s.would_adopt){out+='<div class="sub">Will take over <b>'+s.would_adopt+'</b> resting orders from the earlier versions the moment it\\u2019s armed \\u2014 they keep resting; 3.0 just becomes the one maintaining them.</div>';}
   out+='<div class="stats">'
    +'<div class="stat"><div class="lab">resting earns about</div><div class="val">'+usd(s.est_day)+'<span class="u">/day</span></div></div>'
    +'<div class="stat"><div class="lab">earned today so far</div><div class="val">'+usd(s.earned_today)+'</div></div>'
@@ -268,7 +274,9 @@ function render(d){
   out+='<div class="card"><b>'+esc(label)+'</b> ';
   out+=s.on?'<span class="pill on">ON</span>':(s.armed?'<span class="pill">armed</span>':'<span class="pill">off</span>');
   if(sm){out+='<div class="muted">'+usd(sm.spent)+' of '+usd(sm.capital_usd)+' at risk; resting earns ~'+usd(sm.est_day)+'/day.</div>';}
-  if(k==='master'){out+='<div class="hint">Master gates every family. A family places only when BOTH are on. One tap here stops everything.</div>';}
+  if(k==='master'){out+='<div class="hint">Master gates every family, and it moves the whole operation: ON asks 1.0 and 2.0 to halt their automation first \\u2014 3.0 touches nothing until both confirm \\u2014 then 3.0 adopts every resting order in its families and runs the book alone. OFF hands the floor straight back. One tap here stops all of 3.0.</div>';
+   var fl=(window._d&&window._d.floor)||{};
+   if(s.on){out+=fl.acked?'<div class="ok">1.0 and 2.0 have stood down \\u2014 3.0 has the floor.</div>':'<div class="warn">Waiting for 1.0/2.0 to stand down\\u2026</div>';}}
   if(s.on){out+='<div><button class="off" onclick="tap(\\'off\\',\\''+k+'\\')">Turn OFF</button></div>';}
   else if(s.armed){out+='<div class="sub warn">Armed \\u2014 confirm within '+(s.arm_expires_in||0)+'s to turn on.</div>'
    +'<div><button onclick="tap(\\'confirm\\',\\''+k+'\\')">Confirm ON</button>'

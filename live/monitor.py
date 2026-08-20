@@ -3494,6 +3494,52 @@ def _keep_place(m: str, side: str, px: float, qty: int) -> bool:
 # History that motivated this: the two loops shared one switch, so turning
 # defend on for the night also turned on the keeper, which placed orders the
 # owner never chose. Never again -- one switch per loop, owner's button only.
+# ---------------------------------------------------------------------------
+# The 3.0 floor (owner, 2026-08-20: "when I turn on v3, the other versions
+# will immediately halt before anything v3 related happens"). 3.0 writes
+# v3_floor.json when its master switch is on; every automated order-touching
+# loop here checks _FLOOR["halt"] and stands down, and the loop stamps
+# v1_halted.json so 3.0 knows it is safe to move. The owner's own taps on
+# the map are not automation and are not gated. A wanted floor is honoured
+# even if the file goes stale (a crashed 3.0 places nothing; resuming
+# underneath a 3.0 that comes back would briefly run both) — but a stale
+# want is alerted so it can't rot silently.
+_FLOOR = {"halt": False, "warned": 0.0}
+
+
+def _floor_pass() -> None:
+    """Read 3.0's floor request and acknowledge. Called once per poll."""
+    want, age = False, float("inf")
+    try:
+        with open(os.environ.get("V3_FLOOR_PATH") or "v3_floor.json") as _fh:
+            _d = json.load(_fh) or {}
+        want = bool(_d.get("want"))
+        ts = float(_d.get("ts") or 0)
+        age = (time.time() - ts) if ts else float("inf")
+    except (OSError, ValueError):
+        pass
+    if want and not _FLOOR["halt"]:
+        print("[floor] 3.0 asked for the floor — automation standing down",
+              flush=True)
+    elif _FLOOR["halt"] and not want:
+        print("[floor] 3.0 gave the floor back — automation resumes",
+              flush=True)
+    _FLOOR["halt"] = want
+    if want and age > 900 and time.time() - _FLOOR["warned"] > 3600:
+        _FLOOR["warned"] = time.time()
+        MONITOR.pending_alerts.append((
+            "3.0 has the floor but has gone quiet",
+            f"its floor request is {age / 60:.0f} min old; "
+            "1.0 automation stays halted — check /v3/", "high"))
+    try:
+        _tmp = "v1_halted.json.tmp"
+        with open(_tmp, "w") as _fh:
+            json.dump({"halted": bool(want), "ts": round(time.time(), 1)}, _fh)
+        os.replace(_tmp, "v1_halted.json")
+    except OSError:
+        pass
+
+
 def _auto_on(which: str) -> bool:
     """Is this placement loop enabled? `which` is 'defend' or 'keeper'."""
     auto = MONITOR.state.get("auto") or {}
@@ -3501,6 +3547,8 @@ def _auto_on(which: str) -> bool:
 
 
 def keep_qualified() -> None:
+    if _FLOOR["halt"]:
+        return    # 3.0 has the floor
     if not _auto_on("keeper"):
         return
     if os.environ.get("KEEP_PAUSE", "") == "1":
@@ -3605,6 +3653,8 @@ def keep_qualified() -> None:
 
 def auto_defend() -> None:
     """One pass over the defended markets after each poll."""
+    if _FLOOR["halt"]:
+        return    # 3.0 has the floor
     # Resumed 2026-08-11 after the /modify incident. The exchange's modify
     # endpoint has returned 200 while cancelling the original and never
     # placing the replacement since the morning maintenance (proven with a
@@ -3776,6 +3826,8 @@ _SNIPE_LAST: dict = {}
 
 def auto_snipe() -> None:
     """Take the tiny over-priced bids sitting on the 2028 longshots."""
+    if _FLOOR["halt"]:
+        return    # 3.0 has the floor
     if not _auto_on("snipe"):
         return
     if os.environ.get("SNIPE_PAUSE", "") == "1":
@@ -4687,6 +4739,8 @@ def cancel_dead_sweep() -> None:
     cleared 1,691 orders and then 446 exits across 87 markets; steady state
     is a handful a day. Everything runs off the poll caches — no extra API
     reads."""
+    if _FLOOR["halt"]:
+        return    # 3.0 has the floor
     now = time.time()
     if _DEAD_SWEEP["running"] or now - _DEAD_SWEEP["last_try"] < DEAD_SWEEP_EVERY_S:
         return
@@ -4868,6 +4922,8 @@ def auto_qualify(event_sizes: dict[str, int] | None = None) -> None:
     for a tap on the map. New ground also only ever takes an EMPTY side.
     The queue is capped so the phone card stays readable — richest side
     pool first, so what shows is what pays."""
+    if _FLOOR["halt"]:
+        return    # 3.0 has the floor
     if not _auto_on("qualify") or os.environ.get("QUALIFY_PAUSE", "") == "1":
         return
     now = time.time()
@@ -5017,6 +5073,8 @@ def _inv_price(slug: str, ent: tuple) -> float | None:
 
 def auto_inventory() -> None:
     """Rest idle held shares as asks so they earn while they sit."""
+    if _FLOOR["halt"]:
+        return    # 3.0 has the floor
     if not _auto_on("inventory"):
         return
     now = time.time()
@@ -5091,6 +5149,8 @@ def auto_inventory() -> None:
 
 
 def auto_probe() -> None:
+    if _FLOOR["halt"]:
+        return    # 3.0 has the floor
     # one-time owner grants into the info fund, applied exactly once each
     # (the applied list persists with the saved state, surviving restarts)
     granted = False
@@ -7147,6 +7207,8 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
 
 
 def auto_earn() -> None:
+    if _FLOOR["halt"]:
+        return    # 3.0 has the floor
     # accrue what the earner's resting bids are EARNING (reward-scoring
     # rate integrated over time, same formula as the headline counter but
     # filtered to the earner's own order ids) — runs even while the switch
@@ -15900,6 +15962,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
             except Exception:  # noqa: BLE001 — config refresh never kills the poll
                 pass
             try:
+                _floor_pass()           # 3.0's halt request, honoured first
+            except Exception:  # noqa: BLE001 — the floor never kills the poll
+                pass
+            try:
                 auto_defend()
                 try:
                     keep_qualified()
@@ -15950,8 +16016,10 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                     bt["orders"] = len(orders)
                     bt["books"] = len(tr._BOOK_CACHE)
                     bt["mkts"] = len({o.get("market") for o in orders if o.get("market")})
-                    bt["ran"] = [k for k in ("defend", "keeper", "snipe", "probe",
-                                             "earn", "qualify") if _auto_on(k)]
+                    bt["ran"] = ([] if _FLOOR["halt"] else
+                                 [k for k in ("defend", "keeper", "snipe", "probe",
+                                              "earn", "qualify") if _auto_on(k)])
+                    bt["floor"] = _FLOOR["halt"]
                     bt["did"] = (ACTIONS[-1]["side"] + " " + ACTIONS[-1]["market"]
                                  if ACTIONS else "")
                     bt["did_ts"] = ACTIONS[-1]["ts"] if ACTIONS else ""
