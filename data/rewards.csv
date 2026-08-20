@@ -1701,7 +1701,7 @@ date,market,program_type,reward_usd,status
 2026-08-06,scc-senate-gop-2026-11-03-gte57,liquidityProgram,0.38,PAID
 2026-08-06,scc-senate-gop-2026-11-03-lte45,liquidityProgram,0.34,PAID
 2026-08-06,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.19,PAID
-2026-08-06,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.01,PENDING
+2026-08-06,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.01,SKIPPED
 2026-08-07,apdc-alito-2026-12-31,liquidityProgram,3.12,PAID
 2026-08-07,apdc-jerpowgov-2026-12-31,liquidityProgram,7.23,PAID
 2026-08-07,dccc-cyclo-us-2026-08-31-gt10000,liquidityProgram,0.19,PAID
@@ -1749,7 +1749,7 @@ date,market,program_type,reward_usd,status
 2026-08-07,tec-cbb-champ-2027-04-05-w-lou,liquidityProgram,0.11,PAID
 2026-08-07,usgcc-aliens-12-31-2026,liquidityProgram,0.13999999999999999,PAID
 2026-08-07,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.17,PAID
-2026-08-07,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.01,PENDING
+2026-08-07,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.01,SKIPPED
 2026-08-08,apdc-alito-2026-12-31,liquidityProgram,8.52,PAID
 2026-08-08,apdc-jerpowgov-2026-12-31,liquidityProgram,6.21,PAID
 2026-08-08,ewc-usse-nh-2026-11-03-dem,liquidityProgram,0.34,PAID
@@ -1784,7 +1784,7 @@ date,market,program_type,reward_usd,status
 2026-08-08,tec-cbb-champ-2027-04-05-w-iowast,liquidityProgram,0.01,PAID
 2026-08-08,tec-cbb-champ-2027-04-05-w-lou,liquidityProgram,0.1,PAID
 2026-08-08,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.56,PAID
-2026-08-08,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.05,PENDING
+2026-08-08,vmc-ussep-misen-2026-08-04-els0-5,liquidityProgram,0.05,SKIPPED
 2026-08-09,apdc-alito-2026-12-31,liquidityProgram,6.91,PAID
 2026-08-09,apdc-jerpowgov-2026-12-31,liquidityProgram,22.67,PAID
 2026-08-09,enwc-usgubp-mn-2026-08-11-rep-lisdem,liquidityProgram,0.02,PAID
