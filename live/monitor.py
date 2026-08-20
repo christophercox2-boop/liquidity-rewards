@@ -3274,7 +3274,9 @@ def refresh_defend_seed() -> None:
 # those early earns nothing, but the moment a pool appears the front of a thin
 # book is worth having, so this notices the transition and pushes a phone alert.
 PROGRAM_WATCH_BATCH = 25         # symbols per /v1/incentives call
-PROGRAM_WATCH_MAX = 300          # slugs examined per pass, keeps the poll cheap
+PROGRAM_WATCH_MAX = 700          # slugs examined per pass, keeps the poll cheap
+                                 # (raised from 300 on 2026-08-20: the board
+                                 # outgrew it and the overflow was invisible)
 
 
 def watch_program_arrivals(pol_slugs: list[str]) -> None:
@@ -3285,8 +3287,20 @@ def watch_program_arrivals(pol_slugs: list[str]) -> None:
     """
     if not pol_slugs:
         return
-    cands = [s for s in pol_slugs
-             if tr._is_us_politics(s) and not tr._is_econ(s)][:PROGRAM_WATCH_MAX]
+    # NEVER-CHECKED MARKETS GO FIRST. This list is truncated at
+    # PROGRAM_WATCH_MAX, and it used to be truncated in whatever order the
+    # event map returned — so once the board outgrew the cap, the markets
+    # past it were never asked about at all. On 2026-08-20 the exchange
+    # listed 120 new politics markets (109 ushsscc- House seat counts, 11
+    # usgovcc- governor seat counts) and not one of them was ever checked
+    # for a reward program: prog_seen had zero rows for either family. A
+    # market we have never asked about is exactly the one worth asking
+    # about, so it is asked first and the cap only ever delays a re-check.
+    with MONITOR.lock:
+        asked = set(MONITOR.state.get("prog_seen") or {})
+    cands = sorted((s for s in pol_slugs
+                    if tr._is_us_politics(s) and not tr._is_econ(s)),
+                   key=lambda s: (s in asked, s))[:PROGRAM_WATCH_MAX]
     if not cands:
         return
     with MONITOR.lock:
@@ -3890,7 +3904,15 @@ PROBE_PREFIXES = ("enwc-uspres-nom-rep-2028-", "enwc-uspres-nom-dem-2028-",
                   "ewc-usp-2028-11-07-", "ewc-usp-party-2028-11-07-",
                   "ussewc-", "usgubewc-", "ewc-usse-", "ewc-usgub-",
                   "scc-", "ushrewc-", "enwc-usgubp-", "enwc-ushrp-",
-                  "enwc-ussep-", "vsc-usgubp-")
+                  "enwc-ussep-", "vsc-usgubp-",
+                  # listed 2026-08-20, the day the scc- seat ladders went
+                  # dark: House seat counts by state and governor seat
+                  # counts. This tuple is what EXTRA_SLUGS filters on, so
+                  # without an entry here 1.0 fetches neither their
+                  # programs nor their books and cannot see them at all.
+                  # Nothing places until a live pool is confirmed — the
+                  # no-rewards guard still applies.
+                  "ushsscc-", "usgovcc-")
 PROBE_SIZE = 1
 PROBE_REAL_MIN = 5.0          # book levels smaller than this are bait — ignore
 # PREFERRED FAMILIES — worked first by the prober and the earner (owner,

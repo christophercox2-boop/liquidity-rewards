@@ -1747,3 +1747,36 @@ orders; scoring the first 500" banner. Two fixes:
   covered-fraction under the 80% bar and silently stop the scan as they
   grow — and those are the same markets that fall off the cap. 2.0's
   families pull their own orders when a program dies.
+
+## 2026-08-20 evening — the seat ladders moved, and 1.0 could not see them
+
+Owner: "New markets added how do I get back into politics". The exchange
+listed 120 new US-politics markets today — 109 `ushsscc-ushrsc-*` (House
+seat counts by state) and 11 `usgovcc-*` (governor seat counts) — on the
+same day the `scc-` Senate/House seat ladders went dark at 09:01 ET. They
+look like the replacement listings.
+
+Three stacked gates kept them invisible, none of them about money:
+
+1. `PROGRAM_WATCH_MAX` (300) truncated the politics slug list in whatever
+   order the event map returned, so once the board outgrew the cap the
+   overflow was never asked about. `prog_seen` had ZERO rows for either
+   new family — 1.0 had never once checked whether they pay. Fixed twice
+   over: never-checked markets are now sorted FIRST (so the cap can only
+   ever delay a re-check, never hide a new listing), and the cap is 700.
+   The watch runs every 15 minutes and batches 25 slugs a call, so the
+   extra cost is a handful of batched requests per quarter hour.
+2. `PROBE_PREFIXES` is what `EXTRA_SLUGS` filters on — the mechanism that
+   lets 1.0 fetch programs and books for markets it holds nothing in.
+   Neither prefix was in it, so no book, no score, no entry. Added both.
+3. 2.0's whitelist is still the dead `scc-` ladders. Left alone on
+   purpose: the Silver model gives national Senate/House seat
+   distributions, not per-STATE House counts or governor counts, so its
+   fair values do not map onto these. 1.0's generic earner is the right
+   tool for them.
+
+Nothing places on the strength of this change alone — the no-rewards
+guard means a market with no confirmed live pool gets no orders, and the
+estimate gate means no market is valued until its pool divisor is known.
+Within a poll or two of the deploy the watch reports whether the new
+families carry pools, and an arrival alert fires if they do.
