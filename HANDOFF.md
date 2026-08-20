@@ -1732,3 +1732,18 @@ starving the politics books its earner, prober and estimate actually run on.
   deliberately NOT gated on hands-off so selling continues in the
   primaries — now skips them explicitly: two apps resting asks against one
   position is how orders start fighting.
+
+Owner's screenshot, 2026-08-20 evening: a red "slug_cap: 507 markets with
+orders; scoring the first 500" banner. Two fixes:
+
+* The cap truncated a SORTED list, so the tail of the alphabet fell off —
+  the "usse…"/"usgub…" politics slugs, exactly the markets 1.0 trades,
+  while 2.0's football markets (a, f, t) kept their slots. It now sorts
+  1.0's own markets first, so anything dropped belongs to 2.0, which
+  scores it on its own pages. Verified: at 510 markets the old cap dropped
+  10 of 40 politics markets, the new one drops none.
+* `cancel_dead_sweep` now measures coverage over 1.0's own markets only.
+  Left as it was, the families' hundreds of markets would push the
+  covered-fraction under the 80% bar and silently stop the scan as they
+  grow — and those are the same markets that fall off the cap. 2.0's
+  families pull their own orders when a program dies.

@@ -1059,7 +1059,20 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     slugs = sorted({o["market"] for o in orders if o["market"]} | EXTRA_SLUGS)
     debug: dict[str, str] = {}
     if len(slugs) > 500:  # safety bound — never truncate silently
-        debug["_slug_cap"] = f"{len(slugs)} markets with orders; scoring the first 500"
+        # 1.0'S OWN MARKETS KEEP THEIR SLOTS. The cap used to truncate the
+        # sorted list, which drops the tail of the alphabet — the "usse…"
+        # and "usgub…" politics slugs, i.e. exactly the markets 1.0 trades,
+        # while 2.0's football markets (a, f, t) kept theirs. On 2026-08-20
+        # the families pushed the count to 507 and the owner saw the banner.
+        # Anything dropped now is 2.0's, and 2.0 scores those itself.
+        slugs = sorted(slugs, key=lambda s: (_is_v2_owned(s), s))
+        dropped = slugs[500:]
+        mine = sum(1 for s in dropped if not _is_v2_owned(s))
+        debug["_slug_cap"] = (
+            f"{len(slugs)} markets with orders; scoring 500 — "
+            + (f"{len(dropped)} of 2.0's families left out (it scores those "
+               f"on its own pages)" if not mine
+               else f"{mine} of 1.0's own markets left out — raise the cap"))
         slugs = slugs[:500]
 
     # Full order books (public) — needed for ticks-from-best and the window walk.

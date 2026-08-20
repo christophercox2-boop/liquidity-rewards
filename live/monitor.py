@@ -4551,7 +4551,13 @@ def cancel_dead_sweep() -> None:
     if not MONITOR.orders or not progs or not MONITOR.positions:
         return                       # caches still warming after a boot
     _DEAD_SWEEP["last_try"] = now
-    markets = sorted({o.get("market") or "" for o in MONITOR.orders} - {""})
+    # 1.0's own markets only: 2.0's families pull their own orders when a
+    # program dies, and counting their hundreds of markets here would sink
+    # the coverage ratio below the bar and silently stop the scan as the
+    # families grow (they are also the first to fall off the 500 cap)
+    markets = sorted({o.get("market") or "" for o in MONITOR.orders} - {""}
+                     - {m for m in (o.get("market") for o in MONITOR.orders)
+                        if m and tr._is_v2_owned(m)})
     # a market with NO program is absent from progs but present in the
     # queried slugs — that absence IS the dead reading
     covered = [m for m in markets if m in queried]
