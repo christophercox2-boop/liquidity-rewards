@@ -589,7 +589,11 @@ class Family:
         the floor is ours (cycle gates it), so nothing else is still
         maintaining these orders when we start."""
         for o in adoptable:
-            purpose = "sell" if o["intent"] in (SELL_LONG, SELL_SHORT) else "earn"
+            net0 = (positions.get(o["market"]) or (0.0, 0.0))[0]
+            purpose = ("sell" if o["intent"] in (SELL_LONG, SELL_SHORT)
+                       or (o["side"] == "SELL" and net0 > 0.005)
+                       or (o["side"] == "BUY" and net0 < -0.005)
+                       else "earn")
 
             self.orders[o["id"]] = FamilyOrder(
                 id=o["id"], market=o["market"], side=o["side"],
@@ -602,24 +606,45 @@ class Family:
             # already earning, so it converges to 3.0's shape at the usual
             # measured pace instead of being rearranged in a burst
             self._mark(o["market"], o["side"], now)
-        for m, pv in positions.items():
-            net, cost = ((list(pv) + [0.0, 0.0])[:2]
-                         if isinstance(pv, (tuple, list)) else (float(pv), 0.0))
-            if m in self.universe and net > 0.005 and m not in self.inventory:
-                self.inventory[m] = {"qty": net, "cost": max(cost, 0.0)}
-                self.positions_seen[m] = net
         if adoptable:
             self._log(event="adopted", n=len(adoptable))
             self.alert(f"{self.cfg.tag}: took over the resting book",
                        f"{len(adoptable)} orders adopted from the earlier "
                        f"versions — maintained under 3.0's rules from here")
 
+    def _seed_inventory(self, positions: dict) -> None:
+        """Positions on our ground the seller does not know yet — long
+        stock OR shorts — join its book. Runs every armed cycle so a
+        position found after the adoption still gets its exit."""
+        for m, pv in positions.items():
+            net, cost = ((list(pv) + [0.0, 0.0])[:2]
+                         if isinstance(pv, (tuple, list)) else (float(pv), 0.0))
+            if m in self.universe and abs(net) > 0.005 and m not in self.inventory:
+                self.inventory[m] = {"qty": net, "cost": cost}
+                self.positions_seen[m] = net
+
     # ------------------------------------------------------------------ cycle
+
+    def _reclassify_exits(self, positions: dict) -> None:
+        """An adopted order whose FILL reduces the position it sits on is
+        an EXIT whatever its intent says — a bid covering a short, an ask
+        while long. Mislabelling them "earn" once let maintenance reprice
+        and pull the owner's exits (2026-08-20 23:12Z) and counted their
+        collateral against the rebuild ceiling. Idempotent, every cycle."""
+        for rec in self.orders.values():
+            if rec.purpose == "sell" or not rec.why.startswith("adopted"):
+                continue
+            net = (positions.get(rec.market) or (0.0, 0.0))[0]
+            if ((rec.side == "SELL" and net > 0.005)
+                    or (rec.side == "BUY" and net < -0.005)):
+                rec.purpose = "sell"
+                rec.why = "adopted exit — reduces the position it sits on"
 
     def cycle(self, now: float, open_orders: list[dict], positions: dict,
               client, switch_on: bool, foreign_ids=(),
               exits_only: bool = False) -> dict:
         self.reconcile(open_orders, positions, now)
+        self._reclassify_exits(positions)
         self.refresh_universe(client, now)
         self.refresh_terms(client, now)
         refreshed = self._refresh_books(client, now)
@@ -639,6 +664,8 @@ class Family:
             self._adopt(pending, positions, now)
             summary["would_adopt"] = 0
             summary["active"] = len(self.active_markets())
+        if self.cfg.adopt:
+            self._seed_inventory(positions)
         if exits_only:
             # the flatten's first phase: the monitor is cancelling every
             # opening order; this family only keeps stock exiting — asks
@@ -860,29 +887,56 @@ class Family:
             if actions <= 0:
                 break
             qty = inv.get("qty") or 0.0
-            if qty < 0.01:
+            if abs(qty) < 0.01:
                 continue
             if self._dead_here(slug):
                 continue      # out means out — no resting anything there
-            covered = sum(o.qty for o in self.orders.values()
-                          if o.market == slug and o.purpose == "sell")
-            rest = qty - covered
             book = self.cache.fresh(slug, BOOK_MAX_AGE, now)
-            if rest < 0.01 or book is None \
-                    or not self._cooldown_ok(slug, "SELL", now):
+            if book is None:
                 continue
-            break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
-            ask_touch = book.asks[0][0] if book.asks else break_even + book.tick
-            px = round(max(break_even + book.tick, ask_touch), 3)
-            r = self.desk.place_resting(slug, "SELL", px, rest,
-                                        net_position=qty, intent=SELL_LONG)
+            if qty >= 0.01:
+                # long stock: an ask at break-even or better
+                covered = sum(o.qty for o in self.orders.values()
+                              if o.market == slug and o.purpose == "sell"
+                              and o.side == "SELL")
+                rest = qty - covered
+                if rest < 0.01 or not self._cooldown_ok(slug, "SELL", now):
+                    continue
+                break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
+                ask_touch = (book.asks[0][0] if book.asks
+                             else break_even + book.tick)
+                px = round(max(break_even + book.tick, ask_touch), 3)
+                side, intent, rest_qty = "SELL", SELL_LONG, rest
+                why = "selling filled stock — it earns while it waits"
+            else:
+                # a SHORT: buy it back at the bid touch, never above
+                # break-even — the bid earns rewards while it exits and
+                # adds no collateral (owner, 2026-08-20: "try and exit
+                # positions in a way that earns liquidity reward")
+                covered = sum(o.qty for o in self.orders.values()
+                              if o.market == slug and o.purpose == "sell"
+                              and o.side == "BUY")
+                rest = -qty - covered
+                if rest < 0.01 or not self._cooldown_ok(slug, "BUY", now):
+                    continue
+                received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
+                bid_touch = (book.bids[0][0] if book.bids
+                             else received - book.tick)
+                px = round(min(received - book.tick, bid_touch), 3)
+                px = min(max(px, 0.001), 0.999)
+                side, intent, rest_qty = "BUY", SELL_SHORT, rest
+                why = ("buying back the short at or under what it sold "
+                       "for — the bid earns while it waits")
+            r = self.desk.place_resting(slug, side, px, rest_qty,
+                                        net_position=qty, intent=intent)
             if r.ok and r.order_id:
                 self.orders[r.order_id] = FamilyOrder(
-                    id=r.order_id, market=slug, side="SELL", price=px,
-                    qty=rest, intent=SELL_LONG, placed_ts=now, purpose="sell",
-                    why="selling filled stock — it earns while it waits")
-                self._log(event="sell_rested", market=slug, price=px, qty=rest)
-                self._mark(slug, "SELL", now)
+                    id=r.order_id, market=slug, side=side, price=px,
+                    qty=rest_qty, intent=intent, placed_ts=now,
+                    purpose="sell", why=why)
+                self._log(event="sell_rested", market=slug, price=px,
+                          qty=rest_qty, side=side)
+                self._mark(slug, side, now)
                 actions -= 1
 
     # --------------------------------------------------------------- books

@@ -220,3 +220,58 @@ class TestFullCycleRegression(unittest.TestCase):
                 for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V1_ACK_PATH",
                           "V2_ACK_PATH", "V3_FLATTEN"):
                     os.environ.pop(k, None)
+
+
+class TestExitProtection(unittest.TestCase):
+    """The 23:12Z incident: adopted position-reducing orders were labelled
+    'earn', so maintenance repriced/pulled the owner's exits and their
+    collateral blocked the rebuild ceiling."""
+
+    def rig_short(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=0.0)     # no new entries — exits only
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        # the owner is SHORT 100; a big buy-back bid rests (BUY_LONG,
+        # 1.0-style) — an exit by position, an opening by intent
+        r.positions[A] = (-100.0, -5.0)
+        r.exchange.live["cover"] = {
+            "id": "cover", "market": A, "side": "BUY", "price": 0.01,
+            "size": 100.0, "intent": BUY_LONG, "manual": False}
+        return r, A
+
+    def test_adopted_cover_bid_is_an_exit_not_spend(self):
+        r, A = self.rig_short()
+        r.cycle()
+        rec = r.fam.orders["cover"]
+        self.assertEqual(rec.purpose, "sell")
+        self.assertEqual(r.fam.family_spent(), 0.0)   # exits never block the ceiling
+        # and maintenance never touches it, however long it sits
+        r.cycle(advance=8000.0)
+        self.assertIn("cover", r.fam.orders)
+        self.assertEqual(r.fam.orders["cover"].price, 0.01)
+
+    def test_short_gets_covered_at_touch_under_break_even(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        from v3.intents import SELL_SHORT
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=0.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        # short 100 sold at ~40c (cost -40): no cover resting anywhere
+        r.positions[A] = (-100.0, -40.0)
+        r.cycle()
+        covers = [o for o in r.fam.orders.values()
+                  if o.side == "BUY" and o.intent == SELL_SHORT]
+        self.assertEqual(len(covers), 1)
+        c = covers[0]
+        self.assertEqual(c.purpose, "sell")
+        self.assertLessEqual(c.price, 0.40 - 0.01)    # never above break-even
+        self.assertAlmostEqual(c.qty, 100.0)
+        from v3.intents import capital_at_risk
+        self.assertEqual(capital_at_risk(c.intent, c.price, c.qty), 0.0)
