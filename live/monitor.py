@@ -4500,31 +4500,28 @@ def _qual_place(job: dict) -> tuple[bool, str]:
 BLOCK_MIN_SHARES = int(os.environ.get("BLOCK_MIN_SHARES", "100"))
 
 
-_DEAD_SWEEP = {"running": False, "last_try": 0.0}
-# Bump the mark to run the sweep again. Pass 1 (2026-08-20) cancelled 1,691
-# reward-seeking orders and kept 446 exits; the owner then said "You can
-# remove the unwinding positions as well. I'll replace those if necessary"
-# — so pass 2 takes the exits in dead markets too.
-DEAD_SWEEP_MARK = "2026-08-20-exits-too"
-DEAD_SWEEP_KEEP_EXITS = False
+_DEAD_SWEEP = {"running": False, "last_try": 0.0, "suspect": set(),
+               "done_ids": set()}
+DEAD_SWEEP_EVERY_S = float(os.environ.get("DEAD_SWEEP_EVERY_S", "600"))
 
 
 def cancel_dead_sweep() -> None:
-    """One-time sweep (owner, 2026-08-20): "Go through and cancel all the
-    orders in markets that recently lost their rewards program."
+    """CONTINUAL dead-market scan (owner, 2026-08-20: "Go through and
+    cancel all the orders in markets that recently lost their rewards
+    program", then "More rewards are dropping. Can you make it a continual
+    scan"). Every ten minutes: any market whose program is gone or whose
+    pool reads zero gets ALL our resting orders pulled — exits included,
+    per the owner's word ("I'll replace those if necessary").
 
-    Runs on the box because GitHub Actions has been failing repo-wide since
-    2026-08-19 (no runner assigned, ~4s failures — a billing/limit problem
-    only the owner can clear). Everything needed is already in the poll
-    caches: the account's orders, a fresh program reading for every market
-    they rest in (fetch_live_orders refreshes _PROG_CACHE each poll), and
-    positions for the exits rule. Exits are never touched. A sanity rail
-    refuses to act when the data claims most of the board is dead."""
-    st = MONITOR.state
-    if st.get("cancel_dead_run") == DEAD_SWEEP_MARK or _DEAD_SWEEP["running"]:
-        return
+    Rails, in order: caches must be warm; the program cache must cover the
+    order book; a market must read dead on TWO consecutive checks before
+    anything cancels (one API flake must never fire it); and if most of
+    the board reads dead at once that is data trouble, not reality — hold
+    and say so. The first run of 2026-08-20 cleared 1,691 orders and then
+    446 exits across 87 markets; steady state should be a handful a day.
+    Everything runs off the poll caches — no extra API reads."""
     now = time.time()
-    if now - _DEAD_SWEEP["last_try"] < 1800:
+    if _DEAD_SWEEP["running"] or now - _DEAD_SWEEP["last_try"] < DEAD_SWEEP_EVERY_S:
         return
     progs = tr._PROG_CACHE.get("progs") or {}
     queried = set(tr._PROG_CACHE.get("slugs") or ())
@@ -4540,27 +4537,22 @@ def cancel_dead_sweep() -> None:
     dead = {m for m in covered
             if m not in progs or not (progs.get(m) or {}).get("pool")}
     if len(markets) >= 20 and len(dead) > 0.7 * len(markets):
-        notify("Dead-market sweep held back",
+        _DEAD_SWEEP["suspect"] = set()
+        notify("Dead-market scan held back",
                f"{len(dead)} of {len(markets)} markets read as paying nothing "
                f"— that smells like bad program data, not reality. No orders "
-               f"were cancelled; will re-check in 30 minutes.")
+               f"were cancelled; re-checking in {DEAD_SWEEP_EVERY_S/60:.0f} minutes.")
         return
-    targets, kept_exits = [], 0
-    for o in MONITOR.orders:
-        m = o.get("market") or ""
-        if m not in dead or not o.get("id"):
-            continue
-        net = tr._num((MONITOR.positions.get(m) or {}).get("netPosition"))
-        if DEAD_SWEEP_KEEP_EXITS and ((o["side"] == "SELL" and net > 0)
-                                      or (o["side"] == "BUY" and net < 0)):
-            kept_exits += 1
-            continue                 # an exit is never dead weight
-        targets.append(o)
+    confirmed = dead & _DEAD_SWEEP["suspect"]     # dead twice in a row
+    _DEAD_SWEEP["suspect"] = dead
+    targets = [o for o in MONITOR.orders
+               if (o.get("market") or "") in confirmed and o.get("id")
+               and o["id"] not in _DEAD_SWEEP["done_ids"]]
     if not targets:
-        st["cancel_dead_run"] = DEAD_SWEEP_MARK
-        st["cancel_dead"] = {"ts": now, "dead_markets": len(dead),
-                             "cancelled": 0, "failed": 0,
-                             "kept_exits": kept_exits}
+        with MONITOR.lock:
+            prev = MONITOR.state.get("cancel_dead") or {}
+            MONITOR.state["cancel_dead"] = {**prev, "ts": now,
+                                            "dead_markets": len(dead)}
         return
     _DEAD_SWEEP["running"] = True
 
@@ -4571,6 +4563,10 @@ def cancel_dead_sweep() -> None:
             for o in targets:
                 code, res = do_cancel_order(str(o["id"]))
                 ok = bool(res.get("ok")) or code == 404
+                if ok:
+                    _DEAD_SWEEP["done_ids"].add(o["id"])
+                    if len(_DEAD_SWEEP["done_ids"]) > 4000:
+                        _DEAD_SWEEP["done_ids"].clear()
                 done += ok; failed += (not ok)
                 rows.append(f"{o['market']} {o['side']} {o['size']:g} @ "
                             f"{o['price']*100:g}c -> "
@@ -4579,17 +4575,20 @@ def cancel_dead_sweep() -> None:
         finally:
             _DEAD_SWEEP["running"] = False
             with MONITOR.lock:
-                MONITOR.state["cancel_dead_run"] = DEAD_SWEEP_MARK
+                prev = MONITOR.state.get("cancel_dead") or {}
                 MONITOR.state["cancel_dead"] = {
                     "ts": time.time(), "dead_markets": len(dead),
-                    "cancelled": done, "failed": failed,
-                    "kept_exits": kept_exits, "rows": rows[-60:]}
-            what = ("reward-seeking orders" if DEAD_SWEEP_KEEP_EXITS
-                    else "orders (exits included, per your word)")
-            notify("Dead-market sweep finished",
-                   f"{done} {what} cancelled across "
-                   f"{len(dead)} markets that no longer pay; {failed} failed; "
-                   f"{kept_exits} position exits left working.")
+                    "cancelled": (prev.get("cancelled") or 0) + done,
+                    "failed": (prev.get("failed") or 0) + failed,
+                    "last_run": {"cancelled": done, "failed": failed,
+                                 "markets": sorted({o["market"] for o in targets})},
+                    "rows": ((prev.get("rows") or []) + rows)[-80:]}
+            notify("Programs died — orders pulled",
+                   f"{done} orders cancelled across "
+                   f"{len({o['market'] for o in targets})} markets whose "
+                   f"rewards ended (exits included, per your word); "
+                   f"{failed} failed. The scan keeps running every "
+                   f"{DEAD_SWEEP_EVERY_S/60:.0f} minutes.")
 
     threading.Thread(target=work, daemon=True, name="dead-sweep").start()
 

@@ -1646,3 +1646,12 @@ of automated probing or placing of orders on any markets without rewards."
   picks, and a candidate whose fresh terms read dead is dropped from the
   scoreboard before anything places. Seats engine and calibration probes
   already required a live pool.
+
+Owner, 2026-08-20 afternoon: "More rewards are dropping. Can you make it a
+continual scan" — cancel_dead_sweep is now a standing loop (every 10 min,
+DEAD_SWEEP_EVERY_S). A market must read dead on TWO consecutive checks
+before anything cancels (one API flake can't fire it), cancelled ids are
+remembered so nothing double-fires, exits go too (owner's earlier word),
+and the rails held: a partial mass-death reading (>70% of the board) holds
+and notifies; a totally blank program response exits before judging.
+Notify per batch; cumulative counts in state["cancel_dead"].
