@@ -3109,3 +3109,16 @@ date,market,program_type,reward_usd,status
 2026-08-18,ewc-usse-me-2026-11-03-rep,liquidityProgram,0.38,PENDING
 2026-08-18,ewc-usse-tx-2026-11-03-dem,liquidityProgram,0.61,PENDING
 2026-08-18,ewc-usse-tx-2026-11-03-rep,liquidityProgram,0.3,PENDING
+2026-08-18,lawec-saveact-2026-12-31,liquidityProgram,1.74,PENDING
+2026-08-18,opdc-mcconnell-resign-2026-11-02,liquidityProgram,0.01,PENDING
+2026-08-18,scc-hrep-rep-2026-11-03-gte225,liquidityProgram,0.05,PENDING
+2026-08-18,scc-hrep-rep-2026-11-03-gte230,liquidityProgram,0.05,PENDING
+2026-08-18,scc-senate-gop-2026-11-03-47,liquidityProgram,0.28,PENDING
+2026-08-18,scc-senate-gop-2026-11-03-48,liquidityProgram,2.13,PENDING
+2026-08-18,scc-senate-gop-2026-11-03-49,liquidityProgram,0.01,PENDING
+2026-08-18,scc-senate-gop-2026-11-03-51,liquidityProgram,0.4,PENDING
+2026-08-18,scc-senate-gop-2026-11-03-52,liquidityProgram,1.57,PENDING
+2026-08-18,scc-senate-gop-2026-11-03-53,liquidityProgram,0.01,PENDING
+2026-08-18,scc-senate-gop-2026-11-03-54,liquidityProgram,0.63,PENDING
+2026-08-18,scc-senate-gop-2026-11-03-gte57,liquidityProgram,0.33,PENDING
+2026-08-18,scc-senate-gop-2026-11-03-lte45,liquidityProgram,0.06,PENDING
