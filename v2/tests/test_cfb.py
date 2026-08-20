@@ -292,3 +292,31 @@ class TestStockEarnsWhileWaiting(unittest.TestCase):
         self.assertIsNotNone(exits[0]["live_est"])
         self.assertGreater(exits[0]["live_est"], 0.0)
         self.assertAlmostEqual(s["stock_day"], exits[0]["live_est"], delta=0.011)
+
+
+class TestFastPlacement(unittest.TestCase):
+    def test_phantom_placement_self_corrects(self):
+        # verify-free placement trusts the accepted response; an order the
+        # exchange accepted but never rested must vanish on the next
+        # reconcile as a silent cancel, not linger as a phantom
+        r = Rig()
+        r.add_market(ALA, polite_book(r.now))
+        r.cycle()
+        r.cycle()
+        self.assertGreater(len(r.fam.orders), 0)
+        phantom = next(iter(r.fam.orders))
+        del r.exchange.live[phantom]           # never actually rested
+        r.now += 3600
+        r.exchange.books[ALA] = polite_book(r.now)
+        r.cycle()
+        self.assertNotIn(phantom, r.fam.orders)
+        self.assertGreaterEqual(r.fam.silent_cancels, 1)
+
+    def test_scan_and_actions_pace(self):
+        # six placements a cycle, ten books with four kept for the scan
+        from v2.family import college
+        cfg = college()
+        self.assertEqual(cfg.max_actions_per_cycle, 6)
+        self.assertEqual(cfg.books_per_cycle, 10)
+        self.assertEqual(cfg.scan_reserve, 4)
+        self.assertFalse(cfg.verify_resting)

@@ -78,8 +78,20 @@ class FamilyConfig:
     # paying market the planner finds worth resting in; the real bounds are
     # the $1/market cap, the share band, and the placement/scan pacing.
     max_markets: int | None = None
-    max_actions_per_cycle: int = 3   # rate-limit manners
-    books_per_cycle: int = 6         # REST fetches: active first, then the scan
+    # Ramp speed (owner, 2026-08-20: "What can be done to let the cfb bot
+    # go faster?"): six placements and ten book fetches a cycle, four of
+    # them reserved for discovering new markets. The big saving that pays
+    # for this is verify_resting=False below — the old per-placement
+    # verification polled the account's open orders (3,300+ rows) up to
+    # four times per order, which is where the HTTP 429s came from.
+    max_actions_per_cycle: int = 6
+    books_per_cycle: int = 10        # REST fetches: active first, then the scan
+    scan_reserve: int = 4            # fetches the scan always keeps
+    # New placements trust the exchange's accepted-response and skip the
+    # verify poll; the NEXT cycle's reconcile checks every order by id
+    # anyway, and a post-only rejection simply vanishes there as a silent
+    # cancel and is retried later. Reprices keep full place-verify-cancel.
+    verify_resting: bool = False
     rescan_s: float = 4 * 3600.0     # re-score an idle candidate this often
     # Live tuning, 2026-08-20 early hours: the first cfb deploy repriced a
     # dozen orders per pass chasing 1-tick touch wobbles for +$0.02/day
@@ -513,8 +525,9 @@ class Family:
                     continue
                 net = (positions.get(slug) or (0.0,))[0]
                 r = self.desk.place_resting(slug, plan["side"], plan["px"],
-                                            plan["qty"], net_position=net)
-                if r.ok:
+                                            plan["qty"], net_position=net,
+                                            verify=self.cfg.verify_resting)
+                if r.ok and r.order_id:
                     self.orders[r.order_id] = FamilyOrder(
                         id=r.order_id, market=slug, side=plan["side"],
                         price=plan["px"], qty=plan["qty"], intent=r.intent,
@@ -573,7 +586,7 @@ class Family:
         fresher than 4x BOOK_MAX_AGE, so actives can wait 150s between
         refreshes and still stay well inside that."""
         budget = self.cfg.books_per_cycle
-        scan_reserve = min(2, budget)
+        scan_reserve = min(self.cfg.scan_reserve, budget)
         done = 0
         active = sorted(self.active_markets() | set(self.inventory),
                         key=lambda s: self.cache.age(s, now), reverse=True)
