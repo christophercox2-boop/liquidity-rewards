@@ -1461,3 +1461,48 @@ reachable than setting NONE. With no number, `MAX_UNBACKED_BID_C` caps at 15c �
 which for mids of 6.5–14.5c reaches the touch fine. With a 2c number, the cap is
 8c and the market is shut. Clearing a fair value can therefore INCREASE what we
 can earn there, which is the opposite of what anyone would expect.
+
+## 2026-08-20 — the qualifier goes board-wide (the "unprobed markets")
+
+The owner: "massive spread in the governor, senate, and slate markets where
+there is definitely money to be made, but I'm not even probing it," then "Do
+the unprobed markets first." Diagnosis from the live state: 138 of 223
+program-carrying US-politics markets had NO book in the tracker's cache —
+`fetch_live_orders` only fetches books for markets with orders, and
+`auto_qualify` only scanned `PROBE_PREFIXES` (the 2028 nomination families).
+So a side below Target Size in an OH/GA/CA governor race, a midterms-control
+slate, or the 2028 presidential slate was invisible: it paid nobody, and
+nothing of ours could ever see it.
+
+What changed in `auto_qualify` (live/monitor.py):
+
+* **Scope**: every market in `prog_terms` (the program watcher's whole-board
+  snapshot) plus the tracker's cache — not just PROBE_PREFIXES. Hands-off
+  (2.0's seats families, unwind markets, resolving today), econ, and anything
+  resolving within `QUAL_MIN_DAYS_OUT` (2) days stay out.
+* **Books**: the qualifier fetches its own (`QUAL_BOOKS_PER_PASS` = 6 per
+  5-minute pass, least-recently-tried first, own cache — the tracker's cache
+  evicts anything without orders). Whole board rotates in ~3h.
+* **Empty sides only, outside the nomination families.** A side someone else
+  already quotes is the earner's problem: a floor block behind their price
+  scores `df^ticks` from THEIR best ≈ zero, and the collateral would qualify
+  the side for strangers.
+* **Routing unchanged** (owner 2026-08-16): far-dated + non-primary + ≤$50
+  places itself, everything else queues for a tap on /map. New bounds:
+  `QUAL_AUTO_DAY_USD` ($300/day auto budget), queue capped at
+  `QUAL_QUEUE_MAX` (12) rows sorted richest side pool first, denials stick
+  for 7 days (`qual_denied`), a placed side is not re-tried for 6h.
+* **Bug fixes that only bit at sub-cent ticks**: prices serialized `:.2f`
+  (a 0.1c floor became "0.00") and the ask ceiling rounded to 2 decimals
+  (1 − 0.001 became 1.0). Now `:.3f` with trailing zeros stripped, ceiling
+  rounded to 3. NOTE: an empty book's tick is unknowable from levels, so it
+  defaults to 0.01 — floors go in at 1c ($50 per 5,000-target side), which
+  routes most first entries through the queue, where the cost is on the card.
+* Approve on /map now re-checks against a book fetched AT TAP TIME, not the
+  rotation's cache; map card rows show the side pool $/day and days out.
+
+Verified with a stubbed-network harness driving the real state snapshot:
+routing gates, day budget, redo guard, deny stickiness, queue hygiene,
+sub-cent serialization, ask chunking under low buying power (existing
+behavior: ~$bp−reserve shares per chunk, 40 chunks max, retried after the
+redo window). v2 untouched; its 210 tests still green.

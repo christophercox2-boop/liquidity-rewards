@@ -4299,7 +4299,20 @@ QUAL_AUTO_MAX_USD = float(os.environ.get("QUAL_AUTO_MAX_USD", "50"))
 QUAL_BP_RESERVE = float(os.environ.get("QUAL_BP_RESERVE", "200"))
 QUAL_MAX_PER_POLL = int(os.environ.get("QUAL_MAX_PER_POLL", "2"))
 QUAL_PRIMARY_MARKS = ("usgubp", "ussep", "ushrp", "uspresp")
-_QUAL: dict = {"last": 0.0}
+# The 2026-08-20 widening (owner: "massive spread in the governor, senate,
+# and slate markets where there is definitely money to be made, but I'm not
+# even probing it" / "Do the unprobed markets first"): the scan covers every
+# US-politics program market, not just the 2028 nomination families. These
+# knobs bound the wider loop; the routing rules above are the owner's and
+# did not change.
+QUAL_BOOKS_PER_PASS = int(os.environ.get("QUAL_BOOKS_PER_PASS", "6"))
+QUAL_BOOK_TTL = float(os.environ.get("QUAL_BOOK_TTL", "3600"))
+QUAL_QUEUE_MAX = int(os.environ.get("QUAL_QUEUE_MAX", "12"))
+QUAL_AUTO_DAY_USD = float(os.environ.get("QUAL_AUTO_DAY_USD", "300"))
+QUAL_MIN_DAYS_OUT = int(os.environ.get("QUAL_MIN_DAYS_OUT", "2"))
+QUAL_REDO_S = float(os.environ.get("QUAL_REDO_S", "21600"))
+QUAL_DENY_TTL = float(os.environ.get("QUAL_DENY_TTL", str(7 * 86400)))
+_QUAL: dict = {"last": 0.0, "books": {}, "done": {}, "day": ["", 0.0]}
 
 
 def _is_primary(m: str) -> bool:
@@ -4323,6 +4336,62 @@ def _far_dated(m: str) -> bool:
     return bool(yrs) and max(yrs) >= 2027
 
 
+def _qual_prog(m: str) -> dict | None:
+    """pool/target for m: the tracker's cache first (it only covers markets
+    with orders), else the whole-board prog_terms snapshot the program
+    watcher keeps as [pool, target, df] — the widened scan's markets mostly
+    have no orders, so no cache row."""
+    pr = (tr._PROG_CACHE.get("progs") or {}).get(m)
+    if pr and pr.get("target"):
+        return {"pool": float(pr.get("pool") or 0),
+                "target": int(pr.get("target") or 0)}
+    row = (MONITOR.state.get("prog_terms") or {}).get(m)
+    if isinstance(row, (list, tuple)) and len(row) >= 2 and row[1]:
+        return {"pool": float(row[0] or 0), "target": int(row[1] or 0)}
+    return None
+
+
+def _qual_days_out(m: str) -> int | None:
+    """Days until the slug's resolution date; None when the slug is undated
+    (the 2028 nomination style) — undated reads as far away, same as
+    _far_dated's year fallback."""
+    d = _SLUG_DATE.search(str(m))
+    if not d:
+        return None
+    try:
+        when = dt.date.fromisoformat(d.group(1))
+    except ValueError:
+        return None
+    return (when - dt.datetime.now(ET).date()).days
+
+
+def _qual_book(m: str) -> tuple[float, dict] | None:
+    """A book at most QUAL_BOOK_TTL old: the tracker's cache (markets with
+    orders keep those fresh) or the qualifier's own fetches (markets
+    without orders never appear in the tracker's cache — which is exactly
+    why the empty markets stayed invisible until 2026-08-20)."""
+    now = time.time()
+    for ent in (tr._BOOK_CACHE.get(m), _QUAL["books"].get(m)):
+        if ent and ent[1] and now - ent[0] <= QUAL_BOOK_TTL:
+            return ent
+    return None
+
+
+def _qual_fetch_books(cands: list[str]) -> None:
+    """Fetch up to QUAL_BOOKS_PER_PASS books for candidates that have none,
+    least-recently-tried first, so the whole board rotates through in a few
+    hours without leaning on the rate limit."""
+    todo = [m for m in cands if _qual_book(m) is None]
+    todo.sort(key=lambda m: _QUAL["books"].get(m, (0.0,))[0])
+    for m in todo[:QUAL_BOOKS_PER_PASS]:
+        try:
+            _QUAL["books"][m] = (time.time(), tr._fetch_book(m))
+        except Exception:  # noqa: BLE001 — a failed fetch just waits its turn
+            _QUAL["books"][m] = (time.time(), None)
+    for gone in set(_QUAL["books"]) - set(cands):
+        del _QUAL["books"][gone]
+
+
 def _qual_gaps(m: str) -> list[dict]:
     """Sides of m that are short of Target Size, with what closing costs.
 
@@ -4330,11 +4399,13 @@ def _qual_gaps(m: str) -> list[dict]:
     is left of the dollar. At 1c and 99c those are the same penny, which is
     what makes the floor the cheap place to do this.
     """
-    pr = (tr._PROG_CACHE.get("progs") or {}).get(m) or {}
-    target = int(pr.get("target") or 0)
-    ent = tr._BOOK_CACHE.get(m)
-    if not target or not ent or time.time() - ent[0] > 600:
+    pr = _qual_prog(m)
+    if not pr or not pr["target"] or not pr["pool"]:
+        return []          # no target to close, or a pool that pays nobody
+    ent = _qual_book(m)
+    if not ent:
         return []
+    target = pr["target"]
     tick = float(ent[1].get("tick") or 0.01)
     out = []
     for side, key in (("BUY", "bids"), ("SELL", "asks")):
@@ -4342,7 +4413,7 @@ def _qual_gaps(m: str) -> list[dict]:
         gap = int(target - tot)
         if gap <= 0:
             continue
-        px = tick if side == "BUY" else round(1 - tick, 2)
+        px = tick if side == "BUY" else round(1 - tick, 3)
         out.append({"m": m, "side": side, "gap": gap, "px": px,
                     "cost": round(gap * (px if side == "BUY" else 1 - px), 2),
                     "target": target, "have": int(tot)})
@@ -4383,7 +4454,10 @@ def _qual_place(job: dict) -> tuple[bool, str]:
                          "Content-Type": "application/json"},
                 json={"marketSlug": m, "intent": intent,
                       "type": "ORDER_TYPE_LIMIT",
-                      "price": {"value": f"{px:.2f}", "currency": "USD"},
+                      # trailing zeros stripped, three decimals kept: a 0.1c
+                      # floor must not serialize as "0.00" (the old :.2f did)
+                      "price": {"value": f"{px:.3f}".rstrip("0").rstrip("."),
+                                "currency": "USD"},
                       "quantity": int(qty),
                       "tif": "TIME_IN_FORCE_GOOD_TILL_CANCEL",
                       "participateDontInitiate": True},
@@ -4405,40 +4479,109 @@ def _qual_place(job: dict) -> tuple[bool, str]:
     return True, "done" if left <= 0 else f"{left:,} still short"
 
 
-def auto_qualify() -> None:
-    """Close cheap qualification gaps; queue the rest for the owner."""
+def auto_qualify(event_sizes: dict[str, int] | None = None) -> None:
+    """Close cheap qualification gaps; queue the rest for the owner.
+
+    Widened 2026-08-20 to every US-politics program market. Outside the
+    nomination families it only ever takes an EMPTY side: a side someone
+    else already quotes is the earner's problem, and a floor block behind
+    their price would qualify the side for THEM — score decays df^ticks
+    from THEIR best, so ours would round to zero and the collateral would
+    subsidize strangers.
+
+    The routing is unchanged and the owner's (2026-08-16): far-dated,
+    non-primary, <= $50 places itself; everything else waits for a tap on
+    the map. Two additions bound the wider scope: a per-day auto budget,
+    and a queue cap so the phone card stays readable — richest side pool
+    first, so what shows is what pays."""
     if not _auto_on("qualify") or os.environ.get("QUALIFY_PAUSE", "") == "1":
         return
     now = time.time()
     if now - float(_QUAL.get("last") or 0) < 300:
         return
     _QUAL["last"] = now
-    queue = MONITOR.state.setdefault("qual_queue", {})
-    done = 0
-    for m in sorted((tr._PROG_CACHE.get("progs") or {})):
-        if done >= QUAL_MAX_PER_POLL:
-            break
-        if not m.startswith(PROBE_PREFIXES) or _hands_off(m):
+    ev = event_sizes or {}
+    today = dt.datetime.now(ET).strftime("%Y-%m-%d")
+    if _QUAL["day"][0] != today:
+        _QUAL["day"] = [today, 0.0]
+    # every politics market with paying terms; hands-off (the 2.0 seats
+    # families, unwind markets, anything resolving today) and econ stay
+    # out, and so does anything resolving within QUAL_MIN_DAYS_OUT days —
+    # "very small chance of a fill at the floor" stops being true there
+    ranked = []
+    for m in set(tr._PROG_CACHE.get("progs") or {}) | set(
+            MONITOR.state.get("prog_terms") or {}):
+        if _hands_off(m) or tr._is_econ(m):
             continue
+        d = _qual_days_out(m)
+        if d is not None and d < QUAL_MIN_DAYS_OUT:
+            continue
+        pr = _qual_prog(m)
+        if not pr or not pr["target"] or not pr["pool"]:
+            continue
+        est = round(pr["pool"] / max(ev.get(m) or 1, 1) / 2.0, 2)
+        ranked.append((est, m))
+    ranked.sort(key=lambda t: (-t[0], t[1]))
+    _qual_fetch_books([m for _, m in ranked])
+    queue = MONITOR.state.setdefault("qual_queue", {})
+    denied = MONITOR.state.setdefault("qual_denied", {})
+    for k, ts in list(denied.items()):
+        if now - float(ts or 0) > QUAL_DENY_TTL:
+            del denied[k]
+    done = 0
+    placed_notes = []
+    for est, m in ranked:
+        wide = not m.startswith(PROBE_PREFIXES)
         for job in _qual_gaps(m):
+            if wide and job["have"] > 0:
+                continue     # someone already quotes this side — earner turf
             key = f"{job['m']}|{job['side']}"
+            if key in denied:
+                continue
+            if now - float(_QUAL["done"].get(key) or 0) < QUAL_REDO_S:
+                continue     # placed recently; let the book catch up first
+            job["est"] = est
+            job["days"] = _qual_days_out(m)
             route = _qual_route(job)
+            if route == "auto" and _QUAL["day"][1] + job["cost"] > QUAL_AUTO_DAY_USD:
+                route = "ask"
+                job["why"] = f"today's ${QUAL_AUTO_DAY_USD:,.0f} auto budget is used"
             if route == "ask":
-                if key not in queue:
-                    queue[key] = {**job, "why": ("primary" if _is_primary(job["m"]) else
-                                                 "resolves before Nov 2026"
-                                                 if not _far_dated(job["m"]) else
-                                                 f"costs ${job['cost']:,.2f}"),
+                if key not in queue and len(queue) < QUAL_QUEUE_MAX:
+                    queue[key] = {**job, "why": job.get("why") or
+                                  ("primary" if _is_primary(job["m"]) else
+                                   "resolves before Nov 2026"
+                                   if not _far_dated(job["m"]) else
+                                   f"costs ${job['cost']:,.2f}"),
                                   "asked": now}
                 continue
             if done >= QUAL_MAX_PER_POLL:
-                break
+                continue
             ok, note = _qual_place(job)
             done += 1
+            _QUAL["done"][key] = now
+            if ok:
+                _QUAL["day"][1] += job["cost"]
+                placed_notes.append(f"{job['m']} {job['side']} {job['gap']:,} "
+                                    f"at {job['px']*100:g}¢ (${job['cost']:,.2f})")
             _probe_log(job["m"], "qualify", job["side"], job["px"],
                        f"{job['have']:,} of {job['target']:,} — "
                        f"{'closed' if ok else 'failed'} {job['gap']:,} at "
-                       f"{job['px']*100:.0f}¢ (${job['cost']:,.2f}) · {note}")
+                       f"{job['px']*100:g}¢ (${job['cost']:,.2f}) · {note}")
+    # queue hygiene: a side that qualified in the meantime, went hands-off,
+    # or was denied comes off the card by itself
+    for k in list(queue):
+        m, _, side = k.partition("|")
+        if k in denied or _hands_off(m):
+            queue.pop(k, None)
+            continue
+        if _qual_book(m) and not any(g["side"] == side for g in _qual_gaps(m)):
+            queue.pop(k, None)
+    if placed_notes:
+        notify("Qualified " + ("1 side" if len(placed_notes) == 1
+                               else f"{len(placed_notes)} sides"),
+               "Empty sides now hold Target Size at the floor/ceiling — "
+               "a side below target pays nobody:\n" + "\n".join(placed_notes))
 
 
 # --- idle inventory: shares that are held but not working -------------------
@@ -9497,15 +9640,25 @@ def do_maction(body: dict) -> tuple[int, dict]:
         if act == "deny":
             with MONITOR.lock:
                 (MONITOR.state.get("qual_queue") or {}).pop(key, None)
+                # a denial sticks for QUAL_DENY_TTL — before this the scan
+                # re-queued every denied side on its next pass
+                MONITOR.state.setdefault("qual_denied", {})[key] = time.time()
             return 200, {"ok": True, "acted": "denied"}
         if act != "approve":
             return 400, {"ok": False, "error": "act must be approve or deny"}
+        # a queued job can be hours old — re-check against a book fetched NOW,
+        # not whatever age the rotation last left in the cache
+        try:
+            _QUAL["books"][job["m"]] = (time.time(), tr._fetch_book(job["m"]))
+        except Exception:  # noqa: BLE001 — fall back to the cached book
+            pass
         fresh = [g for g in _qual_gaps(job["m"]) if g["side"] == job["side"]]
         if not fresh:
             with MONITOR.lock:
                 (MONITOR.state.get("qual_queue") or {}).pop(key, None)
             return 200, {"ok": True, "acted": "already at target — dropped"}
         ok, note = _qual_place(fresh[0])
+        _QUAL["done"][f"{job['m']}|{job['side']}"] = time.time()
         with MONITOR.lock:
             (MONITOR.state.get("qual_queue") or {}).pop(key, None)
         return 200, {"ok": ok, "acted": note}
@@ -10072,7 +10225,7 @@ def _map_payload() -> dict:
             key=lambda j: -float(j.get("loss_usd") or 0)),
         "qual_queue": sorted(
             ({"key": k, **v} for k, v in (MONITOR.state.get("qual_queue") or {}).items()),
-            key=lambda j: -float(j.get("cost") or 0)),
+            key=lambda j: (-float(j.get("est") or 0), float(j.get("cost") or 0))),
         # every alert the monitor decided about, sent or held, newest first
         "notify_log": list(reversed((MONITOR.state.get("notify_log") or [])[-60:])),
         "probe_est": MONITOR.state.get("probe") or {},
@@ -10804,17 +10957,19 @@ function renderQual(){
   document.getElementById('qualBody').innerHTML =
     '<div class="sub" style="margin-bottom:6px">' + rows.length +
     ' side' + (rows.length===1?'':'s') + ' below Target Size that I will not do on my own — $' +
-    tot.toFixed(2) + ' to close them all. A side below target pays nobody, so these ' +
-    'markets currently earn us nothing.</div>' +
+    tot.toFixed(2) + ' to close them all, richest pools first. A side below target pays ' +
+    'NOBODY, so every one of these is reward money going unclaimed.</div>' +
     rows.map(r =>
       '<div style="border-top:1px solid var(--line);padding:7px 0">' +
       '<div style="display:flex;align-items:baseline;gap:6px">' +
       '<b style="font-size:13px;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;' +
       'white-space:nowrap">' + esc((DATA.labels||{})[r.m] || r.m) + '</b>' +
       '<span style="font-size:13px;font-weight:700">$' + (r.cost||0).toFixed(2) + '</span></div>' +
-      '<div class="sub" style="font-size:10.5px;margin:1px 0 5px">' + r.side + ' side · ' +
+      '<div class="sub" style="font-size:10.5px;margin:1px 0 5px">' +
+      (r.est ? 'side pool ~$' + r.est.toFixed(2) + '/day · ' : '') + r.side + ' side · ' +
       (r.have||0).toLocaleString() + ' of ' + (r.target||0).toLocaleString() +
-      ' · ' + (r.gap||0).toLocaleString() + ' more at ' + Math.round((r.px||0)*100) + '¢' +
+      ' · ' + (r.gap||0).toLocaleString() + ' more at ' + ((r.px||0)*100).toFixed(1).replace(/\.0$/,'') + '¢' +
+      (r.days != null ? ' · ' + r.days + 'd out' : '') +
       ' · held back: ' + esc(r.why||'') + '</div>' +
       '<div class="ctlrow rp"><button onclick="qualAct(&#39;' + esc(r.key) +
       '&#39;,&#39;approve&#39;)">Approve $' + (r.cost||0).toFixed(2) + '</button>' +
@@ -15261,7 +15416,7 @@ def poll_loop(key_id: str, secret_key: str) -> None:
                 except Exception as e:  # noqa: BLE001 — earner never kills the poll
                     MONITOR.error = f"earn: {type(e).__name__}: {e}"[:150]
                 try:
-                    auto_qualify()
+                    auto_qualify(event_sizes)
                 except Exception as e:  # noqa: BLE001 — never kills the poll
                     MONITOR.error = f"qualify: {type(e).__name__}: {e}"[:150]
                 try:
