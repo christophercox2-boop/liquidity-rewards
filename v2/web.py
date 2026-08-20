@@ -49,8 +49,8 @@ def authed(get_header, query_string: str, password: str) -> bool:
 
 
 NAV = (("status", "."), ("orders", "orders"), ("markets", "markets"),
-       ("opps", "opps"), ("calib", "calib"), ("log", "log"),
-       ("switch", "switch"))
+       ("opps", "opps"), ("calib", "calib"), ("scout", "scout"),
+       ("log", "log"), ("switch", "switch"))
 
 _CSS = """
  body{background:#1a202b;color:#e6e9ef;font:16px/1.45 -apple-system,system-ui,sans-serif;
@@ -711,6 +711,47 @@ CALIB_JS = """
  return h;
 """
 
+
+SCOUT_JS = """
+ var sv=d.survey_view||{};var st=sv.status||{};var rows=sv.rows||[];
+ var fams=sv.families||[];
+ var h='<div class="card"><b>Where else could this work?</b>'+
+  '<div class="sub">Read-only. Nothing here is traded &mdash; it is a measurement of '+
+  'families 2.0 does not touch, priced with the same scoring code as your live orders.</div>'+
+  '<div class="stats">'+
+  '<div class="stat"><div class="lab">markets found</div><div class="val">'+(st.catalogue||0)+'</div></div>'+
+  '<div class="stat"><div class="lab">priced so far</div><div class="val">'+(st.priced||0)+'</div></div>'+
+  '</div>'+
+  (st.age_h!=null?'<div class="hint">catalogue '+st.age_h+'h old; a few markets are priced each cycle so the '+
+    'rate limit is never spiked.</div>':'<div class="hint">first sweep still running.</div>')+
+  (st.note?'<div class="warn">'+st.note+'</div>':'')+
+  '<details class="how"><summary>what the numbers mean</summary>'+
+  'Every row is what a $'+(st.stake||25)+' order would earn per day, using the real scoring formula. '+
+  '<b>back</b> is the money resting '+(st.back_ticks||3)+' ticks BEHIND the touch &mdash; the earning you can '+
+  'take without standing in front of the flow, and the number these are ranked by. '+
+  '<b>touch</b> is joining the best price, which earns more and gets filled more. '+
+  'The gap between them is decided by <b>df</b>: at df 0.1 resting one tick back keeps a tenth of your score, '+
+  'at df 0.9 it keeps nine tenths. High df is what makes a family safe to sit in.</details></div>';
+ if(fams.length){
+  h+='<div class="card"><b>By family</b><table>'+hrow(['family','priced','best df','$/day back']);
+  fams.forEach(function(f){h+=row([f.family,f.priced+' of '+f.markets,
+    (f.best_df||0).toFixed(2),usd(f.safe_day)]);});
+  h+='</table></div>';}
+ if(rows.length){
+  h+='<div class="card"><b>Best individual markets</b>'+
+   '<div class="hint">Ranked by what $'+(st.stake||25)+' earns resting back from the touch.</div>'+
+   '<table>'+hrow(['market','df','back','touch','resolves']);
+  rows.forEach(function(r){
+   h+=row(['<span class="muted">'+(r.family||'')+'</span><br>'+(r.event||r.market||'').slice(0,44),
+     (r.df||0).toFixed(2),
+     usd(r.safe_day)+(r.safe_ticks?'<br><span class="muted">'+r.safe_ticks+' back</span>':''),
+     usd(r.touch_day),
+     (r.resolves||'?')+(r.days_out!=null?'<br><span class="muted">'+r.days_out+'d</span>':'')]);});
+  h+='</table></div>';}
+ else if(st.catalogue){h+='<div class="card muted">pricing in progress &mdash; check back in a few minutes</div>';}
+ return h;
+"""
+
 LOG_JS = """
  var h='';var es=d.engine_saved||{};
  function card(title,rows,fmt){
@@ -754,6 +795,7 @@ def build_shells() -> dict[str, str]:
         "/opps": _page("opps", "2.0 opportunities", OPPS_JS),
         "/order": _page("orders", "2.0 order", ORDER_JS),
         "/calib": _page("calib", "2.0 calibration", CALIB_JS),
+        "/scout": _page("scout", "2.0 scout", SCOUT_JS),
         "/log": _page("log", "2.0 log", LOG_JS),
     }
 

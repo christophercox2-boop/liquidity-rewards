@@ -33,6 +33,7 @@ from .estimator import Estimator
 from .orders import OrderDesk
 from .rewardswatch import RewardsWatch
 from .silver import SilverFairs
+from .survey import Survey
 from .state import StateStore
 from .switch import MasterSwitch
 from .terms import TermsStore
@@ -118,6 +119,8 @@ class Monitor:
         self.switch = MasterSwitch(alert=self.alerts.notify)
         self.silver = SilverFairs(client=self.client)
         self.rewards_watch = RewardsWatch()
+        # read-only scout for families we do NOT trade
+        self.survey = Survey()
         cfg = EngineConfig()
         self.desk = OrderDesk(
             client=self.client,
@@ -175,6 +178,8 @@ class Monitor:
             self.engine.restore(saved["engine_saved"])
         if saved.get("rewards_watch"):
             self.rewards_watch = RewardsWatch.from_dict(saved["rewards_watch"])
+        if saved.get("survey"):
+            self.survey = Survey.from_dict(saved["survey"])
         # errors survive restarts, and every boot leaves a visible marker —
         # a container restart-loop must show on the page, not vanish
         self.errors = list(saved.get("errors") or [])
@@ -310,6 +315,14 @@ class Monitor:
         except Exception as e:  # noqa: BLE001 — never lose the save below
             self._note(f"rewards watch: {type(e).__name__}: {e}")
 
+        # the survey: read-only, gentle, and last in line — it may never
+        # cost the engine a cycle or the box its rate limit
+        try:
+            self.survey.refresh_catalogue(self.client, now)
+            self.survey.measure(self.client, now)
+        except Exception as e:  # noqa: BLE001 — a scout must never break the loop
+            self._note(f"survey: {type(e).__name__}: {e}")
+
         recent_boots = [b for b in self.boots if now - b < 3600]
         if len(recent_boots) >= 5:
             # title includes "monitor failing" so it skips the alert floor
@@ -368,6 +381,10 @@ class Monitor:
             "control": {c: cv for c in ("senate", "house")
                         if (cv := self.silver.control(c)) is not None},
             "rewards_watch": self.rewards_watch.to_dict(),
+            "survey": self.survey.to_dict(),
+            "survey_view": {"status": self.survey.status(now),
+                            "families": self.survey.by_family(),
+                            "rows": self.survey.ranked(40)},
             "rewards_status": self.rewards_watch.status(now),
         }
         self.last_state = state
