@@ -130,6 +130,13 @@ class Client:
                 wait = min(float(ra), 30.0) if ra else delay
             except ValueError:
                 wait = delay
+            if resp.status_code == 429:
+                # Cloudflare throttle windows are TIME-based and outlast a
+                # 2/4/8s ladder — the 2026-08-20 cycle failures were 429s
+                # that survived all four quick tries. Wait the window out:
+                # a cycle that stretches a minute beats a cycle that dies
+                # (the web thread keeps serving health checks meanwhile).
+                wait = max(wait, 15.0 * (attempt + 1))
             self._sleep(wait)
             delay = min(delay * 2, 15.0)
         raise ApiError(f"{url}: {type(last_exc).__name__} on every one of {tries} tries — {last_exc}")
