@@ -2348,6 +2348,29 @@ def start_batch(payload: dict) -> tuple[int, dict]:
                  "precheck_skipped": precheck_skips[:20]}
 
 
+def _market_labels() -> dict:
+    """slug -> the best name we have. Order-feed names win (they carry the
+    candidate), then the events feed, then a decode of the slug itself."""
+    out: dict = {}
+    for m in set(tr.MARKET_NAMES) | set(MONITOR.state.get("prog_terms") or {}) \
+            | {o.get("market") for o in MONITOR.orders if o.get("market")}:
+        if not m:
+            continue
+        nm = tr.MARKET_NAMES.get(m) or _decode_slug(m)
+        out[m] = nm
+    for o in MONITOR.orders:
+        m = o.get("market")
+        sub = (o.get("subject") or "").strip()
+        title = (o.get("title") or "").strip()
+        if m and (sub or title):
+            base = tr.MARKET_NAMES.get(m) or _decode_slug(m)
+            if sub and sub.lower() not in base.lower():
+                out[m] = f"{base} — {sub}"[:110]
+            else:
+                out[m] = (title or base)[:110]
+    return out
+
+
 def compute_dead_orders() -> list[dict]:
     """Resting orders earning ~nothing for a DEFINITIVE reason — scored
     against a real book (no program, outside the window, ~0% share). Orders
@@ -4003,6 +4026,105 @@ def _no_live_program(m: str) -> bool:
     if isinstance(row, (list, tuple)) and row:
         return not row[0]
     return False
+
+
+# Slug decoder — the fallback when the exchange gives us no name. Every
+# politics slug is family-code + state + date + subject, and the owner
+# should not have to know that "ushsscc-ushrsc-al-2026-11-03-0" is a bet on
+# how many Alabama House seats one party wins.
+_SLUG_WORDS = (
+    ("usgubp", "Governor primary"), ("usgubmov", "Governor margin"),
+    ("usgubsc", "Governor seat count"), ("usgub", "Governor"),
+    ("ussep", "Senate primary"), ("ussemov", "Senate margin"),
+    ("ussesc", "Senate seat count"), ("usse", "Senate"),
+    ("ushrp", "House primary"), ("ushrsc", "House seat count"),
+    ("ushrep", "House"), ("ushr", "House"), ("hrep", "House"),
+    ("uspresp", "Presidential primary"), ("uspres", "President"),
+    ("usp", "President"), ("usho", "House control"),
+    ("usgovcc", "Governors count"), ("senate", "Senate"),
+    ("midterms", "Midterms"),
+)
+_STATES = {
+    "al":"Alabama","ak":"Alaska","az":"Arizona","ar":"Arkansas","ca":"California",
+    "co":"Colorado","ct":"Connecticut","de":"Delaware","fl":"Florida","ga":"Georgia",
+    "hi":"Hawaii","id":"Idaho","il":"Illinois","in":"Indiana","ia":"Iowa",
+    "ks":"Kansas","ky":"Kentucky","la":"Louisiana","me":"Maine","md":"Maryland",
+    "ma":"Massachusetts","mi":"Michigan","mn":"Minnesota","ms":"Mississippi",
+    "mo":"Missouri","mt":"Montana","ne":"Nebraska","nv":"Nevada","nh":"New Hampshire",
+    "nj":"New Jersey","nm":"New Mexico","ny":"New York","nc":"North Carolina",
+    "nd":"North Dakota","oh":"Ohio","ok":"Oklahoma","or":"Oregon","pa":"Pennsylvania",
+    "ri":"Rhode Island","sc":"South Carolina","sd":"South Dakota","tn":"Tennessee",
+    "tx":"Texas","ut":"Utah","vt":"Vermont","va":"Virginia","wa":"Washington",
+    "wv":"West Virginia","wi":"Wisconsin","wy":"Wyoming",
+}
+
+
+def _decode_slug(m: str) -> str:
+    """A readable guess at what a market is, from its slug alone."""
+    parts = [p for p in str(m or "").split("-") if p]
+    if not parts:
+        return m
+    what = ""
+    for tok in parts:
+        for code, word in _SLUG_WORDS:
+            if tok == code or tok.endswith(code):
+                what = word
+                break
+        if what:
+            break
+    state = next((_STATES[p] for p in parts if p in _STATES), "")
+    # Find the date (YYYY or YYYY-MM-DD) so its tokens are never mistaken
+    # for a bracket; whatever FOLLOWS the date is the market's subject.
+    subj = None
+    for i, tok in enumerate(parts):
+        if len(tok) == 4 and tok.isdigit() and tok.startswith("20"):
+            j = i + 1
+            if (i + 2 < len(parts) and parts[i + 1].isdigit()
+                    and len(parts[i + 1]) == 2 and parts[i + 2].isdigit()
+                    and len(parts[i + 2]) == 2):
+                j = i + 3
+            subj = parts[j:]
+            break
+    if subj is None:          # no date in the slug — fall back to the tail
+        subj = (parts[-2:] if (len(parts) >= 2 and parts[-1].isdigit()
+                               and parts[-2].isdigit()) else parts[-1:])
+
+    def _side(tok: str) -> str:
+        return {"d": "D", "r": "R"}.get(tok[:1], "")
+
+    extra = ""
+    if len(subj) == 2 and subj[0].isdigit() and subj[1].isdigit():
+        extra = f"{subj[0]}\u2013{subj[1]}"          # ...-20-21 -> "20 to 21"
+    elif (len(subj) == 2 and _side(subj[0]) and subj[0][1:].isdigit()
+            and subj[1].isdigit()):
+        # margin bracket over two tokens: d12-15 -> "D +12 to 15"
+        extra = f"{_side(subj[0])} +{subj[0][1:]}\u2013{subj[1]}"
+    elif len(subj) == 1:
+        t = subj[0]
+        side = _side(t)
+        body = t[1:] if side else t
+        if body.startswith("gte") and body[3:].isdigit():
+            extra = (f"{side} +{body[3:]}" if side else body[3:]) + " or more"
+        elif body.startswith("lte") and body[3:].isdigit():
+            extra = (f"{side} +{body[3:]}" if side else body[3:]) + " or fewer"
+        elif side and body.isdigit():
+            extra = f"{side} +{body}"
+        elif t.isdigit():
+            extra = f"exactly {t}"
+        elif "adv" in parts:
+            extra = f"advances \u2014 {t}" if t.isalpha() else "advances"
+        elif t.isalpha() and t not in ("dem", "rep", "gop") and len(t) >= 5:
+            extra = t         # a candidate code the feed will name properly
+    elif "adv" in parts:
+        extra = "advances"
+    if "nom" in parts:
+        what = (what + " nomination").strip()
+    if "dem" in parts and not ("rep" in parts or "gop" in parts):
+        what = (what + " (D)").strip()
+    elif ("rep" in parts or "gop" in parts) and "dem" not in parts:
+        what = (what + " (R)").strip()
+    bits = [b for b in (state, what, extra) if b]
+    return " ".join(bits) if bits else m
 
 
 def _hands_off(m: str) -> bool:
@@ -10489,11 +10611,11 @@ def _map_payload() -> dict:
                       "waiting_cost": round(sum(w.get("cost") or 0
                                                 for w in (_EARN.get("waiting") or [])), 2)},
         # slug -> human label, from the exchange's own naming
-        "labels": {o["market"]: (
-                       (o.get("subject") or "").strip()
-                       or (o.get("title") or "").strip())
-                   for o in MONITOR.orders
-                   if o.get("market") and (o.get("subject") or o.get("title"))},
+        # Names for EVERY market we can see, not just the ones we hold:
+        # the exchange's own name from the events feed, the order feed's
+        # candidate/title where we have orders (most specific, so it wins),
+        # and a decoded slug for anything neither covers.
+        "labels": _market_labels(),
         # The 2028 slate as a face grid: who we are earning on, and how much.
         "slate": sorted(
             ({"m": m_, "img": v_[0], "name": v_[1] or m_.rsplit("-", 1)[-1],

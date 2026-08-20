@@ -668,6 +668,32 @@ def _is_econ(slug: str) -> bool:
     )
 
 
+# slug -> human name, harvested from the events feed we already fetch. The
+# order feed carries titles too, but ONLY for markets we hold orders in, so
+# the whole rest of the board reads as raw slugs on the owner's phone
+# (2026-08-20: "Are you able to pull any more descriptive names for these
+# markets? I don't understand what some of them are."). This costs no extra
+# API calls — the names are in the same response as the event sizes.
+MARKET_NAMES: dict[str, str] = {}
+
+
+def _name_from_market(m: dict, event_title: str) -> str:
+    """The most descriptive label the payload offers, without repeating
+    itself: a market question when there is one, otherwise the event title
+    with the market's own subject (the candidate, the bracket) appended."""
+    q = str(m.get("question") or m.get("title") or m.get("name") or "").strip()
+    subj = m.get("subject")
+    sub = str((subj or {}).get("name") if isinstance(subj, dict)
+              else (subj or "")).strip()
+    ev = (event_title or "").strip()
+    if q and len(q) > len(sub) + 4:
+        return q                       # a real question stands on its own
+    tail = sub or q
+    if ev and tail and tail.lower() not in ev.lower():
+        return f"{ev} — {tail}"
+    return ev or tail
+
+
 def fetch_politics_events() -> tuple[list[str], dict[str, int]]:
     """From events tagged politics/elections (authoritative, unlike slug
     heuristics): (ordered open market slugs, market slug -> number of open
@@ -686,8 +712,14 @@ def fetch_politics_events() -> tuple[list[str], dict[str, int]]:
                 break
             events = r.json().get("events") or []
             for ev in events:
-                open_mkts = [m["slug"] for m in ev.get("markets") or []
+                ev_title = str(ev.get("title") or ev.get("name") or "").strip()
+                open_rows = [m for m in ev.get("markets") or []
                              if m.get("slug") and not m.get("closed")]
+                open_mkts = [m["slug"] for m in open_rows]
+                for m in open_rows:
+                    nm = _name_from_market(m, ev_title)
+                    if nm:
+                        MARKET_NAMES[m["slug"]] = nm[:110]
                 for s in open_mkts:
                     slugs.append(s)
                     sizes[s] = len(open_mkts)
