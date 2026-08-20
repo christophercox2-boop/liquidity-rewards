@@ -91,17 +91,24 @@ class Rig:
 
 
 class TestWindow(unittest.TestCase):
-    def test_week_shape(self):
-        def at(day, hour):
-            return dt.datetime(2026, 8, day, hour, 0, tzinfo=ET).timestamp()
-        self.assertTrue(resting_ok(at(19, 12)))    # Wednesday noon
-        self.assertTrue(resting_ok(at(20, 16)))    # Thursday 4pm
-        self.assertFalse(resting_ok(at(20, 17)))   # Thursday 5pm — out
-        self.assertFalse(resting_ok(at(21, 12)))   # Friday — out
-        self.assertFalse(resting_ok(at(22, 12)))   # Saturday — out
-        self.assertFalse(resting_ok(at(23, 5)))    # Sunday 5am — out
-        self.assertTrue(resting_ok(at(23, 6)))     # Sunday 6am — back in
-        self.assertTrue(resting_ok(at(24, 12)))    # Monday
+    def test_week_shape_in_season(self):
+        def at(day, hour):        # September 2026: Wed 2 ... Mon 7
+            return dt.datetime(2026, 9, day, hour, 0, tzinfo=ET).timestamp()
+        self.assertTrue(resting_ok(at(2, 12)))     # Wednesday noon
+        self.assertTrue(resting_ok(at(3, 16)))     # Thursday 4pm
+        self.assertFalse(resting_ok(at(3, 17)))    # Thursday 5pm — out
+        self.assertFalse(resting_ok(at(4, 12)))    # Friday — out
+        self.assertFalse(resting_ok(at(5, 12)))    # Saturday — out
+        self.assertFalse(resting_ok(at(6, 5)))     # Sunday 5am — out
+        self.assertTrue(resting_ok(at(6, 6)))      # Sunday 6am — back in
+        self.assertTrue(resting_ok(at(7, 12)))     # Monday
+
+    def test_no_game_days_before_the_season(self):
+        # owner, 2026-08-20: "there aren't any games until next week" —
+        # before Week 0 the Thursday-Sunday pull must not fire
+        for day, hour in ((20, 17), (21, 12), (22, 12), (23, 5)):
+            self.assertTrue(resting_ok(
+                dt.datetime(2026, 8, day, hour, 0, tzinfo=ET).timestamp()))
 
     def test_days_out(self):
         self.assertEqual(slug_days_out(ALA, wednesday()), 101)
@@ -169,8 +176,8 @@ class TestCycle(unittest.TestCase):
         s = r.cycle()
         n = len(s["orders"])
         self.assertGreater(n, 0)
-        # Friday: everything non-exit comes out, nothing new goes in
-        r.now = dt.datetime(2026, 8, 21, 12, 0, tzinfo=ET).timestamp()
+        # an in-season Friday: everything non-exit comes out, nothing new in
+        r.now = dt.datetime(2026, 9, 4, 12, 0, tzinfo=ET).timestamp()
         for slug in list(r.exchange.books):
             r.exchange.books[slug] = polite_book(r.now)
         s = r.cycle()

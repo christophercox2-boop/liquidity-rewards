@@ -63,6 +63,10 @@ class FamilyConfig:
     # only exit orders stay. (weekday, hour), Monday = 0.
     rest_from: tuple[int, int] = (6, 6)     # Sunday 06:00
     rest_until: tuple[int, int] = (3, 17)   # Thursday 17:00
+    # the weekly window only means anything once the season is playing —
+    # before this ET date every day is a resting day (owner, 2026-08-20:
+    # "there aren't any games until next week")
+    season_start: tuple[int, int, int] | None = None
     # may the planner price IN FRONT of the side's current touch? College
     # launched with this on (it is why some of its orders rest alone, in
     # front of a junk wall); the owner's 2026-08-20 correction makes every
@@ -70,7 +74,8 @@ class FamilyConfig:
     allow_improve: bool = True
     per_market_usd: float = 1.00     # owner's cap, both sides combined
     share_hi: float = 0.10           # the not-drawing-attention ceiling
-    max_markets: int = 40            # first tranche; scales on the owner's word
+    max_markets: int = 400           # owner, 2026-08-20: "a 40 market cap
+                                     # leaves out 90% of what's available"
     max_actions_per_cycle: int = 3   # rate-limit manners
     books_per_cycle: int = 6         # REST fetches: active first, then the scan
     rescan_s: float = 4 * 3600.0     # re-score an idle candidate this often
@@ -108,8 +113,11 @@ class FamilyOrder:
 def resting_ok(now: float, cfg: FamilyConfig) -> bool:
     """Inside the family's weekly resting window? Game days belong to
     others (owner). The window runs rest_from -> rest_until in ET and may
-    wrap the week boundary."""
+    wrap the week boundary; before season_start there are no game days
+    and every hour is a resting hour."""
     t = dt.datetime.fromtimestamp(now, ET)
+    if cfg.season_start is not None and t.date() < dt.date(*cfg.season_start):
+        return True
     m = t.weekday() * 24 + t.hour                    # hour-of-week, Mon 0
     a = cfg.rest_from[0] * 24 + cfg.rest_from[1]
     b = cfg.rest_until[0] * 24 + cfg.rest_until[1]
@@ -636,8 +644,9 @@ class Family:
 
 
 def college() -> FamilyConfig:
-    """The launch family, behavior unchanged from its first deploy."""
-    return FamilyConfig()
+    """The launch family. Week 0 kicks off Saturday 2026-08-29; the weekly
+    Thu-evening-to-Sun-morning pull starts with that week's Thursday."""
+    return FamilyConfig(season_start=(2026, 8, 27))
 
 
 def nfl() -> FamilyConfig:
@@ -652,4 +661,5 @@ def nfl() -> FamilyConfig:
         prefixes=("tec-nfl-", "aqc-nfl-", "ftsc-nfl-", "fptc-nfl-"),
         rest_from=(1, 6), rest_until=(3, 17),
         allow_improve=False,
+        season_start=(2026, 8, 20),   # preseason games are already playing
     )

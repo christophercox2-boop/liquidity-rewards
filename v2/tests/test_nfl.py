@@ -64,17 +64,17 @@ class TestWindow(unittest.TestCase):
     def test_week_shape(self):
         cfg = nfl()
 
-        def at(day, hour):
+        def at(day, hour):             # September 2026: Mon 7 ... Sun 13
             return resting_ok(
-                dt.datetime(2026, 8, day, hour, 0, tzinfo=ET).timestamp(), cfg)
-        self.assertFalse(at(17, 12))   # Monday — out (MNF)
-        self.assertFalse(at(18, 5))    # Tuesday 5am — out
-        self.assertTrue(at(18, 6))     # Tuesday 6am — in
-        self.assertTrue(at(19, 12))    # Wednesday — in
-        self.assertTrue(at(20, 16))    # Thursday 4pm — in
-        self.assertFalse(at(20, 17))   # Thursday 5pm — out (TNF)
-        self.assertFalse(at(22, 12))   # Saturday — out
-        self.assertFalse(at(23, 12))   # Sunday — out
+                dt.datetime(2026, 9, day, hour, 0, tzinfo=ET).timestamp(), cfg)
+        self.assertFalse(at(7, 12))    # Monday — out (MNF)
+        self.assertFalse(at(8, 5))     # Tuesday 5am — out
+        self.assertTrue(at(8, 6))      # Tuesday 6am — in
+        self.assertTrue(at(9, 12))     # Wednesday — in
+        self.assertTrue(at(10, 16))    # Thursday 4pm — in
+        self.assertFalse(at(10, 17))   # Thursday 5pm — out (TNF)
+        self.assertFalse(at(12, 12))   # Saturday — out
+        self.assertFalse(at(13, 12))   # Sunday — out
 
 
 class TestBehindTheTouch(unittest.TestCase):

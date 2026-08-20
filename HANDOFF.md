@@ -1604,3 +1604,11 @@ claim at 1c) plus one known-market partial (ewc-usp-party-2028-11-07-rep,
 ~$50/day side, $192.43 to finish at 1c). The governor/slate books all
 carry real quotes; presence there is an earner/prober problem, not a
 qualification one.
+
+Owner corrections, 2026-08-20 morning: (1) `season_start` on FamilyConfig —
+no game-day pulls before the season plays (CFB Week 0 is Sat 2026-08-29, so
+college's window arms Thu 2026-08-27; NFL preseason is already live). The
+first Thursday-evening pull would otherwise have fired on a weekend with no
+games. (2) max_markets 40 -> 400 ("a 40 market cap leaves out 90% of
+what's available") — college can now cover all ~375 paying win-total
+markets; ramp is bounded by 3 actions and 2 scan books per 60s cycle.
