@@ -319,7 +319,8 @@ class Monitor:
         # cost the engine a cycle or the box its rate limit
         try:
             self.survey.refresh_catalogue(self.client, now)
-            self.survey.measure(self.client, now)
+            self.survey.scan_terms(self.client, now)   # cheap: which pay
+            self.survey.measure(self.client, now)      # costly: what they pay
         except Exception as e:  # noqa: BLE001 — a scout must never break the loop
             self._note(f"survey: {type(e).__name__}: {e}")
 

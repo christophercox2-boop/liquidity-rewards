@@ -720,7 +720,9 @@ SCOUT_JS = """
   'families 2.0 does not touch, priced with the same scoring code as your live orders.</div>'+
   '<div class="stats">'+
   '<div class="stat"><div class="lab">markets found</div><div class="val">'+(st.catalogue||0)+'</div></div>'+
-  '<div class="stat"><div class="lab">priced so far</div><div class="val">'+(st.priced||0)+'</div></div>'+
+  '<div class="stat"><div class="lab">pay rewards</div><div class="val">'+(st.payers||0)+
+    '<span class="u"> of '+(st.terms_known||0)+' checked</span></div></div>'+
+  '<div class="stat"><div class="lab">priced</div><div class="val">'+(st.priced||0)+'</div></div>'+
   '</div>'+
   (st.age_h!=null?'<div class="hint">catalogue '+st.age_h+'h old; a few markets are priced each cycle so the '+
     'rate limit is never spiked.</div>':'<div class="hint">first sweep still running.</div>')+
@@ -740,12 +742,13 @@ SCOUT_JS = """
  if(rows.length){
   h+='<div class="card"><b>Best individual markets</b>'+
    '<div class="hint">Ranked by what $'+(st.stake||25)+' earns resting back from the touch.</div>'+
-   '<table>'+hrow(['market','df','back','touch','resolves']);
+   '<table>'+hrow(['market','df','back','yield','resolves']);
   rows.forEach(function(r){
    h+=row(['<span class="muted">'+(r.family||'')+'</span><br>'+(r.event||r.market||'').slice(0,44),
      (r.df||0).toFixed(2),
      usd(r.safe_day)+(r.safe_ticks?'<br><span class="muted">'+r.safe_ticks+' back</span>':''),
-     usd(r.touch_day),
+     (r.yield_pct!=null?r.yield_pct+'%/d':'&ndash;')+
+       '<br><span class="muted">'+usd(r.touch_day)+' at touch</span>',
      (r.resolves||'?')+(r.days_out!=null?'<br><span class="muted">'+r.days_out+'d</span>':'')]);});
   h+='</table></div>';}
  else if(st.catalogue){h+='<div class="card muted">pricing in progress &mdash; check back in a few minutes</div>';}

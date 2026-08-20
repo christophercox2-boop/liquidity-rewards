@@ -97,7 +97,10 @@ class TestSurvey(unittest.TestCase):
         self.assertFalse(s.refresh_catalogue(c, now=200.0))
         self.assertEqual(len(c.calls), n)
 
-    def test_measure_is_budgeted_and_round_robins(self):
+    def test_pools_are_learned_cheaply_before_books_are_spent(self):
+        """One batched call learns 40 markets' terms; a book costs a call
+        each. Doing both together took 18.6h for one sweep of 8,923
+        markets — longer than the catalogue lives (measured live)."""
         slugs = [f"mlb-2026-champ-{i}" for i in range(10)]
         raw = {"timePeriods": [{"programId": "p", "rewardPool": 100,
                                 "targetSize": 5000, "discountFactor": 0.9,
@@ -106,10 +109,28 @@ class TestSurvey(unittest.TestCase):
                        programs={s: raw for s in slugs})
         s = Survey(clock=lambda: 100.0)
         s.refresh_catalogue(c, now=100.0)
+        # the cheap stage covers everything at once, and fetches no books
+        s.scan_terms(c, now=100.0)
+        self.assertEqual(len(s.terms), 10)
+        self.assertEqual([k for k, _ in c.calls].count("book"), 0)
+        # the costly stage is budgeted and only touches markets that pay
         s.measure(c, now=100.0, budget=3)
         self.assertEqual(len(s.rows), 3)
         s.measure(c, now=100.0, budget=3)
         self.assertEqual(len(s.rows), 6)          # moved on, didn't redo
+
+    def test_books_are_never_spent_on_markets_with_no_pool(self):
+        slugs = ["mlb-2026-champ-a", "mlb-2026-champ-b"]
+        dead = {"timePeriods": [{"programId": "p", "rewardPool": 0,
+                                 "targetSize": 5000, "discountFactor": 0.9,
+                                 "status": "CLOSED"}]}
+        c = FakeClient(events={"mlb": self.ev(*slugs)},
+                       programs={s: dead for s in slugs})
+        s = Survey(clock=lambda: 100.0)
+        s.refresh_catalogue(c, now=100.0)
+        s.scan_terms(c, now=100.0)
+        self.assertEqual(s.measure(c, now=100.0, budget=5), 0)
+        self.assertEqual([k for k, _ in c.calls].count("book"), 0)
 
     def test_ranked_puts_the_safest_earner_first_and_hides_settling_markets(self):
         s = Survey(clock=lambda: 100.0)

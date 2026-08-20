@@ -52,6 +52,13 @@ BACK_TICKS = 3          # "safe" means this far behind the touch
 MIN_DAYS_OUT = 14       # anything settling sooner is not a resting market
 CATALOGUE_TTL_S = 12 * 3600.0
 BOOKS_PER_PASS = 6      # gentle: the box is small and shares its rate limit
+TERM_BATCHES_PER_PASS = 3   # 40 slugs per batched call — pools are cheap to learn
+# Learning WHICH markets pay is cheap (one batched call per 40 slugs);
+# pricing one is expensive (a book fetch each). So the sweep does them in
+# that order: find the pools across the whole catalogue first, then spend
+# book fetches only where a pool actually exists. Doing both together took
+# 18.6 hours for one sweep of 8,923 markets — longer than the catalogue's
+# own lifetime, so it never finished (measured live, 2026-08-19).
 
 
 def _rows_from_events(events: list[dict]) -> tuple[dict[str, int], dict[str, str]]:
@@ -130,9 +137,11 @@ class Survey:
         self._clock = clock or time.time
         self.catalogue: dict[str, dict] = {}   # slug -> {family,label,event_n}
         self.rows: dict[str, dict] = {}        # slug -> scored row
+        self.terms: dict[str, dict] = {}       # slug -> pool/target/df, or a skip
         self.catalogue_at = 0.0
         self.note = ""
         self.cursor = 0
+        self.term_cursor = 0
 
     # -- stage 1: what exists -------------------------------------------------
 
@@ -164,53 +173,74 @@ class Survey:
 
     # -- stage 2: what it pays ------------------------------------------------
 
+    def scan_terms(self, client: Client, now: float | None = None,
+                   batches: int = TERM_BATCHES_PER_PASS) -> int:
+        """Cheap stage: learn which catalogue entries have a live pool.
+        Batched 40 to a call, so the whole catalogue is known in about an
+        hour instead of a day."""
+        now = now if now is not None else self._clock()
+        todo = [s for s in sorted(self.catalogue) if s not in self.terms]
+        if not todo:
+            return 0
+        picked = todo[:batches * 40]
+        try:
+            raw = client.programs(picked)
+        except ApiError as e:
+            self.note = f"programs: {e}"[:80]
+            return 0
+        for slug in picked:
+            tp = pick_period((raw.get(slug) or {}).get("timePeriods") or [], slug)
+            prog = (with_event_n(program_from_period(tp),
+                                 max(self.catalogue[slug]["event_n"], 1))
+                    if tp is not None else None)
+            if prog is None or not prog.is_live() or not prog.pool:
+                self.terms[slug] = {"skip": "no live pool"}
+                continue
+            self.terms[slug] = {"pool": prog.pool, "target": prog.target,
+                                "df": prog.df, "event_n": prog.event_n,
+                                "side_pool": round(daily_side_pool(prog, slug), 4)}
+        return len(picked)
+
     def measure(self, client: Client, now: float | None = None,
                 budget: int = BOOKS_PER_PASS) -> int:
-        """Price a few catalogue entries per pass. Round-robin so the
-        whole catalogue fills in over time without ever spiking the rate
-        limit the box shares with 1.0."""
+        """Expensive stage: price the markets that actually pay, richest
+        side-pool first so the useful answers arrive early."""
         now = now if now is not None else self._clock()
-        slugs = sorted(self.catalogue)
-        if not slugs:
+        payers = [(t["side_pool"], s) for s, t in self.terms.items()
+                  if not t.get("skip")
+                  and (s not in self.rows
+                       or now - self.rows[s].get("at", 0) > CATALOGUE_TTL_S)]
+        if not payers:
             return 0
-        picked, i, seen = [], self.cursor, 0
-        while len(picked) < budget and seen < len(slugs):
-            s = slugs[i % len(slugs)]
-            i, seen = i + 1, seen + 1
-            row = self.rows.get(s)
-            if row and now - row.get("at", 0) < CATALOGUE_TTL_S:
-                continue
-            picked.append(s)
-        self.cursor = i
-        if not picked:
-            return 0
+        payers.sort(reverse=True)
+        picked = [s for _, s in payers[:budget]]
         try:
             raw = client.programs(picked)
         except ApiError as e:
             self.note = f"programs: {e}"[:80]
             return 0
         done = 0
-        for s in picked:
-            tp = pick_period((raw.get(s) or {}).get("timePeriods") or [], s)
+        for slug in picked:
+            tp = pick_period((raw.get(slug) or {}).get("timePeriods") or [], slug)
             prog = (with_event_n(program_from_period(tp),
-                                 max(self.catalogue[s]["event_n"], 1))
+                                 max(self.catalogue[slug]["event_n"], 1))
                     if tp is not None else None)
             if prog is None or not prog.is_live() or not prog.pool:
-                self.rows[s] = {"market": s, "at": now, "skip": "no live pool",
-                                **self.catalogue[s]}
+                self.terms[slug] = {"skip": "pool closed"}
                 continue
             try:
-                book = client.book(s, fetched_at=now)
+                book = client.book(slug, fetched_at=now)
             except ApiError:
                 continue
-            row = score_row(s, prog, book, self.catalogue[s]["event_n"], now)
+            row = score_row(slug, prog, book, self.catalogue[slug]["event_n"], now)
             if row is None:
-                self.rows[s] = {"market": s, "at": now, "skip": "unscorable",
-                                **self.catalogue[s]}
+                self.rows[slug] = {"market": slug, "at": now,
+                                   "skip": "unscorable", **self.catalogue[slug]}
                 continue
-            row.update(self.catalogue[s])
+            row.update(self.catalogue[slug])
             row["at"] = now
-            self.rows[s] = row
+            row["yield_pct"] = round(100.0 * row["safe_day"] / STAKE_USD, 2)
+            self.rows[slug] = row
             done += 1
         return done
 
@@ -244,7 +274,9 @@ class Survey:
     def status(self, now: float | None = None) -> dict:
         now = now if now is not None else self._clock()
         priced = sum(1 for r in self.rows.values() if not r.get("skip"))
+        payers = sum(1 for t in self.terms.values() if not t.get("skip"))
         return {"catalogue": len(self.catalogue), "measured": len(self.rows),
+                "terms_known": len(self.terms), "payers": payers,
                 "priced": priced, "stake": STAKE_USD, "back_ticks": BACK_TICKS,
                 "age_h": (round((now - self.catalogue_at) / 3600, 1)
                           if self.catalogue_at else None),
@@ -252,14 +284,15 @@ class Survey:
 
     def to_dict(self) -> dict:
         return {"catalogue": self.catalogue, "rows": self.rows,
-                "catalogue_at": self.catalogue_at, "cursor": self.cursor,
-                "note": self.note}
+                "terms": self.terms, "catalogue_at": self.catalogue_at,
+                "cursor": self.cursor, "note": self.note}
 
     @classmethod
     def from_dict(cls, d: dict, clock=None) -> "Survey":
         s = cls(clock=clock)
         s.catalogue = dict(d.get("catalogue") or {})
         s.rows = dict(d.get("rows") or {})
+        s.terms = dict(d.get("terms") or {})
         s.catalogue_at = float(d.get("catalogue_at") or 0.0)
         s.cursor = int(d.get("cursor") or 0)
         s.note = str(d.get("note") or "")
