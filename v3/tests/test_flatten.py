@@ -171,3 +171,52 @@ class TestCycleOut(unittest.TestCase):
         self.assertEqual(pulls, [])
         self.assertTrue(all(not o.weak_since for o in r.fam.orders.values()
                             if o.purpose != "sell"))
+
+
+class TestFullCycleRegression(unittest.TestCase):
+    """The 2026-08-20 22:0x production failure: cycle() died assembling
+    state while flatten was active (a local leaked into _state). The whole
+    path must run end to end offline."""
+
+    class StubClient:
+        def __init__(self):
+            self.orders = [O("open1", "m", BUY_LONG)]
+
+        def open_orders(self):
+            return list(self.orders)
+
+        def positions_net(self):
+            return {}
+
+    def test_cycle_completes_with_flatten_active(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as p:
+            for k, v in (("V3_STATE_PATH", "state.json"),
+                         ("V3_FLOOR_PATH", "floor.json"),
+                         ("V1_ACK_PATH", "a1.json"), ("V2_ACK_PATH", "a2.json")):
+                os.environ[k] = os.path.join(p, v)
+            os.environ["V3_FLATTEN"] = "1"
+            os.environ["GITHUB_TOKEN"] = ""
+            try:
+                mon = Monitor()
+                stub = self.StubClient()
+                mon.client = stub
+                cancelled = []
+                from v3.orders import OrderResult
+
+                def cancel(oid, mkt, initiator="auto"):
+                    cancelled.append(oid)
+                    stub.orders = [o for o in stub.orders if o["id"] != oid]
+                    return OrderResult(ok=True, note="ok")
+                mon.families["politics"].desk.cancel = cancel
+                floor.ack("v1", True)
+                floor.ack("v2", True)
+                st = mon.cycle()               # must not raise
+                self.assertTrue(st["flatten"]["active"])
+                self.assertEqual(cancelled, ["open1"])
+                st = mon.cycle()               # clean pass -> phase two
+                self.assertEqual(st["flatten"]["phase"], "rebuild")
+            finally:
+                for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V1_ACK_PATH",
+                          "V2_ACK_PATH", "V3_FLATTEN"):
+                    os.environ.pop(k, None)

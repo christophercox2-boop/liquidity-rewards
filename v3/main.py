@@ -168,6 +168,7 @@ class Monitor:
         self.flatten = flatten_active()
         self.flatten_done = False          # phase two reached (persisted)
         self.flat_stats = {"cancelled": 0, "failed": 0}
+        self.last_flat: dict | None = None
         self._history_at = 0.0
         self.families: dict[str, Family] = {}
         self.switches: dict[str, MasterSwitch] = {}
@@ -250,7 +251,7 @@ class Monitor:
             "summaries": summaries,
             "floor": self.floor.status(now),
             "flatten": ({"active": self.flatten,
-                         "done": self.flatten_done, **(flat_summary or {})}
+                         "done": self.flatten_done, **(self.last_flat or {})}
                         if self.flatten else {"active": False}),
             "alerts_log": self.alerts.log[-30:],
         }
@@ -366,9 +367,9 @@ class Monitor:
         self._floor_ok = self.floor.acked(now)
         orders = self.client.open_orders()
         positions = self.client.positions_net()
-        flat_summary = None
+        self.last_flat = None
         if self.flatten and self._floor_ok:
-            flat_summary = self._flatten_pass(orders, positions)
+            self.last_flat = self._flatten_pass(orders, positions)
         if now - self._history_at > 6 * 3600.0:
             self._history_at = now
             hist = load_history()
