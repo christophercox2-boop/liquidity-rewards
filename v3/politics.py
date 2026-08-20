@@ -39,7 +39,11 @@ def discover(client) -> dict[str, dict]:
     out: dict[str, dict] = {}
     order: list[str] = []
     for tag in TAGS:
-        for ev in client.events_by_tag(tag):
+        try:
+            events = client.events_by_tag(tag)
+        except Exception:  # noqa: BLE001 — one bad tag must not sink the other
+            continue
+        for ev in events:
             title = str(ev.get("title") or ev.get("name") or "").strip()
             rows = [m for m in ev.get("markets") or []
                     if m.get("slug") and not m.get("closed")

@@ -116,6 +116,10 @@ class Monitor:
         self._restore()
         self.boots = [b for b in self.boots if time.time() - b < 86400]
         self.boots.append(time.time())
+        # A deploy replaces the container and its floor files with it. If the
+        # master came back ON, the request must be back on disk before 1.0's
+        # first automation pass, not a poll later.
+        self.floor.write_want(self.master.on)
 
     def _audit(self, row: dict) -> None:
         self.audit.append(row)
@@ -224,6 +228,7 @@ class Monitor:
         st["switch_view"] = {
             "master": self.master.state(),
             **{k: self.switches[k].state() for k in self.families}}
+        st["floor"] = self.floor.status()
         return st
 
     # -- one poll -----------------------------------------------------------

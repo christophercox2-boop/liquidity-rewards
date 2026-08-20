@@ -26,7 +26,11 @@ def _feed_discover(tags: tuple[str, ...], prefixes: tuple[str, ...]):
         out: dict[str, dict] = {}
         order: list[str] = []
         for tag in tags:
-            for ev in client.events_by_tag(tag, max_pages=8):
+            try:
+                events = client.events_by_tag(tag, max_pages=8)
+            except Exception:  # noqa: BLE001 — an unknown tag must not sink the rest
+                continue
+            for ev in events:
                 title = str(ev.get("title") or ev.get("name") or "").strip()
                 rows = [m for m in ev.get("markets") or []
                         if m.get("slug") and not m.get("closed")
