@@ -341,6 +341,24 @@ def _score_order(order: dict, book: dict | None, prog: dict | None) -> None:
     verdict = f"✅ scoring — ~{share * 100:.1f}% of {side_name} side"
     if target:  # show the qualification check so it's verifiable at a glance
         verdict += f" ({side_total:,.0f} resting ≥ {target:,.0f} ✓)"
+    if prog.get("pool") and not prog.get("event_n_ok"):
+        # NO ESTIMATE UNTIL THE DIVISOR IS KNOWN. The pool belongs to the
+        # EVENT, so what one market pays depends on how many markets share
+        # it — and until the race search confirms that count, the fallback
+        # is "however many siblings we happen to have noticed", which is
+        # maximally optimistic. On 2026-08-20 an NFL race read 2 instead of
+        # 31 and this line printed $23.30/day for a market whose entire side
+        # pays $1.61 (owner: "Just don't estimate until you have a grasp of
+        # everything you need to know. If you miss a few seconds that is
+        # fine"). est_day stays None, which every consumer already reads as
+        # "unscored" — it is left out of the rate, the market rates and the
+        # dead-order list rather than counted wrong.
+        order["est_pending"] = True
+        order["event_n"] = None
+        order["verdict"] = (
+            f"⏳ scoring ~{share * 100:.1f}% of the {side_name} side — holding "
+            f"the estimate until I know how many markets share this pool")
+        return
     if prog.get("pool"):
         slug = order.get("market") or ""
         order["est_day"] = share * _daily_pool(prog, slug) / 2  # pool split per side
@@ -1171,6 +1189,11 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
     for slug in progs:
         group = race_map.get(slug.rsplit("-", 1)[0], [])
         progs[slug]["event_n"] = max(event_sizes.get(slug, 1), len(group))
+        # CONFIRMED means the EXCHANGE told us the size — its own event/tag
+        # map. Counting the siblings we happen to know about is a guess, and
+        # a low guess inflates the estimate, so it never counts as confirmed;
+        # the prefix search below is the other way to confirm.
+        progs[slug]["event_n_ok"] = bool(event_sizes.get(slug))
         if len(group) >= progs[slug]["event_n"]:
             _note_members(slug, group)
     # Definitive pass: search the race prefix to find ALL sibling markets,
@@ -1192,6 +1215,7 @@ def fetch_live_orders(key_id: str, secret_key: str, event_sizes: dict[str, int] 
                 race_search[key] = None
         if race_search[key]:
             progs[slug]["event_n"] = max(progs[slug]["event_n"], race_search[key])
+            progs[slug]["event_n_ok"] = True
             _note_members(slug, SEARCH_KEY_MEMBERS.get(key, []))
     for slug in progs:
         progs[slug]["siblings"] = RACE_MEMBERS.get(slug, [])[:40]

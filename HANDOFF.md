@@ -1655,3 +1655,37 @@ remembered so nothing double-fires, exits go too (owner's earlier word),
 and the rails held: a partial mass-death reading (>70% of the board) holds
 and notifies; a totally blank program response exits before judging.
 Notify per batch; cumulative counts in state["cancel_dead"].
+
+## 2026-08-20 — no estimate without a confirmed divisor
+
+The owner spotted a market card reading "$1.50/day · max $23.30" where the
+whole side pool is $1.61/day: "How could the max rate earned per day ever
+approach what is stated here when the market only pays out a little over a
+dollar." It could not. The card's own arithmetic showed why —
+`$100 ÷ 2 ÷ 2 × 93.2% = $23.30` six minutes earlier vs
+`$100 ÷ 31 ÷ 2 × 93.2% = $1.50` now. Only the divisor moved.
+
+`event_n` resolves in three passes: the exchange's event/tag map (politics
+only), then a count of the siblings we happen to know about, then a
+definitive prefix search bounded to 10 new races per call. For a market the
+tag map doesn't cover — every sports market v2's families place in, which
+1.0 also scores — the middle pass produced 2 (the two orders we had just
+placed) and the estimate ran 15x high until the search caught up.
+
+Owner: "Just don't estimate until you have a grasp of everything you need
+to know. If you miss a few seconds that is fine." So:
+
+* `progs[slug]["event_n_ok"]` is set ONLY by the exchange's event map or
+  the prefix search. Counting known siblings is a guess and never confirms.
+* `_score_order` holds the estimate when the divisor is unconfirmed:
+  est_day stays None (every consumer already reads that as unscored, so it
+  leaves the rate, the market rates and the dead-order list alone) and the
+  verdict reads "⏳ … holding the estimate until I know how many markets
+  share this pool". The ⏳ prefix keeps it off the dead-order list, which
+  keys on ✅/❌.
+* Both earner sides refuse to enter on an unconfirmed divisor — that path
+  is not cosmetic, it is the yield auction that decides which markets get
+  the budget, and a low guess is exactly the one that wins it.
+
+2.0 was already safe: the seats engine's sizes come from the politics event
+map and the families' from the survey's real event membership.

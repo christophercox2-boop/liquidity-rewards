@@ -6493,6 +6493,18 @@ def _earn_ask_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
     if not target or per <= 0:
         out["skip"] = "no reward program on this market"
         return out
+    # NO ENTRY ON AN UNCONFIRMED DIVISOR. `per` is the event pool split
+    # across the markets that share it; when that count is still a guess it
+    # is a LOW guess, which inflates this market's worth and — as the note
+    # above says — the yield auction spends real budget on it. Wait for the
+    # race size (owner, 2026-08-20: "don't estimate until you have a grasp
+    # of everything you need to know. If you miss a few seconds that is
+    # fine").
+    if pr.get("pool") and not pr.get("event_n_ok"):
+        out["skip"] = ("still confirming how many markets share this pool — "
+                       "no estimate, no entry, until the count is known")
+        return out
+
     if not ent or now - ent[0] > 300:
         out["skip"] = "no book snapshot from the last 5 minutes"
         return out
@@ -6601,6 +6613,18 @@ def _earn_scan(m: str, b: dict, conf: dict, ent: tuple, pr: dict) -> dict:
     out: dict = {"rows": [], "best": None, "base": None, "top": None,
                  "target": target, "per_side_pool": per, "df": df,
                  "back": conf["back"], "qmul": conf["qmul"], "skip": None}
+    # NO ENTRY ON AN UNCONFIRMED DIVISOR. `per` is the event pool split
+    # across the markets that share it; when that count is still a guess it
+    # is a LOW guess, which inflates this market's worth and — as the note
+    # above says — the yield auction spends real budget on it. Wait for the
+    # race size (owner, 2026-08-20: "don't estimate until you have a grasp
+    # of everything you need to know. If you miss a few seconds that is
+    # fine").
+    if pr.get("pool") and not pr.get("event_n_ok"):
+        out["skip"] = ("still confirming how many markets share this pool — "
+                       "no estimate, no entry, until the count is known")
+        return out
+
     if not target:
         out["skip"] = "no reward program on this market — nothing to earn"
         return out
