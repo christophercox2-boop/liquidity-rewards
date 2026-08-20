@@ -19,11 +19,12 @@ class TestMonitorFloor(unittest.TestCase):
         os.environ["V1_ACK_PATH"] = os.path.join(p, "a1.json")
         os.environ["V2_ACK_PATH"] = os.path.join(p, "a2.json")
         os.environ["GITHUB_TOKEN"] = ""
+        os.environ["V3_FLATTEN"] = "0"     # pure master semantics here
         self.mon = Monitor()
 
     def tearDown(self):
         for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V1_ACK_PATH",
-                  "V2_ACK_PATH"):
+                  "V2_ACK_PATH", "V3_FLATTEN"):
             os.environ.pop(k, None)
         self.dir.cleanup()
 

@@ -70,9 +70,9 @@ def config() -> FamilyConfig:
         name="Politics", tag="POL",
         known_ground=True, rest_style="join_quiet", revive=True,
         vol_quiet=0.15,
-        # Sized for the handover: the account's politics book runs to a
-        # thousand-plus resting orders across hundreds of markets.
-        capital_usd=400.0, per_market_usd=2.0, revive_max_usd=5.0,
+        # Owner, 2026-08-20 (the flatten rebuild): "increase the budget
+        # to 100" — one hundred dollars of collateral at risk, total.
+        capital_usd=100.0, per_market_usd=2.0, revive_max_usd=5.0,
         share_hi=0.10,
         rest_from=None, rest_until=None,      # politics rests every day
         min_days_out=3,

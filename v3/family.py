@@ -183,6 +183,7 @@ class Family:
         self.terms = TermsStore()
         self.universe: dict[str, dict] = {}       # slug -> {event_n, ...}
         self.orders: dict[str, FamilyOrder] = {}
+        self.history: dict[str, float] = {}       # slug -> avg $/day actually PAID
         self.inventory: dict[str, dict] = {}      # slug -> {qty, cost}
         self.positions_seen: dict[str, float] = {}
         self.scoreboard: dict[str, dict] = {}     # slug -> {ts, plans, why...}
@@ -608,7 +609,8 @@ class Family:
     # ------------------------------------------------------------------ cycle
 
     def cycle(self, now: float, open_orders: list[dict], positions: dict,
-              client, switch_on: bool, foreign_ids=()) -> dict:
+              client, switch_on: bool, foreign_ids=(),
+              exits_only: bool = False) -> dict:
         self.reconcile(open_orders, positions, now)
         self.refresh_universe(client, now)
         self.refresh_terms(client, now)
@@ -629,6 +631,13 @@ class Family:
             self._adopt(pending, positions, now)
             summary["would_adopt"] = 0
             summary["active"] = len(self.active_markets())
+        if exits_only:
+            # the flatten's first phase: the monitor is cancelling every
+            # opening order; this family only keeps stock exiting — asks
+            # that cost nothing to place and earn while they wait
+            summary["mode"] = "flatten — exits only"
+            self._sell(now, self.cfg.max_actions_per_cycle)
+            return self._finish(summary)
         actions = self.cfg.max_actions_per_cycle
 
         # game window: pull everything that isn't an exit
@@ -765,9 +774,15 @@ class Family:
     def _enter(self, now: float, positions: dict, actions: int) -> int:
         have = {(o.market, o.side) for o in self.orders.values()
                 if o.purpose != "sell"}
+        # proven ground first (owner, 2026-08-20: "looking at the orders
+        # that were the most successful and trying to replicate those") —
+        # a market's record of actually PAYING us counts alongside what
+        # the book says it should pay now
         ranked = sorted(((s, sb) for s, sb in self.scoreboard.items()
                          if sb.get("plans")),
-                        key=lambda kv: -sum(p["est"] for p in kv[1]["plans"]))
+                        key=lambda kv: -(sum(p["est"] for p in kv[1]["plans"])
+                                         + min(self.history.get(kv[0], 0.0),
+                                               5.0)))
         for slug, sb in ranked:
             if actions <= 0:
                 break
@@ -871,7 +886,8 @@ class Family:
         idle = [s for s in self.universe if s not in self.active_markets()
                 and now - (self.scoreboard.get(s) or {}).get("ts", 0.0)
                 > self.cfg.rescan_s]
-        idle.sort(key=lambda s: (self.scoreboard.get(s) or {}).get("ts", 0.0))
+        idle.sort(key=lambda s: (-min(self.history.get(s, 0.0), 5.0),
+                                 (self.scoreboard.get(s) or {}).get("ts", 0.0)))
         for slug in idle:
             if done >= budget:
                 break
@@ -957,6 +973,7 @@ class Family:
                      key=lambda kv: -(kv[1].get("est") or 0.0))[:12]
         summary["best_idle"] = [
             {"market": s, "name": self._label(s), "est": sb.get("est"),
+             "hist": self.history.get(s),
              "plans": sb["plans"]} for s, sb in top]
         return summary
 

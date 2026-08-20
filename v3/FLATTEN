@@ -1,0 +1,16 @@
+Flatten mode marker — v3/main.py:flatten_active() reads this.
+
+Owner, 2026-08-20 evening: "cancel all of my open orders except for the
+ones that are exiting a position that I'm already in... I need to have no
+risk of spending any money. Feel free to try and exit positions in a way
+that earns liquidity reward." And once flat: "increase the budget to 100
+and follow the same strategy that was already existing in V1 and V2 for
+politics markets, looking at the orders that were the most successful and
+trying to replicate those strategies."
+
+Phase one: every opening order on the account is cancelled, exits kept.
+Phase two (automatic once nothing is left to cancel): the armed families
+rebuild under the $100 politics ceiling, ranked by what actually paid,
+while this mode keeps guarding against opening orders 3.0 does not own.
+
+Delete this file (and redeploy) to end the mode.

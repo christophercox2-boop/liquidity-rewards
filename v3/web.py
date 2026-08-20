@@ -161,6 +161,9 @@ function render(d){
  var fl=(d.floor||{});
  if(m.on&&!fl.acked){out+='<div class="warn" style="margin-top:6px">Armed \\u2014 waiting for 1.0 and 2.0 to stand down (they halt within a minute; nothing is touched until both confirm).</div>';}
  else if(m.on&&fl.acked){out+='<div class="ok" style="margin-top:6px">3.0 has the floor \\u2014 1.0 and 2.0 automation is standing down.</div>';}
+ var fz=(d.flatten||{});
+ if(fz.active&&fz.phase!=='rebuild'){out+='<div class="warn" style="margin-top:6px">FLATTEN: cancelling every order that isn\\u2019t an exit \\u2014 '+(fz.cancelled_total||0)+' cancelled, '+(fz.kept_exits||0)+' exits kept, '+(fz.remaining||0)+' to go. Nothing that costs money will be placed.</div>';}
+ else if(fz.active){out+='<div class="ok" style="margin-top:6px">Flat \\u2014 '+(fz.kept_exits||0)+' exits resting and earning. Rebuilding politics under the $100 ceiling, best-paying markets first.</div>';}
  out+='<div class="hint">Nothing places orders unless the master switch AND that family\\u2019s own switch are on. Master ON hands ALL automation to 3.0: 1.0 and 2.0 halt first, then 3.0 takes over their resting orders and runs them under its own rules. Master OFF hands it back. Flips happen on the switch page, never here.</div></div>';
  fams(d).forEach(function(kv){
   var k=kv[0],s=kv[1];
