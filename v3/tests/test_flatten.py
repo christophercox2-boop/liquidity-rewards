@@ -991,3 +991,55 @@ class TestChartResolver(unittest.TestCase):
         finally:
             if old is not None: sys.modules["requests"] = old
             else: sys.modules.pop("requests", None)
+
+
+class TestGovChartChooser(unittest.TestCase):
+    HDR = ("state,abbr,winner_Dparty,winner_Rparty,name_D1,name_D2,name_D3,"
+           "name_D4,name_R1,name_R2,name_R3,name_R4,winner_D1,winner_D2,"
+           "winner_D3,winner_D4,winner_R1,winner_R2,winner_R3,winner_R4,"
+           "rating")
+
+    def csv(self, rows):
+        return self.HDR + "\n" + "\n".join(rows)
+
+    def test_finds_governor_under_a_new_id(self):
+        import sys, types, inspect, time
+        import v3.silver as sv
+        senate_csv = self.csv(["Texas,TX,60,40,A,,,,B,,,,60,,,,40,,,,0"])
+        gov_new = self.csv([
+            "Alaska,AK,38.5,61.5,Tom Begich,J Kreiss-Tomkins,,,"
+            "Bernadette Wilson,David Bronson,,,22.2,16.3,,,41.5,20.0,,,0",
+            "Vermont,VT,80,20,C,,,,D,,,,80,,,,20,,,,0"])
+        pages = {
+            "3DsnL": senate_csv,      # a decoy: same as the senate table
+            "KXB1W": self.csv(["Ohio,OH,50,50,E,,,,F,,,,50,,,,50,,,,0"]),
+            "N13WX": gov_new,
+        }
+        fake = types.ModuleType("requests")
+        class R:
+            def __init__(self, t): self.text, self.status_code = t, 200
+        def get(url, **kw):
+            for cid, body in pages.items():
+                if cid in url:
+                    return R(body)
+            return R("")
+        fake.get = get
+        cls = [o for n, o in vars(sv).items()
+               if inspect.isclass(o) and hasattr(o, "_refresh_gov")][0]
+        s = cls(client=None)
+        s.races = sv.parse_races(senate_csv)      # the senate table, loaded
+        s.gov_races = sv.parse_races(self.csv([
+            "Alaska,AK,72,28,Tom Begich,,,,Bernadette Wilson,,,,72,,,,28,,,,0",
+            "Vermont,VT,79,21,C,,,,D,,,,79,,,,21,,,,0"]))
+        old = sys.modules.get("requests")
+        sys.modules["requests"] = fake
+        try:
+            s._gov_at = 0.0
+            ok = s._refresh_gov(1_000_000.0)
+        finally:
+            if old is not None: sys.modules["requests"] = old
+            else: sys.modules.pop("requests", None)
+        self.assertTrue(ok)
+        ak = s.gov_races.get("ak") or {}
+        self.assertAlmostEqual(ak.get("rep"), 0.615, places=2)
+        self.assertEqual(s._gov_cid, "N13WX")

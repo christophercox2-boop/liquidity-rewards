@@ -64,7 +64,7 @@ jobs:
               "6aks4": ("silver_senate_lite",   "Senate win probability, Lite model"),
               "6mA2E": ("silver_senate_seats",  "Senate average seats, Deluxe model"),
               "kNspD": ("silver_senate_races",  "per-race Senate win probability"),
-              "N13WX": ("silver_gov_races",     "per-race Governor win probability"),
+              "3DsnL": ("silver_gov_races",     "per-race Governor win probability"),
           }
           UA = {"User-Agent": "Mozilla/5.0 (liquidity-rewards data pull)"}
           os.makedirs("data", exist_ok=True)

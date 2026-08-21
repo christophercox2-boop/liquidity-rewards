@@ -67,6 +67,11 @@ _SWING_NODES = 41      # quadrature nodes over the swing (-4..4 sigma)
 
 SENATE_URL = "https://static.dwcdn.net/data/kNspD.csv"
 SENATE_FALLBACK = Path(__file__).resolve().parent.parent / "data" / "silver_senate_races.csv"
+# The site's embed references several chart ids (the owner dug them out
+# of the embed source, 2026-08-21, after the governor numbers froze for
+# 3 days): the fetch tries each and keeps whichever table matches the
+# governor races by its own states — proof, not guesswork.
+GOV_CANDIDATE_IDS = ("3DsnL", "KXB1W", "N13WX")
 GOV_URL = "https://static.dwcdn.net/data/N13WX.csv"
 GOV_FALLBACK = Path(__file__).resolve().parent.parent / "data" / "silver_gov_races.csv"
 TTL_S = 6 * 3600.0
@@ -287,6 +292,7 @@ class SilverFairs:
         self._content_sig = ""
         self.gov_changed_at = 0.0
         self._gov_sig = ""
+        self._gov_cid = ""
         self.source = "none"
         self.note = ""
         # Silver's own simulated distributions — the primary model
@@ -340,21 +346,43 @@ class SilverFairs:
     def _refresh_gov(self, now: float) -> bool:
         if self.gov_races and now - getattr(self, "_gov_at", 0.0) < TTL_S:
             return False
-        text = ""
+        want = set(self.gov_races)
+        if not want:
+            try:
+                want = set(parse_races(GOV_FALLBACK.read_text()))
+            except OSError:
+                pass
+        got: dict = {}
         try:
             import requests
-            r = requests.get(self._resolve_csv("N13WX", GOV_URL), timeout=20,
-                             headers={"User-Agent": "liquidity-rewards v3"})
-            if r.status_code < 400:
-                text = r.text
+            order = ((self._gov_cid,) if self._gov_cid else ()) + \
+                tuple(c for c in GOV_CANDIDATE_IDS if c != self._gov_cid)
+            for cid in order:
+                u = f"https://static.dwcdn.net/data/{cid}.csv"
+                u += ("&" if "?" in u else "?") + f"v={int(now * 1000)}"
+                r = requests.get(u, timeout=20,
+                                 headers={"User-Agent": "liquidity-rewards v3"})
+                if r.status_code >= 400:
+                    continue
+                cand = parse_races(r.text)
+                if not cand:
+                    continue
+                if set(cand) == set(self.races) and cand == self.races:
+                    continue          # that one is the senate table
+                if want and set(cand) != want:
+                    continue          # different race set — not governor
+                got = cand
+                if cid != self._gov_cid:
+                    self._gov_cid = cid
+                    self.note = f"governor data found under chart {cid}"
+                break
         except Exception:  # noqa: BLE001 — fall through to the disk copy
             pass
-        if not text:
+        if not got:
             try:
-                text = GOV_FALLBACK.read_text()
+                got = parse_races(GOV_FALLBACK.read_text())
             except OSError:
                 return False
-        got = parse_races(text)
         if got:
             self._diff_races(self.gov_races, got, "governor", now)
             sig = repr(sorted((k, v.get("dem")) for k, v in got.items()))
@@ -427,8 +455,9 @@ class SilverFairs:
         try:
             if self.client is not None:
                 import requests
-                r = requests.get(self._resolve_csv("kNspD", SENATE_URL),
-                                 timeout=20,
+                u = self._resolve_csv("kNspD", SENATE_URL)
+                u += ("&" if "?" in u else "?") + f"v={int(now * 1000)}"
+                r = requests.get(u, timeout=20,
                                  headers={"User-Agent": "liquidity-rewards v2"})
                 if r.status_code < 400:
                     text, self.source = r.text, "cdn"
