@@ -960,6 +960,9 @@ class Family:
                 ask_touch = (book.asks[0][0] if book.asks
                              else break_even + book.tick)
                 px = round(max(break_even + book.tick, ask_touch), 3)
+                if book.bids:
+                    px = max(px, round(book.bids[0][0] + book.tick, 3))
+                px = min(max(px, 0.002), 0.999)
                 side, intent, rest_qty = "SELL", SELL_LONG, rest
                 why = "selling filled stock — it earns while it waits"
             else:
@@ -977,6 +980,10 @@ class Family:
                 bid_touch = (book.bids[0][0] if book.bids
                              else received - book.tick)
                 px = round(min(received - book.tick, bid_touch), 3)
+                if book.asks:
+                    # a locked or one-tick book: the bid must still rest
+                    # UNDER the ask or the desk rightly refuses it
+                    px = min(px, round(book.asks[0][0] - book.tick, 3))
                 px = min(max(px, 0.001), 0.999)
                 side, intent, rest_qty = "BUY", SELL_SHORT, rest
                 why = ("buying back the short at or under what it sold "

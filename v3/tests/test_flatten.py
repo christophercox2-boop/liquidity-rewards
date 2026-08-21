@@ -378,3 +378,24 @@ class TestCeilingEnforcement(unittest.TestCase):
         r.exchange.prog_raw["ushsscc-ushrsc-wi-2026-11-03-0"] = copy.deepcopy(LIVE_PROG)
         r.cycle(advance=r.fam.cfg.terms_full_s + 1)
         self.assertNotIn("ushsscc-ushrsc-wi-2026-11-03-0", r.fam.known_dead)
+
+
+class TestCoverInTightBooks(unittest.TestCase):
+    def test_cover_bid_rests_under_a_locked_ask(self):
+        # 00:37Z: cover bids were refused ("bid 4c would cross the best
+        # ask 4c") in tight books — the price must duck under the ask
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        from v3.scoring import Book
+        from v3.intents import SELL_SHORT
+        cfg = FamilyConfig(name="P", tag="P", capital_usd=0.0)
+        r = Rig(cfg=cfg)
+        tight = Book(bids=((0.04, 50.0), (0.02, 60000.0)),
+                     asks=((0.04, 40.0), (0.98, 60000.0)),
+                     tick=0.01, fetched_at=r.now)
+        r.add_market(A, book=tight)
+        r.positions[A] = (-100.0, -40.0)     # short, received ~40c
+        r.cycle()
+        covers = [o for o in r.fam.orders.values() if o.intent == SELL_SHORT]
+        self.assertEqual(len(covers), 1)
+        self.assertLessEqual(covers[0].price, 0.03)   # under the 4c ask
