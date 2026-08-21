@@ -410,6 +410,7 @@ class Monitor:
         start = (_dt.datetime.now(_dt.timezone.utc)
                  - _dt.timedelta(days=6)).strftime("%Y-%m-%d")
         rows = self.client.earnings(start)
+        first = not self.rewards_seen
         seen = self.rewards_seen
         fresh = []
         totals: dict[str, float] = {}
@@ -423,14 +424,30 @@ class Monitor:
                              if k[:10] >= start}
         for d, v in totals.items():
             self.actuals_by_day[d] = round(v, 2)
-        fresh.sort(key=lambda r: (r["date"], -r["reward_usd"]))
+        # the baseline must survive a deploy between now and the next save
+        if self.last_state:
+            self.last_state["rewards_seen"] = self.rewards_seen
+            self.last_state["actuals_by_day"] = self.actuals_by_day
+            self.store.save_local(self.last_state)
+        days = {d: round(v, 2) for d, v in sorted(totals.items())}
+        if first:
+            # the FIRST check has nothing to compare against — every row
+            # would read "new". Record the baseline and say so plainly.
+            latest = max(totals) if totals else "?"
+            self._note(f"rewards baseline: {len(rows)} rows through {latest}")
+            return {"ok": True, "new_rows": [], "new_count": 0, "days": days,
+                    "note": (f"First check: I recorded a baseline of "
+                             f"{len(rows):,} rows through {latest}. From "
+                             f"now on this button shows only what is new.")}
+        fresh.sort(key=lambda r: (r["date"], r["reward_usd"]),
+                   reverse=True)               # newest day, biggest first
         out_rows = [{"day": r["date"], "market": r["market"],
                      "name": self.names.label(r["market"]),
                      "usd": round(r["reward_usd"], 2),
-                     "status": r["status"]} for r in fresh[-40:]]
+                     "status": r["status"]} for r in fresh[:40]]
         self._note(f"rewards check: {len(fresh)} new/changed rows")
         return {"ok": True, "new_rows": out_rows, "new_count": len(fresh),
-                "days": {d: round(v, 2) for d, v in sorted(totals.items())}}
+                "days": days}
 
     def public_state(self) -> dict:
         st = dict(self.last_state) if self.last_state else {"saved_at": 0}

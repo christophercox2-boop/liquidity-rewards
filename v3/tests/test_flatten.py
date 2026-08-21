@@ -494,3 +494,49 @@ class TestTriageProgress(unittest.TestCase):
         self.assertEqual(tg["total"], 2)
         self.assertEqual(tg["done"], 2)          # both scored on cycle one
         self.assertGreaterEqual(tg["per_cycle"], 1)
+
+
+class TestPayoutButton(unittest.TestCase):
+    def mon(self, rows):
+        import tempfile
+        self.dir = tempfile.TemporaryDirectory()
+        p = self.dir.name
+        for k, v in (("V3_STATE_PATH", "s.json"), ("V3_FLOOR_PATH", "f.json"),
+                     ("V1_ACK_PATH", "a1.json"), ("V2_ACK_PATH", "a2.json")):
+            os.environ[k] = os.path.join(p, v)
+        os.environ["V3_FLATTEN"] = "0"
+        os.environ["GITHUB_TOKEN"] = ""
+        m = Monitor()
+
+        class C:
+            def earnings(self, start):
+                return list(rows)
+        m.client = C()
+        return m
+
+    def tearDown(self):
+        for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V1_ACK_PATH",
+                  "V2_ACK_PATH", "V3_FLATTEN"):
+            os.environ.pop(k, None)
+        self.dir.cleanup()
+
+    def test_first_check_records_a_baseline_not_2566_new_rows(self):
+        rows = [{"date": "2026-08-18", "market": "m1",
+                 "program_type": "lp", "reward_usd": 1.5, "status": "PAID"},
+                {"date": "2026-08-19", "market": "m2",
+                 "program_type": "lp", "reward_usd": 0.6, "status": "PENDING"}]
+        m = self.mon(rows)
+        r1 = m.refresh_rewards()
+        self.assertEqual(r1["new_count"], 0)
+        self.assertIn("baseline", r1["note"])
+        self.assertEqual(r1["days"]["2026-08-19"], 0.6)
+        # second check, nothing changed: zero new rows, no note
+        r2 = m.refresh_rewards()
+        self.assertEqual(r2["new_count"], 0)
+        self.assertNotIn("note", r2)
+        # a new posting appears: exactly one new row, newest first
+        rows.append({"date": "2026-08-20", "market": "m3",
+                     "program_type": "lp", "reward_usd": 2.0, "status": "PENDING"})
+        r3 = m.refresh_rewards()
+        self.assertEqual(r3["new_count"], 1)
+        self.assertEqual(r3["new_rows"][0]["day"], "2026-08-20")

@@ -390,7 +390,14 @@ function rwcard(){
  var j=window._rw;
  if(!j)return '';
  if(!j.ok)return '<div class="bad">'+esc(j.note||'failed')+'</div>';
- var h='<div class="card"><b>'+(j.new_count||0)+' new or changed row'+(j.new_count!==1?'s':'')+'</b>';
+ var h='<div class="card">';
+ if(j.note){h+='<div class="sub">'+esc(j.note)+'</div>';}
+ else{h+='<b>'+(j.new_count||0)+' new or changed row'+(j.new_count!==1?'s':'')+'</b>';}
+ var dk=Object.keys(j.days||{}).sort().reverse().slice(0,4);
+ if(dk.length){
+  var dl=dk.map(function(d){return d.slice(5)+' '+usd(j.days[d]);}).join(' \\u00b7 ');
+  h+='<div class="muted">Posted day totals: '+dl+'</div>';
+ }
  (j.new_rows||[]).slice().reverse().forEach(function(r){
   h+='<div class="sub">'+esc(r.day)+' \\u00b7 '+usd(r.usd)+' \\u00b7 '+esc(r.name)+' <span class="muted">'+esc(r.status)+'</span></div>';
  });
