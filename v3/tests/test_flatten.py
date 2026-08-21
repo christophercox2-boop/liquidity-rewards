@@ -467,3 +467,17 @@ class TestOwnerDirectives0821(unittest.TestCase):
         self.assertEqual(sf.race_fair("usgubewc-usgub-or-2026-11-03-dem"), 0.88)
         self.assertIsNone(sf.race_fair("usgubewc-usgub-ri-2026-11-03-kenblo"))
         self.assertIsNone(sf.race_fair("vmc-usgubmov-or-2026-11-03-d12-15"))
+
+    def test_existing_out_of_scope_orders_are_cycled_out(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.add_market("paccc-usho-midterms-2026-11-03-rep", event="House control")
+        r.cycle()                                    # enters both (no scope yet)
+        self.assertIn("paccc-usho-midterms-2026-11-03-rep",
+                      {o.market for o in r.fam.orders.values()})
+        r.fam.cfg.enter_tokens = ("usse",)           # the owner narrows scope
+        r.cycle()
+        mkts = {o.market for o in r.fam.orders.values()}
+        self.assertNotIn("paccc-usho-midterms-2026-11-03-rep", mkts)
+        self.assertIn(A, mkts)                       # in-scope stays

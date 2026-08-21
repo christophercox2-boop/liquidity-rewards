@@ -747,10 +747,14 @@ class Family:
             days = slug_days_out(rec.market, now)
             near = days is not None and days < self.cfg.min_days_out
             dead = self._dead_here(rec.market)
-            if dead or (near and rec.purpose != "sell"):
+            out_of_scope = (rec.purpose != "sell"
+                            and not self.enterable(rec.market))
+            if dead or ((near or out_of_scope) and rec.purpose != "sell"):
                 r = self.desk.cancel(rec.id, rec.market)
                 if r.ok:
-                    why = "program pays nothing" if dead else "resolves soon"
+                    why = ("program pays nothing" if dead
+                           else "outside the families you chose"
+                           if out_of_scope else "resolves soon")
                     self._log(event="exit", market=rec.market, why=why, id=rec.id)
                     del self.orders[rec.id]
                     actions -= 1
