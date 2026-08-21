@@ -1,11 +1,11 @@
 # Liquidity rewards — 3.0
 
-✅ Updated Aug 21, 04:20 PM ET — the app writes this file every hour.
+✅ Updated Aug 21, 04:31 PM ET — the app writes this file every hour.
 
-- **Politics**: about $310.26/day resting ($147.77 accrued today), 236 orders, $686.14 of $250 at risk.
-- **College football**: about $107.50/day resting ($14.42 accrued today), 192 orders, $50.00 of $50 at risk — includes holdings worth $15.94 at liquidation.
+- **Politics**: about $287.54/day resting ($150.45 accrued today), 234 orders, $701.99 of $250 at risk.
+- **College football**: about $111.84/day resting ($15.23 accrued today), 179 orders, $50.55 of $50 at risk — includes holdings worth $15.94 at liquidation.
 - **NFL futures**: about $0.00/day resting ($0.00 accrued today), 0 orders, $0.00 of $100 at risk.
 
-**Whole book: ~$417.76/day; $162.20 accrued today.**
+**Whole book: ~$399.39/day; $165.68 accrued today.**
 
 Every number is arithmetic on the exchange's own reward terms — no fudge factors. The pages have the detail: orders (with plain-English verdicts), the model's moves, and grades (estimate vs. what actually paid).
