@@ -248,6 +248,7 @@ function render(d){
     var fresh=!window._tseen[key];window._tseen[key]=1;
     var info=[];
     if(t.in)info.push('worth '+usd(t.ev)+'/day');
+    if(t.in&&t.plan)info.push(t.plan);
     if(t.spread!=null)info.push('spread '+t.spread+'c');
     if(t.pool!=null)info.push('pool '+usd(t.pool)+'/day');
     if(t.conf!=null&&t.conf>0)info.push('conf '+Math.round(t.conf*100)+'%');

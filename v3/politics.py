@@ -28,7 +28,7 @@ usually losses here, not wins."
 from __future__ import annotations
 
 from .family import FamilyConfig
-from .names import name_from_market
+from .names import disambiguate, name_from_market
 from .programs import is_econ
 
 TAGS = ("politics", "elections")
@@ -48,12 +48,15 @@ def discover(client) -> dict[str, dict]:
             rows = [m for m in ev.get("markets") or []
                     if m.get("slug") and not m.get("closed")
                     and not is_econ(m["slug"])]
+            labels = disambiguate([(m["slug"],
+                                    name_from_market(m, title)[:110])
+                                   for m in rows])
             for m in rows:
                 slug = m["slug"]
                 if slug not in out:
                     order.append(slug)
                 out[slug] = {"event_n": len(rows),
-                             "name": name_from_market(m, title)[:110]}
+                             "name": labels[slug]}
     # single-market events that are really one race sharing one pool
     groups: dict[str, list[str]] = {}
     for s in order:

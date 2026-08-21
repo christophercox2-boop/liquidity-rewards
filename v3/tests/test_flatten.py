@@ -1076,3 +1076,16 @@ class TestHoldingsCeiling(unittest.TestCase):
                             tick=0.01, fetched_at=r.now))
         r.fam.inventory[A] = {"qty": 100.0, "cost": 35.0}
         self.assertAlmostEqual(r.fam.family_spent(), 0.0, places=2)
+
+
+class TestCandidateLabels(unittest.TestCase):
+    def test_sibling_markets_show_their_candidate(self):
+        from v3.names import disambiguate
+        out = disambiguate([
+            ("enwc-uspres-nom-rep-2028-dontru", "2028 GOP Nominee"),
+            ("enwc-uspres-nom-rep-2028-jdvan", "2028 GOP Nominee"),
+            ("ussewc-usse-ks-2026-11-03-rep", "Kansas Senate Winner")])
+        self.assertIn("dontru", out["enwc-uspres-nom-rep-2028-dontru"])
+        self.assertIn("jdvan", out["enwc-uspres-nom-rep-2028-jdvan"])
+        self.assertEqual(out["ussewc-usse-ks-2026-11-03-rep"],
+                         "Kansas Senate Winner")

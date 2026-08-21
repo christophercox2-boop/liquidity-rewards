@@ -1772,12 +1772,17 @@ class Family:
                         if book.bids and book.asks else None)
             best_ev = (max(p.get("ev", p["est"]) for p in plans)
                        if plans else (potential if grow else 0.0))
+            top = (max(plans, key=lambda p: p.get("ev", p["est"]))
+                   if plans else (grow[0] if grow else None))
             self.triage_feed.append({
                 "ts": round(now, 1), "market": slug,
                 "in": bool(plans or grow),
                 "ev": round(best_ev, 2), "spread": spread_c,
                 "pool": round(sp2, 2) if sp2 is not None else None,
                 "conf": round(conf2, 2),
+                "plan": (f"{'bid' if top['side'] == 'BUY' else 'ask'} "
+                         f"{top['qty']:g} @ {top['px'] * 100:.0f}c"
+                         if top else None),
                 "why": (plans[0]["why"][:60] if plans
                         else grow[0]["why"][:60] if grow
                         else (why or "")[:60])})

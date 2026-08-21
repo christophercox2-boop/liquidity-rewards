@@ -155,3 +155,29 @@ class Names:
 
     def restore(self, d: dict) -> None:
         self.known.update(d.get("known") or {})
+
+
+def disambiguate(pairs: list[tuple[str, str]]) -> dict[str, str]:
+    """slug -> final label. Where one label covers several sibling
+    markets (every 2028 candidate market carries the same event
+    question), append each slug's distinguishing tail so the reader can
+    tell WHICH candidate the card is about (owner, 2026-08-21: "I can't
+    tell from these names who the candidate is")."""
+    groups: dict[str, list[str]] = {}
+    for slug, label in pairs:
+        groups.setdefault(label, []).append(slug)
+    out: dict[str, str] = {}
+    for label, slugs in groups.items():
+        if len(slugs) == 1:
+            out[slugs[0]] = label
+            continue
+        import os.path
+        pre = os.path.commonprefix(slugs)
+        if "-" in pre:
+            pre = pre[:pre.rfind("-") + 1]
+        else:
+            pre = ""
+        for s in slugs:
+            tail = s[len(pre):] or s.rsplit("-", 1)[-1]
+            out[s] = f"{label} \u2014 {tail}"[:110]
+    return out
