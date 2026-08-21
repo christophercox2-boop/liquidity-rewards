@@ -107,3 +107,27 @@ class TestWeb(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPageScriptsParse(unittest.TestCase):
+    """The grades page shipped with a raw apostrophe inside a JS string
+    and every visitor got a permanent 'loading…' (2026-08-21). Every
+    page's script must PARSE, checked with a real JS parser."""
+
+    def test_every_page_script_is_valid_javascript(self):
+        import shutil
+        import subprocess
+        import tempfile
+        from v3 import web
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("node not available")
+        for route, (_title, _here, js) in web.PAGES.items():
+            with tempfile.NamedTemporaryFile("w", suffix=".js",
+                                             delete=False) as f:
+                f.write(js + web._PLUMBING)
+                path = f.name
+            r = subprocess.run([node, "--check", path],
+                               capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0,
+                             f"{route}: {r.stderr[:300]}")

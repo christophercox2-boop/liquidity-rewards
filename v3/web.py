@@ -348,7 +348,7 @@ function render(d){
  var rows=(d.grades||[]);
  var out='<div class="card"><b>Estimate vs. what the exchange paid</b>';
  out+='<div style="margin:6px 0"><button onclick="ckrw()">Check for new payouts now</button></div><div id="rwout"></div>';
- out+='<div class="hint">The estimate is 3.0's own sampler \\u2014 measured on an independent clock, accruing only while books are fresh. Actuals are the account's posted rewards (during the transition the older versions' books pay into the same number). No fudge factors: a gap means an input was wrong, and the unmeasured minutes say how much of the day went unscored.</div>';
+ out+='<div class="hint">The estimate is 3.0\\u2019s own sampler \\u2014 measured on an independent clock, accruing only while books are fresh. Actuals are the account\\u2019s posted rewards (during the transition the older versions\\u2019 books pay into the same number). No fudge factors: a gap means an input was wrong, and the unmeasured minutes say how much of the day went unscored.</div>';
  if(!rows.length){out+='<div class="muted">Nothing to grade yet \\u2014 the first full day under 3.0 lands tomorrow.</div>';}
  var mx=1;rows.forEach(function(r){mx=Math.max(mx,r.est||0,r.actual||0);});
  rows.slice().reverse().forEach(function(r){

@@ -1114,8 +1114,8 @@ class Family:
             for plan in sb["plans"]:
                 if actions <= 0:
                     break
-                if plan["est"] < self.cfg.min_est_day:
-                    continue    # a plan scored under an older, looser config
+                if plan.get("ev", plan["est"]) < self.cfg.min_est_day:
+                    continue    # under the bar (old plans lack ev: use est)
                 if (slug, plan["side"]) in have:
                     continue
                 if not self._cooldown_ok(slug, plan["side"], now):
