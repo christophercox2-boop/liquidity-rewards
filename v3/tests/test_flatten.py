@@ -919,3 +919,19 @@ class TestWholeShares(unittest.TestCase):
                                    "size": 1.5}
         r.cycle()
         self.assertIn("MAN1", r.fam.orders)
+
+
+class TestSeatScope(unittest.TestCase):
+    """Owner, 2026-08-21 evening: House control and the seat brackets
+    join the entry scope; turnout does not."""
+
+    def test_scope_covers_control_and_brackets_not_turnout(self):
+        from v3 import politics
+        fam_cfg = politics.config()
+        def enterable(slug):
+            return any(tok in slug for tok in fam_cfg.enter_tokens)
+        self.assertTrue(enterable("paccc-usho-midterms-2026-11-03-rep"))
+        self.assertTrue(enterable("scc-hrep-rep-2026-11-03-gte205"))
+        self.assertTrue(enterable("ussewc-usse-ks-2026-11-03-rep"))
+        self.assertFalse(enterable("vtc-hrep-to-2026-11-03-gte130m"))
+        self.assertFalse(enterable("dccc-measles-us-2026-12-31-gt4500"))
