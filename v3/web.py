@@ -122,6 +122,30 @@ function post(body,cb){
   .then(function(r){return r.json();}).then(function(j){if(cb)cb(j);load();})
   .catch(function(){alert('unreachable');});
 }
+function fmtsz(q){if(q>=1e6)return (q/1e6).toFixed(1)+'M';if(q>=1e3)return (q/1e3).toFixed(1)+'k';return ''+Math.round(q);}
+function showbook(slug,el){
+ var box=document.getElementById(el);
+ if(!box)return;
+ if(box.innerHTML){box.innerHTML='';return;}
+ box.innerHTML='<div class="muted">fetching the book\u2026</div>';
+ fetch('book.json?m='+encodeURIComponent(slug),{headers:hdrs(),cache:'no-store'})
+  .then(function(r){return r.json();}).then(function(b){
+   if(!b.ok){box.innerHTML='<div class="muted">'+esc(b.note||'no book')+'</div>';return;}
+   var oursAt={};(b.ours||[]).forEach(function(o){oursAt[o.side+(o.price*100).toFixed(1)]=o;});
+   var h='<div class="muted" style="margin:4px 0">book '+b.age_s+'s old'+(b.fair!=null?' \u00b7 model '+(b.fair*100).toFixed(1)+'c':'')+'</div>';
+   h+='<table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
+   var n=Math.max((b.bids||[]).length,(b.asks||[]).length);
+   for(var i=0;i<n;i++){
+    var bd=(b.bids||[])[i],ak=(b.asks||[])[i];
+    var bmark=bd&&oursAt['BUY'+(bd[0]*100).toFixed(1)]?' \u25CF':'';
+    var amark=ak&&oursAt['SELL'+(ak[0]*100).toFixed(1)]?' \u25CF':'';
+    h+='<tr><td class="r">'+(bd?fmtsz(bd[1]):'')+'</td><td class="r">'+(bd?pc(bd[0])+bmark:'')+'</td>'
+      +'<td>'+(ak?pc(ak[0])+amark:'')+'</td><td>'+(ak?fmtsz(ak[1]):'')+'</td></tr>';
+   }
+   h+='</table><div class="hint">\u25CF marks a level where one of our orders rests.</div>';
+   box.innerHTML=h;
+  }).catch(function(){box.innerHTML='<div class="bad">unreachable</div>';});
+}
 function load(){
  fetch('data.json',{headers:hdrs(),cache:'no-store'}).then(function(r){
   if(r.status===401){document.getElementById('login').style.display='block';
@@ -262,8 +286,10 @@ function fold(title,sub,body,open){
 }
 function orow(d,o){
  var e=(o.live_est!=null?o.live_est:o.est_day);
+ var bid='bk_'+esc(o.id);
  return '<div style="margin:9px 0 0;border-top:1px solid #2c3527;padding-top:7px">'
-  +'<div class="name">'+nm(d,o.market)+'</div>'
+  +'<div class="name" style="cursor:pointer" onclick="showbook(\\''+esc(o.market)+'\\',\\''+bid+'\\')">'+nm(d,o.market)+' <span class="muted">\u25be book</span></div>'
+  +'<div id="'+bid+'"></div>'
   +'<div class="muted"><code>'+esc(o.market)+'</code></div>'
   +'<div class="sub">'+(o.side==='BUY'?'bid':'ask')+' '+(o.qty||0)+' @ '+pc(o.price)
   +' \\u2014 '+(e==null?'<span class="warn">no estimate yet</span>':usd(e)+'/day')
@@ -354,8 +380,10 @@ function render(d){
   if(!best.length){out+='<div class="muted">Nothing worth entering right now \\u2014 every scored market either pays under the bar, is louder than the courtesy share, resolves too soon, or has a dead side I don\\u2019t revive.</div></div>';return;}
   out+='<div class="sub">Best candidates, best first:</div>';
   best.forEach(function(b){
+   var pid='pb_'+esc(b.market).replace(/[^a-z0-9]/g,'');
    out+='<div style="margin:8px 0 0;border-top:1px solid #2c3527;padding-top:6px">'
-    +'<div class="name">'+esc(b.name||b.market)+'</div>'
+    +'<div class="name" style="cursor:pointer" onclick="showbook(\\''+esc(b.market)+'\\',\\''+pid+'\\')">'+esc(b.name||b.market)+' <span class="muted">\u25be book</span></div>'
+    +'<div id="'+pid+'"></div>'
     +'<div class="muted"><code>'+esc(b.market)+'</code> \\u2014 worth ~'+usd(b.est)+'/day</div>';
    (b.plans||[]).forEach(function(p){
     out+='<div class="vrd">'+(p.side==='BUY'?'bid':'ask')+' '+p.qty+' @ '+pc(p.px)
@@ -600,6 +628,15 @@ class WebServer:
                     title, here, js = PAGES[route]
                     self._send(200, "text/html; charset=utf-8",
                                _shell(title, here, js).encode())
+                    return
+                if route == "/book.json":
+                    if not authed(self.headers.get, u.query, server.password):
+                        self._send(401, "application/json", b'{"error":"key required"}')
+                        return
+                    from urllib.parse import parse_qs
+                    slug = (parse_qs(u.query).get("m") or [""])[0]
+                    self._send(200, "application/json",
+                               json.dumps(server.monitor.book_view(slug)).encode())
                     return
                 if route == "/data.json":
                     if not authed(self.headers.get, u.query, server.password):

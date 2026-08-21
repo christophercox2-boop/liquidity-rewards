@@ -707,6 +707,27 @@ class Monitor:
         return {"ok": True, "new_rows": out_rows, "new_count": len(shown),
                 "days": days}
 
+    def book_view(self, slug: str) -> dict:
+        """The raw shape of one market's book, with our own orders
+        marked — the owner looks at the truth himself."""
+        for fam in self.families.values():
+            b = fam.cache.any_age(slug)
+            if b is None:
+                continue
+            ours = [{"side": o.side, "price": o.price, "qty": o.qty,
+                     "purpose": o.purpose}
+                    for o in fam.orders.values() if o.market == slug]
+            return {"ok": True, "market": slug,
+                    "name": self.names.label(slug),
+                    "age_s": round(time.time() - b.fetched_at, 1),
+                    "tick": b.tick,
+                    "bids": [[p, q] for p, q in b.bids[:12]],
+                    "asks": [[p, q] for p, q in b.asks[:12]],
+                    "ours": ours,
+                    "fair": (self.silver.model_fair(slug)
+                             if hasattr(self, "silver") else None)}
+        return {"ok": False, "note": "no book cached for this market yet"}
+
     def public_state(self) -> dict:
         st = dict(self.last_state) if self.last_state else {"saved_at": 0}
         st["switch_view"] = {
