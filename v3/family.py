@@ -684,7 +684,7 @@ class Family:
                      if (px - (cross_px - sign * tick)) * sign <= 1e-9]
         sf = self.fillmodel.scoring_fraction(slug)
         exit_rate_ps = self._exit_rate_ps
-        pick = None
+        contenders: list[dict] = []
         for px in cands:
             cost_ps = px if side == "BUY" else 1.0 - px
             in_front = (px - touch) * sign > 1e-9
@@ -765,12 +765,19 @@ class Family:
                 # cap"). Size is bounded by the per-market money, the
                 # family ceiling, the EV bar, and fill odds — nothing
                 # else.
-                if pick is None or ev > pick["ev"] + 1e-9:
-                    pick = row
+                contenders.append(row)
         the_bar = self.cfg.min_est_day if bar is None else bar
-        if pick is not None and pick["ev"] >= the_bar:
-            return pick
-        return None
+        live = [r for r in contenders if r["ev"] >= the_bar]
+        if not live:
+            return None
+        best_ev = max(r["ev"] for r in live)
+        # Near-tied EVs resolve to the most CONSERVATIVE spot — lowest
+        # fill odds (owner, 2026-08-21: "the model is not precise
+        # enough to make a big fuss over 1 cent of ev" — never take a
+        # deeper price for the last penny).
+        tol = max(0.01, 0.01 * best_ev)
+        close = [r for r in live if r["ev"] >= best_ev - tol]
+        return min(close, key=lambda r: (r["p_fill"], -r["ev"]))
 
     def ladder_view(self, slug: str) -> dict:
         """Every price level the planner prices, with its numbers —
@@ -784,10 +791,14 @@ class Family:
         if prog is None:
             return {"ok": False, "note": why}
         sp = self._side_pool(slug, prog)
+        headroom = self.cfg.capital_usd - self.family_spent()
         out = {"ok": True, "bar": self.cfg.min_est_day,
                "pool_day": round(sp, 2) if sp is not None else None,
                "note": ("pool divisor unconfirmed — dollar figures held at 0"
-                        if sp is None else ""), "sides": {}}
+                        if sp is None else
+                        f"family at its ceiling — new orders wait for "
+                        f"${-headroom + 1:.0f} of space" if headroom < 1.0
+                        else ""), "sides": {}}
         for side in ("BUY", "SELL"):
             rows: list[dict] = []
             try:

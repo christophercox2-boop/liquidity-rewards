@@ -694,3 +694,33 @@ class TestConcessionProtected(unittest.TestCase):
         slug = "ussewc-usse-fl-2026-11-03-dem"
         c = m.fill_cost(slug, "BUY", 0.19, 0.102, exit_rate_ps=0.048)
         self.assertGreaterEqual(c, 0.088 - 1e-6)   # the concession stands
+
+
+class TestConservativeTies(unittest.TestCase):
+    def test_near_tied_evs_take_the_lowest_fill_odds(self):
+        # UCLA, 2026-08-21: 29c and 25c tied at $2.50 EV; the old argmax
+        # took the deepest. Ties resolve to the safest spot.
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.01, 46500.0),),
+                                  asks=((0.41, 147.0), (0.99, 6000.0)),
+                                  tick=0.01, fetched_at=1_000_000.0))
+        r.cycle()
+        rows = []
+        book = r.cache.fresh(A, 300, r.now)
+        prog, _ = r.fam._prog_row(A)
+        sp = r.fam._side_pool(A, prog)
+        pick = r.fam._plan_side(A, book, "BUY", prog, sp or 0.0, 10.0,
+                                ladder=rows)
+        self.assertIsNotNone(pick)
+        near = [x for x in rows if x["ev"] >= pick["ev"] - max(0.01, 0.01 * pick["ev"])]
+        self.assertEqual(pick["p_fill"], min(x["p_fill"] for x in near))
+
+    def test_credit_never_eats_the_ignorance_premium(self):
+        from v3.fillmodel import FillModel
+        m = FillModel()
+        slug = "aachc-cfb-wins-2026-11-28-ucla-5pt5wins"
+        c = m.fill_cost(slug, "BUY", 0.29, None, exit_rate_ps=0.10,
+                        ignorance=0.098)
+        self.assertGreaterEqual(c, 0.098 - 1e-6)

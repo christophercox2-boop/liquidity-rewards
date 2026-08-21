@@ -288,13 +288,16 @@ class FillModel:
         takes. Can go negative where exits earn more than the fill
         loses — which is exactly a fill worth taking."""
         fam = family_of(slug)
-        soft = self.markdown.get(fam, MARKDOWN_SEED) + max(ignorance, 0.0)
-        conc = 0.0
+        soft = self.markdown.get(fam, MARKDOWN_SEED)
+        conc = max(ignorance, 0.0)
         if fair is not None:
             excess = (price - fair) if side == "BUY" else (fair - price)
-            conc = max(excess, 0.0)
-        # The exit credit may offset the SOFT costs (markdown, the
-        # ignorance premium) but never the concession past fair. Twice
+            conc += max(excess, 0.0)
+        # The exit credit may offset the markdown ONLY — never the
+        # concession past fair NOR the ignorance premium, which is the
+        # same concession estimated blind (UCLA, 2026-08-21: a no-model
+        # book showed fill cost 0.0c ten ticks into the spread because
+        # the credit ate the premium). Twice
         # burned (2026-08-21): the Rock — a negative cost made fills
         # look profitable; then Florida — the family-average credit
         # swallowed a 9c KNOWN overpay against a model-grounded 10.2c
