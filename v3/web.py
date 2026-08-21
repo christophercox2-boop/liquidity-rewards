@@ -592,7 +592,7 @@ function render(d){
  window._watchBuf=window._watchBuf||[];
  window._watchSeen=window._watchSeen||{};
  var buf=window._watchBuf;
- ['politics','cfb','nfl'].forEach(function(k){
+ ['politics'].forEach(function(k){
   var s=(d.summaries||{})[k]||{};
   (s.triage_feed||[]).forEach(function(t){
    if((window._watchSeen[t.market]||0)>=t.ts)return;
@@ -604,7 +604,7 @@ function render(d){
  });
  buf.sort(function(a,b){return a.ts-b.ts;});
  if(!window._watchCurHTML&&buf.length)setTimeout(wNext,300);
- return '<div class="card"><div class="muted">One market per tap \u2014 what the engine saw as it considered. Up to 25 verdicts wait; the queue refills as the sweep scores.</div>'
+ return '<div class="card"><div class="muted">One politics market per tap \u2014 what the engine saw as it considered. Up to 25 verdicts wait; the queue refills as the sweep scores.</div>'
   +'<div style="margin:8px 0"><button onclick="wNext()" id="wn" style="font-size:16px;padding:10px 16px;width:100%">next market \u25b8'+(buf.length?' ('+buf.length+' saved)':'')+'</button></div>'
   +'<div id="spot" style="transition:opacity 0.2s ease;min-height:280px">'+(window._watchCurHTML||'')+'</div></div>';
 }
