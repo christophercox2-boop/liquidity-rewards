@@ -1633,17 +1633,23 @@ class Family:
                       note=f"a slot at {best:.2f} earns more — moving")
 
     def _exit_opportunity_rate(self) -> float:
-        """$/day one freed dollar could earn, scaled by how binding the
-        ceiling is (owner, 2026-08-21: exits may concede price when the
-        freed money earns more elsewhere — with headroom to spare, the
-        freed dollar has nowhere urgent to go and exits stay greedy)."""
-        spent = self.family_spent()
-        if spent < 1.0 or not self.cfg.capital_usd:
+        """$/day one freed cent could earn — the owner's definition
+        (2026-08-21): "assume that we could use each cent gained from a
+        sale about as effectively on average as our last marginal cent."
+        Measured as the lower-quartile value-per-dollar among the
+        deployed earn orders: the rate of the last money we chose to
+        put to work, not the average of the best of it."""
+        rates = []
+        for o in self.orders.values():
+            if o.purpose in ("sell", "manual", "probe"):
+                continue
+            risk = capital_at_risk(o.intent, o.price, o.qty)
+            if risk > 0.005 and (o.live_est or 0.0) > 0:
+                rates.append((o.live_est or 0.0) / risk)
+        if not rates:
             return 0.0
-        ests = sum(o.live_est or 0.0 for o in self.orders.values()
-                   if o.purpose not in ("sell", "manual"))
-        bind = min(spent / self.cfg.capital_usd, 1.0)
-        return (ests / spent) * bind
+        rates.sort()
+        return rates[max(len(rates) // 4 - 1, 0)]
 
     def _exit_score(self, est: float, pf: float, qty: float, px: float,
                     basis: float, side: str, r_eff: float,

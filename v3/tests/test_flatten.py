@@ -1257,16 +1257,19 @@ class TestExitOpportunityCost(unittest.TestCase):
                               basis=0.92, side="SELL", r_eff=1.0, d_off=2.0)
         self.assertGreater(lo_px, hi_est)
 
-    def test_opportunity_rate_is_zero_with_headroom_and_scales_with_bind(self):
+    def test_opportunity_rate_is_the_marginal_cent(self):
         from v3.tests.test_family import Rig, A
         from v3.family import FamilyOrder
         from v3.intents import BUY_LONG
         r = Rig()
         self.assertEqual(r.fam._exit_opportunity_rate(), 0.0)  # empty book
-        r.fam.orders["E1"] = FamilyOrder(
-            id="E1", market=A, side="BUY", price=0.50, qty=100.0,
-            intent=BUY_LONG, placed_ts=0.0, purpose="earn", live_est=25.0)
+        # a star earning $2/day per $ and a marginal order earning 10c/$:
+        # the freed cent redeploys like the MARGINAL one
+        for oid, px, qty, est in (("STAR", 0.10, 10.0, 2.0),
+                                  ("EDGE", 0.50, 100.0, 5.0)):
+            r.fam.orders[oid] = FamilyOrder(
+                id=oid, market=A, side="BUY", price=px, qty=qty,
+                intent=BUY_LONG, placed_ts=0.0, purpose="earn",
+                live_est=est)
         rate = r.fam._exit_opportunity_rate()
-        self.assertGreater(rate, 0.0)
-        # $50 at risk of a $100 ceiling -> bind 0.5; est/spent = 0.5/day
-        self.assertAlmostEqual(rate, (25.0 / 50.0) * 0.5, places=2)
+        self.assertAlmostEqual(rate, 5.0 / 50.0, places=3)
