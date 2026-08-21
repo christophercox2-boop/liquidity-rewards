@@ -858,11 +858,23 @@ class Family:
             live = open_by_id.get(oid)
             if live is not None:
                 if live["size"] < rec.qty - 1e-9:
-                    filled = rec.qty - live["size"]
+                    # a shrunken size is only a FILL if the position
+                    # moved with it (the Louisiana phantom, 2026-08-21:
+                    # cancelled revives were booked as 265-share shorts
+                    # the exchange never saw, and the exit engine bid
+                    # real money to cover them). No delta -> it is a
+                    # size correction, not a fill.
+                    shrink = rec.qty - live["size"]
                     d = deltas.get(rec.market, 0.0)
-                    deltas[rec.market] = d - (filled if rec.intent == BUY_LONG
-                                              else -filled)
-                    self._on_fill(rec, filled, now)
+                    expected_sign = 1.0 if rec.intent == BUY_LONG else -1.0
+                    if abs(d) > 1e-9 and (d > 0) == (expected_sign > 0):
+                        filled = min(shrink, abs(d))
+                        deltas[rec.market] = d - expected_sign * filled
+                        self._on_fill(rec, filled, now)
+                    else:
+                        self._log(event="size_shrunk_no_fill",
+                                  market=rec.market, side=rec.side,
+                                  price=rec.price, qty=shrink, id=oid)
                     rec.qty = live["size"]
                 continue
             delta = deltas.get(rec.market, 0.0)
@@ -880,6 +892,30 @@ class Family:
         for m in tracked:
             if m in positions:
                 self.positions_seen[m] = positions[m][0]
+                # the exchange's position feed is the truth: wherever it
+                # explicitly reports this market, our inventory snaps to
+                # it, purging any phantom the fill accounting invented
+                feed_qty = positions[m][0]
+                inv = self.inventory.get(m)
+                have = (inv or {}).get("qty", 0.0)
+                if abs(feed_qty - have) > 0.01:
+                    if abs(feed_qty) < 0.005:
+                        if inv is not None:
+                            self.inventory.pop(m, None)
+                            self.inv_since.pop(m, None)
+                    else:
+                        if abs(have) > 0.005:
+                            per = (inv or {}).get("cost", 0.0) / have
+                            cost = per * feed_qty
+                        else:
+                            cost = (positions[m][1]
+                                    if len(positions[m]) > 1 else 0.0)
+                        self.inventory[m] = {"qty": feed_qty,
+                                             "cost": round(cost, 4)}
+                    self._log(event="inventory_corrected", market=m,
+                              qty=feed_qty,
+                              note=f"book said {have:g}, exchange says "
+                                   f"{feed_qty:g} — exchange wins")
         for m in list(self.positions_seen):
             if (m not in self.inventory
                     and m not in {o.market for o in self.orders.values()}):

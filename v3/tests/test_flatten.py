@@ -1089,3 +1089,49 @@ class TestCandidateLabels(unittest.TestCase):
         self.assertIn("jdvan", out["enwc-uspres-nom-rep-2028-jdvan"])
         self.assertEqual(out["ussewc-usse-ks-2026-11-03-rep"],
                          "Kansas Senate Winner")
+
+
+class TestPhantomFills(unittest.TestCase):
+    """The Louisiana phantom (2026-08-21): cancelled revives were booked
+    as 265-share shorts the exchange never saw. Fills need the position
+    feed to agree; the exchange's positions are the truth."""
+
+    def test_size_shrink_without_delta_books_no_fill(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_SHORT
+        r = Rig()
+        r.add_market(A)
+        r.fam.orders["S1"] = FamilyOrder(
+            id="S1", market=A, side="SELL", price=0.99, qty=500.0,
+            intent=BUY_SHORT, placed_ts=r.now, purpose="revive")
+        r.exchange.live["S1"] = {"id": "S1", "market": A, "side": "SELL",
+                                 "price": 0.99, "size": 234.5}
+        r.cycle()                      # position feed shows nothing
+        # the later cull may pull the weak revive — the point is that
+        # NO phantom short was ever booked
+        self.assertNotIn(A, r.fam.inventory)
+
+    def test_size_shrink_with_matching_delta_is_a_fill(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r = Rig()
+        r.add_market(A)
+        r.fam.orders["B1"] = FamilyOrder(
+            id="B1", market=A, side="BUY", price=0.40, qty=10.0,
+            intent=BUY_LONG, placed_ts=r.now, purpose="earn")
+        r.exchange.live["B1"] = {"id": "B1", "market": A, "side": "BUY",
+                                 "price": 0.40, "size": 6.0}
+        r.positions[A] = (4.0, 1.60)   # the exchange saw 4 shares arrive
+        r.cycle()
+        self.assertAlmostEqual(r.fam.inventory[A]["qty"], 4.0, places=2)
+
+    def test_exchange_positions_purge_phantom_inventory(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.fam.inventory[A] = {"qty": -574.4, "cost": -568.66}   # the phantom
+        r.positions[A] = (0.0, 0.0)    # the exchange says flat
+        r.cycle()
+        self.assertNotIn(A, r.fam.inventory)
