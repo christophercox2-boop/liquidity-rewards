@@ -1228,3 +1228,45 @@ class TestSamplerDots(unittest.TestCase):
         self.assertEqual(e.dots[0][0], 1_000_000.0)
         e2 = Estimator.from_dict(e.to_dict())
         self.assertEqual(e2.dots, e.dots)
+
+
+class TestExitOpportunityCost(unittest.TestCase):
+    """Owner, 2026-08-21 evening: exits may concede price when the freed
+    money earns more elsewhere."""
+
+    def test_score_prefers_yield_when_capital_is_slack(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        f = r.fam
+        # r_eff 0: the higher-earning slot wins outright
+        hi_est = f._exit_score(est=5.0, pf=0.1, qty=10, px=0.97,
+                               basis=0.92, side="SELL", r_eff=0.0, d_off=2.0)
+        lo_px = f._exit_score(est=1.0, pf=0.4, qty=10, px=0.93,
+                              basis=0.92, side="SELL", r_eff=0.0, d_off=2.0)
+        self.assertGreater(hi_est, lo_px)
+
+    def test_score_concedes_when_the_ceiling_binds(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        f = r.fam
+        # a binding book earning ~$1/day per dollar: the faster, cheaper
+        # exit now wins — freed capital out-earns the resting slot
+        hi_est = f._exit_score(est=5.0, pf=0.1, qty=10, px=0.97,
+                               basis=0.92, side="SELL", r_eff=1.0, d_off=2.0)
+        lo_px = f._exit_score(est=1.0, pf=0.4, qty=10, px=0.93,
+                              basis=0.92, side="SELL", r_eff=1.0, d_off=2.0)
+        self.assertGreater(lo_px, hi_est)
+
+    def test_opportunity_rate_is_zero_with_headroom_and_scales_with_bind(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r = Rig()
+        self.assertEqual(r.fam._exit_opportunity_rate(), 0.0)  # empty book
+        r.fam.orders["E1"] = FamilyOrder(
+            id="E1", market=A, side="BUY", price=0.50, qty=100.0,
+            intent=BUY_LONG, placed_ts=0.0, purpose="earn", live_est=25.0)
+        rate = r.fam._exit_opportunity_rate()
+        self.assertGreater(rate, 0.0)
+        # $50 at risk of a $100 ceiling -> bind 0.5; est/spent = 0.5/day
+        self.assertAlmostEqual(rate, (25.0 / 50.0) * 0.5, places=2)

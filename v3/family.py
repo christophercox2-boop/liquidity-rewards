@@ -1632,14 +1632,42 @@ class Family:
                       qty=rec.qty,
                       note=f"a slot at {best:.2f} earns more — moving")
 
+    def _exit_opportunity_rate(self) -> float:
+        """$/day one freed dollar could earn, scaled by how binding the
+        ceiling is (owner, 2026-08-21: exits may concede price when the
+        freed money earns more elsewhere — with headroom to spare, the
+        freed dollar has nowhere urgent to go and exits stay greedy)."""
+        spent = self.family_spent()
+        if spent < 1.0 or not self.cfg.capital_usd:
+            return 0.0
+        ests = sum(o.live_est or 0.0 for o in self.orders.values()
+                   if o.purpose not in ("sell", "manual"))
+        bind = min(spent / self.cfg.capital_usd, 1.0)
+        return (ests / spent) * bind
+
+    def _exit_score(self, est: float, pf: float, qty: float, px: float,
+                    basis: float, side: str, r_eff: float,
+                    d_off: float) -> float:
+        """$/day value of resting an exit at px: what it earns resting,
+        plus fill odds times (the realized profit over basis AND the
+        freed capital redeployed at the book's rate for the measured
+        hold). The owner's exit math, 2026-08-21."""
+        if side == "SELL":
+            profit = max(px - basis, 0.0) * qty
+            freed = px * qty
+        else:
+            profit = max(basis - px, 0.0) * qty
+            freed = (1.0 - px) * qty
+        return est + pf * (profit + freed * r_eff * d_off)
+
     def _best_exit_px(self, slug: str, side: str, book, lo: float,
-                      hi: float, qty: float) -> float:
-        """The exit slot that EARNS the most among prices that still
-        profit (owner, 2026-08-21: the MN example — don't pile onto a
-        crowded touch next to a wall when an open slot a few cents
-        lower earns more, and a fill there is still profit plus buying
-        power back). Tie goes to the price nearer the other side, which
-        fills sooner."""
+                      hi: float, qty: float,
+                      basis: float | None = None) -> float:
+        """The exit slot with the best $/day VALUE: resting earnings
+        plus the expected gain of actually exiting (profit + freed
+        money redeployed). With slack in the ceiling this reduces to
+        the best-earning slot; with the ceiling binding it concedes
+        toward faster exits (owner, 2026-08-21: opportunity cost)."""
         lo, hi = round(lo, 3), round(hi, 3)
         if hi < lo:
             return hi
@@ -1648,6 +1676,10 @@ class Family:
         if prog is None:
             return hi if side == "SELL" else lo
         levels = [(p, q) for p, q in book.side(side) if q > 1e-9]
+        touch = levels[0][0] if levels else (hi if side == "SELL" else lo)
+        r_eff = self._exit_opportunity_rate()
+        d_off = self.fillmodel.expected_offload_days(slug)
+        base = basis if basis is not None else (lo if side == "SELL" else hi)
         n = int(round((hi - lo) / book.tick)) + 1
         step = max(1, n // 24)            # sample big ranges, walk small
         cands = [round(lo + i * book.tick, 3) for i in range(0, n, step)]
@@ -1660,10 +1692,15 @@ class Family:
             est = (j.share * side_pool
                    if side_pool is not None and j.qualifies and j.in_window
                    else 0.0)
-            # nearer the other side breaks ties: it fills sooner, and an
-            # exit fill is profit plus buying power back
+            ticks = (max(round((px - touch) / book.tick), 0)
+                     if side == "SELL"
+                     else max(round((touch - px) / book.tick), 0))
+            pf = self.fillmodel.p_fill(slug, side, ticks,
+                                       target=float(prog.target))
+            score = self._exit_score(est, pf, qty, px, base, side,
+                                     r_eff, d_off)
             near = -px if side == "SELL" else px
-            key = (round(est, 4), near)
+            key = (round(score, 4), near)
             if best_key is None or key > best_key:
                 best_px, best_key = px, key
         return best_px if best_px is not None else (hi if side == "SELL" else lo)
@@ -1701,7 +1738,8 @@ class Family:
                          (book.bids[0][0] + book.tick) if book.bids
                          else 0.002)
                 px = self._best_exit_px(slug, "SELL", book, lo,
-                                        max(ask_touch, lo), rest)
+                                        max(ask_touch, lo), rest,
+                                        basis=break_even)
                 px = min(max(px, 0.002), 0.999)
                 side, intent, rest_qty = "SELL", SELL_LONG, rest
                 why = "selling filled stock — it earns while it waits"
@@ -1729,7 +1767,8 @@ class Family:
                          (book.asks[0][0] - book.tick) if book.asks
                          else received - book.tick)
                 px = self._best_exit_px(slug, "BUY", book,
-                                        min(bid_touch, hi), hi, rest)
+                                        min(bid_touch, hi), hi, rest,
+                                        basis=received)
                 px = min(max(px, 0.001), 0.999)
                 side, intent, rest_qty = "BUY", SELL_SHORT, rest
                 why = ("buying back the short at or under what it sold "
