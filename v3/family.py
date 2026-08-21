@@ -865,6 +865,24 @@ class Family:
                "raw_bid": book.bids[0][0] if book.bids else None,
                "raw_ask": book.asks[0][0] if book.asks else None,
                "est_alt": 0.0, "est_cur": 0.0}
+        # levels the exchange's declared best SKIPPED — the filter that
+        # produced the declared value must reject every one of these
+        # (owner, 2026-08-21: "figure out how the best bid / ask are
+        # calculated ... so that I could try and move them")
+        if bb is not None:
+            out["skip_b"] = [[p, round(q, 2)] for p, q in book.bids
+                             if p > bb + 1e-9][:6]
+        if ba is not None:
+            out["skip_a"] = [[p, round(q, 2)] for p, q in book.asks
+                             if p < ba - 1e-9][:6]
+        # the window-closing play, priced: resting Target Size at the raw
+        # touch closes the scoring window there — everyone deeper earns
+        # zero (the docs' own example). What that costs per side:
+        if book.bids:
+            out["own_bid_usd"] = round(target * book.bids[0][0], 2)
+        if book.asks:
+            out["own_ask_usd"] = round(target * (1.0 - book.asks[0][0]), 2)
+        out["pool_side"] = round(sp, 2)
         for side, anchor in (("BUY", bb), ("SELL", ba)):
             levels = list(book.side(side))
             total = sum(q for _, q in levels)
