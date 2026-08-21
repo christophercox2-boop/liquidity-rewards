@@ -330,7 +330,17 @@ class Family:
             raw.setdefault(slug, {})
         sizes = {s: int((self.universe.get(s) or {}).get("event_n") or 0) or 1
                  for s in batch}
-        for ch in self.terms.refresh(raw, sizes, now=now):
+        changes = self.terms.refresh(raw, sizes, now=now)
+        # the store only keeps LIVE programs; a slug we asked about that
+        # ends up without one was read-and-programless — dead ground until
+        # a later read finds a program (the seat-count families read empty
+        # on 2026-08-21 but were shown as "not read yet" forever)
+        for slug in batch:
+            if slug in self.terms.current:
+                self.known_dead.discard(slug)
+            else:
+                self.known_dead.add(slug)
+        for ch in changes:
             if ch.field == "program_gone":
                 self.known_dead.add(ch.slug)
             elif ch.field == "program_new":
@@ -715,11 +725,16 @@ class Family:
         # 2) maintenance: reprice or pull against fresh books
         actions = self._maintain(now, actions)
 
-        # 3) the seller first — getting the owner OUT always outranks new
+        # 3) the ceiling is enforced, not just checked at the door: over
+        # it (reprices once grew orders past it), the worst value per
+        # dollar goes first until the book fits
+        actions = self._trim(now, actions)
+
+        # 4) the seller next — getting the owner OUT always outranks new
         # risk (starving it behind entries left shorts uncovered, 23:53Z)
         actions = self._sell(now, actions)
 
-        # 4) new entries, best scoreboard candidates first
+        # 5) new entries, best scoreboard candidates first
         self._enter(now, positions, actions)
         return self._finish(summary)
 
@@ -807,7 +822,13 @@ class Family:
             elif (best is not None
                     and (drifted or gain >= self.cfg.reprice_gain_day)
                     and (abs(best["px"] - rec.price) > 1e-9
-                         or abs(best["qty"] - rec.qty) > 1e-9)):
+                         or abs(best["qty"] - rec.qty) > 1e-9)
+                    # a reprice that GROWS the order answers to the same
+                    # ceiling as a new entry (the $121.99-of-$100 lesson)
+                    and (self.family_spent()
+                         - capital_at_risk(rec.intent, rec.price, rec.qty)
+                         + capital_at_risk(rec.intent, best["px"], best["qty"])
+                         <= self.cfg.capital_usd + 1e-9)):
                 r = self.desk.reprice(
                     {"id": rec.id, "market": rec.market, "side": rec.side,
                      "price": rec.price, "size": rec.qty, "intent": rec.intent},
@@ -889,6 +910,30 @@ class Family:
                     self._log(event="refused", market=slug, side=plan["side"],
                               note=r.note[:90])
                     self._mark(slug, plan["side"], now)
+        return actions
+
+    def _trim(self, now: float, actions: int) -> int:
+        while actions > 0:
+            spent = self.family_spent()
+            if spent <= self.cfg.capital_usd + 1e-9:
+                break
+            cands = [o for o in self.orders.values() if o.purpose != "sell"]
+            if not cands:
+                break
+            def value_per_dollar(o):
+                est = (o.live_est if o.live_est is not None else o.est_day) or 0.0
+                return est / max(capital_at_risk(o.intent, o.price, o.qty), 0.01)
+            worst = min(cands, key=value_per_dollar)
+            r = self.desk.cancel(worst.id, worst.market)
+            if not r.ok:
+                break
+            freed = capital_at_risk(worst.intent, worst.price, worst.qty)
+            self._log(event="trim", market=worst.market, side=worst.side,
+                      why=(f"${spent:.2f} on the book is over the "
+                           f"${self.cfg.capital_usd:.0f} ceiling — freeing "
+                           f"${freed:.2f} from the lowest earner"))
+            del self.orders[worst.id]
+            actions -= 1
         return actions
 
     def _sell(self, now: float, actions: int) -> int:

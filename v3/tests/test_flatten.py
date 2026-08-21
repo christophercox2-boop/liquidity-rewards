@@ -333,3 +333,48 @@ class TestStalePlansAndPriorities(unittest.TestCase):
         self.assertEqual(len(placed), 1)             # one action, and it went...
         self.assertEqual(placed[0].purpose, "sell")  # ...to the cover, not entry
         self.assertEqual(placed[0].intent, SELL_SHORT)
+
+
+class TestCeilingEnforcement(unittest.TestCase):
+    """00:30Z lesson: reprices grew orders past the $100 ceiling
+    ($121.99 on the book). The ceiling binds everywhere, and an
+    over-ceiling book trims its worst value first."""
+
+    def test_trim_pulls_worst_value_until_under(self):
+        from v3.tests.test_family import Rig, A, C
+        from v3.family import FamilyConfig, FamilyOrder
+        from v3.intents import BUY_LONG
+        cfg = FamilyConfig(name="P", tag="P", capital_usd=1.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        # two orders on the book: $1.26 at risk vs a $1 ceiling; "good"
+        # rests near the touch and earns, "bad" is deep and earns ~nothing
+        for oid, px, qty in (("good", 0.43, 2.0),    # $0.86 at risk
+                             ("bad", 0.02, 20.0)):   # $0.40 at risk
+            r.exchange.live[oid] = {"id": oid, "market": A, "side": "BUY",
+                                    "price": px, "size": qty,
+                                    "intent": BUY_LONG, "manual": False}
+            r.fam.orders[oid] = FamilyOrder(
+                id=oid, market=A, side="BUY", price=px, qty=qty,
+                intent=BUY_LONG, placed_ts=0.0, purpose="earn")
+        r.cycle()
+        self.assertNotIn("bad", r.fam.orders)        # worst $/day-per-$ went
+        self.assertIn("good", r.fam.orders)
+        self.assertLessEqual(r.fam.family_spent(), 1.0 + 1e-9)
+
+    def test_programless_read_is_dead_ground_until_a_program_appears(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        # a discovered market with NO program at the incentives API
+        r.add_market("ushsscc-ushrsc-wi-2026-11-03-0", event="WI House seats")
+        del r.exchange.prog_raw["ushsscc-ushrsc-wi-2026-11-03-0"]
+        r.cycle(advance=r.fam.cfg.terms_full_s + 1)
+        self.assertIn("ushsscc-ushrsc-wi-2026-11-03-0", r.fam.known_dead)
+        self.assertTrue(r.fam._dead_here("ushsscc-ushrsc-wi-2026-11-03-0"))
+        # the pool arrives later -> alive again
+        from v3.tests.test_family import LIVE_PROG
+        import copy
+        r.exchange.prog_raw["ushsscc-ushrsc-wi-2026-11-03-0"] = copy.deepcopy(LIVE_PROG)
+        r.cycle(advance=r.fam.cfg.terms_full_s + 1)
+        self.assertNotIn("ushsscc-ushrsc-wi-2026-11-03-0", r.fam.known_dead)
