@@ -722,3 +722,49 @@ class TestLiveReplans(unittest.TestCase):
         sb = r.fam.scoreboard[A]
         self.assertGreater(sb["ts"], 1_000_060)        # rescored
         self.assertEqual(fetches["n"], 0)              # for free
+
+
+class TestStreamRouter(unittest.TestCase):
+    def test_frames_route_to_the_owning_family(self):
+        from v3.main import CacheRouter
+        from v3.books import BookCache
+        from v3.scoring import Book
+
+        class F:
+            def __init__(self, universe):
+                self.universe = universe
+                self.cache = BookCache()
+        pol = F({"ussewc-usse-ga-2026-11-03-rep": {}})
+        cfb = F({"aachc-cfb-wins-2026-11-28-ala-9pt5wins": {}})
+        router = CacheRouter({"politics": pol, "cfb": cfb})
+        b = Book(bids=((0.4, 5.0),), asks=((0.6, 5.0),), tick=0.01,
+                 fetched_at=1.0)
+        router.put("aachc-cfb-wins-2026-11-28-ala-9pt5wins", b)
+        self.assertIsNotNone(
+            cfb.cache.any_age("aachc-cfb-wins-2026-11-28-ala-9pt5wins"))
+        self.assertIsNone(
+            pol.cache.any_age("aachc-cfb-wins-2026-11-28-ala-9pt5wins"))
+        router.put("ussewc-usse-ga-2026-11-03-rep", b)     # falls to politics
+        self.assertIsNotNone(
+            pol.cache.any_age("ussewc-usse-ga-2026-11-03-rep"))
+
+    def test_ws_list_carries_every_family(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as p:
+            for k, v in (("V3_STATE_PATH", "s.json"),
+                         ("V3_FLOOR_PATH", "f.json")):
+                os.environ[k] = os.path.join(p, v)
+            os.environ["GITHUB_TOKEN"] = ""
+            try:
+                m = Monitor()
+                from v3.family import FamilyOrder
+                from v3.intents import BUY_LONG
+                m.families["cfb"].orders["x"] = FamilyOrder(
+                    id="x", market="aachc-cfb-wins-2026-11-28-ala-9pt5wins",
+                    side="BUY", price=0.4, qty=1.0, intent=BUY_LONG,
+                    placed_ts=0.0, purpose="earn")
+                slugs = m._ws_slugs()
+                self.assertIn("aachc-cfb-wins-2026-11-28-ala-9pt5wins", slugs)
+            finally:
+                for k in ("V3_STATE_PATH", "V3_FLOOR_PATH"):
+                    os.environ.pop(k, None)

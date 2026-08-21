@@ -629,7 +629,8 @@ class Family:
                        "fill_cost": round(fcost, 4),
                        "cost": round(qty * cost_ps, 2),
                        "why": (f"at the touch — a fill here is "
-                               f"{edge_ticks(px):.0f} ticks inside value"
+                               f"{edge_ticks(px):.0f} ticks inside value "
+                               f"({'Silver + evidence' if independence >= 1.0 else f'evidence band only, confidence {independence:.0%}'})"
                                if k == 0 and not in_front
                                and edge_ticks(px) >= 1 else
                                "joins the touch — the book has been quiet"

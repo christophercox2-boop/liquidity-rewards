@@ -143,6 +143,24 @@ def build_hash() -> str:
     return h.hexdigest()[:8]
 
 
+class CacheRouter:
+    """The stream writes here; frames route to the family that owns the
+    market (politics is the fallback). One socket, every family fed."""
+
+    def __init__(self, families: dict):
+        self.families = families
+
+    def put(self, slug: str, book) -> None:
+        for key in ("cfb", "nfl"):
+            fam = self.families.get(key)
+            if fam is not None and slug in fam.universe:
+                fam.cache.put(slug, book)
+                return
+        pol = self.families.get("politics")
+        if pol is not None:
+            pol.cache.put(slug, book)
+
+
 def touch_snapshot(fam: Family, now: float, cap: int = 400) -> dict:
     """Best bid/ask + side totals + age per market the family is in —
     published so the book is readable without the dashboard."""
@@ -216,12 +234,13 @@ class Monitor:
             fam.desk = desk
             if key == "politics":
                 fam.fairs = self.silver.model_fair
-                cache.on_put = (lambda slug, book, f=fam:
-                                f.fillmodel.observe_touch(
-                                    slug,
-                                    book.bids[0][0] if book.bids else None,
-                                    book.asks[0][0] if book.asks else None,
-                                    book.tick, book.fetched_at))
+            # every family's fill model learns from its own book feed
+            cache.on_put = (lambda slug, book, f=fam:
+                            f.fillmodel.observe_touch(
+                                slug,
+                                book.bids[0][0] if book.bids else None,
+                                book.asks[0][0] if book.asks else None,
+                                book.tick, book.fetched_at))
             self.families[key] = fam
             self.switches[key] = sw
             self.samplers[key] = Estimator()
@@ -229,7 +248,7 @@ class Monitor:
         # the one the stream writes); a dead stream degrades to REST
         # polling through the cache's own age interlock.
         pol = self.families.get("politics")
-        self.stream = (Stream(pol.cache, self._ws_slugs,
+        self.stream = (Stream(CacheRouter(self.families), self._ws_slugs,
                               self.client.key_id, self.client.secret_key)
                        if pol is not None else None)
         self._restore()
@@ -241,12 +260,22 @@ class Monitor:
         self.floor.write_want(self.master.on or self.flatten)
 
     def _ws_slugs(self) -> list[str]:
-        fam = self.families["politics"]
-        held = sorted(fam.active_markets() | set(fam.inventory))
-        top = [s for s, sb in sorted(fam.scoreboard.items(),
-                                     key=lambda kv: -(kv[1].get("est") or 0.0))
-               if sb.get("plans")][:120]
-        return ws_priority(held, [], held + top)
+        """Every armed family's held markets first (they must stay
+        fresh), then the best idle candidates, 200-market cap. Football
+        going unmeasured for hours because the stream only knew politics
+        was the 2026-08-21 morning lesson."""
+        held: list[str] = []
+        tops: list[str] = []
+        for key in ("politics", "cfb", "nfl"):
+            fam = self.families.get(key)
+            if fam is None:
+                continue
+            held += sorted(fam.active_markets() | set(fam.inventory))
+            tops += [s for s, sb in sorted(fam.scoreboard.items(),
+                                           key=lambda kv: -(kv[1].get("est")
+                                                            or 0.0))
+                     if sb.get("plans")][:60]
+        return ws_priority(held, [], held + tops)
 
     def _sampler_loop(self) -> None:
         """The independent clock (REBUILD.md's lesson): earnings are
