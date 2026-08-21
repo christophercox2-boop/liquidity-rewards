@@ -199,3 +199,59 @@ class TestProbing(unittest.TestCase):
         r.cycle()
         self.assertEqual([o for o in r.fam.orders.values()
                           if o.purpose == "probe"], [])
+
+
+class TestEdgeAggression(unittest.TestCase):
+    """Owner, 2026-08-21: 'it's okay to get filled at reasonable prices' —
+    edge against value earns the touch and lifts the courtesy share."""
+
+    def rig(self, fair):
+        from v3.tests.test_family import Rig
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=100.0, per_market_usd=20.0,
+                           join_edge_ticks=2.0, share_max=0.35)
+        r = Rig(cfg=cfg)
+        r.fam.fairs = (lambda s: fair) if fair is not None else None
+        return r
+
+    def test_edge_earns_the_touch_without_quiet_proof(self):
+        from v3.tests.test_family import A
+        r = self.rig(0.52)              # model: worth 52c; bid touch is 44c
+        r.add_market(A)
+        r.cycle()                       # NO volatility evidence exists
+        bids = [o for o in r.fam.orders.values() if o.side == "BUY"]
+        self.assertTrue(any(abs(o.price - 0.44) < 1e-9 for o in bids), bids)
+        self.assertTrue(any("inside value" in o.why for o in bids))
+
+    def test_no_edge_information_keeps_the_timid_defaults(self):
+        from v3.tests.test_family import A
+        r = self.rig(None)              # no model, no evidence
+        r.add_market(A)
+        r.cycle()
+        for o in r.fam.orders.values():
+            if o.side == "BUY":
+                self.assertLess(o.price, 0.44)   # behind the touch
+
+    def test_share_cap_lifts_with_edge(self):
+        from v3.tests.test_family import A
+        from v3.scoring import Book
+        # thin real competition: joining with size means a BIG share
+        thin = Book(bids=((0.40, 6.0), (0.02, 60000.0)),
+                    asks=((0.60, 6.0), (0.98, 60000.0)),
+                    tick=0.01, fetched_at=1_000_000.0)
+        r = self.rig(0.52)              # touch 40c, 12 ticks inside value
+        r.add_market(A, book=thin)
+        r.cycle()
+        bids = [o for o in r.fam.orders.values() if o.side == "BUY"]
+        self.assertTrue(bids)
+        self.assertGreater(max(o.share for o in bids), 0.10)   # past the old cap
+        self.assertLessEqual(max(o.share for o in bids), 0.36)
+        # same book, no value information: the old courtesy stands
+        r2 = self.rig(None)
+        r2.add_market(A, book=thin)
+        r2.cycle()
+        for o in r2.fam.orders.values():
+            if o.side == "BUY":
+                self.assertLessEqual(o.share, 0.101)

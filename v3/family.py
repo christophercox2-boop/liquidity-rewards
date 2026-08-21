@@ -110,6 +110,15 @@ class FamilyConfig:
     probe_cooldown_s: float = 6 * 3600.0
     probe_conf: float = 0.5           # below this confidence, information pays
     probes_per_cycle: int = 1
+    # Owner, 2026-08-21: "it's okay to get filled at reasonable prices."
+    # When the touch sits at least join_edge_ticks INSIDE what the market
+    # is worth (the Silver+evidence blend), joining it needs no quiet-book
+    # proof — a fill there is a purchase at better than value, not a loss.
+    # And the courtesy share cap lifts continuously with that same edge,
+    # from share_hi up to share_max at four-plus ticks of edge. No edge
+    # information (no model, no evidence) = the timid defaults stand.
+    join_edge_ticks: float | None = None
+    share_max: float = 0.10           # == share_hi means no lift
     # College only: may price IN FRONT of a junk touch (wall-only books).
     # The owner kept college's launch behavior ("I wouldn't change anything
     # for now"); every other family leaves this off.
@@ -473,6 +482,24 @@ class Family:
         # decays on its own as the fills age out
         h = self.evidence.heat(slug)
         min_rung = 0 if h < 0.5 else 1 if h < 1.5 else 2 if h < 3.0 else 3
+        value_ctr = None
+        if b_lo is not None and b_hi is not None:
+            value_ctr = (b_lo + b_hi) / 2.0
+        elif b_hi is not None:
+            value_ctr = b_hi
+        elif b_lo is not None:
+            value_ctr = b_lo
+
+        def edge_ticks(px: float) -> float:
+            """How far inside value a fill at px is, in ticks (0 = none)."""
+            if value_ctr is None:
+                return 0.0
+            e = (value_ctr - px) if side == "BUY" else (px - value_ctr)
+            return max(e / tick, 0.0)
+
+        if (not join_ok and self.cfg.join_edge_ticks is not None
+                and edge_ticks(touch) >= self.cfg.join_edge_ticks):
+            join_ok = True    # a fill AT the touch is a good deal — take the front
         rungs = tuple(k for k in ((0,) if join_ok else ()) + (1, 2, 3, 6, 10, 15)
                       if k >= min_rung)
         cands = []
@@ -529,7 +556,11 @@ class Family:
                 row = {"side": side, "px": px, "qty": qty,
                        "share": round(j.share, 4), "est": round(est, 4),
                        "cost": round(qty * cost_ps, 2),
-                       "why": ("joins the touch — the book has been quiet"
+                       "why": (f"at the touch — a fill here is "
+                               f"{edge_ticks(px):.0f} ticks inside value"
+                               if k == 0 and not in_front
+                               and edge_ticks(px) >= 1 else
+                               "joins the touch — the book has been quiet"
                                if k == 0 and not in_front else
                                f"{k} tick{'s' if k != 1 else ''} in front of "
                                f"a junk wall — nothing real to stand behind"
@@ -537,9 +568,14 @@ class Family:
                                f"{k} tick{'s' if k != 1 else ''} behind the "
                                f"touch, ~{j.share * 100:.1f}% of the "
                                f"{side_name} side")}
-                if j.share > self.cfg.share_hi:
-                    # louder than the courtesy band: acceptable only as a
-                    # minimum-size solo in front of a wall (college)
+                lift = min(edge_ticks(px) / 4.0, 1.0)
+                eff_cap = (self.cfg.share_hi
+                           + (max(self.cfg.share_max, self.cfg.share_hi)
+                              - self.cfg.share_hi) * lift)
+                if j.share > eff_cap:
+                    # louder than the (edge-lifted) courtesy band:
+                    # acceptable only as a minimum-size solo in front of a
+                    # wall (college)
                     if in_front and qty == QTY_GRID[0]:
                         if solo is None or est > solo["est"] + 1e-9:
                             solo = {**row, "solo": True}

@@ -90,6 +90,11 @@ def config() -> FamilyConfig:
         # places under 75c/day, and two consecutive under-bar readings
         # (the loop runs every 60s) pull the order for the next best spot.
         min_est_day=0.75, weak_pull_s=30.0,
+        # owner, 2026-08-21: "it's okay to get filled at reasonable
+        # prices" — two ticks of edge earns the touch, four lifts the
+        # courtesy share toward 35%; the drift alarm moves above that so
+        # the two don't fight
+        join_edge_ticks=2.0, share_max=0.35, drift_share=0.45,
         # and fresh money goes ONLY where the fill-and-reward record is
         # deepest: governor and senate races (winners, margins, primaries,
         # seat ladders) and the 2028 presidential slate
