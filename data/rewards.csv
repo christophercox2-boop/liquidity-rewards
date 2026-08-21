@@ -2250,9 +2250,12 @@ date,market,program_type,reward_usd,status
 2026-08-13,dccc-measles-us-2026-12-31-gt4000,liquidityProgram,0.13,PAID
 2026-08-13,dccc-measles-us-2026-12-31-gt4500,liquidityProgram,0.87,PAID
 2026-08-13,enwc-ushrp-fl25-2026-08-18-dem-jarmos,liquidityProgram,0.31,PAID
+2026-08-13,enwc-ushrp-fl25-2026-08-18-dem-jarmos,liquidityProgram,0.23,PENDING
 2026-08-13,enwc-ushrp-fl25-2026-08-18-dem-olilar,liquidityProgram,0.92,PAID
+2026-08-13,enwc-ushrp-fl25-2026-08-18-dem-olilar,liquidityProgram,0.21,PENDING
 2026-08-13,enwc-ussep-nh-2026-09-01-rep-scobro,liquidityProgram,0.19,PAID
 2026-08-13,enwc-ussep-sc-2026-08-11-rep-darnor,liquidityProgram,0.07,PAID
+2026-08-13,enwc-ussep-sc-2026-08-11-rep-darnor,liquidityProgram,0.92,PENDING
 2026-08-13,ewc-pres-fra-2027-04-11-marlep,liquidityProgram,0.01,PAID
 2026-08-13,ewc-usgub-ca-2026-11-03-stehil,liquidityProgram,0.33,PAID
 2026-08-13,ewc-usgub-ca-2026-11-03-xavbec,liquidityProgram,0.01,PAID
@@ -2268,6 +2271,7 @@ date,market,program_type,reward_usd,status
 2026-08-13,pandc-anydis-2027-12-31,liquidityProgram,4.8,PAID
 2026-08-13,pic-congress-trump-2026-12-31,liquidityProgram,0.2,PAID
 2026-08-13,pntcbk-wnba-freedom-2027-06-30-enekan,liquidityProgram,20.7,PAID
+2026-08-13,pntcbk-wnba-freedom-2027-06-30-enekan,liquidityProgram,0.01,PENDING
 2026-08-13,pntcbk-wnba-white-2027-06-30-roywhi,liquidityProgram,21.38,PAID
 2026-08-13,pvwc-housepopw-2026-11-03-rep,liquidityProgram,0.12,PAID
 2026-08-13,scc-hrep-rep-2026-11-03-gte180,liquidityProgram,0.2,PAID
