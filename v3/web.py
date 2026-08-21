@@ -559,36 +559,57 @@ function wCard(name,slug,b,tri){
  }
  return head+s+legend+pk+bt+'<div class="hint">\u25CF marks our order</div>'+mine;
 }
-function wSpot(){
- var q=window._watchQ||[];
- if(!q.length){return;}
- window._watchI=((window._watchI||0)+1)%q.length;
- var t=q[window._watchI];
+function wShow(t){
  fetch('book.json?m='+encodeURIComponent(t.market),{headers:hdrs(),cache:'no-store'})
   .then(function(r){return r.json();}).then(function(b){
    var el=document.getElementById('spot');
    if(!el)return;
    el.style.opacity=0;
    setTimeout(function(){
-    el.innerHTML=wCard(nm(window._watchD,t.market),t.market,b,t);
+    window._watchCurHTML=wCard(nm(window._watchD,t.market),t.market,b,t);
+    el.innerHTML=window._watchCurHTML;
     el.style.opacity=1;
-   },240);
+    wCount();
+   },200);
   }).catch(function(){});
+}
+function wCount(){
+ var el=document.getElementById('wn');
+ if(el)el.innerHTML=(window._watchBuf||[]).length
+  ? 'next market \u25b8 ('+window._watchBuf.length+' saved)'
+  : 'caught up \u2014 the sweep is scoring more';
+}
+function wNext(){
+ var q=window._watchBuf||[];
+ if(!q.length){wCount();return;}
+ var t=q.shift();
+ window._watchSeen=window._watchSeen||{};
+ window._watchSeen[t.market]=t.ts;
+ wShow(t);
 }
 function render(d){
  window._watchD=d;
- var q=[];
+ window._watchBuf=window._watchBuf||[];
+ window._watchSeen=window._watchSeen||{};
+ var buf=window._watchBuf;
  ['politics','cfb','nfl'].forEach(function(k){
   var s=(d.summaries||{})[k]||{};
-  (s.triage_feed||[]).slice(-8).forEach(function(t){q.push(t);});
+  (s.triage_feed||[]).forEach(function(t){
+   if((window._watchSeen[t.market]||0)>=t.ts)return;
+   for(var i=0;i<buf.length;i++){
+    if(buf[i].market===t.market){if(t.ts>buf[i].ts)buf[i]=t;return;}
+   }
+   if(buf.length<25)buf.push(t);
+  });
  });
- q.sort(function(a,b){return b.ts-a.ts;});
- window._watchQ=q.slice(0,10);
- if(!window._watchT){window._watchT=setInterval(wSpot,15000);setTimeout(wSpot,300);}
- return '<div class="card"><div class="muted">What the engine is considering \u2014 one market at a time, rotating through the sweep\u2019s latest verdicts. The curve is EV/day at every resting price.</div>'
-  +'<div id="spot" style="transition:opacity 0.24s ease;min-height:280px"></div></div>';
+ buf.sort(function(a,b){return a.ts-b.ts;});
+ if(!window._watchCurHTML&&buf.length)setTimeout(wNext,300);
+ return '<div class="card"><div class="muted">One market per tap \u2014 what the engine saw as it considered. Up to 25 verdicts wait; the queue refills as the sweep scores.</div>'
+  +'<div style="margin:8px 0"><button onclick="wNext()" id="wn" style="font-size:16px;padding:10px 16px;width:100%">next market \u25b8'+(buf.length?' ('+buf.length+' saved)':'')+'</button></div>'
+  +'<div id="spot" style="transition:opacity 0.2s ease;min-height:280px">'+(window._watchCurHTML||'')+'</div></div>';
 }
 """
+
 
 GRAPH_JS = """
 function fmtT(ts){var d=new Date(ts*1000);return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
