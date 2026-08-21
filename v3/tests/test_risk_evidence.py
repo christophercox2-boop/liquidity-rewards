@@ -618,6 +618,7 @@ class TestOwnerCorrections0821b(unittest.TestCase):
                     tick=0.01, fetched_at=1_000_000.0)
         r.add_market(A, book=book)
         r.fam.inventory[A] = {"qty": 10.0, "cost": 9.2}     # 92c each
+        r.positions[A] = (10.0, 9.2)
         r.cycle()
         exits = [o for o in r.fam.orders.values() if o.purpose == "sell"]
         self.assertTrue(exits)
@@ -636,6 +637,7 @@ class TestOwnerCorrections0821b(unittest.TestCase):
                     tick=0.01, fetched_at=1_000_000.0)
         r.add_market(A, book=book)
         r.fam.inventory[A] = {"qty": 10.0, "cost": 9.2}
+        r.positions[A] = (10.0, 9.2)
         rec = FamilyOrder(id="OLD", market=A, side="SELL", price=0.97,
                           qty=10.0, intent="ORDER_INTENT_SELL_LONG",
                           placed_ts=0.0, purpose="sell", live_est=0.01)

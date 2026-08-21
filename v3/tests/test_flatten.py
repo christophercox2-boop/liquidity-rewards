@@ -898,6 +898,7 @@ class TestWholeShares(unittest.TestCase):
         r = self._rig()
         r.add_market(A)
         r.fam.inventory[A] = {"qty": 12.4, "cost": 12.4 * 0.30}
+        r.positions[A] = (12.4, 12.4 * 0.30)
         r.cycle()
         exits = [o for o in r.fam.orders.values() if o.purpose == "sell"]
         self.assertTrue(exits)
