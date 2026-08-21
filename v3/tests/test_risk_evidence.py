@@ -683,3 +683,14 @@ class TestIgnorancePremium(unittest.TestCase):
         self.assertGreater(len(deeps), 2)
         # monotone climb into the unknown
         self.assertGreater(blind[deeps[-1]], blind[deeps[0]] + 0.01)
+
+
+class TestConcessionProtected(unittest.TestCase):
+    def test_credit_never_swallows_a_known_overpay(self):
+        # Florida, 2026-08-21: model fair 10.2c, bid 19c, family-average
+        # exit credit zeroed the 9c concession. Never again.
+        from v3.fillmodel import FillModel
+        m = FillModel()
+        slug = "ussewc-usse-fl-2026-11-03-dem"
+        c = m.fill_cost(slug, "BUY", 0.19, 0.102, exit_rate_ps=0.048)
+        self.assertGreaterEqual(c, 0.088 - 1e-6)   # the concession stands

@@ -288,20 +288,22 @@ class FillModel:
         takes. Can go negative where exits earn more than the fill
         loses — which is exactly a fill worth taking."""
         fam = family_of(slug)
-        cost = self.markdown.get(fam, MARKDOWN_SEED)
+        soft = self.markdown.get(fam, MARKDOWN_SEED) + max(ignorance, 0.0)
+        conc = 0.0
         if fair is not None:
             excess = (price - fair) if side == "BUY" else (fair - price)
-            cost += max(excess, 0.0)
-        cost += max(ignorance, 0.0)
-        cost -= exit_rate_ps * self.expected_offload_days(slug)
-        # The credit may offset the fill's costs but never turn a fill
-        # into imagined profit. The Rock lesson (2026-08-21): the
-        # family-average exit yield came from a few small positions
-        # whose exits take huge shares of thin sides — applying it to
-        # NEW stock made fill_cost negative in 634 plans and the engine
-        # bid 6-8c for 2028 long shots BECAUSE fills looked profitable.
-        # A true per-market credit needs the owner's sign-off first.
-        return round(max(cost, 0.0), 4)
+            conc = max(excess, 0.0)
+        # The exit credit may offset the SOFT costs (markdown, the
+        # ignorance premium) but never the concession past fair. Twice
+        # burned (2026-08-21): the Rock — a negative cost made fills
+        # look profitable; then Florida — the family-average credit
+        # swallowed a 9c KNOWN overpay against a model-grounded 10.2c
+        # fair, and 100 shares were bought at 19c showing fill cost
+        # $0.00. An overpay is certain money lost at fill; the credit
+        # is an unproven claim. Certain loss can't be paid for with an
+        # unproven claim.
+        credit = exit_rate_ps * self.expected_offload_days(slug)
+        return round(conc + max(soft - credit, 0.0), 4)
 
     def scoring_fraction(self, slug: str) -> float:
         return self.scoring_frac.get(family_of(slug), SCORING_FRAC_SEED)
