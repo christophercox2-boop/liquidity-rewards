@@ -1533,6 +1533,30 @@ class Family:
                     actions -= 1
         return actions
 
+    def _prune_excess_exits(self, slug: str, side: str, excess: float,
+                            now: float) -> None:
+        """Exits must never total more than the position they exit —
+        an over-covered short flips long when everything fills (the
+        Alabama six-covers-for-five-shares case, 2026-08-21). Pull the
+        worst-earning excess, never manual orders."""
+        cands = sorted((o for o in self.orders.values()
+                        if o.market == slug and o.purpose == "sell"
+                        and o.side == side),
+                       key=lambda o: (o.live_est or 0.0))
+        for rec in cands:
+            if excess < 0.01:
+                break
+            if rec.qty > excess + 0.01:
+                continue          # too big to pull whole; a later pass
+            r = self.desk.cancel(rec.id, rec.market)
+            if r.ok:
+                excess -= rec.qty
+                self.orders.pop(rec.id, None)
+                self.evidence.order_gone(rec.market, rec.id)
+                self._log(event="excess_exit_pruned", market=slug,
+                          price=rec.price, qty=rec.qty,
+                          note="exits exceeded the position")
+
     def _maybe_move_exit(self, slug: str, side: str, mine: list, book,
                          inv: dict, now: float) -> None:
         """A single resting exit in a clearly worse slot moves to the
@@ -1640,6 +1664,8 @@ class Family:
                               if o.market == slug and o.purpose == "sell"
                               and o.side == "SELL")
                 rest = qty - covered
+                if covered > qty + 0.01:
+                    self._prune_excess_exits(slug, "SELL", covered - qty, now)
                 if rest < 0.01 or not self._cooldown_ok(slug, "SELL", now):
                     continue
                 break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
@@ -1666,6 +1692,8 @@ class Family:
                               if o.market == slug and o.purpose == "sell"
                               and o.side == "BUY")
                 rest = -qty - covered
+                if covered > -qty + 0.01:
+                    self._prune_excess_exits(slug, "BUY", covered + qty, now)
                 if rest < 0.01 or not self._cooldown_ok(slug, "BUY", now):
                     continue
                 received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)

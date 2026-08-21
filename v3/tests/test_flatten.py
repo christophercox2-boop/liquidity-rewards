@@ -1170,3 +1170,35 @@ class TestLadderView(unittest.TestCase):
         for k in ("px", "qty", "share", "est", "ev", "p_fill", "fill_cost"):
             self.assertIn(k, rows[0])
         self.assertTrue(any(r_.get("picked") for r_ in rows))
+
+
+class TestExitOverCover(unittest.TestCase):
+    def test_excess_covers_get_pruned(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_SHORT
+        from v3.scoring import Book
+        r = Rig()
+        # the Alabama shape: covers ladder in a near-empty bid side, so
+        # the 15c cover genuinely out-earns the 1c ones
+        r.add_market(A, book=Book(bids=((0.01, 42100.0),),
+                                  asks=((0.16, 462.0), (0.98, 60000.0)),
+                                  tick=0.01, fetched_at=1_000_000.0))
+        r.fam.inventory[A] = {"qty": -5.0, "cost": 5.12}
+        r.positions[A] = (-5.0, 5.12)
+        for i, (px, est) in enumerate([(0.15, 5.68), (0.14, 0.57),
+                                       (0.01, 0.0), (0.01, 0.0),
+                                       (0.01, 0.0), (0.01, 0.0)]):
+            oid = f"C{i}"
+            r.fam.orders[oid] = FamilyOrder(
+                id=oid, market=A, side="BUY", price=px, qty=1.0,
+                intent=SELL_SHORT, placed_ts=0.0, purpose="sell",
+                live_est=est)
+            r.exchange.live[oid] = {"id": oid, "market": A, "side": "BUY",
+                                    "price": px, "size": 1.0}
+        r.cycle()
+        covers = [o for o in r.fam.orders.values()
+                  if o.market == A and o.purpose == "sell"]
+        self.assertLessEqual(sum(o.qty for o in covers), 5.0 + 0.01)
+        # the earners survived; the dead 1c excess went
+        self.assertTrue(any(abs(o.price - 0.15) < 1e-9 for o in covers))
