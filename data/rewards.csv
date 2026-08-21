@@ -1827,7 +1827,9 @@ date,market,program_type,reward_usd,status
 2026-08-10,enwc-usgubp-wi-2026-08-11-dem-sarrod,liquidityProgram,0.04,PAID
 2026-08-10,enwc-ushrp-fl25-2026-08-18-dem-jarmos,liquidityProgram,5.16,PAID
 2026-08-10,enwc-ushrp-fl25-2026-08-18-dem-olilar,liquidityProgram,4.32,PAID
+2026-08-10,enwc-ushrp-fl25-2026-08-18-dem-olilar,liquidityProgram,0.01,PENDING
 2026-08-10,enwc-ussep-sc-2026-08-11-rep-ralnor,liquidityProgram,0.35,PAID
+2026-08-10,enwc-ussep-sc-2026-08-11-rep-ralnor,liquidityProgram,3.93,PENDING
 2026-08-10,enwc-ussep-sc-2026-08-11-rep-rusfry,liquidityProgram,0.15,PAID
 2026-08-10,ewc-usgub-ca-2026-11-03-xavbec,liquidityProgram,3.28,PAID
 2026-08-10,ewc-usse-nh-2026-11-03-dem,liquidityProgram,0.03,PAID
