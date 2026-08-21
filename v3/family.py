@@ -665,11 +665,14 @@ class Family:
     def _band(self, slug: str, bids, asks, tick: float) -> dict | None:
         """The evidence band for a market: Silver as prior when it prices
         it, real touches (levels holding at least 5 shares — smaller is
-        bait, 1.0's rule) as anchors."""
+        bait, 1.0's rule) as anchors, WEIGHTED BY THEIR SIZE — a
+        million-share wall testifies harder than a token quote."""
         fair = self.fairs(slug) if self.fairs is not None else None
-        bb = next((p for p, q in (bids or ()) if q >= 5.0), None)
-        ba = next((p for p, q in (asks or ()) if q >= 5.0), None)
-        return self.evidence.band(slug, prior_fair=fair, touches=(bb, ba))
+        bt = next(((p, q) for p, q in (bids or ()) if q >= 5.0), (None, None))
+        at = next(((p, q) for p, q in (asks or ()) if q >= 5.0), (None, None))
+        return self.evidence.band(slug, prior_fair=fair,
+                                  touches=(bt[0], at[0]),
+                                  touch_sizes=(bt[1], at[1]))
 
     def _price_bounds(self, slug: str, bids, asks,
                       tick: float) -> tuple[float | None, float | None]:
@@ -770,6 +773,7 @@ class Family:
                 self.silent_cancels += 1
                 self._log(event="silent_cancel", market=rec.market,
                           side=rec.side, price=rec.price, qty=rec.qty, id=oid)
+            self.evidence.order_gone(rec.market, oid, now=now)
             del self.orders[oid]
         for m in tracked:
             if m in positions:
@@ -790,6 +794,7 @@ class Family:
         if abs(inv["qty"]) < 0.005:
             self.inventory.pop(rec.market, None)
         self.evidence.fill(rec.market, rec.side, rec.price, ts=now)
+        self.fillmodel.observe_fill_age(rec.market, now - rec.placed_ts)
         self.pending_marks.append({"market": rec.market, "side": rec.side,
                                    "price": rec.price, "due": now + 3600.0})
         del self.pending_marks[:-60]
@@ -1025,6 +1030,8 @@ class Family:
                 continue
             rec.live_est = round(j.share * side_pool
                                  if j.qualifies and j.in_window else 0.0, 4)
+            self.fillmodel.observe_order_age(rec.market, now - rec.placed_ts,
+                                             60.0)
             if rec.purpose not in ("sell", "probe"):
                 ticks_now = (round(abs(lv[0][0] - rec.price) / book.tick)
                              if lv else 0)
@@ -1043,7 +1050,8 @@ class Family:
                                                j.qualifies and j.in_window)
             if rec.purpose != "sell" and now - rec.rest_noted > 1800.0:
                 rec.rest_noted = now
-                self.evidence.rested(rec.market, rec.side, rec.price, ts=now)
+                self.evidence.rest_mark(rec.market, rec.id, rec.side,
+                                        rec.price, rec.placed_ts, now=now)
             if not j.qualifies:
                 rec.verdict = ("its side is below Target Size — the whole "
                                "side pays nobody right now")
@@ -1441,8 +1449,9 @@ class Family:
             if now - rec.placed_ts >= self.cfg.probe_ttl_s:
                 r = self.desk.cancel(rec.id, rec.market)
                 if r.ok:
-                    self.evidence.rested(rec.market, rec.side, rec.price,
-                                         ts=now)
+                    self.evidence.rest_mark(rec.market, rec.id, rec.side,
+                                            rec.price, rec.placed_ts, now=now)
+                    self.evidence.order_gone(rec.market, rec.id, now=now)
                     self._log(event="probe_done", market=rec.market,
                               why="sat its watch untouched — noted")
                     del self.orders[rec.id]

@@ -187,8 +187,8 @@ class TestProbing(unittest.TestCase):
         r.cycle(advance=r.fam.cfg.probe_ttl_s + 60)
         self.assertNotIn(pid, r.fam.orders)          # rotated out
         self.assertNotIn(pid, r.exchange.live)
-        self.assertTrue(any(k.startswith("rest")
-                            for _, k, _2 in r.fam.evidence.events.get(A, ())))
+        self.assertTrue(any(str(row[1]).startswith("rest")
+                            for row in r.fam.evidence.events.get(A, ())))
 
     def test_confident_markets_are_not_probed(self):
         r = self.rig()
@@ -397,3 +397,57 @@ class TestGrowthInvesting(unittest.TestCase):
         # hours later it must still be standing
         r.cycle(advance=4000.0)
         self.assertIn(g.id, r.fam.orders)
+
+
+class TestEvidenceWeighting0821(unittest.TestCase):
+    """The owner's Becerra critique, as tests: one vote per resting
+    order growing with log-time, and the market's standing depth counted
+    by its size."""
+
+    def test_one_order_one_vote_however_long_it_rests(self):
+        from v3.evidence import Evidence
+        ev = Evidence(clock=lambda: 100_000.0)
+        for i in range(12):                      # 12 half-hourly marks
+            ev.rest_mark("m", "o1", "SELL", 0.95, started=78_400.0,
+                         now=78_400.0 + (i + 1) * 1800)
+        rows = [r for r in ev.events["m"] if str(r[1]).startswith("restrec")]
+        self.assertEqual(len(rows), 1)           # ONE record, not twelve
+
+    def test_a_week_outweighs_an_hour_but_not_by_168x(self):
+        from v3.evidence import Evidence
+        hour = Evidence._rest_weight(3600.0)
+        day = Evidence._rest_weight(86_400.0)
+        week = Evidence._rest_weight(7 * 86_400.0)
+        self.assertLess(hour, day)
+        self.assertLess(day, week)
+        self.assertLess(week / hour, 8)          # log growth, not linear
+
+    def test_million_share_bid_outvotes_our_quiet_ask(self):
+        # the owner's exact scenario: our ask rested at 95 for hours, a
+        # 1,011,120-share bid stands at 94. Value must land between the
+        # touches, not at 88.
+        from v3.evidence import Evidence
+        ev = Evidence(clock=lambda: 100_000.0)
+        ev.rest_mark("m", "o1", "SELL", 0.95, started=78_400.0, now=100_000.0)
+        b = ev.band("m", touches=(0.94, 0.95),
+                    touch_sizes=(1_011_120.0, 26_693.0))
+        self.assertGreaterEqual(b["med"], 93, b)
+        self.assertLessEqual(b["med"], 96, b)
+
+    def test_instruments_collect_and_persist(self):
+        from v3.fillmodel import FillModel, age_bucket, tod_band
+        self.assertEqual(age_bucket(1800), 0)
+        self.assertEqual(age_bucket(7200), 1)
+        self.assertEqual(age_bucket(3 * 86400), 3)
+        fm = FillModel()
+        fm.observe_order_age("ussewc-usse-ga-2026-11-03-rep", 7200, 60.0)
+        fm.observe_fill_age("ussewc-usse-ga-2026-11-03-rep", 7200)
+        self.assertEqual(fm.age_obs["senate|1"], [60.0, 1.0])
+        fm.observe_touch("ussewc-usse-ga-2026-11-03-rep", 0.44, 0.47,
+                         0.01, 1_000_000.0)
+        fm.observe_touch("ussewc-usse-ga-2026-11-03-rep", 0.44, 0.47,
+                         0.01, 1_000_060.0)
+        self.assertTrue(any(k.startswith("senate|") for k in fm.tod_obs))
+        fm2 = FillModel.from_dict(fm.to_dict())
+        self.assertEqual(fm2.age_obs, fm.age_obs)
+        self.assertEqual(fm2.tod_obs, fm.tod_obs)

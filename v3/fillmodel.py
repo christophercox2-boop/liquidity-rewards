@@ -100,6 +100,34 @@ def _bucket(ticks_back: int) -> int:
     return min(max(int(ticks_back), 0), DIST_BUCKETS[-1])
 
 
+AGE_BUCKETS = ((0, "0-1h", 3600), (1, "1-6h", 6 * 3600),
+               (2, "6-24h", 24 * 3600), (3, "1d+", float("inf")))
+TOD_BANDS = ((9, 17, "day"), (17, 23, "evening"), (23, 9, "night"))
+
+
+def age_bucket(age_s: float) -> int:
+    for idx, _label, hi in AGE_BUCKETS:
+        if age_s < hi:
+            return idx
+    return 3
+
+
+def tod_band(ts: float) -> str:
+    import datetime as _dt
+    try:
+        from zoneinfo import ZoneInfo
+        h = _dt.datetime.fromtimestamp(ts, ZoneInfo("America/New_York")).hour
+    except Exception:  # noqa: BLE001
+        h = _dt.datetime.utcfromtimestamp(ts).hour - 4
+    h %= 24
+    for lo, hi, name in TOD_BANDS:
+        if lo < hi and lo <= h < hi:
+            return name
+        if lo > hi and (h >= lo or h < hi):
+            return name
+    return "day"
+
+
 class FillModel:
     def __init__(self):
         # (family, side, bucket) -> [exposure_seconds, crossings]
@@ -109,6 +137,12 @@ class FillModel:
         self.markdown: dict[str, float] = {}       # family -> $/share EWMA
         self.marks_n: dict[str, int] = {}          # family -> graded fills count
         self.scoring_frac: dict[str, float] = {}   # family -> EWMA 0..1
+        # INSTRUMENTS, collecting only (owner-approved 2026-08-21): the
+        # order-age survival question ("is a week-old order safer than an
+        # hour-old one?") and the day/night question. Nothing acts on
+        # these until the data speaks and the owner turns them on.
+        self.age_obs: dict[str, list[float]] = {}   # fam|bucket -> [sec, fills]
+        self.tod_obs: dict[str, list[float]] = {}   # fam|side|band -> [sec, crossings]
 
     @staticmethod
     def _key(family: str, side: str, bucket: int) -> str:
@@ -131,7 +165,16 @@ class FillModel:
         if dt <= 0 or dt > MAX_OBS_GAP_S:
             return
         fam = family_of(slug)
+        band = tod_band(now)
         for side, ref, opp in (("BUY", pbid, ask), ("SELL", pask, bid)):
+            if ref is not None:
+                tk = f"{fam}|{side}|{band}"
+                tcell = self.tod_obs.setdefault(tk, [0.0, 0.0])
+                tcell[0] += dt
+                if opp is not None and (
+                        opp <= ref + 1e-12 if side == "BUY"
+                        else opp >= ref - 1e-12):
+                    tcell[1] += 1.0
             if ref is None:
                 continue
             for b in DIST_BUCKETS:
@@ -145,6 +188,16 @@ class FillModel:
                         opp <= level + 1e-12 if side == "BUY"
                         else opp >= level - 1e-12):
                     cell[1] += 1.0
+
+    def observe_order_age(self, slug: str, age_s: float, dt_s: float) -> None:
+        k = f"{family_of(slug)}|{age_bucket(age_s)}"
+        cell = self.age_obs.setdefault(k, [0.0, 0.0])
+        cell[0] += dt_s
+
+    def observe_fill_age(self, slug: str, age_s: float) -> None:
+        k = f"{family_of(slug)}|{age_bucket(age_s)}"
+        cell = self.age_obs.setdefault(k, [0.0, 0.0])
+        cell[1] += 1.0
 
     def observe_fill_mark(self, slug: str, side: str, fill_price: float,
                           mid_later: float) -> float:
@@ -223,7 +276,11 @@ class FillModel:
     def to_dict(self) -> dict:
         return {"obs": {k: [round(v[0], 1), v[1]] for k, v in self.obs.items()},
                 "markdown": self.markdown, "marks_n": self.marks_n,
-                "scoring_frac": self.scoring_frac}
+                "scoring_frac": self.scoring_frac,
+                "age_obs": {k: [round(v[0], 1), v[1]]
+                            for k, v in self.age_obs.items()},
+                "tod_obs": {k: [round(v[0], 1), v[1]]
+                            for k, v in self.tod_obs.items()}}
 
     @classmethod
     def from_dict(cls, d: dict) -> "FillModel":
@@ -232,4 +289,8 @@ class FillModel:
         m.markdown = dict(d.get("markdown") or {})
         m.marks_n = dict(d.get("marks_n") or {})
         m.scoring_frac = dict(d.get("scoring_frac") or {})
+        m.age_obs = {k: [float(v[0]), float(v[1])]
+                     for k, v in (d.get("age_obs") or {}).items()}
+        m.tod_obs = {k: [float(v[0]), float(v[1])]
+                     for k, v in (d.get("tod_obs") or {}).items()}
         return m
