@@ -521,28 +521,38 @@ class TestPayoutButton(unittest.TestCase):
         self.dir.cleanup()
 
     def test_first_check_records_a_baseline_not_2566_new_rows(self):
+        import datetime as dt
+        d0 = (dt.datetime.now(dt.timezone.utc)
+              - dt.timedelta(days=1)).strftime("%Y-%m-%d")
+        d1 = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
         rows = [{"date": "2026-08-01", "market": "old1",     # OLDER than the
                  "program_type": "lp", "reward_usd": 0.5,    # requested start:
                  "status": "PAID"},                          # the API does this
-                {"date": "2026-08-18", "market": "m1",
+                # the exchange SPLITS one market-day into rows by status
+                {"date": d0, "market": "m1",
                  "program_type": "lp", "reward_usd": 1.5, "status": "PAID"},
-                {"date": "2026-08-19", "market": "m2",
-                 "program_type": "lp", "reward_usd": 0.6, "status": "PENDING"}]
+                {"date": d0, "market": "m1",
+                 "program_type": "lp", "reward_usd": 0.19, "status": "SKIPPED"}]
         m = self.mon(rows)
         r1 = m.refresh_rewards()
         self.assertEqual(r1["new_count"], 0)
         self.assertIn("baseline", r1["note"])
-        self.assertEqual(r1["days"]["2026-08-19"], 0.6)
-        # second check, nothing changed: zero new rows, no note
+        self.assertEqual(r1["days"][d0], 1.5)        # SKIPPED not in totals
+        # second check, nothing changed: split rows must NOT flip-flop
         r2 = m.refresh_rewards()
         self.assertEqual(r2["new_count"], 0)
         self.assertNotIn("note", r2)
-        # a new posting appears: exactly one new row, newest first
-        rows.append({"date": "2026-08-20", "market": "m3",
+        # the API's stray window shifts: an ANCIENT row appears — absorbed
+        rows.append({"date": "2026-07-29", "market": "fla-ref",
+                     "program_type": "lp", "reward_usd": 2.07, "status": "PAID"})
+        r2b = m.refresh_rewards()
+        self.assertEqual(r2b["new_count"], 0)
+        # a truly new posting appears: exactly one new market-day shows
+        rows.append({"date": d1, "market": "m3",
                      "program_type": "lp", "reward_usd": 2.0, "status": "PENDING"})
         r3 = m.refresh_rewards()
         self.assertEqual(r3["new_count"], 1)
-        self.assertEqual(r3["new_rows"][0]["day"], "2026-08-20")
+        self.assertEqual(r3["new_rows"][0]["day"], d1)
 
 
 class TestSilverLogAndWatcher(unittest.TestCase):

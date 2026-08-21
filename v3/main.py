@@ -444,22 +444,34 @@ class Monitor:
                  - _dt.timedelta(days=6)).strftime("%Y-%m-%d")
         rows = self.client.earnings(start)
         first = not self.rewards_seen
+        # The exchange splits one market-day into SEVERAL rows (a SKIPPED
+        # row and a PAID row of different amounts), and each call returns
+        # a different set of ancient strays outside the asked window. So:
+        # AGGREGATE per market-day before diffing, remember everything
+        # ever seen (never date-pruned, size-capped instead), and only
+        # SHOW news from the last few days — older strays are absorbed
+        # silently (owner, 2026-08-21: "still off").
+        agg: dict[str, dict] = {}
+        for r in rows:
+            key = f"{r['date']}|{r['market']}"
+            a = agg.setdefault(key, {"date": r["date"], "market": r["market"],
+                                     "usd": 0.0, "paid": 0.0, "status": set()})
+            a["usd"] += r["reward_usd"]
+            a["status"].add(r["status"])
+            if r["status"] != "SKIPPED":
+                a["paid"] += r["reward_usd"]
         seen = self.rewards_seen
         fresh = []
         totals: dict[str, float] = {}
-        for r in rows:
-            key = f"{r['date']}|{r['market']}|{r['program_type']}"
-            totals[r["date"]] = totals.get(r["date"], 0.0) + r["reward_usd"]
-            if abs(seen.get(key, -1.0) - r["reward_usd"]) > 0.005:
-                fresh.append(r)
-            seen[key] = r["reward_usd"]
-        # prune by the oldest date the API ACTUALLY returned, never by the
-        # requested start — the API sends older rows than asked, and
-        # pruning to the request made those rows read "new" on every
-        # press (owner, 2026-08-21: "still posting the same rows")
-        min_date = min((r["date"] for r in rows), default=start)
-        self.rewards_seen = {k: v for k, v in seen.items()
-                             if k[:10] >= min_date}
+        for key, a in agg.items():
+            totals[a["date"]] = totals.get(a["date"], 0.0) + a["paid"]
+            if abs(seen.get(key, -1.0) - round(a["usd"], 2)) > 0.005:
+                fresh.append(a)
+            seen[key] = round(a["usd"], 2)
+        if len(seen) > 12000:
+            for k in sorted(seen)[:len(seen) - 12000]:
+                del seen[k]
+        self.rewards_seen = seen
         for d, v in totals.items():
             self.actuals_by_day[d] = round(v, 2)
         # the baseline must survive a deploy between now and the next save
@@ -490,14 +502,27 @@ class Monitor:
                              f"re-recorded it ({len(rows):,} rows through "
                              f"{latest}). Press again later — only true "
                              f"news will show.")}
-        fresh.sort(key=lambda r: (r["date"], r["reward_usd"]),
-                   reverse=True)               # newest day, biggest first
-        out_rows = [{"day": r["date"], "market": r["market"],
-                     "name": self.names.label(r["market"]),
-                     "usd": round(r["reward_usd"], 2),
-                     "status": r["status"]} for r in fresh[:40]]
-        self._note(f"rewards check: {len(fresh)} new/changed rows")
-        return {"ok": True, "new_rows": out_rows, "new_count": len(fresh),
+        if len(fresh) > max(400, 0.5 * len(agg)):
+            # more than half the window "changed" means the memory was
+            # lost or its format moved — re-record it, never spam old rows
+            latest = max(totals) if totals else "?"
+            self._note(f"rewards baseline re-recorded ({len(fresh)} rows)")
+            return {"ok": True, "new_rows": [], "new_count": 0, "days": days,
+                    "note": (f"I re-recorded the baseline "
+                             f"({len(agg):,} market-days through {latest}). "
+                             f"From here only true news shows.")}
+        show_from = (_dt.datetime.now(_dt.timezone.utc)
+                     - _dt.timedelta(days=4)).strftime("%Y-%m-%d")
+        shown = [a for a in fresh if a["date"] >= show_from]
+        shown.sort(key=lambda a: (a["date"], a["usd"]), reverse=True)
+        out_rows = [{"day": a["date"], "market": a["market"],
+                     "name": self.names.label(a["market"]),
+                     "usd": round(a["usd"], 2),
+                     "status": "/".join(sorted(a["status"]))}
+                    for a in shown[:40]]
+        self._note(f"rewards check: {len(shown)} new market-days shown, "
+                   f"{len(fresh) - len(shown)} old strays absorbed")
+        return {"ok": True, "new_rows": out_rows, "new_count": len(shown),
                 "days": days}
 
     def public_state(self) -> dict:
