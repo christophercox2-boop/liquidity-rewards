@@ -464,7 +464,8 @@ class Family:
                    side_pool: float | None, budget: float,
                    own: FamilyOrder | None = None, bar: float | None = None,
                    full_confidence: bool = False,
-                   cross_px: float | None = None) -> dict | None:
+                   cross_px: float | None = None,
+                   ladder: list | None = None) -> dict | None:
         """The best resting order for one side, or None. Every plan and
         every refusal is phone-readable."""
         df, target = float(prog.df), float(prog.target)
@@ -735,6 +736,8 @@ class Family:
                                f"{k} tick{'s' if k != 1 else ''} behind the "
                                f"touch, ~{j.share * 100:.1f}% of the "
                                f"{side_name} side")}
+                if ladder is not None:
+                    ladder.append(dict(row))
                 lift = 1.0 if full_confidence else min(edge_ticks(px) / 4.0, 1.0)
                 eff_cap = (self.cfg.share_hi
                            + (max(self.cfg.share_max, self.cfg.share_hi)
@@ -755,6 +758,44 @@ class Family:
         if solo is not None and solo["ev"] >= the_bar:
             return solo
         return None
+
+    def ladder_view(self, slug: str) -> dict:
+        """Every price level the planner prices, with its numbers —
+        the owner reads the whole ladder himself (2026-08-21: "allow me
+        to click into any market to see even more detail on the numbers
+        for listing at every price level")."""
+        book = self.cache.any_age(slug)
+        if book is None:
+            return {"ok": False, "note": "no book cached yet"}
+        prog, why = self._prog_row(slug)
+        if prog is None:
+            return {"ok": False, "note": why}
+        sp = self._side_pool(slug, prog)
+        out = {"ok": True, "bar": self.cfg.min_est_day,
+               "pool_day": round(sp, 2) if sp is not None else None,
+               "note": ("pool divisor unconfirmed — dollar figures held at 0"
+                        if sp is None else ""), "sides": {}}
+        for side in ("BUY", "SELL"):
+            rows: list[dict] = []
+            try:
+                pick = self._plan_side(slug, book, side, prog, sp or 0.0,
+                                       self.cfg.per_market_usd / 2.0,
+                                       ladder=rows)
+            except Exception as e:  # noqa: BLE001 — the view never breaks
+                out["sides"][side] = {"rows": [], "note": str(e)[:80]}
+                continue
+            best: dict[float, dict] = {}
+            for r in rows:
+                b = best.get(r["px"])
+                if b is None or r["ev"] > b["ev"]:
+                    best[r["px"]] = r
+            ordered = sorted(best.values(), key=lambda r: -r["px"]
+                             if side == "BUY" else r["px"])
+            for r in ordered:
+                r["picked"] = bool(pick and abs(pick["px"] - r["px"]) < 1e-9)
+                r["clears_bar"] = r["ev"] >= self.cfg.min_est_day
+            out["sides"][side] = {"rows": ordered[:24]}
+        return out
 
     def _band(self, slug: str, bids, asks, tick: float) -> dict | None:
         """The evidence band for a market: Silver as prior when it prices

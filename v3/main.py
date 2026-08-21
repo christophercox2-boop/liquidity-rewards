@@ -788,7 +788,8 @@ class Monitor:
                     "fair": (self.silver.model_fair(slug)
                              if hasattr(self, "silver") else None),
                     "band": fam._band(slug, b.bids, b.asks, b.tick),
-                    "conf": round(fam.evidence.confidence(slug), 3)}
+                    "conf": round(fam.evidence.confidence(slug), 3),
+                    "ladder": fam.ladder_view(slug)}
         return {"ok": False, "note": "no book cached for this market yet"}
 
     def public_state(self) -> dict:

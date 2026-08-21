@@ -144,6 +144,24 @@ function showbook(slug,el){
       +'<td>'+(ak?pc(ak[0])+amark:'')+'</td><td>'+(ak?fmtsz(ak[1]):'')+'</td></tr>';
    }
    h+='</table><div class="hint">\u25CF marks a level where one of our orders rests.</div>';
+   var lad=b.ladder||{};
+   if(lad.ok&&lad.sides){
+    if(lad.note)h+='<div class="muted">'+esc(lad.note)+'</div>';
+    ['BUY','SELL'].forEach(function(side){
+     var s=lad.sides[side]||{};var rows=s.rows||[];
+     if(!rows.length)return;
+     h+='<div class="muted" style="margin-top:8px"><b>'+(side==='BUY'?'bid':'ask')+' ladder</b> \u2014 what resting at each price would do</div>';
+     h+='<table><tr><th class="r">price</th><th class="r">size</th><th class="r">share</th><th class="r">$/day</th><th class="r">fill odds</th><th class="r">fill cost</th><th class="r">EV/day</th></tr>';
+     rows.forEach(function(r){
+      var st=r.picked?' style="font-weight:bold"':(r.clears_bar?'':' class="muted"');
+      h+='<tr'+st+'><td class="r">'+pc(r.px)+(r.picked?' \u25C0':'')+'</td><td class="r">'+r.qty+'</td><td class="r">'+Math.round(r.share*100)+'%</td>'
+        +'<td class="r">'+usd(r.est)+'</td><td class="r">'+Math.round(r.p_fill*100)+'%</td>'
+        +'<td class="r">'+(r.fill_cost*100).toFixed(1)+'c</td><td class="r">'+usd(r.ev)+'</td></tr>';
+     });
+     h+='</table>';
+    });
+    h+='<div class="hint">\u25C0 is the planner\u2019s pick; dim rows pay under the '+((lad.bar||0.75)*100).toFixed(0)+'c bar. Fill odds are per day; fill cost is per share.</div>';
+   }else if(lad.note){h+='<div class="muted">ladder: '+esc(lad.note)+'</div>';}
    box.innerHTML=h;
   }).catch(function(){box.innerHTML='<div class="bad">unreachable</div>';});
 }

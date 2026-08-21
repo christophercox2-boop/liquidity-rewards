@@ -1155,3 +1155,18 @@ class TestPhantomFills(unittest.TestCase):
         r.fam.inv_since[A] = r.now + 50.0   # booked seconds ago
         r.cycle(advance=60.0)
         self.assertIn(A, r.fam.inventory)   # grace period holds it
+
+
+class TestLadderView(unittest.TestCase):
+    def test_every_priced_level_carries_its_numbers(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        lad = r.fam.ladder_view(A)
+        self.assertTrue(lad["ok"])
+        rows = lad["sides"]["BUY"]["rows"]
+        self.assertGreater(len(rows), 3)
+        for k in ("px", "qty", "share", "est", "ev", "p_fill", "fill_cost"):
+            self.assertIn(k, rows[0])
+        self.assertTrue(any(r_.get("picked") for r_ in rows))
