@@ -552,7 +552,8 @@ class Family:
                                     f" Size and pays NOBODY — this order "
                                     f"revives it and takes ~"
                                     f"{j.share * 100:.0f}% of the side")}
-            if best is not None and best["ev"] >= self.cfg.min_est_day:
+            bar_here = self.cfg.min_est_day if bar is None else bar
+            if best is not None and best["ev"] >= bar_here:
                 return best
             return None
 
@@ -1416,6 +1417,29 @@ class Family:
                     and now - rec.weak_since > window_here
                     and (best is None
                          or best.get("ev", best["est"]) < floor_here))
+            if (best is not None and best.get("revive")
+                    and rec.purpose != "grow"):
+                # the order earns nothing only because its side is below
+                # Target Size, and a revive within the caps can qualify
+                # it — that is the fix, not a cancel (owner, 2026-08-21:
+                # "we shouldn't cancel something on the basis that it
+                # does not earn rewards if the fix is easy i.e.
+                # qualifying the side")
+                rec.weak_since = 0.0
+                continue
+            if (best is None and rec.purpose != "grow"
+                    and (rec.live_est or 0.0) <= 0.0
+                    and sum(q for _, q in book.side(rec.side))
+                    < float(prog.target)
+                    and self._plan_side(rec.market, book, rec.side, prog,
+                                        side_pool,
+                                        self._market_budget(rec.market) / 2.0,
+                                        own=rec, bar=0.0) is not None):
+                # same caveat, bar aside: the side CAN be qualified within
+                # the caps, it just does not pay enough to act on yet —
+                # the order stays; the revive places if its EV ever clears
+                rec.weak_since = 0.0
+                continue
             if (best is None and (rec.live_est or 0.0) <= 0.0) or weak:
                 r = self.desk.cancel(rec.id, rec.market)
                 if r.ok:
@@ -1639,7 +1663,7 @@ class Family:
             if excess < 0.01:
                 break
             if rec.qty > excess + 0.01:
-                continue          # too big to pull whole; a later pass
+                continue          # too big to pull whole — fallback below
             r = self.desk.cancel(rec.id, rec.market)
             if r.ok:
                 excess -= rec.qty
@@ -1648,6 +1672,24 @@ class Family:
                 self._log(event="excess_exit_pruned", market=slug,
                           price=rec.price, qty=rec.qty,
                           note="exits exceeded the position")
+        if excess >= 0.01:
+            # every remaining cover is BIGGER than the excess (the tulgab
+            # 500-vs-1 shape) — cancel the worst earner whole; the next
+            # pass rests one sized to the real position. Cancel-first, so
+            # nothing is ever over-offered (owner approved 2026-08-21).
+            for rec in cands:
+                if rec.id not in self.orders:
+                    continue
+                r = self.desk.cancel(rec.id, rec.market)
+                if r.ok:
+                    self.orders.pop(rec.id, None)
+                    self.evidence.order_gone(rec.market, rec.id)
+                    self._log(event="excess_exit_pruned", market=slug,
+                              price=rec.price, qty=rec.qty,
+                              note="bigger than the position it covers — "
+                                   "cancelled whole; the next pass rests "
+                                   "one sized to the real position")
+                break
 
     def _maybe_move_exit(self, slug: str, side: str, mine: list, book,
                          inv: dict, now: float) -> None:
@@ -1855,6 +1897,31 @@ class Family:
                 self._log(event="sell_rested", market=slug, price=px,
                           qty=rest_qty, side=side)
                 self._mark(slug, side, now)
+                actions -= 1
+        # an "exit" with no position behind it is not an exit — a fill
+        # would OPEN a position, not close one (the petbut shape; owner
+        # approved 2026-08-21). Reduce-checking also catches covers left
+        # on the wrong side after a phantom position was corrected.
+        for rec in list(self.orders.values()):
+            if actions <= 0:
+                break
+            if rec.purpose != "sell":
+                continue
+            if now - rec.placed_ts < 300.0:
+                continue      # a fresh exit gets its feed cycle first
+            pos = (self.inventory.get(rec.market) or {}).get("qty", 0.0)
+            reduces = ((rec.side == "BUY" and pos < -0.005)
+                       or (rec.side == "SELL" and pos > 0.005))
+            if reduces:
+                continue
+            r = self.desk.cancel(rec.id, rec.market)
+            if r.ok:
+                self.orders.pop(rec.id, None)
+                self.evidence.order_gone(rec.market, rec.id)
+                self._log(event="orphan_exit_cancelled", market=rec.market,
+                          price=rec.price, qty=rec.qty,
+                          note="no position behind it — a fill would open "
+                               "a new position, not close one")
                 actions -= 1
         return actions
 

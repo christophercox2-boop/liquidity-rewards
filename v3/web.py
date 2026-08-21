@@ -542,6 +542,11 @@ function wCard(name,slug,b,tri){
    return (bids.indexOf(r)>=0?'bid':'ask')+' '+r.qty+' @ '+wFmtC(r.px)+' \u2192 $'+r.ev.toFixed(2)+'/day, '+Math.round(r.p_fill*100)+'% fill odds';
   }).join(' \u00b7 ')+'</b>'+pkRows.map(function(r){return r.why?'<div class="muted" style="font-size:12px;font-weight:400">'+esc(r.why)+'</div>':'';}).join('')+'</div>'
   :'<div class="muted" style="margin:6px 0"><b>Decision:</b> nothing here clears the bar</div>';
+ var evs='';
+ [['bids',bids],['asks',asks]].forEach(function(pr){
+  var rs=pr[1].slice().sort(function(x,y){return y.ev-x.ev;}).slice(0,3);
+  if(rs.length)evs+='<div class="muted" style="font-size:12px">best '+pr[0]+' by EV/day: '+rs.map(function(r2){return pc(r2.px)+' \u2192 $'+r2.ev.toFixed(2);}).join(' \u00b7 ')+'</div>';
+ });
  var oursAt={};(b.ours||[]).forEach(function(o){oursAt[o.side+(o.price*100).toFixed(1)]=o;});
  var bt='<table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
  var nrows=Math.min(Math.max((b.bids||[]).length,(b.asks||[]).length),6);
@@ -565,7 +570,7 @@ function wCard(name,slug,b,tri){
   var pq=b.position.qty,pc2=b.position.cost;
   mine+='<div><b>Position:</b> '+pq+' shares'+(pq>0?' at '+((pc2/pq)*100).toFixed(1)+'c average':' (short)')+'</div>';
  }
- return head+s+legend+pk+bt+'<div class="hint">\u25CF marks our order</div>'+mine;
+ return head+s+legend+pk+evs+bt+'<div class="hint">\u25CF marks our order</div>'+mine;
 }
 function wShow(t){
  fetch('book.json?m='+encodeURIComponent(t.market),{headers:hdrs(),cache:'no-store'})

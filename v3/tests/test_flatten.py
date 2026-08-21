@@ -1395,3 +1395,93 @@ class TestRoundTripPairing(unittest.TestCase):
         self.assertAlmostEqual(second["realized"], 0.2)  # 2 x (30c - 20c)
         other = [c for c in cards if c["market"] == "other"][0]
         self.assertEqual(other["open_qty"], 1.0)         # an earn short stays open
+
+
+class TestOversizedExitFallback(unittest.TestCase):
+    def test_tulgab_shape_cancelled_whole_then_resized(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_SHORT
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.03, 210.0), (0.02, 500.0)),
+                                  asks=((0.04, 641.0), (0.08, 31000.0)),
+                                  tick=0.01, fetched_at=1_000_000.0))
+        r.fam.inventory[A] = {"qty": -1.0, "cost": 0.78}
+        r.positions[A] = (-1.0, 0.78)
+        r.fam.orders["T1"] = FamilyOrder(
+            id="T1", market=A, side="BUY", price=0.02, qty=500.0,
+            intent=SELL_SHORT, placed_ts=0.0, purpose="sell",
+            live_est=0.0)
+        r.exchange.live["T1"] = {"id": "T1", "market": A, "side": "BUY",
+                                 "price": 0.02, "size": 500.0}
+        r.cycle()
+        self.assertNotIn("T1", r.fam.orders)   # the 500 went, whole
+        r.cycle(advance=600.0)                 # past the cooldown
+        covers = [o for o in r.fam.orders.values()
+                  if o.market == A and o.purpose == "sell"
+                  and o.side == "BUY"]
+        self.assertTrue(covers)
+        self.assertLessEqual(sum(o.qty for o in covers), 1.01)
+
+    def test_exit_with_no_position_is_cancelled(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
+        r = Rig()
+        r.add_market(A)
+        r.fam.orders["P1"] = FamilyOrder(
+            id="P1", market=A, side="SELL", price=0.7, qty=20.0,
+            intent=SELL_LONG, placed_ts=1.0, purpose="sell")
+        r.exchange.live["P1"] = {"id": "P1", "market": A, "side": "SELL",
+                                 "price": 0.7, "size": 20.0}
+        r.cycle()
+        self.assertNotIn("P1", r.fam.orders)
+        self.assertTrue(any(e.get("event") == "orphan_exit_cancelled"
+                            for e in r.fam.log))
+
+    def test_wrong_side_cover_on_a_long_is_cancelled(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_SHORT
+        r = Rig()
+        r.add_market(A)
+        r.fam.inventory[A] = {"qty": 5.0, "cost": 0.5}
+        r.positions[A] = (5.0, 0.5)
+        r.fam.orders["W1"] = FamilyOrder(
+            id="W1", market=A, side="BUY", price=0.05, qty=10.0,
+            intent=SELL_SHORT, placed_ts=1.0, purpose="sell")
+        r.exchange.live["W1"] = {"id": "W1", "market": A, "side": "BUY",
+                                 "price": 0.05, "size": 10.0}
+        r.cycle()
+        self.assertNotIn("W1", r.fam.orders)
+
+
+class TestKeepWhenSideCanBeQualified(unittest.TestCase):
+    def test_starved_side_revive_beats_the_pull(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder, FamilyConfig
+        from v3.intents import BUY_LONG
+        from v3.scoring import Book
+        cfg = FamilyConfig(
+            name="Politics", tag="POL", known_ground=True,
+            rest_style="join_quiet", revive=True,
+            capital_usd=100.0, per_market_usd=2.0, revive_max_usd=5.0,
+            min_days_out=3, weak_pull_s=3600.0, min_est_day=5.0)
+        r = Rig(cfg=cfg)
+        prog = {"timePeriods": [{"programId": "politics_mid_1",
+                                 "rewardPool": 20.0, "targetSize": 100,
+                                 "discountFactor": 0.2, "status": "LIVE"}]}
+        r.add_market(A, book=Book(bids=((0.02, 90.0),),
+                                  asks=((0.03, 6000.0),),
+                                  tick=0.01, fetched_at=1_000_000.0),
+                     prog=prog)
+        r.fam.orders["K1"] = FamilyOrder(
+            id="K1", market=A, side="BUY", price=0.02, qty=10.0,
+            intent=BUY_LONG, placed_ts=1.0, purpose="earn",
+            why="joins", live_est=0.0, weak_since=1.0)
+        r.exchange.live["K1"] = {"id": "K1", "market": A, "side": "BUY",
+                                 "price": 0.02, "size": 10.0}
+        r.cycle()
+        self.assertIn("K1", r.fam.orders)   # kept — the side can be qualified
+        self.assertEqual(r.fam.orders["K1"].weak_since, 0.0)
