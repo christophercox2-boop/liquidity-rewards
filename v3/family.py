@@ -516,6 +516,20 @@ class Family:
                 return best
             return None
 
+        if own is not None and own.side == side:
+            # net OUR OWN resting order out of the book first — planning
+            # against a touch that is just ourselves anchors on a ghost
+            # (the Massachusetts primary lesson: our 13c bid kept
+            # re-planning against itself)
+            netted = []
+            for p2, q2 in levels:
+                if abs(p2 - own.price) < tick / 2:
+                    q2 = q2 - own.qty
+                if q2 > 1e-9:
+                    netted.append((p2, q2))
+            levels = tuple(netted)
+            if not levels:
+                return None
         # -- the side qualifies: join or step back, never in front --
         touch = levels[0][0]
         # Every price level is an option (owner, 2026-08-21): the EV math
@@ -577,15 +591,20 @@ class Family:
                 continue
             if px not in cands:
                 cands.append(px)
-        if other:
-            # In FRONT of the touch is an option too (owner, 2026-08-21:
-            # in a wide spread, a small order closer to the midpoint can
-            # capture far more of the score, and a fill there may be a
-            # bargain against fair value, not a cost). Post-only bounds
-            # it one tick inside the other side's touch; the EV math
-            # prices the rest — no queue ahead, bait-fast fill odds, and
-            # the fill cost credits a fill below fair.
+        # How far in front we may quote scales with how much we
+        # INDEPENDENTLY know about fair value (owner, 2026-08-21:
+        # "Obviously this only works in certain politics markets where I
+        # have a sense of what fair value is" — and the Massachusetts
+        # primary lesson: no model, no evidence, so the engine had no
+        # business making its own 1-tick market at 13c). A model opens
+        # the full 50 ticks; fill-built confidence opens it partway; no
+        # grounding keeps us at or behind the touch. College's junk-wall
+        # quirk (allow_improve) keeps its blessed fronting.
+        kf_max = 50.0 * (1.0 if self.cfg.allow_improve else independence)
+        if other and kf_max >= 1.0:
             for kf in (1, 2, 3, 5, 8, 12, 18, 25, 35, 50):
+                if kf > kf_max:
+                    break
                 px = round(touch + kf * sign * tick, 3)
                 if not (0.001 <= px <= 0.999):
                     continue

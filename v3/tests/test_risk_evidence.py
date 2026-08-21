@@ -162,17 +162,31 @@ class TestProbing(unittest.TestCase):
         return Book(bids=((0.05, 9000.0),), asks=((0.95, 9000.0),),
                     tick=0.01, fetched_at=now)
 
-    def test_wide_walls_get_a_small_quote_in_front_not_a_probe(self):
-        # Owner, 2026-08-21: in a wide spread with massive walls, a
-        # small order in front captures the score — the planner can act
-        # now, so no probe is needed
+    def test_ungrounded_wide_walls_get_a_scout_not_a_market(self):
+        # Owner, 2026-08-21 (the Massachusetts primary lesson): with no
+        # model and no evidence, the engine must NOT make its own market
+        # in the middle — the scout goes out instead
         from v3.tests.test_family import Rig, A
         r = self.rig()
         r.add_market(A, book=self.unknowable_book(1_000_000.0))
         r.cycle()
         self.assertEqual([o for o in r.fam.orders.values()
+                          if o.purpose == "earn"], [])
+        self.assertTrue([o for o in r.fam.orders.values()
+                         if o.purpose == "probe"])
+
+    def test_grounded_wide_walls_get_a_small_quote_in_front(self):
+        # ...and WITH a model, the wide spread is the owner's play: a
+        # small order in front captures the score, no probe needed
+        from v3.tests.test_family import Rig, A
+        r = self.rig()
+        r.add_market(A, book=self.unknowable_book(1_000_000.0))
+        r.fam.fairs = lambda s: 0.50
+        r.cycle()
+        self.assertEqual([o for o in r.fam.orders.values()
                           if o.purpose == "probe"], [])
-        earns = [o for o in r.fam.orders.values() if o.purpose == "earn"]
+        earns = [o for o in r.fam.orders.values() if o.purpose in
+                 ("earn", "solo")]
         self.assertTrue(earns)
         for o in earns:
             if o.side == "BUY":
@@ -557,23 +571,21 @@ class TestOwnerCorrections0821b(unittest.TestCase):
                     asks=((0.90, 50000.0), (0.98, 500000.0)),
                     tick=0.01, fetched_at=1_000_000.0)
 
-    def test_model_fair_waives_the_front_bait(self):
-        # same wide book; with a 50c model, a 35c bid is a bargain for
-        # us — its priced fill odds must be well under the no-model case
+    def test_the_front_opens_only_with_grounding(self):
+        # Owner, 2026-08-21: "this only works in certain politics
+        # markets where I have a sense of what fair value is." No model,
+        # no evidence -> no quoting in front at all (the Massachusetts
+        # and Delaware primary lessons). A model opens the front.
         from v3.tests.test_family import A
-        def front_pf(fair):
+        def front_rows(fair):
             r = self._rig(fair)
             r.add_market(A, book=self.wide_book())
             r.cycle()
-            rows = [p for p in ((r.fam.scoreboard.get(A) or {})
+            return [p for p in ((r.fam.scoreboard.get(A) or {})
                                 .get("plans") or [])
                     if p["side"] == "BUY" and p["px"] > 0.10]
-            return rows[0]["p_fill"] if rows else None
-        blind = front_pf(None)
-        seeing = front_pf(0.50)
-        self.assertIsNotNone(blind)
-        self.assertIsNotNone(seeing)
-        self.assertLess(seeing, blind * 0.7)
+        self.assertEqual(front_rows(None), [])
+        self.assertTrue(front_rows(0.50))
 
     def test_heat_shrinks_the_retry_instead_of_closing_the_front(self):
         from v3.tests.test_family import A

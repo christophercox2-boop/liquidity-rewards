@@ -132,7 +132,8 @@ function showbook(slug,el){
   .then(function(r){return r.json();}).then(function(b){
    if(!b.ok){box.innerHTML='<div class="muted">'+esc(b.note||'no book')+'</div>';return;}
    var oursAt={};(b.ours||[]).forEach(function(o){oursAt[o.side+(o.price*100).toFixed(1)]=o;});
-   var h='<div class="muted" style="margin:4px 0">book '+b.age_s+'s old'+(b.fair!=null?' \u00b7 model '+(b.fair*100).toFixed(1)+'c':'')+'</div>';
+   var g=b.fair!=null?'model '+(b.fair*100).toFixed(1)+'c':(b.band&&b.band.med!=null?'no model \u2014 evidence '+b.band.lo.toFixed(0)+'\u2013'+b.band.hi.toFixed(0)+'c, confidence '+Math.round((b.conf||0)*100)+'%':'NO GROUNDING \u2014 no model, no evidence');
+   var h='<div class="muted" style="margin:4px 0">book '+b.age_s+'s old \u00b7 '+g+'</div>';
    h+='<table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
    var n=Math.max((b.bids||[]).length,(b.asks||[]).length);
    for(var i=0;i<n;i++){
