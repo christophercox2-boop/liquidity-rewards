@@ -881,7 +881,8 @@ class TestWholeShares(unittest.TestCase):
         r.cycle()
         self.assertNotIn("FRAC1", r.fam.orders)
 
-    def test_exit_rests_whole_leaving_dust(self):
+    def test_exits_keep_fractional_sizes(self):
+        # owner, 2026-08-21: "Fractional are fine for exits"
         from v3.tests.test_family import A
         r = self._rig()
         r.add_market(A)
@@ -889,7 +890,9 @@ class TestWholeShares(unittest.TestCase):
         r.cycle()
         exits = [o for o in r.fam.orders.values() if o.purpose == "sell"]
         self.assertTrue(exits)
-        self.assertEqual(exits[0].qty, 12.0)   # dust of 0.4 waits
+        self.assertEqual(exits[0].qty, 12.4)   # the whole position rests
+        r.cycle(); r.cycle()
+        self.assertIn(exits[0].id, r.fam.orders)   # and is not culled
 
     def test_manual_fractional_order_is_left_alone(self):
         from v3.tests.test_family import A

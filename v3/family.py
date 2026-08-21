@@ -1095,7 +1095,8 @@ class Family:
         for rec in list(self.orders.values()):
             if actions <= 0:
                 break
-            if (self.cfg.whole_shares and rec.purpose != "manual"
+            if (self.cfg.whole_shares
+                    and rec.purpose not in ("sell", "manual")
                     and abs(rec.qty - round(rec.qty)) > 1e-9):
                 r = self.desk.cancel(rec.id, rec.market)
                 if r.ok:
@@ -1367,8 +1368,6 @@ class Family:
                               if o.market == slug and o.purpose == "sell"
                               and o.side == "SELL")
                 rest = qty - covered
-                if self.cfg.whole_shares:
-                    rest = float(int(rest + 1e-9))
                 if rest < 0.01 or not self._cooldown_ok(slug, "SELL", now):
                     continue
                 break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
@@ -1389,8 +1388,6 @@ class Family:
                               if o.market == slug and o.purpose == "sell"
                               and o.side == "BUY")
                 rest = -qty - covered
-                if self.cfg.whole_shares:
-                    rest = float(int(rest + 1e-9))
                 if rest < 0.01 or not self._cooldown_ok(slug, "BUY", now):
                     continue
                 received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
