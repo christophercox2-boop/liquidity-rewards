@@ -283,6 +283,8 @@ class SilverFairs:
         self.pmf_lo: dict[int, float] = {}    # rho = SWING_RHO_LOW
         self.pmf_hi: dict[int, float] = {}    # rho = SWING_RHO_HIGH
         self.fetched_at = 0.0
+        self.changed_at = 0.0            # when the numbers last MOVED
+        self._content_sig = ""
         self.source = "none"
         self.note = ""
         # Silver's own simulated distributions — the primary model
@@ -486,6 +488,13 @@ class SilverFairs:
             # a missing race silently shifts the whole ladder — say so
             self.note = f"{len(races)} races, expected {SENATE_RACES_EXPECTED}"
         self.races = races
+        # "checked 10 minutes ago" can hide a frozen feed — track when
+        # the CONTENT last changed, separately from when we last looked
+        # (owner, 2026-08-21: the site had moved and the numbers had not)
+        sig = repr(sorted((k, v.get("dem")) for k, v in races.items()))
+        if sig != self._content_sig:
+            self._content_sig = sig
+            self.changed_at = now
         probs = [r["rep"] for r in races.values()]
         self.pmf = seat_pmf(probs, rho=SWING_RHO_MID)
         self.pmf_lo = seat_pmf(probs, rho=SWING_RHO_LOW)

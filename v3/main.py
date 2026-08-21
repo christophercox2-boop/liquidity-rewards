@@ -437,6 +437,9 @@ class Monitor:
                 "gov_races": len(self.silver.gov_races),
                 "tables_age_min": (round((now - self.silver.fetched_at) / 60)
                                    if self.silver.fetched_at else None),
+                "tables_changed_h": (round(
+                    (now - self.silver.changed_at) / 3600, 1)
+                    if getattr(self.silver, "changed_at", 0) else None),
                 "official_source": self.silver.official_source,
                 "official_age_h": (round(
                     self.silver.official_run_age_s(now) / 3600, 1)
