@@ -80,9 +80,12 @@ def config() -> FamilyConfig:
         # bar for two hours with nothing better at the market.
         capital_usd=100.0, per_market_usd=20.0, revive_max_usd=5.0,
         share_hi=0.10,
-        # owner, 2026-08-21: two hours "is way too long to wait to be
-        # culled" — half an hour under the bar and the capital moves on
-        min_est_day=0.10, weak_pull_s=1800.0,
+        # owner, 2026-08-21: "I would do 30 seconds under 75 cents, but
+        # just for politics. There are so many options you can find
+        # something better." One bar for entry and culling — nothing
+        # places under 75c/day, and two consecutive under-bar readings
+        # (the loop runs every 60s) pull the order for the next best spot.
+        min_est_day=0.75, weak_pull_s=30.0,
         # and fresh money goes ONLY where the fill-and-reward record is
         # deepest: governor and senate races (winners, margins, primaries,
         # seat ladders) and the 2028 presidential slate
