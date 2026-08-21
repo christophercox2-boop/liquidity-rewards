@@ -489,13 +489,22 @@ class Family:
             value_ctr = b_hi
         elif b_lo is not None:
             value_ctr = b_lo
+        # Edge must come from INDEPENDENT information. The market's own
+        # touches feed the band, so without a model or real fills the
+        # band's center is just the spread's midpoint — and the touch must
+        # not certify itself. The model counts in full; without it, edge
+        # scales with fill-built confidence, continuously.
+        if self.fairs is not None and self.fairs(slug) is not None:
+            independence = 1.0
+        else:
+            independence = self.evidence.confidence(slug)
 
         def edge_ticks(px: float) -> float:
-            """How far inside value a fill at px is, in ticks (0 = none)."""
-            if value_ctr is None:
+            """How far inside independent value a fill at px is, in ticks."""
+            if value_ctr is None or independence <= 0.0:
                 return 0.0
             e = (value_ctr - px) if side == "BUY" else (px - value_ctr)
-            return max(e / tick, 0.0)
+            return max(e / tick, 0.0) * independence
 
         if (not join_ok and self.cfg.join_edge_ticks is not None
                 and edge_ticks(touch) >= self.cfg.join_edge_ticks):
