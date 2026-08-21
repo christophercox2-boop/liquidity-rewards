@@ -1135,3 +1135,22 @@ class TestPhantomFills(unittest.TestCase):
         r.positions[A] = (0.0, 0.0)    # the exchange says flat
         r.cycle()
         self.assertNotIn(A, r.fam.inventory)
+
+    def test_feed_absence_purges_phantom_after_grace(self):
+        # the feed lists only held markets — a phantom market is exactly
+        # the one it never names
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.fam.inventory[A] = {"qty": -872.1, "cost": -863.38}
+        r.cycle()                      # positions feed says nothing at all
+        self.assertNotIn(A, r.fam.inventory)
+
+    def test_fresh_fill_survives_one_absent_snapshot(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.fam.inventory[A] = {"qty": 4.0, "cost": 1.6}
+        r.fam.inv_since[A] = r.now + 50.0   # booked seconds ago
+        r.cycle(advance=60.0)
+        self.assertIn(A, r.fam.inventory)   # grace period holds it

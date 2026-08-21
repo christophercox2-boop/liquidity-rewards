@@ -916,6 +916,24 @@ class Family:
                               qty=feed_qty,
                               note=f"book said {have:g}, exchange says "
                                    f"{feed_qty:g} — exchange wins")
+        # The feed lists only markets actually held (a failed fetch
+        # aborts the cycle upstream, so this snapshot is complete).
+        # Book inventory in a market the feed does not mention is
+        # phantom — the Louisiana lesson part two: the first fix only
+        # snapped markets the feed NAMED, and a phantom market is
+        # exactly the one it never names. Fresh fills get a grace
+        # period; the next snapshot confirms them.
+        for m in list(self.inventory):
+            if m in positions:
+                continue
+            if now - self.inv_since.get(m, 0.0) < 180.0:
+                continue
+            gone_qty = self.inventory[m].get("qty", 0.0)
+            self.inventory.pop(m, None)
+            self.inv_since.pop(m, None)
+            self._log(event="inventory_corrected", market=m, qty=0.0,
+                      note=f"book said {gone_qty:g}, the exchange holds "
+                           f"nothing — phantom purged")
         for m in list(self.positions_seen):
             if (m not in self.inventory
                     and m not in {o.market for o in self.orders.values()}):
