@@ -135,6 +135,54 @@ def load_history() -> dict[str, float]:
         return {}, {}
 
 
+def pair_fills(fills: list) -> list:
+    """Match closes to entries, oldest lot first, per market: a buy pairs
+    with the sells that unload it, a short sale with the buys that cover
+    it (owner, 2026-08-21: "each should have a matching buy and sell or
+    sell short and buy back"). Returns one card per entry lot carrying
+    its closes and realized money, plus stray closes of stock the journal
+    never saw bought."""
+    out: list[dict] = []
+    by_mkt: dict[str, list] = {}
+    for r in sorted(fills, key=lambda x: x.get("ts", 0.0)):
+        by_mkt.setdefault(r.get("market", "?"), []).append(r)
+    for evs in by_mkt.values():
+        longs: list[dict] = []
+        shorts: list[dict] = []
+        for r in evs:
+            qty = float(r.get("qty") or 0.0)
+            opp = shorts if r["side"] == "BUY" else longs
+            while qty > 0.005 and opp:
+                lot = opp[0]
+                take = min(qty, lot["open_qty"])
+                pl = ((lot["px"] - r["px"]) if r["side"] == "BUY"
+                      else (r["px"] - lot["px"])) * take
+                lot["closes"].append({
+                    "ts": r["ts"], "px": r["px"], "qty": round(take, 2),
+                    "pl": round(pl, 4)})
+                lot["realized"] = round(lot["realized"] + pl, 4)
+                lot["open_qty"] = round(lot["open_qty"] - take, 2)
+                lot["last_ts"] = r["ts"]
+                if lot["open_qty"] <= 0.005:
+                    opp.pop(0)
+                qty = round(qty - take, 2)
+            if qty > 0.005:
+                lot = dict(r)
+                lot["open_qty"] = qty
+                lot["closes"] = []
+                lot["realized"] = 0.0
+                lot["last_ts"] = r["ts"]
+                if r.get("purpose") == "sell":
+                    # an exit with no purchase to match: it closed stock
+                    # bought before the journal — not a new position
+                    lot["stray_close"] = True
+                    lot["open_qty"] = 0.0
+                else:
+                    (longs if r["side"] == "BUY" else shorts).append(lot)
+                out.append(lot)
+    return out
+
+
 def build_hash() -> str:
     h = hashlib.sha256()
     for p in sorted(Path(__file__).parent.glob("*.py")):
@@ -769,27 +817,27 @@ class Monitor:
                 "days": days}
 
     def fills_view(self) -> dict:
-        """Every recorded purchase, newest first, joined with where the
-        market stands now — one report per fill for the owner."""
+        """Every purchase as a round trip, newest activity first, joined
+        with where the market stands now — one report per entry lot,
+        updated as its closes land."""
         rows = []
         for tag, fam in self.families.items():
-            for r in fam.fills:
-                row = dict(r)
-                row["family"] = tag
-                row["name"] = self.names.label(r["market"])
-                b = fam.cache.any_age(r["market"])
-                row["now_bid"] = (b.bids[0][0]
-                                  if b is not None and b.bids else None)
-                row["now_ask"] = (b.asks[0][0]
-                                  if b is not None and b.asks else None)
-                inv = fam.inventory.get(r["market"])
-                row["pos_now"] = (round(inv.get("qty", 0.0), 2)
-                                  if inv else 0.0)
-                row["exit_resting"] = any(
-                    o.market == r["market"] and o.purpose == "sell"
+            for card in pair_fills(fam.fills):
+                card["family"] = tag
+                card["name"] = self.names.label(card["market"])
+                b = fam.cache.any_age(card["market"])
+                card["now_bid"] = (b.bids[0][0]
+                                   if b is not None and b.bids else None)
+                card["now_ask"] = (b.asks[0][0]
+                                   if b is not None and b.asks else None)
+                inv = fam.inventory.get(card["market"])
+                card["pos_now"] = (round(inv.get("qty", 0.0), 2)
+                                   if inv else 0.0)
+                card["exit_resting"] = any(
+                    o.market == card["market"] and o.purpose == "sell"
                     for o in fam.orders.values())
-                rows.append(row)
-        rows.sort(key=lambda x: -x["ts"])
+                rows.append(card)
+        rows.sort(key=lambda x: -x.get("last_ts", x["ts"]))
         return {"ok": True, "fills": rows[:100]}
 
     def book_view(self, slug: str) -> dict:

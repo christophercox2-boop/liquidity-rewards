@@ -735,7 +735,7 @@ function fRest(h){if(h==null)return '';return h<1?Math.round(h*60)+' min':(h<48?
 function fCard(f){
  var out='<div class="card">';
  out+='<div><b>'+esc(f.name||f.market)+'</b> <span class="muted" style="font-size:12px">'+esc(f.family||'')+'</span></div>';
- out+='<div style="font-size:16px;margin:2px 0"><b>'+(f.side==='BUY'?'bought':'sold')+' '+f.qty+' @ '+pc(f.px)+'</b> \u00b7 '+fWhen(f.ts)+(f.purpose==='sell'?' \u00b7 an exit \u2014 it reduced the position':'')+'</div>';
+ out+='<div style="font-size:16px;margin:2px 0"><b>'+(f.side==='BUY'?'bought':'sold')+' '+f.qty+' @ '+pc(f.px)+'</b> \u00b7 '+fWhen(f.ts)+(f.stray_close?' \u00b7 an exit':'')+'</div>';
  var plan='The order: '+esc(f.why||'(no note)');
  if(f.est_day)plan+=' \u2014 estimated ~$'+f.est_day.toFixed(2)+'/day while resting';
  if(f.rested_h!=null)plan+=' \u00b7 rested '+fRest(f.rested_h)+' before filling';
@@ -755,15 +755,24 @@ function fCard(f){
  else cl='Filled right at value';
  if(earned!=null)cl+=' \u00b7 earned ~$'+earned.toFixed(2)+' in rewards while it rested';
  out+='<div style="margin:2px 0">'+cl+'</div>';
- if(f.purpose!=='sell'){
-  var mk=null;
-  if(f.side==='BUY'&&f.now_bid!=null)mk=(f.now_bid-f.px)*f.qty;
-  if(f.side==='SELL'&&f.now_ask!=null)mk=(f.px-f.now_ask)*f.qty;
-  var nw='Now: book '+(f.now_bid!=null?pc(f.now_bid):'\u2014')+'/'+(f.now_ask!=null?pc(f.now_ask):'\u2014')+' \u00b7 position '+(f.pos_now!=null?f.pos_now:'?')+(f.exit_resting?' \u00b7 an exit is resting':'');
-  if(mk!=null)nw+='<br><b>This lot marks '+fUsd(mk)+' today'+(earned!=null?' \u00b7 net with rewards '+fUsd(mk+earned):'')+'</b>';
-  out+='<div style="margin:2px 0">'+nw+'</div>';
+ if((f.closes||[]).length){
+  out+='<div style="margin:2px 0">'+f.closes.map(function(c){
+   return '\u21b3 '+(f.side==='BUY'?'sold':'bought back')+' '+c.qty+' @ '+pc(c.px)+' \u00b7 '+fWhen(c.ts)+' \u2192 '+fUsd(c.pl);
+  }).join('<br>')+'</div>';
+ }
+ if(f.stray_close){
+  out+='<div class="muted" style="margin:2px 0">This closed stock bought before the journal began \u2014 no matching purchase on record, so no round-trip math.</div>';
+ }else if(f.open_qty<=0.005){
+  out+='<div style="margin:2px 0"><b>Round trip closed \u2014 realized '+fUsd(f.realized)+(earned!=null?' \u00b7 plus ~$'+earned.toFixed(2)+' rewards while it rested':'')+'</b></div>';
  }else{
-  out+='<div style="margin:2px 0">Position after: '+(f.pos_after!=null?f.pos_after:'?')+'</div>';
+  var oq=f.open_qty!=null?f.open_qty:f.qty;
+  var mk=null;
+  if(f.side==='BUY'&&f.now_bid!=null)mk=(f.now_bid-f.px)*oq;
+  if(f.side==='SELL'&&f.now_ask!=null)mk=(f.px-f.now_ask)*oq;
+  var nw='Now: book '+(f.now_bid!=null?pc(f.now_bid):'\u2014')+'/'+(f.now_ask!=null?pc(f.now_ask):'\u2014')+' \u00b7 position '+(f.pos_now!=null?f.pos_now:'?')+(f.exit_resting?' \u00b7 an exit is resting':'');
+  if(oq<f.qty)nw+='<br>Still open: '+oq+' of '+f.qty+' \u00b7 realized so far '+fUsd(f.realized);
+  if(mk!=null)nw+='<br><b>The open part marks '+fUsd(mk)+' today'+(earned!=null?' \u00b7 net with rewards '+fUsd(mk+earned+(f.realized||0)):'')+'</b>';
+  out+='<div style="margin:2px 0">'+nw+'</div>';
  }
  return out+'</div>';
 }
@@ -774,7 +783,7 @@ function render(d){
   if(!j.ok||!(j.fills||[]).length){el.innerHTML='<div class="card muted">No purchases on record yet \u2014 the journal starts with the next fill.</div>';return;}
   el.innerHTML=j.fills.map(fCard).join('');
  }).catch(function(){});
- return '<div class="card"><div class="muted">One report per purchase, newest first \u2014 what the order was doing, what value looked like at that moment (before the fill itself moved the evidence), and where the lot stands now. The journal starts Aug 21; older fills are not recorded.</div></div><div id="fl"><div class="card muted">loading\u2026</div></div>';
+ return '<div class="card"><div class="muted">One report per purchase, newest activity first \u2014 each buy paired with the sells that unload it, each short sale with its buy-backs. A card updates and moves up when its close lands. The journal starts Aug 21; older fills are not recorded.</div></div><div id="fl"><div class="card muted">loading\u2026</div></div>';
 }
 """
 

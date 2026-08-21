@@ -1333,3 +1333,65 @@ class TestFillJournal(unittest.TestCase):
 
 
 from v3.tests.test_family import A as A_J  # noqa: E402
+
+
+class TestRoundTripPairing(unittest.TestCase):
+    def test_buy_pairs_with_its_sells(self):
+        from v3.main import pair_fills
+        cards = pair_fills([
+            {"ts": 1.0, "market": "m", "side": "BUY", "qty": 100.0,
+             "px": 0.19, "purpose": "earn"},
+            {"ts": 2.0, "market": "m", "side": "SELL", "qty": 40.0,
+             "px": 0.21, "purpose": "sell"},
+        ])
+        self.assertEqual(len(cards), 1)
+        c = cards[0]
+        self.assertEqual(c["open_qty"], 60.0)
+        self.assertEqual(c["closes"][0]["qty"], 40.0)
+        self.assertAlmostEqual(c["realized"], 0.8)
+        self.assertEqual(c["last_ts"], 2.0)
+
+    def test_short_pairs_with_its_buy_back(self):
+        from v3.main import pair_fills
+        cards = pair_fills([
+            {"ts": 1.0, "market": "m", "side": "SELL", "qty": 5.0,
+             "px": 0.93, "purpose": "earn"},
+            {"ts": 2.0, "market": "m", "side": "BUY", "qty": 5.0,
+             "px": 0.90, "purpose": "sell"},
+        ])
+        self.assertEqual(len(cards), 1)
+        c = cards[0]
+        self.assertEqual(c["open_qty"], 0.0)
+        self.assertAlmostEqual(c["realized"], 0.15)
+
+    def test_unmatched_exit_is_a_stray_not_a_short(self):
+        from v3.main import pair_fills
+        cards = pair_fills([
+            {"ts": 1.0, "market": "m", "side": "SELL", "qty": 10.0,
+             "px": 0.70, "purpose": "sell"},
+        ])
+        self.assertEqual(len(cards), 1)
+        self.assertTrue(cards[0].get("stray_close"))
+        self.assertEqual(cards[0]["open_qty"], 0.0)
+
+    def test_fifo_across_lots_and_markets_stay_separate(self):
+        from v3.main import pair_fills
+        cards = pair_fills([
+            {"ts": 1.0, "market": "m", "side": "BUY", "qty": 2.0,
+             "px": 0.10, "purpose": "earn"},
+            {"ts": 2.0, "market": "m", "side": "BUY", "qty": 3.0,
+             "px": 0.20, "purpose": "earn"},
+            {"ts": 3.0, "market": "other", "side": "SELL", "qty": 1.0,
+             "px": 0.50, "purpose": "earn"},
+            {"ts": 4.0, "market": "m", "side": "SELL", "qty": 4.0,
+             "px": 0.30, "purpose": "sell"},
+        ])
+        m_cards = [c for c in cards if c["market"] == "m"]
+        self.assertEqual(len(m_cards), 2)
+        first, second = m_cards
+        self.assertEqual(first["open_qty"], 0.0)        # oldest lot closed first
+        self.assertAlmostEqual(first["realized"], 0.4)  # 2 x (30c - 10c)
+        self.assertEqual(second["open_qty"], 1.0)
+        self.assertAlmostEqual(second["realized"], 0.2)  # 2 x (30c - 20c)
+        other = [c for c in cards if c["market"] == "other"][0]
+        self.assertEqual(other["open_qty"], 1.0)         # an earn short stays open
