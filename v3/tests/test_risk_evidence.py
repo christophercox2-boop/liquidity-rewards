@@ -162,18 +162,22 @@ class TestProbing(unittest.TestCase):
         return Book(bids=((0.05, 9000.0),), asks=((0.95, 9000.0),),
                     tick=0.01, fetched_at=now)
 
-    def test_ungrounded_wide_walls_get_a_scout_not_a_market(self):
-        # Owner, 2026-08-21 (the Massachusetts primary lesson): with no
-        # model and no evidence, the engine must NOT make its own market
-        # in the middle — the scout goes out instead
+    def test_no_model_wide_walls_still_quote_but_at_the_frontier(self):
+        # Owner, 2026-08-21: "Fine to scout ahead when there's no model
+        # as we were doing before" — but never deeper than where the
+        # score maxes out
         from v3.tests.test_family import Rig, A
         r = self.rig()
         r.add_market(A, book=self.unknowable_book(1_000_000.0))
         r.cycle()
         self.assertEqual([o for o in r.fam.orders.values()
-                          if o.purpose == "earn"], [])
-        self.assertTrue([o for o in r.fam.orders.values()
-                         if o.purpose == "probe"])
+                          if o.purpose == "probe"], [])
+        bids = [o for o in r.fam.orders.values()
+                if o.side == "BUY" and o.purpose in ("earn", "solo")]
+        self.assertTrue(bids)
+        for o in bids:
+            self.assertGreater(o.price, 0.05)   # in front of the wall
+            self.assertLess(o.price, 0.16)      # but not past the frontier
 
     def test_grounded_wide_walls_get_a_small_quote_in_front(self):
         # ...and WITH a model, the wide spread is the owner's play: a
@@ -571,21 +575,21 @@ class TestOwnerCorrections0821b(unittest.TestCase):
                     asks=((0.90, 50000.0), (0.98, 500000.0)),
                     tick=0.01, fetched_at=1_000_000.0)
 
-    def test_the_front_opens_only_with_grounding(self):
-        # Owner, 2026-08-21: "this only works in certain politics
-        # markets where I have a sense of what fair value is." No model,
-        # no evidence -> no quoting in front at all (the Massachusetts
-        # and Delaware primary lessons). A model opens the front.
+    def test_the_front_stops_at_the_score_frontier(self):
+        # Owner, 2026-08-21: the question is 27 vs 28 vs 29 — once the
+        # score stops improving, deeper placement is pointless. Model or
+        # no model, the front walk stops at the frontier.
         from v3.tests.test_family import A
-        def front_rows(fair):
+        for fair in (None, 0.50):
             r = self._rig(fair)
             r.add_market(A, book=self.wide_book())
             r.cycle()
-            return [p for p in ((r.fam.scoreboard.get(A) or {})
+            rows = [p for p in ((r.fam.scoreboard.get(A) or {})
                                 .get("plans") or [])
                     if p["side"] == "BUY" and p["px"] > 0.10]
-        self.assertEqual(front_rows(None), [])
-        self.assertTrue(front_rows(0.50))
+            self.assertTrue(rows, fair)
+            for p in rows:
+                self.assertLessEqual(p["px"], 0.20)   # frontier, not mid
 
     def test_heat_shrinks_the_retry_instead_of_closing_the_front(self):
         from v3.tests.test_family import A

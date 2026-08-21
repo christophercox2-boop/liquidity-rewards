@@ -580,6 +580,8 @@ class Family:
             e = (value_ctr - px) if side == "BUY" else (px - value_ctr)
             return max(e / tick, 0.0) * independence
 
+        grid = (tuple(q for q in QTY_GRID if q >= 1.0)
+                if self.cfg.whole_shares else QTY_GRID)
         rungs = tuple(range(0, 16))
         cands = []
         for k in rungs:
@@ -591,25 +593,27 @@ class Family:
                 continue
             if px not in cands:
                 cands.append(px)
-        # How far in front we may quote scales with how much we
-        # INDEPENDENTLY know about fair value (owner, 2026-08-21:
-        # "Obviously this only works in certain politics markets where I
-        # have a sense of what fair value is" — and the Massachusetts
-        # primary lesson: no model, no evidence, so the engine had no
-        # business making its own 1-tick market at 13c). A model opens
-        # the full 50 ticks; fill-built confidence opens it partway; no
-        # grounding keeps us at or behind the touch. College's junk-wall
-        # quirk (allow_improve) keeps its blessed fronting.
-        kf_max = 50.0 * (1.0 if self.cfg.allow_improve else independence)
-        if other and kf_max >= 1.0:
-            for kf in (1, 2, 3, 5, 8, 12, 18, 25, 35, 50):
-                if kf > kf_max:
-                    break
+        # In front of the touch, walk ONLY to the score frontier
+        # (owner, 2026-08-21: "if you can get 100% of the score at 8
+        # cents, why go to 9" — the question is 27 vs 28 vs 29, not 27
+        # vs 44). Each next rung must materially improve the minimum-
+        # size score share, or the walk stops: deeper adds fill risk
+        # and a worse price for nothing.
+        if other:
+            best_share = 0.0
+            for kf in range(1, 51):
                 px = round(touch + kf * sign * tick, 3)
                 if not (0.001 <= px <= 0.999):
-                    continue
+                    break
                 if (px - (other[0][0] - sign * tick)) * sign > 1e-9:
-                    continue
+                    break
+                j = estimate_join(side, levels, tick, df, target, px,
+                                  grid[0])
+                s = j.share if (j.qualifies and j.in_window) else 0.0
+                if best_share > 0 and s <= best_share * 1.01 + 1e-9:
+                    break         # no marginal score out here — pointless
+                if s > best_share:
+                    best_share = s
                 if px not in cands:
                     cands.append(px)
         elif self.cfg.allow_improve and not other:
@@ -641,8 +645,6 @@ class Family:
                      if (px - (cross_px - sign * tick)) * sign <= 1e-9]
         sf = self.fillmodel.scoring_fraction(slug)
         exit_rate_ps = self._exit_rate_ps
-        grid = (tuple(q for q in QTY_GRID if q >= 1.0)
-                if self.cfg.whole_shares else QTY_GRID)
         pick, solo = None, None
         for px in cands:
             cost_ps = px if side == "BUY" else 1.0 - px
