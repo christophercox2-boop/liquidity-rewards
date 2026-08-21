@@ -479,7 +479,7 @@ function render(d){
 GRAPH_JS = """
 function fmtT(ts){var d=new Date(ts*1000);return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
 function drawGraph(name,dots){
- if(!dots||dots.length<2)return '<div class="card"><b>'+esc(name)+'</b><div class="muted">not enough samples yet</div></div>';
+ if(!dots||dots.length<2)return '<div class="card"><b>'+esc(name)+'</b><div class="muted">not enough samples yet \u2014 one dot arrives every 20 seconds</div></div>';
  var W=340,H=150,PL=34,PB=18,PT=8,PR=6;
  var t0=dots[0][0],t1=dots[dots.length-1][0];var span=Math.max(t1-t0,60);
  var ymax=0;dots.forEach(function(d){if(d[1]>ymax)ymax=d[1];});
@@ -504,17 +504,14 @@ function drawGraph(name,dots){
  return '<div class="card"><b>'+esc(name)+'</b> <span class="muted">\u2014 $/day, one dot per 20-second sample \u00b7 now $'+last[1].toFixed(2)+'/day, '+last[2]+' markets in view</span>'+s
   +'<div class="hint">Gaps are minutes the meter could not see a fresh book. The sampling clock is independent \u2014 nothing that places, moves, or cancels orders can touch it.</div></div>';
 }
-function load(){
- fetch('data.json',{headers:hdrs(),cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
-  var out='';
-  [['Politics','est_politics'],['College football','est_cfb'],['NFL','est_nfl']].forEach(function(p){
-   var e=d[p[1]]||{};
-   if((e.dots||[]).length||p[1]!=='est_nfl')out+=drawGraph(p[0],e.dots||[]);
-  });
-  document.getElementById('c').innerHTML=out;
- }).catch(function(){document.getElementById('c').innerHTML='<div class="muted">waking up \u2014 retrying in 20s\u2026</div>';});
+function render(d){
+ var out='';
+ [['Politics','est_politics'],['College football','est_cfb'],['NFL','est_nfl']].forEach(function(p){
+  var e=d[p[1]]||{};
+  if((e.dots||[]).length||p[1]!=='est_nfl')out+=drawGraph(p[0],e.dots||[]);
+ });
+ return out||'<div class="card muted">no samplers armed</div>';
 }
-load();setInterval(load,20000);
 """
 
 GRADES_JS = """
