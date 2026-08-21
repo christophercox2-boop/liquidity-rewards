@@ -1,0 +1,110 @@
+"""The WebSocket book stream — writer 1 of the book cache.
+
+A close port of 1.0's, which REBUILD.md marked worth keeping: every
+frame goes through the same normalizer as the REST fetch so the two
+writers produce identical books; the exchange caps a subscription at
+200 markets, so held and defended markets subscribe first; a dead or
+missing stream degrades to REST polling with no state change anywhere
+(the cache's 15-second interlock does that by itself).
+
+Runs as a daemon thread. If the websockets library is missing the
+status says so and the system simply polls — the stream is an
+optimization, never a dependency.
+"""
+
+from __future__ import annotations
+
+import json
+import threading
+import time
+
+from .api import auth_headers
+from .books import BookCache
+from .programs import to_num
+from .scoring import normalize_book
+
+WS_URL = "wss://api.polymarket.us/v1/ws/markets"
+WS_PATH = "/v1/ws/markets"
+RECONNECT_WAIT_S = 15.0
+RESUBSCRIBE_CHECK_S = 60.0
+SUB_CAP = 200
+
+
+class Stream:
+    """`get_slugs` returns the current subscription list (already
+    priority-ordered, ws_priority's job); the stream reconnects by itself
+    when that list grows."""
+
+    def __init__(self, cache: BookCache, get_slugs, key_id: str, secret_key: str):
+        self.cache = cache
+        self.get_slugs = get_slugs
+        self.key_id, self.secret_key = key_id, secret_key
+        self.status = {"state": "off", "last_msg": 0.0, "subscribed": 0, "note": ""}
+        self._thread: threading.Thread | None = None
+
+    def start(self) -> None:
+        self._thread = threading.Thread(target=self._run, daemon=True, name="ws-books")
+        self._thread.start()
+
+    def apply_frame(self, raw: str | bytes) -> str | None:
+        """Parse one frame into the cache. Returns the slug, or None for
+        frames that aren't book data — one bad frame must never kill the
+        socket."""
+        try:
+            msg = json.loads(raw)
+            md = msg.get("marketData") or {}
+            slug = md.get("marketSlug")
+            if not slug:
+                return None
+            bids = [(to_num(l.get("px")), to_num(l.get("qty")))
+                    for l in md.get("bids") or []]
+            asks = [(to_num(l.get("px")), to_num(l.get("qty")))
+                    for l in md.get("offers") or md.get("asks") or []]
+            self.cache.put(slug, normalize_book(bids, asks, fetched_at=time.time()))
+            self.status["last_msg"] = time.time()
+            return slug
+        except Exception:  # noqa: BLE001
+            return None
+
+    def _run(self) -> None:
+        try:
+            import asyncio
+            import websockets
+        except ImportError:
+            self.status.update(state="unavailable",
+                               note="websockets not installed — REST polling only")
+            return
+
+        async def session() -> None:
+            slugs = self.get_slugs()[:SUB_CAP]
+            headers = auth_headers(self.key_id, self.secret_key, "GET", WS_PATH)
+            try:  # websockets >= 14 renamed the kwarg
+                conn = websockets.connect(WS_URL, additional_headers=headers)
+            except TypeError:
+                conn = websockets.connect(WS_URL, extra_headers=headers)
+            async with conn as ws:
+                await ws.send(json.dumps({"subscribe": {
+                    "requestId": "books",
+                    "subscriptionType": "SUBSCRIPTION_TYPE_MARKET_DATA",
+                    "marketSlugs": slugs,
+                }}))
+                self.status.update(state="live", subscribed=len(slugs), note="")
+                last_check = time.time()
+                while True:
+                    try:
+                        raw = await asyncio.wait_for(ws.recv(), timeout=60)
+                        self.apply_frame(raw)
+                    except asyncio.TimeoutError:
+                        pass  # quiet books are normal
+                    if time.time() - last_check > RESUBSCRIBE_CHECK_S:
+                        last_check = time.time()
+                        if len(self.get_slugs()[:SUB_CAP]) > len(slugs):
+                            return  # reconnect to pick up the larger universe
+
+        while True:
+            try:
+                import asyncio
+                asyncio.run(session())
+            except Exception as e:  # noqa: BLE001 — reconnect after any failure
+                self.status.update(state="reconnecting", note=str(e)[:200])
+                time.sleep(RECONNECT_WAIT_S)

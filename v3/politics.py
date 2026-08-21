@@ -78,7 +78,11 @@ def config() -> FamilyConfig:
         # Picky = a 10c/day entry bar (5x the old one) on a $100 book
         # ranked by what actually paid; not-working = measured under that
         # bar for two hours with nothing better at the market.
-        capital_usd=100.0, per_market_usd=20.0, revive_max_usd=5.0,
+        # revive up to the full per-market cap (owner, 2026-08-21: "we
+        # have to be able to qualify markets that could be winners") —
+        # and with negative-risk netting, qualifying several brackets of
+        # one race barely moves the ceiling
+        capital_usd=100.0, per_market_usd=20.0, revive_max_usd=20.0,
         share_hi=0.10,
         # owner, 2026-08-21: "I would do 30 seconds under 75 cents, but
         # just for politics. There are so many options you can find

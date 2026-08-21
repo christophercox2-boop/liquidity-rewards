@@ -47,7 +47,7 @@ def authed(get_header, query_string: str, password: str) -> bool:
 
 
 NAV = (("status", "."), ("orders", "orders"), ("plan", "plan"),
-       ("log", "log"), ("switch", "switch"))
+       ("grades", "grades"), ("log", "log"), ("switch", "switch"))
 
 _CSS = """
  body{background:#151b12;color:#e8ecdf;font:16px/1.45 -apple-system,system-ui,sans-serif;
@@ -185,9 +185,12 @@ function render(d){
   var inv=s.inventory||{};var invn=Object.keys(inv).length;
   if(invn){out+='<div class="muted">'+invn+' position'+(invn>1?'s':'')+' held from fills \\u2014 see orders page.</div>';}
   out+='<div class="muted">'+(s.markets||0)+' markets known, '+(s.scanned||0)+' scored'
+  if(s.unmeasured_min>1){out+='<div class="muted">'+s.unmeasured_min+' min of today went unmeasured (books too stale to score) \\u2014 counted as zero, never guessed.</div>';}
    +(s.resting_ok===false?' \\u2014 <span class="warn">game window: resting is paused</span>':'')+'.</div>';
   out+='</div>';
  });
+ var ws=(d.ws||{});
+ if(ws.state){out+='<div class="muted">book stream: '+esc(ws.state)+(ws.subscribed?' ('+ws.subscribed+' markets live)':'')+'</div>';}
  var errs=d.errors||[];
  if(errs.length){out+='<div class="card"><details><summary class="muted">recent notes ('+errs.length+')</summary>';
   errs.slice(-8).reverse().forEach(function(e){out+='<div class="muted">'+esc(e)+'</div>';});
@@ -326,11 +329,30 @@ function render(d){
 }
 """
 
+GRADES_JS = """
+function render(d){
+ var rows=(d.grades||[]);
+ var out='<div class="card"><b>Estimate vs. what the exchange paid</b>';
+ out+='<div class="hint">The estimate is 3.0's own sampler \\u2014 measured on an independent clock, accruing only while books are fresh. Actuals are the account's posted rewards (during the transition the older versions' books pay into the same number). No fudge factors: a gap means an input was wrong, and the unmeasured minutes say how much of the day went unscored.</div>';
+ if(!rows.length){out+='<div class="muted">Nothing to grade yet \\u2014 the first full day under 3.0 lands tomorrow.</div>';}
+ var mx=1;rows.forEach(function(r){mx=Math.max(mx,r.est||0,r.actual||0);});
+ rows.slice().reverse().forEach(function(r){
+  out+='<div style="margin:10px 0 0"><b>'+esc(r.day)+'</b>';
+  out+=' <span class="muted">est '+(r.est==null?'\\u2014':usd(r.est))+' \\u00b7 paid '+(r.actual==null?'not posted yet':usd(r.actual))+(r.unmeasured_min>1?' \\u00b7 '+r.unmeasured_min+'m unmeasured':'')+'</span>';
+  if(r.est!=null){out+='<div class="mtrack"><div class="mfill" style="width:'+(100*(r.est||0)/mx)+'%"></div></div>';}
+  if(r.actual!=null){out+='<div class="mtrack"><div class="mfill" style="width:'+(100*(r.actual||0)/mx)+'%;background:#8a7a2f"></div></div>';}
+  out+='</div>';
+ });
+ return out+'</div>';
+}
+"""
+
 PAGES = {
     "/": ("3.0 — status", "status", STATUS_JS),
     "/orders": ("3.0 — orders", "orders", ORDERS_JS),
     "/plan": ("3.0 — the plan", "plan", PLAN_JS),
     "/switch": ("3.0 — switches", "switch", SWITCH_JS),
+    "/grades": ("3.0 — grades", "grades", GRADES_JS),
     "/log": ("3.0 — log", "log", LOG_JS),
 }
 

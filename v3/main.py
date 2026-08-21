@@ -23,6 +23,7 @@ from __future__ import annotations
 import hashlib
 import os
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -34,9 +35,12 @@ from .family import Family
 from .floor import Floor
 from .names import Names
 from .orders import OrderDesk
+from .books import ws_priority
+from .estimator import Estimator
 from .silver import SilverFairs
 from .state import StateStore
 from .switch import MasterSwitch
+from .ws import Stream
 
 POLL_S = 60.0
 ERROR_BACKOFF_CAP_S = 600.0
@@ -92,7 +96,7 @@ def load_history() -> dict[str, float]:
     guides, it never blocks."""
     tok = os.environ.get("GITHUB_TOKEN", "")
     if not tok:
-        return {}
+        return {}, {}
     import csv
     import io
     from collections import defaultdict
@@ -106,9 +110,10 @@ def load_history() -> dict[str, float]:
                      "Accept": "application/vnd.github.raw+json"},
             timeout=30)
         if r.status_code >= 400:
-            return {}
+            return {}, {}
         paid: dict = defaultdict(float)
         days: dict = defaultdict(set)
+        day_totals: dict = defaultdict(float)
         for row in csv.DictReader(io.StringIO(r.text)):
             v = float(row.get("reward_usd") or 0)
             if v <= 0:
@@ -116,10 +121,12 @@ def load_history() -> dict[str, float]:
             mkt = row.get("market") or ""
             paid[mkt] += v
             days[mkt].add(row.get("date"))
-        return {mkt: round(paid[mkt] / max(len(days[mkt]), 1), 4)
-                for mkt in paid}
+            day_totals[row.get("date") or "?"] += v
+        return ({mkt: round(paid[mkt] / max(len(days[mkt]), 1), 4)
+                 for mkt in paid},
+                {d: round(v, 2) for d, v in day_totals.items()})
     except Exception:  # noqa: BLE001
-        return {}
+        return {}, {}
 
 
 def build_hash() -> str:
@@ -172,6 +179,9 @@ class Monitor:
         self.last_flat: dict | None = None
         self._history_at = 0.0
         self.silver = SilverFairs(client=self.client)
+        self.samplers: dict[str, Estimator] = {}
+        self.actuals_by_day: dict[str, float] = {}
+        self._lock = threading.Lock()
         self.families: dict[str, Family] = {}
         self.switches: dict[str, MasterSwitch] = {}
         for key, (cfg_fn, discover) in FAMILIES.items():
@@ -194,6 +204,14 @@ class Monitor:
                 fam.fairs = self.silver.model_fair
             self.families[key] = fam
             self.switches[key] = sw
+            self.samplers[key] = Estimator()
+        # The book stream: politics markets subscribe first (its cache is
+        # the one the stream writes); a dead stream degrades to REST
+        # polling through the cache's own age interlock.
+        pol = self.families.get("politics")
+        self.stream = (Stream(pol.cache, self._ws_slugs,
+                              self.client.key_id, self.client.secret_key)
+                       if pol is not None else None)
         self._restore()
         self.boots = [b for b in self.boots if time.time() - b < 86400]
         self.boots.append(time.time())
@@ -201,6 +219,33 @@ class Monitor:
         # master came back ON, the request must be back on disk before 1.0's
         # first automation pass, not a poll later.
         self.floor.write_want(self.master.on or self.flatten)
+
+    def _ws_slugs(self) -> list[str]:
+        fam = self.families["politics"]
+        held = sorted(fam.active_markets() | set(fam.inventory))
+        top = [s for s, sb in sorted(fam.scoreboard.items(),
+                                     key=lambda kv: -(kv[1].get("est") or 0.0))
+               if sb.get("plans")][:120]
+        return ws_priority(held, [], held + top)
+
+    def _sampler_loop(self) -> None:
+        """The independent clock (REBUILD.md's lesson): earnings are
+        sampled every 20s by this thread, never by anything that just
+        placed an order. Nothing here can touch an order."""
+        while True:
+            time.sleep(20.0)
+            now = time.time()
+            with self._lock:
+                for key, fam in self.families.items():
+                    try:
+                        orders = [{"market": o.market, "side": o.side,
+                                   "price": o.price, "size": o.qty}
+                                  for o in fam.orders.values()]
+                        self.samplers[key].sample(
+                            now, orders, fam.cache, fam.terms,
+                            side_pool=lambda s, p, f=fam: f._side_pool(s, p))
+                    except Exception:  # noqa: BLE001 — measuring never breaks
+                        pass
 
     def _audit(self, row: dict) -> None:
         self.audit.append(row)
@@ -228,6 +273,10 @@ class Monitor:
                 fam.restore(saved[f"fam_{key}"])
             if saved.get(f"sw_{key}"):
                 self.switches[key].restore(saved[f"sw_{key}"])
+            if saved.get(f"est_{key}"):
+                self.samplers[key] = Estimator.from_dict(saved[f"est_{key}"])
+            if saved.get(f"evi_{key}"):
+                fam.evidence.restore(saved[f"evi_{key}"])
         self.errors = list(saved.get("errors") or [])
         self.boots = list(saved.get("boots") or [])
         self.audit = list(saved.get("audit") or [])
@@ -243,6 +292,31 @@ class Monitor:
                                f"build {self.build} booted; may place orders "
                                f"({', '.join(armed)})")
 
+    def _grades(self) -> list[dict]:
+        """Per-day estimate vs what the exchange actually paid. The
+        estimate is 3.0's own sampler from the day it took over; the
+        actuals are the whole account's postings (during the transition
+        the older versions' books pay into the same number — labelled so
+        on the page)."""
+        est_by_day: dict[str, dict] = {}
+        for key, est in self.samplers.items():
+            for h in est.history:
+                row = est_by_day.setdefault(h["day"], {"est": 0.0, "stale_s": 0.0})
+                row["est"] += h.get("earned") or 0.0
+                row["stale_s"] += h.get("stale_s") or 0.0
+            if est.day:
+                row = est_by_day.setdefault(est.day, {"est": 0.0, "stale_s": 0.0})
+                row["est"] += est.earned
+                row["stale_s"] += est.stale_s
+        days = sorted(set(est_by_day) | set(self.actuals_by_day))[-14:]
+        return [{"day": d,
+                 "est": round(est_by_day.get(d, {}).get("est", 0.0), 2)
+                 if d in est_by_day else None,
+                 "actual": self.actuals_by_day.get(d),
+                 "unmeasured_min": round(
+                     est_by_day.get(d, {}).get("stale_s", 0.0) / 60.0, 1)}
+                for d in days]
+
     def _state(self, now: float, summaries: dict) -> dict:
         st = {
             "saved_at": now, "build": self.build, "boot_ts": self.boot_ts,
@@ -254,6 +328,8 @@ class Monitor:
             "names": self.names.to_dict(),
             "summaries": summaries,
             "floor": self.floor.status(now),
+            "ws": dict(self.stream.status) if self.stream else {},
+            "grades": self._grades(),
             "flatten": ({"active": self.flatten,
                          "done": self.flatten_done, **(self.last_flat or {})}
                         if self.flatten else {"active": False}),
@@ -261,6 +337,8 @@ class Monitor:
         }
         for key, fam in self.families.items():
             st[f"fam_{key}"] = fam.to_dict()
+            st[f"est_{key}"] = self.samplers[key].to_dict()
+            st[f"evi_{key}"] = fam.evidence.to_dict()
             st[f"sw_{key}"] = self.switches[key].to_dict()
             st[f"touches_{key}"] = touch_snapshot(fam, now)
         return st
@@ -366,6 +444,10 @@ class Monitor:
 
     def cycle(self, now: float | None = None) -> dict:
         now = now or time.time()
+        with self._lock:
+            return self._cycle_locked(now)
+
+    def _cycle_locked(self, now: float) -> dict:
         self.flatten = flatten_active()
         self.floor.write_want(self.master.on or self.flatten)
         self._floor_ok = self.floor.acked(now)
@@ -380,10 +462,12 @@ class Monitor:
             self._note(f"silver: {e}")
         if now - self._history_at > 6 * 3600.0:
             self._history_at = now
-            hist = load_history()
+            hist, day_totals = load_history()
             if hist:
                 for fam in self.families.values():
                     fam.history = hist
+            if day_totals:
+                self.actuals_by_day = day_totals
         summaries = {}
         for key, fam in self.families.items():
             on = self.master.on and self.switches[key].on and self._floor_ok
@@ -396,6 +480,10 @@ class Monitor:
                                            foreign_ids=foreign,
                                            exits_only=exits_only)
                 summaries[key]["name"] = fam.cfg.name
+                est = self.samplers[key]
+                summaries[key]["earned_today"] = round(est.earned, 2)
+                summaries[key]["est_rate"] = round(est.rate, 2)
+                summaries[key]["unmeasured_min"] = round(est.stale_s / 60.0, 1)
                 if (self.master.on and self.switches[key].on
                         and not self._floor_ok):
                     summaries[key]["mode"] = "waiting for the floor"
@@ -412,6 +500,10 @@ class Monitor:
         from .web import WebServer
         web = WebServer(self)
         web.start()
+        if self.stream is not None:
+            self.stream.start()
+        threading.Thread(target=self._sampler_loop, daemon=True,
+                         name="sampler").start()
         self._note(f"serving on :{web.port}")
         backoff = 5.0
         while True:

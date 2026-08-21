@@ -46,8 +46,10 @@ import time
 from dataclasses import dataclass, field
 from zoneinfo import ZoneInfo
 
+from . import risk
 from .books import BookCache
-from .intents import BUY_LONG, SELL_LONG, SELL_SHORT, capital_at_risk
+from .evidence import Evidence
+from .intents import BUY_LONG, BUY_SHORT, SELL_LONG, SELL_SHORT, capital_at_risk
 from .orders import OrderDesk
 from .scoring import estimate_join
 from .terms import TermsStore
@@ -137,6 +139,7 @@ class FamilyOrder:
     live_est: float | None = None
     live_share: float | None = None
     weak_since: float = 0.0   # measuring under the bar since (0 = fine)
+    rest_noted: float = 0.0   # last time quiet resting was logged as evidence
     verdict: str = ""    # plain-English live state, refreshed each cycle
 
 
@@ -192,6 +195,7 @@ class Family:
         self.alert = alert or (lambda title, msg: None)
         self.names = names
         self.fairs = None      # callable(slug) -> model fair prob | None
+        self.evidence = Evidence(clock=clock)
         self._clock = clock or time.time
         self.terms = TermsStore()
         self.universe: dict[str, dict] = {}       # slug -> {event_n, ...}
@@ -245,9 +249,11 @@ class Family:
                    if o.market == slug and o.purpose != "sell")
 
     def family_spent(self) -> float:
-        """The one risk number: collateral across every resting order."""
-        return sum(capital_at_risk(o.intent, o.price, o.qty)
-                   for o in self.orders.values() if o.purpose != "sell")
+        """The one risk number: the WORST CASE the resting book can lose,
+        with negative risk netted inside each race group (mutually
+        exclusive outcomes can't all pay against us — v3/risk.py). Never
+        more than the gross collateral sum, often much less."""
+        return risk.book_risk(risk.order_legs(self.orders.values()))
 
     def active_markets(self) -> set[str]:
         return {o.market for o in self.orders.values() if o.purpose != "sell"}
@@ -394,14 +400,16 @@ class Family:
                       else other[0][0] - sign * 5 * tick)
             qty = round(gap * 1.02 + 1.0, 2)
             best = None
-            fair_r = self.fairs(slug) if self.fairs is not None else None
+            r_lo, r_hi = self._price_bounds(
+                slug, levels if side == "BUY" else other,
+                other if side == "BUY" else levels, tick)
             for k in (0, 1, 2, 3):
                 px = round(anchor - k * sign * tick, 3)
                 if not (0.001 <= px <= 0.999):
                     continue
-                if fair_r is not None and (
-                        px > fair_r + 2 * tick if side == "BUY"
-                        else px < fair_r - 2 * tick):
+                if side == "BUY" and r_hi is not None and px > r_hi + 2 * tick:
+                    continue
+                if side == "SELL" and r_lo is not None and px < r_lo - 2 * tick:
                     continue
                 if other and (px >= other[0][0] - 1e-9 if side == "BUY"
                               else px <= other[0][0] + 1e-9):
@@ -439,12 +447,17 @@ class Family:
         if self.cfg.rest_style == "join_quiet":
             v = self.cache.volatility_of(slug)
             join_ok = v is not None and v <= self.cfg.vol_quiet
-        # Never rest on the wrong side of the Silver model's value: a bid
-        # above fair (or an ask below it) is offering to fill at a loss to
-        # the model. Two ticks of slack; markets the model can't price are
-        # unfiltered (owner, 2026-08-21: "build back in info from Nate
-        # Silver model").
-        fair = self.fairs(slug) if self.fairs is not None else None
+        # Never rest on the wrong side of what we KNOW a market is worth.
+        # "Know" is the evidence band: the Silver model as prior where it
+        # prices the market, pulled by real events — our fills (strong),
+        # our orders sitting quietly (weak), the de-baited touches
+        # (anchors). Bids stay under the band's high edge, asks above its
+        # low edge; no band means no filter.
+        b_lo, b_hi = self._price_bounds(
+            slug, levels if side == "BUY" else other,
+            other if side == "BUY" else levels, tick)
+        if join_ok and self.evidence.heat(slug) > 0:
+            join_ok = False    # our orders are getting eaten here — step back
         rungs = ((0,) if join_ok else ()) + (1, 2, 3, 6, 10, 15)
         cands = []
         for k in rungs:
@@ -454,9 +467,9 @@ class Family:
             if other and (px >= other[0][0] - 1e-9 if side == "BUY"
                           else px <= other[0][0] + 1e-9):
                 continue
-            if fair is not None and (
-                    px > fair + 2 * tick if side == "BUY"
-                    else px < fair - 2 * tick):
+            if side == "BUY" and b_hi is not None and px > b_hi + 2 * tick:
+                continue
+            if side == "SELL" and b_lo is not None and px < b_lo - 2 * tick:
                 continue
             if px not in cands:
                 cands.append(px)
@@ -522,6 +535,35 @@ class Family:
         if solo is not None and solo["est"] >= self.cfg.min_est_day:
             return solo
         return None
+
+    def _band(self, slug: str, bids, asks, tick: float) -> dict | None:
+        """The evidence band for a market: Silver as prior when it prices
+        it, real touches (levels holding at least 5 shares — smaller is
+        bait, 1.0's rule) as anchors."""
+        fair = self.fairs(slug) if self.fairs is not None else None
+        bb = next((p for p, q in (bids or ()) if q >= 5.0), None)
+        ba = next((p for p, q in (asks or ()) if q >= 5.0), None)
+        return self.evidence.band(slug, prior_fair=fair, touches=(bb, ba))
+
+    def _price_bounds(self, slug: str, bids, asks,
+                      tick: float) -> tuple[float | None, float | None]:
+        """(lo, hi) price bounds in DOLLARS for resting, or Nones.
+
+        The hierarchy is 1.0's, stated once: a real trade is strong
+        evidence, everything else is weak. With fewer than two of OUR
+        fills on record, the Silver model BINDS — the band may not carry
+        a bid above fair or an ask below it just because the market's
+        touches sit elsewhere (the market being far from the model is
+        the reason the model is here). Two or more real fills and the
+        evidence band takes over."""
+        band = self._band(slug, bids, asks, tick)
+        fair = self.fairs(slug) if self.fairs is not None else None
+        lo = band["lo"] / 100.0 if band else None
+        hi = band["hi"] / 100.0 if band else None
+        if fair is not None and (band is None or band["fills"] < 2):
+            hi = fair if hi is None else min(hi, fair)
+            lo = fair if lo is None else max(lo, fair)
+        return lo, hi
 
     def plan_market(self, book, slug: str) -> tuple[list[dict], str]:
         """Both sides' best entries, within the caps. Returns (plans, why)
@@ -597,6 +639,7 @@ class Family:
             inv["cost"] -= filled * rec.price
         if abs(inv["qty"]) < 0.005:
             self.inventory.pop(rec.market, None)
+        self.evidence.fill(rec.market, rec.side, rec.price, ts=now)
         self._log(event="fill", market=rec.market, side=rec.side,
                   price=rec.price, qty=round(filled, 2))
         self.alert(f"{self.cfg.tag} order filled",
@@ -804,6 +847,9 @@ class Family:
                 continue
             rec.live_est = round(j.share * side_pool
                                  if j.qualifies and j.in_window else 0.0, 4)
+            if rec.purpose != "sell" and now - rec.rest_noted > 1800.0:
+                rec.rest_noted = now
+                self.evidence.rested(rec.market, rec.side, rec.price, ts=now)
             if not j.qualifies:
                 rec.verdict = ("its side is below Target Size — the whole "
                                "side pays nobody right now")
@@ -932,9 +978,12 @@ class Family:
                         > self.cfg.per_market_usd + 1e-9 \
                         and not plan.get("revive"):
                     continue
-                if self.family_spent() + plan["cost"] \
+                guess = BUY_LONG if plan["side"] == "BUY" else BUY_SHORT
+                if self.family_spent() + risk.marginal(
+                        self.orders.values(), slug, guess,
+                        plan["px"], plan["qty"]) \
                         > self.cfg.capital_usd + 1e-9:
-                    continue          # THE ceiling — one number, it binds
+                    continue          # THE ceiling — worst case, it binds
                 book = self.cache.fresh(slug, BOOK_MAX_AGE, now)
                 if book is None:
                     continue
