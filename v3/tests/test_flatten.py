@@ -1507,3 +1507,113 @@ class TestProvenBudgetActsToo(unittest.TestCase):
                  if o.market == A and o.purpose == "earn"]
         self.assertTrue(earns)          # $25 plan fits the $40 proven cap
         self.assertEqual(earns[0].qty, 250.0)
+
+
+class TestNoSelfBidding(unittest.TestCase):
+    def _rig(self, with_ours):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        from v3.scoring import Book
+        r = Rig(switch=False)
+        r.add_market(A, book=Book(
+            bids=((0.91, 2.0), (0.85, 6000.0)),
+            asks=((0.95, 9000.0),),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.cycle()
+        if with_ours:
+            r.fam.orders["S1"] = FamilyOrder(
+                id="S1", market=A, side="BUY", price=0.91, qty=2.0,
+                intent=BUY_LONG, placed_ts=1.0, purpose="earn")
+        return r
+
+    def _plan(self, r, ladder=None):
+        from v3.tests.test_family import A
+        b = r.cache.fresh(A, 3600, r.now)
+        p, _ = r.fam._prog_row(A)
+        sp = r.fam._side_pool(A, p)
+        return r.fam._plan_side(A, b, "BUY", p, sp, 10.0, ladder=ladder)
+
+    def test_side_that_is_only_us_gets_no_plan(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        from v3.scoring import Book
+        r = Rig(switch=False)
+        r.add_market(A, book=Book(bids=((0.50, 6000.0),),
+                                  asks=((0.60, 100000.0),),
+                                  tick=0.01, fetched_at=1_000_000.0))
+        r.cycle()
+        r.fam.orders["S1"] = FamilyOrder(
+            id="S1", market=A, side="BUY", price=0.50, qty=6000.0,
+            intent=BUY_LONG, placed_ts=1.0, purpose="earn")
+        self.assertIsNone(self._plan(r))
+
+    def test_our_touch_is_not_the_touch(self):
+        r = self._rig(with_ours=True)
+        rows = []
+        self._plan(r, ladder=rows)
+        joins = [w for w in rows
+                 if abs(w["px"] - 0.85) < 1e-9 and "joins the touch" in w["why"]]
+        self.assertTrue(joins)      # 85c, not our own 91c, is the touch
+
+    def test_fronting_our_own_order_is_charged(self):
+        rows_a, rows_b = [], []
+        self._plan(self._rig(with_ours=False), ladder=rows_a)
+        self._plan(self._rig(with_ours=True), ladder=rows_b)
+        by_a = {(w["px"], w["qty"]): w["ev"] for w in rows_a}
+        by_b = {(w["px"], w["qty"]): w["ev"] for w in rows_b}
+        shared = [k for k in by_b if k in by_a and k[0] > 0.911]
+        self.assertTrue(shared)
+        for k in shared:    # in front of our 2 @ 91c on a thin side:
+            self.assertLess(by_b[k], by_a[k] - 0.5)   # pays what it steals
+
+
+class TestCapitalInTheEv(unittest.TestCase):
+    def test_selling_held_stock_beats_a_naked_short(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        rows = {}
+        for held in (0.0, 500.0):
+            r = Rig(switch=False)
+            r.add_market(A, book=Book(
+                bids=((0.40, 9000.0),),
+                asks=((0.60, 3000.0), (0.62, 4000.0)),
+                tick=0.01, fetched_at=1_000_000.0))
+            r.cycle()
+            if held:
+                r.fam.inventory[A] = {"qty": held, "cost": held * 0.5}
+                r.positions[A] = (held, held * 0.5)
+            r.fam._exit_opportunity_rate = lambda: 0.10
+            lad = []
+            b = r.cache.fresh(A, 3600, r.now)
+            p, _ = r.fam._prog_row(A)
+            sp = r.fam._side_pool(A, p)
+            r.fam._plan_side(A, b, "SELL", p, sp, 10.0, ladder=lad)
+            rows[held] = {(w["px"], w["qty"]): w["ev"] for w in lad}
+        shared = [k for k in rows[500.0] if k in rows[0.0]]
+        self.assertTrue(shared)
+        for k in shared:   # stock to unload: no collateral tied + release credit
+            self.assertGreater(rows[500.0][k], rows[0.0][k])
+
+
+class TestLossCutExits(unittest.TestCase):
+    def test_floor_moves_to_fair_only_when_model_says_worse(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        r.fam.fairs = lambda s: None
+        self.assertEqual(r.fam._exit_floor(A, "SELL", 0.50, 0.01),
+                         (0.51, 0.50))
+        self.assertEqual(r.fam._exit_floor(A, "BUY", 0.93, 0.01),
+                         (0.92, 0.93))
+        r.fam.fairs = lambda s: 0.9998    # the Massachusetts short
+        self.assertEqual(r.fam._exit_floor(A, "BUY", 0.93, 0.01),
+                         (0.998, 0.998))
+        r.fam.fairs = lambda s: 0.10      # stock worth less than we paid
+        self.assertEqual(r.fam._exit_floor(A, "SELL", 0.50, 0.01),
+                         (0.10, 0.10))
+        r.fam.fairs = lambda s: 0.60      # model AGREES with break-even
+        self.assertEqual(r.fam._exit_floor(A, "SELL", 0.50, 0.01),
+                         (0.51, 0.50))

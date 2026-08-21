@@ -540,7 +540,8 @@ class Family:
                 fc_r = self.fillmodel.fill_cost(slug, side, px, r_ctr,
                                                 exit_rate_ps=self._exit_rate_ps)
                 ev = (est * self.fillmodel.scoring_fraction(slug)
-                      - pf_r * fc_r * qty)
+                      - pf_r * fc_r * qty
+                      - cost * self._exit_opportunity_rate())
                 if best is None or ev > best["ev"]:
                     best = {"side": side, "px": px, "qty": qty,
                             "share": round(j.share, 4), "est": round(est, 4),
@@ -572,7 +573,27 @@ class Family:
             if not levels:
                 return None
         # -- the side qualifies: join or step back, never in front --
-        touch = levels[0][0]
+        # Never plan against ourselves (the Massachusetts rule,
+        # generalized on the owner's word 2026-08-21: "Aren't I just
+        # bidding against myself?"). Every order WE have resting on this
+        # side comes out of the book before the touch is read; the share
+        # math below still uses the full book, because the program counts
+        # our size like anyone else's.
+        mine_orders = [o for o in self.orders.values()
+                       if o.market == slug and o.side == side
+                       and (own is None or o.id != own.id)]
+        mine_at: dict[float, float] = {}
+        for o in mine_orders:
+            pk = round(o.price, 3)
+            mine_at[pk] = mine_at.get(pk, 0.0) + o.qty
+        others = []
+        for p2, q2 in levels:
+            q3 = q2 - mine_at.get(round(p2, 3), 0.0)
+            if q3 > 1e-9:
+                others.append((p2, q3))
+        if not others:
+            return None   # the only real orders on this side are ours
+        touch = others[0][0]
         # Every price level is an option (owner, 2026-08-21): the EV math
         # walks the whole in-window ladder and picks the best spot.
         # Joining an occupied level is safer than the distance alone
@@ -686,6 +707,25 @@ class Family:
                      if (px - (cross_px - sign * tick)) * sign <= 1e-9]
         sf = self.fillmodel.scoring_fraction(slug)
         exit_rate_ps = self._exit_rate_ps
+        r_day = self._exit_opportunity_rate()
+        d_off = self.fillmodel.expected_offload_days(slug)
+        inv_net = (self.inventory.get(slug) or {}).get("qty", 0.0)
+
+        def _minus(lv, price, q0):
+            out = []
+            for p3, q3 in lv:
+                if abs(p3 - price) < tick / 2:
+                    q3 = q3 - q0
+                if q3 > 1e-9:
+                    out.append((p3, q3))
+            return out
+
+        est0 = 0.0
+        for o in mine_orders:
+            j0 = estimate_join(side, _minus(levels, o.price, o.qty), tick,
+                               df, target, o.price, o.qty)
+            if j0.qualifies and j0.in_window:
+                est0 += j0.share * side_pool
         contenders: list[dict] = []
         for px in cands:
             cost_ps = px if side == "BUY" else 1.0 - px
@@ -738,7 +778,33 @@ class Family:
                 if not (j.qualifies and j.in_window):
                     break
                 est = j.share * side_pool
-                ev = est * sf - pf * fcost * qty
+                # marginal, not gross (owner, 2026-08-21): what this
+                # order ADDS is its own score minus what it takes from
+                # our other orders already resting on this side
+                cann = 0.0
+                if mine_orders:
+                    cl = list(levels) + [(px, qty)]
+                    est1 = 0.0
+                    for o in mine_orders:
+                        j1 = estimate_join(side, _minus(cl, o.price, o.qty),
+                                           tick, df, target, o.price, o.qty)
+                        if j1.qualifies and j1.in_window:
+                            est1 += j1.share * side_pool
+                    cann = max(est0 - est1, 0.0)
+                # capital is charged AND credited (owner, 2026-08-21):
+                # collateral tied while resting costs the marginal-cent
+                # rate; capital a fill RELEASES earns it back over the
+                # measured redeploy horizon
+                if side == "BUY":
+                    covers = max(min(qty, -inv_net), 0.0)
+                    tie = px * qty
+                    freed = (1.0 - px) * covers
+                else:
+                    sells = max(min(qty, inv_net), 0.0)
+                    tie = (1.0 - px) * (qty - sells)
+                    freed = px * sells
+                ev = ((est - cann) * sf - pf * fcost * qty
+                      - tie * r_day + pf * freed * r_day * d_off)
                 k = k_px
                 kf = round(abs(px - touch) / tick)
                 row = {"side": side, "px": px, "qty": qty,
@@ -1707,15 +1773,18 @@ class Family:
             return
         if side == "SELL":
             break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
-            lo = max(break_even + book.tick,
+            floor_px, _sb = self._exit_floor(slug, "SELL", break_even,
+                                             book.tick)
+            lo = max(floor_px,
                      (book.bids[0][0] + book.tick) if book.bids else 0.002)
             hi = max((book.asks[0][0] if book.asks
                       else break_even + book.tick), lo)
         else:
             received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
-            hi = min(received - book.tick,
+            cap_px, _sb = self._exit_floor(slug, "BUY", received, book.tick)
+            hi = min(cap_px,
                      (book.asks[0][0] - book.tick) if book.asks
-                     else received - book.tick)
+                     else cap_px)
             lo = min((book.bids[0][0] if book.bids else hi), hi)
         best = self._best_exit_px(slug, side, book, lo, hi, rec.qty)
         if best is None or abs(best - rec.price) < book.tick / 2:
@@ -1739,6 +1808,25 @@ class Family:
             self._log(event="exit_moved", market=slug, price=rec.price,
                       qty=rec.qty,
                       note=f"a slot at {best:.2f} earns more — moving")
+
+    def _exit_floor(self, slug: str, side: str, basis: float,
+                    tick: float) -> tuple[float, float]:
+        """(price limit, scoring basis) for an exit. Break-even bounds it
+        by default. When the model prices the market and says holding to
+        resolution loses MORE than closing near fair, the limit extends
+        to fair — a loss-cutting exit, allowed on the owner's word
+        (2026-08-21, the Massachusetts short). The scoring basis moves to
+        fair with it, so the slot scorer sees the true gain of closing."""
+        fair = self.fairs(slug) if self.fairs is not None else None
+        if side == "SELL":
+            if fair is not None and fair < basis:
+                fl = max(fair, 0.002)
+                return fl, fl
+            return basis + tick, basis
+        if fair is not None and fair > basis:
+            cp = min(fair, 0.998)
+            return cp, cp
+        return basis - tick, basis
 
     def _exit_opportunity_rate(self) -> float:
         """$/day one freed cent could earn — the owner's definition
@@ -1846,14 +1934,16 @@ class Family:
                 if rest < 0.01 or not self._cooldown_ok(slug, "SELL", now):
                     continue
                 break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
+                floor_px, score_basis = self._exit_floor(
+                    slug, "SELL", break_even, book.tick)
                 ask_touch = (book.asks[0][0] if book.asks
                              else break_even + book.tick)
-                lo = max(break_even + book.tick,
+                lo = max(floor_px,
                          (book.bids[0][0] + book.tick) if book.bids
                          else 0.002)
                 px = self._best_exit_px(slug, "SELL", book, lo,
                                         max(ask_touch, lo), rest,
-                                        basis=break_even)
+                                        basis=score_basis)
                 px = min(max(px, 0.002), 0.999)
                 side, intent, rest_qty = "SELL", SELL_LONG, rest
                 why = "selling filled stock — it earns while it waits"
@@ -1875,14 +1965,16 @@ class Family:
                 if rest < 0.01 or not self._cooldown_ok(slug, "BUY", now):
                     continue
                 received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
+                cap_px, score_basis = self._exit_floor(
+                    slug, "BUY", received, book.tick)
                 bid_touch = (book.bids[0][0] if book.bids
                              else received - book.tick)
-                hi = min(received - book.tick,
+                hi = min(cap_px,
                          (book.asks[0][0] - book.tick) if book.asks
-                         else received - book.tick)
+                         else cap_px)
                 px = self._best_exit_px(slug, "BUY", book,
                                         min(bid_touch, hi), hi, rest,
-                                        basis=received)
+                                        basis=score_basis)
                 px = min(max(px, 0.001), 0.999)
                 side, intent, rest_qty = "BUY", SELL_SHORT, rest
                 why = ("buying back the short at or under what it sold "

@@ -980,8 +980,10 @@ class Monitor:
             self._stage(f"{fam.cfg.name}: discovering, reading terms, "
                         f"scoring books", fam_pct.get(key, 94))
             if fam.cfg.proven_usd > 0:
-                per_mkt = self.samplers[key].per_market
-                fam.proven = {mkt for mkt, usd in per_mkt.items()
+                # graduation is earned with PAID money, not estimates
+                # (owner, 2026-08-21): history is avg $/day the rewards
+                # feed actually posted for the market
+                fam.proven = {mkt for mkt, usd in fam.history.items()
                               if usd >= fam.cfg.graduate_paid_usd}
             on = self.master.on and self.switches[key].on and self._floor_ok
             foreign = {oid for k2, f2 in self.families.items() if k2 != key
