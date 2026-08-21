@@ -430,10 +430,12 @@ class Monitor:
         for d, v in totals.items():
             self.actuals_by_day[d] = round(v, 2)
         # the baseline must survive a deploy between now and the next save
+        # — local AND remote, immediately (a rebuild replaces the disk)
         if self.last_state:
             self.last_state["rewards_seen"] = self.rewards_seen
             self.last_state["actuals_by_day"] = self.actuals_by_day
             self.store.save_local(self.last_state)
+            self.store.save_remote(self.last_state)
         days = {d: round(v, 2) for d, v in sorted(totals.items())}
         if first:
             # the FIRST check has nothing to compare against — every row
@@ -444,6 +446,17 @@ class Monitor:
                     "note": (f"First check: I recorded a baseline of "
                              f"{len(rows):,} rows through {latest}. From "
                              f"now on this button shows only what is new.")}
+        if len(fresh) > max(400, 0.5 * len(rows)):
+            # more than half the window "changed" means the baseline was
+            # lost (a deploy race), not that thousands of rows posted at
+            # once. Re-record it and say so, instead of spamming old rows.
+            latest = max(totals) if totals else "?"
+            self._note(f"rewards baseline re-recorded ({len(fresh)} rows)")
+            return {"ok": True, "new_rows": [], "new_count": 0, "days": days,
+                    "note": (f"The baseline was lost in a restart, so I "
+                             f"re-recorded it ({len(rows):,} rows through "
+                             f"{latest}). Press again later — only true "
+                             f"news will show.")}
         fresh.sort(key=lambda r: (r["date"], r["reward_usd"]),
                    reverse=True)               # newest day, biggest first
         out_rows = [{"day": r["date"], "market": r["market"],
