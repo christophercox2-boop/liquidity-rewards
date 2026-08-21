@@ -44,6 +44,10 @@ class Stream:
         # Lite feed (owner, 2026-08-21: does the exchange's "best" match
         # the raw touch, and is IT the scoring anchor?)
         self.declared: dict[str, tuple[float | None, float | None, float]] = {}
+        # verbatim frames for a few watched markets — the owner reads the
+        # raw API payloads himself (2026-08-21)
+        self.raw_want: set[str] = set()
+        self.raw_frames: dict[str, str] = {}
         self._thread: threading.Thread | None = None
 
     def start(self) -> None:
@@ -58,6 +62,9 @@ class Stream:
             msg = json.loads(raw)
             lite = msg.get("marketDataLite") or {}
             if lite.get("marketSlug"):
+                if lite["marketSlug"] in self.raw_want:
+                    self.raw_frames["lite|" + lite["marketSlug"]] = (
+                        raw if isinstance(raw, str) else raw.decode())[:3000]
                 bb = to_num((lite.get("bestBid") or {}).get("value"))
                 ba = to_num((lite.get("bestAsk") or {}).get("value"))
                 self.declared[lite["marketSlug"]] = (
@@ -72,6 +79,9 @@ class Stream:
             slug = md.get("marketSlug")
             if not slug:
                 return None
+            if slug in self.raw_want:
+                self.raw_frames["book|" + slug] = (
+                    raw if isinstance(raw, str) else raw.decode())[:6000]
             bids = [(to_num(l.get("px")), to_num(l.get("qty")))
                     for l in md.get("bids") or []]
             asks = [(to_num(l.get("px")), to_num(l.get("qty")))

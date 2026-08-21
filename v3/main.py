@@ -473,6 +473,8 @@ class Monitor:
             "floor": self.floor.status(now),
             "ws": dict(self.stream.status) if self.stream else {},
             "lite_study": self._lite_study(),
+            "raw_sample": (dict(self.stream.raw_frames)
+                           if self.stream else {}),
             "silver_log": self.silver.changes[-120:],
             "rewards_last": self.rw_last,
             "silver": {
@@ -1059,6 +1061,8 @@ class Monitor:
         web = WebServer(self)
         web.start()
         if self.stream is not None:
+            self.stream.raw_want = {"enwc-uspres-nom-rep-2028-jdvan",
+                                    "enwc-uspres-nom-rep-2028-tuccar"}
             self.stream.start()
         threading.Thread(target=self._sampler_loop, daemon=True,
                          name="sampler").start()
