@@ -407,7 +407,7 @@ function render(d){
   var sm=(d.summaries||{})[k];
   out+='<div class="card"><b>'+esc(label)+'</b> ';
   out+=s.on?'<span class="pill on">ON</span>':(s.armed?'<span class="pill">armed</span>':'<span class="pill">off</span>');
-  if(sm){out+='<div class="muted">'+usd(sm.spent)+' of '+usd(sm.capital_usd)+' at risk; resting earns ~'+usd(sm.est_day)+'/day.</div>';}
+  if(sm){out+='<div class="muted">'+usd(sm.spent)+' of '+usd(sm.capital_usd)+' at risk'+(sm.holdings_usd?' (incl. holdings worth '+usd(sm.holdings_usd)+' at liquidation)':'')+'; resting earns ~'+usd(sm.est_day)+'/day.</div>';}
   if(k==='master'){out+='<div class="hint">Master gates every family, and it moves the whole operation: ON asks 1.0 and 2.0 to halt their automation first \\u2014 3.0 touches nothing until both confirm \\u2014 then 3.0 adopts every resting order in its families and runs the book alone. OFF hands the floor straight back. One tap here stops all of 3.0.</div>';
    var fl=(window._d&&window._d.floor)||{};
    if(s.on){out+=fl.acked?'<div class="ok">1.0 and 2.0 have stood down \\u2014 3.0 has the floor.</div>':'<div class="warn">Waiting for 1.0/2.0 to stand down\\u2026</div>';}}

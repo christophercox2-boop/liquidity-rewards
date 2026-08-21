@@ -65,8 +65,11 @@ def cfb() -> FamilyConfig:
         name="College football", tag="CFB",
         known_ground=False, rest_style="behind", revive=False,
         allow_improve=True,
-        # owner, 2026-08-21 evening: "Bring cfb down to 50."
+        # owner, 2026-08-21 evening: "Bring cfb down to 50." — and the
+        # holdings count against it at liquidation value: "no more than
+        # $50 of risk in cfb, orders + holdings"
         capital_usd=50.0, per_market_usd=1.00,
+        holdings_in_ceiling=True,
         rest_from=(6, 6), rest_until=(3, 17),      # Sun 06:00 -> Thu 17:00 ET
         season_start=(2026, 8, 27),
         # 400+ live orders need real book coverage: the meter went blind

@@ -626,7 +626,10 @@ class Monitor:
                 f"(${est.earned:,.2f} accrued today), "
                 f"{len(fam.orders)} orders, "
                 f"${fam.family_spent():,.2f} of "
-                f"${fam.cfg.capital_usd:,.0f} at risk.")
+                f"${fam.cfg.capital_usd:,.0f} at risk"
+                + (f" — includes holdings worth "
+                   f"${fam.holdings_value():,.2f} at liquidation"
+                   if fam.cfg.holdings_in_ceiling else "") + ".")
         lines += ["",
                   f"**Whole book: ~${total_rate:,.2f}/day; "
                   f"${total_today:,.2f} accrued today.**", "",

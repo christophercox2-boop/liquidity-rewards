@@ -118,6 +118,9 @@ class FamilyConfig:
     # whole-share quoting: the owner is testing whether fractional-share
     # orders are even picked up by the rewards program (2026-08-21)
     whole_shares: bool = False
+    # holdings count against the family ceiling at liquidation value
+    # (owner, 2026-08-21: cfb risk = orders + holdings, capped)
+    holdings_in_ceiling: bool = False
     probe_ttl_s: float = 45 * 60.0    # rotate: 45 quiet minutes IS the datum
     probe_cooldown_s: float = 6 * 3600.0
     probe_conf: float = 0.5           # below this confidence, information pays
@@ -309,8 +312,35 @@ class Family:
         """The search ceiling's number: worst case of the UNGRADUATED
         book, negative risk netted per race group (v3/risk.py). Graduated
         markets sit outside it, under proven_spent's own cap."""
-        return risk.book_risk(risk.order_legs(
+        spent = risk.book_risk(risk.order_legs(
             o for o in self.orders.values() if o.market not in self.proven))
+        if self.cfg.holdings_in_ceiling:
+            spent += self.holdings_value()
+        return spent
+
+    def holdings_value(self) -> float:
+        """What the stock would fetch if liquidated NOW: longs at the
+        best bid, shorts at what closing them recovers (owner,
+        2026-08-21 evening: this number counts against the family
+        budget — 'no more than $50 of risk in cfb, orders + holdings').
+        A market with no book values conservatively at cost."""
+        total = 0.0
+        for slug, inv in self.inventory.items():
+            qty = inv.get("qty") or 0.0
+            if abs(qty) < 0.005:
+                continue
+            book = self.cache.any_age(slug)
+            if qty > 0:
+                if book is not None and book.bids:
+                    total += qty * book.bids[0][0]
+                else:
+                    total += max(inv.get("cost", 0.0), 0.0)
+            else:
+                if book is not None and book.asks:
+                    total += -qty * (1.0 - book.asks[0][0])
+                else:
+                    total += max(-inv.get("cost", 0.0), 0.0)
+        return total
 
     def proven_spent(self) -> float:
         return risk.book_risk(risk.order_legs(
@@ -1833,6 +1863,7 @@ class Family:
                                          for o in self.orders.values()
                                          if o.purpose == "sell"), 2)
         summary["spent"] = round(self.family_spent(), 2)
+        summary["holdings_usd"] = round(self.holdings_value(), 2)
         summary["capital_usd"] = self.cfg.capital_usd
         summary["earned_today"] = round(self.earned_today, 2)
         summary["inventory"] = {k: dict(v) for k, v in self.inventory.items()}

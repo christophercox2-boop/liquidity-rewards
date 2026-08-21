@@ -122,18 +122,24 @@ class Estimator:
         considered = [m for m in by_market if terms.get(m) is not None]
         fresh = [m for m in considered
                  if books.fresh(m, BOOK_MAX_AGE, now) is not None]
-        quorum = (len(fresh) / len(considered)) if considered else 1.0
-        if considered and quorum < MIN_FRESH:
-            # the feed is too stale to measure: bank the time, accrue nothing
-            self.stale_s += dt_s
-            self.samples += 1
-            return self.snapshot(now)
-
+        fresh_set = set(fresh)
+        # Per-market accrual (owner, 2026-08-21 evening: "CFB still says
+        # it's only earned 5 cents today" — the old all-or-nothing
+        # freshness quorum threw away whole minutes when most of a big
+        # family was unwatched, refusing to count even the markets it
+        # COULD see). Each market with a fresh book bills its own rate;
+        # only the unwatched ones bank stale time. covered/stale are
+        # coverage-weighted seconds, so the phone still shows how much
+        # of the family the meter actually sees.
+        frac = (len(fresh) / len(considered)) if considered else 1.0
         if dt_s:
-            self.earned += self.rate * dt_s / 86400.0
             for m, r in self.market_rates.items():
-                self.per_market[m] = self.per_market.get(m, 0.0) + r * dt_s / 86400.0
-            self.covered_s += dt_s
+                if m in fresh_set:
+                    self.earned += r * dt_s / 86400.0
+                    self.per_market[m] = (self.per_market.get(m, 0.0)
+                                          + r * dt_s / 86400.0)
+            self.covered_s += dt_s * frac
+            self.stale_s += dt_s * (1.0 - frac)
 
         rates: dict[str, float] = {}
         for m in fresh:

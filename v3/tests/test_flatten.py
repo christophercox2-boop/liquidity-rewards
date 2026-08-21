@@ -1043,3 +1043,36 @@ class TestGovChartChooser(unittest.TestCase):
         ak = s.gov_races.get("ak") or {}
         self.assertAlmostEqual(ak.get("rep"), 0.615, places=2)
         self.assertEqual(s._gov_cid, "N13WX")
+
+
+class TestHoldingsCeiling(unittest.TestCase):
+    """Owner, 2026-08-21 evening: cfb risk = orders + holdings at
+    liquidation value, capped together."""
+
+    def test_holdings_valued_at_the_liquidating_price(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        from v3.scoring import Book
+        cfg = FamilyConfig(name="C", tag="C", capital_usd=50.0,
+                           holdings_in_ceiling=True)
+        r = Rig(cfg=cfg)
+        r.add_market(A, book=Book(bids=((0.30, 50.0),),
+                                  asks=((0.40, 50.0),),
+                                  tick=0.01, fetched_at=1_000_000.0))
+        r.cache.put(A, Book(bids=((0.30, 50.0),), asks=((0.40, 50.0),),
+                            tick=0.01, fetched_at=r.now))
+        r.fam.inventory[A] = {"qty": 100.0, "cost": 35.0}
+        self.assertAlmostEqual(r.fam.holdings_value(), 30.0, places=2)
+        # and the ceiling includes it
+        self.assertGreaterEqual(r.fam.family_spent(), 30.0)
+
+    def test_ceiling_ignores_holdings_when_flag_off(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        from v3.scoring import Book
+        cfg = FamilyConfig(name="P", tag="P", capital_usd=50.0)
+        r = Rig(cfg=cfg)
+        r.cache.put(A, Book(bids=((0.30, 50.0),), asks=((0.40, 50.0),),
+                            tick=0.01, fetched_at=r.now))
+        r.fam.inventory[A] = {"qty": 100.0, "cost": 35.0}
+        self.assertAlmostEqual(r.fam.family_spent(), 0.0, places=2)
