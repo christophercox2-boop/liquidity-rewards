@@ -708,10 +708,24 @@ class Family:
                 # market is a bargain for US, however far in front)
                 conc = max(conc, (abs(px - touch) / tick)
                            * (1.0 - independence))
+            # the ignorance premium (owner approved 2026-08-21): when we
+            # cannot price the market, a fill's cost includes the
+            # EXPECTED overpay if true fair lies anywhere in the spread
+            # — zero at the touch, quadratic as we advance, gone when a
+            # model grounds the market or fills build confidence
+            ign = 0.0
+            if independence < 1.0 and other:
+                spread_w = abs(other[0][0] - touch)
+                if spread_w > tick / 2:
+                    adv = (px - touch) if side == "BUY" else (touch - px)
+                    if adv > 0:
+                        ign = ((1.0 - independence) * adv * adv
+                               / (2.0 * spread_w))
             pf = self.fillmodel.p_fill(slug, side, k_px, shield=shield,
                                        target=target, bait=conc + h)
             fcost = self.fillmodel.fill_cost(slug, side, px, value_ctr,
-                                             exit_rate_ps=exit_rate_ps)
+                                             exit_rate_ps=exit_rate_ps,
+                                             ignorance=ign)
             for qty in grid:
                 if (h >= 0.5 and qty > grid[0]
                         and (in_front or k_px == 0)):
@@ -1250,8 +1264,22 @@ class Family:
                 pf_now = self.fillmodel.p_fill(rec.market, rec.side, ticks_now,
                                                shield=shield_now,
                                                target=float(prog.target))
+                ign_now = 0.0
+                ind_now = (1.0 if self.fairs is not None
+                           and self.fairs(rec.market) is not None
+                           else self.evidence.confidence(rec.market))
+                osd = book.side("SELL" if rec.side == "BUY" else "BUY")
+                if ind_now < 1.0 and lv and osd:
+                    spread_w = abs(osd[0][0] - lv[0][0])
+                    if spread_w > book.tick / 2:
+                        adv = ((rec.price - lv[0][0]) if rec.side == "BUY"
+                               else (lv[0][0] - rec.price))
+                        if adv > 0:
+                            ign_now = ((1.0 - ind_now) * adv * adv
+                                       / (2.0 * spread_w))
                 fc_now = self.fillmodel.fill_cost(rec.market, rec.side,
-                                                  rec.price, None)
+                                                  rec.price, None,
+                                                  ignorance=ign_now)
                 rec.live_ev = round(
                     rec.live_est * self.fillmodel.scoring_fraction(rec.market)
                     - pf_now * fc_now * rec.qty, 4)

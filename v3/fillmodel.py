@@ -279,7 +279,8 @@ class FillModel:
         return 1.0 - math.exp(-h * horizon_s / DAY_S)
 
     def fill_cost(self, slug: str, side: str, price: float,
-                  fair: float | None, exit_rate_ps: float = 0.0) -> float:
+                  fair: float | None, exit_rate_ps: float = 0.0,
+                  ignorance: float = 0.0) -> float:
         """$/share the fill is expected to cost, the owner's equation
         (2026-08-21): the offload loss (the calibrated adverse markdown
         plus anything conceded past fair) MINUS what the stock earns per
@@ -291,6 +292,7 @@ class FillModel:
         if fair is not None:
             excess = (price - fair) if side == "BUY" else (fair - price)
             cost += max(excess, 0.0)
+        cost += max(ignorance, 0.0)
         cost -= exit_rate_ps * self.expected_offload_days(slug)
         # The credit may offset the fill's costs but never turn a fill
         # into imagined profit. The Rock lesson (2026-08-21): the

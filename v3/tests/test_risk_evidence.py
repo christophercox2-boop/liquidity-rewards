@@ -636,3 +636,50 @@ class TestOwnerCorrections0821b(unittest.TestCase):
         exits = [o for o in r.fam.orders.values() if o.purpose == "sell"]
         self.assertTrue(exits)
         self.assertTrue(all(o.price < 0.97 for o in exits))  # moved down
+
+
+class TestIgnorancePremium(unittest.TestCase):
+    """Owner approved 2026-08-21: when we cannot price a market, a fill
+    is assumed to cost the expected overpay across the spread — the
+    Massachusetts lesson priced in, continuously."""
+
+    def test_fill_cost_carries_the_premium_and_floors(self):
+        from v3.fillmodel import FillModel
+        m = FillModel()
+        slug = "ussewc-usse-mt-2026-11-03-dem"
+        base = m.fill_cost(slug, "BUY", 0.13, None)
+        with_ign = m.fill_cost(slug, "BUY", 0.13, None, ignorance=0.055)
+        self.assertAlmostEqual(with_ign - base, 0.055, places=4)
+
+    def test_unpriced_spread_penalizes_deep_advances(self):
+        # no model: ladder fill costs must RISE as the bid advances into
+        # the spread; with a model they stay flat
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        def costs(fair):
+            r = Rig()
+            r.add_market(A, book=Book(
+                bids=((0.01, 6000.0),), asks=((0.14, 151.0), (0.99, 6000.0)),
+                tick=0.01, fetched_at=1_000_000.0))
+            if fair is not None:
+                r.fam.fairs = lambda s: fair
+            rows = []
+            book = r.cache.fresh(A, 300, r.now + 60)
+            prog, _ = r.fam._prog_row(A) if r.fam.terms.get(A) else (None, "")
+            r.cycle()
+            book = r.cache.fresh(A, 300, r.now)
+            prog, _ = r.fam._prog_row(A)
+            sp = r.fam._side_pool(A, prog)
+            r.fam._plan_side(A, book, "BUY", prog, sp or 0.0, 10.0,
+                             ladder=rows)
+            best = {}
+            for x in rows:
+                b = best.get(x["px"])
+                if b is None or x["ev"] > b["ev"]:
+                    best[x["px"]] = x
+            return {px: x["fill_cost"] for px, x in best.items()}
+        blind = costs(None)
+        deeps = sorted(px for px in blind if px > 0.01)
+        self.assertGreater(len(deeps), 2)
+        # monotone climb into the unknown
+        self.assertGreater(blind[deeps[-1]], blind[deeps[0]] + 0.01)
