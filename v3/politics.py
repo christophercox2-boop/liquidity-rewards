@@ -86,7 +86,9 @@ def config() -> FamilyConfig:
         # have to be able to qualify markets that could be winners") —
         # and with negative-risk netting, qualifying several brackets of
         # one race barely moves the ceiling
-        capital_usd=100.0, per_market_usd=20.0, revive_max_usd=20.0,
+        # owner, 2026-08-21 evening: "we can up the politics budget
+        # to 250"
+        capital_usd=250.0, per_market_usd=20.0, revive_max_usd=20.0,
         share_hi=0.10,
         # owner, 2026-08-21: "I would do 30 seconds under 75 cents, but
         # just for politics. There are so many options you can find
