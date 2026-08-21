@@ -292,7 +292,14 @@ class FillModel:
             excess = (price - fair) if side == "BUY" else (fair - price)
             cost += max(excess, 0.0)
         cost -= exit_rate_ps * self.expected_offload_days(slug)
-        return round(cost, 4)
+        # The credit may offset the fill's costs but never turn a fill
+        # into imagined profit. The Rock lesson (2026-08-21): the
+        # family-average exit yield came from a few small positions
+        # whose exits take huge shares of thin sides — applying it to
+        # NEW stock made fill_cost negative in 634 plans and the engine
+        # bid 6-8c for 2028 long shots BECAUSE fills looked profitable.
+        # A true per-market credit needs the owner's sign-off first.
+        return round(max(cost, 0.0), 4)
 
     def scoring_fraction(self, slug: str) -> float:
         return self.scoring_frac.get(family_of(slug), SCORING_FRAC_SEED)

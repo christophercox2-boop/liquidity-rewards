@@ -495,12 +495,15 @@ class TestFillCostEquation(unittest.TestCase):
                           exit_rate_ps=0.01)
         self.assertAlmostEqual(base - net, 0.02, places=6)
 
-    def test_fill_cost_can_go_negative(self):
+    def test_fill_cost_never_goes_negative(self):
+        # The Rock lesson (2026-08-21): a negative fill cost pays the
+        # engine to get filled — it bid 6-8c on 2028 long shots for the
+        # imagined exit profit. The credit floors at zero.
         from v3.fillmodel import FillModel
         m = FillModel()
         net = m.fill_cost("ussewc-usse-mt-2026-11-03-dem", "SELL", 0.33, 0.33,
                           exit_rate_ps=0.10)
-        self.assertLess(net, 0.0)  # exits that earn more than the fill loses
+        self.assertEqual(net, 0.0)
 
     def test_offload_days_learned_and_persisted(self):
         from v3.fillmodel import FillModel
