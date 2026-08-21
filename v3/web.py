@@ -86,6 +86,21 @@ _CSS = """
  .name{font-size:13.5px}
  .mtrack{height:10px;background:#2c3d20;border-radius:5px;margin:8px 0 2px;
          position:relative;overflow:hidden}
+ .tri{display:flex;gap:8px;margin:8px 0 2px}
+ .tri-col{flex:1;min-width:0}
+ .tri-h{font-size:11px;color:#79856d;margin:0 0 4px;text-transform:uppercase;
+        letter-spacing:.4px}
+ .tchip{border-radius:8px;padding:5px 8px;margin:4px 0;font-size:12px;
+        background:#1a2214;border-left:3px solid #55482a;overflow:hidden}
+ .tchip.win{border-left-color:#4c7a2f;background:#1c2a16}
+ .tchip .tn{color:#e8ecdf;font-size:12px}
+ .tchip .tm{color:#93a08a;font-size:11px}
+ @keyframes triL{from{transform:translateX(70%);opacity:0}
+                 to{transform:translateX(0);opacity:1}}
+ @keyframes triR{from{transform:translateX(-70%);opacity:0}
+                 to{transform:translateX(0);opacity:1}}
+ .tchip.new-l{animation:triL .7s ease-out}
+ .tchip.new-r{animation:triR .7s ease-out}
  .mfill{position:absolute;left:0;top:0;bottom:0;background:#4c7a2f;
         border-radius:5px}
 """
@@ -191,6 +206,26 @@ function render(d){
    out+='<div class="muted">Triage: '+(tg.done||0)+' of '+tg.total+' markets scored this pass'
     +((tg.done||0)>=tg.total?' \\u2014 all scored; rescanning the oldest first.'
     :' \\u2014 about '+Math.ceil((tg.total-(tg.done||0))/(tg.per_cycle||1))+' min to finish.')+'</div>';
+  }
+  var tf=s.triage_feed||[];
+  if(tf.length){
+   if(!window._tseen)window._tseen={};
+   var outs='',ins='';
+   tf.slice().reverse().slice(0,12).forEach(function(t){
+    var key=k+'|'+t.market+'|'+t.ts;
+    var fresh=!window._tseen[key];window._tseen[key]=1;
+    var info=[];
+    if(t.in)info.push('worth '+usd(t.ev)+'/day');
+    if(t.spread!=null)info.push('spread '+t.spread+'c');
+    if(t.pool!=null)info.push('pool '+usd(t.pool)+'/day');
+    if(t.conf!=null&&t.conf>0)info.push('conf '+Math.round(t.conf*100)+'%');
+    var chip='<div class="tchip '+(t.in?'win':'')+' '+(fresh?(t.in?'new-r':'new-l'):'')+'">'
+     +'<div class="tn">'+nm(d,t.market)+'</div>'
+     +'<div class="tm">'+esc(info.join(' \\u00b7 '))+(t.in?'':(info.length?' \\u00b7 ':'')+esc(t.why||''))+'</div></div>';
+    if(t.in)ins+=chip;else outs+=chip;
+   });
+   out+='<div class="tri"><div class="tri-col"><div class="tri-h">passed on</div>'+outs+'</div>'
+    +'<div class="tri-col"><div class="tri-h">worth budget</div>'+ins+'</div></div>';
   }
   out+='<div class="muted">'+(s.markets||0)+' markets known, '+(s.scanned||0)+' scored'
   if(s.unmeasured_min>1){out+='<div class="muted">'+s.unmeasured_min+' min of today went unmeasured (books too stale to score) \\u2014 counted as zero, never guessed.</div>';}
@@ -442,6 +477,8 @@ class WebServer:
                 slugs.add(o.get("market") or "")
             for b in s.get("best_idle") or []:
                 slugs.add(b.get("market") or "")
+            for t in s.get("triage_feed") or []:
+                slugs.add(t.get("market") or "")
             slugs.update((s.get("inventory") or {}).keys())
             fam = self.monitor.families.get(key)
             if fam is not None:

@@ -229,6 +229,7 @@ class Family:
         self.fillmodel = FillModel()
         self.pending_marks: list[dict] = []   # fills awaiting their 1h grade
         self.proven: set[str] = set()         # graduated markets (main feeds it)
+        self.triage_feed: list[dict] = []     # the sweep's recent verdicts
         self._clock = clock or time.time
         self.terms = TermsStore()
         self.universe: dict[str, dict] = {}       # slug -> {event_n, ...}
@@ -1419,11 +1420,24 @@ class Family:
             plans, why = self.plan_market(book, slug)
             prog2, _ = self._prog_row(slug)
             sp2 = self._side_pool(slug, prog2) if prog2 else None
+            conf2 = self.evidence.confidence(slug)
             self.scoreboard[slug] = {
                 "ts": now, "plans": plans, "why": why,
                 "est": round(sum(p["est"] for p in plans), 4),
                 "pool_day": round(sp2, 4) if sp2 is not None else None,
-                "conf": self.evidence.confidence(slug)}
+                "conf": conf2}
+            # the sweep's verdict, for the live triage feed on the page
+            spread_c = (round((book.asks[0][0] - book.bids[0][0]) * 100, 1)
+                        if book.bids and book.asks else None)
+            best_ev = (max(p.get("ev", p["est"]) for p in plans)
+                       if plans else 0.0)
+            self.triage_feed.append({
+                "ts": round(now, 1), "market": slug, "in": bool(plans),
+                "ev": round(best_ev, 2), "spread": spread_c,
+                "pool": round(sp2, 2) if sp2 is not None else None,
+                "conf": round(conf2, 2),
+                "why": (plans[0]["why"][:60] if plans else (why or "")[:60])})
+            del self.triage_feed[:-40]
             done += 1
         for gone in set(self.scoreboard) - set(self.universe):
             del self.scoreboard[gone]
@@ -1482,6 +1496,7 @@ class Family:
                    <= self.cfg.rescan_s)
         summary["triage"] = {"total": len(elig), "done": done,
                              "per_cycle": max(self.cfg.scan_reserve, 1)}
+        summary["triage_feed"] = self.triage_feed[-16:]
         top = sorted(((s, sb) for s, sb in self.scoreboard.items()
                       if sb.get("plans")),
                      key=lambda kv: -(kv[1].get("est") or 0.0))[:12]
