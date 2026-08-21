@@ -293,6 +293,8 @@ class SilverFairs:
         self.gov_changed_at = 0.0
         self._gov_sig = ""
         self._gov_cid = ""
+        self.gov_raw = ""
+        self.senate_raw = ""
         self.source = "none"
         self.note = ""
         # Silver's own simulated distributions — the primary model
@@ -353,6 +355,7 @@ class SilverFairs:
             except OSError:
                 pass
         got: dict = {}
+        raw_text = ""
         try:
             import requests
             order = ((self._gov_cid,) if self._gov_cid else ()) + \
@@ -372,6 +375,7 @@ class SilverFairs:
                 if want and set(cand) != want:
                     continue          # different race set — not governor
                 got = cand
+                raw_text = r.text
                 if cid != self._gov_cid:
                     self._gov_cid = cid
                     self.note = f"governor data found under chart {cid}"
@@ -384,6 +388,8 @@ class SilverFairs:
             except OSError:
                 return False
         if got:
+            if raw_text:
+                self.gov_raw = raw_text
             self._diff_races(self.gov_races, got, "governor", now)
             sig = repr(sorted((k, v.get("dem")) for k, v in got.items()))
             if sig != self._gov_sig:
@@ -555,6 +561,7 @@ class SilverFairs:
         if not races:
             self.note = "silver table parsed empty"
             return False
+        self.senate_raw = text
         if len(races) != SENATE_RACES_EXPECTED:
             # a missing race silently shifts the whole ladder — say so
             self.note = f"{len(races)} races, expected {SENATE_RACES_EXPECTED}"

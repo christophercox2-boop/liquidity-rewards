@@ -444,6 +444,7 @@ class Monitor:
                     (now - self.silver.gov_changed_at) / 3600, 1)
                     if getattr(self.silver, "gov_changed_at", 0) else None),
                 "note": getattr(self.silver, "note", ""),
+                "ak_gov": dict(self.silver.gov_races.get("ak") or {}),
                 "official_source": self.silver.official_source,
                 "official_age_h": (round(
                     self.silver.official_run_age_s(now) / 3600, 1)
@@ -655,6 +656,16 @@ class Monitor:
         except Exception as e:  # noqa: BLE001
             self._note(f"rewards.csv publish: {e}")
         try:
+            for path, text in (("data/silver_gov_races.csv",
+                                getattr(self.silver, "gov_raw", "")),
+                               ("data/silver_senate_races.csv",
+                                getattr(self.silver, "senate_raw", ""))):
+                if not text:
+                    continue
+                existing, sha = self._gh_file(path)
+                if existing is not None and existing != text:
+                    self._gh_put(path, text, sha,
+                                 "Silver model refresh [skip ci]")
             existing, sha = self._gh_file("STATUS.md")
             text = self.compose_status_md(now)
             if text != existing:
