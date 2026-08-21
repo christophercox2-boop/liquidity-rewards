@@ -13,9 +13,12 @@ class TestFloor(unittest.TestCase):
         os.environ["V3_FLOOR_PATH"] = os.path.join(self.dir.name, "f.json")
         os.environ["V1_ACK_PATH"] = os.path.join(self.dir.name, "a1.json")
         os.environ["V2_ACK_PATH"] = os.path.join(self.dir.name, "a2.json")
+        os.environ["V1_ENABLED"] = "1"
+        os.environ["V2_ENABLED"] = "1"
 
     def tearDown(self):
-        for k in ("V3_FLOOR_PATH", "V1_ACK_PATH", "V2_ACK_PATH"):
+        for k in ("V3_FLOOR_PATH", "V1_ACK_PATH", "V2_ACK_PATH",
+                  "V1_ENABLED", "V2_ENABLED"):
             os.environ.pop(k, None)
         self.dir.cleanup()
 

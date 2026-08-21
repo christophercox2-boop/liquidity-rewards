@@ -92,9 +92,12 @@ class Floor:
 
     @staticmethod
     def required() -> tuple[str, ...]:
-        if os.environ.get("V2_ENABLED", "1") == "0":
-            return ("v1",)
-        return ("v1", "v2")
+        out = []
+        if os.environ.get("V1_ENABLED", "0") != "0":
+            out.append("v1")
+        if os.environ.get("V2_ENABLED", "0") != "0":
+            out.append("v2")
+        return tuple(out)
 
     def status(self, now: float | None = None) -> dict:
         now = now if now is not None else self._clock()

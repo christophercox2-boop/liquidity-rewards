@@ -57,3 +57,18 @@ real gaps only if 1.0/2.0 are retired.
   Aug 18; 3.0 now fetches the CDN/sheets live instead, so this mostly
   matters for the archived copies.
 - Aug 19-20 reward postings still filling in at the exchange.
+
+## 2026-08-21: the 1.0/2.0 ports landed
+
+Moved into 3.0 and verified: the public front door (old /v3/ bookmarks
+still work; /map and friends redirect home), the hourly rewards.csv and
+STATUS.md writers (single-writer gated on V1_ENABLED), the payout
+watcher with phone pushes, and a manual order form (purpose "manual" —
+automation never touches the owner's own orders). The floor no longer
+waits for retired versions, so post-deploy stalls are gone.
+
+Retired WITH 1.0 (not ported, by choice): the /map page and its tabs,
+deep-blocks risk alerts, the daily digest push, the prober journal, the
+whole-board estimate. Retired with 2.0: the seats EV engine and its
+calibration pages, the whole-exchange survey. V1_ENABLED=1 or
+V2_ENABLED=1 resurrects either.

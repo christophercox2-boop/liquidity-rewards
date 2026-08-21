@@ -625,3 +625,73 @@ class TestSilverLogAndWatcher(unittest.TestCase):
                       "V2_ACK_PATH", "V3_FLATTEN"):
                 os.environ.pop(k, None)
             self.dir.cleanup()
+
+
+class TestV1Port(unittest.TestCase):
+    """1.0's essentials, now 3.0's: the front door, the repo files, the
+    owner's own order form."""
+
+    def test_floor_needs_nobody_when_both_are_retired(self):
+        import tempfile
+        from v3 import floor
+        with tempfile.TemporaryDirectory() as p:
+            os.environ["V3_FLOOR_PATH"] = os.path.join(p, "f.json")
+            try:
+                self.assertEqual(floor.Floor.required(), ())
+                self.assertTrue(floor.Floor(clock=lambda: 1.0).acked())
+            finally:
+                os.environ.pop("V3_FLOOR_PATH", None)
+
+    def test_rewards_csv_preserves_unreachable_history(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as p:
+            for k, v in (("V3_STATE_PATH", "s.json"),
+                         ("V3_FLOOR_PATH", "f.json")):
+                os.environ[k] = os.path.join(p, v)
+            os.environ["GITHUB_TOKEN"] = ""
+            try:
+                m = Monitor()
+                existing = ("date,market,program_type,reward_usd,status\n"
+                            "2026-07-01,ancient,liquidityProgram,9.99,PAID\n"
+                            "2026-08-18,m1,liquidityProgram,1.5,PAID\n")
+                rows = [{"date": "2026-08-18", "market": "m1",
+                         "program_type": "liquidityProgram",
+                         "reward_usd": 1.5, "status": "PAID"},
+                        {"date": "2026-08-20", "market": "m2",
+                         "program_type": "liquidityProgram",
+                         "reward_usd": 2.0, "status": "PENDING"}]
+                text = m.compose_rewards_csv(rows, existing)
+                lines = text.strip().split("\n")
+                self.assertEqual(lines[0],
+                                 "date,market,program_type,reward_usd,status")
+                self.assertIn("2026-07-01,ancient,liquidityProgram,9.99,PAID",
+                              lines)          # history beyond the API kept
+                self.assertIn("2026-08-20,m2,liquidityProgram,2,PENDING",
+                              lines)
+                self.assertEqual(len([l for l in lines if ",m1," in l]), 1)
+                md = m.compose_status_md(1_787_300_000.0)
+                self.assertIn("Politics", md)
+                self.assertIn("/day resting", md)
+            finally:
+                for k in ("V3_STATE_PATH", "V3_FLOOR_PATH"):
+                    os.environ.pop(k, None)
+
+    def test_owner_place_routes_and_manual_is_untouchable(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        res_like = r.fam.desk.place_resting(A, "BUY", 0.30, 3.0,
+                                            initiator="owner", verify=False)
+        self.assertTrue(res_like.ok)
+        from v3.family import FamilyOrder
+        r.fam.orders[res_like.order_id] = FamilyOrder(
+            id=res_like.order_id, market=A, side="BUY", price=0.30, qty=3.0,
+            intent=res_like.intent, placed_ts=r.now, purpose="manual",
+            why="placed by the owner")
+        # hours pass; the cull would eat a 30c bid measuring ~0 — but
+        # manual orders are the owner's and automation never touches them
+        r.fam.last_action.clear()
+        r.cycle(advance=7200.0)
+        self.assertIn(res_like.order_id, r.fam.orders)
+        self.assertEqual(r.fam.orders[res_like.order_id].price, 0.30)

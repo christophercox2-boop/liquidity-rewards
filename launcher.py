@@ -27,7 +27,15 @@ BACKOFF_MIN_S, BACKOFF_MAX_S = 5.0, 60.0
 
 
 def children() -> dict[str, list[str]]:
-    procs = {"1.0": [sys.executable, "-u", os.path.join(HERE, "live", "monitor.py")]}
+    procs = {}
+    if os.environ.get("V1_ENABLED", "0") == "0":
+        # RETIRED by default (owner, 2026-08-21: "get the important bits of
+        # 1.0 ported over so we can kill it"). 3.0 is the front door now.
+        # Set V1_ENABLED=1 to resurrect the old monitor and its /map.
+        print("launcher: 1.0 retired — V1_ENABLED=1 resurrects it", flush=True)
+    else:
+        procs["1.0"] = [sys.executable, "-u",
+                        os.path.join(HERE, "live", "monitor.py")]
     if os.environ.get("V2_ENABLED", "0") == "0":
         # RETIRED by default (owner, 2026-08-21: "go ahead and start the
         # ports") — 3.0 carries the payout watcher now. Set V2_ENABLED=1

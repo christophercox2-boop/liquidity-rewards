@@ -860,7 +860,7 @@ class Family:
         and pull the owner's exits (2026-08-20 23:12Z) and counted their
         collateral against the rebuild ceiling. Idempotent, every cycle."""
         for rec in self.orders.values():
-            if rec.purpose == "sell":
+            if rec.purpose in ("sell", "manual"):
                 continue
             net = (positions.get(rec.market) or (0.0, 0.0))[0]
             if ((rec.side == "SELL" and net > 0.005)
@@ -1049,7 +1049,7 @@ class Family:
         for rec in list(self.orders.values()):
             if actions <= 0:
                 break
-            if rec.purpose in ("sell", "probe"):
+            if rec.purpose in ("sell", "probe", "manual"):
                 continue
             book = self.cache.fresh(rec.market, self.cfg.read_age_s, now)
             prog, _why = self._prog_row(rec.market)

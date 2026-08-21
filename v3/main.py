@@ -42,6 +42,13 @@ from .state import StateStore
 from .switch import MasterSwitch
 from .ws import Stream
 
+try:
+    from zoneinfo import ZoneInfo
+    ET_STATUS = ZoneInfo("America/New_York")
+except Exception:  # noqa: BLE001
+    import datetime as _dtz
+    ET_STATUS = _dtz.timezone(_dtz.timedelta(hours=-4), "ET")
+
 POLL_S = 60.0
 ERROR_BACKOFF_CAP_S = 600.0
 FLATTEN_CANCELS_PER_CYCLE = 45
@@ -389,6 +396,31 @@ class Monitor:
         self.store.save_remote(st)
         return s
 
+    def owner_place(self, market: str, side: str, price: float,
+                    qty: float) -> dict:
+        """The owner's own hand: bypasses switches, keeps every other
+        rail, and the automation never touches the result."""
+        from .family import FamilyOrder
+        for fam in self.families.values():
+            if not fam.knows(market):
+                continue
+            net = 0.0
+            try:
+                net = (self.client.positions_net().get(market) or (0.0,))[0]
+            except Exception:  # noqa: BLE001
+                pass
+            r = fam.desk.place_resting(market, side, price, qty,
+                                       net_position=net, initiator="owner",
+                                       verify=True)
+            if r.ok and r.order_id:
+                fam.orders[r.order_id] = FamilyOrder(
+                    id=r.order_id, market=market, side=side, price=price,
+                    qty=qty, intent=r.intent, placed_ts=time.time(),
+                    purpose="manual", why="placed by the owner")
+            return {"ok": r.ok, "note": r.note, "order_id": r.order_id}
+        return {"ok": False,
+                "note": "no family knows this market — check the slug"}
+
     def order_op(self, op: str, order_id: str, price: float | None = None) -> dict:
         """Owner move/cancel on one of OUR orders, from the orders page.
         initiator='owner' bypasses the switches but no other rail."""
@@ -433,6 +465,117 @@ class Monitor:
                 timeout=5)
         except Exception:  # noqa: BLE001 — best effort
             pass
+
+    # -- the repo files 1.0 used to write (ported; single-writer gated) --
+
+    def _gh_file(self, path: str):
+        """(text, sha) of a repo file on main, or (None, None)."""
+        tok = os.environ.get("GITHUB_TOKEN", "")
+        if not tok:
+            return None, None
+        import requests
+        repo = os.environ.get("GITHUB_REPOSITORY", "wfco223/Liquidity-rewards")
+        r = requests.get(
+            f"https://api.github.com/repos/{repo}/contents/{path}",
+            headers={"Authorization": f"Bearer {tok}",
+                     "Accept": "application/vnd.github+json"}, timeout=30)
+        if r.status_code >= 400:
+            return None, None
+        j = r.json()
+        import base64
+        return base64.b64decode(j.get("content") or "").decode(), j.get("sha")
+
+    def _gh_put(self, path: str, text: str, sha, message: str) -> bool:
+        tok = os.environ.get("GITHUB_TOKEN", "")
+        if not tok:
+            return False
+        import base64
+        import requests
+        repo = os.environ.get("GITHUB_REPOSITORY", "wfco223/Liquidity-rewards")
+        body = {"message": message,
+                "content": base64.b64encode(text.encode()).decode()}
+        if sha:
+            body["sha"] = sha
+        r = requests.put(
+            f"https://api.github.com/repos/{repo}/contents/{path}",
+            headers={"Authorization": f"Bearer {tok}",
+                     "Accept": "application/vnd.github+json"},
+            json=body, timeout=30)
+        return r.status_code < 300
+
+    def compose_rewards_csv(self, rows: list[dict], existing: str | None) -> str:
+        """The exact 1.0 file shape, with history the API no longer serves
+        preserved from the existing file."""
+        header = "date,market,program_type,reward_usd,status"
+        fetched_min = min((r["date"] for r in rows), default="9999")
+        keep = []
+        for line in (existing or "").splitlines():
+            if not line or line.startswith("date,"):
+                continue
+            if line.split(",", 1)[0] < fetched_min:
+                keep.append(line)
+        fresh = [f"{r['date']},{r['market']},{r['program_type']},"
+                 f"{r['reward_usd']:g},{r['status']}" for r in rows]
+        return "\n".join([header] + keep + fresh) + "\n"
+
+    def compose_status_md(self, now: float) -> str:
+        import datetime as _dt2
+        ts = _dt2.datetime.fromtimestamp(now, _dt2.timezone.utc)
+        et = ts.astimezone(ET_STATUS)
+        lines = [f"# Liquidity rewards — 3.0",
+                 f"",
+                 f"✅ Updated {et.strftime('%b %d, %I:%M %p ET')} — the app "
+                 f"writes this file every hour.", ""]
+        total_rate = 0.0
+        total_today = 0.0
+        for key, fam in self.families.items():
+            est = self.samplers[key]
+            s = (self.last_state.get("summaries") or {}).get(key) or {}
+            total_today += est.earned
+            rate = est.rate
+            total_rate += rate
+            lines.append(
+                f"- **{fam.cfg.name}**: about ${rate:,.2f}/day resting "
+                f"(${est.earned:,.2f} accrued today), "
+                f"{len(fam.orders)} orders, "
+                f"${fam.family_spent():,.2f} of "
+                f"${fam.cfg.capital_usd:,.0f} at risk.")
+        lines += ["",
+                  f"**Whole book: ~${total_rate:,.2f}/day; "
+                  f"${total_today:,.2f} accrued today.**", "",
+                  "Every number is arithmetic on the exchange's own reward "
+                  "terms — no fudge factors. The pages have the detail: "
+                  "orders (with plain-English verdicts), the model's moves, "
+                  "and grades (estimate vs. what actually paid).", ""]
+        return "\n".join(lines)
+
+    def publish_files(self, now: float) -> None:
+        """Hourly, and only while 1.0 is retired (one writer per file)."""
+        if os.environ.get("V1_ENABLED", "0") != "0":
+            return
+        if now - getattr(self, "_pub_at", 0.0) < 3600.0:
+            return
+        self._pub_at = now
+        try:
+            import datetime as _dt3
+            start = (_dt3.datetime.now(_dt3.timezone.utc)
+                     - _dt3.timedelta(days=40)).strftime("%Y-%m-%d")
+            rows = self.client.earnings(start)
+            existing, sha = self._gh_file("data/rewards.csv")
+            text = self.compose_rewards_csv(rows, existing)
+            if text != existing:
+                self._gh_put("data/rewards.csv", text, sha,
+                             "Update rewards.csv [skip ci]")
+        except Exception as e:  # noqa: BLE001
+            self._note(f"rewards.csv publish: {e}")
+        try:
+            existing, sha = self._gh_file("STATUS.md")
+            text = self.compose_status_md(now)
+            if text != existing:
+                self._gh_put("STATUS.md", text, sha,
+                             "Update STATUS.md [skip ci]")
+        except Exception as e:  # noqa: BLE001
+            self._note(f"STATUS.md publish: {e}")
 
     def refresh_rewards(self) -> dict:
         """Owner's button: pull the exchange's posted payouts now, show
@@ -613,6 +756,7 @@ class Monitor:
                     self._kick_tracker()
             except Exception as e:  # noqa: BLE001 — watching never breaks
                 self._note(f"rewards watch: {e}")
+        self.publish_files(now)
         if now - self._history_at > 6 * 3600.0:
             self._history_at = now
             hist, day_totals = load_history()

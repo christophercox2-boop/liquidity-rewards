@@ -270,6 +270,11 @@ function orow(d,o){
 }
 function render(d){
  var out='';var any=false;
+ out+='<div class="card"><details><summary><b>Place an order by hand</b> <span class="muted">\\u2014 bypasses the switches, keeps every safety rail; the automation never touches it</span></summary>'
+  +'<div style="margin:8px 0"><input id="pm" placeholder="market slug" style="width:95%"></div>'
+  +'<div style="margin:8px 0"><select id="ps" style="font-size:16px;padding:8px"><option value="BUY">bid (buy)</option><option value="SELL">ask (sell)</option></select>'
+  +' <input id="pp" placeholder="price c" style="width:20%"> <input id="pq" placeholder="shares" style="width:20%">'
+  +' <button onclick="pl()">Place</button></div><div id="plout"></div></details></div>';
  fams(d).forEach(function(kv){
   var k=kv[0],s=kv[1];var os=(s.orders||[]);
   if(!os.length)return; any=true;
@@ -313,6 +318,18 @@ function mv(id,px){
  if(v==null)return; var p=parseFloat(v)/100;
  if(!(p>0&&p<1)){alert('price must be between 0.1c and 99.9c');return;}
  post({op:'move',order_id:id,price:p},function(j){if(!j.ok)alert(j.note||'refused');});
+}
+function pl(){
+ var m=document.getElementById('pm').value.trim();
+ var s=document.getElementById('ps').value;
+ var p=parseFloat(document.getElementById('pp').value)/100;
+ var q=parseFloat(document.getElementById('pq').value);
+ if(!m||!(p>0&&p<1)||!(q>0)){alert('need a slug, a price in cents, and shares');return;}
+ if(!confirm('Place '+(s==='BUY'?'bid':'ask')+' '+q+' @ '+(p*100).toFixed(1)+'c on '+m+'?'))return;
+ document.getElementById('plout').innerHTML='<div class="muted">placing\\u2026</div>';
+ post({op:'place',market:m,side:s,price:p,qty:q},function(j){
+  document.getElementById('plout').innerHTML='<div class="'+(j.ok?'ok':'bad')+'">'+esc(j.note||'')+'</div>';
+ });
 }
 function cx(id){
  if(!confirm('Cancel this order?'))return;
@@ -488,8 +505,14 @@ PAGES = {
 class WebServer:
     def __init__(self, monitor, port: int | None = None, bind: str = DEFAULT_BIND):
         self.monitor = monitor
-        self.port = port if port is not None else int(os.environ.get("V3_PORT", DEFAULT_PORT))
-        self.bind = bind
+        if port is None and os.environ.get("V1_ENABLED", "0") == "0":
+            # 1.0 retired: 3.0 IS the front door on the public port
+            self.port = int(os.environ.get("PORT", "8080"))
+            self.bind = "0.0.0.0"
+        else:
+            self.port = (port if port is not None
+                         else int(os.environ.get("V3_PORT", DEFAULT_PORT)))
+            self.bind = bind
         self.password = os.environ.get("DASH_PASSWORD", "")
         self._httpd: ThreadingHTTPServer | None = None
 
@@ -528,6 +551,10 @@ class WebServer:
                                                      str(body.get("which") or "master"))}
         if op == "refresh_rewards":
             return self.monitor.refresh_rewards()
+        if op == "place":
+            return self.monitor.owner_place(
+                str(body.get("market") or ""), str(body.get("side") or ""),
+                float(body.get("price") or 0), float(body.get("qty") or 0))
         if op in ("cancel", "move"):
             price = body.get("price")
             return self.monitor.order_op(op, str(body.get("order_id") or ""),
@@ -551,7 +578,16 @@ class WebServer:
 
             def do_GET(self):  # noqa: N802
                 u = urlparse(self.path)
-                route = u.path.rstrip("/") or "/"
+                path = u.path
+                if path == "/v3" or path.startswith("/v3/"):
+                    path = path[len("/v3"):] or "/"   # old bookmarks
+                if path.startswith(("/map", "/lab", "/hunt", "/why",
+                                    "/slate", "/unwind", "/v2")):
+                    self.send_response(302)           # the old pages retired
+                    self.send_header("Location", "/")
+                    self.end_headers()
+                    return
+                route = path.rstrip("/") or "/"
                 if route in PAGES:
                     title, here, js = PAGES[route]
                     self._send(200, "text/html; charset=utf-8",
@@ -568,7 +604,10 @@ class WebServer:
 
             def do_POST(self):  # noqa: N802
                 u = urlparse(self.path)
-                if u.path.rstrip("/") != "/op":
+                p = u.path
+                if p == "/v3" or p.startswith("/v3/"):
+                    p = p[len("/v3"):] or "/"
+                if p.rstrip("/") != "/op":
                     self._send(404, "text/plain", b"not found")
                     return
                 if not authed(self.headers.get, u.query, server.password):
