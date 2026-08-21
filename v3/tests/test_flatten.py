@@ -399,3 +399,71 @@ class TestCoverInTightBooks(unittest.TestCase):
         covers = [o for o in r.fam.orders.values() if o.intent == SELL_SHORT]
         self.assertEqual(len(covers), 1)
         self.assertLessEqual(covers[0].price, 0.03)   # under the 4c ask
+
+
+class TestOwnerDirectives0821(unittest.TestCase):
+    """2026-08-21 morning: scope entries to gov/senate/2028, Silver keeps
+    us off the wrong side of value, no ghosts after a move."""
+
+    def test_entry_scope_blocks_out_of_family_markets(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", capital_usd=100.0,
+                           enter_tokens=("usgub", "usse"))
+        r = Rig(cfg=cfg)
+        r.add_market(A)                              # vmc-ussemov... contains usse
+        r.add_market("paccc-usho-midterms-2026-11-03-rep", event="House control")
+        r.cycle()
+        mkts = {o.market for o in r.fam.orders.values()}
+        self.assertIn(A, mkts)
+        self.assertNotIn("paccc-usho-midterms-2026-11-03-rep", mkts)
+
+    def test_silver_fair_blocks_wrong_side(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.fam.fairs = lambda s: 0.30     # model says 30c; touch is 44c/47c
+        r.cycle()
+        for o in r.fam.orders.values():
+            if o.side == "BUY":
+                self.assertLessEqual(o.price, 0.32)  # no bids above fair+2t
+        # asks at 0.48 are fine (above fair) — and must still exist
+        self.assertTrue(any(o.side == "SELL" for o in r.fam.orders.values()))
+
+    def test_failed_cancel_keeps_original_tracked_and_retries(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        rec = next(o for o in r.fam.orders.values() if o.side == "BUY")
+        # the exchange refuses this order's cancel once, then allows it
+        real_post = r.exchange.post
+        refuse = {"n": 0}
+        def post(url, body, path=None, **kw):
+            if "/cancel" in url and rec.id in url and refuse["n"] == 0:
+                refuse["n"] = 1
+                raise __import__("v3.api", fromlist=["ApiError"]).ApiError("nope", status=500)
+            return real_post(url, body, path=path, **kw)
+        r.exchange.post = post
+        # force a reprice of rec: the touch moves, so the best spot moves
+        from v3.tests.test_family import politics_book
+        r.exchange.books[A] = politics_book(r.now, bid=0.40, ask=0.47)
+        r.fam.last_action.clear()
+        r.fam.cfg.reprice_gain_day = -1.0            # any move clears the bar
+        r.cycle(advance=3700.0)
+        self.assertIn(rec.id, r.fam.orders)          # ghost stays TRACKED
+        self.assertIn("retrying", r.fam.orders[rec.id].why)
+        self.assertIn(rec.id, r.exchange.live)       # and really still rests
+        r.cycle()                                    # retry pass kills it
+        self.assertNotIn(rec.id, r.fam.orders)
+        self.assertNotIn(rec.id, r.exchange.live)
+
+    def test_race_fair_reads_both_tables(self):
+        from v3.silver import SilverFairs
+        sf = SilverFairs()
+        sf.races = {"ga": {"dem": 0.42, "rep": 0.58}}
+        sf.gov_races = {"or": {"dem": 0.88, "rep": 0.12}}
+        self.assertEqual(sf.race_fair("ussewc-usse-ga-2026-11-03-rep"), 0.58)
+        self.assertEqual(sf.race_fair("usgubewc-usgub-or-2026-11-03-dem"), 0.88)
+        self.assertIsNone(sf.race_fair("usgubewc-usgub-ri-2026-11-03-kenblo"))
+        self.assertIsNone(sf.race_fair("vmc-usgubmov-or-2026-11-03-d12-15"))

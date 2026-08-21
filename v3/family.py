@@ -85,6 +85,10 @@ class FamilyConfig:
     rest_until: tuple[int, int] | None = None
     season_start: tuple[int, int, int] | None = None
     min_days_out: int = 3               # nothing resolving this week
+    # Restrict NEW entries to slugs containing any of these tokens (None =
+    # the whole universe). Exits, adopted orders, and dead handling are
+    # never scoped — only where fresh money goes.
+    enter_tokens: tuple[str, ...] | None = None
     max_actions_per_cycle: int = 6
     books_per_cycle: int = 16
     scan_reserve: int = 6
@@ -187,6 +191,7 @@ class Family:
         self.cfg = config or FamilyConfig()
         self.alert = alert or (lambda title, msg: None)
         self.names = names
+        self.fairs = None      # callable(slug) -> model fair prob | None
         self._clock = clock or time.time
         self.terms = TermsStore()
         self.universe: dict[str, dict] = {}       # slug -> {event_n, ...}
@@ -217,6 +222,10 @@ class Family:
         row.setdefault("ts", round(self._clock(), 1))
         self.log.append(row)
         del self.log[:-self.cfg.log_keep]
+
+    def enterable(self, slug: str) -> bool:
+        toks = self.cfg.enter_tokens
+        return toks is None or any(t in slug for t in toks)
 
     def knows(self, slug: str) -> bool:
         """This family's ground: discovered markets, plus anything we
@@ -385,9 +394,14 @@ class Family:
                       else other[0][0] - sign * 5 * tick)
             qty = round(gap * 1.02 + 1.0, 2)
             best = None
+            fair_r = self.fairs(slug) if self.fairs is not None else None
             for k in (0, 1, 2, 3):
                 px = round(anchor - k * sign * tick, 3)
                 if not (0.001 <= px <= 0.999):
+                    continue
+                if fair_r is not None and (
+                        px > fair_r + 2 * tick if side == "BUY"
+                        else px < fair_r - 2 * tick):
                     continue
                 if other and (px >= other[0][0] - 1e-9 if side == "BUY"
                               else px <= other[0][0] + 1e-9):
@@ -425,6 +439,12 @@ class Family:
         if self.cfg.rest_style == "join_quiet":
             v = self.cache.volatility_of(slug)
             join_ok = v is not None and v <= self.cfg.vol_quiet
+        # Never rest on the wrong side of the Silver model's value: a bid
+        # above fair (or an ask below it) is offering to fill at a loss to
+        # the model. Two ticks of slack; markets the model can't price are
+        # unfiltered (owner, 2026-08-21: "build back in info from Nate
+        # Silver model").
+        fair = self.fairs(slug) if self.fairs is not None else None
         rungs = ((0,) if join_ok else ()) + (1, 2, 3, 6, 10, 15)
         cands = []
         for k in rungs:
@@ -433,6 +453,10 @@ class Family:
                 continue
             if other and (px >= other[0][0] - 1e-9 if side == "BUY"
                           else px <= other[0][0] + 1e-9):
+                continue
+            if fair is not None and (
+                    px > fair + 2 * tick if side == "BUY"
+                    else px < fair - 2 * tick):
                 continue
             if px not in cands:
                 cands.append(px)
@@ -707,6 +731,15 @@ class Family:
                     actions -= 1
             return self._finish(summary)
 
+        # 0) zombies from a failed cancel: retry until they die
+        for rec in list(self.orders.values()):
+            if rec.why == "cancel failed during a move — retrying":
+                r = self.desk.cancel(rec.id, rec.market)
+                if r.ok:
+                    self._log(event="zombie_cancelled", market=rec.market,
+                              id=rec.id)
+                    del self.orders[rec.id]
+
         # 1) leave dead or near-resolution markets ENTIRELY (exits included)
         for rec in list(self.orders.values()):
             if actions <= 0:
@@ -836,7 +869,19 @@ class Family:
                 if r.ok:
                     self._log(event="reprice", market=rec.market, side=rec.side,
                               frm=rec.price, to=best["px"], qty=best["qty"])
-                    del self.orders[rec.id]
+                    if r.two_orders:
+                        # the original REFUSED to cancel and still rests.
+                        # It stays tracked — its collateral is real, the
+                        # ceiling must see it — and the cancel is retried
+                        # every cycle until it dies (owner, 2026-08-21: no
+                        # ghosts left behind after a move).
+                        rec.why = "cancel failed during a move — retrying"
+                        self.alert(f"{self.cfg.tag}: two orders resting",
+                                   f"{self._label(rec.market)}: the original "
+                                   f"would not cancel during a move; holding "
+                                   f"both and retrying the cancel")
+                    else:
+                        del self.orders[rec.id]
                     self.orders[r.order_id] = FamilyOrder(
                         id=r.order_id, market=rec.market, side=rec.side,
                         price=best["px"], qty=best["qty"], intent=rec.intent,
@@ -864,6 +909,8 @@ class Family:
             if actions <= 0:
                 break
             if slug not in self.universe or self._dead_here(slug):
+                continue
+            if not self.enterable(slug):
                 continue
             days = slug_days_out(slug, now)
             if days is not None and days < self.cfg.min_days_out:
@@ -1022,6 +1069,7 @@ class Family:
                     self._log(event="book_error", market=slug, error=str(e)[:60])
                 done += 1
         idle = [s for s in self.universe if s not in self.active_markets()
+                and self.enterable(s)
                 and now - (self.scoreboard.get(s) or {}).get("ts", 0.0)
                 > self.cfg.rescan_s]
         idle.sort(key=lambda s: (-min(self.history.get(s, 0.0), 5.0),

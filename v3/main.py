@@ -34,6 +34,7 @@ from .family import Family
 from .floor import Floor
 from .names import Names
 from .orders import OrderDesk
+from .silver import SilverFairs
 from .state import StateStore
 from .switch import MasterSwitch
 
@@ -170,6 +171,7 @@ class Monitor:
         self.flat_stats = {"cancelled": 0, "failed": 0}
         self.last_flat: dict | None = None
         self._history_at = 0.0
+        self.silver = SilverFairs(client=self.client)
         self.families: dict[str, Family] = {}
         self.switches: dict[str, MasterSwitch] = {}
         for key, (cfg_fn, discover) in FAMILIES.items():
@@ -188,6 +190,8 @@ class Monitor:
                 log=self._audit,
             )
             fam.desk = desk
+            if key == "politics":
+                fam.fairs = self.silver.model_fair
             self.families[key] = fam
             self.switches[key] = sw
         self._restore()
@@ -370,6 +374,10 @@ class Monitor:
         self.last_flat = None
         if self.flatten and self._floor_ok:
             self.last_flat = self._flatten_pass(orders, positions)
+        try:
+            self.silver.refresh(now)     # TTL-gated inside
+        except Exception as e:  # noqa: BLE001 — the model never kills the loop
+            self._note(f"silver: {e}")
         if now - self._history_at > 6 * 3600.0:
             self._history_at = now
             hist = load_history()

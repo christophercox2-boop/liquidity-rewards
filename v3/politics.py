@@ -80,7 +80,13 @@ def config() -> FamilyConfig:
         # bar for two hours with nothing better at the market.
         capital_usd=100.0, per_market_usd=20.0, revive_max_usd=5.0,
         share_hi=0.10,
-        min_est_day=0.10, weak_pull_s=2 * 3600.0,
+        # owner, 2026-08-21: two hours "is way too long to wait to be
+        # culled" — half an hour under the bar and the capital moves on
+        min_est_day=0.10, weak_pull_s=1800.0,
+        # and fresh money goes ONLY where the fill-and-reward record is
+        # deepest: governor and senate races (winners, margins, primaries,
+        # seat ladders) and the 2028 presidential slate
+        enter_tokens=("usgub", "usse", "senate", "uspres", "usp-2028"),
         rest_from=None, rest_until=None,      # politics rests every day
         min_days_out=3,
         books_per_cycle=36, scan_reserve=8,
