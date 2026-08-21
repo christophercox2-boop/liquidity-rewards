@@ -543,3 +543,75 @@ class TestPayoutButton(unittest.TestCase):
         r3 = m.refresh_rewards()
         self.assertEqual(r3["new_count"], 1)
         self.assertEqual(r3["new_rows"][0]["day"], "2026-08-20")
+
+
+class TestSilverLogAndWatcher(unittest.TestCase):
+    def test_race_moves_are_logged(self):
+        from v3.silver import SilverFairs
+        sf = SilverFairs(clock=lambda: 100.0)
+        sf.gov_races = {"ga": {"dem": 0.40, "rep": 0.60, "name": "Georgia"}}
+        sf._diff_races(sf.gov_races,
+                       {"ga": {"dem": 0.37, "rep": 0.63, "name": "Georgia"}},
+                       "governor", 200.0)
+        self.assertEqual(len(sf.changes), 1)
+        c = sf.changes[0]
+        self.assertEqual((c["old"], c["new"]), (60.0, 63.0))
+        # a sub-half-point wiggle is noise, not a move
+        sf._diff_races({"ga": {"rep": 0.630}},
+                       {"ga": {"rep": 0.632, "name": "Georgia"}},
+                       "governor", 300.0)
+        self.assertEqual(len(sf.changes), 1)
+
+    def test_floor_skips_a_retired_v2(self):
+        import tempfile
+        from v3 import floor
+        with tempfile.TemporaryDirectory() as p:
+            os.environ["V3_FLOOR_PATH"] = os.path.join(p, "f.json")
+            os.environ["V1_ACK_PATH"] = os.path.join(p, "a1.json")
+            os.environ["V2_ACK_PATH"] = os.path.join(p, "a2.json")
+            os.environ["V2_ENABLED"] = "0"
+            try:
+                f = floor.Floor(clock=lambda: 1000.0)
+                floor.ack("v1", True, clock=lambda: 999.0)
+                self.assertTrue(f.acked())       # no v2 ack needed
+                os.environ["V2_ENABLED"] = "1"
+                self.assertFalse(f.acked())      # running v2 must ack
+            finally:
+                for k in ("V3_FLOOR_PATH", "V1_ACK_PATH", "V2_ACK_PATH",
+                          "V2_ENABLED"):
+                    os.environ.pop(k, None)
+
+    def test_watcher_pushes_only_on_truly_new_rows(self):
+        import tempfile
+        self.dir = tempfile.TemporaryDirectory()
+        p = self.dir.name
+        for k, v in (("V3_STATE_PATH", "s.json"), ("V3_FLOOR_PATH", "f.json"),
+                     ("V1_ACK_PATH", "a1.json"), ("V2_ACK_PATH", "a2.json")):
+            os.environ[k] = os.path.join(p, v)
+        os.environ["V3_FLATTEN"] = "0"
+        os.environ["GITHUB_TOKEN"] = ""
+        try:
+            m = Monitor()
+            rows = [{"date": "2026-08-19", "market": "m1",
+                     "program_type": "lp", "reward_usd": 0.6,
+                     "status": "PENDING"}]
+
+            class C:
+                def earnings(self, start):
+                    return list(rows)
+            m.client = C()
+            pushes = []
+            m.alerts.notify = lambda t, msg, priority="default": pushes.append(t)
+            m.refresh_rewards()                  # baseline
+            r = m.refresh_rewards()
+            self.assertEqual(r["new_count"], 0)  # quiet when nothing new
+            rows.append({"date": "2026-08-20", "market": "m2",
+                         "program_type": "lp", "reward_usd": 3.0,
+                         "status": "PENDING"})
+            r = m.refresh_rewards()
+            self.assertEqual(r["new_count"], 1)  # the watcher would push this
+        finally:
+            for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V1_ACK_PATH",
+                      "V2_ACK_PATH", "V3_FLATTEN"):
+                os.environ.pop(k, None)
+            self.dir.cleanup()

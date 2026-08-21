@@ -47,6 +47,7 @@ def authed(get_header, query_string: str, password: str) -> bool:
 
 
 NAV = (("status", "."), ("orders", "orders"), ("plan", "plan"),
+       ("model", "silver"),
        ("grades", "grades"), ("log", "log"), ("switch", "switch"))
 
 _CSS = """
@@ -424,8 +425,8 @@ function render(d){
 
 function rwcard(){
  if(window._rwbusy)return '<div class="muted">checking the exchange\\u2026</div>';
- var j=window._rw;
- if(!j)return '';
+ var j=window._rw||(window._d&&window._d.rewards_last);
+ if(!j)return '<div class="muted">The watcher checks every 5 minutes and pushes your phone when rewards post. The button forces a check now.</div>';
  if(!j.ok)return '<div class="bad">'+esc(j.note||'failed')+'</div>';
  var h='<div class="card">';
  if(j.note){h+='<div class="sub">'+esc(j.note)+'</div>';}
@@ -451,11 +452,34 @@ function ckrw(){
 }
 """
 
+SILVER_JS = """
+function render(d){
+ var sv=d.silver||{};var out='';
+ out+='<div class="card"><b>The Silver model, as this system sees it</b>';
+ out+='<div class="sub">'+(sv.senate_races||0)+' senate and '+(sv.gov_races||0)+' governor races. Tables checked '+(sv.tables_age_min==null?'?':sv.tables_age_min)+' min ago.'+(sv.official_age_h!=null?' Seat simulations from '+sv.official_age_h+' hours ago ('+esc(sv.official_source||'')+').':'')+'</div>';
+ out+='<div class="hint">The feed carries the model\\u2019s odds, not the polls behind them. So this page shows every MOVE in the odds and when this system saw it. The tables update when Silver posts new polling \\u2014 about daily in season, checked every 6 hours. The simulations update only when he reruns the model; past 5 days old, the system widens its bands instead of trusting them alone.</div>';
+ out+='</div>';
+ var log=(d.silver_log||[]).slice().reverse();
+ out+='<div class="card"><b>Model moves seen</b>';
+ if(!log.length)out+='<div class="muted">None yet \\u2014 the log starts now and fills as the odds move.</div>';
+ var day='';
+ log.slice(0,60).forEach(function(r){
+  var dt=new Date((r.ts||0)*1000);var dl=dt.toLocaleDateString([], {month:'short',day:'numeric'});
+  if(dl!==day){day=dl;out+='<div class="tri-h" style="margin-top:8px">'+esc(dl)+'</div>';}
+  var dd=(r.new-r.old);
+  out+='<div class="sub">'+esc(r.name)+' ('+esc(r.chamber)+'): R '+r.old+'% \\u2192 '+r.new+'% <span class="'+(Math.abs(dd)>=2?'warn':'muted')+'">('+(dd>0?'+':'')+dd.toFixed(1)+')</span> <span class="muted">'+when(r.ts)+'</span></div>';
+ });
+ out+='</div>';
+ return out;
+}
+"""
+
 PAGES = {
     "/": ("3.0 — status", "status", STATUS_JS),
     "/orders": ("3.0 — orders", "orders", ORDERS_JS),
     "/plan": ("3.0 — the plan", "plan", PLAN_JS),
     "/switch": ("3.0 — switches", "switch", SWITCH_JS),
+    "/silver": ("3.0 — the model", "model", SILVER_JS),
     "/grades": ("3.0 — grades", "grades", GRADES_JS),
     "/log": ("3.0 — log", "log", LOG_JS),
 }

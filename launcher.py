@@ -28,8 +28,11 @@ BACKOFF_MIN_S, BACKOFF_MAX_S = 5.0, 60.0
 
 def children() -> dict[str, list[str]]:
     procs = {"1.0": [sys.executable, "-u", os.path.join(HERE, "live", "monitor.py")]}
-    if os.environ.get("V2_ENABLED", "1") == "0":
-        print("launcher: 2.0 disabled by V2_ENABLED=0", flush=True)
+    if os.environ.get("V2_ENABLED", "0") == "0":
+        # RETIRED by default (owner, 2026-08-21: "go ahead and start the
+        # ports") — 3.0 carries the payout watcher now. Set V2_ENABLED=1
+        # to resurrect the seats engine and its pages.
+        print("launcher: 2.0 retired — V2_ENABLED=1 resurrects it", flush=True)
     elif not (os.environ.get("POLYMARKET_KEY_ID") and os.environ.get("POLYMARKET_SECRET_KEY")):
         print("launcher: 2.0 skipped — exchange keys not set", flush=True)
     else:

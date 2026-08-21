@@ -182,6 +182,8 @@ class Monitor:
         self.samplers: dict[str, Estimator] = {}
         self.actuals_by_day: dict[str, float] = {}
         self.rewards_seen: dict[str, float] = {}
+        self.rw_last: dict | None = None      # latest payout-check result
+        self._rw_at = 0.0
         self._lock = threading.Lock()
         self.families: dict[str, Family] = {}
         self.switches: dict[str, MasterSwitch] = {}
@@ -292,6 +294,8 @@ class Monitor:
                                or {"cancelled": 0, "failed": 0})
         self.rewards_seen = dict(saved.get("rewards_seen") or {})
         self.actuals_by_day = dict(saved.get("actuals_by_day") or {})
+        self.silver.changes = list(saved.get("silver_log") or [])
+        self.rw_last = saved.get("rewards_last")
         age = time.time() - (saved.get("saved_at") or 0)
         armed = [k for k, sw in self.switches.items() if sw.on and self.master.on]
         self._note(f"booted build {self.build}; restored state {age:.0f}s old"
@@ -340,6 +344,8 @@ class Monitor:
             "summaries": summaries,
             "floor": self.floor.status(now),
             "ws": dict(self.stream.status) if self.stream else {},
+            "silver_log": self.silver.changes[-120:],
+            "rewards_last": self.rw_last,
             "silver": {
                 "senate_races": len(self.silver.races),
                 "gov_races": len(self.silver.gov_races),
@@ -411,6 +417,22 @@ class Monitor:
                 return {"ok": r.ok, "note": r.note}
             return {"ok": False, "note": f"unknown op {op}"}
         return {"ok": False, "note": "not one of 3.0's orders"}
+
+    def _kick_tracker(self) -> None:
+        """Ask 1.0 (same container) to refresh rewards.csv on GitHub so
+        the committed record is current when the push lands. The file
+        keeps exactly one writer."""
+        pw = os.environ.get("DASH_PASSWORD", "")
+        if not pw:
+            return
+        try:
+            import requests
+            requests.post(
+                f"http://127.0.0.1:{os.environ.get('PORT', '8080')}/track_now",
+                json={}, headers={"X-Dash-Key": pw, "X-Reprice": "1"},
+                timeout=5)
+        except Exception:  # noqa: BLE001 — best effort
+            pass
 
     def refresh_rewards(self) -> dict:
         """Owner's button: pull the exchange's posted payouts now, show
@@ -548,6 +570,24 @@ class Monitor:
             self.silver.refresh(now)     # TTL-gated inside
         except Exception as e:  # noqa: BLE001 — the model never kills the loop
             self._note(f"silver: {e}")
+        # the payout watcher (ported from 2.0, owner-approved): every five
+        # minutes, diff the exchange's posted rewards and push the phone
+        # the moment something new lands
+        if now - self._rw_at > 300.0:
+            self._rw_at = now
+            try:
+                res = self.refresh_rewards()
+                if res.get("new_count"):
+                    self.rw_last = res
+                    days = sorted((res.get("days") or {}).items())[-2:]
+                    line = ", ".join(f"{d[5:]} ${v:,.2f}" for d, v in days)
+                    self.alerts.notify(
+                        "Rewards posted",
+                        f"{res['new_count']} new rows at the exchange; "
+                        f"latest day totals: {line}")
+                    self._kick_tracker()
+            except Exception as e:  # noqa: BLE001 — watching never breaks
+                self._note(f"rewards watch: {e}")
         if now - self._history_at > 6 * 3600.0:
             self._history_at = now
             hist, day_totals = load_history()

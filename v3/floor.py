@@ -78,9 +78,11 @@ class Floor:
         _write(floor_path(), {"want": bool(want), "ts": round(self._clock(), 1)})
 
     def acked(self, now: float | None = None) -> bool:
-        """Both older versions have halted, recently enough to act on."""
+        """Every RUNNING older version has halted, recently enough to act
+        on. A retired version (V2_ENABLED=0 — owner, 2026-08-21: kill
+        2.0) writes no acknowledgement and is not awaited."""
         now = now if now is not None else self._clock()
-        for who in ("v1", "v2"):
+        for who in self.required():
             ack = _read(ack_path(who))
             if not ack.get("halted"):
                 return False
@@ -88,10 +90,17 @@ class Floor:
                 return False
         return True
 
+    @staticmethod
+    def required() -> tuple[str, ...]:
+        if os.environ.get("V2_ENABLED", "1") == "0":
+            return ("v1",)
+        return ("v1", "v2")
+
     def status(self, now: float | None = None) -> dict:
         now = now if now is not None else self._clock()
-        out = {"want": bool(_read(floor_path()).get("want"))}
-        for who in ("v1", "v2"):
+        out = {"want": bool(_read(floor_path()).get("want")),
+               "required": list(self.required())}
+        for who in self.required():
             ack = _read(ack_path(who))
             out[who] = {"halted": bool(ack.get("halted")),
                         "age": (round(now - float(ack["ts"]), 1)

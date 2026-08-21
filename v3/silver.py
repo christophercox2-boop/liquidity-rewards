@@ -242,6 +242,11 @@ class SilverFairs:
     def __init__(self, client=None, clock=None):
         self.client = client            # v2.api.Client, for its session/retries
         self._clock = clock or time.time
+        # every observed model move, for the /silver page: the feed does
+        # not carry the POLLS that cause a move, only the odds — so the
+        # log records what changed and when we saw it, and the page links
+        # to the source table
+        self.changes: list[dict] = []
         self.races: dict[str, dict] = {}
         self.gov_races: dict[str, dict] = {}   # governor table, same shape
         self.pmf: dict[int, float] = {}       # central curve (SWING_RHO_MID)
@@ -282,9 +287,27 @@ class SilverFairs:
                 return False
         got = parse_races(text)
         if got:
+            self._diff_races(self.gov_races, got, "governor", now)
             self.gov_races = got
             self._gov_at = now
         return bool(got)
+
+    def _diff_races(self, old: dict, new: dict, chamber: str,
+                    now: float) -> None:
+        if not old:
+            return
+        for ab, row in new.items():
+            o = old.get(ab)
+            if not o:
+                continue
+            d = (row.get("rep") or 0.0) - (o.get("rep") or 0.0)
+            if abs(d) >= 0.005:
+                self.changes.append({
+                    "ts": round(now, 1), "chamber": chamber, "abbr": ab,
+                    "name": row.get("name") or ab.upper(),
+                    "old": round((o.get("rep") or 0.0) * 100, 1),
+                    "new": round((row.get("rep") or 0.0) * 100, 1)})
+        del self.changes[:-200]
 
     def race_fair(self, slug: str) -> float | None:
         """The Silver table's win probability for a party's race-winner
@@ -410,6 +433,12 @@ class SilverFairs:
             return float("inf")
 
     def load(self, text: str, now: float) -> bool:
+        got0 = parse_races(text)
+        if got0:
+            self._diff_races(self.races, got0, "senate", now)
+        return self._load_inner(text, now)
+
+    def _load_inner(self, text: str, now: float) -> bool:
         races = parse_races(text)
         if not races:
             self.note = "silver table parsed empty"
