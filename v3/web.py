@@ -205,28 +205,42 @@ function render(d){
 """
 
 ORDERS_JS = """
+function fold(title,sub,body,open){
+ return '<details'+(open?' open':'')+'><summary><b>'+title+'</b> <span class="muted">'+sub+'</span></summary>'+body+'</details>';
+}
+function orow(d,o){
+ var e=(o.live_est!=null?o.live_est:o.est_day);
+ return '<div style="margin:9px 0 0;border-top:1px solid #2c3527;padding-top:7px">'
+  +'<div class="name">'+nm(d,o.market)+'</div>'
+  +'<div class="muted"><code>'+esc(o.market)+'</code></div>'
+  +'<div class="sub">'+(o.side==='BUY'?'bid':'ask')+' '+(o.qty||0)+' @ '+pc(o.price)
+  +' \\u2014 '+(e==null?'<span class="warn">no estimate yet</span>':usd(e)+'/day')
+  +' <span class="pill">'+esc(o.purpose)+'</span></div>'
+  +(o.verdict?'<div class="vrd">'+esc(o.verdict)+'</div>':'')
+  +(o.why?'<div class="vrd">placed because: '+esc(o.why)+'</div>':'')
+  +'<div><button class="small" onclick="mv(\\''+esc(o.id)+'\\','+o.price+')">Move</button>'
+  +'<button class="small off" onclick="cx(\\''+esc(o.id)+'\\')">Cancel</button></div>'
+  +'</div>';
+}
 function render(d){
- var out='';var total=0;var any=false;
+ var out='';var any=false;
  fams(d).forEach(function(kv){
   var k=kv[0],s=kv[1];var os=(s.orders||[]);
   if(!os.length)return; any=true;
-  var est=0;os.forEach(function(o){est+=(o.live_est!=null?o.live_est:o.est_day)||0;});
-  out+='<div class="card"><b>'+esc(s.name||k)+'</b> <span class="muted">'+os.length+' orders, ~'+usd(est)+'/day</span>';
-  os.sort(function(a,b){return ((b.live_est!=null?b.live_est:b.est_day)||0)-((a.live_est!=null?a.live_est:a.est_day)||0);});
-  os.forEach(function(o){
-   var e=(o.live_est!=null?o.live_est:o.est_day);
-   out+='<div style="margin:9px 0 0;border-top:1px solid #2c3527;padding-top:7px">'
-    +'<div class="name">'+nm(d,o.market)+'</div>'
-    +'<div class="muted"><code>'+esc(o.market)+'</code></div>'
-    +'<div class="sub">'+(o.side==='BUY'?'bid':'ask')+' '+(o.qty||0)+' @ '+pc(o.price)
-    +' \\u2014 '+(e==null?'<span class="warn">no estimate yet</span>':usd(e)+'/day')
-    +' <span class="pill">'+esc(o.purpose)+'</span></div>'
-    +(o.verdict?'<div class="vrd">'+esc(o.verdict)+'</div>':'')
-    +(o.why?'<div class="vrd">placed because: '+esc(o.why)+'</div>':'')
-    +'<div><button class="small" onclick="mv(\\''+esc(o.id)+'\\','+o.price+')">Move</button>'
-    +'<button class="small off" onclick="cx(\\''+esc(o.id)+'\\')">Cancel</button></div>'
-    +'</div>';
-  });
+  var byest=function(a,b){return ((b.live_est!=null?b.live_est:b.est_day)||0)-((a.live_est!=null?a.live_est:a.est_day)||0);};
+  var earn=os.filter(function(o){return o.purpose!=='sell';}).sort(byest);
+  var sell=os.filter(function(o){return o.purpose==='sell';}).sort(byest);
+  var esum=0;earn.forEach(function(o){esum+=(o.live_est!=null?o.live_est:o.est_day)||0;});
+  var ssum=0;sell.forEach(function(o){ssum+=(o.live_est!=null?o.live_est:o.est_day)||0;});
+  out+='<div class="card"><b>'+esc(s.name||k)+'</b>';
+  if(earn.length){
+   var eb='';earn.forEach(function(o){eb+=orow(d,o);});
+   out+=fold('Earning','\\u2014 '+earn.length+' order'+(earn.length!==1?'s':'')+', ~'+usd(esum)+'/day',eb,true);
+  }else{out+='<div class="muted" style="margin:8px 0 0">No earning orders resting.</div>';}
+  if(sell.length){
+   var sb='';sell.forEach(function(o){sb+=orow(d,o);});
+   out+=fold('Exits','\\u2014 '+sell.length+' order'+(sell.length!==1?'s':'')+', earning ~'+usd(ssum)+'/day while they wait',sb,false);
+  }
   out+='</div>';
  });
  if(!any)out+='<div class="card muted">No resting orders. When a family is armed and finds something worth resting in, each order shows here with its name, its verdict, and its own Move/Cancel.</div>';
