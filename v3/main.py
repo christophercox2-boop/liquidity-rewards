@@ -264,18 +264,32 @@ class Monitor:
         fresh), then the best idle candidates, 200-market cap. Football
         going unmeasured for hours because the stream only knew politics
         was the 2026-08-21 morning lesson."""
-        held: list[str] = []
-        tops: list[str] = []
+        held_by: list[list[str]] = []
+        tops_by: list[list[str]] = []
         for key in ("politics", "cfb", "nfl"):
             fam = self.families.get(key)
             if fam is None:
                 continue
-            held += sorted(fam.active_markets() | set(fam.inventory))
-            tops += [s for s, sb in sorted(fam.scoreboard.items(),
-                                           key=lambda kv: -(kv[1].get("est")
-                                                            or 0.0))
-                     if sb.get("plans")][:60]
-        return ws_priority(held, [], held + tops)
+            held_by.append(sorted(fam.active_markets() | set(fam.inventory)))
+            tops_by.append([s for s, sb in sorted(
+                fam.scoreboard.items(),
+                key=lambda kv: -(kv[1].get("est") or 0.0))
+                if sb.get("plans")][:60])
+
+        def interleave(lists):
+            # FAIR turns per family — politics' six hundred held markets
+            # once filled the 200-slot cap before football got one
+            # (2026-08-21 morning: cfb blind for 8 hours)
+            out, i = [], 0
+            while any(i < len(l) for l in lists):
+                for l in lists:
+                    if i < len(l):
+                        out.append(l[i])
+                i += 1
+            return out
+
+        held = interleave(held_by)
+        return ws_priority(held, [], held + interleave(tops_by))
 
     def _sampler_loop(self) -> None:
         """The independent clock (REBUILD.md's lesson): earnings are

@@ -763,8 +763,17 @@ class TestStreamRouter(unittest.TestCase):
                     id="x", market="aachc-cfb-wins-2026-11-28-ala-9pt5wins",
                     side="BUY", price=0.4, qty=1.0, intent=BUY_LONG,
                     placed_ts=0.0, purpose="earn")
+                # politics floods its held list: football must still get
+                # early slots under the 200 cap (fair interleave)
+                from v3.family import FamilyOrder as FO
+                for i in range(300):
+                    m.families["politics"].orders[f"p{i}"] = FO(
+                        id=f"p{i}", market=f"ussewc-usse-x{i}-2026-11-03-rep",
+                        side="BUY", price=0.4, qty=1.0, intent=BUY_LONG,
+                        placed_ts=0.0, purpose="earn")
                 slugs = m._ws_slugs()
-                self.assertIn("aachc-cfb-wins-2026-11-28-ala-9pt5wins", slugs)
+                self.assertIn("aachc-cfb-wins-2026-11-28-ala-9pt5wins",
+                              slugs[:10])
             finally:
                 for k in ("V3_STATE_PATH", "V3_FLOOR_PATH"):
                     os.environ.pop(k, None)

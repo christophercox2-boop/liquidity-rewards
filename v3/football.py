@@ -68,7 +68,10 @@ def cfb() -> FamilyConfig:
         capital_usd=150.0, per_market_usd=1.00,
         rest_from=(6, 6), rest_until=(3, 17),      # Sun 06:00 -> Thu 17:00 ET
         season_start=(2026, 8, 27),
-        books_per_cycle=12, scan_reserve=6,
+        # 400+ live orders need real book coverage: the meter went blind
+        # for 8 hours on the smaller budget (2026-08-21 morning)
+        books_per_cycle=20, scan_reserve=8,
+        book_stale_s=300.0, read_age_s=900.0,
         max_actions_per_cycle=6,
         # owner, 2026-08-21: football must test hypotheses too — scouts
         # and starter positions are how it learns what earns
