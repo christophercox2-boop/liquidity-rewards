@@ -1529,9 +1529,9 @@ class Family:
                 if not self._cooldown_ok(slug, plan["side"], now):
                     continue
                 if self.market_spent(slug) + plan["cost"] \
-                        > self.cfg.per_market_usd + 1e-9 \
+                        > self._market_budget(slug) + 1e-9 \
                         and not plan.get("revive"):
-                    continue
+                    continue    # proven ground gets its bigger allowance
                 guess = BUY_LONG if plan["side"] == "BUY" else BUY_SHORT
                 if slug in self.proven and self.cfg.proven_usd > 0:
                     pool_orders = [o for o in self.orders.values()

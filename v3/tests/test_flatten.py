@@ -1485,3 +1485,25 @@ class TestKeepWhenSideCanBeQualified(unittest.TestCase):
         r.cycle()
         self.assertIn("K1", r.fam.orders)   # kept — the side can be qualified
         self.assertEqual(r.fam.orders["K1"].weak_since, 0.0)
+
+
+class TestProvenBudgetActsToo(unittest.TestCase):
+    def test_acting_gate_honors_the_proven_allowance(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        r.fam.orders.clear()            # a clean slate for the gate test
+        r.fam.cfg.proven_per_market_usd = 40.0
+        r.fam.cfg.proven_usd = 150.0
+        r.fam.proven = {A}
+        r.fam.scoreboard[A] = {"ts": r.now, "plans": [
+            {"side": "BUY", "px": 0.10, "qty": 250.0, "share": 0.5,
+             "est": 5.0, "ev": 5.0, "p_fill": 0.1, "fill_cost": 0.01,
+             "cost": 25.0, "why": "t"}]}
+        r.fam.last_action.clear()       # clear the per-side cooldown
+        placed = r.fam._enter(r.now, r.positions, 3)
+        earns = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "earn"]
+        self.assertTrue(earns)          # $25 plan fits the $40 proven cap
+        self.assertEqual(earns[0].qty, 250.0)
