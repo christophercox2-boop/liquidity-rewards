@@ -154,13 +154,13 @@ function showbook(slug,el){
      h+='<table><tr><th class="r">price</th><th class="r">size</th><th class="r">share</th><th class="r">$/day</th><th class="r">fill odds</th><th class="r">fill cost</th><th class="r">EV/day</th></tr>';
      rows.forEach(function(r){
       var st=r.picked?' style="font-weight:bold"':(r.clears_bar?'':' class="muted"');
-      h+='<tr'+st+'><td class="r">'+pc(r.px)+(r.picked?' \u25C0':'')+(r.over_cap?' \u2020':'')+'</td><td class="r">'+r.qty+'</td><td class="r">'+Math.round(r.share*100)+'%</td>'
+      h+='<tr'+st+'><td class="r">'+pc(r.px)+(r.picked?' \u25C0':'')+'</td><td class="r">'+r.qty+'</td><td class="r">'+Math.round(r.share*100)+'%</td>'
         +'<td class="r">'+usd(r.est)+'</td><td class="r">'+Math.round(r.p_fill*100)+'%</td>'
         +'<td class="r">'+(r.fill_cost*100).toFixed(1)+'c</td><td class="r">'+usd(r.ev)+'</td></tr>';
      });
      h+='</table>';
     });
-    h+='<div class="hint">\u25C0 is the planner\u2019s pick; \u2020 means bigger sizes are blocked by the courtesy share cap \u2014 one share only; dim rows pay under the '+((lad.bar||0.75)*100).toFixed(0)+'c bar. Fill odds are per day; fill cost is per share.</div>';
+    h+='<div class="hint">\u25C0 is the planner\u2019s pick; dim rows pay under the '+((lad.bar||0.75)*100).toFixed(0)+'c bar. Fill odds are per day; fill cost is per share.</div>';
    }else if(lad.note){h+='<div class="muted">ladder: '+esc(lad.note)+'</div>';}
    box.innerHTML=h;
   }).catch(function(){box.innerHTML='<div class="bad">unreachable</div>';});

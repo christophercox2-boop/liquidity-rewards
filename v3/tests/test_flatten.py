@@ -157,7 +157,7 @@ class TestCycleOut(unittest.TestCase):
         self.assertTrue(r.fam.orders)
         # the pool collapses to almost nothing: orders now earn ~0.4c/day
         for o in r.exchange.prog_raw.values():
-            o["timePeriods"][0]["rewardPool"] = 0.5
+            o["timePeriods"][0]["rewardPool"] = 0.05
         r.cycle(advance=r.fam.cfg.terms_active_s + 1)   # terms re-read, weak starts
         self.assertTrue(any(o.weak_since for o in r.fam.orders.values()))
         r.cycle(advance=7300.0)                          # past the window

@@ -172,15 +172,16 @@ class TestModes(unittest.TestCase):
             self.assertTrue(o.why)
         self.assertLessEqual(s["spent"], r.fam.cfg.capital_usd)
 
-    def test_join_needs_evidence_of_quiet(self):
+    def test_bids_stay_inside_the_opposing_touch(self):
+        # no quiet-proof needed and no share cap — the one hard bound
+        # left is post-only mechanics: a tick inside the other side
         r = Rig()
         r.add_market(A)
-        for _ in range(6):                       # same book, six sightings
-            r.cache.put(A, politics_book(r.now))
-        self.assertLessEqual(r.cache.volatility_of(A), r.fam.cfg.vol_quiet)
         r.cycle()
-        prices = {round(o.price, 2) for o in r.fam.orders.values()}
-        self.assertIn(0.44, prices)              # joined the quiet touch
+        prices = {o.price for o in r.fam.orders.values() if o.side == "BUY"}
+        self.assertTrue(prices)
+        self.assertTrue(all(p <= 0.46 + 1e-9 for p in prices))
+
 
     def test_busy_book_may_join_when_ev_clears(self):
         # Owner, 2026-08-21: every level is an option, no hard rules —
@@ -195,7 +196,7 @@ class TestModes(unittest.TestCase):
         bids = [o for o in r.fam.orders.values() if o.side == "BUY"]
         self.assertTrue(bids)
         for o in bids:
-            self.assertLessEqual(o.price, 0.45)  # never in front
+            self.assertLessEqual(o.price, 0.46)  # a tick inside the ask
 
 
 class TestRevive(unittest.TestCase):

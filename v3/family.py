@@ -684,7 +684,7 @@ class Family:
                      if (px - (cross_px - sign * tick)) * sign <= 1e-9]
         sf = self.fillmodel.scoring_fraction(slug)
         exit_rate_ps = self._exit_rate_ps
-        pick, solo = None, None
+        pick = None
         for px in cands:
             cost_ps = px if side == "BUY" else 1.0 - px
             in_front = (px - touch) * sign > 1e-9
@@ -744,35 +744,19 @@ class Family:
                                f"{k} tick{'s' if k != 1 else ''} behind the "
                                f"touch, ~{j.share * 100:.1f}% of the "
                                f"{side_name} side")}
-                lift = 1.0 if full_confidence else min(edge_ticks(px) / 4.0, 1.0)
-                eff_cap = (self.cfg.share_hi
-                           + (max(self.cfg.share_max, self.cfg.share_hi)
-                              - self.cfg.share_hi) * lift)
                 if ladder is not None:
-                    row2 = dict(row)
-                    row2["over_cap"] = j.share > eff_cap
-                    ladder.append(row2)
-                if j.share > eff_cap:
-                    # louder than the (edge-lifted) courtesy band:
-                    # acceptable only as a minimum-size solo in front of a
-                    # wall (college)
-                    if in_front and qty == grid[0]:
-                        if solo is None or ev > solo["ev"] + 1e-9:
-                            solo = {**row, "solo": True}
-                    break
+                    ladder.append(dict(row))
+                # No share cap (owner, 2026-08-21: "why would we cap the
+                # total score we can claim? I don't agree with that. No
+                # cap"). Size is bounded by the per-market money, the
+                # family ceiling, the EV bar, and fill odds — nothing
+                # else.
                 if pick is None or ev > pick["ev"] + 1e-9:
                     pick = row
         the_bar = self.cfg.min_est_day if bar is None else bar
-        # best EV wins between the capped pick and the 1-share solo —
-        # the owner's rule (2026-08-21: a 6c/5-share pick at $2.02 was
-        # chosen over a 9c solo at $6.01 because the old order preferred
-        # any capped row; the numbers decide, not the ordering)
-        best = None
-        for cand in (pick, solo):
-            if cand is not None and cand["ev"] >= the_bar:
-                if best is None or cand["ev"] > best["ev"] + 1e-9:
-                    best = cand
-        return best
+        if pick is not None and pick["ev"] >= the_bar:
+            return pick
+        return None
 
     def ladder_view(self, slug: str) -> dict:
         """Every price level the planner prices, with its numbers —
@@ -1323,8 +1307,6 @@ class Family:
                                    own=rec,
                                    bar=(self.cfg.grow_floor
                                         if rec.purpose == "grow" else None))
-            drifted = ((rec.live_share or 0.0) > self.cfg.drift_share
-                       and rec.purpose not in ("revive", "solo"))
             gain = (best["est"] if best else 0.0) - (rec.live_est or 0.0)
             measured = rec.live_ev if rec.live_ev is not None else rec.live_est
             floor_here = (self.cfg.grow_floor if rec.purpose == "grow"
@@ -1353,7 +1335,7 @@ class Family:
                     self._mark(rec.market, rec.side, now)
                     actions -= 1
             elif (best is not None
-                    and (drifted or gain >= self.cfg.reprice_gain_day)
+                    and gain >= self.cfg.reprice_gain_day
                     and (abs(best["px"] - rec.price) > 1e-9
                          or abs(best["qty"] - rec.qty) > 1e-9)
                     # a reprice that GROWS the order answers to the same

@@ -263,10 +263,12 @@ class TestEdgeAggression(unittest.TestCase):
         thick = m.p_fill(slug, "BUY", 0, shield=4000.0, target=5000.0)
         self.assertLess(thick, thin * 0.8)
 
-    def test_share_cap_lifts_with_edge(self):
+    def test_no_share_cap_size_follows_the_money(self):
+        # Owner, 2026-08-21: "why would we cap the total score we can
+        # claim? I don't agree with that. No cap." Sized orders may take
+        # any share; only money, the bar, and fill odds bound them.
         from v3.tests.test_family import A
         from v3.scoring import Book
-        # thin real competition: joining with size means a BIG share
         thin = Book(bids=((0.40, 6.0), (0.02, 60000.0)),
                     asks=((0.60, 6.0), (0.98, 60000.0)),
                     tick=0.01, fetched_at=1_000_000.0)
@@ -275,20 +277,10 @@ class TestEdgeAggression(unittest.TestCase):
         r.cycle()
         bids = [o for o in r.fam.orders.values() if o.side == "BUY"]
         self.assertTrue(bids)
-        self.assertGreater(max(o.share for o in bids), 0.10)   # past the old cap
-        # share above the lifted cap is allowed ONLY at minimum size —
-        # the courtesy cap disciplines size, the solo claims the score
-        for o in bids:
-            if o.share > 0.36:
-                self.assertLessEqual(o.qty, 0.011)
-        # same book, no value information: sized orders still respect
-        # the 10% courtesy; only a minimum-size solo may exceed it
-        r2 = self.rig(None)
-        r2.add_market(A, book=thin)
-        r2.cycle()
-        for o in r2.fam.orders.values():
-            if o.side == "BUY" and o.share > 0.101:
-                self.assertLessEqual(o.qty, 0.011)
+        big = max(bids, key=lambda o: o.share)
+        self.assertGreater(big.share, 0.36)     # past the old cap
+        cost = sum(o.price * o.qty for o in bids)
+        self.assertLessEqual(cost, r.fam.cfg.per_market_usd / 2 + 1e-6)
 
 
 class TestEVDecision(unittest.TestCase):
@@ -395,19 +387,20 @@ class TestGrowthInvesting(unittest.TestCase):
                                    "rewardPool": 6.0, "targetSize": 5000,
                                    "discountFactor": 0.2, "status": "LIVE"}]}
 
-    def test_under_goal_market_gets_a_starter_when_potential_clears(self):
+    def test_no_cap_makes_thin_books_normal_ground(self):
+        # with the share cap gone, sized orders clear the bar here
+        # directly — no growth starter needed
         from v3.tests.test_family import A
         r = self.rig()
         r.add_market(A, book=self.thin_book(1_000_000.0),
                      prog=self.SMALL_POOL)
         r.cycle()
-        grows = [o for o in r.fam.orders.values() if o.purpose == "grow"]
-        self.assertTrue(grows)
-        g = grows[0]
-        self.assertIn("investing to build the evidence", g.why)
-        spent = sum(o.price * o.qty if o.side == "BUY"
-                    else (1 - o.price) * o.qty for o in grows)
-        self.assertLessEqual(spent, 30.0 + 1e-6)
+        earns = [o for o in r.fam.orders.values()
+                 if o.purpose in ("earn", "solo")]
+        self.assertTrue(earns)
+        self.assertEqual([o for o in r.fam.orders.values()
+                          if o.purpose == "grow"], [])
+
 
     def test_growth_off_means_no_starter(self):
         from v3.tests.test_family import A, Rig
@@ -420,18 +413,6 @@ class TestGrowthInvesting(unittest.TestCase):
         r.cycle()
         self.assertEqual([o for o in r.fam.orders.values()
                           if o.purpose == "grow"], [])
-
-    def test_grow_culls_at_its_own_floor_not_the_goal(self):
-        from v3.tests.test_family import A
-        r = self.rig()
-        r.add_market(A, book=self.thin_book(1_000_000.0),
-                     prog=self.SMALL_POOL)
-        r.cycle()
-        g = next(o for o in r.fam.orders.values() if o.purpose == "grow")
-        # it measures ~30-70c: under the GOAL but above its 10c floor —
-        # hours later it must still be standing
-        r.cycle(advance=4000.0)
-        self.assertIn(g.id, r.fam.orders)
 
 
 class TestEvidenceWeighting0821(unittest.TestCase):
