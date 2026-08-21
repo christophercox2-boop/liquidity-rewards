@@ -531,6 +531,12 @@ function wCard(name,slug,b,tri){
  s+=wCurve(asks,X,Y,'#d9b36a');
  s+='</svg>';
  var legend='<div class="muted" style="font-size:12px"><span style="color:#9ec49a">\u25cf</span> bids &nbsp;<span style="color:#d9b36a">\u25cf</span> asks &nbsp;\u00b7 big dot = the pick &nbsp;\u00b7 EV/day at each resting price</div>';
+ var notes='';
+ ['BUY','SELL'].forEach(function(sd){
+  var e=(lad.sides||{})[sd]||{};
+  if(e.note)notes+='<div class="muted" style="font-size:12px">'+(sd==='BUY'?'bids: ':'asks: ')+esc(e.note)+'</div>';
+ });
+ legend+=notes;
  var pkRows=all.filter(function(r){return r.picked;});
  var pk=pkRows.length?'<div style="font-size:16px;margin:6px 0"><b>Decision: '+pkRows.map(function(r){
    return (bids.indexOf(r)>=0?'bid':'ask')+' '+r.qty+' @ '+wFmtC(r.px)+' \u2192 $'+r.ev.toFixed(2)+'/day, '+Math.round(r.p_fill*100)+'% fill odds';
@@ -550,7 +556,9 @@ function wCard(name,slug,b,tri){
  var mine='';
  if((b.ours||[]).length){
   mine='<div style="margin:4px 0"><b>Where I am:</b> '+b.ours.map(function(o){
-   return (o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+wFmtC(o.price)+' ['+o.purpose+']'+(o.est?' ~$'+o.est.toFixed(2)+'/day':'');
+   var tag=o.purpose==='sell'?'exit':o.purpose;
+   var earn=(o.est&&o.est>=0.005)?' \u2014 earning ~$'+o.est.toFixed(2)+'/day':(o.verdict?' \u2014 '+esc(o.verdict):' \u2014 earning $0');
+   return (o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+wFmtC(o.price)+' ['+tag+']'+earn;
   }).join(' \u00b7 ')+'</div>';
  }else{mine='<div class="muted" style="margin:4px 0">no orders resting here yet</div>';}
  if(b.position&&b.position.qty){

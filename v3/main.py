@@ -776,7 +776,8 @@ class Monitor:
             if b is None:
                 continue
             ours = [{"side": o.side, "price": o.price, "qty": o.qty,
-                     "purpose": o.purpose, "est": o.live_est}
+                     "purpose": o.purpose, "est": o.live_est,
+                     "verdict": o.verdict}
                     for o in fam.orders.values() if o.market == slug]
             inv = fam.inventory.get(slug)
             return {"ok": True, "market": slug,

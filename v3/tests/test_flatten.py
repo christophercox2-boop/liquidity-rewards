@@ -1273,3 +1273,20 @@ class TestExitOpportunityCost(unittest.TestCase):
                 live_est=est)
         rate = r.fam._exit_opportunity_rate()
         self.assertAlmostEqual(rate, 5.0 / 50.0, places=3)
+
+
+class TestLadderBelowTargetNote(unittest.TestCase):
+    def test_starved_side_explains_itself(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.02, 10.0),),
+                                  asks=((0.04, 50000.0), (0.08, 31000.0)),
+                                  tick=0.01, fetched_at=1_000_000.0))
+        r.cycle()
+        lad = r.fam.ladder_view(A)
+        self.assertTrue(lad["ok"])
+        buy = lad["sides"]["BUY"]
+        self.assertEqual(buy["rows"], [])
+        self.assertIn("Target Size", buy.get("note", ""))
+        self.assertIn("pays nobody", buy.get("note", ""))

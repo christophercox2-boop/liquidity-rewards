@@ -818,7 +818,16 @@ class Family:
             for r in ordered:
                 r["picked"] = bool(pick and abs(pick["px"] - r["px"]) < 1e-9)
                 r["clears_bar"] = r["ev"] >= self.cfg.min_est_day
-            out["sides"][side] = {"rows": ordered[:24]}
+            entry = {"rows": ordered[:24]}
+            if not ordered:
+                st = sum(q for _, q in book.side(side))
+                if st < float(prog.target):
+                    entry["note"] = (
+                        f"the {'bid' if side == 'BUY' else 'ask'} side holds "
+                        f"{st:,.0f} of {float(prog.target):,.0f} Target Size "
+                        f"shares — the whole side pays nobody, so there is "
+                        f"nothing to price")
+            out["sides"][side] = entry
         return out
 
     def _band(self, slug: str, bids, asks, tick: float) -> dict | None:
