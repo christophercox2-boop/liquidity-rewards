@@ -325,12 +325,14 @@ class SilverFairs:
                         url = m.group(1).rstrip("+' ")
                         continue
                 m = re.search(
-                    r"https://static\.dwcdn\.net/data/[A-Za-z0-9]+\.csv[^\"' ]*",
+                    r"https://static\.dwcdn\.net/data/[A-Za-z0-9]+\.csv"
+                    r"[^\\\s\"']*",
                     r.text)
-                if m and m.group(0).split("?")[0] != default_url:
+                found = m.group(0).rstrip("\\") if m else default_url
+                if found.split("?")[0] != default_url:
                     self.note = (f"{cid} data moved to "
-                                 f"{m.group(0).rsplit('/', 1)[-1].split('?')[0]}")
-                return m.group(0) if m else default_url
+                                 f"{found.rsplit('/', 1)[-1].split('?')[0]}")
+                return found
             return default_url
         except Exception:  # noqa: BLE001 — the fixed address still works
             return default_url
