@@ -165,6 +165,12 @@ STATUS_JS = """
 function render(d){
  var out='';
  var age=Math.max(0,Math.round(Date.now()/1000-(d.saved_at||0)));
+ var bt=(d.boot||{});var btage=(Date.now()/1000)-(bt.ts||0);
+ if(age>=180&&bt.pct!=null&&bt.pct<100&&btage<900){
+  out+='<div class="card"><span class="warn">\\u23F3 starting up \\u2014 '+esc(bt.stage||'')+'</span>'
+   +'<div class="mtrack"><div class="mfill" style="width:'+bt.pct+'%"></div></div>'
+   +'<div class="hint">The first cycle after a restart walks the whole board \\u2014 orders, positions, discovery, terms, books. The page fills in when it completes, usually two to five minutes.</div>';
+ } else
  out+='<div class="card">'+(age<180
    ?'<span class="ok">\\u2705 fresh</span> <span class="muted">\\u2014 updated '+age+'s ago</span>'
    :'<span class="bad">\\u274C stale</span> <span class="muted">\\u2014 last update '+Math.round(age/60)+' min ago; the loop may be down</span>');
@@ -541,6 +547,7 @@ class WebServer:
                 labels[s] = self.monitor.names.label(s)
         d["labels"] = labels
         d["now"] = time.time()
+        d["boot"] = dict(getattr(self.monitor, "boot_stage", {}) or {})
         return d
 
     def handle_op(self, body: dict) -> dict:

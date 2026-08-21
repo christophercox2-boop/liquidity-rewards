@@ -185,6 +185,10 @@ class Monitor:
         self.flat_stats = {"cancelled": 0, "failed": 0}
         self.last_flat: dict | None = None
         self._history_at = 0.0
+        # the boot readout: what the first cycle is doing right now, so a
+        # restart shows a progress bar instead of a scary red "stale"
+        self.boot_stage = {"stage": "starting", "pct": 2, "ts": time.time()}
+        self._first_cycle_done = False
         self.silver = SilverFairs(client=self.client)
         self.samplers: dict[str, Estimator] = {}
         self.actuals_by_day: dict[str, float] = {}
@@ -725,11 +729,19 @@ class Monitor:
         with self._lock:
             return self._cycle_locked(now)
 
+    def _stage(self, stage: str, pct: int) -> None:
+        if not self._first_cycle_done:
+            self.boot_stage = {"stage": stage, "pct": pct,
+                               "ts": round(time.time(), 1)}
+
     def _cycle_locked(self, now: float) -> dict:
+        self._stage("checking the floor and switches", 5)
         self.flatten = flatten_active()
         self.floor.write_want(self.master.on or self.flatten)
         self._floor_ok = self.floor.acked(now)
+        self._stage("fetching the account's resting orders", 10)
         orders = self.client.open_orders()
+        self._stage("fetching positions", 18)
         positions = self.client.positions_net()
         self.last_flat = None
         if self.flatten and self._floor_ok:
@@ -766,7 +778,10 @@ class Monitor:
             if day_totals:
                 self.actuals_by_day = day_totals
         summaries = {}
+        fam_pct = {"politics": 25, "cfb": 78, "nfl": 90}
         for key, fam in self.families.items():
+            self._stage(f"{fam.cfg.name}: discovering, reading terms, "
+                        f"scoring books", fam_pct.get(key, 94))
             if fam.cfg.proven_usd > 0:
                 per_mkt = self.samplers[key].per_market
                 fam.proven = {mkt for mkt, usd in per_mkt.items()
@@ -791,10 +806,15 @@ class Monitor:
             except ApiError as e:
                 self._note(f"{key}: {e}")
                 summaries[key] = {"name": fam.cfg.name, "error": str(e)[:120]}
+        self._stage("first save", 98)
         st = self._state(now, summaries)
         self.last_state = st
         self.store.save_local(st)
         self.store.maybe_save_remote(st)
+        if not self._first_cycle_done:
+            self._first_cycle_done = True
+            self.boot_stage = {"stage": "running", "pct": 100,
+                               "ts": round(time.time(), 1)}
         return st
 
     def run(self) -> int:
