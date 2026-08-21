@@ -305,7 +305,13 @@ class Family:
             self.last_terms_active = now
             batch += sorted(self.active_markets() | set(self.inventory))
         if now - self.last_terms_full >= self.cfg.terms_full_s and self.universe:
-            slugs = sorted(self.universe)
+            # markets whose terms were NEVER read come first — a restart
+            # must not send the rotation back to the top of the alphabet
+            # while whole families (the Aug-20 seat-count arrivals) sit
+            # unread at the bottom of it
+            slugs = sorted(self.universe,
+                           key=lambda s: (s in self.terms.current
+                                          or s in self.known_dead, s))
             take = self.cfg.terms_slice
             lo = self._terms_rotor % max(len(slugs), 1)
             batch += (slugs[lo:lo + take] + slugs[:max(0, lo + take - len(slugs))])
