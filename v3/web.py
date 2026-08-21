@@ -46,8 +46,8 @@ def authed(get_header, query_string: str, password: str) -> bool:
     return False
 
 
-NAV = (("status", "."), ("orders", "orders"), ("plan", "plan"),
-       ("model", "silver"), ("graph", "graph"),
+NAV = (("meter", "."), ("status", "status"), ("orders", "orders"),
+       ("plan", "plan"), ("model", "silver"),
        ("grades", "grades"), ("log", "log"), ("switch", "switch"))
 
 _CSS = """
@@ -512,7 +512,7 @@ function load(){
    if((e.dots||[]).length||p[1]!=='est_nfl')out+=drawGraph(p[0],e.dots||[]);
   });
   document.getElementById('c').innerHTML=out;
- }).catch(function(){document.getElementById('c').innerHTML='<div class="bad">unreachable</div>';});
+ }).catch(function(){document.getElementById('c').innerHTML='<div class="muted">waking up \u2014 retrying in 20s\u2026</div>';});
 }
 load();setInterval(load,20000);
 """
@@ -588,13 +588,14 @@ function render(d){
 """
 
 PAGES = {
-    "/": ("3.0 — status", "status", STATUS_JS),
+    "/": ("3.0 — the meter", "meter", GRAPH_JS),
+    "/status": ("3.0 — status", "status", STATUS_JS),
     "/orders": ("3.0 — orders", "orders", ORDERS_JS),
     "/plan": ("3.0 — the plan", "plan", PLAN_JS),
     "/switch": ("3.0 — switches", "switch", SWITCH_JS),
     "/silver": ("3.0 — the model", "model", SILVER_JS),
     "/grades": ("3.0 — grades", "grades", GRADES_JS),
-    "/graph": ("3.0 — the meter", "graph", GRAPH_JS),
+    "/graph": ("3.0 — the meter", "meter", GRAPH_JS),
     "/log": ("3.0 — log", "log", LOG_JS),
 }
 
