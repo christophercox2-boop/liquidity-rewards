@@ -517,14 +517,12 @@ class Family:
 
         # -- the side qualifies: join or step back, never in front --
         touch = levels[0][0]
-        # Joining the touch needs EVIDENCE of quiet: a volatility reading
-        # exists only after repeated fetches, so a first entry always goes
-        # behind the touch and only a market we are already watching can
-        # graduate to the touch. Known ground only.
-        join_ok = False
-        if self.cfg.rest_style == "join_quiet":
-            v = self.cache.volatility_of(slug)
-            join_ok = v is not None and v <= self.cfg.vol_quiet
+        # Every price level is an option (owner, 2026-08-21): the EV math
+        # walks the whole in-window ladder and picks the best spot.
+        # Joining an occupied level is safer than the distance alone
+        # says — fills are first-come-first-served, so the shares already
+        # resting there absorb takers before ours. That protection is
+        # priced into the fill odds (the queue shield), not a rule.
         # One fair price per market, everything through EV (owner,
         # 2026-08-21): the band — Silver prior pulled by fills, quiet
         # rests, and sized touch anchors — gives a single fair estimate.
@@ -566,13 +564,7 @@ class Family:
             e = (value_ctr - px) if side == "BUY" else (px - value_ctr)
             return max(e / tick, 0.0) * independence
 
-        if (not join_ok and self.cfg.join_edge_ticks is not None
-                and edge_ticks(touch) >= self.cfg.join_edge_ticks):
-            join_ok = True    # a fill AT the touch is a good deal — take the front
-        if full_confidence:
-            join_ok = True
-        rungs = tuple(k for k in ((0,) if join_ok else ()) + (1, 2, 3, 6, 10, 15)
-                      if k >= min_rung)
+        rungs = tuple(k for k in range(0, 16) if k >= min_rung)
         cands = []
         for k in rungs:
             px = round(touch - k * sign * tick, 3)
@@ -625,6 +617,11 @@ class Family:
             k_px = round(abs(touch - px) / tick)
             shield = sum(q for p2, q in levels
                          if (p2 - px) * sign > 1e-9)
+            queue = sum(q for p2, q in levels if abs(p2 - px) <= 1e-9)
+            if (own is not None and own.side == side
+                    and abs(own.price - px) <= 1e-9):
+                queue = max(queue - own.qty, 0.0)
+            shield += queue
             conc = 0.0
             if value_ctr is not None:
                 past = (px - value_ctr) if side == "BUY" else (value_ctr - px)
@@ -1068,6 +1065,9 @@ class Family:
                 shield_now = sum(q for p2, q in lv
                                  if (p2 - rec.price)
                                  * (1.0 if rec.side == "BUY" else -1.0) > 1e-9)
+                shield_now += max(sum(q for p2, q in lv
+                                      if abs(p2 - rec.price) <= 1e-9)
+                                  - rec.qty, 0.0)
                 pf_now = self.fillmodel.p_fill(rec.market, rec.side, ticks_now,
                                                shield=shield_now,
                                                target=float(prog.target))
@@ -1078,6 +1078,9 @@ class Family:
                     - pf_now * fc_now * rec.qty, 4)
                 self.fillmodel.observe_scoring(rec.market,
                                                j.qualifies and j.in_window)
+                self.fillmodel.observe_approach(rec.market, rec.side,
+                                                ticks_now, 60.0,
+                                                rec.live_est or 0.0)
             if rec.purpose != "sell" and now - rec.rest_noted > 1800.0:
                 rec.rest_noted = now
                 self.evidence.rest_mark(rec.market, rec.id, rec.side,

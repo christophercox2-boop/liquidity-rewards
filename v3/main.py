@@ -35,7 +35,6 @@ from .family import Family
 from .floor import Floor
 from .names import Names
 from .orders import OrderDesk
-from .books import ws_priority
 from .estimator import Estimator
 from .silver import SilverFairs
 from .state import StateStore
@@ -260,36 +259,63 @@ class Monitor:
         self.floor.write_want(self.master.on or self.flatten)
 
     def _ws_slugs(self) -> list[str]:
-        """Every armed family's held markets first (they must stay
-        fresh), then the best idle candidates, 200-market cap. Football
-        going unmeasured for hours because the stream only knew politics
-        was the 2026-08-21 morning lesson."""
-        held_by: list[list[str]] = []
-        tops_by: list[list[str]] = []
+        """The owner's slot order (2026-08-21): every politics market
+        he is in seats first — that is the priority — then football
+        markets holding orders, then idle candidates rotate through the
+        leftover slots. Promising candidates (a measured rate or a
+        planned estimate) hold stable seats or rotate often; cold ones
+        get a thin rotation lane."""
+        from .ws import SUB_CAP
+        out: list[str] = []
+        seen: set[str] = set()
+
+        def take(slugs, room=None):
+            for s in slugs:
+                if room is not None and len(out) >= room:
+                    break
+                if s not in seen:
+                    seen.add(s)
+                    out.append(s)
+
+        for key in ("politics", "cfb", "nfl"):
+            fam = self.families.get(key)
+            if fam is not None:
+                take(sorted(fam.active_markets() | set(fam.inventory)),
+                     room=SUB_CAP)
+        cands: list[tuple[float, str]] = []
         for key in ("politics", "cfb", "nfl"):
             fam = self.families.get(key)
             if fam is None:
                 continue
-            held_by.append(sorted(fam.active_markets() | set(fam.inventory)))
-            tops_by.append([s for s, sb in sorted(
-                fam.scoreboard.items(),
-                key=lambda kv: -(kv[1].get("est") or 0.0))
-                if sb.get("plans")][:60])
+            est = self.samplers.get(key)
+            rates = est.market_rates if est is not None else {}
+            for s, sb in fam.scoreboard.items():
+                if s in seen:
+                    continue
+                promise = max(rates.get(s) or 0.0,
+                              (sb.get("est") or 0.0) if sb.get("plans")
+                              else 0.0)
+                cands.append((promise, s))
+        cands.sort(key=lambda t: (-t[0], t[1]))
+        warm = [s for p, s in cands if p > 0.0]
+        cold = [s for p, s in cands if p <= 0.0]
+        room = max(SUB_CAP - len(out), 0)
+        take(warm[:room // 2], room=SUB_CAP)     # stable seats for the best
+        warm_rest = warm[room // 2:]
 
-        def interleave(lists):
-            # FAIR turns per family — politics' six hundred held markets
-            # once filled the 200-slot cap before football got one
-            # (2026-08-21 morning: cfb blind for 8 hours)
-            out, i = [], 0
-            while any(i < len(l) for l in lists):
-                for l in lists:
-                    if i < len(l):
-                        out.append(l[i])
-                i += 1
-            return out
+        def rotate(pool, n, window):
+            if not pool or n <= 0:
+                return []
+            n = min(n, len(pool))
+            off = (window * n) % len(pool)
+            return (pool + pool)[off:off + n]
 
-        held = interleave(held_by)
-        return ws_priority(held, [], held + interleave(tops_by))
+        window = int(time.time() // 900)         # a fresh mix every 15 min
+        room = max(SUB_CAP - len(out), 0)
+        take(rotate(warm_rest, (room * 3) // 4, window), room=SUB_CAP)
+        room = max(SUB_CAP - len(out), 0)
+        take(rotate(cold, room, window), room=SUB_CAP)
+        return out[:SUB_CAP]
 
     def _sampler_loop(self) -> None:
         """The independent clock (REBUILD.md's lesson): earnings are

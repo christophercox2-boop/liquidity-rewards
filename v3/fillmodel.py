@@ -155,6 +155,11 @@ class FillModel:
         # rests. This learns how long offloading actually takes.
         self.offload_days: dict[str, float] = {}    # family -> EWMA days
         self.offload_n: dict[str, int] = {}
+        # which resting approach pays (owner, 2026-08-21: "Collect some
+        # data on a variety of approaches to see which pays off more
+        # over time"): seconds rested and estimate-dollars accrued per
+        # (family, side, distance bucket). COLLECT ONLY for now.
+        self.approach_obs: dict[str, list[float]] = {}  # fam|side|b -> [sec, $sec/day]
         self.tod_obs: dict[str, list[float]] = {}   # fam|side|band -> [sec, crossings]
 
     @staticmethod
@@ -211,6 +216,13 @@ class FillModel:
         k = f"{family_of(slug)}|{age_bucket(age_s)}"
         cell = self.age_obs.setdefault(k, [0.0, 0.0])
         cell[1] += 1.0
+
+    def observe_approach(self, slug: str, side: str, ticks_back: int,
+                         dt_s: float, est_day: float) -> None:
+        k = f"{family_of(slug)}|{side}|{_bucket(ticks_back)}"
+        cell = self.approach_obs.setdefault(k, [0.0, 0.0])
+        cell[0] += dt_s
+        cell[1] += (est_day or 0.0) * dt_s
 
     def observe_offload(self, slug: str, days: float) -> None:
         fam = family_of(slug)
@@ -309,6 +321,8 @@ class FillModel:
                 "scoring_frac": self.scoring_frac,
                 "offload_days": self.offload_days,
                 "offload_n": self.offload_n,
+                "approach_obs": {k: [round(v[0], 1), round(v[1], 2)]
+                                 for k, v in self.approach_obs.items()},
                 "age_obs": {k: [round(v[0], 1), v[1]]
                             for k, v in self.age_obs.items()},
                 "tod_obs": {k: [round(v[0], 1), v[1]]
@@ -323,6 +337,8 @@ class FillModel:
         m.scoring_frac = dict(d.get("scoring_frac") or {})
         m.offload_days = dict(d.get("offload_days") or {})
         m.offload_n = dict(d.get("offload_n") or {})
+        m.approach_obs = {k: [float(v[0]), float(v[1])]
+                          for k, v in (d.get("approach_obs") or {}).items()}
         m.age_obs = {k: [float(v[0]), float(v[1])]
                      for k, v in (d.get("age_obs") or {}).items()}
         m.tod_obs = {k: [float(v[0]), float(v[1])]

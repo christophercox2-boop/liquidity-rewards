@@ -225,14 +225,28 @@ class TestEdgeAggression(unittest.TestCase):
         self.assertTrue(any(abs(o.price - 0.44) < 1e-9 for o in bids), bids)
         self.assertTrue(any("inside value" in o.why for o in bids))
 
-    def test_no_edge_information_keeps_the_timid_defaults(self):
+    def test_queue_ahead_shields_the_join(self):
+        # Owner, 2026-08-21: joining an occupied level is protected by
+        # the shares already there — first come, first served. Thick
+        # queue -> lower fill odds at the SAME price.
         from v3.tests.test_family import A
-        r = self.rig(None)              # no model, no evidence
-        r.add_market(A)
-        r.cycle()
-        for o in r.fam.orders.values():
-            if o.side == "BUY":
-                self.assertLess(o.price, 0.44)   # behind the touch
+        from v3.scoring import Book
+        def join_p_fill(touch_q):
+            r = self.rig(None)
+            r.add_market(A, book=Book(
+                bids=((0.44, touch_q), (0.02, 60000.0)),
+                asks=((0.47, 20.0), (0.98, 60000.0)),
+                tick=0.01, fetched_at=1_000_000.0))
+            r.cycle()
+            plan = r.fam.scoreboard.get(A) or {}
+            rows = [p for p in (plan.get("plans") or [])
+                    if p.get("side") == "BUY" and p.get("px") == 0.44]
+            return rows[0]["p_fill"] if rows else None
+        thin = join_p_fill(0.5)
+        thick = join_p_fill(4000.0)
+        self.assertIsNotNone(thin)
+        self.assertIsNotNone(thick)
+        self.assertLess(thick, thin * 0.8)
 
     def test_share_cap_lifts_with_edge(self):
         from v3.tests.test_family import A
@@ -280,9 +294,9 @@ class TestEVDecision(unittest.TestCase):
                          if o.side == "BUY"])          # baseline: it places
         r2 = self.rig()
         r2.add_market(A)
-        # fills here are LEARNED to be ruinous: $5 adverse per share —
-        # every candidate's EV goes negative and nothing rests
-        r2.fam.fillmodel.markdown["margins"] = 5.0
+        # fills here are LEARNED to be ruinous — absurdly so, on
+        # purpose: even the touch's five-fold score cannot pay for it
+        r2.fam.fillmodel.markdown["margins"] = 50.0
         r2.cycle()
         self.assertEqual([o for o in r2.fam.orders.values()
                           if o.side == "BUY" and o.purpose == "earn"], [])
@@ -504,3 +518,19 @@ class TestFillCostEquation(unittest.TestCase):
         assert A not in fam.inv_since
         d = fam.fillmodel.expected_offload_days(A)
         assert 1.0 < d < 2.0  # EWMA of seed 2.0 and observed 1.0
+
+
+class TestApproachData(unittest.TestCase):
+    def test_approach_minutes_and_dollars_accumulate_and_persist(self):
+        from v3.fillmodel import FillModel
+        m = FillModel()
+        slug = "ussewc-usse-mt-2026-11-03-dem"
+        m.observe_approach(slug, "BUY", 0, 60.0, 2.4)   # a minute at the touch
+        m.observe_approach(slug, "BUY", 0, 60.0, 2.4)
+        m.observe_approach(slug, "BUY", 3, 60.0, 0.3)   # a minute well back
+        key0 = "senate|BUY|0"
+        self.assertEqual(m.approach_obs[key0][0], 120.0)
+        self.assertAlmostEqual(m.approach_obs[key0][1] / m.approach_obs[key0][0],
+                               2.4, places=6)           # $/day while resting there
+        m2 = FillModel.from_dict(m.to_dict())
+        self.assertEqual(set(m2.approach_obs), set(m.approach_obs))

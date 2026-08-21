@@ -89,7 +89,7 @@ class Stream:
                     "marketSlugs": slugs,
                 }}))
                 self.status.update(state="live", subscribed=len(slugs), note="")
-                last_check = time.time()
+                last_check = started = time.time()
                 while True:
                     try:
                         raw = await asyncio.wait_for(ws.recv(), timeout=60)
@@ -98,8 +98,14 @@ class Stream:
                         pass  # quiet books are normal
                     if time.time() - last_check > RESUBSCRIBE_CHECK_S:
                         last_check = time.time()
-                        if len(self.get_slugs()[:SUB_CAP]) > len(slugs):
-                            return  # reconnect to pick up the larger universe
+                        want = set(self.get_slugs()[:SUB_CAP])
+                        drift = len(want ^ set(slugs))
+                        # reconnect when the wanted list really moved —
+                        # the 15-minute rotation windows land here — but
+                        # not for every single order placed or pulled
+                        if drift >= 5 or (drift > 0 and
+                                          time.time() - started > 900.0):
+                            return
 
         while True:
             try:

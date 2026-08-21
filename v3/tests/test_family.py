@@ -157,14 +157,18 @@ class TestModes(unittest.TestCase):
         self.assertTrue(s["best_idle"])          # it found the opportunity
         self.assertEqual(r.exchange.live, {})    # and touched nothing
 
-    def test_armed_places_behind_the_touch_first(self):
+    def test_armed_places_on_both_sides_never_in_front(self):
         r = Rig()
         r.add_market(A)
         s = r.cycle()
         self.assertEqual(len(r.exchange.live), 2)  # both sides
         for o in r.fam.orders.values():
-            # no volatility evidence yet -> never ON the touch
-            self.assertNotIn(o.price, (0.44, 0.47))
+            # joining the touch is allowed (owner, 2026-08-21) —
+            # standing in FRONT of it never is
+            if o.side == "BUY":
+                self.assertLessEqual(o.price, 0.44)
+            else:
+                self.assertGreaterEqual(o.price, 0.47)
             self.assertTrue(o.why)
         self.assertLessEqual(s["spent"], r.fam.cfg.capital_usd)
 
@@ -178,17 +182,20 @@ class TestModes(unittest.TestCase):
         prices = {round(o.price, 2) for o in r.fam.orders.values()}
         self.assertIn(0.44, prices)              # joined the quiet touch
 
-    def test_busy_book_stays_behind(self):
+    def test_busy_book_may_join_when_ev_clears(self):
+        # Owner, 2026-08-21: every level is an option, no hard rules —
+        # a moving touch no longer forbids joining it; fill odds and
+        # the queue ahead carry the caution instead.
         r = Rig()
         r.add_market(A)
         for i in range(6):                       # touch moves every sighting
             r.cache.put(A, politics_book(r.now, bid=0.40 + i * 0.01))
-        self.assertGreater(r.cache.volatility_of(A), r.fam.cfg.vol_quiet)
         r.exchange.books[A] = politics_book(r.now, bid=0.45)
         r.cycle()
-        for o in r.fam.orders.values():
-            if o.side == "BUY":
-                self.assertLess(o.price, 0.45)
+        bids = [o for o in r.fam.orders.values() if o.side == "BUY"]
+        self.assertTrue(bids)
+        for o in bids:
+            self.assertLessEqual(o.price, 0.45)  # never in front
 
 
 class TestRevive(unittest.TestCase):
@@ -430,9 +437,13 @@ class TestImprove(unittest.TestCase):
         self.assertGreater(bids[0].price, 0.011)     # in FRONT of the wall
         self.assertLessEqual(bids[0].price * bids[0].qty, 0.51)  # inside caps
 
-    def test_everyone_else_skips_the_wall(self):
+    def test_everyone_else_never_fronts_the_wall(self):
+        # joining AT the wall's price is allowed (their shares queue
+        # ahead of ours) — standing in FRONT of it is college's quirk
+        # alone
         r = Rig(cfg=self.cfg(False))
         r.add_market(A, book=self.wall_book(r.now))
         r.cycle()
-        self.assertEqual([o for o in r.fam.orders.values()
-                          if o.side == "BUY"], [])
+        for o in r.fam.orders.values():
+            if o.side == "BUY":
+                self.assertLessEqual(o.price, 0.01 + 1e-9)
