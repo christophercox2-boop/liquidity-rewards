@@ -98,6 +98,18 @@ class FamilyConfig:
     read_age_s: float = 480.0           # oldest book maintenance will read
     verify_resting: bool = False        # next cycle's reconcile checks by id anyway
     rescan_s: float = 4 * 3600.0
+    # The prober (owner, 2026-08-21: "there are markets we can earn in
+    # that need probing for information. Unless you have all the
+    # information you need, go out and get some"): a market whose pool
+    # could clear the bar but whose evidence confidence is still low gets
+    # a one-share scout behind the touch. Its job is the information —
+    # what fills it, what ignores it — and it earns a trickle meanwhile.
+    probe_usd: float = 5.0            # concurrent probe collateral, total
+    probe_qty: float = 1.0
+    probe_ttl_s: float = 45 * 60.0    # rotate: 45 quiet minutes IS the datum
+    probe_cooldown_s: float = 6 * 3600.0
+    probe_conf: float = 0.5           # below this confidence, information pays
+    probes_per_cycle: int = 1
     # College only: may price IN FRONT of a junk touch (wall-only books).
     # The owner kept college's launch behavior ("I wouldn't change anything
     # for now"); every other family leaves this off.
@@ -456,9 +468,13 @@ class Family:
         b_lo, b_hi = self._price_bounds(
             slug, levels if side == "BUY" else other,
             other if side == "BUY" else levels, tick)
-        if join_ok and self.evidence.heat(slug) > 0:
-            join_ok = False    # our orders are getting eaten here — step back
-        rungs = ((0,) if join_ok else ()) + (1, 2, 3, 6, 10, 15)
+        # heat pushes the ladder back CONTINUOUSLY: ~one recent fill costs
+        # the touch, a hot streak costs the front rungs too, and it all
+        # decays on its own as the fills age out
+        h = self.evidence.heat(slug)
+        min_rung = 0 if h < 0.5 else 1 if h < 1.5 else 2 if h < 3.0 else 3
+        rungs = tuple(k for k in ((0,) if join_ok else ()) + (1, 2, 3, 6, 10, 15)
+                      if k >= min_rung)
         cands = []
         for k in rungs:
             px = round(touch - k * sign * tick, 3)
@@ -549,21 +565,25 @@ class Family:
                       tick: float) -> tuple[float | None, float | None]:
         """(lo, hi) price bounds in DOLLARS for resting, or Nones.
 
-        The hierarchy is 1.0's, stated once: a real trade is strong
-        evidence, everything else is weak. With fewer than two of OUR
-        fills on record, the Silver model BINDS — the band may not carry
-        a bid above fair or an ask below it just because the market's
-        touches sit elsewhere (the market being far from the model is
-        the reason the model is here). Two or more real fills and the
-        evidence band takes over."""
+        No thresholds (owner, 2026-08-21: "I don't want hard and fast
+        rules. I want confidence values that learned over time"). The
+        bound is a continuous blend: it sits ON the Silver model when the
+        evidence has earned nothing, and slides toward the evidence
+        band's edge exactly as far as the evidence's confidence — built
+        by real fills, amplified by a tight band, decayed by time — has
+        earned. One fresh fill moves it some; a run of fills moves it
+        most of the way; a quiet week slides it back toward the model.
+        With no model the band stands alone; with neither, no bound."""
         band = self._band(slug, bids, asks, tick)
         fair = self.fairs(slug) if self.fairs is not None else None
         lo = band["lo"] / 100.0 if band else None
         hi = band["hi"] / 100.0 if band else None
-        if fair is not None and (band is None or band["fills"] < 2):
-            hi = fair if hi is None else min(hi, fair)
-            lo = fair if lo is None else max(lo, fair)
-        return lo, hi
+        if fair is None:
+            return lo, hi
+        if band is None:
+            return fair, fair
+        c = self.evidence.confidence(slug, band)
+        return (fair + c * (lo - fair), fair + c * (hi - fair))
 
     def plan_market(self, book, slug: str) -> tuple[list[dict], str]:
         """Both sides' best entries, within the caps. Returns (plans, why)
@@ -814,7 +834,10 @@ class Family:
         # risk (starving it behind entries left shorts uncovered, 23:53Z)
         actions = self._sell(now, actions)
 
-        # 5) new entries, best scoreboard candidates first
+        # 5) probes: buy information where it is missing
+        actions = self._probe(now, positions, actions)
+
+        # 6) new entries, best scoreboard candidates first
         self._enter(now, positions, actions)
         return self._finish(summary)
 
@@ -863,7 +886,7 @@ class Family:
         for rec in list(self.orders.values()):
             if actions <= 0:
                 break
-            if rec.purpose == "sell":
+            if rec.purpose in ("sell", "probe"):
                 continue
             book = self.cache.fresh(rec.market, self.cfg.read_age_s, now)
             prog, _why = self._prog_row(rec.market)
@@ -1103,6 +1126,78 @@ class Family:
 
     # --------------------------------------------------------------- books
 
+    def _probe(self, now: float, positions: dict, actions: int) -> int:
+        if not self.cfg.known_ground or actions <= 0:
+            return actions
+        spent = sum(capital_at_risk(o.intent, o.price, o.qty)
+                    for o in self.orders.values() if o.purpose == "probe")
+        placed = 0
+        for slug, sb in sorted(self.scoreboard.items(),
+                               key=lambda kv: -(kv[1].get("pool_day") or 0.0)):
+            if actions <= 0 or placed >= self.cfg.probes_per_cycle:
+                break
+            if spent >= self.cfg.probe_usd - 1e-9:
+                break
+            if not self.enterable(slug) or self._dead_here(slug):
+                continue
+            prog, _w = self._prog_row(slug)
+            if prog is None:
+                continue
+            side_pool = self._side_pool(slug, prog)
+            if side_pool is None or side_pool < self.cfg.min_est_day:
+                continue      # even owning the side couldn't pay the bar
+            if sb.get("plans"):
+                continue      # the planner can already act — no probe needed
+            band = self.evidence.band(
+                slug, prior_fair=self.fairs(slug) if self.fairs else None)
+            if self.evidence.confidence(slug, band) >= self.cfg.probe_conf:
+                continue      # we already know enough here
+            if now - self.last_action.get(f"{slug}|probe", 0.0) \
+                    < self.cfg.probe_cooldown_s:
+                continue
+            if any(o.market == slug and o.purpose == "probe"
+                   for o in self.orders.values()):
+                continue
+            book = self.cache.fresh(slug, BOOK_MAX_AGE, now)
+            if book is None or not book.bids:
+                continue
+            px = round(book.bids[0][0] - 2 * book.tick, 3)
+            _lo, hi = self._price_bounds(slug, book.bids, book.asks, book.tick)
+            if hi is not None:
+                px = min(px, round(hi, 3))
+            if not (0.001 <= px <= 0.6):
+                continue      # 1.0's rule: probes buy cheap or not at all
+            r = self.desk.place_resting(slug, "BUY", px, self.cfg.probe_qty,
+                                        net_position=(positions.get(slug)
+                                                      or (0.0,))[0],
+                                        verify=self.cfg.verify_resting)
+            if r.ok and r.order_id:
+                self.orders[r.order_id] = FamilyOrder(
+                    id=r.order_id, market=slug, side="BUY", price=px,
+                    qty=self.cfg.probe_qty, intent=r.intent, placed_ts=now,
+                    purpose="probe",
+                    why=("a scout — this market's pool could pay, but I "
+                         "don't know enough yet; what happens to this "
+                         "share IS the information"))
+                self._log(event="probe", market=slug, price=px)
+                self.last_action[f"{slug}|probe"] = now
+                spent += capital_at_risk(r.intent, px, self.cfg.probe_qty)
+                placed += 1
+                actions -= 1
+        # rotation: a scout that sat its full watch has reported in
+        for rec in list(self.orders.values()):
+            if rec.purpose != "probe":
+                continue
+            if now - rec.placed_ts >= self.cfg.probe_ttl_s:
+                r = self.desk.cancel(rec.id, rec.market)
+                if r.ok:
+                    self.evidence.rested(rec.market, rec.side, rec.price,
+                                         ts=now)
+                    self._log(event="probe_done", market=rec.market,
+                              why="sat its watch untouched — noted")
+                    del self.orders[rec.id]
+        return actions
+
     def _refresh_books(self, client, now: float) -> int:
         """Active markets by staleness first; the candidate scan keeps its
         reserved slice so discovery can never starve (the 2026-08-20 CFB
@@ -1157,8 +1252,13 @@ class Family:
                 done += 1
                 continue
             plans, why = self.plan_market(book, slug)
-            self.scoreboard[slug] = {"ts": now, "plans": plans, "why": why,
-                                     "est": round(sum(p["est"] for p in plans), 4)}
+            prog2, _ = self._prog_row(slug)
+            sp2 = self._side_pool(slug, prog2) if prog2 else None
+            self.scoreboard[slug] = {
+                "ts": now, "plans": plans, "why": why,
+                "est": round(sum(p["est"] for p in plans), 4),
+                "pool_day": round(sp2, 4) if sp2 is not None else None,
+                "conf": self.evidence.confidence(slug)}
             done += 1
         for gone in set(self.scoreboard) - set(self.universe):
             del self.scoreboard[gone]
@@ -1212,7 +1312,7 @@ class Family:
                      key=lambda kv: -(kv[1].get("est") or 0.0))[:12]
         summary["best_idle"] = [
             {"market": s, "name": self._label(s), "est": sb.get("est"),
-             "hist": self.history.get(s),
+             "hist": self.history.get(s), "conf": sb.get("conf"),
              "plans": sb["plans"]} for s, sb in top]
         return summary
 

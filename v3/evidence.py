@@ -74,11 +74,39 @@ class Evidence:
 
     # -- the read ------------------------------------------------------------
 
-    def heat(self, slug: str, now: float | None = None) -> int:
-        """Fills through our orders in the last day — how hot the ground is."""
+    def heat(self, slug: str, now: float | None = None) -> float:
+        """Age-weighted fills through our orders in the last day — how hot
+        the ground is, as a CONTINUOUS quantity: a fill an hour ago counts
+        nearly 1.0, one from last night counts a fraction, and the number
+        decays back toward zero on its own. No cliffs."""
         now = now if now is not None else self._clock()
-        return sum(1 for ts, kind, _ in self.events.get(slug, ())
-                   if kind.startswith("fill") and now - ts < HEAT_WINDOW_S)
+        return round(sum(0.5 ** ((now - ts) / HALF_LIFE_S)
+                         for ts, kind, _ in self.events.get(slug, ())
+                         if kind.startswith("fill")
+                         and now - ts < HEAT_WINDOW_S), 3)
+
+    def fills_effective(self, slug: str, now: float | None = None) -> float:
+        """Age-weighted count of ALL our fills here — the evidence mass
+        confidence grows from and decays with."""
+        now = now if now is not None else self._clock()
+        return sum(0.5 ** ((now - ts) / HALF_LIFE_S)
+                   for ts, kind, _ in self.events.get(slug, ())
+                   if kind.startswith("fill"))
+
+    def confidence(self, slug: str, band: dict | None = None,
+                   now: float | None = None) -> float:
+        """How much the evidence has EARNED the right to move prices off
+        the model, 0..1 and continuous — 1.0's graduated idea ("one real
+        trade is enough when the band is very tight, two when it's merely
+        tight") as a curve instead of thresholds. Real trades build it,
+        time decays it, a tight band amplifies it, a sloppy band damps
+        it. Nothing about it is a rule; it is a weight."""
+        f = self.fills_effective(slug, now)
+        base = f / (f + 1.2)
+        if band and band.get("hi") is not None and band.get("lo") is not None:
+            width = band["hi"] - band["lo"]
+            base *= min(max(1.3 - width / 30.0, 0.3), 1.0)
+        return round(min(base, 1.0), 4)
 
     def band(self, slug: str, prior_fair: float | None = None,
              touches: tuple[float | None, float | None] = (None, None),

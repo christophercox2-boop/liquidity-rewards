@@ -70,11 +70,43 @@ class TestEvidence(unittest.TestCase):
         b = ev.band("m")
         self.assertGreater(b["hi"] - b["lo"], 30)    # honest uncertainty
 
-    def test_heat_counts_recent_fills_only(self):
+    def test_heat_is_continuous_and_decays(self):
         ev = Evidence(clock=lambda: 200000.0)
-        ev.fill("m", "BUY", 0.3, ts=100.0)           # two days ago
-        ev.fill("m", "BUY", 0.3, ts=199000.0)
-        self.assertEqual(ev.heat("m"), 1)
+        ev.fill("m", "BUY", 0.3, ts=100.0)           # two days ago: aged out
+        ev.fill("m", "BUY", 0.3, ts=199000.0)        # 17 min ago: ~full weight
+        self.assertAlmostEqual(ev.heat("m"), 1.0, places=1)
+        ev2 = Evidence(clock=lambda: 200000.0 + 20 * 3600)
+        ev2.events = {k: [list(r) for r in v] for k, v in ev.events.items()}
+        self.assertLess(ev2.heat("m"), 0.75)         # same fill, cooler later
+
+    def test_confidence_grows_with_fills_and_decays_with_time(self):
+        ev = Evidence(clock=lambda: 1000.0)
+        self.assertEqual(ev.confidence("m"), 0.0)
+        cs = []
+        for _ in range(4):
+            ev.fill("m", "SELL", 0.45)
+            cs.append(ev.confidence("m", ev.band("m")))
+        self.assertTrue(cs[0] < cs[1] < cs[3] < 1.0)
+        late = Evidence(clock=lambda: 1000.0 + 3 * 86400)
+        late.events = {k: [list(r) for r in v] for k, v in ev.events.items()}
+        self.assertLess(late.confidence("m", late.band("m")), cs[3])
+
+    def test_bounds_slide_continuously_with_confidence(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.fam.fairs = lambda s: 0.30
+        book = r.exchange.books[A]
+        def hi():
+            return r.fam._price_bounds(A, book.bids, book.asks, 0.01)[1]
+        h0 = hi()
+        r.fam.evidence.fill(A, "SELL", 0.45, ts=r.now)
+        h1 = hi()
+        for _ in range(3):
+            r.fam.evidence.fill(A, "SELL", 0.45, ts=r.now)
+        h4 = hi()
+        self.assertLess(abs(h0 - 0.30), 0.02)        # no evidence: on the model
+        self.assertTrue(h0 < h1 < h4)                # each fill earns more room
 
     def test_round_trip(self):
         ev = Evidence(clock=lambda: 1000.0)
@@ -108,3 +140,62 @@ class TestPlannerBounds(unittest.TestCase):
         for o in r.fam.orders.values():
             if o.side == "BUY":
                 self.assertLess(o.price, 0.44)       # no joining the touch
+
+
+class TestProbing(unittest.TestCase):
+    """Owner, 2026-08-21: 'Unless you have all the information you need,
+    go out and get some.'"""
+
+    def rig(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=100.0, min_est_day=0.75,
+                           probe_usd=5.0)
+        return Rig(cfg=cfg)
+
+    def unknowable_book(self, now):
+        # a rich pool but a book the planner can't clear the bar in:
+        # a lone junk wall each side, no real competition to join
+        from v3.scoring import Book
+        return Book(bids=((0.05, 9000.0),), asks=((0.95, 9000.0),),
+                    tick=0.01, fetched_at=now)
+
+    def test_low_confidence_rich_pool_gets_a_scout(self):
+        from v3.tests.test_family import Rig, A
+        r = self.rig()
+        r.add_market(A, book=self.unknowable_book(1_000_000.0))
+        r.cycle()
+        probes = [o for o in r.fam.orders.values() if o.purpose == "probe"]
+        self.assertEqual(len(probes), 1)
+        p = probes[0]
+        self.assertLessEqual(p.qty, 1.0)
+        self.assertLessEqual(p.price, 0.05)          # behind the wall, cheap
+        self.assertIn("scout", p.why)
+        # cooldown: no second scout in the same market next cycle
+        r.cycle()
+        self.assertEqual(len([o for o in r.fam.orders.values()
+                              if o.purpose == "probe"]), 1)
+
+    def test_scout_reports_in_after_its_watch(self):
+        r = self.rig()
+        from v3.tests.test_family import A
+        r.add_market(A, book=self.unknowable_book(1_000_000.0))
+        r.cycle()
+        pid = next(o.id for o in r.fam.orders.values() if o.purpose == "probe")
+        r.cycle(advance=r.fam.cfg.probe_ttl_s + 60)
+        self.assertNotIn(pid, r.fam.orders)          # rotated out
+        self.assertNotIn(pid, r.exchange.live)
+        self.assertTrue(any(k.startswith("rest")
+                            for _, k, _2 in r.fam.evidence.events.get(A, ())))
+
+    def test_confident_markets_are_not_probed(self):
+        r = self.rig()
+        from v3.tests.test_family import A
+        r.add_market(A, book=self.unknowable_book(1_000_000.0))
+        for _ in range(8):
+            r.fam.evidence.fill(A, "BUY", 0.05, ts=1_000_000.0)
+        r.cycle()
+        self.assertEqual([o for o in r.fam.orders.values()
+                          if o.purpose == "probe"], [])
