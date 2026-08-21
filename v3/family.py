@@ -850,7 +850,7 @@ class Family:
                    "refreshed": refreshed,
                    "would_adopt": len(pending)}
         if not switch_on:
-            return self._finish(summary)
+            return self._finish(summary, now)
         if pending:
             self._adopt(pending, positions, now)
             summary["would_adopt"] = 0
@@ -863,7 +863,7 @@ class Family:
             # that cost nothing to place and earn while they wait
             summary["mode"] = "flatten — exits only"
             self._sell(now, self.cfg.max_actions_per_cycle)
-            return self._finish(summary)
+            return self._finish(summary, now)
         actions = self.cfg.max_actions_per_cycle
 
         # game window: pull everything that isn't an exit
@@ -880,7 +880,7 @@ class Family:
                               side=rec.side, price=rec.price)
                     del self.orders[rec.id]
                     actions -= 1
-            return self._finish(summary)
+            return self._finish(summary, now)
 
         # grade fills that have had their hour: the adverse move a fill
         # actually cost is the calibration everything else leans on
@@ -946,7 +946,7 @@ class Family:
 
         # 6) new entries, best scoreboard candidates first
         self._enter(now, positions, actions)
-        return self._finish(summary)
+        return self._finish(summary, now)
 
     def _read_live(self, now: float) -> None:
         """Refresh every order's live share/est and verdict — the reading
@@ -1458,7 +1458,7 @@ class Family:
 
     # --------------------------------------------------------------- finish
 
-    def _finish(self, summary: dict) -> dict:
+    def _finish(self, summary: dict, now: float) -> dict:
         summary["orders"] = [vars(o) for o in self.orders.values()]
         ests = [o.live_est if o.live_est is not None else o.est_day
                 for o in self.orders.values() if o.purpose != "sell"]
@@ -1472,6 +1472,16 @@ class Family:
         summary["inventory"] = {k: dict(v) for k, v in self.inventory.items()}
         summary["scanned"] = sum(1 for sb in self.scoreboard.values()
                                  if "plans" in sb)
+        # the triage sweep's progress: how much of the eligible board —
+        # in scope, carrying a live program — has a current score
+        elig = [s for s in self.universe
+                if self.enterable(s) and s in self.terms.current
+                and not self._dead_here(s)]
+        done = sum(1 for s in elig
+                   if now - (self.scoreboard.get(s) or {}).get("ts", 0.0)
+                   <= self.cfg.rescan_s)
+        summary["triage"] = {"total": len(elig), "done": done,
+                             "per_cycle": max(self.cfg.scan_reserve, 1)}
         top = sorted(((s, sb) for s, sb in self.scoreboard.items()
                       if sb.get("plans")),
                      key=lambda kv: -(kv[1].get("est") or 0.0))[:12]

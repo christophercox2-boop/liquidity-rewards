@@ -184,6 +184,14 @@ function render(d){
   if(s.stock_day){out+='<div class="sub">Stock waiting to sell is earning '+usd(s.stock_day)+'/day while it waits.</div>';}
   var inv=s.inventory||{};var invn=Object.keys(inv).length;
   if(invn){out+='<div class="muted">'+invn+' position'+(invn>1?'s':'')+' held from fills \\u2014 see orders page.</div>';}
+  var tg=s.triage||{};
+  if(tg.total){
+   var pctT=Math.min(100,100*(tg.done||0)/tg.total);
+   out+='<div class="mtrack"><div class="mfill" style="width:'+pctT+'%;background:#5a7a9a"></div></div>';
+   out+='<div class="muted">Triage: '+(tg.done||0)+' of '+tg.total+' markets scored this pass'
+    +((tg.done||0)>=tg.total?' \\u2014 all scored; rescanning the oldest first.'
+    :' \\u2014 about '+Math.ceil((tg.total-(tg.done||0))/(tg.per_cycle||1))+' min to finish.')+'</div>';
+  }
   out+='<div class="muted">'+(s.markets||0)+' markets known, '+(s.scanned||0)+' scored'
   if(s.unmeasured_min>1){out+='<div class="muted">'+s.unmeasured_min+' min of today went unmeasured (books too stale to score) \\u2014 counted as zero, never guessed.</div>';}
    +(s.resting_ok===false?' \\u2014 <span class="warn">game window: resting is paused</span>':'')+'.</div>';

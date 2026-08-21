@@ -481,3 +481,16 @@ class TestOwnerDirectives0821(unittest.TestCase):
         mkts = {o.market for o in r.fam.orders.values()}
         self.assertNotIn("paccc-usho-midterms-2026-11-03-rep", mkts)
         self.assertIn(A, mkts)                       # in-scope stays
+
+
+class TestTriageProgress(unittest.TestCase):
+    def test_summary_reports_the_sweep(self):
+        from v3.tests.test_family import Rig, A, C
+        r = Rig()
+        r.add_market(A)
+        r.add_market(C, event="House control")
+        s = r.cycle()
+        tg = s["triage"]
+        self.assertEqual(tg["total"], 2)
+        self.assertEqual(tg["done"], 2)          # both scored on cycle one
+        self.assertGreaterEqual(tg["per_cycle"], 1)
