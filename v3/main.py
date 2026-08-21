@@ -29,7 +29,7 @@ from pathlib import Path
 
 from . import football, politics
 from .alerts import Alerts
-from .api import ApiError, Client
+from .api import ApiError, Client, GATEWAY
 from .books import BookCache
 from .family import Family
 from .floor import Floor
@@ -475,6 +475,7 @@ class Monitor:
             "lite_study": self._lite_study(),
             "raw_sample": (dict(self.stream.raw_frames)
                            if self.stream else {}),
+            "rest_sample": self._rest_probe(),
             "silver_log": self.silver.changes[-120:],
             "rewards_last": self.rw_last,
             "silver": {
@@ -818,6 +819,29 @@ class Monitor:
                    f"{len(fresh) - len(shown)} old strays absorbed")
         return {"ok": True, "new_rows": out_rows, "new_count": len(shown),
                 "days": days}
+
+    _rest_cache: dict = {}
+
+    def _rest_probe(self) -> dict:
+        """Verbatim REST market + book payloads for the watched markets
+        (owner, 2026-08-21: the REST bestBid object with px AND qty —
+        "try this too and see if it gives you anything different").
+        Fetched at most every 10 minutes; study only."""
+        now = time.time()
+        if now - self._rest_cache.get("ts", 0.0) < 600.0:
+            return self._rest_cache.get("out", {})
+        out: dict = {}
+        for slug in ("enwc-uspres-nom-rep-2028-jdvan",
+                     "enwc-uspres-nom-rep-2028-tuccar"):
+            for name, url in (("mkt", f"{GATEWAY}/v1/markets/{slug}"),
+                              ("book", f"{GATEWAY}/v1/markets/{slug}/book")):
+                try:
+                    j = self.client.get(url)
+                    out[f"{name}|{slug}"] = json.dumps(j)[:3000]
+                except Exception as e:  # noqa: BLE001
+                    out[f"{name}|{slug}"] = f"error: {e}"[:200]
+        self._rest_cache = {"ts": now, "out": out}
+        return out
 
     def _lite_study(self) -> dict:
         """Declared-anchor scoring study (owner, 2026-08-21): what each
