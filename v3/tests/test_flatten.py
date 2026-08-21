@@ -841,3 +841,67 @@ class TestCandidatePriors(unittest.TestCase):
         self.assertAlmostEqual(v, 0.6)
         v2 = sf.model_fair("paccc-usho-midterms-2026-11-03-dem")
         self.assertAlmostEqual(v2, 0.4)
+
+
+class TestWholeShares(unittest.TestCase):
+    """Owner, 2026-08-21: politics quotes whole shares only, for now —
+    testing whether fractional orders even earn rewards."""
+
+    def _rig(self):
+        from v3.tests.test_family import Rig
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=100.0, per_market_usd=2.0,
+                           whole_shares=True)
+        return Rig(cfg=cfg)
+
+    def test_new_quotes_are_whole_shares(self):
+        from v3.tests.test_family import A
+        r = self._rig()
+        r.add_market(A)
+        r.cycle()
+        self.assertTrue(r.fam.orders)
+        for o in r.fam.orders.values():
+            self.assertEqual(o.qty, round(o.qty), o)
+
+    def test_live_fractional_order_is_retired(self):
+        from v3.tests.test_family import A
+        from v3.family import FamilyOrder
+        r = self._rig()
+        r.add_market(A)
+        r.cycle()
+        rec = FamilyOrder(id="FRAC1", market=A, side="BUY", price=0.42,
+                          qty=2.5, intent="ORDER_INTENT_BUY_LONG",
+                          placed_ts=r.now, purpose="earn")
+        r.fam.orders["FRAC1"] = rec
+        r.exchange.live["FRAC1"] = {"id": "FRAC1", "market": A,
+                                    "side": "BUY", "price": 0.42,
+                                    "size": 2.5}
+        r.cycle()
+        self.assertNotIn("FRAC1", r.fam.orders)
+
+    def test_exit_rests_whole_leaving_dust(self):
+        from v3.tests.test_family import A
+        r = self._rig()
+        r.add_market(A)
+        r.fam.inventory[A] = {"qty": 12.4, "cost": 12.4 * 0.30}
+        r.cycle()
+        exits = [o for o in r.fam.orders.values() if o.purpose == "sell"]
+        self.assertTrue(exits)
+        self.assertEqual(exits[0].qty, 12.0)   # dust of 0.4 waits
+
+    def test_manual_fractional_order_is_left_alone(self):
+        from v3.tests.test_family import A
+        from v3.family import FamilyOrder
+        r = self._rig()
+        r.add_market(A)
+        rec = FamilyOrder(id="MAN1", market=A, side="BUY", price=0.40,
+                          qty=1.5, intent="ORDER_INTENT_BUY_LONG",
+                          placed_ts=r.now, purpose="manual")
+        r.fam.orders["MAN1"] = rec
+        r.exchange.live["MAN1"] = {"id": "MAN1", "market": A,
+                                   "side": "BUY", "price": 0.40,
+                                   "size": 1.5}
+        r.cycle()
+        self.assertIn("MAN1", r.fam.orders)

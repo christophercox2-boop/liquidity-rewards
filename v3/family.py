@@ -41,6 +41,7 @@ bounds, whitelist, verify-by-id, never /modify.
 
 from __future__ import annotations
 
+import math
 import datetime as dt
 import time
 from dataclasses import dataclass, field
@@ -114,6 +115,9 @@ class FamilyConfig:
     # what fills it, what ignores it — and it earns a trickle meanwhile.
     probe_usd: float = 0.0            # concurrent probe collateral (0 = off)
     probe_qty: float = 1.0
+    # whole-share quoting: the owner is testing whether fractional-share
+    # orders are even picked up by the rewards program (2026-08-21)
+    whole_shares: bool = False
     probe_ttl_s: float = 45 * 60.0    # rotate: 45 quiet minutes IS the datum
     probe_cooldown_s: float = 6 * 3600.0
     probe_conf: float = 0.5           # below this confidence, information pays
@@ -457,6 +461,8 @@ class Family:
             anchor = (levels[0][0] if levels
                       else other[0][0] - sign * 5 * tick)
             qty = round(gap * 1.02 + 1.0, 2)
+            if self.cfg.whole_shares:
+                qty = float(math.ceil(qty))
             best = None
             r_lo, r_hi = self._price_bounds(
                 slug, levels if side == "BUY" else other,
@@ -611,6 +617,8 @@ class Family:
         # conceded past value; depth ahead of the price shields the odds.
         sf = self.fillmodel.scoring_fraction(slug)
         exit_rate_ps = self._exit_rate_ps
+        grid = (tuple(q for q in QTY_GRID if q >= 1.0)
+                if self.cfg.whole_shares else QTY_GRID)
         pick, solo = None, None
         for px in cands:
             cost_ps = px if side == "BUY" else 1.0 - px
@@ -625,7 +633,7 @@ class Family:
                                        target=target, bait=conc)
             fcost = self.fillmodel.fill_cost(slug, side, px, value_ctr,
                                              exit_rate_ps=exit_rate_ps)
-            for qty in QTY_GRID:
+            for qty in grid:
                 if qty * cost_ps > budget + 1e-9:
                     break
                 j = estimate_join(side, levels, tick, df, target, px, qty)
@@ -661,7 +669,7 @@ class Family:
                     # louder than the (edge-lifted) courtesy band:
                     # acceptable only as a minimum-size solo in front of a
                     # wall (college)
-                    if in_front and qty == QTY_GRID[0]:
+                    if in_front and qty == grid[0]:
                         if solo is None or ev > solo["ev"] + 1e-9:
                             solo = {**row, "solo": True}
                     break
@@ -1087,6 +1095,18 @@ class Family:
         for rec in list(self.orders.values()):
             if actions <= 0:
                 break
+            if (self.cfg.whole_shares and rec.purpose != "manual"
+                    and abs(rec.qty - round(rec.qty)) > 1e-9):
+                r = self.desk.cancel(rec.id, rec.market)
+                if r.ok:
+                    self.orders.pop(rec.id, None)
+                    self.evidence.order_gone(rec.market, rec.id)
+                    self._log(event="whole_shares_cull", market=rec.market,
+                              price=rec.price, qty=rec.qty,
+                              note="fractional size retired — politics "
+                                   "quotes whole shares now")
+                    actions -= 1
+                continue
             if rec.purpose in ("sell", "probe", "manual"):
                 continue
             book = self.cache.fresh(rec.market, self.cfg.read_age_s, now)
@@ -1347,6 +1367,8 @@ class Family:
                               if o.market == slug and o.purpose == "sell"
                               and o.side == "SELL")
                 rest = qty - covered
+                if self.cfg.whole_shares:
+                    rest = float(int(rest + 1e-9))
                 if rest < 0.01 or not self._cooldown_ok(slug, "SELL", now):
                     continue
                 break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
@@ -1367,6 +1389,8 @@ class Family:
                               if o.market == slug and o.purpose == "sell"
                               and o.side == "BUY")
                 rest = -qty - covered
+                if self.cfg.whole_shares:
+                    rest = float(int(rest + 1e-9))
                 if rest < 0.01 or not self._cooldown_ok(slug, "BUY", now):
                     continue
                 received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)

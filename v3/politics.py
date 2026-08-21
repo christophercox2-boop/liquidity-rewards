@@ -69,6 +69,10 @@ def config() -> FamilyConfig:
     return FamilyConfig(
         name="Politics", tag="POL",
         known_ground=True, rest_style="join_quiet", revive=True,
+        # owner, 2026-08-21: "only quote in whole shares. No fractional
+        # in politics, for now. We need to test whether those are even
+        # getting picked up for earning rewards."
+        whole_shares=True,
         vol_quiet=0.15,
         # Owner, 2026-08-20 (the flatten rebuild): "increase the budget
         # to 100" — one hundred dollars of collateral at risk, total —
