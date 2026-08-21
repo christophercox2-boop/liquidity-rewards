@@ -254,6 +254,7 @@ class Family:
         self.evidence = Evidence(clock=clock)
         self.fillmodel = FillModel()
         self.pending_marks: list[dict] = []   # fills awaiting their 1h grade
+        self.fills: list[dict] = []           # the purchase journal, one row per fill
         self.proven: set[str] = set()         # graduated markets (main feeds it)
         self.inv_since: dict[str, float] = {}  # market -> first-fill ts
         self._exit_rate_ps = 0.0               # $/share/day our exits earn
@@ -1023,12 +1024,14 @@ class Family:
         else:
             inv["qty"] -= filled
             inv["cost"] -= filled * rec.price
+        qty_after = round(inv["qty"], 2)
         if abs(inv["qty"]) < 0.005:
             self.inventory.pop(rec.market, None)
             since = self.inv_since.pop(rec.market, None)
             if since is not None and now > since:
                 self.fillmodel.observe_offload(rec.market,
                                                (now - since) / 86400.0)
+        self._journal_fill(rec, filled, now, qty_after)
         self.evidence.fill(rec.market, rec.side, rec.price, ts=now)
         self.fillmodel.observe_fill_age(rec.market, now - rec.placed_ts)
         self.pending_marks.append({"market": rec.market, "side": rec.side,
@@ -1040,6 +1043,49 @@ class Family:
                    f"{self._label(rec.market)}: {rec.side} {filled:g} @ "
                    f"{rec.price * 100:g}c — fills are usually losses here; "
                    f"the exit seller takes over")
+
+    def _journal_fill(self, rec: FamilyOrder, filled: float, now: float,
+                      qty_after: float) -> None:
+        """One row per purchase, captured the moment it happens: what the
+        order was doing, what value looked like right then (before this
+        fill enters the evidence), and the position it left behind. The
+        fills page reads these back to the owner."""
+        try:
+            book = self.cache.any_age(rec.market)
+            fair = self.fairs(rec.market) if self.fairs is not None else None
+            band = None
+            if book is not None:
+                try:
+                    band = self._band(rec.market, book.bids, book.asks,
+                                      book.tick)
+                except Exception:  # noqa: BLE001
+                    band = None
+            ref = fair
+            if ref is None and band and band.get("med") is not None:
+                ref = band["med"] / 100.0
+            conc = None
+            if ref is not None:
+                conc = round((rec.price - ref) if rec.side == "BUY"
+                             else (ref - rec.price), 4)
+            self.fills.append({
+                "ts": round(now, 1), "market": rec.market, "side": rec.side,
+                "qty": round(filled, 2), "px": rec.price,
+                "purpose": rec.purpose, "why": rec.why,
+                "est_day": (rec.live_est if rec.live_est is not None
+                            else rec.est_day),
+                "rested_h": (round((now - rec.placed_ts) / 3600.0, 2)
+                             if rec.placed_ts > 0 else None),
+                "fair": fair,
+                "band": ([band["lo"], band["hi"]] if band else None),
+                "conf": round(self.evidence.confidence(rec.market), 3),
+                "touch_bid": (book.bids[0][0]
+                              if book is not None and book.bids else None),
+                "touch_ask": (book.asks[0][0]
+                              if book is not None and book.asks else None),
+                "conc": conc, "pos_after": qty_after})
+            del self.fills[:-200]
+        except Exception:  # noqa: BLE001 — the journal never breaks a fill
+            pass
 
     # ---------------------------------------------------------------- adoption
 
@@ -2129,6 +2175,7 @@ class Family:
             "inv_since": self.inv_since,
             "fillmodel": self.fillmodel.to_dict(),
             "pending_marks": self.pending_marks[-60:],
+            "fills": self.fills[-200:],
             "scoreboard": self.scoreboard,
             "universe": self.universe,
             "terms": self.terms.to_dict(),
@@ -2151,6 +2198,7 @@ class Family:
         if d.get("fillmodel"):
             self.fillmodel = FillModel.from_dict(d["fillmodel"])
         self.pending_marks = list(d.get("pending_marks") or [])
+        self.fills = list(d.get("fills") or [])
         if d.get("cfg_sig") == self._cfg_sig():
             self.scoreboard = dict(d.get("scoreboard") or {})
         else:

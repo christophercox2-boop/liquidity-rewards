@@ -768,6 +768,30 @@ class Monitor:
         return {"ok": True, "new_rows": out_rows, "new_count": len(shown),
                 "days": days}
 
+    def fills_view(self) -> dict:
+        """Every recorded purchase, newest first, joined with where the
+        market stands now — one report per fill for the owner."""
+        rows = []
+        for tag, fam in self.families.items():
+            for r in fam.fills:
+                row = dict(r)
+                row["family"] = tag
+                row["name"] = self.names.label(r["market"])
+                b = fam.cache.any_age(r["market"])
+                row["now_bid"] = (b.bids[0][0]
+                                  if b is not None and b.bids else None)
+                row["now_ask"] = (b.asks[0][0]
+                                  if b is not None and b.asks else None)
+                inv = fam.inventory.get(r["market"])
+                row["pos_now"] = (round(inv.get("qty", 0.0), 2)
+                                  if inv else 0.0)
+                row["exit_resting"] = any(
+                    o.market == r["market"] and o.purpose == "sell"
+                    for o in fam.orders.values())
+                rows.append(row)
+        rows.sort(key=lambda x: -x["ts"])
+        return {"ok": True, "fills": rows[:100]}
+
     def book_view(self, slug: str) -> dict:
         """The raw shape of one market's book, with our own orders
         marked — the owner looks at the truth himself."""

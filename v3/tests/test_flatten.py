@@ -1290,3 +1290,46 @@ class TestLadderBelowTargetNote(unittest.TestCase):
         self.assertEqual(buy["rows"], [])
         self.assertIn("Target Size", buy.get("note", ""))
         self.assertIn("pays nobody", buy.get("note", ""))
+
+
+class TestFillJournal(unittest.TestCase):
+    def _fill_one(self, r):
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        rec = FamilyOrder(id="J1", market=A_J, side="BUY", price=0.19,
+                          qty=100.0, intent=BUY_LONG, placed_ts=999_000.0,
+                          purpose="earn", why="joins the touch",
+                          live_est=2.4)
+        r.fam._on_fill(rec, 100.0, 1_000_000.0)
+        return r.fam.fills[-1]
+
+    def test_every_fill_leaves_a_report_row(self):
+        from v3.tests.test_family import Rig
+        r = Rig()
+        r.add_market(A_J)
+        r.fam.fairs = lambda s: 0.10
+        row = self._fill_one(r)
+        self.assertEqual(row["side"], "BUY")
+        self.assertEqual(row["qty"], 100.0)
+        self.assertEqual(row["px"], 0.19)
+        self.assertEqual(row["why"], "joins the touch")
+        self.assertEqual(row["est_day"], 2.4)
+        self.assertAlmostEqual(row["conc"], 0.09)   # paid 9c past the model
+        self.assertAlmostEqual(row["rested_h"], 0.28, places=2)
+        self.assertEqual(row["pos_after"], 100.0)
+
+    def test_journal_survives_a_restart(self):
+        from v3.tests.test_family import Rig
+        r = Rig()
+        r.add_market(A_J)
+        r.fam.fairs = None
+        row = self._fill_one(r)
+        self.assertIsNone(row["fair"])
+        d = r.fam.to_dict()
+        r2 = Rig()
+        r2.fam.restore(d)
+        self.assertEqual(len(r2.fam.fills), 1)
+        self.assertEqual(r2.fam.fills[0]["px"], 0.19)
+
+
+from v3.tests.test_family import A as A_J  # noqa: E402

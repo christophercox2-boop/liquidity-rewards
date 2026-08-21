@@ -46,7 +46,7 @@ def authed(get_header, query_string: str, password: str) -> bool:
     return False
 
 
-NAV = (("meter", "."), ("watch", "watch"), ("status", "status"), ("orders", "orders"),
+NAV = (("meter", "."), ("watch", "watch"), ("fills", "fills"), ("status", "status"), ("orders", "orders"),
        ("plan", "plan"), ("model", "silver"),
        ("grades", "grades"), ("log", "log"), ("switch", "switch"))
 
@@ -727,8 +727,60 @@ function render(d){
 }
 """
 
+FILLS_JS = """
+var _MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fWhen(ts){var d=new Date(ts*1000);return _MO[d.getMonth()]+' '+d.getDate()+', '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+function fUsd(v){return (v<-0.005?'\u2212$':'+$')+Math.abs(v).toFixed(2);}
+function fRest(h){if(h==null)return '';return h<1?Math.round(h*60)+' min':(h<48?h.toFixed(1)+' h':(h/24).toFixed(1)+' days');}
+function fCard(f){
+ var out='<div class="card">';
+ out+='<div><b>'+esc(f.name||f.market)+'</b> <span class="muted" style="font-size:12px">'+esc(f.family||'')+'</span></div>';
+ out+='<div style="font-size:16px;margin:2px 0"><b>'+(f.side==='BUY'?'bought':'sold')+' '+f.qty+' @ '+pc(f.px)+'</b> \u00b7 '+fWhen(f.ts)+(f.purpose==='sell'?' \u00b7 an exit \u2014 it reduced the position':'')+'</div>';
+ var plan='The order: '+esc(f.why||'(no note)');
+ if(f.est_day)plan+=' \u2014 estimated ~$'+f.est_day.toFixed(2)+'/day while resting';
+ if(f.rested_h!=null)plan+=' \u00b7 rested '+fRest(f.rested_h)+' before filling';
+ out+='<div class="muted" style="margin:2px 0">'+plan+'</div>';
+ var v='';
+ if(f.fair!=null)v='Model said '+pc(f.fair);
+ else if(f.band)v='No model \u2014 evidence put value between '+f.band[0].toFixed(0)+'c and '+f.band[1].toFixed(0)+'c';
+ else v='No independent sense of value at the time';
+ if(f.touch_bid!=null||f.touch_ask!=null)v+=' \u00b7 book was '+(f.touch_bid!=null?pc(f.touch_bid):'\u2014')+'/'+(f.touch_ask!=null?pc(f.touch_ask):'\u2014');
+ out+='<div style="margin:2px 0">'+v+'</div>';
+ var lot=(f.conc!=null)?-f.conc*f.qty:null;
+ var earned=(f.est_day&&f.rested_h!=null)?f.est_day*f.rested_h/24:null;
+ var cl;
+ if(f.conc==null)cl='Value unknown then \u2014 no concession math';
+ else if(f.conc>0.0005)cl='Paid '+(f.conc*100).toFixed(1)+'c past value \u2192 '+fUsd(lot)+' on the lot';
+ else if(f.conc<-0.0005)cl='Filled '+(-f.conc*100).toFixed(1)+'c inside value \u2192 '+fUsd(lot)+' on the lot';
+ else cl='Filled right at value';
+ if(earned!=null)cl+=' \u00b7 earned ~$'+earned.toFixed(2)+' in rewards while it rested';
+ out+='<div style="margin:2px 0">'+cl+'</div>';
+ if(f.purpose!=='sell'){
+  var mk=null;
+  if(f.side==='BUY'&&f.now_bid!=null)mk=(f.now_bid-f.px)*f.qty;
+  if(f.side==='SELL'&&f.now_ask!=null)mk=(f.px-f.now_ask)*f.qty;
+  var nw='Now: book '+(f.now_bid!=null?pc(f.now_bid):'\u2014')+'/'+(f.now_ask!=null?pc(f.now_ask):'\u2014')+' \u00b7 position '+(f.pos_now!=null?f.pos_now:'?')+(f.exit_resting?' \u00b7 an exit is resting':'');
+  if(mk!=null)nw+='<br><b>This lot marks '+fUsd(mk)+' today'+(earned!=null?' \u00b7 net with rewards '+fUsd(mk+earned):'')+'</b>';
+  out+='<div style="margin:2px 0">'+nw+'</div>';
+ }else{
+  out+='<div style="margin:2px 0">Position after: '+(f.pos_after!=null?f.pos_after:'?')+'</div>';
+ }
+ return out+'</div>';
+}
+function render(d){
+ fetch('fills.json',{headers:hdrs(),cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+  var el=document.getElementById('fl');
+  if(!el)return;
+  if(!j.ok||!(j.fills||[]).length){el.innerHTML='<div class="card muted">No purchases on record yet \u2014 the journal starts with the next fill.</div>';return;}
+  el.innerHTML=j.fills.map(fCard).join('');
+ }).catch(function(){});
+ return '<div class="card"><div class="muted">One report per purchase, newest first \u2014 what the order was doing, what value looked like at that moment (before the fill itself moved the evidence), and where the lot stands now. The journal starts Aug 21; older fills are not recorded.</div></div><div id="fl"><div class="card muted">loading\u2026</div></div>';
+}
+"""
+
 PAGES = {
     "/": ("3.0 — the meter", "meter", GRAPH_JS),
+    "/fills": ("3.0 — purchases", "fills", FILLS_JS),
     "/status": ("3.0 — status", "status", STATUS_JS),
     "/orders": ("3.0 — orders", "orders", ORDERS_JS),
     "/plan": ("3.0 — the plan", "plan", PLAN_JS),
@@ -841,6 +893,13 @@ class WebServer:
                     slug = (parse_qs(u.query).get("m") or [""])[0]
                     self._send(200, "application/json",
                                json.dumps(server.monitor.book_view(slug)).encode())
+                    return
+                if route == "/fills.json":
+                    if not authed(self.headers.get, u.query, server.password):
+                        self._send(401, "application/json", b'{"error":"key required"}')
+                        return
+                    self._send(200, "application/json",
+                               json.dumps(server.monitor.fills_view()).encode())
                     return
                 if route == "/data.json":
                     if not authed(self.headers.get, u.query, server.password):

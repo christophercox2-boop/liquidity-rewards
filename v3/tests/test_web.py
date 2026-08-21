@@ -37,6 +37,16 @@ class FakeMonitor:
         self.ops.append((op, order_id, price))
         return {"ok": True, "note": "done"}
 
+    def fills_view(self):
+        return {"ok": True, "fills": [
+            {"ts": 1.0, "market": "m-1", "side": "BUY", "qty": 5.0,
+             "px": 0.19, "purpose": "earn", "why": "w", "est_day": 1.0,
+             "rested_h": 2.0, "fair": 0.1, "band": None, "conf": 1.0,
+             "touch_bid": 0.18, "touch_ask": 0.2, "conc": 0.09,
+             "pos_after": 5.0, "family": "politics", "name": "name:m-1",
+             "now_bid": 0.18, "now_ask": 0.2, "pos_now": 5.0,
+             "exit_resting": False}]}
+
 
 def req(url, method="GET", headers=None, body=None):
     r = urllib.request.Request(url, method=method,
@@ -64,6 +74,19 @@ class TestWeb(unittest.TestCase):
             code, body = req(self.base + path)
             self.assertEqual(code, 200, path)
             self.assertNotIn(b"m-1", body)
+
+    def test_fills_tab_and_feed(self):
+        code, body = req(self.base + "/fills")
+        self.assertEqual(code, 200)
+        self.assertNotIn(b"m-1", body)          # the shell holds no data
+        code, _ = req(self.base + "/fills.json")
+        self.assertEqual(code, 401)             # the feed demands the key
+        code, body = req(self.base + "/fills.json",
+                         headers={"X-Dash-Key": "pw"})
+        self.assertEqual(code, 200)
+        j = json.loads(body)
+        self.assertTrue(j["ok"])
+        self.assertEqual(j["fills"][0]["market"], "m-1")
 
     def test_data_needs_the_key_and_carries_labels(self):
         code, _ = req(self.base + "/data.json")
