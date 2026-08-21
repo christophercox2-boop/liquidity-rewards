@@ -52,6 +52,8 @@ PRIOR_HAZARD_PER_DAY = {0: 0.35, 1: 0.15, 2: 0.07, 3: 0.03}
 PRIOR_EXPOSURE_S = DAY_S
 
 MARKDOWN_SEED = 0.02             # $/share adverse move on a fill, to start
+OFFLOAD_SEED_DAYS = 2.0          # fill -> fully offloaded, until measured
+OFFLOAD_ALPHA = 0.25             # EWMA weight per completed offload
 MARKDOWN_ALPHA = 0.2             # EWMA weight of each new observed fill
 SCORING_FRAC_SEED = 0.8
 SCORING_FRAC_ALPHA = 0.1
@@ -142,6 +144,11 @@ class FillModel:
         # hour-old one?") and the day/night question. Nothing acts on
         # these until the data speaks and the owner turns them on.
         self.age_obs: dict[str, list[float]] = {}   # fam|bucket -> [sec, fills]
+        # the owner's fill-cost equation (2026-08-21): a fill's true cost
+        # is the offload loss MINUS what the stock earns while the exit
+        # rests. This learns how long offloading actually takes.
+        self.offload_days: dict[str, float] = {}    # family -> EWMA days
+        self.offload_n: dict[str, int] = {}
         self.tod_obs: dict[str, list[float]] = {}   # fam|side|band -> [sec, crossings]
 
     @staticmethod
@@ -199,6 +206,16 @@ class FillModel:
         cell = self.age_obs.setdefault(k, [0.0, 0.0])
         cell[1] += 1.0
 
+    def observe_offload(self, slug: str, days: float) -> None:
+        fam = family_of(slug)
+        cur = self.offload_days.get(fam, OFFLOAD_SEED_DAYS)
+        self.offload_days[fam] = round(cur * (1 - OFFLOAD_ALPHA)
+                                       + max(days, 0.0) * OFFLOAD_ALPHA, 3)
+        self.offload_n[fam] = self.offload_n.get(fam, 0) + 1
+
+    def expected_offload_days(self, slug: str) -> float:
+        return self.offload_days.get(family_of(slug), OFFLOAD_SEED_DAYS)
+
     def observe_fill_mark(self, slug: str, side: str, fill_price: float,
                           mid_later: float) -> float:
         """Grade a real fill against the touch mid about an hour later.
@@ -241,15 +258,19 @@ class FillModel:
         return 1.0 - math.exp(-h * horizon_s / DAY_S)
 
     def fill_cost(self, slug: str, side: str, price: float,
-                  fair: float | None) -> float:
-        """$/share the fill is expected to cost: the calibrated adverse
-        markdown, plus anything already conceded to fair — a bid above
-        fair pays the excess the moment it fills."""
+                  fair: float | None, exit_rate_ps: float = 0.0) -> float:
+        """$/share the fill is expected to cost, the owner's equation
+        (2026-08-21): the offload loss (the calibrated adverse markdown
+        plus anything conceded past fair) MINUS what the stock earns per
+        share while its exit rests, over the measured time an offload
+        takes. Can go negative where exits earn more than the fill
+        loses — which is exactly a fill worth taking."""
         fam = family_of(slug)
         cost = self.markdown.get(fam, MARKDOWN_SEED)
         if fair is not None:
             excess = (price - fair) if side == "BUY" else (fair - price)
             cost += max(excess, 0.0)
+        cost -= exit_rate_ps * self.expected_offload_days(slug)
         return round(cost, 4)
 
     def scoring_fraction(self, slug: str) -> float:
@@ -277,6 +298,8 @@ class FillModel:
         return {"obs": {k: [round(v[0], 1), v[1]] for k, v in self.obs.items()},
                 "markdown": self.markdown, "marks_n": self.marks_n,
                 "scoring_frac": self.scoring_frac,
+                "offload_days": self.offload_days,
+                "offload_n": self.offload_n,
                 "age_obs": {k: [round(v[0], 1), v[1]]
                             for k, v in self.age_obs.items()},
                 "tod_obs": {k: [round(v[0], 1), v[1]]
@@ -289,6 +312,8 @@ class FillModel:
         m.markdown = dict(d.get("markdown") or {})
         m.marks_n = dict(d.get("marks_n") or {})
         m.scoring_frac = dict(d.get("scoring_frac") or {})
+        m.offload_days = dict(d.get("offload_days") or {})
+        m.offload_n = dict(d.get("offload_n") or {})
         m.age_obs = {k: [float(v[0]), float(v[1])]
                      for k, v in (d.get("age_obs") or {}).items()}
         m.tod_obs = {k: [float(v[0]), float(v[1])]

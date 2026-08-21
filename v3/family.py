@@ -246,6 +246,8 @@ class Family:
         self.fillmodel = FillModel()
         self.pending_marks: list[dict] = []   # fills awaiting their 1h grade
         self.proven: set[str] = set()         # graduated markets (main feeds it)
+        self.inv_since: dict[str, float] = {}  # market -> first-fill ts
+        self._exit_rate_ps = 0.0               # $/share/day our exits earn
         self.triage_feed: list[dict] = []     # the sweep's recent verdicts
         self._clock = clock or time.time
         self.terms = TermsStore()
@@ -482,7 +484,8 @@ class Family:
                 est = j.share * side_pool
                 k_r = round(abs(((levels[0][0]) if levels else px) - px) / tick)
                 pf_r = self.fillmodel.p_fill(slug, side, k_r, target=target)
-                fc_r = self.fillmodel.fill_cost(slug, side, px, None)
+                fc_r = self.fillmodel.fill_cost(slug, side, px, None,
+                                                exit_rate_ps=self._exit_rate_ps)
                 ev = (est * self.fillmodel.scoring_fraction(slug)
                       - pf_r * fc_r * qty)
                 if best is None or ev > best["ev"]:
@@ -604,6 +607,7 @@ class Family:
         # fill cost is the calibrated adverse markdown plus anything
         # conceded past value; depth ahead of the price shields the odds.
         sf = self.fillmodel.scoring_fraction(slug)
+        exit_rate_ps = self._exit_rate_ps
         pick, solo = None, None
         for px in cands:
             cost_ps = px if side == "BUY" else 1.0 - px
@@ -612,7 +616,8 @@ class Family:
                          if (p2 - px) * sign > 1e-9)
             pf = self.fillmodel.p_fill(slug, side, k_px, shield=shield,
                                        target=target)
-            fcost = self.fillmodel.fill_cost(slug, side, px, value_ctr)
+            fcost = self.fillmodel.fill_cost(slug, side, px, value_ctr,
+                                             exit_rate_ps=exit_rate_ps)
             for qty in QTY_GRID:
                 if qty * cost_ps > budget + 1e-9:
                     break
@@ -784,6 +789,8 @@ class Family:
                 self.positions_seen.pop(m, None)
 
     def _on_fill(self, rec: FamilyOrder, filled: float, now: float) -> None:
+        if rec.market not in self.inventory:
+            self.inv_since[rec.market] = now
         inv = self.inventory.setdefault(rec.market, {"qty": 0.0, "cost": 0.0})
         if rec.side == "BUY":
             inv["qty"] += filled
@@ -793,6 +800,10 @@ class Family:
             inv["cost"] -= filled * rec.price
         if abs(inv["qty"]) < 0.005:
             self.inventory.pop(rec.market, None)
+            since = self.inv_since.pop(rec.market, None)
+            if since is not None and now > since:
+                self.fillmodel.observe_offload(rec.market,
+                                               (now - since) / 86400.0)
         self.evidence.fill(rec.market, rec.side, rec.price, ts=now)
         self.fillmodel.observe_fill_age(rec.market, now - rec.placed_ts)
         self.pending_marks.append({"market": rec.market, "side": rec.side,
@@ -888,6 +899,10 @@ class Family:
         self._reclassify_exits(positions)
         self.refresh_universe(client, now)
         self.refresh_terms(client, now)
+        stock = sum(abs(v.get("qty") or 0.0) for v in self.inventory.values())
+        stock_rate = sum(o.live_est or 0.0 for o in self.orders.values()
+                         if o.purpose == "sell")
+        self._exit_rate_ps = (stock_rate / stock) if stock > 0.01 else 0.0
         refreshed = self._refresh_books(client, now)
         self._read_live(now)
         self._accrue(now)
@@ -1679,6 +1694,7 @@ class Family:
             "silent_cancels": self.silent_cancels,
             "last_action": self.last_action,
             "known_dead": sorted(self.known_dead),
+            "inv_since": self.inv_since,
             "fillmodel": self.fillmodel.to_dict(),
             "pending_marks": self.pending_marks[-60:],
             "scoreboard": self.scoreboard,
@@ -1699,6 +1715,7 @@ class Family:
         self.silent_cancels = d.get("silent_cancels") or 0
         self.last_action = dict(d.get("last_action") or {})
         self.known_dead = set(d.get("known_dead") or ())
+        self.inv_since = dict(d.get("inv_since") or {})
         if d.get("fillmodel"):
             self.fillmodel = FillModel.from_dict(d["fillmodel"])
         self.pending_marks = list(d.get("pending_marks") or [])

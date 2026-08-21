@@ -451,3 +451,56 @@ class TestEvidenceWeighting0821(unittest.TestCase):
         fm2 = FillModel.from_dict(fm.to_dict())
         self.assertEqual(fm2.age_obs, fm.age_obs)
         self.assertEqual(fm2.tod_obs, fm.tod_obs)
+
+
+# ---- the owner's fill-cost equation (2026-08-21) ----
+
+class TestFillCostEquation(unittest.TestCase):
+    def test_fill_cost_credits_exit_earnings(self):
+        from v3.fillmodel import FillModel
+        m = FillModel()
+        base = m.fill_cost("ussewc-usse-mt-2026-11-03-dem", "SELL", 0.30, 0.33)
+        # exit earns 1c/share/day, offload seed is 2 days -> 2c credit
+        net = m.fill_cost("ussewc-usse-mt-2026-11-03-dem", "SELL", 0.30, 0.33,
+                          exit_rate_ps=0.01)
+        self.assertAlmostEqual(base - net, 0.02, places=6)
+
+    def test_fill_cost_can_go_negative(self):
+        from v3.fillmodel import FillModel
+        m = FillModel()
+        net = m.fill_cost("ussewc-usse-mt-2026-11-03-dem", "SELL", 0.33, 0.33,
+                          exit_rate_ps=0.10)
+        self.assertLess(net, 0.0)  # exits that earn more than the fill loses
+
+    def test_offload_days_learned_and_persisted(self):
+        from v3.fillmodel import FillModel
+        m = FillModel()
+        slug = "ussewc-usse-mt-2026-11-03-dem"
+        assert m.expected_offload_days(slug) == 2.0  # seed
+        m.observe_offload(slug, 0.5)
+        d1 = m.expected_offload_days(slug)
+        assert 0.5 < d1 < 2.0  # EWMA moved toward the observation
+        m2 = FillModel.from_dict(m.to_dict())
+        assert m2.expected_offload_days(slug) == d1
+        assert m2.offload_n == m.offload_n
+
+    def test_family_times_the_offload(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        r = Rig()
+        fam = r.fam
+        now = 1_000_000.0
+        rec = fam.orders["A1"] = FamilyOrder(
+            id="A1", market=A, side="BUY",
+            price=0.30, qty=10.0, intent="ORDER_INTENT_BUY_LONG",
+            placed_ts=now, purpose="earn")
+        fam._on_fill(rec, 10.0, now)
+        assert fam.inv_since.get(A) == now
+        sell = fam.orders["A2"] = FamilyOrder(
+            id="A2", market=A, side="SELL",
+            price=0.35, qty=10.0, intent="ORDER_INTENT_SELL_LONG",
+            placed_ts=now, purpose="sell")
+        fam._on_fill(sell, 10.0, now + 86400.0)  # offloaded a day later
+        assert A not in fam.inv_since
+        d = fam.fillmodel.expected_offload_days(A)
+        assert 1.0 < d < 2.0  # EWMA of seed 2.0 and observed 1.0
