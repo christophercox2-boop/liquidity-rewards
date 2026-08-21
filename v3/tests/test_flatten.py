@@ -418,17 +418,50 @@ class TestOwnerDirectives0821(unittest.TestCase):
         self.assertIn(A, mkts)
         self.assertNotIn("paccc-usho-midterms-2026-11-03-rep", mkts)
 
-    def test_silver_fair_blocks_wrong_side(self):
+    def test_mispriced_rest_is_an_ev_decision_not_a_rule(self):
+        # Owner, 2026-08-21: no hard wrong-side rule. Resting past fair
+        # is +EV only when the pool pays for the fill risk — and the
+        # fill risk of a mispriced order is assumed HIGH (bait) until
+        # data proves otherwise.
         from v3.tests.test_family import Rig, A
+        import copy
+        # a poor pool cannot pay the bait: no bids past fair
+        poor = {"timePeriods": [{"programId": "politics_mid_1",
+                                 "rewardPool": 1.0, "targetSize": 5000,
+                                 "discountFactor": 0.2, "status": "LIVE"}]}
         r = Rig()
-        r.add_market(A)
+        r.add_market(A, prog=copy.deepcopy(poor))
         r.fam.fairs = lambda s: 0.30     # model says 30c; touch is 44c/47c
         r.cycle()
         for o in r.fam.orders.values():
             if o.side == "BUY":
-                self.assertLessEqual(o.price, 0.32)  # no bids above fair+2t
-        # asks at 0.48 are fine (above fair) — and must still exist
-        self.assertTrue(any(o.side == "SELL" for o in r.fam.orders.values()))
+                self.assertLessEqual(o.price, 0.32)
+        # a rich pool may license the same rest — but only with the
+        # bait-raised fill odds priced in, and clearing the EV bar
+        r2 = Rig()
+        r2.add_market(A)                 # default pool: $100/day
+        r2.fam.fairs = lambda s: 0.30
+        r2.cycle()
+        wrong = [o for o in r2.fam.orders.values()
+                 if o.side == "BUY" and o.price > 0.32]
+        for o in wrong:
+            plan = r2.fam.scoreboard.get(A) or {}
+            rows = [p for p in (plan.get("plans") or [])
+                    if p.get("side") == "BUY" and p.get("px") == o.price]
+            for p in rows:
+                self.assertGreaterEqual(p["p_fill"], 0.5)   # bait honesty
+                self.assertGreaterEqual(p["ev"], r2.fam.cfg.min_est_day)
+        # asks above fair still exist either way
+        self.assertTrue(any(o.side == "SELL" for o in r2.fam.orders.values()))
+
+    def test_bait_scales_the_fill_prior(self):
+        from v3.fillmodel import FillModel
+        m = FillModel()
+        slug = "ussewc-usse-mt-2026-11-03-dem"
+        quiet = m.p_fill(slug, "BUY", 1)
+        baity = m.p_fill(slug, "BUY", 1, bait=13.0)
+        self.assertGreater(baity, quiet * 5)
+        self.assertGreater(baity, 0.5)   # 13 ticks past fair: near-certain
 
     def test_failed_cancel_keeps_original_tracked_and_retries(self):
         from v3.tests.test_family import Rig, A

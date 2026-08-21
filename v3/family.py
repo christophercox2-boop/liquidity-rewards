@@ -465,10 +465,6 @@ class Family:
                 px = round(anchor - k * sign * tick, 3)
                 if not (0.001 <= px <= 0.999):
                     continue
-                if side == "BUY" and r_hi is not None and px > r_hi + 2 * tick:
-                    continue
-                if side == "SELL" and r_lo is not None and px < r_lo - 2 * tick:
-                    continue
                 if other and (px >= other[0][0] - 1e-9 if side == "BUY"
                               else px <= other[0][0] + 1e-9):
                     continue
@@ -483,8 +479,18 @@ class Family:
                     continue
                 est = j.share * side_pool
                 k_r = round(abs(((levels[0][0]) if levels else px) - px) / tick)
-                pf_r = self.fillmodel.p_fill(slug, side, k_r, target=target)
-                fc_r = self.fillmodel.fill_cost(slug, side, px, None,
+                r_ctr = None
+                if r_lo is not None and r_hi is not None:
+                    r_ctr = (r_lo + r_hi) / 2.0
+                else:
+                    r_ctr = r_hi if r_hi is not None else r_lo
+                conc_r = 0.0
+                if r_ctr is not None:
+                    past = (px - r_ctr) if side == "BUY" else (r_ctr - px)
+                    conc_r = max(past / tick, 0.0)
+                pf_r = self.fillmodel.p_fill(slug, side, k_r, target=target,
+                                             bait=conc_r)
+                fc_r = self.fillmodel.fill_cost(slug, side, px, r_ctr,
                                                 exit_rate_ps=self._exit_rate_ps)
                 ev = (est * self.fillmodel.scoring_fraction(slug)
                       - pf_r * fc_r * qty)
@@ -513,12 +519,13 @@ class Family:
         if self.cfg.rest_style == "join_quiet":
             v = self.cache.volatility_of(slug)
             join_ok = v is not None and v <= self.cfg.vol_quiet
-        # Never rest on the wrong side of what we KNOW a market is worth.
-        # "Know" is the evidence band: the Silver model as prior where it
-        # prices the market, pulled by real events — our fills (strong),
-        # our orders sitting quietly (weak), the de-baited touches
-        # (anchors). Bids stay under the band's high edge, asks above its
-        # low edge; no band means no filter.
+        # One fair price per market, everything through EV (owner,
+        # 2026-08-21): the band — Silver prior pulled by fills, quiet
+        # rests, and sized touch anchors — gives a single fair estimate.
+        # There is no hard wrong-side rule. Resting past fair pays the
+        # concession inside fill_cost and raises the assumed fill speed
+        # (bait); if the reward still clears the bar, it is +EV and
+        # allowed — on either side, both, or neither.
         b_lo, b_hi = self._price_bounds(
             slug, levels if side == "BUY" else other,
             other if side == "BUY" else levels, tick)
@@ -568,10 +575,6 @@ class Family:
             if other and (px >= other[0][0] - 1e-9 if side == "BUY"
                           else px <= other[0][0] + 1e-9):
                 continue
-            if side == "BUY" and b_hi is not None and px > b_hi + 2 * tick:
-                continue
-            if side == "SELL" and b_lo is not None and px < b_lo - 2 * tick:
-                continue
             if px not in cands:
                 cands.append(px)
         if self.cfg.allow_improve:
@@ -614,8 +617,12 @@ class Family:
             k_px = round(abs(touch - px) / tick)
             shield = sum(q for p2, q in levels
                          if (p2 - px) * sign > 1e-9)
+            conc = 0.0
+            if value_ctr is not None:
+                past = (px - value_ctr) if side == "BUY" else (value_ctr - px)
+                conc = max(past / tick, 0.0)
             pf = self.fillmodel.p_fill(slug, side, k_px, shield=shield,
-                                       target=target)
+                                       target=target, bait=conc)
             fcost = self.fillmodel.fill_cost(slug, side, px, value_ctr,
                                              exit_rate_ps=exit_rate_ps)
             for qty in QTY_GRID:

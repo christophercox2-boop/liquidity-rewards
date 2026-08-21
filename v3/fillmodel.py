@@ -49,6 +49,12 @@ DAY_S = 86400.0
 # hit sometimes, three ticks back rarely. Real observation replaces them
 # within days.
 PRIOR_HAZARD_PER_DAY = {0: 0.35, 1: 0.15, 2: 0.07, 3: 0.03}
+# A mispriced order is bait: until data proves otherwise, assume it fills
+# fast. Each tick resting past fair value scales the PRIOR hazard up by
+# this much; observed survival in the cell can still prove it down, and
+# evidence moving the fair itself shrinks the measured mispricing
+# (owner approved 2026-08-21).
+BAIT_PER_TICK = 1.0
 PRIOR_EXPOSURE_S = DAY_S
 
 MARKDOWN_SEED = 0.02             # $/share adverse move on a fill, to start
@@ -239,21 +245,24 @@ class FillModel:
 
     # -- predictions ------------------------------------------------------------
 
-    def hazard_per_day(self, family: str, side: str, ticks_back: int) -> float:
+    def hazard_per_day(self, family: str, side: str, ticks_back: int,
+                       bait: float = 0.0) -> float:
         b = _bucket(ticks_back)
         cell = self.obs.get(self._key(family, side, b), [0.0, 0.0])
-        prior = PRIOR_HAZARD_PER_DAY[b] * PRIOR_EXPOSURE_S / DAY_S
+        prior = (PRIOR_HAZARD_PER_DAY[b] * (1.0 + BAIT_PER_TICK * bait)
+                 * PRIOR_EXPOSURE_S / DAY_S)
         return ((cell[1] + prior) / (cell[0] + PRIOR_EXPOSURE_S)) * DAY_S
 
     def p_fill(self, slug: str, side: str, ticks_back: int,
                horizon_s: float = DAY_S, shield: float = 0.0,
-               target: float = 0.0) -> float:
+               target: float = 0.0, bait: float = 0.0) -> float:
         """Chance of a fill over the horizon. `shield` is the contracts a
         taker must consume before reaching us — direct evidence against a
         fill that the distance-only hazard cannot see (owner, 2026-08-19:
         "the size of the walls is also evidence that an order won't get
-        filled")."""
-        h = self.hazard_per_day(family_of(slug), side, ticks_back)
+        filled"). `bait` is ticks resting past fair value — a mispriced
+        order is assumed to fill fast until data proves otherwise."""
+        h = self.hazard_per_day(family_of(slug), side, ticks_back, bait=bait)
         h *= shield_discount(shield, target)
         return 1.0 - math.exp(-h * horizon_s / DAY_S)
 
