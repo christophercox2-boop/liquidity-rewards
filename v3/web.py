@@ -47,7 +47,7 @@ def authed(get_header, query_string: str, password: str) -> bool:
 
 
 NAV = (("status", "."), ("orders", "orders"), ("plan", "plan"),
-       ("model", "silver"),
+       ("model", "silver"), ("graph", "graph"),
        ("grades", "grades"), ("log", "log"), ("switch", "switch"))
 
 _CSS = """
@@ -476,6 +476,47 @@ function render(d){
 }
 """
 
+GRAPH_JS = """
+function fmtT(ts){var d=new Date(ts*1000);return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+function drawGraph(name,dots){
+ if(!dots||dots.length<2)return '<div class="card"><b>'+esc(name)+'</b><div class="muted">not enough samples yet</div></div>';
+ var W=340,H=150,PL=34,PB=18,PT=8,PR=6;
+ var t0=dots[0][0],t1=dots[dots.length-1][0];var span=Math.max(t1-t0,60);
+ var ymax=0;dots.forEach(function(d){if(d[1]>ymax)ymax=d[1];});
+ ymax=Math.max(ymax*1.08,1);
+ function X(t){return PL+(W-PL-PR)*(t-t0)/span;}
+ function Y(v){return PT+(H-PT-PB)*(1-v/ymax);}
+ var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto" role="img" aria-label="'+esc(name)+' earning rate samples">';
+ [0,0.5,1].forEach(function(f){
+  var v=ymax*f,y=Y(v);
+  s+='<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
+  s+='<text x="'+(PL-4)+'" y="'+(y+3)+'" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.45)">$'+v.toFixed(0)+'</text>';
+ });
+ [t0,(t0+t1)/2,t1].forEach(function(t,i){
+  var x=X(t);var anch=i===0?'start':(i===2?'end':'middle');
+  s+='<text x="'+x+'" y="'+(H-4)+'" text-anchor="'+anch+'" font-size="8" fill="rgba(255,255,255,0.45)">'+fmtT(t)+'</text>';
+ });
+ dots.forEach(function(d){
+  s+='<circle cx="'+X(d[0]).toFixed(1)+'" cy="'+Y(d[1]).toFixed(1)+'" r="1.6" fill="#9ec49a" fill-opacity="0.85"/>';
+ });
+ s+='</svg>';
+ var last=dots[dots.length-1];
+ return '<div class="card"><b>'+esc(name)+'</b> <span class="muted">\u2014 $/day, one dot per 20-second sample \u00b7 now $'+last[1].toFixed(2)+'/day, '+last[2]+' markets in view</span>'+s
+  +'<div class="hint">Gaps are minutes the meter could not see a fresh book. The sampling clock is independent \u2014 nothing that places, moves, or cancels orders can touch it.</div></div>';
+}
+function load(){
+ fetch('data.json',{headers:hdrs(),cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+  var out='';
+  [['Politics','est_politics'],['College football','est_cfb'],['NFL','est_nfl']].forEach(function(p){
+   var e=d[p[1]]||{};
+   if((e.dots||[]).length||p[1]!=='est_nfl')out+=drawGraph(p[0],e.dots||[]);
+  });
+  document.getElementById('c').innerHTML=out;
+ }).catch(function(){document.getElementById('c').innerHTML='<div class="bad">unreachable</div>';});
+}
+load();setInterval(load,20000);
+"""
+
 GRADES_JS = """
 function render(d){
  var rows=(d.grades||[]);
@@ -553,6 +594,7 @@ PAGES = {
     "/switch": ("3.0 — switches", "switch", SWITCH_JS),
     "/silver": ("3.0 — the model", "model", SILVER_JS),
     "/grades": ("3.0 — grades", "grades", GRADES_JS),
+    "/graph": ("3.0 — the meter", "graph", GRAPH_JS),
     "/log": ("3.0 — log", "log", LOG_JS),
 }
 

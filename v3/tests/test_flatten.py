@@ -1214,3 +1214,17 @@ class TestProvenBudget(unittest.TestCase):
         self.assertEqual(r.fam._market_budget(A), 20.0)
         r.fam.proven.add(A)
         self.assertEqual(r.fam._market_budget(A), 40.0)
+
+
+class TestSamplerDots(unittest.TestCase):
+    def test_every_sample_leaves_a_dot_and_survives_restarts(self):
+        from v3.estimator import Estimator
+        e = Estimator()
+        class B:
+            def fresh(self, m, age, now): return None
+        e.sample(1_000_000.0, [], {}, B(), lambda m, p: 1.0)
+        e.sample(1_000_020.0, [], {}, B(), lambda m, p: 1.0)
+        self.assertEqual(len(e.dots), 2)
+        self.assertEqual(e.dots[0][0], 1_000_000.0)
+        e2 = Estimator.from_dict(e.to_dict())
+        self.assertEqual(e2.dots, e.dots)

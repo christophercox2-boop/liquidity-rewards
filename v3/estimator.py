@@ -90,6 +90,10 @@ class Estimator:
         self.stale_s = 0.0                   # seconds refused for staleness today
         self.last_ts: float | None = None
         self.history: list[dict] = []        # closed days
+        # the owner's v1 graph: one dot per sample, raw, rolling across
+        # day closes. Written ONLY by the independent sampler clock —
+        # orders can never touch it.
+        self.dots: list = []
 
     # -- the one entry point -------------------------------------------------
 
@@ -158,6 +162,8 @@ class Estimator:
                     rates[m] = rates.get(m, 0.0) + s.est_day
         self.market_rates = rates
         self.rate = sum(rates.values())
+        self.dots.append([round(now, 1), round(self.rate, 2), len(fresh)])
+        del self.dots[:-2880]                # ~16h at the 20s clock
         self.samples += 1
         return self.snapshot(now)
 
@@ -194,6 +200,7 @@ class Estimator:
         d = self.snapshot(self.last_ts or 0.0)
         d["history"] = self.history
         d["last_ts"] = self.last_ts
+        d["dots"] = self.dots
         return d
 
     @classmethod
@@ -209,4 +216,5 @@ class Estimator:
         e.stale_s = d.get("stale_s") or 0.0
         e.last_ts = d.get("last_ts")
         e.history = list(d.get("history") or [])
+        e.dots = list(d.get("dots") or [])
         return e
