@@ -181,13 +181,17 @@ class TestProbing(unittest.TestCase):
             self.assertLessEqual(o.price * o.qty, 1.01)   # small money
 
     def test_scout_reports_in_after_its_watch(self):
-        r = self.rig()
-        from v3.tests.test_family import A
+        # a bar the planner cannot clear anywhere (est tops out near
+        # side_pool x scoring fraction = $40) while the side pool still
+        # pays the probe's own worth-it check — the scout goes out
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=100.0, min_est_day=45.0,
+                           probe_usd=5.0)
+        r = Rig(cfg=cfg)
         r.add_market(A, book=self.unknowable_book(1_000_000.0))
-        # one recent fill closes the front door (heat) while leaving
-        # confidence under the probe bar; behind the wall nothing clears
-        # — the planner cannot act, so the scout goes out
-        r.fam.evidence.fill(A, "BUY", 0.05, ts=999_995.0)
         r.cycle()
         pid = next(o.id for o in r.fam.orders.values() if o.purpose == "probe")
         r.cycle(advance=r.fam.cfg.probe_ttl_s + 60)
@@ -528,3 +532,98 @@ class TestApproachData(unittest.TestCase):
                                2.4, places=6)           # $/day while resting there
         m2 = FillModel.from_dict(m.to_dict())
         self.assertEqual(set(m2.approach_obs), set(m.approach_obs))
+
+
+class TestOwnerCorrections0821b(unittest.TestCase):
+    """Owner, 2026-08-21 evening: bait measures against FAIR not the
+    touch; heat means small retries, not a closed front; exits hunt the
+    best-earning profitable slot."""
+
+    def _rig(self, fair=None):
+        from v3.tests.test_family import Rig
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=100.0, per_market_usd=20.0,
+                           min_est_day=0.05, share_max=0.35)
+        r = Rig(cfg=cfg)
+        if fair is not None:
+            r.fam.fairs = lambda s: fair
+        return r
+
+    def wide_book(self):
+        from v3.scoring import Book
+        return Book(bids=((0.10, 50000.0), (0.02, 500000.0)),
+                    asks=((0.90, 50000.0), (0.98, 500000.0)),
+                    tick=0.01, fetched_at=1_000_000.0)
+
+    def test_model_fair_waives_the_front_bait(self):
+        # same wide book; with a 50c model, a 35c bid is a bargain for
+        # us — its priced fill odds must be well under the no-model case
+        from v3.tests.test_family import A
+        def front_pf(fair):
+            r = self._rig(fair)
+            r.add_market(A, book=self.wide_book())
+            r.cycle()
+            rows = [p for p in ((r.fam.scoreboard.get(A) or {})
+                                .get("plans") or [])
+                    if p["side"] == "BUY" and p["px"] > 0.10]
+            return rows[0]["p_fill"] if rows else None
+        blind = front_pf(None)
+        seeing = front_pf(0.50)
+        self.assertIsNotNone(blind)
+        self.assertIsNotNone(seeing)
+        self.assertLess(seeing, blind * 0.7)
+
+    def test_heat_shrinks_the_retry_instead_of_closing_the_front(self):
+        from v3.tests.test_family import A
+        r = self._rig(0.50)
+        r.add_market(A, book=self.wide_book())
+        r.fam.evidence.fill(A, "BUY", 0.15, ts=999_995.0)   # just filled
+        r.cycle()
+        bids = [o for o in r.fam.orders.values()
+                if o.side == "BUY" and o.purpose == "earn"]
+        self.assertTrue(bids)                # the front is NOT closed
+        for o in bids:
+            self.assertLessEqual(o.qty, 0.011)   # minimum-size retry
+
+    def test_exit_takes_the_open_slot_not_the_crowded_touch(self):
+        # the owner's MN example: bought 10 @ 92c; the ask touch at 97c
+        # holds 217 shares by a wall, while 94c is open. The exit must
+        # rest where it earns, not pile on.
+        from v3.tests.test_family import A
+        from v3.scoring import Book
+        r = self._rig()
+        book = Book(bids=((0.92, 30.0), (0.02, 60000.0)),
+                    asks=((0.97, 217.0), (0.99, 60000.0)),
+                    tick=0.01, fetched_at=1_000_000.0)
+        r.add_market(A, book=book)
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 9.2}     # 92c each
+        r.cycle()
+        exits = [o for o in r.fam.orders.values() if o.purpose == "sell"]
+        self.assertTrue(exits)
+        e = exits[0]
+        self.assertLess(e.price, 0.97)          # off the crowded touch
+        self.assertGreaterEqual(e.price, 0.93)  # still a profit
+        self.assertGreater(e.est_day if e.est_day else 1.0, 0.0)
+
+    def test_lone_misplaced_exit_moves_to_the_better_slot(self):
+        from v3.tests.test_family import A
+        from v3.family import FamilyOrder
+        from v3.scoring import Book
+        r = self._rig()
+        book = Book(bids=((0.92, 30.0), (0.02, 60000.0)),
+                    asks=((0.97, 217.0), (0.99, 60000.0)),
+                    tick=0.01, fetched_at=1_000_000.0)
+        r.add_market(A, book=book)
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 9.2}
+        rec = FamilyOrder(id="OLD", market=A, side="SELL", price=0.97,
+                          qty=10.0, intent="ORDER_INTENT_SELL_LONG",
+                          placed_ts=0.0, purpose="sell", live_est=0.01)
+        r.fam.orders["OLD"] = rec
+        r.exchange.live["OLD"] = {"id": "OLD", "market": A, "side": "SELL",
+                                  "price": 0.97, "size": 10.0}
+        r.cycle()
+        exits = [o for o in r.fam.orders.values() if o.purpose == "sell"]
+        self.assertTrue(exits)
+        self.assertTrue(all(o.price < 0.97 for o in exits))  # moved down

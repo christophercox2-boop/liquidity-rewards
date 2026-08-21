@@ -534,11 +534,12 @@ class Family:
         b_lo, b_hi = self._price_bounds(
             slug, levels if side == "BUY" else other,
             other if side == "BUY" else levels, tick)
-        # heat pushes the ladder back CONTINUOUSLY: ~one recent fill costs
-        # the touch, a hot streak costs the front rungs too, and it all
-        # decays on its own as the fills age out
+        # heat (recent fills through our orders) is not a gate — the
+        # owner, 2026-08-21: "Fine to try and place again with a small
+        # size to see if the taker has moved on." It raises the assumed
+        # fill odds everywhere in this market and shrinks the retry size
+        # at the front; both fade as the fills age out.
         h = self.evidence.heat(slug)
-        min_rung = 0 if h < 0.5 else 1 if h < 1.5 else 2 if h < 3.0 else 3
         value_ctr = None
         if b_lo is not None and b_hi is not None:
             value_ctr = (b_lo + b_hi) / 2.0
@@ -565,7 +566,7 @@ class Family:
             e = (value_ctr - px) if side == "BUY" else (px - value_ctr)
             return max(e / tick, 0.0) * independence
 
-        rungs = tuple(k for k in range(0, 16) if k >= min_rung)
+        rungs = tuple(range(0, 16))
         cands = []
         for k in rungs:
             px = round(touch - k * sign * tick, 3)
@@ -576,15 +577,14 @@ class Family:
                 continue
             if px not in cands:
                 cands.append(px)
-        if other and min_rung == 0:
+        if other:
             # In FRONT of the touch is an option too (owner, 2026-08-21:
             # in a wide spread, a small order closer to the midpoint can
             # capture far more of the score, and a fill there may be a
             # bargain against fair value, not a cost). Post-only bounds
             # it one tick inside the other side's touch; the EV math
             # prices the rest — no queue ahead, bait-fast fill odds, and
-            # the fill cost credits a fill below fair. Recent fills
-            # (heat) take the option off the table.
+            # the fill cost credits a fill below fair.
             for kf in (1, 2, 3, 5, 8, 12, 18, 25, 35, 50):
                 px = round(touch + kf * sign * tick, 3)
                 if not (0.001 <= px <= 0.999):
@@ -640,16 +640,22 @@ class Family:
             if value_ctr is not None:
                 past = (px - value_ctr) if side == "BUY" else (value_ctr - px)
                 conc = max(past / tick, 0.0)
-            if in_front:
-                # improving the touch by kf ticks hands takers kf ticks
-                # they were not being offered — bait, same as resting
-                # past fair, whichever is bigger
-                conc = max(conc, abs(px - touch) / tick)
+            if in_front and independence < 1.0:
+                # with no independent sense of fair value, ticks in
+                # front of the touch are assumed to be a gift to takers;
+                # a model or fill-built confidence waives that in
+                # proportion (owner, 2026-08-21: a 35c bid on a 50c-fair
+                # market is a bargain for US, however far in front)
+                conc = max(conc, (abs(px - touch) / tick)
+                           * (1.0 - independence))
             pf = self.fillmodel.p_fill(slug, side, k_px, shield=shield,
-                                       target=target, bait=conc)
+                                       target=target, bait=conc + h)
             fcost = self.fillmodel.fill_cost(slug, side, px, value_ctr,
                                              exit_rate_ps=exit_rate_ps)
             for qty in grid:
+                if (h >= 0.5 and qty > grid[0]
+                        and (in_front or k_px == 0)):
+                    break     # a fill just happened here: minimum size
                 if qty * cost_ps > budget + 1e-9:
                     break
                 j = estimate_join(side, levels, tick, df, target, px, qty)
@@ -1381,6 +1387,91 @@ class Family:
                     actions -= 1
         return actions
 
+    def _maybe_move_exit(self, slug: str, side: str, mine: list, book,
+                         inv: dict, now: float) -> None:
+        """A single resting exit in a clearly worse slot moves to the
+        better one. Cancel-first on purpose: placing the replacement
+        before cancelling would briefly offer MORE than the position
+        holds, and that extra could fill. Ladders of several exits are
+        left alone — moving them wholesale would churn the adopted
+        book."""
+        if len(mine) != 1:
+            return
+        rec = mine[0]
+        qty = inv.get("qty") or 0.0
+        if not self._cooldown_ok(slug, side, now):
+            return
+        if side == "SELL":
+            break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
+            lo = max(break_even + book.tick,
+                     (book.bids[0][0] + book.tick) if book.bids else 0.002)
+            hi = max((book.asks[0][0] if book.asks
+                      else break_even + book.tick), lo)
+        else:
+            received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
+            hi = min(received - book.tick,
+                     (book.asks[0][0] - book.tick) if book.asks
+                     else received - book.tick)
+            lo = min((book.bids[0][0] if book.bids else hi), hi)
+        best = self._best_exit_px(slug, side, book, lo, hi, rec.qty)
+        if best is None or abs(best - rec.price) < book.tick / 2:
+            return
+        prog, _w = self._prog_row(slug)
+        side_pool = self._side_pool(slug, prog) if prog is not None else None
+        if prog is None or side_pool is None:
+            return
+        levels = [(p, q) for p, q in book.side(side) if q > 1e-9]
+        j = estimate_join(side, levels, book.tick, float(prog.df),
+                          float(prog.target), best, rec.qty)
+        best_est = (j.share * side_pool
+                    if j.qualifies and j.in_window else 0.0)
+        cur_est = rec.live_est or 0.0
+        if best_est < cur_est * 1.5 + 0.05:
+            return                      # not clearly better — stay put
+        r = self.desk.cancel(rec.id, rec.market)
+        if r.ok:
+            self.orders.pop(rec.id, None)
+            self.evidence.order_gone(rec.market, rec.id)
+            self._log(event="exit_moved", market=slug, price=rec.price,
+                      qty=rec.qty,
+                      note=f"a slot at {best:.2f} earns more — moving")
+
+    def _best_exit_px(self, slug: str, side: str, book, lo: float,
+                      hi: float, qty: float) -> float:
+        """The exit slot that EARNS the most among prices that still
+        profit (owner, 2026-08-21: the MN example — don't pile onto a
+        crowded touch next to a wall when an open slot a few cents
+        lower earns more, and a fill there is still profit plus buying
+        power back). Tie goes to the price nearer the other side, which
+        fills sooner."""
+        lo, hi = round(lo, 3), round(hi, 3)
+        if hi < lo:
+            return hi
+        prog, _w = self._prog_row(slug)
+        side_pool = self._side_pool(slug, prog) if prog is not None else None
+        if prog is None:
+            return hi if side == "SELL" else lo
+        levels = [(p, q) for p, q in book.side(side) if q > 1e-9]
+        n = int(round((hi - lo) / book.tick)) + 1
+        step = max(1, n // 24)            # sample big ranges, walk small
+        cands = [round(lo + i * book.tick, 3) for i in range(0, n, step)]
+        if cands[-1] != hi:
+            cands.append(hi)
+        best_px, best_key = None, None
+        for px in cands:
+            j = estimate_join(side, levels, book.tick, float(prog.df),
+                              float(prog.target), px, qty)
+            est = (j.share * side_pool
+                   if side_pool is not None and j.qualifies and j.in_window
+                   else 0.0)
+            # nearer the other side breaks ties: it fills sooner, and an
+            # exit fill is profit plus buying power back
+            near = -px if side == "SELL" else px
+            key = (round(est, 4), near)
+            if best_key is None or key > best_key:
+                best_px, best_key = px, key
+        return best_px if best_px is not None else (hi if side == "SELL" else lo)
+
     def _sell(self, now: float, actions: int) -> int:
         for slug, inv in list(self.inventory.items()):
             if actions <= 0:
@@ -1395,6 +1486,10 @@ class Family:
                 continue
             if qty >= 0.01:
                 # long stock: an ask at break-even or better
+                mine = [o for o in self.orders.values()
+                        if o.market == slug and o.purpose == "sell"
+                        and o.side == "SELL"]
+                self._maybe_move_exit(slug, "SELL", mine, book, inv, now)
                 covered = sum(o.qty for o in self.orders.values()
                               if o.market == slug and o.purpose == "sell"
                               and o.side == "SELL")
@@ -1404,9 +1499,11 @@ class Family:
                 break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
                 ask_touch = (book.asks[0][0] if book.asks
                              else break_even + book.tick)
-                px = round(max(break_even + book.tick, ask_touch), 3)
-                if book.bids:
-                    px = max(px, round(book.bids[0][0] + book.tick, 3))
+                lo = max(break_even + book.tick,
+                         (book.bids[0][0] + book.tick) if book.bids
+                         else 0.002)
+                px = self._best_exit_px(slug, "SELL", book, lo,
+                                        max(ask_touch, lo), rest)
                 px = min(max(px, 0.002), 0.999)
                 side, intent, rest_qty = "SELL", SELL_LONG, rest
                 why = "selling filled stock — it earns while it waits"
@@ -1415,6 +1512,10 @@ class Family:
                 # break-even — the bid earns rewards while it exits and
                 # adds no collateral (owner, 2026-08-20: "try and exit
                 # positions in a way that earns liquidity reward")
+                mine = [o for o in self.orders.values()
+                        if o.market == slug and o.purpose == "sell"
+                        and o.side == "BUY"]
+                self._maybe_move_exit(slug, "BUY", mine, book, inv, now)
                 covered = sum(o.qty for o in self.orders.values()
                               if o.market == slug and o.purpose == "sell"
                               and o.side == "BUY")
@@ -1424,11 +1525,11 @@ class Family:
                 received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
                 bid_touch = (book.bids[0][0] if book.bids
                              else received - book.tick)
-                px = round(min(received - book.tick, bid_touch), 3)
-                if book.asks:
-                    # a locked or one-tick book: the bid must still rest
-                    # UNDER the ask or the desk rightly refuses it
-                    px = min(px, round(book.asks[0][0] - book.tick, 3))
+                hi = min(received - book.tick,
+                         (book.asks[0][0] - book.tick) if book.asks
+                         else received - book.tick)
+                px = self._best_exit_px(slug, "BUY", book,
+                                        min(bid_touch, hi), hi, rest)
                 px = min(max(px, 0.001), 0.999)
                 side, intent, rest_qty = "BUY", SELL_SHORT, rest
                 why = ("buying back the short at or under what it sold "
