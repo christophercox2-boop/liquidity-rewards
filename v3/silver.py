@@ -100,9 +100,24 @@ SENATE_GOP_NOT_UP = 31
 SENATE_RACES_EXPECTED = 35
 
 
+def slug_code(name: str) -> str:
+    """The exchange's candidate code: first three letters of the first
+    name plus first three of the last ("Xavier Becerra" -> xavbec,
+    "J.D. Vance" -> jdvan)."""
+    words = [w for w in name.replace(".", "").split() if w]
+    if not words:
+        return ""
+    first = "".join(c for c in words[0] if c.isalpha()).lower()[:3]
+    last = "".join(c for c in words[-1] if c.isalpha()).lower()[:3]
+    return first + last
+
+
 def parse_races(text: str) -> dict[str, dict]:
-    """Datawrapper race table -> {abbr: {dem, rep, name}} as fractions.
-    Same parse as 1.0's, so both read the same table the same way."""
+    """Datawrapper race table -> {abbr: {dem, rep, name, cands}} as
+    fractions. cands maps the exchange's candidate code to Silver's OWN
+    per-candidate odds (the name_D1/winner_D1... columns) — the owner's
+    2026-08-21 correction: the model DOES price candidate markets, and
+    a port that drops those columns silently unpriced hundreds of them."""
     out: dict[str, dict] = {}
     for row in csv.DictReader(io.StringIO(text)):
         abbr = (row.get("abbr") or "").strip().lower()
@@ -113,7 +128,22 @@ def parse_races(text: str) -> dict[str, dict]:
             rep = float(row.get("winner_Rparty") or "") / 100.0
         except ValueError:
             continue
-        out[abbr] = {"dem": dem, "rep": rep, "name": (row.get("state") or "").strip()}
+        cands: dict[str, float] = {}
+        for party in ("D", "R"):
+            for i in (1, 2, 3, 4):
+                nm = (row.get(f"name_{party}{i}") or "").strip()
+                pv = (row.get(f"winner_{party}{i}") or "").strip()
+                if not nm or not pv:
+                    continue
+                try:
+                    code = slug_code(nm)
+                    if code:
+                        cands[code] = float(pv) / 100.0
+                except ValueError:
+                    continue
+        out[abbr] = {"dem": dem, "rep": rep,
+                     "name": (row.get("state") or "").strip(),
+                     "cands": cands}
     return out
 
 
@@ -316,8 +346,8 @@ class SilverFairs:
         return None — the table doesn't price them."""
         parts = (slug or "").split("-")
         tail = parts[-1] if parts else ""
-        if tail not in ("dem", "rep"):
-            return None
+        # party tails AND candidate-coded tails both resolve; anything
+        # else (margin brackets, primaries) stays unpriced
         if any(p.startswith("usse") for p in parts):
             table = self.races
         elif any("usgub" in p for p in parts):
@@ -328,14 +358,23 @@ class SilverFairs:
         if st is None:
             return None
         v = table[st].get(tail)
-        return float(v) if v is not None else None
+        if v is not None:
+            return float(v)
+        cv = (table[st].get("cands") or {}).get(tail)
+        return float(cv) if cv is not None else None
 
     def model_fair(self, slug: str) -> float | None:
-        """One entry point for the engine: a race-winner probability, or
-        a seat-ladder rung value, or None."""
+        """One entry point for the engine: a race-winner probability
+        (party or candidate), a chamber-control probability, or a
+        seat-ladder rung value, or None."""
         v = self.race_fair(slug)
         if v is not None:
             return v
+        if "usho" in slug and slug.rsplit("-", 1)[-1] in ("dem", "rep"):
+            ctl = self.control("house")
+            if ctl:
+                gop = ctl.get("deluxe") or next(iter(ctl.values()))
+                return gop if slug.endswith("rep") else 1.0 - gop
         return self.fair(slug)
 
     def _refresh_races(self, now: float) -> bool:

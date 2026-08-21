@@ -768,3 +768,34 @@ class TestStreamRouter(unittest.TestCase):
             finally:
                 for k in ("V3_STATE_PATH", "V3_FLOOR_PATH"):
                     os.environ.pop(k, None)
+
+
+class TestCandidatePriors(unittest.TestCase):
+    """Owner, 2026-08-21: 'There is only one democratic candidate. I gave
+    you the model as a prior.' Silver's per-candidate columns price the
+    candidate markets, and dropping them silently unpriced hundreds."""
+
+    def test_becerra_gets_silvers_number(self):
+        from v3.silver import SilverFairs, slug_code
+        self.assertEqual(slug_code("Xavier Becerra"), "xavbec")
+        self.assertEqual(slug_code("J.D. Vance"), "jdvan")
+        sf = SilverFairs()
+        sf.gov_races = {"ca": {"dem": 0.9994, "rep": 0.0006,
+                               "name": "California",
+                               "cands": {"xavbec": 0.9994,
+                                         "stehil": 0.0006}}}
+        self.assertAlmostEqual(
+            sf.race_fair("ewc-usgub-ca-2026-11-03-xavbec"), 0.9994)
+        self.assertAlmostEqual(
+            sf.model_fair("ewc-usgub-ca-2026-11-03-stehil"), 0.0006)
+        self.assertIsNone(
+            sf.race_fair("vmc-usgubmov-ca-2026-11-03-d12-15"))
+
+    def test_house_control_maps_to_the_histograms(self):
+        from v3.silver import SilverFairs
+        sf = SilverFairs()
+        sf.official = {"house": {"deluxe": {217: 0.4, 218: 0.6}}}
+        v = sf.model_fair("paccc-usho-midterms-2026-11-03-rep")
+        self.assertAlmostEqual(v, 0.6)
+        v2 = sf.model_fair("paccc-usho-midterms-2026-11-03-dem")
+        self.assertAlmostEqual(v2, 0.4)

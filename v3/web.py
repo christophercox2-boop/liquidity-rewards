@@ -480,6 +480,7 @@ function render(d){
  var sv=d.silver||{};var out='';
  out+='<div class="card"><b>The Silver model, as this system sees it</b>';
  out+='<div class="sub">'+(sv.senate_races||0)+' senate and '+(sv.gov_races||0)+' governor races. Tables checked '+(sv.tables_age_min==null?'?':sv.tables_age_min)+' min ago.'+(sv.official_age_h!=null?' Seat simulations from '+sv.official_age_h+' hours ago ('+esc(sv.official_source||'')+').':'')+'</div>';
+ out+='<div class="sub">Model coverage in your scope: <b>'+(sv.priced||0)+'</b> markets priced, '+(sv.unpriced||0)+' without a model number (margins, primaries, the 2028 slate) \\u2014 those run on evidence alone and every card says so.</div>';
  out+='<div class="hint">The feed carries the model\\u2019s odds, not the polls behind them. So this page shows every MOVE in the odds and when this system saw it. The tables update when Silver posts new polling \\u2014 about daily in season, checked every 6 hours. The simulations update only when he reruns the model; past 5 days old, the system widens its bands instead of trusting them alone.</div>';
  out+='</div>';
  var log=(d.silver_log||[]).slice().reverse();

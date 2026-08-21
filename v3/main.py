@@ -387,6 +387,12 @@ class Monitor:
             "silver_log": self.silver.changes[-120:],
             "rewards_last": self.rw_last,
             "silver": {
+                "priced": sum(1 for s in self.families["politics"].universe
+                              if self.families["politics"].enterable(s)
+                              and self.silver.model_fair(s) is not None),
+                "unpriced": sum(1 for s in self.families["politics"].universe
+                                if self.families["politics"].enterable(s)
+                                and self.silver.model_fair(s) is None),
                 "senate_races": len(self.silver.races),
                 "gov_races": len(self.silver.gov_races),
                 "tables_age_min": (round((now - self.silver.fetched_at) / 60)
