@@ -776,8 +776,9 @@ class Monitor:
             if b is None:
                 continue
             ours = [{"side": o.side, "price": o.price, "qty": o.qty,
-                     "purpose": o.purpose}
+                     "purpose": o.purpose, "est": o.live_est}
                     for o in fam.orders.values() if o.market == slug]
+            inv = fam.inventory.get(slug)
             return {"ok": True, "market": slug,
                     "name": self.names.label(slug),
                     "age_s": round(time.time() - b.fetched_at, 1),
@@ -789,6 +790,9 @@ class Monitor:
                              if hasattr(self, "silver") else None),
                     "band": fam._band(slug, b.bids, b.asks, b.tick),
                     "conf": round(fam.evidence.confidence(slug), 3),
+                    "position": ({"qty": round(inv.get("qty", 0), 2),
+                                  "cost": round(inv.get("cost", 0), 2)}
+                                 if inv else None),
                     "ladder": fam.ladder_view(slug)}
         return {"ok": False, "note": "no book cached for this market yet"}
 

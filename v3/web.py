@@ -531,11 +531,33 @@ function wCard(name,slug,b,tri){
  s+=wCurve(asks,X,Y,'#d9b36a');
  s+='</svg>';
  var legend='<div class="muted" style="font-size:12px"><span style="color:#9ec49a">\u25cf</span> bids &nbsp;<span style="color:#d9b36a">\u25cf</span> asks &nbsp;\u00b7 big dot = the pick &nbsp;\u00b7 EV/day at each resting price</div>';
- var picks=all.filter(function(r){return r.picked;}).map(function(r){
-  return (bids.indexOf(r)>=0?'bid':'ask')+' '+r.qty+' @ '+wFmtC(r.px)+' \u2192 $'+r.ev.toFixed(2)+'/day';
- });
- var pk=picks.length?'<div style="font-size:16px;margin:4px 0"><b>'+picks.join(' \u00b7 ')+'</b></div>':'<div class="muted" style="margin:4px 0">nothing here clears the bar</div>';
- return head+s+legend+pk;
+ var pkRows=all.filter(function(r){return r.picked;});
+ var pk=pkRows.length?'<div style="font-size:16px;margin:6px 0"><b>Decision: '+pkRows.map(function(r){
+   return (bids.indexOf(r)>=0?'bid':'ask')+' '+r.qty+' @ '+wFmtC(r.px)+' \u2192 $'+r.ev.toFixed(2)+'/day, '+Math.round(r.p_fill*100)+'% fill odds';
+  }).join(' \u00b7 ')+'</b>'+pkRows.map(function(r){return r.why?'<div class="muted" style="font-size:12px;font-weight:400">'+esc(r.why)+'</div>':'';}).join('')+'</div>'
+  :'<div class="muted" style="margin:6px 0"><b>Decision:</b> nothing here clears the bar</div>';
+ var oursAt={};(b.ours||[]).forEach(function(o){oursAt[o.side+(o.price*100).toFixed(1)]=o;});
+ var bt='<table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
+ var nrows=Math.min(Math.max((b.bids||[]).length,(b.asks||[]).length),6);
+ for(var i=0;i<nrows;i++){
+  var bd=(b.bids||[])[i],ak=(b.asks||[])[i];
+  var bm=bd&&oursAt['BUY'+(bd[0]*100).toFixed(1)]?' \u25CF':'';
+  var am=ak&&oursAt['SELL'+(ak[0]*100).toFixed(1)]?' \u25CF':'';
+  bt+='<tr><td class="r">'+(bd?fmtsz(bd[1]):'')+'</td><td class="r">'+(bd?pc(bd[0])+bm:'')+'</td>'
+    +'<td>'+(ak?pc(ak[0])+am:'')+'</td><td>'+(ak?fmtsz(ak[1]):'')+'</td></tr>';
+ }
+ bt+='</table>';
+ var mine='';
+ if((b.ours||[]).length){
+  mine='<div style="margin:4px 0"><b>Where I am:</b> '+b.ours.map(function(o){
+   return (o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+wFmtC(o.price)+' ['+o.purpose+']'+(o.est?' ~$'+o.est.toFixed(2)+'/day':'');
+  }).join(' \u00b7 ')+'</div>';
+ }else{mine='<div class="muted" style="margin:4px 0">no orders resting here yet</div>';}
+ if(b.position&&b.position.qty){
+  var pq=b.position.qty,pc2=b.position.cost;
+  mine+='<div><b>Position:</b> '+pq+' shares'+(pq>0?' at '+((pc2/pq)*100).toFixed(1)+'c average':' (short)')+'</div>';
+ }
+ return head+s+legend+pk+bt+'<div class="hint">\u25CF marks our order</div>'+mine;
 }
 function wSpot(){
  var q=window._watchQ||[];
@@ -562,7 +584,7 @@ function render(d){
  });
  q.sort(function(a,b){return b.ts-a.ts;});
  window._watchQ=q.slice(0,10);
- if(!window._watchT){window._watchT=setInterval(wSpot,7000);setTimeout(wSpot,300);}
+ if(!window._watchT){window._watchT=setInterval(wSpot,15000);setTimeout(wSpot,300);}
  return '<div class="card"><div class="muted">What the engine is considering \u2014 one market at a time, rotating through the sweep\u2019s latest verdicts. The curve is EV/day at every resting price.</div>'
   +'<div id="spot" style="transition:opacity 0.24s ease;min-height:280px"></div></div>';
 }
