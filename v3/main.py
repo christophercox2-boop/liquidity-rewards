@@ -472,6 +472,7 @@ class Monitor:
             "summaries": summaries,
             "floor": self.floor.status(now),
             "ws": dict(self.stream.status) if self.stream else {},
+            "lite_study": self._lite_study(),
             "silver_log": self.silver.changes[-120:],
             "rewards_last": self.rw_last,
             "silver": {
@@ -815,6 +816,43 @@ class Monitor:
                    f"{len(fresh) - len(shown)} old strays absorbed")
         return {"ok": True, "new_rows": out_rows, "new_count": len(shown),
                 "days": days}
+
+    def _lite_study(self) -> dict:
+        """Declared-anchor scoring study (owner, 2026-08-21): what each
+        of our markets would pay if scoring anchors on the exchange's
+        DECLARED best bid/ask instead of the raw touch. Read-only."""
+        if self.stream is None:
+            return {"note": "no stream"}
+        declared = dict(getattr(self.stream, "declared", {}) or {})
+        if not declared:
+            return {"note": "no lite frames yet"}
+        rows: list[dict] = []
+        n_cov = n_div = 0
+        tot_cur = tot_alt = 0.0
+        for tag, fam in self.families.items():
+            for slug in {o.market for o in fam.orders.values()}:
+                d = declared.get(slug)
+                if not d:
+                    continue
+                r = fam.lite_recalc(slug, d[0], d[1])
+                if r is None:
+                    continue
+                n_cov += 1
+                div = ((r["bb"] is not None and r["raw_bid"] is not None
+                        and abs(r["bb"] - r["raw_bid"]) > 0.005)
+                       or (r["ba"] is not None and r["raw_ask"] is not None
+                           and abs(r["ba"] - r["raw_ask"]) > 0.005))
+                r["diverges"] = div
+                r["family"] = tag
+                n_div += 1 if div else 0
+                tot_cur += r["est_cur"]
+                tot_alt += r["est_alt"]
+                rows.append(r)
+        rows.sort(key=lambda x: -abs(x["est_alt"] - x["est_cur"]))
+        return {"covered": n_cov, "divergent": n_div,
+                "est_current_total": round(tot_cur, 2),
+                "est_declared_total": round(tot_alt, 2),
+                "rows": rows[:60]}
 
     def fills_view(self) -> dict:
         """Every purchase as a round trip, newest activity first, joined

@@ -847,6 +847,44 @@ class Family:
         close = [r for r in live if r["ev"] >= best_ev - tol]
         return min(close, key=lambda r: (r["p_fill"], -r["ev"]))
 
+    def lite_recalc(self, slug: str, bb: float | None,
+                    ba: float | None) -> dict | None:
+        """Our estimated $/day in this market IF scoring anchors on the
+        exchange's DECLARED best bid/ask (the group-chat claim,
+        2026-08-21) instead of the raw touch. Study only — changes no
+        behavior."""
+        book = self.cache.any_age(slug)
+        prog, _w = self._prog_row(slug)
+        if book is None or prog is None:
+            return None
+        sp = self._side_pool(slug, prog)
+        if sp is None:
+            return None
+        df, target = float(prog.df), float(prog.target)
+        out = {"market": slug, "bb": bb, "ba": ba,
+               "raw_bid": book.bids[0][0] if book.bids else None,
+               "raw_ask": book.asks[0][0] if book.asks else None,
+               "est_alt": 0.0, "est_cur": 0.0}
+        for side, anchor in (("BUY", bb), ("SELL", ba)):
+            levels = list(book.side(side))
+            total = sum(q for _, q in levels)
+            mine = [(o.price, o.qty) for o in self.orders.values()
+                    if o.market == slug and o.side == side]
+            out["est_cur"] += sum((o.live_est or 0.0)
+                                  for o in self.orders.values()
+                                  if o.market == slug and o.side == side)
+            if anchor is None or not mine or total < target:
+                continue
+            denom = sum(q * df ** round(abs(p - anchor) / book.tick)
+                        for p, q in levels)
+            ours = sum(q * df ** round(abs(p - anchor) / book.tick)
+                       for p, q in mine)
+            if denom > 1e-12:
+                out["est_alt"] += min(ours / denom, 1.0) * sp
+        out["est_alt"] = round(out["est_alt"], 4)
+        out["est_cur"] = round(out["est_cur"], 4)
+        return out
+
     def ladder_view(self, slug: str) -> dict:
         """Every price level the planner prices, with its numbers —
         the owner reads the whole ladder himself (2026-08-21: "allow me

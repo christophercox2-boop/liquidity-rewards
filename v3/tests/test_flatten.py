@@ -1617,3 +1617,53 @@ class TestLossCutExits(unittest.TestCase):
         r.fam.fairs = lambda s: 0.60      # model AGREES with break-even
         self.assertEqual(r.fam._exit_floor(A, "SELL", 0.50, 0.01),
                          (0.51, 0.50))
+
+
+class TestLiteFeed(unittest.TestCase):
+    def test_lite_frame_captures_declared_best_without_touching_books(self):
+        from v3.ws import Stream
+        from v3.books import BookCache
+        import json as _json
+        cache = BookCache()
+        s = Stream(cache, lambda: [], "k", "s")
+        raw = _json.dumps({"marketDataLite": {
+            "marketSlug": "m-1",
+            "bestBid": {"value": "0.03", "currency": "USD"},
+            "bestAsk": {"value": "0.99", "currency": "USD"}}})
+        out = s.apply_frame(raw)
+        self.assertIsNone(out)
+        bb, ba, ts = s.declared["m-1"]
+        self.assertEqual((bb, ba), (0.03, 0.99))
+        self.assertIsNone(cache.any_age("m-1"))   # books untouched
+
+    def test_declared_anchor_recalc_matches_the_group_tool(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_SHORT
+        from v3.scoring import Book
+        r = Rig(switch=False)
+        # the screenshot's book, with OUR 38 shares as the 98c ask
+        r.add_market(A, book=Book(
+            bids=((0.14, 0.02), (0.04, 58.0), (0.03, 40098.0),
+                  (0.01, 2500.0)),
+            asks=((0.15, 0.02), (0.23, 50.0), (0.49, 25.0),
+                  (0.98, 38.0), (0.99, 21718.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.cycle()
+        r.fam.orders["L1"] = FamilyOrder(
+            id="L1", market=A, side="SELL", price=0.98, qty=38.0,
+            intent=SELL_SHORT, placed_ts=1.0, purpose="earn",
+            live_est=0.0)
+        out = r.fam.lite_recalc(A, 0.03, 0.99)
+        self.assertIsNotNone(out)
+        # under wall anchoring our 98c order holds 11.40/21729.4 of the
+        # ask side (the tool's own numbers)
+        prog, _w = r.fam._prog_row(A)
+        sp = r.fam._side_pool(A, prog)
+        df = float(prog.df)
+        ours = 38.0 * df          # one tick behind the declared 99c best
+        denom = (21718.0 + ours + 25.0 * df ** 50
+                 + 50.0 * df ** 76 + 0.02 * df ** 84)
+        self.assertAlmostEqual(out["est_alt"], ours / denom * sp, places=3)
+        self.assertEqual(out["raw_ask"], 0.15)   # raw touch differs
+        self.assertEqual(out["ba"], 0.99)        # from the declared one

@@ -40,6 +40,10 @@ class Stream:
         self.get_slugs = get_slugs
         self.key_id, self.secret_key = key_id, secret_key
         self.status = {"state": "off", "last_msg": 0.0, "subscribed": 0, "note": ""}
+        # the exchange's own DECLARED best bid/ask per market, from the
+        # Lite feed (owner, 2026-08-21: does the exchange's "best" match
+        # the raw touch, and is IT the scoring anchor?)
+        self.declared: dict[str, tuple[float | None, float | None, float]] = {}
         self._thread: threading.Thread | None = None
 
     def start(self) -> None:
@@ -52,6 +56,18 @@ class Stream:
         socket."""
         try:
             msg = json.loads(raw)
+            lite = msg.get("marketDataLite") or {}
+            if lite.get("marketSlug"):
+                bb = to_num((lite.get("bestBid") or {}).get("value"))
+                ba = to_num((lite.get("bestAsk") or {}).get("value"))
+                self.declared[lite["marketSlug"]] = (
+                    bb if bb > 0 else None, ba if ba > 0 else None,
+                    time.time())
+                if len(self.declared) > 600:
+                    oldest = min(self.declared, key=lambda k: self.declared[k][2])
+                    self.declared.pop(oldest, None)
+                self.status["last_msg"] = time.time()
+                return None
             md = msg.get("marketData") or {}
             slug = md.get("marketSlug")
             if not slug:
@@ -86,6 +102,11 @@ class Stream:
                 await ws.send(json.dumps({"subscribe": {
                     "requestId": "books",
                     "subscriptionType": "SUBSCRIPTION_TYPE_MARKET_DATA",
+                    "marketSlugs": slugs,
+                }}))
+                await ws.send(json.dumps({"subscribe": {
+                    "requestId": "lite",
+                    "subscriptionType": "SUBSCRIPTION_TYPE_MARKET_DATA_LITE",
                     "marketSlugs": slugs,
                 }}))
                 self.status.update(state="live", subscribed=len(slugs), note="")
