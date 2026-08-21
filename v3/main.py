@@ -340,6 +340,17 @@ class Monitor:
             "summaries": summaries,
             "floor": self.floor.status(now),
             "ws": dict(self.stream.status) if self.stream else {},
+            "silver": {
+                "senate_races": len(self.silver.races),
+                "gov_races": len(self.silver.gov_races),
+                "tables_age_min": (round((now - self.silver.fetched_at) / 60)
+                                   if self.silver.fetched_at else None),
+                "official_source": self.silver.official_source,
+                "official_age_h": (round(
+                    self.silver.official_run_age_s(now) / 3600, 1)
+                    if self.silver.official_meta else None),
+                "meta": dict(self.silver.official_meta or {}),
+            },
             "grades": self._grades(),
             "flatten": ({"active": self.flatten,
                          "done": self.flatten_done, **(self.last_flat or {})}

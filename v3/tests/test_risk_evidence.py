@@ -331,3 +331,69 @@ class TestEVDecision(unittest.TestCase):
         self.assertLess(r.fam.family_spent(), spent_all + 1e-9)
         self.assertGreater(r.fam.proven_spent(), 0.0)
         self.assertLessEqual(r.fam.family_spent() + 1e-9, 10.0)
+
+
+class TestGrowthInvesting(unittest.TestCase):
+    """Owner, 2026-08-21: 75c is a GOAL. A market that cannot clear it at
+    today's confidence, but would at full confidence, gets a starter."""
+
+    def rig(self):
+        from v3.tests.test_family import Rig
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet",
+                           capital_usd=100.0, per_market_usd=20.0,
+                           min_est_day=0.75, share_max=0.35,
+                           grow_usd=30.0, grow_floor=0.10,
+                           join_edge_ticks=2.0)
+        return Rig(cfg=cfg)
+
+    def thin_book(self, now):
+        # tiny real competition: at the 10% courtesy cap the est stays
+        # under the goal, but at the full 35% cap it clears it
+        from v3.scoring import Book
+        return Book(bids=((0.40, 4.0), (0.02, 60000.0)),
+                    asks=((0.60, 4.0), (0.98, 60000.0)),
+                    tick=0.01, fetched_at=now)
+
+    SMALL_POOL = {"timePeriods": [{"programId": "politics_mid_1",
+                                   "rewardPool": 6.0, "targetSize": 5000,
+                                   "discountFactor": 0.2, "status": "LIVE"}]}
+
+    def test_under_goal_market_gets_a_starter_when_potential_clears(self):
+        from v3.tests.test_family import A
+        r = self.rig()
+        r.add_market(A, book=self.thin_book(1_000_000.0),
+                     prog=self.SMALL_POOL)
+        r.cycle()
+        grows = [o for o in r.fam.orders.values() if o.purpose == "grow"]
+        self.assertTrue(grows)
+        g = grows[0]
+        self.assertIn("investing to build the evidence", g.why)
+        spent = sum(o.price * o.qty if o.side == "BUY"
+                    else (1 - o.price) * o.qty for o in grows)
+        self.assertLessEqual(spent, 30.0 + 1e-6)
+
+    def test_growth_off_means_no_starter(self):
+        from v3.tests.test_family import A, Rig
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           min_est_day=0.75, grow_usd=0.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A, book=self.thin_book(1_000_000.0),
+                     prog=self.SMALL_POOL)
+        r.cycle()
+        self.assertEqual([o for o in r.fam.orders.values()
+                          if o.purpose == "grow"], [])
+
+    def test_grow_culls_at_its_own_floor_not_the_goal(self):
+        from v3.tests.test_family import A
+        r = self.rig()
+        r.add_market(A, book=self.thin_book(1_000_000.0),
+                     prog=self.SMALL_POOL)
+        r.cycle()
+        g = next(o for o in r.fam.orders.values() if o.purpose == "grow")
+        # it measures ~30-70c: under the GOAL but above its 10c floor —
+        # hours later it must still be standing
+        r.cycle(advance=4000.0)
+        self.assertIn(g.id, r.fam.orders)

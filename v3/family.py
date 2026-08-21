@@ -105,7 +105,7 @@ class FamilyConfig:
     # could clear the bar but whose evidence confidence is still low gets
     # a one-share scout behind the touch. Its job is the information —
     # what fills it, what ignores it — and it earns a trickle meanwhile.
-    probe_usd: float = 5.0            # concurrent probe collateral, total
+    probe_usd: float = 0.0            # concurrent probe collateral (0 = off)
     probe_qty: float = 1.0
     probe_ttl_s: float = 45 * 60.0    # rotate: 45 quiet minutes IS the datum
     probe_cooldown_s: float = 6 * 3600.0
@@ -120,6 +120,16 @@ class FamilyConfig:
     # information (no model, no evidence) = the timid defaults stand.
     join_edge_ticks: float | None = None
     share_max: float = 0.10           # == share_hi means no lift
+    # Growth investing (owner, 2026-08-21: "take the 75 cents per day as
+    # a GOAL and if it's not doable at first, invest in the markets where
+    # growth after building confidence is possible"). A market that can't
+    # clear the goal at today's confidence, but WOULD at full confidence
+    # (touch unlocked, full share cap, evidence-width bounds), gets a
+    # starter position from its own budget. Its resting and its fills are
+    # the evidence that grows the confidence that clears the goal.
+    grow_usd: float = 0.0             # 0 = growth investing off
+    grow_floor: float = 0.10          # a growth order must still earn this
+    grow_pull_s: float = 1800.0       # under its floor this long -> out
     # College only: may price IN FRONT of a junk touch (wall-only books).
     # The owner kept college's launch behavior ("I wouldn't change anything
     # for now"); every other family leaves this off.
@@ -409,7 +419,8 @@ class Family:
 
     def _plan_side(self, slug: str, book, side: str, prog,
                    side_pool: float | None, budget: float,
-                   own: FamilyOrder | None = None) -> dict | None:
+                   own: FamilyOrder | None = None, bar: float | None = None,
+                   full_confidence: bool = False) -> dict | None:
         """The best resting order for one side, or None. Every plan and
         every refusal is phone-readable."""
         df, target = float(prog.df), float(prog.target)
@@ -518,7 +529,9 @@ class Family:
         # band's center is just the spread's midpoint — and the touch must
         # not certify itself. The model counts in full; without it, edge
         # scales with fill-built confidence, continuously.
-        if self.fairs is not None and self.fairs(slug) is not None:
+        if full_confidence:
+            independence = 1.0
+        elif self.fairs is not None and self.fairs(slug) is not None:
             independence = 1.0
         else:
             independence = self.evidence.confidence(slug)
@@ -533,6 +546,8 @@ class Family:
         if (not join_ok and self.cfg.join_edge_ticks is not None
                 and edge_ticks(touch) >= self.cfg.join_edge_ticks):
             join_ok = True    # a fill AT the touch is a good deal — take the front
+        if full_confidence:
+            join_ok = True
         rungs = tuple(k for k in ((0,) if join_ok else ()) + (1, 2, 3, 6, 10, 15)
                       if k >= min_rung)
         cands = []
@@ -618,7 +633,7 @@ class Family:
                                f"{k} tick{'s' if k != 1 else ''} behind the "
                                f"touch, ~{j.share * 100:.1f}% of the "
                                f"{side_name} side")}
-                lift = min(edge_ticks(px) / 4.0, 1.0)
+                lift = 1.0 if full_confidence else min(edge_ticks(px) / 4.0, 1.0)
                 eff_cap = (self.cfg.share_hi
                            + (max(self.cfg.share_max, self.cfg.share_hi)
                               - self.cfg.share_hi) * lift)
@@ -632,9 +647,10 @@ class Family:
                     break
                 if pick is None or ev > pick["ev"] + 1e-9:
                     pick = row
-        if pick is not None and pick["ev"] >= self.cfg.min_est_day:
+        the_bar = self.cfg.min_est_day if bar is None else bar
+        if pick is not None and pick["ev"] >= the_bar:
             return pick
-        if solo is not None and solo["ev"] >= self.cfg.min_est_day:
+        if solo is not None and solo["ev"] >= the_bar:
             return solo
         return None
 
@@ -687,11 +703,31 @@ class Family:
             p = self._plan_side(slug, book, side, prog, side_pool, budget)
             if p:
                 out.append(p)
+        grow: list[dict] = []
+        potential = 0.0
+        if not out and self.cfg.grow_usd > 0:
+            for side in ("BUY", "SELL"):
+                fp = self._plan_side(slug, book, side, prog, side_pool,
+                                     budget, full_confidence=True)
+                if fp:
+                    potential = max(potential, fp["ev"])
+            if potential >= self.cfg.min_est_day:
+                for side in ("BUY", "SELL"):
+                    gp = self._plan_side(slug, book, side, prog, side_pool,
+                                         budget, bar=self.cfg.grow_floor)
+                    if gp:
+                        gp["grow"] = True
+                        gp["why"] = (
+                            f"under the {self.cfg.min_est_day * 100:.0f}c "
+                            f"goal today (${gp['ev']:.2f}/day) but worth "
+                            f"${potential:.2f} at full confidence — "
+                            f"investing to build the evidence")
+                        grow.append(gp)
         if not out:
             why = ("nothing here clears the bar: both sides either pay "
                    f"under {self.cfg.min_est_day * 100:.0f}c/day, are louder "
                    "than the courtesy band, or don't qualify")
-        return out, why
+        return out, why, grow, round(potential, 4)
 
     # -------------------------------------------------------------- reconcile
 
@@ -946,7 +982,10 @@ class Family:
         actions = self._probe(now, positions, actions)
 
         # 6) new entries, best scoreboard candidates first
-        self._enter(now, positions, actions)
+        actions = self._enter(now, positions, actions)
+
+        # 7) growth: seed the markets whose goal needs confidence first
+        self._grow(now, positions, actions)
         return self._finish(summary, now)
 
     def _read_live(self, now: float) -> None:
@@ -1023,20 +1062,26 @@ class Family:
                 continue
             best = self._plan_side(rec.market, book, rec.side, prog,
                                    side_pool,
-                                   self.cfg.per_market_usd / 2.0, own=rec)
+                                   self.cfg.per_market_usd / 2.0, own=rec,
+                                   bar=(self.cfg.grow_floor
+                                        if rec.purpose == "grow" else None))
             drifted = ((rec.live_share or 0.0) > self.cfg.drift_share
                        and rec.purpose not in ("revive", "solo"))
             gain = (best["est"] if best else 0.0) - (rec.live_est or 0.0)
             measured = rec.live_ev if rec.live_ev is not None else rec.live_est
-            below = measured is not None and measured < self.cfg.min_est_day
+            floor_here = (self.cfg.grow_floor if rec.purpose == "grow"
+                          else self.cfg.min_est_day)
+            below = measured is not None and measured < floor_here
             if below and not rec.weak_since:
                 rec.weak_since = now
             elif not below:
                 rec.weak_since = 0.0
-            weak = (self.cfg.weak_pull_s > 0 and rec.weak_since
-                    and now - rec.weak_since > self.cfg.weak_pull_s
+            window_here = (self.cfg.grow_pull_s if rec.purpose == "grow"
+                           else self.cfg.weak_pull_s)
+            weak = (window_here > 0 and rec.weak_since
+                    and now - rec.weak_since > window_here
                     and (best is None
-                         or best["est"] < self.cfg.min_est_day))
+                         or best.get("ev", best["est"]) < floor_here))
             if (best is None and (rec.live_est or 0.0) <= 0.0) or weak:
                 r = self.desk.cancel(rec.id, rec.market)
                 if r.ok:
@@ -1079,12 +1124,16 @@ class Family:
                                    f"both and retrying the cancel")
                     else:
                         del self.orders[rec.id]
+                    new_purpose = ("revive" if best.get("revive")
+                                   else "solo" if best.get("solo")
+                                   else "grow" if (rec.purpose == "grow"
+                                   and best.get("ev", best["est"])
+                                   < self.cfg.min_est_day)
+                                   else "earn")
                     self.orders[r.order_id] = FamilyOrder(
                         id=r.order_id, market=rec.market, side=rec.side,
                         price=best["px"], qty=best["qty"], intent=rec.intent,
-                        placed_ts=now,
-                        purpose=("revive" if best.get("revive")
-                                 else "solo" if best.get("solo") else "earn"),
+                        placed_ts=now, purpose=new_purpose,
                         why=best["why"], est_day=best["est"], share=best["share"])
                     self._mark(rec.market, rec.side, now)
                     actions -= 1
@@ -1194,6 +1243,54 @@ class Family:
             actions -= 1
         return actions
 
+    def _grow(self, now: float, positions: dict, actions: int) -> int:
+        if self.cfg.grow_usd <= 0 or actions <= 0:
+            return actions
+        spent = sum(capital_at_risk(o.intent, o.price, o.qty)
+                    for o in self.orders.values() if o.purpose == "grow")
+        have = {(o.market, o.side) for o in self.orders.values()
+                if o.purpose != "sell"}
+        ranked = sorted(((s, sb) for s, sb in self.scoreboard.items()
+                         if sb.get("grow")),
+                        key=lambda kv: -(kv[1].get("potential") or 0.0))
+        for slug, sb in ranked:
+            if actions <= 0 or spent >= self.cfg.grow_usd - 1e-9:
+                break
+            if slug not in self.universe or self._dead_here(slug) \
+                    or not self.enterable(slug):
+                continue
+            days = slug_days_out(slug, now)
+            if days is not None and days < self.cfg.min_days_out:
+                continue
+            for plan in sb["grow"]:
+                if actions <= 0 or spent + plan["cost"] > self.cfg.grow_usd + 1e-9:
+                    break
+                if (slug, plan["side"]) in have:
+                    continue
+                if not self._cooldown_ok(slug, plan["side"], now):
+                    continue
+                book = self.cache.fresh(slug, BOOK_MAX_AGE, now)
+                if book is None:
+                    continue
+                net = (positions.get(slug) or (0.0,))[0]
+                r = self.desk.place_resting(slug, plan["side"], plan["px"],
+                                            plan["qty"], net_position=net,
+                                            verify=self.cfg.verify_resting)
+                if r.ok and r.order_id:
+                    self.positions_seen.setdefault(slug, net)
+                    self.orders[r.order_id] = FamilyOrder(
+                        id=r.order_id, market=slug, side=plan["side"],
+                        price=plan["px"], qty=plan["qty"], intent=r.intent,
+                        placed_ts=now, purpose="grow", why=plan["why"],
+                        est_day=plan["est"], share=plan["share"])
+                    self._log(event="grow", market=slug, side=plan["side"],
+                              price=plan["px"], qty=plan["qty"],
+                              why=plan["why"][:80])
+                    self._mark(slug, plan["side"], now)
+                    spent += plan["cost"]
+                    actions -= 1
+        return actions
+
     def _sell(self, now: float, actions: int) -> int:
         for slug, inv in list(self.inventory.items()):
             if actions <= 0:
@@ -1262,7 +1359,7 @@ class Family:
     # --------------------------------------------------------------- books
 
     def _probe(self, now: float, positions: dict, actions: int) -> int:
-        if not self.cfg.known_ground or actions <= 0:
+        if self.cfg.probe_usd <= 0 or actions <= 0:
             return actions
         spent = sum(capital_at_risk(o.intent, o.price, o.qty)
                     for o in self.orders.values() if o.purpose == "probe")
@@ -1417,12 +1514,13 @@ class Family:
                                          "why": f"book fetch failed: {str(e)[:50]}"}
                 done += 1
                 continue
-            plans, why = self.plan_market(book, slug)
+            plans, why, grow, potential = self.plan_market(book, slug)
             prog2, _ = self._prog_row(slug)
             sp2 = self._side_pool(slug, prog2) if prog2 else None
             conf2 = self.evidence.confidence(slug)
             self.scoreboard[slug] = {
                 "ts": now, "plans": plans, "why": why,
+                "grow": grow, "potential": potential,
                 "est": round(sum(p["est"] for p in plans), 4),
                 "pool_day": round(sp2, 4) if sp2 is not None else None,
                 "conf": conf2}
@@ -1430,13 +1528,16 @@ class Family:
             spread_c = (round((book.asks[0][0] - book.bids[0][0]) * 100, 1)
                         if book.bids and book.asks else None)
             best_ev = (max(p.get("ev", p["est"]) for p in plans)
-                       if plans else 0.0)
+                       if plans else (potential if grow else 0.0))
             self.triage_feed.append({
-                "ts": round(now, 1), "market": slug, "in": bool(plans),
+                "ts": round(now, 1), "market": slug,
+                "in": bool(plans or grow),
                 "ev": round(best_ev, 2), "spread": spread_c,
                 "pool": round(sp2, 2) if sp2 is not None else None,
                 "conf": round(conf2, 2),
-                "why": (plans[0]["why"][:60] if plans else (why or "")[:60])})
+                "why": (plans[0]["why"][:60] if plans
+                        else grow[0]["why"][:60] if grow
+                        else (why or "")[:60])})
             del self.triage_feed[:-40]
             done += 1
         for gone in set(self.scoreboard) - set(self.universe):

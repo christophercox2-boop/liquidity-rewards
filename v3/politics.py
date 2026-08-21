@@ -100,6 +100,10 @@ def config() -> FamilyConfig:
         # onto the proven pool's own $150 cap — the search money keeps
         # hunting new candidates
         graduate_paid_usd=0.25, proven_usd=150.0,
+        # owner, 2026-08-21: 75c is a GOAL — markets that could clear it
+        # at full confidence get starter positions from this budget, and
+        # probes stay funded ("you have to go out and get evidence")
+        probe_usd=5.0, grow_usd=30.0,
         # and fresh money goes ONLY where the fill-and-reward record is
         # deepest: governor and senate races (winners, margins, primaries,
         # seat ladders) and the 2028 presidential slate

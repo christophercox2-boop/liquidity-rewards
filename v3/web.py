@@ -234,6 +234,8 @@ function render(d){
  });
  var ws=(d.ws||{});
  if(ws.state){out+='<div class="muted">book stream: '+esc(ws.state)+(ws.subscribed?' ('+ws.subscribed+' markets live)':'')+'</div>';}
+ var sv2=(d.silver||{});
+ if(sv2.senate_races){out+='<div class="muted">Silver model: '+sv2.senate_races+' senate + '+(sv2.gov_races||0)+' governor races, tables checked '+(sv2.tables_age_min==null?'?':sv2.tables_age_min)+' min ago'+(sv2.official_age_h!=null?' \\u00b7 seat simulations from '+sv2.official_age_h+'h ago ('+esc(sv2.official_source||'')+')':'')+'</div>';}
  var errs=d.errors||[];
  if(errs.length){out+='<div class="card"><details><summary class="muted">recent notes ('+errs.length+')</summary>';
   errs.slice(-8).reverse().forEach(function(e){out+='<div class="muted">'+esc(e)+'</div>';});

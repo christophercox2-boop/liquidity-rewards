@@ -70,6 +70,9 @@ def cfb() -> FamilyConfig:
         season_start=(2026, 8, 27),
         books_per_cycle=12, scan_reserve=6,
         max_actions_per_cycle=6,
+        # owner, 2026-08-21: football must test hypotheses too — scouts
+        # and starter positions are how it learns what earns
+        probe_usd=3.0, grow_usd=10.0,
     )
 
 
@@ -86,4 +89,5 @@ def nfl() -> FamilyConfig:
         season_start=(2026, 8, 20),
         books_per_cycle=10, scan_reserve=4,
         max_actions_per_cycle=6,
+        probe_usd=3.0, grow_usd=10.0,
     )
