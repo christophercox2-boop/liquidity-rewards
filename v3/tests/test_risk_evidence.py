@@ -177,7 +177,7 @@ class TestProbing(unittest.TestCase):
         self.assertTrue(bids)
         for o in bids:
             self.assertGreater(o.price, 0.05)   # in front of the wall
-            self.assertLess(o.price, 0.16)      # but not past the frontier
+            self.assertLess(o.price, 0.22)      # but far from the 50c mid
 
     def test_grounded_wide_walls_get_a_small_quote_in_front(self):
         # ...and WITH a model, the wide spread is the owner's play: a
@@ -276,14 +276,19 @@ class TestEdgeAggression(unittest.TestCase):
         bids = [o for o in r.fam.orders.values() if o.side == "BUY"]
         self.assertTrue(bids)
         self.assertGreater(max(o.share for o in bids), 0.10)   # past the old cap
-        self.assertLessEqual(max(o.share for o in bids), 0.36)
-        # same book, no value information: the old courtesy stands
+        # share above the lifted cap is allowed ONLY at minimum size —
+        # the courtesy cap disciplines size, the solo claims the score
+        for o in bids:
+            if o.share > 0.36:
+                self.assertLessEqual(o.qty, 0.011)
+        # same book, no value information: sized orders still respect
+        # the 10% courtesy; only a minimum-size solo may exceed it
         r2 = self.rig(None)
         r2.add_market(A, book=thin)
         r2.cycle()
         for o in r2.fam.orders.values():
-            if o.side == "BUY":
-                self.assertLessEqual(o.share, 0.101)
+            if o.side == "BUY" and o.share > 0.101:
+                self.assertLessEqual(o.qty, 0.011)
 
 
 class TestEVDecision(unittest.TestCase):
@@ -592,7 +597,9 @@ class TestOwnerCorrections0821b(unittest.TestCase):
                     if p["side"] == "BUY" and p["px"] > 0.10]
             self.assertTrue(rows, fair)
             for p in rows:
-                self.assertLessEqual(p["px"], 0.20)   # frontier, not mid
+                # the walk stops where the score share plateaus — well
+                # short of the 50c midpoint
+                self.assertLessEqual(p["px"], 0.25)
 
     def test_heat_shrinks_the_retry_instead_of_closing_the_front(self):
         from v3.tests.test_family import A
@@ -601,7 +608,7 @@ class TestOwnerCorrections0821b(unittest.TestCase):
         r.fam.evidence.fill(A, "BUY", 0.15, ts=999_995.0)   # just filled
         r.cycle()
         bids = [o for o in r.fam.orders.values()
-                if o.side == "BUY" and o.purpose == "earn"]
+                if o.side == "BUY" and o.purpose in ("earn", "solo")]
         self.assertTrue(bids)                # the front is NOT closed
         for o in bids:
             self.assertLessEqual(o.qty, 0.011)   # minimum-size retry

@@ -736,12 +736,14 @@ class Family:
                                f"{k} tick{'s' if k != 1 else ''} behind the "
                                f"touch, ~{j.share * 100:.1f}% of the "
                                f"{side_name} side")}
-                if ladder is not None:
-                    ladder.append(dict(row))
                 lift = 1.0 if full_confidence else min(edge_ticks(px) / 4.0, 1.0)
                 eff_cap = (self.cfg.share_hi
                            + (max(self.cfg.share_max, self.cfg.share_hi)
                               - self.cfg.share_hi) * lift)
+                if ladder is not None:
+                    row2 = dict(row)
+                    row2["over_cap"] = j.share > eff_cap
+                    ladder.append(row2)
                 if j.share > eff_cap:
                     # louder than the (edge-lifted) courtesy band:
                     # acceptable only as a minimum-size solo in front of a
@@ -753,11 +755,16 @@ class Family:
                 if pick is None or ev > pick["ev"] + 1e-9:
                     pick = row
         the_bar = self.cfg.min_est_day if bar is None else bar
-        if pick is not None and pick["ev"] >= the_bar:
-            return pick
-        if solo is not None and solo["ev"] >= the_bar:
-            return solo
-        return None
+        # best EV wins between the capped pick and the 1-share solo —
+        # the owner's rule (2026-08-21: a 6c/5-share pick at $2.02 was
+        # chosen over a 9c solo at $6.01 because the old order preferred
+        # any capped row; the numbers decide, not the ordering)
+        best = None
+        for cand in (pick, solo):
+            if cand is not None and cand["ev"] >= the_bar:
+                if best is None or cand["ev"] > best["ev"] + 1e-9:
+                    best = cand
+        return best
 
     def ladder_view(self, slug: str) -> dict:
         """Every price level the planner prices, with its numbers —
