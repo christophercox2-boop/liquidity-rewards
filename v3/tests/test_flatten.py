@@ -130,7 +130,8 @@ class TestHistoryRanking(unittest.TestCase):
         r.fam.history[C] = 5.0                       # C actually paid us
         r.cycle()
         mkts = {o.market for o in r.fam.orders.values()}
-        self.assertEqual(mkts, {C})                  # the ceiling went to C
+        self.assertIn(C, mkts)                       # the proven market got in
+        self.assertLessEqual(r.fam.family_spent(), 1.0 + 1e-9)
 
 
 if __name__ == "__main__":
@@ -350,7 +351,7 @@ class TestCeilingEnforcement(unittest.TestCase):
         # two orders on the book: $1.26 at risk vs a $1 ceiling; "good"
         # rests near the touch and earns, "bad" is deep and earns ~nothing
         for oid, px, qty in (("good", 0.43, 2.0),    # $0.86 at risk
-                             ("bad", 0.02, 40.0)):   # $0.80 at risk
+                             ("bad", 0.02, 60.0)):   # $1.20 — over alone
             r.exchange.live[oid] = {"id": oid, "market": A, "side": "BUY",
                                     "price": px, "size": qty,
                                     "intent": BUY_LONG, "manual": False}

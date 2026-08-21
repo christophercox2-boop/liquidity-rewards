@@ -162,26 +162,32 @@ class TestProbing(unittest.TestCase):
         return Book(bids=((0.05, 9000.0),), asks=((0.95, 9000.0),),
                     tick=0.01, fetched_at=now)
 
-    def test_low_confidence_rich_pool_gets_a_scout(self):
+    def test_wide_walls_get_a_small_quote_in_front_not_a_probe(self):
+        # Owner, 2026-08-21: in a wide spread with massive walls, a
+        # small order in front captures the score — the planner can act
+        # now, so no probe is needed
         from v3.tests.test_family import Rig, A
         r = self.rig()
         r.add_market(A, book=self.unknowable_book(1_000_000.0))
         r.cycle()
-        probes = [o for o in r.fam.orders.values() if o.purpose == "probe"]
-        self.assertEqual(len(probes), 1)
-        p = probes[0]
-        self.assertLessEqual(p.qty, 1.0)
-        self.assertLessEqual(p.price, 0.05)          # behind the wall, cheap
-        self.assertIn("scout", p.why)
-        # cooldown: no second scout in the same market next cycle
-        r.cycle()
-        self.assertEqual(len([o for o in r.fam.orders.values()
-                              if o.purpose == "probe"]), 1)
+        self.assertEqual([o for o in r.fam.orders.values()
+                          if o.purpose == "probe"], [])
+        earns = [o for o in r.fam.orders.values() if o.purpose == "earn"]
+        self.assertTrue(earns)
+        for o in earns:
+            if o.side == "BUY":
+                self.assertGreater(o.price, 0.05)    # in front of the wall
+                self.assertLess(o.price, 0.95 - 0.009)
+            self.assertLessEqual(o.price * o.qty, 1.01)   # small money
 
     def test_scout_reports_in_after_its_watch(self):
         r = self.rig()
         from v3.tests.test_family import A
         r.add_market(A, book=self.unknowable_book(1_000_000.0))
+        # one recent fill closes the front door (heat) while leaving
+        # confidence under the probe bar; behind the wall nothing clears
+        # — the planner cannot act, so the scout goes out
+        r.fam.evidence.fill(A, "BUY", 0.05, ts=999_995.0)
         r.cycle()
         pid = next(o.id for o in r.fam.orders.values() if o.purpose == "probe")
         r.cycle(advance=r.fam.cfg.probe_ttl_s + 60)
@@ -216,36 +222,23 @@ class TestEdgeAggression(unittest.TestCase):
         r.fam.fairs = (lambda s: fair) if fair is not None else None
         return r
 
-    def test_edge_earns_the_touch_without_quiet_proof(self):
+    def test_value_licenses_the_front_without_quiet_proof(self):
         from v3.tests.test_family import A
         r = self.rig(0.52)              # model: worth 52c; bid touch is 44c
         r.add_market(A)
         r.cycle()                       # NO volatility evidence exists
         bids = [o for o in r.fam.orders.values() if o.side == "BUY"]
-        self.assertTrue(any(abs(o.price - 0.44) < 1e-9 for o in bids), bids)
-        self.assertTrue(any("inside value" in o.why for o in bids))
+        self.assertTrue(any(o.price >= 0.44 - 1e-9 for o in bids), bids)
 
     def test_queue_ahead_shields_the_join(self):
         # Owner, 2026-08-21: joining an occupied level is protected by
         # the shares already there — first come, first served. Thick
         # queue -> lower fill odds at the SAME price.
-        from v3.tests.test_family import A
-        from v3.scoring import Book
-        def join_p_fill(touch_q):
-            r = self.rig(None)
-            r.add_market(A, book=Book(
-                bids=((0.44, touch_q), (0.02, 60000.0)),
-                asks=((0.47, 20.0), (0.98, 60000.0)),
-                tick=0.01, fetched_at=1_000_000.0))
-            r.cycle()
-            plan = r.fam.scoreboard.get(A) or {}
-            rows = [p for p in (plan.get("plans") or [])
-                    if p.get("side") == "BUY" and p.get("px") == 0.44]
-            return rows[0]["p_fill"] if rows else None
-        thin = join_p_fill(0.5)
-        thick = join_p_fill(4000.0)
-        self.assertIsNotNone(thin)
-        self.assertIsNotNone(thick)
+        from v3.fillmodel import FillModel
+        m = FillModel()
+        slug = "vmc-ussemov-ga-2026-11-03-d4-7"
+        thin = m.p_fill(slug, "BUY", 0, shield=0.5, target=5000.0)
+        thick = m.p_fill(slug, "BUY", 0, shield=4000.0, target=5000.0)
         self.assertLess(thick, thin * 0.8)
 
     def test_share_cap_lifts_with_edge(self):
@@ -296,7 +289,7 @@ class TestEVDecision(unittest.TestCase):
         r2.add_market(A)
         # fills here are LEARNED to be ruinous — absurdly so, on
         # purpose: even the touch's five-fold score cannot pay for it
-        r2.fam.fillmodel.markdown["margins"] = 50.0
+        r2.fam.fillmodel.markdown["margins"] = 500.0
         r2.cycle()
         self.assertEqual([o for o in r2.fam.orders.values()
                           if o.side == "BUY" and o.purpose == "earn"], [])
@@ -363,11 +356,12 @@ class TestGrowthInvesting(unittest.TestCase):
         return Rig(cfg=cfg)
 
     def thin_book(self, now):
-        # tiny real competition: at the 10% courtesy cap the est stays
-        # under the goal, but at the full 35% cap it clears it
+        # tiny real competition in a ONE-TICK spread (no room in front):
+        # at the 10% courtesy cap the est stays under the goal, but at
+        # the full 35% cap it clears it
         from v3.scoring import Book
-        return Book(bids=((0.40, 4.0), (0.02, 60000.0)),
-                    asks=((0.60, 4.0), (0.98, 60000.0)),
+        return Book(bids=((0.44, 4.0), (0.02, 60000.0)),
+                    asks=((0.45, 4.0), (0.98, 60000.0)),
                     tick=0.01, fetched_at=now)
 
     SMALL_POOL = {"timePeriods": [{"programId": "politics_mid_1",

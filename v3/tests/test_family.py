@@ -157,18 +157,18 @@ class TestModes(unittest.TestCase):
         self.assertTrue(s["best_idle"])          # it found the opportunity
         self.assertEqual(r.exchange.live, {})    # and touched nothing
 
-    def test_armed_places_on_both_sides_never_in_front(self):
+    def test_armed_places_on_both_sides_without_crossing(self):
         r = Rig()
         r.add_market(A)
         s = r.cycle()
         self.assertEqual(len(r.exchange.live), 2)  # both sides
+        bids = [o.price for o in r.fam.orders.values() if o.side == "BUY"]
+        asks = [o.price for o in r.fam.orders.values() if o.side == "SELL"]
+        self.assertTrue(bids and asks)
+        # in front is allowed now (owner, 2026-08-21) — but our own two
+        # quotes must never cross
+        self.assertLess(max(bids), min(asks) - 0.009)
         for o in r.fam.orders.values():
-            # joining the touch is allowed (owner, 2026-08-21) —
-            # standing in FRONT of it never is
-            if o.side == "BUY":
-                self.assertLessEqual(o.price, 0.44)
-            else:
-                self.assertGreaterEqual(o.price, 0.47)
             self.assertTrue(o.why)
         self.assertLessEqual(s["spent"], r.fam.cfg.capital_usd)
 
@@ -437,13 +437,15 @@ class TestImprove(unittest.TestCase):
         self.assertGreater(bids[0].price, 0.011)     # in FRONT of the wall
         self.assertLessEqual(bids[0].price * bids[0].qty, 0.51)  # inside caps
 
-    def test_everyone_else_never_fronts_the_wall(self):
-        # joining AT the wall's price is allowed (their shares queue
-        # ahead of ours) — standing in FRONT of it is college's quirk
-        # alone
+    def test_fronting_stays_inside_the_other_touch(self):
+        # every family may quote in front now (owner, 2026-08-21) — the
+        # hard bound is post-only mechanics: a full tick inside the
+        # opposing touch, and small money
         r = Rig(cfg=self.cfg(False))
         r.add_market(A, book=self.wall_book(r.now))
         r.cycle()
-        for o in r.fam.orders.values():
-            if o.side == "BUY":
-                self.assertLessEqual(o.price, 0.01 + 1e-9)
+        bids = [o for o in r.fam.orders.values() if o.side == "BUY"]
+        self.assertTrue(bids)
+        for o in bids:
+            self.assertLessEqual(o.price, 0.47 - 0.01 + 1e-9)
+            self.assertLessEqual(o.price * o.qty, 0.51)

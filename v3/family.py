@@ -433,7 +433,8 @@ class Family:
     def _plan_side(self, slug: str, book, side: str, prog,
                    side_pool: float | None, budget: float,
                    own: FamilyOrder | None = None, bar: float | None = None,
-                   full_confidence: bool = False) -> dict | None:
+                   full_confidence: bool = False,
+                   cross_px: float | None = None) -> dict | None:
         """The best resting order for one side, or None. Every plan and
         every refusal is phone-readable."""
         df, target = float(prog.df), float(prog.target)
@@ -575,31 +576,37 @@ class Family:
                 continue
             if px not in cands:
                 cands.append(px)
-        if self.cfg.allow_improve:
-            # College's launch quirk, kept on the owner's word: in a book
-            # whose touch is a junk wall far from any opposing quote, a
-            # small order may price in front of it. The improve rungs stay
-            # 5 ticks clear of the other side's touch; with no opposing
-            # quote at all there is no value anchor, so the rungs stay
-            # short and size is clamped to probe money (in the qty grid).
-            if other:
-                cap_improve = other[0][0] - sign * 5 * tick
-                improve = (1, 5, 10, 15, 20)
-            else:
-                cap_improve = touch + sign * 10 * tick
-                improve = (1, 5, 10)
-                budget = min(budget, 0.05)
-            for k in improve:
-                px = round(touch + k * sign * tick, 3)
+        if other and min_rung == 0:
+            # In FRONT of the touch is an option too (owner, 2026-08-21:
+            # in a wide spread, a small order closer to the midpoint can
+            # capture far more of the score, and a fill there may be a
+            # bargain against fair value, not a cost). Post-only bounds
+            # it one tick inside the other side's touch; the EV math
+            # prices the rest — no queue ahead, bait-fast fill odds, and
+            # the fill cost credits a fill below fair. Recent fills
+            # (heat) take the option off the table.
+            for kf in (1, 2, 3, 5, 8, 12, 18, 25, 35, 50):
+                px = round(touch + kf * sign * tick, 3)
                 if not (0.001 <= px <= 0.999):
                     continue
-                if (px - cap_improve) * sign > 1e-9:
-                    continue
-                if other and (px >= other[0][0] - 1e-9 if side == "BUY"
-                              else px <= other[0][0] + 1e-9):
+                if (px - (other[0][0] - sign * tick)) * sign > 1e-9:
                     continue
                 if px not in cands:
                     cands.append(px)
+        elif self.cfg.allow_improve and not other:
+            # College's launch quirk, kept on the owner's word: a book
+            # with NO opposing quote at all has no value anchor, so the
+            # in-front rungs stay short and size is clamped to probe
+            # money (in the qty grid).
+            for k in (1, 5, 10):
+                px = round(touch + k * sign * tick, 3)
+                if not (0.001 <= px <= 0.999):
+                    continue
+                if (px - (touch + sign * 10 * tick)) * sign > 1e-9:
+                    continue
+                if px not in cands:
+                    cands.append(px)
+            budget = min(budget, 0.05)
         # Every candidate is priced by the owner's EV formula
         # (2026-08-19): what it earns while resting, minus what a fill
         # would probably cost.
@@ -607,6 +614,12 @@ class Family:
         # Fill odds are learned per distance bucket from every touch move;
         # fill cost is the calibrated adverse markdown plus anything
         # conceded past value; depth ahead of the price shields the odds.
+        if cross_px is not None:
+            # our own opposite-side order rests at cross_px: stay a full
+            # tick clear so the pair can never cross (post-only would
+            # bounce the second placement)
+            cands = [px for px in cands
+                     if (px - (cross_px - sign * tick)) * sign <= 1e-9]
         sf = self.fillmodel.scoring_fraction(slug)
         exit_rate_ps = self._exit_rate_ps
         grid = (tuple(q for q in QTY_GRID if q >= 1.0)
@@ -614,7 +627,8 @@ class Family:
         pick, solo = None, None
         for px in cands:
             cost_ps = px if side == "BUY" else 1.0 - px
-            k_px = round(abs(touch - px) / tick)
+            in_front = (px - touch) * sign > 1e-9
+            k_px = 0 if in_front else round(abs(touch - px) / tick)
             shield = sum(q for p2, q in levels
                          if (p2 - px) * sign > 1e-9)
             queue = sum(q for p2, q in levels if abs(p2 - px) <= 1e-9)
@@ -626,6 +640,11 @@ class Family:
             if value_ctr is not None:
                 past = (px - value_ctr) if side == "BUY" else (value_ctr - px)
                 conc = max(past / tick, 0.0)
+            if in_front:
+                # improving the touch by kf ticks hands takers kf ticks
+                # they were not being offered — bait, same as resting
+                # past fair, whichever is bigger
+                conc = max(conc, abs(px - touch) / tick)
             pf = self.fillmodel.p_fill(slug, side, k_px, shield=shield,
                                        target=target, bait=conc)
             fcost = self.fillmodel.fill_cost(slug, side, px, value_ctr,
@@ -639,7 +658,7 @@ class Family:
                 est = j.share * side_pool
                 ev = est * sf - pf * fcost * qty
                 k = k_px
-                in_front = (px - touch) * sign > 1e-9
+                kf = round(abs(px - touch) / tick)
                 row = {"side": side, "px": px, "qty": qty,
                        "share": round(j.share, 4), "est": round(est, 4),
                        "ev": round(ev, 4), "p_fill": round(pf, 4),
@@ -652,8 +671,9 @@ class Family:
                                and edge_ticks(px) >= 1 else
                                "joins the touch — the book has been quiet"
                                if k == 0 and not in_front else
-                               f"{k} tick{'s' if k != 1 else ''} in front of "
-                               f"a junk wall — nothing real to stand behind"
+                               f"{kf} tick{'s' if kf != 1 else ''} in front "
+                               f"of the touch — closer to the midpoint, "
+                               f"~{j.share * 100:.1f}% of the {side_name} side"
                                if in_front else
                                f"{k} tick{'s' if k != 1 else ''} behind the "
                                f"touch, ~{j.share * 100:.1f}% of the "
@@ -726,11 +746,22 @@ class Family:
             return [], ("still confirming how many markets share this "
                         "pool — no estimate until I know")
         budget = self.cfg.per_market_usd / 2.0
-        out = []
-        for side in ("BUY", "SELL"):
-            p = self._plan_side(slug, book, side, prog, side_pool, budget)
-            if p:
-                out.append(p)
+
+        def plan_pair(bar=None):
+            a = self._plan_side(slug, book, "BUY", prog, side_pool,
+                                budget, bar=bar)
+            b = self._plan_side(slug, book, "SELL", prog, side_pool,
+                                budget, bar=bar)
+            if a and b and a["px"] >= b["px"] - 1e-9:
+                if a["ev"] >= b["ev"]:
+                    b = self._plan_side(slug, book, "SELL", prog, side_pool,
+                                        budget, bar=bar, cross_px=a["px"])
+                else:
+                    a = self._plan_side(slug, book, "BUY", prog, side_pool,
+                                        budget, bar=bar, cross_px=b["px"])
+            return [p for p in (a, b) if p]
+
+        out = plan_pair()
         grow: list[dict] = []
         potential = 0.0
         if not out and self.cfg.grow_usd > 0:
@@ -740,17 +771,14 @@ class Family:
                 if fp:
                     potential = max(potential, fp["ev"])
             if potential >= self.cfg.min_est_day:
-                for side in ("BUY", "SELL"):
-                    gp = self._plan_side(slug, book, side, prog, side_pool,
-                                         budget, bar=self.cfg.grow_floor)
-                    if gp:
-                        gp["grow"] = True
-                        gp["why"] = (
-                            f"under the {self.cfg.min_est_day * 100:.0f}c "
-                            f"goal today (${gp['ev']:.2f}/day) but worth "
-                            f"${potential:.2f} at full confidence — "
-                            f"investing to build the evidence")
-                        grow.append(gp)
+                for gp in plan_pair(bar=self.cfg.grow_floor):
+                    gp["grow"] = True
+                    gp["why"] = (
+                        f"under the {self.cfg.min_est_day * 100:.0f}c "
+                        f"goal today (${gp['ev']:.2f}/day) but worth "
+                        f"${potential:.2f} at full confidence — "
+                        f"investing to build the evidence")
+                    grow.append(gp)
         if not out:
             why = ("nothing here clears the bar: both sides either pay "
                    f"under {self.cfg.min_est_day * 100:.0f}c/day, are louder "
