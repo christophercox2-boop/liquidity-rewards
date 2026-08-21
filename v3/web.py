@@ -46,7 +46,7 @@ def authed(get_header, query_string: str, password: str) -> bool:
     return False
 
 
-NAV = (("meter", "."), ("status", "status"), ("orders", "orders"),
+NAV = (("meter", "."), ("watch", "watch"), ("status", "status"), ("orders", "orders"),
        ("plan", "plan"), ("model", "silver"),
        ("grades", "grades"), ("log", "log"), ("switch", "switch"))
 
@@ -476,6 +476,98 @@ function render(d){
 }
 """
 
+WATCH_JS = """
+function wFmtC(v){return Math.round(v*100)+'c';}
+function wCurve(rows,X,Y,color){
+ if(!rows.length)return '';
+ var pts=rows.map(function(r){return [X(r.px),Y(r.ev)];});
+ var d='M'+pts[0][0].toFixed(1)+' '+pts[0][1].toFixed(1);
+ for(var i=1;i<pts.length;i++){d+=' L'+pts[i][0].toFixed(1)+' '+pts[i][1].toFixed(1);}
+ var s='<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>';
+ rows.forEach(function(r){
+  s+='<circle cx="'+X(r.px).toFixed(1)+'" cy="'+Y(r.ev).toFixed(1)+'" r="'+(r.picked?5:2.2)+'" fill="'+color+'"'+(r.picked?' stroke="#fff" stroke-width="1.5"':' opacity="0.75"')+'/>';
+ });
+ return s;
+}
+function wCard(name,slug,b,tri){
+ var lad=(b&&b.ladder)||{};var sides=lad.sides||{};
+ var bids=(sides.BUY||{}).rows||[],asks=(sides.SELL||{}).rows||[];
+ var all=bids.concat(asks);
+ var g=b&&b.fair!=null?'model '+(b.fair*100).toFixed(1)+'c':(b&&b.band&&b.band.med!=null?'evidence '+b.band.lo.toFixed(0)+'\u2013'+b.band.hi.toFixed(0)+'c \u00b7 confidence '+Math.round((b.conf||0)*100)+'%':'no grounding');
+ var head='<div style="font-size:22px;font-weight:700;line-height:1.2;margin:2px 0">'+esc(name)+'</div>'
+  +'<div class="muted">'+esc(g)+(lad.pool_day!=null?' \u00b7 pool $'+lad.pool_day+'/day per side':'')+(lad.note?' \u00b7 '+esc(lad.note):'')+'</div>';
+ if(tri&&tri.why)head+='<div class="muted" style="margin:2px 0">'+(tri['in']?'\u2705 worth budget':'\u25cb passed on')+' \u2014 '+esc(tri.why)+'</div>';
+ if(!all.length)return head+'<div class="muted" style="padding:30px 0">no priced ladder \u2014 '+esc(lad.note||'nothing clears here')+'</div>';
+ var W=340,H=210,PL=36,PB=26,PT=14,PR=10;
+ var pxs=all.map(function(r){return r.px;});
+ var x0=Math.max(Math.min.apply(null,pxs)-0.02,0),x1=Math.min(Math.max.apply(null,pxs)+0.02,1);
+ var evs=all.map(function(r){return r.ev;});
+ var y1=Math.max(Math.max.apply(null,evs)*1.12,(lad.bar||0.5)*1.4),y0=Math.min(0,Math.min.apply(null,evs));
+ function X(p){return PL+(W-PL-PR)*(p-x0)/(x1-x0);}
+ function Y(v){return PT+(H-PT-PB)*(1-(v-y0)/(y1-y0));}
+ var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto" role="img" aria-label="EV curve">';
+ if(b&&b.band&&b.band.lo!=null&&b.fair==null){
+  var bl=Math.max(b.band.lo/100,x0),bh=Math.min(b.band.hi/100,x1);
+  if(bh>bl)s+='<rect x="'+X(bl).toFixed(1)+'" y="'+PT+'" width="'+(X(bh)-X(bl)).toFixed(1)+'" height="'+(H-PT-PB)+'" fill="rgba(158,196,154,0.07)"/>';
+ }
+ [0.25,0.5,0.75,1].forEach(function(f){
+  var v=y0+(y1-y0)*f,y=Y(v);
+  s+='<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="rgba(255,255,255,0.06)"/>';
+  s+='<text x="'+(PL-4)+'" y="'+(y+3)+'" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.4)">$'+v.toFixed(1)+'</text>';
+ });
+ var yb=Y(lad.bar||0.5);
+ s+='<line x1="'+PL+'" y1="'+yb+'" x2="'+(W-PR)+'" y2="'+yb+'" stroke="rgba(255,208,107,0.5)" stroke-dasharray="4 3"/>';
+ s+='<text x="'+(W-PR)+'" y="'+(yb-3)+'" text-anchor="end" font-size="8" fill="rgba(255,208,107,0.8)">the '+((lad.bar||0.5)*100).toFixed(0)+'c bar</text>';
+ if(Y(0)<H-PB)s+='<line x1="'+PL+'" y1="'+Y(0)+'" x2="'+(W-PR)+'" y2="'+Y(0)+'" stroke="rgba(255,255,255,0.15)"/>';
+ if(b&&b.fair!=null&&b.fair>=x0&&b.fair<=x1){
+  s+='<line x1="'+X(b.fair).toFixed(1)+'" y1="'+PT+'" x2="'+X(b.fair).toFixed(1)+'" y2="'+(H-PB)+'" stroke="rgba(255,255,255,0.3)" stroke-dasharray="2 3"/>';
+  s+='<text x="'+X(b.fair).toFixed(1)+'" y="'+(PT-3)+'" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.6)">model '+wFmtC(b.fair)+'</text>';
+ }
+ [x0,(x0+x1)/2,x1].forEach(function(p,i){
+  var anch=i===0?'start':(i===2?'end':'middle');
+  s+='<text x="'+X(p).toFixed(1)+'" y="'+(H-8)+'" text-anchor="'+anch+'" font-size="8" fill="rgba(255,255,255,0.4)">'+wFmtC(p)+'</text>';
+ });
+ s+=wCurve(bids,X,Y,'#9ec49a');
+ s+=wCurve(asks,X,Y,'#d9b36a');
+ s+='</svg>';
+ var legend='<div class="muted" style="font-size:12px"><span style="color:#9ec49a">\u25cf</span> bids &nbsp;<span style="color:#d9b36a">\u25cf</span> asks &nbsp;\u00b7 big dot = the pick &nbsp;\u00b7 EV/day at each resting price</div>';
+ var picks=all.filter(function(r){return r.picked;}).map(function(r){
+  return (bids.indexOf(r)>=0?'bid':'ask')+' '+r.qty+' @ '+wFmtC(r.px)+' \u2192 $'+r.ev.toFixed(2)+'/day';
+ });
+ var pk=picks.length?'<div style="font-size:16px;margin:4px 0"><b>'+picks.join(' \u00b7 ')+'</b></div>':'<div class="muted" style="margin:4px 0">nothing here clears the bar</div>';
+ return head+s+legend+pk;
+}
+function wSpot(){
+ var q=window._watchQ||[];
+ if(!q.length){return;}
+ window._watchI=((window._watchI||0)+1)%q.length;
+ var t=q[window._watchI];
+ fetch('book.json?m='+encodeURIComponent(t.market),{headers:hdrs(),cache:'no-store'})
+  .then(function(r){return r.json();}).then(function(b){
+   var el=document.getElementById('spot');
+   if(!el)return;
+   el.style.opacity=0;
+   setTimeout(function(){
+    el.innerHTML=wCard(nm(window._watchD,t.market),t.market,b,t);
+    el.style.opacity=1;
+   },240);
+  }).catch(function(){});
+}
+function render(d){
+ window._watchD=d;
+ var q=[];
+ ['politics','cfb','nfl'].forEach(function(k){
+  var s=(d.summaries||{})[k]||{};
+  (s.triage_feed||[]).slice(-8).forEach(function(t){q.push(t);});
+ });
+ q.sort(function(a,b){return b.ts-a.ts;});
+ window._watchQ=q.slice(0,10);
+ if(!window._watchT){window._watchT=setInterval(wSpot,7000);setTimeout(wSpot,300);}
+ return '<div class="card"><div class="muted">What the engine is considering \u2014 one market at a time, rotating through the sweep\u2019s latest verdicts. The curve is EV/day at every resting price.</div>'
+  +'<div id="spot" style="transition:opacity 0.24s ease;min-height:280px"></div></div>';
+}
+"""
+
 GRAPH_JS = """
 function fmtT(ts){var d=new Date(ts*1000);return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
 function drawGraph(name,dots){
@@ -593,6 +685,7 @@ PAGES = {
     "/silver": ("3.0 — the model", "model", SILVER_JS),
     "/grades": ("3.0 — grades", "grades", GRADES_JS),
     "/graph": ("3.0 — the meter", "meter", GRAPH_JS),
+    "/watch": ("3.0 — considering", "watch", WATCH_JS),
     "/log": ("3.0 — log", "log", LOG_JS),
 }
 
