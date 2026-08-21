@@ -935,3 +935,59 @@ class TestSeatScope(unittest.TestCase):
         self.assertTrue(enterable("ussewc-usse-ks-2026-11-03-rep"))
         self.assertFalse(enterable("vtc-hrep-to-2026-11-03-gte130m"))
         self.assertFalse(enterable("dccc-measles-us-2026-12-31-gt4500"))
+
+
+class TestChartResolver(unittest.TestCase):
+    """Owner, 2026-08-21: the governor table froze at the Aug 18 Alaska
+    primary while the site moved — the fetch must follow the chart to
+    wherever its data lives now."""
+
+    def _silver(self):
+        import inspect
+        import v3.silver as sv
+        cls = [o for n, o in vars(sv).items()
+               if inspect.isclass(o) and hasattr(o, "_resolve_csv")][0]
+        s = cls.__new__(cls)
+        s.note = ""
+        return s
+
+    def test_follows_redirect_and_reads_the_moved_data_url(self):
+        import sys, types
+        pages = {
+            "https://datawrapper.dwcdn.net/N13WX/":
+                "<meta http-equiv=\"REFRESH\" content=\"0; "
+                "url=https://datawrapper.dwcdn.net/N13WX/17/+'\">",
+            "https://datawrapper.dwcdn.net/N13WX/17/":
+                "x" * 3000 + '"https://static.dwcdn.net/data/ZZtop.csv?v=4"',
+        }
+        fake = types.ModuleType("requests")
+        class R:
+            def __init__(self, text): self.text, self.status_code = text, 200
+        fake.get = lambda url, **kw: R(pages.get(url, ""))
+        old = sys.modules.get("requests")
+        sys.modules["requests"] = fake
+        try:
+            s = self._silver()
+            got = s._resolve_csv("N13WX",
+                                 "https://static.dwcdn.net/data/N13WX.csv")
+            self.assertEqual(got, "https://static.dwcdn.net/data/ZZtop.csv?v=4")
+            self.assertIn("data moved", s.note)
+        finally:
+            if old is not None: sys.modules["requests"] = old
+            else: sys.modules.pop("requests", None)
+
+    def test_falls_back_to_the_fixed_address_on_any_trouble(self):
+        import sys, types
+        fake = types.ModuleType("requests")
+        def boom(url, **kw): raise OSError("no route")
+        fake.get = boom
+        old = sys.modules.get("requests")
+        sys.modules["requests"] = fake
+        try:
+            s = self._silver()
+            got = s._resolve_csv("kNspD",
+                                 "https://static.dwcdn.net/data/kNspD.csv")
+            self.assertEqual(got, "https://static.dwcdn.net/data/kNspD.csv")
+        finally:
+            if old is not None: sys.modules["requests"] = old
+            else: sys.modules.pop("requests", None)

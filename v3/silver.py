@@ -285,6 +285,8 @@ class SilverFairs:
         self.fetched_at = 0.0
         self.changed_at = 0.0            # when the numbers last MOVED
         self._content_sig = ""
+        self.gov_changed_at = 0.0
+        self._gov_sig = ""
         self.source = "none"
         self.note = ""
         # Silver's own simulated distributions — the primary model
@@ -300,13 +302,46 @@ class SilverFairs:
         changed = self._refresh_gov(now) or changed
         return self._refresh_official(now) or changed
 
+    def _resolve_csv(self, cid: str, default_url: str) -> str:
+        """A republished Datawrapper chart can leave its old data
+        address serving frozen numbers forever — the Alaska governor
+        lesson (2026-08-21: the table froze at the Aug 18 primary while
+        the site moved on). Follow the chart page's redirects to the
+        live version and use the data URL it actually references."""
+        try:
+            import re
+            import requests
+            url = f"https://datawrapper.dwcdn.net/{cid}/"
+            for _ in range(4):
+                r = requests.get(url, timeout=20,
+                                 headers={"User-Agent": "liquidity-rewards v3"})
+                if r.status_code >= 400:
+                    return default_url
+                if len(r.text) < 2000:
+                    m = re.search(
+                        r"url=(https://datawrapper\.dwcdn\.net/[^\"'>\s]+)",
+                        r.text)
+                    if m:
+                        url = m.group(1).rstrip("+' ")
+                        continue
+                m = re.search(
+                    r"https://static\.dwcdn\.net/data/[A-Za-z0-9]+\.csv[^\"' ]*",
+                    r.text)
+                if m and m.group(0).split("?")[0] != default_url:
+                    self.note = (f"{cid} data moved to "
+                                 f"{m.group(0).rsplit('/', 1)[-1].split('?')[0]}")
+                return m.group(0) if m else default_url
+            return default_url
+        except Exception:  # noqa: BLE001 — the fixed address still works
+            return default_url
+
     def _refresh_gov(self, now: float) -> bool:
         if self.gov_races and now - getattr(self, "_gov_at", 0.0) < TTL_S:
             return False
         text = ""
         try:
             import requests
-            r = requests.get(GOV_URL, timeout=20,
+            r = requests.get(self._resolve_csv("N13WX", GOV_URL), timeout=20,
                              headers={"User-Agent": "liquidity-rewards v3"})
             if r.status_code < 400:
                 text = r.text
@@ -320,6 +355,10 @@ class SilverFairs:
         got = parse_races(text)
         if got:
             self._diff_races(self.gov_races, got, "governor", now)
+            sig = repr(sorted((k, v.get("dem")) for k, v in got.items()))
+            if sig != self._gov_sig:
+                self._gov_sig = sig
+                self.gov_changed_at = now
             self.gov_races = got
             self._gov_at = now
         return bool(got)
@@ -386,7 +425,8 @@ class SilverFairs:
         try:
             if self.client is not None:
                 import requests
-                r = requests.get(SENATE_URL, timeout=20,
+                r = requests.get(self._resolve_csv("kNspD", SENATE_URL),
+                                 timeout=20,
                                  headers={"User-Agent": "liquidity-rewards v2"})
                 if r.status_code < 400:
                     text, self.source = r.text, "cdn"

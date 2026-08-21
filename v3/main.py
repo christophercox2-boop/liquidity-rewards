@@ -440,6 +440,10 @@ class Monitor:
                 "tables_changed_h": (round(
                     (now - self.silver.changed_at) / 3600, 1)
                     if getattr(self.silver, "changed_at", 0) else None),
+                "gov_changed_h": (round(
+                    (now - self.silver.gov_changed_at) / 3600, 1)
+                    if getattr(self.silver, "gov_changed_at", 0) else None),
+                "note": getattr(self.silver, "note", ""),
                 "official_source": self.silver.official_source,
                 "official_age_h": (round(
                     self.silver.official_run_age_s(now) / 3600, 1)
