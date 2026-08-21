@@ -521,7 +521,10 @@ class TestPayoutButton(unittest.TestCase):
         self.dir.cleanup()
 
     def test_first_check_records_a_baseline_not_2566_new_rows(self):
-        rows = [{"date": "2026-08-18", "market": "m1",
+        rows = [{"date": "2026-08-01", "market": "old1",     # OLDER than the
+                 "program_type": "lp", "reward_usd": 0.5,    # requested start:
+                 "status": "PAID"},                          # the API does this
+                {"date": "2026-08-18", "market": "m1",
                  "program_type": "lp", "reward_usd": 1.5, "status": "PAID"},
                 {"date": "2026-08-19", "market": "m2",
                  "program_type": "lp", "reward_usd": 0.6, "status": "PENDING"}]

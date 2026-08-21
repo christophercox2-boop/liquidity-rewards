@@ -417,11 +417,16 @@ class Monitor:
         for r in rows:
             key = f"{r['date']}|{r['market']}|{r['program_type']}"
             totals[r["date"]] = totals.get(r["date"], 0.0) + r["reward_usd"]
-            if abs(seen.get(key, -1.0) - r["reward_usd"]) > 1e-9:
+            if abs(seen.get(key, -1.0) - r["reward_usd"]) > 0.005:
                 fresh.append(r)
             seen[key] = r["reward_usd"]
+        # prune by the oldest date the API ACTUALLY returned, never by the
+        # requested start — the API sends older rows than asked, and
+        # pruning to the request made those rows read "new" on every
+        # press (owner, 2026-08-21: "still posting the same rows")
+        min_date = min((r["date"] for r in rows), default=start)
         self.rewards_seen = {k: v for k, v in seen.items()
-                             if k[:10] >= start}
+                             if k[:10] >= min_date}
         for d, v in totals.items():
             self.actuals_by_day[d] = round(v, 2)
         # the baseline must survive a deploy between now and the next save
