@@ -2487,6 +2487,7 @@ date,market,program_type,reward_usd,status
 2026-08-14,paccc-usse-midterms-2026-11-03-rep,liquidityProgram,0.01,PAID
 2026-08-14,pandc-anydis-2027-12-31,liquidityProgram,3.31,PAID
 2026-08-14,pntcbk-wnba-freedom-2027-06-30-enekan,liquidityProgram,27.91,PAID
+2026-08-14,pntcbk-wnba-freedom-2027-06-30-enekan,liquidityProgram,0.06,PENDING
 2026-08-14,pntcbk-wnba-white-2027-06-30-roywhi,liquidityProgram,20.17,PAID
 2026-08-14,scc-hrep-rep-2026-11-03-gte200,liquidityProgram,0.51,PAID
 2026-08-14,scc-hrep-rep-2026-11-03-gte205,liquidityProgram,1.16,PAID
@@ -3196,4 +3197,5 @@ date,market,program_type,reward_usd,status
 2026-08-18,vsc-usgubp-fl-fshbck-atl-5pct,liquidityProgram,11.48,PAID
 2026-08-18,vsc-usgubp-fl-fshbck-atl-7pct,liquidityProgram,2.31,PAID
 2026-08-18,vsc-usgubp-fl-fshbck-atl-9pct,liquidityProgram,7.23,PAID
+2026-08-19,apdc-jerpowgov-2026-12-31,liquidityProgram,0.23,PENDING
 2026-08-19,enwc-ushrp-fl19-2026-08-18-olahaw,liquidityProgram,0.6,PAID
