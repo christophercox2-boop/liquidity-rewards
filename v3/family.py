@@ -49,6 +49,7 @@ from zoneinfo import ZoneInfo
 from . import risk
 from .books import BookCache
 from .evidence import Evidence
+from .fillmodel import FillModel
 from .intents import BUY_LONG, BUY_SHORT, SELL_LONG, SELL_SHORT, capital_at_risk
 from .orders import OrderDesk
 from .scoring import estimate_join
@@ -136,6 +137,13 @@ class FamilyConfig:
     # the bar either, is pulled so the capital can go to the next best
     # market. 0 disables.
     weak_pull_s: float = 0.0
+    # Graduation (owner, 2026-08-21, the v1 pattern): a market whose
+    # orders have MEASURED real accrual today moves off the search
+    # ceiling onto the proven pool's own cap, so the search money keeps
+    # hunting new candidates. Membership is recomputed from the sampler
+    # every cycle — a market that stops accruing falls back in.
+    graduate_paid_usd: float = 0.25   # measured $ accrued today to graduate
+    proven_usd: float = 0.0           # 0 = graduation off
     reprice_gain_day: float = 0.06
     drift_share: float = 0.15
     terms_active_s: float = 600.0       # live terms for markets we're in
@@ -158,6 +166,7 @@ class FamilyOrder:
     est_day: float = 0.0
     share: float = 0.0
     live_est: float | None = None
+    live_ev: float | None = None
     live_share: float | None = None
     weak_since: float = 0.0   # measuring under the bar since (0 = fine)
     rest_noted: float = 0.0   # last time quiet resting was logged as evidence
@@ -217,6 +226,9 @@ class Family:
         self.names = names
         self.fairs = None      # callable(slug) -> model fair prob | None
         self.evidence = Evidence(clock=clock)
+        self.fillmodel = FillModel()
+        self.pending_marks: list[dict] = []   # fills awaiting their 1h grade
+        self.proven: set[str] = set()         # graduated markets (main feeds it)
         self._clock = clock or time.time
         self.terms = TermsStore()
         self.universe: dict[str, dict] = {}       # slug -> {event_n, ...}
@@ -270,11 +282,15 @@ class Family:
                    if o.market == slug and o.purpose != "sell")
 
     def family_spent(self) -> float:
-        """The one risk number: the WORST CASE the resting book can lose,
-        with negative risk netted inside each race group (mutually
-        exclusive outcomes can't all pay against us — v3/risk.py). Never
-        more than the gross collateral sum, often much less."""
-        return risk.book_risk(risk.order_legs(self.orders.values()))
+        """The search ceiling's number: worst case of the UNGRADUATED
+        book, negative risk netted per race group (v3/risk.py). Graduated
+        markets sit outside it, under proven_spent's own cap."""
+        return risk.book_risk(risk.order_legs(
+            o for o in self.orders.values() if o.market not in self.proven))
+
+    def proven_spent(self) -> float:
+        return risk.book_risk(risk.order_legs(
+            o for o in self.orders.values() if o.market in self.proven))
 
     def active_markets(self) -> set[str]:
         return {o.market for o in self.orders.values() if o.purpose != "sell"}
@@ -445,16 +461,23 @@ class Family:
                 if not (j.qualifies and j.in_window):
                     continue
                 est = j.share * side_pool
-                if best is None or est > best["est"]:
+                k_r = round(abs(((levels[0][0]) if levels else px) - px) / tick)
+                pf_r = self.fillmodel.p_fill(slug, side, k_r, target=target)
+                fc_r = self.fillmodel.fill_cost(slug, side, px, None)
+                ev = (est * self.fillmodel.scoring_fraction(slug)
+                      - pf_r * fc_r * qty)
+                if best is None or ev > best["ev"]:
                     best = {"side": side, "px": px, "qty": qty,
                             "share": round(j.share, 4), "est": round(est, 4),
+                            "ev": round(ev, 4), "p_fill": round(pf_r, 4),
+                            "fill_cost": round(fc_r, 4),
                             "cost": round(cost, 2), "revive": True,
                             "why": (f"the {side_name} side holds "
                                     f"{side_total:,.0f} of {target:,.0f} Target"
                                     f" Size and pays NOBODY — this order "
                                     f"revives it and takes ~"
                                     f"{j.share * 100:.0f}% of the side")}
-            if best is not None and best["est"] >= self.cfg.min_est_day:
+            if best is not None and best["ev"] >= self.cfg.min_est_day:
                 return best
             return None
 
@@ -550,9 +573,23 @@ class Family:
                     continue
                 if px not in cands:
                     cands.append(px)
+        # Every candidate is priced by the owner's EV formula
+        # (2026-08-19): what it earns while resting, minus what a fill
+        # would probably cost.
+        #     EV/day = est x scoring_fraction - p(fill) x fill_cost x size
+        # Fill odds are learned per distance bucket from every touch move;
+        # fill cost is the calibrated adverse markdown plus anything
+        # conceded past value; depth ahead of the price shields the odds.
+        sf = self.fillmodel.scoring_fraction(slug)
         pick, solo = None, None
         for px in cands:
             cost_ps = px if side == "BUY" else 1.0 - px
+            k_px = round(abs(touch - px) / tick)
+            shield = sum(q for p2, q in levels
+                         if (p2 - px) * sign > 1e-9)
+            pf = self.fillmodel.p_fill(slug, side, k_px, shield=shield,
+                                       target=target)
+            fcost = self.fillmodel.fill_cost(slug, side, px, value_ctr)
             for qty in QTY_GRID:
                 if qty * cost_ps > budget + 1e-9:
                     break
@@ -560,10 +597,13 @@ class Family:
                 if not (j.qualifies and j.in_window):
                     break
                 est = j.share * side_pool
-                k = round(abs(touch - px) / tick)
+                ev = est * sf - pf * fcost * qty
+                k = k_px
                 in_front = (px - touch) * sign > 1e-9
                 row = {"side": side, "px": px, "qty": qty,
                        "share": round(j.share, 4), "est": round(est, 4),
+                       "ev": round(ev, 4), "p_fill": round(pf, 4),
+                       "fill_cost": round(fcost, 4),
                        "cost": round(qty * cost_ps, 2),
                        "why": (f"at the touch — a fill here is "
                                f"{edge_ticks(px):.0f} ticks inside value"
@@ -586,14 +626,14 @@ class Family:
                     # acceptable only as a minimum-size solo in front of a
                     # wall (college)
                     if in_front and qty == QTY_GRID[0]:
-                        if solo is None or est > solo["est"] + 1e-9:
+                        if solo is None or ev > solo["ev"] + 1e-9:
                             solo = {**row, "solo": True}
                     break
-                if pick is None or est > pick["est"] + 1e-9:
+                if pick is None or ev > pick["ev"] + 1e-9:
                     pick = row
-        if pick is not None and pick["est"] >= self.cfg.min_est_day:
+        if pick is not None and pick["ev"] >= self.cfg.min_est_day:
             return pick
-        if solo is not None and solo["est"] >= self.cfg.min_est_day:
+        if solo is not None and solo["ev"] >= self.cfg.min_est_day:
             return solo
         return None
 
@@ -705,6 +745,9 @@ class Family:
         if abs(inv["qty"]) < 0.005:
             self.inventory.pop(rec.market, None)
         self.evidence.fill(rec.market, rec.side, rec.price, ts=now)
+        self.pending_marks.append({"market": rec.market, "side": rec.side,
+                                   "price": rec.price, "due": now + 3600.0})
+        del self.pending_marks[:-60]
         self._log(event="fill", market=rec.market, side=rec.side,
                   price=rec.price, qty=round(filled, 2))
         self.alert(f"{self.cfg.tag} order filled",
@@ -839,6 +882,25 @@ class Family:
                     actions -= 1
             return self._finish(summary)
 
+        # grade fills that have had their hour: the adverse move a fill
+        # actually cost is the calibration everything else leans on
+        for mk in list(self.pending_marks):
+            if now < mk["due"]:
+                continue
+            book_m = self.cache.fresh(mk["market"], self.cfg.read_age_s, now)
+            if book_m is None:
+                if now > mk["due"] + 4 * 3600.0:
+                    self.pending_marks.remove(mk)   # too stale to grade honestly
+                continue
+            if book_m.bids and book_m.asks:
+                mid = (book_m.bids[0][0] + book_m.asks[0][0]) / 2.0
+                adverse = self.fillmodel.observe_fill_mark(
+                    mk["market"], mk["side"], mk["price"], mid)
+                self._log(event="fill_graded", market=mk["market"],
+                          why=f"cost {adverse * 100:.1f}c/share vs the "
+                              f"mid an hour on")
+            self.pending_marks.remove(mk)
+
         # 0) zombies from a failed cancel: retry until they die
         for rec in list(self.orders.values()):
             if rec.why == "cancel failed during a move — retrying":
@@ -915,6 +977,22 @@ class Family:
                 continue
             rec.live_est = round(j.share * side_pool
                                  if j.qualifies and j.in_window else 0.0, 4)
+            if rec.purpose not in ("sell", "probe"):
+                ticks_now = (round(abs(lv[0][0] - rec.price) / book.tick)
+                             if lv else 0)
+                shield_now = sum(q for p2, q in lv
+                                 if (p2 - rec.price)
+                                 * (1.0 if rec.side == "BUY" else -1.0) > 1e-9)
+                pf_now = self.fillmodel.p_fill(rec.market, rec.side, ticks_now,
+                                               shield=shield_now,
+                                               target=float(prog.target))
+                fc_now = self.fillmodel.fill_cost(rec.market, rec.side,
+                                                  rec.price, None)
+                rec.live_ev = round(
+                    rec.live_est * self.fillmodel.scoring_fraction(rec.market)
+                    - pf_now * fc_now * rec.qty, 4)
+                self.fillmodel.observe_scoring(rec.market,
+                                               j.qualifies and j.in_window)
             if rec.purpose != "sell" and now - rec.rest_noted > 1800.0:
                 rec.rest_noted = now
                 self.evidence.rested(rec.market, rec.side, rec.price, ts=now)
@@ -948,8 +1026,8 @@ class Family:
             drifted = ((rec.live_share or 0.0) > self.cfg.drift_share
                        and rec.purpose not in ("revive", "solo"))
             gain = (best["est"] if best else 0.0) - (rec.live_est or 0.0)
-            below = (rec.live_est is not None
-                     and rec.live_est < self.cfg.min_est_day)
+            measured = rec.live_ev if rec.live_ev is not None else rec.live_est
+            below = measured is not None and measured < self.cfg.min_est_day
             if below and not rec.weak_since:
                 rec.weak_since = now
             elif not below:
@@ -1047,11 +1125,22 @@ class Family:
                         and not plan.get("revive"):
                     continue
                 guess = BUY_LONG if plan["side"] == "BUY" else BUY_SHORT
-                if self.family_spent() + risk.marginal(
-                        self.orders.values(), slug, guess,
-                        plan["px"], plan["qty"]) \
-                        > self.cfg.capital_usd + 1e-9:
-                    continue          # THE ceiling — worst case, it binds
+                if slug in self.proven and self.cfg.proven_usd > 0:
+                    pool_orders = [o for o in self.orders.values()
+                                   if o.market in self.proven]
+                    if self.proven_spent() + risk.marginal(
+                            pool_orders, slug, guess,
+                            plan["px"], plan["qty"]) \
+                            > self.cfg.proven_usd + 1e-9:
+                        continue      # the proven pool has its own cap
+                else:
+                    search_orders = [o for o in self.orders.values()
+                                     if o.market not in self.proven]
+                    if self.family_spent() + risk.marginal(
+                            search_orders, slug, guess,
+                            plan["px"], plan["qty"]) \
+                            > self.cfg.capital_usd + 1e-9:
+                        continue      # the search ceiling — it binds
                 book = self.cache.fresh(slug, BOOK_MAX_AGE, now)
                 if book is None:
                     continue
@@ -1206,7 +1295,17 @@ class Family:
             book = self.cache.fresh(slug, BOOK_MAX_AGE, now)
             if book is None or not book.bids:
                 continue
-            px = round(book.bids[0][0] - 2 * book.tick, 3)
+            # aim the scout at the least-observed fill-odds bucket
+            # (owner, 2026-08-19: "we won't get a full picture of the odds
+            # if we just stick on the safe side")
+            from .fillmodel import DIST_BUCKETS, family_of
+            fam_k = family_of(slug)
+            def bucket_hours(b):
+                cell = self.fillmodel.obs.get(
+                    self.fillmodel._key(fam_k, "BUY", b))
+                return (cell or [0.0])[0]
+            k_probe = min(DIST_BUCKETS, key=bucket_hours)
+            px = round(book.bids[0][0] - k_probe * book.tick, 3)
             _lo, hi = self._price_bounds(slug, book.bids, book.asks, book.tick)
             if hi is not None:
                 px = min(px, round(hi, 3))
@@ -1265,7 +1364,28 @@ class Family:
                 and self.enterable(s)
                 and now - (self.scoreboard.get(s) or {}).get("ts", 0.0)
                 > self.cfg.rescan_s]
-        idle.sort(key=lambda s: (-min(self.history.get(s, 0.0), 5.0),
+
+        def triage(s: str) -> float:
+            """Rapid triage (owner, 2026-08-21): mispriced markets and big
+            spreads first, using whatever is already known — the model's
+            distance from the last seen touch, the spread's width, the
+            payout record. A market never seen at all scores a flat
+            curiosity bonus so first looks keep happening."""
+            score = min(self.history.get(s, 0.0), 5.0)
+            b2 = self.cache.any_age(s)
+            if b2 is None:
+                return score + 1.0
+            bb2 = b2.bids[0][0] if b2.bids else None
+            ba2 = b2.asks[0][0] if b2.asks else None
+            if bb2 is not None and ba2 is not None:
+                score += min((ba2 - bb2) * 100.0 / 2.0, 10.0)   # spread, cents
+                fair2 = self.fairs(s) if self.fairs is not None else None
+                if fair2 is not None:
+                    mid2 = (bb2 + ba2) / 2.0
+                    score += min(abs(mid2 - fair2) * 100.0, 20.0)  # mispricing
+            return score
+
+        idle.sort(key=lambda s: (-triage(s),
                                  (self.scoreboard.get(s) or {}).get("ts", 0.0)))
         for slug in idle:
             if done >= budget:
@@ -1378,6 +1498,8 @@ class Family:
             "silent_cancels": self.silent_cancels,
             "last_action": self.last_action,
             "known_dead": sorted(self.known_dead),
+            "fillmodel": self.fillmodel.to_dict(),
+            "pending_marks": self.pending_marks[-60:],
             "scoreboard": self.scoreboard,
             "universe": self.universe,
             "terms": self.terms.to_dict(),
@@ -1396,6 +1518,9 @@ class Family:
         self.silent_cancels = d.get("silent_cancels") or 0
         self.last_action = dict(d.get("last_action") or {})
         self.known_dead = set(d.get("known_dead") or ())
+        if d.get("fillmodel"):
+            self.fillmodel = FillModel.from_dict(d["fillmodel"])
+        self.pending_marks = list(d.get("pending_marks") or [])
         if d.get("cfg_sig") == self._cfg_sig():
             self.scoreboard = dict(d.get("scoreboard") or {})
         else:

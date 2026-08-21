@@ -95,6 +95,11 @@ def config() -> FamilyConfig:
         # courtesy share toward 35%; the drift alarm moves above that so
         # the two don't fight
         join_edge_ticks=2.0, share_max=0.35, drift_share=0.45,
+        # graduation (owner, 2026-08-21): a market that has MEASURED at
+        # least 25c of accrual today moves off the $100 search ceiling
+        # onto the proven pool's own $150 cap — the search money keeps
+        # hunting new candidates
+        graduate_paid_usd=0.25, proven_usd=150.0,
         # and fresh money goes ONLY where the fill-and-reward record is
         # deepest: governor and senate races (winners, margins, primaries,
         # seat ladders) and the 2028 presidential slate

@@ -34,6 +34,10 @@ PRIORITY_RESERVE = 6     # rotation slots the priority set can never starve
 class BookCache:
     def __init__(self):
         self._books: dict[str, Book] = {}
+        # optional observer: called as on_put(slug, book) after every
+        # write, from EITHER writer (REST rotation or the stream thread).
+        # The fill model learns its hazards from exactly this feed.
+        self.on_put = None
         # EWMA of "top 3 levels changed since last refresh", 0..1
         self._volatility: dict[str, float] = {}
 
@@ -78,6 +82,11 @@ class BookCache:
             v = self._volatility.get(slug, 0.5)
             self._volatility[slug] = round(0.7 * v + (0.3 if changed else 0.0), 4)
         self._books[slug] = book
+        if self.on_put is not None:
+            try:
+                self.on_put(slug, book)
+            except Exception:  # noqa: BLE001 — an observer never breaks a write
+                pass
 
     def volatility_of(self, slug: str) -> float | None:
         """The book's churn EWMA (0 quiet .. 1 busy), or None until two

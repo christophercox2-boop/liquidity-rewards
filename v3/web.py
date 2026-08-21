@@ -347,6 +347,7 @@ GRADES_JS = """
 function render(d){
  var rows=(d.grades||[]);
  var out='<div class="card"><b>Estimate vs. what the exchange paid</b>';
+ out+='<div style="margin:6px 0"><button onclick="ckrw()">Check for new payouts now</button></div><div id="rwout"></div>';
  out+='<div class="hint">The estimate is 3.0's own sampler \\u2014 measured on an independent clock, accruing only while books are fresh. Actuals are the account's posted rewards (during the transition the older versions' books pay into the same number). No fudge factors: a gap means an input was wrong, and the unmeasured minutes say how much of the day went unscored.</div>';
  if(!rows.length){out+='<div class="muted">Nothing to grade yet \\u2014 the first full day under 3.0 lands tomorrow.</div>';}
  var mx=1;rows.forEach(function(r){mx=Math.max(mx,r.est||0,r.actual||0);});
@@ -358,6 +359,20 @@ function render(d){
   out+='</div>';
  });
  return out+'</div>';
+}
+
+function ckrw(){
+ var el=document.getElementById('rwout');
+ el.innerHTML='<div class="muted">checking the exchange\\u2026</div>';
+ post({op:'refresh_rewards'},function(j){
+  if(!j.ok){el.innerHTML='<div class="bad">'+esc(j.note||'failed')+'</div>';return;}
+  var h='<div class="card"><b>'+(j.new_count||0)+' new or changed row'+(j.new_count!==1?'s':'')+'</b>';
+  (j.new_rows||[]).slice().reverse().forEach(function(r){
+   h+='<div class="sub">'+esc(r.day)+' \\u00b7 '+usd(r.usd)+' \\u00b7 '+esc(r.name)+' <span class="muted">'+esc(r.status)+'</span></div>';
+  });
+  if(!(j.new_rows||[]).length)h+='<div class="muted">Nothing new since the last check.</div>';
+  el.innerHTML=h+'</div>';
+ });
 }
 """
 
@@ -406,6 +421,8 @@ class WebServer:
             return {"ok": True,
                     "state": self.monitor.switch_tap(op[len("switch_"):],
                                                      str(body.get("which") or "master"))}
+        if op == "refresh_rewards":
+            return self.monitor.refresh_rewards()
         if op in ("cancel", "move"):
             price = body.get("price")
             return self.monitor.order_op(op, str(body.get("order_id") or ""),

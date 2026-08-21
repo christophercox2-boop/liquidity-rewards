@@ -255,3 +255,79 @@ class TestEdgeAggression(unittest.TestCase):
         for o in r2.fam.orders.values():
             if o.side == "BUY":
                 self.assertLessEqual(o.share, 0.101)
+
+
+class TestEVDecision(unittest.TestCase):
+    """The owner's 2026-08-19 directive, now in v3: every placement is
+    EV = income x scoring fraction - p(fill) x fill cost x size."""
+
+    def rig(self):
+        from v3.tests.test_family import Rig
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=100.0, per_market_usd=20.0,
+                           join_edge_ticks=2.0, share_max=0.35,
+                           min_est_day=0.02)
+        return Rig(cfg=cfg)
+
+    def test_ruinous_learned_fill_cost_stops_placement(self):
+        from v3.tests.test_family import A
+        r1 = self.rig()
+        r1.add_market(A)
+        r1.cycle()
+        self.assertTrue([o for o in r1.fam.orders.values()
+                         if o.side == "BUY"])          # baseline: it places
+        r2 = self.rig()
+        r2.add_market(A)
+        # fills here are LEARNED to be ruinous: $5 adverse per share —
+        # every candidate's EV goes negative and nothing rests
+        r2.fam.fillmodel.markdown["margins"] = 5.0
+        r2.cycle()
+        self.assertEqual([o for o in r2.fam.orders.values()
+                          if o.side == "BUY" and o.purpose == "earn"], [])
+
+    def test_plans_carry_the_ev_numbers(self):
+        from v3.tests.test_family import A
+        r = self.rig()
+        r.add_market(A)
+        r.cycle()
+        sb = r.fam.scoreboard[A]
+        for p in sb["plans"]:
+            self.assertIn("ev", p)
+            self.assertIn("p_fill", p)
+            self.assertLessEqual(p["ev"], p["est"] + 1e-9)
+
+    def test_fill_is_graded_an_hour_later(self):
+        from v3.tests.test_family import A
+        r = self.rig()
+        r.add_market(A)
+        r.cycle()
+        bid = next(o for o in r.fam.orders.values() if o.side == "BUY")
+        del r.exchange.live[bid.id]
+        r.positions[A] = (bid.qty, bid.qty * bid.price)
+        r.cycle()
+        self.assertTrue(r.fam.pending_marks)
+        before = dict(r.fam.fillmodel.markdown)
+        r.cycle(advance=3700.0)
+        self.assertNotEqual(r.fam.fillmodel.markdown, before)
+        self.assertTrue(any(l.get("event") == "fill_graded"
+                            for l in r.fam.log))
+
+    def test_graduated_markets_leave_the_search_ceiling(self):
+        from v3.tests.test_family import A, C, Rig
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet",
+                           capital_usd=10.0, per_market_usd=20.0,
+                           proven_usd=50.0, graduate_paid_usd=0.25)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        r.add_market(C, event="House control")
+        r.cycle()
+        spent_all = r.fam.family_spent()
+        # A graduates: its collateral moves to the proven pool
+        r.fam.proven = {A}
+        self.assertLess(r.fam.family_spent(), spent_all + 1e-9)
+        self.assertGreater(r.fam.proven_spent(), 0.0)
+        self.assertLessEqual(r.fam.family_spent() + 1e-9, 10.0)

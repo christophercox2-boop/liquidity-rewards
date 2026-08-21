@@ -181,6 +181,7 @@ class Monitor:
         self.silver = SilverFairs(client=self.client)
         self.samplers: dict[str, Estimator] = {}
         self.actuals_by_day: dict[str, float] = {}
+        self.rewards_seen: dict[str, float] = {}
         self._lock = threading.Lock()
         self.families: dict[str, Family] = {}
         self.switches: dict[str, MasterSwitch] = {}
@@ -202,6 +203,12 @@ class Monitor:
             fam.desk = desk
             if key == "politics":
                 fam.fairs = self.silver.model_fair
+                cache.on_put = (lambda slug, book, f=fam:
+                                f.fillmodel.observe_touch(
+                                    slug,
+                                    book.bids[0][0] if book.bids else None,
+                                    book.asks[0][0] if book.asks else None,
+                                    book.tick, book.fetched_at))
             self.families[key] = fam
             self.switches[key] = sw
             self.samplers[key] = Estimator()
@@ -283,6 +290,8 @@ class Monitor:
         self.flatten_done = bool(saved.get("flatten_done"))
         self.flat_stats = dict(saved.get("flat_stats")
                                or {"cancelled": 0, "failed": 0})
+        self.rewards_seen = dict(saved.get("rewards_seen") or {})
+        self.actuals_by_day = dict(saved.get("actuals_by_day") or {})
         age = time.time() - (saved.get("saved_at") or 0)
         armed = [k for k, sw in self.switches.items() if sw.on and self.master.on]
         self._note(f"booted build {self.build}; restored state {age:.0f}s old"
@@ -325,6 +334,8 @@ class Monitor:
             "master_switch": self.master.to_dict(),
             "flatten_done": self.flatten_done,
             "flat_stats": self.flat_stats,
+            "rewards_seen": self.rewards_seen,
+            "actuals_by_day": self.actuals_by_day,
             "names": self.names.to_dict(),
             "summaries": summaries,
             "floor": self.floor.status(now),
@@ -389,6 +400,37 @@ class Monitor:
                 return {"ok": r.ok, "note": r.note}
             return {"ok": False, "note": f"unknown op {op}"}
         return {"ok": False, "note": "not one of 3.0's orders"}
+
+    def refresh_rewards(self) -> dict:
+        """Owner's button: pull the exchange's posted payouts now, show
+        what is new since the last look, and fold the day totals into the
+        grades page. Reads only — rewards.csv on GitHub stays 1.0's file
+        to write."""
+        import datetime as _dt
+        start = (_dt.datetime.now(_dt.timezone.utc)
+                 - _dt.timedelta(days=6)).strftime("%Y-%m-%d")
+        rows = self.client.earnings(start)
+        seen = self.rewards_seen
+        fresh = []
+        totals: dict[str, float] = {}
+        for r in rows:
+            key = f"{r['date']}|{r['market']}|{r['program_type']}"
+            totals[r["date"]] = totals.get(r["date"], 0.0) + r["reward_usd"]
+            if abs(seen.get(key, -1.0) - r["reward_usd"]) > 1e-9:
+                fresh.append(r)
+            seen[key] = r["reward_usd"]
+        self.rewards_seen = {k: v for k, v in seen.items()
+                             if k[:10] >= start}
+        for d, v in totals.items():
+            self.actuals_by_day[d] = round(v, 2)
+        fresh.sort(key=lambda r: (r["date"], -r["reward_usd"]))
+        out_rows = [{"day": r["date"], "market": r["market"],
+                     "name": self.names.label(r["market"]),
+                     "usd": round(r["reward_usd"], 2),
+                     "status": r["status"]} for r in fresh[-40:]]
+        self._note(f"rewards check: {len(fresh)} new/changed rows")
+        return {"ok": True, "new_rows": out_rows, "new_count": len(fresh),
+                "days": {d: round(v, 2) for d, v in sorted(totals.items())}}
 
     def public_state(self) -> dict:
         st = dict(self.last_state) if self.last_state else {"saved_at": 0}
@@ -470,6 +512,10 @@ class Monitor:
                 self.actuals_by_day = day_totals
         summaries = {}
         for key, fam in self.families.items():
+            if fam.cfg.proven_usd > 0:
+                per_mkt = self.samplers[key].per_market
+                fam.proven = {mkt for mkt, usd in per_mkt.items()
+                              if usd >= fam.cfg.graduate_paid_usd}
             on = self.master.on and self.switches[key].on and self._floor_ok
             foreign = {oid for k2, f2 in self.families.items() if k2 != key
                        for oid in f2.orders}
