@@ -98,7 +98,14 @@ class FamilyConfig:
     book_stale_s: float = 150.0         # refresh an active market's book this often
     read_age_s: float = 480.0           # oldest book maintenance will read
     verify_resting: bool = False        # next cycle's reconcile checks by id anyway
-    rescan_s: float = 4 * 3600.0
+    rescan_s: float = 4 * 3600.0        # full REFETCH cadence per market
+    # Re-SCORING a market whose book is already fresh in the cache (the
+    # stream keeps ~100 live) costs no API call at all — so it happens
+    # every replan_s, keeps the triage feed genuinely live, and catches a
+    # spread opening minutes after it appears instead of hours
+    # (owner, 2026-08-21: "I don't see anything moving").
+    replan_s: float = 0.0               # 0 = off
+    replans_per_cycle: int = 40
     # The prober (owner, 2026-08-21: "there are markets we can earn in
     # that need probing for information. Unless you have all the
     # information you need, go out and get some"): a market whose pool
@@ -1540,6 +1547,44 @@ class Family:
                         else (why or "")[:60])})
             del self.triage_feed[:-40]
             done += 1
+        # the free pass: re-plan from cached books, no fetches spent
+        if self.cfg.replan_s > 0:
+            fresh_idle = [s for s in self.universe
+                          if s not in self.active_markets()
+                          and self.enterable(s)
+                          and not self._dead_here(s)
+                          and now - (self.scoreboard.get(s) or {}).get("ts", 0.0)
+                          > self.cfg.replan_s
+                          and self.cache.fresh(s, BOOK_MAX_AGE, now) is not None]
+            fresh_idle.sort(key=lambda s: (self.scoreboard.get(s) or {}).get("ts", 0.0))
+            for slug in fresh_idle[:self.cfg.replans_per_cycle]:
+                prog3, _w3 = self._prog_row(slug)
+                if prog3 is None:
+                    continue
+                book3 = self.cache.fresh(slug, BOOK_MAX_AGE, now)
+                plans, why, grow, potential = self.plan_market(book3, slug)
+                sp3 = self._side_pool(slug, prog3)
+                conf3 = self.evidence.confidence(slug)
+                self.scoreboard[slug] = {
+                    "ts": now, "plans": plans, "why": why,
+                    "grow": grow, "potential": potential,
+                    "est": round(sum(p["est"] for p in plans), 4),
+                    "pool_day": round(sp3, 4) if sp3 is not None else None,
+                    "conf": conf3}
+                spread3 = (round((book3.asks[0][0] - book3.bids[0][0]) * 100, 1)
+                           if book3.bids and book3.asks else None)
+                best3 = (max(p.get("ev", p["est"]) for p in plans)
+                         if plans else (potential if grow else 0.0))
+                self.triage_feed.append({
+                    "ts": round(now, 1), "market": slug,
+                    "in": bool(plans or grow),
+                    "ev": round(best3, 2), "spread": spread3,
+                    "pool": round(sp3, 2) if sp3 is not None else None,
+                    "conf": round(conf3, 2),
+                    "why": (plans[0]["why"][:60] if plans
+                            else grow[0]["why"][:60] if grow
+                            else (why or "")[:60])})
+                del self.triage_feed[:-40]
         for gone in set(self.scoreboard) - set(self.universe):
             del self.scoreboard[gone]
         return done

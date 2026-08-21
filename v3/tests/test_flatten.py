@@ -695,3 +695,30 @@ class TestV1Port(unittest.TestCase):
         r.cycle(advance=7200.0)
         self.assertIn(res_like.order_id, r.fam.orders)
         self.assertEqual(r.fam.orders[res_like.order_id].price, 0.30)
+
+
+class TestLiveReplans(unittest.TestCase):
+    def test_fresh_books_rescore_without_spending_fetches(self):
+        from v3.tests.test_family import Rig, A, politics_book
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           capital_usd=100.0, replan_s=600.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        r.cycle()
+        feed0 = len(r.fam.triage_feed)
+        # the stream keeps the book fresh; the REST fetch counter must not move
+        fetches = {"n": 0}
+        real_book = r.exchange.book
+        def counted(slug, fetched_at=None):
+            fetches["n"] += 1
+            return real_book(slug, fetched_at)
+        r.exchange.book = counted
+        r.cache.put(A, politics_book(r.now + 660))     # stream write
+        r.fam.orders.clear()                           # A is idle again
+        r.cycle(advance=660.0)
+        self.assertGreater(len([t for t in r.fam.triage_feed
+                                if t["ts"] > 1_000_060]), 0)
+        sb = r.fam.scoreboard[A]
+        self.assertGreater(sb["ts"], 1_000_060)        # rescored
+        self.assertEqual(fetches["n"], 0)              # for free

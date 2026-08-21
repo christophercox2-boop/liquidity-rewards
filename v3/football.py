@@ -73,6 +73,7 @@ def cfb() -> FamilyConfig:
         # owner, 2026-08-21: football must test hypotheses too — scouts
         # and starter positions are how it learns what earns
         probe_usd=3.0, grow_usd=10.0,
+        replan_s=900.0,
     )
 
 
@@ -90,4 +91,5 @@ def nfl() -> FamilyConfig:
         books_per_cycle=10, scan_reserve=4,
         max_actions_per_cycle=6,
         probe_usd=3.0, grow_usd=10.0,
+        replan_s=900.0,
     )

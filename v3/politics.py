@@ -114,4 +114,6 @@ def config() -> FamilyConfig:
         book_stale_s=300.0, read_age_s=900.0,
         max_actions_per_cycle=10,
         terms_slice=300, terms_full_s=1800.0,
+        replan_s=600.0,                       # a fresh look every 10 minutes
+
     )
