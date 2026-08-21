@@ -241,6 +241,22 @@ function render(d){
    var sb='';sell.forEach(function(o){sb+=orow(d,o);});
    out+=fold('Exits','\\u2014 '+sell.length+' order'+(sell.length!==1?'s':'')+', earning ~'+usd(ssum)+'/day while they wait',sb,false);
   }
+  var lg=(d['fam_log_'+k]||[]).filter(function(r){
+   return ['place','pull','silent_cancel','reprice','exit','trim','probe','probe_done','zombie_cancelled','window_pull'].indexOf(r.event)>=0;
+  }).slice(-14).reverse();
+  if(lg.length){
+   var lb='';
+   lg.forEach(function(r){
+    var what={place:'placed',pull:'pulled',silent_cancel:'the exchange dropped it on arrival',
+     reprice:'moved',exit:'left the market',trim:'trimmed for the ceiling',
+     probe:'scout sent',probe_done:'scout finished its watch',
+     zombie_cancelled:'stuck order finally cancelled',window_pull:'pulled for the game window'}[r.event]||r.event;
+    lb+='<div class="vrd">'+when(r.ts||0)+' \\u2014 '+what+' \\u2014 '+nm(d,r.market||'')
+     +(r.why?' <span class="muted">('+esc(r.why)+')</span>':'')
+     +(r.to!=null?' <span class="muted">to '+pc(r.to)+'</span>':'')+'</div>';
+   });
+   out+=fold('Recent changes','\\u2014 what appeared and what left, and why',lb,false);
+  }
   out+='</div>';
  });
  if(!any)out+='<div class="card muted">No resting orders. When a family is armed and finds something worth resting in, each order shows here with its name, its verdict, and its own Move/Cancel.</div>';
@@ -408,6 +424,10 @@ class WebServer:
             fam = self.monitor.families.get(key)
             if fam is not None:
                 d[f"fam_log_{key}"] = fam.log[-80:]
+                for row in d[f"fam_log_{key}"]:
+                    mkt = row.get("market")
+                    if mkt:
+                        slugs.add(mkt)
         for s in slugs:
             if s:
                 labels[s] = self.monitor.names.label(s)
