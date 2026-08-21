@@ -1202,3 +1202,15 @@ class TestExitOverCover(unittest.TestCase):
         self.assertLessEqual(sum(o.qty for o in covers), 5.0 + 0.01)
         # the earners survived; the dead 1c excess went
         self.assertTrue(any(abs(o.price - 0.15) < 1e-9 for o in covers))
+
+
+class TestProvenBudget(unittest.TestCase):
+    def test_graduated_markets_get_the_bigger_allowance(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", per_market_usd=20.0,
+                           proven_per_market_usd=40.0)
+        r = Rig(cfg=cfg)
+        self.assertEqual(r.fam._market_budget(A), 20.0)
+        r.fam.proven.add(A)
+        self.assertEqual(r.fam._market_budget(A), 40.0)

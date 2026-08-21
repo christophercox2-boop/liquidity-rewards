@@ -121,6 +121,8 @@ class FamilyConfig:
     # holdings count against the family ceiling at liquidation value
     # (owner, 2026-08-21: cfb risk = orders + holdings, capped)
     holdings_in_ceiling: bool = False
+    # graduated markets may carry more money than searchers
+    proven_per_market_usd: float | None = None
     probe_ttl_s: float = 45 * 60.0    # rotate: 45 quiet minutes IS the datum
     probe_cooldown_s: float = 6 * 3600.0
     probe_conf: float = 0.5           # below this confidence, information pays
@@ -307,6 +309,12 @@ class Family:
         return sum(capital_at_risk(o.intent, o.price, o.qty)
                    for o in self.orders.values()
                    if o.market == slug and o.purpose != "sell")
+
+    def _market_budget(self, slug: str) -> float:
+        """Proven ground earns a bigger allowance (owner, 2026-08-21)."""
+        if slug in self.proven and self.cfg.proven_per_market_usd:
+            return self.cfg.proven_per_market_usd
+        return self.cfg.per_market_usd
 
     def family_spent(self) -> float:
         """The search ceiling's number: worst case of the UNGRADUATED
@@ -850,7 +858,7 @@ class Family:
         if side_pool is None:
             return [], ("still confirming how many markets share this "
                         "pool — no estimate until I know")
-        budget = self.cfg.per_market_usd / 2.0
+        budget = self._market_budget(slug) / 2.0
 
         def plan_pair(bar=None):
             a = self._plan_side(slug, book, "BUY", prog, side_pool,
@@ -1311,7 +1319,8 @@ class Family:
                 continue
             best = self._plan_side(rec.market, book, rec.side, prog,
                                    side_pool,
-                                   self.cfg.per_market_usd / 2.0, own=rec,
+                                   self._market_budget(rec.market) / 2.0,
+                                   own=rec,
                                    bar=(self.cfg.grow_floor
                                         if rec.purpose == "grow" else None))
             drifted = ((rec.live_share or 0.0) > self.cfg.drift_share
@@ -1999,6 +2008,7 @@ class Family:
                                          if o.purpose == "sell"), 2)
         summary["spent"] = round(self.family_spent(), 2)
         summary["holdings_usd"] = round(self.holdings_value(), 2)
+        summary["holdings_counted"] = bool(self.cfg.holdings_in_ceiling)
         summary["capital_usd"] = self.cfg.capital_usd
         summary["earned_today"] = round(self.earned_today, 2)
         summary["inventory"] = {k: dict(v) for k, v in self.inventory.items()}
