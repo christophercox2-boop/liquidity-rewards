@@ -2153,8 +2153,13 @@ class Family:
                                 self._mark(slug, "SELL", now)
                                 actions -= 1
                                 continue
-                if rest < 0.01 or not self._cooldown_ok(slug, "SELL", now):
+                if rest < 0.01:
                     continue
+                if covered > 0.01 and not self._cooldown_ok(slug, "SELL",
+                                                            now):
+                    continue    # adjustments throttle; a bare position
+                                # gets its exit NOW (owner, 2026-08-22:
+                                # "no reason to wait")
                 break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
                 floor_px, score_basis = self._exit_floor(
                     slug, "SELL", break_even, book.tick, book=book, qty=qty)
@@ -2206,8 +2211,12 @@ class Family:
                 rest = -qty - covered
                 if covered > -qty + 0.01:
                     self._prune_excess_exits(slug, "BUY", covered + qty, now)
-                if rest < 0.01 or not self._cooldown_ok(slug, "BUY", now):
+                if rest < 0.01:
                     continue
+                if covered > 0.01 and not self._cooldown_ok(slug, "BUY",
+                                                            now):
+                    continue    # same rule for covers: bare shorts get
+                                # their buy-back immediately
                 received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
                 cap_px, score_basis = self._exit_floor(
                     slug, "BUY", received, book.tick, book=book, qty=-qty)

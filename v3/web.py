@@ -932,7 +932,8 @@ function fDraw(){
   var on=tab===t;
   return '<button onclick="fTabSet('+t+')" style="font-size:15px;padding:8px 18px;margin-right:8px'+(on?';font-weight:bold;text-decoration:underline':'')+'">'+label+' <span style="opacity:0.7">'+n+'</span></button>';
  };
- var out='<div style="margin:2px 0 8px 0">'+btn(1,'open',open.length)+btn(0,'closed',closed.length)+'</div>';
+ var greens=j.open_hidden||0;
+ var out='<div style="margin:2px 0 8px 0">'+btn(1,'open',open.length)+(greens?'<span style="color:#9ec49a;font-size:13px;margin-right:8px">+'+greens+' in profit</span>':'')+btn(0,'closed',closed.length)+'</div>';
  var list=tab===1?open:closed;
  if(!list.length)out+='<div class="card muted">nothing '+(tab===1?'open':'closed')+' right now</div>';
  else out+=list.map(fCard).join('');

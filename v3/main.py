@@ -973,6 +973,7 @@ class Monitor:
         with where the market stands now — one report per entry lot,
         updated as its closes land."""
         rows = []
+        hidden_open = 0
         for tag, fam in self.families.items():
             for card in pair_fills(fam.fills):
                 card["family"] = tag
@@ -997,14 +998,18 @@ class Monitor:
                     for o in exits if o.placed_ts > 0), 4)
                 card["net"] = round(card_net(card), 4)
                 if not card_visible(card, now):
-                    continue      # tracked in the journal, off the list
+                    if card_is_open(card):
+                        hidden_open += 1   # open AND profitable — off
+                                           # the list, still counted
+                    continue
                 rows.append(card)
         # open lots first, newest activity first within each group
         rows.sort(key=lambda x: (
             0 if (x.get("open_qty", 0) > 0.005
                   and not x.get("stray_close")) else 1,
             -x.get("last_ts", x["ts"])))
-        return {"ok": True, "fills": rows[:150]}
+        return {"ok": True, "fills": rows[:150],
+                "open_hidden": hidden_open}
 
     def book_view(self, slug: str) -> dict:
         """The raw shape of one market's book, with our own orders
