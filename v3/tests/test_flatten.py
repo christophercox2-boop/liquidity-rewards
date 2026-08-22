@@ -485,12 +485,25 @@ class TestOwnerDirectives0821(unittest.TestCase):
                 raise __import__("v3.api", fromlist=["ApiError"]).ApiError("nope", status=500)
             return real_post(url, body, path=path, **kw)
         r.exchange.post = post
-        # force a reprice of rec: the touch moves, so the best spot moves
-        from v3.tests.test_family import politics_book
-        r.exchange.books[A] = politics_book(r.now, bid=0.40, ask=0.47)
+        # force a reprice of rec deterministically — the machinery under
+        # test is the failed-cancel retry, not the planner's choice
+        import v3.family as F
         r.fam.last_action.clear()
         r.fam.cfg.reprice_gain_day = -1.0            # any move clears the bar
-        r.cycle(advance=3700.0)
+        orig_ps = F.Family._plan_side
+        def forced(self, slug, book, side, prog, sp, budget, own=None, **kw):
+            if own is not None and own.id == rec.id:
+                return {"side": side, "px": 0.21, "qty": own.qty,
+                        "share": 0.5, "est": 5.0, "ev": 5.0,
+                        "p_fill": 0.1, "fill_cost": 0.0, "cost": 0.42,
+                        "why": "forced move for the test"}
+            return orig_ps(self, slug, book, side, prog, sp, budget,
+                           own=own, **kw)
+        F.Family._plan_side = forced
+        try:
+            r.cycle(advance=3700.0)
+        finally:
+            F.Family._plan_side = orig_ps
         self.assertIn(rec.id, r.fam.orders)          # ghost stays TRACKED
         self.assertIn("retrying", r.fam.orders[rec.id].why)
         self.assertIn(rec.id, r.exchange.live)       # and really still rests
@@ -1731,3 +1744,74 @@ class TestStrandedExits(unittest.TestCase):
         self.assertTrue(exits)
         self.assertLess(exits[0].price, 0.14)   # below break-even, band-backed
         self.assertGreaterEqual(exits[0].price, 0.02)
+
+
+class TestTargetPricesStaySmall(unittest.TestCase):
+    def test_size_shrinks_past_fair(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig(switch=False)
+        # the Arkansas shape: book far above the model
+        r.add_market(A, book=Book(
+            bids=((0.12, 4000.0), (0.07, 3000.0)),
+            asks=((0.14, 5000.0),),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.cycle()
+        r.fam.fairs = lambda s: 0.02
+        rows = []
+        b = r.cache.fresh(A, 3600, r.now)
+        p, _ = r.fam._prog_row(A)
+        sp = r.fam._side_pool(A, p)
+        r.fam._plan_side(A, b, "BUY", p, sp, 10.0, ladder=rows)
+        deep = [w for w in rows if w["px"] >= 0.06]
+        self.assertTrue(deep)
+        for w in deep:              # 4+ ticks past a 2c fair: minimum only
+            self.assertLessEqual(w["qty"], r.fam.cfg.min_qty
+                                 if hasattr(r.fam.cfg, "min_qty") else 1.0)
+
+    def test_at_fair_size_is_unrestricted(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig(switch=False)
+        r.add_market(A, book=Book(
+            bids=((0.50, 4000.0), (0.48, 3000.0)),
+            asks=((0.53, 5000.0),),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.cycle()
+        r.fam.fairs = lambda s: 0.52
+        rows = []
+        b = r.cache.fresh(A, 3600, r.now)
+        p, _ = r.fam._prog_row(A)
+        sp = r.fam._side_pool(A, p)
+        r.fam._plan_side(A, b, "BUY", p, sp, 10.0, ladder=rows)
+        inside = [w for w in rows if w["px"] <= 0.52]
+        self.assertTrue(any(w["qty"] > 1.0 for w in inside))
+
+
+class TestRestingTargetsShrink(unittest.TestCase):
+    def test_resting_size_past_fair_gets_pulled_in(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(
+            bids=((0.12, 4000.0), (0.07, 3000.0)),
+            asks=((0.14, 5000.0),),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.cycle()
+        r.fam.fairs = lambda s: 0.02
+        r.fam.orders["R1"] = FamilyOrder(
+            id="R1", market=A, side="BUY", price=0.12, qty=50.0,
+            intent=BUY_LONG, placed_ts=1.0, purpose="earn",
+            live_est=0.5)
+        r.exchange.live["R1"] = {"id": "R1", "market": A, "side": "BUY",
+                                 "price": 0.12, "size": 50.0}
+        for _ in range(3):          # one shrink per market-side per cycle
+            r.fam.last_action.clear()
+            r.cycle(advance=600.0)
+        big = [o for o in r.fam.orders.values()
+               if o.market == A and o.side == "BUY"
+               and o.purpose != "sell" and o.price >= 0.06
+               and o.qty > 8.0]
+        self.assertEqual(big, [])   # the 50-share target shrank or left

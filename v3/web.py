@@ -652,11 +652,24 @@ function drawGraph(name,dots){
  return '<div class="card"><b>'+esc(name)+'</b> <span class="muted">\u2014 $/day, one dot per 20-second sample \u00b7 now $'+last[1].toFixed(2)+'/day, '+last[2]+' markets in view</span>'+s
   +'<div class="hint">Gaps are minutes the meter could not see a fresh book. The sampling clock is independent \u2014 nothing that places, moves, or cancels orders can touch it.</div></div>';
 }
+function mWin(sec){
+ window._meterWin=sec;
+ if(window._meterD){var el=document.getElementById('view');if(el)el.innerHTML=render(window._meterD);}
+}
 function render(d){
- var out='';
+ window._meterD=d;
+ var win=window._meterWin||0;
+ var btn=function(sec,label){
+  var on=(window._meterWin||0)===sec;
+  return '<button onclick="mWin('+sec+')" style="font-size:14px;padding:6px 14px;margin-right:8px'+(on?';font-weight:bold;text-decoration:underline':'')+'">'+label+'</button>';
+ };
+ var out='<div style="margin:2px 0 8px 0">'+btn(900,'last 15 min')+btn(0,'all day')+'</div>';
+ var now=Date.now()/1000;
  [['Politics','est_politics'],['College football','est_cfb'],['NFL','est_nfl']].forEach(function(p){
   var e=d[p[1]]||{};
-  if((e.dots||[]).length||p[1]!=='est_nfl')out+=drawGraph(p[0],e.dots||[]);
+  var dots=e.dots||[];
+  if(win)dots=dots.filter(function(x){return x[0]>=now-win;});
+  if(dots.length||p[1]!=='est_nfl')out+=drawGraph(p[0],dots);
  });
  return out||'<div class="card muted">no samplers armed</div>';
 }

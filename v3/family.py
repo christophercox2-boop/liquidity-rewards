@@ -775,6 +775,16 @@ class Family:
                 if (h >= 0.5 and qty > grid[0]
                         and (in_front or k_px == 0)):
                     break     # a fill just happened here: minimum size
+                # a price past fair is a TARGET (owner, 2026-08-22:
+                # "bigger size is fine so long as we can use some of the
+                # spread to offset losses"): size shrinks with every tick
+                # conceded — three or more ticks past value rests only
+                # the minimum
+                if conc >= 1.0 and qty > grid[0]:
+                    if conc >= 3.0:
+                        break
+                    if qty > grid[0] * (8.0 if conc < 2.0 else 3.0):
+                        break
                 if qty * cost_ps > budget + 1e-9:
                     break
                 j = estimate_join(side, levels, tick, df, target, px, qty)
@@ -1542,6 +1552,20 @@ class Family:
                     and now - rec.weak_since > window_here
                     and (best is None
                          or best.get("ev", best["est"]) < floor_here))
+            gmin = 1.0 if self.cfg.whole_shares else QTY_GRID[0]
+            shrink_cap = None
+            fair_m = self.fairs(rec.market) if self.fairs is not None else None
+            if fair_m is not None:
+                past_t = (((rec.price - fair_m) if rec.side == "BUY"
+                           else (fair_m - rec.price)) / book.tick)
+                if past_t >= 3.0:
+                    shrink_cap = gmin
+                elif past_t >= 2.0:
+                    shrink_cap = gmin * 3.0
+                elif past_t >= 1.0:
+                    shrink_cap = gmin * 8.0
+            shrink_needed = (shrink_cap is not None
+                             and rec.qty > shrink_cap + 1e-9)
             if (best is not None and best.get("revive")
                     and rec.purpose != "grow"):
                 # the order earns nothing only because its side is below
@@ -1565,12 +1589,15 @@ class Family:
                 # the order stays; the revive places if its EV ever clears
                 rec.weak_since = 0.0
                 continue
-            if (best is None and (rec.live_est or 0.0) <= 0.0) or weak:
+            if ((best is None and ((rec.live_est or 0.0) <= 0.0
+                                   or shrink_needed)) or weak):
                 r = self.desk.cancel(rec.id, rec.market)
                 if r.ok:
                     why = (f"under {self.cfg.min_est_day * 100:.0f}c/day for "
                            f"{(now - rec.weak_since) / 3600:.1f}h — cycling "
                            f"out to the next best market" if weak else
+                           "resting size past fair — a target; pulled "
+                           "(owner, 2026-08-22)" if shrink_needed else
                            "earning nothing and no better spot")
                     self._log(event="pull", market=rec.market, side=rec.side,
                               why=why)
@@ -1578,7 +1605,8 @@ class Family:
                     self._mark(rec.market, rec.side, now)
                     actions -= 1
             elif (best is not None
-                    and gain >= self.cfg.reprice_gain_day
+                    and (gain >= self.cfg.reprice_gain_day
+                         or shrink_needed)
                     and (abs(best["px"] - rec.price) > 1e-9
                          or abs(best["qty"] - rec.qty) > 1e-9)
                     # a reprice that GROWS the order answers to the same
