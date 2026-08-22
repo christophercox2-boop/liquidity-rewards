@@ -116,7 +116,7 @@ def load_history() -> dict[str, float]:
                      "Accept": "application/vnd.github.raw+json"},
             timeout=30)
         if r.status_code >= 400:
-            return {}, {}
+            return {}, {}, {}
         paid: dict = defaultdict(float)
         days: dict = defaultdict(set)
         day_totals: dict = defaultdict(float)
