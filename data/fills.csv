@@ -135,3 +135,8 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787406259.2,politics,usgubewc-usgub-ak-2026-11-03-adacru,BUY,1,0.23,earn,0.0177,0.31,,14,26,0,0.01,0.3,0.03,1,joins the touch — the book has been quiet
 1787406743.2,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.95,earn,6.2494,10.41,0.996525,94,99,0,0.88,0.98,-0.0465,1,2 ticks in front of the touch — closer to the midpoint; ~99.0% of the bid side
 1787406863.2,cfb,aachc-cfb-wins-2026-11-28-oregst-1pt5wins,BUY,0.5,0.98,earn,2.4984,19.1,,,,0,,,,0.5,10 ticks in front of the touch — closer to the midpoint; ~80.4% of the bid side
+1787407349.3,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.97,earn,6.25,0.17,0.996525,93,98,0.454,0.88,0.98,-0.0265,2,2 ticks in front of the touch — closer to the midpoint; ~99.0% of the bid side
+1787407529.4,cfb,aachc-cfb-wins-2026-11-28-ill-6pt5wins,BUY,0.5,0.73,earn,2.4649,19.34,,72,79,0,0.73,0.78,-0.03,0.5,2 ticks in front of the touch — closer to the midpoint; ~98.7% of the bid side
+1787407529.4,cfb,aachc-cfb-wins-2026-11-28-minnst-8pt5wins,BUY,0.5,0.44,earn,1.1468,0.66,,,,0,,,,0.5,joins the touch — the book has been quiet
+1787408489.4,politics,usgubewc-usgub-al-2026-11-03-rep,SELL,0.98,0.89,earn,6.25,9.22,0.985125,87,93,0,0.86,0.89,0.0951,-0.98,joins the touch — the book has been quiet
+1787409389.4,cfb,aachc-cfb-wins-2026-11-28-pur-4pt5wins,SELL,1,0.33,sell,0.0486,9.44,,33,42,0.34,0.32,0.33,0.04,0,selling filled stock — it earns while it waits
