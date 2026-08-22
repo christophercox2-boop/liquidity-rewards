@@ -168,7 +168,8 @@ class FamilyConfig:
     # ceiling onto the proven pool's own cap, so the search money keeps
     # hunting new candidates. Membership is recomputed from the sampler
     # every cycle — a market that stops accruing falls back in.
-    graduate_paid_usd: float = 0.25   # measured $ accrued today to graduate
+    graduate_paid_usd: float = 0.25   # avg PAID $/day over recent paid days
+    graduate_days: int = 3            # paid days needed in the last 7 (stability)
     proven_usd: float = 0.0           # 0 = graduation off
     reprice_gain_day: float = 0.06
     drift_share: float = 0.15
@@ -256,6 +257,7 @@ class Family:
         self.pending_marks: list[dict] = []   # fills awaiting their 1h grade
         self.fills: list[dict] = []           # the purchase journal, one row per fill
         self.proven: set[str] = set()         # graduated markets (main feeds it)
+        self.recent_paid: dict[str, tuple] = {}   # mkt -> (avg $/day, paid days), last 7d
         self.inv_since: dict[str, float] = {}  # market -> first-fill ts
         self._exit_rate_ps = 0.0               # $/share/day our exits earn
         self.triage_feed: list[dict] = []     # the sweep's recent verdicts

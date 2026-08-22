@@ -102,7 +102,7 @@ def load_history() -> dict[str, float]:
     guides, it never blocks."""
     tok = os.environ.get("GITHUB_TOKEN", "")
     if not tok:
-        return {}, {}
+        return {}, {}, {}
     import csv
     import io
     from collections import defaultdict
@@ -120,6 +120,11 @@ def load_history() -> dict[str, float]:
         paid: dict = defaultdict(float)
         days: dict = defaultdict(set)
         day_totals: dict = defaultdict(float)
+        r_paid: dict = defaultdict(float)
+        r_days: dict = defaultdict(set)
+        import datetime as _dt
+        cutoff = (_dt.date.today()
+                  - _dt.timedelta(days=7)).isoformat()
         for row in csv.DictReader(io.StringIO(r.text)):
             v = float(row.get("reward_usd") or 0)
             if v <= 0:
@@ -128,11 +133,17 @@ def load_history() -> dict[str, float]:
             paid[mkt] += v
             days[mkt].add(row.get("date"))
             day_totals[row.get("date") or "?"] += v
+            if (row.get("date") or "") >= cutoff:
+                r_paid[mkt] += v
+                r_days[mkt].add(row.get("date"))
+        recent = {mkt: (round(r_paid[mkt] / max(len(r_days[mkt]), 1), 4),
+                        len(r_days[mkt])) for mkt in r_paid}
         return ({mkt: round(paid[mkt] / max(len(days[mkt]), 1), 4)
                  for mkt in paid},
-                {d: round(v, 2) for d, v in day_totals.items()})
+                {d: round(v, 2) for d, v in day_totals.items()},
+                recent)
     except Exception:  # noqa: BLE001
-        return {}, {}
+        return {}, {}, {}
 
 
 def pair_fills(fills: list) -> list:
@@ -1007,10 +1018,11 @@ class Monitor:
         self.publish_files(now)
         if now - self._history_at > 6 * 3600.0:
             self._history_at = now
-            hist, day_totals = load_history()
+            hist, day_totals, recent = load_history()
             if hist:
                 for fam in self.families.values():
                     fam.history = hist
+                    fam.recent_paid = recent
             if day_totals:
                 self.actuals_by_day = day_totals
         summaries = {}
@@ -1019,11 +1031,14 @@ class Monitor:
             self._stage(f"{fam.cfg.name}: discovering, reading terms, "
                         f"scoring books", fam_pct.get(key, 94))
             if fam.cfg.proven_usd > 0:
-                # graduation is earned with PAID money, not estimates
-                # (owner, 2026-08-21): history is avg $/day the rewards
-                # feed actually posted for the market
-                fam.proven = {mkt for mkt, usd in fam.history.items()
-                              if usd >= fam.cfg.graduate_paid_usd}
+                # graduation takes STABILITY and HIGH EARNINGS (owner,
+                # 2026-08-22): paid on 3+ of the last 7 days, averaging
+                # at least the bar — no reaching back to the old era
+                fam.proven = {
+                    mkt for mkt, (avg, nd)
+                    in getattr(fam, "recent_paid", {}).items()
+                    if avg >= fam.cfg.graduate_paid_usd
+                    and nd >= fam.cfg.graduate_days}
             on = self.master.on and self.switches[key].on and self._floor_ok
             foreign = {oid for k2, f2 in self.families.items() if k2 != key
                        for oid in f2.orders}
