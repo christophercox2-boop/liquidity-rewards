@@ -248,17 +248,19 @@ class TestExitProtection(unittest.TestCase):
         r, A = self.rig_short()
         r.cycle()
         rec = r.fam.orders["cover"]
-        self.assertEqual(rec.purpose, "sell")
+        # since 2026-08-22 an order the engine did not place is the
+        # OWNER'S OWN: hands off. It still reduces the short, so it
+        # never blocks the ceiling — and the engine rests no second
+        # cover alongside it (his 100 covers the whole short).
+        self.assertEqual(rec.purpose, "manual")
         self.assertEqual(r.fam.family_spent(), 0.0)   # exits never block the ceiling
-        # since 2026-08-22 maintenance MAY move it: the evidence band
-        # says the short is deep underwater, so the cover walks up into
-        # fillable range — but it stays an exit and never blocks spend
         r.cycle(advance=8000.0)
-        r.cycle(advance=8000.0)   # move, then re-rest on the next pass
-        covers = [o for o in r.fam.orders.values()
-                  if o.market == A and o.purpose == "sell"
-                  and o.side == "BUY"]
-        self.assertTrue(covers)
+        r.cycle(advance=8000.0)
+        self.assertIn("cover", r.fam.orders)          # never cancelled
+        self.assertEqual(r.fam.orders["cover"].price, 0.01)  # never moved
+        engine_covers = [o for o in r.fam.orders.values()
+                         if o.market == A and o.purpose == "sell"]
+        self.assertEqual(engine_covers, [])
         self.assertEqual(r.fam.family_spent(), 0.0)
 
     def test_short_gets_covered_at_touch_under_break_even(self):
@@ -2109,3 +2111,66 @@ class TestNbaFamily(unittest.TestCase):
                          ["tec-nba-champ-2027-06-30-w-bos",
                           "tec-nba-champ-2027-06-30-w-lal"])
         self.assertEqual(out["tec-nba-champ-2027-06-30-w-bos"]["event_n"], 2)
+
+
+class TestHandsOffOwnerOrders(unittest.TestCase):
+    """Owner, 2026-08-22: "Don't let it cancel orders I set by hand."
+    Manual orders survive every cull the engine runs, and the engine
+    sizes its own book around them."""
+
+    def _manual(self, r, oid, market, side, px, qty, intent=None):
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG, SELL_LONG
+        it = intent or (BUY_LONG if side == "BUY" else SELL_LONG)
+        r.fam.orders[oid] = FamilyOrder(
+            id=oid, market=market, side=side, price=px, qty=qty,
+            intent=it, placed_ts=r.now, purpose="manual",
+            why="placed by the owner")
+        r.exchange.live[oid] = {"id": oid, "market": market, "side": side,
+                                "price": px, "size": qty, "intent": it}
+
+    def test_survives_the_dead_program_sweep(self):
+        from v3.tests.test_family import Rig, A, DEAD_PROG
+        import copy
+        r = Rig()
+        r.add_market(A)
+        r.cycle()                     # the engine rests its own orders
+        self.assertTrue(any(o.purpose != "manual"
+                            for o in r.fam.orders.values()))
+        self._manual(r, "HAND1", A, "BUY", 0.02, 5.0)
+        r.exchange.prog_raw[A] = copy.deepcopy(DEAD_PROG)
+        for _ in range(40):
+            r.cycle(advance=1200.0)   # terms re-read -> dead -> leave
+        self.assertIn("HAND1", r.fam.orders)          # the hand survives
+        self.assertEqual([o.id for o in r.fam.orders.values()
+                          if o.market == A and o.purpose != "manual"], [])
+
+    def test_never_shed_by_the_ceiling_trim(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=1.0, per_market_usd=2.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        self._manual(r, "HAND2", A, "BUY", 0.40, 10.0)  # $4 of hand money
+        self.assertGreater(r.fam.family_spent(), 1.0)   # over the $1 cap
+        r.fam._trim(r.now, 5)
+        self.assertIn("HAND2", r.fam.orders)            # never trimmed
+
+    def test_owner_exit_counts_as_cover(self):
+        from v3.tests.test_family import Rig, A, politics_book
+        from v3.intents import SELL_LONG
+        r = Rig()
+        r.add_market(A)
+        r.positions[A] = (10.0, 1.0)
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 1.0}
+        r.fam.cache.put(A, politics_book(r.now))
+        self._manual(r, "HAND3", A, "SELL", 0.60, 10.0, intent=SELL_LONG)
+        r.fam._sell(r.now, 5)
+        engine_sells = [o for o in r.fam.orders.values()
+                        if o.market == A and o.purpose == "sell"]
+        self.assertEqual(engine_sells, [])   # his 10 already cover the 10
+        self.assertIn("HAND3", r.fam.orders)
+        # and his exit adds no new risk, so it never blocks the ceiling
+        self.assertEqual(r.fam.family_spent(), 0.0)

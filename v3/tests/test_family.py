@@ -391,23 +391,28 @@ class TestAdoption(unittest.TestCase):
         self.assertEqual(s["would_adopt"], 2)        # v1a + v1x, not manual/far
         self.assertEqual(set(r.fam.orders), set())
 
-    def test_armed_adopts_with_the_right_purposes(self):
+    def test_armed_records_unknown_orders_hands_off(self):
+        """Since 2026-08-22 ("Don't let it cancel orders I set by hand"):
+        the 1.0/2.0 handover is over, so any order this engine did not
+        place is the OWNER'S — recorded as manual, never managed."""
         r = self.rig_with_foreign()
         r.positions[A] = (10.0, 4.0)                 # held stock too
         s = r.cycle()
         self.assertIn("v1a", r.fam.orders)
-        self.assertEqual(r.fam.orders["v1a"].purpose, "earn")
+        self.assertEqual(r.fam.orders["v1a"].purpose, "manual")
         self.assertIn("v1x", r.fam.orders)
-        self.assertEqual(r.fam.orders["v1x"].purpose, "sell")
-        self.assertNotIn("own", r.fam.orders)        # the owner's manual order
+        self.assertEqual(r.fam.orders["v1x"].purpose, "manual")
+        self.assertNotIn("own", r.fam.orders)        # pre-flagged manual
         self.assertNotIn("far", r.fam.orders)        # not our ground
         self.assertEqual(s["would_adopt"], 0)
         self.assertEqual(r.fam.inventory[A]["qty"], 10.0)
-        self.assertTrue(any("took over" in t for t, _ in r.alerts))
-        # adopted orders are not phantom-filled on the next cycle
+        # no takeover page — the owner knows what he placed
+        self.assertFalse(any("took over" in t for t, _ in r.alerts))
+        # recorded orders are not phantom-filled on the next cycle
         n = len(r.fam.orders)
         r.cycle()
         self.assertEqual(len(r.fam.orders), n)
+        self.assertIn("v1a", r.fam.orders)           # still untouched
 
     def test_sibling_family_claims_are_respected(self):
         r = self.rig_with_foreign()

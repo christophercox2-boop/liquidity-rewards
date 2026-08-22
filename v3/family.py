@@ -335,10 +335,22 @@ class Family:
         book, negative risk netted per race group (v3/risk.py). Graduated
         markets sit outside it, under proven_spent's own cap."""
         spent = risk.book_risk(risk.order_legs(
-            o for o in self.orders.values() if o.market not in self.proven))
+            o for o in self.orders.values()
+            if o.market not in self.proven and not self._owner_exit(o)))
         if self.cfg.holdings_in_ceiling:
             spent += self.holdings_value()
         return spent
+
+    def _owner_exit(self, o) -> bool:
+        """A manual order whose fill REDUCES the position it sits on is
+        the owner's own exit: it adds no new risk, so it never counts
+        against a ceiling — and like every manual order it is never
+        cancelled (owner, 2026-08-22)."""
+        if o.purpose != "manual":
+            return False
+        pos = (self.inventory.get(o.market) or {}).get("qty", 0.0)
+        return ((o.side == "SELL" and pos > 0.005)
+                or (o.side == "BUY" and pos < -0.005))
 
     def holdings_value(self) -> float:
         """What the stock would fetch if liquidated NOW: longs at the
@@ -366,7 +378,8 @@ class Family:
 
     def proven_spent(self) -> float:
         return risk.book_risk(risk.order_legs(
-            o for o in self.orders.values() if o.market in self.proven))
+            o for o in self.orders.values()
+            if o.market in self.proven and not self._owner_exit(o)))
 
     def active_markets(self) -> set[str]:
         return {o.market for o in self.orders.values() if o.purpose != "sell"}
@@ -1284,33 +1297,24 @@ class Family:
         return out
 
     def _adopt(self, adoptable: list[dict], positions: dict, now: float) -> None:
-        """The 1.0/2.0 handover: claim their resting orders as our own and
-        take their long stock onto the exit seller's book. Runs only once
-        the floor is ours (cycle gates it), so nothing else is still
-        maintaining these orders when we start."""
+        """An open order this engine did not place is the OWNER'S OWN
+        (the 1.0/2.0 handover is finished — nothing else places orders).
+        Record it so ceilings, exits, and dedupe can see it, mark it
+        manual, and never cancel, move, or reprice it (owner, 2026-08-22:
+        "Don't let it cancel orders I set by hand")."""
         for o in adoptable:
-            net0 = (positions.get(o["market"]) or (0.0, 0.0))[0]
-            purpose = ("sell" if o["intent"] in (SELL_LONG, SELL_SHORT)
-                       or (o["side"] == "SELL" and net0 > 0.005)
-                       or (o["side"] == "BUY" and net0 < -0.005)
-                       else "earn")
-
             self.orders[o["id"]] = FamilyOrder(
                 id=o["id"], market=o["market"], side=o["side"],
                 price=o["price"], qty=o["size"], intent=o["intent"],
-                placed_ts=now, purpose=purpose,
-                why="adopted from the earlier versions")
+                placed_ts=now, purpose="manual",
+                why="the owner's own order — the engine leaves it alone")
             self.positions_seen.setdefault(
                 o["market"], (positions.get(o["market"]) or (0.0,))[0])
-            # a cooldown from the moment of adoption: the inherited book is
-            # already earning, so it converges to 3.0's shape at the usual
-            # measured pace instead of being rearranged in a burst
             self._mark(o["market"], o["side"], now)
         if adoptable:
-            self._log(event="adopted", n=len(adoptable))
-            self.alert(f"{self.cfg.tag}: took over the resting book",
-                       f"{len(adoptable)} orders adopted from the earlier "
-                       f"versions — maintained under 3.0's rules from here")
+            self._log(event="owner_orders_seen", n=len(adoptable),
+                      note="resting orders this engine did not place — "
+                           "recorded hands-off, never cancelled")
 
     def _seed_inventory(self, positions: dict) -> None:
         """Positions on our ground the seller does not know yet — long
@@ -1427,6 +1431,9 @@ class Family:
         for rec in list(self.orders.values()):
             if actions <= 0:
                 break
+            if rec.purpose == "manual":
+                continue      # owner, 2026-08-22: never cancel the owner's
+                              # own orders — no rule outranks the hand
             days = slug_days_out(rec.market, now)
             near = days is not None and days < self.cfg.min_days_out
             dead = self._dead_here(rec.market)
@@ -1788,7 +1795,8 @@ class Family:
             spent = self.family_spent()
             if spent <= self.cfg.capital_usd + 1e-9:
                 break
-            cands = [o for o in self.orders.values() if o.purpose != "sell"]
+            cands = [o for o in self.orders.values()
+                     if o.purpose not in ("sell", "manual")]
             if not cands:
                 break
             def value_per_dollar(o):
@@ -2116,9 +2124,17 @@ class Family:
                         if o.market == slug and o.purpose == "sell"
                         and o.side == "SELL"]
                 self._maybe_move_exit(slug, "SELL", mine, book, inv, now)
-                covered = sum(o.qty for o in self.orders.values()
-                              if o.market == slug and o.purpose == "sell"
-                              and o.side == "SELL")
+                # the owner's own resting SELLs of this stock count as
+                # cover too — the engine sizes around them and never
+                # offers the same shares twice (owner, 2026-08-22)
+                manual_cover = sum(
+                    o.qty for o in self.orders.values()
+                    if o.market == slug and o.purpose == "manual"
+                    and o.side == "SELL")
+                covered = manual_cover + sum(
+                    o.qty for o in self.orders.values()
+                    if o.market == slug and o.purpose == "sell"
+                    and o.side == "SELL")
                 rest = qty - covered
                 if covered > qty + 0.01:
                     self._prune_excess_exits(slug, "SELL", covered - qty, now)
@@ -2143,7 +2159,7 @@ class Family:
                             <= 2 * book.tick + 1e-9
                             and (fair_d is None
                                  or bid_t >= fair_d - 3 * book.tick)):
-                        dq = min(qty, bid_sz,
+                        dq = min(qty - manual_cover, bid_sz,
                                  (self.cfg.dump_usd_day
                                   - self.dump_today)
                                  / max(bid_t, 0.01))
@@ -2227,9 +2243,10 @@ class Family:
                         if o.market == slug and o.purpose == "sell"
                         and o.side == "BUY"]
                 self._maybe_move_exit(slug, "BUY", mine, book, inv, now)
-                covered = sum(o.qty for o in self.orders.values()
-                              if o.market == slug and o.purpose == "sell"
-                              and o.side == "BUY")
+                covered = sum(
+                    o.qty for o in self.orders.values()
+                    if o.market == slug and o.side == "BUY"
+                    and o.purpose in ("sell", "manual"))
                 rest = -qty - covered
                 if covered > -qty + 0.01:
                     self._prune_excess_exits(slug, "BUY", covered + qty, now)

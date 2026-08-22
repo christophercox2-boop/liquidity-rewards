@@ -35,6 +35,11 @@ long and accreted, so search it rather than reading it through.
   loop's switch on from /map. Off by default, persisted in state["auto"],
   every flip audit-logged. Turning ON takes two taps; OFF takes one.
   Never add automation that places orders without such a switch.
+- Orders the owner placed by hand are untouchable (owner, 2026-08-22
+  "Don't let it cancel orders I set by hand"): the engine never cancels,
+  moves, or reprices them — any resting order the engine did not place
+  itself is treated as the owner's. It sizes its own exits and dumps
+  around them so shares are never offered twice.
 - Order-touching endpoints keep: auth, X-Reprice CSRF header, known-market
   whitelist, 0.1–99.9c price bounds, post-only placement.
   ONE carved exception (owner, 2026-08-22 "Carve it"): the taker dump —
