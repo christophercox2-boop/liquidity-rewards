@@ -93,14 +93,17 @@ def nfl() -> FamilyConfig:
     return FamilyConfig(
         name="NFL futures", tag="NFL",
         known_ground=False, rest_style="behind", revive=False,
-        # owner, 2026-08-22: $50 all-in like cfb — orders AND holdings
-        # count against the ceiling
+        allow_improve=True,
+        # owner, 2026-08-22: "similar to cfb, which has done pretty
+        # well" — $50 all-in (orders AND holdings), same dump cap, same
+        # coverage and book-freshness posture
         capital_usd=50.0, per_market_usd=1.00,
         holdings_in_ceiling=True,
         dump_usd_day=10.0,
         rest_from=(1, 6), rest_until=(3, 17),
         season_start=(2026, 8, 20),
-        books_per_cycle=10, scan_reserve=4,
+        books_per_cycle=20, scan_reserve=8,
+        book_stale_s=300.0, read_age_s=900.0,
         max_actions_per_cycle=6,
         probe_usd=3.0, grow_usd=10.0,
         replan_s=900.0,
