@@ -150,3 +150,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787416289.5,politics,enwc-uspres-nom-dem-2028-gavnew,SELL,1,0.25,sell,0.4847,1.88,,21,27,0.675,0.24,0.28,-0.01,0,selling filled stock — it earns while it waits
 1787417249.5,politics,enwc-usgubp-ma-2026-09-01-rep-micmin,SELL,1,0.93,earn,6.2313,0.43,0.000625,90,94,0.588,0.92,0.99,-0.9294,-100.99,4 ticks in front of the touch — closer to the midpoint; ~79.9% of the ask side
 1787418708.0,cfb,aachc-cfb-wins-2026-11-28-txam-9pt5wins,SELL,1,0.15,sell,0,0.02,,39,46,0.382,0.14,0.15,0.28,0,selling filled stock — it earns while it waits
+1787420573.9,cfb,aachc-cfb-wins-2026-11-28-gtech-6pt5wins,BUY,0.5,0.58,earn,0.7998,0.7,,54,60,0,0.58,0.59,0.01,0.5,joins the touch — the book has been quiet
+1787420753.9,politics,ussewc-usse-ar-2026-11-03-dem,SELL,5.87,0.08,sell,1.1489,6.6,0.01805,8,13,0.382,0.07,0.08,-0.062,44.13,selling filled stock — it earns while it waits
