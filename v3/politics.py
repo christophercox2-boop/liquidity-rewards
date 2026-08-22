@@ -113,6 +113,9 @@ def config() -> FamilyConfig:
         # onto the proven pool's own $150 cap — the search money keeps
         # hunting new candidates
         dump_usd_day=50.0,
+        # owner, 2026-08-22: stay out of the Alaska governor markets —
+        # special (ranked-choice) rules pending
+        avoid_tokens=("usgub-ak", "usgubp-ak"),
         graduate_paid_usd=1.00, proven_usd=150.0,
         # owner, 2026-08-21: 75c is a GOAL — markets that could clear it
         # at full confidence get starter positions from this budget, and

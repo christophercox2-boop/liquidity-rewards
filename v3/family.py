@@ -171,6 +171,7 @@ class FamilyConfig:
     graduate_paid_usd: float = 0.25   # avg PAID $/day over recent paid days
     graduate_days: int = 3            # paid days needed in the last 7 (stability)
     dump_usd_day: float = 0.0         # taker-dump proceeds allowed per day (0 = off)
+    avoid_tokens: tuple = ()          # slug fragments the owner told us to stay out of
     proven_usd: float = 0.0           # 0 = graduation off
     reprice_gain_day: float = 0.06
     drift_share: float = 0.15
@@ -294,7 +295,15 @@ class Family:
         self.log.append(row)
         del self.log[:-self.cfg.log_keep]
 
+    def _avoided(self, slug: str) -> bool:
+        """Markets the owner told us to stay out of (2026-08-22: Alaska
+        governor, special rules pending). Exits still manage held stock;
+        nothing new rests, probes, revives, or dumps here."""
+        return any(t in slug for t in self.cfg.avoid_tokens)
+
     def enterable(self, slug: str) -> bool:
+        if self._avoided(slug):
+            return False
         toks = self.cfg.enter_tokens
         return toks is None or any(t in slug for t in toks)
 
@@ -1521,7 +1530,19 @@ class Family:
                                    "quotes whole shares now")
                     actions -= 1
                 continue
-            if rec.purpose in ("sell", "probe", "manual"):
+            if rec.purpose == "manual":
+                continue
+            if self._avoided(rec.market) and rec.purpose != "sell":
+                r = self.desk.cancel(rec.id, rec.market)
+                if r.ok:
+                    self._log(event="pull", market=rec.market,
+                              side=rec.side,
+                              why="owner: staying out of this market "
+                                  "for now — special rules pending")
+                    del self.orders[rec.id]
+                    actions -= 1
+                continue
+            if rec.purpose in ("sell", "probe"):
                 continue
             book = self.cache.fresh(rec.market, self.cfg.read_age_s, now)
             prog, _why = self._prog_row(rec.market)
@@ -2076,6 +2097,7 @@ class Family:
                 # bid's displayed size, never a giveaway against the
                 # model, exits cancelled first, capped per day.
                 if (self.cfg.dump_usd_day > 0 and actions > 0
+                        and not self._avoided(slug)
                         and book.bids and book.asks
                         and self._cooldown_ok(slug, "SELL", now)
                         and self.dump_today

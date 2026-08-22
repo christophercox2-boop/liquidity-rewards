@@ -1914,3 +1914,36 @@ class TestTakerDump(unittest.TestCase):
         r.fam.fairs = lambda s: 0.60                 # bid is 16 ticks under fair
         r.cycle()
         self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
+
+
+class TestOwnerAvoidList(unittest.TestCase):
+    def test_avoided_markets_stop_quoting_but_exits_survive(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG, SELL_LONG
+        r = Rig()
+        r.add_market(A)
+        r.cycle()                               # the engine quotes A
+        earns = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "earn"]
+        self.assertTrue(earns)
+        r.fam.orders["X1"] = FamilyOrder(
+            id="X1", market=A, side="SELL", price=0.50, qty=2.0,
+            intent=SELL_LONG, placed_ts=1.0, purpose="sell")
+        r.exchange.live["X1"] = {"id": "X1", "market": A, "side": "SELL",
+                                 "price": 0.50, "size": 2.0}
+        r.fam.inventory[A] = {"qty": 2.0, "cost": 0.60}
+        r.positions[A] = (2.0, 0.60)
+        r.fam.cfg.avoid_tokens = ("ussemov",)   # matches the rig's slug
+        self.assertFalse(r.fam.enterable(A))
+        for _ in range(3):                      # pulls are throttled
+            r.fam.last_action.clear()
+            r.cycle(advance=120.0)
+        left = [o for o in r.fam.orders.values()
+                if o.market == A and o.purpose not in ("sell", "manual")]
+        self.assertEqual(left, [])              # nothing keeps quoting
+        exits = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "sell"]
+        self.assertTrue(exits)                  # stock still managed
+        # the quotes left either via the immediate owner-pull or the
+        # universe drop at rediscovery — both are the ordered outcome
