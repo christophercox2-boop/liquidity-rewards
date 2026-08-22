@@ -1164,6 +1164,7 @@ class Family:
         if rec.market not in self.inventory:
             self.inv_since[rec.market] = now
         inv = self.inventory.setdefault(rec.market, {"qty": 0.0, "cost": 0.0})
+        q0, c0 = inv["qty"], inv["cost"]
         if rec.side == "BUY":
             inv["qty"] += filled
             inv["cost"] += filled * rec.price
@@ -1185,10 +1186,31 @@ class Family:
         del self.pending_marks[:-60]
         self._log(event="fill", market=rec.market, side=rec.side,
                   price=rec.price, qty=round(filled, 2))
-        self.alert(f"{self.cfg.tag} order filled",
-                   f"{self._label(rec.market)}: {rec.side} {filled:g} @ "
-                   f"{rec.price * 100:g}c — fills are usually losses here; "
-                   f"the exit seller takes over")
+        gain = self._closing_gain(rec.side, rec.price, filled, q0, c0)
+        if gain is not None and gain > 0.005:
+            # owner, 2026-08-22: profitable fills do not page the phone.
+            # The fill still lands in the journal and the fill cards.
+            self._log(event="fill_no_page", market=rec.market,
+                      note=f"closed {filled:g} at a ${gain:.2f} gain — "
+                           f"good news does not page")
+        else:
+            self.alert(f"{self.cfg.tag} order filled",
+                       f"{self._label(rec.market)}: {rec.side} {filled:g} @ "
+                       f"{rec.price * 100:g}c — fills are usually losses "
+                       f"here; the exit seller takes over")
+
+    @staticmethod
+    def _closing_gain(side: str, price: float, filled: float,
+                      q0: float, c0: float) -> float | None:
+        """Realized dollars when a fill only REDUCES the position it
+        found: proceeds against the average cost of the shares closed.
+        None when the fill opened, grew, or flipped a position — that
+        is new risk, and new risk always pages."""
+        if side == "SELL" and q0 > 0.005 and filled <= q0 + 0.005:
+            return (price - c0 / q0) * filled
+        if side == "BUY" and q0 < -0.005 and filled <= -q0 + 0.005:
+            return (c0 / q0 - price) * filled
+        return None
 
     def _journal_fill(self, rec: FamilyOrder, filled: float, now: float,
                       qty_after: float) -> None:
