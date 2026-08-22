@@ -1947,3 +1947,34 @@ class TestOwnerAvoidList(unittest.TestCase):
         self.assertTrue(exits)                  # stock still managed
         # the quotes left either via the immediate owner-pull or the
         # universe drop at rediscovery — both are the ordered outcome
+
+
+class TestFillCardRetention(unittest.TestCase):
+    def test_closed_cards_show_three_days_then_leave(self):
+        from v3.main import card_visible
+        now = 1_000_000.0
+        closed = {"side": "SELL", "qty": 5.0, "px": 0.9, "open_qty": 0.0,
+                  "realized": 0.15, "ts": now - 4 * 86400,
+                  "last_ts": now - 2 * 86400}
+        self.assertTrue(card_visible(closed, now))
+        closed["last_ts"] = now - 4 * 86400
+        self.assertFalse(card_visible(closed, now))
+
+    def test_open_cards_stay_until_profitable(self):
+        from v3.main import card_visible
+        now = 1_000_000.0
+        losing = {"side": "BUY", "qty": 50.0, "px": 0.13, "open_qty": 50.0,
+                  "realized": 0.0, "est_day": 2.0, "rested_h": 2.0,
+                  "now_bid": 0.07, "exit_earned": 0.0,
+                  "ts": now - 9 * 86400, "last_ts": now - 9 * 86400}
+        self.assertTrue(card_visible(losing, now))     # old but underwater
+        winner = dict(losing, now_bid=0.20)            # mark turned green
+        self.assertFalse(card_visible(winner, now))    # off the list
+
+    def test_stray_closes_use_the_three_day_window(self):
+        from v3.main import card_visible
+        now = 1_000_000.0
+        stray = {"side": "SELL", "qty": 10.0, "px": 0.7, "open_qty": 0.0,
+                 "stray_close": True, "ts": now - 86400,
+                 "last_ts": now - 86400}
+        self.assertTrue(card_visible(stray, now))

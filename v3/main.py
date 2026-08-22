@@ -146,6 +146,43 @@ def load_history() -> dict[str, float]:
         return {}, {}, {}
 
 
+def card_net(card: dict) -> float:
+    """The card's bottom line, same math the page shows: realized plus
+    rewards earned resting, plus (for open lots) the conservative mark
+    and what the resting exit has earned."""
+    earned = 0.0
+    if card.get("est_day") and card.get("rested_h") is not None:
+        earned = card["est_day"] * card["rested_h"] / 24.0
+    is_open = (not card.get("stray_close")
+               and (card.get("open_qty")
+                    if card.get("open_qty") is not None
+                    else card.get("qty", 0.0)) > 0.005)
+    net = (card.get("realized") or 0.0) + earned
+    if is_open:
+        oq = (card.get("open_qty") if card.get("open_qty") is not None
+              else card.get("qty", 0.0))
+        if card.get("side") == "BUY" and card.get("now_bid") is not None:
+            net += (card["now_bid"] - card["px"]) * oq
+        if card.get("side") == "SELL" and card.get("now_ask") is not None:
+            net += (card["px"] - card["now_ask"]) * oq
+        net += card.get("exit_earned") or 0.0
+    return net
+
+
+def card_visible(card: dict, now: float) -> bool:
+    """Owner's retention (2026-08-22): closed cards show for 3 days
+    after their last close; open cards show until they turn profitable
+    (then the journal keeps tracking them silently)."""
+    is_open = (not card.get("stray_close")
+               and (card.get("open_qty")
+                    if card.get("open_qty") is not None
+                    else card.get("qty", 0.0)) > 0.005)
+    if is_open:
+        return card_net(card) <= 0.005
+    last = card.get("last_ts", card.get("ts", 0.0))
+    return now - last <= 3 * 86400.0
+
+
 def pair_fills(fills: list) -> list:
     """Match closes to entries, oldest lot first, per market: a buy pairs
     with the sells that unload it, a short sale with the buys that cover
@@ -893,13 +930,16 @@ class Monitor:
                 card["exit_earned"] = round(sum(
                     (o.live_est or 0.0) * (now - o.placed_ts) / 86400.0
                     for o in exits if o.placed_ts > 0), 4)
+                card["net"] = round(card_net(card), 4)
+                if not card_visible(card, now):
+                    continue      # tracked in the journal, off the list
                 rows.append(card)
         # open lots first, newest activity first within each group
         rows.sort(key=lambda x: (
             0 if (x.get("open_qty", 0) > 0.005
                   and not x.get("stray_close")) else 1,
             -x.get("last_ts", x["ts"])))
-        return {"ok": True, "fills": rows[:100]}
+        return {"ok": True, "fills": rows[:150]}
 
     def book_view(self, slug: str) -> dict:
         """The raw shape of one market's book, with our own orders

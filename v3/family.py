@@ -1229,7 +1229,16 @@ class Family:
                 "touch_ask": (book.asks[0][0]
                               if book is not None and book.asks else None),
                 "conc": conc, "pos_after": qty_after})
-            del self.fills[:-200]
+            # retention (owner, 2026-08-22): a row must outlive its card
+            # — closed cards show for 3 days, open ones until profitable
+            # — so keep a week of rows plus anything belonging to a
+            # market we still hold, bounded at 600
+            cutoff = now - 7 * 86400.0
+            keep = [r2 for r2 in self.fills
+                    if r2.get("ts", 0.0) >= cutoff
+                    or abs((self.inventory.get(r2.get("market"))
+                            or {}).get("qty", 0.0)) > 0.005]
+            self.fills = keep[-600:]
         except Exception:  # noqa: BLE001 — the journal never breaks a fill
             pass
 

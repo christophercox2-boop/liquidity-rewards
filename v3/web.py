@@ -913,16 +913,34 @@ function fTick(){
   }
  }
 }
+function fDraw(){
+ var el=document.getElementById('fl');
+ var j=window._fillsJ;
+ if(!el||!j)return;
+ if(!j.ok||!(j.fills||[]).length){el.innerHTML='<div class="card muted">No purchases on record yet \\u2014 the journal starts with the next fill.</div>';return;}
+ var open=[],closed=[];
+ j.fills.forEach(function(f){(fParts(f).open?open:closed).push(f);});
+ var tab=(window._fillTab!=null?window._fillTab:1);
+ if(tab===1&&!open.length&&closed.length)tab=0;
+ var btn=function(t,label,n){
+  var on=tab===t;
+  return '<button onclick="fTabSet('+t+')" style="font-size:15px;padding:8px 18px;margin-right:8px'+(on?';font-weight:bold;text-decoration:underline':'')+'">'+label+' <span style="opacity:0.7">'+n+'</span></button>';
+ };
+ var out='<div style="margin:2px 0 8px 0">'+btn(1,'open',open.length)+btn(0,'closed',closed.length)+'</div>';
+ var list=tab===1?open:closed;
+ if(!list.length)out+='<div class="card muted">nothing '+(tab===1?'open':'closed')+' right now</div>';
+ else out+=list.map(fCard).join('');
+ window._fillT0=Date.now()/1000;
+ el.innerHTML=out;
+}
+function fTabSet(t){window._fillTab=t;fDraw();}
 function render(d){
  fetch('fills.json',{headers:hdrs(),cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
-  var el=document.getElementById('fl');
-  if(!el)return;
-  if(!j.ok||!(j.fills||[]).length){el.innerHTML='<div class="card muted">No purchases on record yet \\u2014 the journal starts with the next fill.</div>';return;}
-  window._fillT0=Date.now()/1000;
-  el.innerHTML=j.fills.map(fCard).join('');
+  window._fillsJ=j;
+  fDraw();
   if(!window._fillTick)window._fillTick=setInterval(fTick,1000);
  }).catch(function(){});
- return '<div class="card"><div class="muted">One card per purchase \\u2014 open lots on top, ticking as their exits earn; the color grades how it went. Tap a card for the full story. The journal starts Aug 21.</div></div><div id="fl"><div class="card muted">loading\\u2026</div></div>';
+ return '<div class="card"><div class="muted">One card per purchase \\u2014 open lots tick as their exits earn; the color grades how it went. Tap a card for the story. Closed cards stay 3 days; open ones stay until they turn profitable.</div></div><div id="fl"><div class="card muted">loading\\u2026</div></div>';
 }
 """
 
