@@ -820,8 +820,10 @@ function fUsd(v){return (v<-0.005?'\\u2212$':'+$')+Math.abs(v).toFixed(2);}
 function fRest(h){if(h==null)return '';return h<1?Math.round(h*60)+' min':(h<48?h.toFixed(1)+' h':(h/24).toFixed(1)+' days');}
 function fParts(f){
  var earned=(f.est_day&&f.rested_h!=null)?f.est_day*f.rested_h/24:0;
- var open=!f.stray_close&&(f.open_qty==null?f.qty:f.open_qty)>0.005;
  var oq=f.open_qty!=null?f.open_qty:f.qty;
+ var flat=f.pos_now!=null&&Math.abs(f.pos_now)<0.005;
+ var open=!f.stray_close&&oq>0.005&&!flat;
+ var reconciled=!f.stray_close&&oq>0.005&&flat;
  var mk=0;
  if(open){
   if(f.side==='BUY'&&f.now_bid!=null)mk=(f.now_bid-f.px)*oq;
@@ -829,6 +831,7 @@ function fParts(f){
  }
  var net=(f.realized||0)+earned+(open?mk+(f.exit_earned||0):0);
  return {open:open,oq:oq,mark:mk,earned:earned,net:net,
+         reconciled:reconciled,
          rate:open?(f.exit_rate||0):0};
 }
 function fTint(net){
@@ -883,6 +886,8 @@ function fBack(f,p){
  }
  if(f.stray_close){
   out+='<div class="muted" style="margin:2px 0">This closed stock bought before the journal began \\u2014 no matching purchase on record, so no round-trip math.</div>';
+ }else if(p.reconciled){
+  out+='<div style="margin:2px 0"><b>Closed by reconciliation</b> \\u2014 the exchange shows this market flat, so the remaining '+p.oq+' closed outside the journal (a correction or an untracked fill; no price recorded). Realized covers only the recorded closes: '+fUsd(f.realized||0)+'.</div>';
  }else if(!p.open){
   out+='<div style="margin:2px 0"><b>Round trip closed \\u2014 realized '+fUsd(f.realized||0)+(p.earned?' \\u00b7 plus ~$'+p.earned.toFixed(2)+' rewards':'')+'</b></div>';
  }else{
@@ -890,6 +895,7 @@ function fBack(f,p){
   if(p.oq<f.qty)nw+='<br>Still open: '+p.oq+' of '+f.qty+' \\u00b7 realized so far '+fUsd(f.realized||0);
   nw+='<br>The open part marks '+fUsd(p.mark)+' today';
   if(f.exit_resting)nw+='<br>Exit resting \\u2014 earning ~$'+(f.exit_rate||0).toFixed(2)+'/day, ~$'+(f.exit_earned||0).toFixed(2)+' since it rested';
+  else nw+='<br>No exit resting yet \\u2014 the open part earns $0.00/day until one rests';
   out+='<div style="margin:2px 0">'+nw+'</div>';
  }
  out+='<div class="muted" style="font-size:12px;margin-top:4px">tap to flip back</div>';

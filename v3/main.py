@@ -189,6 +189,23 @@ def fills_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
     return text, added
 
 
+def card_is_open(card: dict) -> bool:
+    """A lot is open only while the exchange still shows a position —
+    a lot the pairing thinks is open on a FLAT market was closed by a
+    correction or an untracked fill (the Florida card, 2026-08-22) and
+    counts as closed."""
+    if card.get("stray_close"):
+        return False
+    oq = (card.get("open_qty") if card.get("open_qty") is not None
+          else card.get("qty", 0.0))
+    if oq <= 0.005:
+        return False
+    if (card.get("pos_now") is not None
+            and abs(card["pos_now"]) < 0.005):
+        return False
+    return True
+
+
 def card_net(card: dict) -> float:
     """The card's bottom line, same math the page shows: realized plus
     rewards earned resting, plus (for open lots) the conservative mark
@@ -196,10 +213,7 @@ def card_net(card: dict) -> float:
     earned = 0.0
     if card.get("est_day") and card.get("rested_h") is not None:
         earned = card["est_day"] * card["rested_h"] / 24.0
-    is_open = (not card.get("stray_close")
-               and (card.get("open_qty")
-                    if card.get("open_qty") is not None
-                    else card.get("qty", 0.0)) > 0.005)
+    is_open = card_is_open(card)
     net = (card.get("realized") or 0.0) + earned
     if is_open:
         oq = (card.get("open_qty") if card.get("open_qty") is not None
@@ -216,11 +230,7 @@ def card_visible(card: dict, now: float) -> bool:
     """Owner's retention (2026-08-22): closed cards show for 3 days
     after their last close; open cards show until they turn profitable
     (then the journal keeps tracking them silently)."""
-    is_open = (not card.get("stray_close")
-               and (card.get("open_qty")
-                    if card.get("open_qty") is not None
-                    else card.get("qty", 0.0)) > 0.005)
-    if is_open:
+    if card_is_open(card):
         return card_net(card) <= 0.005
     last = card.get("last_ts", card.get("ts", 0.0))
     return now - last <= 3 * 86400.0

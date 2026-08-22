@@ -2005,3 +2005,18 @@ class TestFillsArchive(unittest.TestCase):
                                              (200.0, "cfb", r3)])
         self.assertEqual(n3, 1)
         self.assertIn("200.0,cfb,m3", text3)
+
+
+class TestReconciledFlatLots(unittest.TestCase):
+    def test_open_lot_on_a_flat_market_counts_as_closed(self):
+        from v3.main import card_is_open, card_visible
+        now = 1_000_000.0
+        card = {"side": "SELL", "qty": 5.0, "px": 0.20, "open_qty": 4.0,
+                "realized": -0.02, "pos_now": 0.0,
+                "ts": now - 3600, "last_ts": now - 3600}
+        self.assertFalse(card_is_open(card))          # flat = closed
+        self.assertTrue(card_visible(card, now))      # 3-day window
+        card["last_ts"] = now - 4 * 86400
+        self.assertFalse(card_visible(card, now))
+        live = dict(card, pos_now=-4.0, last_ts=now - 3600)
+        self.assertTrue(card_is_open(live))           # real position: open
