@@ -883,11 +883,22 @@ class Monitor:
                 inv = fam.inventory.get(card["market"])
                 card["pos_now"] = (round(inv.get("qty", 0.0), 2)
                                    if inv else 0.0)
-                card["exit_resting"] = any(
-                    o.market == card["market"] and o.purpose == "sell"
-                    for o in fam.orders.values())
+                exits = [o for o in fam.orders.values()
+                         if o.market == card["market"]
+                         and o.purpose == "sell"]
+                card["exit_resting"] = bool(exits)
+                now = time.time()
+                card["exit_rate"] = round(sum((o.live_est or 0.0)
+                                              for o in exits), 4)
+                card["exit_earned"] = round(sum(
+                    (o.live_est or 0.0) * (now - o.placed_ts) / 86400.0
+                    for o in exits if o.placed_ts > 0), 4)
                 rows.append(card)
-        rows.sort(key=lambda x: -x.get("last_ts", x["ts"]))
+        # open lots first, newest activity first within each group
+        rows.sort(key=lambda x: (
+            0 if (x.get("open_qty", 0) > 0.005
+                  and not x.get("stray_close")) else 1,
+            -x.get("last_ts", x["ts"])))
         return {"ok": True, "fills": rows[:100]}
 
     def book_view(self, slug: str) -> dict:

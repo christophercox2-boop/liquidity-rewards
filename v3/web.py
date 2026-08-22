@@ -735,60 +735,113 @@ function render(d){
 FILLS_JS = """
 var _MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function fWhen(ts){var d=new Date(ts*1000);return _MO[d.getMonth()]+' '+d.getDate()+', '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
-function fUsd(v){return (v<-0.005?'\u2212$':'+$')+Math.abs(v).toFixed(2);}
+function fUsd(v){return (v<-0.005?'\\u2212$':'+$')+Math.abs(v).toFixed(2);}
 function fRest(h){if(h==null)return '';return h<1?Math.round(h*60)+' min':(h<48?h.toFixed(1)+' h':(h/24).toFixed(1)+' days');}
-function fCard(f){
- var out='<div class="card">';
- out+='<div><b>'+esc(f.name||f.market)+'</b> <span class="muted" style="font-size:12px">'+esc(f.family||'')+'</span></div>';
- out+='<div style="font-size:16px;margin:2px 0"><b>'+(f.side==='BUY'?'bought':'sold')+' '+f.qty+' @ '+pc(f.px)+'</b> \u00b7 '+fWhen(f.ts)+(f.stray_close?' \u00b7 an exit':'')+'</div>';
+function fParts(f){
+ var earned=(f.est_day&&f.rested_h!=null)?f.est_day*f.rested_h/24:0;
+ var open=!f.stray_close&&(f.open_qty==null?f.qty:f.open_qty)>0.005;
+ var oq=f.open_qty!=null?f.open_qty:f.qty;
+ var mk=0;
+ if(open){
+  if(f.side==='BUY'&&f.now_bid!=null)mk=(f.now_bid-f.px)*oq;
+  if(f.side==='SELL'&&f.now_ask!=null)mk=(f.px-f.now_ask)*oq;
+ }
+ var net=(f.realized||0)+earned+(open?mk+(f.exit_earned||0):0);
+ return {open:open,oq:oq,mark:mk,earned:earned,net:net,
+         rate:open?(f.exit_rate||0):0};
+}
+function fTint(net){
+ if(net>=1)return 'rgba(96,170,96,0.32)';
+ if(net>=0.05)return 'rgba(96,170,96,0.16)';
+ if(net<=-1)return 'rgba(200,84,84,0.30)';
+ if(net<=-0.05)return 'rgba(200,84,84,0.15)';
+ return 'rgba(255,255,255,0.04)';
+}
+function fFlip(el){
+ el.style.transition='transform 0.14s ease';
+ el.style.transform='rotateY(90deg)';
+ setTimeout(function(){
+  var a=el.querySelector('.ffront'),b=el.querySelector('.fback');
+  if(a&&b){var sh=a.style.display==='none';a.style.display=sh?'':'none';b.style.display=sh?'none':'';}
+  el.style.transform='rotateY(0deg)';
+ },140);
+}
+function fFront(f,p){
+ var st=f.stray_close?'CLOSED OUT':(p.open?'OPEN \\u00b7 so far':'CLOSED');
+ var tick=p.open&&p.rate>0.005?' <span class="muted" style="font-size:12px">+'+p.rate.toFixed(2)+'/day ticking</span>':'';
+ return '<div style="font-size:17px;line-height:1.25"><b>'+esc(f.name||f.market)+'</b></div>'
+  +'<div style="font-size:21px;margin:3px 0"><b>'+(f.side==='BUY'?'bought':'sold')+' '+f.qty+' @ '+pc(f.px)+'</b></div>'
+  +'<div style="font-size:26px;margin:2px 0"><b class="fnet" data-base="'+p.net.toFixed(4)+'" data-rate="'+p.rate.toFixed(4)+'">'+fUsd(p.net)+'</b> <span class="muted" style="font-size:13px">'+st+'</span>'+tick+'</div>'
+  +'<div class="muted" style="font-size:12px">'+esc(f.family||'')+' \\u00b7 '+fWhen(f.ts)+' \\u00b7 tap for the story</div>';
+}
+function fBack(f,p){
+ var out='<div><b>'+esc(f.name||f.market)+'</b> <span class="muted" style="font-size:12px">'+esc(f.family||'')+'</span></div>';
+ out+='<div style="font-size:15px;margin:2px 0"><b>'+(f.side==='BUY'?'bought':'sold')+' '+f.qty+' @ '+pc(f.px)+'</b> \\u00b7 '+fWhen(f.ts)+(f.stray_close?' \\u00b7 an exit':'')+'</div>';
  var plan='The order: '+esc(f.why||'(no note)');
- if(f.est_day)plan+=' \u2014 estimated ~$'+f.est_day.toFixed(2)+'/day while resting';
- if(f.rested_h!=null)plan+=' \u00b7 rested '+fRest(f.rested_h)+' before filling';
+ if(f.est_day)plan+=' \\u2014 estimated ~$'+f.est_day.toFixed(2)+'/day while resting';
+ if(f.rested_h!=null)plan+=' \\u00b7 rested '+fRest(f.rested_h)+' before filling';
  out+='<div class="muted" style="margin:2px 0">'+plan+'</div>';
  var v='';
  if(f.fair!=null)v='Model said '+pc(f.fair);
- else if(f.band)v='No model \u2014 evidence put value between '+f.band[0].toFixed(0)+'c and '+f.band[1].toFixed(0)+'c';
+ else if(f.band)v='No model \\u2014 evidence put value between '+f.band[0].toFixed(0)+'c and '+f.band[1].toFixed(0)+'c';
  else v='No independent sense of value at the time';
- if(f.touch_bid!=null||f.touch_ask!=null)v+=' \u00b7 book was '+(f.touch_bid!=null?pc(f.touch_bid):'\u2014')+'/'+(f.touch_ask!=null?pc(f.touch_ask):'\u2014');
+ if(f.touch_bid!=null||f.touch_ask!=null)v+=' \\u00b7 book was '+(f.touch_bid!=null?pc(f.touch_bid):'\\u2014')+'/'+(f.touch_ask!=null?pc(f.touch_ask):'\\u2014');
  out+='<div style="margin:2px 0">'+v+'</div>';
  var lot=(f.conc!=null)?-f.conc*f.qty:null;
- var earned=(f.est_day&&f.rested_h!=null)?f.est_day*f.rested_h/24:null;
  var cl;
- if(f.conc==null)cl='Value unknown then \u2014 no concession math';
- else if(f.conc>0.0005)cl='Paid '+(f.conc*100).toFixed(1)+'c past value \u2192 '+fUsd(lot)+' on the lot';
- else if(f.conc<-0.0005)cl='Filled '+(-f.conc*100).toFixed(1)+'c inside value \u2192 '+fUsd(lot)+' on the lot';
+ if(f.conc==null)cl='Value unknown then \\u2014 no concession math';
+ else if(f.conc>0.0005)cl='Paid '+(f.conc*100).toFixed(1)+'c past value \\u2192 '+fUsd(lot)+' on the lot';
+ else if(f.conc<-0.0005)cl='Filled '+(-f.conc*100).toFixed(1)+'c inside value \\u2192 '+fUsd(lot)+' on the lot';
  else cl='Filled right at value';
- if(earned!=null)cl+=' \u00b7 earned ~$'+earned.toFixed(2)+' in rewards while it rested';
+ if(p.earned)cl+=' \\u00b7 earned ~$'+p.earned.toFixed(2)+' in rewards while it rested';
  out+='<div style="margin:2px 0">'+cl+'</div>';
  if((f.closes||[]).length){
   out+='<div style="margin:2px 0">'+f.closes.map(function(c){
-   return '\u21b3 '+(f.side==='BUY'?'sold':'bought back')+' '+c.qty+' @ '+pc(c.px)+' \u00b7 '+fWhen(c.ts)+' \u2192 '+fUsd(c.pl);
+   return '\\u21b3 '+(f.side==='BUY'?'sold':'bought back')+' '+c.qty+' @ '+pc(c.px)+' \\u00b7 '+fWhen(c.ts)+' \\u2192 '+fUsd(c.pl);
   }).join('<br>')+'</div>';
  }
  if(f.stray_close){
-  out+='<div class="muted" style="margin:2px 0">This closed stock bought before the journal began \u2014 no matching purchase on record, so no round-trip math.</div>';
- }else if(f.open_qty<=0.005){
-  out+='<div style="margin:2px 0"><b>Round trip closed \u2014 realized '+fUsd(f.realized)+(earned!=null?' \u00b7 plus ~$'+earned.toFixed(2)+' rewards while it rested':'')+'</b></div>';
+  out+='<div class="muted" style="margin:2px 0">This closed stock bought before the journal began \\u2014 no matching purchase on record, so no round-trip math.</div>';
+ }else if(!p.open){
+  out+='<div style="margin:2px 0"><b>Round trip closed \\u2014 realized '+fUsd(f.realized||0)+(p.earned?' \\u00b7 plus ~$'+p.earned.toFixed(2)+' rewards':'')+'</b></div>';
  }else{
-  var oq=f.open_qty!=null?f.open_qty:f.qty;
-  var mk=null;
-  if(f.side==='BUY'&&f.now_bid!=null)mk=(f.now_bid-f.px)*oq;
-  if(f.side==='SELL'&&f.now_ask!=null)mk=(f.px-f.now_ask)*oq;
-  var nw='Now: book '+(f.now_bid!=null?pc(f.now_bid):'\u2014')+'/'+(f.now_ask!=null?pc(f.now_ask):'\u2014')+' \u00b7 position '+(f.pos_now!=null?f.pos_now:'?')+(f.exit_resting?' \u00b7 an exit is resting':'');
-  if(oq<f.qty)nw+='<br>Still open: '+oq+' of '+f.qty+' \u00b7 realized so far '+fUsd(f.realized);
-  if(mk!=null)nw+='<br><b>The open part marks '+fUsd(mk)+' today'+(earned!=null?' \u00b7 net with rewards '+fUsd(mk+earned+(f.realized||0)):'')+'</b>';
+  var nw='Now: book '+(f.now_bid!=null?pc(f.now_bid):'\\u2014')+'/'+(f.now_ask!=null?pc(f.now_ask):'\\u2014')+' \\u00b7 position '+(f.pos_now!=null?f.pos_now:'?');
+  if(p.oq<f.qty)nw+='<br>Still open: '+p.oq+' of '+f.qty+' \\u00b7 realized so far '+fUsd(f.realized||0);
+  nw+='<br>The open part marks '+fUsd(p.mark)+' today';
+  if(f.exit_resting)nw+='<br>Exit resting \\u2014 earning ~$'+(f.exit_rate||0).toFixed(2)+'/day, ~$'+(f.exit_earned||0).toFixed(2)+' since it rested';
   out+='<div style="margin:2px 0">'+nw+'</div>';
  }
- return out+'</div>';
+ out+='<div class="muted" style="font-size:12px;margin-top:4px">tap to flip back</div>';
+ return out;
+}
+function fCard(f){
+ var p=fParts(f);
+ return '<div class="card" onclick="fFlip(this)" style="cursor:pointer;background:'+fTint(p.net)+'">'
+  +'<div class="ffront">'+fFront(f,p)+'</div>'
+  +'<div class="fback" style="display:none">'+fBack(f,p)+'</div></div>';
+}
+function fTick(){
+ if(!document.querySelectorAll)return;
+ var dt=(Date.now()/1000)-(window._fillT0||0);
+ var els=document.querySelectorAll('.fnet');
+ for(var i=0;i<els.length;i++){
+  var r=parseFloat(els[i].getAttribute('data-rate')||'0');
+  if(r>0.005){
+   var b=parseFloat(els[i].getAttribute('data-base')||'0');
+   els[i].textContent=fUsd(b+r*dt/86400);
+  }
+ }
 }
 function render(d){
  fetch('fills.json',{headers:hdrs(),cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
   var el=document.getElementById('fl');
   if(!el)return;
-  if(!j.ok||!(j.fills||[]).length){el.innerHTML='<div class="card muted">No purchases on record yet \u2014 the journal starts with the next fill.</div>';return;}
+  if(!j.ok||!(j.fills||[]).length){el.innerHTML='<div class="card muted">No purchases on record yet \\u2014 the journal starts with the next fill.</div>';return;}
+  window._fillT0=Date.now()/1000;
   el.innerHTML=j.fills.map(fCard).join('');
+  if(!window._fillTick)window._fillTick=setInterval(fTick,1000);
  }).catch(function(){});
- return '<div class="card"><div class="muted">One report per purchase, newest activity first \u2014 each buy paired with the sells that unload it, each short sale with its buy-backs. A card updates and moves up when its close lands. The journal starts Aug 21; older fills are not recorded.</div></div><div id="fl"><div class="card muted">loading\u2026</div></div>';
+ return '<div class="card"><div class="muted">One card per purchase \\u2014 open lots on top, ticking as their exits earn; the color grades how it went. Tap a card for the full story. The journal starts Aug 21.</div></div><div id="fl"><div class="card muted">loading\\u2026</div></div>';
 }
 """
 
