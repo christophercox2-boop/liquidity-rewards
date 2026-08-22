@@ -1978,3 +1978,30 @@ class TestFillCardRetention(unittest.TestCase):
                  "stray_close": True, "ts": now - 86400,
                  "last_ts": now - 86400}
         self.assertTrue(card_visible(stray, now))
+
+
+class TestFillsArchive(unittest.TestCase):
+    def test_append_only_with_same_timestamp_siblings(self):
+        from v3.main import fills_csv_append, FILLS_CSV_HEADER
+        r1 = {"market": "m1", "side": "BUY", "qty": 50.0, "px": 0.13,
+              "purpose": "earn", "est_day": 2.0, "rested_h": 8.7,
+              "fair": 0.018, "band": [9, 16], "conf": 0.0,
+              "touch_bid": 0.07, "touch_ask": 0.13, "conc": 0.112,
+              "pos_after": 50.0, "why": "joins, the touch"}
+        r2 = dict(r1, market="m2", qty=1.0)
+        text, n = fills_csv_append(None, [(100.0, "politics", r1),
+                                          (100.0, "politics", r2)])
+        self.assertEqual(n, 2)               # same ts, both kept
+        self.assertTrue(text.startswith(FILLS_CSV_HEADER))
+        self.assertIn("joins; the touch", text)   # commas sanitized
+        # a second publish with the same rows adds nothing
+        text2, n2 = fills_csv_append(text, [(100.0, "politics", r1),
+                                            (100.0, "politics", r2)])
+        self.assertEqual(n2, 0)
+        self.assertEqual(text2, text)
+        # a newer fill appends one line
+        r3 = dict(r1, market="m3")
+        text3, n3 = fills_csv_append(text2, [(100.0, "politics", r1),
+                                             (200.0, "cfb", r3)])
+        self.assertEqual(n3, 1)
+        self.assertIn("200.0,cfb,m3", text3)

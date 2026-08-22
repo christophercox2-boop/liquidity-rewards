@@ -146,6 +146,49 @@ def load_history() -> dict[str, float]:
         return {}, {}, {}
 
 
+FILLS_CSV_HEADER = ("ts,family,market,side,qty,px,purpose,est_day,"
+                    "rested_h,fair,band_lo,band_hi,conf,touch_bid,"
+                    "touch_ask,conc,pos_after,why\n")
+
+
+def fills_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
+    """Append-only fills archive (owner, 2026-08-22: 'bound it much
+    higher — write to GitHub'). `rows` are (ts, family, journal-row)
+    tuples; returns (new file text, rows added). Fills from the same
+    cycle share a timestamp, so dedup is by the whole line, not ts."""
+    def s(x):
+        if x is None:
+            return ""
+        return f"{x:g}" if isinstance(x, (int, float)) else str(x)
+    text = existing if existing else FILLS_CSV_HEADER
+    tail = set(text.rstrip().split("\n")[-400:])
+    last = 0.0
+    body = text.rstrip().rsplit("\n", 1)[-1]
+    try:
+        last = float(body.split(",", 1)[0])
+    except Exception:
+        last = 0.0
+    added = 0
+    for ts, fam, r in sorted(rows, key=lambda x: x[0]):
+        if ts < last - 0.05:
+            continue
+        band = r.get("band") or [None, None]
+        why = str(r.get("why") or "").replace(",", ";").replace("\n", " ")[:80]
+        line = ",".join([
+            f"{ts:.1f}", fam, s(r.get("market")), s(r.get("side")),
+            s(r.get("qty")), s(r.get("px")), s(r.get("purpose")),
+            s(r.get("est_day")), s(r.get("rested_h")), s(r.get("fair")),
+            s(band[0]), s(band[1]), s(r.get("conf")),
+            s(r.get("touch_bid")), s(r.get("touch_ask")),
+            s(r.get("conc")), s(r.get("pos_after")), why])
+        if line in tail:
+            continue
+        text += line + "\n"
+        tail.add(line)
+        added += 1
+    return text, added
+
+
 def card_net(card: dict) -> float:
     """The card's bottom line, same math the page shows: realized plus
     rewards earned resting, plus (for open lots) the conservative mark
@@ -756,6 +799,18 @@ class Monitor:
                              "Update rewards.csv [skip ci]")
         except Exception as e:  # noqa: BLE001
             self._note(f"rewards.csv publish: {e}")
+        try:
+            frows = [(r.get("ts", 0.0), tag, r)
+                     for tag, fam in self.families.items()
+                     for r in fam.fills]
+            if frows:
+                existing, sha = self._gh_file("data/fills.csv")
+                text, added = fills_csv_append(existing, frows)
+                if added:
+                    self._gh_put("data/fills.csv", text, sha,
+                                 f"fills archive: +{added} rows [skip ci]")
+        except Exception as e:  # noqa: BLE001
+            self._note(f"fills.csv publish: {e}")
         try:
             for path, text in (("data/silver_gov_races.csv",
                                 getattr(self.silver, "gov_raw", "")),
