@@ -2343,6 +2343,10 @@ class Family:
                                          for o in self.orders.values()
                                          if o.purpose == "sell"), 2)
         summary["spent"] = round(self.family_spent(), 2)
+        if self.cfg.proven_usd > 0:
+            summary["proven_spent"] = round(self.proven_spent(), 2)
+            summary["proven_usd"] = self.cfg.proven_usd
+            summary["proven_n"] = len(self.proven)
         summary["holdings_usd"] = round(self.holdings_value(), 2)
         summary["holdings_counted"] = bool(self.cfg.holdings_in_ceiling)
         summary["capital_usd"] = self.cfg.capital_usd
