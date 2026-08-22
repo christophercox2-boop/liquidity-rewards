@@ -250,10 +250,16 @@ class TestExitProtection(unittest.TestCase):
         rec = r.fam.orders["cover"]
         self.assertEqual(rec.purpose, "sell")
         self.assertEqual(r.fam.family_spent(), 0.0)   # exits never block the ceiling
-        # and maintenance never touches it, however long it sits
+        # since 2026-08-22 maintenance MAY move it: the evidence band
+        # says the short is deep underwater, so the cover walks up into
+        # fillable range — but it stays an exit and never blocks spend
         r.cycle(advance=8000.0)
-        self.assertIn("cover", r.fam.orders)
-        self.assertEqual(r.fam.orders["cover"].price, 0.01)
+        r.cycle(advance=8000.0)   # move, then re-rest on the next pass
+        covers = [o for o in r.fam.orders.values()
+                  if o.market == A and o.purpose == "sell"
+                  and o.side == "BUY"]
+        self.assertTrue(covers)
+        self.assertEqual(r.fam.family_spent(), 0.0)
 
     def test_short_gets_covered_at_touch_under_break_even(self):
         from v3.tests.test_family import Rig, A
@@ -1667,3 +1673,57 @@ class TestLiteFeed(unittest.TestCase):
         self.assertAlmostEqual(out["est_alt"], ours / denom * sp, places=3)
         self.assertEqual(out["raw_ask"], 0.15)   # raw touch differs
         self.assertEqual(out["ba"], 0.99)        # from the declared one
+
+
+class TestStrandedExits(unittest.TestCase):
+    def test_dust_position_walks_away_at_the_touch(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(
+            bids=((0.04, 185.0), (0.02, 83300.0)),
+            asks=((0.05, 965.0), (0.18, 50.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.fam.inventory[A] = {"qty": 1.0, "cost": 0.13}
+        r.positions[A] = (1.0, 0.13)
+        r.cycle()
+        exits = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "sell"
+                 and o.side == "SELL"]
+        self.assertTrue(exits)
+        self.assertLessEqual(exits[0].price, 0.06)   # not 14c forever
+
+    def test_collapsed_basis_cover_rests_at_the_band(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(
+            bids=((0.02, 47600.0), (0.01, 23600.0)),
+            asks=((0.09, 549.0), (0.13, 12500.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.fam.inventory[A] = {"qty": -2.0, "cost": 0.06}   # degenerate sign
+        r.positions[A] = (-2.0, 0.06)
+        r.cycle()
+        covers = [o for o in r.fam.orders.values()
+                  if o.market == A and o.purpose == "sell"
+                  and o.side == "BUY"]
+        self.assertTrue(covers)                       # no longer blocked
+        self.assertLessEqual(covers[0].price, 0.09)
+
+    def test_band_justifies_selling_under_water(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(
+            bids=((0.03, 50000.0),),
+            asks=((0.04, 40000.0), (0.99, 20000.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.fam.inventory[A] = {"qty": 25.0, "cost": 3.50}   # 14c basis
+        r.positions[A] = (25.0, 3.50)
+        r.cycle()
+        exits = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "sell"
+                 and o.side == "SELL"]
+        self.assertTrue(exits)
+        self.assertLess(exits[0].price, 0.14)   # below break-even, band-backed
+        self.assertGreaterEqual(exits[0].price, 0.02)

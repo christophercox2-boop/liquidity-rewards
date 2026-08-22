@@ -1832,14 +1832,15 @@ class Family:
         if side == "SELL":
             break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
             floor_px, _sb = self._exit_floor(slug, "SELL", break_even,
-                                             book.tick)
+                                             book.tick, book=book, qty=qty)
             lo = max(floor_px,
                      (book.bids[0][0] + book.tick) if book.bids else 0.002)
             hi = max((book.asks[0][0] if book.asks
                       else break_even + book.tick), lo)
         else:
             received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
-            cap_px, _sb = self._exit_floor(slug, "BUY", received, book.tick)
+            cap_px, _sb = self._exit_floor(slug, "BUY", received, book.tick,
+                                           book=book, qty=-qty)
             hi = min(cap_px,
                      (book.asks[0][0] - book.tick) if book.asks
                      else cap_px)
@@ -1868,19 +1869,44 @@ class Family:
                       note=f"a slot at {best:.2f} earns more — moving")
 
     def _exit_floor(self, slug: str, side: str, basis: float,
-                    tick: float) -> tuple[float, float]:
+                    tick: float, book=None,
+                    qty: float | None = None) -> tuple[float, float]:
         """(price limit, scoring basis) for an exit. Break-even bounds it
         by default. When the model prices the market and says holding to
         resolution loses MORE than closing near fair, the limit extends
-        to fair — a loss-cutting exit, allowed on the owner's word
-        (2026-08-21, the Massachusetts short). The scoring basis moves to
-        fair with it, so the slot scorer sees the true gain of closing."""
+        to fair (owner, 2026-08-21, the Massachusetts short). With no
+        model, the EVIDENCE BAND's conservative edge does the same job —
+        sell no lower than the band's top, cover no higher than its
+        bottom (owner, 2026-08-22: stranded exits must be able to fill).
+        And a position worth under 50 cents in total may walk away at
+        the touch — the argument is smaller than the tick."""
         fair = self.fairs(slug) if self.fairs is not None else None
+        if fair is None and book is not None:
+            try:
+                band = self._band(slug, book.bids, book.asks, book.tick)
+            except Exception:  # noqa: BLE001
+                band = None
+            if band:
+                edge = band.get("hi") if side == "SELL" else band.get("lo")
+                if edge is not None:
+                    fair = edge / 100.0
+        dust = False
+        if qty is not None and book is not None:
+            if side == "SELL" and book.bids:
+                dust = qty * book.bids[0][0] < 0.50
+            elif side == "BUY" and book.asks:
+                dust = qty * (1.0 - book.asks[0][0]) < 0.50
         if side == "SELL":
+            if dust and book is not None and book.bids:
+                fl = round(book.bids[0][0] + tick, 3)
+                return fl, min(basis, fl)
             if fair is not None and fair < basis:
                 fl = max(fair, 0.002)
                 return fl, fl
             return basis + tick, basis
+        if dust and book is not None and book.asks:
+            cp = round(book.asks[0][0] - tick, 3)
+            return cp, max(basis, cp)
         if fair is not None and fair > basis:
             cp = min(fair, 0.998)
             return cp, cp
@@ -1993,12 +2019,29 @@ class Family:
                     continue
                 break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
                 floor_px, score_basis = self._exit_floor(
-                    slug, "SELL", break_even, book.tick)
+                    slug, "SELL", break_even, book.tick, book=book, qty=qty)
                 ask_touch = (book.asks[0][0] if book.asks
                              else break_even + book.tick)
                 lo = max(floor_px,
                          (book.bids[0][0] + book.tick) if book.bids
                          else 0.002)
+                bound = max(ask_touch, floor_px) + 2 * book.tick
+                stray = [o for o in mine if o.price > bound + 1e-9
+                         and o.id in self.orders]
+                if stray:
+                    worst = max(stray, key=lambda o: o.price)
+                    rr = self.desk.cancel(worst.id, worst.market)
+                    if rr.ok:
+                        self.orders.pop(worst.id, None)
+                        self.evidence.order_gone(worst.market, worst.id)
+                        self._log(event="stranded_exit_repriced",
+                                  market=slug, price=worst.price,
+                                  qty=worst.qty,
+                                  note="past the touch and the allowed "
+                                       "bound — re-resting where it can "
+                                       "fill (owner, 2026-08-22)")
+                        actions -= 1
+                    continue
                 px = self._best_exit_px(slug, "SELL", book, lo,
                                         max(ask_touch, lo), rest,
                                         basis=score_basis)
@@ -2024,12 +2067,29 @@ class Family:
                     continue
                 received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
                 cap_px, score_basis = self._exit_floor(
-                    slug, "BUY", received, book.tick)
+                    slug, "BUY", received, book.tick, book=book, qty=-qty)
                 bid_touch = (book.bids[0][0] if book.bids
                              else received - book.tick)
                 hi = min(cap_px,
                          (book.asks[0][0] - book.tick) if book.asks
                          else cap_px)
+                bound = min(bid_touch, cap_px) - 2 * book.tick
+                stray = [o for o in mine if o.price < bound - 1e-9
+                         and o.id in self.orders]
+                if stray:
+                    worst = min(stray, key=lambda o: o.price)
+                    rr = self.desk.cancel(worst.id, worst.market)
+                    if rr.ok:
+                        self.orders.pop(worst.id, None)
+                        self.evidence.order_gone(worst.market, worst.id)
+                        self._log(event="stranded_exit_repriced",
+                                  market=slug, price=worst.price,
+                                  qty=worst.qty,
+                                  note="past the touch and the allowed "
+                                       "bound — re-resting where it can "
+                                       "fill (owner, 2026-08-22)")
+                        actions -= 1
+                    continue
                 px = self._best_exit_px(slug, "BUY", book,
                                         min(bid_touch, hi), hi, rest,
                                         basis=score_basis)
