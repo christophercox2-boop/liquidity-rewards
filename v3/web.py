@@ -174,10 +174,35 @@ function load(){
   if(!d)return;
   window._d=d;
   document.getElementById('login').style.display='none';
+  // reading protection (owner, 2026-08-22): while you are scrolled into
+  // the page, refreshes HOLD — the data keeps arriving, but the page
+  // only redraws when you are back near the top, so lists stay put and
+  // your place is never lost
+  if(window._loaded&&(window.scrollY||0)>120){
+   window._held=true;
+   var hb=document.getElementById('heldnote');
+   if(!hb){hb=document.createElement('div');hb.id='heldnote';
+    hb.style.cssText='position:fixed;bottom:10px;right:10px;background:rgba(0,0,0,0.55);color:#cfe3cf;padding:4px 10px;border-radius:8px;font-size:11px;z-index:9';
+    hb.textContent='refresh held while you read \\u2014 scroll up to update';
+    document.body.appendChild(hb);}
+   return;
+  }
+  var hb2=document.getElementById('heldnote');if(hb2)hb2.remove();
+  window._held=false;
+  var y=window.scrollY||0;
   document.getElementById('view').innerHTML=render(d);
- }).catch(function(){document.getElementById('view').innerHTML='<div class="card bad">unreachable</div>';});
+  if(y>0)window.scrollTo(0,y);
+  window._loaded=true;
+ }).catch(function(){if(!window._held)document.getElementById('view').innerHTML='<div class="card bad">unreachable</div>';});
 }
 load();setInterval(load,30000);
+if(window.addEventListener)window.addEventListener('scroll',function(){
+ if(window._held&&(window.scrollY||0)<=120&&window._d){
+  window._held=false;
+  var hb=document.getElementById('heldnote');if(hb)hb.remove();
+  document.getElementById('view').innerHTML=render(window._d);
+ }
+});
 """
 
 
