@@ -1603,7 +1603,7 @@ class TestCapitalInTheEv(unittest.TestCase):
             if held:
                 r.fam.inventory[A] = {"qty": held, "cost": held * 0.5}
                 r.positions[A] = (held, held * 0.5)
-            r.fam._exit_opportunity_rate = lambda: 0.10
+            r.fam._capital_charge_rate = lambda slug: 0.10
             lad = []
             b = r.cache.fresh(A, 3600, r.now)
             p, _ = r.fam._prog_row(A)
@@ -1612,10 +1612,9 @@ class TestCapitalInTheEv(unittest.TestCase):
             rows[held] = {(w["px"], w["qty"]): w["ev"] for w in lad}
         shared = [k for k in rows[500.0] if k in rows[0.0]]
         self.assertTrue(shared)
-        # with slack in the ceiling the tie charge is ~0 (scarcity-scaled,
-        # owner 2026-08-22), so the release credit is what differentiates:
-        # holding stock must never score worse, and must score better
-        # wherever the row is alive enough to round above zero
+        # earners get NOTHING for freeing capital (owner, 2026-08-22) —
+        # the only remaining difference is the collateral fact: selling
+        # held stock ties nothing, a naked short pays the charge
         self.assertTrue(all(rows[500.0][k] >= rows[0.0][k] for k in shared))
         self.assertTrue(any(rows[500.0][k] > rows[0.0][k] for k in shared))
 

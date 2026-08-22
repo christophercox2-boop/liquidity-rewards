@@ -804,20 +804,19 @@ class Family:
                         if j1.qualifies and j1.in_window:
                             est1 += j1.share * side_pool
                     cann = max(est0 - est1, 0.0)
-                # capital is charged AND credited (owner, 2026-08-21):
                 # collateral tied while resting costs the marginal-cent
-                # rate; capital a fill RELEASES earns it back over the
-                # measured redeploy horizon
+                # rate, scarcity-scaled. Freed capital counts ONLY in the
+                # exit scorer — an earner gets NOTHING for freeing
+                # capital (owner, 2026-08-22). Selling stock we already
+                # hold still ties no new collateral; that is a fact, not
+                # a credit.
                 if side == "BUY":
-                    covers = max(min(qty, -inv_net), 0.0)
                     tie = px * qty
-                    freed = (1.0 - px) * covers
                 else:
                     sells = max(min(qty, inv_net), 0.0)
                     tie = (1.0 - px) * (qty - sells)
-                    freed = px * sells
                 ev = ((est - cann) * sf - pf * fcost * qty
-                      - tie * r_tie + pf * freed * r_day * d_off)
+                      - tie * r_tie)
                 k = k_px
                 kf = round(abs(px - touch) / tick)
                 row = {"side": side, "px": px, "qty": qty,
