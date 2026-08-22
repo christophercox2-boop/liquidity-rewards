@@ -228,7 +228,7 @@ function render(d){
  else if(m.on&&fl.acked){out+='<div class="ok" style="margin-top:6px">3.0 has the floor \\u2014 1.0 and 2.0 automation is standing down.</div>';}
  var fz=(d.flatten||{});
  if(fz.active&&fz.phase!=='rebuild'){out+='<div class="warn" style="margin-top:6px">FLATTEN: cancelling every order that isn\\u2019t an exit \\u2014 '+(fz.cancelled_total||0)+' cancelled, '+(fz.kept_exits||0)+' exits kept, '+(fz.remaining||0)+' to go. Nothing that costs money will be placed.</div>';}
- else if(fz.active){out+='<div class="ok" style="margin-top:6px">Flat \\u2014 '+(fz.kept_exits||0)+' exits resting and earning. Rebuilding politics under the $100 ceiling, best-paying markets first.</div>';}
+ else if(fz.active&&!fz.done){out+='<div class="ok" style="margin-top:6px">Flat \\u2014 '+(fz.kept_exits||0)+' exits resting and earning. Rebuilding under the family ceilings, best-paying markets first.</div>';}
  out+='<div class="hint">Nothing places orders unless the master switch AND that family\\u2019s own switch are on. Master ON hands ALL automation to 3.0: 1.0 and 2.0 halt first, then 3.0 takes over their resting orders and runs them under its own rules. Master OFF hands it back. Flips happen on the switch page, never here.</div></div>';
  fams(d).forEach(function(kv){
   var k=kv[0],s=kv[1];
@@ -245,7 +245,7 @@ function render(d){
    +'</div>';
   var cap=s.capital_usd||0,sp=s.spent||0;
   out+='<div class="mtrack"><div class="mfill" style="width:'+Math.min(100,cap?100*sp/cap:0)+'%"></div></div>'
-   +'<div class="muted">'+usd(sp)+' of the '+usd(cap)+' risk ceiling is on the book \\u2014 the one number that binds.</div>';
+   +'<div class="muted">'+usd(sp)+' of the '+usd(cap)+' search ceiling is on the book.'+(s.proven_usd?' Proven markets ('+(s.proven_n||0)+') hold '+usd(s.proven_spent||0)+' more under their own '+usd(s.proven_usd)+' cap.':'')+'</div>';
   if(s.stock_day){out+='<div class="sub">Stock waiting to sell is earning '+usd(s.stock_day)+'/day while it waits.</div>';}
   var inv=s.inventory||{};var invn=Object.keys(inv).length;
   if(invn){out+='<div class="muted">'+invn+' position'+(invn>1?'s':'')+' held from fills \\u2014 see orders page.</div>';}
