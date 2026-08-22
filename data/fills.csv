@@ -140,3 +140,8 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787407529.4,cfb,aachc-cfb-wins-2026-11-28-minnst-8pt5wins,BUY,0.5,0.44,earn,1.1468,0.66,,,,0,,,,0.5,joins the touch — the book has been quiet
 1787408489.4,politics,usgubewc-usgub-al-2026-11-03-rep,SELL,0.98,0.89,earn,6.25,9.22,0.985125,87,93,0,0.86,0.89,0.0951,-0.98,joins the touch — the book has been quiet
 1787409389.4,cfb,aachc-cfb-wins-2026-11-28-pur-4pt5wins,SELL,1,0.33,sell,0.0486,9.44,,33,42,0.34,0.32,0.33,0.04,0,selling filled stock — it earns while it waits
+1787411189.4,politics,enwc-uspres-nom-dem-2028-petbut,BUY,1,0.13,earn,4.6583,0.03,,19,23,0.868,0.06,0.18,-0.08,2,7 ticks in front of the touch — closer to the midpoint; ~99.3% of the bid side
+1787412149.4,politics,enwc-usgubp-ma-2026-09-01-rep-micmin,SELL,50,0.94,earn,1.7358,0.02,0.000625,89,93,0.389,0.92,0.98,-0.9394,-99.99,1 tick behind the touch; ~27.8% of the ask side
+1787412389.4,politics,usgubewc-usgub-il-2026-11-03-dem,BUY,5,0.98,earn,6.25,1.28,0.998575,94,99,0,0.91,0.98,-0.0186,5,2 ticks in front of the touch — closer to the midpoint; ~77.5% of the bid side
+1787413109.4,politics,enwc-usgubp-ri-2026-09-09-dem-danmck,BUY,1,0.16,earn,4.1496,0.02,,6,11,0.748,0.15,0.19,0.07,-16,1 tick in front of the touch — closer to the midpoint; ~99.6% of the bid side
+1787413289.4,politics,enwc-uspres-nom-dem-2028-andbes,SELL,2,0.07,earn,2.8732,0.02,,5,11,0.299,0.06,0.1,0.01,38,3 ticks in front of the touch — closer to the midpoint; ~48.8% of the ask side
