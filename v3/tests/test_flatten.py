@@ -1831,3 +1831,40 @@ class TestVerdictCarriesTheBook(unittest.TestCase):
         if t["in"]:
             self.assertTrue(t["picks"])
             self.assertIn("ev", t["picks"][0])
+
+
+class TestExitsJoinTheTouch(unittest.TestCase):
+    def test_profitable_exit_rests_at_the_ask_touch(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(
+            bids=((0.42, 500.0), (0.40, 900.0)),
+            asks=((0.45, 800.0), (0.50, 900.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 3.00}   # 30c basis
+        r.positions[A] = (10.0, 3.00)
+        r.cycle()
+        exits = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "sell"
+                 and o.side == "SELL"]
+        self.assertTrue(exits)
+        self.assertAlmostEqual(exits[0].price, 0.45)   # the front, not behind
+
+    def test_touch_far_under_the_model_is_not_joined(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(
+            bids=((0.42, 500.0), (0.40, 900.0)),
+            asks=((0.45, 800.0), (0.50, 900.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.fam.fairs = lambda s: 0.60                   # touch is a giveaway
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 3.00}
+        r.positions[A] = (10.0, 3.00)
+        r.cycle()
+        exits = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "sell"
+                 and o.side == "SELL"]
+        self.assertTrue(exits)
+        self.assertAlmostEqual(exits[0].price, 0.59)   # just under fair

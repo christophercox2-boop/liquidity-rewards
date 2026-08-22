@@ -611,11 +611,12 @@ class TestOwnerCorrections0821b(unittest.TestCase):
         exits = [o for o in r.fam.orders.values() if o.purpose == "sell"]
         self.assertTrue(exits)
         e = exits[0]
-        self.assertLess(e.price, 0.97)          # off the crowded touch
+        # doctrine change 2026-08-22 ("sell more aggressively"): the exit
+        # JOINS the crowded touch — fill speed beats slot earnings now
+        self.assertAlmostEqual(e.price, 0.97)
         self.assertGreaterEqual(e.price, 0.93)  # still a profit
-        self.assertGreater(e.est_day if e.est_day else 1.0, 0.0)
 
-    def test_lone_misplaced_exit_moves_to_the_better_slot(self):
+    def test_lone_misplaced_exit_moves_to_the_front(self):
         from v3.tests.test_family import A
         from v3.family import FamilyOrder
         from v3.scoring import Book
@@ -626,16 +627,19 @@ class TestOwnerCorrections0821b(unittest.TestCase):
         r.add_market(A, book=book)
         r.fam.inventory[A] = {"qty": 10.0, "cost": 9.2}
         r.positions[A] = (10.0, 9.2)
-        rec = FamilyOrder(id="OLD", market=A, side="SELL", price=0.97,
+        rec = FamilyOrder(id="OLD", market=A, side="SELL", price=0.99,
                           qty=10.0, intent="ORDER_INTENT_SELL_LONG",
                           placed_ts=0.0, purpose="sell", live_est=0.01)
         r.fam.orders["OLD"] = rec
         r.exchange.live["OLD"] = {"id": "OLD", "market": A, "side": "SELL",
-                                  "price": 0.97, "size": 10.0}
-        r.cycle()
+                                  "price": 0.99, "size": 10.0}
+        r.cycle(advance=700.0)
+        r.cycle(advance=700.0)   # move, then re-rest at the front
         exits = [o for o in r.fam.orders.values() if o.purpose == "sell"]
         self.assertTrue(exits)
-        self.assertTrue(all(o.price < 0.97 for o in exits))  # moved down
+        # doctrine change 2026-08-22: parked behind at 99c, it comes IN
+        # to the 97c touch where it can actually fill
+        self.assertTrue(all(o.price <= 0.97 + 1e-9 for o in exits))
 
 
 class TestIgnorancePremium(unittest.TestCase):

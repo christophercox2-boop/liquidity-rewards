@@ -1863,8 +1863,15 @@ class Family:
                                              book.tick, book=book, qty=qty)
             lo = max(floor_px,
                      (book.bids[0][0] + book.tick) if book.bids else 0.002)
-            hi = max((book.asks[0][0] if book.asks
-                      else break_even + book.tick), lo)
+            # 2026-08-22: the target IS the front of the profitable
+            # range — join the ask touch unless it gives away against
+            # the model
+            fair_m2 = self.fairs(slug) if self.fairs is not None else None
+            jp = (book.asks[0][0] if book.asks
+                  else break_even + book.tick)
+            if fair_m2 is not None and jp < fair_m2 - 3 * book.tick:
+                jp = fair_m2 - book.tick
+            hi = max(min(jp, 0.999), lo)
         else:
             received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
             cap_px, _sb = self._exit_floor(slug, "BUY", received, book.tick,
@@ -1873,7 +1880,8 @@ class Family:
                      (book.asks[0][0] - book.tick) if book.asks
                      else cap_px)
             lo = min((book.bids[0][0] if book.bids else hi), hi)
-        best = self._best_exit_px(slug, side, book, lo, hi, rec.qty)
+        best = (hi if side == "SELL"
+                else self._best_exit_px(slug, side, book, lo, hi, rec.qty))
         if best is None or abs(best - rec.price) < book.tick / 2:
             return
         prog, _w = self._prog_row(slug)
@@ -1886,8 +1894,10 @@ class Family:
         best_est = (j.share * side_pool
                     if j.qualifies and j.in_window else 0.0)
         cur_est = rec.live_est or 0.0
-        if best_est < cur_est * 1.5 + 0.05:
-            return                      # not clearly better — stay put
+        if side != "SELL" and best_est < cur_est * 1.5 + 0.05:
+            return                      # covers: move only when clearly better
+        # stock sells always come to the front (owner, 2026-08-22:
+        # "sell more aggressively") — the cooldown throttles the churn
         r = self.desk.cancel(rec.id, rec.market)
         if r.ok:
             self.orders.pop(rec.id, None)
@@ -2085,9 +2095,14 @@ class Family:
                                        "fill (owner, 2026-08-22)")
                         actions -= 1
                     continue
-                px = self._best_exit_px(slug, "SELL", book, lo,
-                                        max(ask_touch, lo), rest,
-                                        basis=score_basis)
+                # sell at the FRONT of the profitable range (owner,
+                # 2026-08-22): join the ask touch — unless the touch is
+                # a giveaway against the model, then rest just under fair
+                fair_g = self.fairs(slug) if self.fairs is not None else None
+                join_px = ask_touch
+                if fair_g is not None and join_px < fair_g - 3 * book.tick:
+                    join_px = fair_g - book.tick
+                px = max(lo, min(join_px, 0.999))
                 px = min(max(px, 0.002), 0.999)
                 side, intent, rest_qty = "SELL", SELL_LONG, rest
                 why = "selling filled stock — it earns while it waits"
