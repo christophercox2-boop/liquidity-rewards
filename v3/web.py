@@ -492,11 +492,24 @@ function wCurve(rows,X,Y,color){
 }
 function wSnapT(tri,oursAt){
  var pickAt={};(tri.picks||[]).forEach(function(r){pickAt[r.s+(r.px*100).toFixed(1)]=r;});
- var sb=tri.book.b||[],sa=tri.book.a||[];
+ function wRows(arr,side,desc){
+  var out=arr.filter(function(x){
+   var k=side+(x[0]*100).toFixed(1);
+   return x[1]>=0.5||pickAt[k]||oursAt[k];   // dust hidden unless marked
+  });
+  (tri.picks||[]).forEach(function(r){
+   if(r.s!==side)return;
+   if(out.some(function(x){return Math.abs(x[0]-r.px)<0.0001;}))return;
+   out.push([r.px,r.q]);                     // decision rows in price order
+  });
+  out.sort(function(a,b){return desc?b[0]-a[0]:a[0]-b[0];});
+  return out;
+ }
+ var sb=wRows(tri.book.b||[],'BUY',true),sa=wRows(tri.book.a||[],'SELL',false);
  var age=Math.max(0,Math.round((Date.now()/1000-tri.ts)/60));
  var bt='<div class="muted" style="font-size:12px">the book as the engine saw it \u2014 '+(age<1?'moments':age+' min')+' ago \u00b7 \u25c9 marks the decision</div>';
  bt+='<table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
- var nrows=Math.min(Math.max(sb.length,sa.length),6);
+ var nrows=Math.min(Math.max(sb.length,sa.length),7);
  for(var i=0;i<nrows;i++){
   var bd=sb[i],ak=sa[i];
   var bm=bd?((pickAt['BUY'+(bd[0]*100).toFixed(1)]?' \u25c9':'')+(oursAt['BUY'+(bd[0]*100).toFixed(1)]?' \u25CF':'')):'';
@@ -504,12 +517,6 @@ function wSnapT(tri,oursAt){
   bt+='<tr><td class="r">'+(bd?fmtsz(bd[1]):'')+'</td><td class="r">'+(bd?pc(bd[0])+bm:'')+'</td>'
     +'<td>'+(ak?pc(ak[0])+am:'')+'</td><td>'+(ak?fmtsz(ak[1]):'')+'</td></tr>';
  }
- (tri.picks||[]).forEach(function(r){
-  var arr=r.s==='BUY'?sb:sa;
-  if(arr.some(function(x){return Math.abs(x[0]-r.px)<0.0001;}))return;
-  bt+='<tr><td class="r">'+(r.s==='BUY'?r.q:'')+'</td><td class="r">'+(r.s==='BUY'?pc(r.px)+' \u25c9':'')+'</td>'
-    +'<td>'+(r.s==='SELL'?pc(r.px)+' \u25c9':'')+'</td><td>'+(r.s==='SELL'?r.q:'')+'</td></tr>';
- });
  return bt+'</table>';
 }
 function wCard(name,slug,b,tri){
