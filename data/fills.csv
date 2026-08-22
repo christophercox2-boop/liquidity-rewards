@@ -152,3 +152,13 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787418708.0,cfb,aachc-cfb-wins-2026-11-28-txam-9pt5wins,SELL,1,0.15,sell,0,0.02,,39,46,0.382,0.14,0.15,0.28,0,selling filled stock — it earns while it waits
 1787420573.9,cfb,aachc-cfb-wins-2026-11-28-gtech-6pt5wins,BUY,0.5,0.58,earn,0.7998,0.7,,54,60,0,0.58,0.59,0.01,0.5,joins the touch — the book has been quiet
 1787420753.9,politics,ussewc-usse-ar-2026-11-03-dem,SELL,5.87,0.08,sell,1.1489,6.6,0.01805,8,13,0.382,0.07,0.08,-0.062,44.13,selling filled stock — it earns while it waits
+1787421233.2,politics,scc-senate-gop-2026-11-03-50,SELL,3,0.15,sell,0.1138,11.46,0.137575,13,19,0,0.14,0.15,-0.0124,0,selling filled stock — it earns while it waits
+1787421353.2,politics,usgubewc-usgub-ar-2026-11-03-dem,BUY,0.72,0.09,earn,4.8827,0.8,0.001975,7,12,0,0.09,0.1,0.088,0.72,joins the touch — the book has been quiet
+1787421413.2,politics,usgubewc-usgub-co-2026-11-03-rep,BUY,1,0.15,earn,6.25,22.13,0.0021,9,16,0,0.02,0.12,0.1479,1,joins the touch — the book has been quiet
+1787421713.2,politics,usgubewc-usgub-tn-2026-11-03-dem,BUY,1,0.13,earn,6.25,24.04,0.002325,8,15,0,0.01,0.13,0.1277,1,6 ticks in front of the touch — closer to the midpoint; ~99.8% of the bid side
+1787421773.2,politics,usgubewc-usgub-pa-2026-11-03-dem,SELL,1,0.89,earn,6.2499,3.04,0.99755,93,98,0,0.88,0.97,0.1075,-1,joins the touch — the book has been quiet
+1787421773.2,politics,usgubewc-usgub-ne-2026-11-03-rep,BUY,1,0.95,earn,6.2498,2.16,0.958775,94,98,0,0.88,0.98,-0.0088,10,joins the touch — the book has been quiet
+1787422373.2,cfb,aachc-cfb-wins-2026-11-28-ncar-4pt5wins,SELL,1,0.47,sell,1.6354,0.57,,47,56,0.325,0.44,0.47,0.05,0,selling filled stock — it earns while it waits
+1787422493.2,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,BUY,1,0.16,earn,4.089,0.02,0.008325,11,16,0.537,0.02,0.17,0.1517,1,3 ticks in front of the touch — closer to the midpoint; ~98.1% of the bid side
+1787422553.2,politics,usgubewc-usgub-md-2026-11-03-dem,BUY,1,0.98,sell,0.3676,0.2,0.99985,83,95,0.375,0.98,0.99,-0.0199,0,an exit — its fill reduces the position it sits on
+1787422973.2,politics,usgubewc-usgub-tn-2026-11-03-rep,SELL,1,0.92,earn,6.2363,0.2,0.997675,97,99,0,0.91,0.97,0.0777,-1,5 ticks in front of the touch — closer to the midpoint; ~99.4% of the ask side
