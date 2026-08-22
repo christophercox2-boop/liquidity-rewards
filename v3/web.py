@@ -489,6 +489,28 @@ function wCurve(rows,X,Y,color){
  });
  return s;
 }
+function wSnapT(tri,oursAt){
+ var pickAt={};(tri.picks||[]).forEach(function(r){pickAt[r.s+(r.px*100).toFixed(1)]=r;});
+ var sb=tri.book.b||[],sa=tri.book.a||[];
+ var age=Math.max(0,Math.round((Date.now()/1000-tri.ts)/60));
+ var bt='<div class="muted" style="font-size:12px">the book as the engine saw it \u2014 '+(age<1?'moments':age+' min')+' ago \u00b7 \u25c9 marks the decision</div>';
+ bt+='<table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
+ var nrows=Math.min(Math.max(sb.length,sa.length),6);
+ for(var i=0;i<nrows;i++){
+  var bd=sb[i],ak=sa[i];
+  var bm=bd?((pickAt['BUY'+(bd[0]*100).toFixed(1)]?' \u25c9':'')+(oursAt['BUY'+(bd[0]*100).toFixed(1)]?' \u25CF':'')):'';
+  var am=ak?((pickAt['SELL'+(ak[0]*100).toFixed(1)]?' \u25c9':'')+(oursAt['SELL'+(ak[0]*100).toFixed(1)]?' \u25CF':'')):'';
+  bt+='<tr><td class="r">'+(bd?fmtsz(bd[1]):'')+'</td><td class="r">'+(bd?pc(bd[0])+bm:'')+'</td>'
+    +'<td>'+(ak?pc(ak[0])+am:'')+'</td><td>'+(ak?fmtsz(ak[1]):'')+'</td></tr>';
+ }
+ (tri.picks||[]).forEach(function(r){
+  var arr=r.s==='BUY'?sb:sa;
+  if(arr.some(function(x){return Math.abs(x[0]-r.px)<0.0001;}))return;
+  bt+='<tr><td class="r">'+(r.s==='BUY'?r.q:'')+'</td><td class="r">'+(r.s==='BUY'?pc(r.px)+' \u25c9':'')+'</td>'
+    +'<td>'+(r.s==='SELL'?pc(r.px)+' \u25c9':'')+'</td><td>'+(r.s==='SELL'?r.q:'')+'</td></tr>';
+ });
+ return bt+'</table>';
+}
 function wCard(name,slug,b,tri){
  var lad=(b&&b.ladder)||{};var sides=lad.sides||{};
  var bids=(sides.BUY||{}).rows||[],asks=(sides.SELL||{}).rows||[];
@@ -497,7 +519,7 @@ function wCard(name,slug,b,tri){
  var head='<div style="font-size:22px;font-weight:700;line-height:1.2;margin:2px 0">'+esc(name)+'</div>'
   +'<div class="muted">'+esc(g)+(lad.pool_day!=null?' \u00b7 pool $'+lad.pool_day+'/day per side':'')+(lad.note?' \u00b7 '+esc(lad.note):'')+'</div>';
  if(tri&&tri.why)head+='<div class="muted" style="margin:2px 0">'+(tri['in']?'\u2705 worth budget':'\u25cb passed on')+' \u2014 '+esc(tri.why)+'</div>';
- if(!all.length)return head+'<div class="muted" style="padding:30px 0">no priced ladder \u2014 '+esc(lad.note||'nothing clears here')+'</div>';
+ if(!all.length)return head+((tri&&tri.book)?wSnapT(tri,{}):'')+'<div class="muted" style="padding:14px 0">no priced ladder \u2014 '+esc(lad.note||'nothing clears here')+'</div>';
  var W=340,H=210,PL=36,PB=26,PT=14,PR=10;
  var pxs=all.map(function(r){return r.px;});
  var x0=Math.max(Math.min.apply(null,pxs)-0.02,0),x1=Math.min(Math.max.apply(null,pxs)+0.02,1);
@@ -538,26 +560,39 @@ function wCard(name,slug,b,tri){
  });
  legend+=notes;
  var pkRows=all.filter(function(r){return r.picked;});
- var pk=pkRows.length?'<div style="font-size:16px;margin:6px 0"><b>Decision: '+pkRows.map(function(r){
+ var pk;
+ if(tri&&(tri.picks||[]).length){
+  pk='<div style="font-size:16px;margin:6px 0"><b>Decision: '+tri.picks.map(function(r){
+   return (r.s==='BUY'?'bid':'ask')+' '+r.q+' @ '+wFmtC(r.px)+' \u2192 $'+r.ev.toFixed(2)+'/day';
+  }).join(' \u00b7 ')+'</b><div class="muted" style="font-size:12px;font-weight:400">'+esc(tri.why||'')+'</div></div>';
+ }else if(pkRows.length){
+  pk='<div style="font-size:16px;margin:6px 0"><b>Decision: '+pkRows.map(function(r){
    return (bids.indexOf(r)>=0?'bid':'ask')+' '+r.qty+' @ '+wFmtC(r.px)+' \u2192 $'+r.ev.toFixed(2)+'/day, '+Math.round(r.p_fill*100)+'% fill odds';
-  }).join(' \u00b7 ')+'</b>'+pkRows.map(function(r){return r.why?'<div class="muted" style="font-size:12px;font-weight:400">'+esc(r.why)+'</div>':'';}).join('')+'</div>'
-  :'<div class="muted" style="margin:6px 0"><b>Decision:</b> nothing here clears the bar</div>';
+  }).join(' \u00b7 ')+'</b>'+pkRows.map(function(r){return r.why?'<div class="muted" style="font-size:12px;font-weight:400">'+esc(r.why)+'</div>':'';}).join('')+'</div>';
+ }else{
+  pk='<div class="muted" style="margin:6px 0"><b>Decision:</b> nothing here clears the bar</div>';
+ }
  var evs='';
  [['bids',bids],['asks',asks]].forEach(function(pr){
   var rs=pr[1].slice().sort(function(x,y){return y.ev-x.ev;}).slice(0,3);
   if(rs.length)evs+='<div class="muted" style="font-size:12px">best '+pr[0]+' by EV/day: '+rs.map(function(r2){return pc(r2.px)+' \u2192 $'+r2.ev.toFixed(2);}).join(' \u00b7 ')+'</div>';
  });
  var oursAt={};(b.ours||[]).forEach(function(o){oursAt[o.side+(o.price*100).toFixed(1)]=o;});
- var bt='<table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
- var nrows=Math.min(Math.max((b.bids||[]).length,(b.asks||[]).length),6);
- for(var i=0;i<nrows;i++){
-  var bd=(b.bids||[])[i],ak=(b.asks||[])[i];
-  var bm=bd&&oursAt['BUY'+(bd[0]*100).toFixed(1)]?' \u25CF':'';
-  var am=ak&&oursAt['SELL'+(ak[0]*100).toFixed(1)]?' \u25CF':'';
-  bt+='<tr><td class="r">'+(bd?fmtsz(bd[1]):'')+'</td><td class="r">'+(bd?pc(bd[0])+bm:'')+'</td>'
-    +'<td>'+(ak?pc(ak[0])+am:'')+'</td><td>'+(ak?fmtsz(ak[1]):'')+'</td></tr>';
+ var bt;
+ if(tri&&tri.book&&(tri.book.b||tri.book.a)){
+  bt=wSnapT(tri,oursAt);
+ }else{
+  bt='<table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
+  var nrows=Math.min(Math.max((b.bids||[]).length,(b.asks||[]).length),6);
+  for(var i=0;i<nrows;i++){
+   var bd=(b.bids||[])[i],ak=(b.asks||[])[i];
+   var bm=bd&&oursAt['BUY'+(bd[0]*100).toFixed(1)]?' \u25CF':'';
+   var am=ak&&oursAt['SELL'+(ak[0]*100).toFixed(1)]?' \u25CF':'';
+   bt+='<tr><td class="r">'+(bd?fmtsz(bd[1]):'')+'</td><td class="r">'+(bd?pc(bd[0])+bm:'')+'</td>'
+     +'<td>'+(ak?pc(ak[0])+am:'')+'</td><td>'+(ak?fmtsz(ak[1]):'')+'</td></tr>';
+  }
+  bt+='</table>';
  }
- bt+='</table>';
  var mine='';
  if((b.ours||[]).length){
   mine='<div style="margin:4px 0"><b>Where I am:</b> '+b.ours.map(function(o){

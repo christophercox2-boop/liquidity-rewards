@@ -1815,3 +1815,20 @@ class TestRestingTargetsShrink(unittest.TestCase):
                and o.purpose != "sell" and o.price >= 0.06
                and o.qty > 8.0]
         self.assertEqual(big, [])   # the 50-share target shrank or left
+
+
+class TestVerdictCarriesTheBook(unittest.TestCase):
+    def test_feed_entries_freeze_book_and_picks(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        self.assertTrue(r.fam.triage_feed)
+        t = r.fam.triage_feed[-1]
+        self.assertIn("book", t)
+        self.assertTrue(t["book"]["b"])          # bid levels captured
+        self.assertTrue(t["book"]["a"])          # ask levels captured
+        self.assertIn("picks", t)
+        if t["in"]:
+            self.assertTrue(t["picks"])
+            self.assertIn("ev", t["picks"][0])

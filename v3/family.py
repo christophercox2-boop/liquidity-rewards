@@ -2364,6 +2364,11 @@ class Family:
                 "plan": (f"{'bid' if top['side'] == 'BUY' else 'ask'} "
                          f"{top['qty']:g} @ {top['px'] * 100:.0f}c"
                          if top else None),
+                "book": {"b": [[p2, round(q2, 1)] for p2, q2 in book.bids[:6]],
+                         "a": [[p2, round(q2, 1)] for p2, q2 in book.asks[:6]]},
+                "picks": [{"s": p["side"], "px": p["px"], "q": p["qty"],
+                           "ev": round(p.get("ev", p["est"]), 2)}
+                          for p in plans[:2]],
                 "why": (plans[0]["why"][:60] if plans
                         else grow[0]["why"][:60] if grow
                         else (why or "")[:60])})
@@ -2403,6 +2408,13 @@ class Family:
                     "ev": round(best3, 2), "spread": spread3,
                     "pool": round(sp3, 2) if sp3 is not None else None,
                     "conf": round(conf3, 2),
+                    "book": {"b": [[p2, round(q2, 1)]
+                                   for p2, q2 in book3.bids[:6]],
+                             "a": [[p2, round(q2, 1)]
+                                   for p2, q2 in book3.asks[:6]]},
+                    "picks": [{"s": p["side"], "px": p["px"], "q": p["qty"],
+                               "ev": round(p.get("ev", p["est"]), 2)}
+                              for p in plans[:2]],
                     "why": (plans[0]["why"][:60] if plans
                             else grow[0]["why"][:60] if grow
                             else (why or "")[:60])})
