@@ -733,7 +733,7 @@ function render(d){
  };
  var out='<div style="margin:2px 0 8px 0">'+btn(900,'last 15 min')+btn(0,'all day')+'</div>';
  var now=Date.now()/1000;
- [['Politics','est_politics'],['College football','est_cfb'],['NFL','est_nfl']].forEach(function(p){
+ [['Politics','est_politics'],['College football','est_cfb'],['NFL','est_nfl'],['NBA','est_nba']].forEach(function(p){
   var e=d[p[1]]||{};
   var dots=e.dots||[];
   if(win)dots=dots.filter(function(x){return x[0]>=now-win;});

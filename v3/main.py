@@ -27,7 +27,7 @@ import threading
 import time
 from pathlib import Path
 
-from . import football, politics
+from . import basketball, football, politics
 from .alerts import Alerts
 from .api import ApiError, Client, GATEWAY
 from .books import BookCache
@@ -92,6 +92,7 @@ FAMILIES = {
     "politics": (politics.config, politics.discover),
     "cfb": (football.cfb, football.cfb_discover),
     "nfl": (football.nfl, football.nfl_discover),
+    "nba": (basketball.nba, basketball.nba_discover),
 }
 
 
@@ -299,7 +300,7 @@ class CacheRouter:
         self.families = families
 
     def put(self, slug: str, book) -> None:
-        for key in ("cfb", "nfl"):
+        for key in ("cfb", "nfl", "nba"):
             fam = self.families.get(key)
             if fam is not None and slug in fam.universe:
                 fam.cache.put(slug, book)
@@ -426,13 +427,13 @@ class Monitor:
                     seen.add(s)
                     out.append(s)
 
-        for key in ("politics", "cfb", "nfl"):
+        for key in ("politics", "cfb", "nfl", "nba"):
             fam = self.families.get(key)
             if fam is not None:
                 take(sorted(fam.active_markets() | set(fam.inventory)),
                      room=SUB_CAP)
         cands: list[tuple[float, str]] = []
-        for key in ("politics", "cfb", "nfl"):
+        for key in ("politics", "cfb", "nfl", "nba"):
             fam = self.families.get(key)
             if fam is None:
                 continue
@@ -1147,7 +1148,7 @@ class Monitor:
             if day_totals:
                 self.actuals_by_day = day_totals
         summaries = {}
-        fam_pct = {"politics": 25, "cfb": 78, "nfl": 90}
+        fam_pct = {"politics": 25, "cfb": 78, "nfl": 88, "nba": 92}
         for key, fam in self.families.items():
             self._stage(f"{fam.cfg.name}: discovering, reading terms, "
                         f"scoring books", fam_pct.get(key, 94))

@@ -2073,3 +2073,39 @@ class TestProfitableFillsDontPage(unittest.TestCase):
         self._fill(r, "BUY", 0.10, 5.0)
         self._fill(r, "SELL", 0.20, 8.0)        # closes 5, opens 3 short
         self.assertEqual(len(self._pages(r)), 2)
+
+
+class TestNbaFamily(unittest.TestCase):
+    """Owner, 2026-08-22: "Also add in NBA." Same posture as the NFL:
+    $50 all-in with holdings counted, behind the touch, capped dumps,
+    and its own switch that starts OFF."""
+
+    def test_config_mirrors_the_nfl(self):
+        from v3.basketball import nba
+        from v3.football import nfl
+        a, b = nba(), nfl()
+        for f in ("capital_usd", "per_market_usd", "holdings_in_ceiling",
+                  "dump_usd_day", "rest_style", "known_ground", "revive",
+                  "probe_usd", "grow_usd"):
+            self.assertEqual(getattr(a, f), getattr(b, f), f)
+        self.assertEqual(a.tag, "NBA")
+        # offseason: no game-day window until the owner sets one
+        self.assertIsNone(a.rest_from)
+
+    def test_discovery_keeps_only_nba_prefixes(self):
+        from v3.basketball import nba_discover
+        class C:
+            def events_by_tag(self, tag, max_pages=8):
+                if tag != "nba":
+                    return []
+                return [{"title": "NBA Champion 2027", "markets": [
+                    {"slug": "tec-nba-champ-2027-06-30-w-bos"},
+                    {"slug": "tec-nba-champ-2027-06-30-w-lal"},
+                    {"slug": "tec-wnba-champ-2026-w-lv"},      # not NBA
+                    {"slug": "aachc-cfb-wins-2026-osu-9pt5"},  # not NBA
+                ]}]
+        out = nba_discover(C())
+        self.assertEqual(sorted(out),
+                         ["tec-nba-champ-2027-06-30-w-bos",
+                          "tec-nba-champ-2027-06-30-w-lal"])
+        self.assertEqual(out["tec-nba-champ-2027-06-30-w-bos"]["event_n"], 2)

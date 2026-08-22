@@ -28,7 +28,7 @@ _SLUG_WORDS = (
     ("usp", "President"), ("usho", "House control"),
     ("usgovcc", "Governors count"), ("senate", "Senate"),
     ("midterms", "Midterms"),
-    ("cfb", "CFB win total"), ("nfl", "NFL"),
+    ("cfb", "CFB win total"), ("nfl", "NFL"), ("nba", "NBA"),
 )
 _STATES = {
     "al": "Alabama", "ak": "Alaska", "az": "Arizona", "ar": "Arkansas",
