@@ -1,0 +1,138 @@
+name: NBA tag survey
+
+# What does the exchange's events feed hold under the basketball tags?
+# v3 discovery filters by slug prefix, so the prefix list must come from
+# this data, never from a guess (the NFL list was built the same way).
+# Read-only: GET only, no auth.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/nba_tags.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nba-tag-survey
+  cancel-in-progress: false
+
+jobs:
+  survey:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Enumerate basketball-tagged events
+        run: |
+          pip install -q requests
+          python3 - <<'EOF'
+          import io, time, requests
+          from collections import defaultdict
+
+          GATEWAY = "https://gateway.polymarket.us"
+          TAGS = ("nba", "basketball", "nba-futures", "nba-champion")
+          BUF = io.StringIO(); _p = print
+          def print(*a, **k):
+              _p(*a, **k); _p(*a, **{**k, "file": BUF})
+
+          def events_by_tag(tag, max_pages=12):
+              out, offset = [], 0
+              for _ in range(max_pages):
+                  r = requests.get(GATEWAY + "/v1/events",
+                                   params={"tagSlug": tag, "active": "true",
+                                           "limit": 100, "offset": offset},
+                                   timeout=30)
+                  if r.status_code >= 400:
+                      print(f"tag {tag}: HTTP {r.status_code}")
+                      return out
+                  evs = r.json().get("events") or []
+                  out.extend(evs)
+                  if len(evs) < 100:
+                      break
+                  offset += 100
+                  time.sleep(0.3)
+              return out
+
+          # slug prefix = everything up to and including the sport token,
+          # e.g. tec-nba- ; fall back to the first two dash-tokens.
+          def prefix_of(slug):
+              parts = slug.split("-")
+              for i, p in enumerate(parts):
+                  if p in ("nba", "wnba", "cbb", "nfl", "cfb"):
+                      return "-".join(parts[:i + 1]) + "-"
+              return "-".join(parts[:2]) + "-"
+
+          seen = {}
+          by_prefix = defaultdict(list)
+          ev_of = {}
+          for tag in TAGS:
+              evs = events_by_tag(tag)
+              open_m = sum(1 for ev in evs for m in ev.get("markets") or []
+                           if m.get("slug") and not m.get("closed"))
+              print(f"tag '{tag}': {len(evs)} events, {open_m} open markets")
+              for ev in evs:
+                  title = str(ev.get("title") or ev.get("name") or "").strip()
+                  for m in ev.get("markets") or []:
+                      s = m.get("slug")
+                      if not s or m.get("closed") or s in seen:
+                          continue
+                      seen[s] = title
+                      by_prefix[prefix_of(s)].append(s)
+                      ev_of.setdefault(prefix_of(s), title)
+          print(f"\n{len(seen)} distinct open markets\n")
+
+          print(f"{'prefix':<28s} {'markets':>7s}  example / event")
+          for pfx in sorted(by_prefix, key=lambda p: -len(by_prefix[p])):
+              rows = by_prefix[pfx]
+              print(f"{pfx:<28s} {len(rows):>7d}  {rows[0][:52]}")
+              print(f"{'':<28s} {'':<7s}  ({ev_of.get(pfx, '')[:52]})")
+
+          # do these carry live reward programs? sample up to 40 per prefix
+          print("\nreward programs (sampled):")
+          for pfx in sorted(by_prefix, key=lambda p: -len(by_prefix[p])):
+              sample = by_prefix[pfx][:40]
+              live = 0
+              pools = set()
+              for i in range(0, len(sample), 40):
+                  r = requests.get(GATEWAY + "/v1/incentives",
+                                   params={"symbols": sample[i:i+40],
+                                           "pageSize": 100}, timeout=30)
+                  if r.status_code >= 400:
+                      continue
+                  for p in r.json().get("programs") or []:
+                      for tp in p.get("timePeriods") or []:
+                          if str(tp.get("status") or "").lower() in (
+                                  "active", "live", "status_live"):
+                              live += 1
+                              pools.add(float(tp.get("rewardPool") or 0))
+                  time.sleep(0.3)
+              print(f"  {pfx:<28s} {live:>3d} live of {len(sample)} sampled"
+                    f"   pools: {sorted(pools) if pools else 'none'}")
+
+          import os
+          os.makedirs("data", exist_ok=True)
+          with open("data/nba_tags.txt", "w") as f:
+              f.write(BUF.getvalue())
+          EOF
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/nba_tags.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "NBA tag survey [skip ci]"
+            pushed=""
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push; then pushed=yes; break; fi
+              echo "push race lost (attempt $attempt) — retrying"
+              sleep $((attempt * 3))
+            done
+            if [ -z "$pushed" ]; then echo "push failed after 5 attempts"; exit 1; fi
+          fi
