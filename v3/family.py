@@ -543,7 +543,7 @@ class Family:
                                                 exit_rate_ps=self._exit_rate_ps)
                 ev = (est * self.fillmodel.scoring_fraction(slug)
                       - pf_r * fc_r * qty
-                      - cost * self._exit_opportunity_rate())
+                      - cost * self._capital_charge_rate(slug))
                 if best is None or ev > best["ev"]:
                     best = {"side": side, "px": px, "qty": qty,
                             "share": round(j.share, 4), "est": round(est, 4),
@@ -710,6 +710,7 @@ class Family:
         sf = self.fillmodel.scoring_fraction(slug)
         exit_rate_ps = self._exit_rate_ps
         r_day = self._exit_opportunity_rate()
+        r_tie = self._capital_charge_rate(slug)
         d_off = self.fillmodel.expected_offload_days(slug)
         inv_net = (self.inventory.get(slug) or {}).get("qty", 0.0)
 
@@ -806,7 +807,7 @@ class Family:
                     tie = (1.0 - px) * (qty - sells)
                     freed = px * sells
                 ev = ((est - cann) * sf - pf * fcost * qty
-                      - tie * r_day + pf * freed * r_day * d_off)
+                      - tie * r_tie + pf * freed * r_day * d_off)
                 k = k_px
                 kf = round(abs(px - touch) / tick)
                 row = {"side": side, "px": px, "qty": qty,
@@ -1912,6 +1913,18 @@ class Family:
             return cp, cp
         return basis - tick, basis
 
+    def _capital_charge_rate(self, slug: str) -> float:
+        """The rate a candidate pays for tying capital up. Opportunity
+        cost only exists under scarcity (owner, 2026-08-22: "opportunity
+        cost is not a factor here" — the ceiling has slack): the
+        marginal-cent rate scaled by how full the relevant pool is."""
+        r = self._exit_opportunity_rate()
+        if slug in self.proven and self.cfg.proven_usd > 0:
+            util = self.proven_spent() / self.cfg.proven_usd
+        else:
+            util = self.family_spent() / max(self.cfg.capital_usd, 1e-9)
+        return r * min(max(util, 0.0), 1.0)
+
     def _exit_opportunity_rate(self) -> float:
         """$/day one freed cent could earn — the owner's definition
         (2026-08-21): "assume that we could use each cent gained from a
@@ -1925,7 +1938,10 @@ class Family:
                 continue
             risk = capital_at_risk(o.intent, o.price, o.qty)
             if risk > 0.005 and (o.live_est or 0.0) > 0:
-                rates.append((o.live_est or 0.0) / risk)
+                # cap what one order's claim may testify (owner,
+                # 2026-08-22: "realistically we can do no better than
+                # 2 dollars a day on one dollar worth of capital")
+                rates.append(min((o.live_est or 0.0) / risk, 2.0))
         if not rates:
             return 0.0
         rates.sort()
