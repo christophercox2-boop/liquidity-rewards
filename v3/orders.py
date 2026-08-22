@@ -105,7 +105,8 @@ class OrderDesk:
         return OrderResult(ok=False, note=f"refused: {note}")
 
     def _check(self, op: str, slug: str, side: str, price: float, qty: float,
-               initiator: str, intent: str | None = None) -> str | None:
+               initiator: str, intent: str | None = None,
+               taker: bool = False) -> str | None:
         """The rail checks shared by place and reprice. Returns a refusal
         reason or None. Order matters: cheap checks first, the book last."""
         if not self.whitelist(slug):
@@ -121,6 +122,17 @@ class OrderDesk:
         book = self.fresh_book(slug)
         if book is None:
             return f"no book fresher than {BOOK_MAX_AGE:g}s — refusing to place blind"
+        if taker:
+            # the ONE carved exception (owner, 2026-08-22): a SELL of
+            # held stock limited AT the bid crosses on purpose — but
+            # never below the bid, and never anything else
+            if side != "SELL" or intent != SELL_LONG:
+                return "taker orders may only be SELLs of held stock"
+            if book.bids and price < book.bids[0][0] - 1e-12:
+                return (f"taker ask {price * 100:g}c is below the bid "
+                        f"{book.bids[0][0] * 100:g}c — never worse than "
+                        f"the touch")
+            return None
         if side == "BUY":
             if book.asks and price >= book.asks[0][0] - 1e-12:
                 return (f"bid {price * 100:g}c would cross the best ask "
@@ -136,7 +148,7 @@ class OrderDesk:
     def place_resting(self, slug: str, side: str, price: float, qty: float, *,
                       net_position: float = 0.0, close_short: bool = False,
                       intent: str | None = None, initiator: str = "auto",
-                      verify: bool = True) -> OrderResult:
+                      verify: bool = True, taker: bool = False) -> OrderResult:
         """Place one post-only GTC resting order and (by default) confirm it
         rests. `side` is the BOOK side: BUY = bid, SELL = ask. The intent
         is derived from the position unless the caller pins it (a reprice
@@ -145,7 +157,7 @@ class OrderDesk:
         if intent is None:
             intent = intent_for(side, net_position, qty, close_short)
         reason = self._check("place", slug, side, price, qty, initiator,
-                             intent=intent)
+                             intent=intent, taker=taker)
         if reason:
             return self._refuse("place", slug, reason)
         if REST_SIDE[intent] != side:
@@ -158,7 +170,10 @@ class OrderDesk:
             "price": {"value": price_str(price), "currency": "USD"},
             "quantity": qty,
             "tif": GTC,
-            "participateDontInitiate": True,
+            # post-only everywhere, with ONE carved exception (owner,
+            # 2026-08-22): the taker dump, a SELL of held stock limited
+            # at the bid — see CLAUDE.md
+            "participateDontInitiate": not taker,
         }
         try:
             resp = self.client.post(TRADE_API + "/v1/orders", body, path="/v1/orders")

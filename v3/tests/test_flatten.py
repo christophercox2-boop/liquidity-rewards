@@ -1868,3 +1868,49 @@ class TestExitsJoinTheTouch(unittest.TestCase):
                  and o.side == "SELL"]
         self.assertTrue(exits)
         self.assertAlmostEqual(exits[0].price, 0.59)   # just under fair
+
+
+class TestTakerDump(unittest.TestCase):
+    def _rig(self, bids, asks, cost=3.00, qty=10.0):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.fam.cfg.dump_usd_day = 50.0
+        r.add_market(A, book=Book(bids=bids, asks=asks, tick=0.01,
+                                  fetched_at=1_000_000.0))
+        r.fam.inventory[A] = {"qty": qty, "cost": cost}
+        r.positions[A] = (qty, cost)
+        return r, A
+
+    def test_tight_spread_above_basis_dumps_into_the_bid(self):
+        r, A = self._rig(bids=((0.44, 50.0), (0.40, 900.0)),
+                         asks=((0.45, 800.0),))
+        r.cycle()
+        dumps = [e for e in r.fam.log if e.get("event") == "dump"]
+        self.assertTrue(dumps)
+        self.assertAlmostEqual(dumps[0]["price"], 0.44)  # at the bid, never worse
+        self.assertLessEqual(dumps[0]["qty"], 10.0)
+        self.assertGreater(r.fam.dump_today, 0.0)
+        live = [o for o in r.exchange.live.values()
+                if o["market"] == A and o["side"] == "SELL"
+                and abs(o["price"] - 0.44) < 1e-9]
+        self.assertTrue(live)                            # the crossing limit
+
+    def test_wide_spread_never_dumps(self):
+        r, A = self._rig(bids=((0.30, 500.0),), asks=((0.45, 800.0),))
+        r.cycle()
+        self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
+
+    def test_dump_never_exceeds_displayed_size_or_cap(self):
+        r, A = self._rig(bids=((0.44, 3.0), (0.40, 900.0)),
+                         asks=((0.45, 800.0),), qty=10.0)
+        r.cycle()
+        dumps = [e for e in r.fam.log if e.get("event") == "dump"]
+        self.assertTrue(dumps)
+        self.assertLessEqual(dumps[0]["qty"], 3.0)   # the bid's size, no deeper
+
+    def test_giveaway_against_the_model_never_dumps(self):
+        r, A = self._rig(bids=((0.44, 500.0),), asks=((0.45, 800.0),))
+        r.fam.fairs = lambda s: 0.60                 # bid is 16 ticks under fair
+        r.cycle()
+        self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])

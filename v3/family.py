@@ -170,6 +170,7 @@ class FamilyConfig:
     # every cycle — a market that stops accruing falls back in.
     graduate_paid_usd: float = 0.25   # avg PAID $/day over recent paid days
     graduate_days: int = 3            # paid days needed in the last 7 (stability)
+    dump_usd_day: float = 0.0         # taker-dump proceeds allowed per day (0 = off)
     proven_usd: float = 0.0           # 0 = graduation off
     reprice_gain_day: float = 0.06
     drift_share: float = 0.15
@@ -277,6 +278,7 @@ class Family:
         self._terms_rotor = 0
         self.earned_today = 0.0
         self.earned_day = ""
+        self.dump_today = 0.0                     # taker-dump proceeds today
         self.earned_history: list[list] = []      # [day, $] rolling
         self._last_accrual = 0.0
         self.silent_cancels = 0
@@ -2068,6 +2070,58 @@ class Family:
                 rest = qty - covered
                 if covered > qty + 0.01:
                     self._prune_excess_exits(slug, "SELL", covered - qty, now)
+                # THE CARVED EXCEPTION (owner, 2026-08-22 "Carve it"):
+                # the taker dump — a limit SELL of held stock priced AT
+                # the bid, never worse. Tight spread only, never past the
+                # bid's displayed size, never a giveaway against the
+                # model, exits cancelled first, capped per day.
+                if (self.cfg.dump_usd_day > 0 and actions > 0
+                        and book.bids and book.asks
+                        and self._cooldown_ok(slug, "SELL", now)
+                        and self.dump_today
+                        < self.cfg.dump_usd_day - 1e-9):
+                    be_d = min(max(inv.get("cost", 0.0) / qty, 0.001),
+                               0.989)
+                    fair_d = (self.fairs(slug)
+                              if self.fairs is not None else None)
+                    bid_t, bid_sz = book.bids[0]
+                    if (bid_t >= be_d + 2 * book.tick
+                            and book.asks[0][0] - bid_t
+                            <= 2 * book.tick + 1e-9
+                            and (fair_d is None
+                                 or bid_t >= fair_d - 3 * book.tick)):
+                        dq = min(qty, bid_sz,
+                                 (self.cfg.dump_usd_day
+                                  - self.dump_today)
+                                 / max(bid_t, 0.01))
+                        if self.cfg.whole_shares:
+                            dq = float(int(dq))
+                        dq = round(dq, 2)
+                        if dq >= (1.0 if self.cfg.whole_shares else 0.01):
+                            for o2 in [o2 for o2 in self.orders.values()
+                                       if o2.market == slug
+                                       and o2.purpose == "sell"
+                                       and o2.side == "SELL"]:
+                                rr = self.desk.cancel(o2.id, o2.market)
+                                if rr.ok:
+                                    self.orders.pop(o2.id, None)
+                                    self.evidence.order_gone(o2.market,
+                                                             o2.id)
+                            r2 = self.desk.place_resting(
+                                slug, "SELL", bid_t, dq,
+                                net_position=qty, intent=SELL_LONG,
+                                taker=True, verify=False)
+                            if r2.ok:
+                                self.dump_today = round(
+                                    self.dump_today + dq * bid_t, 2)
+                                self._log(event="dump", market=slug,
+                                          price=bid_t, qty=dq,
+                                          note="sold into the bid — "
+                                               "tight spread, above "
+                                               "basis")
+                                self._mark(slug, "SELL", now)
+                                actions -= 1
+                                continue
                 if rest < 0.01 or not self._cooldown_ok(slug, "SELL", now):
                     continue
                 break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
@@ -2446,6 +2500,7 @@ class Family:
         guess; owner: "If you miss a few seconds that is fine")."""
         day = _et_day(now)
         if self.earned_day and day != self.earned_day:
+            self.dump_today = 0.0
             self.earned_history.append([self.earned_day,
                                         round(self.earned_today, 2)])
             del self.earned_history[:-14]
@@ -2532,6 +2587,7 @@ class Family:
             "terms": self.terms.to_dict(),
             "earned_today": round(self.earned_today, 4),
             "earned_day": self.earned_day,
+            "dump_today": round(self.dump_today, 2),
             "earned_history": self.earned_history,
             "log": self.log[-self.cfg.log_keep:],
         }
@@ -2550,6 +2606,7 @@ class Family:
             self.fillmodel = FillModel.from_dict(d["fillmodel"])
         self.pending_marks = list(d.get("pending_marks") or [])
         self.fills = list(d.get("fills") or [])
+        self.dump_today = float(d.get("dump_today") or 0.0)
         if d.get("cfg_sig") == self._cfg_sig():
             self.scoreboard = dict(d.get("scoreboard") or {})
         else:

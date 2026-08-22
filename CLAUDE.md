@@ -37,6 +37,11 @@ long and accreted, so search it rather than reading it through.
   Never add automation that places orders without such a switch.
 - Order-touching endpoints keep: auth, X-Reprice CSRF header, known-market
   whitelist, 0.1–99.9c price bounds, post-only placement.
+  ONE carved exception (owner, 2026-08-22 "Carve it"): the taker dump —
+  a limit SELL of held stock priced AT the current bid (never worse),
+  only when the spread is ≤2 ticks, only up to the bid's displayed size,
+  never below model fair − 3 ticks, exits cancelled first, capped per
+  family per day (politics $50, cfb $10). Nothing else may cross.
 - Heavy or blocked-egress work (Silver CSV fetches, exchange surveys) runs
   as GitHub Actions workflows that commit results to data/*.txt — the owner
   reads the output files, not logs. Order-touching workflows trigger only

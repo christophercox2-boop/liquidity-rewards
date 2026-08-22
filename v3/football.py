@@ -70,6 +70,7 @@ def cfb() -> FamilyConfig:
         # $50 of risk in cfb, orders + holdings"
         capital_usd=50.0, per_market_usd=1.00,
         holdings_in_ceiling=True,
+        dump_usd_day=10.0,
         rest_from=(6, 6), rest_until=(3, 17),      # Sun 06:00 -> Thu 17:00 ET
         season_start=(2026, 8, 27),
         # 400+ live orders need real book coverage: the meter went blind
