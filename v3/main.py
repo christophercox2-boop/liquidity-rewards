@@ -1360,12 +1360,20 @@ class Monitor:
                                            # the list, still counted
                     continue
                 rows.append(card)
-        # open lots first, newest activity first within each group
-        rows.sort(key=lambda x: (
-            0 if (x.get("open_qty", 0) > 0.005
-                  and not x.get("stray_close")) else 1,
-            -x.get("last_ts", x["ts"])))
-        return {"ok": True, "fills": rows[:150],
+        # Cap each group SEPARATELY. A single rows[:150] after an
+        # open-first sort let 150 open cards eat the whole budget and
+        # the closed tab came up empty however many real round trips
+        # existed (owner, 2026-08-23: "I'm not seeing any").
+        def recent(x):
+            return -x.get("last_ts", x["ts"])
+        is_open = (lambda x: (x.get("open_qty", 0) > 0.005
+                              and not x.get("stray_close")))
+        opens = sorted([r for r in rows if is_open(r)], key=recent)[:120]
+        closes = sorted([r for r in rows if not is_open(r)],
+                        key=recent)[:120]
+        return {"ok": True, "fills": opens + closes,
+                "open_total": sum(1 for r in rows if is_open(r)),
+                "closed_total": sum(1 for r in rows if not is_open(r)),
                 "open_hidden": hidden_open,
                 "hidden_reconciled": hidden_recon,
                 "pending": self._pending_fills()}

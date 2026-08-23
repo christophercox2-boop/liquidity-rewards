@@ -949,7 +949,10 @@ function fDraw(){
   return '<button onclick="fTabSet('+t+')" style="font-size:15px;padding:8px 18px;margin-right:8px'+(on?';font-weight:bold;text-decoration:underline':'')+'">'+label+' <span style="opacity:0.7">'+n+'</span></button>';
  };
  var greens=j.open_hidden||0;
- var out='<div style="margin:2px 0 8px 0">'+btn(1,'open',open.length)+(greens?'<span style="color:#9ec49a;font-size:13px;margin-right:8px">+'+greens+' in profit</span>':'')+btn(0,'closed',closed.length+pend.length)+'</div>';
+ // counts are the TRUE totals, not the number that fit in the list
+ var nOpen=(j.open_total!=null?j.open_total:open.length);
+ var nClosed=(j.closed_total!=null?j.closed_total:closed.length)+pend.length;
+ var out='<div style="margin:2px 0 8px 0">'+btn(1,'open',nOpen)+(greens?'<span style="color:#9ec49a;font-size:13px;margin-right:8px">+'+greens+' in profit</span>':'')+btn(0,'closed',nClosed)+'</div>';
  var hr=j.hidden_reconciled||0;
  if(hr)out+='<div class="muted" style="margin:-4px 0 8px 0">'+hr+' more closed without a recorded sale \\u2014 hidden; the exchange\\u2019s record of them is in data/trades.csv</div>';
  var list=tab===1?open:closed;

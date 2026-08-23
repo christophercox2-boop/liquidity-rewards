@@ -2912,3 +2912,47 @@ class TestReconciliationCardsHidden(unittest.TestCase):
             for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
                 os.environ.pop(k, None)
             d.cleanup()
+
+
+class TestBothTabsGetCards(unittest.TestCase):
+    def test_many_open_cards_do_not_starve_the_closed_tab(self):
+        """Owner, 2026-08-23 ('I'm not seeing any'): a single cap after
+        an open-first sort let open cards eat the whole budget."""
+        import tempfile
+        import time as _time
+        from v3.main import Monitor
+        d = tempfile.TemporaryDirectory()
+        os.environ["V3_STATE_PATH"] = os.path.join(d.name, "s.json")
+        os.environ["V3_FLOOR_PATH"] = os.path.join(d.name, "f.json")
+        os.environ["GITHUB_TOKEN"] = ""
+        os.environ["V3_FLATTEN"] = "0"
+        try:
+            m = Monitor()
+            fam = m.families["politics"]
+            now = _time.time()
+            for i in range(200):                      # 200 open lots
+                mk = f"open-{i}"
+                fam.fills.append({"ts": now - 60, "market": mk,
+                                  "side": "BUY", "qty": 5.0, "px": 0.30,
+                                  "purpose": "earn"})
+                fam.inventory[mk] = {"qty": 5.0, "cost": 1.5}
+            for i in range(5):                        # 5 real round trips
+                mk = f"done-{i}"
+                fam.fills.append({"ts": now - 7200, "market": mk,
+                                  "side": "BUY", "qty": 4.0, "px": 0.30,
+                                  "purpose": "earn"})
+                fam.fills.append({"ts": now - 3600, "market": mk,
+                                  "side": "SELL", "qty": 4.0, "px": 0.40,
+                                  "purpose": "sell"})
+            v = m.fills_view()
+            shown = v["fills"]
+            closed = [c for c in shown
+                      if (c.get("open_qty") or 0) <= 0.005]
+            self.assertEqual(len(closed), 5)          # all of them survive
+            self.assertGreater(len([c for c in shown
+                                    if (c.get("open_qty") or 0) > 0.005]), 0)
+            self.assertEqual(v["closed_total"], 5)
+        finally:
+            for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
+                os.environ.pop(k, None)
+            d.cleanup()
