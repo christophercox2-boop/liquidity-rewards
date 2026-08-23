@@ -117,17 +117,20 @@ class TestEvidence(unittest.TestCase):
 
 
 class TestPlannerBounds(unittest.TestCase):
-    def test_model_binds_until_two_fills_override(self):
+    def test_model_binds_no_matter_how_many_fills(self):
+        """Owner, 2026-08-23 ('Yes do both'): under 50c the model is a
+        HARD ceiling for bids. Fills no longer buy the right to push
+        past it — that override built the junk book."""
         from v3.tests.test_family import Rig, A
         r = Rig()
         r.add_market(A)
         r.fam.fairs = lambda s: 0.30
-        # two real fills through our asks at 45c: evidence outranks Silver
         r.fam.evidence.fill(A, "SELL", 0.45, ts=r.now)
         r.fam.evidence.fill(A, "SELL", 0.45, ts=r.now)
         r.cycle()
         bids = [o for o in r.fam.orders.values() if o.side == "BUY"]
-        self.assertTrue(any(o.price > 0.32 for o in bids))
+        for o in bids:
+            self.assertLessEqual(o.price, 0.29 + 1e-9)
 
     def test_hot_market_loses_the_touch(self):
         from v3.tests.test_family import Rig, A, politics_book

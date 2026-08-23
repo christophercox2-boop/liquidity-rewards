@@ -17,6 +17,7 @@ The only mutating route is /op — auth plus the X-Reprice CSRF header.
 from __future__ import annotations
 
 import base64
+import gzip
 import json
 import os
 import threading
@@ -984,9 +985,23 @@ class WebServer:
         self.password = os.environ.get("DASH_PASSWORD", "")
         self._httpd: ThreadingHTTPServer | None = None
 
+    # what the phone pages actually read. The old payload shipped the
+    # whole state minus fam_* — 1.85 MB a refresh, every 30 seconds —
+    # and the owner's phone showed "unreachable" while the app was
+    # healthy (2026-08-22 night). rewards_seen, the evidence stores,
+    # and the raw names table were most of it and no page reads them.
+    _PHONE_KEYS = ("saved_at", "build", "boot_ts", "errors", "audit",
+                   "master_switch", "flatten", "flat_stats", "summaries",
+                   "silver", "silver_log", "grades", "paid_total", "ws",
+                   "alerts_log", "rewards_last", "floor")
+
     def data_payload(self) -> dict:
         st = self.monitor.public_state()
-        d = {k: v for k, v in st.items() if not k.startswith("fam_")}
+        d = {k: st[k] for k in self._PHONE_KEYS if k in st}
+        for k in st:
+            if k.startswith("est_") or k.startswith("sw_") \
+                    or k == "switch_view":
+                d[k] = st[k]
         labels: dict[str, str] = {}
         slugs: set[str] = set()
         for key, s in (st.get("summaries") or {}).items():
@@ -1038,9 +1053,19 @@ class WebServer:
                 pass
 
             def _send(self, code: int, ctype: str, body: bytes) -> None:
+                # gzip when the client accepts it: the data payload is
+                # hundreds of KB of JSON, and the owner reads it over a
+                # phone connection — 10x smaller on the wire
+                enc = ""
+                if (len(body) > 2048 and "gzip" in
+                        (self.headers.get("Accept-Encoding") or "")):
+                    body = gzip.compress(body, 5)
+                    enc = "gzip"
                 self.send_response(code)
                 self.send_header("Content-Type", ctype)
                 self.send_header("Cache-Control", "no-store")
+                if enc:
+                    self.send_header("Content-Encoding", enc)
                 self.send_header("Content-Length", str(len(body)))
                 self.end_headers()
                 self.wfile.write(body)
@@ -1082,8 +1107,14 @@ class WebServer:
                     if not authed(self.headers.get, u.query, server.password):
                         self._send(401, "application/json", b'{"error":"key required"}')
                         return
-                    self._send(200, "application/json",
-                               json.dumps(server.data_payload()).encode())
+                    try:
+                        body = json.dumps(server.data_payload()).encode()
+                    except Exception as e:  # noqa: BLE001 — a broken
+                        # payload must FAIL VISIBLY, not drop the socket
+                        self._send(500, "application/json", json.dumps(
+                            {"error": f"{type(e).__name__}: {e}"}).encode())
+                        return
+                    self._send(200, "application/json", body)
                     return
                 self._send(404, "text/plain", b"not found")
 

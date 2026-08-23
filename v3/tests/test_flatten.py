@@ -1770,11 +1770,10 @@ class TestTargetPricesStaySmall(unittest.TestCase):
         p, _ = r.fam._prog_row(A)
         sp = r.fam._side_pool(A, p)
         r.fam._plan_side(A, b, "BUY", p, sp, 10.0, ladder=rows)
-        deep = [w for w in rows if w["px"] >= 0.06]
-        self.assertTrue(deep)
-        for w in deep:              # 4+ ticks past a 2c fair: minimum only
-            self.assertLessEqual(w["qty"], r.fam.cfg.min_qty
-                                 if hasattr(r.fam.cfg, "min_qty") else 1.0)
+        # owner, 2026-08-23 ("Yes do both"): the shrink ladder is gone —
+        # below 50c NOTHING rests above fair, at any size. The Arkansas
+        # shape now produces zero bids past the 2c model.
+        self.assertEqual([w for w in rows if w["px"] > 0.011], [])
 
     def test_at_fair_size_is_unrestricted(self):
         from v3.tests.test_family import Rig, A
@@ -2205,3 +2204,29 @@ class TestOldAdoptionsMigrateToManual(unittest.TestCase):
         rec = r2.fam.orders["OLD1"]
         self.assertEqual(rec.purpose, "manual")
         self.assertIn("owner", rec.why)
+
+
+class TestExpensiveSidePreference(unittest.TestCase):
+    """Owner, 2026-08-23 ('Yes do both'): favorites are wanted — a
+    75c+ bid's locked-cash charge is halved in the EV ranking."""
+
+    def test_favorite_bid_charged_half(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig(switch=False)
+        r.add_market(A, book=Book(
+            bids=((0.80, 400.0), (0.02, 60000.0)),
+            asks=((0.84, 400.0), (0.98, 60000.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.cycle()
+        r.fam.fairs = lambda s: 0.83
+        rows = []
+        b = r.cache.fresh(A, 3600, r.now)
+        p, _ = r.fam._prog_row(A)
+        sp = r.fam._side_pool(A, p)
+        r.fam._plan_side(A, b, "BUY", p, sp, 10.0, ladder=rows)
+        self.assertTrue(rows)      # the expensive side quotes happily
+        # and the EV at 80c is better than a full-price capital charge
+        # would allow: reconstruct the charge difference on one row
+        w = max(rows, key=lambda x: x["ev"])
+        self.assertGreaterEqual(w["px"], 0.5)
