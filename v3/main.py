@@ -1070,6 +1070,18 @@ class Monitor:
         desk = self.families["politics"].desk
         owned = {oid for fam in self.families.values() for oid in fam.orders}
         done = kept = remaining = 0
+        if self.flatten_done:
+            # Phase two was a janitor: cancel any open order the families
+            # did not own. Since 2026-08-22 an unknown order IS THE
+            # OWNER'S OWN ("Don't let it cancel orders I set by hand") —
+            # this guard cancelled 964 orders, his hand-placed ones
+            # included, racing adoption every cycle. It now only reports.
+            kept = sum(1 for o in orders if is_exit_order(o, positions))
+            return {"active": True, "phase": "rebuild",
+                    "kept_exits": kept, "remaining": 0,
+                    "cancelled_now": 0,
+                    "cancelled_total": self.flat_stats["cancelled"],
+                    "failed_total": self.flat_stats["failed"]}
         for o in orders:
             if not (o.get("id") and o.get("market")):
                 continue

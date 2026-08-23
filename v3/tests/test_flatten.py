@@ -84,7 +84,11 @@ class TestFlattenPass(unittest.TestCase):
         self.assertTrue(any("Flat" in t for t in self.alerts))
         self.assertEqual(s["phase"], "rebuild")
 
-    def test_phase_two_guards_but_spares_the_rebuild(self):
+    def test_phase_two_cancels_nothing_the_stray_is_the_owners(self):
+        """The phase-two janitor used to kill any order the families did
+        not own — 964 cancels, the owner's hand orders included. Since
+        2026-08-22 ('Don't let it cancel orders I set by hand') an
+        unknown order is HIS: phase two only reports."""
         self.mon.flatten_done = True
         fam = self.mon.families["politics"]
         from v3.family import FamilyOrder
@@ -92,9 +96,11 @@ class TestFlattenPass(unittest.TestCase):
             id="mine1", market="mkt-z", side="BUY", price=0.3, qty=1.0,
             intent=BUY_LONG, placed_ts=0.0, purpose="earn")
         orders = [O("mine1", "mkt-z", BUY_LONG),     # 3.0's own rebuild order
-                  O("stray", "mkt-z", BUY_LONG)]     # nobody's: guard kills it
-        self.mon._flatten_pass(orders, {})
-        self.assertEqual(self.cancelled, ["stray"])
+                  O("stray", "mkt-z", BUY_LONG)]     # the owner's hand
+        s = self.mon._flatten_pass(orders, {})
+        self.assertEqual(self.cancelled, [])
+        self.assertEqual(s["cancelled_now"], 0)
+        self.assertEqual(s["phase"], "rebuild")
 
     def test_flatten_requests_the_floor_even_with_master_off(self):
         self.assertFalse(self.mon.master.on)
