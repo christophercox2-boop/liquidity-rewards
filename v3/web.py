@@ -985,47 +985,12 @@ class WebServer:
         self.password = os.environ.get("DASH_PASSWORD", "")
         self._httpd: ThreadingHTTPServer | None = None
 
-    # what the phone pages actually read. The old payload shipped the
-    # whole state minus fam_* — 1.85 MB a refresh, every 30 seconds —
-    # and the owner's phone showed "unreachable" while the app was
-    # healthy (2026-08-22 night). rewards_seen, the evidence stores,
-    # and the raw names table were most of it and no page reads them.
-    _PHONE_KEYS = ("saved_at", "build", "boot_ts", "errors", "audit",
-                   "master_switch", "flatten", "flat_stats", "summaries",
-                   "silver", "silver_log", "grades", "paid_total", "ws",
-                   "alerts_log", "rewards_last", "floor")
-
     def data_payload(self) -> dict:
-        st = self.monitor.public_state()
-        d = {k: st[k] for k in self._PHONE_KEYS if k in st}
-        for k in st:
-            if k.startswith("est_") or k.startswith("sw_") \
-                    or k == "switch_view":
-                d[k] = st[k]
-        labels: dict[str, str] = {}
-        slugs: set[str] = set()
-        for key, s in (st.get("summaries") or {}).items():
-            for o in s.get("orders") or []:
-                slugs.add(o.get("market") or "")
-            for b in s.get("best_idle") or []:
-                slugs.add(b.get("market") or "")
-            for t in s.get("triage_feed") or []:
-                slugs.add(t.get("market") or "")
-            slugs.update((s.get("inventory") or {}).keys())
-            fam = self.monitor.families.get(key)
-            if fam is not None:
-                d[f"fam_log_{key}"] = fam.log[-80:]
-                for row in d[f"fam_log_{key}"]:
-                    mkt = row.get("market")
-                    if mkt:
-                        slugs.add(mkt)
-        for s in slugs:
-            if s:
-                labels[s] = self.monitor.names.label(s)
-        d["labels"] = labels
-        d["now"] = time.time()
-        d["boot"] = dict(getattr(self.monitor, "boot_stage", {}) or {})
-        return d
+        # boot-time fallback only: once the first cycle completes, the
+        # handler serves monitor.payload_json — bytes frozen on the
+        # cycle thread, under the cycle lock, so the web thread never
+        # serializes live dicts (the 2026-08-22 "unreachable" race)
+        return self.monitor.build_phone_payload()
 
     def handle_op(self, body: dict) -> dict:
         op = str(body.get("op") or "")
@@ -1107,13 +1072,15 @@ class WebServer:
                     if not authed(self.headers.get, u.query, server.password):
                         self._send(401, "application/json", b'{"error":"key required"}')
                         return
-                    try:
-                        body = json.dumps(server.data_payload()).encode()
-                    except Exception as e:  # noqa: BLE001 — a broken
-                        # payload must FAIL VISIBLY, not drop the socket
-                        self._send(500, "application/json", json.dumps(
-                            {"error": f"{type(e).__name__}: {e}"}).encode())
-                        return
+                    body = getattr(server.monitor, "payload_json", None)
+                    if body is None:
+                        try:      # first cycle still running: build live
+                            body = json.dumps(server.data_payload()).encode()
+                        except Exception as e:  # noqa: BLE001 — fail
+                            # VISIBLY, never drop the socket
+                            self._send(500, "application/json", json.dumps(
+                                {"error": f"{type(e).__name__}: {e}"}).encode())
+                            return
                     self._send(200, "application/json", body)
                     return
                 self._send(404, "text/plain", b"not found")

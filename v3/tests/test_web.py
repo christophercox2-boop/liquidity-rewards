@@ -14,11 +14,19 @@ class FakeMonitor:
         self.taps = []
         self.ops = []
         self.families = {}
+        self.payload_json = None
+        self.boot_stage = {}
 
         class N:
             def label(self, s):
                 return f"name:{s}"
         self.names = N()
+
+    # the REAL payload builder, bound to this fake — the contract the
+    # pages depend on is main's, not a test double's
+    from v3.main import Monitor as _M
+    PHONE_KEYS = _M.PHONE_KEYS
+    build_phone_payload = _M.build_phone_payload
 
     def public_state(self):
         return {"saved_at": 123.0, "build": "abc",

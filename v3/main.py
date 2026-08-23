@@ -355,6 +355,7 @@ class Monitor:
         # the boot readout: what the first cycle is doing right now, so a
         # restart shows a progress bar instead of a scary red "stale"
         self.boot_stage = {"stage": "starting", "pct": 2, "ts": time.time()}
+        self.payload_json: bytes | None = None    # frozen /data.json body
         self._first_cycle_done = False
         self.silver = SilverFairs(client=self.client)
         self.samplers: dict[str, Estimator] = {}
@@ -642,6 +643,7 @@ class Monitor:
             st[f"sw_{key}"] = self.switches[key].to_dict()
         st["saved_at"] = time.time()
         self.last_state = st
+        self.freeze_payload()      # a switch flip shows immediately
         self.store.save_local(st)
         self.store.save_remote(st)
         return s
@@ -1060,6 +1062,57 @@ class Monitor:
         st["floor"] = self.floor.status()
         return st
 
+    # what the phone pages actually read. The old payload shipped the
+    # whole state minus fam_* — 1.85 MB a refresh — and worse, the web
+    # thread serialized LIVE dicts while the cycle thread mutated them:
+    # "dictionary changed size during iteration" dropped the socket and
+    # every page read "unreachable" while the app was healthy
+    # (2026-08-22 night). The payload is now frozen to bytes at the end
+    # of each cycle, on the cycle's own thread, under the cycle's lock.
+    PHONE_KEYS = ("saved_at", "build", "boot_ts", "errors", "audit",
+                  "master_switch", "flatten", "flat_stats", "summaries",
+                  "silver", "silver_log", "grades", "paid_total", "ws",
+                  "alerts_log", "rewards_last", "floor")
+
+    def build_phone_payload(self) -> dict:
+        st = self.public_state()
+        d = {k: st[k] for k in self.PHONE_KEYS if k in st}
+        for k in st:
+            if k.startswith("est_") or k.startswith("sw_") \
+                    or k == "switch_view":
+                d[k] = st[k]
+        labels: dict[str, str] = {}
+        slugs: set[str] = set()
+        for key, s in (st.get("summaries") or {}).items():
+            for o in s.get("orders") or []:
+                slugs.add(o.get("market") or "")
+            for b in s.get("best_idle") or []:
+                slugs.add(b.get("market") or "")
+            for t in s.get("triage_feed") or []:
+                slugs.add(t.get("market") or "")
+            slugs.update((s.get("inventory") or {}).keys())
+            fam = self.families.get(key)
+            if fam is not None:
+                d[f"fam_log_{key}"] = [dict(r) for r in fam.log[-80:]]
+                for row in d[f"fam_log_{key}"]:
+                    mkt = row.get("market")
+                    if mkt:
+                        slugs.add(mkt)
+        for s in slugs:
+            if s:
+                labels[s] = self.names.label(s)
+        d["labels"] = labels
+        d["now"] = time.time()
+        d["boot"] = dict(self.boot_stage or {})
+        return d
+
+    def freeze_payload(self) -> None:
+        try:
+            self.payload_json = json.dumps(
+                self.build_phone_payload()).encode()
+        except Exception as e:  # noqa: BLE001 — a stale payload beats none
+            self._note(f"payload freeze: {e}")
+
     # -- one poll -----------------------------------------------------------
 
     def _flatten_pass(self, orders: list[dict], positions: dict) -> dict:
@@ -1207,6 +1260,7 @@ class Monitor:
         self._stage("first save", 98)
         st = self._state(now, summaries)
         self.last_state = st
+        self.freeze_payload()
         self.store.save_local(st)
         self.store.maybe_save_remote(st)
         if not self._first_cycle_done:

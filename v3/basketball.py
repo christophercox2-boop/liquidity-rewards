@@ -36,7 +36,14 @@ def nba() -> FamilyConfig:
     return FamilyConfig(
         name="NBA futures", tag="NBA",
         known_ground=False, rest_style="behind", revive=False,
-        allow_improve=True,
+        # owner, 2026-08-23: "Try to join the walls, even if you don't
+        # make all that much. Looking for stability here and not a lot
+        # of bad buys." Joining a 400-900k wall means the whole wall
+        # trades before our shares do — tiny share, near-zero fill
+        # odds. So: never price in front of a wall, and no earnings
+        # bar — any positive-EV join may rest, however small.
+        allow_improve=False,
+        min_est_day=0.0,
         capital_usd=50.0, per_market_usd=1.00,
         holdings_in_ceiling=True,
         dump_usd_day=10.0,
