@@ -328,6 +328,13 @@ function render(d){
 """
 
 ORDERS_JS = """
+function sfair(m){
+ var v=prompt('Fair value in CENTS for\\n'+m+'\\n\\nYour number beats the model everywhere fair is used.\\nLeave empty to go back to the model.');
+ if(v===null)return;
+ var f=(v==='')?'':(parseFloat(v)/100);
+ if(v!==''&&!(f>0&&f<1)){alert('enter cents, 0.1 to 99.9');return;}
+ post({op:'set_fair',market:m,fair:f},function(j){alert(j.note||'done');});
+}
 function fold(title,sub,body,open){
  return '<details'+(open?' open':'')+'><summary><b>'+title+'</b> <span class="muted">'+sub+'</span></summary>'+body+'</details>';
 }
@@ -338,6 +345,8 @@ function orow(d,o){
   +'<div class="name" style="cursor:pointer" onclick="showbook(\\''+esc(o.market)+'\\',\\''+bid+'\\')">'+nm(d,o.market)+' <span class="muted">\u25be book</span></div>'
   +'<div id="'+bid+'"></div>'
   +'<div class="muted"><code>'+esc(o.market)+'</code></div>'
+  +'<div class="muted">fair: '+((d.owner_fairs&&d.owner_fairs[o.market]!=null)?('<b>'+pc(d.owner_fairs[o.market])+' (yours)</b>'):'model')
+  +' <a style="cursor:pointer;text-decoration:underline" onclick="sfair(\\''+esc(o.market)+'\\')">set</a></div>'
   +'<div class="sub">'+(o.side==='BUY'?'bid':'ask')+' '+(o.qty||0)+' @ '+pc(o.price)
   +' \\u2014 '+(e==null?'<span class="warn">no estimate yet</span>':usd(e)+'/day')
   +' <span class="pill">'+esc(o.purpose)+'</span></div>'
@@ -1009,6 +1018,11 @@ class WebServer:
             price = body.get("price")
             return self.monitor.order_op(op, str(body.get("order_id") or ""),
                                          float(price) if price is not None else None)
+        if op == "set_fair":
+            f = body.get("fair")
+            return self.monitor.set_owner_fair(
+                str(body.get("market") or ""),
+                float(f) if f not in (None, "") else None)
         return {"ok": False, "note": f"unknown op {op}"}
 
     def start(self) -> None:

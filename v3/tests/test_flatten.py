@@ -2425,3 +2425,47 @@ class TestVanishedOrderLimbo(unittest.TestCase):
         r2.positions[A_J] = (5.0, 2.0)
         r2.cycle()
         self.assertTrue([x for x in r2.fam.fills if x["market"] == A_J])
+
+
+class TestOwnerFair(unittest.TestCase):
+    """Owner, 2026-08-23: 'Give me an option to set fair market for the
+    2028 markets because you're off.' His number beats the model
+    everywhere fair is used, survives into state, and clears back."""
+
+    def setUp(self):
+        import tempfile
+        from v3.main import Monitor
+        self.dir = tempfile.TemporaryDirectory()
+        os.environ["V3_STATE_PATH"] = os.path.join(self.dir.name, "s.json")
+        os.environ["V3_FLOOR_PATH"] = os.path.join(self.dir.name, "f.json")
+        os.environ["GITHUB_TOKEN"] = ""
+        os.environ["V3_FLATTEN"] = "0"
+        self.mon = Monitor()
+
+    def tearDown(self):
+        for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
+            os.environ.pop(k, None)
+        self.dir.cleanup()
+
+    def test_owner_fair_beats_the_model_and_clears(self):
+        m = self.mon
+        fam = m.families["politics"]
+        slug = "enwc-uspres-nom-dem-2028-gavnew"
+        fam.universe[slug] = {"event_n": 1, "name": "Newsom"}
+        m.silver.model_fair = lambda s: 0.30
+        self.assertEqual(m._fair_for(slug), 0.30)      # model by default
+        r = m.set_owner_fair(slug, 0.22)
+        self.assertTrue(r["ok"])
+        self.assertEqual(m._fair_for(slug), 0.22)      # the owner wins
+        self.assertEqual(fam.fairs(slug), 0.22)        # families see it
+        self.assertEqual(m.last_state["owner_fairs"][slug], 0.22)
+        r = m.set_owner_fair(slug, None)
+        self.assertTrue(r["ok"])
+        self.assertEqual(m._fair_for(slug), 0.30)      # back to the model
+
+    def test_unknown_market_and_bad_range_refused(self):
+        m = self.mon
+        self.assertFalse(m.set_owner_fair("not-a-market", 0.2)["ok"])
+        fam = m.families["politics"]
+        fam.universe["x-known"] = {"event_n": 1, "name": "X"}
+        self.assertFalse(m.set_owner_fair("x-known", 1.5)["ok"])

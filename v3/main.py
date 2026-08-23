@@ -357,6 +357,11 @@ class Monitor:
         # restart shows a progress bar instead of a scary red "stale"
         self.boot_stage = {"stage": "starting", "pct": 2, "ts": time.time()}
         self.payload_json: bytes | None = None    # frozen /data.json body
+        # per-market fair values SET BY THE OWNER from the orders page —
+        # his number beats the model everywhere fair is used (owner,
+        # 2026-08-23: "Give me an option to set fair market for the
+        # 2028 markets because you're off")
+        self.owner_fairs: dict[str, float] = {}
         self._first_cycle_done = False
         self.silver = SilverFairs(client=self.client)
         self.samplers: dict[str, Estimator] = {}
@@ -383,8 +388,7 @@ class Monitor:
                 log=self._audit,
             )
             fam.desk = desk
-            if key == "politics":
-                fam.fairs = self.silver.model_fair
+            fam.fairs = self._fair_for
             # every family's fill model learns from its own book feed
             cache.on_put = (lambda slug, book, f=fam:
                             f.fillmodel.observe_touch(
@@ -526,6 +530,8 @@ class Monitor:
                                or {"cancelled": 0, "failed": 0})
         self.rewards_seen = dict(saved.get("rewards_seen") or {})
         self.actuals_by_day = dict(saved.get("actuals_by_day") or {})
+        self.owner_fairs = {k: float(v) for k, v in
+                            (saved.get("owner_fairs") or {}).items()}
         self.silver.changes = list(saved.get("silver_log") or [])
         self.rw_last = saved.get("rewards_last")
         age = time.time() - (saved.get("saved_at") or 0)
@@ -582,6 +588,7 @@ class Monitor:
             "flat_stats": self.flat_stats,
             "rewards_seen": self.rewards_seen,
             "actuals_by_day": self.actuals_by_day,
+            "owner_fairs": dict(self.owner_fairs),
             "names": self.names.to_dict(),
             "summaries": summaries,
             "floor": self.floor.status(now),
@@ -648,6 +655,44 @@ class Monitor:
         self.store.save_local(st)
         self.store.save_remote(st)
         return s
+
+    def _fair_for(self, slug: str) -> float | None:
+        """One fair per market: the OWNER'S number when he has set one,
+        else the model's. Every consumer of fair — the past-fair caps,
+        exit guards, EV edge, watch cards — sees the same value."""
+        own = self.owner_fairs.get(slug)
+        if own is not None:
+            return own
+        return self.silver.model_fair(slug)
+
+    def set_owner_fair(self, market: str, fair: float | None) -> dict:
+        """Owner control from the orders page. fair in DOLLARS
+        (0.001-0.999); None clears back to the model."""
+        if not any(fam.knows(market) for fam in self.families.values()):
+            return {"ok": False,
+                    "note": "no family knows this market — check the slug"}
+        if fair is None:
+            had = self.owner_fairs.pop(market, None)
+            note = ("owner fair cleared — the model prices it again"
+                    if had is not None else "no owner fair was set")
+        else:
+            if not (0.001 <= fair <= 0.999):
+                return {"ok": False, "note": "fair must be 0.1c to 99.9c"}
+            self.owner_fairs[market] = round(float(fair), 4)
+            note = f"owner fair set: {fair * 100:g}c — beats the model"
+        self._audit({"op": "owner_fair", "market": market,
+                     "fair": fair, "ts": time.time()})
+        self._note(f"{note} ({market})")
+        # persisted IMMEDIATELY, like a switch flip — a restart between
+        # the tap and the next save must not undo it
+        st = dict(self.last_state) if self.last_state else {}
+        st["owner_fairs"] = dict(self.owner_fairs)
+        st["saved_at"] = time.time()
+        self.last_state = st
+        self.freeze_payload()
+        self.store.save_local(st)
+        self.store.save_remote(st)
+        return {"ok": True, "note": note}
 
     def owner_place(self, market: str, side: str, price: float,
                     qty: float) -> dict:
@@ -1070,7 +1115,8 @@ class Monitor:
     # every page read "unreachable" while the app was healthy
     # (2026-08-22 night). The payload is now frozen to bytes at the end
     # of each cycle, on the cycle's own thread, under the cycle's lock.
-    PHONE_KEYS = ("saved_at", "build", "boot_ts", "errors", "audit",
+    PHONE_KEYS = ("owner_fairs",
+                  "saved_at", "build", "boot_ts", "errors", "audit",
                   "master_switch", "flatten", "flat_stats", "summaries",
                   "silver", "silver_log", "grades", "paid_total", "ws",
                   "alerts_log", "rewards_last", "floor")
