@@ -254,3 +254,13 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787456644.4,cfb,aachc-cfb-wins-2026-11-28-sc-5pt5wins,BUY,0.5,0.87,earn,0.8708,0.2,,83,90,0,0.88,0.91,0,0.5,1 tick behind the touch; ~41.0% of the bid side
 1787456704.4,politics,usgubewc-usgub-md-2026-11-03-rep,BUY,1,0.15,earn,6.2488,0.07,0.000125,9,13,0.786,0.13,0.16,0.1499,5,1 tick in front of the touch — closer to the midpoint; ~99.7% of the bid side
 1787457184.5,cfb,aachc-cfb-wins-2026-11-28-pitt-5pt5wins,BUY,0.5,0.97,earn,0.8249,1.51,,96,99,0,0.97,0.98,-0.01,0.5,joins the touch — the book has been quiet
+1787457304.5,cfb,aachc-cfb-wins-2026-11-28-ore-9pt5wins,BUY,0.01,0.86,manual,1.7946,1.02,,62,68,0.324,0.86,0.88,0.21,-1.99,the owner's own order — the engine leaves it alone
+1787457544.5,politics,usgubewc-usgub-ny-2026-11-03-rep,SELL,1,0.08,manual,1.2474,2.65,0.01565,5,10,0.337,0.07,0.13,-0.0644,4,the owner's own order — the engine leaves it alone
+1787457544.5,politics,usgubewc-usgub-ny-2026-11-03-rep,SELL,4,0.08,sell,4.9897,1.64,0.01565,6,11,0.573,0.07,0.13,-0.0644,0,selling filled stock — it earns while it waits
+1787458264.5,politics,usgubewc-usgub-ne-2026-11-03-rep,SELL,1,0.92,sell,0.133,0.03,0.957975,93,96,0.6,0.91,0.94,0.038,10,an exit — its fill reduces the position it sits on
+1787458624.5,politics,enwc-usgubp-ma-2026-09-01-rep-brisho,SELL,1,0.064445,sell,1.1224,5.64,,5,9,0.738,0.05,0.06,0.0056,188,selling filled stock — it earns while it waits
+1787458624.5,politics,enwc-usgubp-ma-2026-09-01-rep-micmin,SELL,1,0.93,earn,0.568,0.58,0.00055,91,94,0.769,0.92,0.99,-0.9294,-178.99,2 ticks in front of the touch — closer to the midpoint; ~87.7% of the ask side
+1787458624.5,cfb,aachc-cfb-wins-2026-11-28-miss-6pt5wins,SELL,0.5,0.59,earn,2.5,1.15,,55,61,0,0.57,0.59,-0.01,-0.5,joins the touch — the book has been quiet
+1787458924.5,politics,ussewc-usse-ri-2026-11-03-dem,SELL,1,0.84,earn,6.25,0.72,0.999225,91,97,0,0.66,0.99,0.1592,-1,2 ticks in front of the touch — closer to the midpoint; ~99.3% of the ask side
+1787459764.5,cfb,aachc-cfb-wins-2026-11-28-mich-8pt5wins,BUY,0.5,0.51,earn,2.1363,33.93,,47,52,0,0.51,0.52,0.01,0.5,14 ticks in front of the touch — closer to the midpoint; ~85.4% of the bid side
+1787460724.5,cfb,aachc-cfb-wins-2026-11-28-smu-10pt5wins,SELL,1,0.05,sell,0.1923,10.55,,27,36,0.331,0.04,0.05,0.27,0,selling filled stock — it earns while it waits
