@@ -2752,7 +2752,12 @@ class TestJournalBackfill(unittest.TestCase):
         self._feed([self._act("ORDER_INTENT_BUY_LONG", 0.44, 10)])
         r = self.mon.backfill_journal(dry_run=False)
         self.assertEqual(r["added"], 1)
-        self.assertAlmostEqual(self.fam.fills[-1]["qty"], 4.0)  # 10 - 6
+        # find it by label: the two rows can share a timestamp, so
+        # position in the sorted journal is not a stable handle
+        recovered = [x for x in self.fam.fills
+                     if x.get("purpose") == "backfill"]
+        self.assertEqual(len(recovered), 1)
+        self.assertAlmostEqual(recovered[0]["qty"], 4.0)        # 10 - 6
 
     def test_fully_journaled_fills_add_nothing(self):
         self.fam.fills.append({"ts": self.now - 3600, "market": self.slug,
@@ -2765,7 +2770,9 @@ class TestJournalBackfill(unittest.TestCase):
     def test_short_intents_land_on_the_right_side(self):
         self._feed([self._act("ORDER_INTENT_SELL_SHORT", 0.30, 8)])
         self.mon.backfill_journal(dry_run=False)
-        self.assertEqual(self.fam.fills[-1]["side"], "BUY")   # a BID
+        recovered = [x for x in self.fam.fills
+                     if x.get("purpose") == "backfill"]
+        self.assertEqual(recovered[0]["side"], "BUY")         # a BID
 
     def test_outside_the_window_is_left_alone(self):
         self._feed([self._act("ORDER_INTENT_BUY_LONG", 0.44, 10,
