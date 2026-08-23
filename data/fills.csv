@@ -419,3 +419,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787501977.0,cfb,aachc-cfb-wins-2026-11-28-pur-3pt5wins,BUY,0.01,0.56,manual,0.0048,0.35,,,,0,,,,0.01,the owner's own order — the engine leaves it alone,
 1787502217.0,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.96,earn,6.188,0.02,0.996725,93,97,0.749,0.95,0.97,-0.0367,6,1 tick in front of the touch — closer to the midpoint; ~99.0% of the bid side,
 1787502277.0,cfb,aachc-cfb-wins-2026-11-28-wvir-6pt5wins,SELL,0.23,0.43,sell,0,0,,41,47,0.243,0.43,0.44,0.01,0.77,taker dump — sold into the bid (the carved exception),
+1787502750.5,politics,enwc-usgubp-ma-2026-09-01-rep-micmin,SELL,100,0.94,manual,6.2481,0.36,0.00055,92,94,0.846,0.94,0.98,-0.9394,-381,the owner's own order — the engine leaves it alone,C20PFRWWTDKA
