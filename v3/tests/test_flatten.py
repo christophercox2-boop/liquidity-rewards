@@ -2663,3 +2663,24 @@ class TestTransactionHistory(unittest.TestCase):
         rows = parse_activities([a])
         self.assertEqual(rows[0]["shares"], 7.0)
         self.assertEqual(rows[0]["price"], 0.33)
+
+
+class TestActivitySideMapping(unittest.TestCase):
+    def test_short_intents_map_to_the_opposite_side(self):
+        """BUY_SHORT rests as an ASK, SELL_SHORT as a BID — reading the
+        intent NAME inverted the side on every short (2026-08-23)."""
+        from v3.main import parse_activities
+        def act(intent):
+            return {"type": "ACTIVITY_TYPE_TRADE", "trade": {
+                "marketSlug": "m", "updateTime": "2026-08-23T10:00:00Z",
+                "passiveExecution": {
+                    "order": {"id": "O", "intent": intent},
+                    "lastShares": "5", "lastPx": "0.30",
+                    "transactTime": "2026-08-23T10:00:00Z"}}}
+        want = {"ORDER_INTENT_BUY_LONG": "BUY",
+                "ORDER_INTENT_SELL_LONG": "SELL",
+                "ORDER_INTENT_BUY_SHORT": "SELL",     # an ASK
+                "ORDER_INTENT_SELL_SHORT": "BUY"}     # a BID
+        for intent, side in want.items():
+            self.assertEqual(parse_activities([act(intent)])[0]["side"],
+                             side, intent)

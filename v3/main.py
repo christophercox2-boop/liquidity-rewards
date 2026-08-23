@@ -252,8 +252,14 @@ def parse_activities(rows: list) -> list[dict]:
             px = (_act_num(ours.get("lastPx"))
                   or _act_num(o.get("avgPx")) or _act_num(o.get("price")))
             intent = str(o.get("intent") or "")
-            side = "BUY" if "BUY" in intent else (
-                "SELL" if "SELL" in intent else "")
+            # Two of the four intents rest on the OPPOSITE side from
+            # their name (BUY_SHORT is an ASK, SELL_SHORT is a BID) —
+            # v3/intents.py is the single place that mapping lives.
+            # Reading the name naively inverted the side on every
+            # short and made the journal look like it had missed
+            # fills it had actually recorded.
+            from .intents import REST_SIDE
+            side = REST_SIDE.get(intent, "")
             ts_s = str(ours.get("transactTime") or t.get("updateTime")
                        or t.get("createTime") or "")
             out.append({
