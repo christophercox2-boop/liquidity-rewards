@@ -1726,6 +1726,15 @@ class Family:
                 # (owner, 2026-08-23): a quote past fair moves back to
                 # a compliant slot or leaves — regardless of earnings
                 shrink_needed = True
+            if (self.cfg.wall_size_up and best is not None
+                    and best["qty"] > rec.qty * 2 + 1e-9):
+                # the size-up binds the RESTING book too (owner,
+                # 2026-08-23: "I don't see any increase in nba order
+                # sizes" — the dust joins placed before the rule never
+                # repriced, because bigger size shows worse model EV).
+                # An undersized join is forced to the full-size slot
+                # exactly like an oversized one is forced to shrink.
+                shrink_needed = True
             if (best is not None and best.get("revive")
                     and rec.purpose != "grow"):
                 # the order earns nothing only because its side is below

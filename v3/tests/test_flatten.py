@@ -2522,3 +2522,35 @@ class TestTradeHistoryConfirms(unittest.TestCase):
             for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
                 _os.environ.pop(k, None)
             d.cleanup()
+
+
+class TestWallSizeUpBindsRestingBook(unittest.TestCase):
+    def test_dust_join_is_repriced_to_full_size(self):
+        """Owner, 2026-08-23: 'I don't see any increase in nba order
+        sizes' — pre-rule 0.01-share joins never upgraded because the
+        bigger size shows worse model EV. Undersized joins are now
+        forced to the full-size slot like oversized ones shrink."""
+        from v3.tests.test_family import Rig, A
+        from v3.basketball import nba
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        from v3.scoring import Book
+        r = Rig(cfg=nba())
+        r.add_market(A, book=Book(
+            bids=((0.01, 480000.0),),
+            asks=((0.02, 280000.0), (0.98, 60000.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.fam.orders["DUST"] = FamilyOrder(
+            id="DUST", market=A, side="BUY", price=0.01, qty=0.01,
+            intent=BUY_LONG, placed_ts=1.0, purpose="earn")
+        r.exchange.live["DUST"] = {"id": "DUST", "market": A,
+                                   "side": "BUY", "price": 0.01,
+                                   "size": 0.01, "intent": BUY_LONG}
+        for _ in range(3):
+            r.fam.last_action.clear()
+            r.cycle(advance=120.0)
+        bids = [o for o in r.fam.orders.values()
+                if o.market == A and o.side == "BUY"
+                and o.purpose != "manual"]
+        self.assertTrue(bids)
+        self.assertGreaterEqual(max(o.qty for o in bids), 50.0)
