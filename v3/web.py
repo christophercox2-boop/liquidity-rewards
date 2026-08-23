@@ -938,19 +938,27 @@ function fDraw(){
  var el=document.getElementById('fl');
  var j=window._fillsJ;
  if(!el||!j)return;
- if(!j.ok||!(j.fills||[]).length){el.innerHTML='<div class="card muted">No purchases on record yet \\u2014 the journal starts with the next fill.</div>';return;}
+ var pend=(j.pending||[]);
+ if(!j.ok||(!(j.fills||[]).length&&!pend.length)){el.innerHTML='<div class="card muted">No purchases on record yet \\u2014 the journal starts with the next fill.</div>';return;}
  var open=[],closed=[];
- j.fills.forEach(function(f){(fParts(f).open?open:closed).push(f);});
+ (j.fills||[]).forEach(function(f){(fParts(f).open?open:closed).push(f);});
  var tab=(window._fillTab!=null?window._fillTab:1);
- if(tab===1&&!open.length&&closed.length)tab=0;
+ if(tab===1&&!open.length&&(closed.length||pend.length))tab=0;
  var btn=function(t,label,n){
   var on=tab===t;
   return '<button onclick="fTabSet('+t+')" style="font-size:15px;padding:8px 18px;margin-right:8px'+(on?';font-weight:bold;text-decoration:underline':'')+'">'+label+' <span style="opacity:0.7">'+n+'</span></button>';
  };
  var greens=j.open_hidden||0;
- var out='<div style="margin:2px 0 8px 0">'+btn(1,'open',open.length)+(greens?'<span style="color:#9ec49a;font-size:13px;margin-right:8px">+'+greens+' in profit</span>':'')+btn(0,'closed',closed.length)+'</div>';
+ var out='<div style="margin:2px 0 8px 0">'+btn(1,'open',open.length)+(greens?'<span style="color:#9ec49a;font-size:13px;margin-right:8px">+'+greens+' in profit</span>':'')+btn(0,'closed',closed.length+pend.length)+'</div>';
  var list=tab===1?open:closed;
- if(!list.length)out+='<div class="card muted">nothing '+(tab===1?'open':'closed')+' right now</div>';
+ if(tab===0&&pend.length){
+  out+=pend.map(function(p){
+   return '<div class="card" style="opacity:0.55;border-left:3px solid #8a8a8a"><b>'+esc(p.name||p.market)+'</b> <span class="muted">'+esc(p.family||'')+'</span>'
+    +'<div class="muted">'+(p.side==='BUY'?'bought':'sold')+' '+p.qty+' @ '+pc(p.px)+' \\u00b7 '+when(p.ts)+'</div>'
+    +'<div class="muted"><b>waiting for the position feed to close out</b> \\u2014 the order left the book; the trade history or the feed confirms it within a few minutes</div></div>';
+  }).join('');
+ }
+ if(!list.length&&!(tab===0&&pend.length))out+='<div class="card muted">nothing '+(tab===1?'open':'closed')+' right now</div>';
  else out+=list.map(fCard).join('');
  window._fillT0=Date.now()/1000;
  el.innerHTML=out;

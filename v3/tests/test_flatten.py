@@ -2469,3 +2469,56 @@ class TestOwnerFair(unittest.TestCase):
         fam = m.families["politics"]
         fam.universe["x-known"] = {"event_n": 1, "name": "X"}
         self.assertFalse(m.set_owner_fair("x-known", 1.5)["ok"])
+
+
+class TestTradeHistoryConfirms(unittest.TestCase):
+    def test_limbo_resolves_by_order_id_from_trade_history(self):
+        """Owner, 2026-08-23: 'is there no way to see transaction
+        history and backfill?' — there is: /v1/portfolio/activities
+        names our order ids, and limbo resolves against it."""
+        from v3.tests.test_family import Rig
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r = Rig()
+        r.add_market(A_J)
+        r.fam.orders["T1"] = FamilyOrder(
+            id="T1", market=A_J, side="BUY", price=0.40, qty=5.0,
+            intent=BUY_LONG, placed_ts=r.now, purpose="earn")
+        # vanished, no position delta — but the trade history knows it
+        r.now += 60.0
+        r.fam.cycle(r.now, r.exchange.open_orders(), r.positions,
+                    r.exchange, True, trades={"T1": 5.0})
+        self.assertEqual(r.fam.silent_cancels, 0)
+        self.assertEqual(len(r.fam.gone_pending), 0)
+        fills = [x for x in r.fam.fills if x["market"] == A_J]
+        self.assertTrue(fills)
+        self.assertEqual(fills[-1]["px"], 0.40)
+        self.assertEqual((r.fam.inventory.get(A_J) or {}).get("qty"), 5.0)
+
+    def test_pending_cards_surface_in_fills_view(self):
+        import tempfile, os as _os
+        from v3.main import Monitor
+        d = tempfile.TemporaryDirectory()
+        _os.environ["V3_STATE_PATH"] = _os.path.join(d.name, "s.json")
+        _os.environ["V3_FLOOR_PATH"] = _os.path.join(d.name, "f.json")
+        _os.environ["GITHUB_TOKEN"] = ""
+        _os.environ["V3_FLATTEN"] = "0"
+        try:
+            m = Monitor()
+            from v3.family import FamilyOrder
+            from v3.intents import SELL_LONG
+            fam = m.families["politics"]
+            fam.gone_pending["P1"] = {
+                "rec": FamilyOrder(id="P1", market="m-x", side="SELL",
+                                   price=0.91, qty=50.0, intent=SELL_LONG,
+                                   placed_ts=1.0, purpose="sell"),
+                "until": 1000.0}
+            v = m.fills_view()
+            pend = v.get("pending") or []
+            self.assertEqual(len(pend), 1)
+            self.assertEqual(pend[0]["qty"], 50.0)
+            self.assertEqual(pend[0]["px"], 0.91)
+        finally:
+            for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
+                _os.environ.pop(k, None)
+            d.cleanup()

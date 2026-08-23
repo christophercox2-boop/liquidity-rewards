@@ -1127,7 +1127,8 @@ class Family:
 
     # -------------------------------------------------------------- reconcile
 
-    def reconcile(self, open_orders: list[dict], positions: dict, now: float) -> None:
+    def reconcile(self, open_orders: list[dict], positions: dict, now: float,
+                  trades=None) -> None:
         """Adopt reality. Fills come from position deltas, never from mere
         disappearance. Scoped to markets THIS family placed in — the
         account is shared with 1.0 and 2.0, and their fills are not ours."""
@@ -1142,6 +1143,14 @@ class Family:
         # lagging position feed to say fill or cancel
         for oid, gp in list(self.gone_pending.items()):
             rec = gp["rec"]
+            if trades and oid in trades:
+                # the exchange's own trade history names this order id:
+                # the definitive confirmation — a post-only rest fills
+                # at its own price, so the journal price is exact
+                filled = min(float(trades[oid]), rec.qty)
+                self._on_fill(rec, filled, now)
+                del self.gone_pending[oid]
+                continue
             d = deltas.get(rec.market, 0.0)
             expected = rec.qty if rec.intent == BUY_LONG else -rec.qty
             if abs(d) > 1e-9 and (d > 0) == (expected > 0):
@@ -1184,6 +1193,8 @@ class Family:
                 filled = min(abs(delta), rec.qty)
                 deltas[rec.market] = delta - (filled if delta > 0 else -filled)
                 self._on_fill(rec, filled, now)
+            elif trades and oid in trades:
+                self._on_fill(rec, min(float(trades[oid]), rec.qty), now)
             else:
                 # NOT ruled a silent cancel yet: the position feed LAGS
                 # the order list, so a complete fill often shows the
@@ -1421,8 +1432,8 @@ class Family:
 
     def cycle(self, now: float, open_orders: list[dict], positions: dict,
               client, switch_on: bool, foreign_ids=(),
-              exits_only: bool = False) -> dict:
-        self.reconcile(open_orders, positions, now)
+              exits_only: bool = False, trades=None) -> dict:
+        self.reconcile(open_orders, positions, now, trades=trades)
         self._reclassify_exits(positions)
         self.refresh_universe(client, now)
         self.refresh_terms(client, now)

@@ -1069,7 +1069,26 @@ class Monitor:
                   and not x.get("stray_close")) else 1,
             -x.get("last_ts", x["ts"])))
         return {"ok": True, "fills": rows[:150],
-                "open_hidden": hidden_open}
+                "open_hidden": hidden_open,
+                "pending": self._pending_fills()}
+
+    def _pending_fills(self) -> list[dict]:
+        """Vanished orders waiting for the position feed or the trade
+        history to confirm — shown gray in the closed cards (owner,
+        2026-08-23: "include the card in the closed section colored
+        gray and note it is waiting for position to close out")."""
+        from .family import GONE_GRACE_S
+        out = []
+        for tag, fam in self.families.items():
+            for oid, gp in list(fam.gone_pending.items()):
+                rec = gp["rec"]
+                out.append({"market": rec.market, "family": tag,
+                            "name": self.names.label(rec.market),
+                            "side": rec.side, "qty": rec.qty,
+                            "px": rec.price,
+                            "ts": gp["until"] - GONE_GRACE_S})
+        out.sort(key=lambda r: -r["ts"])
+        return out
 
     def book_view(self, slug: str) -> dict:
         """The raw shape of one market's book, with our own orders
@@ -1238,6 +1257,30 @@ class Monitor:
         self.last_flat = None
         if self.flatten and self._floor_ok:
             self.last_flat = self._flatten_pass(orders, positions)
+        trades_by_oid: dict[str, float] = {}
+        if any(fam.gone_pending for fam in self.families.values()):
+            # vanished orders waiting for confirmation: ask the
+            # exchange's own trade history by ORDER ID — the definitive
+            # source (owner, 2026-08-23: "is there no way to see
+            # transaction history and backfill?" — there is)
+            try:
+                for a in self.client.recent_trades(limit=50):
+                    t = a.get("trade") or {}
+                    for exk in ("passiveExecution", "aggressorExecution"):
+                        ex = t.get(exk) or {}
+                        o = ex.get("order") or {}
+                        it = str(o.get("intent") or "")
+                        if o.get("id") and it and not it.endswith("UNDEFINED"):
+                            try:
+                                sh = float(ex.get("lastShares") or 0)
+                            except (TypeError, ValueError):
+                                sh = 0.0
+                            if sh > 0:
+                                oid = str(o["id"])
+                                trades_by_oid[oid] = (
+                                    trades_by_oid.get(oid, 0.0) + sh)
+            except Exception as e:  # noqa: BLE001 — history is a bonus
+                self._note(f"trade history: {e}")
         try:
             self.silver.refresh(now)     # TTL-gated inside
         except Exception as e:  # noqa: BLE001 — the model never kills the loop
@@ -1292,7 +1335,8 @@ class Monitor:
                 summaries[key] = fam.cycle(now, orders, positions,
                                            self.client, on,
                                            foreign_ids=foreign,
-                                           exits_only=exits_only)
+                                           exits_only=exits_only,
+                                           trades=trades_by_oid)
                 summaries[key]["name"] = fam.cfg.name
                 est = self.samplers[key]
                 summaries[key]["earned_today"] = round(est.earned, 2)
