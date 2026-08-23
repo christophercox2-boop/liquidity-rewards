@@ -119,7 +119,10 @@ def config() -> FamilyConfig:
         # the balance of power. I'm going to do that one by hand") — the
         # engine's resting orders there were killing his via the
         # exchange's self-match prevention.
-        avoid_tokens=("usgub-ak", "usgubp-ak", "paccc-balpow"),
+        # owner, 2026-08-22: the presidential announce markets "aren't
+        # doing good" — off limits ($24.92 paid all-time across 32)
+        avoid_tokens=("usgub-ak", "usgubp-ak", "paccc-balpow",
+                      "cranc-uspres28"),
         graduate_paid_usd=1.00, proven_usd=150.0,
         # owner, 2026-08-21: 75c is a GOAL — markets that could clear it
         # at full confidence get starter positions from this budget, and
