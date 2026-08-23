@@ -53,6 +53,22 @@ long and accreted, so search it rather than reading it through.
   by push-path or manual dispatch, never cron.
 - Alerts go through ntfy; the topic name is a password.
 
+## Evidence and predictions (owner, 2026-08-23)
+- "We want verifiable and testable predictions and we want to keep
+  getting closer to the goal of stable and high earnings."
+- Write predictions down in v3/PREDICTIONS.md BEFORE the data lands:
+  the claim, why, and what would falsify it. Grade them against the
+  exchange's own files. Wrong ones stay on the page with what they
+  taught; nothing is quietly deleted.
+- "Be wary of anything that is opaque or not giving you the
+  information you need. It's always out there for you to find."
+  When a number cannot be checked, go find the source rather than
+  inferring — probe the API's real response shape, log the fields,
+  read the record. The 2026-08-23 probe found the exchange had been
+  handing us placement times, cancel reasons, and commissions all
+  along while we read five fields of twenty-four.
+- The owner will help get access when it is genuinely blocked. Ask.
+
 ## Scope and secrets
 - Markets: US politics, plus only categories the owner explicitly asked
   about (some sports futures have been surveyed). NEVER econ markets.
