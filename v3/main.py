@@ -21,6 +21,7 @@ V3_STATE_PATH (default ./v3_state.json), V3_PORT (default 8092).
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import sys
 import threading
