@@ -488,6 +488,7 @@ class Monitor:
         # 2026-08-23: "Give me an option to set fair market for the
         # 2028 markets because you're off")
         self.owner_fairs: dict[str, float] = {}
+        self.backfilled = False        # one-shot journal recovery
         self._first_cycle_done = False
         self.silver = SilverFairs(client=self.client)
         self.samplers: dict[str, Estimator] = {}
@@ -658,6 +659,7 @@ class Monitor:
         self.actuals_by_day = dict(saved.get("actuals_by_day") or {})
         self.owner_fairs = {k: float(v) for k, v in
                             (saved.get("owner_fairs") or {}).items()}
+        self.backfilled = bool(saved.get("backfilled"))
         self.silver.changes = list(saved.get("silver_log") or [])
         self.rw_last = saved.get("rewards_last")
         age = time.time() - (saved.get("saved_at") or 0)
@@ -715,6 +717,7 @@ class Monitor:
             "rewards_seen": self.rewards_seen,
             "actuals_by_day": self.actuals_by_day,
             "owner_fairs": dict(self.owner_fairs),
+            "backfilled": bool(self.backfilled),
             "names": self.names.to_dict(),
             "summaries": summaries,
             "floor": self.floor.status(now),
@@ -1099,6 +1102,17 @@ class Monitor:
             self._trades_deep = True
         except Exception as e:  # noqa: BLE001
             self._note(f"trades: {e}")
+        # one-shot recovery of fills the journal never recorded (owner,
+        # 2026-08-23: "Do it"). Runs once, then the flag is persisted;
+        # the fills page keeps a button for later runs. Additive and
+        # idempotent, so a repeat would be harmless anyway.
+        if not self.backfilled:
+            try:
+                r = self.backfill_journal(days=3.0, dry_run=False)
+                if r.get("ok"):
+                    self.backfilled = True
+            except Exception as e:  # noqa: BLE001
+                self._note(f"backfill: {e}")
         try:
             import datetime as _dt3
             start = (_dt3.datetime.now(_dt3.timezone.utc)
