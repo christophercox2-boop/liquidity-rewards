@@ -386,3 +386,18 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787496292.5,politics,enwc-uspres-nom-rep-2028-jdvan,BUY,1,0.57,earn,7.0616,0.05,0.5,48,52,0.902,0.51,0.58,0.07,5,6 ticks in front of the touch — closer to the midpoint; ~98.9% of the bid side
 1787496352.5,politics,paccc-usho-midterms-2026-11-03-rep,BUY,1,0.157,probe,0.0002,0.08,0.1634,14,18,0.454,0.155,0.158,-0.0064,51,a scout — this market's pool could pay; but I don't know enough yet; what happen
 1787497432.5,politics,ussewc-usse-ri-2026-11-03-dem,BUY,1,0.98,sell,3.1248,0.2,0.999225,91,96,0.685,0.98,0.99,-0.0192,-1.99,an exit — its fill reduces the position it sits on
+1787497672.5,cfb,aachc-cfb-wins-2026-11-28-wvir-6pt5wins,SELL,0.23,0.43,sell,0,0,,41,47,0.247,0.43,0.44,0.01,0.77,taker dump — sold into the bid (the carved exception)
+1787497732.5,politics,enwc-usgubp-ma-2026-09-01-rep-micmin,SELL,100,0.94,manual,4.561,3.25,0.00055,92,94,0.828,0.92,0.97,-0.9394,-281,the owner's own order — the engine leaves it alone
+1787497852.5,cfb,aachc-cfb-wins-2026-11-28-wisc-4pt5wins,BUY,0.01,0.89,manual,0.0498,1.34,,75,82,0.213,0.89,0.9,0.1,-0.99,the owner's own order — the engine leaves it alone
+1787497912.5,cfb,aachc-cfb-wins-2026-11-28-wisc-4pt5wins,BUY,0.99,0.89,sell,1.6703,0.25,,75,82,0.525,0.89,0.9,0.1,0.99,buying back the short at or under what it sold for — the bid earns while it wait
+1787498032.5,cfb,aachc-cfb-wins-2026-11-28-missr-4pt5wins,BUY,0.01,0.98,earn,2.4925,1.52,,70,76,0,0.98,0.99,0.25,0.01,2 ticks in front of the touch — closer to the midpoint; ~3.9% of the bid side
+1787498932.5,cfb,aachc-cfb-wins-2026-11-28-lsu-6pt5wins,BUY,0.01,0.97,earn,0.625,0.52,,79,90,0,0.97,0.98,0.12,0.01,4 ticks in front of the touch — closer to the midpoint; ~84.2% of the bid side
+1787498932.5,cfb,aachc-cfb-wins-2026-11-28-vand-5pt5wins,BUY,1,0.66,sell,2.4424,14.98,,48,54,0.384,0.66,0.68,0.15,0,buying back the short at or under what it sold for — the bid earns while it wait
+1787498932.5,cfb,aachc-cfb-wins-2026-11-28-wash-6pt5wins,SELL,0.01,0.48,earn,1.6665,2.49,,71,80,0,0.47,0.48,0.28,-0.01,1 tick in front of the touch — closer to the midpoint; ~66.7% of the ask side
+1787499052.5,cfb,aachc-cfb-wins-2026-11-28-pur-1pt5wins,SELL,0.02,0.67,earn,2.4852,38.16,,67,74,0,0.66,0.96,0.03,-0.02,29 ticks in front of the touch — closer to the midpoint; ~98.9% of the ask side
+1787499052.5,cfb,aachc-cfb-wins-2026-11-28-vand-5pt5wins,SELL,0.04,0.66,sell,0,0,,48,54,0.593,0.66,0.68,-0.15,0.96,taker dump — sold into the bid (the carved exception)
+1787499412.5,cfb,aachc-cfb-wins-2026-11-28-txam-7pt5wins,BUY,0.01,0.8,earn,2.4868,1.69,,57,62,0,0.8,0.85,0.21,0.01,21 ticks in front of the touch — closer to the midpoint; ~98.6% of the bid side
+1787499772.5,politics,enwc-uspres-nom-rep-2028-elomus,BUY,1,0.12,earn,7.1182,0.02,,5,10,0.873,0.05,0.16,0.04,10,7 ticks in front of the touch — closer to the midpoint; ~99.7% of the bid side
+1787499832.5,cfb,aachc-cfb-wins-2026-11-28-gtech-6pt5wins,BUY,0.01,0.58,earn,0.164,0.1,,56,60,0.577,0.45,0.59,0,1.01,13 ticks in front of the touch — closer to the midpoint; ~6.3% of the bid side
+1787499952.5,cfb,aachc-cfb-wins-2026-11-28-aubrn-4pt5wins,SELL,0.01,0.7,earn,2.4969,1.25,,72,79,0.325,0.69,0.99,0.06,-0.01,3 ticks in front of the touch — closer to the midpoint; ~7.5% of the ask side
+1787500072.5,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,SELL,1,0.03,sell,4.1667,5.28,0.008,10,14,0.568,0.03,0.12,-0.022,0,selling filled stock — it earns while it waits
