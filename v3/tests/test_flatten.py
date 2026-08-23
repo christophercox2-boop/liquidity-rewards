@@ -2684,3 +2684,91 @@ class TestActivitySideMapping(unittest.TestCase):
         for intent, side in want.items():
             self.assertEqual(parse_activities([act(intent)])[0]["side"],
                              side, intent)
+
+
+class TestJournalBackfill(unittest.TestCase):
+    """Owner, 2026-08-23 ('Do it'): recover fills the journal never
+    recorded, from the exchange's own record. Additive, idempotent,
+    and it must never touch inventory."""
+
+    def setUp(self):
+        import tempfile
+        import time as _time
+        from v3.main import Monitor
+        self.dir = tempfile.TemporaryDirectory()
+        os.environ["V3_STATE_PATH"] = os.path.join(self.dir.name, "s.json")
+        os.environ["V3_FLOOR_PATH"] = os.path.join(self.dir.name, "f.json")
+        os.environ["GITHUB_TOKEN"] = ""
+        os.environ["V3_FLATTEN"] = "0"
+        self.mon = Monitor()
+        self.fam = self.mon.families["politics"]
+        self.slug = "ussewc-usse-ga-2026-11-03-dem"
+        self.fam.universe[self.slug] = {"event_n": 1, "name": "GA"}
+        self.now = _time.time()
+
+    def tearDown(self):
+        for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
+            os.environ.pop(k, None)
+        self.dir.cleanup()
+
+    def _act(self, intent, px, shares, ago_h=1.0):
+        import datetime as _d
+        ts = _d.datetime.fromtimestamp(self.now - ago_h * 3600,
+                                       _d.timezone.utc).isoformat()
+        return {"type": "ACTIVITY_TYPE_TRADE", "trade": {
+            "marketSlug": self.slug, "updateTime": ts,
+            "passiveExecution": {"order": {"id": "OX", "intent": intent},
+                                 "lastShares": str(shares),
+                                 "lastPx": str(px), "transactTime": ts}}}
+
+    def _feed(self, acts):
+        self.mon.client.activities = lambda pages=25: acts
+
+    def test_recovers_a_missing_fill_and_is_idempotent(self):
+        self._feed([self._act("ORDER_INTENT_BUY_LONG", 0.44, 10)])
+        prev_inv = dict(self.fam.inventory)
+        dry = self.mon.backfill_journal(dry_run=True)
+        self.assertTrue(dry["ok"])
+        self.assertEqual(dry["added"], 1)
+        self.assertEqual(len(self.fam.fills), 0)      # dry run writes nothing
+        r = self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(r["added"], 1)
+        self.assertEqual(len(self.fam.fills), 1)
+        row = self.fam.fills[0]
+        self.assertEqual(row["qty"], 10)
+        self.assertEqual(row["px"], 0.44)
+        self.assertEqual(row["side"], "BUY")
+        self.assertEqual(row["purpose"], "backfill")
+        self.assertEqual(self.fam.inventory, prev_inv)  # inventory untouched
+        again = self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(again["added"], 0)           # IDEMPOTENT
+        self.assertEqual(len(self.fam.fills), 1)
+
+    def test_only_the_shortfall_is_written(self):
+        # the journal already has 6 of the 10 shares the exchange shows
+        self.fam.fills.append({"ts": self.now - 3600, "market": self.slug,
+                               "side": "BUY", "qty": 6.0, "px": 0.44,
+                               "purpose": "earn"})
+        self._feed([self._act("ORDER_INTENT_BUY_LONG", 0.44, 10)])
+        r = self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(r["added"], 1)
+        self.assertAlmostEqual(self.fam.fills[-1]["qty"], 4.0)  # 10 - 6
+
+    def test_fully_journaled_fills_add_nothing(self):
+        self.fam.fills.append({"ts": self.now - 3600, "market": self.slug,
+                               "side": "SELL", "qty": 5.0, "px": 0.90,
+                               "purpose": "sell"})
+        self._feed([self._act("ORDER_INTENT_SELL_LONG", 0.90, 5)])
+        r = self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(r["added"], 0)
+
+    def test_short_intents_land_on_the_right_side(self):
+        self._feed([self._act("ORDER_INTENT_SELL_SHORT", 0.30, 8)])
+        self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(self.fam.fills[-1]["side"], "BUY")   # a BID
+
+    def test_outside_the_window_is_left_alone(self):
+        self._feed([self._act("ORDER_INTENT_BUY_LONG", 0.44, 10,
+                              ago_h=24 * 9)])
+        r = self.mon.backfill_journal(days=3.0, dry_run=False)
+        self.assertEqual(r["added"], 0)

@@ -1006,6 +1006,86 @@ class Monitor:
         return {"ok": True, "activities": len(raw), "parsed": len(rows),
                 "added": added, "kinds": kinds}
 
+    def backfill_journal(self, days: float = 3.0,
+                         dry_run: bool = True) -> dict:
+        """Walk the exchange's transaction record against the fills
+        journal and add rows for executions the journal never recorded
+        (owner, 2026-08-23). Additive and IDEMPOTENT: executions are
+        bucketed by market/side/price and only the SHORTFALL against
+        what the journal already holds is written, so re-running finds
+        nothing to do. Inventory is never touched — the exchange's
+        position feed stays the sole authority on what we hold."""
+        from collections import defaultdict
+        try:
+            raw = self.client.activities(pages=25)
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "note": f"history fetch: {str(e)[:120]}"}
+        cutoff = time.time() - days * 86400.0
+        ex: dict = defaultdict(lambda: {"shares": 0.0, "ts": 0.0, "n": 0})
+        for r in parse_activities(raw):
+            if r["type"] != "ACTIVITY_TYPE_TRADE":
+                continue
+            if not (r["market"] and r["side"] and r["price"]):
+                continue
+            if (r["ts"] or 0) < cutoff or not r["shares"]:
+                continue
+            k = (r["market"], r["side"], round(r["price"], 4))
+            ex[k]["shares"] += r["shares"]
+            ex[k]["ts"] = max(ex[k]["ts"], r["ts"])
+            ex[k]["n"] += 1
+        # what the journal already holds, same buckets
+        jr: dict = defaultdict(float)
+        owner_of: dict = {}
+        for tag, fam in self.families.items():
+            for row in fam.fills:
+                if (row.get("ts") or 0) < cutoff:
+                    continue
+                k = (row.get("market"), row.get("side"),
+                     round(row.get("px") or 0, 4))
+                jr[k] += row.get("qty") or 0.0
+                owner_of[row.get("market")] = tag
+        added, skipped, rows_out = 0, 0, []
+        for k, v in sorted(ex.items(), key=lambda kv: kv[1]["ts"]):
+            market, side, px = k
+            short = round(v["shares"] - jr.get(k, 0.0), 4)
+            if short <= 0.005:
+                continue
+            tag = owner_of.get(market)
+            if tag is None:
+                for t2, fam in self.families.items():
+                    if fam.knows(market):
+                        tag = t2
+                        break
+            if tag is None:
+                skipped += 1
+                continue
+            rows_out.append({"family": tag, "market": market, "side": side,
+                             "px": px, "qty": short, "ts": v["ts"]})
+            added += 1
+        if not dry_run:
+            for r in rows_out:
+                fam = self.families[r["family"]]
+                fam.fills.append({
+                    "ts": round(r["ts"], 1), "market": r["market"],
+                    "side": r["side"], "qty": round(r["qty"], 2),
+                    "px": r["px"], "purpose": "backfill",
+                    "why": "recovered from the exchange\u2019s transaction "
+                           "history \u2014 this fill was never journaled",
+                    "est_day": None, "rested_h": None, "fair": None,
+                    "band": None, "conf": None, "touch_bid": None,
+                    "touch_ask": None, "conc": None, "pos_after": None})
+                fam.fills.sort(key=lambda x: x.get("ts") or 0.0)
+            self._note(f"journal backfill: +{added} rows from the exchange "
+                       f"record ({days:g} days)")
+            self.freeze_payload()
+        return {"ok": True, "dry_run": dry_run, "added": added,
+                "skipped_unknown_market": skipped,
+                "days": days,
+                "shares": round(sum(r["qty"] for r in rows_out), 2),
+                "sample": [f"{r['market'][:34]} {r['side']} "
+                           f"{r['qty']:g}@{r['px']*100:g}c"
+                           for r in rows_out[:8]]}
+
     def publish_files(self, now: float) -> None:
         """Hourly, and only while 1.0 is retired (one writer per file)."""
         if os.environ.get("V1_ENABLED", "0") != "0":

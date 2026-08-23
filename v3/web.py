@@ -964,6 +964,27 @@ function fDraw(){
  el.innerHTML=out;
 }
 function fTabSet(t){window._fillTab=t;fDraw();}
+function fbackfill(){
+ var b=document.getElementById('thout');
+ if(b)b.innerHTML='<div class="muted">comparing the exchange record with the journal\\u2026</div>';
+ post({op:'backfill',days:3,dry_run:true},function(j){
+  if(!b)return;
+  if(!j||!j.ok){b.innerHTML='<div class="bad">'+esc((j&&j.note)||'failed')+'</div>';return;}
+  if(!j.added){b.innerHTML='<div class="muted">nothing missing \\u2014 the journal already matches the exchange for the last '+j.days+' days</div>';return;}
+  var lines=(j.sample||[]).map(function(x){return '<div class="muted">'+esc(x)+'</div>';}).join('');
+  b.innerHTML='<div><b>'+j.added+' fills</b> ('+j.shares+' shares) are in the exchange record but not the cards:</div>'+lines
+   +'<div style="margin:6px 0"><button onclick="fbackapply()">Add them to the cards</button></div>';
+ });
+}
+function fbackapply(){
+ var b=document.getElementById('thout');
+ if(b)b.innerHTML='<div class="muted">writing\\u2026</div>';
+ post({op:'backfill',days:3,dry_run:false},function(j){
+  if(!b)return;
+  b.innerHTML=(j&&j.ok)?'<div class="muted">added '+j.added+' fills ('+j.shares+' shares) to the cards</div>'
+   :'<div class="bad">'+esc((j&&j.note)||'failed')+'</div>';
+ });
+}
 function ftrades(){
  var b=document.getElementById('thout');
  if(b)b.innerHTML='<div class="muted">asking the exchange\\u2026</div>';
@@ -981,7 +1002,7 @@ function render(d){
   if(!window._fillTick)window._fillTick=setInterval(fTick,1000);
  }).catch(function(){});
  return '<div class="card"><div class="muted">One card per purchase \\u2014 open lots tick as their exits earn; the color grades how it went. Tap a card for the story. Closed cards stay 3 days; open ones stay until they turn profitable.</div>'
-  +'<div style="margin:8px 0 0"><button onclick="ftrades()">Refresh transaction history</button> <span class="muted">\\u2014 pulls the exchange\\u2019s own record into data/trades.csv</span></div><div id="thout"></div></div>'
+  +'<div style="margin:8px 0 0"><button onclick="ftrades()">Refresh transaction history</button> <button onclick="fbackfill()">Recover missing fills</button> <span class="muted">\\u2014 the exchange\\u2019s own record, into data/trades.csv and the cards</span></div><div id="thout"></div></div>'
   +'<div id="fl"><div class="card muted">loading\\u2026</div></div>';
 }
 """
@@ -1038,6 +1059,10 @@ class WebServer:
             price = body.get("price")
             return self.monitor.order_op(op, str(body.get("order_id") or ""),
                                          float(price) if price is not None else None)
+        if op == "backfill":
+            return self.monitor.backfill_journal(
+                days=float(body.get("days") or 3.0),
+                dry_run=bool(body.get("dry_run", True)))
         if op == "fetch_trades":
             import time as _t
             return self.monitor.publish_trades(_t.time(), deep=True)
