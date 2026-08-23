@@ -2230,3 +2230,39 @@ class TestExpensiveSidePreference(unittest.TestCase):
         # would allow: reconstruct the charge difference on one row
         w = max(rows, key=lambda x: x["ev"])
         self.assertGreaterEqual(w["px"], 0.5)
+
+
+class TestNbaSearchFallback(unittest.TestCase):
+    def test_empty_tags_fall_back_to_search(self):
+        from v3.basketball import nba_discover
+
+        class C:
+            def events_by_tag(self, tag, max_pages=8):
+                return []                       # the tags sit empty
+            def search(self, q, limit=20):
+                if "Champion" not in q:
+                    return {"events": []}
+                return {"events": [{"title": "NBA Champion 2027",
+                                    "markets": [
+                    {"slug": "tec-nba-champ-2027-06-30-w-okc"},
+                    {"slug": "tec-nba-champ-2027-06-30-w-bos"},
+                    {"slug": "tec-wnba-champ-2026-w-lv"}]}]}
+        out = nba_discover(C())
+        self.assertEqual(sorted(out),
+                         ["tec-nba-champ-2027-06-30-w-bos",
+                          "tec-nba-champ-2027-06-30-w-okc"])
+        self.assertEqual(out["tec-nba-champ-2027-06-30-w-okc"]["event_n"], 2)
+
+    def test_tags_win_when_they_work(self):
+        from v3.basketball import nba_discover
+
+        class C:
+            def events_by_tag(self, tag, max_pages=8):
+                if tag != "nba":
+                    return []
+                return [{"title": "NBA MVP", "markets": [
+                    {"slug": "aqc-nba-mvp-2027-shagil"}]}]
+            def search(self, q, limit=20):
+                raise AssertionError("search must not run when tags work")
+        out = nba_discover(C())
+        self.assertEqual(list(out), ["aqc-nba-mvp-2027-shagil"])

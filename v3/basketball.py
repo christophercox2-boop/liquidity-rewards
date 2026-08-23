@@ -25,11 +25,54 @@ from __future__ import annotations
 
 from .family import FamilyConfig
 from .football import _feed_discover
+from .names import name_from_market
 
 NBA_PREFIXES = ("tec-nba-", "aqc-nba-", "ftsc-nba-", "fptc-nba-")
 
-nba_discover = _feed_discover(("nba", "basketball", "nba-futures"),
-                              NBA_PREFIXES)
+_nba_by_tag = _feed_discover(("nba", "basketball", "nba-futures"),
+                             NBA_PREFIXES)
+
+# what the search sweep asks for when the tags come back empty — each
+# query is one market class the family covers
+_NBA_SEARCHES = ("NBA Champion", "NBA Finals", "NBA Eastern Conference",
+                 "NBA Western Conference", "NBA MVP", "NBA award",
+                 "NBA wins", "NBA Defensive Player", "NBA Rookie",
+                 "NBA scoring")
+
+
+def nba_discover(client) -> dict[str, dict]:
+    """Tags first; the exchange's basketball tags sat EMPTY on
+    2026-08-23 (the NBA card read '0 markets known' while the same
+    mechanism fed the NFL 1064), so the search endpoint — which found
+    the East-winner event for the August survey — is the fallback."""
+    out = _nba_by_tag(client)
+    if out:
+        return out
+    order: list[str] = []
+    for q in _NBA_SEARCHES:
+        try:
+            j = client.search(q, limit=25)
+        except Exception:  # noqa: BLE001 — one query must not sink the rest
+            continue
+        for ev in (j.get("events") or []) if isinstance(j, dict) else []:
+            title = str(ev.get("title") or ev.get("name") or "").strip()
+            rows = [m for m in ev.get("markets") or []
+                    if m.get("slug") and not m.get("closed")
+                    and m["slug"].startswith(NBA_PREFIXES)]
+            for m in rows:
+                slug = m["slug"]
+                if slug not in out:
+                    order.append(slug)
+                out[slug] = {"event_n": len(rows),
+                             "name": name_from_market(m, title)[:110]}
+    groups: dict[str, list[str]] = {}
+    for s in order:
+        groups.setdefault(s.rsplit("-", 1)[0], []).append(s)
+    for s in order:
+        g = groups[s.rsplit("-", 1)[0]]
+        if len(g) > out[s]["event_n"]:
+            out[s]["event_n"] = len(g)
+    return out
 
 
 def nba() -> FamilyConfig:
