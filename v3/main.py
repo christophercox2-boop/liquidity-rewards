@@ -352,6 +352,70 @@ def trades_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
     return text, added
 
 
+ESTIMATES_CSV_HEADER = ("day,family,est_usd,unmeasured_min,recorded_at,"
+                        "paid_usd,paid_at,error_pct\n")
+
+
+def estimates_csv_append(existing: str | None, today: str,
+                         rows: list, paid_by_day: dict,
+                         now_iso: str) -> tuple[str, int]:
+    """The estimate ledger (owner, 2026-08-23: "All the estimates
+    should stay written down somewhere until the actual numbers come
+    in").
+
+    A past day's estimate is FROZEN the first time it is written — it
+    is a prediction, and a prediction you can revise after the fact is
+    worthless. Only the paid column fills in later. Today's row keeps
+    updating because the day is still accruing.
+
+    `rows` are (day, family, est_usd, unmeasured_min) tuples;
+    `paid_by_day` maps day -> total paid for the whole account.
+    """
+    text = existing if existing else ESTIMATES_CSV_HEADER
+    kept: dict = {}
+    order: list = []
+    for line in text.strip().split("\n")[1:]:
+        parts = line.split(",")
+        if len(parts) < 8:
+            continue
+        key = (parts[0], parts[1])
+        if key not in kept:
+            order.append(key)
+        kept[key] = parts
+    changed = 0
+    for day, family, est, unmeas in rows:
+        key = (day, family)
+        prior = kept.get(key)
+        if prior and day != today:
+            est_s, unmeas_s, rec_s = prior[2], prior[3], prior[4]
+        else:                       # today, or never recorded before
+            est_s = f"{est:.2f}"
+            unmeas_s = f"{unmeas:.1f}"
+            rec_s = prior[4] if prior else now_iso
+        paid = paid_by_day.get(day)
+        paid_s = f"{paid:.2f}" if paid is not None else ""
+        paid_at = (prior[6] if prior and prior[5] else
+                   (now_iso if paid is not None else ""))
+        err = ""
+        if paid is not None:
+            try:
+                e = float(est_s)
+                if e > 0:
+                    err = f"{(paid - e) / e * 100:+.1f}"
+            except ValueError:
+                pass
+        row = [day, family, est_s, unmeas_s, rec_s, paid_s, paid_at, err]
+        if prior != row:
+            changed += 1
+        if key not in kept:
+            order.append(key)
+        kept[key] = row
+    out = ESTIMATES_CSV_HEADER
+    for key in sorted(order, key=lambda k: (k[0], k[1])):
+        out += ",".join(kept[key]) + "\n"
+    return out, changed
+
+
 def card_is_open(card: dict) -> bool:
     """A lot is open only while the exchange still shows a position —
     a lot the pairing thinks is open on a FLAT market was closed by a
@@ -1207,6 +1271,27 @@ class Monitor:
         if now - getattr(self, "_pub_at", 0.0) < 3600.0:
             return
         self._pub_at = now
+        try:      # the estimate ledger: every day's prediction, kept
+                  # until the exchange settles it (owner, 2026-08-23)
+            from .estimator import et_day
+            rows = []
+            for key, est in self.samplers.items():
+                for h in est.history:
+                    rows.append((h["day"], key, h.get("earned") or 0.0,
+                                 (h.get("stale_s") or 0.0) / 60.0))
+                if est.day:
+                    rows.append((est.day, key, est.earned,
+                                 est.stale_s / 60.0))
+            if rows:
+                existing, sha = self._gh_file("data/estimates.csv")
+                text, n = estimates_csv_append(
+                    existing, et_day(now), rows, self.actuals_by_day,
+                    time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)))
+                if n:
+                    self._gh_put("data/estimates.csv", text, sha,
+                                 f"estimates: {n} rows [skip ci]")
+        except Exception as e:  # noqa: BLE001
+            self._note(f"estimates ledger: {e}")
         try:
             self.publish_trades(now, deep=not getattr(self, "_trades_deep",
                                                       False))

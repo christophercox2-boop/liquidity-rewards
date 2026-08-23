@@ -3171,3 +3171,61 @@ class TestExchangeCarriesPlacementTime(unittest.TestCase):
                     "cancel_reason", "order_state"):
             self.assertIn(col, head)
         self.assertIn("3.5", text)
+
+
+class TestEstimateLedger(unittest.TestCase):
+    """Owner, 2026-08-23: 'All the estimates should stay written down
+    somewhere until the actual numbers come in.' A past day's estimate
+    is frozen once written — a prediction you can revise afterwards is
+    worthless — and only the paid column fills in later."""
+
+    def test_todays_row_updates_but_yesterdays_is_frozen(self):
+        from v3.main import estimates_csv_append
+        t1, n1 = estimates_csv_append(
+            None, "2026-08-23",
+            [("2026-08-22", "politics", 413.84, 1420.1),
+             ("2026-08-23", "politics", 100.00, 500.0)],
+            {}, "2026-08-23T17:00:00Z")
+        self.assertEqual(n1, 2)
+        # later the same day: today grew, yesterday must NOT change
+        t2, _ = estimates_csv_append(
+            t1, "2026-08-23",
+            [("2026-08-22", "politics", 999.99, 1.0),   # a revision...
+             ("2026-08-23", "politics", 178.32, 958.8)],
+            {}, "2026-08-23T19:00:00Z")
+        y = [l for l in t2.strip().split("\n") if l.startswith("2026-08-22")][0]
+        self.assertIn("413.84", y)          # frozen at the original
+        self.assertNotIn("999.99", y)       # the revision is refused
+        d = [l for l in t2.strip().split("\n") if l.startswith("2026-08-23")][0]
+        self.assertIn("178.32", d)          # today still updates
+
+    def test_paid_fills_in_and_the_error_is_computed(self):
+        from v3.main import estimates_csv_append
+        t1, _ = estimates_csv_append(
+            None, "2026-08-23", [("2026-08-21", "politics", 295.90, 1063.1)],
+            {}, "2026-08-23T17:00:00Z")
+        self.assertTrue(t1.strip().split("\n")[1].endswith(",,"))
+        t2, n = estimates_csv_append(
+            t1, "2026-08-23", [("2026-08-21", "politics", 295.90, 1063.1)],
+            {"2026-08-21": 400.00}, "2026-08-24T09:00:00Z")
+        self.assertEqual(n, 1)
+        row = t2.strip().split("\n")[1]
+        self.assertIn("400.00", row)
+        self.assertIn("+35.2", row)         # (400-295.90)/295.90
+        # and settling it again changes nothing
+        t3, n3 = estimates_csv_append(
+            t2, "2026-08-23", [("2026-08-21", "politics", 295.90, 1063.1)],
+            {"2026-08-21": 400.00}, "2026-08-25T09:00:00Z")
+        self.assertEqual(n3, 0)
+        self.assertEqual(t3, t2)
+
+    def test_every_family_gets_its_own_row(self):
+        from v3.main import estimates_csv_append
+        t, n = estimates_csv_append(
+            None, "2026-08-23",
+            [("2026-08-23", "politics", 178.32, 958.8),
+             ("2026-08-23", "cfb", 228.38, 100.0),
+             ("2026-08-23", "nba", 0.30, 5.0)],
+            {}, "2026-08-23T17:00:00Z")
+        self.assertEqual(n, 3)
+        self.assertEqual(len(t.strip().split("\n")), 4)   # header + 3
