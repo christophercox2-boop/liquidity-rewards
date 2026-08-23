@@ -34,6 +34,13 @@ is wrong and the payout decides which.
 **Resolves:** when Aug-23 posts.
 
 ### P3 — the fair cap stops junk buys
+**Status 2026-08-23 20:25Z:** 2 breaches already, both explained and
+one now fixed. cfb 0 of 130 fills past fair; NBA 0 of 1; politics 2 of
+171 after the cap deployed — jdvan BUY 1@57c against a fair the owner
+had *just* set (the sweep had not reached the order; fixed by the
+priority sweep), and ne-dem BUY 1@8c on a 4.2c fair. Watch whether the
+count reaches zero now that owner-set fairs act promptly.
+
 **Claim:** from Aug-24, zero earn fills on MODELED markets land past
 fair (conc > 0).
 **Why:** the symmetric hard cap refuses those prices outright.
