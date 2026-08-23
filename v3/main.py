@@ -911,6 +911,11 @@ class Monitor:
                 return {"ok": False, "note": "fair must be 0.1c to 99.9c"}
             self.owner_fairs[market] = round(float(fair), 4)
             note = f"owner fair set: {fair * 100:g}c — beats the model"
+        # the resting book in this market is now suspect: re-check it
+        # first on the next sweep instead of waiting its turn
+        for fam in self.families.values():
+            if fam.knows(market):
+                fam.priority.add(market)
         self._audit({"op": "owner_fair", "market": market,
                      "fair": fair, "ts": time.time()})
         self._note(f"{note} ({market})")

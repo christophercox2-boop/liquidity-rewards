@@ -3229,3 +3229,30 @@ class TestEstimateLedger(unittest.TestCase):
             {}, "2026-08-23T17:00:00Z")
         self.assertEqual(n, 3)
         self.assertEqual(len(t.strip().split("\n")), 4)   # header + 3
+
+
+class TestOwnerFairActsPromptly(unittest.TestCase):
+    def test_setting_a_fair_puts_that_market_first_in_the_sweep(self):
+        """2026-08-23: a resting BUY at 57c filled against a 50c fair
+        the owner had just set — the sweep had not reached it yet."""
+        import tempfile
+        from v3.main import Monitor
+        d = tempfile.TemporaryDirectory()
+        os.environ["V3_STATE_PATH"] = os.path.join(d.name, "s.json")
+        os.environ["V3_FLOOR_PATH"] = os.path.join(d.name, "f.json")
+        os.environ["GITHUB_TOKEN"] = ""
+        os.environ["V3_FLATTEN"] = "0"
+        try:
+            m = Monitor()
+            fam = m.families["politics"]
+            slug = "enwc-uspres-nom-rep-2028-jdvan"
+            fam.universe[slug] = {"event_n": 1, "name": "JD"}
+            self.assertNotIn(slug, fam.priority)
+            r = m.set_owner_fair(slug, 0.50)
+            self.assertTrue(r["ok"])
+            self.assertIn(slug, fam.priority)   # jumps the queue
+            self.assertEqual(fam.fairs(slug), 0.50)
+        finally:
+            for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
+                os.environ.pop(k, None)
+            d.cleanup()

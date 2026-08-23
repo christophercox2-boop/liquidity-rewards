@@ -298,6 +298,7 @@ class Family:
         # "can't you match up the placement time with the execution
         # time to get an exact resting period?" — yes, with this).
         self.placed_at: dict[str, float] = {}
+        self.priority: set = set()   # markets to re-check first
         self.log: list[dict] = []
 
     # ------------------------------------------------------------- helpers
@@ -1658,7 +1659,15 @@ class Family:
                                f"{j.share * 100:.1f}% of its side")
 
     def _maintain(self, now: float, actions: int) -> int:
-        for rec in list(self.orders.values()):
+        # Markets the owner just repriced come FIRST. Setting a fair is
+        # a statement that the resting book is wrong there, and with
+        # 283 orders and 10 actions a cycle the sweep could take many
+        # minutes to reach them — long enough for a non-compliant order
+        # to fill (the jdvan buy at 57c against his 50c fair,
+        # 2026-08-23). Same rails, same budget, different order.
+        recs = sorted(self.orders.values(),
+                      key=lambda r: 0 if r.market in self.priority else 1)
+        for rec in recs:
             if actions <= 0:
                 break
             if (self.cfg.whole_shares
