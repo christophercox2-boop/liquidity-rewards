@@ -408,3 +408,7 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787501460.5,cfb,aachc-cfb-wins-2026-11-28-mia-9pt5wins,BUY,0.02,0.89,backfill,,,,,,,,,,,recovered from the exchange’s transaction history — this fill was never journale
 1787501460.5,cfb,aachc-cfb-wins-2026-11-28-sc-5pt5wins,BUY,1,0.87,backfill,,,,,,,,,,,recovered from the exchange’s transaction history — this fill was never journale
 1787501487.9,cfb,aachc-cfb-wins-2026-11-28-sc-4pt5wins,BUY,1.01,0.98,backfill,,,,,,,,,,,recovered from the exchange’s transaction history — this fill was never journale
+1787501535.7,cfb,aachc-cfb-wins-2026-11-28-ucf-7pt5wins,BUY,0.01,0.47,manual,0.0245,2.24,,,,0.442,,,,1.01,the owner's own order — the engine leaves it alone
+1787501535.7,cfb,aachc-cfb-wins-2026-11-28-mia-9pt5wins,BUY,0.01,0.89,earn,0.4981,8.72,,,,0,,,,0.01,22 ticks in front of the touch — closer to the midpoint; ~95.8% of the bid side
+1787501535.7,cfb,aachc-cfb-wins-2026-11-28-sc-5pt5wins,BUY,0.2,0.87,earn,1.6645,1.84,,,,0.396,,,,1.2,1 tick behind the touch; ~83.2% of the bid side
+1787501535.7,cfb,aachc-cfb-wins-2026-11-28-sc-4pt5wins,BUY,0.01,0.98,earn,0.4118,0.32,,,,0.323,,,,0.01,14 ticks in front of the touch — closer to the midpoint; ~24.3% of the bid side
