@@ -470,3 +470,12 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787522276.3,politics,paccc-usho-midterms-2026-11-03-rep,BUY,50,0.156,earn,2.3196,1.82,0.1612,13,17,0.592,0.158,0.159,-0.0052,101,2 ticks behind the touch; ~3.8% of the bid side,C242Q5JMMDK2
 1787522644.3,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.96,earn,6.1879,0.17,0.99655,93,96,0.838,0.95,0.97,-0.0366,8,1 tick in front of the touch — closer to the midpoint; ~99.0% of the bid side,C25MHG3KRDJP
 1787523200.0,politics,usgubewc-usgub-hi-2026-11-03-rep,SELL,1,0.05,sell,0.1786,0.21,5e-05,4,11,0.413,0.04,0.05,-0.05,0,selling filled stock — it earns while it waits,C25R051PGDJP
+1787524061.4,politics,vmc-ussep-mov-sc-rep-2026-08-25-gragte30,BUY,1,0.07,sell,0.8895,0.21,,6,12,0.514,0.02,0.11,-0.02,1,buying back the short at or under what it sold for — the bid earns while it wait,C25YQVTHYDJR
+1787524271.8,politics,enwc-usgubp-ri-2026-09-09-dem-helfou,SELL,1,0.87,sell,0.1603,32.48,,87,91,0.628,0.84,0.87,0.02,2,an exit — its fill reduces the position it sits on,C1A9W6FQEDKA
+1787524664.0,cfb,aachc-cfb-wins-2026-11-28-flst-7pt5wins,BUY,1,0.39,earn,2.5,28.16,,38,43,0.296,0.39,0.4,-0.01,1,joins the touch — the book has been quiet,C1E4BS458DJT
+1787524740.1,cfb,aachc-cfb-wins-2026-11-28-wash-8pt5wins,BUY,0.5,0.49,earn,2.2271,12.81,,47,52,0.566,0.32,0.5,-0.01,0.5,1 tick in front of the touch — closer to the midpoint; ~38.1% of the bid side,C1V93T9W2DJV
+1787524740.1,cfb,aachc-cfb-wins-2026-11-28-kanst-8pt5wins,BUY,0.2,0.63,manual,2.5,6.42,,63,68,0.229,0.14,0.64,-0.02,0.2,the owner's own order — the engine leaves it alone,C20R2WDERDJT
+1787524740.1,cfb,aachc-cfb-wins-2026-11-28-usc-8pt5wins,BUY,0.01,0.5,sell,0.0328,5.84,,42,50,0.72,0.5,0.51,0.04,0,buying back the short at or under what it sold for — the bid earns while it wait,C219556J2DK5
+1787525854.6,cfb,aachc-cfb-wins-2026-11-28-nd-10pt5wins,BUY,0.01,0.78,earn,0.625,8.45,,72,77,0.709,0.31,0.79,0.03,0.01,13 ticks in front of the touch — closer to the midpoint; ~5.9% of the bid side,C1Z9JVS98DJV
+1787525854.6,nba,tec-nba-champ-2027-06-18-w-mia,SELL,1,0.04,earn,0.0001,8.83,,2,5,0,0.03,0.04,0,-1,joins the touch — the book has been quiet,C1YYWGX9GDJR
+1787526725.1,cfb,aachc-cfb-wins-2026-11-28-wash-6pt5wins,SELL,0.01,0.48,earn,1.2499,7.65,,50,62,0.418,0.47,0.81,0.07,-0.02,1 tick in front of the touch — closer to the midpoint; ~66.7% of the ask side,C206E0FTGDJV
