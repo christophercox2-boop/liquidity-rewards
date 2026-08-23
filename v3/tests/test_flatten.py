@@ -2956,3 +2956,86 @@ class TestBothTabsGetCards(unittest.TestCase):
             for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
                 os.environ.pop(k, None)
             d.cleanup()
+
+
+class TestRecoveredFillsCorrectTheBand(unittest.TestCase):
+    """Owner approved 2026-08-23: recovered fills feed the EVIDENCE
+    band (they are real information about where a market trades) but
+    never the fill-odds model (that needs the order's placed time,
+    which the exchange record does not carry)."""
+
+    def setUp(self):
+        import tempfile
+        import time as _time
+        from v3.main import Monitor
+        self.dir = tempfile.TemporaryDirectory()
+        os.environ["V3_STATE_PATH"] = os.path.join(self.dir.name, "s.json")
+        os.environ["V3_FLOOR_PATH"] = os.path.join(self.dir.name, "f.json")
+        os.environ["GITHUB_TOKEN"] = ""
+        os.environ["V3_FLATTEN"] = "0"
+        self.mon = Monitor()
+        self.fam = self.mon.families["politics"]
+        self.slug = "ussewc-usse-ga-2026-11-03-dem"
+        self.fam.universe[self.slug] = {"event_n": 1, "name": "GA"}
+        self.now = _time.time()
+
+    def tearDown(self):
+        for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
+            os.environ.pop(k, None)
+        self.dir.cleanup()
+
+    def _feed_one(self, oid="Z1", px=0.44, shares=10, ago_h=1.0):
+        import datetime as _d
+        ts = _d.datetime.fromtimestamp(self.now - ago_h * 3600,
+                                       _d.timezone.utc).isoformat()
+        act = {"type": "ACTIVITY_TYPE_TRADE", "trade": {
+            "marketSlug": self.slug, "updateTime": ts,
+            "passiveExecution": {
+                "order": {"id": oid, "intent": "ORDER_INTENT_BUY_LONG"},
+                "lastShares": str(shares), "lastPx": str(px),
+                "transactTime": ts}}}
+        self.mon.client.activities = lambda pages=25: [act]
+
+    def test_recovery_feeds_the_band_not_the_odds_model(self):
+        self._feed_one()
+        import json as _j
+        before = len(self.fam.evidence.events.get(self.slug) or [])
+        fm_before = _j.dumps(self.fam.fillmodel.to_dict(), sort_keys=True)
+        self.mon.backfill_journal(dry_run=False)
+        after = len(self.fam.evidence.events.get(self.slug) or [])
+        self.assertEqual(after, before + 1)          # the band learned
+        self.assertEqual(_j.dumps(self.fam.fillmodel.to_dict(),
+                                  sort_keys=True), fm_before)   # odds did not
+
+    def test_a_dry_run_teaches_nothing(self):
+        self._feed_one()
+        before = len(self.fam.evidence.events.get(self.slug) or [])
+        self.mon.backfill_journal(dry_run=True)
+        self.assertEqual(len(self.fam.evidence.events.get(self.slug) or []),
+                         before)
+
+    def test_older_recoveries_carry_less_weight(self):
+        """The fill's own timestamp rides along, so evidence's 36h
+        half-life damps an old recovery instead of treating it as news."""
+        import time as _time
+        self._feed_one(oid="OLD", ago_h=72.0)
+        self.mon.backfill_journal(days=5.0, dry_run=False)
+        rows = self.fam.evidence.events.get(self.slug) or []
+        self.assertTrue(rows)
+        age_h = (_time.time() - rows[-1][0]) / 3600.0
+        self.assertGreater(age_h, 70.0)   # stored at its real age
+
+    def test_seeding_runs_once_over_already_recovered_rows(self):
+        self.fam.fills.append({"ts": self.now - 3600, "market": self.slug,
+                               "side": "BUY", "qty": 5.0, "px": 0.31,
+                               "purpose": "backfill"})
+        self.mon.client.activities = lambda pages=25: []
+        import time as _t2
+        self.mon.publish_files(_t2.time())
+        n1 = len(self.fam.evidence.events.get(self.slug) or [])
+        self.assertEqual(n1, 1)
+        self.assertTrue(self.mon.evidence_seeded)
+        self.mon._pub_at = 0.0
+        self.mon.publish_files(_t2.time())             # a second pass
+        self.assertEqual(len(self.fam.evidence.events.get(self.slug) or []),
+                         n1)                            # no double feed

@@ -498,6 +498,7 @@ class Monitor:
         # 2028 markets because you're off")
         self.owner_fairs: dict[str, float] = {}
         self.backfilled = False        # one-shot journal recovery
+        self.evidence_seeded = False   # one-shot evidence seed
         self._first_cycle_done = False
         self.silver = SilverFairs(client=self.client)
         self.samplers: dict[str, Estimator] = {}
@@ -669,6 +670,7 @@ class Monitor:
         self.owner_fairs = {k: float(v) for k, v in
                             (saved.get("owner_fairs") or {}).items()}
         self.backfilled = bool(saved.get("backfilled_600"))
+        self.evidence_seeded = bool(saved.get("evidence_seeded"))
         self.silver.changes = list(saved.get("silver_log") or [])
         self.rw_last = saved.get("rewards_last")
         age = time.time() - (saved.get("saved_at") or 0)
@@ -727,6 +729,7 @@ class Monitor:
             "actuals_by_day": self.actuals_by_day,
             "owner_fairs": dict(self.owner_fairs),
             "backfilled_600": bool(self.backfilled),
+            "evidence_seeded": bool(self.evidence_seeded),
             "names": self.names.to_dict(),
             "summaries": summaries,
             "floor": self.floor.status(now),
@@ -1106,6 +1109,16 @@ class Monitor:
                     "est_day": None, "rested_h": None, "fair": None,
                     "band": None, "conf": None, "touch_bid": None,
                     "touch_ask": None, "conc": None, "pos_after": None})
+                # a recovered fill is real evidence about where this
+                # market trades, so it corrects the band the engine
+                # prices against (owner approved, 2026-08-23). Its own
+                # timestamp carries it: evidence decays on a 36h half
+                # life, so an older recovery lands lighter. NOT fed to
+                # the fill-odds model — that needs the order's PLACED
+                # time, which the exchange record does not carry, and
+                # inventing one would poison the odds with fiction.
+                fam.evidence.fill(r["market"], r["side"], r["px"],
+                                  ts=r["ts"])
                 fam.fills.sort(key=lambda x: x.get("ts") or 0.0)
             self._note(f"journal backfill: +{added} rows from the exchange "
                        f"record ({days:g} days, matched by order id)")
@@ -1134,6 +1147,24 @@ class Monitor:
         # 2026-08-23: "Do it"). Runs once, then the flag is persisted;
         # the fills page keeps a button for later runs. Additive and
         # idempotent, so a repeat would be harmless anyway.
+        if not self.evidence_seeded:
+            # the 554 rows recovered before evidence feeding existed
+            n = 0
+            try:
+                for fam in self.families.values():
+                    for row in fam.fills:
+                        if row.get("purpose") != "backfill":
+                            continue
+                        if not (row.get("market") and row.get("side")
+                                and row.get("px")):
+                            continue
+                        fam.evidence.fill(row["market"], row["side"],
+                                          row["px"], ts=row.get("ts"))
+                        n += 1
+                self.evidence_seeded = True
+                self._note(f"evidence seeded from {n} recovered fills")
+            except Exception as e:  # noqa: BLE001
+                self._note(f"evidence seed: {e}")
         if not self.backfilled:
             try:
                 r = self.backfill_journal(days=3.0, dry_run=False)
