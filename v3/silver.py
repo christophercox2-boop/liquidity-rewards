@@ -423,6 +423,18 @@ class SilverFairs:
         return None — the table doesn't price them."""
         parts = (slug or "").split("-")
         tail = parts[-1] if parts else ""
+        # PRIMARIES ARE NOT THIS TABLE (owner, 2026-08-23: "It's a
+        # primary and he's going to win the primary but lose the
+        # general election"). Silver prices the GENERAL; a primary asks
+        # a different question entirely. The docstring always claimed
+        # primaries stayed unpriced, but the matching below is by
+        # substring — "usgubp" CONTAINS "usgub" and "ussep" STARTS WITH
+        # "usse" — so every primary was quietly priced at its
+        # candidate's chance of winning the general. Massachusetts
+        # governor rep: model 0.055c against a market at 92/94, which
+        # built a 381-share short.
+        if any(p in ("usgubp", "ussep", "ushrp", "uspresp") for p in parts):
+            return None
         # party tails AND candidate-coded tails both resolve; anything
         # else (margin brackets, primaries) stays unpriced
         if any(p.startswith("usse") for p in parts):

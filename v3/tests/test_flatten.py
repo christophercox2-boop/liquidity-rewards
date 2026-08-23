@@ -3256,3 +3256,46 @@ class TestOwnerFairActsPromptly(unittest.TestCase):
             for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
                 os.environ.pop(k, None)
             d.cleanup()
+
+
+class TestPrimariesAreNotTheGeneralElection(unittest.TestCase):
+    """Owner, 2026-08-23: 'It's a primary and he's going to win the
+    primary but lose the general election.' Silver prices the GENERAL.
+    Matching by substring priced every primary at its candidate's
+    general-election chance — 'usgubp' contains 'usgub', 'ussep'
+    starts with 'usse' — which built a 381-share short in the
+    Massachusetts governor primary against a 92/94 market."""
+
+    def _silver(self):
+        from v3.silver import SilverFairs
+        sf = SilverFairs(client=None)
+        sf.gov_races = {"ma": {"rep": 0.08, "dem": 0.92,
+                               "cands": {"micmin": 0.00055}}}
+        sf.races = {"nh": {"dem": 0.75, "rep": 0.25,
+                           "cands": {"chrpap": 0.62}}}
+        return sf
+
+    def test_a_governor_primary_is_not_priced_by_the_general_table(self):
+        sf = self._silver()
+        self.assertIsNone(
+            sf.race_fair("enwc-usgubp-ma-2026-09-01-rep-micmin"))
+        self.assertIsNone(
+            sf.model_fair("enwc-usgubp-ma-2026-09-01-rep-micmin"))
+
+    def test_a_senate_primary_is_not_priced_by_the_general_table(self):
+        sf = self._silver()
+        self.assertIsNone(
+            sf.race_fair("enwc-ussep-nh-2026-09-08-dem-chrpap"))
+
+    def test_the_general_election_still_prices_normally(self):
+        sf = self._silver()
+        self.assertAlmostEqual(
+            sf.race_fair("usgubewc-usgub-ma-2026-11-03-rep"), 0.08)
+        self.assertAlmostEqual(
+            sf.race_fair("ussewc-usse-nh-2026-11-03-dem"), 0.75)
+
+    def test_house_and_presidential_primaries_are_excluded_too(self):
+        sf = self._silver()
+        for slug in ("enwc-ushrp-fl19-2026-08-18-olahaw",
+                     "enwc-uspresp-ia-2028-01-15-dem-somebody"):
+            self.assertIsNone(sf.race_fair(slug), slug)
