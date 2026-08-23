@@ -466,3 +466,7 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787518445.5,politics,enwc-uspres-nom-dem-2028-gavnew,BUY,1,0.24,earn,0.0045,0.94,,23,25,0.946,0.21,0.26,0,55,6 ticks in front of the touch — closer to the midpoint; ~98.8% of the bid side,C23XZGKXPDJP
 1787519669.9,politics,enwc-uspres-nom-dem-2028-gavnew,BUY,1,0.24,earn,0.5255,0.27,,23,25,0.948,0.21,0.25,0,56,6 ticks in front of the touch — closer to the midpoint; ~98.8% of the bid side,C24SRJ61CDK7
 1787520217.8,politics,ewc-usp-2028-11-07-rondes,BUY,1,0.09,sell,0.0069,9,,3,9,0.644,0.04,0.1,0.03,0,an exit — its fill reduces the position it sits on,C1X9ESH3MDK0
+1787521245.0,politics,usgubewc-usgub-md-2026-11-03-dem,BUY,6,0.98,earn,6.2497,2.25,0.999875,94,98,0.628,0.98,0.99,-0.0199,6,joins the touch — the book has been quiet,C23FZ0ZS8DK0
+1787522276.3,politics,paccc-usho-midterms-2026-11-03-rep,BUY,50,0.156,earn,2.3196,1.82,0.1612,13,17,0.592,0.158,0.159,-0.0052,101,2 ticks behind the touch; ~3.8% of the bid side,C242Q5JMMDK2
+1787522644.3,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.96,earn,6.1879,0.17,0.99655,93,96,0.838,0.95,0.97,-0.0366,8,1 tick in front of the touch — closer to the midpoint; ~99.0% of the bid side,C25MHG3KRDJP
+1787523200.0,politics,usgubewc-usgub-hi-2026-11-03-rep,SELL,1,0.05,sell,0.1786,0.21,5e-05,4,11,0.413,0.04,0.05,-0.05,0,selling filled stock — it earns while it waits,C25R051PGDJP
