@@ -3039,3 +3039,78 @@ class TestRecoveredFillsCorrectTheBand(unittest.TestCase):
         self.mon.publish_files(_t2.time())             # a second pass
         self.assertEqual(len(self.fam.evidence.events.get(self.slug) or []),
                          n1)                            # no double feed
+
+
+class TestExactRestingPeriod(unittest.TestCase):
+    """Owner, 2026-08-23: 'can't you match up the placement time with
+    the execution time to get an exact resting period?' Yes — from our
+    own placement ledger. With it the odds model learns; without it the
+    observation is skipped rather than guessed."""
+
+    def setUp(self):
+        import tempfile
+        import time as _time
+        from v3.main import Monitor
+        self.dir = tempfile.TemporaryDirectory()
+        os.environ["V3_STATE_PATH"] = os.path.join(self.dir.name, "s.json")
+        os.environ["V3_FLOOR_PATH"] = os.path.join(self.dir.name, "f.json")
+        os.environ["GITHUB_TOKEN"] = ""
+        os.environ["V3_FLATTEN"] = "0"
+        self.mon = Monitor()
+        self.fam = self.mon.families["politics"]
+        self.slug = "ussewc-usse-ga-2026-11-03-dem"
+        self.fam.universe[self.slug] = {"event_n": 1, "name": "GA"}
+        self.now = _time.time()
+
+    def tearDown(self):
+        for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
+            os.environ.pop(k, None)
+        self.dir.cleanup()
+
+    def _feed(self, oid, exec_ago_h=1.0):
+        import datetime as _d
+        ts = _d.datetime.fromtimestamp(self.now - exec_ago_h * 3600,
+                                       _d.timezone.utc).isoformat()
+        self.mon.client.activities = lambda pages=25: [
+            {"type": "ACTIVITY_TYPE_TRADE", "trade": {
+                "marketSlug": self.slug, "updateTime": ts,
+                "passiveExecution": {
+                    "order": {"id": oid,
+                              "intent": "ORDER_INTENT_BUY_LONG"},
+                    "lastShares": "5", "lastPx": "0.40",
+                    "transactTime": ts}}}]
+
+    def test_ledger_gives_the_exact_resting_period(self):
+        # placed 4h ago, executed 1h ago -> rested exactly 3h
+        self.fam.placed_at["L1"] = self.now - 4 * 3600
+        self._feed("L1", exec_ago_h=1.0)
+        r = self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(r["odds_fed"], 1)
+        row = [x for x in self.fam.fills if x.get("oid") == "L1"][0]
+        self.assertAlmostEqual(row["rested_h"], 3.0, places=1)
+
+    def test_no_ledger_entry_means_no_guess(self):
+        self._feed("L2", exec_ago_h=1.0)          # never placed by us
+        r = self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(r["odds_fed"], 0)
+        row = [x for x in self.fam.fills if x.get("oid") == "L2"][0]
+        self.assertIsNone(row["rested_h"])
+
+    def test_the_ledger_survives_the_order_vanishing(self):
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        self.fam.orders["L3"] = FamilyOrder(
+            id="L3", market=self.slug, side="BUY", price=0.40, qty=5.0,
+            intent=BUY_LONG, placed_ts=self.now - 7200, purpose="earn")
+        self.fam.reconcile([], {}, self.now)       # order vanishes
+        self.assertNotIn("L3", self.fam.orders)
+        self.assertIn("L3", self.fam.placed_at)    # its placement remains
+        self.assertAlmostEqual(self.fam.placed_at["L3"], self.now - 7200)
+
+    def test_the_ledger_survives_a_restart(self):
+        self.fam.placed_at["L4"] = self.now - 3600
+        d = self.fam.to_dict()
+        from v3.tests.test_family import Rig
+        r2 = Rig()
+        r2.fam.restore(d)
+        self.assertAlmostEqual(r2.fam.placed_at["L4"], self.now - 3600)

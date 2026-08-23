@@ -292,6 +292,12 @@ class Family:
         self._last_accrual = 0.0
         self.silent_cancels = 0
         self.gone_pending: dict[str, dict] = {}   # vanished, feed pending
+        # order id -> when WE placed it. The audit log keeps 60 rows, so
+        # a fill recovered from the exchange later had no placement time
+        # and its resting period was unknowable (owner, 2026-08-23:
+        # "can't you match up the placement time with the execution
+        # time to get an exact resting period?" — yes, with this).
+        self.placed_at: dict[str, float] = {}
         self.log: list[dict] = []
 
     # ------------------------------------------------------------- helpers
@@ -1133,6 +1139,13 @@ class Family:
         disappearance. Scoped to markets THIS family placed in — the
         account is shared with 1.0 and 2.0, and their fills are not ours."""
         open_by_id = {o["id"]: o for o in open_orders}
+        # remember when each live order was placed, before it can vanish
+        for _oid, _rec in self.orders.items():
+            if _rec.placed_ts:
+                self.placed_at[_oid] = _rec.placed_ts
+        if len(self.placed_at) > 6000:      # keep the newest, bounded
+            for _k in sorted(self.placed_at, key=self.placed_at.get)[:2000]:
+                self.placed_at.pop(_k, None)
         tracked = (set(self.positions_seen) | set(self.inventory)
                    | {o.market for o in self.orders.values()}
                    | {g["rec"].market for g in self.gone_pending.values()})
@@ -2801,6 +2814,7 @@ class Family:
             "inventory": self.inventory,
             "positions_seen": self.positions_seen,
             "silent_cancels": self.silent_cancels,
+            "placed_at": self.placed_at,
             "gone_pending": {oid: {"rec": asdict(g["rec"]),
                                    "until": g["until"]}
                              for oid, g in self.gone_pending.items()},
@@ -2841,6 +2855,8 @@ class Family:
         self.inventory = dict(d.get("inventory") or {})
         self.positions_seen = dict(d.get("positions_seen") or {})
         self.silent_cancels = d.get("silent_cancels") or 0
+        self.placed_at = {k: float(v) for k, v in
+                          (d.get("placed_at") or {}).items()}
         self.gone_pending = {}
         for oid, g in (d.get("gone_pending") or {}).items():
             try:

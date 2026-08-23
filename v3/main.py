@@ -1004,6 +1004,26 @@ class Monitor:
             self._note(f"trades history: {e}")
             return {"ok": False, "note": str(e)[:120]}
         rows = parse_activities(raw)
+        # One-time shape probe: if the exchange's order object already
+        # carries a creation time, resting periods come free for
+        # history too — no ledger needed for the past. Written once so
+        # it can be read rather than guessed at.
+        if raw and not getattr(self, "_act_shape_noted", False):
+            self._act_shape_noted = True
+            try:
+                for a in raw:
+                    t = (a.get("trade") or {})
+                    ex = (t.get("passiveExecution")
+                          or t.get("aggressorExecution") or {})
+                    o = ex.get("order") or {}
+                    if o:
+                        self._note("activity order fields: "
+                                   + ",".join(sorted(o.keys()))
+                                   + " | execution fields: "
+                                   + ",".join(sorted(ex.keys())))
+                        break
+            except Exception:  # noqa: BLE001
+                pass
         kinds = {}
         for r in rows:
             kinds[r["type"]] = kinds.get(r["type"], 0) + 1
@@ -1097,6 +1117,7 @@ class Monitor:
                              "side": g["side"], "px": g["px"],
                              "qty": short, "ts": g["ts"], "oid": oid})
             added += 1
+        fed_odds = [0]
         if not dry_run:
             for r in rows_out:
                 fam = self.families[r["family"]]
@@ -1108,7 +1129,13 @@ class Monitor:
                            "history \u2014 this fill was never journaled",
                     "est_day": None, "rested_h": None, "fair": None,
                     "band": None, "conf": None, "touch_bid": None,
-                    "touch_ask": None, "conc": None, "pos_after": None})
+                    "touch_ask": None, "conc": None,
+                    "pos_after": None,
+                    # exact resting period when we still know when the
+                    # order went on the book (owner, 2026-08-23)
+                    "rested_h": (round((r["ts"] - placed) / 3600.0, 2)
+                                 if (placed := fam.placed_at.get(r["oid"]))
+                                 and r["ts"] > placed else None)})
                 # a recovered fill is real evidence about where this
                 # market trades, so it corrects the band the engine
                 # prices against (owner approved, 2026-08-23). Its own
@@ -1119,6 +1146,15 @@ class Monitor:
                 # inventing one would poison the odds with fiction.
                 fam.evidence.fill(r["market"], r["side"], r["px"],
                                   ts=r["ts"])
+                # and the fill-odds model, but ONLY with a real resting
+                # period measured from our own placement ledger. No
+                # ledger entry means no observation — a guessed resting
+                # time would poison the odds that price every order.
+                placed = fam.placed_at.get(r["oid"])
+                if placed and r["ts"] > placed:
+                    fam.fillmodel.observe_fill_age(r["market"],
+                                                   r["ts"] - placed)
+                    fed_odds[0] += 1
                 fam.fills.sort(key=lambda x: x.get("ts") or 0.0)
             self._note(f"journal backfill: +{added} rows from the exchange "
                        f"record ({days:g} days, matched by order id)")
@@ -1126,6 +1162,7 @@ class Monitor:
         return {"ok": True, "dry_run": dry_run, "added": added,
                 "skipped_unknown_market": skipped, "days": days,
                 "shares": round(sum(r["qty"] for r in rows_out), 2),
+                "odds_fed": fed_odds[0],
                 "sample": [f"{r['market'][:34]} {r['side']} "
                            f"{r['qty']:g}@{r['px']*100:g}c"
                            for r in rows_out[:8]]}
