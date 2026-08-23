@@ -659,7 +659,7 @@ class Monitor:
         self.actuals_by_day = dict(saved.get("actuals_by_day") or {})
         self.owner_fairs = {k: float(v) for k, v in
                             (saved.get("owner_fairs") or {}).items()}
-        self.backfilled = bool(saved.get("backfilled"))
+        self.backfilled = bool(saved.get("backfilled_600"))
         self.silver.changes = list(saved.get("silver_log") or [])
         self.rw_last = saved.get("rewards_last")
         age = time.time() - (saved.get("saved_at") or 0)
@@ -717,7 +717,7 @@ class Monitor:
             "rewards_seen": self.rewards_seen,
             "actuals_by_day": self.actuals_by_day,
             "owner_fairs": dict(self.owner_fairs),
-            "backfilled": bool(self.backfilled),
+            "backfilled_600": bool(self.backfilled),
             "names": self.names.to_dict(),
             "summaries": summaries,
             "floor": self.floor.status(now),

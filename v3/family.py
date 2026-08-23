@@ -2802,7 +2802,12 @@ class Family:
             "inv_since": self.inv_since,
             "fillmodel": self.fillmodel.to_dict(),
             "pending_marks": self.pending_marks[-60:],
-            "fills": self.fills[-200:],
+            # 600 to match the in-memory retention trim: saving
+            # only 200 silently discarded most of the journal on
+            # every save, and threw away 300 of the 493 rows the
+            # 2026-08-23 recovery had just rebuilt. data/fills.csv
+            # and data/trades.csv remain the unbounded archives.
+            "fills": self.fills[-600:],
             "scoreboard": self.scoreboard,
             "universe": self.universe,
             "terms": self.terms.to_dict(),
