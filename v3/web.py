@@ -756,6 +756,7 @@ function render(d){
  var pt=d.paid_total;
  if(!pt){var tot=0,nd=0;rows.forEach(function(r){if(r.actual!=null){tot+=r.actual;nd++;}});pt=nd?{usd:tot,days:nd,since:''}:null;}
  if(pt){out+='<div style="margin:8px 0 2px;font-size:1.15em"><b>'+usd(pt.usd)+' paid in total</b> <span class="muted">over '+pt.days+' posted days'+(pt.since?' since '+esc(pt.since):'')+(pend>0.005?' \\u00b7 '+usd(pend)+' more estimated, not posted yet':'')+'</span></div>';}
+ var mx=1;rows.forEach(function(r){mx=Math.max(mx,r.est||0,r.actual||0);});
  rows.slice().reverse().forEach(function(r){
   out+='<div style="margin:10px 0 0"><b>'+esc(r.day)+'</b>';
   out+=' <span class="muted">est '+(r.est==null?'\\u2014':usd(r.est))+' \\u00b7 paid '+(r.actual==null?'not posted yet':usd(r.actual))+(r.unmeasured_min>1?' \\u00b7 '+r.unmeasured_min+'m unmeasured':'')+'</span>';
