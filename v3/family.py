@@ -1570,13 +1570,18 @@ class Family:
                 continue
             if rec.purpose == "manual":
                 continue
-            if self._avoided(rec.market) and rec.purpose != "sell":
+            if self._avoided(rec.market):
+                # out means OUT — earn orders, probes, AND the engine's
+                # own exits leave (owner, 2026-08-22: the balance-of-power
+                # markets are his to work by hand; an engine order resting
+                # there kills his via the exchange's self-match guard).
+                # Manual orders were already skipped above.
                 r = self.desk.cancel(rec.id, rec.market)
                 if r.ok:
                     self._log(event="pull", market=rec.market,
                               side=rec.side,
                               why="owner: staying out of this market "
-                                  "for now — special rules pending")
+                                  "for now — it is his to work by hand")
                     del self.orders[rec.id]
                     actions -= 1
                 continue
@@ -2115,6 +2120,9 @@ class Family:
                 continue
             if self._dead_here(slug):
                 continue      # out means out — no resting anything there
+            if self._avoided(slug):
+                continue      # the owner works these by hand: the engine
+                              # rests NO exits here (owner, 2026-08-22)
             book = self.cache.fresh(slug, BOOK_MAX_AGE, now)
             if book is None:
                 continue

@@ -1919,7 +1919,11 @@ class TestTakerDump(unittest.TestCase):
 
 
 class TestOwnerAvoidList(unittest.TestCase):
-    def test_avoided_markets_stop_quoting_but_exits_survive(self):
+    def test_avoided_markets_are_left_entirely_to_the_owner(self):
+        """Owner, 2026-08-22 ('Don't place any orders in the balance of
+        power. I'm going to do that one by hand'): an avoided market
+        gets NO engine orders at all — quotes, probes, dumps, AND the
+        engine's own exits leave. Only his manual orders stay."""
         from v3.tests.test_family import Rig, A
         from v3.family import FamilyOrder
         from v3.intents import BUY_LONG, SELL_LONG
@@ -1934,21 +1938,24 @@ class TestOwnerAvoidList(unittest.TestCase):
             intent=SELL_LONG, placed_ts=1.0, purpose="sell")
         r.exchange.live["X1"] = {"id": "X1", "market": A, "side": "SELL",
                                  "price": 0.50, "size": 2.0}
+        r.fam.orders["HAND"] = FamilyOrder(
+            id="HAND", market=A, side="SELL", price=0.60, qty=2.0,
+            intent=SELL_LONG, placed_ts=1.0, purpose="manual",
+            why="placed by the owner")
+        r.exchange.live["HAND"] = {"id": "HAND", "market": A,
+                                   "side": "SELL", "price": 0.60,
+                                   "size": 2.0}
         r.fam.inventory[A] = {"qty": 2.0, "cost": 0.60}
         r.positions[A] = (2.0, 0.60)
         r.fam.cfg.avoid_tokens = ("ussemov",)   # matches the rig's slug
         self.assertFalse(r.fam.enterable(A))
-        for _ in range(3):                      # pulls are throttled
+        for _ in range(4):                      # pulls are throttled
             r.fam.last_action.clear()
             r.cycle(advance=120.0)
-        left = [o for o in r.fam.orders.values()
-                if o.market == A and o.purpose not in ("sell", "manual")]
-        self.assertEqual(left, [])              # nothing keeps quoting
-        exits = [o for o in r.fam.orders.values()
-                 if o.market == A and o.purpose == "sell"]
-        self.assertTrue(exits)                  # stock still managed
-        # the quotes left either via the immediate owner-pull or the
-        # universe drop at rediscovery — both are the ordered outcome
+        engine_left = [o for o in r.fam.orders.values()
+                       if o.market == A and o.purpose != "manual"]
+        self.assertEqual(engine_left, [])       # every engine order gone
+        self.assertIn("HAND", r.fam.orders)     # his order untouched
 
 
 class TestFillCardRetention(unittest.TestCase):

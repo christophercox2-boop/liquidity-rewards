@@ -114,8 +114,12 @@ def config() -> FamilyConfig:
         # hunting new candidates
         dump_usd_day=50.0,
         # owner, 2026-08-22: stay out of the Alaska governor markets —
-        # special (ranked-choice) rules pending
-        avoid_tokens=("usgub-ak", "usgubp-ak"),
+        # special (ranked-choice) rules pending. And the balance-of-power
+        # markets are the owner's own book ("Don't place any orders in
+        # the balance of power. I'm going to do that one by hand") — the
+        # engine's resting orders there were killing his via the
+        # exchange's self-match prevention.
+        avoid_tokens=("usgub-ak", "usgubp-ak", "paccc-balpow"),
         graduate_paid_usd=1.00, proven_usd=150.0,
         # owner, 2026-08-21: 75c is a GOAL — markets that could clear it
         # at full confidence get starter positions from this budget, and
