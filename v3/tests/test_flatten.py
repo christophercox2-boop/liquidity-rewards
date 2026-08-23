@@ -2334,3 +2334,33 @@ class TestNeverQuotePastFair(unittest.TestCase):
         self.assertIsNotNone(plan)
         self.assertGreaterEqual(plan["qty"], 50.0)   # real size, not dust
         self.assertEqual(plan["px"], 0.01)           # still AT the wall
+
+
+class TestDumpsJournalTheirSale(unittest.TestCase):
+    def test_dump_writes_the_fill_row_at_the_known_price(self):
+        """Owner, 2026-08-23: 'most of the markets are being closed by
+        reconciliation' — dumps left no record of their own sale."""
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.fam.cfg.dump_usd_day = 50.0
+        r.add_market(A, book=Book(
+            bids=((0.44, 100.0), (0.02, 60000.0)),
+            asks=((0.45, 100.0), (0.98, 60000.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.positions[A] = (10.0, 2.0)
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 2.0}   # basis 20c
+        r.fam.fairs = lambda s: 0.45
+        r.fam.cache.put(A, Book(bids=((0.44, 100.0), (0.02, 60000.0)),
+                                asks=((0.45, 100.0), (0.98, 60000.0)),
+                                tick=0.01, fetched_at=r.now))
+        n0 = len(r.fam.fills)
+        r.fam._sell(r.now, 5)
+        dumps = [f for f in r.fam.fills[n0:] if "taker dump" in
+                 str(f.get("why", ""))]
+        self.assertTrue(dumps)                    # the sale is on record
+        self.assertEqual(dumps[0]["px"], 0.44)    # at the bid
+        self.assertEqual(dumps[0]["side"], "SELL")
+        # and the inventory came down by the dumped size immediately
+        left = (r.fam.inventory.get(A) or {}).get("qty", 0.0)
+        self.assertLess(left, 10.0)

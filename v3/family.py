@@ -2246,6 +2246,28 @@ class Family:
                             if r2.ok:
                                 self.dump_today = round(
                                     self.dump_today + dq * bid_t, 2)
+                                # the sale is journaled HERE, at the
+                                # known price — dumps used to leave no
+                                # record, so every one surfaced later
+                                # as "closed by reconciliation, no
+                                # price recorded" (owner, 2026-08-23).
+                                # A rare partial fill rests at the bid
+                                # and the exchange snapshot reconciles.
+                                inv["qty"] -= dq
+                                inv["cost"] -= dq * bid_t
+                                left = round(inv["qty"], 2)
+                                if abs(inv["qty"]) < 0.005:
+                                    self.inventory.pop(slug, None)
+                                    self.inv_since.pop(slug, None)
+                                self._journal_fill(FamilyOrder(
+                                    id=r2.order_id or f"dump{int(now)}",
+                                    market=slug, side="SELL",
+                                    price=bid_t, qty=dq,
+                                    intent=SELL_LONG, placed_ts=now,
+                                    purpose="sell",
+                                    why="taker dump — sold into the "
+                                        "bid (the carved exception)"),
+                                    dq, now, left)
                                 self._log(event="dump", market=slug,
                                           price=bid_t, qty=dq,
                                           note="sold into the bid — "
