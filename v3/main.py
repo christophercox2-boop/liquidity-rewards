@@ -191,6 +191,126 @@ def fills_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
     return text, added
 
 
+TRADES_CSV_HEADER = ("ts,iso,type,market,side,intent,price,shares,"
+                     "order_id,role,realized_pnl\n")
+
+
+def _act_num(x):
+    """Protobuf money/qty shapes: plain, {'value': '1.5'}, or string."""
+    if x is None:
+        return None
+    if isinstance(x, dict):
+        x = x.get("value")
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return None
+
+
+def _iso_to_ts(s: str) -> float:
+    import datetime as _d
+    s = (s or "").strip()
+    if not s:
+        return 0.0
+    try:
+        return _d.datetime.fromisoformat(
+            s.replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        return 0.0
+
+
+def parse_activities(rows: list) -> list[dict]:
+    """Activity rows -> OUR executions, one per row.
+
+    The feed returns BOTH sides of every trade: ours and the
+    counterparty's. Treating that as a self-cross once dropped 1,623 of
+    1,623 real fills (1.0, the hard way). OUR side is the one whose
+    order carries a real intent — the API redacts the counterparty's to
+    ORDER_INTENT_UNDEFINED."""
+    out = []
+    for a in rows or []:
+        atype = str(a.get("type") or a.get("activityType") or "")
+        t = a.get("trade") or {}
+        pr = a.get("positionResolution") or {}
+        if t:
+            ours = None
+            role = ""
+            for key, name in (("passiveExecution", "passive"),
+                              ("aggressorExecution", "aggressor")):
+                ex = t.get(key) or {}
+                o = ex.get("order") or {}
+                it = str(o.get("intent") or "")
+                if o.get("id") and it and not it.endswith("UNDEFINED"):
+                    ours, role = ex, name
+                    break
+            if ours is None:
+                continue                      # entirely the other side
+            o = ours.get("order") or {}
+            shares = _act_num(ours.get("lastShares"))
+            if not shares or shares <= 0:
+                continue                      # a placement, not a fill
+            px = (_act_num(ours.get("lastPx"))
+                  or _act_num(o.get("avgPx")) or _act_num(o.get("price")))
+            intent = str(o.get("intent") or "")
+            side = "BUY" if "BUY" in intent else (
+                "SELL" if "SELL" in intent else "")
+            ts_s = str(ours.get("transactTime") or t.get("updateTime")
+                       or t.get("createTime") or "")
+            out.append({
+                "ts": _iso_to_ts(ts_s), "iso": ts_s,
+                "type": atype or "TRADE",
+                "market": str(t.get("marketSlug") or ""),
+                "side": side, "intent": intent,
+                "price": px, "shares": shares,
+                "order_id": str(o.get("id") or ""), "role": role,
+                "realized_pnl": _act_num(t.get("realizedPnl"))})
+        elif pr:
+            ts_s = str(pr.get("updateTime") or pr.get("createTime") or "")
+            after = pr.get("afterPosition") or {}
+            out.append({
+                "ts": _iso_to_ts(ts_s), "iso": ts_s,
+                "type": atype or "POSITION_RESOLUTION",
+                "market": str(pr.get("marketSlug") or ""),
+                "side": "", "intent": "",
+                "price": None, "shares": _act_num(after.get("quantity")),
+                "order_id": "", "role": "",
+                "realized_pnl": _act_num(pr.get("realizedPnl"))})
+        else:
+            # an activity shape we have never seen: record that it
+            # exists rather than dropping it silently
+            ts_s = str(a.get("updateTime") or a.get("createTime") or "")
+            out.append({"ts": _iso_to_ts(ts_s), "iso": ts_s,
+                        "type": atype or "UNKNOWN", "market": "",
+                        "side": "", "intent": "", "price": None,
+                        "shares": None, "order_id": "", "role": "",
+                        "realized_pnl": None})
+    return out
+
+
+def trades_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
+    """Append-only transaction record. Deduplicated on the whole line,
+    so re-fetching overlapping pages adds nothing."""
+    def s(x):
+        if x is None:
+            return ""
+        return f"{x:g}" if isinstance(x, (int, float)) else str(x)
+    text = existing if existing else TRADES_CSV_HEADER
+    seen = set(text.rstrip().split("\n"))
+    added = 0
+    for r in sorted(rows, key=lambda x: x.get("ts") or 0.0):
+        line = ",".join([
+            f"{r.get('ts') or 0:.1f}", s(r.get("iso")), s(r.get("type")),
+            s(r.get("market")), s(r.get("side")), s(r.get("intent")),
+            s(r.get("price")), s(r.get("shares")), s(r.get("order_id")),
+            s(r.get("role")), s(r.get("realized_pnl"))])
+        if line in seen:
+            continue
+        text += line + "\n"
+        seen.add(line)
+        added += 1
+    return text, added
+
+
 def card_is_open(card: dict) -> bool:
     """A lot is open only while the exchange still shows a position —
     a lot the pairing thinks is open on a FLAT market was closed by a
@@ -850,6 +970,36 @@ class Monitor:
                   "and grades (estimate vs. what actually paid).", ""]
         return "\n".join(lines)
 
+    def publish_trades(self, now: float, deep: bool = False) -> dict:
+        """The definitive transaction record: the exchange's own
+        activity history, published to data/trades.csv (owner,
+        2026-08-23: "get the transaction history so we can have a
+        definitive record of what is happening"). Deep at boot, a few
+        pages hourly after — the file is append-only and deduplicated,
+        so overlap costs nothing."""
+        try:
+            raw = self.client.activities(pages=25 if deep else 3)
+        except Exception as e:  # noqa: BLE001 — never breaks the loop
+            self._note(f"trades history: {e}")
+            return {"ok": False, "note": str(e)[:120]}
+        rows = parse_activities(raw)
+        kinds = {}
+        for r in rows:
+            kinds[r["type"]] = kinds.get(r["type"], 0) + 1
+        try:
+            existing, sha = self._gh_file("data/trades.csv")
+            text, added = trades_csv_append(existing, rows)
+            if added:
+                self._gh_put("data/trades.csv", text, sha,
+                             f"trade history: +{added} rows [skip ci]")
+        except Exception as e:  # noqa: BLE001
+            self._note(f"trades publish: {e}")
+            return {"ok": False, "note": str(e)[:120]}
+        self._note(f"trade history: {len(raw)} activities, {len(rows)} ours, "
+                   f"+{added} new rows; kinds={kinds}")
+        return {"ok": True, "activities": len(raw), "parsed": len(rows),
+                "added": added, "kinds": kinds}
+
     def publish_files(self, now: float) -> None:
         """Hourly, and only while 1.0 is retired (one writer per file)."""
         if os.environ.get("V1_ENABLED", "0") != "0":
@@ -857,6 +1007,12 @@ class Monitor:
         if now - getattr(self, "_pub_at", 0.0) < 3600.0:
             return
         self._pub_at = now
+        try:
+            self.publish_trades(now, deep=not getattr(self, "_trades_deep",
+                                                      False))
+            self._trades_deep = True
+        except Exception as e:  # noqa: BLE001
+            self._note(f"trades: {e}")
         try:
             import datetime as _dt3
             start = (_dt3.datetime.now(_dt3.timezone.utc)

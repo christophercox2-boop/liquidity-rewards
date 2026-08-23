@@ -201,6 +201,32 @@ class Client:
                 out[slug] = (net, round(cost, 2))
         return out
 
+    def activities(self, types=None, pages: int = 10,
+                   page_size: int = 100) -> list[dict]:
+        """The account's activity history, paginated to the end or
+        `pages` pages — the DEFINITIVE record of what happened (owner,
+        2026-08-23: "get the transaction history so we can have a
+        definitive record"). types=None asks for everything the
+        exchange records, not just trades, so cancels and resolutions
+        show up if the feed carries them. Raw rows; the caller parses."""
+        out: list[dict] = []
+        cursor = None
+        for _ in range(max(pages, 1)):
+            params: dict = {"limit": page_size,
+                            "sortOrder": "SORT_ORDER_DESCENDING"}
+            if types:
+                params["types"] = list(types)
+            if cursor:
+                params["cursor"] = cursor
+            j = self.get(TRADE_API + "/v1/portfolio/activities",
+                         signed=True, params=params)
+            rows = j.get("activities") or []
+            out.extend(rows)
+            cursor = j.get("nextCursor")
+            if j.get("eof") or not cursor or not rows:
+                break
+        return out
+
     def recent_trades(self, limit: int = 25) -> list[dict]:
         """Latest trade activities. The feed returns BOTH sides of every
         trade — treating that as a self-cross once dropped 1,623 of 1,623

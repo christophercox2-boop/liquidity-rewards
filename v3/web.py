@@ -964,13 +964,25 @@ function fDraw(){
  el.innerHTML=out;
 }
 function fTabSet(t){window._fillTab=t;fDraw();}
+function ftrades(){
+ var b=document.getElementById('thout');
+ if(b)b.innerHTML='<div class="muted">asking the exchange\\u2026</div>';
+ post({op:'fetch_trades'},function(j){
+  if(!b)return;
+  b.innerHTML=j&&j.ok
+   ? '<div class="muted">'+j.activities+' activities read, '+j.parsed+' ours, +'+j.added+' new rows written to data/trades.csv</div>'
+   : '<div class="bad">'+esc((j&&j.note)||'failed')+'</div>';
+ });
+}
 function render(d){
  fetch('/fills.json',{headers:hdrs(),cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
   window._fillsJ=j;
   fDraw();
   if(!window._fillTick)window._fillTick=setInterval(fTick,1000);
  }).catch(function(){});
- return '<div class="card"><div class="muted">One card per purchase \\u2014 open lots tick as their exits earn; the color grades how it went. Tap a card for the story. Closed cards stay 3 days; open ones stay until they turn profitable.</div></div><div id="fl"><div class="card muted">loading\\u2026</div></div>';
+ return '<div class="card"><div class="muted">One card per purchase \\u2014 open lots tick as their exits earn; the color grades how it went. Tap a card for the story. Closed cards stay 3 days; open ones stay until they turn profitable.</div>'
+  +'<div style="margin:8px 0 0"><button onclick="ftrades()">Refresh transaction history</button> <span class="muted">\\u2014 pulls the exchange\\u2019s own record into data/trades.csv</span></div><div id="thout"></div></div>'
+  +'<div id="fl"><div class="card muted">loading\\u2026</div></div>';
 }
 """
 
@@ -1026,6 +1038,9 @@ class WebServer:
             price = body.get("price")
             return self.monitor.order_op(op, str(body.get("order_id") or ""),
                                          float(price) if price is not None else None)
+        if op == "fetch_trades":
+            import time as _t
+            return self.monitor.publish_trades(_t.time(), deep=True)
         if op == "set_fair":
             f = body.get("fair")
             return self.monitor.set_owner_fair(

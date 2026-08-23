@@ -2554,3 +2554,112 @@ class TestWallSizeUpBindsRestingBook(unittest.TestCase):
                 and o.purpose != "manual"]
         self.assertTrue(bids)
         self.assertGreaterEqual(max(o.qty for o in bids), 50.0)
+
+
+class TestTransactionHistory(unittest.TestCase):
+    """Owner, 2026-08-23: 'get the transaction history so we can have a
+    definitive record of what is happening.'"""
+
+    def _trade(self, oid, mkt, intent, px, shares, ts, pnl=None,
+               role="passive", other_first=True):
+        ours = {"order": {"id": oid, "intent": intent},
+                "lastShares": str(shares), "lastPx": str(px),
+                "transactTime": ts}
+        theirs = {"order": {"id": "THEIRS",
+                            "intent": "ORDER_INTENT_UNDEFINED"},
+                  "lastShares": str(shares), "lastPx": str(px),
+                  "transactTime": ts}
+        t = {"marketSlug": mkt, "updateTime": ts}
+        if role == "passive":
+            t["passiveExecution"], t["aggressorExecution"] = ours, theirs
+        else:
+            t["passiveExecution"], t["aggressorExecution"] = theirs, ours
+        if pnl is not None:
+            t["realizedPnl"] = str(pnl)
+        return {"type": "ACTIVITY_TYPE_TRADE", "trade": t}
+
+    def test_picks_our_side_not_the_counterpartys(self):
+        from v3.main import parse_activities
+        rows = parse_activities([
+            self._trade("O1", "mkt-a", "ORDER_INTENT_BUY_LONG",
+                        0.44, 10, "2026-08-23T14:00:00Z"),
+            # we were the AGGRESSOR here (a taker dump)
+            self._trade("O2", "mkt-b", "ORDER_INTENT_SELL_LONG",
+                        0.91, 50, "2026-08-23T14:05:00Z", role="aggressor"),
+        ])
+        self.assertEqual(len(rows), 2)          # both ours, neither dropped
+        self.assertEqual(rows[0]["order_id"], "O1")
+        self.assertEqual(rows[0]["side"], "BUY")
+        self.assertEqual(rows[0]["price"], 0.44)
+        self.assertEqual(rows[0]["shares"], 10)
+        self.assertEqual(rows[0]["role"], "passive")
+        self.assertEqual(rows[1]["order_id"], "O2")
+        self.assertEqual(rows[1]["side"], "SELL")
+        self.assertEqual(rows[1]["role"], "aggressor")
+        self.assertGreater(rows[0]["ts"], 1_700_000_000)
+
+    def test_trade_entirely_the_counterpartys_is_skipped(self):
+        from v3.main import parse_activities
+        rows = parse_activities([{"type": "ACTIVITY_TYPE_TRADE", "trade": {
+            "marketSlug": "mkt-c",
+            "passiveExecution": {"order": {"id": "X",
+                                 "intent": "ORDER_INTENT_UNDEFINED"},
+                                 "lastShares": "5"},
+            "aggressorExecution": {"order": {"id": "Y",
+                                   "intent": "ORDER_INTENT_UNDEFINED"},
+                                   "lastShares": "5"}}}])
+        self.assertEqual(rows, [])
+
+    def test_placement_with_no_shares_is_not_a_fill(self):
+        from v3.main import parse_activities
+        a = self._trade("O3", "mkt-d", "ORDER_INTENT_BUY_LONG",
+                        0.10, 0, "2026-08-23T14:00:00Z")
+        self.assertEqual(parse_activities([a]), [])
+
+    def test_resolutions_and_unknown_shapes_are_recorded(self):
+        from v3.main import parse_activities
+        rows = parse_activities([
+            {"type": "ACTIVITY_TYPE_POSITION_RESOLUTION",
+             "positionResolution": {"marketSlug": "mkt-e",
+                                    "updateTime": "2026-08-23T12:00:00Z",
+                                    "realizedPnl": "3.25",
+                                    "afterPosition": {"quantity": "0"}}},
+            {"type": "ACTIVITY_TYPE_SOMETHING_NEW",
+             "updateTime": "2026-08-23T11:00:00Z"},
+        ])
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]["market"], "mkt-e")
+        self.assertEqual(rows[0]["realized_pnl"], 3.25)
+        self.assertEqual(rows[1]["type"], "ACTIVITY_TYPE_SOMETHING_NEW")
+
+    def test_csv_is_append_only_and_deduplicates(self):
+        from v3.main import parse_activities, trades_csv_append
+        rows = parse_activities([
+            self._trade("O1", "mkt-a", "ORDER_INTENT_BUY_LONG",
+                        0.44, 10, "2026-08-23T14:00:00Z")])
+        text, n = trades_csv_append(None, rows)
+        self.assertEqual(n, 1)
+        self.assertIn("mkt-a", text)
+        self.assertIn("O1", text)
+        text2, n2 = trades_csv_append(text, rows)     # same page again
+        self.assertEqual(n2, 0)
+        self.assertEqual(text2, text)
+        more = parse_activities([
+            self._trade("O9", "mkt-z", "ORDER_INTENT_SELL_LONG",
+                        0.07, 44, "2026-08-23T15:00:00Z")])
+        text3, n3 = trades_csv_append(text2, more)
+        self.assertEqual(n3, 1)
+        self.assertIn("mkt-z", text3)
+
+    def test_protobuf_money_shapes_parse(self):
+        from v3.main import parse_activities
+        a = {"type": "ACTIVITY_TYPE_TRADE", "trade": {
+            "marketSlug": "mkt-p", "updateTime": "2026-08-23T10:00:00Z",
+            "passiveExecution": {
+                "order": {"id": "OP", "intent": "ORDER_INTENT_BUY_LONG"},
+                "lastShares": {"value": "7"},
+                "lastPx": {"value": "0.33"},
+                "transactTime": "2026-08-23T10:00:00Z"}}}
+        rows = parse_activities([a])
+        self.assertEqual(rows[0]["shares"], 7.0)
+        self.assertEqual(rows[0]["price"], 0.33)
