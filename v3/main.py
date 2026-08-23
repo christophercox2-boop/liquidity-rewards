@@ -201,7 +201,9 @@ def fills_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
 
 
 TRADES_CSV_HEADER = ("ts,iso,type,market,side,intent,price,shares,"
-                     "order_id,role,realized_pnl\n")
+                     "order_id,role,realized_pnl,placed_iso,rested_h,"
+                     "commission,maker_bps,manual,order_state,"
+                     "cancel_reason,reject_reason\n")
 
 
 def _act_num(x):
@@ -271,14 +273,34 @@ def parse_activities(rows: list) -> list[dict]:
             side = REST_SIDE.get(intent, "")
             ts_s = str(ours.get("transactTime") or t.get("updateTime")
                        or t.get("createTime") or "")
+            # the exchange carries far more than we were reading (the
+            # 2026-08-23 shape probe): when the order was PLACED, why
+            # it was cancelled, and the commissions actually charged.
+            placed_s = str(o.get("createTime") or o.get("insertTime") or "")
+            placed = _iso_to_ts(placed_s)
+            ex_ts = _iso_to_ts(ts_s)
             out.append({
-                "ts": _iso_to_ts(ts_s), "iso": ts_s,
+                "ts": ex_ts, "iso": ts_s,
                 "type": atype or "TRADE",
                 "market": str(t.get("marketSlug") or ""),
                 "side": side, "intent": intent,
                 "price": px, "shares": shares,
                 "order_id": str(o.get("id") or ""), "role": role,
-                "realized_pnl": _act_num(t.get("realizedPnl"))})
+                "realized_pnl": _act_num(t.get("realizedPnl")),
+                "placed_iso": placed_s,
+                "placed_ts": placed or None,
+                # the exact resting period, from the exchange itself —
+                # no ledger needed, and it covers history too
+                "rested_h": (round((ex_ts - placed) / 3600.0, 3)
+                             if placed and ex_ts > placed else None),
+                "commission": _act_num(
+                    ours.get("commissionNotionalCollected")),
+                "maker_bps": _act_num(o.get("makerCommissionsBasisPoints")),
+                "manual": (1 if o.get("manualOrderIndicator") else 0),
+                "order_state": str(o.get("state") or ""),
+                "cancel_reason": str(ours.get("unsolicitedCancelReason")
+                                     or ""),
+                "reject_reason": str(ours.get("orderRejectReason") or "")})
         elif pr:
             ts_s = str(pr.get("updateTime") or pr.get("createTime") or "")
             after = pr.get("afterPosition") or {}
@@ -317,7 +339,11 @@ def trades_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
             f"{r.get('ts') or 0:.1f}", s(r.get("iso")), s(r.get("type")),
             s(r.get("market")), s(r.get("side")), s(r.get("intent")),
             s(r.get("price")), s(r.get("shares")), s(r.get("order_id")),
-            s(r.get("role")), s(r.get("realized_pnl"))])
+            s(r.get("role")), s(r.get("realized_pnl")),
+            s(r.get("placed_iso")), s(r.get("rested_h")),
+            s(r.get("commission")), s(r.get("maker_bps")),
+            s(r.get("manual")), s(r.get("order_state")),
+            s(r.get("cancel_reason")), s(r.get("reject_reason"))])
         if line in seen:
             continue
         text += line + "\n"
@@ -1064,7 +1090,8 @@ class Monitor:
             return {"ok": False, "note": f"history fetch: {str(e)[:120]}"}
         cutoff = time.time() - days * 86400.0
         ex: dict = defaultdict(lambda: {"shares": 0.0, "ts": 0.0,
-                                        "market": "", "side": "", "px": 0.0})
+                                        "market": "", "side": "", "px": 0.0,
+                                        "placed_ts": None})
         for r in parse_activities(raw):
             if r["type"] != "ACTIVITY_TYPE_TRADE":
                 continue
@@ -1078,6 +1105,8 @@ class Monitor:
             g["ts"] = max(g["ts"], r["ts"])
             g["market"], g["side"] = r["market"], r["side"]
             g["px"] = round(r["price"], 4)
+            if r.get("placed_ts"):
+                g["placed_ts"] = r["placed_ts"]
         jr_oid: dict = defaultdict(float)
         legacy: dict = defaultdict(float)
         owner_of: dict = {}
@@ -1115,7 +1144,8 @@ class Monitor:
                 continue
             rows_out.append({"family": tag, "market": g["market"],
                              "side": g["side"], "px": g["px"],
-                             "qty": short, "ts": g["ts"], "oid": oid})
+                             "qty": short, "ts": g["ts"], "oid": oid,
+                             "placed_ts": g.get("placed_ts")})
             added += 1
         fed_odds = [0]
         if not dry_run:
@@ -1134,7 +1164,8 @@ class Monitor:
                     # exact resting period when we still know when the
                     # order went on the book (owner, 2026-08-23)
                     "rested_h": (round((r["ts"] - placed) / 3600.0, 2)
-                                 if (placed := fam.placed_at.get(r["oid"]))
+                                 if (placed := (r.get("placed_ts")
+                                     or fam.placed_at.get(r["oid"])))
                                  and r["ts"] > placed else None)})
                 # a recovered fill is real evidence about where this
                 # market trades, so it corrects the band the engine
@@ -1150,7 +1181,9 @@ class Monitor:
                 # period measured from our own placement ledger. No
                 # ledger entry means no observation — a guessed resting
                 # time would poison the odds that price every order.
-                placed = fam.placed_at.get(r["oid"])
+                # the exchange's own createTime first — it covers
+                # history, which our ledger cannot; the ledger backs it
+                placed = r.get("placed_ts") or fam.placed_at.get(r["oid"])
                 if placed and r["ts"] > placed:
                     fam.fillmodel.observe_fill_age(r["market"],
                                                    r["ts"] - placed)

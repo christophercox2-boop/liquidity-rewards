@@ -3114,3 +3114,60 @@ class TestExactRestingPeriod(unittest.TestCase):
         r2 = Rig()
         r2.fam.restore(d)
         self.assertAlmostEqual(r2.fam.placed_at["L4"], self.now - 3600)
+
+
+class TestExchangeCarriesPlacementTime(unittest.TestCase):
+    """The 2026-08-23 shape probe: the exchange's order object carries
+    createTime, the cancel reason, and the commissions actually
+    charged. Owner: 'Be wary of anything opaque... it's always out
+    there for you to find.' It was."""
+
+    def _act(self, created, executed, cancel="", comm=None):
+        return {"type": "ACTIVITY_TYPE_TRADE", "trade": {
+            "marketSlug": "m-1", "updateTime": executed,
+            "passiveExecution": {
+                "order": {"id": "O1",
+                          "intent": "ORDER_INTENT_BUY_LONG",
+                          "createTime": created, "state": "FILLED",
+                          "makerCommissionsBasisPoints": "5",
+                          "manualOrderIndicator": True},
+                "lastShares": "5", "lastPx": "0.40",
+                "transactTime": executed,
+                "commissionNotionalCollected": comm,
+                "unsolicitedCancelReason": cancel}}}
+
+    def test_resting_period_comes_from_the_exchange(self):
+        from v3.main import parse_activities
+        r = parse_activities([self._act("2026-08-23T10:00:00Z",
+                                        "2026-08-23T13:30:00Z")])[0]
+        self.assertAlmostEqual(r["rested_h"], 3.5, places=2)
+        self.assertEqual(r["order_state"], "FILLED")
+        self.assertEqual(r["manual"], 1)
+        self.assertEqual(r["maker_bps"], 5.0)
+
+    def test_cancel_reason_and_commission_are_captured(self):
+        from v3.main import parse_activities
+        r = parse_activities([self._act("2026-08-23T10:00:00Z",
+                                        "2026-08-23T11:00:00Z",
+                                        cancel="SELF_MATCH_PREVENTION",
+                                        comm="0.02")])[0]
+        self.assertEqual(r["cancel_reason"], "SELF_MATCH_PREVENTION")
+        self.assertEqual(r["commission"], 0.02)
+
+    def test_missing_placement_time_yields_no_resting_period(self):
+        from v3.main import parse_activities
+        a = self._act("", "2026-08-23T11:00:00Z")
+        a["trade"]["passiveExecution"]["order"].pop("createTime")
+        self.assertIsNone(parse_activities([a])[0]["rested_h"])
+
+    def test_csv_carries_the_new_columns(self):
+        from v3.main import parse_activities, trades_csv_append
+        rows = parse_activities([self._act("2026-08-23T10:00:00Z",
+                                           "2026-08-23T13:30:00Z")])
+        text, n = trades_csv_append(None, rows)
+        self.assertEqual(n, 1)
+        head = text.split("\n")[0]
+        for col in ("placed_iso", "rested_h", "commission",
+                    "cancel_reason", "order_state"):
+            self.assertIn(col, head)
+        self.assertIn("3.5", text)
