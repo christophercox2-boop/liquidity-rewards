@@ -2673,8 +2673,17 @@ class Family:
 
     def restore(self, d: dict) -> None:
         for oid, v in (d.get("orders") or {}).items():
-            self.orders[oid] = FamilyOrder(**{k: x for k, x in v.items()
-                                           if k in FamilyOrder.__dataclass_fields__})
+            rec = FamilyOrder(**{k: x for k, x in v.items()
+                                 if k in FamilyOrder.__dataclass_fields__})
+            if rec.why == "adopted from the earlier versions":
+                # one-time migration (owner, 2026-08-22 "Don't let it
+                # cancel orders I set by hand", then "Still getting
+                # orders cancelled"): everything claimed by the old
+                # adoption after the 1.0/2.0 retirement was the owner's
+                # hand — relabel it untouchable.
+                rec.purpose = "manual"
+                rec.why = "the owner's own order — the engine leaves it alone"
+            self.orders[oid] = rec
         self.inventory = dict(d.get("inventory") or {})
         self.positions_seen = dict(d.get("positions_seen") or {})
         self.silent_cancels = d.get("silent_cancels") or 0

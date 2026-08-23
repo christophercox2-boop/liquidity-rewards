@@ -750,12 +750,11 @@ function render(d){
  out+='<div style="margin:6px 0"><button onclick="ckrw()">Check for new payouts now</button></div>'+rwcard();
  out+='<div class="hint">The estimate is 3.0\\u2019s own sampler \\u2014 measured on an independent clock, accruing only while books are fresh. Actuals are the account\\u2019s posted rewards (during the transition the older versions\\u2019 books pay into the same number). No fudge factors: a gap means an input was wrong, and the unmeasured minutes say how much of the day went unscored.</div>';
  if(!rows.length){out+='<div class="muted">Nothing to grade yet \\u2014 the first full day under 3.0 lands tomorrow.</div>';}
- var tot=0,nd=0,pend=0;
- rows.forEach(function(r){
-  if(r.actual!=null){tot+=r.actual;nd++;}
-  else if(r.est!=null){pend+=r.est;}
- });
- if(nd){out+='<div style="margin:8px 0 2px;font-size:1.15em"><b>'+usd(tot)+' paid in total</b> <span class="muted">over the '+nd+' posted days shown'+(pend>0.005?' \\u00b7 '+usd(pend)+' more estimated, not posted yet':'')+'</span></div>';}
+ var pend=0;
+ rows.forEach(function(r){if(r.actual==null&&r.est!=null){pend+=r.est;}});
+ var pt=d.paid_total;
+ if(!pt){var tot=0,nd=0;rows.forEach(function(r){if(r.actual!=null){tot+=r.actual;nd++;}});pt=nd?{usd:tot,days:nd,since:''}:null;}
+ if(pt){out+='<div style="margin:8px 0 2px;font-size:1.15em"><b>'+usd(pt.usd)+' paid in total</b> <span class="muted">over '+pt.days+' posted days'+(pt.since?' since '+esc(pt.since):'')+(pend>0.005?' \\u00b7 '+usd(pend)+' more estimated, not posted yet':'')+'</span></div>';}
  rows.slice().reverse().forEach(function(r){
   out+='<div style="margin:10px 0 0"><b>'+esc(r.day)+'</b>';
   out+=' <span class="muted">est '+(r.est==null?'\\u2014':usd(r.est))+' \\u00b7 paid '+(r.actual==null?'not posted yet':usd(r.actual))+(r.unmeasured_min>1?' \\u00b7 '+r.unmeasured_min+'m unmeasured':'')+'</span>';

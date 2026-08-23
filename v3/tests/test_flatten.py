@@ -2174,3 +2174,21 @@ class TestHandsOffOwnerOrders(unittest.TestCase):
         self.assertIn("HAND3", r.fam.orders)
         # and his exit adds no new risk, so it never blocks the ceiling
         self.assertEqual(r.fam.family_spent(), 0.0)
+
+
+class TestOldAdoptionsMigrateToManual(unittest.TestCase):
+    def test_restore_relabels_pre_fix_adoptions(self):
+        from v3.tests.test_family import Rig
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
+        r = Rig()
+        r.fam.orders["OLD1"] = FamilyOrder(
+            id="OLD1", market=A_J, side="SELL", price=0.06, qty=4.0,
+            intent=SELL_LONG, placed_ts=999_000.0, purpose="sell",
+            why="adopted from the earlier versions")
+        d = r.fam.to_dict()
+        r2 = Rig()
+        r2.fam.restore(d)
+        rec = r2.fam.orders["OLD1"]
+        self.assertEqual(rec.purpose, "manual")
+        self.assertIn("owner", rec.why)

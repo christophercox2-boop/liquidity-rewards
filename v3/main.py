@@ -560,6 +560,16 @@ class Monitor:
                      est_by_day.get(d, {}).get("stale_s", 0.0) / 60.0, 1)}
                 for d in days]
 
+    def _paid_total(self) -> dict | None:
+        """All-time posted rewards: EVERY day in rewards.csv, not just
+        the rows the grades page lists (owner, 2026-08-22: "way more
+        than 12 posted days — just look at rewards.csv")."""
+        if not self.actuals_by_day:
+            return None
+        return {"usd": round(sum(self.actuals_by_day.values()), 2),
+                "days": len(self.actuals_by_day),
+                "since": min(self.actuals_by_day)}
+
     def _state(self, now: float, summaries: dict) -> dict:
         st = {
             "saved_at": now, "build": self.build, "boot_ts": self.boot_ts,
@@ -604,6 +614,7 @@ class Monitor:
                 "meta": dict(self.silver.official_meta or {}),
             },
             "grades": self._grades(),
+            "paid_total": self._paid_total(),
             "flatten": ({"active": self.flatten,
                          "done": self.flatten_done, **(self.last_flat or {})}
                         if self.flatten else {"active": False}),
