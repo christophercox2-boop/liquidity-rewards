@@ -225,3 +225,7 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787451157.1,politics,scc-hrep-rep-2026-11-03-gte200,BUY,1,0.76,earn,0.4318,1.02,0.63395,73,82,0.511,0.77,0.87,0.126,1,3 ticks in front of the touch — closer to the midpoint; ~99.6% of the bid side
 1787451817.1,cfb,aachc-cfb-wins-2026-11-28-nd-11pt5wins,BUY,0.01,0.47,earn,1.7629,0.03,,39,46,0.291,0.28,0.48,0.05,0.01,19 ticks in front of the touch — closer to the midpoint; ~70.5% of the bid side
 1787452057.1,cfb,aachc-cfb-wins-2026-11-28-nd-10pt5wins,BUY,0.01,0.77,sell,0.0248,8.73,,,,0.327,,,,-0.99,an exit — its fill reduces the position it sits on
+1787452193.2,politics,enwc-ussep-ma-2026-09-01-dem-edmark,SELL,5,0.91,earn,0.6132,0.17,,87,96,0,0.88,0.95,0.01,-5,1 tick in front of the touch — closer to the midpoint; ~50.0% of the ask side
+1787452493.2,politics,usgubewc-usgub-fl-2026-11-03-dem,SELL,1,0.13,earn,6.2375,4.17,0.1543,15,20,0.552,0.21,0.23,0.0243,-1,5 ticks in front of the touch — closer to the midpoint; ~99.8% of the ask side
+1787452553.2,politics,usgubewc-usgub-tx-2026-11-03-rep,BUY,1,0.89,earn,3.0471,1.13,0.87545,85,89,0.815,0.88,0.9,0.0145,1,joins the touch — the book has been quiet
+1787452553.2,politics,enwc-usgubp-ma-2026-09-01-rep-micmin,SELL,2,0.94,earn,4.561,0.91,0.00055,91,94,0.722,0.92,0.94,-0.9394,-177.99,1 tick behind the touch; ~52.6% of the ask side
