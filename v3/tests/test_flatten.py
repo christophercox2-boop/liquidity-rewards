@@ -2364,3 +2364,64 @@ class TestDumpsJournalTheirSale(unittest.TestCase):
         # and the inventory came down by the dumped size immediately
         left = (r.fam.inventory.get(A) or {}).get("qty", 0.0)
         self.assertLess(left, 10.0)
+
+
+class TestVanishedOrderLimbo(unittest.TestCase):
+    """Owner, 2026-08-23: 'literally every closed position... says
+    closed by reconciliation.' A completely-filled order vanishes from
+    the order list before the slower position feed shows the delta;
+    instant silent-cancel classification threw the fill away. Vanished
+    orders now wait in limbo for the feed."""
+
+    def _vanish(self, r, oid="V1", qty=5.0):
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r.fam.orders[oid] = FamilyOrder(
+            id=oid, market=A_J, side="BUY", price=0.40, qty=qty,
+            intent=BUY_LONG, placed_ts=r.now, purpose="earn")
+        # NOT in exchange.live: the order has vanished
+
+    def test_late_delta_books_the_fill(self):
+        from v3.tests.test_family import Rig
+        r = Rig()
+        r.add_market(A_J)
+        self._vanish(r)
+        r.cycle()                          # gone, no delta: limbo
+        self.assertEqual(r.fam.silent_cancels, 0)
+        self.assertEqual(len(r.fam.gone_pending), 1)
+        r.positions[A_J] = (5.0, 2.0)      # the feed catches up
+        r.cycle()
+        self.assertEqual(len(r.fam.gone_pending), 0)
+        self.assertEqual(r.fam.silent_cancels, 0)
+        fills = [x for x in r.fam.fills if x["market"] == A_J]
+        self.assertTrue(fills)             # the fill made the journal
+        self.assertEqual(fills[-1]["px"], 0.40)
+        self.assertEqual((r.fam.inventory.get(A_J) or {}).get("qty"), 5.0)
+
+    def test_true_silence_still_counts_after_grace(self):
+        from v3.tests.test_family import Rig
+        r = Rig()
+        r.add_market(A_J)
+        self._vanish(r, oid="V2")
+        r.cycle()
+        self.assertEqual(len(r.fam.gone_pending), 1)
+        for _ in range(4):
+            r.cycle(advance=120.0)         # grace expires, no delta ever
+        self.assertEqual(len(r.fam.gone_pending), 0)
+        self.assertEqual(r.fam.silent_cancels, 1)
+        self.assertFalse([x for x in r.fam.fills if x["market"] == A_J])
+
+    def test_limbo_survives_a_restart(self):
+        from v3.tests.test_family import Rig
+        r = Rig()
+        r.add_market(A_J)
+        self._vanish(r, oid="V3")
+        r.cycle()
+        d = r.fam.to_dict()
+        r2 = Rig()
+        r2.add_market(A_J)
+        r2.fam.restore(d)
+        self.assertIn("V3", r2.fam.gone_pending)
+        r2.positions[A_J] = (5.0, 2.0)
+        r2.cycle()
+        self.assertTrue([x for x in r2.fam.fills if x["market"] == A_J])

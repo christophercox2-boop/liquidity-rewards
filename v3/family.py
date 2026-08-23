@@ -44,7 +44,7 @@ from __future__ import annotations
 import math
 import datetime as dt
 import time
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from zoneinfo import ZoneInfo
 
 from . import risk
@@ -59,6 +59,8 @@ from .terms import TermsStore
 ET = ZoneInfo("America/New_York")
 
 BOOK_MAX_AGE = 120.0
+GONE_GRACE_S = 300.0   # a vanished order waits this long for the lagging
+                       # position feed before it counts as a silent cancel
 
 # size grid the planner walks (contracts); fractional sizes are live rails
 QTY_GRID = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0,
@@ -289,6 +291,7 @@ class Family:
         self.earned_history: list[list] = []      # [day, $] rolling
         self._last_accrual = 0.0
         self.silent_cancels = 0
+        self.gone_pending: dict[str, dict] = {}   # vanished, feed pending
         self.log: list[dict] = []
 
     # ------------------------------------------------------------- helpers
@@ -1130,10 +1133,28 @@ class Family:
         account is shared with 1.0 and 2.0, and their fills are not ours."""
         open_by_id = {o["id"]: o for o in open_orders}
         tracked = (set(self.positions_seen) | set(self.inventory)
-                   | {o.market for o in self.orders.values()})
+                   | {o.market for o in self.orders.values()}
+                   | {g["rec"].market for g in self.gone_pending.values()})
         deltas = {m: (positions.get(m) or (0.0, 0.0))[0]
                   - self.positions_seen.get(m, 0.0)
                   for m in tracked}
+        # limbo first: orders that disappeared earlier waiting for the
+        # lagging position feed to say fill or cancel
+        for oid, gp in list(self.gone_pending.items()):
+            rec = gp["rec"]
+            d = deltas.get(rec.market, 0.0)
+            expected = rec.qty if rec.intent == BUY_LONG else -rec.qty
+            if abs(d) > 1e-9 and (d > 0) == (expected > 0):
+                filled = min(abs(d), rec.qty)
+                deltas[rec.market] = d - (filled if d > 0 else -filled)
+                self._on_fill(rec, filled, now)
+                del self.gone_pending[oid]
+            elif now >= gp["until"]:
+                self.silent_cancels += 1
+                self._log(event="silent_cancel", market=rec.market,
+                          side=rec.side, price=rec.price, qty=rec.qty,
+                          id=oid)
+                del self.gone_pending[oid]
         for oid, rec in list(self.orders.items()):
             live = open_by_id.get(oid)
             if live is not None:
@@ -1164,9 +1185,17 @@ class Family:
                 deltas[rec.market] = delta - (filled if delta > 0 else -filled)
                 self._on_fill(rec, filled, now)
             else:
-                self.silent_cancels += 1
-                self._log(event="silent_cancel", market=rec.market,
-                          side=rec.side, price=rec.price, qty=rec.qty, id=oid)
+                # NOT ruled a silent cancel yet: the position feed LAGS
+                # the order list, so a complete fill often shows the
+                # order gone before the delta arrives — instant
+                # classification threw those fills away and the cards
+                # read "closed by reconciliation" (owner, 2026-08-23:
+                # "literally every closed position... says closed by
+                # reconciliation"). The record waits in limbo; a
+                # matching delta books the fill, GONE_GRACE_S of
+                # silence makes it a real silent cancel.
+                self.gone_pending[oid] = {"rec": rec,
+                                          "until": now + GONE_GRACE_S}
             self.evidence.order_gone(rec.market, oid, now=now)
             del self.orders[oid]
         for m in tracked:
@@ -2745,6 +2774,9 @@ class Family:
             "inventory": self.inventory,
             "positions_seen": self.positions_seen,
             "silent_cancels": self.silent_cancels,
+            "gone_pending": {oid: {"rec": asdict(g["rec"]),
+                                   "until": g["until"]}
+                             for oid, g in self.gone_pending.items()},
             "last_action": self.last_action,
             "known_dead": sorted(self.known_dead),
             "inv_since": self.inv_since,
@@ -2777,6 +2809,16 @@ class Family:
         self.inventory = dict(d.get("inventory") or {})
         self.positions_seen = dict(d.get("positions_seen") or {})
         self.silent_cancels = d.get("silent_cancels") or 0
+        self.gone_pending = {}
+        for oid, g in (d.get("gone_pending") or {}).items():
+            try:
+                self.gone_pending[oid] = {
+                    "rec": FamilyOrder(**{k: x for k, x in g["rec"].items()
+                                          if k in
+                                          FamilyOrder.__dataclass_fields__}),
+                    "until": float(g["until"])}
+            except (KeyError, TypeError, ValueError):
+                continue
         self.last_action = dict(d.get("last_action") or {})
         self.known_dead = set(d.get("known_dead") or ())
         self.inv_since = dict(d.get("inv_since") or {})
