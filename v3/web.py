@@ -609,9 +609,13 @@ function wCard(name,slug,b,tri){
    return (r.s==='BUY'?'bid':'ask')+' '+r.q+' @ '+wFmtC(r.px)+' \u2192 $'+r.ev.toFixed(2)+'/day';
   }).join(' \u00b7 ')+'</b><div class="muted" style="font-size:12px;font-weight:400">'+esc(tri.why||'')+'</div></div>';
  }else if(pkRows.length){
-  pk='<div style="font-size:16px;margin:6px 0"><b>Decision: '+pkRows.map(function(r){
+  // NOT a decision: the engine recorded no pick for this market, so
+  // this is the ladder's best spot priced RIGHT NOW, against a book
+  // the scan may not have seen yet. Labelling it "Decision" told the
+  // owner the engine had acted when it had not (2026-08-23).
+  pk='<div style="font-size:16px;margin:6px 0"><b>Not taken \u2014 best spot if it were priced now: '+pkRows.map(function(r){
    return (bids.indexOf(r)>=0?'bid':'ask')+' '+r.qty+' @ '+wFmtC(r.px)+' \u2192 $'+r.ev.toFixed(2)+'/day, '+Math.round(r.p_fill*100)+'% fill odds';
-  }).join(' \u00b7 ')+'</b>'+pkRows.map(function(r){return r.why?'<div class="muted" style="font-size:12px;font-weight:400">'+esc(r.why)+'</div>':'';}).join('')+'</div>';
+  }).join(' \u00b7 ')+'</b><div class="muted" style="font-size:12px;font-weight:400">the engine placed nothing here \u2014 its own last look at this market is what the verdict above reports</div>'+pkRows.map(function(r){return r.why?'<div class="muted" style="font-size:12px;font-weight:400">'+esc(r.why)+'</div>':'';}).join('')+'</div>';
  }else{
   pk='<div class="muted" style="margin:6px 0"><b>Decision:</b> nothing here clears the bar</div>';
  }
