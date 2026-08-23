@@ -76,6 +76,12 @@ class FamilyConfig:
     # familiar" and "place them behind the touch because of the df").
     known_ground: bool = False
     rest_style: str = "behind"          # "behind" | "join_quiet"
+    # Size the chosen join up to the per-market money even when the
+    # fill-cost term prefers dust (owner, 2026-08-23, NBA: "increase
+    # the amounts... they are so small that they aren't earning
+    # anything" — stability comes from the wall's queue, not tiny size,
+    # and "obviously we'll get filled occasionally" is accepted).
+    wall_size_up: bool = False
     revive: bool = False                # may qualify a below-target side
     vol_quiet: float = 0.15             # book EWMA below this = quiet enough to join
     # THE risk number: total collateral this family may hold at once.
@@ -542,11 +548,12 @@ class Family:
                 if other and (px >= other[0][0] - 1e-9 if side == "BUY"
                               else px <= other[0][0] + 1e-9):
                     continue
-                if (side == "BUY" and fair_rv is not None
-                        and fair_rv < 0.50
-                        and px > fair_rv - tick + 1e-9):
-                    continue    # the hard cap binds revives too (owner,
-                                # 2026-08-23: no buying junk to qualify)
+                if fair_rv is not None and (
+                        (side == "BUY" and px > fair_rv - tick + 1e-9)
+                        or (side == "SELL"
+                            and px < fair_rv + tick - 1e-9)):
+                    continue    # the hard cap binds revives too, both
+                                # sides (owner, 2026-08-23)
                 cost = qty * (px if side == "BUY" else 1.0 - px)
                 # a revival is bigger than an earn order by nature — its own
                 # cap applies, not the per-market split; the family ceiling
@@ -724,21 +731,23 @@ class Family:
                 if px not in cands:
                     cands.append(px)
             budget = min(budget, 0.05)
-        # THE HARD CAP (owner, 2026-08-23 "Yes do both" — "instead of
-        # pushing the envelope on past fair value longshots"): a BUY on
-        # a market whose MODEL fair value sits under 50c may never rest
-        # above fair minus one tick. No concession ladder, no
-        # earned-confidence override, no exceptions — a fill below 50c
-        # only happens at value or better, so junk is never bought on
-        # purpose. Markets with no model have no fair line to cap
-        # against (the band's edge just tracks the touch and capping
-        # there stops ALL quoting); they keep the ignorance premium and
-        # the independence discount instead.
-        if side == "BUY":
-            fair_hard = self.fairs(slug) if self.fairs is not None else None
-            if fair_hard is not None and fair_hard < 0.50:
+        # THE HARD CAP (owner, 2026-08-23, both halves: "not paying so
+        # much past value for underdogs. That includes selling the
+        # favorites short"): on a MODELED market an earn quote never
+        # rests past fair — a BUY stays at or under fair minus one
+        # tick, a SELL at or over fair plus one tick, at any price.
+        # No concession ladder, no earned-confidence override. The NY
+        # governor short (sold 1 @ 91c against a 98.4c model, filled
+        # in a minute) is what the SELL half prevents. Markets with no
+        # model keep the ignorance premium and independence discount.
+        fair_hard = self.fairs(slug) if self.fairs is not None else None
+        if fair_hard is not None:
+            if side == "BUY":
                 cands = [px for px in cands
                          if px <= fair_hard - tick + 1e-9]
+            else:
+                cands = [px for px in cands
+                         if px >= fair_hard + tick - 1e-9]
         # Every candidate is priced by the owner's EV formula
         # (2026-08-19): what it earns while resting, minus what a fill
         # would probably cost.
@@ -909,7 +918,16 @@ class Family:
         # deeper price for the last penny).
         tol = max(0.01, 0.01 * best_ev)
         close = [r for r in live if r["ev"] >= best_ev - tol]
-        return min(close, key=lambda r: (r["p_fill"], -r["ev"]))
+        pick = min(close, key=lambda r: (r["p_fill"], -r["ev"]))
+        if self.cfg.wall_size_up:
+            # same price level, biggest size the budget allows: the
+            # modeled fill cost that shrank it is an accepted cost here
+            same_px = [r for r in contenders
+                       if abs(r["px"] - pick["px"]) < 1e-9
+                       and r["est"] > 0.0]
+            if same_px:
+                pick = max(same_px, key=lambda r: r["qty"])
+        return pick
 
     def lite_recalc(self, slug: str, bb: float | None,
                     ba: float | None) -> dict | None:
@@ -1659,12 +1677,14 @@ class Family:
                     shrink_cap = gmin * 8.0
             shrink_needed = (shrink_cap is not None
                              and rec.qty > shrink_cap + 1e-9)
-            if (rec.side == "BUY" and fair_m is not None
-                    and fair_m < 0.50
-                    and rec.price > fair_m - book.tick + 1e-9):
-                # the hard cap binds the RESTING book too (owner,
-                # 2026-08-23): a cheap bid above fair moves back to a
-                # compliant slot or leaves — regardless of what it earns
+            if fair_m is not None and (
+                    (rec.side == "BUY"
+                     and rec.price > fair_m - book.tick + 1e-9)
+                    or (rec.side == "SELL"
+                        and rec.price < fair_m + book.tick - 1e-9)):
+                # the hard cap binds the RESTING book too, both sides
+                # (owner, 2026-08-23): a quote past fair moves back to
+                # a compliant slot or leaves — regardless of earnings
                 shrink_needed = True
             if (best is not None and best.get("revive")
                     and rec.purpose != "grow"):
@@ -2419,7 +2439,7 @@ class Family:
             px = round(book.bids[0][0] - k_probe * book.tick, 3)
             _lo, hi = self._price_bounds(slug, book.bids, book.asks, book.tick)
             fair_pr = self.fairs(slug) if self.fairs is not None else None
-            if fair_pr is not None and fair_pr < 0.50:
+            if fair_pr is not None:
                 # scouts obey the hard cap too (owner, 2026-08-23)
                 cap_pr = fair_pr - book.tick
                 hi = cap_pr if hi is None else min(hi, cap_pr)

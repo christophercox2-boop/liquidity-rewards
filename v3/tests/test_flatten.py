@@ -2098,10 +2098,15 @@ class TestNbaFamily(unittest.TestCase):
         from v3.basketball import nba
         from v3.football import nfl
         a, b = nba(), nfl()
-        for f in ("capital_usd", "per_market_usd", "holdings_in_ceiling",
+        for f in ("capital_usd", "holdings_in_ceiling",
                   "dump_usd_day", "rest_style", "known_ground", "revive",
                   "probe_usd", "grow_usd"):
             self.assertEqual(getattr(a, f), getattr(b, f), f)
+        # owner, 2026-08-23: NBA departs from the NFL copy — wall joins
+        # at double the per-market money, sized up, never improving
+        self.assertEqual(a.per_market_usd, 2.00)
+        self.assertTrue(a.wall_size_up)
+        self.assertFalse(a.allow_improve)
         self.assertEqual(a.tag, "NBA")
         # offseason: no game-day window until the owner sets one
         self.assertIsNone(a.rest_from)
@@ -2266,3 +2271,66 @@ class TestNbaSearchFallback(unittest.TestCase):
                 raise AssertionError("search must not run when tags work")
         out = nba_discover(C())
         self.assertEqual(list(out), ["aqc-nba-mvp-2027-shagil"])
+
+
+class TestNeverQuotePastFair(unittest.TestCase):
+    """Owner, 2026-08-23: 'not paying so much past value for underdogs.
+    That includes selling the favorites short.' The NY governor case:
+    sold 1 @ 91c against a 98.4c model, filled in a minute."""
+
+    def test_favorite_never_shorted_below_fair(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(
+            bids=((0.90, 50.0), (0.02, 60000.0)),
+            asks=((0.94, 40.0), (0.98, 60000.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.cycle()
+        r.fam.fairs = lambda s: 0.984
+        b = r.cache.fresh(A, 3600, r.now)
+        p, _ = r.fam._prog_row(A)
+        sp = r.fam._side_pool(A, p)
+        plan = r.fam._plan_side(A, b, "SELL", p, sp, 10.0)
+        self.assertTrue(plan is None or plan["px"] >= 0.984 + 0.01 - 1e-9)
+
+    def test_resting_short_below_fair_is_forced_out(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_SHORT
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(
+            bids=((0.90, 50.0), (0.02, 60000.0)),
+            asks=((0.91, 1.0), (0.98, 60000.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.fam.orders["NY"] = FamilyOrder(
+            id="NY", market=A, side="SELL", price=0.91, qty=1.0,
+            intent=SELL_SHORT, placed_ts=1.0, purpose="earn")
+        r.exchange.live["NY"] = {"id": "NY", "market": A, "side": "SELL",
+                                 "price": 0.91, "size": 1.0}
+        r.fam.fairs = lambda s: 0.984
+        for _ in range(3):
+            r.fam.last_action.clear()
+            r.cycle(advance=120.0)
+        rec = r.fam.orders.get("NY")
+        self.assertIsNone(rec)      # pulled or repriced away — never kept
+
+    def test_wall_join_sizes_to_the_market_money(self):
+        from v3.tests.test_family import Rig, A
+        from v3.basketball import nba
+        from v3.scoring import Book
+        r = Rig(cfg=nba())
+        r.add_market(A, book=Book(
+            bids=((0.01, 480000.0),),
+            asks=((0.02, 280000.0), (0.98, 60000.0)),
+            tick=0.01, fetched_at=1_000_000.0))
+        r.cycle()
+        b = r.cache.fresh(A, 3600, r.now)
+        p, _ = r.fam._prog_row(A)
+        sp = r.fam._side_pool(A, p)
+        plan = r.fam._plan_side(A, b, "BUY", p, sp,
+                                r.fam._market_budget(A) / 2.0)
+        self.assertIsNotNone(plan)
+        self.assertGreaterEqual(plan["qty"], 50.0)   # real size, not dust
+        self.assertEqual(plan["px"], 0.01)           # still AT the wall

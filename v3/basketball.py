@@ -87,7 +87,10 @@ def nba() -> FamilyConfig:
         # bar — any positive-EV join may rest, however small.
         allow_improve=False,
         min_est_day=0.0,
-        capital_usd=50.0, per_market_usd=1.00,
+        # owner, 2026-08-23: "You can increase the amounts in NBA per
+        # market. They are so small that they aren't earning anything."
+        wall_size_up=True,
+        capital_usd=50.0, per_market_usd=2.00,
         holdings_in_ceiling=True,
         dump_usd_day=10.0,
         rest_from=None, rest_until=None,     # offseason: no game days yet
