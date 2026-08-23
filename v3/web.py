@@ -119,7 +119,7 @@ function nm(d,s){return esc((d.labels&&d.labels[s])||s);}
 function fams(d){var out=[];for(var k in (d.summaries||{})){out.push([k,d.summaries[k]]);}return out;}
 function post(body,cb){
  var h=hdrs();h.set('X-Reprice','1');h.set('Content-Type','application/json');
- fetch('op',{method:'POST',headers:h,body:JSON.stringify(body)})
+ fetch('/op',{method:'POST',headers:h,body:JSON.stringify(body)})
   .then(function(r){return r.json();}).then(function(j){if(cb)cb(j);load();})
   .catch(function(){alert('unreachable');});
 }
@@ -129,7 +129,7 @@ function showbook(slug,el){
  if(!box)return;
  if(box.innerHTML){box.innerHTML='';return;}
  box.innerHTML='<div class="muted">fetching the book\u2026</div>';
- fetch('book.json?m='+encodeURIComponent(slug),{headers:hdrs(),cache:'no-store'})
+ fetch('/book.json?m='+encodeURIComponent(slug),{headers:hdrs(),cache:'no-store'})
   .then(function(r){return r.json();}).then(function(b){
    if(!b.ok){box.innerHTML='<div class="muted">'+esc(b.note||'no book')+'</div>';return;}
    var oursAt={};(b.ours||[]).forEach(function(o){oursAt[o.side+(o.price*100).toFixed(1)]=o;});
@@ -167,7 +167,7 @@ function showbook(slug,el){
   }).catch(function(){box.innerHTML='<div class="bad">unreachable</div>';});
 }
 function load(){
- fetch('data.json',{headers:hdrs(),cache:'no-store'}).then(function(r){
+ fetch('/data.json',{headers:hdrs(),cache:'no-store'}).then(function(r){
   if(r.status===401){document.getElementById('login').style.display='block';
     document.getElementById('view').innerHTML='';return null;}
   return r.json();
@@ -642,7 +642,7 @@ function wCard(name,slug,b,tri){
  return head+s+legend+pk+evs+bt+'<div class="hint">\u25CF marks our order</div>'+mine;
 }
 function wShow(t){
- fetch('book.json?m='+encodeURIComponent(t.market),{headers:hdrs(),cache:'no-store'})
+ fetch('/book.json?m='+encodeURIComponent(t.market),{headers:hdrs(),cache:'no-store'})
   .then(function(r){return r.json();}).then(function(b){
    var el=document.getElementById('spot');
    if(!el)return;
@@ -947,7 +947,7 @@ function fDraw(){
 }
 function fTabSet(t){window._fillTab=t;fDraw();}
 function render(d){
- fetch('fills.json',{headers:hdrs(),cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+ fetch('/fills.json',{headers:hdrs(),cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
   window._fillsJ=j;
   fDraw();
   if(!window._fillTick)window._fillTick=setInterval(fTick,1000);
