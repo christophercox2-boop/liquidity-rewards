@@ -950,6 +950,8 @@ function fDraw(){
  };
  var greens=j.open_hidden||0;
  var out='<div style="margin:2px 0 8px 0">'+btn(1,'open',open.length)+(greens?'<span style="color:#9ec49a;font-size:13px;margin-right:8px">+'+greens+' in profit</span>':'')+btn(0,'closed',closed.length+pend.length)+'</div>';
+ var hr=j.hidden_reconciled||0;
+ if(hr)out+='<div class="muted" style="margin:-4px 0 8px 0">'+hr+' more closed without a recorded sale \\u2014 hidden; the exchange\\u2019s record of them is in data/trades.csv</div>';
  var list=tab===1?open:closed;
  if(tab===0&&pend.length){
   out+=pend.map(function(p){

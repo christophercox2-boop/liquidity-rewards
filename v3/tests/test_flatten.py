@@ -2779,3 +2779,136 @@ class TestJournalBackfill(unittest.TestCase):
                               ago_h=24 * 9)])
         r = self.mon.backfill_journal(days=3.0, dry_run=False)
         self.assertEqual(r["added"], 0)
+
+
+class TestBackfillMatchesByOrderId(unittest.TestCase):
+    """Owner, 2026-08-23: 'keep track of the order id in the future so
+    we can match it up.' Exact matching, and a conservative fallback
+    for journal rows written before order ids were recorded."""
+
+    def setUp(self):
+        import tempfile
+        import time as _time
+        from v3.main import Monitor
+        self.dir = tempfile.TemporaryDirectory()
+        os.environ["V3_STATE_PATH"] = os.path.join(self.dir.name, "s.json")
+        os.environ["V3_FLOOR_PATH"] = os.path.join(self.dir.name, "f.json")
+        os.environ["GITHUB_TOKEN"] = ""
+        os.environ["V3_FLATTEN"] = "0"
+        self.mon = Monitor()
+        self.fam = self.mon.families["politics"]
+        self.slug = "ussewc-usse-ga-2026-11-03-dem"
+        self.fam.universe[self.slug] = {"event_n": 1, "name": "GA"}
+        self.now = _time.time()
+
+    def tearDown(self):
+        for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
+            os.environ.pop(k, None)
+        self.dir.cleanup()
+
+    def _act(self, oid, px, shares, ago_h=1.0,
+             intent="ORDER_INTENT_BUY_LONG"):
+        import datetime as _d
+        ts = _d.datetime.fromtimestamp(self.now - ago_h * 3600,
+                                       _d.timezone.utc).isoformat()
+        return {"type": "ACTIVITY_TYPE_TRADE", "trade": {
+            "marketSlug": self.slug, "updateTime": ts,
+            "passiveExecution": {"order": {"id": oid, "intent": intent},
+                                 "lastShares": str(shares),
+                                 "lastPx": str(px), "transactTime": ts}}}
+
+    def _feed(self, acts):
+        self.mon.client.activities = lambda pages=25: acts
+
+    def test_two_orders_at_one_price_are_told_apart(self):
+        """The price-bucket method could not do this: one order
+        journaled, an identical-price sibling missing."""
+        self.fam.fills.append({"ts": self.now - 3600, "market": self.slug,
+                               "side": "BUY", "qty": 5.0, "px": 0.44,
+                               "oid": "A1", "purpose": "earn"})
+        self._feed([self._act("A1", 0.44, 5), self._act("B2", 0.44, 5)])
+        r = self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(r["added"], 1)               # only the sibling
+        rec = [x for x in self.fam.fills if x.get("purpose") == "backfill"]
+        self.assertEqual(len(rec), 1)
+        self.assertEqual(rec[0]["oid"], "B2")
+        self.assertAlmostEqual(rec[0]["qty"], 5.0)
+
+    def test_recovered_rows_carry_the_id_so_a_rerun_is_exact(self):
+        self._feed([self._act("C3", 0.20, 7)])
+        self.mon.backfill_journal(dry_run=False)
+        rec = [x for x in self.fam.fills if x.get("purpose") == "backfill"]
+        self.assertEqual(rec[0]["oid"], "C3")
+        again = self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(again["added"], 0)
+
+    def test_legacy_rows_without_an_id_are_credited_once(self):
+        """A pre-oid journal row must absorb its execution, and only
+        one of two same-price executions."""
+        self.fam.fills.append({"ts": self.now - 3600, "market": self.slug,
+                               "side": "BUY", "qty": 5.0, "px": 0.44,
+                               "purpose": "earn"})        # no oid
+        self._feed([self._act("D4", 0.44, 5), self._act("E5", 0.44, 5)])
+        r = self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(r["added"], 1)     # legacy credit absorbed one
+        self.assertAlmostEqual(r["shares"], 5.0)
+
+    def test_partial_journaling_of_one_order_tops_up(self):
+        self.fam.fills.append({"ts": self.now - 3600, "market": self.slug,
+                               "side": "BUY", "qty": 3.0, "px": 0.44,
+                               "oid": "F6", "purpose": "earn"})
+        self._feed([self._act("F6", 0.44, 10)])
+        r = self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(r["added"], 1)
+        rec = [x for x in self.fam.fills if x.get("purpose") == "backfill"]
+        self.assertAlmostEqual(rec[0]["qty"], 7.0)     # 10 - 3
+
+    def test_multiple_executions_of_one_order_aggregate(self):
+        """The exchange splits a fill into many small executions; they
+        belong to one order and must not each become a row."""
+        self._feed([self._act("G7", 0.30, 1, ago_h=2.0),
+                    self._act("G7", 0.30, 1, ago_h=1.9),
+                    self._act("G7", 0.30, 1, ago_h=1.8)])
+        r = self.mon.backfill_journal(dry_run=False)
+        self.assertEqual(r["added"], 1)
+        rec = [x for x in self.fam.fills if x.get("purpose") == "backfill"]
+        self.assertAlmostEqual(rec[0]["qty"], 3.0)
+
+
+class TestReconciliationCardsHidden(unittest.TestCase):
+    def test_flat_market_with_missing_closes_is_counted_not_listed(self):
+        """Owner, 2026-08-23: cards closed without a recorded sale are
+        'essentially useless' — hidden, with a count."""
+        import tempfile
+        import time as _time
+        from v3.main import Monitor
+        d = tempfile.TemporaryDirectory()
+        os.environ["V3_STATE_PATH"] = os.path.join(d.name, "s.json")
+        os.environ["V3_FLOOR_PATH"] = os.path.join(d.name, "f.json")
+        os.environ["GITHUB_TOKEN"] = ""
+        os.environ["V3_FLATTEN"] = "0"
+        try:
+            m = Monitor()
+            fam = m.families["politics"]
+            now = _time.time()
+            slug_bad, slug_ok = "mkt-recon", "mkt-real"
+            # bought, market now flat, no sale ever journaled
+            fam.fills.append({"ts": now - 3600, "market": slug_bad,
+                              "side": "BUY", "qty": 10.0, "px": 0.20,
+                              "purpose": "earn"})
+            # a real round trip: bought and sold, both recorded
+            fam.fills.append({"ts": now - 7200, "market": slug_ok,
+                              "side": "BUY", "qty": 5.0, "px": 0.30,
+                              "purpose": "earn"})
+            fam.fills.append({"ts": now - 3600, "market": slug_ok,
+                              "side": "SELL", "qty": 5.0, "px": 0.40,
+                              "purpose": "sell"})
+            v = m.fills_view()
+            self.assertEqual(v["hidden_reconciled"], 1)
+            shown = {c["market"] for c in v["fills"]}
+            self.assertIn(slug_ok, shown)         # the real one survives
+            self.assertNotIn(slug_bad, shown)     # the useless one is gone
+        finally:
+            for k in ("V3_STATE_PATH", "V3_FLOOR_PATH", "V3_FLATTEN"):
+                os.environ.pop(k, None)
+            d.cleanup()

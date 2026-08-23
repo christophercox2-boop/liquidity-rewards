@@ -1337,6 +1337,13 @@ class Family:
             self.fills.append({
                 "ts": round(now, 1), "market": rec.market, "side": rec.side,
                 "qty": round(filled, 2), "px": rec.price,
+                # the exchange's order id: the exact handle for matching
+                # a journal row to the exchange's own transaction record
+                # (owner, 2026-08-23: "keep track of the order id in the
+                # future so we can match it up"). Price-bucket matching
+                # was the only option before this and could not tell two
+                # orders at one price apart.
+                "oid": rec.id,
                 "purpose": rec.purpose, "why": rec.why,
                 "est_day": (rec.live_est if rec.live_est is not None
                             else rec.est_day),

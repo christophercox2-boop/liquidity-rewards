@@ -148,9 +148,12 @@ def load_history() -> dict[str, float]:
         return {}, {}, {}
 
 
+FILLS_CSV_HEADER_V1 = ("ts,family,market,side,qty,px,purpose,est_day,"
+                       "rested_h,fair,band_lo,band_hi,conf,touch_bid,"
+                       "touch_ask,conc,pos_after,why\n")
 FILLS_CSV_HEADER = ("ts,family,market,side,qty,px,purpose,est_day,"
                     "rested_h,fair,band_lo,band_hi,conf,touch_bid,"
-                    "touch_ask,conc,pos_after,why\n")
+                    "touch_ask,conc,pos_after,why,oid\n")
 
 
 def fills_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
@@ -163,6 +166,11 @@ def fills_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
             return ""
         return f"{x:g}" if isinstance(x, (int, float)) else str(x)
     text = existing if existing else FILLS_CSV_HEADER
+    if text.startswith(FILLS_CSV_HEADER_V1):
+        # oid became the final column on 2026-08-23; upgrade the header
+        # in place so the file keeps one shape. Older rows simply lack
+        # the trailing field.
+        text = FILLS_CSV_HEADER + text[len(FILLS_CSV_HEADER_V1):]
     tail = set(text.rstrip().split("\n")[-400:])
     last = 0.0
     body = text.rstrip().rsplit("\n", 1)[-1]
@@ -182,7 +190,8 @@ def fills_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
             s(r.get("est_day")), s(r.get("rested_h")), s(r.get("fair")),
             s(band[0]), s(band[1]), s(r.get("conf")),
             s(r.get("touch_bid")), s(r.get("touch_ask")),
-            s(r.get("conc")), s(r.get("pos_after")), why])
+            s(r.get("conc")), s(r.get("pos_after")), why,
+            s(r.get("oid"))])
         if line in tail:
             continue
         text += line + "\n"
@@ -1013,57 +1022,77 @@ class Monitor:
                          dry_run: bool = True) -> dict:
         """Walk the exchange's transaction record against the fills
         journal and add rows for executions the journal never recorded
-        (owner, 2026-08-23). Additive and IDEMPOTENT: executions are
-        bucketed by market/side/price and only the SHORTFALL against
-        what the journal already holds is written, so re-running finds
-        nothing to do. Inventory is never touched — the exchange's
-        position feed stays the sole authority on what we hold."""
+        (owner, 2026-08-23).
+
+        Matching is by ORDER ID — the exchange's own handle, exact even
+        when two orders rest at one price (owner: "keep track of the
+        order id in the future so we can match it up"). Journal rows
+        written before order ids were recorded carry none, so their
+        shares stay available as a per-market/side/price CREDIT that
+        each unmatched execution consumes before claiming a shortfall;
+        that keeps the transition conservative — it can under-recover,
+        never double-count. Recovered rows carry the order id, so the
+        next run matches them exactly. Inventory is never touched: the
+        exchange's position feed stays the sole authority."""
         from collections import defaultdict
         try:
             raw = self.client.activities(pages=25)
         except Exception as e:  # noqa: BLE001
             return {"ok": False, "note": f"history fetch: {str(e)[:120]}"}
         cutoff = time.time() - days * 86400.0
-        ex: dict = defaultdict(lambda: {"shares": 0.0, "ts": 0.0, "n": 0})
+        ex: dict = defaultdict(lambda: {"shares": 0.0, "ts": 0.0,
+                                        "market": "", "side": "", "px": 0.0})
         for r in parse_activities(raw):
             if r["type"] != "ACTIVITY_TYPE_TRADE":
                 continue
-            if not (r["market"] and r["side"] and r["price"]):
+            if not (r["market"] and r["side"] and r["price"]
+                    and r["shares"] and r["order_id"]):
                 continue
-            if (r["ts"] or 0) < cutoff or not r["shares"]:
+            if (r["ts"] or 0) < cutoff:
                 continue
-            k = (r["market"], r["side"], round(r["price"], 4))
-            ex[k]["shares"] += r["shares"]
-            ex[k]["ts"] = max(ex[k]["ts"], r["ts"])
-            ex[k]["n"] += 1
-        # what the journal already holds, same buckets
-        jr: dict = defaultdict(float)
+            g = ex[r["order_id"]]
+            g["shares"] += r["shares"]
+            g["ts"] = max(g["ts"], r["ts"])
+            g["market"], g["side"] = r["market"], r["side"]
+            g["px"] = round(r["price"], 4)
+        jr_oid: dict = defaultdict(float)
+        legacy: dict = defaultdict(float)
         owner_of: dict = {}
         for tag, fam in self.families.items():
             for row in fam.fills:
                 if (row.get("ts") or 0) < cutoff:
                     continue
-                k = (row.get("market"), row.get("side"),
-                     round(row.get("px") or 0, 4))
-                jr[k] += row.get("qty") or 0.0
                 owner_of[row.get("market")] = tag
+                qty = row.get("qty") or 0.0
+                oid = row.get("oid")
+                if oid:
+                    jr_oid[oid] += qty
+                else:
+                    legacy[(row.get("market"), row.get("side"),
+                            round(row.get("px") or 0, 4))] += qty
         added, skipped, rows_out = 0, 0, []
-        for k, v in sorted(ex.items(), key=lambda kv: kv[1]["ts"]):
-            market, side, px = k
-            short = round(v["shares"] - jr.get(k, 0.0), 4)
-            if short <= 0.005:
+        for oid, g in sorted(ex.items(), key=lambda kv: kv[1]["ts"]):
+            short = g["shares"] - jr_oid.get(oid, 0.0)
+            if oid not in jr_oid:
+                k = (g["market"], g["side"], g["px"])
+                take = min(short, legacy.get(k, 0.0))
+                if take > 0:
+                    legacy[k] -= take
+                    short -= take
+            if round(short, 4) <= 0.005:
                 continue
-            tag = owner_of.get(market)
+            tag = owner_of.get(g["market"])
             if tag is None:
                 for t2, fam in self.families.items():
-                    if fam.knows(market):
+                    if fam.knows(g["market"]):
                         tag = t2
                         break
             if tag is None:
                 skipped += 1
                 continue
-            rows_out.append({"family": tag, "market": market, "side": side,
-                             "px": px, "qty": short, "ts": v["ts"]})
+            rows_out.append({"family": tag, "market": g["market"],
+                             "side": g["side"], "px": g["px"],
+                             "qty": short, "ts": g["ts"], "oid": oid})
             added += 1
         if not dry_run:
             for r in rows_out:
@@ -1071,7 +1100,7 @@ class Monitor:
                 fam.fills.append({
                     "ts": round(r["ts"], 1), "market": r["market"],
                     "side": r["side"], "qty": round(r["qty"], 2),
-                    "px": r["px"], "purpose": "backfill",
+                    "px": r["px"], "oid": r["oid"], "purpose": "backfill",
                     "why": "recovered from the exchange\u2019s transaction "
                            "history \u2014 this fill was never journaled",
                     "est_day": None, "rested_h": None, "fair": None,
@@ -1079,11 +1108,10 @@ class Monitor:
                     "touch_ask": None, "conc": None, "pos_after": None})
                 fam.fills.sort(key=lambda x: x.get("ts") or 0.0)
             self._note(f"journal backfill: +{added} rows from the exchange "
-                       f"record ({days:g} days)")
+                       f"record ({days:g} days, matched by order id)")
             self.freeze_payload()
         return {"ok": True, "dry_run": dry_run, "added": added,
-                "skipped_unknown_market": skipped,
-                "days": days,
+                "skipped_unknown_market": skipped, "days": days,
                 "shares": round(sum(r["qty"] for r in rows_out), 2),
                 "sample": [f"{r['market'][:34]} {r['side']} "
                            f"{r['qty']:g}@{r['px']*100:g}c"
@@ -1290,6 +1318,7 @@ class Monitor:
         updated as its closes land."""
         rows = []
         hidden_open = 0
+        hidden_recon = 0
         for tag, fam in self.families.items():
             for card in pair_fills(fam.fills):
                 card["family"] = tag
@@ -1313,6 +1342,18 @@ class Monitor:
                     (o.live_est or 0.0) * (now - o.placed_ts) / 86400.0
                     for o in exits if o.placed_ts > 0), 4)
                 card["net"] = round(card_net(card), 4)
+                # Cards the journal never saw closed: the position is
+                # flat but the closes are missing, so there is no price
+                # and no P&L to show. The owner, 2026-08-23:
+                # "essentially useless to me for now" — counted, not
+                # listed. The exchange's own record of them lives in
+                # data/trades.csv.
+                if ((card.get("open_qty") or 0) > 0.005
+                        and not card.get("stray_close")
+                        and card.get("pos_now") is not None
+                        and abs(card["pos_now"]) < 0.005):
+                    hidden_recon += 1
+                    continue
                 if not card_visible(card, now):
                     if card_is_open(card):
                         hidden_open += 1   # open AND profitable — off
@@ -1326,6 +1367,7 @@ class Monitor:
             -x.get("last_ts", x["ts"])))
         return {"ok": True, "fills": rows[:150],
                 "open_hidden": hidden_open,
+                "hidden_reconciled": hidden_recon,
                 "pending": self._pending_fills()}
 
     def _pending_fills(self) -> list[dict]:
