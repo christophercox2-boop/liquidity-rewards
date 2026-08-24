@@ -3498,3 +3498,116 @@ class TestOwnerReplacementCountsAsCover(unittest.TestCase):
         engine = [o for o in r.fam.orders.values()
                   if o.market == A and o.purpose == "sell"]
         self.assertEqual(engine, [])
+
+
+class TestPerFamilyGrading(unittest.TestCase):
+    """Each family is graded against ITS OWN paid money, not the whole
+    account's day total (2026-08-24). Before this, politics' $255.22
+    estimate for Aug-21 was scored against $93.02 of politics + college
+    football + NFL combined, and nfl's $0.00 estimate was scored against
+    the entire account."""
+
+    def test_each_family_gets_its_own_paid_column(self):
+        from v3.main import estimates_csv_append
+        rows = [("2026-08-21", "politics", 255.22, 32.7),
+                ("2026-08-21", "cfb", 16.00, 5.0),
+                ("2026-08-21", "nfl", 0.00, 0.0)]
+        text, _ = estimates_csv_append(
+            None, "2026-08-24", rows, {"2026-08-21": 93.02},
+            "2026-08-24T16:00:00Z",
+            paid_by_fam={("2026-08-21", "politics"): 76.45,
+                         ("2026-08-21", "cfb"): 16.57})
+        got = {}
+        for line in text.strip().split("\n")[1:]:
+            p = line.split(",")
+            got[p[1]] = (p[5], p[7])
+        self.assertEqual(got["politics"][0], "76.45")
+        self.assertEqual(got["cfb"][0], "16.57")
+        self.assertEqual(got["nfl"][0], "")        # no money, no grade
+        self.assertEqual(got["politics"][1], "-70.0")   # 3.3x over
+        self.assertEqual(got["cfb"][1], "+3.6")
+
+    def test_day_total_still_used_when_no_breakdown_exists(self):
+        from v3.main import estimates_csv_append
+        rows = [("2026-08-21", "politics", 100.0, 0.0)]
+        text, _ = estimates_csv_append(
+            None, "2026-08-24", rows, {"2026-08-21": 93.02},
+            "2026-08-24T16:00:00Z")
+        self.assertEqual(text.strip().split("\n")[1].split(",")[5], "93.02")
+
+    def test_a_settled_football_market_still_classifies(self):
+        # by the time football pays, the game is over and the market has
+        # left every universe — the prefixes have to carry it
+        m = Monitor.__new__(Monitor)
+        m.families = {}
+        self.assertEqual(m._family_of("tec-nba-lal-2026-10-28"), "nba")
+        self.assertEqual(m._family_of("aqc-cfb-wins-bama-2026"), "cfb")
+        self.assertEqual(m._family_of("vmc-nfl-wins-kc-2026"), "nfl")
+        self.assertEqual(m._family_of("enwc-uspres-nom-rep-2028-rondes"),
+                         "politics")
+
+
+class TestMarketEstimateLedger(unittest.TestCase):
+    """Per-market estimates, so a market or a race can be graded
+    against its own prediction (2026-08-24). Family totals showed
+    politics was 3.4x high; only this shows where."""
+
+    def test_a_past_days_estimate_is_frozen_but_paid_fills_in(self):
+        from v3.main import market_est_append
+        rows = [("2026-08-22", "enwc-uspres-nom-rep-2028-rondes",
+                 "politics", 12.50, 4)]
+        t1, n1 = market_est_append(None, "2026-08-23", rows, {},
+                                   "2026-08-23T01:00:00Z")
+        self.assertEqual(n1, 1)
+        # a later pass sees a different estimate AND the money
+        rows2 = [("2026-08-22", "enwc-uspres-nom-rep-2028-rondes",
+                  "politics", 99.99, 9)]
+        t2, _ = market_est_append(
+            t1, "2026-08-23", rows2,
+            {"2026-08-22|enwc-uspres-nom-rep-2028-rondes": 5.78},
+            "2026-08-24T01:00:00Z")
+        p = t2.strip().split("\n")[1].split(",")
+        self.assertEqual(p[3], "12.5000")    # estimate frozen
+        self.assertEqual(p[4], "4")          # order count frozen with it
+        self.assertEqual(p[5], "2026-08-23T01:00:00Z")
+        self.assertEqual(p[6], "5.7800")     # money filled in
+        self.assertEqual(p[8], "-53.8")      # graded: 2.2x over
+
+    def test_todays_row_keeps_moving(self):
+        from v3.main import market_est_append
+        t1, _ = market_est_append(
+            None, "2026-08-24", [("2026-08-24", "m", "politics", 1.0, 1)],
+            {}, "2026-08-24T01:00:00Z")
+        t2, _ = market_est_append(
+            t1, "2026-08-24", [("2026-08-24", "m", "politics", 3.0, 5)],
+            {}, "2026-08-24T02:00:00Z")
+        p = t2.strip().split("\n")[1].split(",")
+        self.assertEqual(p[3], "3.0000")     # the day is still accruing
+        self.assertEqual(p[4], "5")
+
+    def test_the_oldest_days_are_trimmed_first(self):
+        from v3.main import market_est_append
+        rows = [(f"2026-08-{d:02d}", f"m{i}", "politics", 1.0, 1)
+                for d in (10, 20) for i in range(3)]
+        text, _ = market_est_append(None, "2026-08-24", rows, {},
+                                    "2026-08-24T01:00:00Z", keep_rows=3)
+        days = {ln.split(",")[0] for ln in text.strip().split("\n")[1:]}
+        self.assertEqual(days, {"2026-08-20"})   # newest kept
+
+    def test_the_owners_own_orders_are_not_our_prediction(self):
+        # a manual order carries no estimate of ours, so it must not
+        # inflate the market's predicted rate
+        from v3.tests.test_family import Rig, A
+        from v3.intents import SELL_LONG
+        r = Rig()
+        r.add_market(A)
+        r.fam.inventory[A] = {"qty": 120.0, "cost": 5.35}
+        r.positions[A] = (120.0, 5.35)
+        r.exchange.live["MINE"] = {"id": "MINE", "market": A, "side": "SELL",
+                                   "price": 0.07, "size": 120.0,
+                                   "intent": SELL_LONG, "manual": True}
+        r.cycle()
+        r.cycle()
+        mine = r.fam.orders.get("MINE")
+        self.assertIsNotNone(mine)
+        self.assertEqual(mine.purpose, "manual")

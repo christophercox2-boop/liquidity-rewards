@@ -356,9 +356,85 @@ ESTIMATES_CSV_HEADER = ("day,family,est_usd,unmeasured_min,recorded_at,"
                         "paid_usd,paid_at,error_pct\n")
 
 
+MARKET_EST_CSV_HEADER = ("day,market,family,est_day_usd,orders,"
+                         "recorded_at,paid_usd,paid_at,error_pct\n")
+
+
+def market_est_append(existing: str | None, today: str, rows: list,
+                      paid_by_market_day: dict, now_iso: str,
+                      keep_rows: int = 6000) -> tuple[str, int]:
+    """The per-MARKET estimate ledger.
+
+    The family ledger (estimates_csv_append) records one number a day
+    per family, which is enough to see that politics is wrong and not
+    enough to see WHERE. Across Aug 20-22 politics estimated $255-366
+    a day and paid $76-101, while college football estimated $47.66
+    and paid $54.33 — but with only family totals written down, no
+    market and no race can be graded against its own prediction, so
+    the cause stays a guess. This file makes it arithmetic.
+
+    Same discipline as the family ledger: a past day's estimate is
+    FROZEN the first time it is written. Only paid_usd, paid_at and
+    error_pct fill in afterwards.
+
+    `rows` are (day, market, family, est_day, orders) tuples.
+    `paid_by_market_day` maps "day|market" -> paid, which is exactly
+    the shape the monitor already keeps in self.rewards_seen.
+    """
+    text = existing if existing else MARKET_EST_CSV_HEADER
+    kept: dict = {}
+    order: list = []
+    for line in text.strip().split("\n")[1:]:
+        parts = line.split(",")
+        if len(parts) < 9:
+            continue
+        key = (parts[0], parts[1])
+        if key not in kept:
+            order.append(key)
+        kept[key] = parts
+    changed = 0
+    for day, market, family, est, orders in rows:
+        key = (day, market)
+        prior = kept.get(key)
+        if prior and day != today:      # frozen: a prediction you can
+            est_s = prior[3]            # revise after the fact is
+            ord_s = prior[4]            # worth nothing
+            rec_s = prior[5]
+        else:
+            est_s = f"{est:.4f}"
+            ord_s = str(int(orders))
+            rec_s = prior[5] if prior else now_iso
+        paid = paid_by_market_day.get(f"{day}|{market}")
+        paid_s = f"{paid:.4f}" if paid is not None else ""
+        paid_at = (prior[7] if prior and prior[6] else
+                   (now_iso if paid is not None else ""))
+        err = ""
+        if paid is not None:
+            try:
+                e = float(est_s)
+                if e > 0:
+                    err = f"{(paid - e) / e * 100:+.1f}"
+            except ValueError:
+                pass
+        row = [day, market, family, est_s, ord_s, rec_s, paid_s,
+               paid_at, err]
+        if kept.get(key) != row:
+            changed += 1
+        if key not in kept:
+            order.append(key)
+        kept[key] = row
+    # newest days first when trimming — the old ones are already graded
+    order.sort(key=lambda k: k[0], reverse=True)
+    order = order[:keep_rows]
+    body = "\n".join(",".join(kept[k]) for k in order)
+    return MARKET_EST_CSV_HEADER + body + "\n", changed
+
+
 def estimates_csv_append(existing: str | None, today: str,
                          rows: list, paid_by_day: dict,
-                         now_iso: str) -> tuple[str, int]:
+                         now_iso: str,
+                         paid_by_fam: dict | None = None,
+                         ) -> tuple[str, int]:
     """The estimate ledger (owner, 2026-08-23: "All the estimates
     should stay written down somewhere until the actual numbers come
     in").
@@ -368,8 +444,17 @@ def estimates_csv_append(existing: str | None, today: str,
     worthless. Only the paid column fills in later. Today's row keeps
     updating because the day is still accruing.
 
-    `rows` are (day, family, est_usd, unmeasured_min) tuples;
-    `paid_by_day` maps day -> total paid for the whole account.
+    `rows` are (day, family, est_usd, unmeasured_min) tuples.
+    `paid_by_day` maps day -> total paid for the whole account, and
+    `paid_by_fam` maps (day, family) -> that family's own share.
+
+    Grade a family against ITS OWN money (2026-08-24). Before this the
+    whole account's total was written into every family row, so the
+    politics estimate was measured against politics + football + NBA
+    together, and nfl's $0.00 estimate was scored against the entire
+    day. Both the paid column and error_pct were nonsense per family.
+    The day total is still the fallback for a family the breakdown
+    cannot classify, so a row never goes blank.
     """
     text = existing if existing else ESTIMATES_CSV_HEADER
     kept: dict = {}
@@ -392,7 +477,9 @@ def estimates_csv_append(existing: str | None, today: str,
             est_s = f"{est:.2f}"
             unmeas_s = f"{unmeas:.1f}"
             rec_s = prior[4] if prior else now_iso
-        paid = paid_by_day.get(day)
+        paid = (paid_by_fam or {}).get((day, family))
+        if paid is None and not paid_by_fam:
+            paid = paid_by_day.get(day)
         paid_s = f"{paid:.2f}" if paid is not None else ""
         paid_at = (prior[6] if prior and prior[5] else
                    (now_iso if paid is not None else ""))
@@ -593,6 +680,7 @@ class Monitor:
         self.silver = SilverFairs(client=self.client)
         self.samplers: dict[str, Estimator] = {}
         self.actuals_by_day: dict[str, float] = {}
+        self.actuals_by_fam: dict[str, float] = {}   # "day|family" -> usd
         self.rewards_seen: dict[str, float] = {}
         self.rw_last: dict | None = None      # latest payout-check result
         self._rw_at = 0.0
@@ -757,6 +845,7 @@ class Monitor:
                                or {"cancelled": 0, "failed": 0})
         self.rewards_seen = dict(saved.get("rewards_seen") or {})
         self.actuals_by_day = dict(saved.get("actuals_by_day") or {})
+        self.actuals_by_fam = dict(saved.get("actuals_by_fam") or {})
         self.owner_fairs = {k: float(v) for k, v in
                             (saved.get("owner_fairs") or {}).items()}
         self.backfilled = bool(saved.get("backfilled_600"))
@@ -817,6 +906,7 @@ class Monitor:
             "flat_stats": self.flat_stats,
             "rewards_seen": self.rewards_seen,
             "actuals_by_day": self.actuals_by_day,
+            "actuals_by_fam": self.actuals_by_fam,
             "owner_fairs": dict(self.owner_fairs),
             "backfilled_600": bool(self.backfilled),
             "evidence_seeded": bool(self.evidence_seeded),
@@ -1269,6 +1359,24 @@ class Monitor:
                            f"{r['qty']:g}@{r['px']*100:g}c"
                            for r in rows_out[:8]]}
 
+    def _family_of(self, market: str) -> str:
+        """Which family a rewarded market belongs to. The families'
+        own universes are the authority — a market can only earn where
+        the engine quotes it. Falls back to the prefixes for a market
+        that has since left a universe (a settled game, a closed race),
+        which is most of the football rows by the time they pay."""
+        for key, fam in self.families.items():
+            if market in fam.universe:
+                return key
+        low = market.lower()
+        if low.startswith(("tec-nba-", "aqc-nba-", "ftsc-nba-", "fptc-nba-")):
+            return "nba"
+        if "nfl" in low:
+            return "nfl"
+        if "cfb" in low or "ncaaf" in low:
+            return "cfb"
+        return "politics"
+
     def publish_files(self, now: float) -> None:
         """Hourly, and only while 1.0 is retired (one writer per file)."""
         if os.environ.get("V1_ENABLED", "0") != "0":
@@ -1291,12 +1399,39 @@ class Monitor:
                 existing, sha = self._gh_file("data/estimates.csv")
                 text, n = estimates_csv_append(
                     existing, et_day(now), rows, self.actuals_by_day,
-                    time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)))
+                    time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)),
+                    paid_by_fam={tuple(k.split("|", 1)): v for k, v
+                                 in self.actuals_by_fam.items()})
                 if n:
                     self._gh_put("data/estimates.csv", text, sha,
                                  f"estimates: {n} rows [skip ci]")
         except Exception as e:  # noqa: BLE001
             self._note(f"estimates ledger: {e}")
+        try:      # ...and the same thing per MARKET, so a race can be
+                  # graded against its own prediction (2026-08-24)
+            from .estimator import et_day
+            day = et_day(now)
+            per: dict = {}
+            for key, fam in self.families.items():
+                for o in fam.orders.values():
+                    if o.purpose == "manual":   # not our prediction
+                        continue
+                    a = per.setdefault((day, o.market, key),
+                                       {"est": 0.0, "n": 0})
+                    a["est"] += o.live_est or 0.0
+                    a["n"] += 1
+            mrows = [(d, m, f, a["est"], a["n"])
+                     for (d, m, f), a in per.items()]
+            if mrows:
+                existing, sha = self._gh_file("data/market_est.csv")
+                text, n = market_est_append(
+                    existing, day, mrows, self.rewards_seen,
+                    time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)))
+                if n:
+                    self._gh_put("data/market_est.csv", text, sha,
+                                 f"market estimates: {n} rows [skip ci]")
+        except Exception as e:  # noqa: BLE001
+            self._note(f"market estimate ledger: {e}")
         try:
             self.publish_trades(now, deep=not getattr(self, "_trades_deep",
                                                       False))
@@ -1415,6 +1550,16 @@ class Monitor:
         self.rewards_seen = seen
         for d, v in totals.items():
             self.actuals_by_day[d] = round(v, 2)
+        for key, a in agg.items():           # ...and per family, so the
+            fam = self._family_of(a["market"])   # ledger grades each
+            if not fam:                          # one on its own money
+                continue
+            fk = f"{a['date']}|{fam}"
+            self.actuals_by_fam[fk] = round(
+                self.actuals_by_fam.get(fk, 0.0) + a["paid"], 2)
+        if len(self.actuals_by_fam) > 4000:
+            for k in sorted(self.actuals_by_fam)[:len(self.actuals_by_fam) - 4000]:
+                del self.actuals_by_fam[k]
         # the baseline must survive a deploy between now and the next save
         # — local AND remote, immediately (a rebuild replaces the disk)
         if self.last_state:
