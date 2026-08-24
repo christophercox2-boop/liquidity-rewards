@@ -92,3 +92,27 @@ live markets on the Lite feed: 0 divergences. No change made.
 (2026-08-23) — WRONG. The transaction history shows no such sale; the
 order was cancelled. Taught: infer nothing about fills that the
 exchange's own record can settle. This is why data/trades.csv exists.
+
+## P7 — the owner's replacement orders will stop being sold over
+*Written 2026-08-24, before the fix ships.*
+
+**Claim.** After the adoption change, no market will ever again show
+BOTH an owner order reducing a position AND an engine `sell` order,
+where the two together offer more shares than the position holds.
+
+**Why.** `api.open_orders()` sets `manual=True` from the exchange's
+`manualOrderIndicator`. `Family.adoptable()` skipped exactly those
+orders, so they never entered `self.orders` — and the cover math in
+`_sell()` counts only orders it can see (`purpose in ("sell",
+"manual")`). A hand-placed replacement was therefore invisible: the
+engine read the position as bare and rested its own exit on top.
+Observed 2026-08-24 in `brisho` — owner cancelled the engine's
+SELL 120 @ 5.5c, placed his own, and the engine re-placed
+SELL 120 @ 5.46067c, with two more of the same in limbo. Recording
+the order (still `purpose="manual"`, still never touched) closes it.
+
+**Falsifier.** Any single market on /map showing a manual reduce-side
+order plus an engine `sell` order whose quantities sum above the held
+size. One instance falsifies this outright.
+
+**Check.** Read the order list per market for the next seven days.

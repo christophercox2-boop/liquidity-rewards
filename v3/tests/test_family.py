@@ -392,7 +392,10 @@ class TestAdoption(unittest.TestCase):
     def test_observing_previews_but_claims_nothing(self):
         r = self.rig_with_foreign(switch=False)
         s = r.cycle()
-        self.assertEqual(s["would_adopt"], 2)        # v1a + v1x, not manual/far
+        # v1a + v1x + own: an exchange-flagged MANUAL order is RECORDED
+        # too since 2026-08-24, so the cover math can see it. Only the
+        # far market (not our ground) is left out.
+        self.assertEqual(s["would_adopt"], 3)
         self.assertEqual(set(r.fam.orders), set())
 
     def test_armed_records_unknown_orders_hands_off(self):
@@ -406,7 +409,8 @@ class TestAdoption(unittest.TestCase):
         self.assertEqual(r.fam.orders["v1a"].purpose, "manual")
         self.assertIn("v1x", r.fam.orders)
         self.assertEqual(r.fam.orders["v1x"].purpose, "manual")
-        self.assertNotIn("own", r.fam.orders)        # pre-flagged manual
+        self.assertIn("own", r.fam.orders)           # recorded...
+        self.assertEqual(r.fam.orders["own"].purpose, "manual")  # ...hands off
         self.assertNotIn("far", r.fam.orders)        # not our ground
         self.assertEqual(s["would_adopt"], 0)
         self.assertEqual(r.fam.inventory[A]["qty"], 10.0)

@@ -3430,3 +3430,71 @@ class TestQuieterFillAlerts(unittest.TestCase):
         r.fam._page_opens_due(r.now + 25)
         # -20*0.99 - (-18) = -1.80 -> over the bar, pages
         self.assertTrue(any("earning nothing" in t for t in self._pages(r)))
+
+
+class TestOwnerReplacementCountsAsCover(unittest.TestCase):
+    """Owner, 2026-08-24: 'if I cancel an order and put a new one back
+    the model won't sell more than is already there.' His replacement
+    must count against the position so the engine rests nothing on
+    top of it — including when the EXCHANGE flags it manual, which
+    used to make it invisible."""
+
+    def _rig_long(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.fam.inventory[A] = {"qty": 120.0, "cost": 5.35}
+        r.positions[A] = (120.0, 5.35)
+        return r, A
+
+    def test_exchange_flagged_manual_order_is_recorded_and_covers(self):
+        from v3.intents import SELL_LONG
+        r, A = self._rig_long()
+        # the owner's own replacement, as the exchange reports it
+        r.exchange.live["MINE"] = {"id": "MINE", "market": A,
+                                   "side": "SELL", "price": 0.07,
+                                   "size": 120.0, "intent": SELL_LONG,
+                                   "manual": True}
+        for _ in range(3):
+            r.fam.last_action.clear()
+            r.cycle(advance=120.0)
+        self.assertIn("MINE", r.fam.orders)
+        self.assertEqual(r.fam.orders["MINE"].purpose, "manual")
+        engine_exits = [o for o in r.fam.orders.values()
+                        if o.market == A and o.purpose == "sell"]
+        self.assertEqual(engine_exits, [])       # nothing stacked on top
+        self.assertEqual(r.fam.orders["MINE"].price, 0.07)   # untouched
+
+    def test_a_partial_replacement_is_only_topped_up_by_the_remainder(self):
+        from v3.intents import SELL_LONG
+        r, A = self._rig_long()
+        r.exchange.live["HALF"] = {"id": "HALF", "market": A,
+                                   "side": "SELL", "price": 0.07,
+                                   "size": 50.0, "intent": SELL_LONG,
+                                   "manual": True}
+        for _ in range(3):
+            r.fam.last_action.clear()
+            r.cycle(advance=120.0)
+        engine = [o for o in r.fam.orders.values()
+                  if o.market == A and o.purpose == "sell"]
+        rested = sum(o.qty for o in engine)
+        self.assertLessEqual(rested, 70.0 + 0.01)   # 120 held - his 50
+        self.assertEqual(r.fam.orders["HALF"].qty, 50.0)
+
+    def test_his_cover_on_a_short_counts_too(self):
+        from v3.tests.test_family import Rig, A
+        from v3.intents import SELL_SHORT
+        r = Rig()
+        r.add_market(A)
+        r.fam.inventory[A] = {"qty": -335.0, "cost": -314.44}
+        r.positions[A] = (-335.0, -314.44)
+        r.exchange.live["COVER"] = {"id": "COVER", "market": A,
+                                    "side": "BUY", "price": 0.95,
+                                    "size": 335.0, "intent": SELL_SHORT,
+                                    "manual": True}
+        for _ in range(3):
+            r.fam.last_action.clear()
+            r.cycle(advance=120.0)
+        engine = [o for o in r.fam.orders.values()
+                  if o.market == A and o.purpose == "sell"]
+        self.assertEqual(engine, [])

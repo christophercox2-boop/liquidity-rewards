@@ -1450,14 +1450,21 @@ class Family:
     # ---------------------------------------------------------------- adoption
 
     def adoptable(self, open_orders: list[dict], foreign_ids=()) -> list[dict]:
-        """Resting account orders this family would take over: in its
-        universe, not already claimed (by it or a sibling family), and
-        never the owner's own manual orders."""
+        """Every resting account order this family does not already
+        track, in its universe.
+
+        Orders the exchange flags MANUAL are RECORDED, not skipped
+        (owner, 2026-08-24: "if I cancel an order and put a new one
+        back the model won't sell more than is already there").
+        Skipping them meant the owner's own exits never entered the
+        book, so the cover math saw a bare position and rested a
+        second exit on top of his — the flag that identifies his
+        orders was the thing that hid them. Recording costs nothing:
+        every adopted order becomes purpose="manual", which is never
+        cancelled, moved or resized anywhere in the engine."""
         out = []
         for o in open_orders:
             if o["id"] in self.orders or o["id"] in foreign_ids:
-                continue
-            if o.get("manual"):
                 continue
             if o["market"] not in self.universe:
                 continue
