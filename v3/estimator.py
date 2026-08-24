@@ -85,9 +85,25 @@ class Estimator:
         self.per_market: dict[str, float] = {}
         self.rate = 0.0                      # $/day from the latest sample
         self.market_rates: dict[str, float] = {}
+        self.market_shares: dict[str, float] = {}
+        self.market_pools: dict[str, float] = {}
         self.samples = 0
         self.covered_s = 0.0                 # seconds actually billed today
         self.stale_s = 0.0                   # seconds refused for staleness today
+        # Owner, 2026-08-24: "Shouldn't there be thousands of estimates
+        # ... Shouldn't they catch any changes in my share?" They do —
+        # 4,320 a day at the 20s clock, each off a book under 180s old.
+        # Which means a persistent error is a BIAS in the share
+        # arithmetic, identical in every sample, and averaging cannot
+        # touch it. So bank the ingredients of the comparison that
+        # settles it: our share and the pool it was measured against,
+        # both weighted by the seconds they were actually in force.
+        # Once the exchange pays, realized share = paid / pool-seconds,
+        # and computed-vs-realized share is readable per market with no
+        # theory in between.
+        self.share_s: dict[str, float] = {}   # share x seconds live
+        self.pool_s: dict[str, float] = {}    # side pool $/day x seconds live
+        self.live_s: dict[str, float] = {}    # seconds this market was billed
         self.last_ts: float | None = None
         self.history: list[dict] = []        # closed days
         # the owner's v1 graph: one dot per sample, raw, rolling across
@@ -137,15 +153,13 @@ class Estimator:
         # of the family the meter actually sees.
         frac = (len(fresh) / len(considered)) if considered else 1.0
         if dt_s:
-            for m, r in self.market_rates.items():
-                if m in fresh_set:
-                    self.earned += r * dt_s / 86400.0
-                    self.per_market[m] = (self.per_market.get(m, 0.0)
-                                          + r * dt_s / 86400.0)
+            self._bill(now, fresh_set, dt_s=dt_s)
             self.covered_s += dt_s * frac
             self.stale_s += dt_s * (1.0 - frac)
 
         rates: dict[str, float] = {}
+        shares: dict[str, float] = {}
+        pools: dict[str, float] = {}
         for m in fresh:
             prog = terms.get(m)
             if not prog.is_live():
@@ -160,12 +174,60 @@ class Estimator:
                                   daily_side_pool=pool)
                 if s.est_day:
                     rates[m] = rates.get(m, 0.0) + s.est_day
+                    shares[m] = shares.get(m, 0.0) + (s.share or 0.0)
+                    pools[m] = pool
         self.market_rates = rates
+        self.market_shares = shares
+        self.market_pools = pools
         self.rate = sum(rates.values())
         self.dots.append([round(now, 1), round(self.rate, 2), len(fresh)])
         del self.dots[:-2880]                # ~16h at the 20s clock
         self.samples += 1
         return self.snapshot(now)
+
+    def _bill(self, now: float, fresh_set, dt_s: float | None = None) -> None:
+        """Advance the integral over one interval, at the rates that were
+        in force across it, for the markets whose books were fresh.
+
+        The share and the pool are banked over the SAME interval and
+        under the SAME freshness test as the money. That is what makes
+        the later comparison honest: computed share and realized share
+        are then measured over exactly the same seconds."""
+        if dt_s is None:
+            dt_s = min(max(now - (self.last_ts or now), 0.0), MAX_GAP_S)
+            self.last_ts = now
+        if dt_s <= 0:
+            return
+        for m, r in self.market_rates.items():
+            if m not in fresh_set:
+                continue
+            self.earned += r * dt_s / 86400.0
+            self.per_market[m] = (self.per_market.get(m, 0.0)
+                                  + r * dt_s / 86400.0)
+            self.share_s[m] = (self.share_s.get(m, 0.0)
+                               + self.market_shares.get(m, 0.0) * dt_s)
+            self.pool_s[m] = (self.pool_s.get(m, 0.0)
+                              + self.market_pools.get(m, 0.0) * dt_s)
+            self.live_s[m] = self.live_s.get(m, 0.0) + dt_s
+
+    def calibration(self) -> dict[str, dict]:
+        """Per market: the share we computed, time-weighted, and the pool
+        it was measured against. Paired with what the exchange actually
+        paid, `paid / pool_day_seconds` is the REALIZED share, and the
+        ratio of the two is the estimator's bias with no model in the
+        middle."""
+        out = {}
+        for m, secs in self.live_s.items():
+            if secs <= 0:
+                continue
+            out[m] = {
+                "share": round(self.share_s.get(m, 0.0) / secs, 6),
+                "pool_day": round(self.pool_s.get(m, 0.0) / secs, 6),
+                "live_h": round(secs / 3600.0, 3),
+                # what the pool actually offered over the hours we were live
+                "pool_live": round(self.pool_s.get(m, 0.0) / 86400.0, 6),
+            }
+        return out
 
     # -- bookkeeping ------------------------------------------------------------
 
@@ -176,6 +238,10 @@ class Estimator:
             "stale_s": round(self.stale_s, 1),
             "per_market": {m: round(v, 4) for m, v in sorted(
                 self.per_market.items(), key=lambda kv: -kv[1])[:50]},
+            # the day's share/pool measurement, kept so a payout that
+            # lands five days later can still be graded against what we
+            # actually computed while the day was running
+            "calibration": self.calibration(),
         })
         del self.history[:-HISTORY_DAYS]
         self.earned = 0.0
@@ -183,6 +249,9 @@ class Estimator:
         self.samples = 0
         self.covered_s = 0.0
         self.stale_s = 0.0
+        self.share_s = {}
+        self.pool_s = {}
+        self.live_s = {}
 
     def snapshot(self, now: float) -> dict:
         return {
@@ -201,6 +270,12 @@ class Estimator:
         d["history"] = self.history
         d["last_ts"] = self.last_ts
         d["dots"] = self.dots
+        # the day's share measurement must survive a restart, or a
+        # deploy mid-afternoon silently resets the sample the whole
+        # calibration depends on
+        d["share_s"] = {m: round(v, 4) for m, v in self.share_s.items()}
+        d["pool_s"] = {m: round(v, 4) for m, v in self.pool_s.items()}
+        d["live_s"] = {m: round(v, 1) for m, v in self.live_s.items()}
         return d
 
     @classmethod
@@ -217,4 +292,7 @@ class Estimator:
         e.last_ts = d.get("last_ts")
         e.history = list(d.get("history") or [])
         e.dots = list(d.get("dots") or [])
+        e.share_s = dict(d.get("share_s") or {})
+        e.pool_s = dict(d.get("pool_s") or {})
+        e.live_s = dict(d.get("live_s") or {})
         return e

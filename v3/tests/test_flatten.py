@@ -3555,13 +3555,13 @@ class TestMarketEstimateLedger(unittest.TestCase):
     def test_a_past_days_estimate_is_frozen_but_paid_fills_in(self):
         from v3.main import market_est_append
         rows = [("2026-08-22", "enwc-uspres-nom-rep-2028-rondes",
-                 "politics", 12.50, 4)]
+                 "politics", 12.50, 4, 0.0, 0.0, 0.0)]
         t1, n1 = market_est_append(None, "2026-08-23", rows, {},
                                    "2026-08-23T01:00:00Z")
         self.assertEqual(n1, 1)
         # a later pass sees a different estimate AND the money
         rows2 = [("2026-08-22", "enwc-uspres-nom-rep-2028-rondes",
-                  "politics", 99.99, 9)]
+                  "politics", 99.99, 9, 0.0, 0.0, 0.0)]
         t2, _ = market_est_append(
             t1, "2026-08-23", rows2,
             {"2026-08-22|enwc-uspres-nom-rep-2028-rondes": 5.78},
@@ -3576,10 +3576,12 @@ class TestMarketEstimateLedger(unittest.TestCase):
     def test_todays_row_keeps_moving(self):
         from v3.main import market_est_append
         t1, _ = market_est_append(
-            None, "2026-08-24", [("2026-08-24", "m", "politics", 1.0, 1)],
+            None, "2026-08-24",
+            [("2026-08-24", "m", "politics", 1.0, 1, 0.0, 0.0, 0.0)],
             {}, "2026-08-24T01:00:00Z")
         t2, _ = market_est_append(
-            t1, "2026-08-24", [("2026-08-24", "m", "politics", 3.0, 5)],
+            t1, "2026-08-24",
+            [("2026-08-24", "m", "politics", 3.0, 5, 0.0, 0.0, 0.0)],
             {}, "2026-08-24T02:00:00Z")
         p = t2.strip().split("\n")[1].split(",")
         self.assertEqual(p[3], "3.0000")     # the day is still accruing
@@ -3587,7 +3589,7 @@ class TestMarketEstimateLedger(unittest.TestCase):
 
     def test_the_oldest_days_are_trimmed_first(self):
         from v3.main import market_est_append
-        rows = [(f"2026-08-{d:02d}", f"m{i}", "politics", 1.0, 1)
+        rows = [(f"2026-08-{d:02d}", f"m{i}", "politics", 1.0, 1, 0.0, 0.0, 0.0)
                 for d in (10, 20) for i in range(3)]
         text, _ = market_est_append(None, "2026-08-24", rows, {},
                                     "2026-08-24T01:00:00Z", keep_rows=3)
@@ -3666,3 +3668,75 @@ class TestNonTradePayments(unittest.TestCase):
             "amount_usd": 500.0, "detail": ""}])
         self.assertEqual(n, 1)
         self.assertTrue(text.rstrip().endswith(",500,"))
+
+
+class TestShareCalibration(unittest.TestCase):
+    """Owner, 2026-08-24: "Shouldn't there be thousands of estimates one
+    every 20 seconds for each market. Shouldn't they catch any changes
+    in my share?" They do — 4,320 a day. So a persistent error is a
+    BIAS in the share arithmetic, and no amount of averaging removes a
+    bias. These record the measurement that shows it directly."""
+
+    def _est(self):
+        from v3.estimator import Estimator
+        e = Estimator()
+        e.day = "2026-08-24"
+        e.last_ts = 1000.0
+        return e
+
+    def test_share_and_pool_are_banked_by_the_seconds_they_held(self):
+        e = self._est()
+        # two intervals: 30% of the side for 100s, then 10% for 300s
+        e.market_rates = {"m": 3.0}
+        e.market_shares = {"m": 0.30}
+        e.market_pools = {"m": 10.0}
+        e._bill(1100.0, {"m"})
+        e.market_shares = {"m": 0.10}
+        e._bill(1400.0, {"m"})
+        c = e.calibration()["m"]
+        # time-weighted, not the last read: (.3*100 + .1*300) / 400
+        self.assertAlmostEqual(c["share"], 0.15, places=5)
+        self.assertAlmostEqual(c["pool_day"], 10.0, places=5)
+        self.assertAlmostEqual(c["live_h"], 400 / 3600, places=3)
+
+    def test_a_stale_market_banks_nothing(self):
+        e = self._est()
+        e.market_rates = {"m": 3.0}
+        e.market_shares = {"m": 0.9}
+        e.market_pools = {"m": 10.0}
+        e._bill(1200.0, set())          # not fresh: no bill, no bank
+        self.assertEqual(e.calibration(), {})
+
+    def test_the_measurement_survives_a_restart(self):
+        from v3.estimator import Estimator
+        e = self._est()
+        e.market_rates = {"m": 1.0}
+        e.market_shares = {"m": 0.25}
+        e.market_pools = {"m": 4.0}
+        e._bill(1200.0, {"m"})
+        back = Estimator.from_dict(e.to_dict())
+        self.assertAlmostEqual(back.calibration()["m"]["share"], 0.25, places=5)
+
+    def test_realized_share_is_written_once_the_money_lands(self):
+        from v3.main import market_est_append
+        # we computed 40% of a side offering $10/day, live 12 hours,
+        # so we claimed $5.00 — and the exchange paid $1.25
+        rows = [("2026-08-22", "m", "politics", 5.0, 2, 0.40, 10.0, 12.0)]
+        t1, _ = market_est_append(None, "2026-08-23", rows, {},
+                                  "2026-08-23T00:00:00Z")
+        t2, _ = market_est_append(t1, "2026-08-23", rows,
+                                  {"2026-08-22|m": 1.25},
+                                  "2026-08-24T00:00:00Z")
+        p = t2.strip().split("\n")[1].split(",")
+        self.assertEqual(p[9], "0.400000")      # what we computed
+        self.assertEqual(p[12], "0.250000")     # what we actually got
+        # the bias, stated plainly: we thought 40%, we got 25%
+
+    def test_old_rows_without_the_share_columns_still_load(self):
+        from v3.main import market_est_append, MARKET_EST_CSV_HEADER
+        old = MARKET_EST_CSV_HEADER + "2026-08-01,m,politics,1.0,1,x,,,\n"
+        text, _ = market_est_append(
+            old, "2026-08-24",
+            [("2026-08-24", "n", "politics", 2.0, 1, 0.1, 5.0, 6.0)],
+            {}, "2026-08-24T00:00:00Z")
+        self.assertIn("2026-08-01,m,politics", text)
