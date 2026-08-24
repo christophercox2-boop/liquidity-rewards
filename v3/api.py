@@ -264,8 +264,26 @@ class Client:
 
     # -- market data (public) ------------------------------------------------
 
+    BOOK_DEPTH = 50          # the endpoint's documented maximum
+
     def book(self, slug: str, fetched_at: float | None = None) -> Book:
-        j = self.get(f"{GATEWAY}/v1/markets/{slug}/book")
+        """The resting book, as DEEP as the endpoint will give us.
+
+        We asked for no depth and took the default, which measures at
+        4-5 price levels a side across 370 stored snapshots. Asking for
+        the documented maximum is strictly more information for the same
+        request, and if the parameter is ignored the response is what we
+        get today, so this cannot make the book worse.
+
+        It is NOT a fix for the share overestimate, though it was
+        proposed as one on 2026-08-24 and measured down: with a discount
+        factor of 0.3, a ladder seen 3 deep scores 37.5% and the same
+        ladder 20 deep scores 36.8%. df**ticks decays faster than depth
+        accumulates, so levels past the fourth are nearly weightless.
+        Depth is worth having for the fill model and the touch, not for
+        the share. cache.depth_seen records what actually came back."""
+        j = self.get(f"{GATEWAY}/v1/markets/{slug}/book",
+                     params={"depth": self.BOOK_DEPTH})
         md = j.get("book") or j.get("marketData") or j
         bids = [(to_num(l.get("px")), to_num(l.get("qty"))) for l in md.get("bids") or []]
         asks = [(to_num(l.get("px")), to_num(l.get("qty")))

@@ -469,3 +469,81 @@ estimates.
 
 **Check.** data/market_est.csv began recording every market we rest
 in today, filled or not, which is the sample this needs. Two days.
+
+---
+
+# 2026-08-24 evening — politics only
+
+## The exchange's own formula, from its documentation
+`Score = DiscountFactor ^ (ticks from best price) x OrderSize`, each
+side scored independently, **each side normalized to 1.0 per snapshot
+provided Target Size is met on that side**, every second of the period
+weighted equally, payout pro-rata by share of total score.
+
+Our arithmetic is the same formula. So the error is in an input or in
+how we compare, not in the shape of the maths.
+
+## The measurement that matters
+Using the probe file's real pools and the exchange's own payouts,
+881 politics market-days:
+
+| share of ONE side's daily pool | engine claims | exchange pays |
+|---|---|---|
+| 25th percentile | 4.0% | 2.0% |
+| **median** | **49.5%** | **9.5%** |
+| 75th percentile | 70.8% | 23.9% |
+| 90th percentile | **100.0%** | 48.6% |
+
+The engine's 90th percentile is 100.0% — it routinely believes it owns
+an entire side of a book. Its median belief is half of every book it
+rests in. On a real exchange with other market makers, that is not
+credible on its face, and it is the single most useful number found
+today.
+
+Also: 58 market-days paid MORE than one side's whole pool (max 482%),
+which says the pool model errs LOW in places — matching the note in
+programs.py that per-event division "erred low" when it was settled.
+
+## Two theories killed today, both mine
+1. **Target Size truncating the denominator.** We do use Target Size
+   twice — as the side's gate (correct, matches the docs) and again to
+   cut the denominator at `window_levels`. The docs say it is only the
+   gate. But measured, the truncation is worth **1.0-1.1x**, not 5x.
+2. **The feed handing us shallow books.** 370 stored snapshots cap at
+   4-5 levels a side, which looked damning. Measured with size per
+   level held constant: a ladder seen 3 deep scores **37.5%**, the same
+   ladder 20 deep scores **36.8%**. `df**ticks` decays faster than
+   depth accumulates, so past the fourth level a maker is weightless.
+
+   I first "measured" this as 37% against 10.7% — but that comparison
+   changed the size per level from 400 to 2000 as well as the depth.
+   The SIZE was doing all the work. My own unit test caught it.
+
+**Both are now pinned as tests** so neither gets re-proposed.
+
+## What that leaves, stated honestly
+Our share is far too high, and neither depth nor the window explains
+it. What moves the share is SIZE AT AND NEAR THE TOUCH: ten times the
+size one tick behind us cuts our share by more than three.
+
+And one flaw in my own comparison, which has to be resolved before
+anything is concluded: `est_day` is a RATE per day, while `paid` is a
+whole day's money. If our orders rest only part of the day, the two
+are not comparable, and roughly 20% uptime alone would turn 49.5%
+into 9.5%. The estimator does integrate uptime correctly for the
+family total — which is why the family is 3.4x high and not 5x — so
+this cannot be the whole story, but it is certainly part of the
+measured gap.
+
+## P12 — it is size near the touch, not depth or uptime
+**Claim.** With uptime held constant, our computed share will still
+exceed realized share by 2x or more, and the gap will track how much
+size sits within two ticks of the best price.
+
+**Falsifier.** If computed share x (live_h / 24) matches realized
+share within 20% across politics markets, the arithmetic is right and
+the whole "3.4x" was uptime plus my bad comparison.
+
+**Check.** data/market_est.csv now carries share, live_h, realized
+share, AND book depth per market, all measured over the same seconds.
+This is answerable from one full day of it — no theory required.
