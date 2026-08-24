@@ -275,3 +275,65 @@ file's total. Do not average it in without understanding it.
 
 **Falsifier for P9.** Any trade whose realized_pnl/shares falls
 outside +/-100. All 659 non-zero rows are inside it today.
+
+---
+
+## 2026-08-24 — what the "Transfer" rows are
+
+The owner asked about a **+$14.60 Transfer, completed between 12 and
+1pm ET today**, and said several others arrived a few days ago.
+
+**A Transfer is liquidity reward money landing as cash.** Not a
+separate program. Rewards are posted per market-day as PENDING, then
+settle to PAID, and the cash arrives in the account as a Transfer.
+
+This one is exact to the cent. Aug-19 still had $14.60 pending in
+four rows at the 10:56Z snapshot today, and all four are
+`paccc-balpow` — the **balance of power markets, which the owner
+trades by hand** ("Don't place any orders in the balance of power.
+I'm going to do that one by hand", 2026-08-22):
+
+| | |
+|---|---|
+| paccc-balpow-2026-11-03-dhou-rsen | $7.59 |
+| paccc-balpow-2026-11-03-rhou-dsen | $3.37 |
+| paccc-balpow-2026-11-03-rsweep | $3.26 |
+| paccc-balpow-2026-11-03-dsweep | $0.38 |
+| **total** | **$14.60** |
+
+So that payment is his own book, not the engine's. His hand-placed
+balance-of-power orders earned $14.60 on Aug-19 and $2.84 on Aug-20.
+
+The earlier ones were the daily payouts: Aug-14 $274.92, Aug-15
+$1,352.63, Aug-16 $197.03, Aug-17 $295.29, Aug-18 $181.52, Aug-19
+$108.37.
+
+### Correction: pending totals are NOT final
+Earlier today I wrote that "pending totals are final for grading
+purposes" on the strength of Aug-20 moving seven cents in two days.
+That was too strong, and today's own snapshots refute it: Aug-21
+read **$80.38 at 10:56Z and $93.02 by 16:00Z** — $12.64 added in
+five hours.
+
+Older days settle; recent days are still filling in. Aug-20 was
+stable because it is old, not because pending is final. **P1 stays
+graded wrong** — $93 against a $295.90 prediction does not close
+from accretion — but the exact figure is not yet fixed, and no
+recent day should be treated as final.
+
+A day also does not settle all at once. Aug-19's $108.37 settled
+before today while these four rows settled at midday today, five
+days after they were earned.
+
+## P10 — the pending/paid/Transfer chain
+**Claim.** Every dollar in rewards.csv that flips PENDING -> PAID
+appears as a Transfer of the same amount in the account within a
+day, and no Transfer arrives that does not correspond to such a
+flip.
+
+**Falsifier.** A Transfer whose amount matches no set of rows
+flipping to PAID, or a flip to PAID with no Transfer following it.
+
+**Check.** Aug-20's $143.92, Aug-21's (currently $93.02) and
+Aug-22's $155.47 are all still pending. Each should arrive as one
+or more Transfers. Watch the amounts against the per-market rows.
