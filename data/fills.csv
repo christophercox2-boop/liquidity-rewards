@@ -609,3 +609,10 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787571018.9,politics,ussewc-usse-sd-2026-11-03-briben,SELL,1,0.02,earn,6.2065,0.02,,8,12,0.717,0.01,0.03,0.08,-1,1 tick in front of the touch — closer to the midpoint; ~99.3% of the ask side,C2H8WRAEPDJP
 1787571799.0,politics,scc-hrep-rep-2026-11-03-gte215,SELL,2,0.22,sell,0.4435,1.01,0.226125,15,20,0.758,0.21,0.34,0.0061,0,selling filled stock — it earns while it waits,C2GKF5SDJDK5
 1787572399.0,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.95,earn,6.214,0.02,0.99655,92,94,0.913,0.93,0.95,-0.0466,17,2 ticks in front of the touch — closer to the midpoint; ~99.4% of the bid side,C2HKHA64CDJP
+1787572879.0,politics,ussewc-usse-il-2026-11-03-rep,BUY,1,0.07,manual,0.0374,34.69,0.004375,6,11,0,0.07,0.08,0.0656,2,the owner's own order — the engine leaves it alone,C1M0FRAFEDJP
+1787573119.0,cfb,aachc-cfb-wins-2026-11-28-nebr-8pt5wins,BUY,0.01,0.22,earn,0.0018,19.56,,20,24,0.471,0.22,0.23,0,0.01,19 ticks in front of the touch — closer to the midpoint; ~25.1% of the bid side,C2115FSA2DJT
+1787573119.0,cfb,aachc-cfb-wins-2026-11-28-pur-5pt5wins,BUY,0.01,0.27,earn,0.0022,19.31,,28,33,0.258,0.27,0.28,-0.03,0.01,25 ticks in front of the touch — closer to the midpoint; ~98.5% of the bid side,C2187W77GDJR
+1787573179.0,politics,ussewc-usse-mt-2026-11-03-rep,BUY,1,0.89,earn,1.3888,0.13,0.9833,84,89,0.703,0.84,0.9,-0.0933,2,5 ticks in front of the touch — closer to the midpoint; ~99.8% of the bid side,C2HPGEF4WDK0
+1787574259.0,politics,scc-hrep-rep-2026-11-03-gte205,SELL,1.8,0.51,manual,0.1894,19.92,0.49695,44,50,0.134,0.49,0.51,-0.0131,-13.8,the owner's own order — the engine leaves it alone,C20ZF9GGGDK2
+1787574559.0,politics,scc-hrep-rep-2026-11-03-gte230,SELL,1,0.04,earn,2.7534,0.02,0.023475,3,7,0.601,0.02,0.07,-0.0165,-3,3 ticks in front of the touch — closer to the midpoint; ~66.1% of the ask side,C2J423436DK1
+1787575819.0,cfb,aachc-cfb-wins-2026-11-28-minnst-5pt5wins,SELL,0.2,0.55,earn,1.6667,29.6,,52,57,0,0.53,0.83,-0.01,-0.2,1 tick behind the touch; ~90.9% of the ask side,C1S1BNSKEDJR
