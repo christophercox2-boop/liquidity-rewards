@@ -375,15 +375,27 @@ class Family:
         return spent
 
     def _owner_exit(self, o) -> bool:
-        """A manual order whose fill REDUCES the position it sits on is
-        the owner's own exit: it adds no new risk, so it never counts
-        against a ceiling — and like every manual order it is never
-        cancelled (owner, 2026-08-22)."""
-        if o.purpose != "manual":
-            return False
-        pos = (self.inventory.get(o.market) or {}).get("qty", 0.0)
-        return ((o.side == "SELL" and pos > 0.005)
-                or (o.side == "BUY" and pos < -0.005))
+        """The owner's own order. It never counts against a ceiling.
+
+        The family budget limits what the ENGINE puts at risk on its
+        own initiative. The owner sizes his own book, and standing
+        instruction is that the engine neither touches it nor is
+        credited for it — so spending it against his cap is charging
+        the engine for money it did not commit.
+
+        Was reduce-side manual orders only, on the reasoning that
+        those add no new risk. On 2026-08-24 the manual orders became
+        VISIBLE for the first time (before that the exchange's MANUAL
+        flag made them invisible to the whole engine), and the
+        risk-opening ones alone measured $484.66 against a $250
+        politics cap — 194% of the budget, spent entirely by the
+        owner. The engine was locked out: 0 entry orders, $4.27 of
+        stale exits, and the lowest earning rate on record beside the
+        highest budget utilisation on record. The owner spotted the
+        contradiction before I did.
+
+        Owner, 2026-08-24, on excluding all of them: "That's good." """
+        return o.purpose == "manual"
 
     def holdings_value(self) -> float:
         """What the stock would fetch if liquidated NOW: longs at the

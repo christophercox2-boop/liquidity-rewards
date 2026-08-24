@@ -2123,10 +2123,32 @@ class TestHandsOffOwnerOrders(unittest.TestCase):
                            capital_usd=1.0, per_market_usd=2.0)
         r = Rig(cfg=cfg)
         r.add_market(A)
+        r.cycle()                                       # engine spends
         self._manual(r, "HAND2", A, "BUY", 0.40, 10.0)  # $4 of hand money
-        self.assertGreater(r.fam.family_spent(), 1.0)   # over the $1 cap
         r.fam._trim(r.now, 5)
         self.assertIn("HAND2", r.fam.orders)            # never trimmed
+
+    def test_the_owners_money_is_not_charged_to_the_engines_budget(self):
+        """The family cap limits what the ENGINE risks on its own
+        initiative. Charging the owner's book against it locked the
+        engine out of politics entirely on 2026-08-24 — his 62
+        risk-opening orders counted $484.66 against a $250 cap, and
+        the engine held 0 entry orders and $4.27 of stale exits at the
+        lowest earning rate on record."""
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=1.0, per_market_usd=2.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        before = r.fam.family_spent()
+        # $4 of the owner's own money, on the risk-OPENING side
+        self._manual(r, "HAND9", A, "BUY", 0.40, 10.0)
+        self.assertEqual(r.fam.family_spent(), before)   # not charged
+        # and it still counts as cover, so nothing is offered twice
+        self.assertIn("HAND9", r.fam.orders)
+        self.assertEqual(r.fam.orders["HAND9"].purpose, "manual")
 
     def test_owner_exit_counts_as_cover(self):
         from v3.tests.test_family import Rig, A, politics_book
@@ -3555,13 +3577,13 @@ class TestMarketEstimateLedger(unittest.TestCase):
     def test_a_past_days_estimate_is_frozen_but_paid_fills_in(self):
         from v3.main import market_est_append
         rows = [("2026-08-22", "enwc-uspres-nom-rep-2028-rondes",
-                 "politics", 12.50, 4, 0.0, 0.0, 0.0)]
+                 "politics", 12.50, 4, 0.0, 0.0, 0.0, 0)]
         t1, n1 = market_est_append(None, "2026-08-23", rows, {},
                                    "2026-08-23T01:00:00Z")
         self.assertEqual(n1, 1)
         # a later pass sees a different estimate AND the money
         rows2 = [("2026-08-22", "enwc-uspres-nom-rep-2028-rondes",
-                  "politics", 99.99, 9, 0.0, 0.0, 0.0)]
+                  "politics", 99.99, 9, 0.0, 0.0, 0.0, 0)]
         t2, _ = market_est_append(
             t1, "2026-08-23", rows2,
             {"2026-08-22|enwc-uspres-nom-rep-2028-rondes": 5.78},
@@ -3577,11 +3599,11 @@ class TestMarketEstimateLedger(unittest.TestCase):
         from v3.main import market_est_append
         t1, _ = market_est_append(
             None, "2026-08-24",
-            [("2026-08-24", "m", "politics", 1.0, 1, 0.0, 0.0, 0.0)],
+            [("2026-08-24", "m", "politics", 1.0, 1, 0.0, 0.0, 0.0, 0)],
             {}, "2026-08-24T01:00:00Z")
         t2, _ = market_est_append(
             t1, "2026-08-24",
-            [("2026-08-24", "m", "politics", 3.0, 5, 0.0, 0.0, 0.0)],
+            [("2026-08-24", "m", "politics", 3.0, 5, 0.0, 0.0, 0.0, 0)],
             {}, "2026-08-24T02:00:00Z")
         p = t2.strip().split("\n")[1].split(",")
         self.assertEqual(p[3], "3.0000")     # the day is still accruing
@@ -3589,7 +3611,7 @@ class TestMarketEstimateLedger(unittest.TestCase):
 
     def test_the_oldest_days_are_trimmed_first(self):
         from v3.main import market_est_append
-        rows = [(f"2026-08-{d:02d}", f"m{i}", "politics", 1.0, 1, 0.0, 0.0, 0.0)
+        rows = [(f"2026-08-{d:02d}", f"m{i}", "politics", 1.0, 1, 0.0, 0.0, 0.0, 0)
                 for d in (10, 20) for i in range(3)]
         text, _ = market_est_append(None, "2026-08-24", rows, {},
                                     "2026-08-24T01:00:00Z", keep_rows=3)
@@ -3721,7 +3743,7 @@ class TestShareCalibration(unittest.TestCase):
         from v3.main import market_est_append
         # we computed 40% of a side offering $10/day, live 12 hours,
         # so we claimed $5.00 — and the exchange paid $1.25
-        rows = [("2026-08-22", "m", "politics", 5.0, 2, 0.40, 10.0, 12.0)]
+        rows = [("2026-08-22", "m", "politics", 5.0, 2, 0.40, 10.0, 12.0, 8)]
         t1, _ = market_est_append(None, "2026-08-23", rows, {},
                                   "2026-08-23T00:00:00Z")
         t2, _ = market_est_append(t1, "2026-08-23", rows,
@@ -3737,6 +3759,45 @@ class TestShareCalibration(unittest.TestCase):
         old = MARKET_EST_CSV_HEADER + "2026-08-01,m,politics,1.0,1,x,,,\n"
         text, _ = market_est_append(
             old, "2026-08-24",
-            [("2026-08-24", "n", "politics", 2.0, 1, 0.1, 5.0, 6.0)],
+            [("2026-08-24", "n", "politics", 2.0, 1, 0.1, 5.0, 6.0, 4)],
             {}, "2026-08-24T00:00:00Z")
         self.assertIn("2026-08-01,m,politics", text)
+
+
+class TestBookDepth(unittest.TestCase):
+    """The reward share is our score over EVERY maker's score on that
+    side. A book the feed truncates hides competitors and inflates our
+    share, so how deep the book came back is a number we have to keep
+    (2026-08-24)."""
+
+    def test_the_cache_records_the_depth_it_was_handed(self):
+        from v3.books import BookCache
+        from v3.scoring import normalize_book
+        c = BookCache()
+        c.put("m", normalize_book([(0.40, 10), (0.39, 20), (0.38, 5)],
+                                  [(0.42, 5)], 1.0))
+        self.assertEqual(c.depth_seen["m"], 3)
+        self.assertEqual(c.depth_hist[3], 1)
+
+    def test_depth_is_NOT_what_inflates_our_share(self):
+        """Pinned because I got this wrong on 2026-08-24 and nearly
+        shipped it as the fix. df**ticks decays faster than depth
+        accumulates: past about the fourth level a maker is weightless,
+        so a truncated feed barely moves our computed share. What moves
+        it is SIZE AT AND NEAR THE TOUCH."""
+        from v3.scoring import _window_denom, ticks_from_best
+        def share(levels, df=0.3, tick=0.01, our_px=0.45, our_qty=100.0):
+            best = levels[0][0]
+            mine = our_qty * df ** ticks_from_best(best, our_px, tick)
+            return mine / _window_denom(levels, best, tick, df)
+        shallow = [(0.45, 100.0)] + [(0.44 - i * 0.01, 400.0) for i in range(3)]
+        deep = [(0.45, 100.0)] + [(0.44 - i * 0.01, 400.0) for i in range(20)]
+        # seeing 17 more levels moves the share by well under a point
+        self.assertLess(abs(share(shallow) - share(deep)), 0.01)
+        # ten times the size beside us moves it enormously
+        heavy = [(0.45, 100.0)] + [(0.44 - i * 0.01, 4000.0) for i in range(3)]
+        self.assertLess(share(heavy), share(shallow) / 3)
+
+    def test_we_ask_the_endpoint_for_full_depth(self):
+        from v3.api import Client
+        self.assertEqual(Client.BOOK_DEPTH, 50)

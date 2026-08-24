@@ -33,6 +33,8 @@ PRIORITY_RESERVE = 6     # rotation slots the priority set can never starve
 
 class BookCache:
     def __init__(self):
+        self.depth_seen: dict[str, int] = {}   # slug -> levels last seen
+        self.depth_hist: dict[int, int] = {}   # levels -> how often
         self._books: dict[str, Book] = {}
         # optional observer: called as on_put(slug, book) after every
         # write, from EITHER writer (REST rotation or the stream thread).
@@ -75,7 +77,19 @@ class BookCache:
 
     def put(self, slug: str, book: Book) -> None:
         """Store a freshly normalized book (either writer). Learns how
-        lively the book is from whether its top 3 levels moved."""
+        lively the book is from whether its top 3 levels moved, and how
+        DEEP the book we were handed actually is.
+
+        Depth is recorded because we could not previously say how much
+        of a book we were even seeing: 370 stored snapshots capped at
+        4-5 levels a side. It is not the cause of the share
+        overestimate — measured 2026-08-24, a ladder seen 3 deep scores
+        37.5% against 36.8% seen 20 deep — but a number we cannot state
+        is a number we cannot rule in or out, and this one cost a day
+        of theorising."""
+        n = max(len(book.bids), len(book.asks))
+        self.depth_seen[slug] = n
+        self.depth_hist[min(n, 50)] = self.depth_hist.get(min(n, 50), 0) + 1
         old = self._books.get(slug)
         if old is not None:
             changed = (old.bids[:3] != book.bids[:3] or old.asks[:3] != book.asks[:3])

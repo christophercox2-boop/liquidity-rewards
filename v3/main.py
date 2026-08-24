@@ -424,7 +424,7 @@ ESTIMATES_CSV_HEADER = ("day,family,est_usd,unmeasured_min,recorded_at,"
 
 MARKET_EST_CSV_HEADER = ("day,market,family,est_day_usd,orders,"
                          "recorded_at,paid_usd,paid_at,error_pct,"
-                         "share,pool_day,live_h,realized_share\n")
+                         "share,pool_day,live_h,realized_share,levels\n")
 
 
 def market_est_append(existing: str | None, today: str, rows: list,
@@ -462,13 +462,14 @@ def market_est_append(existing: str | None, today: str, rows: list,
         parts = line.split(",")
         if len(parts) < 9:
             continue
-        parts += [""] * (13 - len(parts))      # rows written before the
-        key = (parts[0], parts[1])             # share columns existed
+        parts += [""] * (14 - len(parts))      # rows written before the
+        key = (parts[0], parts[1])             # share/depth columns existed
         if key not in kept:
             order.append(key)
         kept[key] = parts
     changed = 0
-    for day, market, family, est, orders, share, pool_day, live_h in rows:
+    for day, market, family, est, orders, share, pool_day, live_h, levels \
+            in rows:
         key = (day, market)
         prior = kept.get(key)
         if prior and day != today:      # frozen: a prediction you can
@@ -478,6 +479,7 @@ def market_est_append(existing: str | None, today: str, rows: list,
             share_s = prior[9] if len(prior) > 9 else ""
             pool_s = prior[10] if len(prior) > 10 else ""
             live_s = prior[11] if len(prior) > 11 else ""
+            lv_s = prior[13] if len(prior) > 13 else ""
         else:
             est_s = f"{est:.4f}"
             ord_s = str(int(orders))
@@ -485,6 +487,7 @@ def market_est_append(existing: str | None, today: str, rows: list,
             share_s = f"{share:.6f}" if share else ""
             pool_s = f"{pool_day:.6f}" if pool_day else ""
             live_s = f"{live_h:.3f}" if live_h else ""
+            lv_s = str(int(levels)) if levels else ""
         paid = paid_by_market_day.get(f"{day}|{market}")
         paid_s = f"{paid:.4f}" if paid is not None else ""
         paid_at = (prior[7] if prior and prior[6] else
@@ -506,7 +509,7 @@ def market_est_append(existing: str | None, today: str, rows: list,
             except (ValueError, ZeroDivisionError):
                 pass
         row = [day, market, family, est_s, ord_s, rec_s, paid_s,
-               paid_at, err, share_s, pool_s, live_s, realized]
+               paid_at, err, share_s, pool_s, live_s, realized, lv_s]
         if kept.get(key) != row:
             changed += 1
         if key not in kept:
@@ -1517,7 +1520,8 @@ class Monitor:
             mrows = [(d, m, f, a["est"], a["n"],
                       (cal.get(m) or {}).get("share", 0.0),
                       (cal.get(m) or {}).get("pool_day", 0.0),
-                      (cal.get(m) or {}).get("live_h", 0.0))
+                      (cal.get(m) or {}).get("live_h", 0.0),
+                      self.cache.depth_seen.get(m, 0))
                      for (d, m, f), a in per.items()]
             if mrows:
                 existing, sha = self._gh_file("data/market_est.csv")
