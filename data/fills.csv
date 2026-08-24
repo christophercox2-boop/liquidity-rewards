@@ -689,3 +689,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787603317.6,nba,tec-nba-mvp-2027-05-17-w-cadcun,SELL,1,0.03,earn,0.0001,30.18,,1,4,0,0.02,0.03,0,-1,joins the touch — the book has been quiet,C1Z3K5524DK0
 1787603377.6,cfb,aachc-cfb-wins-2026-11-28-tenn-8pt5wins,SELL,0.01,0.19,earn,2.5,0.22,,42,60,0.121,0.18,0.19,0.32,-0.01,6 ticks in front of the touch — closer to the midpoint; ~19.8% of the ask side,C2RTPJ760DK2
 1787603557.6,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar20-25,SELL,1,0.02,sell,0.3113,26.04,,9,17,0.26,0.01,0.02,0.11,0,an exit — its fill reduces the position it sits on,C22REH0ZADK5
+1787604397.6,cfb,aachc-cfb-wins-2026-11-28-hou-7pt5wins,SELL,0.5,0.51,earn,2.2321,0.23,,49,54,0,0.51,0.68,0,-0.5,joins the touch — the book has been quiet,C2S32QY06DJV
+1787604517.6,cfb,aachc-cfb-wins-2026-11-28-txst-5pt5wins,BUY,0.01,0.63,earn,2.4633,0.7,,43,59,0.46,0.38,0.84,0.14,0.01,25 ticks in front of the touch — closer to the midpoint; ~98.5% of the bid side,C2RQF9T2RDK1
