@@ -40,6 +40,12 @@ long and accreted, so search it rather than reading it through.
   moves, or reprices them — any resting order the engine did not place
   itself is treated as the owner's. It sizes its own exits and dumps
   around them so shares are never offered twice.
+- FROZEN ground — the engine does NOTHING there (owner, 2026-08-24
+  "Don't sell my gop governor count race orders. In fact don't touch
+  those"): places nothing, rests no exits, reprices nothing, cancels
+  nothing. Whatever is resting stays exactly as it is. This is
+  stricter than the avoid list, which PULLS the engine's orders out.
+  Currently frozen: usgovcc (GOP governor seat counts).
 - Order-touching endpoints keep: auth, X-Reprice CSRF header, known-market
   whitelist, 0.1–99.9c price bounds, post-only placement.
   ONE carved exception (owner, 2026-08-22 "Carve it"): the taker dump —

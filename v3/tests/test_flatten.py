@@ -3299,3 +3299,76 @@ class TestPrimariesAreNotTheGeneralElection(unittest.TestCase):
         for slug in ("enwc-ushrp-fl19-2026-08-18-olahaw",
                      "enwc-uspresp-ia-2028-01-15-dem-somebody"):
             self.assertIsNone(sf.race_fair(slug), slug)
+
+
+class TestFrozenGround(unittest.TestCase):
+    """Owner, 2026-08-24: 'Don't sell my gop governor count race
+    orders. In fact don't touch those.' Frozen is stricter than
+    avoided: avoided PULLS the engine's orders out, frozen leaves the
+    book exactly as it stands and adds nothing."""
+
+    def _rig(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=250.0, per_market_usd=20.0,
+                           freeze_tokens=("usgovcc",))
+        r = Rig(cfg=cfg)
+        return r
+
+    def _seed(self, r, slug, purpose="sell", side="SELL", px=0.27,
+              qty=1.0):
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG, BUY_LONG
+        it = SELL_LONG if side == "SELL" else BUY_LONG
+        r.fam.orders["FZ"] = FamilyOrder(
+            id="FZ", market=slug, side=side, price=px, qty=qty,
+            intent=it, placed_ts=1.0, purpose=purpose)
+        r.exchange.live["FZ"] = {"id": "FZ", "market": slug, "side": side,
+                                 "price": px, "size": qty, "intent": it}
+
+    def test_a_resting_engine_order_is_never_touched(self):
+        slug = "usgovcc-26mid-rep-2026-11-03-24-25"
+        r = self._rig()
+        r.add_market(slug)
+        self._seed(r, slug)
+        r.fam.inventory[slug] = {"qty": 1.0, "cost": 0.15}
+        r.positions[slug] = (1.0, 0.15)
+        for _ in range(4):
+            r.fam.last_action.clear()
+            r.cycle(advance=120.0)
+        self.assertIn("FZ", r.fam.orders)                 # still there
+        self.assertEqual(r.fam.orders["FZ"].price, 0.27)  # never moved
+        self.assertEqual(r.fam.orders["FZ"].qty, 1.0)     # never resized
+
+    def test_no_new_exit_is_rested_on_a_frozen_position(self):
+        slug = "usgovcc-demvrep-2026-11-03-dem"
+        r = self._rig()
+        r.add_market(slug)
+        r.fam.inventory[slug] = {"qty": 5.0, "cost": 3.19}
+        r.positions[slug] = (5.0, 3.19)
+        for _ in range(3):
+            r.fam.last_action.clear()
+            r.cycle(advance=120.0)
+        sells = [o for o in r.fam.orders.values()
+                 if o.market == slug and o.purpose == "sell"]
+        self.assertEqual(sells, [])        # the seller stays out
+
+    def test_nothing_new_is_placed_in_frozen_ground(self):
+        slug = "usgovcc-26mid-rep-2026-11-03-30-31"
+        r = self._rig()
+        r.add_market(slug)
+        self.assertFalse(r.fam.enterable(slug))
+        for _ in range(3):
+            r.cycle(advance=120.0)
+        self.assertEqual([o for o in r.fam.orders.values()
+                          if o.market == slug], [])
+
+    def test_unfrozen_markets_are_unaffected(self):
+        from v3.tests.test_family import A
+        r = self._rig()
+        r.add_market(A)
+        self.assertTrue(r.fam.enterable(A))
+        r.cycle()
+        self.assertTrue([o for o in r.fam.orders.values() if o.market == A])

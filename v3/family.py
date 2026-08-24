@@ -179,7 +179,15 @@ class FamilyConfig:
     graduate_paid_usd: float = 0.25   # avg PAID $/day over recent paid days
     graduate_days: int = 3            # paid days needed in the last 7 (stability)
     dump_usd_day: float = 0.0         # taker-dump proceeds allowed per day (0 = off)
-    avoid_tokens: tuple = ()          # slug fragments the owner told us to stay out of
+    avoid_tokens: tuple = ()
+    # FROZEN ground: the engine does nothing here at all — places no
+    # orders, rests no exits, reprices nothing, cancels nothing. Every
+    # order in a frozen market is treated exactly like one the owner
+    # placed by hand (owner, 2026-08-24: "Don't sell my gop governor
+    # count race orders. In fact don't touch those"). Different from
+    # avoid_tokens, which PULLS the engine's orders out; freezing
+    # leaves the book exactly as it stands.
+    freeze_tokens: tuple = ()          # slug fragments the owner told us to stay out of
     proven_usd: float = 0.0           # 0 = graduation off
     reprice_gain_day: float = 0.06
     drift_share: float = 0.15
@@ -317,8 +325,14 @@ class Family:
         nothing new rests, probes, revives, or dumps here."""
         return any(t in slug for t in self.cfg.avoid_tokens)
 
+    def _frozen(self, slug: str) -> bool:
+        """Hands off entirely (owner, 2026-08-24: "don't touch those").
+        Unlike an avoided market, nothing is pulled: whatever rests
+        here stays exactly as it is, and the engine adds nothing."""
+        return any(t in slug for t in self.cfg.freeze_tokens)
+
     def enterable(self, slug: str) -> bool:
-        if self._avoided(slug):
+        if self._avoided(slug) or self._frozen(slug):
             return False
         toks = self.cfg.enter_tokens
         return toks is None or any(t in slug for t in toks)
@@ -1538,9 +1552,10 @@ class Family:
         for rec in list(self.orders.values()):
             if actions <= 0:
                 break
-            if rec.purpose == "manual":
+            if rec.purpose == "manual" or self._frozen(rec.market):
                 continue      # owner, 2026-08-22: never cancel the owner's
-                              # own orders — no rule outranks the hand
+                              # own orders — no rule outranks the hand;
+                              # 2026-08-24: nor anything in frozen ground
             days = slug_days_out(rec.market, now)
             near = days is not None and days < self.cfg.min_days_out
             dead = self._dead_here(rec.market)
@@ -1683,8 +1698,9 @@ class Family:
                                    "quotes whole shares now")
                     actions -= 1
                 continue
-            if rec.purpose == "manual":
-                continue
+            if rec.purpose == "manual" or self._frozen(rec.market):
+                continue          # frozen ground: never repriced,
+                                  # never pulled, never resized
             if self._avoided(rec.market):
                 # out means OUT — earn orders, probes, AND the engine's
                 # own exits leave (owner, 2026-08-22: the balance-of-power
@@ -1934,7 +1950,8 @@ class Family:
             if spent <= self.cfg.capital_usd + 1e-9:
                 break
             cands = [o for o in self.orders.values()
-                     if o.purpose not in ("sell", "manual")]
+                     if o.purpose not in ("sell", "manual")
+                     and not self._frozen(o.market)]
             if not cands:
                 break
             def value_per_dollar(o):
@@ -2253,9 +2270,10 @@ class Family:
                 continue
             if self._dead_here(slug):
                 continue      # out means out — no resting anything there
-            if self._avoided(slug):
+            if self._avoided(slug) or self._frozen(slug):
                 continue      # the owner works these by hand: the engine
-                              # rests NO exits here (owner, 2026-08-22)
+                              # rests NO exits here (owner, 2026-08-22),
+                              # and a FROZEN market is not even tidied
             book = self.cache.fresh(slug, BOOK_MAX_AGE, now)
             if book is None:
                 continue

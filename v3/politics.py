@@ -123,6 +123,10 @@ def config() -> FamilyConfig:
         # doing good" — off limits ($24.92 paid all-time across 32)
         avoid_tokens=("usgub-ak", "usgubp-ak", "paccc-balpow",
                       "cranc-uspres28"),
+        # owner, 2026-08-24: "Don't sell my gop governor count race
+        # orders. In fact don't touch those." Frozen, not avoided —
+        # whatever rests there stays exactly where it is.
+        freeze_tokens=("usgovcc",),
         graduate_paid_usd=1.00, proven_usd=150.0,
         # owner, 2026-08-21: 75c is a GOAL — markets that could clear it
         # at full confidence get starter positions from this budget, and
