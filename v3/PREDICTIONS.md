@@ -393,3 +393,79 @@ I do not know which, and I am not guessing: data/market_est.csv
 records every market we rest in with its estimate whether or not it
 fills, which is exactly the missing evidence. Two days of it will
 answer this.
+
+---
+
+# 2026-08-24 — hunting the estimator's wrong input
+
+Owner: "We have to get better at estimating in real time."
+
+The estimator refuses correction factors by design — "wrong output
+means a wrong input." So: find the input.
+
+### Ruled out 1: the pool divisor. I was wrong about this.
+The probe file shows only 6 distinct `programId`s across 162
+markets — `politics_high_20260727` is $300/day against 62 markets —
+and our divisor (the race group, typically 2-20) is smaller than
+that programId group for 160 of 162. I concluded we were dividing
+by too little and the estimate was therefore ~4.4x too big, which
+matched the measured 3.3-3.6x almost exactly.
+
+**It is still wrong.** `period` reads `daily_event`: the pool is
+per event per day, and the programId is a TIER label, not a pool
+group. Several events each get $300/day. The arithmetic falsifies
+my version outright — under it the whole politics board would offer
+$425/day, and we were PAID $1,352.63 on Aug-15.
+
+v3/programs.py already carries this, settled on the 2026-08-15
+payout, with "do not re-open this" written next to it. I re-opened
+it, got a number that matched the symptom, and nearly shipped it.
+**A wrong theory that predicts the right magnitude is the most
+dangerous kind.** Check it against a number it must also explain.
+
+### Ruled out 2: stale books.
+Politics measured 23.5 of 24 hours on Aug-21 and 22.8 on Aug-22.
+Nothing is being extrapolated across a dead feed. (College football
+is a different story — 17.2h and 19.3h UNMEASURED — which is why
+its estimate reads LOW and lands close: $47.66 estimated, $54.33
+paid, from about five measured hours.)
+
+### What the error actually tracks
+73 market-days with both our estimate and the money:
+
+| estimate size | estimated | paid | error |
+|---|---|---|---|
+| smallest third | $14.89 | $17.51 | **0.85x — slightly LOW** |
+| middle third | $54.35 | $19.96 | 2.72x high |
+| largest third | $134.59 | $27.30 | **4.93x high** |
+
+And by book width at the time:
+
+| | median spread | error |
+|---|---|---|
+| tight books | 2.0c | 2.26x high |
+| wide books | 10.0c | 4.17x high |
+
+**The estimator is accurate when it predicts a little and wildly
+optimistic when it predicts a lot.** Never once did it predict
+money and get nothing — 0 of 73 — so the qualification logic is
+sound. It is the SIZE of the claim that inflates.
+
+Both cuts point one way: our share is read off a single snapshot
+and billed as if it held all day. In a thin or wide book our size
+looks dominant at the instant we look, and does not stay dominant.
+The bigger the share we think we have, the further it has to fall.
+
+## P11 — the estimate's error is share-persistence, not pool size
+**Claim.** Our realized share of a side is systematically lower
+than the snapshot share, by more the higher the snapshot share is.
+A market whose snapshot share is under ~10% will pay close to
+estimate; one over ~40% will pay a third of it or less.
+
+**Falsifier.** Bucket market-days by snapshot share and compare
+paid/estimate. If the error is flat across buckets, share
+persistence is not the mechanism and something else inflates large
+estimates.
+
+**Check.** data/market_est.csv began recording every market we rest
+in today, filled or not, which is the sample this needs. Two days.
