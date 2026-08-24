@@ -356,6 +356,80 @@ ESTIMATES_CSV_HEADER = ("day,family,est_usd,unmeasured_min,recorded_at,"
                         "paid_usd,paid_at,error_pct\n")
 
 
+MARKET_EST_CSV_HEADER = ("day,market,family,est_day_usd,orders,"
+                         "recorded_at,paid_usd,paid_at,error_pct\n")
+
+
+def market_est_append(existing: str | None, today: str, rows: list,
+                      paid_by_market_day: dict, now_iso: str,
+                      keep_rows: int = 6000) -> tuple[str, int]:
+    """The per-MARKET estimate ledger.
+
+    The family ledger (estimates_csv_append) records one number a day
+    per family, which is enough to see that politics is wrong and not
+    enough to see WHERE. Across Aug 20-22 politics estimated $255-366
+    a day and paid $76-101, while college football estimated $47.66
+    and paid $54.33 — but with only family totals written down, no
+    market and no race can be graded against its own prediction, so
+    the cause stays a guess. This file makes it arithmetic.
+
+    Same discipline as the family ledger: a past day's estimate is
+    FROZEN the first time it is written. Only paid_usd, paid_at and
+    error_pct fill in afterwards.
+
+    `rows` are (day, market, family, est_day, orders) tuples.
+    `paid_by_market_day` maps "day|market" -> paid, which is exactly
+    the shape the monitor already keeps in self.rewards_seen.
+    """
+    text = existing if existing else MARKET_EST_CSV_HEADER
+    kept: dict = {}
+    order: list = []
+    for line in text.strip().split("\n")[1:]:
+        parts = line.split(",")
+        if len(parts) < 9:
+            continue
+        key = (parts[0], parts[1])
+        if key not in kept:
+            order.append(key)
+        kept[key] = parts
+    changed = 0
+    for day, market, family, est, orders in rows:
+        key = (day, market)
+        prior = kept.get(key)
+        if prior and day != today:      # frozen: a prediction you can
+            est_s = prior[3]            # revise after the fact is
+            ord_s = prior[4]            # worth nothing
+            rec_s = prior[5]
+        else:
+            est_s = f"{est:.4f}"
+            ord_s = str(int(orders))
+            rec_s = prior[5] if prior else now_iso
+        paid = paid_by_market_day.get(f"{day}|{market}")
+        paid_s = f"{paid:.4f}" if paid is not None else ""
+        paid_at = (prior[7] if prior and prior[6] else
+                   (now_iso if paid is not None else ""))
+        err = ""
+        if paid is not None:
+            try:
+                e = float(est_s)
+                if e > 0:
+                    err = f"{(paid - e) / e * 100:+.1f}"
+            except ValueError:
+                pass
+        row = [day, market, family, est_s, ord_s, rec_s, paid_s,
+               paid_at, err]
+        if kept.get(key) != row:
+            changed += 1
+        if key not in kept:
+            order.append(key)
+        kept[key] = row
+    # newest days first when trimming — the old ones are already graded
+    order.sort(key=lambda k: k[0], reverse=True)
+    order = order[:keep_rows]
+    body = "\n".join(",".join(kept[k]) for k in order)
+    return MARKET_EST_CSV_HEADER + body + "\n", changed
+
+
 def estimates_csv_append(existing: str | None, today: str,
                          rows: list, paid_by_day: dict,
                          now_iso: str,
@@ -1333,6 +1407,31 @@ class Monitor:
                                  f"estimates: {n} rows [skip ci]")
         except Exception as e:  # noqa: BLE001
             self._note(f"estimates ledger: {e}")
+        try:      # ...and the same thing per MARKET, so a race can be
+                  # graded against its own prediction (2026-08-24)
+            from .estimator import et_day
+            day = et_day(now)
+            per: dict = {}
+            for key, fam in self.families.items():
+                for o in fam.orders.values():
+                    if o.purpose == "manual":   # not our prediction
+                        continue
+                    a = per.setdefault((day, o.market, key),
+                                       {"est": 0.0, "n": 0})
+                    a["est"] += o.live_est or 0.0
+                    a["n"] += 1
+            mrows = [(d, m, f, a["est"], a["n"])
+                     for (d, m, f), a in per.items()]
+            if mrows:
+                existing, sha = self._gh_file("data/market_est.csv")
+                text, n = market_est_append(
+                    existing, day, mrows, self.rewards_seen,
+                    time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)))
+                if n:
+                    self._gh_put("data/market_est.csv", text, sha,
+                                 f"market estimates: {n} rows [skip ci]")
+        except Exception as e:  # noqa: BLE001
+            self._note(f"market estimate ledger: {e}")
         try:
             self.publish_trades(now, deep=not getattr(self, "_trades_deep",
                                                       False))
