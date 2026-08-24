@@ -313,7 +313,11 @@ class TestMoney(unittest.TestCase):
         r.positions[A] = (bid.qty, bid.qty * bid.price)
         s = r.cycle(advance=r.fam.cfg.cooldown_s + 1)
         self.assertIn(A, r.fam.inventory)
-        self.assertTrue(any("filled" in t for t, _ in r.alerts))
+        # owner, 2026-08-24: an ordinary open no longer pages — the
+        # verdict waits 20s for the book to settle and then only fires
+        # on a >$1 mark-to-market loss with nothing earning.
+        self.assertEqual([t for t, _ in r.alerts if "filled" in t], [])
+        self.assertTrue(r.fam.pending_pages)
         sells = [o for o in r.fam.orders.values() if o.purpose == "sell"]
         # the seller's exit, plus the market's old earn-ask which the
         # reclassifier now (correctly) counts as an exit while stock is held

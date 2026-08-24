@@ -2036,57 +2036,10 @@ class TestReconciledFlatLots(unittest.TestCase):
         self.assertTrue(card_is_open(live))           # real position: open
 
 
-class TestProfitableFillsDontPage(unittest.TestCase):
-    """Owner, 2026-08-22: no phone page for fills that close a position
-    at a profit. Everything else — losses, break-even, new positions —
-    still pages, because those are the fills that need eyes."""
-
-    def _fill(self, r, side, px, qty):
-        from v3.family import FamilyOrder
-        from v3.intents import BUY_LONG, SELL_LONG
-        rec = FamilyOrder(id=f"F-{side}-{px}", market=A_J, side=side,
-                          price=px, qty=qty,
-                          intent=BUY_LONG if side == "BUY" else SELL_LONG,
-                          placed_ts=999_000.0, purpose="earn", why="t")
-        r.fam._on_fill(rec, qty, 1_000_000.0)
-
-    def _pages(self, r):
-        return [t for t, _ in r.alerts if "order filled" in t]
-
-    def test_closing_above_basis_is_silent(self):
-        from v3.tests.test_family import Rig
-        r = Rig()
-        r.add_market(A_J)
-        self._fill(r, "BUY", 0.10, 10.0)        # opens: pages
-        self.assertEqual(len(self._pages(r)), 1)
-        self._fill(r, "SELL", 0.14, 10.0)       # +4c/share: silent
-        self.assertEqual(len(self._pages(r)), 1)
-        self.assertEqual(r.fam.log[-1]["event"], "fill_no_page")
-        self.assertEqual(len(r.fam.fills), 2)   # journal still complete
-
-    def test_closing_at_a_loss_still_pages(self):
-        from v3.tests.test_family import Rig
-        r = Rig()
-        r.add_market(A_J)
-        self._fill(r, "BUY", 0.10, 10.0)
-        self._fill(r, "SELL", 0.07, 10.0)       # loss-cut: pages
-        self.assertEqual(len(self._pages(r)), 2)
-
-    def test_profitable_cover_of_a_short_is_silent(self):
-        from v3.tests.test_family import Rig
-        r = Rig()
-        r.add_market(A_J)
-        self._fill(r, "SELL", 0.60, 5.0)        # opens a short: pages
-        self._fill(r, "BUY", 0.55, 5.0)         # covers 5c better: silent
-        self.assertEqual(len(self._pages(r)), 1)
-
-    def test_flipping_past_flat_pages(self):
-        from v3.tests.test_family import Rig
-        r = Rig()
-        r.add_market(A_J)
-        self._fill(r, "BUY", 0.10, 5.0)
-        self._fill(r, "SELL", 0.20, 8.0)        # closes 5, opens 3 short
-        self.assertEqual(len(self._pages(r)), 2)
+# TestProfitableFillsDontPage lived here. It pinned the 2026-08-22
+# rule (profitable closes silent, every other fill pages), which the
+# owner replaced on 2026-08-24 with the loss-threshold rule now
+# covered by TestQuieterFillAlerts below.
 
 
 class TestNbaFamily(unittest.TestCase):
