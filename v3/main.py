@@ -423,7 +423,8 @@ ESTIMATES_CSV_HEADER = ("day,family,est_usd,unmeasured_min,recorded_at,"
 
 
 MARKET_EST_CSV_HEADER = ("day,market,family,est_day_usd,orders,"
-                         "recorded_at,paid_usd,paid_at,error_pct\n")
+                         "recorded_at,paid_usd,paid_at,error_pct,"
+                         "share,pool_day,live_h,realized_share\n")
 
 
 def market_est_append(existing: str | None, today: str, rows: list,
@@ -443,7 +444,14 @@ def market_est_append(existing: str | None, today: str, rows: list,
     FROZEN the first time it is written. Only paid_usd, paid_at and
     error_pct fill in afterwards.
 
-    `rows` are (day, market, family, est_day, orders) tuples.
+    `rows` are (day, market, family, est_day, orders, share, pool_day,
+    live_h) tuples. The last three are the estimator's own time-weighted
+    measurement of our share and the pool it competed for. Once the
+    money lands, realized_share = paid / (pool_day * live_h / 24), and
+    share vs realized_share is the estimator's bias measured directly,
+    with no model in between (owner, 2026-08-24: the sampler runs 4,320
+    times a day, so a persistent error is a bias, and averaging more
+    samples cannot remove a bias).
     `paid_by_market_day` maps "day|market" -> paid, which is exactly
     the shape the monitor already keeps in self.rewards_seen.
     """
@@ -454,22 +462,29 @@ def market_est_append(existing: str | None, today: str, rows: list,
         parts = line.split(",")
         if len(parts) < 9:
             continue
-        key = (parts[0], parts[1])
+        parts += [""] * (13 - len(parts))      # rows written before the
+        key = (parts[0], parts[1])             # share columns existed
         if key not in kept:
             order.append(key)
         kept[key] = parts
     changed = 0
-    for day, market, family, est, orders in rows:
+    for day, market, family, est, orders, share, pool_day, live_h in rows:
         key = (day, market)
         prior = kept.get(key)
         if prior and day != today:      # frozen: a prediction you can
             est_s = prior[3]            # revise after the fact is
             ord_s = prior[4]            # worth nothing
             rec_s = prior[5]
+            share_s = prior[9] if len(prior) > 9 else ""
+            pool_s = prior[10] if len(prior) > 10 else ""
+            live_s = prior[11] if len(prior) > 11 else ""
         else:
             est_s = f"{est:.4f}"
             ord_s = str(int(orders))
             rec_s = prior[5] if prior else now_iso
+            share_s = f"{share:.6f}" if share else ""
+            pool_s = f"{pool_day:.6f}" if pool_day else ""
+            live_s = f"{live_h:.3f}" if live_h else ""
         paid = paid_by_market_day.get(f"{day}|{market}")
         paid_s = f"{paid:.4f}" if paid is not None else ""
         paid_at = (prior[7] if prior and prior[6] else
@@ -482,8 +497,16 @@ def market_est_append(existing: str | None, today: str, rows: list,
                     err = f"{(paid - e) / e * 100:+.1f}"
             except ValueError:
                 pass
+        realized = ""
+        if paid is not None:
+            try:
+                offered = float(pool_s) * float(live_s) / 24.0
+                if offered > 0:
+                    realized = f"{paid / offered:.6f}"
+            except (ValueError, ZeroDivisionError):
+                pass
         row = [day, market, family, est_s, ord_s, rec_s, paid_s,
-               paid_at, err]
+               paid_at, err, share_s, pool_s, live_s, realized]
         if kept.get(key) != row:
             changed += 1
         if key not in kept:
@@ -1486,7 +1509,15 @@ class Monitor:
                                        {"est": 0.0, "n": 0})
                     a["est"] += o.live_est or 0.0
                     a["n"] += 1
-            mrows = [(d, m, f, a["est"], a["n"])
+            cal = {}
+            for key in self.families:
+                est = self.samplers.get(key)
+                if est is not None:
+                    cal.update(est.calibration())
+            mrows = [(d, m, f, a["est"], a["n"],
+                      (cal.get(m) or {}).get("share", 0.0),
+                      (cal.get(m) or {}).get("pool_day", 0.0),
+                      (cal.get(m) or {}).get("live_h", 0.0))
                      for (d, m, f), a in per.items()]
             if mrows:
                 existing, sha = self._gh_file("data/market_est.csv")

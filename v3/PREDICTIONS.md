@@ -275,3 +275,197 @@ file's total. Do not average it in without understanding it.
 
 **Falsifier for P9.** Any trade whose realized_pnl/shares falls
 outside +/-100. All 659 non-zero rows are inside it today.
+
+---
+
+## 2026-08-24 — what the "Transfer" rows are
+
+The owner asked about a **+$14.60 Transfer, completed between 12 and
+1pm ET today**, and said several others arrived a few days ago.
+
+**A Transfer is liquidity reward money landing as cash.** Not a
+separate program. Rewards are posted per market-day as PENDING, then
+settle to PAID, and the cash arrives in the account as a Transfer.
+
+This one is exact to the cent. Aug-19 still had $14.60 pending in
+four rows at the 10:56Z snapshot today, and all four are
+`paccc-balpow` — the **balance of power markets, which the owner
+trades by hand** ("Don't place any orders in the balance of power.
+I'm going to do that one by hand", 2026-08-22):
+
+| | |
+|---|---|
+| paccc-balpow-2026-11-03-dhou-rsen | $7.59 |
+| paccc-balpow-2026-11-03-rhou-dsen | $3.37 |
+| paccc-balpow-2026-11-03-rsweep | $3.26 |
+| paccc-balpow-2026-11-03-dsweep | $0.38 |
+| **total** | **$14.60** |
+
+So that payment is his own book, not the engine's. His hand-placed
+balance-of-power orders earned $14.60 on Aug-19 and $2.84 on Aug-20.
+
+The earlier ones were the daily payouts: Aug-14 $274.92, Aug-15
+$1,352.63, Aug-16 $197.03, Aug-17 $295.29, Aug-18 $181.52, Aug-19
+$108.37.
+
+### Correction: pending totals are NOT final
+Earlier today I wrote that "pending totals are final for grading
+purposes" on the strength of Aug-20 moving seven cents in two days.
+That was too strong, and today's own snapshots refute it: Aug-21
+read **$80.38 at 10:56Z and $93.02 by 16:00Z** — $12.64 added in
+five hours.
+
+Older days settle; recent days are still filling in. Aug-20 was
+stable because it is old, not because pending is final. **P1 stays
+graded wrong** — $93 against a $295.90 prediction does not close
+from accretion — but the exact figure is not yet fixed, and no
+recent day should be treated as final.
+
+A day also does not settle all at once. Aug-19's $108.37 settled
+before today while these four rows settled at midday today, five
+days after they were earned.
+
+## P10 — the pending/paid/Transfer chain
+**Claim.** Every dollar in rewards.csv that flips PENDING -> PAID
+appears as a Transfer of the same amount in the account within a
+day, and no Transfer arrives that does not correspond to such a
+flip.
+
+**Falsifier.** A Transfer whose amount matches no set of rows
+flipping to PAID, or a flip to PAID with no Transfer following it.
+
+**Check.** Aug-20's $143.92, Aug-21's (currently $93.02) and
+Aug-22's $155.47 are all still pending. Each should arrive as one
+or more Transfers. Watch the amounts against the per-market rows.
+
+---
+
+## 2026-08-24 — markets that used to pay and now pay nothing
+
+The owner asked. Comparing Aug 14-18 (the strong stretch) against
+Aug 20-22 (now): **105 markets paid then and pay nothing now, worth
+$149.07/day.** That is the entire decline and more.
+
+| why it stopped | markets | $/day |
+|---|---|---|
+| **still open — we simply stopped earning** | **77** | **$104.87** |
+| on the owner's avoid list (deliberate) | 19 | $26.10 |
+| out of scope — WNBA | 2 | $12.59 |
+| market resolved before Aug-20 | 7 | $5.51 |
+
+### Wrong theory, recorded
+I expected getting FILLED to be what kills a market — take a
+position, the book turns exit-only, the rewards stop. The single
+biggest loss fits it perfectly: `ewc-usp-party-2028-11-07-rep` paid
+$79.85 on Aug-15, we bought 400 shares at 41c that evening and 350
+more at 39c on Aug-17 (position +695), and it paid $0.17 on Aug-18
+and nothing since.
+
+**It does not generalise.** Markets that KEPT paying had a higher
+fill rate than those that stopped — 91% (126/138) against 61%
+(47/77). Fills are normal everywhere. One market's story is not a
+mechanism.
+
+### What does explain a large piece of it
+**10 of the 77 match none of `enter_tokens`, and they are worth
+$38.68/day** — including the top two losses:
+
+| $/day | market | |
+|---|---|---|
+| $22.10 | `ewc-usp-party-2028-11-07-rep` | which party wins 2028 |
+| $9.79 | `apdc-jerpowgov-2026-12-31` | Powell departs as Fed governor |
+
+`enter_tokens` is `("usgub","usse","senate","uspres","usp-2028",
+"usho","scc-hrep")`. The party market's slug is `usp-party-2028`,
+so `usp-2028` does not match it and neither does `uspres`. **Our
+single best market by far is excluded from fresh money by a hyphen.**
+
+Across all history, non-sport markets that match no enter token
+have paid **$1,079.61 — 18% of the $6,118.30 we have ever earned.**
+The biggest excluded families are `apdc-*` ($346.24, "will official
+X depart") and `ewc-*` ($260.79).
+
+### Still unexplained
+The other **67 markets, $66.18/day**, DO match an enter token and
+stopped anyway. Candidates are the 50c/day entry bar with its
+two-reading cull, and capital exhaustion at the $250 politics cap.
+I do not know which, and I am not guessing: data/market_est.csv
+records every market we rest in with its estimate whether or not it
+fills, which is exactly the missing evidence. Two days of it will
+answer this.
+
+---
+
+# 2026-08-24 — hunting the estimator's wrong input
+
+Owner: "We have to get better at estimating in real time."
+
+The estimator refuses correction factors by design — "wrong output
+means a wrong input." So: find the input.
+
+### Ruled out 1: the pool divisor. I was wrong about this.
+The probe file shows only 6 distinct `programId`s across 162
+markets — `politics_high_20260727` is $300/day against 62 markets —
+and our divisor (the race group, typically 2-20) is smaller than
+that programId group for 160 of 162. I concluded we were dividing
+by too little and the estimate was therefore ~4.4x too big, which
+matched the measured 3.3-3.6x almost exactly.
+
+**It is still wrong.** `period` reads `daily_event`: the pool is
+per event per day, and the programId is a TIER label, not a pool
+group. Several events each get $300/day. The arithmetic falsifies
+my version outright — under it the whole politics board would offer
+$425/day, and we were PAID $1,352.63 on Aug-15.
+
+v3/programs.py already carries this, settled on the 2026-08-15
+payout, with "do not re-open this" written next to it. I re-opened
+it, got a number that matched the symptom, and nearly shipped it.
+**A wrong theory that predicts the right magnitude is the most
+dangerous kind.** Check it against a number it must also explain.
+
+### Ruled out 2: stale books.
+Politics measured 23.5 of 24 hours on Aug-21 and 22.8 on Aug-22.
+Nothing is being extrapolated across a dead feed. (College football
+is a different story — 17.2h and 19.3h UNMEASURED — which is why
+its estimate reads LOW and lands close: $47.66 estimated, $54.33
+paid, from about five measured hours.)
+
+### What the error actually tracks
+73 market-days with both our estimate and the money:
+
+| estimate size | estimated | paid | error |
+|---|---|---|---|
+| smallest third | $14.89 | $17.51 | **0.85x — slightly LOW** |
+| middle third | $54.35 | $19.96 | 2.72x high |
+| largest third | $134.59 | $27.30 | **4.93x high** |
+
+And by book width at the time:
+
+| | median spread | error |
+|---|---|---|
+| tight books | 2.0c | 2.26x high |
+| wide books | 10.0c | 4.17x high |
+
+**The estimator is accurate when it predicts a little and wildly
+optimistic when it predicts a lot.** Never once did it predict
+money and get nothing — 0 of 73 — so the qualification logic is
+sound. It is the SIZE of the claim that inflates.
+
+Both cuts point one way: our share is read off a single snapshot
+and billed as if it held all day. In a thin or wide book our size
+looks dominant at the instant we look, and does not stay dominant.
+The bigger the share we think we have, the further it has to fall.
+
+## P11 — the estimate's error is share-persistence, not pool size
+**Claim.** Our realized share of a side is systematically lower
+than the snapshot share, by more the higher the snapshot share is.
+A market whose snapshot share is under ~10% will pay close to
+estimate; one over ~40% will pay a third of it or less.
+
+**Falsifier.** Bucket market-days by snapshot share and compare
+paid/estimate. If the error is flat across buckets, share
+persistence is not the mechanism and something else inflates large
+estimates.
+
+**Check.** data/market_est.csv began recording every market we rest
+in today, filled or not, which is the sample this needs. Two days.
