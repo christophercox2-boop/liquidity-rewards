@@ -57,16 +57,29 @@ number is written down so the trade-off is judged on data.
 **Falsified if:** NBA pays ≥ $1.00.
 **Resolves:** when Aug-24 posts.
 
-### P5 — the exchange will name why orders vanish
-**Claim:** `cancel_reason` in data/trades.csv will carry a specific
-reason for orders that disappear without filling.
-**Why:** the shape probe found `unsolicitedCancelReason` on every
-execution. 919 politics and 609 cfb silent cancels have been counted
-without ever being explained.
-**Falsified if:** the column is empty for every row after a full day.
-**Resolves:** Aug-24.
+### P5 — the exchange will name why orders vanish — **WRONG**
+**Claimed:** `cancel_reason` would explain the silent cancels.
+**Settled 2026-08-24:** all 2,626 rows read
+`UNSOLICITED_CXL_REASON_UNDEFINED`. The field exists and is useless
+here, for a reason I should have seen before predicting: the activity
+feed carries TRADES. An order cancelled without trading never
+produces a trade row, so the trade feed structurally cannot explain a
+silent cancel. The field only ever describes orders that DID trade.
+**Taught:** check that a data source can contain the answer before
+predicting it will. The next probe is the ORDER endpoint, not the
+activity feed — the order object carries `state`, so a query over
+orders (not activities) is where a cancelled order's fate lives.
 
 ---
+
+### P6 — resting is paid twice, taking is taxed  *(new, 2026-08-24)*
+**Claim:** over the next week the maker rebate stays near -47 bps of
+passive notional and taker fees near +166 bps, so the EV model
+understates resting and understates the cost of a dump.
+**Why:** measured over 2,626 executions and $7,250 of notional since
+Aug-14 — passive trades earned $30.01, the 63 taker dumps paid $14.33.
+**Falsified if:** either rate moves more than 20 bps from those.
+**Resolves:** Aug-31, from data/trades.csv.
 
 ## RESOLVED
 
