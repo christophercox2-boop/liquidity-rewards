@@ -337,3 +337,59 @@ flipping to PAID, or a flip to PAID with no Transfer following it.
 **Check.** Aug-20's $143.92, Aug-21's (currently $93.02) and
 Aug-22's $155.47 are all still pending. Each should arrive as one
 or more Transfers. Watch the amounts against the per-market rows.
+
+---
+
+## 2026-08-24 — markets that used to pay and now pay nothing
+
+The owner asked. Comparing Aug 14-18 (the strong stretch) against
+Aug 20-22 (now): **105 markets paid then and pay nothing now, worth
+$149.07/day.** That is the entire decline and more.
+
+| why it stopped | markets | $/day |
+|---|---|---|
+| **still open — we simply stopped earning** | **77** | **$104.87** |
+| on the owner's avoid list (deliberate) | 19 | $26.10 |
+| out of scope — WNBA | 2 | $12.59 |
+| market resolved before Aug-20 | 7 | $5.51 |
+
+### Wrong theory, recorded
+I expected getting FILLED to be what kills a market — take a
+position, the book turns exit-only, the rewards stop. The single
+biggest loss fits it perfectly: `ewc-usp-party-2028-11-07-rep` paid
+$79.85 on Aug-15, we bought 400 shares at 41c that evening and 350
+more at 39c on Aug-17 (position +695), and it paid $0.17 on Aug-18
+and nothing since.
+
+**It does not generalise.** Markets that KEPT paying had a higher
+fill rate than those that stopped — 91% (126/138) against 61%
+(47/77). Fills are normal everywhere. One market's story is not a
+mechanism.
+
+### What does explain a large piece of it
+**10 of the 77 match none of `enter_tokens`, and they are worth
+$38.68/day** — including the top two losses:
+
+| $/day | market | |
+|---|---|---|
+| $22.10 | `ewc-usp-party-2028-11-07-rep` | which party wins 2028 |
+| $9.79 | `apdc-jerpowgov-2026-12-31` | Powell departs as Fed governor |
+
+`enter_tokens` is `("usgub","usse","senate","uspres","usp-2028",
+"usho","scc-hrep")`. The party market's slug is `usp-party-2028`,
+so `usp-2028` does not match it and neither does `uspres`. **Our
+single best market by far is excluded from fresh money by a hyphen.**
+
+Across all history, non-sport markets that match no enter token
+have paid **$1,079.61 — 18% of the $6,118.30 we have ever earned.**
+The biggest excluded families are `apdc-*` ($346.24, "will official
+X depart") and `ewc-*` ($260.79).
+
+### Still unexplained
+The other **67 markets, $66.18/day**, DO match an enter token and
+stopped anyway. Candidates are the 50c/day entry bar with its
+two-reading cull, and capital exhaustion at the $250 politics cap.
+I do not know which, and I am not guessing: data/market_est.csv
+records every market we rest in with its estimate whether or not it
+fills, which is exactly the missing evidence. Two days of it will
+answer this.
