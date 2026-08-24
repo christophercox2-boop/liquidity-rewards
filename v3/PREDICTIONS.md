@@ -116,3 +116,72 @@ order plus an engine `sell` order whose quantities sum above the held
 size. One instance falsifies this outright.
 
 **Check.** Read the order list per market for the next seven days.
+
+---
+
+# Graded 2026-08-24
+
+## P1 — WRONG, and by a lot
+Predicted Aug-21 would pay **at least $295.90**. It paid **$93.02**
+(politics $76.45, college football $16.57). Off by 3.2x.
+
+**What it taught.** I was reading "no PAID rows yet" as "the exchange
+has not told us." It had. Aug-20, 21 and 22 have been sitting in
+rewards.csv as PENDING rows the whole time — 387, 175 and 238 of them.
+PENDING is not "unknown", it is the number, waiting to settle. Aug-20
+read $143.85 on Aug-22 and $143.92 today: seven cents in two days.
+Pending totals are final for grading purposes.
+
+I spent four days telling the owner these days were "unposted and
+blocking grading" when the answer was in a file I write myself. This
+is the second time the same mistake has cost real information — the
+first was reading five of the exchange's twenty-four order fields.
+**Check the file before reporting an absence.**
+
+## P2 — RIGHT
+Predicted college football would stay under $100 all-time. It is at
+**$99.11** over three paying days. Right, but by $0.89 — call it
+provisionally right and re-grade at the end of the week.
+
+## P4 — RIGHT
+Predicted NBA would pay under $1/day. NBA has paid **$0.01, once**,
+against 121 resting orders and $48.08 of the $50 cap committed.
+
+## The finding that matters more than any of these
+The politics estimate is not slightly high, it is **~3.4x** high:
+
+| day | politics estimated | politics paid | ratio |
+|-----|-------------------|---------------|-------|
+| Aug-20 | — | $110.19 | |
+| Aug-21 | $255.22 | $76.45 | 3.3x |
+| Aug-22 | $366.17 | $101.14 | 3.6x |
+
+College football over the same window: estimated $47.66, paid $54.33 —
+accurate to 14%. So this is not a broken estimator, it is something
+specific to politics.
+
+And the direction is worse than the level. Politics paid $181.52 on
+Aug-18, $122.97, $110.19, $76.45, $101.14 — roughly halved in five
+days — while orders grew and risk went to the $250 cap. **More money
+resting, more orders, less earned.**
+
+## P8 — the politics estimate is wrong because the pool is shared
+**Claim.** The politics over-estimate comes from the pool divisor, not
+from uptime or spread. Markets in the same race share one pool; the
+estimator credits each bracket its own share, so a race we hold five
+brackets of is counted about five times.
+
+**Why this fits.** College football markets are one-per-pool and its
+estimate is accurate. Politics 2028 nomination markets are dozens of
+candidates against a single pool, and they are exactly where the
+estimate is largest. Aug 20-22: 225 politics markets paid anything,
+only 88 paid more than 50c.
+
+**Falsifier.** Group the Aug 20-22 paid rows by race prefix and
+compare each race's total against the sum of its brackets' estimates.
+If the gap is flat across races rather than proportional to how many
+brackets we hold in each, the divisor is not the cause and this is
+wrong.
+
+**Check.** Runnable now against rewards.csv and estimates.csv — no
+waiting on the exchange.

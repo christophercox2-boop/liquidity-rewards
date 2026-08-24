@@ -358,7 +358,9 @@ ESTIMATES_CSV_HEADER = ("day,family,est_usd,unmeasured_min,recorded_at,"
 
 def estimates_csv_append(existing: str | None, today: str,
                          rows: list, paid_by_day: dict,
-                         now_iso: str) -> tuple[str, int]:
+                         now_iso: str,
+                         paid_by_fam: dict | None = None,
+                         ) -> tuple[str, int]:
     """The estimate ledger (owner, 2026-08-23: "All the estimates
     should stay written down somewhere until the actual numbers come
     in").
@@ -368,8 +370,17 @@ def estimates_csv_append(existing: str | None, today: str,
     worthless. Only the paid column fills in later. Today's row keeps
     updating because the day is still accruing.
 
-    `rows` are (day, family, est_usd, unmeasured_min) tuples;
-    `paid_by_day` maps day -> total paid for the whole account.
+    `rows` are (day, family, est_usd, unmeasured_min) tuples.
+    `paid_by_day` maps day -> total paid for the whole account, and
+    `paid_by_fam` maps (day, family) -> that family's own share.
+
+    Grade a family against ITS OWN money (2026-08-24). Before this the
+    whole account's total was written into every family row, so the
+    politics estimate was measured against politics + football + NBA
+    together, and nfl's $0.00 estimate was scored against the entire
+    day. Both the paid column and error_pct were nonsense per family.
+    The day total is still the fallback for a family the breakdown
+    cannot classify, so a row never goes blank.
     """
     text = existing if existing else ESTIMATES_CSV_HEADER
     kept: dict = {}
@@ -392,7 +403,9 @@ def estimates_csv_append(existing: str | None, today: str,
             est_s = f"{est:.2f}"
             unmeas_s = f"{unmeas:.1f}"
             rec_s = prior[4] if prior else now_iso
-        paid = paid_by_day.get(day)
+        paid = (paid_by_fam or {}).get((day, family))
+        if paid is None and not paid_by_fam:
+            paid = paid_by_day.get(day)
         paid_s = f"{paid:.2f}" if paid is not None else ""
         paid_at = (prior[6] if prior and prior[5] else
                    (now_iso if paid is not None else ""))
@@ -593,6 +606,7 @@ class Monitor:
         self.silver = SilverFairs(client=self.client)
         self.samplers: dict[str, Estimator] = {}
         self.actuals_by_day: dict[str, float] = {}
+        self.actuals_by_fam: dict[str, float] = {}   # "day|family" -> usd
         self.rewards_seen: dict[str, float] = {}
         self.rw_last: dict | None = None      # latest payout-check result
         self._rw_at = 0.0
@@ -757,6 +771,7 @@ class Monitor:
                                or {"cancelled": 0, "failed": 0})
         self.rewards_seen = dict(saved.get("rewards_seen") or {})
         self.actuals_by_day = dict(saved.get("actuals_by_day") or {})
+        self.actuals_by_fam = dict(saved.get("actuals_by_fam") or {})
         self.owner_fairs = {k: float(v) for k, v in
                             (saved.get("owner_fairs") or {}).items()}
         self.backfilled = bool(saved.get("backfilled_600"))
@@ -817,6 +832,7 @@ class Monitor:
             "flat_stats": self.flat_stats,
             "rewards_seen": self.rewards_seen,
             "actuals_by_day": self.actuals_by_day,
+            "actuals_by_fam": self.actuals_by_fam,
             "owner_fairs": dict(self.owner_fairs),
             "backfilled_600": bool(self.backfilled),
             "evidence_seeded": bool(self.evidence_seeded),
@@ -1269,6 +1285,24 @@ class Monitor:
                            f"{r['qty']:g}@{r['px']*100:g}c"
                            for r in rows_out[:8]]}
 
+    def _family_of(self, market: str) -> str:
+        """Which family a rewarded market belongs to. The families'
+        own universes are the authority — a market can only earn where
+        the engine quotes it. Falls back to the prefixes for a market
+        that has since left a universe (a settled game, a closed race),
+        which is most of the football rows by the time they pay."""
+        for key, fam in self.families.items():
+            if market in fam.universe:
+                return key
+        low = market.lower()
+        if low.startswith(("tec-nba-", "aqc-nba-", "ftsc-nba-", "fptc-nba-")):
+            return "nba"
+        if "nfl" in low:
+            return "nfl"
+        if "cfb" in low or "ncaaf" in low:
+            return "cfb"
+        return "politics"
+
     def publish_files(self, now: float) -> None:
         """Hourly, and only while 1.0 is retired (one writer per file)."""
         if os.environ.get("V1_ENABLED", "0") != "0":
@@ -1291,7 +1325,9 @@ class Monitor:
                 existing, sha = self._gh_file("data/estimates.csv")
                 text, n = estimates_csv_append(
                     existing, et_day(now), rows, self.actuals_by_day,
-                    time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)))
+                    time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)),
+                    paid_by_fam={tuple(k.split("|", 1)): v for k, v
+                                 in self.actuals_by_fam.items()})
                 if n:
                     self._gh_put("data/estimates.csv", text, sha,
                                  f"estimates: {n} rows [skip ci]")
@@ -1415,6 +1451,16 @@ class Monitor:
         self.rewards_seen = seen
         for d, v in totals.items():
             self.actuals_by_day[d] = round(v, 2)
+        for key, a in agg.items():           # ...and per family, so the
+            fam = self._family_of(a["market"])   # ledger grades each
+            if not fam:                          # one on its own money
+                continue
+            fk = f"{a['date']}|{fam}"
+            self.actuals_by_fam[fk] = round(
+                self.actuals_by_fam.get(fk, 0.0) + a["paid"], 2)
+        if len(self.actuals_by_fam) > 4000:
+            for k in sorted(self.actuals_by_fam)[:len(self.actuals_by_fam) - 4000]:
+                del self.actuals_by_fam[k]
         # the baseline must survive a deploy between now and the next save
         # — local AND remote, immediately (a rebuild replaces the disk)
         if self.last_state:
