@@ -3247,10 +3247,10 @@ date,market,program_type,reward_usd,status
 2026-08-19,ewc-usse-tx-2026-11-03-dem,liquidityProgram,1.35,PAID
 2026-08-19,ewc-usse-tx-2026-11-03-rep,liquidityProgram,0.09,PAID
 2026-08-19,opdc-mcconnell-resign-2026-11-02,liquidityProgram,0.13,PAID
-2026-08-19,paccc-balpow-2026-11-03-dhou-rsen,liquidityProgram,7.59,PENDING
-2026-08-19,paccc-balpow-2026-11-03-dsweep,liquidityProgram,0.38,PENDING
-2026-08-19,paccc-balpow-2026-11-03-rhou-dsen,liquidityProgram,3.37,PENDING
-2026-08-19,paccc-balpow-2026-11-03-rsweep,liquidityProgram,3.26,PENDING
+2026-08-19,paccc-balpow-2026-11-03-dhou-rsen,liquidityProgram,7.59,PAID
+2026-08-19,paccc-balpow-2026-11-03-dsweep,liquidityProgram,0.38,PAID
+2026-08-19,paccc-balpow-2026-11-03-rhou-dsen,liquidityProgram,3.37,PAID
+2026-08-19,paccc-balpow-2026-11-03-rsweep,liquidityProgram,3.26,PAID
 2026-08-19,scc-hrep-rep-2026-11-03-gte180,liquidityProgram,0.46,PAID
 2026-08-19,scc-hrep-rep-2026-11-03-gte225,liquidityProgram,0.43,PAID
 2026-08-19,scc-hrep-rep-2026-11-03-gte230,liquidityProgram,0.01,PAID
