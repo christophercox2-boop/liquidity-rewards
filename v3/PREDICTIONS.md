@@ -185,3 +185,28 @@ wrong.
 
 **Check.** Runnable now against rewards.csv and estimates.csv — no
 waiting on the exchange.
+
+### P8 — first check, and an admission
+Pay per bracket does not collapse as we hold more brackets of a race,
+which is what pool-splitting would look like:
+
+| brackets held | races | paid per bracket |
+|---------------|-------|------------------|
+| 1 | 56 | $0.60 |
+| 2 | 39 | $0.97 |
+| 3 | 3 | $1.81 |
+
+And the widest: 23 brackets of `ewc-usp-2028-11-07` paid $1.80 each,
+12 of `enwc-uspres-nom-rep-2028` paid $3.50 each. Wide races pay MORE
+per bracket, not less. If one pool were being counted once per
+bracket, this column would fall like 1/N. It rises.
+
+**But that is not the falsifier I wrote.** The stated test needs each
+race's ESTIMATE, and estimates.csv only stores a per-family total. I
+cannot grade a market or a race against its own prediction, which
+means P8 is undecided rather than refuted — and the reason is a hole
+in my own record-keeping, not in the exchange's.
+
+The owner asked on 2026-08-23 that estimates stay written down until
+the actual numbers come in. I wrote them down per family. Per market
+is what makes them testable. That is the next thing to build.
