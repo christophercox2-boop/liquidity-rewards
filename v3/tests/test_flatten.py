@@ -2123,10 +2123,32 @@ class TestHandsOffOwnerOrders(unittest.TestCase):
                            capital_usd=1.0, per_market_usd=2.0)
         r = Rig(cfg=cfg)
         r.add_market(A)
+        r.cycle()                                       # engine spends
         self._manual(r, "HAND2", A, "BUY", 0.40, 10.0)  # $4 of hand money
-        self.assertGreater(r.fam.family_spent(), 1.0)   # over the $1 cap
         r.fam._trim(r.now, 5)
         self.assertIn("HAND2", r.fam.orders)            # never trimmed
+
+    def test_the_owners_money_is_not_charged_to_the_engines_budget(self):
+        """The family cap limits what the ENGINE risks on its own
+        initiative. Charging the owner's book against it locked the
+        engine out of politics entirely on 2026-08-24 — his 62
+        risk-opening orders counted $484.66 against a $250 cap, and
+        the engine held 0 entry orders and $4.27 of stale exits at the
+        lowest earning rate on record."""
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=1.0, per_market_usd=2.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        before = r.fam.family_spent()
+        # $4 of the owner's own money, on the risk-OPENING side
+        self._manual(r, "HAND9", A, "BUY", 0.40, 10.0)
+        self.assertEqual(r.fam.family_spent(), before)   # not charged
+        # and it still counts as cover, so nothing is offered twice
+        self.assertIn("HAND9", r.fam.orders)
+        self.assertEqual(r.fam.orders["HAND9"].purpose, "manual")
 
     def test_owner_exit_counts_as_cover(self):
         from v3.tests.test_family import Rig, A, politics_book
