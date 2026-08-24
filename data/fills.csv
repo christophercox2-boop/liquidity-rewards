@@ -626,3 +626,9 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787581884.7,politics,scc-hrep-rep-2026-11-03-gte230,SELL,1,0.04,earn,2.7461,0.02,0.023475,3,7,0.692,0.03,0.05,-0.0165,-5,1 tick in front of the touch — closer to the midpoint; ~65.9% of the ask side,C2KV22MAPDK2
 1787582904.7,cfb,aachc-cfb-wins-2026-11-28-txtech-7pt5wins,SELL,0.01,0.74,earn,1.5812,67.28,,70,76,0.304,0.74,0.99,-0.01,-1.01,14 ticks in front of the touch — closer to the midpoint; ~63.3% of the ask side,C0TDSBN2CDJR
 1787583204.7,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,2,0.94,earn,6.2131,0.02,0.985525,90,94,0.677,0.9,0.98,-0.0455,2,4 ticks in front of the touch — closer to the midpoint; ~99.4% of the bid side,C2M69J7FTDK1
+1787583504.7,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.95,earn,5.8918,0.02,0.99655,91,94,0.925,0.94,0.95,-0.0466,20,1 tick in front of the touch — closer to the midpoint; ~94.3% of the bid side,C2M8AA6C2DK5
+1787583684.7,cfb,aachc-cfb-wins-2026-11-28-txtech-8pt5wins,BUY,0.2,0.9,earn,0.1312,28.4,,89,93,0,0.73,0.91,-0.01,0.2,joins the touch — the book has been quiet,C1VYJ17X0DK5
+1787585184.7,politics,vmc-ussep-mov-ma-dem-2026-09-01-mougte5,SELL,1,0.07,sell,0.0333,26.46,,7,11,0.331,0.06,0.07,0.02,0,selling filled stock — it earns while it waits,C1XT9SSSJDKA
+1787585544.7,politics,scc-hrep-rep-2026-11-03-gte230,SELL,1,0.04,earn,2.7534,0.02,0.023475,4,7,0.751,0.03,0.07,-0.0165,-6,3 ticks in front of the touch — closer to the midpoint; ~66.1% of the ask side,C2MR4F6BRDK7
+1787585964.7,politics,scc-senate-gop-2026-11-03-52,SELL,5,0.14,manual,0.2498,23.48,0.08125,10,15,0.397,0.13,0.15,-0.0588,-5,the owner's own order — the engine leaves it alone,C20P37184DJT
+1787586324.8,cfb,aachc-cfb-wins-2026-11-28-lou-8pt5wins,BUY,1,0.55,sell,0.3397,35.07,,33,41,0.454,0.55,0.56,0.18,1,buying back the short at or under what it sold for — the bid earns while it wait,C1PVCQ7ETDJP
