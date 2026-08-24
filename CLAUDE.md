@@ -53,10 +53,13 @@ long and accreted, so search it rather than reading it through.
   only when the spread is ≤2 ticks, only up to the bid's displayed size,
   never below model fair − 3 ticks, exits cancelled first, capped per
   family per day (politics $50, cfb $10). Nothing else may cross.
-- Heavy or blocked-egress work (Silver CSV fetches, exchange surveys) runs
-  as GitHub Actions workflows that commit results to data/*.txt — the owner
-  reads the output files, not logs. Order-touching workflows trigger only
-  by push-path or manual dispatch, never cron.
+- NO SCHEDULED GitHub Actions (owner, 2026-08-24: "remove the GitHub
+  automation. It keeps running and I keep getting emails"). Every cron
+  workflow is deleted; the monitor writes rewards.csv, fills.csv,
+  trades.csv, estimates.csv, the Silver tables and STATUS.md itself.
+  The remaining workflows are manual-dispatch or push-path only and
+  never fire on their own. Do not add a cron workflow — put the work
+  in the monitor's publish loop instead.
 - Alerts go through ntfy; the topic name is a password.
 
 ## Evidence and predictions (owner, 2026-08-23)
