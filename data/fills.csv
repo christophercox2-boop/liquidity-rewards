@@ -638,3 +638,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787587530.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-margte40,BUY,1,0.09,manual,0.0188,23.89,,9,13,0.276,0.09,0.1,-0.02,2,the owner's own order — the engine leaves it alone,C20QTPJ5MDJR
 1787587590.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar10-15,BUY,1,0.38,earn,1.1233,0.03,,13,20,0.454,0.34,0.39,0.22,2,joins the touch — the book has been quiet,C2N869ZPPDK1
 1787587710.8,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,SELL,0.74,0.04,earn,1.8437,1.35,,5,10,0.708,0.03,0.04,0.03,-0.74,joins the touch — the book has been quiet,C2M3VBGTTDJP
+1787588079.6,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,BUY,1,0.06,sell,0.3969,0.1,,5,10,0.765,0.06,0.16,-0.01,0,buying back the short at or under what it sold for — the bid earns while it wait,C2N9QXDK0DJR
