@@ -645,3 +645,16 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787589537.3,politics,ussewc-usse-wv-2026-11-03-rep,BUY,1,0.98,sell,0.1377,0.69,0.999875,91,97,0.29,0.93,0.99,-0.0199,1,buying back the short at or under what it sold for — the bid earns while it wait,C2N4GKPEWDK5
 1787590317.3,politics,enwc-uspres-nom-rep-2028-thomas,SELL,5,0.06,manual,0.1477,0.66,,1,6,0.208,0.05,0.06,-0.03,-19,the owner's own order — the engine leaves it alone,C2G65FGBRDK1
 1787592177.3,cfb,aachc-cfb-wins-2026-11-28-rutger-2pt5wins,BUY,0.2,0.95,earn,1.5528,24.67,,94,99,0.25,0.88,0.99,-0.02,0.2,joins the touch — the book has been quiet,C21696H20DK7
+1787592837.3,cfb,aachc-cfb-wins-2026-11-28-wvir-6pt5wins,SELL,0.27,0.43,sell,0,0,,41,45,0.677,0.43,0.44,0,0.73,taker dump — sold into the bid (the carved exception),C2PH2B3T4DK5
+1787592897.3,cfb,aachc-cfb-wins-2026-11-28-cin-5pt5wins,SELL,1,0.39,sell,0,0,,35,41,0.52,0.39,0.4,-0.01,0,taker dump — sold into the bid (the carved exception),C2PHQCC52DJP
+1787593197.3,cfb,aachc-cfb-wins-2026-11-28-vir-7pt5wins,SELL,0.3,0.66,sell,0,0,,44,50,0.553,0.66,0.67,-0.19,0.7,taker dump — sold into the bid (the carved exception),C2PKT36YCDJT
+1787593797.3,cfb,aachc-cfb-wins-2026-11-28-miss-6pt5wins,SELL,0.12,0.91,sell,0,0,,60,67,0.513,0.91,0.92,-0.28,0.88,taker dump — sold into the bid (the carved exception),C2PRCNNK0DK5
+1787593857.3,cfb,aachc-cfb-wins-2026-11-28-bayl-4pt5wins,SELL,0.01,0.62,manual,0.0009,27.73,,60,63,0,0.61,0.91,0,-0.01,the owner's own order — the engine leaves it alone,C1YY43H2YDJV
+1787593857.3,cfb,aachc-cfb-wins-2026-11-28-bayl-4pt5wins,SELL,0.05,0.62,manual,0.0046,25.67,,60,64,0.455,0.61,0.91,0,-0.06,the owner's own order — the engine leaves it alone,C20P371JTDJT
+1787594037.3,cfb,aachc-cfb-wins-2026-11-28-pur-2pt5wins,SELL,1,0.54,earn,0.2762,0.4,,51,56,0,0.53,0.54,-0.01,-1,joins the touch — the book has been quiet,C2PF3F6AJDJT
+1787594397.3,cfb,aachc-cfb-wins-2026-11-28-pur-3pt5wins,BUY,0.01,0.56,earn,2.3039,0.13,,53,59,0.451,0.35,0.57,0,0.02,21 ticks in front of the touch — closer to the midpoint; ~92.2% of the bid side,C2PS54744DK7
+1787594397.3,cfb,aachc-cfb-wins-2026-11-28-pur-2pt5wins,BUY,1,0.72,sell,2.4874,0.1,,52,57,0.454,0.53,0.83,0.17,0,buying back the short at or under what it sold for — the bid earns while it wait,C2PT9JJ70DK7
+1787594577.3,cfb,aachc-cfb-wins-2026-11-28-okl-8pt5wins,BUY,0.01,0.67,earn,2.4276,0.12,,58,65,0.606,0.55,0.68,0.05,1.01,12 ticks in front of the touch — closer to the midpoint; ~97.1% of the bid side,C2PVG72QYDKA
+1787595057.3,cfb,aachc-cfb-wins-2026-11-28-ncar-3pt5wins,BUY,0.01,0.8,sell,0.0641,0.37,,73,81,0.577,0.78,0.81,0.03,0,buying back the short at or under what it sold for — the bid earns while it wait,C2PQR1AYWDJT
+1787595417.4,cfb,aachc-cfb-wins-2026-11-28-ncar-5pt5wins,BUY,0.5,0.59,earn,2.2453,0.42,,57,61,0.71,0.59,0.61,0,2.51,joins the touch — the book has been quiet,C2PSEZ4KADJT
+1787595597.4,cfb,aachc-cfb-wins-2026-11-28-ncar-4pt5wins,SELL,0.55,0.55,sell,0.007,27.23,,49,56,0.611,0.52,0.55,-0.02,0.45,selling filled stock — it earns while it waits,C1ZSS4YEGDK1
