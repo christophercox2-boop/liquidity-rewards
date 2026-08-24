@@ -3372,3 +3372,108 @@ class TestFrozenGround(unittest.TestCase):
         self.assertTrue(r.fam.enterable(A))
         r.cycle()
         self.assertTrue([o for o in r.fam.orders.values() if o.market == A])
+
+
+class TestQuieterFillAlerts(unittest.TestCase):
+    """Owner, 2026-08-24. CLOSES: silent unless the realised loss is
+    over $1. OPENS: silent unless, once the book has settled, the
+    position marks more than $1 down AND nothing is earning there."""
+
+    def _rig(self):
+        from v3.tests.test_family import Rig
+        r = Rig()
+        r.add_market(A_J)
+        return r
+
+    def _fill(self, r, side, px, qty, intent=None):
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG, SELL_LONG
+        it = intent or (BUY_LONG if side == "BUY" else SELL_LONG)
+        rec = FamilyOrder(id=f"O{side}{px}", market=A_J, side=side,
+                          price=px, qty=qty, intent=it,
+                          placed_ts=r.now - 60, purpose="earn")
+        r.fam._on_fill(rec, qty, r.now)
+
+    def _pages(self, r):
+        return [t for t, _ in r.alerts if "POL" in t]
+
+    # ---- closes -------------------------------------------------------
+    def test_small_losing_close_is_silent(self):
+        r = self._rig()
+        r.fam.inventory[A_J] = {"qty": 10.0, "cost": 5.0}   # 50c basis
+        self._fill(r, "SELL", 0.45, 10.0)                   # -50c realised
+        self.assertEqual(self._pages(r), [])
+
+    def test_big_losing_close_pages(self):
+        r = self._rig()
+        r.fam.inventory[A_J] = {"qty": 10.0, "cost": 5.0}
+        self._fill(r, "SELL", 0.30, 10.0)                   # -$2.00 realised
+        self.assertTrue(any("closed at a loss" in t for t in self._pages(r)))
+
+    def test_profitable_close_is_silent(self):
+        r = self._rig()
+        r.fam.inventory[A_J] = {"qty": 10.0, "cost": 5.0}
+        self._fill(r, "SELL", 0.90, 10.0)
+        self.assertEqual(self._pages(r), [])
+
+    # ---- opens --------------------------------------------------------
+    def test_open_does_not_page_at_the_moment_of_the_fill(self):
+        r = self._rig()
+        self._fill(r, "BUY", 0.50, 20.0)
+        self.assertEqual(self._pages(r), [])            # held back
+        self.assertEqual(len(r.fam.pending_pages), 1)
+
+    def test_open_underwater_and_earning_nothing_pages_after_settling(self):
+        from v3.scoring import Book
+        r = self._rig()
+        self._fill(r, "BUY", 0.50, 20.0)                # $10 of stock
+        r.fam.inventory[A_J] = {"qty": 20.0, "cost": 10.0}
+        r.fam.cache.put(A_J, Book(bids=((0.40, 100.0),),   # marks -$2
+                                  asks=((0.42, 100.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.fam.orders.clear()                            # nothing earning
+        r.fam._page_opens_due(r.now + 25)
+        self.assertTrue(any("earning nothing" in t for t in self._pages(r)))
+
+    def test_open_underwater_but_earning_stays_silent(self):
+        from v3.scoring import Book
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
+        r = self._rig()
+        self._fill(r, "BUY", 0.50, 20.0)
+        r.fam.inventory[A_J] = {"qty": 20.0, "cost": 10.0}
+        r.fam.cache.put(A_J, Book(bids=((0.40, 100.0),),
+                                  asks=((0.42, 100.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.fam.orders["E1"] = FamilyOrder(
+            id="E1", market=A_J, side="SELL", price=0.60, qty=20.0,
+            intent=SELL_LONG, placed_ts=r.now, purpose="sell",
+            live_est=0.75)                               # it IS earning
+        r.fam._page_opens_due(r.now + 25)
+        self.assertEqual(self._pages(r), [])
+
+    def test_open_only_slightly_down_stays_silent(self):
+        from v3.scoring import Book
+        r = self._rig()
+        self._fill(r, "BUY", 0.50, 20.0)
+        r.fam.inventory[A_J] = {"qty": 20.0, "cost": 10.0}
+        r.fam.cache.put(A_J, Book(bids=((0.48, 100.0),),   # marks -40c
+                                  asks=((0.50, 100.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.fam.orders.clear()
+        r.fam._page_opens_due(r.now + 25)
+        self.assertEqual(self._pages(r), [])
+
+    def test_a_short_marks_against_the_ask(self):
+        from v3.scoring import Book
+        from v3.intents import BUY_SHORT
+        r = self._rig()
+        self._fill(r, "SELL", 0.90, 20.0, intent=BUY_SHORT)
+        r.fam.inventory[A_J] = {"qty": -20.0, "cost": -18.0}  # sold at 90c
+        r.fam.cache.put(A_J, Book(bids=((0.97, 50.0),),
+                                  asks=((0.99, 50.0),),   # buy back at 99c
+                                  tick=0.01, fetched_at=r.now))
+        r.fam.orders.clear()
+        r.fam._page_opens_due(r.now + 25)
+        # -20*0.99 - (-18) = -1.80 -> over the bar, pages
+        self.assertTrue(any("earning nothing" in t for t in self._pages(r)))

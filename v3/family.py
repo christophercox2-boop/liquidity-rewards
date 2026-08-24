@@ -59,6 +59,8 @@ from .terms import TermsStore
 ET = ZoneInfo("America/New_York")
 
 BOOK_MAX_AGE = 120.0
+PAGE_LOSS_USD = 1.0    # only losses bigger than this reach the phone
+PAGE_SETTLE_S = 20.0   # let the book settle before marking an open
 GONE_GRACE_S = 300.0   # a vanished order waits this long for the lagging
                        # position feed before it counts as a silent cancel
 
@@ -307,6 +309,7 @@ class Family:
         # time to get an exact resting period?" — yes, with this).
         self.placed_at: dict[str, float] = {}
         self.priority: set = set()   # markets to re-check first
+        self.pending_pages: list = []   # open fills awaiting a mark
         self.log: list[dict] = []
 
     # ------------------------------------------------------------- helpers
@@ -1314,17 +1317,27 @@ class Family:
         self._log(event="fill", market=rec.market, side=rec.side,
                   price=rec.price, qty=round(filled, 2))
         gain = self._closing_gain(rec.side, rec.price, filled, q0, c0)
-        if gain is not None and gain > 0.005:
-            # owner, 2026-08-22: profitable fills do not page the phone.
-            # The fill still lands in the journal and the fill cards.
-            self._log(event="fill_no_page", market=rec.market,
-                      note=f"closed {filled:g} at a ${gain:.2f} gain — "
-                           f"good news does not page")
+        if gain is not None:
+            # A CLOSE. Silent unless it realised more than a dollar of
+            # loss (owner, 2026-08-24). Profit, break-even and small
+            # losses all stay off the phone; the card still records it.
+            if gain < -PAGE_LOSS_USD:
+                self.alert(f"{self.cfg.tag} closed at a loss",
+                           f"{self._label(rec.market)}: {rec.side} "
+                           f"{filled:g} @ {rec.price * 100:g}c — "
+                           f"${-gain:.2f} lost on the round trip")
+            else:
+                self._log(event="fill_no_page", market=rec.market,
+                          note=f"closed {filled:g} at ${gain:+.2f} — "
+                               f"under the ${PAGE_LOSS_USD:g} page bar")
         else:
-            self.alert(f"{self.cfg.tag} order filled",
-                       f"{self._label(rec.market)}: {rec.side} {filled:g} @ "
-                       f"{rec.price * 100:g}c — fills are usually losses "
-                       f"here; the exit seller takes over")
+            # An OPEN. The decision waits for the book to settle: right
+            # after a fill the touch is the one our own trade just moved
+            # (owner, 2026-08-24: "liquidation 20 seconds later").
+            self.pending_pages.append(
+                {"market": rec.market, "side": rec.side, "qty": filled,
+                 "px": rec.price, "due": now + PAGE_SETTLE_S})
+            del self.pending_pages[:-200]
 
     @staticmethod
     def _closing_gain(side: str, price: float, filled: float,
@@ -1338,6 +1351,42 @@ class Family:
         if side == "BUY" and q0 < -0.005 and filled <= -q0 + 0.005:
             return (c0 / q0 - price) * filled
         return None
+
+    def _page_opens_due(self, now: float) -> None:
+        """Decide the held-back OPEN fills once the book has settled.
+        Page only when the position is BOTH marked at more than a
+        dollar of loss AND earning nothing (owner, 2026-08-24) — a
+        paper loss that is collecting rewards is the business working,
+        not news."""
+        for p in list(self.pending_pages):
+            if now < p["due"]:
+                continue
+            self.pending_pages.remove(p)
+            slug = p["market"]
+            inv = self.inventory.get(slug) or {}
+            qty = inv.get("qty") or 0.0
+            if abs(qty) < 0.005:
+                continue                  # already gone; nothing to warn about
+            book = self.cache.any_age(slug)
+            if book is None:
+                continue                  # no mark, no claim
+            mark = (book.bids[0][0] if qty > 0 and book.bids
+                    else book.asks[0][0] if qty < 0 and book.asks else None)
+            if mark is None:
+                continue
+            pnl = qty * mark - (inv.get("cost") or 0.0)
+            earning = any((o.live_est or 0.0) > 0.0
+                          for o in self.orders.values() if o.market == slug)
+            if pnl < -PAGE_LOSS_USD and not earning:
+                self.alert(f"{self.cfg.tag} position under water, earning nothing",
+                           f"{self._label(slug)}: {p['side']} {p['qty']:g} @ "
+                           f"{p['px'] * 100:g}c — the {qty:g} now held marks "
+                           f"${-pnl:.2f} down and nothing is earning here")
+            else:
+                self._log(event="fill_no_page", market=slug,
+                          note=f"opened {p['qty']:g} — marks ${pnl:+.2f}"
+                               f"{' and is earning' if earning else ''}; "
+                               f"under the page bar")
 
     def _journal_fill(self, rec: FamilyOrder, filled: float, now: float,
                       qty_after: float) -> None:
@@ -1469,6 +1518,7 @@ class Family:
               client, switch_on: bool, foreign_ids=(),
               exits_only: bool = False, trades=None) -> dict:
         self.reconcile(open_orders, positions, now, trades=trades)
+        self._page_opens_due(now)
         self._reclassify_exits(positions)
         self.refresh_universe(client, now)
         self.refresh_terms(client, now)
@@ -2842,6 +2892,7 @@ class Family:
             "positions_seen": self.positions_seen,
             "silent_cancels": self.silent_cancels,
             "placed_at": self.placed_at,
+            "pending_pages": self.pending_pages,
             "gone_pending": {oid: {"rec": asdict(g["rec"]),
                                    "until": g["until"]}
                              for oid, g in self.gone_pending.items()},
@@ -2884,6 +2935,7 @@ class Family:
         self.silent_cancels = d.get("silent_cancels") or 0
         self.placed_at = {k: float(v) for k, v in
                           (d.get("placed_at") or {}).items()}
+        self.pending_pages = list(d.get("pending_pages") or [])
         self.gone_pending = {}
         for oid, g in (d.get("gone_pending") or {}).items():
             try:
