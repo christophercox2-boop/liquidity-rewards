@@ -210,3 +210,68 @@ in my own record-keeping, not in the exchange's.
 The owner asked on 2026-08-23 that estimates stay written down until
 the actual numbers come in. I wrote them down per family. Per market
 is what makes them testable. That is the next thing to build.
+
+---
+
+## 2026-08-24, later — I was wrong about what we have
+
+The owner asked whether we have per-market estimates or fill data at
+all. We have both, and I had just said otherwise.
+
+* **data/fills.csv — 633 fills.** Each one carries the market's
+  estimated daily rate AT THE MOMENT WE WERE RESTING THERE, plus our
+  fair, the band, the confidence, both sides of the touch, hours
+  rested and the order id.
+* **data/trades.csv — 2,739 trades**, with realized P/L, placement
+  time, hours rested, commission, maker/taker role.
+* **data/rewards.csv — 4,108 market-day payout rows** over 51 days.
+
+So the join I said was impossible runs today. 73 market-days have
+both our estimate and the exchange's money:
+
+| | market-days | estimated | paid | ratio |
+|---|---|---|---|---|
+| politics | 55 | $172.56 | $58.18 | 2.97x |
+| college football | 18 | $31.27 | $6.59 | 4.74x |
+| **all** | **73** | **$203.83** | **$64.77** | **3.15x** |
+
+**Read this carefully — the sample is biased.** fills.csv only
+records markets where we were FILLED, which are the markets that
+moved. So the honest claim is narrow and still useful: *on the
+markets where we got filled, our estimate was about 3x the money.*
+Getting filled and over-estimating travel together.
+
+Note college football is 4.74x over here while its FAMILY estimate
+for Aug-22 was accurate to 14% ($47.66 est, $54.33 paid). Both are
+true — of different samples. The family number averages over the
+quiet markets that pay as predicted; this one is the filled tail.
+
+**The actual gap** is narrower than I claimed: we have no stored
+estimate for markets we rested in and were NOT filled — the good
+ones. data/market_est.csv, deployed today, records exactly those.
+
+## P9 — realized trading P/L is about -$31, not -$3,110
+`realized_pnl` in the activity feed is in **cents**, not dollars.
+
+Four trades at one instant on 2026-08-17 in
+`ewc-usp-party-2028-11-07-rep` (37, 128, 2 and 183 shares at 39c)
+report -108.93, -376.84, -5.89 and -538.75 — exactly -2.944 per
+share each. At $2.94/share that is impossible on a 39c contract; at
+2.9c/share it is ordinary. Confirmed independently: 400 bought at
+41c on Aug-15, 50 sold at 28c the next day, field says -6.37 on 50
+= 12.74c/share against a 13c predicted move.
+
+**So: -$31.11 of realized trading loss across 2,739 trades, against
+$6,118.30 of rewards paid.** The trading side is roughly flat and
+the rewards are close to net profit. I was one report away from
+telling the owner we had lost $3,110.
+
+**Unexplained, flagged not resolved.** `scc-hrep-rep-2026-11-03-gte200`
+contributes -$1.64 with per-share numbers that need a cost basis
+above 100c (bought 1 at 67c, sold 1 at 68c, reported -55.91c). That
+only makes sense if the shares arrived through a negative-risk
+bracket conversion rather than a purchase. One market, 5% of the
+file's total. Do not average it in without understanding it.
+
+**Falsifier for P9.** Any trade whose realized_pnl/shares falls
+outside +/-100. All 659 non-zero rows are inside it today.

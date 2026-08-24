@@ -3611,3 +3611,58 @@ class TestMarketEstimateLedger(unittest.TestCase):
         mine = r.fam.orders.get("MINE")
         self.assertIsNotNone(mine)
         self.assertEqual(mine.purpose, "manual")
+
+
+class TestNonTradePayments(unittest.TestCase):
+    """Settlements, deposits and transfers are money moving. We were
+    recording that they happened and not how much, with no date either
+    (owner, 2026-08-24: "tell me what these other payments I'm getting
+    are")."""
+
+    def test_a_settlement_carries_its_payout(self):
+        from v3.main import parse_activities
+        rows = parse_activities([{
+            "type": "ACTIVITY_TYPE_POSITION_RESOLUTION",
+            "positionResolution": {
+                "updateTime": "2026-08-19T14:59:15Z",
+                "marketSlug": "enwc-ushrp-fl19-2026-08-18-olahaw",
+                "beforePosition": {"quantity": "75"},
+                "afterPosition": {"quantity": "0"},
+                "settlementPrice": "1", "payout": "75.00",
+                "realizedPnl": "6708"}}])
+        self.assertEqual(len(rows), 1)
+        r = rows[0]
+        self.assertEqual(r["amount_usd"], 75.0)
+        self.assertEqual(r["price"], 1.0)
+        self.assertEqual(r["detail"], "held=75")
+        self.assertTrue(r["iso"].startswith("2026-08-19"))
+
+    def test_a_deposit_reads_its_time_and_amount_from_the_payload(self):
+        # the fields are nested under the activity's own name, not at
+        # the root — reading the root gave a blank date and no amount
+        from v3.main import parse_activities
+        rows = parse_activities([{
+            "type": "ACTIVITY_TYPE_ACCOUNT_DEPOSIT",
+            "accountDeposit": {"createTime": "2026-08-12T10:00:00Z",
+                               "amount": {"value": "500.00"}}}])
+        self.assertEqual(rows[0]["amount_usd"], 500.0)
+        self.assertTrue(rows[0]["iso"].startswith("2026-08-12"))
+
+    def test_an_unreadable_shape_records_what_it_offered(self):
+        from v3.main import parse_activities
+        rows = parse_activities([{
+            "type": "ACTIVITY_TYPE_MYSTERY",
+            "mystery": {"updateTime": "2026-08-20T00:00:00Z",
+                        "creditsGranted": "9", "programRef": "x"}}])
+        self.assertIsNone(rows[0]["amount_usd"])
+        self.assertEqual(rows[0]["detail"],
+                         "keys=creditsGranted|programRef|updateTime")
+
+    def test_the_new_columns_are_written(self):
+        from v3.main import trades_csv_append, TRADES_CSV_HEADER
+        self.assertIn("amount_usd,detail", TRADES_CSV_HEADER)
+        text, n = trades_csv_append(None, [{
+            "ts": 1.0, "type": "ACTIVITY_TYPE_ACCOUNT_DEPOSIT",
+            "amount_usd": 500.0, "detail": ""}])
+        self.assertEqual(n, 1)
+        self.assertTrue(text.rstrip().endswith(",500,"))

@@ -203,7 +203,37 @@ def fills_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
 TRADES_CSV_HEADER = ("ts,iso,type,market,side,intent,price,shares,"
                      "order_id,role,realized_pnl,placed_iso,rested_h,"
                      "commission,maker_bps,manual,order_state,"
-                     "cancel_reason,reject_reason\n")
+                     "cancel_reason,reject_reason,amount_usd,detail\n")
+
+
+def _first_num(d: dict, keys) -> float | None:
+    """The first of `keys` present in `d` that reads as a number.
+
+    Written for the settlement and account-transfer rows, where the
+    feed's own name for the money is not yet known to us — try the
+    plausible ones in order rather than guessing one and recording
+    a blank forever."""
+    for k in keys:
+        if k in d:
+            v = _act_num(d.get(k))
+            if v is not None:
+                return v
+        inner = d.get(k)
+        if isinstance(inner, dict):        # {"amount": {"value": "3.00"}}
+            v = _act_num(inner.get("value") or inner.get("amount"))
+            if v is not None:
+                return v
+    return None
+
+
+def _shape_of(d: dict, limit: int = 10) -> str:
+    """The payload's field names, for a shape we could not read a
+    number out of. The owner's standing rule (2026-08-23): when a
+    number cannot be checked, go find the source — so record what
+    the source actually offered instead of a silent blank."""
+    if not isinstance(d, dict):
+        return ""
+    return "keys=" + "|".join(sorted(d.keys())[:limit])
 
 
 def _act_num(x):
@@ -304,23 +334,58 @@ def parse_activities(rows: list) -> list[dict]:
         elif pr:
             ts_s = str(pr.get("updateTime") or pr.get("createTime") or "")
             after = pr.get("afterPosition") or {}
+            before = pr.get("beforePosition") or {}
+            # a settlement is a PAYMENT — the shares we held stop being
+            # shares and become cash. We were recording that it happened
+            # and not how much (2026-08-24, owner: "tell me what these
+            # other payments I'm getting are"). Take the first amount
+            # field the feed actually carries.
+            amt = _first_num(pr, ("payout", "payoutNotional", "notional",
+                                  "settlementNotional", "amount",
+                                  "cashAmount", "proceeds"))
+            held = _act_num(before.get("quantity"))
             out.append({
                 "ts": _iso_to_ts(ts_s), "iso": ts_s,
                 "type": atype or "POSITION_RESOLUTION",
                 "market": str(pr.get("marketSlug") or ""),
                 "side": "", "intent": "",
-                "price": None, "shares": _act_num(after.get("quantity")),
+                "price": _first_num(pr, ("settlementPrice", "price",
+                                         "resolutionPrice")),
+                "shares": _act_num(after.get("quantity")),
                 "order_id": "", "role": "",
-                "realized_pnl": _act_num(pr.get("realizedPnl"))})
+                "realized_pnl": _act_num(pr.get("realizedPnl")),
+                "amount_usd": amt,
+                "detail": _shape_of(pr) if amt is None else
+                          (f"held={held:g}" if held else "")})
         else:
-            # an activity shape we have never seen: record that it
-            # exists rather than dropping it silently
-            ts_s = str(a.get("updateTime") or a.get("createTime") or "")
+            # Deposits, withdrawals, transfers and any shape we have
+            # not seen. These carry their fields in a sub-object named
+            # after the activity, not at the top level, so reading
+            # updateTime/createTime off the root produced rows with no
+            # date and no amount at all — four of them, all blank.
+            # Find the payload, take its time and its amount, and if
+            # the amount is not where we expect, write down the shape
+            # so the next fetch answers the question instead of
+            # repeating it.
+            body = None
+            for k, v in a.items():
+                if isinstance(v, dict) and k not in ("trade",
+                                                     "positionResolution"):
+                    body = v
+                    break
+            src = body if isinstance(body, dict) else a
+            ts_s = str(src.get("updateTime") or src.get("createTime")
+                       or a.get("updateTime") or a.get("createTime") or "")
+            amt = _first_num(src, ("amount", "notional", "amountUsd",
+                                   "cashAmount", "value", "quantity",
+                                   "usdAmount", "netAmount"))
             out.append({"ts": _iso_to_ts(ts_s), "iso": ts_s,
                         "type": atype or "UNKNOWN", "market": "",
                         "side": "", "intent": "", "price": None,
                         "shares": None, "order_id": "", "role": "",
-                        "realized_pnl": None})
+                        "realized_pnl": None,
+                        "amount_usd": amt,
+                        "detail": _shape_of(src) if amt is None else ""})
     return out
 
 
@@ -343,7 +408,8 @@ def trades_csv_append(existing: str | None, rows: list) -> tuple[str, int]:
             s(r.get("placed_iso")), s(r.get("rested_h")),
             s(r.get("commission")), s(r.get("maker_bps")),
             s(r.get("manual")), s(r.get("order_state")),
-            s(r.get("cancel_reason")), s(r.get("reject_reason"))])
+            s(r.get("cancel_reason")), s(r.get("reject_reason")),
+            s(r.get("amount_usd")), s(r.get("detail"))])
         if line in seen:
             continue
         text += line + "\n"
