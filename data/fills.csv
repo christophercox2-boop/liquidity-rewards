@@ -618,3 +618,11 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787575819.0,cfb,aachc-cfb-wins-2026-11-28-minnst-5pt5wins,SELL,0.2,0.55,earn,1.6667,29.6,,52,57,0,0.53,0.83,-0.01,-0.2,1 tick behind the touch; ~90.9% of the ask side,C1S1BNSKEDJR
 1787576179.0,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.95,earn,6.214,0.02,0.99655,92,94,0.918,0.93,0.96,-0.0466,18,2 ticks in front of the touch — closer to the midpoint; ~99.4% of the bid side,C2JGAHXJ8DK1
 1787578159.0,politics,enwc-ussep-de-2026-09-15-rep-johshu,SELL,1,0.06,sell,0.6942,0.05,,12,18,0.3,0.05,0.06,0.09,0,an exit — its fill reduces the position it sits on,C2JYJAAWMDJP
+1787579899.0,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.95,earn,6.214,0.02,0.99655,91,94,0.921,0.93,0.95,-0.0466,19,2 ticks in front of the touch — closer to the midpoint; ~99.4% of the bid side,C2KCN5YHMDJP
+1787580379.0,nba,tec-nba-champ-2027-06-18-w-nyk,BUY,1,0.08,earn,0.0009,23.96,,8,11,0,0.08,0.09,-0.02,1,joins the touch — the book has been quiet,C1YZNN2S4DKA
+1787581099.0,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,1,0.9,earn,0.1599,0.57,0.984175,93,96,0.788,0.9,0.91,-0.0842,2,at the touch — a fill here is 5 ticks inside value (Silver + evidence),C2K6RDNECDK5
+1787581099.0,politics,usgubewc-usgub-nm-2026-11-03-dem,BUY,4,0.9,earn,0.448,0.37,0.988425,96,99,0.292,0.9,0.91,-0.0884,14,at the touch — a fill here is 8 ticks inside value (Silver + evidence),C2KC34KCRDK0
+1787581704.7,politics,enwc-ussep-ma-2026-09-01-dem-edmark,SELL,1,0.93,sell,0.02,0.35,,90,94,0.795,0.92,0.93,-0.01,2,an exit — its fill reduces the position it sits on,C2KGXHGT0DKA
+1787581884.7,politics,scc-hrep-rep-2026-11-03-gte230,SELL,1,0.04,earn,2.7461,0.02,0.023475,3,7,0.692,0.03,0.05,-0.0165,-5,1 tick in front of the touch — closer to the midpoint; ~65.9% of the ask side,C2KV22MAPDK2
+1787582904.7,cfb,aachc-cfb-wins-2026-11-28-txtech-7pt5wins,SELL,0.01,0.74,earn,1.5812,67.28,,70,76,0.304,0.74,0.99,-0.01,-1.01,14 ticks in front of the touch — closer to the midpoint; ~63.3% of the ask side,C0TDSBN2CDJR
+1787583204.7,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,2,0.94,earn,6.2131,0.02,0.985525,90,94,0.677,0.9,0.98,-0.0455,2,4 ticks in front of the touch — closer to the midpoint; ~99.4% of the bid side,C2M69J7FTDK1
