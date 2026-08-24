@@ -565,3 +565,10 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787547359.7,politics,scc-hrep-rep-2026-11-03-gte215,BUY,1,0.13,earn,0.0471,0.57,0.226125,19,29,0.491,0.04,0.42,-0.0961,1,10 ticks in front of the touch — closer to the midpoint; ~99.2% of the bid side,C2B4P3QSPDK5
 1787547539.7,politics,usgubewc-usgub-il-2026-11-03-rep,SELL,3,0.02,sell,6.25,4.6,0.0014,3,8,0.748,0.01,0.5,-0.0186,0,selling filled stock — it earns while it waits,C27S9NC0EDJP
 1787547659.7,cfb,aachc-cfb-wins-2026-11-28-mary-7pt5wins,SELL,0.01,0.02,earn,0.0061,36.16,,3,12,0,0.01,0.02,0.04,-0.01,21 ticks in front of the touch — closer to the midpoint; ~56.6% of the ask side,C1CQEQFQWDK0
+1787549399.8,politics,scc-hrep-rep-2026-11-03-gte215,BUY,1,0.13,earn,0.1602,0.12,0.226125,14,22,0.64,0.13,0.42,-0.0961,2,9 ticks in front of the touch — closer to the midpoint; ~99.1% of the bid side,C2C0NZ374DJV
+1787550419.8,politics,ussewc-usse-ky-2026-11-03-rep,BUY,0.94,0.96,earn,5.8959,0.02,0.99655,92,95,0.882,0.96,0.97,-0.0366,11.94,joins the touch — the book has been quiet,C2CBK1REWDK7
+1787551919.8,politics,usgubewc-usgub-ri-2026-11-03-dem,BUY,1,0.98,sell,2.0833,2.45,0.991775,91,97,0.516,0.8,0.99,-0.0118,-1,an exit — its fill reduces the position it sits on,C2AM05DXEDJV
+1787551919.8,politics,usgubewc-usgub-ri-2026-11-03-dem,BUY,1,0.98,sell,2.0833,1.45,0.991775,91,96,0.655,0.8,0.99,-0.0118,0,an exit — its fill reduces the position it sits on,C2BFZ1HP0DJR
+1787551979.8,cfb,aachc-cfb-wins-2026-11-28-sc-5pt5wins,BUY,0.01,0.88,earn,0.0073,13.93,,86,89,0.727,0.88,0.89,0.01,2.01,6 ticks in front of the touch — closer to the midpoint; ~98.1% of the bid side,C20TWFRYPDK2
+1787551979.8,cfb,aachc-cfb-wins-2026-11-28-txam-7pt5wins,BUY,0.01,0.82,earn,0.0068,13.06,,60,66,0.488,0.82,0.83,0.19,0.02,joins the touch — the book has been quiet,C21JX1CS4DKA
+1787551979.8,cfb,aachc-cfb-wins-2026-11-28-sc-4pt5wins,BUY,0.01,0.98,earn,0.0075,13.29,,82,89,0.667,0.98,0.99,0.12,0.02,14 ticks in front of the touch — closer to the midpoint; ~24.1% of the bid side,C21CC61V4DJP
