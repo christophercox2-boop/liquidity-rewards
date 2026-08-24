@@ -580,3 +580,27 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787557739.9,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.95,earn,6.214,0.02,0.99655,92,95,0.898,0.93,0.96,-0.0466,14,2 ticks in front of the touch — closer to the midpoint; ~99.4% of the bid side,C2E3DMNXEDK5
 1787561519.9,politics,ussewc-usse-ky-2026-11-03-rep,BUY,0.95,0.95,earn,5.9197,0.02,0.99655,92,95,0.904,0.95,0.96,-0.0466,14.95,joins the touch — the book has been quiet,C2F0C33F0DKA
 1787565119.9,politics,ussewc-usse-ky-2026-11-03-rep,BUY,0.94,0.95,earn,5.8643,0.02,0.99655,92,94,0.91,0.95,0.96,-0.0466,15.94,joins the touch — the book has been quiet,C2FVTC3ETDJP
+1787566570.0,politics,usgubewc-usgub-sc-2026-11-03-rep,SELL,10,0.97,sell,0.0565,17.2,0.971275,92,96,0.722,0.93,0.97,0.0013,1,selling filled stock — it earns while it waits,C21GAW3MJDJT
+1787566570.0,politics,usgubewc-usgub-sc-2026-11-03-rep,SELL,1,0.97,sell,0.0056,7.17,0.971275,93,96,0.774,0.93,0.97,0.0013,0,selling filled stock — it earns while it waits,C2A2J1SQMDK0
+1787567311.1,politics,scc-hrep-rep-2026-11-03-gte230,SELL,1,0.04,earn,3.0789,0.02,0.023475,2,6,0.422,0.02,0.09,-0.0165,-2,5 ticks in front of the touch — closer to the midpoint; ~73.9% of the ask side,C2GCK9J52DJP
+1787568211.1,politics,scc-hrep-rep-2026-11-03-gte215,BUY,1,0.17,sell,4.1637,0.2,0.226125,14,20,0.703,0.11,0.22,-0.0561,3,buying back the short at or under what it sold for — the bid earns while it wait,C2GEG05GTDKA
+1787568211.1,politics,usgubewc-usgub-fl-2026-11-03-rep,SELL,21,0.87,sell,0.0329,24.64,0.84385,85,89,0.651,0.85,0.86,-0.0261,2,selling filled stock — it earns while it waits,C1VFWP6ZRDJP
+1787568211.1,politics,usgubewc-usgub-fl-2026-11-03-rep,SELL,1,0.87,sell,0.0016,23.64,0.84385,86,90,0.73,0.85,0.86,-0.0261,1,an exit — its fill reduces the position it sits on,C1WBD23ACDK1
+1787568211.1,politics,usgubewc-usgub-fl-2026-11-03-rep,SELL,1,0.87,sell,0.0016,22.63,0.84385,86,90,0.779,0.85,0.86,-0.0261,0,an exit — its fill reduces the position it sits on,C1X0MRKKEDJR
+1787568211.1,politics,enwc-uspres-nom-dem-2028-gavnew,BUY,50,0.23,earn,1.849,4.54,,24,26,0.944,0.19,0.23,-0.02,105,1 tick behind the touch; ~55.5% of the bid side,C2CPY9R5TDK0
+1787568211.1,cfb,aachc-cfb-wins-2026-11-28-iowast-5pt5wins,BUY,0.01,0.39,sell,0.5989,19.46,,25,34,0.621,0.39,0.4,0.09,-0.99,an exit — its fill reduces the position it sits on,C1ZY81APRDJR
+1787568391.1,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.09,sell,0.1785,21.73,0.040675,7,10,0.72,0.09,0.19,-0.0493,5,selling filled stock — it earns while it waits,C1XXAM3J2DK2
+1787568391.1,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.09,sell,0.1785,14.58,0.040675,7,11,0.773,0.09,0.19,-0.0493,4,selling filled stock — it earns while it waits,C243Q4S46DK2
+1787568391.1,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.09,sell,0.1785,9.49,0.040675,8,11,0.809,0.09,0.19,-0.0493,3,selling filled stock — it earns while it waits,C28HNS528DJR
+1787568391.1,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.09,sell,0.1785,7.98,0.040675,8,12,0.835,0.09,0.19,-0.0493,2,selling filled stock — it earns while it waits,C29TB1T16DJV
+1787568391.1,politics,usgubewc-usgub-fl-2026-11-03-dem,SELL,1,0.25,earn,0.0092,0.96,0.15615,16,20,0.727,0.24,0.27,-0.0938,-3,2 ticks in front of the touch — closer to the midpoint; ~52.9% of the ask side,C2FTQ5ZKGDK7
+1787568451.1,politics,enwc-uspres-nom-rep-2028-elomus,SELL,1,0.04,sell,0,4.04,0.03,2,6,0.864,0.03,0.04,-0.01,10,an exit — its fill reduces the position it sits on,C2D4FJMR2DJT
+1787568511.1,politics,enwc-uspres-nom-dem-2028-jonoss,SELL,1,0.25,sell,0.0225,2.59,,24,28,0.744,0.24,0.25,0.01,0,selling filled stock — it earns while it waits,C2EEFAF50DKA
+1787568571.1,politics,enwc-uspres-nom-dem-2028-gavnew,SELL,51,0.27,manual,0.0025,31.96,,23,25,0.946,0.18,0.27,-0.03,54,the owner's own order — the engine leaves it alone,C1N9FWV76DKA
+1787568571.1,politics,enwc-uspres-nom-dem-2028-gavnew,SELL,1,0.26,sell,0.0002,15.85,,24,26,0.948,0.18,0.27,-0.01,53,selling filled stock — it earns while it waits,C233KRGHTDKA
+1787568571.1,politics,enwc-uspres-nom-dem-2028-gavnew,SELL,1,0.26,sell,0.0002,13.92,,24,26,0.95,0.18,0.27,-0.01,52,selling filled stock — it earns while it waits,C24QT9CQEDK5
+1787568571.1,politics,enwc-uspres-nom-dem-2028-rokha,SELL,1,0.04,sell,0.0091,9.78,0.03,7,10,0.881,0.03,0.04,-0.01,229,an exit — its fill reduces the position it sits on,C28BDRA28DJP
+1787568571.1,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,1,0.93,earn,3.0472,0.18,0.984175,93,97,0.759,0.88,0.94,-0.0542,1,at the touch — a fill here is 3 ticks inside value (Silver + evidence),C2GHJJ8RRDKA
+1787568571.1,politics,enwc-uspres-nom-dem-2028-gavnew,SELL,52,0.246301,sell,0.0627,0.07,,24,26,0.952,0.18,0.27,0.0037,0,selling filled stock — it earns while it waits,C2GMV782JDKA
+1787568691.1,cfb,aachc-cfb-wins-2026-11-28-ohiost-9pt5wins,SELL,0.5,0.55,earn,2.0818,20.76,,52,57,0.318,0.53,0.92,-0.01,-0.5,1 tick behind the touch; ~80.6% of the ask side,C1YY8Q9R6DK0
+1787568691.1,cfb,aachc-cfb-wins-2026-11-28-iowast-6pt5wins,BUY,0.01,0.36,manual,0.0004,22.98,,32,38,0.606,0.37,0.39,0.01,-0.99,the owner's own order — the engine leaves it alone,C1WTXDG7TDJT
