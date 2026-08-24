@@ -572,3 +572,7 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787551979.8,cfb,aachc-cfb-wins-2026-11-28-sc-5pt5wins,BUY,0.01,0.88,earn,0.0073,13.93,,86,89,0.727,0.88,0.89,0.01,2.01,6 ticks in front of the touch — closer to the midpoint; ~98.1% of the bid side,C20TWFRYPDK2
 1787551979.8,cfb,aachc-cfb-wins-2026-11-28-txam-7pt5wins,BUY,0.01,0.82,earn,0.0068,13.06,,60,66,0.488,0.82,0.83,0.19,0.02,joins the touch — the book has been quiet,C21JX1CS4DKA
 1787551979.8,cfb,aachc-cfb-wins-2026-11-28-sc-4pt5wins,BUY,0.01,0.98,earn,0.0075,13.29,,82,89,0.667,0.98,0.99,0.12,0.02,14 ticks in front of the touch — closer to the midpoint; ~24.1% of the bid side,C21CC61V4DJP
+1787552819.8,cfb,aachc-cfb-wins-2026-11-28-txam-6pt5wins,BUY,0.01,0.88,earn,2.3638,14.75,,72,85,0,0.67,0.92,0.1,0.01,21 ticks in front of the touch — closer to the midpoint; ~98.8% of the bid side,C20AHDKJ8DK7
+1787553179.8,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,1,0.93,sell,6.2433,0.42,0.984175,94,98,0.721,0.88,0.94,-0.0542,1,buying back the short at or under what it sold for — the bid earns while it wait,C2CNYKYE2DJT
+1787554139.8,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.95,earn,6.214,0.02,0.99655,92,95,0.891,0.93,0.96,-0.0466,13,2 ticks in front of the touch — closer to the midpoint; ~99.4% of the bid side,C2D79RNE4DJP
+1787554979.8,politics,usgovcc-26mid-rep-2026-11-03-24-25,SELL,1,0.18,sell,0,0,,17,35,0,0.18,0.19,0.08,0,taker dump — sold into the bid (the carved exception),C2DEW5BAADK5
