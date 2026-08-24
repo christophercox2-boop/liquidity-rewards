@@ -639,3 +639,9 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787587590.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar10-15,BUY,1,0.38,earn,1.1233,0.03,,13,20,0.454,0.34,0.39,0.22,2,joins the touch — the book has been quiet,C2N869ZPPDK1
 1787587710.8,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,SELL,0.74,0.04,earn,1.8437,1.35,,5,10,0.708,0.03,0.04,0.03,-0.74,joins the touch — the book has been quiet,C2M3VBGTTDJP
 1787588079.6,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,BUY,1,0.06,sell,0.3969,0.1,,5,10,0.765,0.06,0.16,-0.01,0,buying back the short at or under what it sold for — the bid earns while it wait,C2N9QXDK0DJR
+1787588757.3,cfb,aachc-cfb-wins-2026-11-28-iowa-6pt5wins,BUY,0.16,0.82,earn,0,24.02,,88,92,0.317,0.63,0.85,-0.08,1.16,1 tick in front of the touch — closer to the midpoint; ~94.3% of the bid side,C20XV1XJ4DK7
+1787588877.3,politics,enwc-ussep-nh-2026-09-08-dem-karman,SELL,200,0.06,sell,0.009,14.98,,2,6,0.397,0.03,0.04,-0.02,0,selling filled stock — it earns while it waits,C28PXAKNGDK1
+1787588937.3,politics,usgubewc-usgub-il-2026-11-03-dem,SELL,5,0.98,sell,0.0802,24.49,0.9986,97,99,0.684,0.97,0.98,0.0186,0,selling filled stock — it earns while it waits,C20JC8RAMDJV
+1787589537.3,politics,ussewc-usse-wv-2026-11-03-rep,BUY,1,0.98,sell,0.1377,0.69,0.999875,91,97,0.29,0.93,0.99,-0.0199,1,buying back the short at or under what it sold for — the bid earns while it wait,C2N4GKPEWDK5
+1787590317.3,politics,enwc-uspres-nom-rep-2028-thomas,SELL,5,0.06,manual,0.1477,0.66,,1,6,0.208,0.05,0.06,-0.03,-19,the owner's own order — the engine leaves it alone,C2G65FGBRDK1
+1787592177.3,cfb,aachc-cfb-wins-2026-11-28-rutger-2pt5wins,BUY,0.2,0.95,earn,1.5528,24.67,,94,99,0.25,0.88,0.99,-0.02,0.2,joins the touch — the book has been quiet,C21696H20DK7
