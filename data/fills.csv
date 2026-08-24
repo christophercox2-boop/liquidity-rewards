@@ -691,3 +691,20 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787603557.6,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar20-25,SELL,1,0.02,sell,0.3113,26.04,,9,17,0.26,0.01,0.02,0.11,0,an exit — its fill reduces the position it sits on,C22REH0ZADK5
 1787604397.6,cfb,aachc-cfb-wins-2026-11-28-hou-7pt5wins,SELL,0.5,0.51,earn,2.2321,0.23,,49,54,0,0.51,0.68,0,-0.5,joins the touch — the book has been quiet,C2S32QY06DJV
 1787604517.6,cfb,aachc-cfb-wins-2026-11-28-txst-5pt5wins,BUY,0.01,0.63,earn,2.4633,0.7,,43,59,0.46,0.38,0.84,0.14,0.01,25 ticks in front of the touch — closer to the midpoint; ~98.5% of the bid side,C2RQF9T2RDK1
+1787605336.4,cfb,aachc-cfb-wins-2026-11-28-wake-6pt5wins,SELL,0.01,0.1,earn,0.0513,3.46,,,,0.423,,,,-0.01,joins the touch — the book has been quiet,C2PHH0J2YDK0
+1787605336.4,cfb,aachc-cfb-wins-2026-11-28-wake-6pt5wins,SELL,0.25,0.1,manual,1.2821,0.53,,,,0.61,,,,-0.26,the owner's own order — the engine leaves it alone,C2S1Q7DWGDK1
+1787605456.5,cfb,aachc-cfb-wins-2026-11-28-iowa-8pt5wins,BUY,1,0.44,earn,2.3585,1.21,,46,51,0.432,0.44,0.48,-0.04,2,1 tick in front of the touch — closer to the midpoint; ~91.0% of the bid side,C2RGEW0Y4DK0
+1787606056.5,cfb,aachc-cfb-wins-2026-11-28-cin-4pt5wins,BUY,0.02,0.75,earn,0.035,0.03,,70,77,0.225,0.72,0.76,0.02,0.02,3 ticks in front of the touch — closer to the midpoint; ~1.4% of the bid side,C2SMF5C1YDJV
+1787606056.5,nba,tec-nba-mvp-2027-05-17-w-jaytat,SELL,0.5,0.08,sell,0,42.3,,4,7,0.449,0.05,0.06,-0.02,19.5,an exit — its fill reduces the position it sits on,C1NC2CMNCDK2
+1787606056.5,nba,tec-nba-mvp-2027-05-17-w-denavd,SELL,1,0.1,sell,0,30.99,,1,4,0.451,0.01,0.02,-0.08,99,an exit — its fill reduces the position it sits on,C1Z2DA9A4DK7
+1787606116.5,nba,tec-nba-mvp-2027-05-17-w-nikjok,SELL,0.5,0.15,sell,0,42.35,,11,14,0.451,0.12,0.13,-0.02,4.5,an exit — its fill reduces the position it sits on,C1NB8XDBGDJT
+1787606116.5,nba,tec-nba-mvp-2027-05-17-w-giaant,SELL,0.5,0.09,sell,0,42.34,,5,8,0.449,0.06,0.07,-0.02,9.5,an exit — its fill reduces the position it sits on,C1NBJB6A2DK5
+1787606116.5,nba,tec-nba-mvp-2027-05-17-w-shagil,SELL,1,0.25,sell,0,31.01,,15,19,0.449,0.16,0.17,-0.08,4,an exit — its fill reduces the position it sits on,C1Z2FDJ2ADJV
+1787606116.5,nba,tec-nba-mvp-2027-05-17-w-tyrmax,SELL,1,0.02,sell,0.0004,30.97,,1,3,0.451,0.01,0.02,-0.01,99,an exit — its fill reduces the position it sits on,C1Z38J1K4DK5
+1787606236.5,cfb,aachc-cfb-wins-2026-11-28-gtech-6pt5wins,BUY,0.01,0.58,manual,0.5007,0.27,,54,58,0.751,0.45,0.59,0.02,1.01,the owner's own order — the engine leaves it alone,C2SFQVHXADK5
+1787608216.5,cfb,aachc-cfb-wins-2026-11-28-txam-6pt5wins,SELL,0.01,0.72,sell,0.0248,3.06,,71,83,0.383,0.69,0.72,0.04,-0.01,selling filled stock — it earns while it waits,C2QK8D452DK0
+1787608336.5,politics,ussewc-usse-sc-2026-11-03-rep,BUY,2,0.91,sell,6.25,21.72,0.888375,78,88,0.298,0.49,0.92,0.0216,2,buying back the short at or under what it sold for — the bid earns while it wait,C27J561E6DK1
+1787608336.5,politics,ussewc-usse-ms-2026-11-03-dem,SELL,20,0.11,manual,0.7561,43.37,0.029825,2,7,0.574,0.11,0.16,-0.0802,-34.01,the owner's own order — the engine leaves it alone,C1N06W9QWDK2
+1787608336.5,politics,ussewc-usse-ms-2026-11-03-dem,SELL,5,0.1,manual,1.8903,5.66,0.029825,4,8,0.686,0.11,0.16,-0.0702,-39.01,the owner's own order — the engine leaves it alone,C1MQ18NWMDKA
+1787608756.5,politics,ussewc-usse-ks-2026-11-03-dem,SELL,25,0.19,sell,3.2347,25.94,0.1706,17,22,0.593,0.18,0.19,-0.0194,25,selling filled stock — it earns while it waits,C2403N59YDJV
+1787608816.5,politics,enwc-ussep-ma-2026-09-01-dem-edmark,BUY,1,0.96,earn,0.0573,0.18,,91,95,0.803,0.93,0.97,0.03,3,1 tick in front of the touch — closer to the midpoint; ~16.5% of the bid side,C2T60SFTMDK5
