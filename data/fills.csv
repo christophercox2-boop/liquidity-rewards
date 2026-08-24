@@ -658,3 +658,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787595057.3,cfb,aachc-cfb-wins-2026-11-28-ncar-3pt5wins,BUY,0.01,0.8,sell,0.0641,0.37,,73,81,0.577,0.78,0.81,0.03,0,buying back the short at or under what it sold for — the bid earns while it wait,C2PQR1AYWDJT
 1787595417.4,cfb,aachc-cfb-wins-2026-11-28-ncar-5pt5wins,BUY,0.5,0.59,earn,2.2453,0.42,,57,61,0.71,0.59,0.61,0,2.51,joins the touch — the book has been quiet,C2PSEZ4KADJT
 1787595597.4,cfb,aachc-cfb-wins-2026-11-28-ncar-4pt5wins,SELL,0.55,0.55,sell,0.007,27.23,,49,56,0.611,0.52,0.55,-0.02,0.45,selling filled stock — it earns while it waits,C1ZSS4YEGDK1
+1787596497.4,cfb,aachc-cfb-wins-2026-11-28-wvir-6pt5wins,SELL,0.27,0.43,sell,0,0,,41,45,0.672,0.43,0.44,0,0.73,taker dump — sold into the bid (the carved exception),C2QDPNJEWDJV
