@@ -576,3 +576,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787553179.8,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,1,0.93,sell,6.2433,0.42,0.984175,94,98,0.721,0.88,0.94,-0.0542,1,buying back the short at or under what it sold for — the bid earns while it wait,C2CNYKYE2DJT
 1787554139.8,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.95,earn,6.214,0.02,0.99655,92,95,0.891,0.93,0.96,-0.0466,13,2 ticks in front of the touch — closer to the midpoint; ~99.4% of the bid side,C2D79RNE4DJP
 1787554979.8,politics,usgovcc-26mid-rep-2026-11-03-24-25,SELL,1,0.18,sell,0,0,,17,35,0,0.18,0.19,0.08,0,taker dump — sold into the bid (the carved exception),C2DEW5BAADK5
+1787556899.8,politics,ussewc-usse-sd-2026-11-03-briben,SELL,1,0.02,sell,0,0.02,,8,12,0.654,0.01,0.07,0.08,0,selling filled stock — it earns while it waits,C2DWYBQY4DK2
+1787557739.9,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.95,earn,6.214,0.02,0.99655,92,95,0.898,0.93,0.96,-0.0466,14,2 ticks in front of the touch — closer to the midpoint; ~99.4% of the bid side,C2E3DMNXEDK5
