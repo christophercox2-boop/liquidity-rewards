@@ -547,3 +547,53 @@ the whole "3.4x" was uptime plus my bad comparison.
 **Check.** data/market_est.csv now carries share, live_h, realized
 share, AND book depth per market, all measured over the same seconds.
 This is answerable from one full day of it — no theory required.
+
+---
+
+## 2026-08-24 20:45Z — the hand-order fix is confirmed live
+
+Build e29e7309. The owner's own orders are now recorded, and the
+engine sizes around them instead of over them:
+
+| market | his order | engine's order |
+|---|---|---|
+| MA micmin (short 335) | BUY 334.84 @ 98c | BUY **0.16** @ 92.9c |
+| NH chrpap (short 180) | BUY 179.9 @ 96c | BUY **0.10** @ 95c |
+| brisho (long 120) | SELL 120.02 @ 2c | **none** |
+
+Before the fix the engine re-placed SELL 120 @ 5.46c over him in
+brisho every time he cleared it. It now rests nothing there. The
+leftovers are the fractional remainders his orders do not cover.
+Politics manual orders read 137, up from 48 — that is the fix
+recording what it used to discard, not new orders appearing.
+
+## Aug-20, 21 and 22 all settled to PAID today
+
+| day | politics estimated | paid | off by |
+|---|---|---|---|
+| Aug-21 | $255.22 | $76.45 | 3.3x |
+| Aug-22 | $366.17 | $101.14 | 3.6x |
+
+(Aug-20's $6.23 estimate is a partial-day artifact — ignore it.)
+**The 3x is now confirmed on final numbers, not pending ones.**
+
+## Retracted: "the engine thinks it owns half the book"
+That came from dividing what we were paid by MY OWN guess at the
+pool, where I counted markets-per-race across only the 156 markets
+in the probe file. The engine uses the exchange's events feed and
+knows better than my guess did.
+
+Using the engine's own recorded numbers instead — its time-weighted
+share and the pool it actually competed against — today's median
+politics share is **1.4%**, not 49.5%. The whole "engine claims half
+of every book" finding was an artifact of my arithmetic. It is dead.
+
+Against Aug-22's realized share (median 5.4%), today's computed
+share runs a median 0.30x — the engine reading LOW, not high, with
+an enormous spread (25th 0.01x, 75th 3.27x).
+
+**That comparison is not clean** and must not be treated as a
+result: it puts today's share beside a different day's payout. The
+honest test is today's share against today's money, which settles
+around Aug-29. Four theories have died today by being checked; this
+one is not getting announced before it is.
