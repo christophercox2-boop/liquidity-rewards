@@ -646,3 +646,50 @@ conversation and never entered this file, so when the owner asked
 whether it had come back I could not tell him what it was. The rule
 exists for exactly this. Anything we agree to check goes in here
 first, before the data lands.
+
+---
+
+## 2026-08-25 — RETRACTED: "the exchange re-tiered politics"
+
+I told the owner the exchange had moved most politics markets into a
+cheap $25/day pool whose discount factor (0.10) pays a tenth one tick
+off the touch, and that this explained the collapse. He asked for
+evidence that it was a CHANGE. There is none.
+
+**What I did wrong.** I compared the Aug-18 probe file (162 markets,
+whatever I happened to probe) against the live terms (549 markets)
+and read the difference in counts — "70 in the cheap tier then, 343
+now" — as the exchange moving markets. It is a sample against a full
+set. The counts differ because the sets differ.
+
+**The correct test**, on the 156 markets present in BOTH snapshots:
+
+| | |
+|---|---|
+| moved into the cheap df-0.10 tier | **0** |
+| discount factor made worse | **0** |
+| `politics_high` -> `presidential_election_2028`, $300 -> $200, df 0.20 both | 60 |
+| `politics_mid` -> `politics_gov_race_20260817`, $100 -> $20 | 1 |
+
+Nothing was demoted. No discount factor changed anywhere. The cheap
+tier's 0.10 was already there on Aug-18 — it is not new.
+
+The one real change is 60 presidential markets getting a dedicated
+$200/day program instead of a share of the $300 pool. That is a cut,
+but it is 60 markets and one pool, and it cannot account for politics
+falling from $295.29 (Aug-17) to $36.05 (Aug-23).
+
+**The proposed engine change is withdrawn** — I had asked to stop
+quoting behind the touch in cheap politics markets. Its premise was
+this retracted finding. It may still be a good idea on its own
+merits, but it will not be proposed again off this evidence.
+
+**Still unexplained, and now with no live theory:** politics down 8x
+in six days, markets paying 162 -> 84, estimate error growing 3.3x ->
+3.6x -> 7.1x.
+
+**The lesson, which is the owner's:** "You can't just say things."
+Five theories dead in two days. Four I killed by checking my own
+arithmetic; this one survived until he asked for evidence I had never
+gathered. Before the next claim: name the two things being compared
+and confirm they are the same population.
