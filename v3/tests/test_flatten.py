@@ -366,10 +366,13 @@ class TestCeilingEnforcement(unittest.TestCase):
         from v3.tests.test_family import Rig, A, C
         from v3.family import FamilyConfig, FamilyOrder
         from v3.intents import BUY_LONG
-        cfg = FamilyConfig(name="P", tag="P", capital_usd=1.0)
+        # expected-risk era: the deep order charges collateral x its
+        # tiny fill odds, so the cap must sit between the two charges
+        # for the trim to fire and stop after one pull
+        cfg = FamilyConfig(name="P", tag="P", capital_usd=0.45)
         r = Rig(cfg=cfg)
         r.add_market(A)
-        # two orders on the book: $1.26 at risk vs a $1 ceiling; "good"
+        # two orders on the book: "good"
         # rests near the touch and earns, "bad" is deep and earns ~nothing
         for oid, px, qty in (("good", 0.43, 2.0),    # $0.86 at risk
                              ("bad", 0.02, 60.0)):   # $1.20 — over alone
@@ -382,7 +385,7 @@ class TestCeilingEnforcement(unittest.TestCase):
         r.cycle()
         self.assertNotIn("bad", r.fam.orders)        # worst $/day-per-$ went
         self.assertIn("good", r.fam.orders)
-        self.assertLessEqual(r.fam.family_spent(), 1.0 + 1e-9)
+        self.assertLessEqual(r.fam.family_spent(), 0.45 + 1e-9)
 
     def test_programless_read_is_dead_ground_until_a_program_appears(self):
         from v3.tests.test_family import Rig, A
@@ -3992,7 +3995,10 @@ class TestTheCeilingIsNeverStarved(unittest.TestCase):
         from v3.tests.test_family import Rig, A
         from v3.family import FamilyConfig, FamilyOrder, TRIM_RESERVE
         from v3.intents import BUY_LONG
-        cfg = FamilyConfig(name="P", tag="P", capital_usd=1.0,
+        # expected-risk era: with charge floors of 5%, these two
+        # orders charge at least $0.10 together, so a $0.08 cap is
+        # over by construction whatever the fill model estimates
+        cfg = FamilyConfig(name="P", tag="P", capital_usd=0.08,
                            max_actions_per_cycle=10)
         r = Rig(cfg=cfg)
         r.add_market(A)
@@ -4015,7 +4021,6 @@ class TestTheCeilingIsNeverStarved(unittest.TestCase):
         # budget and the trim had actions left to act with
         self.assertEqual(seen["given"], 10 - TRIM_RESERVE)
         self.assertNotIn("bad", r.fam.orders)     # and it removed the right one
-        self.assertLessEqual(r.fam.family_spent(), 1.0 + 1e-9)
 
     def test_under_the_ceiling_maintenance_keeps_the_whole_budget(self):
         from v3.tests.test_family import Rig, A
@@ -4703,3 +4708,76 @@ class TestFeedCheck(unittest.TestCase):
             "bids": [{"px": "0.4", "qty": "10"}],
             "asks": [{"px": "0.6", "qty": "10"}]}}))
         self.assertEqual(st.cache.last_writer["m"], "ws")
+
+
+class TestExpectedRiskBudget(unittest.TestCase):
+    """Owner, 2026-08-25: "make the budget take into account the fill
+    risk" — each order charges collateral x its measured fill odds,
+    floored at 5%, unmeasured charged in full, with hard GROSS
+    ceilings bounding the worst correlated day in dollars."""
+
+    def _fam(self, **cfg_kw):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        base = dict(name="P", tag="P")
+        base.update(cfg_kw)
+        r = Rig(cfg=FamilyConfig(**base))
+        r.add_market(A)
+        return r, A
+
+    def _order(self, r, A, oid, px, qty, pf):
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        o = FamilyOrder(id=oid, market=A, side="BUY", price=px, qty=qty,
+                        intent=BUY_LONG, placed_ts=0.0, purpose="earn")
+        o.live_pf = pf
+        r.fam.orders[oid] = o
+        return o
+
+    def test_the_charge_is_collateral_times_odds(self):
+        r, A = self._fam()
+        o = self._order(r, A, "x", 0.50, 10.0, 0.30)   # $5 at 30%
+        self.assertAlmostEqual(r.fam._charge(o), 1.50, places=6)
+
+    def test_the_floor_and_the_unmeasured_full_charge(self):
+        r, A = self._fam()
+        low = self._order(r, A, "low", 0.50, 10.0, 0.001)  # near-zero odds
+        self.assertAlmostEqual(r.fam._charge(low), 0.25, places=6)  # 5% floor
+        raw = self._order(r, A, "raw", 0.50, 10.0, None)   # unmeasured
+        self.assertAlmostEqual(r.fam._charge(raw), 5.00, places=6)  # full
+
+    def test_gross_cap_defaults_to_twice_capital(self):
+        r, _ = self._fam(capital_usd=100.0)
+        self.assertEqual(r.fam.gross_cap(), 200.0)
+        r2, _ = self._fam(capital_usd=100.0, gross_cap_usd=500.0)
+        self.assertEqual(r2.fam.gross_cap(), 500.0)
+
+    def test_the_gross_ceiling_binds_whatever_the_model_believes(self):
+        # ten "safe" orders at 2% odds: expected risk tiny, gross huge —
+        # the trim must still fire on the gross breach
+        r, A = self._fam(capital_usd=250.0, gross_cap_usd=3.0)
+        for i in range(8):
+            self._order(r, A, f"o{i}", 0.50, 1.0, 0.02)   # $0.50 each
+        self.assertLess(r.fam.family_spent(), 1.0)         # expected: fine
+        self.assertGreater(r.fam.family_gross(), 3.0)      # gross: over
+        r.fam._trim(1_000_100.0, 10)
+        self.assertLessEqual(r.fam.family_gross(), 3.0 + 1e-9)
+
+    def test_politics_config_carries_the_approved_numbers(self):
+        from v3 import politics
+        c = politics.config()
+        self.assertEqual(c.capital_usd, 250.0)
+        self.assertEqual(c.gross_cap_usd, 500.0)
+        self.assertEqual(c.per_market_usd, 20.0)
+        self.assertEqual(c.per_market_gross_usd, 60.0)
+        self.assertEqual(c.min_est_day, 0.02)
+
+    def test_low_odds_orders_multiply_under_the_same_expected_cap(self):
+        # the point of the whole change: $10 nominal at 3% odds charges
+        # 50c (the floor), so a $2 expected cap carries $40 nominal —
+        # while four unmeasured $10 orders would blow it immediately
+        r, A = self._fam(capital_usd=2.0, gross_cap_usd=100.0)
+        for i in range(4):
+            self._order(r, A, f"safe{i}", 0.50, 20.0, 0.03)  # $10 @ floor
+        self.assertLessEqual(r.fam.family_spent(), 2.0 + 1e-9)
+        self.assertAlmostEqual(r.fam.family_gross(), 40.0, places=1)

@@ -91,7 +91,12 @@ def config() -> FamilyConfig:
         # one race barely moves the ceiling
         # owner, 2026-08-21 evening: "we can up the politics budget
         # to 250"
-        capital_usd=250.0, per_market_usd=20.0, revive_max_usd=20.0,
+        # expected-risk budgeting (owner, 2026-08-25): capital_usd is
+        # the EXPECTED-risk cap (collateral x fill odds); the gross
+        # ceilings bound the worst correlated day in nominal dollars
+        capital_usd=250.0, gross_cap_usd=500.0,
+        per_market_usd=20.0, per_market_gross_usd=60.0,
+        revive_max_usd=20.0,
         share_hi=0.10,
         # owner, 2026-08-21: "I would do 30 seconds under 75 cents, but
         # just for politics. There are so many options you can find
@@ -102,7 +107,11 @@ def config() -> FamilyConfig:
         # to 50c to admit the passed-on middle of the board; the share
         # cap may reach 50% where model edge has earned the lift; proven
         # markets get double the per-market money.
-        min_est_day=0.50, weak_pull_s=30.0,
+        # owner, 2026-08-25 ("lift the 50 cent cap... if it is a small
+        # potential benefit the risk is also small"): the bar drops to
+        # 2c/day — EV-positive is the gate, and the expected-risk
+        # budget makes small claims carry only small charges
+        min_est_day=0.02, weak_pull_s=30.0,
         # owner, 2026-08-25 ("Yes, that's fine for now"): politics
         # decisions run on claims divided by 3 — the measured gap
         # between its estimates and what the exchange paid (3.3x,

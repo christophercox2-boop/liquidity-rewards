@@ -1553,6 +1553,33 @@ class Monitor:
             self._feed_check(now)
         except Exception as e:  # noqa: BLE001 — a diagnostic, never a blocker
             self._note(f"feed check failed: {type(e).__name__}: {e}")
+        try:
+            # FILL-MODEL CALIBRATION, out loud (owner, 2026-08-25: the
+            # expected-risk budget leans on these odds, so they are
+            # graded hourly): the model's own expected fills per day
+            # across the resting book, beside actual fills in the last
+            # 24h. Drift past ~2x is the tripwire to raise with the
+            # owner.
+            for key, fam in self.families.items():
+                exp_day = sum(o.live_pf for o in fam.orders.values()
+                              if o.live_pf is not None
+                              and o.purpose != "manual")
+                actual = sum(1 for f in fam.fills
+                             if (f.get("ts") or 0) > now - 86400)
+                if exp_day or actual:
+                    self._note(
+                        f"fill calibration {key}: model expects "
+                        f"{exp_day:.1f} fills/day resting; actual last "
+                        f"24h: {actual}"
+                        + ("  <-- DRIFTING" if exp_day > 0 and
+                           (actual > 2 * exp_day + 2
+                            or exp_day > 2 * actual + 2) else ""))
+                    self._note(
+                        f"risk {key}: expected ${fam.family_spent():.2f}"
+                        f"/{fam.cfg.capital_usd:.0f}  gross "
+                        f"${fam.family_gross():.2f}/{fam.gross_cap():.0f}")
+        except Exception as e:  # noqa: BLE001
+            self._note(f"fill calibration failed: {type(e).__name__}: {e}")
         try:      # the estimate ledger: every day's prediction, kept
                   # until the exchange settles it (owner, 2026-08-23)
             from .estimator import et_day
