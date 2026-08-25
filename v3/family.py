@@ -327,6 +327,8 @@ class Family:
         self._last_accrual = 0.0
         self.silent_cancels = 0
         self.gone_pending: dict[str, dict] = {}   # vanished, feed pending
+        self.probe_ratchet: dict[str, list] = {}  # "slug|side" ->
+                                                  # [ticks allowed, last advance ts]
         self._fill_evi_buf: list[dict] = []       # this cycle's fills, fed
                                                   # to evidence as EVENTS
                                                   # (sweeps collapse to one)
@@ -815,6 +817,49 @@ class Family:
             else:
                 cands = [px for px in cands
                          if px >= fair_hard + tick - 1e-9]
+        else:
+            # Owner, 2026-08-25: "Only fronting past fair where we have
+            # no information, and only to the extent necessary to get
+            # information that would allow us to earn." Past-value
+            # fronting is an information TOOL, never an earning
+            # strategy — the dwajoh bid (11c, 10 ticks in front, on a
+            # market that had burned us repeatedly) is what this ends.
+            has_info = any(r[1].startswith("fill")
+                           for r in self.evidence.events.get(slug, ()))
+            if has_info:
+                # the market has spoken before: in-front quotes stop at
+                # the band's conservative edge for our side — the LOW
+                # for a bid, the HIGH for an ask. A snatch record IS
+                # information, so a burned market never sees a
+                # past-value order again while its evidence stands.
+                edge = b_lo if side == "BUY" else b_hi
+                lim = (edge if edge is not None
+                       else touch + sign * tick)
+                cands = [px for px in cands
+                         if (px - touch) * sign <= 1e-9
+                         or (px - lim) * sign <= 1e-9]
+            else:
+                # a truly blank market gets ONE minimum-size probe that
+                # advances like a ratchet: a tick to start, one more per
+                # quiet day survived, snapped shut by the first fill
+                # (which makes the market has_info)
+                key = f"{slug}|{side}"
+                allowed = (self.probe_ratchet.get(key) or [1, 0.0])[0]
+                already = any(
+                    o for o in self.orders.values()
+                    if o.market == slug and o.side == side
+                    and o.purpose not in ("manual", "sell")
+                    and (own is None or o.id != own.id)   # re-planning
+                    and (o.price - touch) * sign > 1e-9)  # the probe
+                                                          # itself must
+                                                          # see its rungs
+                if already:      # one probe at a time
+                    cands = [px for px in cands
+                             if (px - touch) * sign <= 1e-9]
+                else:
+                    lim = touch + sign * allowed * tick
+                    cands = [px for px in cands
+                             if (px - lim) * sign <= 1e-9]
         # Every candidate is priced by the owner's EV formula
         # (2026-08-19): what it earns while resting, minus what a fill
         # would probably cost.
@@ -893,6 +938,10 @@ class Family:
                                              exit_rate_ps=exit_rate_ps,
                                              ignorance=ign)
             for qty in grid:
+                if in_front and fair_hard is None and qty > grid[0]:
+                    break     # no model behind it: an in-front order is
+                              # an experiment, and experiments run at
+                              # minimum size (owner, 2026-08-25)
                 if (h >= 0.5 and qty > grid[0]
                         and (in_front or k_px == 0)):
                     break     # a fill just happened here: minimum size
@@ -1751,6 +1800,13 @@ class Family:
                 rec.dry_since = now
             self.fillmodel.observe_order_age(rec.market, now - rec.placed_ts,
                                              60.0)
+            if (rec.purpose not in ("manual", "sell")
+                    and (self.fairs is None
+                         or self.fairs(rec.market) is None)
+                    and now - rec.placed_ts >= 86400.0
+                    and not any(r2[1].startswith("fill") for r2 in
+                                self.evidence.events.get(rec.market, ()))):
+                self._advance_probe_ratchet(rec.market, rec.side, now)
             if rec.purpose not in ("sell", "probe"):
                 ticks_now = (round(abs(lv[0][0] - rec.price) / book.tick)
                              if lv else 0)
@@ -2306,6 +2362,17 @@ class Family:
                     f"percentile is {q25:.0f} min) — fair is past this "
                     f"price", adv_frac)
         return 1.0, f"filled after {mins:.0f} min — within the range", adv_frac
+
+    def _advance_probe_ratchet(self, slug: str, side: str,
+                               now: float) -> None:
+        """A probe that survived a quiet day earns one more tick of
+        reach, at most one per day, capped — each step licensed by the
+        market itself proving the last one safe (owner, 2026-08-25:
+        "only to the extent necessary to get information")."""
+        key = f"{slug}|{side}"
+        ticks, last = self.probe_ratchet.get(key) or [1, 0.0]
+        if now - last >= 86400.0 and ticks < 8:
+            self.probe_ratchet[key] = [ticks + 1, now]
 
     def _flush_fill_evidence(self, now: float) -> None:
         """Feed this cycle's fills to the evidence band — one EVENT per
@@ -3183,6 +3250,7 @@ class Family:
         return {
             "cfg_sig": self._cfg_sig(),
             "orders": {oid: vars(o) for oid, o in self.orders.items()},
+            "probe_ratchet": self.probe_ratchet,
             "inventory": self.inventory,
             "positions_seen": self.positions_seen,
             "silent_cancels": self.silent_cancels,
@@ -3226,6 +3294,8 @@ class Family:
                 rec.why = "the owner's own order — the engine leaves it alone"
             self.orders[oid] = rec
         self.inventory = dict(d.get("inventory") or {})
+        self.probe_ratchet = {k: list(v) for k, v in
+                              (d.get("probe_ratchet") or {}).items()}
         self.positions_seen = dict(d.get("positions_seen") or {})
         self.silent_cancels = d.get("silent_cancels") or 0
         self.placed_at = {k: float(v) for k, v in
