@@ -806,3 +806,6 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787635993.5,politics,ussewc-usse-ms-2026-11-03-rep,BUY,1,0.96,earn,6.25,0.23,0.970175,94,98,0,0.96,0.99,-0.0102,1,2 ticks behind the touch; ~38.5% of the bid side,C30GV15K2DK7
 1787640973.6,politics,ussewc-usse-ky-2026-11-03-rep,BUY,1,0.95,earn,4.5215,0.02,0.996525,91,94,0.934,0.94,0.96,-0.0465,27,1 tick in front of the touch — closer to the midpoint; ~72.3% of the bid side,C31W7KD9CDJV
 1787642713.6,politics,ussewc-usse-ms-2026-11-03-rep,BUY,1,0.96,earn,6.1275,0.02,0.970175,92,97,0.446,0.94,0.98,-0.0102,2,2 ticks in front of the touch — closer to the midpoint; ~98.0% of the bid side,C329GKDXRDK7
+1787643733.6,cfb,aachc-cfb-wins-ou-2026-11-28-washst,BUY,0.01,0.79,earn,0.1542,0.22,,69,78,0,0.75,0.83,0.06,0.01,4 ticks in front of the touch — closer to the midpoint; ~93.8% of the bid side,C32BYER18DJT
+1787643853.6,politics,enwc-ussep-ma-2026-09-01-dem-edmark,BUY,1,0.96,earn,2.0467,0.02,,90,94,0.863,0.95,0.97,0.04,7,1 tick in front of the touch — closer to the midpoint; ~32.7% of the bid side,C32HWT3J0DK7
+1787644273.6,politics,ussewc-usse-ky-2026-11-03-dem,SELL,10,0.07,earn,4.1665,0.5,0.003475,4,11,0,0.06,0.4,-0.0665,-10,at the touch — a fill here is 7 ticks inside value (Silver + evidence),C32895DBADJV
