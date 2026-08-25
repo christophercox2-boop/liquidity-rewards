@@ -72,7 +72,16 @@ GONE_GRACE_S = 300.0
 EXIT_DRY_S = 6 * 3600.0
 # Actions held back from maintenance for the ceiling when the book is
 # over it. Without this the trim never runs in a busy family.
-TRIM_RESERVE = 4   # a vanished order waits this long for the lagging
+TRIM_RESERVE = 4
+# The exit gate (owner, 2026-08-25: "option B is fine"). An exit may
+# rest past break-even only while the reward it measures AT THAT PRICE,
+# deflated by the measured ~3x estimator optimism, beats the expected
+# fill loss by a margin:   est / EST_DEFLATE >= GATE_MARGIN x p_fill x
+# give-up.  The margin also bridges a known mismatch: est is $/day
+# while resting, the give-up is a one-shot loss at fill. Revisit both
+# numbers when the share calibration lands (~Aug-29).
+EST_DEFLATE = 3.0
+GATE_MARGIN = 3.0   # a vanished order waits this long for the lagging
                        # position feed before it counts as a silent cancel
 
 # size grid the planner walks (contracts); fractional sizes are live rails
@@ -178,6 +187,10 @@ class FamilyConfig:
     terms_slice: int = 120              # universe terms slugs per full-refresh pass
     cooldown_s: float = 3600.0
     min_est_day: float = 0.02
+    # cap on the TOTAL give-up (price past break-even x size) the
+    # family's exits may have in play at once — the belt on the exit
+    # gate, so twenty small approved risks cannot add up quietly
+    exit_giveup_cap_usd: float = 5.0
     # Cycle-out rule (owner, 2026-08-20: "be very picky... and if
     # something's not working cycle out of it"): an order measured under
     # min_est_day for this long, with no plan at this market that clears
@@ -2239,32 +2252,104 @@ class Family:
                       qty=rec.qty,
                       note=f"a slot at {best:.2f} earns more — moving")
 
-    def _exit_is_dry(self, slug: str, side: str, now: float) -> bool:
-        """Has this market's exit on this side earned nothing for
-        EXIT_DRY_S?
+    def _exit_giveup_in_play(self) -> float:
+        """Total give-up the family's exits currently risk below (SELL)
+        or above (BUY) their positions' break-even. The exit gate's
+        family-wide budget draws down against this."""
+        total = 0.0
+        for o in self.orders.values():
+            if o.purpose != "sell":
+                continue
+            inv = self.inventory.get(o.market) or {}
+            q = inv.get("qty") or 0.0
+            if not q:
+                continue
+            basis = abs((inv.get("cost") or 0.0) / q)
+            give = ((basis - o.price) if o.side == "SELL"
+                    else (o.price - basis)) * o.qty
+            if give > 0:
+                total += give
+        return total
 
-        True only when there IS an exit resting and every one of them
-        has been dry the whole time. A market with no exit yet is not
-        dry — it has not had the chance — and one earning order on the
-        side keeps the whole side out of it, because moving an earning
-        exit trades a live reward stream for a faster fill and that is
-        the trade the owner does not want."""
-        mine = [o for o in self.orders.values()
-                if o.market == slug and o.purpose == "sell"
-                and o.side == side]
-        if not mine:
-            return False
-        for o in mine:
-            if o.live_est and o.live_est > 0.0:
-                return False
-            if o.dry_since is None or now - o.dry_since < EXIT_DRY_S:
-                return False
-        return True
+    def _exit_gate(self, slug: str, side: str, basis: float, qty: float,
+                   book, now: float) -> float | None:
+        """The one path past break-even for an exit (owner, 2026-08-25,
+        option B): the price is allowed only while the reward measured
+        AT THAT PRICE, deflated for the estimator's known ~3x optimism,
+        beats the expected fill loss by GATE_MARGIN — using the fill
+        model's own odds, not a guess — inside the family's total
+        give-up budget.
+
+        Checked on the IL senate book where the trade-off is real:
+        fronting an empty side at 2c earns 67% of the pool and passes;
+        the same discount on a 183-share lot fails on size alone.
+        Candidates are the achievable fronts (one tick inside each
+        touch); the one with the LEAST give-up that passes wins, so the
+        engine never gives more price than the reward justifies."""
+        if book is None or qty <= 0:
+            return None
+        prog, _w = self._prog_row(slug)
+        if prog is None or not prog.is_live():
+            return None
+        side_pool = self._side_pool(slug, prog)
+        if side_pool is None or side_pool <= 0:
+            return None
+        tick = book.tick
+        cands = set()
+        if book.bids:
+            cands.add(round(book.bids[0][0] + tick, 3))
+        if book.asks:
+            cands.add(round(book.asks[0][0] - tick, 3))
+        if book.bids:      # post-only: a SELL never crosses the bid
+            lo_ok = book.bids[0][0] + tick - 1e-9
+        else:
+            lo_ok = 0.002
+        if book.asks:      # ...and a BUY never crosses the ask
+            hi_ok = book.asks[0][0] - tick + 1e-9
+        else:
+            hi_ok = 0.998
+        budget = self.cfg.exit_giveup_cap_usd - self._exit_giveup_in_play()
+        # our current exits on this side leave the book before scoring,
+        # so we never count our own size as competition
+        mine_now = [(o.price, o.qty) for o in self.orders.values()
+                    if o.market == slug and o.purpose == "sell"
+                    and o.side == side]
+        raw = list(book.side(side))
+        for mp, mq in mine_now:
+            raw = [(p2, (q2 - mq) if abs(p2 - mp) < 1e-9 else q2)
+                   for p2, q2 in raw]
+        lv = [(p2, q2) for p2, q2 in raw if q2 > 1e-9]
+        best = None
+        for px in cands:
+            if not (0.002 <= px <= 0.998):
+                continue
+            if px < lo_ok or px > hi_ok:
+                continue
+            give = ((basis - px) if side == "SELL"
+                    else (px - basis)) * qty
+            if give <= 0.01 or give > budget:
+                continue
+            j = estimate_join(side, lv, tick, float(prog.df),
+                              float(prog.target), px, qty)
+            est = (j.share * side_pool
+                   if j.qualifies and j.in_window else 0.0)
+            if est <= 0:
+                continue
+            closer = sum(q2 for p2, q2 in lv
+                         if (p2 - px) * (-1.0 if side == "SELL" else 1.0)
+                         > 1e-9)
+            at_level = sum(q2 for p2, q2 in lv if abs(p2 - px) <= 1e-9)
+            pf = self.fillmodel.p_fill(slug, side, j.ticks,
+                                       shield=closer + at_level,
+                                       target=float(prog.target))
+            if est / EST_DEFLATE >= GATE_MARGIN * pf * give:
+                if best is None or give < best[0]:
+                    best = (give, px)
+        return best[1] if best else None
 
     def _exit_floor(self, slug: str, side: str, basis: float,
                     tick: float, book=None,
-                    qty: float | None = None,
-                    dry: bool = False) -> tuple[float, float]:
+                    qty: float | None = None) -> tuple[float, float]:
         """(price limit, scoring basis) for an exit. Break-even bounds it
         by default. When the model prices the market and says holding to
         resolution loses MORE than closing near fair, the limit extends
@@ -2272,17 +2357,15 @@ class Family:
         model, the EVIDENCE BAND's conservative edge does the same job —
         sell no lower than the band's top, cover no higher than its
         bottom (owner, 2026-08-22: stranded exits must be able to fill).
-        And a position worth under 50 cents in total may walk away at
-        the touch — the argument is smaller than the tick.
 
-        `dry` says this market's exit has earned nothing for
-        EXIT_DRY_S. Such an order is not holding out for a better
-        price, it is holding out for a price the book has left behind,
-        and it earns nothing while it waits. It prices to fill, on the
-        same terms as dust. An exit that IS earning is never marked
-        dry, so the reward stream is never traded away for a quicker
-        exit (owner, 2026-08-24: "Just try and make positive ev
-        plays")."""
+        The dust and dry-exit paths that once priced past break-even
+        here are gone (2026-08-25): after the maintenance wipe they
+        priced exits to fill against ghost books — a SELL at 2c on a
+        56c basis. Every price past break-even now goes through ONE
+        door, _exit_gate, which demands the reward at that price pay
+        for the fill risk it takes. The model-fair path stays: a model
+        saying the position is worth less than basis is an authorized
+        loss-cut, not a discount for speed."""
         fair = self.fairs(slug) if self.fairs is not None else None
         if fair is None and book is not None:
             try:
@@ -2293,23 +2376,11 @@ class Family:
                 edge = band.get("hi") if side == "SELL" else band.get("lo")
                 if edge is not None:
                     fair = edge / 100.0
-        dust = bool(dry)
-        if qty is not None and book is not None and not dust:
-            if side == "SELL" and book.bids:
-                dust = qty * book.bids[0][0] < 0.50
-            elif side == "BUY" and book.asks:
-                dust = qty * (1.0 - book.asks[0][0]) < 0.50
         if side == "SELL":
-            if dust and book is not None and book.bids:
-                fl = round(book.bids[0][0] + tick, 3)
-                return fl, min(basis, fl)
             if fair is not None and fair < basis:
                 fl = max(fair, 0.002)
                 return fl, fl
             return basis + tick, basis
-        if dust and book is not None and book.asks:
-            cp = round(book.asks[0][0] - tick, 3)
-            return cp, max(basis, cp)
         if fair is not None and fair > basis:
             cp = min(fair, 0.998)
             return cp, cp
@@ -2529,13 +2600,34 @@ class Family:
                                 # "no reason to wait")
                 break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
                 floor_px, score_basis = self._exit_floor(
-                    slug, "SELL", break_even, book.tick, book=book, qty=qty,
-                    dry=self._exit_is_dry(slug, "SELL", now))
+                    slug, "SELL", break_even, book.tick, book=book, qty=qty)
+                gate_px = self._exit_gate(slug, "SELL", break_even, rest,
+                                          book, now)
                 ask_touch = (book.asks[0][0] if book.asks
                              else break_even + book.tick)
                 lo = max(floor_px,
                          (book.bids[0][0] + book.tick) if book.bids
                          else 0.002)
+                if gate_px is not None:
+                    lo = min(lo, gate_px)
+                # an exit resting BELOW today's floor — yesterday's dry
+                # pricing, a ghost-book quote — retreats: cancelled here,
+                # re-rested at a defensible price next pass (cancel-first
+                # never over-offers)
+                low_stray = [o for o in mine if o.price < lo - 1e-9
+                             and o.id in self.orders]
+                if low_stray:
+                    worst = min(low_stray, key=lambda o: o.price)
+                    rr = self.desk.cancel(worst.id, worst.market)
+                    if rr.ok:
+                        self.orders.pop(worst.id, None)
+                        self.evidence.order_gone(worst.market, worst.id)
+                        self._log(event="exit_retreated", market=slug,
+                                  price=worst.price, qty=worst.qty,
+                                  note="below break-even without the "
+                                       "gate's blessing — pulled back")
+                        actions -= 1
+                    continue
                 bound = max(ask_touch, floor_px) + 2 * book.tick
                 stray = [o for o in mine if o.price > bound + 1e-9
                          and o.id in self.orders]
@@ -2561,6 +2653,10 @@ class Family:
                 if fair_g is not None and join_px < fair_g - 3 * book.tick:
                     join_px = fair_g - book.tick
                 px = max(lo, min(join_px, 0.999))
+                if gate_px is not None:
+                    px = gate_px          # the gate's price IS the plan:
+                                          # it was chosen as the least
+                                          # give-up that pays for itself
                 px = min(max(px, 0.002), 0.999)
                 side, intent, rest_qty = "SELL", SELL_LONG, rest
                 why = "selling filled stock — it earns while it waits"
@@ -2588,13 +2684,32 @@ class Family:
                                 # their buy-back immediately
                 received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
                 cap_px, score_basis = self._exit_floor(
-                    slug, "BUY", received, book.tick, book=book, qty=-qty,
-                    dry=self._exit_is_dry(slug, "BUY", now))
+                    slug, "BUY", received, book.tick, book=book, qty=-qty)
+                gate_px = self._exit_gate(slug, "BUY", received, rest,
+                                          book, now)
                 bid_touch = (book.bids[0][0] if book.bids
                              else received - book.tick)
                 hi = min(cap_px,
                          (book.asks[0][0] - book.tick) if book.asks
                          else cap_px)
+                if gate_px is not None:
+                    hi = max(hi, gate_px)
+                # a cover bidding ABOVE today's cap (the 98c-on-a-2c-
+                # basis ghosts) retreats the same way
+                high_stray = [o for o in mine if o.price > hi + 1e-9
+                              and o.id in self.orders]
+                if high_stray:
+                    worst = max(high_stray, key=lambda o: o.price)
+                    rr = self.desk.cancel(worst.id, worst.market)
+                    if rr.ok:
+                        self.orders.pop(worst.id, None)
+                        self.evidence.order_gone(worst.market, worst.id)
+                        self._log(event="exit_retreated", market=slug,
+                                  price=worst.price, qty=worst.qty,
+                                  note="above break-even without the "
+                                       "gate's blessing — pulled back")
+                        actions -= 1
+                    continue
                 bound = min(bid_touch, cap_px) - 2 * book.tick
                 stray = [o for o in mine if o.price < bound - 1e-9
                          and o.id in self.orders]
@@ -2615,6 +2730,8 @@ class Family:
                 px = self._best_exit_px(slug, "BUY", book,
                                         min(bid_touch, hi), hi, rest,
                                         basis=score_basis)
+                if gate_px is not None:
+                    px = gate_px
                 px = min(max(px, 0.001), 0.999)
                 side, intent, rest_qty = "BUY", SELL_SHORT, rest
                 why = ("buying back the short at or under what it sold "

@@ -286,7 +286,14 @@ class TestExitProtection(unittest.TestCase):
         self.assertEqual(len(covers), 1)
         c = covers[0]
         self.assertEqual(c.purpose, "sell")
-        self.assertLessEqual(c.price, 0.40 - 0.01)    # never above break-even
+        # "never above break-even" became "not above break-even unless
+        # the exit gate blesses the premium" (owner, 2026-08-25,
+        # option B — the gte205 case: paying a little to close while
+        # being paid to wait). Here the gate fronts the 44c bid at 45c,
+        # a 5c/share premium bounded by the family give-up budget.
+        self.assertLessEqual(c.price, 0.46)           # never crosses the ask
+        give = max(c.price - 0.40, 0.0) * c.qty
+        self.assertLessEqual(give, r.fam.cfg.exit_giveup_cap_usd + 1e-9)
         self.assertAlmostEqual(c.qty, 100.0)
         from v3.intents import capital_at_risk
         self.assertEqual(capital_at_risk(c.intent, c.price, c.qty), 0.0)
@@ -1723,7 +1730,15 @@ class TestStrandedExits(unittest.TestCase):
                  if o.market == A and o.purpose == "sell"
                  and o.side == "SELL"]
         self.assertTrue(exits)
-        self.assertLessEqual(exits[0].price, 0.06)   # not 14c forever
+        # The dust rule once walked this 13c lot away AT THE TOUCH
+        # (5c) for free. That freebie is gone (owner, 2026-08-25): this
+        # side holds ~1,000 of 5,000 Target Size so nobody is paid at
+        # any price, and the gate refuses a discount that buys nothing.
+        # What remains is the evidence band's own loss-cut (kept rule,
+        # owner 2026-08-22): the band prices this market ~7c, so the
+        # exit may rest there — above the touch, at the band's edge —
+        # but no lower.
+        self.assertGreater(exits[0].price, 0.05)
 
     def test_collapsed_basis_cover_rests_at_the_band(self):
         from v3.tests.test_family import Rig, A
@@ -3811,99 +3826,105 @@ class TestBookDepth(unittest.TestCase):
         self.assertEqual(Client.BOOK_DEPTH, 50)
 
 
-class TestDryExitsPriceToFill(unittest.TestCase):
-    """Owner, 2026-08-24: "Just try and make positive ev plays."
+class TestExitGate(unittest.TestCase):
+    """Owner, 2026-08-25 (option B): an exit may rest past break-even
+    only while the reward measured AT THAT PRICE, deflated ~3x for the
+    estimator's known optimism, beats the expected fill loss by a
+    margin — under a $5 family-wide give-up budget. Everything else
+    floors at break-even. This replaced the dry/dust price-to-fill
+    paths, which priced exits against ghost books after maintenance
+    (a SELL at 2c on a 56c basis)."""
 
-    Measured on the live book that day: of 39 politics exits pinned at
-    break-even, 18 earned NOTHING against $49.40 of his money, and 21
-    earned $2.196/day — of which ONE order (Buttigieg 2028, SELL 307
-    @ 12c) was $1.983/day on its own. Moving that one 2 ticks costs
-    $6.14 and pays back in 3.1 days, so the +EV play is not "sell
-    harder", it is: free the exits that earn nothing and do not touch
-    the ones that earn."""
+    IL_BOOK = dict(bids=((0.01, 2400.0),),
+                   asks=((0.03, 10.0), (0.98, 5000.0)))
+    IL_PROG = {"timePeriods": [{"programId": "politics_low", "rewardPool": 25.0,
+                                "targetSize": 2000, "discountFactor": 0.1,
+                                "status": "LIVE"}]}
 
-    def _rig(self):
-        from v3.tests.test_family import Rig, A, politics_book
+    def _rig(self, book=None, prog=None):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        b = book or self.IL_BOOK
         r = Rig()
-        r.add_market(A)
-        r.fam.inventory[A] = {"qty": 10.0, "cost": 9.66}   # basis 96.6c
-        r.positions[A] = (10.0, 9.66)
-        r.fam.cache.put(A, politics_book(r.now))
+        r.add_market(A, book=Book(bids=b["bids"], asks=b["asks"],
+                                  tick=0.01, fetched_at=r.now),
+                     prog=prog or self.IL_PROG)
+        r.cycle()      # discovery + terms
         return r, A
 
-    def test_an_earning_exit_is_never_dry(self):
-        from v3.family import FamilyOrder as Order
+    def test_the_IL_book_passes_at_the_front(self):
+        # the case the rule was designed on: 2 shares fronting an empty
+        # side hold ~67% of the score; give-up 57c; earns it back fast
         r, A = self._rig()
-        r.fam.orders["E1"] = Order(id="E1", market=A, side="SELL",
-                                   price=0.97, qty=10.0, purpose="sell",
-                                   intent="", placed_ts=r.now - 99999.0)
-        r.fam.orders["E1"].live_est = 0.5          # it is earning
-        r.fam.orders["E1"].dry_since = r.now - 99999.0
-        self.assertFalse(r.fam._exit_is_dry(A, "SELL", r.now))
+        book = r.fam.cache.fresh(A, 999, r.now)
+        px = r.fam._exit_gate(A, "SELL", 0.305, 2.0, book, r.now)
+        self.assertEqual(px, 0.02)
 
-    def test_one_earning_order_protects_the_whole_side(self):
-        from v3.family import FamilyOrder as Order
+    def test_size_alone_slams_the_gate(self):
+        # the same discount on a big lot exceeds the family budget
         r, A = self._rig()
-        for oid, est in (("E1", 0.0), ("E2", 0.4)):
-            o = Order(id=oid, market=A, side="SELL", price=0.97, qty=5.0,
-                      purpose="sell", intent="", placed_ts=r.now)
-            o.live_est = est
-            o.dry_since = r.now - 99999.0 if est == 0 else None
-            r.fam.orders[oid] = o
-        self.assertFalse(r.fam._exit_is_dry(A, "SELL", r.now))
+        book = r.fam.cache.fresh(A, 999, r.now)
+        self.assertIsNone(r.fam._exit_gate(A, "SELL", 0.5, 183.0,
+                                           book, r.now))
 
-    def test_a_long_dry_exit_is_dry(self):
-        from v3.family import FamilyOrder as Order, EXIT_DRY_S
+    def test_a_side_that_pays_nobody_earns_no_discount(self):
+        # under Target Size the whole side pays nobody: est 0, gate shut
+        r, A = self._rig(book=dict(bids=((0.01, 2400.0),),
+                                   asks=((0.03, 10.0),)))
+        book = r.fam.cache.fresh(A, 999, r.now)
+        self.assertIsNone(r.fam._exit_gate(A, "SELL", 0.305, 2.0,
+                                           book, r.now))
+
+    def test_the_family_budget_is_shared(self):
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
         r, A = self._rig()
-        o = Order(id="E1", market=A, side="SELL", price=0.97, qty=10.0,
-                  purpose="sell", intent="", placed_ts=r.now)
-        o.live_est = 0.0
-        o.dry_since = r.now - EXIT_DRY_S - 1.0
-        r.fam.orders["E1"] = o
-        self.assertTrue(r.fam._exit_is_dry(A, "SELL", r.now))
+        # another market's exit already has $4.90 of give-up in play
+        r.fam.inventory["other-mkt"] = {"qty": 10.0, "cost": 5.1}
+        r.fam.orders["OTH"] = FamilyOrder(
+            id="OTH", market="other-mkt", side="SELL", price=0.02,
+            qty=10.0, intent=SELL_LONG, placed_ts=0.0, purpose="sell")
+        self.assertAlmostEqual(r.fam._exit_giveup_in_play(), 4.9, places=5)
+        book = r.fam.cache.fresh(A, 999, r.now)
+        self.assertIsNone(r.fam._exit_gate(A, "SELL", 0.305, 2.0,
+                                           book, r.now))
 
-    def test_briefly_dry_is_not_dry(self):
-        from v3.family import FamilyOrder as Order, EXIT_DRY_S
-        r, A = self._rig()
-        o = Order(id="E1", market=A, side="SELL", price=0.97, qty=10.0,
-                  purpose="sell", intent="", placed_ts=r.now)
-        o.live_est = 0.0
-        o.dry_since = r.now - EXIT_DRY_S / 2.0
-        r.fam.orders["E1"] = o
-        self.assertFalse(r.fam._exit_is_dry(A, "SELL", r.now))
+    def test_covers_gate_symmetrically(self):
+        # a short that received 90c may bid 95c only through the gate
+        r, A = self._rig(book=dict(bids=((0.94, 20.0), (0.02, 60000.0)),
+                                   asks=((0.97, 30.0),)))
+        book = r.fam.cache.fresh(A, 999, r.now)
+        px = r.fam._exit_gate(A, "BUY", 0.90, 1.0, book, r.now)
+        self.assertEqual(px, 0.95)
 
-    def test_no_exit_yet_is_not_dry(self):
-        r, A = self._rig()
-        self.assertFalse(r.fam._exit_is_dry(A, "SELL", r.now))
-
-    def test_dry_lets_the_exit_price_to_fill_instead_of_break_even(self):
+    def test_without_the_gate_the_floor_is_break_even(self):
+        # the dust/dry freedom is gone from the floor itself. Basis is
+        # set BELOW the evidence band's top so the band's own loss-cut
+        # path (owner, 2026-08-22 — a separate, kept rule) stays out of
+        # the way: with no model authorising a cut, a 1-share dust lot
+        # floors at break-even instead of walking at the touch.
         from v3.tests.test_family import politics_book
         r, A = self._rig()
         book = politics_book(r.now)
-        held, dry = (r.fam._exit_floor(A, "SELL", 0.966, book.tick,
-                                       book=book, qty=10.0, dry=d)[0]
-                     for d in (False, True))
-        # dry prices to FILL: one tick above the best bid, and never
-        # below it — post-only, so it rests rather than crossing
-        self.assertAlmostEqual(dry, book.bids[0][0] + book.tick, places=6)
-        self.assertGreater(dry, book.bids[0][0])
-        self.assertLess(dry, held)           # strictly more willing than held
+        fl, _sb = r.fam._exit_floor(A, "SELL", 0.30, book.tick,
+                                    book=book, qty=1.0)
+        self.assertAlmostEqual(fl, 0.31, places=6)
 
-    def test_a_dry_cover_prices_to_fill_too(self):
-        from v3.tests.test_family import politics_book
+    def test_seller_rests_at_the_gate_price(self):
+        # integration: position 2 @ 30.5c basis on the IL book, no exit
+        # yet -> the seller fronts at 2c because the gate blessed it
         r, A = self._rig()
-        r.fam.inventory[A] = {"qty": -10.0, "cost": -0.30}   # short at 3c
-        book = politics_book(r.now)
-        held, dry = (r.fam._exit_floor(A, "BUY", 0.03, book.tick,
-                                       book=book, qty=10.0, dry=d)[0]
-                     for d in (False, True))
-        self.assertAlmostEqual(dry, book.asks[0][0] - book.tick, places=6)
-        self.assertLess(dry, book.asks[0][0])   # never above the ask
-        self.assertGreater(dry, held)           # more willing than held
+        r.fam.inventory[A] = {"qty": 2.0, "cost": 0.61}
+        r.positions[A] = (2.0, 0.61)
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        exits = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "sell"]
+        self.assertTrue(exits)
+        self.assertEqual(exits[0].price, 0.02)
 
     def test_the_dry_clock_survives_a_restart(self):
-        """We redeploy several times a day. If dry_since reset on every
-        boot the six-hour rule would never once fire."""
+        # dry_since is telemetry now, but state compat must hold
         import dataclasses
         from v3.family import FamilyOrder
         o = FamilyOrder(id="X", market="m", side="SELL", price=0.5,
@@ -3913,7 +3934,6 @@ class TestDryExitsPriceToFill(unittest.TestCase):
         back = FamilyOrder(**{k: v for k, v in vars(o).items()
                               if k in fields})
         self.assertEqual(back.dry_since, 12345.0)
-
 
 class TestCeilingCountsTheSameBookTwice(unittest.TestCase):
     """The ceiling check and the spend it checks against must measure
