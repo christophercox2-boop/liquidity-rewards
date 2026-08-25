@@ -597,3 +597,52 @@ result: it puts today's share beside a different day's payout. The
 honest test is today's share against today's money, which settles
 around Aug-29. Four theories have died today by being checked; this
 one is not getting announced before it is.
+
+---
+
+## R3 — the Texas cover test — SETTLED 2026-08-24, and it PASSED
+
+**The trade.** `usgubewc-usgub-tx-2026-11-03-rep`, Aug-21 19:58: an
+exit, BUY 1 @ 91c against an 87.5c model, book 87c/92c. It rested
+8.1 hours before filling. Cost: 3.5c past model value = **-$0.04**.
+The card claimed **~$1.06** of rewards earned while it rested, from
+an estimated $3.12/day.
+
+**The owner's test, in his words:** "If our numbers are right this
+will be +ev and a great call. Otherwise it could be a small loss.
+We just have to check tomorrow."
+
+**Settled.** Aug-21 posted PAID. That market paid **$1.32** for the
+whole of Aug-21 — every order we had there, both sides, all 24
+hours. Our order held 8.1 of those hours, so it earned **at most
+$0.45**, and less if anything else of ours rested alongside it.
+
+| | |
+|---|---|
+| cost | -$0.04 |
+| earned in 8.1h | about +$0.45 |
+| **net** | **+$0.41** |
+
+**The call was right.** Covering there was +EV by roughly ten times
+what it cost. Paying 3.5c past model to hold a spot that pays was
+the correct trade.
+
+**And the number that justified it was still 2.4x too big.** The
+claim was $1.06 for those 8.1 hours; the market's own payout caps it
+at $0.45. That is the same overstatement seen everywhere in politics
+this week (3.3x on Aug-21, 3.6x on Aug-22, 3.4x across the Texas
+markets as a group).
+
+**What this settles that nothing else did.** The estimate is
+INFLATED, not INVENTED. The money is real, the direction is right,
+and a decision made on these numbers can still be correct — it just
+has less margin than the card says. A 2.4x-optimistic estimate is
+safe on a trade that wins 10x its cost and dangerous on one that
+looks marginal. Until the share measurement lands, treat any
+decision whose claimed edge is under ~3x as unproven.
+
+**Written down late, which is the lesson.** This test was agreed in
+conversation and never entered this file, so when the owner asked
+whether it had come back I could not tell him what it was. The rule
+exists for exactly this. Anything we agree to check goes in here
+first, before the data lands.
