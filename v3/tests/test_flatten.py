@@ -4307,3 +4307,70 @@ class TestPartyMarketsFundable(unittest.TestCase):
         for m in ("apdc-alito-2026-12-31", "opdc-mcconnell-resign-2026-11-02",
                   "lawec-saveact-2026-12-31", "dccc-measles-us-2026-12-31-gt4500"):
             self.assertFalse(any(t in m for t in toks), m)
+
+
+class TestConformanceSweep(unittest.TestCase):
+    """Owner, 2026-08-25: "make sure that all orders are conforming to
+    the new rules before moving on." The fronting bounds govern the
+    RESTING book: an order the rules would refuse to place today is
+    pulled today, instead of catching fills until the planner happens
+    to revisit it."""
+
+    BOOK = dict(bids=((0.01, 6000.0),), asks=((0.22, 5000.0),))
+
+    def _rig(self, price, qty=1.0):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=self.BOOK["bids"],
+                                  asks=self.BOOK["asks"],
+                                  tick=0.01, fetched_at=r.now))
+        r.cycle()
+        for oid in list(r.fam.orders):          # a clean slate, then the
+            r.fam.orders.pop(oid)               # pre-rule leftover
+        r.exchange.live.clear()
+        r.exchange.live["OLD"] = {"id": "OLD", "market": A, "side": "BUY",
+                                  "price": price, "size": qty,
+                                  "intent": BUY_LONG}
+        r.fam.orders["OLD"] = FamilyOrder(
+            id="OLD", market=A, side="BUY", price=price, qty=qty,
+            intent=BUY_LONG, placed_ts=1.0, purpose="earn")
+        return r, A
+
+    def test_a_pre_rule_deep_front_is_pulled(self):
+        # the dwajoh shape: 10 ticks in front on a blank market
+        r, A = self._rig(0.11)
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertNotIn("OLD", r.fam.orders)
+        self.assertTrue(any(l.get("event") == "conform_pulled"
+                            for l in r.fam.log))
+
+    def test_an_oversized_front_is_pulled_even_one_tick_out(self):
+        r, A = self._rig(0.02, qty=50.0)
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertNotIn("OLD", r.fam.orders)
+
+    def test_a_conforming_probe_is_never_conform_pulled(self):
+        # it may still be REPRICED by ordinary maintenance — the
+        # assertion is that the sweep never fires and the market stays
+        # quoted, not that the exact order is immortal
+        r, A = self._rig(0.02, qty=0.5)         # 1 tick, minimum size
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertFalse(any(l.get("event") == "conform_pulled"
+                             for l in r.fam.log))
+        self.assertTrue(any(o.side == "BUY" and o.market == A
+                            for o in r.fam.orders.values()))
+
+    def test_at_the_touch_size_is_not_probe_capped(self):
+        r, A = self._rig(0.01, qty=50.0)        # joining the wall: fine
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertFalse(any(l.get("event") == "conform_pulled"
+                             for l in r.fam.log))
+        self.assertTrue(any(o.side == "BUY" and o.market == A
+                            for o in r.fam.orders.values()))

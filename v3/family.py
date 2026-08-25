@@ -81,7 +81,12 @@ TRIM_RESERVE = 4
 # while resting, the give-up is a one-shot loss at fill. Revisit both
 # numbers when the share calibration lands (~Aug-29).
 EST_DEFLATE = 3.0
-GATE_MARGIN = 3.0   # a vanished order waits this long for the lagging
+GATE_MARGIN = 3.0
+# An information probe's size: one share. Enough that a taker would
+# bother eating it (which is the information), small enough that being
+# wrong costs cents. QTY_GRID[0] (0.01 shares) is too small to probe
+# anything — nobody snipes a hundredth of a share.
+PROBE_MAX_QTY = 1.0   # a vanished order waits this long for the lagging
                        # position feed before it counts as a silent cancel
 
 # size grid the planner walks (contracts); fractional sizes are live rails
@@ -951,10 +956,10 @@ class Family:
                                              exit_rate_ps=exit_rate_ps,
                                              ignorance=ign)
             for qty in grid:
-                if in_front and fair_hard is None and qty > grid[0]:
+                if in_front and fair_hard is None and qty > PROBE_MAX_QTY:
                     break     # no model behind it: an in-front order is
                               # an experiment, and experiments run at
-                              # minimum size (owner, 2026-08-25)
+                              # probe size (owner, 2026-08-25)
                 if (h >= 0.5 and qty > grid[0]
                         and (in_front or k_px == 0)):
                     break     # a fill just happened here: minimum size
@@ -1918,6 +1923,61 @@ class Family:
             prog, _why = self._prog_row(rec.market)
             if book is None or prog is None:
                 continue
+            # CONFORMANCE (owner, 2026-08-25: "make sure that all
+            # orders are conforming to the new rules before moving
+            # on"): the fronting bounds govern the RESTING book, not
+            # just new placements. An order the rules would refuse to
+            # place today is pulled today — pre-rule leftovers were
+            # still catching fills. Manual, frozen and avoided were
+            # handled above; exits answer to the exit gate's retreats.
+            if (actions > 0 and (self.fairs is None
+                                 or self.fairs(rec.market) is None)):
+                sign_c = 1.0 if rec.side == "BUY" else -1.0
+                lv_c = [(p, q - rec.qty if abs(p - rec.price) < 1e-9 else q)
+                        for p, q in book.side(rec.side)]
+                lv_c = [(p, q) for p, q in lv_c if q > 1e-9]
+                touch_c = lv_c[0][0] if lv_c else None
+                bad = None
+                if touch_c is not None:
+                    front_by = (rec.price - touch_c) * sign_c / book.tick
+                    if front_by > 1e-6:
+                        gmin_c = PROBE_MAX_QTY
+                        if any(r2[1].startswith("fill") for r2 in
+                               self.evidence.events.get(rec.market, ())):
+                            eb_lo, eb_hi = self._price_bounds(
+                                rec.market,
+                                lv_c if rec.side == "BUY"
+                                else book.side("BUY"),
+                                book.side("SELL") if rec.side == "BUY"
+                                else lv_c,
+                                book.tick)
+                            edge = eb_lo if rec.side == "BUY" else eb_hi
+                            if (edge is not None
+                                    and (rec.price - edge) * sign_c > 1e-9):
+                                bad = ("in front past the evidence edge "
+                                       f"({edge * 100:.0f}c) on a market "
+                                       "that has burned us")
+                        else:
+                            allowed_c = (self.probe_ratchet.get(
+                                f"{rec.market}|{rec.side}") or [1, 0.0])[0]
+                            if front_by > allowed_c + 1e-6:
+                                bad = (f"{front_by:.0f} ticks in front — "
+                                       "the probe's earned reach is "
+                                       f"{allowed_c}")
+                            elif rec.qty > gmin_c + 1e-6:
+                                bad = ("probe-sized only in front of an "
+                                       "unknown market")
+                if bad is not None:
+                    r_c = self.desk.cancel(rec.id, rec.market)
+                    if r_c.ok:
+                        self.orders.pop(rec.id, None)
+                        self.evidence.order_gone(rec.market, rec.id)
+                        self._log(event="conform_pulled",
+                                  market=rec.market, side=rec.side,
+                                  price=rec.price, qty=rec.qty,
+                                  note=bad[:100])
+                        actions -= 1
+                    continue
             side_pool = self._side_pool(rec.market, prog)
             if side_pool is None:
                 continue
