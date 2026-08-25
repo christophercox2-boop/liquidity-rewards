@@ -836,3 +836,9 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787663707.5,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,BUY,1,0.15,earn,1.3661,0.18,,6,10,0.815,0.02,0.15,0.07,4,joins the touch — the book has been quiet,C376ZE7EPFSN
 1787664007.5,cfb,aachc-cfb-wins-2026-11-28-aubrn-5pt5wins,BUY,0.5,0.83,earn,2.9331,0.07,,85,94,0.33,0.82,0.86,-0.06,0.5,1 tick in front of the touch — we would hold 47% of the bid side,C37CBKK2RFSS
 1787664307.5,politics,ewc-usp-2028-11-07-markel,BUY,0.42,0.05,manual,0.2027,1.32,,5,22,0,0.05,0.14,-0.09,-2.58,the owner's own order — the engine leaves it alone,C36FAFF2GFSP
+1787664367.5,cfb,aachc-cfb-wins-2026-11-28-missr-8pt5wins,BUY,0.99,0.22,earn,0.0095,0.87,,19,36,0,0.37,0.38,-0.06,0.99,3 ticks behind the touch — we would hold 92% of the bid side,C36VE9R8EFSR
+1787665327.5,cfb,aachc-cfb-wins-2026-11-28-ind-7pt5wins,SELL,0.01,0.82,earn,0.2554,1.47,,91,97,0,0.81,0.82,0.12,-3.01,17 ticks in front of the touch — closer to the midpoint; ~6.1% of the ask side,C36J3VTGCFSP
+1787666287.5,politics,enwc-uspres-nom-dem-2028-rahema,BUY,1,0.12,earn,9.0091,0.02,,3,10,0.524,0.03,0.21,0.06,-5,9 ticks in front of the touch — we would hold 99% of the bid side,C381DP346FSR
+1787667367.5,politics,enwc-ussep-ma-2026-09-01-dem-setmou,BUY,1,0.07,earn,6.1877,0.02,,3,10,0,0.02,0.09,0.01,1,6 ticks in front of the touch — closer to the midpoint; ~99.0% of the bid side,C38AH2GAGFSQ
+1787667367.5,cfb,aachc-cfb-wins-2026-11-28-byu-9pt5wins,SELL,0.01,0.34,earn,0.0137,1.08,,51,59,0.258,0.33,0.34,0.21,-0.02,2 ticks in front of the touch — we would hold 4% of the ask side,C379MCVHTFSP
+1787667607.5,politics,enwc-ussep-ma-2026-09-01-dem-setmou,SELL,1,0.03,earn,12.4825,0.02,,3,9,0.454,0.02,0.08,0.03,0,6 ticks in front of the touch — we would hold 100% of the ask side,C38CJ599GFSN
