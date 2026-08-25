@@ -69,7 +69,10 @@ GONE_GRACE_S = 300.0
 # (owner: "Just try and make positive ev plays"). Six hours is long
 # enough that a quiet spell is not mistaken for a dead order, short
 # enough to act the same day.
-EXIT_DRY_S = 6 * 3600.0   # a vanished order waits this long for the lagging
+EXIT_DRY_S = 6 * 3600.0
+# Actions held back from maintenance for the ceiling when the book is
+# over it. Without this the trim never runs in a busy family.
+TRIM_RESERVE = 4   # a vanished order waits this long for the lagging
                        # position feed before it counts as a silent cancel
 
 # size grid the planner walks (contracts); fractional sizes are live rails
@@ -1649,8 +1652,24 @@ class Family:
                     del self.orders[rec.id]
                     actions -= 1
 
-        # 2) maintenance: reprice or pull against fresh books
-        actions = self._maintain(now, actions)
+        # 2) maintenance: reprice or pull against fresh books.
+        #
+        # When the book is OVER the ceiling, maintenance may not spend
+        # the whole budget. It ran unbounded until 2026-08-25, and in a
+        # busy family that starved the trim behind it completely: 89
+        # reprices, 50 places and ZERO trims in one window, while
+        # politics sat at $360.69 against a $250 cap and climbing. A
+        # ceiling that queues behind price improvements is not a
+        # ceiling.
+        #
+        # The reserve, rather than simply running the trim first,
+        # because the trim ranks orders by measured value per dollar
+        # and maintenance is what refreshes that measurement. Trimming
+        # ahead of it means choosing between an unscored good order and
+        # an unscored bad one — which a test caught before it shipped.
+        over = self.family_spent() > self.cfg.capital_usd + 1e-9
+        reserve = min(TRIM_RESERVE, actions) if over else 0
+        actions = self._maintain(now, actions - reserve) + reserve
 
         # 3) the ceiling is enforced, not just checked at the door: over
         # it (reprices once grew orders past it), the worst value per
