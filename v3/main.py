@@ -949,6 +949,37 @@ class Monitor:
         armed = [k for k, sw in self.switches.items() if sw.on and self.master.on]
         self._note(f"booted build {self.build}; restored state {age:.0f}s old"
                    + (f"; ARMED: {', '.join(armed)}" if armed else ""))
+        # THE BOOK TRUTH TEST (owner, 2026-08-25: the exchange UI showed
+        # a 14-level 1c-spread book while ours cap at 4-5 levels). Fetch
+        # the same markets through every book path, log the evidence,
+        # keep the deeper source. Runs every boot; the result lands in
+        # the notes so the next state save shows the verdict.
+        try:
+            probe_slugs = []
+            for fam in self.families.values():
+                for o in fam.orders.values():
+                    if o.market not in probe_slugs:
+                        probe_slugs.append(o.market)
+                    if len(probe_slugs) >= 4:
+                        break
+                if len(probe_slugs) >= 4:
+                    break
+            if not probe_slugs:
+                pol = self.families.get("politics")
+                probe_slugs = list(pol.universe)[:3] if pol else []
+            if probe_slugs:
+                rep = self.client.probe_book_sources(probe_slugs)
+                self._note(
+                    f"book truth test: legacy {rep['legacy_levels']} levels"
+                    f" vs orderbook {rep['orderbook_levels']} across "
+                    f"{len(rep['per_slug'])} markets -> using "
+                    f"{rep['chosen']}")
+                for row in rep["per_slug"]:
+                    self._note(f"  {row['slug'][:44]}: legacy="
+                               f"{row.get('legacy')} orderbook="
+                               f"{row.get('orderbook')}")
+        except Exception as e:  # noqa: BLE001 — diagnosis never blocks boot
+            self._note(f"book truth test failed: {type(e).__name__}: {e}")
         if armed and saved.get("build") != self.build:
             self.alerts.notify("3.0: new build with a switch ON",
                                f"build {self.build} booted; may place orders "

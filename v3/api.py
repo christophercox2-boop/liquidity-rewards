@@ -265,6 +265,65 @@ class Client:
     # -- market data (public) ------------------------------------------------
 
     BOOK_DEPTH = 50          # the endpoint's documented maximum
+    # Which endpoint serves books. Chosen by probe_book_sources() at
+    # boot: the owner's 2026-08-25 screenshots showed the exchange UI
+    # with a 14-level, 1c-spread book while our stored books cap at 4-5
+    # levels — the legacy /markets/{slug}/book path may be a SUMMARY
+    # feed hiding most of the competition, which would inflate every
+    # reward-share estimate mechanically. The probe fetches the same
+    # markets through both paths and keeps whichever is deeper.
+    book_source = "legacy"
+
+    def _parse_levels(self, j) -> tuple[list, list]:
+        md = j.get("book") or j.get("marketData") or j.get("orderbook") or j
+        bids = [(to_num(l.get("px") or l.get("price")),
+                 to_num(l.get("qty") or l.get("size") or l.get("shares")))
+                for l in md.get("bids") or []]
+        asks = [(to_num(l.get("px") or l.get("price")),
+                 to_num(l.get("qty") or l.get("size") or l.get("shares")))
+                for l in md.get("offers") or md.get("asks") or []]
+        return bids, asks
+
+    def _book_orderbook(self, slug: str):
+        j = self.get(f"{GATEWAY}/v1/orderbook/{slug}",
+                     params={"depth": self.BOOK_DEPTH})
+        return self._parse_levels(j)
+
+    def _book_legacy(self, slug: str):
+        j = self.get(f"{GATEWAY}/v1/markets/{slug}/book",
+                     params={"depth": self.BOOK_DEPTH})
+        return self._parse_levels(j)
+
+    def probe_book_sources(self, slugs: list[str]) -> dict:
+        """Fetch the same markets through every book path and keep the
+        one that shows the most of the real book. Returns the per-slug
+        evidence so the caller can LOG it — the choice must be a
+        recorded measurement, not a silent preference."""
+        report = {"per_slug": [], "legacy_levels": 0, "orderbook_levels": 0}
+        for slug in slugs:
+            row = {"slug": slug}
+            try:
+                b, a = self._book_legacy(slug)
+                row["legacy"] = (len(b), len(a),
+                                 max((p for p, _ in b), default=None),
+                                 min((p for p, _ in a), default=None))
+                report["legacy_levels"] += len(b) + len(a)
+            except Exception as e:  # noqa: BLE001
+                row["legacy"] = f"error: {str(e)[:60]}"
+            try:
+                b, a = self._book_orderbook(slug)
+                row["orderbook"] = (len(b), len(a),
+                                    max((p for p, _ in b), default=None),
+                                    min((p for p, _ in a), default=None))
+                report["orderbook_levels"] += len(b) + len(a)
+            except Exception as e:  # noqa: BLE001
+                row["orderbook"] = f"error: {str(e)[:60]}"
+            report["per_slug"].append(row)
+        if (report["orderbook_levels"]
+                > report["legacy_levels"] * 1.2 + 2):
+            self.book_source = "orderbook"
+        report["chosen"] = self.book_source
+        return report
 
     def book(self, slug: str, fetched_at: float | None = None) -> Book:
         """The resting book, as DEEP as the endpoint will give us.
@@ -282,12 +341,16 @@ class Client:
         accumulates, so levels past the fourth are nearly weightless.
         Depth is worth having for the fill model and the touch, not for
         the share. cache.depth_seen records what actually came back."""
-        j = self.get(f"{GATEWAY}/v1/markets/{slug}/book",
-                     params={"depth": self.BOOK_DEPTH})
-        md = j.get("book") or j.get("marketData") or j
-        bids = [(to_num(l.get("px")), to_num(l.get("qty"))) for l in md.get("bids") or []]
-        asks = [(to_num(l.get("px")), to_num(l.get("qty")))
-                for l in md.get("offers") or md.get("asks") or []]
+        if self.book_source == "orderbook":
+            try:
+                bids, asks = self._book_orderbook(slug)
+                if bids or asks:
+                    return normalize_book(
+                        bids, asks,
+                        fetched_at if fetched_at is not None else time.time())
+            except Exception:  # noqa: BLE001 — the legacy path still works
+                pass
+        bids, asks = self._book_legacy(slug)
         return normalize_book(bids, asks,
                               fetched_at if fetched_at is not None else time.time())
 
