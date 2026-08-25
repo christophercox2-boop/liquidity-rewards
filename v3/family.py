@@ -103,9 +103,20 @@ NURSE_STABLE_S = 600.0
 # each within a minute of a boot, carrying the exact pre-deflator
 # estimate) because the signature only covered config knobs, and
 # today's rules are code, not config.
-PLAN_RULES_REV = 2
+PLAN_RULES_REV = 3
 NURSE_APPROACH_TICKS = 2
-NURSE_BOOK_MAX_AGE_S = 15.0   # a vanished order waits this long for the lagging
+NURSE_BOOK_MAX_AGE_S = 15.0
+# Expected-risk budgeting (owner, 2026-08-25): the family and
+# per-market caps charge each order collateral x its FILL ODDS — the
+# risk actually carried — instead of full collateral, so quiet resting
+# money multiplies. Guards, because everything then leans on the fill
+# model: no order charges below PF_CHARGE_FLOOR of its collateral, an
+# order the model has not measured charges IN FULL, hard GROSS
+# ceilings bound the worst day in dollars no matter what the model
+# believes, and the model's expected fills are graded against actual
+# fills in the log every hour ("the full risk must be extremely well
+# calibrated because that could open us up to a lot of exposure").
+PF_CHARGE_FLOOR = 0.05   # a vanished order waits this long for the lagging
                        # position feed before it counts as a silent cancel
 
 # size grid the planner walks (contracts); fractional sizes are live rails
@@ -218,6 +229,11 @@ class FamilyConfig:
     # Owner's revisit trigger: "If we get to the point where we're
     # barely quoting, let's revisit."
     est_deflate: float = 1.0
+    # hard GROSS ceilings behind the expected-risk caps: worst-case
+    # nominal collateral, bounding a correlated day in dollars.
+    # 0 = derive (2x capital, 3x per-market).
+    gross_cap_usd: float = 0.0
+    per_market_gross_usd: float = 0.0
     # cap on the TOTAL give-up (price past break-even x size) the
     # family's exits may have in play at once — the belt on the exit
     # gate, so twenty small approved risks cannot add up quietly
@@ -269,6 +285,7 @@ class FamilyOrder:
     share: float = 0.0
     live_est: float | None = None
     dry_since: float | None = None   # when it last stopped earning
+    live_pf: float | None = None     # measured fill odds; None = charge full
     live_ev: float | None = None
     live_share: float | None = None
     weak_since: float = 0.0   # measuring under the bar since (0 = fine)
@@ -415,7 +432,32 @@ class Family:
     def _mark(self, slug: str, side: str, now: float) -> None:
         self.last_action[f"{slug}|{side}"] = now
 
+    def _charge(self, o) -> float:
+        """What one order costs the EXPECTED-risk budget: collateral x
+        its measured fill odds (owner, 2026-08-25). Floored at
+        PF_CHARGE_FLOOR so near-zero odds cannot stack unbounded size;
+        an UNMEASURED order charges in full — optimism is earned."""
+        car = capital_at_risk(o.intent, o.price, o.qty)
+        pf = getattr(o, "live_pf", None)
+        if pf is None:
+            return car
+        return car * min(max(pf, PF_CHARGE_FLOOR), 1.0)
+
+    def gross_cap(self) -> float:
+        return self.cfg.gross_cap_usd or 2.0 * self.cfg.capital_usd
+
+    def _per_market_gross(self, slug: str) -> float:
+        if self.cfg.per_market_gross_usd:
+            return self.cfg.per_market_gross_usd
+        return 3.0 * self._market_budget(slug)
+
     def market_spent(self, slug: str) -> float:
+        """Expected risk resting in one market."""
+        return sum(self._charge(o)
+                   for o in self.orders.values()
+                   if o.market == slug and o.purpose != "sell")
+
+    def market_gross(self, slug: str) -> float:
         return sum(capital_at_risk(o.intent, o.price, o.qty)
                    for o in self.orders.values()
                    if o.market == slug and o.purpose != "sell")
@@ -427,15 +469,29 @@ class Family:
         return self.cfg.per_market_usd
 
     def family_spent(self) -> float:
-        """The search ceiling's number: worst case of the UNGRADUATED
-        book, negative risk netted per race group (v3/risk.py). Graduated
-        markets sit outside it, under proven_spent's own cap."""
-        spent = risk.book_risk(risk.order_legs(
-            o for o in self.orders.values()
-            if o.market not in self.proven and not self._owner_exit(o)))
+        """The search ceiling's number, in EXPECTED risk: each order
+        charges collateral x fill odds (owner, 2026-08-25 — "make the
+        budget take into account the fill risk"). Holdings are real
+        positions and charge in full. family_gross() bounds the worst
+        day in nominal dollars behind this."""
+        spent = sum(self._charge(o)
+                    for o in self.orders.values()
+                    if o.market not in self.proven
+                    and not self._owner_exit(o))
         if self.cfg.holdings_in_ceiling:
             spent += self.holdings_value()
         return spent
+
+    def family_gross(self) -> float:
+        """Worst-case nominal collateral of the whole engine book —
+        negative risk netted — bounding a correlated day no matter what
+        the fill model believes."""
+        g = risk.book_risk(risk.order_legs(
+            o for o in self.orders.values()
+            if not self._owner_exit(o)))
+        if self.cfg.holdings_in_ceiling:
+            g += self.holdings_value()
+        return g
 
     def _owner_exit(self, o) -> bool:
         """The owner's own order. It never counts against a ceiling.
@@ -485,9 +541,9 @@ class Family:
         return total
 
     def proven_spent(self) -> float:
-        return risk.book_risk(risk.order_legs(
-            o for o in self.orders.values()
-            if o.market in self.proven and not self._owner_exit(o)))
+        return sum(self._charge(o)
+                   for o in self.orders.values()
+                   if o.market in self.proven and not self._owner_exit(o))
 
     def active_markets(self) -> set[str]:
         return {o.market for o in self.orders.values() if o.purpose != "sell"}
@@ -1867,6 +1923,8 @@ class Family:
                 pf_now = self.fillmodel.p_fill(rec.market, rec.side, ticks_now,
                                                shield=shield_now,
                                                target=float(prog.target))
+                rec.live_pf = round(pf_now, 4)   # the expected-risk
+                                                 # budget charges by this
                 ign_now = 0.0
                 ind_now = (1.0 if self.fairs is not None
                            and self.fairs(rec.market) is not None
@@ -2118,11 +2176,19 @@ class Family:
                     and (abs(best["px"] - rec.price) > 1e-9
                          or abs(best["qty"] - rec.qty) > 1e-9)
                     # a reprice that GROWS the order answers to the same
-                    # ceiling as a new entry (the $121.99-of-$100 lesson)
-                    and (self.family_spent()
+                    # ceilings as a new entry (the $121.99-of-$100
+                    # lesson) — expected risk AND the worst-day gross
+                    and (self.family_spent() - self._charge(rec)
+                         + capital_at_risk(rec.intent, best["px"],
+                                           best["qty"])
+                         * min(max(rec.live_pf or 1.0, PF_CHARGE_FLOOR),
+                               1.0)
+                         <= self.cfg.capital_usd + 1e-9)
+                    and (self.family_gross()
                          - capital_at_risk(rec.intent, rec.price, rec.qty)
-                         + capital_at_risk(rec.intent, best["px"], best["qty"])
-                         <= self.cfg.capital_usd + 1e-9)):
+                         + capital_at_risk(rec.intent, best["px"],
+                                           best["qty"])
+                         <= self.gross_cap() + 1e-9)):
                 r = self.desk.reprice(
                     {"id": rec.id, "market": rec.market, "side": rec.side,
                      "price": rec.price, "size": rec.qty, "intent": rec.intent},
@@ -2189,19 +2255,28 @@ class Family:
                     continue
                 if not self._cooldown_ok(slug, plan["side"], now):
                     continue
-                if self.market_spent(slug) + plan["cost"] \
-                        > self._market_budget(slug) + 1e-9 \
-                        and not plan.get("revive"):
-                    continue    # proven ground gets its bigger allowance
+                plan_charge = plan["cost"] * min(
+                    max(plan.get("p_fill") or 1.0, PF_CHARGE_FLOOR), 1.0)
+                if (self.market_spent(slug) + plan_charge
+                        > self._market_budget(slug) + 1e-9
+                        and not plan.get("revive")):
+                    continue    # per-market EXPECTED-risk allowance
+                if (self.market_gross(slug) + plan["cost"]
+                        > self._per_market_gross(slug) + 1e-9
+                        and not plan.get("revive")):
+                    continue    # per-market worst-case ceiling
                 guess = BUY_LONG if plan["side"] == "BUY" else BUY_SHORT
                 if slug in self.proven and self.cfg.proven_usd > 0:
                     pool_orders = [o for o in self.orders.values()
                                    if o.market in self.proven]
-                    if self.proven_spent() + risk.marginal(
-                            pool_orders, slug, guess,
-                            plan["px"], plan["qty"]) \
-                            > self.cfg.proven_usd + 1e-9:
+                    if (self.proven_spent() + plan_charge
+                            > self.cfg.proven_usd + 1e-9):
                         continue      # the proven pool has its own cap
+                    if (self.family_gross() + risk.marginal(
+                            pool_orders, slug, guess,
+                            plan["px"], plan["qty"])
+                            > self.gross_cap() + 1e-9):
+                        continue      # the worst-day ceiling binds all
                 else:
                     # The SAME book family_spent() measures — engine
                     # orders only. Leaving the owner's manual orders in
@@ -2216,11 +2291,15 @@ class Family:
                     search_orders = [o for o in self.orders.values()
                                      if o.market not in self.proven
                                      and o.purpose != "manual"]
-                    if self.family_spent() + risk.marginal(
+                    if (self.family_spent() + plan_charge
+                            > self.cfg.capital_usd + 1e-9):
+                        continue      # the EXPECTED-risk ceiling
+                    if (self.family_gross() + risk.marginal(
                             search_orders, slug, guess,
-                            plan["px"], plan["qty"]) \
-                            > self.cfg.capital_usd + 1e-9:
-                        continue      # the search ceiling — it binds
+                            plan["px"], plan["qty"])
+                            > self.gross_cap() + 1e-9):
+                        continue      # the worst-day ceiling — dollars
+                                      # bound the tail, not the model
                 book = self.cache.fresh(slug, BOOK_MAX_AGE, now)
                 if book is None:
                     continue
@@ -2237,7 +2316,12 @@ class Family:
                         purpose=("revive" if plan.get("revive")
                                  else "solo" if plan.get("solo") else "earn"),
                         why=plan["why"], est_day=plan["est"],
-                        share=plan["share"])
+                        share=plan["share"],
+                        live_pf=(round(plan["p_fill"], 4)
+                                 if plan.get("p_fill") is not None
+                                 else None))   # the guard admitted it at
+                                               # these odds; the spend
+                                               # charges the same
                     self._log(event="place", market=slug, side=plan["side"],
                               price=plan["px"], qty=plan["qty"],
                               est=plan["est"], why=plan["why"][:90])
@@ -2252,7 +2336,10 @@ class Family:
     def _trim(self, now: float, actions: int) -> int:
         while actions > 0:
             spent = self.family_spent()
-            if spent <= self.cfg.capital_usd + 1e-9:
+            gross = self.family_gross()
+            over_exp = spent > self.cfg.capital_usd + 1e-9
+            over_gross = gross > self.gross_cap() + 1e-9
+            if not over_exp and not over_gross:
                 break
             cands = [o for o in self.orders.values()
                      if o.purpose not in ("sell", "manual")
@@ -2261,16 +2348,20 @@ class Family:
                 break
             def value_per_dollar(o):
                 est = (o.live_est if o.live_est is not None else o.est_day) or 0.0
-                return est / max(capital_at_risk(o.intent, o.price, o.qty), 0.01)
+                return est / max(self._charge(o), 0.01)
             worst = min(cands, key=value_per_dollar)
             r = self.desk.cancel(worst.id, worst.market)
             if not r.ok:
                 break
-            freed = capital_at_risk(worst.intent, worst.price, worst.qty)
+            freed = self._charge(worst)
             self._log(event="trim", market=worst.market, side=worst.side,
-                      why=(f"${spent:.2f} on the book is over the "
-                           f"${self.cfg.capital_usd:.0f} ceiling — freeing "
-                           f"${freed:.2f} from the lowest earner"))
+                      why=((f"${spent:.2f} expected risk over the "
+                            f"${self.cfg.capital_usd:.0f} ceiling"
+                            if over_exp else
+                            f"${gross:.2f} gross over the "
+                            f"${self.gross_cap():.0f} worst-day ceiling")
+                           + f" — freeing ${freed:.2f} from the lowest "
+                             "earner per expected dollar"))
             del self.orders[worst.id]
             actions -= 1
         return actions
@@ -2314,7 +2405,10 @@ class Family:
                         id=r.order_id, market=slug, side=plan["side"],
                         price=plan["px"], qty=plan["qty"], intent=r.intent,
                         placed_ts=now, purpose="grow", why=plan["why"],
-                        est_day=plan["est"], share=plan["share"])
+                        est_day=plan["est"], share=plan["share"],
+                        live_pf=(round(plan["p_fill"], 4)
+                                 if plan.get("p_fill") is not None
+                                 else None))
                     self._log(event="grow", market=slug, side=plan["side"],
                               price=plan["px"], qty=plan["qty"],
                               why=plan["why"][:80])
