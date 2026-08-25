@@ -369,7 +369,8 @@ class TestCeilingEnforcement(unittest.TestCase):
         # expected-risk era: the deep order charges collateral x its
         # tiny fill odds, so the cap must sit between the two charges
         # for the trim to fire and stop after one pull
-        cfg = FamilyConfig(name="P", tag="P", capital_usd=0.45)
+        cfg = FamilyConfig(name="P", tag="P", capital_usd=0.45,
+                           expected_risk=True)
         r = Rig(cfg=cfg)
         r.add_market(A)
         # two orders on the book: "good"
@@ -3999,7 +4000,7 @@ class TestTheCeilingIsNeverStarved(unittest.TestCase):
         # orders charge at least $0.10 together, so a $0.08 cap is
         # over by construction whatever the fill model estimates
         cfg = FamilyConfig(name="P", tag="P", capital_usd=0.08,
-                           max_actions_per_cycle=10)
+                           expected_risk=True, max_actions_per_cycle=10)
         r = Rig(cfg=cfg)
         r.add_market(A)
         seen = {}
@@ -4719,7 +4720,7 @@ class TestExpectedRiskBudget(unittest.TestCase):
     def _fam(self, **cfg_kw):
         from v3.tests.test_family import Rig, A
         from v3.family import FamilyConfig
-        base = dict(name="P", tag="P")
+        base = dict(name="P", tag="P", expected_risk=True)
         base.update(cfg_kw)
         r = Rig(cfg=FamilyConfig(**base))
         r.add_market(A)
@@ -4781,3 +4782,16 @@ class TestExpectedRiskBudget(unittest.TestCase):
             self._order(r, A, f"safe{i}", 0.50, 20.0, 0.03)  # $10 @ floor
         self.assertLessEqual(r.fam.family_spent(), 2.0 + 1e-9)
         self.assertAlmostEqual(r.fam.family_gross(), 40.0, places=1)
+
+    def test_off_by_default_the_old_accounting_is_untouched(self):
+        # owner, 2026-08-25: "the cap should stay the same for
+        # everything except for politics"
+        from v3 import politics, football, basketball
+        self.assertTrue(politics.config().expected_risk)
+        self.assertFalse(football.cfb().expected_risk)
+        self.assertFalse(football.nfl().expected_risk)
+        self.assertFalse(basketball.nba().expected_risk)
+        r, A = self._fam(expected_risk=False, capital_usd=50.0)
+        o = self._order(r, A, "x", 0.50, 10.0, 0.03)   # odds ignored
+        self.assertAlmostEqual(r.fam._charge(o), 5.00, places=6)
+        self.assertEqual(r.fam.gross_cap(), 50.0)      # one cap, as ever

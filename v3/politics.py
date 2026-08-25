@@ -94,6 +94,7 @@ def config() -> FamilyConfig:
         # expected-risk budgeting (owner, 2026-08-25): capital_usd is
         # the EXPECTED-risk cap (collateral x fill odds); the gross
         # ceilings bound the worst correlated day in nominal dollars
+        expected_risk=True,
         capital_usd=250.0, gross_cap_usd=500.0,
         per_market_usd=20.0, per_market_gross_usd=60.0,
         revive_max_usd=20.0,

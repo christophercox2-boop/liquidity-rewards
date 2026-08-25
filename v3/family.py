@@ -103,7 +103,7 @@ NURSE_STABLE_S = 600.0
 # each within a minute of a boot, carrying the exact pre-deflator
 # estimate) because the signature only covered config knobs, and
 # today's rules are code, not config.
-PLAN_RULES_REV = 3
+PLAN_RULES_REV = 4
 NURSE_APPROACH_TICKS = 2
 NURSE_BOOK_MAX_AGE_S = 15.0
 # Expected-risk budgeting (owner, 2026-08-25): the family and
@@ -229,11 +229,14 @@ class FamilyConfig:
     # Owner's revisit trigger: "If we get to the point where we're
     # barely quoting, let's revisit."
     est_deflate: float = 1.0
-    # hard GROSS ceilings behind the expected-risk caps: worst-case
-    # nominal collateral, bounding a correlated day in dollars.
-    # 0 = derive (2x capital, 3x per-market).
-    gross_cap_usd: float = 0.0
-    per_market_gross_usd: float = 0.0
+    # Expected-risk budgeting is OPT-IN per family (owner, 2026-08-25:
+    # "the cap should stay the same for everything except for
+    # politics"). Off, the caps charge full collateral exactly as they
+    # always did. On, orders charge collateral x fill odds and the
+    # gross ceilings bound the worst day.
+    expected_risk: bool = False
+    gross_cap_usd: float = 0.0     # 0 = 2x capital (expected_risk only)
+    per_market_gross_usd: float = 0.0   # 0 = 3x per-market
     # cap on the TOTAL give-up (price past break-even x size) the
     # family's exits may have in play at once — the belt on the exit
     # gate, so twenty small approved risks cannot add up quietly
@@ -438,15 +441,21 @@ class Family:
         PF_CHARGE_FLOOR so near-zero odds cannot stack unbounded size;
         an UNMEASURED order charges in full — optimism is earned."""
         car = capital_at_risk(o.intent, o.price, o.qty)
+        if not self.cfg.expected_risk:
+            return car             # the old accounting, untouched
         pf = getattr(o, "live_pf", None)
         if pf is None:
             return car
         return car * min(max(pf, PF_CHARGE_FLOOR), 1.0)
 
     def gross_cap(self) -> float:
+        if not self.cfg.expected_risk:
+            return self.cfg.capital_usd    # one cap, as it always was
         return self.cfg.gross_cap_usd or 2.0 * self.cfg.capital_usd
 
     def _per_market_gross(self, slug: str) -> float:
+        if not self.cfg.expected_risk:
+            return self._market_budget(slug)
         if self.cfg.per_market_gross_usd:
             return self.cfg.per_market_gross_usd
         return 3.0 * self._market_budget(slug)
@@ -2255,8 +2264,9 @@ class Family:
                     continue
                 if not self._cooldown_ok(slug, plan["side"], now):
                     continue
-                plan_charge = plan["cost"] * min(
+                plan_charge = (plan["cost"] * min(
                     max(plan.get("p_fill") or 1.0, PF_CHARGE_FLOOR), 1.0)
+                    if self.cfg.expected_risk else plan["cost"])
                 if (self.market_spent(slug) + plan_charge
                         > self._market_budget(slug) + 1e-9
                         and not plan.get("revive")):

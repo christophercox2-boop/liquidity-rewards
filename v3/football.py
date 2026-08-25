@@ -68,7 +68,7 @@ def cfb() -> FamilyConfig:
         # owner, 2026-08-21 evening: "Bring cfb down to 50." — and the
         # holdings count against it at liquidation value: "no more than
         # $50 of risk in cfb, orders + holdings"
-        capital_usd=50.0, gross_cap_usd=100.0, per_market_usd=1.00,
+        capital_usd=50.0, per_market_usd=1.00,
         holdings_in_ceiling=True,
         dump_usd_day=10.0,
         rest_from=(6, 6), rest_until=(3, 17),      # Sun 06:00 -> Thu 17:00 ET
@@ -97,7 +97,7 @@ def nfl() -> FamilyConfig:
         # owner, 2026-08-22: "similar to cfb, which has done pretty
         # well" — $50 all-in (orders AND holdings), same dump cap, same
         # coverage and book-freshness posture
-        capital_usd=50.0, gross_cap_usd=100.0, per_market_usd=1.00,
+        capital_usd=50.0, per_market_usd=1.00,
         holdings_in_ceiling=True,
         dump_usd_day=10.0,
         rest_from=(1, 6), rest_until=(3, 17),
