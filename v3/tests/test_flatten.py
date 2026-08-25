@@ -4235,3 +4235,61 @@ class TestInformationProbes(unittest.TestCase):
         r2, _ = self._rig()
         r2.fam.restore(d)
         self.assertEqual(r2.fam.probe_ratchet[f"{A}|BUY"], [4, 123.0])
+
+
+class TestDecisionDeflator(unittest.TestCase):
+    """Owner, 2026-08-25: politics decisions act on reward claims
+    divided by 3 (the measured gap to what the exchange paid); the
+    grades and the calibration ledger stay raw. Revisit if quoting
+    thins out badly."""
+
+    def test_politics_ships_with_the_deflator(self):
+        from v3 import politics
+        self.assertEqual(politics.config().est_deflate, 3.0)
+
+    def test_plans_run_on_the_deflated_claim(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        def plan_with(deflate):
+            cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                               rest_style="join_quiet", revive=True,
+                               capital_usd=100.0, per_market_usd=2.0,
+                               est_deflate=deflate)
+            r = Rig(cfg=cfg)
+            r.add_market(A)
+            r.cycle()
+            r.fam.orders.clear()
+            book = r.fam.cache.fresh(A, 999, r.now)
+            prog, _ = r.fam._prog_row(A)
+            sp = r.fam._side_pool(A, prog)
+            return r.fam._plan_side(A, book, "BUY", prog, sp or 0.0,
+                                    20.0, bar=0.0)
+        raw, cut = plan_with(1.0), plan_with(3.0)
+        self.assertIsNotNone(raw)
+        self.assertIsNotNone(cut)
+        self.assertAlmostEqual(raw["est"] / cut["est"], 3.0, places=1)
+
+    def test_a_claim_that_only_clears_the_bar_raw_no_longer_places(self):
+        # the point of the change: an inflated claim stops justifying
+        # an order (the dwajoh EV cleared its bar on a raw claim)
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        def plan_with(deflate, bar):
+            cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                               rest_style="join_quiet", revive=True,
+                               capital_usd=100.0, per_market_usd=2.0,
+                               est_deflate=deflate)
+            r = Rig(cfg=cfg)
+            r.add_market(A)
+            r.cycle()
+            r.fam.orders.clear()
+            book = r.fam.cache.fresh(A, 999, r.now)
+            prog, _ = r.fam._prog_row(A)
+            sp = r.fam._side_pool(A, prog)
+            return r.fam._plan_side(A, book, "BUY", prog, sp or 0.0,
+                                    20.0, bar=bar)
+        raw = plan_with(1.0, 0.0)
+        self.assertIsNotNone(raw)
+        bar = raw["est"] * 0.5          # clears raw, fails deflated
+        self.assertIsNotNone(plan_with(1.0, bar))
+        self.assertIsNone(plan_with(3.0, bar))

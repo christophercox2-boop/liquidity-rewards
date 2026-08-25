@@ -187,6 +187,13 @@ class FamilyConfig:
     terms_slice: int = 120              # universe terms slugs per full-refresh pass
     cooldown_s: float = 3600.0
     min_est_day: float = 0.02
+    # Decisions divide every reward claim by this before acting on it
+    # (owner, 2026-08-25: politics estimates measured 3.3-7.1x what the
+    # exchange actually paid, so the engine acts on the deflated number
+    # while the grades and ledgers stay raw). 1.0 = trust the estimate.
+    # Owner's revisit trigger: "If we get to the point where we're
+    # barely quoting, let's revisit."
+    est_deflate: float = 1.0
     # cap on the TOTAL give-up (price past break-even x size) the
     # family's exits may have in play at once — the belt on the exit
     # gate, so twenty small approved risks cannot add up quietly
@@ -579,6 +586,12 @@ class Family:
         """The best resting order for one side, or None. Every plan and
         every refusal is phone-readable."""
         df, target = float(prog.df), float(prog.target)
+        if side_pool is not None and self.cfg.est_deflate > 1.0:
+            # every plan, bar test and EV in here runs on the DEFLATED
+            # claim — the number the engine acts on. The estimator's
+            # accrual and the calibration ledger stay raw so the bias
+            # keeps being measured, not hidden.
+            side_pool = side_pool / self.cfg.est_deflate
         levels = list(book.side(side))
         if own is not None:
             levels = [(p, q - own.qty if abs(p - own.price) < 1e-9 else q)
@@ -1918,6 +1931,11 @@ class Family:
                                         if rec.purpose == "grow" else None))
             gain = (best["est"] if best else 0.0) - (rec.live_est or 0.0)
             measured = rec.live_ev if rec.live_ev is not None else rec.live_est
+            if measured is not None and self.cfg.est_deflate > 1.0:
+                measured = measured / self.cfg.est_deflate   # cull on the
+                                                             # same deflated
+                                                             # basis entries
+                                                             # are judged on
             floor_here = (self.cfg.grow_floor if rec.purpose == "grow"
                           else self.cfg.min_est_day)
             below = measured is not None and measured < floor_here
