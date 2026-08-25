@@ -949,6 +949,24 @@ class Monitor:
         armed = [k for k, sw in self.switches.items() if sw.on and self.master.on]
         self._note(f"booted build {self.build}; restored state {age:.0f}s old"
                    + (f"; ARMED: {', '.join(armed)}" if armed else ""))
+        # READ-ONLY book comparison (owner approved 2026-08-25): log
+        # what each endpoint sees for a few of our markets. No fetch
+        # path changes; the lines land in the notes for the next check.
+        try:
+            slugs = []
+            for fam in self.families.values():
+                for o in fam.orders.values():
+                    if o.market not in slugs:
+                        slugs.append(o.market)
+                    if len(slugs) >= 4:
+                        break
+                if len(slugs) >= 4:
+                    break
+            for line in (self.client.compare_book_sources(slugs)
+                         if slugs else []):
+                self._note("book compare: " + line)
+        except Exception as e:  # noqa: BLE001 — never blocks a boot
+            self._note(f"book compare failed: {type(e).__name__}: {e}")
         if armed and saved.get("build") != self.build:
             self.alerts.notify("3.0: new build with a switch ON",
                                f"build {self.build} booted; may place orders "

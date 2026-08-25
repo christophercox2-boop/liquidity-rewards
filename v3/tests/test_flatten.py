@@ -4640,3 +4640,37 @@ class TestStalePlansDieOnRuleChanges(unittest.TestCase):
         a = Rig(cfg=FamilyConfig(name="P", tag="P", est_deflate=1.0))
         b = Rig(cfg=FamilyConfig(name="P", tag="P", est_deflate=3.0))
         self.assertNotEqual(a.fam._cfg_sig(), b.fam._cfg_sig())
+
+
+class TestBookCompareIsReadOnly(unittest.TestCase):
+    def test_it_reports_both_shapes_and_changes_nothing(self):
+        from v3.api import Client
+        c = Client.__new__(Client)
+        calls = []
+        def fake_get(url, **kw):
+            calls.append(url)
+            n = 8 if "/v1/orderbook/" in url else 2
+            return {"book": {
+                "bids": [{"px": 0.60 - i * 0.01, "qty": 10}
+                         for i in range(n)],
+                "asks": [{"px": 0.61 + i * 0.01, "qty": 10}
+                         for i in range(n)]}}
+        c.get = fake_get
+        lines = c.compare_book_sources(["ga-dem"])
+        self.assertEqual(len(lines), 1)
+        self.assertIn("current=2+2", lines[0])
+        self.assertIn("orderbook=8+8", lines[0])
+        self.assertIn("60c/61c", lines[0])
+        # nothing on the client changed — there is no switch to flip
+        self.assertFalse(hasattr(c, "book_source"))
+
+    def test_an_endpoint_error_is_a_line_not_a_crash(self):
+        from v3.api import Client
+        c = Client.__new__(Client)
+        def fake_get(url, **kw):
+            if "/v1/orderbook/" in url:
+                raise RuntimeError("404")
+            return {"book": {"bids": [], "asks": []}}
+        c.get = fake_get
+        lines = c.compare_book_sources(["m"])
+        self.assertIn("orderbook=ERR", lines[0])
