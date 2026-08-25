@@ -50,6 +50,7 @@ except Exception:  # noqa: BLE001
     ET_STATUS = _dtz.timezone(_dtz.timedelta(hours=-4), "ET")
 
 POLL_S = 60.0
+NURSE_TICK_S = 5.0
 ERROR_BACKOFF_CAP_S = 600.0
 FLATTEN_CANCELS_PER_CYCLE = 45
 
@@ -2138,7 +2139,24 @@ class Monitor:
                 self._note(f"cycle failed: {type(e).__name__}: {e}")
                 time.sleep(backoff)
                 backoff = min(backoff * 2, ERROR_BACKOFF_CAP_S)
-            time.sleep(max(POLL_S - (time.time() - t0), 5.0))
+            # The sleep between cycles is broken into nurse ticks
+            # (owner, 2026-08-25): freshly placed orders are watched
+            # every few seconds for jumpers and rushing touches, on
+            # THIS thread, so no cancel can race the cycle. With no
+            # young orders to watch, nurse() returns immediately and
+            # this is an ordinary sleep.
+            rem = max(POLL_S - (time.time() - t0), 5.0)
+            end_t = time.time() + rem
+            while True:
+                left = end_t - time.time()
+                if left <= 0:
+                    break
+                time.sleep(min(NURSE_TICK_S, left))
+                try:
+                    for fam in self.families.values():
+                        fam.nurse(time.time(), self.client)
+                except Exception as e:  # noqa: BLE001 — never kill the loop
+                    self._note(f"nurse: {type(e).__name__}: {e}")
 
 
 def main() -> int:

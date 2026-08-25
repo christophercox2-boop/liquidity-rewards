@@ -4374,3 +4374,87 @@ class TestConformanceSweep(unittest.TestCase):
                              for l in r.fam.log))
         self.assertTrue(any(o.side == "BUY" and o.market == A
                             for o in r.fam.orders.values()))
+
+
+class TestTheNurse(unittest.TestCase):
+    """Owner, 2026-08-25: "A process should stick with it just to
+    monitor and guard against quick movements by others that would not
+    get caught until a full cycle pass. When things are stable, then
+    the process can end." Young orders on model-less markets are
+    watched every few seconds; jumped or rushed ones are pulled on
+    sight; quiet ones graduate."""
+
+    def _rig(self, price=0.02, qty=1.0):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.01, 6000.0),),
+                                  asks=((0.22, 5000.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.cycle()
+        for oid in list(r.fam.orders):
+            r.fam.orders.pop(oid)
+        r.exchange.live.clear()
+        r.exchange.live["P"] = {"id": "P", "market": A, "side": "BUY",
+                                "price": price, "size": qty,
+                                "intent": BUY_LONG}
+        r.fam.orders["P"] = FamilyOrder(
+            id="P", market=A, side="BUY", price=price, qty=qty,
+            intent=BUY_LONG, placed_ts=r.now, purpose="earn")
+        r.fam.nurse(r.now, r.exchange)          # first look: baseline
+        return r, A
+
+    def _rebook(self, r, A, bids, asks):
+        from v3.scoring import Book
+        r.fam.cache.put(A, Book(bids=bids, asks=asks, tick=0.01,
+                                fetched_at=r.now))
+
+    def test_a_jumped_probe_is_pulled_within_a_tick_of_the_nurse(self):
+        r, A = self._rig()
+        # someone quotes past our 2c front
+        self._rebook(r, A, ((0.03, 40.0), (0.01, 6000.0)), ((0.22, 5000.0),))
+        r.fam.nurse(r.now + 5, r.exchange)
+        self.assertNotIn("P", r.fam.orders)
+        self.assertTrue(any(l.get("event") == "nursed_pull"
+                            and "fronted" in str(l.get("note"))
+                            for l in r.fam.log))
+
+    def test_a_rushing_ask_pulls_the_bid_before_it_is_eaten(self):
+        r, A = self._rig(price=0.05)
+        # the ask collapses 22c -> 7c, two ticks from our 5c bid
+        self._rebook(r, A, ((0.01, 6000.0),), ((0.07, 300.0),))
+        r.fam.nurse(r.now + 5, r.exchange)
+        self.assertNotIn("P", r.fam.orders)
+        self.assertTrue(any(l.get("event") == "nursed_pull"
+                            and "rushed" in str(l.get("note"))
+                            for l in r.fam.log))
+
+    def test_ordinary_drift_is_left_alone(self):
+        r, A = self._rig(price=0.02)
+        # ask drifts one tick closer: not a rush, no pull
+        self._rebook(r, A, ((0.01, 6000.0),), ((0.21, 5000.0),))
+        r.fam.nurse(r.now + 5, r.exchange)
+        self.assertIn("P", r.fam.orders)
+
+    def test_a_stable_order_graduates_and_the_watch_ends(self):
+        from v3.family import NURSE_STABLE_S
+        r, A = self._rig()
+        r.fam.nurse(r.now + NURSE_STABLE_S + 1, r.exchange)
+        self.assertEqual(r.fam._nurse_base, {})
+        # even a jump after graduation is the CYCLE's business now
+        self._rebook(r, A, ((0.03, 40.0), (0.01, 6000.0)), ((0.22, 5000.0),))
+        r.fam.nurse(r.now + NURSE_STABLE_S + 10, r.exchange)
+        self.assertIn("P", r.fam.orders)
+
+    def test_manual_orders_are_never_nursed(self):
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r, A = self._rig()
+        r.fam.orders["HAND"] = FamilyOrder(
+            id="HAND", market=A, side="BUY", price=0.09, qty=50.0,
+            intent=BUY_LONG, placed_ts=r.now, purpose="manual")
+        self._rebook(r, A, ((0.10, 40.0), (0.01, 6000.0)), ((0.22, 5000.0),))
+        r.fam.nurse(r.now + 5, r.exchange)
+        self.assertIn("HAND", r.fam.orders)
