@@ -3900,3 +3900,16 @@ class TestDryExitsPriceToFill(unittest.TestCase):
         self.assertAlmostEqual(dry, book.asks[0][0] - book.tick, places=6)
         self.assertLess(dry, book.asks[0][0])   # never above the ask
         self.assertGreater(dry, held)           # more willing than held
+
+    def test_the_dry_clock_survives_a_restart(self):
+        """We redeploy several times a day. If dry_since reset on every
+        boot the six-hour rule would never once fire."""
+        import dataclasses
+        from v3.family import FamilyOrder
+        o = FamilyOrder(id="X", market="m", side="SELL", price=0.5,
+                        qty=1.0, purpose="sell", intent="", placed_ts=100.0)
+        o.dry_since = 12345.0
+        fields = {f.name for f in dataclasses.fields(FamilyOrder)}
+        back = FamilyOrder(**{k: v for k, v in vars(o).items()
+                              if k in fields})
+        self.assertEqual(back.dry_since, 12345.0)
