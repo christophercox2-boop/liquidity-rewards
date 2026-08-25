@@ -3953,3 +3953,55 @@ class TestCeilingCountsTheSameBookTwice(unittest.TestCase):
         self.assertLessEqual(r.fam.family_spent(), cfg.capital_usd + 1e-6)
         # ...and it does not buy the engine extra room either
         self.assertLessEqual(r.fam.family_spent(), base + 1e-6)
+
+
+class TestTheCeilingIsNeverStarved(unittest.TestCase):
+    """A ceiling that queues behind price improvements is not a ceiling.
+
+    On 2026-08-25 politics ran to $360.69 against a $250 cap while the
+    log showed 89 reprices, 50 places and ZERO trims: maintenance spent
+    the whole per-cycle action budget every cycle and the trim behind it
+    never got a turn."""
+
+    def test_maintenance_cannot_spend_the_whole_budget_when_over(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig, FamilyOrder, TRIM_RESERVE
+        from v3.intents import BUY_LONG
+        cfg = FamilyConfig(name="P", tag="P", capital_usd=1.0,
+                           max_actions_per_cycle=10)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        seen = {}
+        real = r.fam._maintain
+        def spy(now, actions):
+            seen["given"] = actions
+            return real(now, actions)
+        r.fam._maintain = spy
+        for oid, px, qty in (("good", 0.43, 2.0), ("bad", 0.02, 60.0)):
+            r.exchange.live[oid] = {"id": oid, "market": A, "side": "BUY",
+                                    "price": px, "size": qty,
+                                    "intent": BUY_LONG, "manual": False}
+            o = FamilyOrder(id=oid, market=A, side="BUY", price=px, qty=qty,
+                            intent=BUY_LONG, placed_ts=0.0, purpose="earn")
+            o.live_est = 2.0 if oid == "good" else 0.0
+            r.fam.orders[oid] = o
+        r.cycle()
+        # over the ceiling, so maintenance was handed less than the full
+        # budget and the trim had actions left to act with
+        self.assertEqual(seen["given"], 10 - TRIM_RESERVE)
+        self.assertNotIn("bad", r.fam.orders)     # and it removed the right one
+        self.assertLessEqual(r.fam.family_spent(), 1.0 + 1e-9)
+
+    def test_under_the_ceiling_maintenance_keeps_the_whole_budget(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyConfig
+        cfg = FamilyConfig(name="P", tag="P", capital_usd=500.0,
+                           max_actions_per_cycle=10)
+        r = Rig(cfg=cfg)
+        r.add_market(A)
+        seen = {}
+        real = r.fam._maintain
+        r.fam._maintain = lambda now, actions: (seen.setdefault("given", actions),
+                                                real(now, actions))[1]
+        r.cycle()
+        self.assertEqual(seen["given"], 10)   # nothing held back when fine
