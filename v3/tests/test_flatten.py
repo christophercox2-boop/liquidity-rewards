@@ -4293,3 +4293,17 @@ class TestDecisionDeflator(unittest.TestCase):
         bar = raw["est"] * 0.5          # clears raw, fails deflated
         self.assertIsNotNone(plan_with(1.0, bar))
         self.assertIsNone(plan_with(3.0, bar))
+
+
+class TestPartyMarketsFundable(unittest.TestCase):
+    def test_the_2028_party_pair_matches_an_enter_token(self):
+        # owner, 2026-08-25 — and ONLY this group: apdc/opdc/lawec and
+        # the science pools were offered the same day and declined
+        from v3 import politics
+        toks = politics.config().enter_tokens
+        for m in ("ewc-usp-party-2028-11-07-rep",
+                  "ewc-usp-party-2028-11-07-dem"):
+            self.assertTrue(any(t in m for t in toks), m)
+        for m in ("apdc-alito-2026-12-31", "opdc-mcconnell-resign-2026-11-02",
+                  "lawec-saveact-2026-12-31", "dccc-measles-us-2026-12-31-gt4500"):
+            self.assertFalse(any(t in m for t in toks), m)

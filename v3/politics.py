@@ -146,8 +146,14 @@ def config() -> FamilyConfig:
         # seat counts and house control markets... You can add each of
         # these" — House control (usho) and the GOP seat brackets
         # (scc-hrep) join the scope. Turnout stays out: no model.
+        # owner, 2026-08-25: the 2028 party-winner pair rejoins the
+        # fundable set — his best politics markets ever ($18/day each
+        # at peak), cut off from fresh money by a name mismatch: the
+        # list said usp-2028, the slugs read usp-party-2028. Departures
+        # (apdc), process (opdc/lawec) and science stay OUT — offered
+        # the same day, declined.
         enter_tokens=("usgub", "usse", "senate", "uspres", "usp-2028",
-                      "usho", "scc-hrep"),
+                      "usp-party", "usho", "scc-hrep"),
         rest_from=None, rest_until=None,      # politics rests every day
         min_days_out=3,
         books_per_cycle=36, scan_reserve=8,
