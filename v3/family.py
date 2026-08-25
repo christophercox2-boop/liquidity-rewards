@@ -86,7 +86,17 @@ GATE_MARGIN = 3.0
 # bother eating it (which is the information), small enough that being
 # wrong costs cents. QTY_GRID[0] (0.01 shares) is too small to probe
 # anything — nobody snipes a hundredth of a share.
-PROBE_MAX_QTY = 1.0   # a vanished order waits this long for the lagging
+PROBE_MAX_QTY = 1.0
+# The nurse (owner, 2026-08-25): a freshly placed front order is in
+# the most danger in its first minutes — someone jumps it, or the far
+# touch rushes it — and the 60s cycle would not notice until too late.
+# Young orders on model-less markets get watched every few seconds;
+# once nothing has moved against one for NURSE_STABLE_S it graduates
+# and the watch ends ("When things are stable, then the process can
+# end").
+NURSE_STABLE_S = 600.0
+NURSE_APPROACH_TICKS = 2
+NURSE_BOOK_MAX_AGE_S = 15.0   # a vanished order waits this long for the lagging
                        # position feed before it counts as a silent cancel
 
 # size grid the planner walks (contracts); fractional sizes are live rails
@@ -341,6 +351,8 @@ class Family:
         self.gone_pending: dict[str, dict] = {}   # vanished, feed pending
         self.probe_ratchet: dict[str, list] = {}  # "slug|side" ->
                                                   # [ticks allowed, last advance ts]
+        self._nurse_base: dict[str, dict] = {}    # young orders' first-
+                                                  # seen book, for the nurse
         self._fill_evi_buf: list[dict] = []       # this cycle's fills, fed
                                                   # to evidence as EVENTS
                                                   # (sweeps collapse to one)
@@ -2440,6 +2452,97 @@ class Family:
                     f"percentile is {q25:.0f} min) — fair is past this "
                     f"price", adv_frac)
         return 1.0, f"filled after {mins:.0f} min — within the range", adv_frac
+
+    def nurse(self, now: float, client) -> None:
+        """The between-cycles guard (owner, 2026-08-25: "A process
+        should stick with it just to monitor and guard against quick
+        movements by others that would not get caught until a full
+        cycle pass").
+
+        Watches every engine order younger than NURSE_STABLE_S on a
+        model-less market. Two dangers, both pulled on sight:
+
+        * FRONTED — the order was alone in front of its side and
+          someone has now quoted past it. The jumper knows something;
+          the order's score collapsed with the jump; sitting there is
+          pure fill risk for nothing.
+        * RUSHED — the opposite touch has closed on the order by
+          NURSE_APPROACH_TICKS since the watch began, or sits a tick
+          away. That speed is a taker forming, not drift.
+
+        Runs on the SAME thread as every other order operation (the
+        run loop's sleep is broken into nurse ticks), so no cancel can
+        race the cycle. Pulled markets get the normal cooldown mark so
+        the next cycle does not instantly re-place into the same
+        trap. Manual orders and exits are never nursed; frozen and
+        avoided ground is skipped wholesale."""
+        watch = []
+        for rec in list(self.orders.values()):
+            if rec.purpose in ("manual", "sell"):
+                continue
+            if now - rec.placed_ts > NURSE_STABLE_S:
+                self._nurse_base.pop(rec.id, None)
+                continue
+            if self._frozen(rec.market) or self._avoided(rec.market):
+                continue
+            if self.fairs is not None and self.fairs(rec.market) is not None:
+                continue
+            watch.append(rec)
+        if not watch:
+            if self._nurse_base:
+                self._nurse_base.clear()
+            return
+        for rec in watch:
+            book = self.cache.fresh(rec.market, NURSE_BOOK_MAX_AGE_S, now)
+            if book is None and client is not None:
+                try:
+                    book = client.book(rec.market, fetched_at=now)
+                    self.cache.put(rec.market, book)
+                except Exception:  # noqa: BLE001 — a fetch miss skips a tick
+                    continue
+            if book is None:
+                continue
+            sign = 1.0 if rec.side == "BUY" else -1.0
+            mine_side = [(p, q - rec.qty if abs(p - rec.price) < 1e-9 else q)
+                         for p, q in book.side(rec.side)]
+            mine_side = [(p, q) for p, q in mine_side if q > 1e-9]
+            opp = book.side("SELL" if rec.side == "BUY" else "BUY")
+            opp_t = opp[0][0] if opp else None
+            base = self._nurse_base.get(rec.id)
+            if base is None:
+                in_front = (not mine_side
+                            or (rec.price - mine_side[0][0]) * sign > 1e-9)
+                self._nurse_base[rec.id] = {"opp": opp_t,
+                                            "front": in_front}
+                continue
+            why = None
+            if (base.get("front") and mine_side
+                    and (mine_side[0][0] - rec.price) * sign > 1e-9):
+                why = (f"fronted — {mine_side[0][0]*100:.0f}c quoted past "
+                       f"our {rec.price*100:.0f}c; the jumper knows "
+                       "something")
+            elif opp_t is not None:
+                gap_t = abs(opp_t - rec.price) / book.tick
+                moved = (abs(base["opp"] - opp_t) / book.tick
+                         if base.get("opp") is not None else 0.0)
+                closing = (base.get("opp") is not None
+                           and (base["opp"] - opp_t) * sign > 1e-9)
+                if gap_t <= 1.0 + 1e-6 or (closing
+                                           and moved >= NURSE_APPROACH_TICKS):
+                    why = (f"the {'ask' if rec.side == 'BUY' else 'bid'} "
+                           f"rushed from {base['opp']*100:.0f}c to "
+                           f"{opp_t*100:.0f}c — a taker forming, not drift")
+            if why is None:
+                continue
+            r = self.desk.cancel(rec.id, rec.market)
+            if r.ok:
+                self.orders.pop(rec.id, None)
+                self._nurse_base.pop(rec.id, None)
+                self.evidence.order_gone(rec.market, rec.id)
+                self._mark(rec.market, rec.side, now)
+                self._log(event="nursed_pull", market=rec.market,
+                          side=rec.side, price=rec.price, qty=rec.qty,
+                          note=why[:110])
 
     def _advance_probe_ratchet(self, slug: str, side: str,
                                now: float) -> None:
