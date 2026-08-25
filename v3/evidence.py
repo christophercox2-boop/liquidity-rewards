@@ -38,6 +38,7 @@ HALF_LIFE_S = 36 * 3600.0  # evidence half-life
 LOGISTIC_SCALE = 2.0       # ticks (cents) — 1.0's likelihood width
 PRIOR_SCALE = 4.0          # Silver prior width, cents
 REST_WEIGHT = 0.35         # 1.0's quiet-resting discount
+SNATCH_WEIGHT = 2.5        # a faster-than-its-context fill shouts
 REST_LOG_CAP = 6.0         # log2(1+hours) caps here (~2.6 days saturates)
 ANCHOR_BASE = 0.5          # a touch level's floor weight
 ANCHOR_CAP = 2.5           # ...and its ceiling, however big the wall
@@ -67,9 +68,26 @@ class Evidence:
         rows.append([round(ts, 1), kind, round(px * 100.0, 2)])
         del rows[:-EVENT_KEEP]
 
-    def fill(self, slug: str, side: str, px: float, ts: float | None = None) -> None:
-        """One of OUR orders traded. side is the BOOK side it rested on."""
-        self._note(slug, "fill_buy" if side == "BUY" else "fill_sell", px, ts)
+    def fill(self, slug: str, side: str, px: float, ts: float | None = None,
+             weight: float = 1.0) -> None:
+        """One of OUR orders traded. side is the BOOK side it rested on.
+
+        `weight` carries the SPEED verdict (owner, 2026-08-25: "Getting
+        filled quickly tells us that we're over the fair price. Getting
+        filled after a while tells us we're in the range."). A fill
+        faster than the 25th percentile of its context — spread width x
+        how far past the touch we rested, quantiles measured from our
+        own 368 exchange-stamped fills — arrives at SNATCH_WEIGHT, so a
+        burn pushes the band away from the burn price hard instead of
+        counting like ordinary flow. The direction was always right
+        here (a bid filling says fair <= px); the WEIGHT is what was
+        blind to speed."""
+        ts = ts if ts is not None else self._clock()
+        rows = self.events.setdefault(slug, [])
+        rows.append([round(ts, 1),
+                     "fill_buy" if side == "BUY" else "fill_sell",
+                     round(px * 100.0, 2), round(float(weight), 2)])
+        del rows[:-EVENT_KEEP]
 
     def rested(self, slug: str, side: str, px: float, ts: float | None = None) -> None:
         """Back-compat shim: a single legacy quiet observation."""
@@ -177,10 +195,14 @@ class Evidence:
         for r in rows:
             ts, kind, pxc = r[0], r[1], r[2]
             age_w = 0.5 ** ((now - ts) / HALF_LIFE_S)
-            if kind == "fill_buy":     # seller accepted px -> fair <= px
-                terms.append(("le", pxc, 1.0 * age_w))
-            elif kind == "fill_sell":  # buyer paid px -> fair >= px
-                terms.append(("ge", pxc, 1.0 * age_w))
+            if kind in ("fill_buy", "fill_sell"):
+                w = 1.0                    # legacy rows carry no weight
+                if len(r) >= 4 and isinstance(r[3], (int, float)):
+                    w = float(r[3])
+                # fill_buy: seller accepted px -> fair <= px; fill_sell
+                # the mirror — the speed weight scales how loudly
+                terms.append(("le" if kind == "fill_buy" else "ge",
+                              pxc, w * age_w))
             elif kind in ("rest_buy", "rest_sell"):   # legacy single marks
                 terms.append(("ge" if kind == "rest_buy" else "le",
                               pxc, REST_WEIGHT * age_w))
