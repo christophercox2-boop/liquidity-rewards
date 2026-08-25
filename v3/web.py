@@ -607,7 +607,9 @@ function wCard(name,slug,b,tri){
  if(tri&&(tri.picks||[]).length){
   pk='<div style="font-size:16px;margin:6px 0"><b>Decision: '+tri.picks.map(function(r){
    return (r.s==='BUY'?'bid':'ask')+' '+r.q+' @ '+wFmtC(r.px)+' \u2192 $'+r.ev.toFixed(2)+'/day';
-  }).join(' \u00b7 ')+'</b><div class="muted" style="font-size:12px;font-weight:400">'+esc(tri.why||'')+'</div></div>';
+  }).join(' \u00b7 ')+'</b><div class="muted" style="font-size:12px;font-weight:400">'+esc(tri.why||'')
+   +'<br>this is what the engine decided WHEN IT LOOKED. The "best by EV/day" line below re-prices the same ladder against the book as it is right now, so the two differ whenever the book has moved since.'
+   +'</div></div>';
  }else if(pkRows.length){
   // NOT a decision: the engine recorded no pick for this market, so
   // this is the ladder's best spot priced RIGHT NOW, against a book

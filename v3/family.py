@@ -944,11 +944,12 @@ class Family:
                                "joins the touch — the book has been quiet"
                                if k == 0 and not in_front else
                                f"{kf} tick{'s' if kf != 1 else ''} in front "
-                               f"of the touch — closer to the midpoint, "
-                               f"~{j.share * 100:.1f}% of the {side_name} side"
+                               f"of the touch — we would hold "
+                               f"{j.share * 100:.0f}% of the {side_name} side"
                                if in_front else
                                f"{k} tick{'s' if k != 1 else ''} behind the "
-                               f"touch, ~{j.share * 100:.1f}% of the "
+                               f"touch — we would hold "
+                               f"{j.share * 100:.0f}% of the "
                                f"{side_name} side")}
                 if ladder is not None:
                     ladder.append(dict(row))
