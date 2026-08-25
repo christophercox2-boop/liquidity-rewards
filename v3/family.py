@@ -49,7 +49,7 @@ from zoneinfo import ZoneInfo
 
 from . import risk
 from .books import BookCache
-from .evidence import Evidence
+from .evidence import Evidence, SNATCH_WEIGHT
 from .fillmodel import FillModel
 from .intents import BUY_LONG, BUY_SHORT, SELL_LONG, SELL_SHORT, capital_at_risk
 from .orders import OrderDesk
@@ -327,6 +327,9 @@ class Family:
         self._last_accrual = 0.0
         self.silent_cancels = 0
         self.gone_pending: dict[str, dict] = {}   # vanished, feed pending
+        self._fill_evi_buf: list[dict] = []       # this cycle's fills, fed
+                                                  # to evidence as EVENTS
+                                                  # (sweeps collapse to one)
         # order id -> when WE placed it. The audit log keeps 60 rows, so
         # a fill recovered from the exchange later had no placement time
         # and its resting period was unknowable (owner, 2026-08-23:
@@ -1347,7 +1350,12 @@ class Family:
                 self.fillmodel.observe_offload(rec.market,
                                                (now - since) / 86400.0)
         self._journal_fill(rec, filled, now, qty_after)
-        self.evidence.fill(rec.market, rec.side, rec.price, ts=now)
+        book_now = self.cache.any_age(rec.market)
+        w, verdict, adv = self._fill_speed_verdict(
+            rec.side, rec.price, now - rec.placed_ts, book_now)
+        self._fill_evi_buf.append({"market": rec.market, "side": rec.side,
+                                   "px": rec.price, "weight": w,
+                                   "adv": adv, "verdict": verdict})
         self.fillmodel.observe_fill_age(rec.market, now - rec.placed_ts)
         self.pending_marks.append({"market": rec.market, "side": rec.side,
                                    "price": rec.price, "due": now + 3600.0})
@@ -1563,6 +1571,7 @@ class Family:
               client, switch_on: bool, foreign_ids=(),
               exits_only: bool = False, trades=None) -> dict:
         self.reconcile(open_orders, positions, now, trades=trades)
+        self._flush_fill_evidence(now)
         self._page_opens_due(now)
         self._reclassify_exits(positions)
         self.refresh_universe(client, now)
@@ -2251,6 +2260,75 @@ class Family:
             self._log(event="exit_moved", market=slug, price=rec.price,
                       qty=rec.qty,
                       note=f"a slot at {best:.2f} earns more — moving")
+
+    # Fill-time quartiles by context — spread width x how far past the
+    # touch the order rested — measured from our own 368 fills that
+    # carry both the book at placement and the exchange's resting time
+    # (2026-08-25). A fill faster than its cell's 25th percentile is a
+    # SNATCH; the same minutes mean opposite things at the touch of a
+    # tight book (25th pct: 2 hours) and deep in a wide one (10 min).
+    # Thin cells fall back to the pooled row. Minutes.
+    FILL_TIME_SEED = {
+        ("tight", "touch"): (122.9, 1750.3),
+        ("tight", "deep"): (0.4, 51.5),
+        ("mid", "touch"): (38.5, 648.6),
+        ("mid", "deep"): (0.4, 56.9),
+        ("wide", "touch"): (13.3, 1309.1),
+        ("wide", "deep"): (10.0, 681.4),
+        ("pooled", "pooled"): (16.5, 1062.2),
+    }
+
+    def _fill_speed_verdict(self, side: str, px: float, rested_s: float,
+                            book) -> tuple[float, str, float]:
+        """(evidence weight, verdict text, advancement fraction) for a
+        fill, judged against its own context's clock (owner, 2026-08-25:
+        fast = past fair, a while = in range — and the clock depends on
+        the spread and where we rested)."""
+        adv_frac = 0.0
+        cell = ("pooled", "pooled")
+        if book is not None and book.bids and book.asks:
+            tb, ta = book.bids[0][0], book.asks[0][0]
+            spread = (ta - tb) * 100.0
+            adv = ((px - tb) if side == "BUY" else (ta - px)) * 100.0
+            adv_frac = max(adv, 0.0) / max(spread, 1.0)
+            sb = ("tight" if spread <= 2.0 + 1e-6       # 0.46-0.44 is
+                  else "mid" if spread <= 5.0 + 1e-6      # 2.0000000018c
+                  else "wide")                            # in floats
+            ab = "touch" if adv_frac < 0.01 else (
+                 "front" if adv_frac < 0.33 else "deep")
+            cell = (sb, "deep" if ab == "front" else ab)
+        q25, _q75 = (self.FILL_TIME_SEED.get(cell)
+                     or self.FILL_TIME_SEED[("pooled", "pooled")])
+        mins = max(rested_s, 0.0) / 60.0
+        if mins < q25:
+            return (SNATCH_WEIGHT,
+                    f"snatched in {mins:.0f} min (this context's 25th "
+                    f"percentile is {q25:.0f} min) — fair is past this "
+                    f"price", adv_frac)
+        return 1.0, f"filled after {mins:.0f} min — within the range", adv_frac
+
+    def _flush_fill_evidence(self, now: float) -> None:
+        """Feed this cycle's fills to the evidence band — one EVENT per
+        market-and-side. Seven rungs of a ladder swept in one moment
+        are one loud observation at the deepest rung, not seven
+        ordinary votes (owner, 2026-08-25, the Johnson ladder: 76
+        shares across 7 rungs, all gone in the same minute)."""
+        if not self._fill_evi_buf:
+            return
+        groups: dict[tuple, list[dict]] = {}
+        for f in self._fill_evi_buf:
+            groups.setdefault((f["market"], f["side"]), []).append(f)
+        self._fill_evi_buf = []
+        for (mkt, side), fs in groups.items():
+            lead = max(fs, key=lambda f: f["adv"])
+            w = max(f["weight"] for f in fs)
+            self.evidence.fill(mkt, side, lead["px"], ts=now, weight=w)
+            note = lead["verdict"]
+            if len(fs) > 1:
+                note = (f"{len(fs)} rungs swept together — judged at "
+                        f"the deepest; " + note)
+            self._log(event="fill_evidence", market=mkt, side=side,
+                      price=lead["px"], weight=w, note=note[:110])
 
     def _exit_giveup_in_play(self) -> float:
         """Total give-up the family's exits currently risk below (SELL)

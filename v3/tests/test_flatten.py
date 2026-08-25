@@ -4057,3 +4057,88 @@ class TestTheLedgerActuallyWrites(unittest.TestCase):
         # the assumption that broke it, pinned so it cannot come back
         from v3.main import Monitor
         self.assertFalse(hasattr(Monitor, "cache"))
+
+
+class TestTimeGradedLearning(unittest.TestCase):
+    """Owner, 2026-08-25: "Getting filled quickly tells us that we're
+    over the fair price. Getting filled after a while tells us we're in
+    the range." — judged against each fill's own context clock, and a
+    swept ladder is ONE loud observation, not seven ordinary ones."""
+
+    def _book(self, bid=0.01, ask=0.22):
+        from v3.scoring import Book
+        return Book(bids=((bid, 2400.0),), asks=((ask, 5000.0),),
+                    tick=0.01, fetched_at=1.0)
+
+    def _fam(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        return r, A
+
+    def test_the_dwajoh_fill_reads_as_a_snatch(self):
+        # 11c bid, 10 ticks into a 21-tick spread, filled in 16 min:
+        # its cell (wide spread, deep) has a 10-minute 25th percentile,
+        # but 16 min with adv 48% is judged in the wide/deep cell whose
+        # q25 is 10 -> 16 > 10... the SNATCH came from the earlier
+        # sweep cell; here the pooled fallback (16.5) catches it
+        from v3.family import SNATCH_WEIGHT
+        r, A = self._fam()
+        w, verdict, adv = r.fam._fill_speed_verdict(
+            "BUY", 0.11, 9 * 60, self._book())
+        self.assertEqual(w, SNATCH_WEIGHT)
+        self.assertIn("snatched", verdict)
+        self.assertGreater(adv, 0.4)
+
+    def test_a_slow_touch_fill_is_ordinary(self):
+        r, A = self._fam()
+        w, verdict, _ = r.fam._fill_speed_verdict(
+            "BUY", 0.44, 5 * 3600, self._book(bid=0.44, ask=0.46))
+        self.assertEqual(w, 1.0)
+        self.assertIn("within the range", verdict)
+
+    def test_minutes_mean_different_things_by_context(self):
+        # 60 min at the touch of a tight book = fast (q25 123 min).
+        # 60 min deep in a wide book = ordinary (q25 10 min).
+        from v3.family import SNATCH_WEIGHT
+        r, A = self._fam()
+        w_touch, _, _ = r.fam._fill_speed_verdict(
+            "BUY", 0.44, 3600, self._book(bid=0.44, ask=0.46))
+        w_deep, _, _ = r.fam._fill_speed_verdict(
+            "BUY", 0.11, 3600, self._book())
+        self.assertEqual(w_touch, SNATCH_WEIGHT)
+        self.assertEqual(w_deep, 1.0)
+
+    def test_a_sweep_is_one_observation_at_the_deepest_rung(self):
+        r, A = self._fam()
+        for px in (0.06, 0.08, 0.11):
+            r.fam._fill_evi_buf.append(
+                {"market": A, "side": "BUY", "px": px, "weight": 2.5,
+                 "adv": px, "verdict": "snatched"})
+        r.fam._flush_fill_evidence(2_000_000.0)
+        evs = [e for e in r.fam.evidence.events.get(A, [])
+               if e[1] == "fill_buy"]
+        self.assertEqual(len(evs), 1)            # one event, not three
+        self.assertEqual(evs[0][2], 11.0)        # at the deepest rung
+        self.assertEqual(evs[0][3], 2.5)         # at the loud weight
+
+    def test_a_snatch_pushes_the_band_down_harder_than_a_slow_fill(self):
+        from v3.evidence import Evidence
+        slow, fast = Evidence(clock=lambda: 1000.0), Evidence(clock=lambda: 1000.0)
+        for e in (slow, fast):
+            e.fill("m", "SELL", 0.20, ts=990.0)   # shared context
+        slow.fill("m", "BUY", 0.11, ts=1000.0, weight=1.0)
+        fast.fill("m", "BUY", 0.11, ts=1000.0, weight=2.5)
+        b_slow = slow.band("m", now=1000.0)
+        b_fast = fast.band("m", now=1000.0)
+        self.assertLessEqual(b_fast["hi"], b_slow["hi"])
+        self.assertLess(b_fast["med"], b_slow["med"])
+
+    def test_weighted_rows_survive_persistence(self):
+        from v3.evidence import Evidence
+        e = Evidence(clock=lambda: 1000.0)
+        e.fill("m", "BUY", 0.11, weight=2.5)
+        e2 = Evidence(clock=lambda: 1000.0)
+        e2.restore(e.to_dict())
+        row = e2.events["m"][0]
+        self.assertEqual(row[3], 2.5)
