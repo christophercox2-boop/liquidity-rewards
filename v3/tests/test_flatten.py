@@ -4593,3 +4593,50 @@ class TestTheEvidenceCap(unittest.TestCase):
             cap = r.fam._evidence_cap(A, "BUY", b_lo, b_hi)
             if cap is not None:
                 self.assertLessEqual(plan["px"], cap + 1e-9)
+
+
+class TestStalePlansDieOnRuleChanges(unittest.TestCase):
+    """2026-08-25, the rahema 12c buys: every reboot restored the saved
+    scoreboard and placed its pre-rule plans verbatim — each placement
+    within a minute of a boot, carrying the exact pre-deflator
+    estimate. The signature that guards scoreboard reuse only covered
+    config knobs; the day's rules are code. PLAN_RULES_REV makes rule
+    changes wipe the board too."""
+
+    def test_a_scoreboard_scored_under_old_rules_is_discarded(self):
+        from v3.tests.test_family import Rig, A
+        import v3.family as fam_mod
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        r.fam.scoreboard[A] = {"ts": r.now, "plans": [
+            {"side": "BUY", "px": 0.12, "qty": 1.0, "est": 5.82}]}
+        d = r.fam.to_dict()
+        old = fam_mod.PLAN_RULES_REV
+        try:
+            fam_mod.PLAN_RULES_REV = old + 1     # the rules changed
+            r2 = Rig()
+            r2.add_market(A)
+            r2.fam.restore(d)
+            self.assertEqual(r2.fam.scoreboard, {})   # rescan, no reuse
+        finally:
+            fam_mod.PLAN_RULES_REV = old
+
+    def test_same_rules_keep_the_scoreboard(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        r.fam.scoreboard[A] = {"ts": r.now, "plans": []}
+        d = r.fam.to_dict()
+        r2 = Rig()
+        r2.add_market(A)
+        r2.fam.restore(d)
+        self.assertIn(A, r2.fam.scoreboard)
+
+    def test_the_deflator_is_part_of_the_signature(self):
+        from v3.tests.test_family import Rig
+        from v3.family import FamilyConfig
+        a = Rig(cfg=FamilyConfig(name="P", tag="P", est_deflate=1.0))
+        b = Rig(cfg=FamilyConfig(name="P", tag="P", est_deflate=3.0))
+        self.assertNotEqual(a.fam._cfg_sig(), b.fam._cfg_sig())
