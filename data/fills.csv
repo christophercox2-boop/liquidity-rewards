@@ -817,3 +817,11 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787650769.3,cfb,aachc-cfb-wins-2026-11-28-gtech-5pt5wins,SELL,0.01,0.41,earn,0.061,0.7,,48,56,0,0.41,0.85,0.12,-0.01,15 ticks in front of the touch — closer to the midpoint; ~98.5% of the ask side,C33MNRYPEDK5
 1787652066.2,nba,tec-nba-champ-2027-06-18-w-phi,BUY,5,0.12,earn,0.0009,43.8,,11,14,0,0.12,0.13,-0.01,5,joins the touch — the book has been quiet,C1Z1D6V5EDK1
 1787652126.2,politics,enwc-uspres-nom-dem-2028-gavnew,BUY,1,0.23,earn,5.1377,0.02,,23,25,0.932,0.21,0.24,-0.01,1,4 ticks in front of the touch — closer to the midpoint; ~87.3% of the bid side,C34H21AJYDK0
+1787658746.6,politics,enwc-uspres-nom-dem-2028-markel,SELL,3,0.13,manual,0.0001,58.07,,5,11,0.555,0.03,,-0.05,-3,the owner's own order — the engine leaves it alone,C1MD42DPEDJR
+1787658746.6,politics,enwc-uspres-nom-dem-2028-markel,SELL,1,0.13,manual,0,57.04,,7,12,0.675,0.03,,-0.03,-4,the owner's own order — the engine leaves it alone,C1N8YGEZEDK0
+1787658746.6,politics,ussewc-usse-mt-2026-11-03-rep,SELL,2,0.99,manual,0,19.67,0.9826,87,93,0.669,,,-0.0074,-2,the owner's own order — the engine leaves it alone,C1MPCXWBWDJV
+1787658746.6,nba,tec-nba-champ-2027-06-18-w-ind,SELL,0.01,0.03,sell,0,48.99,,,,0.38,,,,-0.01,an exit — its fill reduces the position it sits on,C1W612110DJV
+1787658746.6,nba,tec-nba-champ-2027-06-18-w-pho,SELL,1,0.03,sell,0,45.64,,,,0.379,,,,-1,an exit — its fill reduces the position it sits on,C1Z1SD2ERDJT
+1787658746.6,nba,tec-nba-champ-2027-06-18-w-dal,SELL,1,0.03,sell,0,45.61,,,,0.379,,,,-1,an exit — its fill reduces the position it sits on,C1Z2P5FP4DK7
+1787658746.6,nba,tec-nba-champ-2027-06-18-w-det,SELL,1,0.06,sell,0,45.56,,,,0.394,,,,-1,an exit — its fill reduces the position it sits on,C1Z4488RPDK5
+1787659047.8,cfb,aachc-cfb-wins-2026-11-28-ore-9pt5wins,SELL,1,0.2237,sell,0,0.07,,84,88,0.498,,,0.6363,0,selling filled stock — it earns while it waits,C35TSVJJ0FSS
