@@ -4005,3 +4005,35 @@ class TestTheCeilingIsNeverStarved(unittest.TestCase):
                                                 real(now, actions))[1]
         r.cycle()
         self.assertEqual(seen["given"], 10)   # nothing held back when fine
+
+
+class TestTheLedgerActuallyWrites(unittest.TestCase):
+    """The per-market share ledger stopped being written the moment the
+    depth column was added: it read self.cache, the Monitor has no
+    cache (each family owns one), and the ledger's own try/except
+    swallowed the AttributeError every hour. The measurement we had
+    been waiting on all week was silently not landing."""
+
+    def test_depth_comes_from_the_family_that_owns_the_book(self):
+        from v3.main import Monitor
+        from v3.books import BookCache
+        m = Monitor.__new__(Monitor)
+        class F:
+            pass
+        f = F()
+        f.cache = BookCache()
+        f.cache.depth_seen = {"mkt": 7}
+        m.families = {"politics": f}
+        self.assertEqual(m._depth_of("politics", "mkt"), 7)
+
+    def test_it_never_throws_on_a_market_or_family_it_does_not_know(self):
+        from v3.main import Monitor
+        m = Monitor.__new__(Monitor)
+        m.families = {}
+        self.assertEqual(m._depth_of("politics", "anything"), 0)
+        self.assertEqual(m._depth_of("nope", "anything"), 0)
+
+    def test_the_monitor_has_no_cache_attribute_to_read(self):
+        # the assumption that broke it, pinned so it cannot come back
+        from v3.main import Monitor
+        self.assertFalse(hasattr(Monitor, "cache"))

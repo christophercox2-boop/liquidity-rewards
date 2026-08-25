@@ -1451,6 +1451,22 @@ class Monitor:
                            f"{r['qty']:g}@{r['px']*100:g}c"
                            for r in rows_out[:8]]}
 
+    def _depth_of(self, family: str, market: str) -> int:
+        """How many price levels the last book for this market carried.
+
+        There is no cache on the Monitor — each family owns its own, and
+        writing self.cache here threw on every publish, so the whole
+        per-market ledger stopped being written from the moment the
+        depth column was added ("'Monitor' object has no attribute
+        'cache'", every hour, swallowed by the ledger's own try/except).
+        The share measurement itself was never lost: the estimator banks
+        it in state. Only the CSV rows went missing."""
+        fam = self.families.get(family)
+        cache = getattr(fam, "cache", None) if fam is not None else None
+        if cache is None:
+            return 0
+        return int(getattr(cache, "depth_seen", {}).get(market, 0) or 0)
+
     def _family_of(self, market: str) -> str:
         """Which family a rewarded market belongs to. The families'
         own universes are the authority — a market can only earn where
@@ -1521,7 +1537,7 @@ class Monitor:
                       (cal.get(m) or {}).get("share", 0.0),
                       (cal.get(m) or {}).get("pool_day", 0.0),
                       (cal.get(m) or {}).get("live_h", 0.0),
-                      self.cache.depth_seen.get(m, 0))
+                      self._depth_of(f, m))
                      for (d, m, f), a in per.items()]
             if mrows:
                 existing, sha = self._gh_file("data/market_est.csv")
