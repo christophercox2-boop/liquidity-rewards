@@ -663,7 +663,15 @@ class TestSilverLogAndWatcher(unittest.TestCase):
         os.environ["GITHUB_TOKEN"] = ""
         try:
             m = Monitor()
-            rows = [{"date": "2026-08-19", "market": "m1",
+            # dates RELATIVE to today: refresh_rewards only shows news
+            # from the last 4 days, so hardcoded dates make this test
+            # pass when written and fail silently a week later. It did
+            # exactly that — written 2026-08-21, broke on 2026-08-25.
+            import datetime as _d
+            today = _d.datetime.now(_d.timezone.utc)
+            d1 = (today - _d.timedelta(days=2)).strftime("%Y-%m-%d")
+            d2 = (today - _d.timedelta(days=1)).strftime("%Y-%m-%d")
+            rows = [{"date": d1, "market": "m1",
                      "program_type": "lp", "reward_usd": 0.6,
                      "status": "PENDING"}]
 
@@ -676,7 +684,7 @@ class TestSilverLogAndWatcher(unittest.TestCase):
             m.refresh_rewards()                  # baseline
             r = m.refresh_rewards()
             self.assertEqual(r["new_count"], 0)  # quiet when nothing new
-            rows.append({"date": "2026-08-20", "market": "m2",
+            rows.append({"date": d2, "market": "m2",
                          "program_type": "lp", "reward_usd": 3.0,
                          "status": "PENDING"})
             r = m.refresh_rewards()
