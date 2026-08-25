@@ -855,3 +855,6 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787669692.9,cfb,aachc-cfb-wins-2026-11-28-minnst-5pt5wins,SELL,0.01,0.61,earn,2.4732,0.08,,56,66,0.335,0.39,0.87,-0.01,-0.01,26 ticks in front of the touch — we would hold 99% of the ask side,C38SP8KC8FSR
 1787669692.9,cfb,aachc-cfb-wins-2026-11-28-byu-6pt5wins,SELL,0.01,0.73,earn,0.0014,1.71,,85,94,0.293,0.73,0.99,0.17,0,20 ticks in front of the touch — we would hold 99% of the ask side,C37A9Y3RWFSS
 1787669692.9,cfb,aachc-cfb-wins-2026-11-28-byu-6pt5wins,SELL,0.01,0.73,sell,0.0014,0.71,,85,94,0.555,0.73,0.99,0.17,-0.01,selling filled stock — it earns while it waits,C3890PQMGFSG
+1787670443.5,politics,ewc-usp-2028-11-07-kamhar,BUY,1,0.13,earn,3.6649,0.02,,8,28,0.079,0.05,0.3,-0.05,26,8 ticks in front of the touch — we would hold 99% of the bid side,C391T2VM8FSJ
+1787670503.5,politics,ewc-usp-2028-11-07-petbut,BUY,1,0.12,earn,3.6849,0.02,,8,13,0,0.02,0.2,0.02,3,10 ticks in front of the touch — we would hold 99% of the bid side,C3929V8KPFSK
+1787670563.5,cfb,aachc-cfb-wins-ou-2026-11-28-wake,SELL,0.01,0.34,earn,0.1645,1.04,,40,53,0,0.25,0.34,0.13,-0.01,9 ticks in front of the touch — we would hold 84% of the ask side,C386H7X0WFSS
