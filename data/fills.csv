@@ -864,3 +864,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787670850.2,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,BUY,1,0.13,earn,4.1667,0.11,,6,11,0.835,0.13,0.14,0.04,5,6 ticks in front of the touch — we would hold 100% of the bid side,C3927JB6TFSG
 1787670970.2,cfb,aachc-cfb-wins-2026-11-28-byu-9pt5wins,SELL,0.01,0.34,earn,0.0238,1.02,,50,58,0.537,0.33,0.49,0.2,-0.01,joins the touch — the book has been quiet,C38AH2HB6FSQ
 1787671030.2,cfb,aachc-cfb-wins-2026-11-28-aubrn-5pt5wins,BUY,0.5,0.81,earn,0.4997,0.98,,80,86,0.561,0.62,0.84,-0.02,1.5,1 tick behind the touch — we would hold 20% of the bid side,C38BPVH7GFSS
+1787671361.4,cfb,aachc-cfb-wins-2026-11-28-aubrn-5pt5wins,BUY,0.01,0.79,earn,1.2181,0.08,,80,85,0.678,0.79,0.84,-0.03,1.01,17 ticks in front of the touch — we would hold 48% of the bid side,C397F6FNYFSN
