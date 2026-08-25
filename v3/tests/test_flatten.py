@@ -4459,80 +4459,25 @@ class TestTheNurse(unittest.TestCase):
         r.fam.nurse(r.now + 5, r.exchange)
         self.assertIn("HAND", r.fam.orders)
 
-
-class TestTheWarBrake(unittest.TestCase):
-    """Owner, 2026-08-25: "be careful about this process getting into a
-    bidding war. Every replacement should be judged against the
-    existing rules." Without the brake: probe 2c, jumper 3c, nurse
-    pulls, next cycle fronts the NEW touch at 4c, jumper 5c... each
-    step legal, the pair marching the price up. With it, the pulled
-    price caps every replacement for a day — the jumper keeps the
-    front and the fill risk."""
-
-    def _rig(self):
-        from v3.tests.test_family import Rig, A
-        from v3.scoring import Book
-        r = Rig()
-        r.add_market(A, book=Book(bids=((0.01, 6000.0),),
-                                  asks=((0.22, 5000.0),),
-                                  tick=0.01, fetched_at=r.now))
-        r.cycle()
-        r.fam.orders.clear()
-        return r, A
-
-    def _plan(self, r, A):
-        book = r.fam.cache.fresh(A, 999, r.now)
-        prog, _ = r.fam._prog_row(A)
-        sp = r.fam._side_pool(A, prog)
-        return r.fam._plan_side(A, book, "BUY", prog, sp or 0.0, 20.0,
-                                bar=0.0)
-
-    def test_no_replacement_fronts_past_the_pulled_price(self):
+    def test_a_pull_does_not_delay_the_replacement(self):
+        # owner, 2026-08-25: "You shouldn't wait, if a replacement is
+        # called for by the rules, it should happen quickly." A nursed
+        # pull leaves no cooldown and no price memory — the very next
+        # cycle re-quotes the market wherever the standing rules allow.
         from v3.scoring import Book
         r, A = self._rig()
-        # the nurse pulled us at 2c; the jumper now IS the 3c touch
-        r.fam.probe_cap[f"{A}|BUY"] = [0.02, r.now]
-        r.fam.cache.put(A, Book(bids=((0.03, 40.0), (0.01, 6000.0)),
-                                asks=((0.22, 5000.0),),
-                                tick=0.01, fetched_at=r.now))
-        plan = self._plan(r, A)
-        if plan is not None:
-            self.assertLessEqual(plan["px"], 0.02 + 1e-9)   # never 4c
-
-    def test_the_brake_lifts_after_a_day(self):
-        from v3.scoring import Book
-        r, A = self._rig()
-        r.fam.probe_cap[f"{A}|BUY"] = [0.02, r.now - 90000.0]
-        r.fam.cache.put(A, Book(bids=((0.03, 40.0), (0.01, 6000.0)),
-                                asks=((0.22, 5000.0),),
-                                tick=0.01, fetched_at=r.now))
-        plan = self._plan(r, A)
-        self.assertIsNotNone(plan)
-        self.assertLessEqual(plan["px"], 0.04 + 1e-9)   # ratchet resumes
-
-    def test_a_nursed_pull_sets_the_brake(self):
-        from v3.tests.test_family import Rig, A
-        from v3.family import FamilyOrder
-        from v3.intents import BUY_LONG
-        from v3.scoring import Book
-        r, A = self._rig()
-        r.exchange.live["P"] = {"id": "P", "market": A, "side": "BUY",
-                                "price": 0.02, "size": 1.0,
-                                "intent": BUY_LONG}
-        r.fam.orders["P"] = FamilyOrder(
-            id="P", market=A, side="BUY", price=0.02, qty=1.0,
-            intent=BUY_LONG, placed_ts=r.now, purpose="earn")
-        r.fam.nurse(r.now, r.exchange)                    # baseline
-        r.fam.cache.put(A, Book(bids=((0.03, 40.0), (0.01, 6000.0)),
-                                asks=((0.22, 5000.0),),
-                                tick=0.01, fetched_at=r.now))
-        r.fam.nurse(r.now + 5, r.exchange)                # jumped -> pull
-        self.assertEqual(r.fam.probe_cap.get(f"{A}|BUY")[0], 0.02)
-
-    def test_the_brake_survives_a_restart(self):
-        r, A = self._rig()
-        r.fam.probe_cap[f"{A}|BUY"] = [0.02, 123.0]
-        d = r.fam.to_dict()
-        r2, _ = self._rig()
-        r2.fam.restore(d)
-        self.assertEqual(r2.fam.probe_cap[f"{A}|BUY"], [0.02, 123.0])
+        self._rebook(r, A, ((0.03, 40.0), (0.01, 6000.0)), ((0.22, 5000.0),))
+        marks_before = dict(r.fam.last_action)
+        r.fam.nurse(r.now + 5, r.exchange)          # jumped -> pulled
+        self.assertNotIn("P", r.fam.orders)
+        self.assertEqual(dict(r.fam.last_action), marks_before)  # no new
+                                                                 # cooldown
+        r.fam.last_action.clear()
+        r.cycle(advance=60.0)                       # the next cycle
+        again = [o for o in r.fam.orders.values()
+                 if o.market == A and o.side == "BUY"
+                 and o.purpose not in ("manual", "sell")]
+        self.assertTrue(again)                      # re-quoted at once...
+        for o in again:                             # ...within the rules:
+            self.assertLessEqual(o.price, 0.04 + 1e-9)  # ratchet off the
+                                                        # 3c touch, tick 1

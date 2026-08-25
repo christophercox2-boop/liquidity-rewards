@@ -95,16 +95,6 @@ PROBE_MAX_QTY = 1.0
 # and the watch ends ("When things are stable, then the process can
 # end").
 NURSE_STABLE_S = 600.0
-# The war brake (owner, 2026-08-25: "be careful about this process
-# getting into a bidding war. Every replacement should be judged
-# against the existing rules"): a nursed pull records the price where
-# trouble found us, and for a day no replacement on that side may
-# front past it. The probe ratchet alone anchors to the CURRENT touch,
-# so pull-and-replace against a jumper would march up a tick per
-# round, each step individually legal. With the cap, the jumper keeps
-# the front and the fill risk; if they really know something the band
-# will learn it from anchors, not from our escalation.
-WAR_BRAKE_S = 86400.0
 NURSE_APPROACH_TICKS = 2
 NURSE_BOOK_MAX_AGE_S = 15.0   # a vanished order waits this long for the lagging
                        # position feed before it counts as a silent cancel
@@ -361,9 +351,6 @@ class Family:
         self.gone_pending: dict[str, dict] = {}   # vanished, feed pending
         self.probe_ratchet: dict[str, list] = {}  # "slug|side" ->
                                                   # [ticks allowed, last advance ts]
-        self.probe_cap: dict[str, list] = {}      # "slug|side" -> [px, ts]
-                                                  # set where a nurse pull
-                                                  # happened; a day's brake
         self._nurse_base: dict[str, dict] = {}    # young orders' first-
                                                   # seen book, for the nurse
         self._fill_evi_buf: list[dict] = []       # this cycle's fills, fed
@@ -901,13 +888,6 @@ class Family:
                              if (px - touch) * sign <= 1e-9]
                 else:
                     lim = touch + sign * allowed * tick
-                    cap = self.probe_cap.get(f"{slug}|{side}")
-                    if cap and self._clock() - cap[1] < WAR_BRAKE_S:
-                        # the war brake: never re-front past the price
-                        # where the nurse last pulled us, however far
-                        # the touch has marched since
-                        lim = (min(lim, cap[0]) if side == "BUY"
-                               else max(lim, cap[0]))
                     cands = [px for px in cands
                              if (px - lim) * sign <= 1e-9]
         # Every candidate is priced by the owner's EV formula
@@ -2559,13 +2539,16 @@ class Family:
                 self.orders.pop(rec.id, None)
                 self._nurse_base.pop(rec.id, None)
                 self.evidence.order_gone(rec.market, rec.id)
-                self._mark(rec.market, rec.side, now)
-                self.probe_cap[f"{rec.market}|{rec.side}"] = [rec.price,
-                                                              round(now, 1)]
+                # NO cooldown and NO price memory (owner, 2026-08-25:
+                # "You shouldn't wait, if a replacement is called for
+                # by the rules, it should happen quickly. If it is
+                # not, then it should not."). The next cycle re-judges
+                # this market under exactly the rules every placement
+                # answers to — ratchet, band edge, probe size, the
+                # deflated bar — and does whatever they say.
                 self._log(event="nursed_pull", market=rec.market,
                           side=rec.side, price=rec.price, qty=rec.qty,
-                          note=(why + " — no re-front past "
-                                f"{rec.price*100:.0f}c for a day")[:130])
+                          note=why[:110])
 
     def _advance_probe_ratchet(self, slug: str, side: str,
                                now: float) -> None:
@@ -3455,7 +3438,6 @@ class Family:
             "cfg_sig": self._cfg_sig(),
             "orders": {oid: vars(o) for oid, o in self.orders.items()},
             "probe_ratchet": self.probe_ratchet,
-            "probe_cap": self.probe_cap,
             "inventory": self.inventory,
             "positions_seen": self.positions_seen,
             "silent_cancels": self.silent_cancels,
@@ -3501,8 +3483,6 @@ class Family:
         self.inventory = dict(d.get("inventory") or {})
         self.probe_ratchet = {k: list(v) for k, v in
                               (d.get("probe_ratchet") or {}).items()}
-        self.probe_cap = {k: list(v) for k, v in
-                          (d.get("probe_cap") or {}).items()}
         self.positions_seen = dict(d.get("positions_seen") or {})
         self.silent_cancels = d.get("silent_cancels") or 0
         self.placed_at = {k: float(v) for k, v in
