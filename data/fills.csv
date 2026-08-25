@@ -899,3 +899,12 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787690479.3,politics,ewc-usp-2028-11-07-jamtal,SELL,7,0.02,sell,0.0213,5.15,,1,6,0,0.01,0.02,0.01,0,selling filled stock — it earns while it waits,C39DVV3WAFSH
 1787690719.3,politics,scc-senate-gop-2026-11-03-48,SELL,1,0.16,earn,3.8458,0.48,0.142625,12,18,0.189,0.15,0.16,-0.0174,-1,2 ticks in front of the touch — we would hold 85% of the ask side,C3DFT45KWFSG
 1787690839.3,politics,ussewc-usse-ms-2026-11-03-dem,SELL,1,0.05,earn,6.25,2.1,0.029825,5,9,0.712,0.03,0.05,-0.0202,-41.01,1 tick in front of the touch — we would hold 98% of the ask side,C3C4RMWKGFSR
+1787691559.3,politics,enwc-ussep-ma-2026-09-01-dem-edmark,SELL,7,0.95,sell,0.0037,5.25,,91,95,0.847,0.94,0.95,-0.02,0,selling filled stock — it earns while it waits,C39KF9TQJFSN
+1787692519.3,cfb,aachc-cfb-wins-2026-11-28-ncst-6pt5wins,BUY,0.5,0.83,manual,2.5,5.07,,81,87,0,0.83,0.85,-0.01,0.5,the owner's own order — the engine leaves it alone,C39YN2ANMFSN
+1787692699.3,politics,ussewc-usse-sc-2026-11-03-rep,BUY,0.01,0.85,manual,0,0.03,0.888375,,,0.445,,,-0.0384,0.01,the owner's own order — the engine leaves it alone,C3E89CE2JFSK
+1787692699.3,cfb,aachc-cfb-wins-2026-11-28-txst-8pt5wins,BUY,1,0.28,earn,2.4037,0.2,,27,33,0.439,0.29,0.34,-0.02,2,1 tick behind the touch — we would hold 96% of the bid side,C3E41BBR2FSR
+1787693299.4,cfb,aachc-cfb-wins-2026-11-28-ala-8pt5wins,BUY,0.01,0.66,earn,2.5,0.5,,65,71,0.538,0.66,0.67,-0.02,0.02,12 ticks in front of the touch — we would hold 89% of the bid side,C3E10T7MTFSP
+1787693719.4,cfb,aachc-cfb-wins-2026-11-28-iowa-6pt5wins,BUY,0.5,0.82,earn,0.8676,0.5,,81,86,0.671,0.83,0.84,-0.01,1.5,1 tick behind the touch — we would hold 35% of the bid side,C3E3RBV0JFSR
+1787693839.4,politics,usgubewc-usgub-hi-2026-11-03-rep,SELL,1,0.02,earn,6.2284,0.1,7.5e-05,3,9,0.382,0.01,0.06,-0.0199,-1,4 ticks in front of the touch — we would hold 100% of the ask side,C3EEY0RY6FSS
+1787694259.6,politics,usgubewc-usgub-pa-2026-11-03-dem,BUY,1,0.94,earn,3.0984,0.2,0.997775,93,98,0.38,0.94,0.95,-0.0578,1,4 ticks in front of the touch — we would hold 98% of the bid side,C3EFBFC7CFSQ
+1787694680.0,politics,enwc-uspres-nom-dem-2028-rahema,BUY,4,0.06,sell,0.0021,3.65,,5,11,0.762,0.11,0.12,-0.02,4,buying back the short at or under what it sold for — the bid earns while it wait,C3BPS2HBRFSN
