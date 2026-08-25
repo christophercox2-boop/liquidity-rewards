@@ -653,6 +653,13 @@ class Family:
                             and px < fair_rv + tick - 1e-9)):
                     continue    # the hard cap binds revives too, both
                                 # sides (owner, 2026-08-23)
+                if fair_rv is None:
+                    cap_rv = self._evidence_cap(slug, side, r_lo, r_hi)
+                    if cap_rv is not None and (px - cap_rv) * sign > 1e-9:
+                        continue    # and so does the evidence cap
+                                    # (owner, 2026-08-25): kamhar's 284
+                                    # shares at 13c against a 5-12c
+                                    # band came through THIS door
                 cost = qty * (px if side == "BUY" else 1.0 - px)
                 # a revival is bigger than an earn order by nature — its own
                 # cap applies, not the per-market split; the family ceiling
@@ -857,17 +864,19 @@ class Family:
             has_info = any(r[1].startswith("fill")
                            for r in self.evidence.events.get(slug, ()))
             if has_info:
-                # the market has spoken before: in-front quotes stop at
-                # the band's conservative edge for our side — the LOW
-                # for a bid, the HIGH for an ask. A snatch record IS
-                # information, so a burned market never sees a
-                # past-value order again while its evidence stands.
-                edge = b_lo if side == "BUY" else b_hi
-                lim = (edge if edge is not None
-                       else touch + sign * tick)
-                cands = [px for px in cands
-                         if (px - touch) * sign <= 1e-9
-                         or (px - lim) * sign <= 1e-9]
+                # the market has spoken: NO earn order — joined,
+                # behind, or in front — rests past the price the
+                # evidence supports (owner, 2026-08-25, kamhar: the
+                # join exemption was the one door left open)
+                cap = self._evidence_cap(slug, side, b_lo, b_hi)
+                if cap is not None:
+                    cands = [px for px in cands
+                             if (px - cap) * sign <= 1e-9]
+                else:
+                    cands = [px for px in cands
+                             if (px - touch) * sign <= 1e-9
+                             or (px - (touch + sign * tick)) * sign
+                             <= 1e-9]
             else:
                 # a truly blank market gets ONE minimum-size probe that
                 # advances like a ratchet: a tick to start, one more per
@@ -1952,33 +1961,36 @@ class Family:
                 bad = None
                 if touch_c is not None:
                     front_by = (rec.price - touch_c) * sign_c / book.tick
-                    if front_by > 1e-6:
-                        gmin_c = PROBE_MAX_QTY
-                        if any(r2[1].startswith("fill") for r2 in
-                               self.evidence.events.get(rec.market, ())):
-                            eb_lo, eb_hi = self._price_bounds(
-                                rec.market,
-                                lv_c if rec.side == "BUY"
-                                else book.side("BUY"),
-                                book.side("SELL") if rec.side == "BUY"
-                                else lv_c,
-                                book.tick)
-                            edge = eb_lo if rec.side == "BUY" else eb_hi
-                            if (edge is not None
-                                    and (rec.price - edge) * sign_c > 1e-9):
-                                bad = ("in front past the evidence edge "
-                                       f"({edge * 100:.0f}c) on a market "
-                                       "that has burned us")
-                        else:
-                            allowed_c = (self.probe_ratchet.get(
-                                f"{rec.market}|{rec.side}") or [1, 0.0])[0]
-                            if front_by > allowed_c + 1e-6:
-                                bad = (f"{front_by:.0f} ticks in front — "
-                                       "the probe's earned reach is "
-                                       f"{allowed_c}")
-                            elif rec.qty > gmin_c + 1e-6:
-                                bad = ("probe-sized only in front of an "
-                                       "unknown market")
+                    has_info_c = any(
+                        r2[1].startswith("fill") for r2 in
+                        self.evidence.events.get(rec.market, ()))
+                    if has_info_c:
+                        # joins included (owner, 2026-08-25, kamhar):
+                        # ANY earn order past the evidence line goes
+                        eb_lo, eb_hi = self._price_bounds(
+                            rec.market,
+                            lv_c if rec.side == "BUY"
+                            else book.side("BUY"),
+                            book.side("SELL") if rec.side == "BUY"
+                            else lv_c,
+                            book.tick)
+                        cap_c = self._evidence_cap(rec.market, rec.side,
+                                                   eb_lo, eb_hi)
+                        if (cap_c is not None
+                                and (rec.price - cap_c) * sign_c > 1e-9):
+                            bad = ("past the price the evidence supports "
+                                   f"({cap_c * 100:.0f}c) on a market "
+                                   "that has burned us")
+                    elif front_by > 1e-6:
+                        allowed_c = (self.probe_ratchet.get(
+                            f"{rec.market}|{rec.side}") or [1, 0.0])[0]
+                        if front_by > allowed_c + 1e-6:
+                            bad = (f"{front_by:.0f} ticks in front — "
+                                   "the probe's earned reach is "
+                                   f"{allowed_c}")
+                        elif rec.qty > PROBE_MAX_QTY + 1e-6:
+                            bad = ("probe-sized only in front of an "
+                                   "unknown market")
                 if bad is not None:
                     r_c = self.desk.cancel(rec.id, rec.market)
                     if r_c.ok:
@@ -2549,6 +2561,33 @@ class Family:
                 self._log(event="nursed_pull", market=rec.market,
                           side=rec.side, price=rec.price, qty=rec.qty,
                           note=why[:110])
+
+    def _evidence_cap(self, slug: str, side: str, b_lo, b_hi):
+        """The price line the evidence supports on a MODEL-LESS market
+        that has real fills (owner, 2026-08-25, the kamhar card: bought
+        14c at the touch against a 5-12c band, on a market we had
+        already round-tripped 13c -> 5c for -$25 the week before).
+
+        A BUY caps at the band's low edge, sliding toward the band's
+        center as fill-built confidence grows; a SELL mirrors from the
+        high edge. Joins are NOT exempt: 'joins the touch' was the one
+        door the fronting rules left open, and joining a bait quote 6c
+        past our own valuation is the same trade as fronting it.
+        Returns None where it does not apply: modeled markets (the
+        fair hard cap governs) and markets with no fills (the band
+        there is only the spread certifying itself)."""
+        if b_lo is None or b_hi is None:
+            return None
+        if not any(r[1].startswith("fill")
+                   for r in self.events_of(slug)):
+            return None
+        ctr = (b_lo + b_hi) / 2.0
+        conf = self.evidence.confidence(slug)
+        return (b_lo + (ctr - b_lo) * conf if side == "BUY"
+                else b_hi - (b_hi - ctr) * conf)
+
+    def events_of(self, slug: str):
+        return self.evidence.events.get(slug, ())
 
     def _advance_probe_ratchet(self, slug: str, side: str,
                                now: float) -> None:

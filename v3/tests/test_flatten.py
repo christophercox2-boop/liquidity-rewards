@@ -4481,3 +4481,104 @@ class TestTheNurse(unittest.TestCase):
         for o in again:                             # ...within the rules:
             self.assertLessEqual(o.price, 0.04 + 1e-9)  # ratchet off the
                                                         # 3c touch, tick 1
+
+
+class TestTheEvidenceCap(unittest.TestCase):
+    """Owner, 2026-08-25, the kamhar card: bought 0.99 @ 14c AT THE
+    TOUCH against a 5-12c evidence band, on a market already
+    round-tripped 13c -> 5c for -$25 the week before. The fronting
+    rules left one door open — "joins the touch" — and this closes it:
+    on a model-less market with real fills, NO earn order rests past
+    the price the evidence supports. BUY caps at the band's low edge
+    sliding toward center with confidence; revives and the resting
+    book answer to the same line."""
+
+    def _burned_rig(self):
+        # the kamhar shape: burn fills recorded low, bait touch high
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.14, 60.0), (0.05, 3000.0)),
+                                  asks=((0.16, 2600.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.cycle()
+        r.fam.orders.clear()
+        for i, px in enumerate((0.05, 0.05, 0.04)):
+            r.fam.evidence.fill(A, "BUY", px, ts=r.now - 3600 - i,
+                                weight=2.5)
+        return r, A
+
+    def _plan(self, r, A, side="BUY"):
+        book = r.fam.cache.fresh(A, 999, r.now)
+        prog, _ = r.fam._prog_row(A)
+        sp = r.fam._side_pool(A, prog)
+        return r.fam._plan_side(A, book, side, prog, sp or 0.0, 20.0,
+                                bar=0.0)
+
+    def test_the_kamhar_join_is_refused(self):
+        r, A = self._burned_rig()
+        plan = self._plan(r, A)
+        if plan is not None:
+            # whatever it rests, it is nowhere near the 14c bait
+            book = r.fam.cache.fresh(A, 999, r.now)
+            b_lo, b_hi = r.fam._price_bounds(A, book.side("BUY"),
+                                             book.side("SELL"), book.tick)
+            cap = r.fam._evidence_cap(A, "BUY", b_lo, b_hi)
+            self.assertLessEqual(plan["px"], cap + 1e-9)
+            self.assertLess(plan["px"], 0.14 - 1e-9)
+
+    def test_confidence_slides_the_cap_toward_center(self):
+        r, A = self._burned_rig()
+        lo_conf_cap = r.fam._evidence_cap(A, "BUY", 0.05, 0.12)
+        for i in range(8):                      # more fills, more trust
+            r.fam.evidence.fill(A, "BUY", 0.06, ts=r.now - 60 - i)
+        hi_conf_cap = r.fam._evidence_cap(A, "BUY", 0.05, 0.12)
+        self.assertGreater(hi_conf_cap, lo_conf_cap)
+        self.assertLessEqual(hi_conf_cap, (0.05 + 0.12) / 2 + 1e-9)
+
+    def test_no_fills_means_no_cap(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        self.assertIsNone(r.fam._evidence_cap(A, "BUY", 0.05, 0.12))
+
+    def test_the_sweep_pulls_a_resting_join_past_the_cap(self):
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r, A = self._burned_rig()
+        r.exchange.live["J"] = {"id": "J", "market": A, "side": "BUY",
+                                "price": 0.14, "size": 5.0,
+                                "intent": BUY_LONG}
+        r.fam.orders["J"] = FamilyOrder(
+            id="J", market=A, side="BUY", price=0.14, qty=5.0,
+            intent=BUY_LONG, placed_ts=1.0, purpose="earn")
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertNotIn("J", r.fam.orders)
+        self.assertTrue(any(l.get("event") == "conform_pulled"
+                            and "evidence" in str(l.get("note"))
+                            for l in r.fam.log))
+
+    def test_a_revive_cannot_buy_through_the_cap(self):
+        # the 284-share door: side under Target Size, anchor at the
+        # bait level — the revive must respect the same line
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.13, 100.0),),
+                                  asks=((0.16, 2600.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.cycle()
+        r.fam.orders.clear()
+        for i in range(3):
+            r.fam.evidence.fill(A, "BUY", 0.05, ts=r.now - 3600 - i,
+                                weight=2.5)
+        plan = self._plan(r, A)          # bid side 100 < 5000 target
+        if plan is not None:             # a revive, if any, sits under
+            book = r.fam.cache.fresh(A, 999, r.now)
+            b_lo, b_hi = r.fam._price_bounds(A, book.side("BUY"),
+                                             book.side("SELL"), book.tick)
+            cap = r.fam._evidence_cap(A, "BUY", b_lo, b_hi)
+            if cap is not None:
+                self.assertLessEqual(plan["px"], cap + 1e-9)
