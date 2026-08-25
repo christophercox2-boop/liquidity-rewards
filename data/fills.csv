@@ -756,3 +756,13 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787622496.6,cfb,aachc-cfb-wins-2026-11-28-tenn-7pt5wins,BUY,0.01,0.85,earn,1.9276,3,,73,79,0.293,0.59,0.77,0.09,0.01,7 ticks in front of the touch — closer to the midpoint; ~77.1% of the bid side,C2V20XMPRDJT
 1787622616.6,cfb,aachc-cfb-wins-2026-11-28-ill-9pt5wins,BUY,0.01,0.32,earn,0.381,0.55,,21,32,0.576,0.32,0.33,0.04,0.02,2 ticks in front of the touch — closer to the midpoint; ~15.2% of the bid side,C2X4XA1JGDJP
 1787623036.6,cfb,aachc-cfb-wins-2026-11-28-tenn-7pt5wins,BUY,0.01,0.76,earn,2.4098,0.15,,73,79,0.555,0.59,0.77,0,0.02,17 ticks in front of the touch — closer to the midpoint; ~96.4% of the bid side,C2XKEXAATDK0
+1787623936.6,politics,enwc-usgubp-ma-2026-09-01-rep-brisho,SELL,120,0.02,manual,4.3367,10,,5,9,0.814,0.01,0.02,0.05,0,the owner's own order — the engine leaves it alone,C2J6TMW3YDJV
+1787624056.6,politics,usgubewc-usgub-mn-2026-11-03-dem,SELL,10,0.98,manual,0,15.95,0.99305,94,97,0.702,0.9,0.96,0.0131,0,the owner's own order — the engine leaves it alone,C2G7FSFTTDKA
+1787624056.6,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,BUY,1,0.14,earn,4.1666,0.07,,5,9,0.807,0.08,0.15,0.07,2,6 ticks in front of the touch — closer to the midpoint; ~99.7% of the bid side,C2XY3EQ3MDK5
+1787624056.6,politics,enwc-usgubp-ri-2026-09-09-rep-elapel,BUY,1,0.87,earn,2.0833,0.03,,90,94,0.847,0.82,0.88,-0.05,8,3 ticks in front of the touch — closer to the midpoint; ~99.6% of the bid side,C2XZ96VAADJP
+1787624536.6,cfb,aachc-cfb-wins-2026-11-28-frest-5pt5wins,SELL,0.01,0.85,sell,0,0,,58,67,0.624,0.85,0.86,-0.22,0,taker dump — sold into the bid (the carved exception),C2Y3J9PG6DK1
+1787625196.7,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,0.98,0.94,earn,0.0879,0.5,0.98475,90,94,0.758,0.94,0.97,-0.0447,3.98,2 ticks in front of the touch — closer to the midpoint; ~22.8% of the bid side,C2XTVN3F0DJV
+1787625196.7,politics,enwc-usgubp-ma-2026-09-01-rep-micmin,BUY,0.99,0.98,earn,3.4956,0.35,,93,96,0.839,0.98,0.99,0.03,0.99,5 ticks in front of the touch — closer to the midpoint; ~99.4% of the bid side,C2XZAS3W8DJT
+1787625256.7,politics,ussewc-usse-co-2026-11-03-dem,BUY,1,0.96,manual,0.1004,10.36,0.995225,94,99,0.531,0.95,0.96,-0.0352,1,the owner's own order — the engine leaves it alone,C21CT4SZMDK1
+1787625256.7,politics,ewc-usp-2028-11-07-dontrujr,BUY,1,0.08,sell,0,17.82,,2,7,0.503,0.06,0.09,0.04,-1,an exit — its fill reduces the position it sits on,C2EXWPHJMDJV
+1787625256.7,politics,enwc-ussep-de-2026-09-15-rep-johshu,BUY,1,0.19,earn,6.2313,0.03,,14,19,0.72,0.09,0.21,0.03,3,4 ticks in front of the touch — closer to the midpoint; ~99.8% of the bid side,C2Y7YJ1MRDK0
