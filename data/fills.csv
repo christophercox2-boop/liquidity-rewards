@@ -812,3 +812,6 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787645549.2,cfb,aachc-cfb-wins-2026-11-28-arz-8pt5wins,SELL,0.01,0.16,earn,0.0065,5.67,,15,21,0,0.15,0.45,0.02,-0.01,joins the touch — the book has been quiet,C2Y81T2X0DJV
 1787645549.2,cfb,aachc-cfb-wins-2026-11-28-arz-9pt5wins,BUY,0.01,0.27,earn,0.05,0.87,,,,0,,,,0.01,14 ticks in front of the touch — closer to the midpoint; ~1.4% of the bid side,C327QKPBPDJR
 1787648369.3,politics,ussewc-usse-ky-2026-11-03-rep,BUY,0.94,0.95,earn,5.8947,0.02,0.996525,91,94,0.935,0.95,0.96,-0.0465,27.94,joins the touch — the book has been quiet,C33N5TPW8DJR
+1787649269.3,cfb,aachc-cfb-wins-2026-11-28-utahst-3pt5wins,BUY,0.01,0.76,earn,0.3383,0.05,,74,80,0.637,0.72,0.77,-0.01,0.01,4 ticks in front of the touch — closer to the midpoint; ~13.5% of the bid side,C33V7CKTGDK1
+1787650769.3,cfb,aachc-cfb-wins-2026-11-28-gtech-6pt5wins,BUY,0.5,0.57,earn,0.789,9.8,,55,59,0.752,0.45,0.59,0,1.5,1 tick behind the touch; ~20.1% of the bid side,C2VYMVMB0DK0
+1787650769.3,cfb,aachc-cfb-wins-2026-11-28-gtech-5pt5wins,SELL,0.01,0.41,earn,0.061,0.7,,48,56,0,0.41,0.85,0.12,-0.01,15 ticks in front of the touch — closer to the midpoint; ~98.5% of the ask side,C33MNRYPEDK5
