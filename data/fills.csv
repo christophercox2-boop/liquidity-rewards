@@ -875,3 +875,6 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787673745.1,cfb,aachc-cfb-wins-2026-11-28-aubrn-4pt5wins,SELL,0.01,0.77,sell,2.2102,0.19,,71,78,0.637,0.7,0.99,-0.03,0,selling filled stock — it earns while it waits,C39P25KV0FSR
 1787674388.0,politics,ewc-usp-2028-11-07-kamhar,BUY,0.99,0.14,earn,1.2208,0.02,,5,12,0.474,0.14,0.16,0.06,26.99,joins the touch — the book has been quiet,C39ZYG238FSH
 1787675108.1,politics,ussewc-usse-sd-2026-11-03-briben,BUY,1,0.09,sell,1.6578,4.38,,5,9,0.658,0.09,0.1,0.02,1,buying back the short at or under what it sold for — the bid earns while it wait,C36A38PJ6FSK
+1787675736.5,politics,usgubewc-usgub-al-2026-11-03-rep,SELL,8,0.97,sell,0,0,0.98475,91,95,0.841,0.97,0.99,0.0147,0,taker dump — sold into the bid (the carved exception),C3AB3G93EFSQ
+1787676516.6,politics,ewc-usp-2028-11-07-gavnew,SELL,0.71,0.22,earn,0.1051,0.69,,8,22,0,0.16,0.22,-0.08,-4.71,joins the touch — the book has been quiet,C39XKKB58FSR
+1787676996.6,cfb,aachc-cfb-wins-2026-11-28-missr-8pt5wins,SELL,1,0.29,sell,0,0,,22,29,0.438,0.29,0.3,-0.03,0,taker dump — sold into the bid (the carved exception),C3AM6MJJ8FSR
