@@ -442,13 +442,21 @@ class TestImprove(unittest.TestCase):
                             allow_improve=improve,
                             capital_usd=150.0, per_market_usd=1.0)
 
-    def test_college_may_front_a_junk_wall(self):
+    def test_college_still_quotes_a_junk_wall_within_the_probe(self):
+        # owner, 2026-08-25: fronting a blank market is the probe
+        # ratchet's job, at minimum size — which also means JOINING the
+        # wall with real size can now legitimately beat a tiny front.
+        # Either way the book gets quoted, nothing rests deeper than
+        # the earned reach, and anything in front is probe-sized.
         r = Rig(cfg=self.cfg(True))
         r.add_market(A, book=self.wall_book(r.now))
+        r.fam.probe_ratchet[f"{A}|BUY"] = [3, 0.0]
         r.cycle()
         bids = [o for o in r.fam.orders.values() if o.side == "BUY"]
         self.assertTrue(bids)
-        self.assertGreater(bids[0].price, 0.011)     # in FRONT of the wall
+        self.assertLessEqual(bids[0].price, 0.04 + 1e-9)   # ratchet-bound
+        if bids[0].price > 0.011:                    # in front: probe size
+            self.assertLessEqual(bids[0].qty, 1.0 + 1e-9)
         self.assertLessEqual(bids[0].price * bids[0].qty, 0.51)  # inside caps
 
     def test_fronting_stays_inside_the_other_touch(self):

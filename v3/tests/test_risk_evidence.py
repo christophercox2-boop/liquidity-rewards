@@ -165,22 +165,23 @@ class TestProbing(unittest.TestCase):
         return Book(bids=((0.05, 9000.0),), asks=((0.95, 9000.0),),
                     tick=0.01, fetched_at=now)
 
-    def test_no_model_wide_walls_still_quote_but_at_the_frontier(self):
-        # Owner, 2026-08-21: "Fine to scout ahead when there's no model
-        # as we were doing before" — but never deeper than where the
-        # score maxes out
+    def test_no_model_wide_walls_still_quote_but_within_the_probe(self):
+        # Owner, 2026-08-25 (superseding the 2026-08-21 scout-ahead):
+        # a blank market still gets quoted — as an earn order or a
+        # scout — but nothing rests deeper than the probe ratchet's
+        # reach past the touch, and anything in front is minimum size.
         from v3.tests.test_family import Rig, A
         r = self.rig()
         r.add_market(A, book=self.unknowable_book(1_000_000.0))
         r.cycle()
-        self.assertEqual([o for o in r.fam.orders.values()
-                          if o.purpose == "probe"], [])
-        bids = [o for o in r.fam.orders.values()
-                if o.side == "BUY" and o.purpose in ("earn", "solo")]
-        self.assertTrue(bids)
-        for o in bids:
-            self.assertGreater(o.price, 0.05)   # in front of the wall
-            self.assertLess(o.price, 0.22)      # but far from the 50c mid
+        ours = [o for o in r.fam.orders.values()
+                if o.side == "BUY"
+                and o.purpose in ("earn", "solo", "probe")]
+        self.assertTrue(ours)
+        for o in ours:
+            self.assertLessEqual(o.price, 0.06 + 1e-9)   # touch + 1 tick
+            if o.price > 0.051:
+                self.assertLessEqual(o.qty, 1.0 + 1e-9)  # probe size
 
     def test_grounded_wide_walls_get_a_small_quote_in_front(self):
         # ...and WITH a model, the wide spread is the owner's play: a
@@ -575,6 +576,12 @@ class TestOwnerCorrections0821b(unittest.TestCase):
         for fair in (None, 0.50):
             r = self._rig(fair)
             r.add_market(A, book=self.wide_book())
+            if fair is None:
+                # owner, 2026-08-25: a blank market's reach past the
+                # touch is the earned probe ratchet, not the frontier.
+                # An earned-out ratchet re-opens the frontier walk, and
+                # the frontier still binds it.
+                r.fam.probe_ratchet[f"{A}|BUY"] = [8, 0.0]
             r.cycle()
             rows = [p for p in ((r.fam.scoreboard.get(A) or {})
                                 .get("plans") or [])
@@ -670,10 +677,16 @@ class TestIgnorancePremium(unittest.TestCase):
                 tick=0.01, fetched_at=1_000_000.0))
             if fair is not None:
                 r.fam.fairs = lambda s: fair
+            else:
+                # deep rungs on a blank market need an earned ratchet
+                # now (owner, 2026-08-25); the premium math they carry
+                # is unchanged
+                r.fam.probe_ratchet[f"{A}|BUY"] = [8, 0.0]
             rows = []
             book = r.cache.fresh(A, 300, r.now + 60)
             prog, _ = r.fam._prog_row(A) if r.fam.terms.get(A) else (None, "")
             r.cycle()
+            r.fam.orders.clear()  # ladder inspection, not placement
             book = r.cache.fresh(A, 300, r.now)
             prog, _ = r.fam._prog_row(A)
             sp = r.fam._side_pool(A, prog)
@@ -713,7 +726,11 @@ class TestConservativeTies(unittest.TestCase):
         r.add_market(A, book=Book(bids=((0.01, 46500.0),),
                                   asks=((0.41, 147.0), (0.99, 6000.0)),
                                   tick=0.01, fetched_at=1_000_000.0))
+        r.fam.probe_ratchet[f"{A}|BUY"] = [8, 0.0]   # earned reach
         r.cycle()
+        r.fam.orders.clear()      # inspect the ladder fresh — the cycle's
+                                  # own placement would otherwise trip the
+                                  # one-probe-at-a-time gate
         rows = []
         book = r.cache.fresh(A, 300, r.now)
         prog, _ = r.fam._prog_row(A)

@@ -1562,6 +1562,11 @@ class TestNoSelfBidding(unittest.TestCase):
             bids=((0.91, 2.0), (0.85, 6000.0)),
             asks=((0.95, 9000.0),),
             tick=0.01, fetched_at=1_000_000.0))
+        # ask-side fills at 95c teach fair >= 95c, so the band's low
+        # edge licenses deep bid rungs — the with-information path
+        # (owner, 2026-08-25); the self-fronting charge is about THOSE
+        for i in range(3):
+            r.fam.evidence.fill(A, "SELL", 0.95, ts=999_000.0 + i)
         r.cycle()
         if with_ours:
             r.fam.orders["S1"] = FamilyOrder(
@@ -1596,7 +1601,7 @@ class TestNoSelfBidding(unittest.TestCase):
         rows = []
         self._plan(r, ladder=rows)
         joins = [w for w in rows
-                 if abs(w["px"] - 0.85) < 1e-9 and "joins the touch" in w["why"]]
+                 if abs(w["px"] - 0.85) < 1e-9 and "touch" in w["why"]]
         self.assertTrue(joins)      # 85c, not our own 91c, is the touch
 
     def test_fronting_our_own_order_is_charged(self):
@@ -4142,3 +4147,91 @@ class TestTimeGradedLearning(unittest.TestCase):
         e2.restore(e.to_dict())
         row = e2.events["m"][0]
         self.assertEqual(row[3], 2.5)
+
+
+class TestInformationProbes(unittest.TestCase):
+    """Owner, 2026-08-25: "Only fronting past fair where we have no
+    information, and only to the extent necessary to get information
+    that would allow us to earn." Past-value fronting is an information
+    tool. A market that has spoken (any fill — a snatch record IS
+    information) caps in-front quotes at the band's conservative edge;
+    a truly blank one gets a single minimum-size probe that advances a
+    tick per quiet day and shuts on the first fill."""
+
+    WIDE = dict(bids=((0.01, 6000.0),), asks=((0.22, 5000.0),))
+
+    def _rig(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=self.WIDE["bids"],
+                                  asks=self.WIDE["asks"],
+                                  tick=0.01, fetched_at=r.now))
+        return r, A
+
+    def _plan(self, r, A):
+        prog, _ = r.fam._prog_row(A)
+        book = r.fam.cache.fresh(A, 999, r.now)
+        return r.fam._plan_side(A, book, "BUY", prog,
+                                r.fam._side_pool(A, prog) or 0.0, 20.0,
+                                bar=0.0)
+
+    def test_a_blank_market_probes_one_tick_at_minimum_size(self):
+        r, A = self._rig()
+        r.cycle()
+        plan = self._plan(r, A)
+        if plan is not None:
+            self.assertLessEqual(plan["px"], 0.02 + 1e-9)  # touch + 1 tick
+            if plan["px"] > 0.011:                     # in front: min size
+                self.assertLessEqual(plan["qty"], 1.0 + 1e-9)
+        # a wider ratchet widens the reach, and no further than it says
+        r.fam.probe_ratchet[f"{A}|BUY"] = [5, 0.0]
+        plan5 = self._plan(r, A)
+        self.assertIsNotNone(plan5)
+        self.assertLessEqual(plan5["px"], 0.06 + 1e-9)  # touch + 5 ticks
+        if plan5["px"] > 0.011:
+            self.assertLessEqual(plan5["qty"], 1.0 + 1e-9)
+
+    def test_a_burned_market_never_fronts_past_its_evidence(self):
+        # the dwajoh shape: fills on record, no model. In-front quotes
+        # stop at the band's low edge, however good the score out front.
+        r, A = self._rig()
+        r.cycle()
+        for ts in (r.now - 3600, r.now - 1800):
+            r.fam.evidence.fill(A, "BUY", 0.05, ts=ts, weight=2.5)
+        plan = self._plan(r, A)
+        if plan is not None:
+            band = r.fam.evidence.band(A)
+            lo = (band["lo"] or 99) / 100.0
+            self.assertLessEqual(plan["px"], max(lo, 0.02) + 1e-9)
+
+    def test_the_ratchet_earns_a_tick_per_quiet_day(self):
+        r, A = self._rig()
+        key = f"{A}|BUY"
+        T = 1_800_000_000.0
+        r.fam._advance_probe_ratchet(A, "BUY", T)
+        self.assertEqual(r.fam.probe_ratchet[key][0], 2)
+        r.fam._advance_probe_ratchet(A, "BUY", T + 1000)   # same day: no
+        self.assertEqual(r.fam.probe_ratchet[key][0], 2)
+        r.fam._advance_probe_ratchet(A, "BUY", T + 90000)
+        self.assertEqual(r.fam.probe_ratchet[key][0], 3)
+
+    def test_one_probe_at_a_time(self):
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r, A = self._rig()
+        r.cycle()
+        r.fam.orders["P1"] = FamilyOrder(
+            id="P1", market=A, side="BUY", price=0.02, qty=1.0,
+            intent=BUY_LONG, placed_ts=r.now, purpose="earn")
+        plan = self._plan(r, A)
+        if plan is not None:                 # a second order stays at
+            self.assertLessEqual(plan["px"], 0.01 + 1e-9)   # the touch
+
+    def test_the_ratchet_survives_a_restart(self):
+        r, A = self._rig()
+        r.fam.probe_ratchet[f"{A}|BUY"] = [4, 123.0]
+        d = r.fam.to_dict()
+        r2, _ = self._rig()
+        r2.fam.restore(d)
+        self.assertEqual(r2.fam.probe_ratchet[f"{A}|BUY"], [4, 123.0])
