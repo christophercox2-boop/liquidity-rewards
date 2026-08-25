@@ -3809,3 +3809,94 @@ class TestBookDepth(unittest.TestCase):
     def test_we_ask_the_endpoint_for_full_depth(self):
         from v3.api import Client
         self.assertEqual(Client.BOOK_DEPTH, 50)
+
+
+class TestDryExitsPriceToFill(unittest.TestCase):
+    """Owner, 2026-08-24: "Just try and make positive ev plays."
+
+    Measured on the live book that day: of 39 politics exits pinned at
+    break-even, 18 earned NOTHING against $49.40 of his money, and 21
+    earned $2.196/day — of which ONE order (Buttigieg 2028, SELL 307
+    @ 12c) was $1.983/day on its own. Moving that one 2 ticks costs
+    $6.14 and pays back in 3.1 days, so the +EV play is not "sell
+    harder", it is: free the exits that earn nothing and do not touch
+    the ones that earn."""
+
+    def _rig(self):
+        from v3.tests.test_family import Rig, A, politics_book
+        r = Rig()
+        r.add_market(A)
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 9.66}   # basis 96.6c
+        r.positions[A] = (10.0, 9.66)
+        r.fam.cache.put(A, politics_book(r.now))
+        return r, A
+
+    def test_an_earning_exit_is_never_dry(self):
+        from v3.family import FamilyOrder as Order
+        r, A = self._rig()
+        r.fam.orders["E1"] = Order(id="E1", market=A, side="SELL",
+                                   price=0.97, qty=10.0, purpose="sell",
+                                   intent="", placed_ts=r.now - 99999.0)
+        r.fam.orders["E1"].live_est = 0.5          # it is earning
+        r.fam.orders["E1"].dry_since = r.now - 99999.0
+        self.assertFalse(r.fam._exit_is_dry(A, "SELL", r.now))
+
+    def test_one_earning_order_protects_the_whole_side(self):
+        from v3.family import FamilyOrder as Order
+        r, A = self._rig()
+        for oid, est in (("E1", 0.0), ("E2", 0.4)):
+            o = Order(id=oid, market=A, side="SELL", price=0.97, qty=5.0,
+                      purpose="sell", intent="", placed_ts=r.now)
+            o.live_est = est
+            o.dry_since = r.now - 99999.0 if est == 0 else None
+            r.fam.orders[oid] = o
+        self.assertFalse(r.fam._exit_is_dry(A, "SELL", r.now))
+
+    def test_a_long_dry_exit_is_dry(self):
+        from v3.family import FamilyOrder as Order, EXIT_DRY_S
+        r, A = self._rig()
+        o = Order(id="E1", market=A, side="SELL", price=0.97, qty=10.0,
+                  purpose="sell", intent="", placed_ts=r.now)
+        o.live_est = 0.0
+        o.dry_since = r.now - EXIT_DRY_S - 1.0
+        r.fam.orders["E1"] = o
+        self.assertTrue(r.fam._exit_is_dry(A, "SELL", r.now))
+
+    def test_briefly_dry_is_not_dry(self):
+        from v3.family import FamilyOrder as Order, EXIT_DRY_S
+        r, A = self._rig()
+        o = Order(id="E1", market=A, side="SELL", price=0.97, qty=10.0,
+                  purpose="sell", intent="", placed_ts=r.now)
+        o.live_est = 0.0
+        o.dry_since = r.now - EXIT_DRY_S / 2.0
+        r.fam.orders["E1"] = o
+        self.assertFalse(r.fam._exit_is_dry(A, "SELL", r.now))
+
+    def test_no_exit_yet_is_not_dry(self):
+        r, A = self._rig()
+        self.assertFalse(r.fam._exit_is_dry(A, "SELL", r.now))
+
+    def test_dry_lets_the_exit_price_to_fill_instead_of_break_even(self):
+        from v3.tests.test_family import politics_book
+        r, A = self._rig()
+        book = politics_book(r.now)
+        held, dry = (r.fam._exit_floor(A, "SELL", 0.966, book.tick,
+                                       book=book, qty=10.0, dry=d)[0]
+                     for d in (False, True))
+        # dry prices to FILL: one tick above the best bid, and never
+        # below it — post-only, so it rests rather than crossing
+        self.assertAlmostEqual(dry, book.bids[0][0] + book.tick, places=6)
+        self.assertGreater(dry, book.bids[0][0])
+        self.assertLess(dry, held)           # strictly more willing than held
+
+    def test_a_dry_cover_prices_to_fill_too(self):
+        from v3.tests.test_family import politics_book
+        r, A = self._rig()
+        r.fam.inventory[A] = {"qty": -10.0, "cost": -0.30}   # short at 3c
+        book = politics_book(r.now)
+        held, dry = (r.fam._exit_floor(A, "BUY", 0.03, book.tick,
+                                       book=book, qty=10.0, dry=d)[0]
+                     for d in (False, True))
+        self.assertAlmostEqual(dry, book.asks[0][0] - book.tick, places=6)
+        self.assertLess(dry, book.asks[0][0])   # never above the ask
+        self.assertGreater(dry, held)           # more willing than held

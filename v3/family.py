@@ -61,7 +61,15 @@ ET = ZoneInfo("America/New_York")
 BOOK_MAX_AGE = 120.0
 PAGE_LOSS_USD = 1.0    # only losses bigger than this reach the phone
 PAGE_SETTLE_S = 20.0   # let the book settle before marking an open
-GONE_GRACE_S = 300.0   # a vanished order waits this long for the lagging
+GONE_GRACE_S = 300.0
+# An exit that has earned NOTHING for this long is not waiting for a
+# better price — it is dead capital. Measured 2026-08-24: 18 of 39
+# stuck politics exits were earning zero against $49.40 of the owner's
+# money, while 21 were earning $2.196/day and must not be disturbed
+# (owner: "Just try and make positive ev plays"). Six hours is long
+# enough that a quiet spell is not mistaken for a dead order, short
+# enough to act the same day.
+EXIT_DRY_S = 6 * 3600.0   # a vanished order waits this long for the lagging
                        # position feed before it counts as a silent cancel
 
 # size grid the planner walks (contracts); fractional sizes are live rails
@@ -213,6 +221,7 @@ class FamilyOrder:
     est_day: float = 0.0
     share: float = 0.0
     live_est: float | None = None
+    dry_since: float | None = None   # when it last stopped earning
     live_ev: float | None = None
     live_share: float | None = None
     weak_since: float = 0.0   # measuring under the bar since (0 = fine)
@@ -1691,6 +1700,13 @@ class Family:
                 continue
             rec.live_est = round(j.share * side_pool
                                  if j.qualifies and j.in_window else 0.0, 4)
+            # when did this order last earn anything? An exit that has
+            # been dry for hours may price to FILL rather than hold out
+            # for a price the book has left behind.
+            if rec.live_est and rec.live_est > 0.0:
+                rec.dry_since = None
+            elif rec.dry_since is None:
+                rec.dry_since = now
             self.fillmodel.observe_order_age(rec.market, now - rec.placed_ts,
                                              60.0)
             if rec.purpose not in ("sell", "probe"):
@@ -2192,9 +2208,32 @@ class Family:
                       qty=rec.qty,
                       note=f"a slot at {best:.2f} earns more — moving")
 
+    def _exit_is_dry(self, slug: str, side: str, now: float) -> bool:
+        """Has this market's exit on this side earned nothing for
+        EXIT_DRY_S?
+
+        True only when there IS an exit resting and every one of them
+        has been dry the whole time. A market with no exit yet is not
+        dry — it has not had the chance — and one earning order on the
+        side keeps the whole side out of it, because moving an earning
+        exit trades a live reward stream for a faster fill and that is
+        the trade the owner does not want."""
+        mine = [o for o in self.orders.values()
+                if o.market == slug and o.purpose == "sell"
+                and o.side == side]
+        if not mine:
+            return False
+        for o in mine:
+            if o.live_est and o.live_est > 0.0:
+                return False
+            if o.dry_since is None or now - o.dry_since < EXIT_DRY_S:
+                return False
+        return True
+
     def _exit_floor(self, slug: str, side: str, basis: float,
                     tick: float, book=None,
-                    qty: float | None = None) -> tuple[float, float]:
+                    qty: float | None = None,
+                    dry: bool = False) -> tuple[float, float]:
         """(price limit, scoring basis) for an exit. Break-even bounds it
         by default. When the model prices the market and says holding to
         resolution loses MORE than closing near fair, the limit extends
@@ -2203,7 +2242,16 @@ class Family:
         sell no lower than the band's top, cover no higher than its
         bottom (owner, 2026-08-22: stranded exits must be able to fill).
         And a position worth under 50 cents in total may walk away at
-        the touch — the argument is smaller than the tick."""
+        the touch — the argument is smaller than the tick.
+
+        `dry` says this market's exit has earned nothing for
+        EXIT_DRY_S. Such an order is not holding out for a better
+        price, it is holding out for a price the book has left behind,
+        and it earns nothing while it waits. It prices to fill, on the
+        same terms as dust. An exit that IS earning is never marked
+        dry, so the reward stream is never traded away for a quicker
+        exit (owner, 2026-08-24: "Just try and make positive ev
+        plays")."""
         fair = self.fairs(slug) if self.fairs is not None else None
         if fair is None and book is not None:
             try:
@@ -2214,8 +2262,8 @@ class Family:
                 edge = band.get("hi") if side == "SELL" else band.get("lo")
                 if edge is not None:
                     fair = edge / 100.0
-        dust = False
-        if qty is not None and book is not None:
+        dust = bool(dry)
+        if qty is not None and book is not None and not dust:
             if side == "SELL" and book.bids:
                 dust = qty * book.bids[0][0] < 0.50
             elif side == "BUY" and book.asks:
@@ -2450,7 +2498,8 @@ class Family:
                                 # "no reason to wait")
                 break_even = min(max(inv.get("cost", 0.0) / qty, 0.001), 0.989)
                 floor_px, score_basis = self._exit_floor(
-                    slug, "SELL", break_even, book.tick, book=book, qty=qty)
+                    slug, "SELL", break_even, book.tick, book=book, qty=qty,
+                    dry=self._exit_is_dry(slug, "SELL", now))
                 ask_touch = (book.asks[0][0] if book.asks
                              else break_even + book.tick)
                 lo = max(floor_px,
@@ -2508,7 +2557,8 @@ class Family:
                                 # their buy-back immediately
                 received = min(max(-inv.get("cost", 0.0) / -qty, 0.002), 0.999)
                 cap_px, score_basis = self._exit_floor(
-                    slug, "BUY", received, book.tick, book=book, qty=-qty)
+                    slug, "BUY", received, book.tick, book=book, qty=-qty,
+                    dry=self._exit_is_dry(slug, "BUY", now))
                 bid_touch = (book.bids[0][0] if book.bids
                              else received - book.tick)
                 hi = min(cap_px,
