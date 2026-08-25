@@ -825,3 +825,14 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787658746.6,nba,tec-nba-champ-2027-06-18-w-dal,SELL,1,0.03,sell,0,45.61,,,,0.379,,,,-1,an exit — its fill reduces the position it sits on,C1Z2P5FP4DK7
 1787658746.6,nba,tec-nba-champ-2027-06-18-w-det,SELL,1,0.06,sell,0,45.56,,,,0.394,,,,-1,an exit — its fill reduces the position it sits on,C1Z4488RPDK5
 1787659047.8,cfb,aachc-cfb-wins-2026-11-28-ore-9pt5wins,SELL,1,0.2237,sell,0,0.07,,84,88,0.498,,,0.6363,0,selling filled stock — it earns while it waits,C35TSVJJ0FSS
+1787661067.4,politics,ewc-usgub-mi-2026-11-03-dem,BUY,1,0.91,earn,12.4599,0.07,0.924025,87,95,0,0.84,0.94,-0.014,1,7 ticks in front of the touch — we would hold 100% of the bid side,C36RFQPEGFSJ
+1787661847.4,cfb,aachc-cfb-wins-ou-2026-11-28-washst,SELL,0.01,0.66,sell,0,0.61,,66,73,0.431,0.63,0.66,0.04,-0.01,selling filled stock — it earns while it waits,C36GBY5V2FSP
+1787661847.4,cfb,aachc-cfb-wins-2026-11-28-missr-4pt5wins,BUY,0.01,0.95,earn,0.0309,0.52,,89,96,0.258,0.95,0.99,0.02,0.02,19 ticks in front of the touch — closer to the midpoint; ~98.4% of the bid side,C36JAJJN6FSS
+1787662567.5,politics,enwc-uspres-nom-dem-2028-rahema,BUY,1,0.12,earn,8.9969,0.02,,3,11,0.226,0.03,0.21,0.06,-6,9 ticks in front of the touch — we would hold 99% of the bid side,C372V7SZJFSH
+1787662687.5,politics,ussewc-usse-id-2026-11-03-todach,BUY,5,0.12,earn,5.5654,0.71,,4,13,0.213,0.01,0.14,0.04,6,2 ticks in front of the touch — closer to the midpoint; ~89.0% of the bid side,C36K57HECFSK
+1787663527.5,cfb,aachc-cfb-wins-2026-11-28-gtech-5pt5wins,SELL,0.01,0.74,earn,0,0.97,,53,58,0.438,0.73,0.74,-0.18,-0.02,11 ticks in front of the touch — closer to the midpoint; ~1.4% of the ask side,C36J3KAT6FSJ
+1787663587.5,politics,ewc-usgub-ks-2026-11-03-rep,SELL,1,0.6,earn,12.4899,0.77,0.52775,57,64,0,0.58,0.6,-0.0723,-1,1 tick in front of the touch — we would hold 99% of the ask side,C36RYPF7GFSK
+1787663647.5,cfb,aachc-cfb-wins-ou-2026-11-28-washst,BUY,0.01,0.63,earn,0,0.99,,68,75,0.612,0.63,0.64,-0.08,0.01,11 ticks in front of the touch — closer to the midpoint; ~95.3% of the bid side,C36JPWBHAFSK
+1787663707.5,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,BUY,1,0.15,earn,1.3661,0.18,,6,10,0.815,0.02,0.15,0.07,4,joins the touch — the book has been quiet,C376ZE7EPFSN
+1787664007.5,cfb,aachc-cfb-wins-2026-11-28-aubrn-5pt5wins,BUY,0.5,0.83,earn,2.9331,0.07,,85,94,0.33,0.82,0.86,-0.06,0.5,1 tick in front of the touch — we would hold 47% of the bid side,C37CBKK2RFSS
+1787664307.5,politics,ewc-usp-2028-11-07-markel,BUY,0.42,0.05,manual,0.2027,1.32,,5,22,0,0.05,0.14,-0.09,-2.58,the owner's own order — the engine leaves it alone,C36FAFF2GFSP
