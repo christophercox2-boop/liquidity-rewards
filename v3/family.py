@@ -95,6 +95,15 @@ PROBE_MAX_QTY = 1.0
 # and the watch ends ("When things are stable, then the process can
 # end").
 NURSE_STABLE_S = 600.0
+# Bump this whenever _plan_side's SEMANTICS change — new caps, new
+# bounds, new deflators. It is part of the scoreboard signature, so a
+# restored scoreboard scored under older rules is thrown away and the
+# board rescanned under the rules actually running. Found 2026-08-25:
+# every reboot re-placed pre-rule plans verbatim (the rahema 12c buys,
+# each within a minute of a boot, carrying the exact pre-deflator
+# estimate) because the signature only covered config knobs, and
+# today's rules are code, not config.
+PLAN_RULES_REV = 2
 NURSE_APPROACH_TICKS = 2
 NURSE_BOOK_MAX_AGE_S = 15.0   # a vanished order waits this long for the lagging
                        # position feed before it counts as a silent cancel
@@ -3474,7 +3483,8 @@ class Family:
         c = self.cfg
         return "|".join(str(x) for x in (
             c.per_market_usd, c.min_est_day, c.share_hi, c.rest_style,
-            c.allow_improve, c.revive, c.revive_max_usd, c.vol_quiet))
+            c.allow_improve, c.revive, c.revive_max_usd, c.vol_quiet,
+            c.est_deflate, PLAN_RULES_REV))
 
     def to_dict(self) -> dict:
         return {
