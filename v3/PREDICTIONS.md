@@ -693,3 +693,33 @@ Five theories dead in two days. Four I killed by checking my own
 arithmetic; this one survived until he asked for evidence I had never
 gathered. Before the next claim: name the two things being compared
 and confirm they are the same population.
+
+---
+
+## P13 — the diminishing-capacity mechanism was junk intake
+*Written 2026-08-25 evening, all of the day's rules live (41327fd).*
+
+**The owner's diagnosis, confirmed as today's whole arc:** every bad
+fill converts earning capital into stuck inventory. The dollar keeps
+counting against the cap but stops earning, so quoting capacity
+shrinks while risk stays maxed — politics fell $295.29 -> $36.05
+over six days at a pinned $250 cap.
+
+**Claim.** With the intake rules live (deflated bar, speed-graded
+learning, probe-only fronting, the evidence cap, the sweep, the
+nurse) and the exit gate working the other end:
+1. Politics' junk intake stops: across the next 7 days, no new
+   politics position opens more than 3c past the evidence band or
+   model fair at entry.
+2. Politics' daily paid stops falling and recovers to at least
+   $75/day by Aug-31 as capital frees, without the cap being raised.
+
+**Falsifier.** A new kamhar-class fill (entry past value on an
+informed model-less market), or politics paid still under $50/day on
+Aug-31 with the rules live and quoting volume healthy. If quoting
+collapsed instead (the owner's "barely quoting" trigger), the
+deflator is re-examined first — that failure mode is over-tight
+intake, not junk.
+
+**Check.** data/fills.csv entries vs band/fair per fill;
+data/rewards.csv daily politics totals; quoting volume from state.
