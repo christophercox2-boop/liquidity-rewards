@@ -266,6 +266,49 @@ class Client:
 
     BOOK_DEPTH = 50          # the endpoint's documented maximum
 
+    def compare_book_sources(self, slugs: list[str]) -> list[str]:
+        """READ-ONLY diagnostic (owner approved 2026-08-25): fetch the
+        same markets through the current book path and the documented
+        /v1/orderbook/{slug}?depth=50 path, and return log lines with
+        the level counts and touches side by side. CHANGES NOTHING —
+        every live fetch still uses the current path. The owner's
+        screenshots showed the exchange rendering 14 levels and a 1c
+        spread on a market our feed shows as 4 levels and 50c wide;
+        this measures whether the other endpoint sees the real book."""
+        def shape(j) -> tuple:
+            md = (j.get("book") or j.get("marketData")
+                  or j.get("orderbook") or j)
+            bids = [(to_num(l.get("px") or l.get("price")),
+                     to_num(l.get("qty") or l.get("size")))
+                    for l in md.get("bids") or []]
+            asks = [(to_num(l.get("px") or l.get("price")),
+                     to_num(l.get("qty") or l.get("size")))
+                    for l in md.get("offers") or md.get("asks") or []]
+            bb = max((p for p, _ in bids), default=None)
+            ba = min((p for p, _ in asks), default=None)
+            return (len(bids), len(asks),
+                    f"{bb*100:.0f}c" if bb else "-",
+                    f"{ba*100:.0f}c" if ba else "-")
+        lines = []
+        for slug in slugs:
+            row = [slug[:44]]
+            try:
+                cur = shape(self.get(f"{GATEWAY}/v1/markets/{slug}/book",
+                                     params={"depth": self.BOOK_DEPTH}))
+                row.append(f"current={cur[0]}+{cur[1]} lvls "
+                           f"{cur[2]}/{cur[3]}")
+            except Exception as e:  # noqa: BLE001
+                row.append(f"current=ERR {str(e)[:40]}")
+            try:
+                ob = shape(self.get(f"{GATEWAY}/v1/orderbook/{slug}",
+                                    params={"depth": self.BOOK_DEPTH}))
+                row.append(f"orderbook={ob[0]}+{ob[1]} lvls "
+                           f"{ob[2]}/{ob[3]}")
+            except Exception as e:  # noqa: BLE001
+                row.append(f"orderbook=ERR {str(e)[:40]}")
+            lines.append("  ".join(row))
+        return lines
+
     def book(self, slug: str, fetched_at: float | None = None) -> Book:
         """The resting book, as DEEP as the endpoint will give us.
 
