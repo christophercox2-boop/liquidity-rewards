@@ -1504,6 +1504,44 @@ class Monitor:
             return "cfb"
         return "politics"
 
+    def _feed_check(self, now: float) -> None:
+        """The approved live-feed test (owner, 2026-08-25, log-only):
+        for a few markets whose cached book was last written by the
+        STREAM, fetch the same book fresh over REST and log both side
+        by side. If the stream-written picture is consistently thinner,
+        the feed is overwriting whole books with partial updates — the
+        prime suspect for the inflated share estimates. Changes
+        nothing; three extra fetches an hour."""
+        done = 0
+        for key, fam in self.families.items():
+            if done >= 3:
+                break
+            for slug, w in list(fam.cache.last_writer.items()):
+                if done >= 3:
+                    break
+                if w != "ws":
+                    continue
+                cached = fam.cache.any_age(slug)
+                if cached is None or now - cached.fetched_at > 90:
+                    continue
+                try:
+                    fresh = self.client.book(slug, fetched_at=now)
+                except Exception as e:  # noqa: BLE001
+                    self._note(f"feed check: {slug[:40]} REST err "
+                               f"{str(e)[:50]}")
+                    done += 1
+                    continue
+                def _shape(b):
+                    bb = b.bids[0][0] * 100 if b.bids else 0
+                    ba = b.asks[0][0] * 100 if b.asks else 0
+                    return (f"{len(b.bids)}+{len(b.asks)} lvls "
+                            f"{bb:.0f}c/{ba:.0f}c")
+                self._note(
+                    f"feed check: {slug[:40]}  stream-cache("
+                    f"{now - cached.fetched_at:.0f}s old)={_shape(cached)}"
+                    f"  fresh-REST={_shape(fresh)}")
+                done += 1
+
     def publish_files(self, now: float) -> None:
         """Hourly, and only while 1.0 is retired (one writer per file)."""
         if os.environ.get("V1_ENABLED", "0") != "0":
@@ -1511,6 +1549,10 @@ class Monitor:
         if now - getattr(self, "_pub_at", 0.0) < 3600.0:
             return
         self._pub_at = now
+        try:
+            self._feed_check(now)
+        except Exception as e:  # noqa: BLE001 — a diagnostic, never a blocker
+            self._note(f"feed check failed: {type(e).__name__}: {e}")
         try:      # the estimate ledger: every day's prediction, kept
                   # until the exchange settles it (owner, 2026-08-23)
             from .estimator import et_day

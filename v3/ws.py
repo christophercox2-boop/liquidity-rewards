@@ -76,7 +76,9 @@ class Stream:
                     for l in md.get("bids") or []]
             asks = [(to_num(l.get("px")), to_num(l.get("qty")))
                     for l in md.get("offers") or md.get("asks") or []]
-            self.cache.put(slug, normalize_book(bids, asks, fetched_at=time.time()))
+            self.cache.put(slug, normalize_book(bids, asks,
+                                                fetched_at=time.time()),
+                           writer="ws")
             self.status["last_msg"] = time.time()
             return slug
         except Exception:  # noqa: BLE001
