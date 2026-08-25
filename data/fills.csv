@@ -858,3 +858,9 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787670443.5,politics,ewc-usp-2028-11-07-kamhar,BUY,1,0.13,earn,3.6649,0.02,,8,28,0.079,0.05,0.3,-0.05,26,8 ticks in front of the touch — we would hold 99% of the bid side,C391T2VM8FSJ
 1787670503.5,politics,ewc-usp-2028-11-07-petbut,BUY,1,0.12,earn,3.6849,0.02,,8,13,0,0.02,0.2,0.02,3,10 ticks in front of the touch — we would hold 99% of the bid side,C3929V8KPFSK
 1787670563.5,cfb,aachc-cfb-wins-ou-2026-11-28-wake,SELL,0.01,0.34,earn,0.1645,1.04,,40,53,0,0.25,0.34,0.13,-0.01,9 ticks in front of the touch — we would hold 84% of the ask side,C386H7X0WFSS
+1787670850.2,politics,enwc-usgubp-ri-2026-09-09-rep-elapel,BUY,1,0.93,earn,4.1667,0.85,,89,93,0.849,0.86,0.94,0.02,10,joins the touch — the book has been quiet,C38E42456FSK
+1787670850.2,politics,enwc-usgubp-ma-2026-09-01-rep-brisho,BUY,1,0.09,manual,0.563,0.73,,6,10,0.802,0.01,0.09,0.01,1,the owner's own order — the engine leaves it alone,C38H3XC34FSJ
+1787670850.2,politics,enwc-usgubp-ri-2026-09-09-rep-robrai,BUY,1,0.02,earn,2.9639,0.59,,4,8,0.564,0.02,0.03,-0.04,6,1 tick in front of the touch — we would hold 71% of the bid side,C38MJW8W6FSS
+1787670850.2,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,BUY,1,0.13,earn,4.1667,0.11,,6,11,0.835,0.13,0.14,0.04,5,6 ticks in front of the touch — we would hold 100% of the bid side,C3927JB6TFSG
+1787670970.2,cfb,aachc-cfb-wins-2026-11-28-byu-9pt5wins,SELL,0.01,0.34,earn,0.0238,1.02,,50,58,0.537,0.33,0.49,0.2,-0.01,joins the touch — the book has been quiet,C38AH2HB6FSQ
+1787671030.2,cfb,aachc-cfb-wins-2026-11-28-aubrn-5pt5wins,BUY,0.5,0.81,earn,0.4997,0.98,,80,86,0.561,0.62,0.84,-0.02,1.5,1 tick behind the touch — we would hold 20% of the bid side,C38BPVH7GFSS
