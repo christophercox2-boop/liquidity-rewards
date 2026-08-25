@@ -2539,8 +2539,12 @@ class Family:
                          if base.get("opp") is not None else 0.0)
                 closing = (base.get("opp") is not None
                            and (base["opp"] - opp_t) * sign > 1e-9)
-                if gap_t <= 1.0 + 1e-6 or (closing
-                                           and moved >= NURSE_APPROACH_TICKS):
+                # a pull needs actual MOVEMENT toward us — on a tight
+                # book a one-tick gap is the normal resting state, and
+                # the first hour live showed pulls reading "rushed from
+                # 2c to 2c" on healthy orders
+                if closing and (gap_t <= 1.0 + 1e-6
+                                or moved >= NURSE_APPROACH_TICKS):
                     why = (f"the {'ask' if rec.side == 'BUY' else 'bid'} "
                            f"rushed from {base['opp']*100:.0f}c to "
                            f"{opp_t*100:.0f}c — a taker forming, not drift")

@@ -4448,6 +4448,17 @@ class TestTheNurse(unittest.TestCase):
         r.fam.nurse(r.now + NURSE_STABLE_S + 10, r.exchange)
         self.assertIn("P", r.fam.orders)
 
+    def test_a_static_tight_gap_is_not_a_rush(self):
+        # first hour live: pulls reading "rushed from 2c to 2c" on
+        # tight books where a one-tick gap IS the resting state. No
+        # movement, no pull.
+        r, A = self._rig(price=0.05)
+        self._rebook(r, A, ((0.01, 6000.0),), ((0.06, 300.0),))
+        r.fam._nurse_base.clear()               # baseline ON the tight book
+        r.fam.nurse(r.now, r.exchange)          # gap already 1 at baseline
+        r.fam.nurse(r.now + 5, r.exchange)      # unchanged book
+        self.assertIn("P", r.fam.orders)
+
     def test_manual_orders_are_never_nursed(self):
         from v3.family import FamilyOrder
         from v3.intents import BUY_LONG
