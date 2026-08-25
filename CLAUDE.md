@@ -12,6 +12,15 @@ decisions already made about the rebuild. Start there, not in the code.
 Working on the running 1.0? HANDOFF.md has the operational history — it is
 long and accreted, so search it rather than reading it through.
 
+## Standing rule (owner, 2026-08-25 — supersedes everything below)
+- "Don't make changes any more without checking with me." EVERY code,
+  config or deploy change gets the owner's explicit yes first, stated
+  plainly enough to approve on a phone. No exceptions for "obvious"
+  fixes, reverts of my own work, or diagnostics that touch behavior.
+- When the owner corrects a factual claim (e.g. 2026-08-25: the party
+  market and the candidate book ARE the same market — corrected twice),
+  the correction is the ground truth going forward. Do not re-litigate.
+
 ## How to talk to the owner
 - Plainly. No characterizing, no hype, no hedging language. Lead with the
   numbers and what happened.
