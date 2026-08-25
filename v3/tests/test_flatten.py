@@ -4674,3 +4674,32 @@ class TestBookCompareIsReadOnly(unittest.TestCase):
         c.get = fake_get
         lines = c.compare_book_sources(["m"])
         self.assertIn("orderbook=ERR", lines[0])
+
+
+class TestFeedCheck(unittest.TestCase):
+    """Owner-approved (2026-08-25) live-feed test, log-only: books the
+    STREAM wrote are compared against a fresh REST fetch of the same
+    market. The writer tag is what makes the comparison honest."""
+
+    def test_the_cache_remembers_who_wrote_each_book(self):
+        from v3.books import BookCache
+        from v3.scoring import normalize_book
+        c = BookCache()
+        c.put("a", normalize_book([(0.4, 1)], [(0.6, 1)], 1.0))
+        c.put("b", normalize_book([(0.4, 1)], [(0.6, 1)], 1.0), writer="ws")
+        self.assertEqual(c.last_writer["a"], "rest")
+        self.assertEqual(c.last_writer["b"], "ws")
+
+    def test_a_stream_frame_is_tagged_ws(self):
+        import json as _json
+        from v3.ws import Stream
+        from v3.books import BookCache
+        st = Stream.__new__(Stream)
+        st.cache = BookCache()
+        st.declared = {}
+        st.status = {"last_msg": 0.0}
+        st.apply_frame(_json.dumps({"marketData": {
+            "marketSlug": "m",
+            "bids": [{"px": "0.4", "qty": "10"}],
+            "asks": [{"px": "0.6", "qty": "10"}]}}))
+        self.assertEqual(st.cache.last_writer["m"], "ws")

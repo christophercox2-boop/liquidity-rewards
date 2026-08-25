@@ -34,6 +34,7 @@ PRIORITY_RESERVE = 6     # rotation slots the priority set can never starve
 class BookCache:
     def __init__(self):
         self.depth_seen: dict[str, int] = {}   # slug -> levels last seen
+        self.last_writer: dict[str, str] = {}  # slug -> "ws" | "rest"
         self.depth_hist: dict[int, int] = {}   # levels -> how often
         self._books: dict[str, Book] = {}
         # optional observer: called as on_put(slug, book) after every
@@ -75,7 +76,7 @@ class BookCache:
 
     # -- writes ------------------------------------------------------------
 
-    def put(self, slug: str, book: Book) -> None:
+    def put(self, slug: str, book: Book, writer: str = "rest") -> None:
         """Store a freshly normalized book (either writer). Learns how
         lively the book is from whether its top 3 levels moved, and how
         DEEP the book we were handed actually is.
@@ -89,6 +90,11 @@ class BookCache:
         of theorising."""
         n = max(len(book.bids), len(book.asks))
         self.depth_seen[slug] = n
+        self.last_writer[slug] = writer   # who wrote this book — the
+                                          # stream or a REST fetch; the
+                                          # approved feed check compares
+                                          # stream-written books against
+                                          # fresh REST for the same slug
         self.depth_hist[min(n, 50)] = self.depth_hist.get(min(n, 50), 0) + 1
         old = self._books.get(slug)
         if old is not None:
