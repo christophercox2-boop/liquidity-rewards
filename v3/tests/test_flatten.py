@@ -3913,3 +3913,43 @@ class TestDryExitsPriceToFill(unittest.TestCase):
         back = FamilyOrder(**{k: v for k, v in vars(o).items()
                               if k in fields})
         self.assertEqual(back.dry_since, 12345.0)
+
+
+class TestCeilingCountsTheSameBookTwice(unittest.TestCase):
+    """The ceiling check and the spend it checks against must measure
+    the SAME book.
+
+    On 2026-08-25, the morning after manual orders stopped counting
+    toward the family ceiling, politics reached $324.58 against a $250
+    cap. family_spent() excluded the owner's orders; the marginal-risk
+    check that gates each new placement did not, so negative-risk
+    netting offset every candidate against his book and each one looked
+    cheaper than it was."""
+
+    def test_a_manual_order_cannot_make_room_for_an_engine_order(self):
+        from v3.tests.test_family import Rig, A, B
+        from v3.family import FamilyConfig
+        from v3.intents import BUY_LONG
+        cfg = FamilyConfig(name="P", tag="P", known_ground=True,
+                           rest_style="join_quiet", revive=True,
+                           capital_usd=6.0, per_market_usd=6.0)
+        r = Rig(cfg=cfg)
+        r.add_market(A, siblings=[B])
+        for _ in range(3):
+            r.fam.last_action.clear()
+            r.cycle(advance=120.0)
+        base = r.fam.family_spent()
+        # a large hand order on the OPPOSITE bracket of the same race:
+        # it nets against the engine's book and used to open headroom
+        r.exchange.live["HAND"] = {"id": "HAND", "market": B, "side": "BUY",
+                                   "price": 0.40, "size": 200.0,
+                                   "intent": BUY_LONG, "manual": True}
+        for _ in range(3):
+            r.fam.last_action.clear()
+            r.cycle(advance=120.0)
+        self.assertIn("HAND", r.fam.orders)
+        self.assertEqual(r.fam.orders["HAND"].purpose, "manual")
+        # his money is not charged to the engine...
+        self.assertLessEqual(r.fam.family_spent(), cfg.capital_usd + 1e-6)
+        # ...and it does not buy the engine extra room either
+        self.assertLessEqual(r.fam.family_spent(), base + 1e-6)

@@ -1994,8 +1994,19 @@ class Family:
                             > self.cfg.proven_usd + 1e-9:
                         continue      # the proven pool has its own cap
                 else:
+                    # The SAME book family_spent() measures — engine
+                    # orders only. Leaving the owner's manual orders in
+                    # here let negative-risk netting offset each new
+                    # order against his book, so every placement looked
+                    # cheaper than it was while the spend it was checked
+                    # against excluded him. Politics reached $324.58
+                    # against a $250 cap that way on 2026-08-25, the
+                    # morning after manual orders stopped counting
+                    # toward the ceiling. The two sides of the
+                    # comparison have to be the same book.
                     search_orders = [o for o in self.orders.values()
-                                     if o.market not in self.proven]
+                                     if o.market not in self.proven
+                                     and o.purpose != "manual"]
                     if self.family_spent() + risk.marginal(
                             search_orders, slug, guess,
                             plan["px"], plan["qty"]) \
