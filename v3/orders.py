@@ -59,6 +59,25 @@ def price_str(price: float) -> str:
     return f"{price:.3f}".rstrip("0").rstrip(".")
 
 
+def snap_price(price: float, tick: float, side: str) -> float:
+    """Snap an outgoing price to the book's own price grid (owner,
+    2026-08-26: "decimal prices are not [fine] on most books. Some are
+    okay like house and senate party control"). Exit prices built from
+    break-even and model-fair arithmetic land on arbitrary decimals — a
+    real exit was resting at 5.90676c — and books that only take whole
+    cents reject or silently round them. Bids snap DOWN and asks snap
+    UP, so every floor, cap and never-cross guard only gets safer.
+    Tenth-cent books keep their finer grid: the grid is the book's
+    tick, not an assumption."""
+    if tick <= 0:
+        return round(price, 3)
+    import math
+    steps = price / tick
+    snapped = (math.floor(steps + 1e-9) if side == "BUY"
+               else math.ceil(steps - 1e-9)) * tick
+    return round(snapped, 3)
+
+
 @dataclass(frozen=True)
 class OrderResult:
     ok: bool
@@ -66,6 +85,9 @@ class OrderResult:
     order_id: str = ""            # the resting order's id when ok
     intent: str = ""
     two_orders: bool = False      # reprice edge: replacement rests, original cancel failed
+    price: float = 0.0            # the price actually sent (snapped to the
+                                  # book's grid) — callers record THIS, so
+                                  # our books show orders where they rest
 
 
 class OrderDesk:
@@ -154,6 +176,9 @@ class OrderDesk:
         is derived from the position unless the caller pins it (a reprice
         keeps the original's)."""
         qty = round(qty, 2)
+        book0 = self.fresh_book(slug)
+        if book0 is not None and book0.tick:
+            price = snap_price(price, book0.tick, side)
         if intent is None:
             intent = intent_for(side, net_position, qty, close_short)
         reason = self._check("place", slug, side, price, qty, initiator,
@@ -179,7 +204,8 @@ class OrderDesk:
             resp = self.client.post(TRADE_API + "/v1/orders", body, path="/v1/orders")
         except ApiError as e:
             self.log({"op": "place", "market": slug, "error": str(e), "ts": self._clock()})
-            return OrderResult(ok=False, note=f"placement failed: {e}")
+            return OrderResult(ok=False, note=f"placement failed: {e}",
+                               price=price)
         order_id = str((resp.get("order") or {}).get("id") or resp.get("id")
                        or resp.get("orderId") or "")
         self.log({"op": "place", "market": slug, "side": side, "price": price,
@@ -187,15 +213,16 @@ class OrderDesk:
                   "ts": self._clock()})
         if not verify:
             return OrderResult(ok=True, note="placed (unverified)",
-                               order_id=order_id, intent=intent)
+                               order_id=order_id, intent=intent, price=price)
         ok, note = self.verify_resting(slug, side, price, want_id=order_id, min_qty=qty)
         if not ok:
             # 2xx that never rests happens (and post-only rejections land
             # here too). Report it; the order id, if any, lets the caller
             # clean up. Never re-post: the first may still land late.
             return OrderResult(ok=False, note=f"placed but not resting: {note}",
-                               order_id=order_id, intent=intent)
-        return OrderResult(ok=True, note=note, order_id=order_id, intent=intent)
+                               order_id=order_id, intent=intent, price=price)
+        return OrderResult(ok=True, note=note, order_id=order_id, intent=intent,
+                           price=price)
 
     def verify_resting(self, slug: str, side: str, price: float, *,
                        want_id: str, min_qty: float) -> tuple[bool, str]:
@@ -274,10 +301,11 @@ class OrderDesk:
             # Two orders resting: costs a little size, far better than
             # losing our place. Surface it loudly; the caller alerts.
             return OrderResult(ok=True, order_id=placed.order_id, intent=placed.intent,
-                               two_orders=True,
+                               price=placed.price, two_orders=True,
                                note=(f"replacement resting (id {placed.order_id}) but the "
                                      f"original {existing['id']} failed to cancel — "
                                      f"two orders on the book"))
         return OrderResult(ok=True, order_id=placed.order_id, intent=placed.intent,
+                           price=placed.price,
                            note=f"repriced: new {placed.order_id} resting, "
                                 f"original {existing['id']} cancelled")

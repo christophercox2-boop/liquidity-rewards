@@ -5205,3 +5205,127 @@ class TestInstantRewardsWrite(unittest.TestCase):
         m._note = lambda s: notes.append(s)
         self.assertFalse(Monitor.publish_rewards_csv(m))
         self.assertTrue(any("rewards.csv write failed" in n for n in notes))
+
+
+class TestPriceGrid(unittest.TestCase):
+    """Owner, 2026-08-26: "decimal prices are not [fine] on most books.
+    Some are okay like house and senate party control." A real exit was
+    resting at 5.90676c — break-even arithmetic sent raw. Every outgoing
+    price now snaps to the book's own grid at the desk: bids down, asks
+    up, so floors and caps only get safer; tenth-cent books keep their
+    finer grid."""
+
+    def test_snap_semantics(self):
+        from v3.orders import snap_price
+        self.assertAlmostEqual(snap_price(0.0590676, 0.01, "SELL"), 0.06)
+        self.assertAlmostEqual(snap_price(0.0590676, 0.01, "BUY"), 0.05)
+        self.assertAlmostEqual(snap_price(0.0590676, 0.001, "SELL"), 0.06)
+        self.assertAlmostEqual(snap_price(0.0596, 0.001, "BUY"), 0.059)
+        # on-grid prices pass through untouched, float noise included
+        self.assertAlmostEqual(snap_price(0.059, 0.001, "SELL"), 0.059)
+        self.assertAlmostEqual(snap_price(0.057, 0.001, "BUY"), 0.057)
+        self.assertAlmostEqual(snap_price(0.44, 0.01, "BUY"), 0.44)
+
+    def test_the_desk_rests_on_grid_and_reports_the_real_price(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.01, 500.0),),
+                                  asks=((0.22, 500.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.cycle()
+        res = r.desk.place_resting(A, "SELL", 0.0590676, 5.0,
+                                   net_position=10.0, initiator="owner")
+        self.assertTrue(res.ok, res.note)
+        self.assertAlmostEqual(res.price, 0.06)     # ask snapped UP
+        live = [o for o in r.exchange.live.values()
+                if o["market"] == A and o["side"] == "SELL"]
+        self.assertTrue(any(abs(o["price"] - 0.06) < 1e-9 for o in live))
+
+    def test_a_failed_exit_placement_is_said_out_loud(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.5, 100.0),),
+                                  asks=((0.52, 100.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.cycle()
+        for oid in list(r.fam.orders):
+            r.fam.orders.pop(oid)
+        r.exchange.live.clear()
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 3.0}
+        r.positions[A] = (10.0, 3.0)      # the exchange agrees
+        # every placement dies exchange-side: the exit CANNOT rest
+        orig = r.exchange.post
+        def dead(url, body, path=None, **kw):
+            if url.endswith("/v1/orders"):
+                raise __import__("v3.api", fromlist=["ApiError"]).ApiError("book closed")
+            return orig(url, body, path=path, **kw)
+        r.exchange.post = dead
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertTrue(any(l.get("event") == "exit_place_failed"
+                            for l in r.fam.log))
+
+
+class TestThePeakDropTrail(unittest.TestCase):
+    """Owner, 2026-08-26: "keep track of the percentage decrease in
+    rewards from an 8 hour peak and allow me to sort the orders page by
+    that." Half-hour buckets of each order's best measured rate; the
+    peak is the window's max and expires with its bucket."""
+
+    def _rec(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r = Rig()
+        r.add_market(A)
+        rec = FamilyOrder(id="P", market=A, side="BUY", price=0.44,
+                          qty=20.0, intent=BUY_LONG, placed_ts=r.now,
+                          purpose="earn")
+        return r, rec
+
+    def test_the_peak_holds_and_the_drop_is_readable(self):
+        r, rec = self._rec()
+        rec.live_est = 1.20
+        r.fam._track_est(rec, r.now)
+        rec.live_est = 0.45
+        r.fam._track_est(rec, r.now + 1800)
+        self.assertAlmostEqual(rec.est_peak8, 1.20)
+        drop = (rec.est_peak8 - rec.live_est) / rec.est_peak8
+        self.assertAlmostEqual(drop, 0.625)
+
+    def test_the_peak_expires_after_eight_hours(self):
+        r, rec = self._rec()
+        rec.live_est = 1.20
+        r.fam._track_est(rec, r.now)
+        rec.live_est = 0.45
+        for i in range(1, 18):
+            r.fam._track_est(rec, r.now + i * 1800)
+        self.assertAlmostEqual(rec.est_peak8, 0.45)   # old peak gone
+
+    def test_a_bucket_keeps_its_best_reading(self):
+        r, rec = self._rec()
+        rec.live_est = 0.30
+        r.fam._track_est(rec, r.now)
+        rec.live_est = 0.90
+        r.fam._track_est(rec, r.now + 60)     # same half-hour bucket
+        rec.live_est = 0.10
+        r.fam._track_est(rec, r.now + 120)
+        self.assertAlmostEqual(rec.est_peak8, 0.90)
+        self.assertEqual(len(rec.est_hist), 1)
+
+    def test_the_trail_survives_a_restart(self):
+        import json as _j
+        from v3.family import Family, FamilyOrder
+        from v3 import politics
+        r, rec = self._rec()
+        rec.live_est = 1.20
+        r.fam._track_est(rec, r.now)
+        r.fam.orders["P"] = rec
+        saved = _j.loads(_j.dumps(r.fam.to_dict()))
+        fam2 = Family(r.fam.desk, r.fam.cache, politics.discover,
+                      config=r.fam.cfg, names=r.names)
+        fam2.restore(saved)
+        self.assertAlmostEqual(fam2.orders["P"].est_peak8, 1.20)
+        self.assertEqual(len(fam2.orders["P"].est_hist), 1)

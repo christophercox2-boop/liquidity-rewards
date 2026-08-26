@@ -1149,7 +1149,8 @@ class Monitor:
                                        verify=True)
             if r.ok and r.order_id:
                 fam.orders[r.order_id] = FamilyOrder(
-                    id=r.order_id, market=market, side=side, price=price,
+                    id=r.order_id, market=market, side=side,
+                    price=(r.price or price),
                     qty=qty, intent=r.intent, placed_ts=time.time(),
                     purpose="manual", why="placed by the owner")
             return {"ok": r.ok, "note": r.note, "order_id": r.order_id}
@@ -1193,7 +1194,8 @@ class Monitor:
                     pinning = pin and rec.purpose != "manual"
                     fam.orders[r.order_id] = FamilyOrder(
                         id=r.order_id, market=rec.market, side=rec.side,
-                        price=new_px, qty=new_q, intent=rec.intent,
+                        price=(r.price or new_px),
+                        qty=new_q, intent=rec.intent,
                         placed_ts=now, purpose=rec.purpose,
                         why=("hand-set from the live card — the engine "
                              "holds off" if pinning

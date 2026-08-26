@@ -312,6 +312,12 @@ class FamilyOrder:
     weak_since: float = 0.0   # measuring under the bar since (0 = fine)
     rest_noted: float = 0.0   # last time quiet resting was logged as evidence
     verdict: str = ""    # plain-English live state, refreshed each cycle
+    # the 8-hour earning trail (owner, 2026-08-26: "keep track of the
+    # percentage decrease in rewards from an 8 hour peak"): half-hour
+    # buckets of the order's best measured $/day, oldest dropped past
+    # 8h. est_peak8 is the window's max, refreshed with every read.
+    est_hist: list = field(default_factory=list)   # [[bucket_ts, max_est]..]
+    est_peak8: float = 0.0
 
 
 def resting_ok(now: float, cfg: FamilyConfig) -> bool:
@@ -1905,6 +1911,7 @@ class Family:
                 continue
             if prog is None:
                 rec.live_est, rec.live_share = 0.0, 0.0
+                self._track_est(rec, now)
                 rec.verdict = why
                 continue
             side_pool = self._side_pool(rec.market, prog)
@@ -1929,6 +1936,7 @@ class Family:
                 rec.dry_since = None
             elif rec.dry_since is None:
                 rec.dry_since = now
+            self._track_est(rec, now)
             self.fillmodel.observe_order_age(rec.market, now - rec.placed_ts,
                                              60.0)
             if (rec.purpose not in ("manual", "sell")
@@ -1991,6 +1999,27 @@ class Family:
         for rec in self.orders.values():
             if rec.pinned:
                 self._pin_check(rec, now)
+
+    def _track_est(self, rec: FamilyOrder, now: float) -> None:
+        """The 8-hour earning trail behind the orders page's
+        drop-from-peak sort (owner, 2026-08-26): half-hour buckets of
+        the order's best measured $/day, oldest dropped past 8h.
+        est_peak8 is the window's max — an order well off its peak has
+        been outbid or its pool has moved, and the sort surfaces it."""
+        if rec.live_est is None:
+            return
+        b = int(now // 1800) * 1800
+        if rec.est_hist and rec.est_hist[-1][0] == b:
+            if rec.live_est > rec.est_hist[-1][1]:
+                rec.est_hist[-1][1] = round(rec.live_est, 4)
+        else:
+            rec.est_hist.append([b, round(rec.live_est, 4)])
+            if (len(rec.est_hist) > 17
+                    or rec.est_hist[0][0] <= now - 28800.0):
+                rec.est_hist = [x for x in rec.est_hist
+                                if x[0] > now - 28800.0][-17:]
+        rec.est_peak8 = round(max((x[1] for x in rec.est_hist),
+                                  default=0.0), 4)
 
     def _pin_check(self, rec: FamilyOrder, now: float) -> None:
         """The release rule for a hand-set order: the owner's placement
@@ -2380,7 +2409,8 @@ class Family:
                     self.positions_seen.setdefault(slug, net)
                     self.orders[r.order_id] = FamilyOrder(
                         id=r.order_id, market=slug, side=plan["side"],
-                        price=plan["px"], qty=plan["qty"], intent=r.intent,
+                        price=(r.price or plan["px"]),
+                        qty=plan["qty"], intent=r.intent,
                         placed_ts=now,
                         purpose=("revive" if plan.get("revive")
                                  else "solo" if plan.get("solo") else "earn"),
@@ -2473,7 +2503,8 @@ class Family:
                     self.positions_seen.setdefault(slug, net)
                     self.orders[r.order_id] = FamilyOrder(
                         id=r.order_id, market=slug, side=plan["side"],
-                        price=plan["px"], qty=plan["qty"], intent=r.intent,
+                        price=(r.price or plan["px"]),
+                        qty=plan["qty"], intent=r.intent,
                         placed_ts=now, purpose="grow", why=plan["why"],
                         est_day=plan["est"], share=plan["share"],
                         live_pf=(round(plan["p_fill"], 4)
@@ -3305,13 +3336,22 @@ class Family:
                                         net_position=qty, intent=intent)
             if r.ok and r.order_id:
                 self.orders[r.order_id] = FamilyOrder(
-                    id=r.order_id, market=slug, side=side, price=px,
+                    id=r.order_id, market=slug, side=side,
+                    price=(r.price or px),
                     qty=rest_qty, intent=intent, placed_ts=now,
                     purpose="sell", why=why)
-                self._log(event="sell_rested", market=slug, price=px,
+                self._log(event="sell_rested", market=slug,
+                          price=(r.price or px),
                           qty=rest_qty, side=side)
                 self._mark(slug, side, now)
                 actions -= 1
+            else:
+                # a position whose exit will not rest is the loudest
+                # kind of problem — it used to fail in silence (owner,
+                # 2026-08-26)
+                self._log(event="exit_place_failed", market=slug,
+                          side=side, price=px, qty=rest_qty,
+                          note=r.note[:110])
         # an "exit" with no position behind it is not an exit — a fill
         # would OPEN a position, not close one (the petbut shape; owner
         # approved 2026-08-21). Reduce-checking also catches covers left
@@ -3403,7 +3443,8 @@ class Family:
                                         verify=self.cfg.verify_resting)
             if r.ok and r.order_id:
                 self.orders[r.order_id] = FamilyOrder(
-                    id=r.order_id, market=slug, side="BUY", price=px,
+                    id=r.order_id, market=slug, side="BUY",
+                    price=(r.price or px),
                     qty=self.cfg.probe_qty, intent=r.intent, placed_ts=now,
                     purpose="probe",
                     why=("a scout — this market's pool could pay, but I "
