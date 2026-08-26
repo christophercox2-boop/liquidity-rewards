@@ -723,3 +723,49 @@ intake, not junk.
 
 **Check.** data/fills.csv entries vs band/fair per fill;
 data/rewards.csv daily politics totals; quoting volume from state.
+
+---
+
+## P14 — where the claims live and where the money lives are different market classes
+*Written 2026-08-26 ~02:30Z, BEFORE the Aug-25 politics postings land.
+From the first full day of the per-market ledger (Aug-25, 151 politics
+markets) joined against the posted-pay history through Aug-24.*
+
+**The pattern found.** Three facts from the data, one story:
+
+1. **$246.89 of the day's $381.35 raw politics claims (65%) sit on
+   markets whose trailing pay is ~zero** — led by safe-seat winner
+   books (AL/NE/AR/OR governor REP, MS senate REP) claiming a uniform
+   ~$6.25/day each. On those rows the ledger's own two estimators
+   disagree: the order-path est says $6.25 while the sampler's own
+   share x pool says $1.6–2.6 — a ~2–4x divisor-shaped gap on
+   REP/DEM paired listings of one race. Exchange trailing pay on
+   them: pennies.
+2. **On the markets that actually pay, the order-path est reads
+   $0.00.** Senate-control DEM: sampler share 1.000 of a $75/day
+   pool, order est $0.00 ("side below Target Size"), exchange paid
+   $2.29–2.71 every posted day. Buttigieg nominee: order est $0.00,
+   paid $1.47–2.71 daily. The engine's qualification read calls the
+   paying markets worthless and the worthless markets rich.
+3. **Membership in the paid set churns**: 45 politics markets paid
+   >5c on Aug-23, 33 on Aug-24, only 14 on both — though Aug-24's
+   posting arrived 26h late and may still be filling in, so churn is
+   provisional.
+
+**Claims (falsifiable when Aug-25 politics posts).**
+1. The $246.89 claimed on zero-trailing markets collects **under $10
+   total**.
+2. The order-est-zero payers keep paying: senate-control DEM and
+   Buttigieg nominee each post **>= $1** for Aug-25.
+3. Politics Aug-25 total lands **$25–70** — near trailing reality,
+   nowhere near the raw $381 or even the deflated $127.
+
+**Falsifiers.** (1) fails if the safe-seat books collect real money —
+then the empty-book arithmetic is right and the divisor theory wrong.
+(2) fails if the big-pool payers post ~$0 — then the Target-Size read
+is right and the exchange's own postings were the anomaly. (3) failing
+high means the claims ledger is better calibrated than three days of
+history suggest.
+
+**Check.** data/rewards.csv day 2026-08-24/25 politics rows vs
+data/market_est.csv day 2026-08-25 (frozen).

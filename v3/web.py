@@ -140,27 +140,163 @@ function post(body,cb){
   .catch(function(){alert('unreachable');});
 }
 function fmtsz(q){if(q>=1e6)return (q/1e6).toFixed(1)+'M';if(q>=1e3)return (q/1e3).toFixed(1)+'k';return ''+Math.round(q);}
+function lvKey(){return encodeURIComponent(localStorage.getItem('dashKey')||'');}
+function lvBox(m,box,onclose){
+ // one live line at a time, shared by the purchase cards and the
+ // orders/plan book folds; reuses a lingering connection to the same
+ // market so coming back within 10s is instant
+ if(window._lvLingerT){clearTimeout(window._lvLingerT);window._lvLingerT=null;}
+ if(window._lv&&window._lv.m===m&&window._lvB){
+  window._lv.box=box;
+  if(onclose)window._lv.onclose=onclose;
+  window._liveOpen=true;window._lvSel=null;
+  box.innerHTML='<div class="lvlivepart"></div><div class="lvladder"></div>';
+  lvDrawBook(window._lvB);
+  return;
+ }
+ lvShut();
+ window._liveOpen=true;window._lvSel=null;window._lvB=null;
+ box.innerHTML='<div class="lvlivepart"><div class="muted">opening the live line\\u2026</div><div class="mtrack"><div class="mfill lvp"></div></div></div><div class="lvladder"></div>';
+ var es=new EventSource('/live?m='+encodeURIComponent(m)+'&key='+lvKey());
+ window._lv={es:es,box:box,m:m,onclose:onclose};
+ es.onmessage=function(ev){
+  var b;try{b=JSON.parse(ev.data);}catch(e){return;}
+  window._lvB=b;
+  if(!window._lvLingerT)lvDrawBook(b);
+ };
+ es.onerror=function(){
+  if(!window._lvB&&window._liveOpen&&window._lv){
+   var t=window._lv.box.querySelector('.lvlivepart');
+   if(t)t.innerHTML='<div class="muted">line dropped \\u2014 reconnecting\\u2026</div><div class="mtrack"><div class="mfill lvp"></div></div>';
+  }
+ };
+}
+function lvShut(linger){
+ if(linger&&window._lv){
+  if(window._lvLingerT)clearTimeout(window._lvLingerT);
+  window._lvLingerT=setTimeout(function(){lvShut();},10000);
+  return;
+ }
+ if(window._lvLingerT){clearTimeout(window._lvLingerT);window._lvLingerT=null;}
+ if(window._lv){
+  try{window._lv.es.close();}catch(e){}
+  try{if(window._lv.onclose)window._lv.onclose();}catch(e){}
+  window._lv=null;
+ }
+ window._liveOpen=false;window._lvSel=null;window._lvB=null;window._lvAfterOp=null;
+}
+function lvDrawBook(b){
+ if(!window._lv||!window._liveOpen)return;
+ var box=window._lv.box;
+ var t=box.querySelector('.lvlivepart')||box;
+ if(!b.ok){t.innerHTML='<div class="bad">'+esc(b.note||'no book')+'</div>';return;}
+ var h='<div style="font-size:15px"><b>'+esc(b.name||b.market)+'</b> <span class="ok" style="font-size:12px">\\u25CF LIVE</span></div>'
+  +'<div class="muted" style="font-size:12px">read straight from the exchange, updating every second</div>';
+ if(b.pool_day!=null)h+='<div class="muted" style="font-size:12px">each side here competes for <b>'+usd(b.pool_day)+'/day</b> of rewards</div>';
+ else if(b.prog_note)h+='<div class="muted" style="font-size:12px">'+esc(b.prog_note)+'</div>';
+ var bid=(b.bids&&b.bids[0])?b.bids[0][0]:null;
+ if(b.position&&b.position.qty>0.005){
+  var av=(b.position.cost/b.position.qty)*100;
+  h+='<div class="sub" style="margin:5px 0 2px">Position: <b>'+b.position.qty+' shares</b> at '+av.toFixed(1)+'c average</div>';
+  if(bid!=null){
+   h+='<div style="margin:4px 0"><button class="small off" onclick="event.stopPropagation();lvCloseOut()">Close out \\u2014 sell at the bid ('+pc(bid)+')</button></div>';
+  }
+ }
+ var oursAt={};(b.ours||[]).forEach(function(o){oursAt[o.side+(o.price*100).toFixed(1)]=1;});
+ h+='<div><table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
+ var nr=Math.max((b.bids||[]).length,(b.asks||[]).length);
+ for(var i=0;i<nr;i++){
+  var bd=(b.bids||[])[i],ak=(b.asks||[])[i];
+  var bm=bd&&oursAt['BUY'+(bd[0]*100).toFixed(1)]?' <span class="lvdot">\\u25CF</span>':'';
+  var am=ak&&oursAt['SELL'+(ak[0]*100).toFixed(1)]?' <span class="lvdot">\\u25CF</span>':'';
+  h+='<tr><td class="r">'+(bd?fmtsz(bd[1]):'')+'</td><td class="r">'+(bd?pc(bd[0])+bm:'')+'</td>'
+    +'<td>'+(ak?pc(ak[0])+am:'')+'</td><td>'+(ak?fmtsz(ak[1]):'')+'</td></tr>';
+ }
+ h+='</table></div>';
+ var sel=window._lvSel;
+ if(sel&&!(b.ours||[]).some(function(o){return o.id===sel;}))sel=window._lvSel=null;
+ if((b.ours||[]).length){
+  var tot=0;(b.ours||[]).forEach(function(o){tot+=(o.est||0);});
+  h+='<div class="muted" style="font-size:12px;margin-top:4px"><b>Your orders here</b>'
+   +(b.pool_day!=null?' \\u2014 earning ~'+usd(tot)+'/day together':'')
+   +' \\u2014 tap one to move or cancel it</div>';
+  (b.ours||[]).forEach(function(o){
+   var on=o.id===sel;
+   var math='';
+   if(o.qualifies===false){math='its side is under Target Size \\u2014 the whole side pays nobody \\u2192 $0.00/day';}
+   else if(o.share!=null&&b.pool_day!=null){math=(o.share*100).toFixed(1)+'% of its side\\u2019s score \\u00d7 '+usd(b.pool_day)+'/day pool = <b>'+usd(o.est||0)+'/day</b>';}
+   else if(o.share!=null){math=(o.share*100).toFixed(1)+'% of its side\\u2019s score \\u2014 no dollar figure until the pool share is confirmed';}
+   h+='<div class="lvrow'+(on?' sel':'')+'" onclick="event.stopPropagation();lvSel(\\''+esc(o.id)+'\\')">'
+    +'<span class="lvdot">\\u25CF</span> '+(o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+pc(o.price)
+    +' <span class="pill">'+esc(o.purpose)+'</span>'
+    +(o.pinned?' <span class="pill on">hand-set</span>':'')
+    +(math?'<div class="muted" style="font-size:12px;margin:1px 0 0 18px">'+math+'</div>':'')
+    +'</div>';
+   if(on){
+    var tk=b.tick||0.01;
+    var dn=Math.round((o.price-tk)*1000)/1000,up=Math.round((o.price+tk)*1000)/1000;
+    h+='<div style="margin:2px 0 6px" onclick="event.stopPropagation()">';
+    if(dn>0.0005)h+='<button class="small" onclick="lvMove(\\''+esc(o.id)+'\\','+dn+')">move to '+pc(dn)+'</button>';
+    if(up<0.9995)h+='<button class="small" onclick="lvMove(\\''+esc(o.id)+'\\','+up+')">move to '+pc(up)+'</button>';
+    h+='<button class="small" onclick="lvType(\\''+esc(o.id)+'\\','+o.price+')">type a price</button>'
+     +'<button class="small" onclick="lvSize(\\''+esc(o.id)+'\\','+o.qty+','+o.price+',\\''+o.side+'\\')">change size</button>'
+     +'<button class="small off" onclick="lvCancelOrder(\\''+esc(o.id)+'\\')">cancel</button></div>';
+   }
+  });
+ }else{h+='<div class="muted" style="font-size:12px;margin-top:4px">none of your orders rest here right now</div>';}
+ h+='<div class="hint">The math is the exchange\\u2019s own: your share of the side\\u2019s score \\u00d7 the side\\u2019s daily pool, refigured every second as the book moves. Claims tend to run high \\u2014 the meter page\\u2019s audited rate is the ground truth for what actually pays. A move you make here is HAND-SET: the engine leaves it alone until the book turns against it (its earning rate falls under half of what it was when you set it) \\u2014 the quick-guard process still watches it.</div>';
+ t.innerHTML=h;
+}
+function lvSel(id){window._lvSel=(window._lvSel===id?null:id);if(window._lvB)lvDrawBook(window._lvB);}
+function lvMove(id,px){
+ if(!confirm('Move this order to '+pc(px)+'? Your price then holds until the book turns against it.'))return;
+ post({op:'move',order_id:id,price:px,pin:1},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;if(window._lvAfterOp)window._lvAfterOp();});
+}
+function lvType(id,cur){
+ var v=prompt('New price in cents (e.g. 3.4):',(cur*100).toFixed(1));
+ if(v==null)return;var p=parseFloat(v)/100;
+ if(!(p>0&&p<1)){alert('price must be between 0.1c and 99.9c');return;}
+ lvMove(id,Math.round(p*1000)/1000);
+}
+function lvSize(id,cur,px,side){
+ var v=prompt('New size in shares (now '+cur+'):',''+cur);
+ if(v==null)return;var q=parseFloat(v);
+ if(!(q>0)){alert('need a positive number of shares');return;}
+ q=Math.round(q*100)/100;
+ if(Math.abs(q-cur)<0.005)return;
+ var msg='Resize this order from '+cur+' to '+q+' shares at '+pc(px)+'?';
+ var d=Math.round((q-cur)*100)/100;
+ if(d>0)msg+=side==='BUY'
+  ? ' The extra '+d+' shares put about '+usd(d*px)+' more at risk.'
+  : ' That offers '+d+' more of your shares for sale.';
+ if(!confirm(msg))return;
+ post({op:'move',order_id:id,price:px,qty:q,pin:1},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;if(window._lvAfterOp)window._lvAfterOp();});
+}
+function lvCancelOrder(id){
+ if(!confirm('Cancel this order?'))return;
+ post({op:'cancel',order_id:id},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;if(window._lvAfterOp)window._lvAfterOp();});
+}
+function lvCloseOut(){
+ var b=window._lvB;if(!b||!window._lv)return;
+ var bid=(b.bids&&b.bids[0])?b.bids[0][0]:null;
+ var q=b.position?b.position.qty:0;
+ if(bid==null||!(q>0))return;
+ if(!confirm('Sell up to '+q+' shares at '+pc(bid)+' \\u2014 about '+usd(q*bid)+'. The resting exit is cancelled first; whatever the bid cannot take rests at '+pc(bid)+' as your own ask. Sure?'))return;
+ post({op:'close_position',market:window._lv.m},function(j){alert(j.note||(j.ok?'done':'refused'));if(window._lvAfterOp)window._lvAfterOp();});
+}
 function showbook(slug,el){
  var box=document.getElementById(el);
  if(!box)return;
- if(box.innerHTML){box.innerHTML='';return;}
- box.innerHTML='<div class="muted">fetching the book\u2026</div>';
+ if(box.innerHTML){box.innerHTML='';lvShut(true);return;}
+ window._lvAfterOp=null;
+ lvBox(slug,box,function(){try{box.innerHTML='';}catch(e){}});
  fetch('/book.json?m='+encodeURIComponent(slug),{headers:hdrs(),cache:'no-store'})
   .then(function(r){return r.json();}).then(function(b){
-   if(!b.ok){box.innerHTML='<div class="muted">'+esc(b.note||'no book')+'</div>';return;}
-   var oursAt={};(b.ours||[]).forEach(function(o){oursAt[o.side+(o.price*100).toFixed(1)]=o;});
+   var ladbox=box.querySelector('.lvladder');
+   if(!ladbox)return;
+   if(!b.ok){ladbox.innerHTML='<div class="muted">'+esc(b.note||'no book')+'</div>';return;}
    var g=b.fair!=null?'model '+(b.fair*100).toFixed(1)+'c':(b.band&&b.band.med!=null?'no model \u2014 evidence '+b.band.lo.toFixed(0)+'\u2013'+b.band.hi.toFixed(0)+'c, confidence '+Math.round((b.conf||0)*100)+'%':'NO GROUNDING \u2014 no model, no evidence');
-   var h='<div class="muted" style="margin:4px 0">book '+b.age_s+'s old \u00b7 '+g+'</div>';
-   h+='<table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
-   var n=Math.max((b.bids||[]).length,(b.asks||[]).length);
-   for(var i=0;i<n;i++){
-    var bd=(b.bids||[])[i],ak=(b.asks||[])[i];
-    var bmark=bd&&oursAt['BUY'+(bd[0]*100).toFixed(1)]?' \u25CF':'';
-    var amark=ak&&oursAt['SELL'+(ak[0]*100).toFixed(1)]?' \u25CF':'';
-    h+='<tr><td class="r">'+(bd?fmtsz(bd[1]):'')+'</td><td class="r">'+(bd?pc(bd[0])+bmark:'')+'</td>'
-      +'<td>'+(ak?pc(ak[0])+amark:'')+'</td><td>'+(ak?fmtsz(ak[1]):'')+'</td></tr>';
-   }
-   h+='</table><div class="hint">\u25CF marks a level where one of our orders rests.</div>';
+   var h='<div class="muted" style="margin:6px 0 2px">'+g+' \u00b7 the planner\u2019s ladder below is the engine\u2019s last read, not live</div>';
    var lad=b.ladder||{};
    if(lad.ok&&lad.sides){
     if(lad.note)h+='<div class="muted">'+esc(lad.note)+'</div>';
@@ -179,8 +315,8 @@ function showbook(slug,el){
     });
     h+='<div class="hint">\u25C0 is the planner\u2019s pick; dim rows pay under the '+((lad.bar||0.75)*100).toFixed(0)+'c bar. Fill odds are per day; fill cost is per share.</div>';
    }else if(lad.note){h+='<div class="muted">ladder: '+esc(lad.note)+'</div>';}
-   box.innerHTML=h;
-  }).catch(function(){box.innerHTML='<div class="bad">unreachable</div>';});
+   ladbox.innerHTML=h;
+  }).catch(function(){});
 }
 function load(){
  fetch('/data.json',{headers:hdrs(),cache:'no-store'}).then(function(r){
@@ -357,8 +493,15 @@ function sfair(m){
 function fold(title,sub,body,open){
  return '<details'+(open?' open':'')+'><summary><b>'+title+'</b> <span class="muted">'+sub+'</span></summary>'+body+'</details>';
 }
+function odrop(o){
+ var cur=(o.live_est!=null?o.live_est:o.est_day)||0;
+ var pk=o.est_peak8||0;
+ if(pk<0.02)return null;
+ return Math.max(0,(pk-cur)/pk);
+}
 function orow(d,o){
  var e=(o.live_est!=null?o.live_est:o.est_day);
+ var dp=odrop(o);
  var bid='bk_'+esc(o.id);
  return '<div style="margin:9px 0 0;border-top:1px solid #2c3527;padding-top:7px">'
   +'<div class="name" style="cursor:pointer" onclick="showbook(\\''+esc(o.market)+'\\',\\''+bid+'\\')">'+nm(d,o.market)+' <span class="muted">\u25be book</span></div>'
@@ -369,6 +512,7 @@ function orow(d,o){
   +'<div class="sub">'+(o.side==='BUY'?'bid':'ask')+' '+(o.qty||0)+' @ '+pc(o.price)
   +' \\u2014 '+(e==null?'<span class="warn">no estimate yet</span>':usd(e)+'/day')
   +' <span class="pill">'+esc(o.purpose)+'</span></div>'
+  +(dp!=null&&dp>0.05?'<div class="vrd'+(dp>=0.5?' warn':'')+'">\\u25BC '+Math.round(dp*100)+'% off its 8h peak ('+usd(o.est_peak8)+' \\u2192 '+usd((o.live_est!=null?o.live_est:o.est_day)||0)+'/day)</div>':'')
   +(o.verdict?'<div class="vrd">'+esc(o.verdict)+'</div>':'')
   +(o.why?'<div class="vrd">placed because: '+esc(o.why)+'</div>':'')
   +'<div><button class="small" onclick="mv(\\''+esc(o.id)+'\\','+o.price+')">Move</button>'
@@ -382,12 +526,18 @@ function render(d){
   +'<div style="margin:8px 0"><select id="ps" style="font-size:16px;padding:8px"><option value="BUY">bid (buy)</option><option value="SELL">ask (sell)</option></select>'
   +' <input id="pp" placeholder="price c" style="width:20%"> <input id="pq" placeholder="shares" style="width:20%">'
   +' <button onclick="pl()">Place</button></div><div id="plout"></div></details></div>';
+ var srt=window._ordSort||'est';
+ out+='<div style="margin:2px 0 8px">sort: '
+  +'<button class="small" '+(srt==='est'?'style="font-weight:bold;text-decoration:underline"':'')+' onclick="oSort(\\'est\\')">by $/day</button>'
+  +'<button class="small" '+(srt==='drop'?'style="font-weight:bold;text-decoration:underline"':'')+' onclick="oSort(\\'drop\\')">by drop from 8h peak</button></div>';
  fams(d).forEach(function(kv){
   var k=kv[0],s=kv[1];var os=(s.orders||[]);
   if(!os.length)return; any=true;
   var byest=function(a,b){return ((b.live_est!=null?b.live_est:b.est_day)||0)-((a.live_est!=null?a.live_est:a.est_day)||0);};
-  var earn=os.filter(function(o){return o.purpose!=='sell';}).sort(byest);
-  var sell=os.filter(function(o){return o.purpose==='sell';}).sort(byest);
+  var bydrop=function(a,b){var x=odrop(a),y=odrop(b);return (y==null?-1:y)-(x==null?-1:x);};
+  var cmp=srt==='drop'?bydrop:byest;
+  var earn=os.filter(function(o){return o.purpose!=='sell';}).sort(cmp);
+  var sell=os.filter(function(o){return o.purpose==='sell';}).sort(cmp);
   var esum=0;earn.forEach(function(o){esum+=(o.live_est!=null?o.live_est:o.est_day)||0;});
   var ssum=0;sell.forEach(function(o){ssum+=(o.live_est!=null?o.live_est:o.est_day)||0;});
   out+='<div class="card"><b>'+esc(s.name||k)+'</b>';
@@ -419,6 +569,10 @@ function render(d){
  });
  if(!any)out+='<div class="card muted">No resting orders. When a family is armed and finds something worth resting in, each order shows here with its name, its verdict, and its own Move/Cancel.</div>';
  return out;
+}
+function oSort(which){
+ window._ordSort=which;
+ if(window._d)document.getElementById('view').innerHTML=render(window._d);
 }
 function mv(id,px){
  var v=prompt('New price in cents (e.g. 3.4):',(px*100).toFixed(1));
@@ -891,58 +1045,32 @@ function fFlip(el){
  setTimeout(function(){
   for(var i=0;i<faces.length;i++){if(faces[i])faces[i].style.display=(i===next?'':'none');}
   el.setAttribute('data-face',''+next);
-  if(next===2)lvOpen(el);else if(cur===2)lvLinger();
+  if(next===2)lvOpen(el);else if(cur===2)lvShut(true);
   el.style.transform='rotateY(0deg)';
  },140);
 }
 function lvOpen(el){
- if(window._lvLingerT){clearTimeout(window._lvLingerT);window._lvLingerT=null;}
- if(window._lv&&window._lv.el===el&&window._lvB){
-  // came back within the linger — the line never dropped; show at once
-  window._lvSel=null;
-  lvDraw(el,window._lvB);
-  return;
- }
- lvClose();
+ // the card's live face rides the shared live line (lvBox); the card
+ // adds its corner light, and hand ops refresh the WHOLE card
  var box=el.querySelector('.flive');
  if(!box)return;
- window._liveOpen=true;window._lvSel=null;window._lvB=null;
  var lt=el.querySelector('.lvlive');if(lt)lt.style.display='';
- box.innerHTML='<div class="muted">opening the live line\\u2026</div><div class="mtrack"><div class="mfill lvp"></div></div>';
- var m=el.getAttribute('data-m');
- var es=new EventSource('/live?m='+encodeURIComponent(m)+'&key='+encodeURIComponent(localStorage.getItem('dashKey')||''));
- window._lv={es:es,el:el,m:m};
- es.onmessage=function(ev){
-  var b;try{b=JSON.parse(ev.data);}catch(e){return;}
-  window._lvB=b;lvDraw(el,b);
- };
- es.onerror=function(){
-  if(!window._lvB&&window._liveOpen)box.innerHTML='<div class="muted">line dropped \\u2014 reconnecting\\u2026</div><div class="mtrack"><div class="mfill lvp"></div></div>';
- };
+ window._lvCard=el;
+ lvBox(el.getAttribute('data-m'),box,function(){
+  try{var l2=el.querySelector('.lvlive');if(l2)l2.style.display='none';}catch(e){}
+  window._lvCard=null;
+ });
+ window._lvAfterOp=lvRefresh;
 }
-function lvLinger(){
- // leaving the live face keeps the line open 10 seconds in case he
- // comes right back; the LIVE light stays on every face until it drops
- if(window._lvLingerT)clearTimeout(window._lvLingerT);
- window._lvLingerT=setTimeout(lvClose,10000);
-}
-function lvClose(){
- if(window._lvLingerT){clearTimeout(window._lvLingerT);window._lvLingerT=null;}
- if(window._lv){
-  try{window._lv.es.close();}catch(e){}
-  try{var lt=window._lv.el.querySelector('.lvlive');if(lt)lt.style.display='none';}catch(e){}
-  window._lv=null;
- }
- window._liveOpen=false;window._lvSel=null;window._lvB=null;
-}
+function lvClose(){lvShut();}
 function lvRefresh(){
  // an order changed by hand: bring the WHOLE card up to date, not
- // just the live face — front and story redrawn from a fresh journal
- if(!window._lv)return;
- var el=window._lv.el;
+ // just the live face - front and story redrawn from a fresh journal
+ var el=window._lvCard;
+ if(!el)return;
  fetch('/fills.json',{headers:hdrs(),cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
   window._fillsJ=j;
-  if(!window._lv||window._lv.el!==el)return;
+  if(window._lvCard!==el)return;
   var m=el.getAttribute('data-m'),ts=el.getAttribute('data-ts');
   var f=null;
   (j.fills||[]).forEach(function(x){if(x.market===m&&''+x.ts===ts)f=x;});
@@ -952,8 +1080,6 @@ function lvRefresh(){
   if(a)a.innerHTML=fFront(f,p);
   if(bk)bk.innerHTML=fBack(f,p);
   el.style.background=fTint(p.net);
-  // keep the per-second ticker honest: bases are read against the
-  // list-wide clock, so rebase this card's fresh numbers onto it
   var dt=(Date.now()/1000)-(window._fillT0||0);
   var els=el.querySelectorAll('.fnet');
   for(var i=0;i<els.length;i++){
@@ -962,104 +1088,6 @@ function lvRefresh(){
    if(r>0.005)els[i].setAttribute('data-base',(b0-r*dt/86400).toFixed(4));
   }
  }).catch(function(){});
-}
-function lvDraw(el,b){
- var box=el.querySelector('.flive');
- if(!box||!window._liveOpen)return;
- if(!b.ok){box.innerHTML='<div class="bad">'+esc(b.note||'no book')+'</div><div class="hint">tap the card to flip back</div>';return;}
- var h='<div style="font-size:15px"><b>'+esc(b.name||b.market)+'</b></div>'
-  +'<div class="muted" style="font-size:12px">read straight from the exchange, updating every second</div>';
- if(b.pool_day!=null)h+='<div class="muted" style="font-size:12px">each side here competes for <b>'+usd(b.pool_day)+'/day</b> of rewards</div>';
- else if(b.prog_note)h+='<div class="muted" style="font-size:12px">'+esc(b.prog_note)+'</div>';
- var bid=(b.bids&&b.bids[0])?b.bids[0][0]:null;
- if(b.position&&b.position.qty>0.005){
-  var av=(b.position.cost/b.position.qty)*100;
-  h+='<div class="sub" style="margin:5px 0 2px">Position: <b>'+b.position.qty+' shares</b> at '+av.toFixed(1)+'c average</div>';
-  if(bid!=null){
-   h+='<div style="margin:4px 0"><button class="small off" onclick="event.stopPropagation();lvCloseOut()">Close out \\u2014 sell at the bid ('+pc(bid)+')</button></div>';
-  }
- }
- var oursAt={};(b.ours||[]).forEach(function(o){oursAt[o.side+(o.price*100).toFixed(1)]=1;});
- h+='<div><table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
- var nr=Math.max((b.bids||[]).length,(b.asks||[]).length);
- for(var i=0;i<nr;i++){
-  var bd=(b.bids||[])[i],ak=(b.asks||[])[i];
-  var bm=bd&&oursAt['BUY'+(bd[0]*100).toFixed(1)]?' <span class="lvdot">\\u25CF</span>':'';
-  var am=ak&&oursAt['SELL'+(ak[0]*100).toFixed(1)]?' <span class="lvdot">\\u25CF</span>':'';
-  h+='<tr><td class="r">'+(bd?fmtsz(bd[1]):'')+'</td><td class="r">'+(bd?pc(bd[0])+bm:'')+'</td>'
-    +'<td>'+(ak?pc(ak[0])+am:'')+'</td><td>'+(ak?fmtsz(ak[1]):'')+'</td></tr>';
- }
- h+='</table></div>';
- var sel=window._lvSel;
- if(sel&&!(b.ours||[]).some(function(o){return o.id===sel;}))sel=window._lvSel=null;
- if((b.ours||[]).length){
-  var tot=0;(b.ours||[]).forEach(function(o){tot+=(o.est||0);});
-  h+='<div class="muted" style="font-size:12px;margin-top:4px"><b>Your orders here</b>'
-   +(b.pool_day!=null?' \\u2014 earning ~'+usd(tot)+'/day together':'')
-   +' \\u2014 tap one to move or cancel it</div>';
-  (b.ours||[]).forEach(function(o){
-   var on=o.id===sel;
-   var math='';
-   if(o.qualifies===false){math='its side is under Target Size \\u2014 the whole side pays nobody \\u2192 $0.00/day';}
-   else if(o.share!=null&&b.pool_day!=null){math=(o.share*100).toFixed(1)+'% of its side\\u2019s score \\u00d7 '+usd(b.pool_day)+'/day pool = <b>'+usd(o.est||0)+'/day</b>';}
-   else if(o.share!=null){math=(o.share*100).toFixed(1)+'% of its side\\u2019s score \\u2014 no dollar figure until the pool share is confirmed';}
-   h+='<div class="lvrow'+(on?' sel':'')+'" onclick="event.stopPropagation();lvSel(\\''+esc(o.id)+'\\')">'
-    +'<span class="lvdot">\\u25CF</span> '+(o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+pc(o.price)
-    +' <span class="pill">'+esc(o.purpose)+'</span>'
-    +(o.pinned?' <span class="pill on">hand-set</span>':'')
-    +(math?'<div class="muted" style="font-size:12px;margin:1px 0 0 18px">'+math+'</div>':'')
-    +'</div>';
-   if(on){
-    var t=b.tick||0.01;
-    var dn=Math.round((o.price-t)*1000)/1000,up=Math.round((o.price+t)*1000)/1000;
-    h+='<div style="margin:2px 0 6px" onclick="event.stopPropagation()">';
-    if(dn>0.0005)h+='<button class="small" onclick="lvMove(\\''+esc(o.id)+'\\','+dn+')">move to '+pc(dn)+'</button>';
-    if(up<0.9995)h+='<button class="small" onclick="lvMove(\\''+esc(o.id)+'\\','+up+')">move to '+pc(up)+'</button>';
-    h+='<button class="small" onclick="lvType(\\''+esc(o.id)+'\\','+o.price+')">type a price</button>'
-     +'<button class="small" onclick="lvSize(\\''+esc(o.id)+'\\','+o.qty+','+o.price+',\\''+o.side+'\\')">change size</button>'
-     +'<button class="small off" onclick="lvCancelOrder(\\''+esc(o.id)+'\\')">cancel</button></div>';
-   }
-  });
- }else{h+='<div class="muted" style="font-size:12px;margin-top:4px">none of your orders rest here right now</div>';}
- h+='<div class="hint">The math is the exchange\\u2019s own: your share of the side\\u2019s score \\u00d7 the side\\u2019s daily pool, refigured every second as the book moves. Claims tend to run high \\u2014 the meter page\\u2019s audited rate is the ground truth for what actually pays. A move you make here is HAND-SET: the engine leaves it alone until the book turns against it (its earning rate falls under half of what it was when you set it) \\u2014 the quick-guard process still watches it. Tap outside the buttons to flip back.</div>';
- box.innerHTML=h;
-}
-function lvSel(id){window._lvSel=(window._lvSel===id?null:id);if(window._lv&&window._lvB)lvDraw(window._lv.el,window._lvB);}
-function lvMove(id,px){
- if(!confirm('Move this order to '+pc(px)+'? Your price then holds until the book turns against it.'))return;
- post({op:'move',order_id:id,price:px,pin:1},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;lvRefresh();});
-}
-function lvType(id,cur){
- var v=prompt('New price in cents (e.g. 3.4):',(cur*100).toFixed(1));
- if(v==null)return;var p=parseFloat(v)/100;
- if(!(p>0&&p<1)){alert('price must be between 0.1c and 99.9c');return;}
- lvMove(id,Math.round(p*1000)/1000);
-}
-function lvSize(id,cur,px,side){
- var v=prompt('New size in shares (now '+cur+'):',''+cur);
- if(v==null)return;var q=parseFloat(v);
- if(!(q>0)){alert('need a positive number of shares');return;}
- q=Math.round(q*100)/100;
- if(Math.abs(q-cur)<0.005)return;
- var msg='Resize this order from '+cur+' to '+q+' shares at '+pc(px)+'?';
- var d=Math.round((q-cur)*100)/100;
- if(d>0)msg+=side==='BUY'
-  ? ' The extra '+d+' shares put about '+usd(d*px)+' more at risk.'
-  : ' That offers '+d+' more of your shares for sale.';
- if(!confirm(msg))return;
- post({op:'move',order_id:id,price:px,qty:q,pin:1},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;lvRefresh();});
-}
-function lvCancelOrder(id){
- if(!confirm('Cancel this order?'))return;
- post({op:'cancel',order_id:id},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;lvRefresh();});
-}
-function lvCloseOut(){
- var b=window._lvB;if(!b||!window._lv)return;
- var bid=(b.bids&&b.bids[0])?b.bids[0][0]:null;
- var q=b.position?b.position.qty:0;
- if(bid==null||!(q>0))return;
- if(!confirm('Sell up to '+q+' shares at '+pc(bid)+' \\u2014 about '+usd(q*bid)+'. The resting exit is cancelled first; whatever the bid cannot take rests at '+pc(bid)+' as your own ask. Sure?'))return;
- post({op:'close_position',market:window._lv.m},function(j){alert(j.note||(j.ok?'done':'refused'));lvRefresh();});
 }
 function fFront(f,p){
  var st=f.stray_close?'CLOSED OUT':(p.open?'OPEN \\u00b7 so far':'CLOSED');
