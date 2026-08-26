@@ -5067,3 +5067,52 @@ class TestTheLiveCard(unittest.TestCase):
         out = Monitor.close_position(self._monitorish(r), A)
         self.assertFalse(out["ok"])
         self.assertIn("short", out["note"])
+
+    def test_the_live_view_shows_the_earnings_math(self):
+        """Owner, 2026-08-26: "make it so that the earnings math is
+        shown so I get a sense of how much it's earning." Each order in
+        the live payload carries its share of the side's score, the
+        side's daily pool, and share x pool = est — refigured on the
+        second's own book."""
+        from v3.main import Monitor
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        for oid in list(r.fam.orders):
+            r.fam.orders.pop(oid)
+        r.fam.orders["P"] = FamilyOrder(
+            id="P", market=A, side="BUY", price=0.44, qty=20.0,
+            intent=BUY_LONG, placed_ts=r.now, purpose="earn")
+        b = Monitor.live_view(self._monitorish(r), A)
+        self.assertTrue(b["ok"])
+        # LIVE_PROG: $100/day pool, 1 market in the event, 2 sides
+        self.assertAlmostEqual(b["pool_day"], 50.0)
+        o = [x for x in b["ours"] if x["id"] == "P"][0]
+        self.assertIsNotNone(o["share"])
+        self.assertGreater(o["share"], 0.0)
+        self.assertTrue(o["qualifies"])
+        self.assertAlmostEqual(o["est"], o["share"] * b["pool_day"],
+                               places=2)
+
+    def test_the_live_view_says_when_the_program_pays_nothing(self):
+        from v3.main import Monitor
+        from v3.tests.test_family import Rig, A, DEAD_PROG
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r = Rig()
+        r.add_market(A, prog=DEAD_PROG)
+        r.cycle()
+        for oid in list(r.fam.orders):
+            r.fam.orders.pop(oid)
+        r.fam.orders["P"] = FamilyOrder(
+            id="P", market=A, side="BUY", price=0.44, qty=20.0,
+            intent=BUY_LONG, placed_ts=r.now, purpose="earn")
+        b = Monitor.live_view(self._monitorish(r), A)
+        self.assertTrue(b["ok"])
+        self.assertIsNone(b["pool_day"])
+        self.assertIn("pays nothing", b["prog_note"])
+        o = [x for x in b["ours"] if x["id"] == "P"][0]
+        self.assertIsNone(o["share"])             # no terms, no math
