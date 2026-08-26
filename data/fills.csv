@@ -923,3 +923,8 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787698521.3,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.97,earn,6.2494,0.75,0.98475,92,95,0.824,0.97,0.98,-0.0147,9,2 ticks in front of the touch — we would hold 96% of the bid side,C3F06TKM2FSP
 1787698521.3,politics,ussewc-usse-co-2026-11-03-dem,BUY,1,0.94,earn,6.1753,0.35,0.995225,93,97,0.57,0.94,0.96,-0.0552,1,4 ticks in front of the touch — we would hold 97% of the bid side,C3FAN7K74FSK
 1787699494.8,politics,scc-senate-gop-2026-11-03-49,BUY,1,0.15,sell,0.0178,4.96,0.1483,14,19,0.251,0.14,0.21,0.0017,1,buying back the short at or under what it sold for — the bid earns while it wait,C3BQTMQ5AFSM
+1787700230.5,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,1,0.9,earn,6.2387,0.24,0.985075,,,0.758,,,-0.0851,13,2 ticks in front of the touch — we would hold 100% of the bid side,C3FSN5HFPFSN
+1787700530.5,cfb,aachc-cfb-wins-2026-11-28-stan-5pt5wins,SELL,1,0.49,sell,0,0.71,,42,51,0.262,0.2,0.21,-0.03,0,selling filled stock — it earns while it waits,C3FGDGZ8WFSG
+1787700710.5,cfb,aachc-cfb-wins-2026-11-28-ncar-5pt5wins,BUY,0.01,0.56,earn,0.0949,0.05,,55,58,0.723,0.56,0.57,-0.01,3.02,2 ticks in front of the touch — we would hold 4% of the bid side,C3G3GEGE0FSM
+1787702391.2,politics,usgubewc-usgub-or-2026-11-03-rep,SELL,1,0.12,earn,0.7812,0.75,0.0796,6,11,0,0.1,0.12,-0.0404,-1,2 ticks in front of the touch — we would hold 99% of the ask side,C3FXAK5S0FSQ
+1787703171.2,politics,ewc-usp-2028-11-07-aleocc,BUY,1,0.12,earn,1.8451,0.83,,12,18,0.311,0.12,0.13,-0.03,7,9 ticks in front of the touch — we would hold 99% of the bid side,C3G19EZA8FSR
