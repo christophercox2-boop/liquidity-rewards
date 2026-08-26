@@ -4795,3 +4795,275 @@ class TestExpectedRiskBudget(unittest.TestCase):
         o = self._order(r, A, "x", 0.50, 10.0, 0.03)   # odds ignored
         self.assertAlmostEqual(r.fam._charge(o), 5.00, places=6)
         self.assertEqual(r.fam.gross_cap(), 50.0)      # one cap, as ever
+
+
+class TestTheLiveCard(unittest.TestCase):
+    """Owner, 2026-08-25, the live card view: an engine order he moves
+    by hand from the live card is HAND-SET (pinned) — "My changes
+    should be durable, as long as things more or less stay the same on
+    the book. But if there is a big change, for instance another order
+    reduces my earning rate, the model can resume control." The nurse
+    stays on watch for the pin's first minutes (his amendment), and
+    the close-out button sells into the bid — the carved taker shape,
+    fired by his own tap."""
+
+    def _rig(self, price=0.11, qty=1.0, pinned=True, purpose="earn"):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.01, 6000.0),),
+                                  asks=((0.22, 5000.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.cycle()
+        for oid in list(r.fam.orders):
+            r.fam.orders.pop(oid)
+        r.exchange.live.clear()
+        r.exchange.live["P"] = {"id": "P", "market": A, "side": "BUY",
+                                "price": price, "size": qty,
+                                "intent": BUY_LONG}
+        r.fam.orders["P"] = FamilyOrder(
+            id="P", market=A, side="BUY", price=price, qty=qty,
+            intent=BUY_LONG, placed_ts=r.now, purpose=purpose,
+            pinned=pinned, pin_ts=r.now, pin_est=1.0)
+        return r, A
+
+    def test_a_pinned_order_survives_the_rules_that_pull_its_twin(self):
+        # 10 ticks in front on a blank market — exactly the shape the
+        # conformance sweep pulls — but HAND-SET, so the engine holds off
+        r, A = self._rig(0.11)
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertIn("P", r.fam.orders)
+        self.assertFalse(any(l.get("event") == "conform_pulled"
+                             for l in r.fam.log))
+
+    def test_the_release_rule_needs_a_sustained_big_change(self):
+        from v3.family import PIN_RELEASE_DWELL_S
+        r, A = self._rig()
+        rec = r.fam.orders["P"]
+        rec.live_est = 0.9                       # fine: above half of 1.0
+        r.fam._pin_check(rec, r.now)
+        self.assertTrue(rec.pinned)
+        rec.live_est = 0.2                       # under half — the clock starts
+        r.fam._pin_check(rec, r.now)
+        self.assertTrue(rec.pinned)              # one bad read never releases
+        r.fam._pin_check(rec, r.now + PIN_RELEASE_DWELL_S + 1)
+        self.assertFalse(rec.pinned)             # sustained — engine resumes
+        self.assertTrue(any(l.get("event") == "pin_released"
+                            for l in r.fam.log))
+
+    def test_a_recovered_rate_resets_the_release_clock(self):
+        from v3.family import PIN_RELEASE_DWELL_S
+        r, A = self._rig()
+        rec = r.fam.orders["P"]
+        rec.live_est = 0.2
+        r.fam._pin_check(rec, r.now)
+        rec.live_est = 0.9                       # the book came back
+        r.fam._pin_check(rec, r.now + 60)
+        rec.live_est = 0.2
+        r.fam._pin_check(rec, r.now + PIN_RELEASE_DWELL_S + 5)
+        self.assertTrue(rec.pinned)              # the old clock is dead
+
+    def test_an_order_that_earned_nothing_when_set_never_rate_releases(self):
+        r, A = self._rig()
+        rec = r.fam.orders["P"]
+        rec.pin_est = 0.0
+        rec.live_est = 0.0
+        r.fam._pin_check(rec, r.now + 9999)
+        self.assertTrue(rec.pinned)
+
+    def test_a_released_order_is_ordinary_again(self):
+        # after the release the same rules that spared it pull it
+        r, A = self._rig(0.11)
+        r.fam.orders["P"].pinned = False
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertNotIn("P", r.fam.orders)
+
+    def test_the_nurse_watches_a_pin_even_on_a_modeled_market(self):
+        r, A = self._rig(0.02)
+        r.fam.fairs = lambda s: 0.10             # a model exists here
+        r.fam.nurse(r.now, r.exchange)           # baseline
+        from v3.scoring import Book
+        r.fam.cache.put(A, Book(bids=((0.03, 40.0), (0.01, 6000.0)),
+                                asks=((0.22, 5000.0),),
+                                tick=0.01, fetched_at=r.now))
+        r.fam.nurse(r.now + 5, r.exchange)       # fronted -> pulled
+        self.assertNotIn("P", r.fam.orders)
+        self.assertTrue(any(l.get("event") == "nursed_pull"
+                            for l in r.fam.log))
+
+    def test_an_unpinned_order_on_a_modeled_market_is_not_nursed(self):
+        r, A = self._rig(0.02, pinned=False)
+        r.fam.fairs = lambda s: 0.10
+        r.fam.nurse(r.now, r.exchange)
+        from v3.scoring import Book
+        r.fam.cache.put(A, Book(bids=((0.03, 40.0), (0.01, 6000.0)),
+                                asks=((0.22, 5000.0),),
+                                tick=0.01, fetched_at=r.now))
+        r.fam.nurse(r.now + 5, r.exchange)
+        self.assertIn("P", r.fam.orders)         # the model's ground —
+                                                 # the cycle's business
+
+    def test_the_pin_restarts_the_nurse_watch_on_an_old_order(self):
+        from v3.family import NURSE_STABLE_S
+        r, A = self._rig(0.02)
+        rec = r.fam.orders["P"]
+        rec.placed_ts = r.now - NURSE_STABLE_S * 9   # long graduated
+        rec.pin_ts = r.now                           # but just hand-set
+        r.fam.nurse(r.now, r.exchange)
+        self.assertIn("P", r.fam._nurse_base)
+
+    def test_trim_never_takes_the_hand_set_order_first(self):
+        r, A = self._rig(0.02, qty=1.0)
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r.exchange.live["Q"] = {"id": "Q", "market": A, "side": "BUY",
+                                "price": 0.02, "size": 1.0,
+                                "intent": BUY_LONG}
+        r.fam.orders["Q"] = FamilyOrder(
+            id="Q", market=A, side="BUY", price=0.02, qty=1.0,
+            intent=BUY_LONG, placed_ts=r.now, purpose="earn")
+        r.fam.cfg.capital_usd = 0.001            # everything is over now
+        r.fam._trim(r.now, actions=4)
+        self.assertIn("P", r.fam.orders)         # hand-set: never trimmed
+        self.assertNotIn("Q", r.fam.orders)
+
+    def test_prune_never_pulls_a_hand_set_exit(self):
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
+        r, A = self._rig()
+        r.fam.orders.pop("P")
+        r.fam.orders["X"] = FamilyOrder(
+            id="X", market=A, side="SELL", price=0.20, qty=5.0,
+            intent=SELL_LONG, placed_ts=r.now, purpose="sell",
+            pinned=True, pin_ts=r.now)
+        r.fam._prune_excess_exits(A, "SELL", 5.0, r.now)
+        self.assertIn("X", r.fam.orders)
+
+    def test_the_pin_survives_a_restart(self):
+        from v3.family import Family
+        from v3 import politics
+        r, A = self._rig()
+        saved = r.fam.to_dict()
+        import json as _j
+        saved = _j.loads(_j.dumps(saved))        # the state file roundtrip
+        fam2 = Family(r.fam.desk, r.fam.cache, politics.discover,
+                      config=r.fam.cfg, names=r.names)
+        fam2.restore(saved)
+        rec = fam2.orders["P"]
+        self.assertTrue(rec.pinned)
+        self.assertAlmostEqual(rec.pin_est, 1.0)
+
+    def _monitorish(self, r):
+        import types
+        return types.SimpleNamespace(families={"politics": r.fam},
+                                     client=r.exchange,
+                                     names=r.names)
+
+    def test_a_live_card_move_pins_and_a_plain_move_does_not(self):
+        from v3.main import Monitor
+        r, A = self._rig(0.02, pinned=False)
+        r.fam.orders["P"].live_est = 0.8
+        m = self._monitorish(r)
+        out = Monitor.order_op(m, "move", "P", 0.03, pin=True)
+        self.assertTrue(out["ok"])
+        rec = [o for o in r.fam.orders.values() if o.market == A][0]
+        self.assertTrue(rec.pinned)
+        self.assertAlmostEqual(rec.pin_est, 0.8)
+        self.assertAlmostEqual(rec.price, 0.03)
+        self.assertTrue(any(l.get("event") == "hand_set" for l in r.fam.log))
+        out = Monitor.order_op(m, "move", rec.id, 0.04)     # orders page
+        rec2 = [o for o in r.fam.orders.values() if o.market == A][0]
+        self.assertFalse(rec2.pinned)            # old behavior, unchanged
+
+    def test_a_manual_order_stays_manual_not_pinned(self):
+        from v3.main import Monitor
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        r, A = self._rig()
+        r.fam.orders.pop("P")
+        r.exchange.live["H"] = {"id": "H", "market": A, "side": "BUY",
+                                "price": 0.02, "size": 3.0,
+                                "intent": BUY_LONG}
+        r.fam.orders["H"] = FamilyOrder(
+            id="H", market=A, side="BUY", price=0.02, qty=3.0,
+            intent=BUY_LONG, placed_ts=r.now, purpose="manual")
+        out = Monitor.order_op(self._monitorish(r), "move", "H", 0.03,
+                               pin=True)
+        self.assertTrue(out["ok"])
+        rec = [o for o in r.fam.orders.values() if o.market == A][0]
+        self.assertEqual(rec.purpose, "manual")  # stronger than any pin
+        self.assertFalse(rec.pinned)
+
+    def _stock_rig(self, qty=10.0, bid_sz=6.0):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.05, bid_sz), (0.02, 60000.0)),
+                                  asks=((0.08, 5000.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.cycle()
+        for oid in list(r.fam.orders):
+            r.fam.orders.pop(oid)
+        r.exchange.live.clear()
+        r.fam.inventory[A] = {"qty": qty, "cost": qty * 0.03}
+        return r, A
+
+    def test_close_out_sells_into_the_bid_and_journals_the_take(self):
+        from v3.main import Monitor
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
+        r, A = self._stock_rig(qty=10.0, bid_sz=6.0)
+        r.exchange.live["E"] = {"id": "E", "market": A, "side": "SELL",
+                                "price": 0.08, "size": 10.0,
+                                "intent": SELL_LONG}
+        r.fam.orders["E"] = FamilyOrder(          # the engine's exit
+            id="E", market=A, side="SELL", price=0.08, qty=10.0,
+            intent=SELL_LONG, placed_ts=r.now, purpose="sell")
+        out = Monitor.close_position(self._monitorish(r), A)
+        self.assertTrue(out["ok"], out.get("note"))
+        self.assertNotIn("E", r.fam.orders)       # exit cancelled first
+        takers = [o for o in r.exchange.live.values()
+                  if o["market"] == A and o["side"] == "SELL"
+                  and abs(o["price"] - 0.05) < 1e-9]
+        self.assertEqual(len(takers), 1)          # AT the bid, never worse
+        self.assertAlmostEqual(takers[0]["size"], 10.0)
+        # the displayed bid takes 6 now: journaled and off the inventory
+        self.assertAlmostEqual(r.fam.inventory[A]["qty"], 4.0)
+        self.assertTrue(any(f.get("market") == A and f.get("side") == "SELL"
+                            and abs(f.get("qty", 0) - 6.0) < 1e-6
+                            for f in r.fam.fills))
+        # the 4 the bid could not take rest as the owner's own ask
+        rest = [o for o in r.fam.orders.values()
+                if o.market == A and o.purpose == "manual"]
+        self.assertEqual(len(rest), 1)
+        self.assertAlmostEqual(rest[0].qty, 4.0)
+
+    def test_close_out_never_touches_his_own_resting_ask(self):
+        from v3.main import Monitor
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
+        r, A = self._stock_rig(qty=10.0, bid_sz=20.0)
+        r.exchange.live["H"] = {"id": "H", "market": A, "side": "SELL",
+                                "price": 0.09, "size": 4.0,
+                                "intent": SELL_LONG}
+        r.fam.orders["H"] = FamilyOrder(
+            id="H", market=A, side="SELL", price=0.09, qty=4.0,
+            intent=SELL_LONG, placed_ts=r.now, purpose="manual")
+        out = Monitor.close_position(self._monitorish(r), A)
+        self.assertTrue(out["ok"], out.get("note"))
+        self.assertIn("H", r.fam.orders)          # untouchable, as ever
+        takers = [o for o in r.exchange.live.values()
+                  if o["market"] == A and abs(o["price"] - 0.05) < 1e-9]
+        self.assertAlmostEqual(takers[0]["size"], 6.0)   # 10 minus his 4
+
+    def test_close_out_refuses_a_short_plainly(self):
+        from v3.main import Monitor
+        r, A = self._stock_rig(qty=10.0)
+        r.fam.inventory[A] = {"qty": -5.0, "cost": -0.3}
+        out = Monitor.close_position(self._monitorish(r), A)
+        self.assertFalse(out["ok"])
+        self.assertIn("short", out["note"])

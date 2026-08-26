@@ -106,6 +106,19 @@ NURSE_STABLE_S = 600.0
 PLAN_RULES_REV = 4
 NURSE_APPROACH_TICKS = 2
 NURSE_BOOK_MAX_AGE_S = 15.0
+# Hand-set orders (owner, 2026-08-25, the live card view): an engine
+# order the owner moves by hand from the live view is PINNED — the
+# engine stops repricing, sweeping, trimming or retreating it. "My
+# changes should be durable, as long as things more or less stay the
+# same on the book. But if there is a big change, for instance another
+# order reduces my earning rate, the model can resume control." The
+# release rule: the order's live earning rate falls under half of what
+# it was when he set it, sustained for PIN_RELEASE_DWELL_S so one bad
+# book read cannot break his word. The nurse still watches a pin for
+# its first NURSE_STABLE_S (owner: "the nurse can also stay active
+# for this") — a nurse pull ends the pin with the order.
+PIN_RELEASE_FRACTION = 0.5
+PIN_RELEASE_DWELL_S = 120.0
 # Expected-risk budgeting (owner, 2026-08-25): the family and
 # per-market caps charge each order collateral x its FILL ODDS — the
 # risk actually carried — instead of full collateral, so quiet resting
@@ -291,6 +304,10 @@ class FamilyOrder:
     live_pf: float | None = None     # measured fill odds; None = charge full
     live_ev: float | None = None
     live_share: float | None = None
+    pinned: bool = False      # hand-set from the live card — engine hands off
+    pin_est: float = 0.0      # $/day the order earned when the owner set it
+    pin_ts: float = 0.0       # when he set it (starts the nurse's watch)
+    pin_weak_since: float = 0.0   # under the release line since (0 = fine)
     weak_since: float = 0.0   # measuring under the bar since (0 = fine)
     rest_noted: float = 0.0   # last time quiet resting was logged as evidence
     verdict: str = ""    # plain-English live state, refreshed each cycle
@@ -1970,6 +1987,35 @@ class Family:
             else:
                 rec.verdict = (f"earning ~${rec.live_est:.2f}/day — "
                                f"{j.share * 100:.1f}% of its side")
+        for rec in self.orders.values():
+            if rec.pinned:
+                self._pin_check(rec, now)
+
+    def _pin_check(self, rec: FamilyOrder, now: float) -> None:
+        """The release rule for a hand-set order: the owner's placement
+        holds until the book materially turns against it — its live
+        earning rate under PIN_RELEASE_FRACTION of what it earned when
+        he set it, sustained PIN_RELEASE_DWELL_S. Then the pin lifts and
+        the order is an ordinary engine order again. An order that
+        earned nothing when he set it has no rate to lose, so only the
+        nurse and his own hand ever move it."""
+        if rec.live_est is None or rec.pin_est <= 0.005:
+            return
+        if rec.live_est < PIN_RELEASE_FRACTION * rec.pin_est - 1e-9:
+            if not rec.pin_weak_since:
+                rec.pin_weak_since = now
+            elif now - rec.pin_weak_since >= PIN_RELEASE_DWELL_S:
+                rec.pinned = False
+                rec.pin_weak_since = 0.0
+                rec.verdict = ("hand-set hold released — the engine "
+                               "resumes")
+                self._log(event="pin_released", market=rec.market,
+                          side=rec.side, price=rec.price, qty=rec.qty,
+                          note=(f"earning fell to ${rec.live_est:.2f}/day "
+                                f"from ${rec.pin_est:.2f} when hand-set — "
+                                "a big change; the engine resumes control"))
+        else:
+            rec.pin_weak_since = 0.0
 
     def _maintain(self, now: float, actions: int) -> int:
         # Markets the owner just repriced come FIRST. Setting a fair is
@@ -1983,6 +2029,10 @@ class Family:
         for rec in recs:
             if actions <= 0:
                 break
+            if rec.pinned:
+                continue      # hand-set from the live card: the owner's
+                              # placement holds until the release rule
+                              # (checked in _read_live) or the nurse ends it
             if (self.cfg.whole_shares
                     and rec.purpose not in ("sell", "manual")
                     and abs(rec.qty - round(rec.qty)) > 1e-9):
@@ -2353,6 +2403,7 @@ class Family:
                 break
             cands = [o for o in self.orders.values()
                      if o.purpose not in ("sell", "manual")
+                     and not o.pinned
                      and not self._frozen(o.market)]
             if not cands:
                 break
@@ -2435,7 +2486,7 @@ class Family:
         worst-earning excess, never manual orders."""
         cands = sorted((o for o in self.orders.values()
                         if o.market == slug and o.purpose == "sell"
-                        and o.side == side),
+                        and o.side == side and not o.pinned),
                        key=lambda o: (o.live_est or 0.0))
         for rec in cands:
             if excess < 0.01:
@@ -2599,18 +2650,28 @@ class Family:
         run loop's sleep is broken into nurse ticks), so no cancel can
         race the cycle. Pulled markets get the normal cooldown mark so
         the next cycle does not instantly re-place into the same
-        trap. Manual orders and exits are never nursed; frozen and
-        avoided ground is skipped wholesale."""
+        trap. Manual orders are never nursed, exits only when
+        hand-set; a hand-set (pinned) order of any other purpose is
+        watched on any market, model or not. Frozen and avoided
+        ground is skipped wholesale."""
         watch = []
         for rec in list(self.orders.values()):
-            if rec.purpose in ("manual", "sell"):
+            if rec.purpose == "manual":
                 continue
-            if now - rec.placed_ts > NURSE_STABLE_S:
+            if rec.purpose == "sell" and not rec.pinned:
+                continue
+            # a hand-set order is watched from the moment the owner set
+            # it, on ANY market (owner, 2026-08-25: "the nurse can also
+            # stay active for this") — a nurse pull ends the pin with
+            # the order, and the next cycle re-judges under the rules
+            age_ref = rec.pin_ts if rec.pinned else rec.placed_ts
+            if now - age_ref > NURSE_STABLE_S:
                 self._nurse_base.pop(rec.id, None)
                 continue
             if self._frozen(rec.market) or self._avoided(rec.market):
                 continue
-            if self.fairs is not None and self.fairs(rec.market) is not None:
+            if (not rec.pinned and self.fairs is not None
+                    and self.fairs(rec.market) is not None):
                 continue
             watch.append(rec)
         if not watch:
@@ -2988,7 +3049,7 @@ class Family:
                 # long stock: an ask at break-even or better
                 mine = [o for o in self.orders.values()
                         if o.market == slug and o.purpose == "sell"
-                        and o.side == "SELL"]
+                        and o.side == "SELL" and not o.pinned]
                 self._maybe_move_exit(slug, "SELL", mine, book, inv, now)
                 # the owner's own resting SELLs of this stock count as
                 # cover too — the engine sizes around them and never
@@ -3025,7 +3086,13 @@ class Family:
                             <= 2 * book.tick + 1e-9
                             and (fair_d is None
                                  or bid_t >= fair_d - 3 * book.tick)):
-                        dq = min(qty - manual_cover, bid_sz,
+                        # hand-set exits stay resting like manual ones —
+                        # the dump sizes around them, never cancels them
+                        pinned_cover = sum(
+                            o.qty for o in self.orders.values()
+                            if o.market == slug and o.purpose == "sell"
+                            and o.side == "SELL" and o.pinned)
+                        dq = min(qty - manual_cover - pinned_cover, bid_sz,
                                  (self.cfg.dump_usd_day
                                   - self.dump_today)
                                  / max(bid_t, 0.01))
@@ -3036,7 +3103,8 @@ class Family:
                             for o2 in [o2 for o2 in self.orders.values()
                                        if o2.market == slug
                                        and o2.purpose == "sell"
-                                       and o2.side == "SELL"]:
+                                       and o2.side == "SELL"
+                                       and not o2.pinned]:
                                 rr = self.desk.cancel(o2.id, o2.market)
                                 if rr.ok:
                                     self.orders.pop(o2.id, None)
