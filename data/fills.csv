@@ -1005,3 +1005,14 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787734263.1,cfb,aachc-cfb-wins-2026-11-28-duke-5pt5wins,BUY,0.01,0.64,manual,0.0005,16.28,,61,69,0,0.51,0.69,-0.01,0.01,the owner's own order — the engine leaves it alone,C3A9J3QAPFSS
 1787734443.1,cfb,aachc-cfb-wins-2026-11-28-ill-6pt5wins,BUY,0.5,0.72,earn,0.5,2.87,,73,77,0.678,0.49,0.7,-0.03,2.5,1 tick behind the touch — we would hold 20% of the bid side,C3NN7ZM7EFSG
 1787734623.2,cfb,aachc-cfb-wins-2026-11-28-mary-5pt5wins,BUY,0.01,0.52,earn,0.024,0.23,,52,56,0.532,0.52,0.53,-0.02,1.01,13 ticks in front of the touch — we would hold 23% of the bid side,C3QZ8B5CRFSN
+1787737623.2,politics,ussewc-usse-sc-2026-11-03-dem,SELL,1,0.13,earn,3.125,9.9,0.11345,10,15,0.437,0.12,0.13,-0.0165,-1,3 ticks in front of the touch — we would hold 100% of the ask side,C3GF3Q7XMFSP
+1787738883.3,politics,ewc-usp-2028-11-07-jdvan,SELL,20,0.26,manual,0.147,5.88,,21,26,0.255,0.22,0.23,-0.02,-20,the owner's own order — the engine leaves it alone,C3M5HAXGJFSR
+1787739063.3,politics,ussewc-usse-ar-2026-11-03-rep,SELL,5,0.96,sell,0.0033,6.67,0.982325,96,99,0.554,0.95,0.96,0.0223,3,selling filled stock — it earns while it waits,C3KG7SAEGFSM
+1787739123.3,politics,ussewc-usse-ar-2026-11-03-dem,BUY,1,0.01,manual,1.8273,6.53,0.017675,3,6,0.613,0.02,0.03,-0.0077,0,the owner's own order — the engine leaves it alone,C3KKWCAQWFSP
+1787739183.3,politics,ussewc-usse-ks-2026-11-03-dem,SELL,25,0.23,sell,0.4623,9,0.171175,18,24,0.533,0.22,0.23,-0.0588,0,selling filled stock — it earns while it waits,C3HJZ4YHYFSJ
+1787739183.3,politics,ussewc-usse-ar-2026-11-03-rep,SELL,2,0.95,manual,0.0126,0.03,0.982325,97,99,0.675,0.86,0.95,0.0323,1,the owner's own order — the engine leaves it alone,C3S8M00MWFSQ
+1787739243.3,politics,usgubewc-usgub-ar-2026-11-03-dem,BUY,3,0.01,manual,1.4818,6.58,0.001725,3,6,0.551,0.01,0.02,0.0083,0,the owner's own order — the engine leaves it alone,C3KKAWRSTFSJ
+1787739303.3,politics,usgubewc-usgub-ar-2026-11-03-dem,SELL,1,0.06,earn,0.0002,6.63,0.001725,2,5,0.673,0.01,0.02,-0.0583,-1,hand-set from the live card — the engine holds off,C3KJTKBNPFSJ
+1787739483.3,politics,usgubewc-usgub-il-2026-11-03-dem,SELL,5,0.99,sell,0.0014,4.98,0.998475,97,99,0.677,0.98,0.99,0.0085,0,selling filled stock — it earns while it waits,C3N1MTQKEFSH
+1787739543.3,politics,usgubewc-usgub-il-2026-11-03-dem,BUY,1,0.98,earn,0.8778,2.42,0.998475,97,99,0.745,0.92,0.99,-0.0185,1,1 tick in front of the touch — we would hold 62% of the bid side,C3Q97ZGPJFSQ
+1787739543.3,politics,usgubewc-usgub-il-2026-11-03-dem,BUY,4,0.92,manual,0,0.02,0.998475,97,99,0.745,0.92,0.99,-0.0785,5,the owner's own order — the engine leaves it alone,C3SC7G0SCFSM
