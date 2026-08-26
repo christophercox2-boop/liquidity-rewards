@@ -960,3 +960,17 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787713168.5,politics,ussewc-usse-ms-2026-11-03-rep,SELL,2,0.97,sell,0.0222,13.92,0.96925,95,99,0.529,0.95,0.97,-0.0008,0,selling filled stock — it earns while it waits,C3763B2Y4FSR
 1787714588.9,politics,ussewc-usse-il-2026-11-03-dem,BUY,4,0.98,earn,4.4643,3.45,0.995525,97,99,0,0.98,0.99,-0.0155,4,1 tick in front of the touch — we would hold 91% of the bid side,C3GGBVMH6FSP
 1787714588.9,politics,ussewc-usse-il-2026-11-03-rep,SELL,2,0.02,sell,1.0105,0.05,0.004475,2,8,0.281,0.01,0.02,-0.0155,0,an exit — its fill reduces the position it sits on,C3KCBC9NEFSG
+1787714821.5,politics,ussewc-usse-wv-2026-11-03-dem,SELL,2,0.02,earn,0.8267,4.12,0.0001,,,0,,,-0.0199,-2,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C3FZGWEACFSM
+1787714881.6,politics,ussewc-usse-ar-2026-11-03-dem,SELL,1,0.03,earn,6.25,5.91,0.017675,3,8,0.492,0.02,0.03,-0.0123,-1,3 ticks in front of the touch — we would hold 100% of the ask side,C3EFTSA1TFSH
+1787714941.6,politics,ussewc-usse-ar-2026-11-03-rep,SELL,0.83,0.96,sell,0.0046,8.46,0.982325,,,0.367,,,0.0223,8.17,selling filled stock — it earns while it waits,C3CCEPYE0FSJ
+1787715302.3,politics,enwc-uspres-nom-dem-2028-gavnew,SELL,1,0.13,sell,0,0,,23,25,0.92,0.13,0.15,0.11,0,taker dump — sold into the bid (the carved exception),C3KHYEGMRFSK
+1787716262.3,politics,usgubewc-usgub-nh-2026-11-03-dem,SELL,5,0.09,earn,1.2525,3.04,0.079425,8,13,0.433,0.08,0.09,-0.0106,-5,joins the touch — the book has been quiet,C3H8WS5S6FSG
+1787716622.4,politics,ussewc-usse-co-2026-11-03-dem,SELL,1,0.99,sell,0,0.65,0.9953,93,96,0.662,0.95,0.96,0.0053,0,selling filled stock — it earns while it waits,C3KC19V5CFSM
+1787716682.4,politics,usgubewc-usgub-vt-2026-11-03-rep,BUY,1,0.46,manual,0,11.88,0.90305,85,90,0.2,0.88,0.89,-0.443,-19,the owner's own order — the engine leaves it alone,C39VXCAFPFSS
+1787716742.4,cfb,aachc-cfb-wins-2026-11-28-okst-7pt5wins,SELL,0.05,0.22,earn,0.0498,0.03,,15,24,0,0.19,0.42,-0.03,-0.05,1 tick in front of the touch — we would hold 3% of the ask side,C3KVS1W4PFSK
+1787716982.4,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.97,earn,1.25,0.33,0.984875,92,95,0.869,0.97,0.99,-0.0149,12,2 ticks in front of the touch — we would hold 99% of the bid side,C3KMZM5DYFSG
+1787716982.4,cfb,aachc-cfb-wins-2026-11-28-txst-8pt5wins,BUY,0.01,0.24,earn,0.0247,0.88,,23,28,0.688,0.24,0.25,-0.02,3.01,23 ticks in front of the touch — we would hold 87% of the bid side,C3K87GEYEFSP
+1787717042.4,politics,usgubewc-usgub-mn-2026-11-03-rep,SELL,2,0.07,earn,0.8213,0.58,0.0067,3,7,0.205,0.05,0.07,-0.0633,-2,1 tick in front of the touch — we would hold 13% of the ask side,C3KFFV6CRFSS
+1787717582.4,cfb,aachc-cfb-wins-2026-11-28-nebr-8pt5wins,SELL,0.01,0.23,sell,0,4.75,,19,24,0.443,0.2,0.26,-0.02,0,selling filled stock — it earns while it waits,C3G3GE74AFSR
+1787717582.4,cfb,aachc-cfb-wins-2026-11-28-nebr-8pt5wins,SELL,0.01,0.05,manual,0.0247,4.74,,19,24,0.443,0.2,0.26,0.16,-0.01,the owner's own order — the engine leaves it alone,C3G38ZZ2MFSG
+1787717582.4,cfb,aachc-cfb-wins-2026-11-28-txst-8pt5wins,BUY,0.01,0.23,earn,2.1167,0.03,,22,26,0.752,0.23,0.25,-0.01,3.02,22 ticks in front of the touch — we would hold 77% of the bid side,C3M3BPPJTFSQ
