@@ -1771,6 +1771,27 @@ class Monitor:
             return
         self._pub_at = now
         try:
+            # the stream-health line (owner approved 2026-08-26, after
+            # the meter sawtooth traced back to the dead feed): is the
+            # stream connected, when did it last speak, and how many
+            # books did each writer actually put in the last hour
+            ws = dict(self.stream.status) if self.stream else {}
+            last = ws.get("last_msg") or 0.0
+            ago = f"{now - last:.0f}s ago" if last else "never"
+            wrote = {"ws": 0, "rest": 0}
+            for cache in {id(f.cache): f.cache
+                          for f in self.families.values()}.values():
+                for w, n in getattr(cache, "writes", {}).items():
+                    wrote[w] = wrote.get(w, 0) + n
+                cache.writes = {"ws": 0, "rest": 0}
+            self._note(
+                f"stream health: {ws.get('state', 'off')} · "
+                f"{ws.get('subscribed', 0)} subscribed · last message "
+                f"{ago} · books written last hour: stream {wrote['ws']}, "
+                f"rest {wrote['rest']}")
+        except Exception as e:  # noqa: BLE001 — a diagnostic, never a blocker
+            self._note(f"stream health line failed: {type(e).__name__}: {e}")
+        try:
             self._feed_check(now)
         except Exception as e:  # noqa: BLE001 — a diagnostic, never a blocker
             self._note(f"feed check failed: {type(e).__name__}: {e}")
@@ -1785,13 +1806,20 @@ class Monitor:
                 exp_day = sum(o.live_pf for o in fam.orders.values()
                               if o.live_pf is not None
                               and o.purpose != "manual")
+                # entries against entries (owner approved 2026-08-26):
+                # the expectation covers entry orders only, so exits
+                # and dumps filling — the unwinding WORKING — must not
+                # read as drift. All day the raw count said 3x while
+                # the honest ratio sat at 1.1-1.7x.
                 actual = sum(1 for f in fam.fills
-                             if (f.get("ts") or 0) > now - 86400)
+                             if (f.get("ts") or 0) > now - 86400
+                             and f.get("purpose") not in
+                             ("sell", "manual", "backfill"))
                 if exp_day or actual:
                     self._note(
                         f"fill calibration {key}: model expects "
-                        f"{exp_day:.1f} fills/day resting; actual last "
-                        f"24h: {actual}"
+                        f"{exp_day:.1f} fills/day resting; actual "
+                        f"entry fills last 24h: {actual}"
                         + ("  <-- DRIFTING" if exp_day > 0 and
                            (actual > 2 * exp_day + 2
                             or exp_day > 2 * actual + 2) else ""))

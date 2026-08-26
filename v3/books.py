@@ -35,6 +35,9 @@ class BookCache:
     def __init__(self):
         self.depth_seen: dict[str, int] = {}   # slug -> levels last seen
         self.last_writer: dict[str, str] = {}  # slug -> "ws" | "rest"
+        # write counters per writer since last read-and-reset — the
+        # hourly stream-health line reports them (owner, 2026-08-26)
+        self.writes: dict[str, int] = {"ws": 0, "rest": 0}
         self.depth_hist: dict[int, int] = {}   # levels -> how often
         self._books: dict[str, Book] = {}
         # optional observer: called as on_put(slug, book) after every
@@ -90,6 +93,7 @@ class BookCache:
         of theorising."""
         n = max(len(book.bids), len(book.asks))
         self.depth_seen[slug] = n
+        self.writes[writer] = self.writes.get(writer, 0) + 1
         self.last_writer[slug] = writer   # who wrote this book — the
                                           # stream or a REST fetch; the
                                           # approved feed check compares
