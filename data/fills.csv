@@ -943,3 +943,9 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787705575.5,politics,usgubewc-usgub-il-2026-11-03-rep,SELL,5,0.02,earn,6.2251,1.02,0.001525,,,0.62,,,-0.0185,-5,joins the touch — the book has been quiet,C3GEFZZQPFSG
 1787705575.5,politics,usgubewc-usgub-me-2026-11-03-rep,SELL,1,0.05,earn,6.25,1,0.01365,,,0.343,,,-0.0364,-10,2 ticks in front of the touch — we would hold 91% of the ask side,C3GEZ3FMJFSS
 1787706115.5,cfb,aachc-cfb-wins-2026-11-28-txst-8pt5wins,BUY,1,0.25,earn,2.3032,1.82,,25,30,0.601,0.27,0.33,-0.03,3,2 ticks behind the touch — we would hold 92% of the bid side,C3FX50CCWFSP
+1787706457.1,politics,usgubewc-usgub-tx-2026-11-03-dem,SELL,1,0.18,manual,0.0058,0.43,0.128575,,,0.606,,,-0.0514,-9,moved by the owner,C3H5A321JFSK
+1787706613.8,politics,usgubewc-usgub-tx-2026-11-03-rep,BUY,2.96,0.86,earn,1.9398,0.02,0.871425,84,88,0.738,0.86,0.87,-0.0114,4.96,joins the touch — the book has been quiet,C3HH980QAFSQ
+1787707749.6,politics,enwc-usgubp-ma-2026-09-01-rep-brisho,SELL,2,0.05,sell,0,0,,5,8,0.822,0.05,0.06,0.02,0,closed out by the owner from the live card — sold into the bid,C3HT2PSQTFSQ
+1787708021.7,politics,enwc-usgubp-ma-2026-09-01-rep-micmin,SELL,2,0.97,sell,0,0,,94,97,0.816,0.97,0.98,-0.01,0,closed out by the owner from the live card — sold into the bid,C3HV4XVFCFSH
+1787708294.1,politics,usgubewc-usgub-tx-2026-11-03-rep,BUY,0.01,0.83,manual,0,0.03,0.871425,82,87,0.783,0.76,0.87,-0.0414,5.01,the owner's own order — the engine leaves it alone,C3HWKJ026FSQ
+1787708294.1,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.97,earn,0.7812,1.14,0.984875,92,95,0.84,0.97,0.98,-0.0149,10,1 tick in front of the touch — we would hold 67% of the bid side,C3GZWXJ5EFSP
