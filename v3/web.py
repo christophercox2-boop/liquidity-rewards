@@ -920,6 +920,8 @@ function lvDraw(el,b){
  if(!b.ok){box.innerHTML='<div class="bad">'+esc(b.note||'no book')+'</div><div class="hint">tap the card to flip back</div>';return;}
  var h='<div style="font-size:15px"><b>'+esc(b.name||b.market)+'</b> <span class="ok" style="font-size:12px">\\u25CF LIVE</span></div>'
   +'<div class="muted" style="font-size:12px">read straight from the exchange, updating every second</div>';
+ if(b.pool_day!=null)h+='<div class="muted" style="font-size:12px">each side here competes for <b>'+usd(b.pool_day)+'/day</b> of rewards</div>';
+ else if(b.prog_note)h+='<div class="muted" style="font-size:12px">'+esc(b.prog_note)+'</div>';
  var bid=(b.bids&&b.bids[0])?b.bids[0][0]:null;
  if(b.position&&b.position.qty>0.005){
   var av=(b.position.cost/b.position.qty)*100;
@@ -942,14 +944,21 @@ function lvDraw(el,b){
  var sel=window._lvSel;
  if(sel&&!(b.ours||[]).some(function(o){return o.id===sel;}))sel=window._lvSel=null;
  if((b.ours||[]).length){
-  h+='<div class="muted" style="font-size:12px;margin-top:4px"><b>Your orders here</b> \\u2014 tap one to move or cancel it</div>';
+  var tot=0;(b.ours||[]).forEach(function(o){tot+=(o.est||0);});
+  h+='<div class="muted" style="font-size:12px;margin-top:4px"><b>Your orders here</b>'
+   +(b.pool_day!=null?' \\u2014 earning ~'+usd(tot)+'/day together':'')
+   +' \\u2014 tap one to move or cancel it</div>';
   (b.ours||[]).forEach(function(o){
    var on=o.id===sel;
+   var math='';
+   if(o.qualifies===false){math='its side is under Target Size \\u2014 the whole side pays nobody \\u2192 $0.00/day';}
+   else if(o.share!=null&&b.pool_day!=null){math=(o.share*100).toFixed(1)+'% of its side\\u2019s score \\u00d7 '+usd(b.pool_day)+'/day pool = <b>'+usd(o.est||0)+'/day</b>';}
+   else if(o.share!=null){math=(o.share*100).toFixed(1)+'% of its side\\u2019s score \\u2014 no dollar figure until the pool share is confirmed';}
    h+='<div class="lvrow'+(on?' sel':'')+'" onclick="event.stopPropagation();lvSel(\\''+esc(o.id)+'\\')">'
     +'<span class="lvdot">\\u25CF</span> '+(o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+pc(o.price)
     +' <span class="pill">'+esc(o.purpose)+'</span>'
     +(o.pinned?' <span class="pill on">hand-set</span>':'')
-    +(o.est!=null?' <span class="muted">~'+usd(o.est)+'/day</span>':'')
+    +(math?'<div class="muted" style="font-size:12px;margin:1px 0 0 18px">'+math+'</div>':'')
     +'</div>';
    if(on){
     var t=b.tick||0.01;
@@ -962,7 +971,7 @@ function lvDraw(el,b){
    }
   });
  }else{h+='<div class="muted" style="font-size:12px;margin-top:4px">none of your orders rest here right now</div>';}
- h+='<div class="hint">A move you make here is HAND-SET: the engine leaves it alone until the book turns against it (its earning rate falls under half of what it was when you set it) \\u2014 the quick-guard process still watches it. Tap outside the buttons to flip back.</div>';
+ h+='<div class="hint">The math is the exchange\\u2019s own: your share of the side\\u2019s score \\u00d7 the side\\u2019s daily pool, refigured every second as the book moves. Claims tend to run high \\u2014 the meter page\\u2019s audited rate is the ground truth for what actually pays. A move you make here is HAND-SET: the engine leaves it alone until the book turns against it (its earning rate falls under half of what it was when you set it) \\u2014 the quick-guard process still watches it. Tap outside the buttons to flip back.</div>';
  box.innerHTML=h;
 }
 function lvSel(id){window._lvSel=(window._lvSel===id?null:id);if(window._lv&&window._lvB)lvDraw(window._lv.el,window._lvB);}

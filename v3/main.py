@@ -1323,16 +1323,46 @@ class Monitor:
         now = time.time()
         book = self.client.book(slug, fetched_at=now)
         fam.cache.put(slug, book)
-        ours = [{"id": o.id, "side": o.side, "price": o.price,
-                 "qty": o.qty, "purpose": o.purpose,
-                 "est": o.live_est, "pinned": bool(o.pinned)}
-                for o in list(fam.orders.values()) if o.market == slug]
+        # the earnings math, recomputed on THIS second's book (owner,
+        # 2026-08-26: "make it so that the earnings math is shown so I
+        # get a sense of how much it's earning"): share of the side's
+        # score x the side's daily pool, the exchange's own arithmetic
+        from .scoring import estimate_join
+        prog, prog_why = fam._prog_row(slug)
+        side_pool = (fam._side_pool(slug, prog)
+                     if prog is not None else None)
+        ours = []
+        for o in list(fam.orders.values()):
+            if o.market != slug:
+                continue
+            row = {"id": o.id, "side": o.side, "price": o.price,
+                   "qty": o.qty, "purpose": o.purpose,
+                   "est": o.live_est, "pinned": bool(o.pinned),
+                   "share": None, "qualifies": None}
+            if prog is not None:
+                lv = [(p, q - o.qty if abs(p - o.price) < 1e-9 else q)
+                      for p, q in book.side(o.side)]
+                lv = [(p, q) for p, q in lv if q > 1e-9]
+                j = estimate_join(o.side, lv, book.tick, float(prog.df),
+                                  float(prog.target), o.price, o.qty)
+                row["share"] = round(j.share, 4)
+                row["qualifies"] = bool(j.qualifies and j.in_window)
+                if side_pool is not None:
+                    row["est"] = round(j.share * side_pool
+                                       if row["qualifies"] else 0.0, 4)
+            ours.append(row)
         inv = fam.inventory.get(slug)
         # deliberately NO timestamp in the payload: the stream sends only
         # when something CHANGED, so a still book costs the phone nothing
         return {"ok": True, "market": slug,
                 "name": self.names.label(slug),
                 "tick": book.tick,
+                "pool_day": (round(side_pool, 2)
+                             if side_pool is not None else None),
+                "prog_note": (prog_why if prog is None
+                              else ("" if side_pool is not None
+                                    else "pool share unconfirmed — no "
+                                         "dollar figure until it is")),
                 "bids": [[p, q] for p, q in book.bids[:10]],
                 "asks": [[p, q] for p, q in book.asks[:10]],
                 "ours": ours,
