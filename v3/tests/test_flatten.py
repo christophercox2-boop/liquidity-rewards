@@ -5135,3 +5135,73 @@ class TestTheLiveCard(unittest.TestCase):
         self.assertIn("pays nothing", b["prog_note"])
         o = [x for x in b["ours"] if x["id"] == "P"][0]
         self.assertIsNone(o["share"])             # no terms, no math
+
+
+class TestInstantRewardsWrite(unittest.TestCase):
+    """Owner, 2026-08-26: "there is info it's just not writing" —
+    politics Aug-24 posted at 01:13Z, the watcher saw it, and the file
+    sat cfb-only until the next hourly batch. rewards.csv is now
+    written the moment the watcher sees new postings."""
+
+    def _mon(self, v1="0"):
+        import os, types
+        from v3.main import Monitor
+        calls = {"puts": [], "earnings": 0}
+
+        class C:
+            def earnings(self, start):
+                calls["earnings"] += 1
+                return [{"date": "2026-08-24", "market": "m-pol",
+                         "program_type": "liquidityProgram",
+                         "reward_usd": 3.07, "status": "PENDING"}]
+        m = types.SimpleNamespace(
+            client=C(),
+            compose_rewards_csv=lambda rows, existing:
+                Monitor.compose_rewards_csv(m, rows, existing),
+            _gh_file=lambda path: ("date,market,program_type,reward_usd,"
+                                   "status\n", "sha1"),
+            _gh_put=lambda path, text, sha, msg:
+                calls["puts"].append((path, text, msg)) or True,
+            _note=lambda s: None)
+        os.environ["V1_ENABLED"] = v1
+        return m, calls
+
+    def tearDown(self):
+        import os
+        os.environ["V1_ENABLED"] = "0"
+
+    def test_the_write_happens_now_and_carries_the_rows(self):
+        from v3.main import Monitor
+        m, calls = self._mon()
+        ok = Monitor.publish_rewards_csv(m)
+        self.assertTrue(ok)
+        self.assertEqual(len(calls["puts"]), 1)
+        path, text, msg = calls["puts"][0]
+        self.assertEqual(path, "data/rewards.csv")
+        self.assertIn("2026-08-24,m-pol,liquidityProgram,3.07,PENDING",
+                      text)
+
+    def test_while_v1_runs_it_owns_the_file(self):
+        from v3.main import Monitor
+        m, calls = self._mon(v1="1")
+        self.assertFalse(Monitor.publish_rewards_csv(m))
+        self.assertEqual(calls["puts"], [])
+        self.assertEqual(calls["earnings"], 0)
+
+    def test_an_unchanged_file_is_not_rewritten(self):
+        from v3.main import Monitor
+        m, calls = self._mon()
+        Monitor.publish_rewards_csv(m)
+        existing = calls["puts"][0][1]
+        m._gh_file = lambda path: (existing, "sha2")
+        Monitor.publish_rewards_csv(m)
+        self.assertEqual(len(calls["puts"]), 1)   # no second commit
+
+    def test_a_failed_write_is_said_out_loud(self):
+        from v3.main import Monitor
+        m, calls = self._mon()
+        notes = []
+        m._gh_put = lambda *a: False
+        m._note = lambda s: notes.append(s)
+        self.assertFalse(Monitor.publish_rewards_csv(m))
+        self.assertTrue(any("rewards.csv write failed" in n for n in notes))

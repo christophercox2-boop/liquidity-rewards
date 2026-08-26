@@ -1733,6 +1733,34 @@ class Monitor:
                     f"  fresh-REST={_shape(fresh)}")
                 done += 1
 
+    def publish_rewards_csv(self) -> bool:
+        """The exchange's posted-payout file, written NOW. Owner,
+        2026-08-26: politics Aug-24 posted at 01:13Z, the watcher saw
+        it and pushed the phone, but the file sat cfb-only until the
+        next hourly batch — "there is info it's just not writing". In
+        1.0 the watcher kicked an immediate write; that kick died with
+        1.0's retirement. This is the write itself, callable from the
+        hourly publish AND from the watcher the moment new postings
+        land. One writer per file: skipped while 1.0 runs."""
+        if os.environ.get("V1_ENABLED", "0") != "0":
+            return False
+        import datetime as _dt3
+        start = (_dt3.datetime.now(_dt3.timezone.utc)
+                 - _dt3.timedelta(days=40)).strftime("%Y-%m-%d")
+        rows = self.client.earnings(start)
+        existing, sha = self._gh_file("data/rewards.csv")
+        text = self.compose_rewards_csv(rows, existing)
+        if text == existing:
+            return True
+        ok = self._gh_put("data/rewards.csv", text, sha,
+                          "Update rewards.csv [skip ci]")
+        if not ok:
+            # _gh_put fails silently by design elsewhere; the payout
+            # record is too important for that — say it, out loud
+            self._note("rewards.csv write failed — retrying on the next "
+                       "posting or the hourly publish")
+        return ok
+
     def publish_files(self, now: float) -> None:
         """Hourly, and only while 1.0 is retired (one writer per file)."""
         if os.environ.get("V1_ENABLED", "0") != "0":
@@ -1864,15 +1892,7 @@ class Monitor:
             except Exception as e:  # noqa: BLE001
                 self._note(f"backfill: {e}")
         try:
-            import datetime as _dt3
-            start = (_dt3.datetime.now(_dt3.timezone.utc)
-                     - _dt3.timedelta(days=40)).strftime("%Y-%m-%d")
-            rows = self.client.earnings(start)
-            existing, sha = self._gh_file("data/rewards.csv")
-            text = self.compose_rewards_csv(rows, existing)
-            if text != existing:
-                self._gh_put("data/rewards.csv", text, sha,
-                             "Update rewards.csv [skip ci]")
+            self.publish_rewards_csv()
         except Exception as e:  # noqa: BLE001
             self._note(f"rewards.csv publish: {e}")
         try:
@@ -2338,7 +2358,13 @@ class Monitor:
                         "Rewards posted",
                         f"{res['new_count']} new rows at the exchange; "
                         f"latest day totals: {line}")
-                    self._kick_tracker()
+                    # write the file the MOMENT postings land (owner,
+                    # 2026-08-26) — while 1.0 runs, it owns the file
+                    # and gets the kick instead
+                    if os.environ.get("V1_ENABLED", "0") != "0":
+                        self._kick_tracker()
+                    else:
+                        self.publish_rewards_csv()
             except Exception as e:  # noqa: BLE001 — watching never breaks
                 self._note(f"rewards watch: {e}")
         self.publish_files(now)
