@@ -1075,3 +1075,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787770939.8,politics,ussewc-usse-id-2026-11-03-rep,BUY,1,0.97,earn,6.25,4.64,0.9975,96,99,0.422,0.97,0.98,-0.0275,6,3 ticks in front of the touch — we would hold 100% of the bid side,C3WWXFSA4FSG
 1787770939.8,politics,ussewc-usse-id-2026-11-03-todach,BUY,1,0.05,earn,0.5685,0.1,,7,14,0.382,0.05,0.08,-0.05,7,at the touch — a fill here is 2 ticks inside value (evidence band only; confiden,C40TP7PSRFSP
 1787771779.8,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,0.86,0.53,earn,1.9569,1.57,0.5,51,53,0.826,0.51,0.52,-0.03,-9.86,1 tick behind the touch — we would hold 50% of the ask side,C3ZR9MXP0FSH
+1787772499.8,politics,enwc-usgubp-ri-2026-09-09-rep-aarguc,SELL,5,0.12,sell,0.6496,0.12,,5,10,0.774,0.11,0.12,-0.04,0,an exit — its fill reduces the position it sits on,C416EWXMTFSR
+1787775319.9,cfb,aachc-cfb-wins-2026-11-28-ala-9pt5wins,BUY,0.5,0.52,earn,1.2373,3,,51,56,0.48,0.51,0.52,-0.01,1.5,1 tick in front of the touch — we would hold 66% of the bid side,C3ZBGQ6N4FSP
