@@ -82,6 +82,12 @@ def cfb() -> FamilyConfig:
         # and starter positions are how it learns what earns
         probe_usd=3.0, grow_usd=10.0,
         replan_s=900.0,
+        # the cycle-out rule, ON (owner, 2026-08-26 "Yes to 1", after
+        # 24 hours of zero cfb churn with the budget pinned full): an
+        # order measuring under the bar with no better plan at its
+        # market is pulled so the money can go to the next best one.
+        # Same setting as politics; nfl/nba stay off.
+        weak_pull_s=30.0,
     )
 
 

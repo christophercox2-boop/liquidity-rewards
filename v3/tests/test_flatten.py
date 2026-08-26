@@ -5397,3 +5397,14 @@ class TestTheOnGridSweep(unittest.TestCase):
         r2.fam.last_action.clear()
         r2.cycle(advance=120.0)
         self.assertIn("G", r2.fam.orders)
+
+
+class TestCfbCycleOut(unittest.TestCase):
+    def test_the_cycle_out_rule_is_on_for_cfb_and_off_for_nfl_nba(self):
+        """Owner, 2026-08-26 ("Yes to 1"): cfb gets the same cycle-out
+        rule as politics; nfl and nba stay as they were."""
+        from v3 import football, basketball, politics
+        self.assertEqual(football.cfb().weak_pull_s, 30.0)
+        self.assertEqual(politics.config().weak_pull_s, 30.0)
+        self.assertEqual(football.nfl().weak_pull_s, 0.0)
+        self.assertEqual(basketball.nba().weak_pull_s, 0.0)
