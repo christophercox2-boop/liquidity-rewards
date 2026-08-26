@@ -928,3 +928,7 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787700710.5,cfb,aachc-cfb-wins-2026-11-28-ncar-5pt5wins,BUY,0.01,0.56,earn,0.0949,0.05,,55,58,0.723,0.56,0.57,-0.01,3.02,2 ticks in front of the touch — we would hold 4% of the bid side,C3G3GEGE0FSM
 1787702391.2,politics,usgubewc-usgub-or-2026-11-03-rep,SELL,1,0.12,earn,0.7812,0.75,0.0796,6,11,0,0.1,0.12,-0.0404,-1,2 ticks in front of the touch — we would hold 99% of the ask side,C3FXAK5S0FSQ
 1787703171.2,politics,ewc-usp-2028-11-07-aleocc,BUY,1,0.12,earn,1.8451,0.83,,12,18,0.311,0.12,0.13,-0.03,7,9 ticks in front of the touch — we would hold 99% of the bid side,C3G19EZA8FSR
+1787705030.6,politics,ussewc-usse-ok-2026-11-03-rep,BUY,1,0.98,manual,0.8747,1.35,0.999075,94,99,0.489,0.98,0.99,-0.0191,1,the owner's own order — the engine leaves it alone,C3G18EKKWFSP
+1787705450.6,politics,ussewc-usse-nm-2026-11-03-rep,SELL,5,0.02,earn,5.6714,2.27,0.00715,1,3,0,0.01,0.02,-0.0129,-5,at the touch — a fill here is 1 ticks inside value (Silver + evidence),C3FB32CDCFSJ
+1787705450.6,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.51,earn,1.7857,1.59,0.5,49,52,0.828,0.5,0.51,-0.01,-8,joins the touch — the book has been quiet,C3FYTNRHGFSP
+1787705450.6,politics,ussewc-usse-co-2026-11-03-rep,SELL,2,0.02,earn,1.1585,1.32,0.0047,1,2,0,0.01,0.02,-0.0153,-2,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C3G4A4SN4FSQ
