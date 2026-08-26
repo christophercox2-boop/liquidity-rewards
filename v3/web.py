@@ -116,6 +116,8 @@ _CSS = """
         border-radius:5px}
  @keyframes lvprog{0%{left:0}50%{left:75%}100%{left:0}}
  .lvp{width:25%;animation:lvprog 1.4s ease-in-out infinite}
+ .lvlive{position:absolute;top:7px;right:12px;font-size:11px;
+         font-weight:700;color:#7fd77f;z-index:2}
  .lvrow{padding:6px;border-radius:6px}
  .lvrow.sel{background:#2c3d20;outline:1px solid #4c7a2f}
  .lvdot{color:#9ec49a;font-weight:700}
@@ -889,15 +891,23 @@ function fFlip(el){
  setTimeout(function(){
   for(var i=0;i<faces.length;i++){if(faces[i])faces[i].style.display=(i===next?'':'none');}
   el.setAttribute('data-face',''+next);
-  if(next===2)lvOpen(el);else if(cur===2)lvClose();
+  if(next===2)lvOpen(el);else if(cur===2)lvLinger();
   el.style.transform='rotateY(0deg)';
  },140);
 }
 function lvOpen(el){
+ if(window._lvLingerT){clearTimeout(window._lvLingerT);window._lvLingerT=null;}
+ if(window._lv&&window._lv.el===el&&window._lvB){
+  // came back within the linger — the line never dropped; show at once
+  window._lvSel=null;
+  lvDraw(el,window._lvB);
+  return;
+ }
  lvClose();
  var box=el.querySelector('.flive');
  if(!box)return;
  window._liveOpen=true;window._lvSel=null;window._lvB=null;
+ var lt=el.querySelector('.lvlive');if(lt)lt.style.display='';
  box.innerHTML='<div class="muted">opening the live line\\u2026</div><div class="mtrack"><div class="mfill lvp"></div></div>';
  var m=el.getAttribute('data-m');
  var es=new EventSource('/live?m='+encodeURIComponent(m)+'&key='+encodeURIComponent(localStorage.getItem('dashKey')||''));
@@ -910,15 +920,54 @@ function lvOpen(el){
   if(!window._lvB&&window._liveOpen)box.innerHTML='<div class="muted">line dropped \\u2014 reconnecting\\u2026</div><div class="mtrack"><div class="mfill lvp"></div></div>';
  };
 }
+function lvLinger(){
+ // leaving the live face keeps the line open 10 seconds in case he
+ // comes right back; the LIVE light stays on every face until it drops
+ if(window._lvLingerT)clearTimeout(window._lvLingerT);
+ window._lvLingerT=setTimeout(lvClose,10000);
+}
 function lvClose(){
- if(window._lv){try{window._lv.es.close();}catch(e){}window._lv=null;}
+ if(window._lvLingerT){clearTimeout(window._lvLingerT);window._lvLingerT=null;}
+ if(window._lv){
+  try{window._lv.es.close();}catch(e){}
+  try{var lt=window._lv.el.querySelector('.lvlive');if(lt)lt.style.display='none';}catch(e){}
+  window._lv=null;
+ }
  window._liveOpen=false;window._lvSel=null;window._lvB=null;
+}
+function lvRefresh(){
+ // an order changed by hand: bring the WHOLE card up to date, not
+ // just the live face — front and story redrawn from a fresh journal
+ if(!window._lv)return;
+ var el=window._lv.el;
+ fetch('/fills.json',{headers:hdrs(),cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+  window._fillsJ=j;
+  if(!window._lv||window._lv.el!==el)return;
+  var m=el.getAttribute('data-m'),ts=el.getAttribute('data-ts');
+  var f=null;
+  (j.fills||[]).forEach(function(x){if(x.market===m&&''+x.ts===ts)f=x;});
+  if(!f)return;
+  var p=fParts(f);
+  var a=el.querySelector('.ffront'),bk=el.querySelector('.fback');
+  if(a)a.innerHTML=fFront(f,p);
+  if(bk)bk.innerHTML=fBack(f,p);
+  el.style.background=fTint(p.net);
+  // keep the per-second ticker honest: bases are read against the
+  // list-wide clock, so rebase this card's fresh numbers onto it
+  var dt=(Date.now()/1000)-(window._fillT0||0);
+  var els=el.querySelectorAll('.fnet');
+  for(var i=0;i<els.length;i++){
+   var r=parseFloat(els[i].getAttribute('data-rate')||'0');
+   var b0=parseFloat(els[i].getAttribute('data-base')||'0');
+   if(r>0.005)els[i].setAttribute('data-base',(b0-r*dt/86400).toFixed(4));
+  }
+ }).catch(function(){});
 }
 function lvDraw(el,b){
  var box=el.querySelector('.flive');
  if(!box||!window._liveOpen)return;
  if(!b.ok){box.innerHTML='<div class="bad">'+esc(b.note||'no book')+'</div><div class="hint">tap the card to flip back</div>';return;}
- var h='<div style="font-size:15px"><b>'+esc(b.name||b.market)+'</b> <span class="ok" style="font-size:12px">\\u25CF LIVE</span></div>'
+ var h='<div style="font-size:15px"><b>'+esc(b.name||b.market)+'</b></div>'
   +'<div class="muted" style="font-size:12px">read straight from the exchange, updating every second</div>';
  if(b.pool_day!=null)h+='<div class="muted" style="font-size:12px">each side here competes for <b>'+usd(b.pool_day)+'/day</b> of rewards</div>';
  else if(b.prog_note)h+='<div class="muted" style="font-size:12px">'+esc(b.prog_note)+'</div>';
@@ -977,7 +1026,7 @@ function lvDraw(el,b){
 function lvSel(id){window._lvSel=(window._lvSel===id?null:id);if(window._lv&&window._lvB)lvDraw(window._lv.el,window._lvB);}
 function lvMove(id,px){
  if(!confirm('Move this order to '+pc(px)+'? Your price then holds until the book turns against it.'))return;
- post({op:'move',order_id:id,price:px,pin:1},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;});
+ post({op:'move',order_id:id,price:px,pin:1},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;lvRefresh();});
 }
 function lvType(id,cur){
  var v=prompt('New price in cents (e.g. 3.4):',(cur*100).toFixed(1));
@@ -987,7 +1036,7 @@ function lvType(id,cur){
 }
 function lvCancelOrder(id){
  if(!confirm('Cancel this order?'))return;
- post({op:'cancel',order_id:id},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;});
+ post({op:'cancel',order_id:id},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;lvRefresh();});
 }
 function lvCloseOut(){
  var b=window._lvB;if(!b||!window._lv)return;
@@ -995,7 +1044,7 @@ function lvCloseOut(){
  var q=b.position?b.position.qty:0;
  if(bid==null||!(q>0))return;
  if(!confirm('Sell up to '+q+' shares at '+pc(bid)+' \\u2014 about '+usd(q*bid)+'. The resting exit is cancelled first; whatever the bid cannot take rests at '+pc(bid)+' as your own ask. Sure?'))return;
- post({op:'close_position',market:window._lv.m},function(j){alert(j.note||(j.ok?'done':'refused'));});
+ post({op:'close_position',market:window._lv.m},function(j){alert(j.note||(j.ok?'done':'refused'));lvRefresh();});
 }
 function fFront(f,p){
  var st=f.stray_close?'CLOSED OUT':(p.open?'OPEN \\u00b7 so far':'CLOSED');
@@ -1051,7 +1100,8 @@ function fBack(f,p){
 function fCard(f){
  var p=fParts(f);
  var live=p.open&&f.market;
- return '<div class="card" data-m="'+esc(f.market)+'" data-face="0" onclick="fFlip(this)" style="cursor:pointer;background:'+fTint(p.net)+'">'
+ return '<div class="card" data-m="'+esc(f.market)+'" data-ts="'+f.ts+'" data-face="0" onclick="fFlip(this)" style="cursor:pointer;position:relative;background:'+fTint(p.net)+'">'
+  +(live?'<span class="lvlive" style="display:none">\\u25CF LIVE</span>':'')
   +'<div class="ffront">'+fFront(f,p)+'</div>'
   +'<div class="fback" style="display:none">'+fBack(f,p)+'</div>'
   +(live?'<div class="flive" style="display:none"></div>':'')
