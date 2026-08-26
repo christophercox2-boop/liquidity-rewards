@@ -996,3 +996,12 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787731323.1,cfb,aachc-cfb-wins-2026-11-28-frest-4pt5wins,BUY,0.01,0.98,sell,2.5,17.97,,74,92,0.206,0.98,0.99,0.14,0.01,buying back the short at or under what it sold for — the bid earns while it wait,C384X6R6GFSM
 1787731443.1,cfb,aachc-cfb-wins-2026-11-28-washst-7pt5wins,BUY,1,0.19,earn,2.2516,0.23,,19,26,0.255,0.19,0.23,-0.03,2,1 tick behind the touch — we would hold 88% of the bid side,C3Q7RJYT6FSN
 1787731683.1,politics,ewc-usp-2028-11-07-rondes,BUY,20,0.11,earn,3.7013,2.38,,11,15,0.73,0.11,0.15,-0.02,20,1 tick behind the touch — we would hold 83% of the bid side,C3ND44YW2FSM
+1787732703.1,cfb,aachc-cfb-wins-2026-11-28-boise-7pt5wins,BUY,0.2,0.7,earn,2.1997,4.57,,66,74,0,0.55,0.72,0,0.2,joins the touch — the book has been quiet,C3KS3XXJ0FSM
+1787732703.1,cfb,aachc-cfb-wins-2026-11-28-lou-8pt5wins,SELL,0.5,0.36,earn,0.8333,1.92,,30,37,0.432,0.35,0.36,-0.02,-0.5,1 tick in front of the touch — we would hold 67% of the ask side,C3P3FY354FSM
+1787732943.1,cfb,aachc-cfb-wins-2026-11-28-sdst-7pt5wins,SELL,0.01,0.29,manual,0.0029,9.1,,30,39,0,0.37,0.59,0.06,-0.01,the owner's own order — the engine leaves it alone,C3G093RYWFSH
+1787733483.1,cfb,aachc-cfb-wins-2026-11-28-arz-8pt5wins,BUY,0.01,0.42,manual,0.0455,9.12,,35,42,0.342,0.27,0.43,0.03,0.01,the owner's own order — the engine leaves it alone,C3G3X57DMFSM
+1787733483.1,cfb,aachc-cfb-wins-2026-11-28-arz-9pt5wins,SELL,0.01,0.11,manual,0.0245,9.12,,10,17,0.342,0.1,0.23,0.02,-0.01,the owner's own order — the engine leaves it alone,C3G42KMYAFSS
+1787733843.1,cfb,aachc-cfb-wins-2026-11-28-mary-5pt5wins,BUY,0.5,0.52,earn,2.4203,8.57,,52,57,0.234,0.52,0.53,-0.03,1.5,joins the touch — the book has been quiet,C3GPA9B4YFSS
+1787734263.1,cfb,aachc-cfb-wins-2026-11-28-duke-5pt5wins,BUY,0.01,0.64,manual,0.0005,16.28,,61,69,0,0.51,0.69,-0.01,0.01,the owner's own order — the engine leaves it alone,C3A9J3QAPFSS
+1787734443.1,cfb,aachc-cfb-wins-2026-11-28-ill-6pt5wins,BUY,0.5,0.72,earn,0.5,2.87,,73,77,0.678,0.49,0.7,-0.03,2.5,1 tick behind the touch — we would hold 20% of the bid side,C3NN7ZM7EFSG
+1787734623.2,cfb,aachc-cfb-wins-2026-11-28-mary-5pt5wins,BUY,0.01,0.52,earn,0.024,0.23,,52,56,0.532,0.52,0.53,-0.02,1.01,13 ticks in front of the touch — we would hold 23% of the bid side,C3QZ8B5CRFSN
