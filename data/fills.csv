@@ -989,3 +989,10 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787724662.7,cfb,aachc-cfb-wins-2026-11-28-stan-4pt5wins,SELL,0.01,0.35,manual,0.0245,6.7,,46,52,0.236,0.34,0.35,0.14,-0.01,the owner's own order — the engine leaves it alone,C3G49QERTFSP
 1787727242.8,cfb,aachc-cfb-wins-2026-11-28-mich-8pt5wins,BUY,1,0.46,sell,0.0915,1.85,,45,55,0.402,0.46,0.59,-0.04,2,buying back the short at or under what it sold for — the bid earns while it wait,C3MTZS204FSM
 1787727782.8,cfb,aachc-cfb-wins-2026-11-28-pennst-9pt5wins,BUY,1,0.48,sell,2.2881,16.14,,47,53,0.698,0.48,0.59,-0.02,2,buying back the short at or under what it sold for — the bid earns while it wait,C38W537A6FSR
+1787729162.9,politics,scc-hrep-rep-2026-11-03-gte185,BUY,2,0.88,earn,0.9444,9.85,0.8957,87,93,0,0.88,0.89,-0.0157,2,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C3EGYXGVTFSH
+1787729282.9,cfb,aachc-cfb-wins-2026-11-28-txam-8pt5wins,BUY,0.2,0.57,earn,2.3245,3.93,,57,62,0.548,0.33,0.63,-0.03,0.2,2 ticks in front of the touch — we would hold 89% of the bid side,C3KGNSR00FSS
+1787729402.9,cfb,aachc-cfb-wins-2026-11-28-ncst-7pt5wins,BUY,0.01,0.62,earn,0.8029,0.57,,53,63,0,0.62,0.65,0.03,0.01,1 tick in front of the touch — we would hold 28% of the bid side,C3PE5JNETFSN
+1787731323.1,cfb,aachc-cfb-wins-2026-11-28-frest-6pt5wins,BUY,0.01,0.65,sell,0,18.92,,55,64,0.426,0.86,0.89,0.06,0.01,buying back the short at or under what it sold for — the bid earns while it wait,C378D1FQ0FSM
+1787731323.1,cfb,aachc-cfb-wins-2026-11-28-frest-4pt5wins,BUY,0.01,0.98,sell,2.5,17.97,,74,92,0.206,0.98,0.99,0.14,0.01,buying back the short at or under what it sold for — the bid earns while it wait,C384X6R6GFSM
+1787731443.1,cfb,aachc-cfb-wins-2026-11-28-washst-7pt5wins,BUY,1,0.19,earn,2.2516,0.23,,19,26,0.255,0.19,0.23,-0.03,2,1 tick behind the touch — we would hold 88% of the bid side,C3Q7RJYT6FSN
+1787731683.1,politics,ewc-usp-2028-11-07-rondes,BUY,20,0.11,earn,3.7013,2.38,,11,15,0.73,0.11,0.15,-0.02,20,1 tick behind the touch — we would hold 83% of the bid side,C3ND44YW2FSM
