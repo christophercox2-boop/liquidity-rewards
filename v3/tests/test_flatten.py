@@ -5408,3 +5408,55 @@ class TestCfbCycleOut(unittest.TestCase):
         self.assertEqual(politics.config().weak_pull_s, 30.0)
         self.assertEqual(football.nfl().weak_pull_s, 0.0)
         self.assertEqual(basketball.nba().weak_pull_s, 0.0)
+
+
+class TestFeedHealthAndCalibrationLine(unittest.TestCase):
+    """Owner approved 2026-08-26 ('Yes' to the parked three): the
+    hourly stream-health line, the entry-only fill calibration count,
+    and the on-grid sweep skipping snaps that leave the price bounds."""
+
+    def test_the_cache_counts_writes_per_writer(self):
+        from v3.books import BookCache
+        from v3.scoring import Book
+        c = BookCache()
+        b = Book(bids=((0.05, 10.0),), asks=((0.07, 10.0),),
+                 tick=0.01, fetched_at=1.0)
+        c.put("m1", b, writer="ws")
+        c.put("m2", b, writer="rest")
+        c.put("m3", b, writer="rest")
+        self.assertEqual(c.writes, {"ws": 1, "rest": 2})
+
+    def test_a_ceiling_ask_is_left_alone_not_retried(self):
+        # the TN shape: a 99.9c ask on a whole-cent book snaps to 100c,
+        # which is not a price — the sweep must skip it, not retry
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.90, 500.0),),
+                                  asks=((0.98, 500.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.cycle()
+        for oid in list(r.fam.orders):
+            r.fam.orders.pop(oid)
+        r.exchange.live.clear()
+        r.positions[A] = (1.0, 0.5)
+        r.fam.inventory[A] = {"qty": 1.0, "cost": 0.5}
+        r.exchange.live["T"] = {"id": "T", "market": A, "side": "SELL",
+                                "price": 0.999, "size": 1.0,
+                                "intent": SELL_LONG}
+        r.fam.orders["T"] = FamilyOrder(
+            id="T", market=A, side="SELL", price=0.999, qty=1.0,
+            intent=SELL_LONG, placed_ts=1.0, purpose="sell")
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        # the SWEEP skipped it (no doomed 100c reprice attempt); the
+        # ordinary exit maintenance is free to re-rest it somewhere
+        # legal, and whatever rests must be within the price bounds
+        self.assertFalse(any(l.get("event") == "regridded"
+                             and l.get("market") == A
+                             for l in r.fam.log))
+        for o in r.fam.orders.values():
+            self.assertLessEqual(o.price, 0.999 + 1e-12)
+            self.assertGreaterEqual(o.price, 0.001 - 1e-12)
