@@ -493,8 +493,15 @@ function sfair(m){
 function fold(title,sub,body,open){
  return '<details'+(open?' open':'')+'><summary><b>'+title+'</b> <span class="muted">'+sub+'</span></summary>'+body+'</details>';
 }
+function odrop(o){
+ var cur=(o.live_est!=null?o.live_est:o.est_day)||0;
+ var pk=o.est_peak8||0;
+ if(pk<0.02)return null;
+ return Math.max(0,(pk-cur)/pk);
+}
 function orow(d,o){
  var e=(o.live_est!=null?o.live_est:o.est_day);
+ var dp=odrop(o);
  var bid='bk_'+esc(o.id);
  return '<div style="margin:9px 0 0;border-top:1px solid #2c3527;padding-top:7px">'
   +'<div class="name" style="cursor:pointer" onclick="showbook(\\''+esc(o.market)+'\\',\\''+bid+'\\')">'+nm(d,o.market)+' <span class="muted">\u25be book</span></div>'
@@ -505,6 +512,7 @@ function orow(d,o){
   +'<div class="sub">'+(o.side==='BUY'?'bid':'ask')+' '+(o.qty||0)+' @ '+pc(o.price)
   +' \\u2014 '+(e==null?'<span class="warn">no estimate yet</span>':usd(e)+'/day')
   +' <span class="pill">'+esc(o.purpose)+'</span></div>'
+  +(dp!=null&&dp>0.05?'<div class="vrd'+(dp>=0.5?' warn':'')+'">\\u25BC '+Math.round(dp*100)+'% off its 8h peak ('+usd(o.est_peak8)+' \\u2192 '+usd((o.live_est!=null?o.live_est:o.est_day)||0)+'/day)</div>':'')
   +(o.verdict?'<div class="vrd">'+esc(o.verdict)+'</div>':'')
   +(o.why?'<div class="vrd">placed because: '+esc(o.why)+'</div>':'')
   +'<div><button class="small" onclick="mv(\\''+esc(o.id)+'\\','+o.price+')">Move</button>'
@@ -518,12 +526,18 @@ function render(d){
   +'<div style="margin:8px 0"><select id="ps" style="font-size:16px;padding:8px"><option value="BUY">bid (buy)</option><option value="SELL">ask (sell)</option></select>'
   +' <input id="pp" placeholder="price c" style="width:20%"> <input id="pq" placeholder="shares" style="width:20%">'
   +' <button onclick="pl()">Place</button></div><div id="plout"></div></details></div>';
+ var srt=window._ordSort||'est';
+ out+='<div style="margin:2px 0 8px">sort: '
+  +'<button class="small" '+(srt==='est'?'style="font-weight:bold;text-decoration:underline"':'')+' onclick="oSort(\\'est\\')">by $/day</button>'
+  +'<button class="small" '+(srt==='drop'?'style="font-weight:bold;text-decoration:underline"':'')+' onclick="oSort(\\'drop\\')">by drop from 8h peak</button></div>';
  fams(d).forEach(function(kv){
   var k=kv[0],s=kv[1];var os=(s.orders||[]);
   if(!os.length)return; any=true;
   var byest=function(a,b){return ((b.live_est!=null?b.live_est:b.est_day)||0)-((a.live_est!=null?a.live_est:a.est_day)||0);};
-  var earn=os.filter(function(o){return o.purpose!=='sell';}).sort(byest);
-  var sell=os.filter(function(o){return o.purpose==='sell';}).sort(byest);
+  var bydrop=function(a,b){var x=odrop(a),y=odrop(b);return (y==null?-1:y)-(x==null?-1:x);};
+  var cmp=srt==='drop'?bydrop:byest;
+  var earn=os.filter(function(o){return o.purpose!=='sell';}).sort(cmp);
+  var sell=os.filter(function(o){return o.purpose==='sell';}).sort(cmp);
   var esum=0;earn.forEach(function(o){esum+=(o.live_est!=null?o.live_est:o.est_day)||0;});
   var ssum=0;sell.forEach(function(o){ssum+=(o.live_est!=null?o.live_est:o.est_day)||0;});
   out+='<div class="card"><b>'+esc(s.name||k)+'</b>';
@@ -555,6 +569,10 @@ function render(d){
  });
  if(!any)out+='<div class="card muted">No resting orders. When a family is armed and finds something worth resting in, each order shows here with its name, its verdict, and its own Move/Cancel.</div>';
  return out;
+}
+function oSort(which){
+ window._ordSort=which;
+ if(window._d)document.getElementById('view').innerHTML=render(window._d);
 }
 function mv(id,px){
  var v=prompt('New price in cents (e.g. 3.4):',(px*100).toFixed(1));
