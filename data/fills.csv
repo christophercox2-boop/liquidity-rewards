@@ -1043,3 +1043,8 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787752443.5,politics,usgubewc-usgub-ok-2026-11-03-rep,BUY,4,0.98,sell,1.4493,0.15,0.994225,93,98,0.287,0.98,0.99,-0.0142,4,buying back the short at or under what it sold for — the bid earns while it wait,C3WAKNQA0FSN
 1787755203.6,politics,ewc-usp-2028-11-07-jonoss,SELL,5,0.13,manual,1.5343,1.59,,14,18,0.674,0.11,0.12,0.03,0,moved by the owner,C3VQ0QC8PFSN
 1787757843.6,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.97,earn,0.8705,0.67,0.984875,93,95,0.89,0.97,0.98,-0.0149,1,1 tick in front of the touch — we would hold 62% of the bid side,C3X5XFG7PFSM
+1787757903.6,politics,scc-senate-gop-2026-11-03-53,SELL,2,0.12,earn,2.2115,16.09,0.05145,7,13,0,0.11,0.12,-0.0685,-2,at the touch — a fill here is 7 ticks inside value (Silver + evidence),C3FZPNQ1EFSR
+1787758098.8,politics,ussewc-usse-sc-2026-11-03-dem,SELL,1,0.13,earn,6.25,3.07,0.11345,10,14,0.59,0.12,0.13,-0.0165,-2,1 tick in front of the touch — we would hold 62% of the ask side,C3V5EFXEYFSS
+1787758338.8,politics,usgubewc-usgub-fl-2026-11-03-dem,SELL,5,0.21,earn,0.1335,3.55,0.157225,16,20,0.622,0.2,0.21,-0.0528,-9,at the touch — a fill here is 4 ticks inside value (Silver + evidence),C3TTVV87YFSN
+1787760019.2,politics,usgubewc-usgub-al-2026-11-03-rep,SELL,1,0.98,sell,0,0.57,0.984875,92,95,0.898,0.95,0.97,0.0049,0,selling filled stock — it earns while it waits,C3XTDQ1J2FSR
+1787761279.3,politics,ewc-usp-2028-11-07-jdvan,BUY,12.89,0.26,manual,1.14,3.83,,25,31,0.51,0.27,0.3,-0.02,-7.11,moved by the owner,C3V8P9KJWFSK
