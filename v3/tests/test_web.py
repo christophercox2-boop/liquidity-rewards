@@ -41,9 +41,20 @@ class FakeMonitor:
         self.taps.append((op, which))
         return {"on": op == "confirm"}
 
-    def order_op(self, op, order_id, price=None):
+    def order_op(self, op, order_id, price=None, pin=False):
         self.ops.append((op, order_id, price))
+        self.pins = getattr(self, "pins", []) + [pin]
         return {"ok": True, "note": "done"}
+
+    def close_position(self, market):
+        self.closed = getattr(self, "closed", []) + [market]
+        return {"ok": True, "note": "sold"}
+
+    def live_view(self, slug):
+        self.live_reads = getattr(self, "live_reads", 0) + 1
+        return {"ok": True, "market": slug, "bids": [[0.05, 100.0]],
+                "asks": [[0.07, 50.0]], "ours": [], "position": None,
+                "tick": 0.01, "name": f"name:{slug}", "ts": 1.0}
 
     def fills_view(self):
         return {"ok": True, "fills": [
@@ -128,6 +139,39 @@ class TestWeb(unittest.TestCase):
                          body={"op": "move", "order_id": "o1", "price": 0.05})
         self.assertEqual(json.loads(body)["ok"], True)
         self.assertIn(("move", "o1", 0.05), self.mon.ops)
+
+    def test_live_card_ops(self):
+        """The live card's ops: a move carries the hand-set pin through,
+        and the close-out button routes to close_position."""
+        h = {"X-Dash-Key": "pw", "X-Reprice": "1",
+             "Content-Type": "application/json"}
+        req(self.base + "/op", method="POST", headers=h,
+            body={"op": "move", "order_id": "o2", "price": 0.08, "pin": 1})
+        self.assertIn(("move", "o2", 0.08), self.mon.ops)
+        self.assertIn(True, getattr(self.mon, "pins", []))
+        code, body = req(self.base + "/op", method="POST", headers=h,
+                         body={"op": "close_position", "market": "m-9"})
+        self.assertEqual(json.loads(body)["ok"], True)
+        self.assertIn("m-9", self.mon.closed)
+
+    def test_live_stream_needs_key_and_pushes_the_book(self):
+        """/live is the card's open line: locked without the key, and
+        with it the first server-sent event carries the fresh book."""
+        import urllib.request
+        code, _ = req(self.base + "/live?m=m-1")
+        self.assertEqual(code, 401)
+        r = urllib.request.Request(self.base + "/live?m=m-1&key=pw")
+        with urllib.request.urlopen(r, timeout=5) as resp:
+            self.assertEqual(resp.status, 200)
+            self.assertIn("text/event-stream",
+                          resp.headers.get("Content-Type", ""))
+            line = resp.readline().decode()
+            self.assertTrue(line.startswith("data: "))
+            j = json.loads(line[len("data: "):])
+            self.assertTrue(j["ok"])
+            self.assertEqual(j["market"], "m-1")
+            self.assertEqual(j["bids"][0], [0.05, 100.0])
+        self.assertGreaterEqual(self.mon.live_reads, 1)
 
     def test_authed_variants(self):
         hdr = {"X-Dash-Key": "pw"}
