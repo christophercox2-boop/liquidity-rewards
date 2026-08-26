@@ -958,3 +958,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787711968.5,politics,ewc-usp-2028-11-07-kamhar,SELL,1,0.08,sell,0,0,,4,9,0.679,0.08,0.09,-0.01,27,taker dump — sold into the bid (the carved exception),C3JV3Z53AFSS
 1787712448.5,cfb,aachc-cfb-wins-2026-11-28-usc-8pt5wins,BUY,0.04,0.56,manual,0.0227,3.28,,50,60,0.555,0.5,0.63,0.01,0.04,the owner's own order — the engine leaves it alone,C3G3Y017MFSQ
 1787713168.5,politics,ussewc-usse-ms-2026-11-03-rep,SELL,2,0.97,sell,0.0222,13.92,0.96925,95,99,0.529,0.95,0.97,-0.0008,0,selling filled stock — it earns while it waits,C3763B2Y4FSR
+1787714588.9,politics,ussewc-usse-il-2026-11-03-dem,BUY,4,0.98,earn,4.4643,3.45,0.995525,97,99,0,0.98,0.99,-0.0155,4,1 tick in front of the touch — we would hold 91% of the bid side,C3GGBVMH6FSP
+1787714588.9,politics,ussewc-usse-il-2026-11-03-rep,SELL,2,0.02,sell,1.0105,0.05,0.004475,2,8,0.281,0.01,0.02,-0.0155,0,an exit — its fill reduces the position it sits on,C3KCBC9NEFSG
