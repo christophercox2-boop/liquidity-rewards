@@ -305,7 +305,8 @@ class FamilyOrder:
     live_ev: float | None = None
     live_share: float | None = None
     pinned: bool = False      # hand-set from the live card — engine hands off
-    pin_est: float = 0.0      # $/day the order earned when the owner set it
+    pin_est: float = 0.0      # $/day baseline for the release rule
+                              # (-1 = measure on the first read after the change)
     pin_ts: float = 0.0       # when he set it (starts the nurse's watch)
     pin_weak_since: float = 0.0   # under the release line since (0 = fine)
     weak_since: float = 0.0   # measuring under the bar since (0 = fine)
@@ -1999,7 +2000,15 @@ class Family:
         the order is an ordinary engine order again. An order that
         earned nothing when he set it has no rate to lose, so only the
         nurse and his own hand ever move it."""
-        if rec.live_est is None or rec.pin_est <= 0.005:
+        if rec.live_est is None:
+            return
+        if rec.pin_est < 0:
+            # a fresh hand change (move or resize): the hold's baseline
+            # is what the order ACTUALLY earns at its new price and
+            # size, measured on the first read after the change
+            rec.pin_est = max(rec.live_est, 0.0)
+            return
+        if rec.pin_est <= 0.005:
             return
         if rec.live_est < PIN_RELEASE_FRACTION * rec.pin_est - 1e-9:
             if not rec.pin_weak_since:

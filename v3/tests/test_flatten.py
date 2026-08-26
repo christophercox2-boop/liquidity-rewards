@@ -4972,7 +4972,11 @@ class TestTheLiveCard(unittest.TestCase):
         self.assertTrue(out["ok"])
         rec = [o for o in r.fam.orders.values() if o.market == A][0]
         self.assertTrue(rec.pinned)
-        self.assertAlmostEqual(rec.pin_est, 0.8)
+        self.assertAlmostEqual(rec.pin_est, -1.0)   # baseline pending
+        rec.live_est = 0.55                          # first read after
+        r.fam._pin_check(rec, r.now)
+        self.assertAlmostEqual(rec.pin_est, 0.55)   # measured, not guessed
+        self.assertTrue(rec.pinned)
         self.assertAlmostEqual(rec.price, 0.03)
         self.assertTrue(any(l.get("event") == "hand_set" for l in r.fam.log))
         out = Monitor.order_op(m, "move", rec.id, 0.04)     # orders page
@@ -4997,6 +5001,21 @@ class TestTheLiveCard(unittest.TestCase):
         rec = [o for o in r.fam.orders.values() if o.market == A][0]
         self.assertEqual(rec.purpose, "manual")  # stronger than any pin
         self.assertFalse(rec.pinned)
+
+    def test_a_live_card_resize_changes_size_and_pins(self):
+        from v3.main import Monitor
+        r, A = self._rig(0.02, pinned=False)
+        out = Monitor.order_op(self._monitorish(r), "move", "P", None,
+                               pin=True, qty=5.0)
+        self.assertTrue(out["ok"], out.get("note"))
+        rec = [o for o in r.fam.orders.values() if o.market == A][0]
+        self.assertAlmostEqual(rec.qty, 5.0)
+        self.assertAlmostEqual(rec.price, 0.02)      # same price, new size
+        self.assertTrue(rec.pinned)
+        self.assertAlmostEqual(rec.pin_est, -1.0)
+        live = [o for o in r.exchange.live.values() if o["market"] == A]
+        self.assertEqual(len(live), 1)               # replaced, not doubled
+        self.assertAlmostEqual(live[0]["size"], 5.0)
 
     def _stock_rig(self, qty=10.0, bid_sz=6.0):
         from v3.tests.test_family import Rig, A
