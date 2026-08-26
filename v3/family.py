@@ -52,7 +52,7 @@ from .books import BookCache
 from .evidence import Evidence, SNATCH_WEIGHT
 from .fillmodel import FillModel
 from .intents import BUY_LONG, BUY_SHORT, SELL_LONG, SELL_SHORT, capital_at_risk
-from .orders import OrderDesk
+from .orders import OrderDesk, snap_price
 from .scoring import estimate_join
 from .terms import TermsStore
 
@@ -2102,6 +2102,48 @@ class Family:
                     del self.orders[rec.id]
                     actions -= 1
                 continue
+            # ON-GRID SWEEP (owner, 2026-08-26: "Go through and change
+            # all the non whole number price orders"): the desk now
+            # snaps every NEW price to the book's grid; this walks the
+            # grandfathered rest onto it — 32 exits were resting at
+            # break-even arithmetic like 5.90676c. Bids re-grid down,
+            # asks up, so floors and never-cross only get safer. Runs
+            # for EVERY engine purpose, exits included; manual, frozen,
+            # avoided and hand-set were already skipped above.
+            if actions > 0:
+                book_g = self.cache.fresh(rec.market, self.cfg.read_age_s,
+                                          now)
+                if book_g is not None and book_g.tick:
+                    px_g = snap_price(rec.price, book_g.tick, rec.side)
+                    if abs(px_g - rec.price) > 1e-9:
+                        r_g = self.desk.reprice(
+                            {"id": rec.id, "market": rec.market,
+                             "side": rec.side, "price": rec.price,
+                             "size": rec.qty, "intent": rec.intent},
+                            px_g)
+                        if r_g.ok:
+                            self.orders.pop(rec.id, None)
+                            self.evidence.order_gone(rec.market, rec.id)
+                            self.orders[r_g.order_id] = FamilyOrder(
+                                id=r_g.order_id, market=rec.market,
+                                side=rec.side,
+                                price=(r_g.price or px_g), qty=rec.qty,
+                                intent=rec.intent, placed_ts=now,
+                                purpose=rec.purpose, why=rec.why,
+                                est_day=rec.est_day, share=rec.share)
+                            self._log(event="regridded",
+                                      market=rec.market, side=rec.side,
+                                      price=rec.price,
+                                      to=(r_g.price or px_g), qty=rec.qty,
+                                      note="was off the book's price "
+                                           "grid — moved onto it")
+                            actions -= 1
+                        else:
+                            # refused (a cross at the snapped price, a
+                            # stale book): throttle the retry, keep the
+                            # original resting
+                            self._mark(rec.market, rec.side, now)
+                        continue
             if rec.purpose in ("sell", "probe"):
                 continue
             book = self.cache.fresh(rec.market, self.cfg.read_age_s, now)

@@ -5329,3 +5329,71 @@ class TestThePeakDropTrail(unittest.TestCase):
         fam2.restore(saved)
         self.assertAlmostEqual(fam2.orders["P"].est_peak8, 1.20)
         self.assertEqual(len(fam2.orders["P"].est_hist), 1)
+
+
+class TestTheOnGridSweep(unittest.TestCase):
+    """Owner, 2026-08-26: "Go through and change all the non whole
+    number price orders." The desk's snap stops new off-grid prices;
+    this sweep walks the grandfathered resting book onto each book's
+    own grid — 32 exits were resting at break-even arithmetic."""
+
+    def _rig(self, price, purpose="sell", tick=0.01, pinned=False,
+             manual=False):
+        from v3.tests.test_family import Rig, A
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.03, 500.0), (0.02, 60000.0)),
+                                  asks=((0.30, 500.0), (0.98, 60000.0)),
+                                  tick=tick, fetched_at=r.now))
+        r.cycle()
+        for oid in list(r.fam.orders):
+            r.fam.orders.pop(oid)
+        r.exchange.live.clear()
+        r.positions[A] = (43.01, 2.54)
+        r.fam.inventory[A] = {"qty": 43.01, "cost": 2.54}
+        r.exchange.live["G"] = {"id": "G", "market": A, "side": "SELL",
+                                "price": price, "size": 43.01,
+                                "intent": SELL_LONG}
+        r.fam.orders["G"] = FamilyOrder(
+            id="G", market=A, side="SELL", price=price, qty=43.01,
+            intent=SELL_LONG, placed_ts=1.0,
+            purpose="manual" if manual else purpose,
+            pinned=pinned, pin_ts=r.now if pinned else 0.0)
+        return r, A
+
+    def test_an_off_grid_exit_is_walked_onto_the_grid(self):
+        r, A = self._rig(0.05906765868402698)
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertNotIn("G", r.fam.orders)
+        moved = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "sell"]
+        self.assertTrue(moved)
+        for o in moved:            # wherever maintenance settled it in
+            steps = o.price / 0.01     # the same cycle, it is ON grid
+            self.assertAlmostEqual(steps, round(steps), places=6)
+        self.assertAlmostEqual(sum(o.qty for o in moved), 43.01)
+        self.assertTrue(any(l.get("event") == "regridded"
+                            for l in r.fam.log))
+        reg = [l for l in r.fam.log if l.get("event") == "regridded"][0]
+        self.assertAlmostEqual(reg.get("to"), 0.06)    # ask snapped UP
+
+    def test_a_tenth_cent_book_keeps_its_finer_grid(self):
+        r, A = self._rig(0.059, tick=0.001)
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        # 5.9c is ON the 0.1c grid: the sweep never fires for it
+        self.assertFalse(any(l.get("event") == "regridded"
+                             for l in r.fam.log))
+
+    def test_manual_and_hand_set_orders_are_never_regridded(self):
+        r, A = self._rig(0.05906765868402698, manual=True)
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertIn("G", r.fam.orders)
+        r2, A2 = self._rig(0.05906765868402698, pinned=True)
+        r2.fam.last_action.clear()
+        r2.cycle(advance=120.0)
+        self.assertIn("G", r2.fam.orders)
