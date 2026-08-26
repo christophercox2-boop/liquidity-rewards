@@ -28,6 +28,15 @@ from urllib.parse import parse_qs, urlparse
 DEFAULT_PORT = 8092
 DEFAULT_BIND = "127.0.0.1"
 
+# The live card (owner, 2026-08-25): an open card streams its market's
+# book read fresh from the exchange every tick. One thread per open
+# stream; the cap bounds both threads and API traffic. After LIVE_MAX_S
+# the stream ends and the page quietly reconnects, so a forgotten tab
+# never holds a line forever.
+LIVE_TICK_S = 1.0
+LIVE_MAX_S = 900.0
+LIVE_MAX_STREAMS = 3
+
 
 def authed(get_header, query_string: str, password: str) -> bool:
     """Same three ways in as 1.0: X-Dash-Key header (localStorage),
@@ -105,6 +114,11 @@ _CSS = """
  .tchip.new-r{animation:triR .7s ease-out}
  .mfill{position:absolute;left:0;top:0;bottom:0;background:#4c7a2f;
         border-radius:5px}
+ @keyframes lvprog{0%{left:0}50%{left:75%}100%{left:0}}
+ .lvp{width:25%;animation:lvprog 1.4s ease-in-out infinite}
+ .lvrow{padding:6px;border-radius:6px}
+ .lvrow.sel{background:#2c3d20;outline:1px solid #4c7a2f}
+ .lvdot{color:#9ec49a;font-weight:700}
 """
 
 _PLUMBING = """
@@ -179,6 +193,9 @@ function load(){
   // the page, refreshes HOLD — the data keeps arriving, but the page
   // only redraws when you are back near the top, so lists stay put and
   // your place is never lost
+  // a live card holds the page still the same way scrolling does —
+  // redrawing the list would tear down its open stream mid-look
+  if(window._loaded&&window._liveOpen){window._held=true;return;}
   if(window._loaded&&(window.scrollY||0)>120){
    window._held=true;
    var hb=document.getElementById('heldnote');
@@ -198,7 +215,7 @@ function load(){
 }
 load();setInterval(load,30000);
 if(window.addEventListener)window.addEventListener('scroll',function(){
- if(window._held&&(window.scrollY||0)<=120&&window._d){
+ if(window._held&&!window._liveOpen&&(window.scrollY||0)<=120&&window._d){
   window._held=false;
   var hb=document.getElementById('heldnote');if(hb)hb.remove();
   document.getElementById('view').innerHTML=render(window._d);
@@ -863,13 +880,113 @@ function fTint(net){
  return 'rgba(255,255,255,0.04)';
 }
 function fFlip(el){
+ var faces=[el.querySelector('.ffront'),el.querySelector('.fback'),el.querySelector('.flive')];
+ var cur=parseInt(el.getAttribute('data-face')||'0',10);
+ var n=faces[2]?3:2;
+ var next=(cur+1)%n;
  el.style.transition='transform 0.14s ease';
  el.style.transform='rotateY(90deg)';
  setTimeout(function(){
-  var a=el.querySelector('.ffront'),b=el.querySelector('.fback');
-  if(a&&b){var sh=a.style.display==='none';a.style.display=sh?'':'none';b.style.display=sh?'none':'';}
+  for(var i=0;i<faces.length;i++){if(faces[i])faces[i].style.display=(i===next?'':'none');}
+  el.setAttribute('data-face',''+next);
+  if(next===2)lvOpen(el);else if(cur===2)lvClose();
   el.style.transform='rotateY(0deg)';
  },140);
+}
+function lvOpen(el){
+ lvClose();
+ var box=el.querySelector('.flive');
+ if(!box)return;
+ window._liveOpen=true;window._lvSel=null;window._lvB=null;
+ box.innerHTML='<div class="muted">opening the live line\\u2026</div><div class="mtrack"><div class="mfill lvp"></div></div>';
+ var m=el.getAttribute('data-m');
+ var es=new EventSource('/live?m='+encodeURIComponent(m)+'&key='+encodeURIComponent(localStorage.getItem('dashKey')||''));
+ window._lv={es:es,el:el,m:m};
+ es.onmessage=function(ev){
+  var b;try{b=JSON.parse(ev.data);}catch(e){return;}
+  window._lvB=b;lvDraw(el,b);
+ };
+ es.onerror=function(){
+  if(!window._lvB&&window._liveOpen)box.innerHTML='<div class="muted">line dropped \\u2014 reconnecting\\u2026</div><div class="mtrack"><div class="mfill lvp"></div></div>';
+ };
+}
+function lvClose(){
+ if(window._lv){try{window._lv.es.close();}catch(e){}window._lv=null;}
+ window._liveOpen=false;window._lvSel=null;window._lvB=null;
+}
+function lvDraw(el,b){
+ var box=el.querySelector('.flive');
+ if(!box||!window._liveOpen)return;
+ if(!b.ok){box.innerHTML='<div class="bad">'+esc(b.note||'no book')+'</div><div class="hint">tap the card to flip back</div>';return;}
+ var h='<div style="font-size:15px"><b>'+esc(b.name||b.market)+'</b> <span class="ok" style="font-size:12px">\\u25CF LIVE</span></div>'
+  +'<div class="muted" style="font-size:12px">read straight from the exchange, updating every second</div>';
+ var bid=(b.bids&&b.bids[0])?b.bids[0][0]:null;
+ if(b.position&&b.position.qty>0.005){
+  var av=(b.position.cost/b.position.qty)*100;
+  h+='<div class="sub" style="margin:5px 0 2px">Position: <b>'+b.position.qty+' shares</b> at '+av.toFixed(1)+'c average</div>';
+  if(bid!=null){
+   h+='<div style="margin:4px 0"><button class="small off" onclick="event.stopPropagation();lvCloseOut()">Close out \\u2014 sell at the bid ('+pc(bid)+')</button></div>';
+  }
+ }
+ var oursAt={};(b.ours||[]).forEach(function(o){oursAt[o.side+(o.price*100).toFixed(1)]=1;});
+ h+='<div><table><tr><th class="r">bid size</th><th class="r">bid</th><th>ask</th><th>ask size</th></tr>';
+ var nr=Math.max((b.bids||[]).length,(b.asks||[]).length);
+ for(var i=0;i<nr;i++){
+  var bd=(b.bids||[])[i],ak=(b.asks||[])[i];
+  var bm=bd&&oursAt['BUY'+(bd[0]*100).toFixed(1)]?' <span class="lvdot">\\u25CF</span>':'';
+  var am=ak&&oursAt['SELL'+(ak[0]*100).toFixed(1)]?' <span class="lvdot">\\u25CF</span>':'';
+  h+='<tr><td class="r">'+(bd?fmtsz(bd[1]):'')+'</td><td class="r">'+(bd?pc(bd[0])+bm:'')+'</td>'
+    +'<td>'+(ak?pc(ak[0])+am:'')+'</td><td>'+(ak?fmtsz(ak[1]):'')+'</td></tr>';
+ }
+ h+='</table></div>';
+ var sel=window._lvSel;
+ if(sel&&!(b.ours||[]).some(function(o){return o.id===sel;}))sel=window._lvSel=null;
+ if((b.ours||[]).length){
+  h+='<div class="muted" style="font-size:12px;margin-top:4px"><b>Your orders here</b> \\u2014 tap one to move or cancel it</div>';
+  (b.ours||[]).forEach(function(o){
+   var on=o.id===sel;
+   h+='<div class="lvrow'+(on?' sel':'')+'" onclick="event.stopPropagation();lvSel(\\''+esc(o.id)+'\\')">'
+    +'<span class="lvdot">\\u25CF</span> '+(o.side==='BUY'?'bid':'ask')+' '+o.qty+' @ '+pc(o.price)
+    +' <span class="pill">'+esc(o.purpose)+'</span>'
+    +(o.pinned?' <span class="pill on">hand-set</span>':'')
+    +(o.est!=null?' <span class="muted">~'+usd(o.est)+'/day</span>':'')
+    +'</div>';
+   if(on){
+    var t=b.tick||0.01;
+    var dn=Math.round((o.price-t)*1000)/1000,up=Math.round((o.price+t)*1000)/1000;
+    h+='<div style="margin:2px 0 6px" onclick="event.stopPropagation()">';
+    if(dn>0.0005)h+='<button class="small" onclick="lvMove(\\''+esc(o.id)+'\\','+dn+')">move to '+pc(dn)+'</button>';
+    if(up<0.9995)h+='<button class="small" onclick="lvMove(\\''+esc(o.id)+'\\','+up+')">move to '+pc(up)+'</button>';
+    h+='<button class="small" onclick="lvType(\\''+esc(o.id)+'\\','+o.price+')">type a price</button>'
+     +'<button class="small off" onclick="lvCancelOrder(\\''+esc(o.id)+'\\')">cancel</button></div>';
+   }
+  });
+ }else{h+='<div class="muted" style="font-size:12px;margin-top:4px">none of your orders rest here right now</div>';}
+ h+='<div class="hint">A move you make here is HAND-SET: the engine leaves it alone until the book turns against it (its earning rate falls under half of what it was when you set it) \\u2014 the quick-guard process still watches it. Tap outside the buttons to flip back.</div>';
+ box.innerHTML=h;
+}
+function lvSel(id){window._lvSel=(window._lvSel===id?null:id);if(window._lv&&window._lvB)lvDraw(window._lv.el,window._lvB);}
+function lvMove(id,px){
+ if(!confirm('Move this order to '+pc(px)+'? Your price then holds until the book turns against it.'))return;
+ post({op:'move',order_id:id,price:px,pin:1},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;});
+}
+function lvType(id,cur){
+ var v=prompt('New price in cents (e.g. 3.4):',(cur*100).toFixed(1));
+ if(v==null)return;var p=parseFloat(v)/100;
+ if(!(p>0&&p<1)){alert('price must be between 0.1c and 99.9c');return;}
+ lvMove(id,Math.round(p*1000)/1000);
+}
+function lvCancelOrder(id){
+ if(!confirm('Cancel this order?'))return;
+ post({op:'cancel',order_id:id},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;});
+}
+function lvCloseOut(){
+ var b=window._lvB;if(!b||!window._lv)return;
+ var bid=(b.bids&&b.bids[0])?b.bids[0][0]:null;
+ var q=b.position?b.position.qty:0;
+ if(bid==null||!(q>0))return;
+ if(!confirm('Sell up to '+q+' shares at '+pc(bid)+' \\u2014 about '+usd(q*bid)+'. The resting exit is cancelled first; whatever the bid cannot take rests at '+pc(bid)+' as your own ask. Sure?'))return;
+ post({op:'close_position',market:window._lv.m},function(j){alert(j.note||(j.ok?'done':'refused'));});
 }
 function fFront(f,p){
  var st=f.stray_close?'CLOSED OUT':(p.open?'OPEN \\u00b7 so far':'CLOSED');
@@ -919,14 +1036,17 @@ function fBack(f,p){
   else nw+='<br>No exit resting yet \\u2014 the open part earns $0.00/day until one rests';
   out+='<div style="margin:2px 0">'+nw+'</div>';
  }
- out+='<div class="muted" style="font-size:12px;margin-top:4px">tap to flip back</div>';
+ out+='<div class="muted" style="font-size:12px;margin-top:4px">'+(p.open?'tap again for the LIVE book \\u2014 move orders, close out':'tap to flip back')+'</div>';
  return out;
 }
 function fCard(f){
  var p=fParts(f);
- return '<div class="card" onclick="fFlip(this)" style="cursor:pointer;background:'+fTint(p.net)+'">'
+ var live=p.open&&f.market;
+ return '<div class="card" data-m="'+esc(f.market)+'" data-face="0" onclick="fFlip(this)" style="cursor:pointer;background:'+fTint(p.net)+'">'
   +'<div class="ffront">'+fFront(f,p)+'</div>'
-  +'<div class="fback" style="display:none">'+fBack(f,p)+'</div></div>';
+  +'<div class="fback" style="display:none">'+fBack(f,p)+'</div>'
+  +(live?'<div class="flive" style="display:none"></div>':'')
+  +'</div>';
 }
 function fTick(){
  if(!document.querySelectorAll)return;
@@ -941,6 +1061,8 @@ function fTick(){
  }
 }
 function fDraw(){
+ if(window._liveOpen)lvClose();   // a redraw tears the cards down —
+                                  // never leave a stream running blind
  var el=document.getElementById('fl');
  var j=window._fillsJ;
  if(!el||!j)return;
@@ -1046,6 +1168,50 @@ class WebServer:
             self.bind = bind
         self.password = os.environ.get("DASH_PASSWORD", "")
         self._httpd: ThreadingHTTPServer | None = None
+        self._live_lock = threading.Lock()
+        self._live_count = 0
+
+    def stream_live(self, slug: str, wfile) -> None:
+        """One live card: hold the connection open and push the market's
+        real book down it about once a second — each tick read straight
+        from the exchange (monitor.live_view), never the stored copy.
+        Ends when the phone closes the card (the write breaks) or after
+        LIVE_MAX_S; the page reconnects by itself if it is still open.
+        A hard cap on simultaneous streams bounds the API traffic."""
+        with self._live_lock:
+            if self._live_count >= LIVE_MAX_STREAMS:
+                try:
+                    wfile.write(b'data: {"ok": false, "note": "too many '
+                                b'live views open at once - close one '
+                                b'first"}\n\n')
+                    wfile.flush()
+                except OSError:
+                    pass
+                return
+            self._live_count += 1
+        try:
+            t0 = time.time()
+            last = None
+            while time.time() - t0 < LIVE_MAX_S:
+                try:
+                    body = json.dumps(self.monitor.live_view(slug))
+                except Exception as e:  # noqa: BLE001 — tell the phone, keep going
+                    body = json.dumps(
+                        {"ok": False,
+                         "note": f"{type(e).__name__}: {e}"})
+                if body != last:
+                    wfile.write(b"data: " + body.encode() + b"\n\n")
+                    last = body
+                else:
+                    wfile.write(b": hb\n\n")   # heartbeat — detects a
+                                               # closed phone within a tick
+                wfile.flush()
+                time.sleep(LIVE_TICK_S)
+        except (BrokenPipeError, ConnectionResetError, OSError):
+            pass                               # the card was closed
+        finally:
+            with self._live_lock:
+                self._live_count -= 1
 
     def data_payload(self) -> dict:
         # boot-time fallback only: once the first cycle completes, the
@@ -1069,7 +1235,10 @@ class WebServer:
         if op in ("cancel", "move"):
             price = body.get("price")
             return self.monitor.order_op(op, str(body.get("order_id") or ""),
-                                         float(price) if price is not None else None)
+                                         float(price) if price is not None else None,
+                                         pin=bool(body.get("pin")))
+        if op == "close_position":
+            return self.monitor.close_position(str(body.get("market") or ""))
         if op == "backfill":
             return self.monitor.backfill_journal(
                 days=float(body.get("days") or 3.0),
@@ -1126,11 +1295,24 @@ class WebServer:
                     self._send(200, "text/html; charset=utf-8",
                                _shell(title, here, js).encode())
                     return
+                if route == "/live":
+                    # the live card's open line. EventSource cannot set
+                    # headers, so the key rides the query string — the
+                    # same ?key= door authed() has always accepted.
+                    if not authed(self.headers.get, u.query, server.password):
+                        self._send(401, "application/json", b'{"error":"key required"}')
+                        return
+                    slug = (parse_qs(u.query).get("m") or [""])[0]
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/event-stream")
+                    self.send_header("Cache-Control", "no-store")
+                    self.end_headers()
+                    server.stream_live(slug, self.wfile)
+                    return
                 if route == "/book.json":
                     if not authed(self.headers.get, u.query, server.password):
                         self._send(401, "application/json", b'{"error":"key required"}')
                         return
-                    from urllib.parse import parse_qs
                     slug = (parse_qs(u.query).get("m") or [""])[0]
                     self._send(200, "application/json",
                                json.dumps(server.monitor.book_view(slug)).encode())

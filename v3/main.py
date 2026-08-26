@@ -1156,9 +1156,14 @@ class Monitor:
         return {"ok": False,
                 "note": "no family knows this market — check the slug"}
 
-    def order_op(self, op: str, order_id: str, price: float | None = None) -> dict:
-        """Owner move/cancel on one of OUR orders, from the orders page.
-        initiator='owner' bypasses the switches but no other rail."""
+    def order_op(self, op: str, order_id: str, price: float | None = None,
+                 pin: bool = False) -> dict:
+        """Owner move/cancel on one of OUR orders, from the orders page
+        or the live card. initiator='owner' bypasses the switches but no
+        other rail. pin=True (the live card's moves) marks an engine
+        order hand-set: the engine hands off until the release rule or
+        the nurse ends the pin. Manual orders stay manual — already
+        stronger than any pin."""
         for fam in self.families.values():
             rec = fam.orders.get(order_id)
             if rec is None:
@@ -1176,14 +1181,164 @@ class Monitor:
                 if r.ok:
                     del fam.orders[order_id]
                     from .family import FamilyOrder
+                    now = time.time()
+                    pinning = pin and rec.purpose != "manual"
                     fam.orders[r.order_id] = FamilyOrder(
                         id=r.order_id, market=rec.market, side=rec.side,
                         price=price, qty=rec.qty, intent=rec.intent,
-                        placed_ts=time.time(), purpose=rec.purpose,
-                        why="moved by the owner")
+                        placed_ts=now, purpose=rec.purpose,
+                        why=("hand-set from the live card — the engine "
+                             "holds off" if pinning
+                             else "moved by the owner"),
+                        pinned=pinning, pin_ts=now if pinning else 0.0,
+                        pin_est=((rec.live_est if rec.live_est is not None
+                                  else rec.est_day) or 0.0)
+                        if pinning else 0.0)
+                    if pinning:
+                        fam._log(event="hand_set", market=rec.market,
+                                 side=rec.side, price=price, qty=rec.qty,
+                                 note="the owner moved this order from the "
+                                      "live card — the engine holds off "
+                                      "until the book turns against it")
                 return {"ok": r.ok, "note": r.note}
             return {"ok": False, "note": f"unknown op {op}"}
         return {"ok": False, "note": "not one of 3.0's orders"}
+
+    def close_position(self, market: str) -> dict:
+        """The live card's close-out button: sell the open shares at the
+        current best bid, never worse — the same carved shape as the
+        taker dump, fired by the owner's own tap. Engine exits are
+        cancelled first so shares are never offered twice; his own
+        hand-placed asks are untouchable, so their shares stay theirs.
+        The part the displayed bid can take is journaled as sold; any
+        rest stays resting AT the bid as the owner's own order."""
+        from .family import FamilyOrder
+        from .intents import SELL_LONG
+        now = time.time()
+        for fam in self.families.values():
+            inv = fam.inventory.get(market)
+            if inv is None:
+                continue
+            qty = round(inv.get("qty") or 0.0, 2)
+            if qty <= -0.01:
+                return {"ok": False,
+                        "note": "this position is short — closing it means "
+                                "BUYING at the ask, which nothing may cross "
+                                "for; rest a bid instead"}
+            if qty < 0.01:
+                return {"ok": False, "note": "no open position here"}
+            try:
+                book = self.client.book(market, fetched_at=now)
+                fam.cache.put(market, book)
+            except Exception as e:  # noqa: BLE001 — fail closed, plainly
+                return {"ok": False,
+                        "note": f"could not read a fresh book: {e}"}
+            if not book.bids:
+                return {"ok": False,
+                        "note": "no bid resting to sell to right now"}
+            bid_px, bid_sz = book.bids[0]
+            manual_cover = sum(
+                o.qty for o in fam.orders.values()
+                if o.market == market and o.side == "SELL"
+                and o.purpose == "manual")
+            sellable = round(qty - manual_cover, 2)
+            if sellable < 0.01:
+                return {"ok": False,
+                        "note": "your own resting asks already cover this "
+                                "position — cancel one first if you want "
+                                "these shares sold here"}
+            # engine exits (hand-set ones included — this tap supersedes
+            # the earlier hand move) come off first
+            for o in [o for o in fam.orders.values()
+                      if o.market == market and o.purpose == "sell"
+                      and o.side == "SELL"]:
+                rr = fam.desk.cancel(o.id, o.market, initiator="owner")
+                if rr.ok:
+                    fam.orders.pop(o.id, None)
+                    fam.evidence.order_gone(o.market, o.id)
+            r = fam.desk.place_resting(
+                market, "SELL", bid_px, sellable, net_position=qty,
+                intent=SELL_LONG, initiator="owner", taker=True,
+                verify=False)
+            if not r.ok:
+                return {"ok": False, "note": r.note}
+            # journal what the displayed bid can take NOW (the dump's
+            # own convention); the rest is the owner's resting ask and
+            # the normal fill watch journals it when it sells
+            took = round(min(sellable, bid_sz), 2)
+            if took >= 0.01:
+                inv["qty"] = round(inv.get("qty", 0.0) - took, 4)
+                inv["cost"] = round(inv.get("cost", 0.0) - took * bid_px, 4)
+                left = round(inv["qty"], 2)
+                if abs(inv["qty"]) < 0.005:
+                    fam.inventory.pop(market, None)
+                    fam.inv_since.pop(market, None)
+                fam._journal_fill(FamilyOrder(
+                    id=r.order_id or f"close{int(now)}",
+                    market=market, side="SELL", price=bid_px, qty=took,
+                    intent=SELL_LONG, placed_ts=now, purpose="sell",
+                    why="closed out by the owner from the live card — "
+                        "sold into the bid"), took, now, left)
+            rest = round(sellable - took, 2)
+            if rest >= 0.01 and r.order_id:
+                fam.orders[r.order_id] = FamilyOrder(
+                    id=r.order_id, market=market, side="SELL",
+                    price=bid_px, qty=rest, intent=SELL_LONG,
+                    placed_ts=now, purpose="manual",
+                    why="the rest of the owner's close-out — resting at "
+                        "the bid until it sells")
+            fam._log(event="close_out", market=market, price=bid_px,
+                     qty=sellable,
+                     note=(f"owner closed out — {took:g} sold into the bid"
+                           + (f", {rest:g} resting at "
+                              f"{bid_px * 100:g}c" if rest >= 0.01 else "")))
+            note = f"sold {took:g} at {bid_px * 100:g}c"
+            if rest >= 0.01:
+                note += (f"; the bid could not take the other {rest:g} — "
+                         f"they rest at {bid_px * 100:g}c as your own ask")
+            if manual_cover > 0.01:
+                note += (f" (your own resting ask for {manual_cover:g} "
+                         "was left alone)")
+            return {"ok": True, "note": note}
+        return {"ok": False, "note": "no position on record for this market"}
+
+    def live_view(self, slug: str) -> dict:
+        """One tick of the live card: the book read STRAIGHT from the
+        exchange this second — never the stored copy — with our orders
+        and the position joined. The fresh read also lands in the cache,
+        so the estimates sharpen while the owner watches."""
+        fam = None
+        for f in self.families.values():
+            if slug in f.inventory or any(
+                    o.market == slug for o in list(f.orders.values())):
+                fam = f
+                break
+        if fam is None:
+            for f in self.families.values():
+                if f.knows(slug):
+                    fam = f
+                    break
+        if fam is None:
+            return {"ok": False, "note": "no family knows this market"}
+        now = time.time()
+        book = self.client.book(slug, fetched_at=now)
+        fam.cache.put(slug, book)
+        ours = [{"id": o.id, "side": o.side, "price": o.price,
+                 "qty": o.qty, "purpose": o.purpose,
+                 "est": o.live_est, "pinned": bool(o.pinned)}
+                for o in list(fam.orders.values()) if o.market == slug]
+        inv = fam.inventory.get(slug)
+        # deliberately NO timestamp in the payload: the stream sends only
+        # when something CHANGED, so a still book costs the phone nothing
+        return {"ok": True, "market": slug,
+                "name": self.names.label(slug),
+                "tick": book.tick,
+                "bids": [[p, q] for p, q in book.bids[:10]],
+                "asks": [[p, q] for p, q in book.asks[:10]],
+                "ours": ours,
+                "position": ({"qty": round(inv.get("qty", 0), 2),
+                              "cost": round(inv.get("cost", 0), 2)}
+                             if inv else None)}
 
     def _kick_tracker(self) -> None:
         """Ask 1.0 (same container) to refresh rewards.csv on GitHub so

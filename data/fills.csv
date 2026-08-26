@@ -922,3 +922,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787698401.3,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,10,0.92,earn,0.8787,0.77,0.9836,92,95,0.699,0.92,0.93,-0.0636,12,at the touch — a fill here is 3 ticks inside value (Silver + evidence),C3EZ2D95JFSS
 1787698521.3,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.97,earn,6.2494,0.75,0.98475,92,95,0.824,0.97,0.98,-0.0147,9,2 ticks in front of the touch — we would hold 96% of the bid side,C3F06TKM2FSP
 1787698521.3,politics,ussewc-usse-co-2026-11-03-dem,BUY,1,0.94,earn,6.1753,0.35,0.995225,93,97,0.57,0.94,0.96,-0.0552,1,4 ticks in front of the touch — we would hold 97% of the bid side,C3FAN7K74FSK
+1787699494.8,politics,scc-senate-gop-2026-11-03-49,BUY,1,0.15,sell,0.0178,4.96,0.1483,14,19,0.251,0.14,0.21,0.0017,1,buying back the short at or under what it sold for — the bid earns while it wait,C3BQTMQ5AFSM
