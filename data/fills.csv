@@ -1031,3 +1031,8 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787742543.3,politics,usgubewc-usgub-ar-2026-11-03-dem,BUY,1.27,0.06,manual,5.5122,0.88,0.001725,3,6,0.74,0.01,0.09,0.0583,1.27,the owner's own order — the engine leaves it alone,C3SBCQNXEFSG
 1787742843.3,cfb,aachc-cfb-wins-2026-11-28-txst-8pt5wins,BUY,1,0.2,earn,0.8314,4.97,,21,24,0.771,0.2,0.21,-0.03,4,1 tick behind the touch — we would hold 50% of the bid side,C3NVMFCARFSR
 1787743083.4,cfb,aachc-cfb-wins-2026-11-28-txst-8pt5wins,BUY,1,0.2,earn,0.4157,5.03,,20,24,0.808,0.2,0.21,-0.02,5,1 tick behind the touch — we would hold 50% of the bid side,C3NVMFCARFSR
+1787743503.4,cfb,aachc-cfb-wins-2026-11-28-txst-8pt5wins,BUY,0.01,0.2,earn,1.0287,0.12,,19,23,0.834,0.2,0.21,-0.01,5.01,19 ticks in front of the touch — we would hold 29% of the bid side,C3T56481AFSK
+1787744163.4,cfb,aachc-cfb-wins-2026-11-28-stan-5pt5wins,BUY,0.01,0.44,earn,2.4451,5.17,,46,51,0.485,0.32,0.44,-0.04,0.01,7 ticks in front of the touch — we would hold 96% of the bid side,C3P16YDBRFSM
+1787746083.4,politics,enwc-uspres-nom-dem-2028-jossha,BUY,5,0.12,sell,0.3748,18.84,0.07,10,15,0.492,0.12,0.13,0.05,5,buying back the short at or under what it sold for — the bid earns while it wait,C3AXZ1RB0FSG
+1787746503.4,politics,usgubewc-usgub-al-2026-11-03-dem,SELL,1,0.02,sell,0.0379,1.47,0.015125,1,5,0.537,0.01,0.02,-0.0049,0,selling filled stock — it earns while it waits,C3SQP3CZ4FSJ
+1787746623.4,politics,ussewc-usse-id-2026-11-03-rep,BUY,5,0.98,earn,6.25,8.08,0.9975,97,99,0,0.98,0.99,-0.0175,5,1 tick in front of the touch — we would hold 84% of the bid side,C3M3DC6W8FSP
