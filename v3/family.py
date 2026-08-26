@@ -312,6 +312,12 @@ class FamilyOrder:
     weak_since: float = 0.0   # measuring under the bar since (0 = fine)
     rest_noted: float = 0.0   # last time quiet resting was logged as evidence
     verdict: str = ""    # plain-English live state, refreshed each cycle
+    # the 8-hour earning trail (owner, 2026-08-26: "keep track of the
+    # percentage decrease in rewards from an 8 hour peak"): half-hour
+    # buckets of the order's best measured $/day, oldest dropped past
+    # 8h. est_peak8 is the window's max, refreshed with every read.
+    est_hist: list = field(default_factory=list)   # [[bucket_ts, max_est]..]
+    est_peak8: float = 0.0
 
 
 def resting_ok(now: float, cfg: FamilyConfig) -> bool:
