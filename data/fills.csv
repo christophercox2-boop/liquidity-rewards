@@ -949,3 +949,12 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787708021.7,politics,enwc-usgubp-ma-2026-09-01-rep-micmin,SELL,2,0.97,sell,0,0,,94,97,0.816,0.97,0.98,-0.01,0,closed out by the owner from the live card — sold into the bid,C3HV4XVFCFSH
 1787708294.1,politics,usgubewc-usgub-tx-2026-11-03-rep,BUY,0.01,0.83,manual,0,0.03,0.871425,82,87,0.783,0.76,0.87,-0.0414,5.01,the owner's own order — the engine leaves it alone,C3HWKJ026FSQ
 1787708294.1,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.97,earn,0.7812,1.14,0.984875,92,95,0.84,0.97,0.98,-0.0149,10,1 tick in front of the touch — we would hold 67% of the bid side,C3GZWXJ5EFSP
+1787709868.3,politics,usgubewc-usgub-tx-2026-11-03-dem,SELL,4.86,0.18,manual,6.25,0.77,0.128575,,,0.699,,,-0.0514,-20.86,the owner's own order — the engine leaves it alone,C3HN4RVBTFSP
+1787709928.3,politics,usgubewc-usgub-pa-2026-11-03-dem,BUY,1,0.94,manual,0.161,1.21,0.99775,92,96,0.571,0.95,0.96,-0.0578,2,the owner's own order — the engine leaves it alone,C3H9YN5JPFSM
+1787710048.3,politics,ewc-usp-2028-11-07-aleocc,SELL,7,0.07,manual,0.0149,0.69,,8,12,0.553,0.05,0.06,0.03,0,moved by the owner,C3HR62YDRFSR
+1787711368.3,politics,ewc-usp-2028-11-07-petbut,SELL,3,0.08,manual,0.1975,0.86,,7,10,0.401,0.07,0.08,0,0,moved by the owner,C3HWRHJ0RFSH
+1787711608.3,politics,enwc-uspres-nom-dem-2028-gavnew,BUY,1,0.19,manual,2.3409,6.66,,23,26,0.918,0.12,0.15,-0.06,2,the owner's own order — the engine leaves it alone,C3D59EY82FSJ
+1787711968.5,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.97,earn,1.8273,0.02,0.984875,92,95,0.856,0.95,0.98,-0.0149,11,2 ticks in front of the touch — we would hold 88% of the bid side,C3JTT0M4WFSM
+1787711968.5,politics,ewc-usp-2028-11-07-kamhar,SELL,1,0.08,sell,0,0,,4,9,0.679,0.08,0.09,-0.01,27,taker dump — sold into the bid (the carved exception),C3JV3Z53AFSS
+1787712448.5,cfb,aachc-cfb-wins-2026-11-28-usc-8pt5wins,BUY,0.04,0.56,manual,0.0227,3.28,,50,60,0.555,0.5,0.63,0.01,0.04,the owner's own order — the engine leaves it alone,C3G3Y017MFSQ
+1787713168.5,politics,ussewc-usse-ms-2026-11-03-rep,SELL,2,0.97,sell,0.0222,13.92,0.96925,95,99,0.529,0.95,0.97,-0.0008,0,selling filled stock — it earns while it waits,C3763B2Y4FSR
