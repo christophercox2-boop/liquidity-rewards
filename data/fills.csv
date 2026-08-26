@@ -1068,3 +1068,10 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787766168.5,politics,enwc-usgubp-ri-2026-09-09-rep-elapel,SELL,30,0.43,sell,0,0,,87,91,0.823,0.43,0.89,0.46,0,closed out by the owner from the live card — sold into the bid,C3ZR9N720FSH
 1787768299.6,politics,enwc-uspres-nom-dem-2028-jbpri,SELL,10,0.04,sell,0.5054,2.92,0.04,5,10,0.704,0.03,0.04,0,56,selling filled stock — it earns while it waits,C3XSC7SGMFSM
 1787768539.6,politics,enwc-uspres-nom-dem-2028-gavnew,BUY,20,0.21,earn,5.5917,0.18,,22,25,0.893,0.13,0.23,-0.03,20,1 tick behind the touch — we would hold 91% of the bid side,C405JRQDPFSN
+1787769199.7,politics,ewc-usp-2028-11-07-marrub,BUY,5,0.18,manual,0.2039,14.3,,17,21,0,0.18,0.19,-0.01,5,the owner's own order — the engine leaves it alone,C3M5HB9YCFSR
+1787769559.7,politics,usgubewc-usgub-ne-2026-11-03-rep,BUY,1,0.94,earn,6.25,21.17,0.95745,94,97,0.797,0.94,0.97,-0.0175,1,1 tick in front of the touch — we would hold 72% of the bid side,C3EDQC1YAFSJ
+1787769619.7,politics,usgubewc-usgub-ne-2026-11-03-dem,BUY,1,0.05,sell,0.001,1.78,0.042525,6,9,0.761,0.05,0.08,0.0075,1,buying back the short at or under what it sold for — the bid earns while it wait,C3Z1RA11RFSQ
+1787769619.7,politics,ussewc-usse-sd-2026-11-03-briben,BUY,1,0.06,sell,3.0941,1.82,,4,8,0.712,0.06,0.07,0,0,buying back the short at or under what it sold for — the bid earns while it wait,C3Z19V60MFSG
+1787770939.8,politics,ussewc-usse-id-2026-11-03-rep,BUY,1,0.97,earn,6.25,4.64,0.9975,96,99,0.422,0.97,0.98,-0.0275,6,3 ticks in front of the touch — we would hold 100% of the bid side,C3WWXFSA4FSG
+1787770939.8,politics,ussewc-usse-id-2026-11-03-todach,BUY,1,0.05,earn,0.5685,0.1,,7,14,0.382,0.05,0.08,-0.05,7,at the touch — a fill here is 2 ticks inside value (evidence band only; confiden,C40TP7PSRFSP
+1787771779.8,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,0.86,0.53,earn,1.9569,1.57,0.5,51,53,0.826,0.51,0.52,-0.03,-9.86,1 tick behind the touch — we would hold 50% of the ask side,C3ZR9MXP0FSH
