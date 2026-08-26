@@ -1157,13 +1157,18 @@ class Monitor:
                 "note": "no family knows this market — check the slug"}
 
     def order_op(self, op: str, order_id: str, price: float | None = None,
-                 pin: bool = False) -> dict:
-        """Owner move/cancel on one of OUR orders, from the orders page
-        or the live card. initiator='owner' bypasses the switches but no
-        other rail. pin=True (the live card's moves) marks an engine
-        order hand-set: the engine hands off until the release rule or
-        the nurse ends the pin. Manual orders stay manual — already
-        stronger than any pin."""
+                 pin: bool = False, qty: float | None = None) -> dict:
+        """Owner move/cancel/resize on one of OUR orders, from the
+        orders page or the live card. initiator='owner' bypasses the
+        switches but no other rail. pin=True (the live card's hand ops)
+        marks an engine order hand-set: the engine hands off until the
+        release rule or the nurse ends the pin; the hold's baseline is
+        measured on the first read AFTER the change (a new price or
+        size earns differently than the old one did). Manual orders
+        stay manual — already stronger than any pin. An oversized SELL
+        is safe by construction: the desk verifies the replacement
+        rests at full size and leaves the original untouched if the
+        exchange trims it."""
         for fam in self.families.values():
             rec = fam.orders.get(order_id)
             if rec is None:
@@ -1173,11 +1178,14 @@ class Monitor:
                 if r.ok:
                     del fam.orders[order_id]
                 return {"ok": r.ok, "note": r.note}
-            if op == "move" and price is not None:
+            if op == "move" and (price is not None or qty is not None):
+                new_px = float(price) if price is not None else rec.price
+                new_q = round(float(qty), 2) if qty is not None else rec.qty
                 r = fam.desk.reprice(
                     {"id": rec.id, "market": rec.market, "side": rec.side,
                      "price": rec.price, "size": rec.qty, "intent": rec.intent},
-                    price, initiator="owner")
+                    new_px, new_q if qty is not None else None,
+                    initiator="owner")
                 if r.ok:
                     del fam.orders[order_id]
                     from .family import FamilyOrder
@@ -1185,21 +1193,19 @@ class Monitor:
                     pinning = pin and rec.purpose != "manual"
                     fam.orders[r.order_id] = FamilyOrder(
                         id=r.order_id, market=rec.market, side=rec.side,
-                        price=price, qty=rec.qty, intent=rec.intent,
+                        price=new_px, qty=new_q, intent=rec.intent,
                         placed_ts=now, purpose=rec.purpose,
                         why=("hand-set from the live card — the engine "
                              "holds off" if pinning
                              else "moved by the owner"),
                         pinned=pinning, pin_ts=now if pinning else 0.0,
-                        pin_est=((rec.live_est if rec.live_est is not None
-                                  else rec.est_day) or 0.0)
-                        if pinning else 0.0)
+                        pin_est=-1.0 if pinning else 0.0)
                     if pinning:
                         fam._log(event="hand_set", market=rec.market,
-                                 side=rec.side, price=price, qty=rec.qty,
-                                 note="the owner moved this order from the "
-                                      "live card — the engine holds off "
-                                      "until the book turns against it")
+                                 side=rec.side, price=new_px, qty=new_q,
+                                 note="the owner changed this order from "
+                                      "the live card — the engine holds "
+                                      "off until the book turns against it")
                 return {"ok": r.ok, "note": r.note}
             return {"ok": False, "note": f"unknown op {op}"}
         return {"ok": False, "note": "not one of 3.0's orders"}
