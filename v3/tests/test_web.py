@@ -41,8 +41,9 @@ class FakeMonitor:
         self.taps.append((op, which))
         return {"on": op == "confirm"}
 
-    def order_op(self, op, order_id, price=None, pin=False):
-        self.ops.append((op, order_id, price))
+    def order_op(self, op, order_id, price=None, pin=False, qty=None):
+        self.ops.append((op, order_id, price) if qty is None
+                        else (op, order_id, price, qty))
         self.pins = getattr(self, "pins", []) + [pin]
         return {"ok": True, "note": "done"}
 
@@ -149,6 +150,10 @@ class TestWeb(unittest.TestCase):
             body={"op": "move", "order_id": "o2", "price": 0.08, "pin": 1})
         self.assertIn(("move", "o2", 0.08), self.mon.ops)
         self.assertIn(True, getattr(self.mon, "pins", []))
+        req(self.base + "/op", method="POST", headers=h,
+            body={"op": "move", "order_id": "o3", "price": 0.08,
+                  "qty": 25.0, "pin": 1})
+        self.assertIn(("move", "o3", 0.08, 25.0), self.mon.ops)
         code, body = req(self.base + "/op", method="POST", headers=h,
                          body={"op": "close_position", "market": "m-9"})
         self.assertEqual(json.loads(body)["ok"], True)

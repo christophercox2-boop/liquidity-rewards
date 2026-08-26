@@ -1016,6 +1016,7 @@ function lvDraw(el,b){
     if(dn>0.0005)h+='<button class="small" onclick="lvMove(\\''+esc(o.id)+'\\','+dn+')">move to '+pc(dn)+'</button>';
     if(up<0.9995)h+='<button class="small" onclick="lvMove(\\''+esc(o.id)+'\\','+up+')">move to '+pc(up)+'</button>';
     h+='<button class="small" onclick="lvType(\\''+esc(o.id)+'\\','+o.price+')">type a price</button>'
+     +'<button class="small" onclick="lvSize(\\''+esc(o.id)+'\\','+o.qty+','+o.price+',\\''+o.side+'\\')">change size</button>'
      +'<button class="small off" onclick="lvCancelOrder(\\''+esc(o.id)+'\\')">cancel</button></div>';
    }
   });
@@ -1033,6 +1034,20 @@ function lvType(id,cur){
  if(v==null)return;var p=parseFloat(v)/100;
  if(!(p>0&&p<1)){alert('price must be between 0.1c and 99.9c');return;}
  lvMove(id,Math.round(p*1000)/1000);
+}
+function lvSize(id,cur,px,side){
+ var v=prompt('New size in shares (now '+cur+'):',''+cur);
+ if(v==null)return;var q=parseFloat(v);
+ if(!(q>0)){alert('need a positive number of shares');return;}
+ q=Math.round(q*100)/100;
+ if(Math.abs(q-cur)<0.005)return;
+ var msg='Resize this order from '+cur+' to '+q+' shares at '+pc(px)+'?';
+ var d=Math.round((q-cur)*100)/100;
+ if(d>0)msg+=side==='BUY'
+  ? ' The extra '+d+' shares put about '+usd(d*px)+' more at risk.'
+  : ' That offers '+d+' more of your shares for sale.';
+ if(!confirm(msg))return;
+ post({op:'move',order_id:id,price:px,qty:q,pin:1},function(j){if(!j.ok)alert(j.note||'refused');window._lvSel=null;lvRefresh();});
 }
 function lvCancelOrder(id){
  if(!confirm('Cancel this order?'))return;
@@ -1293,9 +1308,11 @@ class WebServer:
                 float(body.get("price") or 0), float(body.get("qty") or 0))
         if op in ("cancel", "move"):
             price = body.get("price")
+            qty = body.get("qty")
             return self.monitor.order_op(op, str(body.get("order_id") or ""),
                                          float(price) if price is not None else None,
-                                         pin=bool(body.get("pin")))
+                                         pin=bool(body.get("pin")),
+                                         qty=float(qty) if qty is not None else None)
         if op == "close_position":
             return self.monitor.close_position(str(body.get("market") or ""))
         if op == "backfill":
