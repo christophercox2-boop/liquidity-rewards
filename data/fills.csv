@@ -1201,3 +1201,9 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787856632.2,politics,ussewc-usse-ky-2026-11-03-dem,SELL,1,0.04,earn,6.1976,0.03,0.0032,2,7,0.466,0.01,0.07,-0.0368,-1,3 ticks in front of the touch — we would hold 99% of the ask side,C4NA9TPH0GNK
 1787857112.2,cfb,aachc-cfb-wins-2026-11-28-frest-6pt5wins,SELL,1,0.53,sell,0.8333,1.92,,50,57,0.614,0.51,0.52,0,0,selling filled stock — it earns while it waits,C4KSYAJNAGNK
 1787857292.2,cfb,aachc-cfb-wins-2026-11-28-pennst-9pt5wins,BUY,1,0.46,sell,1.4542,0.35,,45,50,0.701,0.46,0.47,-0.02,2,buying back the short at or under what it sold for — the bid earns while it wait,C4N6P52RMGNP
+1787858647.6,politics,enwc-uspres-nom-dem-2028-jonoss,SELL,10.42,0.2,sell,0.7843,0.23,,21,25,0.687,0.17,0.18,0.03,6.58,hand-set from the live card — the engine holds off,C4NK2SMN2GNR
+1787859127.7,politics,enwc-usgubp-ma-2026-09-01-rep-brisho,BUY,128.5,0.04,earn,5.941,2.58,,4,7,0.661,0.04,0.05,-0.01,130.5,joins the touch — the book has been quiet,C4KPTXEKPGNJ
+1787859487.7,politics,ewc-usp-2028-11-07-rokha,SELL,7,0.06,sell,0,0,,5,15,0,0.06,0.08,0.04,0,taker dump — sold into the bid (the carved exception),C4P0SSZ4CGNJ
+1787859547.7,politics,usgubewc-usgub-ny-2026-11-03-dem,SELL,1,0.92,manual,0.3717,2.18,0.984675,92,95,0.713,0.89,0.92,0.0647,6,the owner's own order — the engine leaves it alone,C4M4GQC0AGNJ
+1787859907.8,politics,ussewc-usse-sc-2026-11-03-rep,SELL,3,0.85,sell,0,0,0.871125,84,87,0.713,0.85,0.86,0.0211,0,taker dump — sold into the bid (the carved exception),C4P4PT56TGNM
+1787859967.8,politics,usgubewc-usgub-il-2026-11-03-dem,BUY,6.83,0.98,earn,3.8652,2,0.998675,97,99,0.745,0.98,0.99,-0.0187,6.83,joins the touch — the book has been quiet,C4MBYGQC0GNP
