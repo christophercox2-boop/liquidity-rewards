@@ -1123,3 +1123,8 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787791416.6,politics,ussewc-usse-fl-2026-11-03-dem,BUY,2,0.12,sell,0.3906,7.92,0.100675,11,15,0.695,0.12,0.13,0.0193,2,buying back the short at or under what it sold for — the bid earns while it wait,C3YZP56K2FSG
 1787791956.6,politics,enwc-usgubp-ri-2026-09-09-dem-danmck,BUY,16.01,0.05,manual,0.1832,8.82,,2,6,0.459,0.05,0.06,0.01,16.01,the owner's own order — the engine leaves it alone,C3YBH60QGFSJ
 1787793996.8,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,1,0.52,earn,0.8929,1.03,0.5,52,54,0.85,0.51,0.52,-0.02,-12,3 ticks in front of the touch — we would hold 94% of the ask side,C45GJV9D8FSH
+1787796280.1,cfb,aachc-cfb-wins-2026-11-28-vtech-5pt5wins,SELL,1,0.75,sell,0.5,20.61,,75,81,0.433,0.66,0.74,0.03,0,selling filled stock — it earns while it waits,C3N5T9790FSN
+1787796400.1,politics,ussewc-usse-ky-2026-11-03-dem,BUY,10,0.08,manual,5.5555,0.65,0.003275,3,8,0.27,0.08,0.09,0.0767,10,the owner's own order — the engine leaves it alone,C46BYF1V4FSM
+1787797300.2,politics,ewc-usp-2028-11-07-jonoss,SELL,1,0.24,earn,0.0805,0.65,,17,21,0.756,0.23,0.24,-0.05,-2,4 ticks in front of the touch — we would hold 100% of the ask side,C46J9KN8GFSM
+1787797480.2,politics,usgubewc-usgub-mn-2026-11-03-dem,BUY,5,0.96,earn,6.0844,0.97,0.993825,95,99,0.529,0.96,0.97,-0.0338,5,1 tick in front of the touch — we would hold 84% of the bid side,C46BKK0ZTFSS
+1787797600.2,politics,ewc-usp-2028-11-07-jonoss,BUY,2,0.2,sell,0.002,0.07,,19,23,0.797,0.23,0.24,-0.01,2,buying back the short at or under what it sold for — the bid earns while it wait,C474GFH5TFSJ
