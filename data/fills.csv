@@ -1145,3 +1145,16 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787833161.0,politics,enwc-usgubp-ri-2026-09-09-dem-helfou,SELL,0.51,0.95,sell,1.7477,43.8,,,,0.547,,,,0.49,selling filled stock — it earns while it waits,C3A8K8PAAFSK
 1787833161.0,politics,ewc-usp-2028-11-07-rondes,SELL,7.91,0.12,sell,1.6716,24.07,,,,0.735,,,,5.09,selling filled stock — it earns while it waits,C3V244QE0FSP
 1787833161.0,politics,ussewc-usse-ks-2026-11-03-rep,BUY,0.31,0.82,sell,0.9114,19.92,0.830325,,,0.118,,,-0.0103,-14.69,buying back the short at or under what it sold for — the bid earns while it wait,C3YMR4ZG0FSQ
+1787834354.7,cfb,aachc-cfb-wins-2026-11-28-mary-5pt5wins,SELL,1,0.13,sell,0,0.02,,50,55,0.536,0.32,0.56,0.4,0,selling filled stock — it earns while it waits,C4G33R0WCGNK
+1787834474.7,politics,ewc-usp-2028-11-07-jossha,BUY,1,0.15,earn,1.2295,0.02,,4,9,0,0.15,0.42,0.08,11,1 tick in front of the touch — we would hold 100% of the bid side,C4G4XPZSEGNJ
+1787834834.7,cfb,aachc-cfb-wins-2026-11-28-ncst-6pt5wins,SELL,1,0.38,sell,4.1667,0.08,,78,84,0.28,0.37,0.38,0.43,0,selling filled stock — it earns while it waits,C4G650HVEGNE
+1787834954.7,cfb,aachc-cfb-wins-2026-11-28-ncar-6pt5wins,SELL,2,0.02,sell,1.66,0.18,,40,44,0.475,0.01,0.02,0.4,0,selling filled stock — it earns while it waits,C4G33R2G0GNK
+1787835315.4,politics,enwc-uspres-nom-dem-2028-micoba,SELL,1,0.45,earn,0.21,0.22,,5,36,0.22,0.01,0.45,-0.28,-1,6 ticks in front of the touch — we would hold 99% of the ask side,C4G62R4SAGHX
+1787835315.4,politics,ewc-usgub-mi-2026-11-03-rep,SELL,1,0.1,earn,6.2154,0.03,0.075775,8,14,0,0.08,0.16,-0.0242,-1,6 ticks in front of the touch — we would hold 99% of the ask side,C4GAJ421PGND
+1787835615.5,politics,ewc-usgub-ga-2026-11-03-rep,SELL,10,0.33,earn,0,0.17,0.31445,29,35,0,0.22,0.28,-0.0156,-10,4 ticks in front of the touch — we would hold 70% of the ask side,C4G9KE6MRGNC
+1787836035.5,politics,ewc-usse-mi-2026-11-03-dem,BUY,1,0.65,earn,1.2494,0.27,0.713525,61,68,0,0.65,0.66,-0.0635,1,6 ticks in front of the touch — we would hold 100% of the bid side,C4GA9DH34GNE
+1787836095.5,politics,scc-senate-gop-2026-11-03-gte57,BUY,5.95,0.47,sell,5,0.03,0.0027,2,8,0.293,0.01,0.48,0.4673,-0.05,buying back the short at or under what it sold for — the bid earns while it wait,C4GFVTPH0GNC
+1787836815.9,politics,enwc-usgubp-ri-2026-09-09-dem-helfou,SELL,1,0.92,sell,0,0.91,,95,99,0.667,0.54,0.92,0.05,0,selling filled stock — it earns while it waits,C4F2B3XB8GNM
+1787836935.9,politics,enwc-uspres-nom-dem-2028-jossha,BUY,0.28,0.06,earn,2.7674,0.65,0.07,8,14,0.526,0.06,0.14,-0.01,0.28,5 ticks in front of the touch — we would hold 76% of the bid side,C4G7EG93WGNR
+1787837356.0,politics,enwc-uspres-nom-dem-2028-jamtal,SELL,15,0.02,sell,5.8824,0.03,,6,16,0,0.01,0.14,0.08,0,selling filled stock — it earns while it waits,C4GS89GKPGND
+1787837596.0,politics,ewc-usse-tx-2026-11-03-dem,BUY,20,0.5,earn,4.439,0.88,0.609175,49,54,0,0.5,0.51,-0.1092,28,at the touch — a fill here is 11 ticks inside value (Silver + evidence),C4G4ZJXG2GNQ
