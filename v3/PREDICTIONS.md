@@ -769,3 +769,28 @@ history suggest.
 
 **Check.** data/rewards.csv day 2026-08-24/25 politics rows vs
 data/market_est.csv day 2026-08-25 (frozen).
+
+### P14 — GRADED 2026-08-27, all three claims WRONG, each one instructive
+*Aug-25 politics posted $119.79 across 203 markets (~26h after day end;
+postings can still grow in waves — graded on what stands at 02:30Z).*
+
+1. **"Zero-trailing claims collect under $10" — WRONG.** The 92
+   markets with ~zero pay across Aug-22–24 collected **$53.78** — 45%
+   of the day's politics money came from markets that looked dead
+   three days running. Lesson: the exchange's paying set CHURNS;
+   trailing pay is a bad predictor of tomorrow's pay, and the
+   divisor theory as stated dies here.
+2. **"The reliable payers keep paying" — WRONG.** Senate-control DEM
+   paid $0.03 (from $2.29–2.71 daily); Buttigieg $0.33. Even the
+   always-pays class rotates. The order path's Target-Size zero-read
+   on them was not obviously the anomaly — they genuinely stopped.
+3. **"Politics lands $25–70" — WRONG, HIGH: $119.79.** Paid trend
+   $101 → $36 → $24 → $119.79 — the collapse reversed on the first
+   full day of the complete rule set. P13's "$75/day by Aug-31" was
+   met on Aug-25, four days early; one day is not a trend.
+
+**What survived:** the family-level deflator. Joined markets claimed
+$348.13 and were paid $98.23 (~3.5x); claims ÷ 3 ≈ $116 against
+$119.79 actually paid — the ÷3 deflator is empirically almost exactly
+right where per-market prediction is hopeless. Predict the family,
+not the market.
