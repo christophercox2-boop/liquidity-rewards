@@ -5460,3 +5460,54 @@ class TestFeedHealthAndCalibrationLine(unittest.TestCase):
         for o in r.fam.orders.values():
             self.assertLessEqual(o.price, 0.999 + 1e-12)
             self.assertGreaterEqual(o.price, 0.001 - 1e-12)
+
+
+class TestPositionsLedger(unittest.TestCase):
+    """Owner, 2026-08-26: sort held positions by earnings per dollar of
+    liquidation value, lowest first, idle ones included — the top of
+    the list is dead money to hand-place."""
+
+    def test_positions_carry_liq_earn_and_ratio(self):
+        from v3.tests.test_family import Rig, A, B
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
+        from v3.tests.test_family import politics_book
+        r = Rig(switch=False)          # observing: nothing new places,
+                                       # so B stays genuinely idle
+        r.add_market(A, book=politics_book(r.now, bid=0.10, ask=0.12))
+        r.add_market(B, book=politics_book(r.now, bid=0.40, ask=0.42))
+        r.positions[A] = (10.0, 0.5)
+        r.positions[B] = (5.0, 1.8)
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 0.5}
+        r.fam.inventory[B] = {"qty": 5.0, "cost": 1.8}
+        rec = FamilyOrder(id="X", market=A, side="SELL", price=0.12,
+                          qty=10.0, intent=SELL_LONG, placed_ts=r.now,
+                          purpose="sell")
+        rec.live_est = 0.50
+        r.fam.orders["X"] = rec
+        r.exchange.live["X"] = {"id": "X", "market": A, "side": "SELL",
+                                "price": 0.12, "size": 10.0,
+                                "intent": SELL_LONG}
+        s = r.cycle()
+        pos = {p["market"]: p for p in s["positions"]}
+        self.assertIn(A, pos)
+        self.assertIn(B, pos)                    # held, no orders: listed
+        self.assertAlmostEqual(pos[A]["liq"], 1.00)   # 10 x 10c bid
+        self.assertAlmostEqual(pos[B]["liq"], 2.00)   # 5 x 40c bid
+        self.assertGreater(pos[A]["earn"], 0.0)
+        self.assertEqual(pos[B]["earn"], 0.0)         # idle money
+        self.assertEqual(pos[B]["covers"], [])
+        self.assertGreater(pos[A]["per_dollar"], pos[B]["per_dollar"])
+
+    def test_a_short_values_at_what_closing_recovers(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.10, 100.0),),
+                                  asks=((0.20, 100.0),),
+                                  tick=0.01, fetched_at=r.now))
+        r.positions[A] = (-10.0, -1.5)
+        r.fam.inventory[A] = {"qty": -10.0, "cost": -1.5}
+        s = r.cycle()
+        pos = {p["market"]: p for p in s["positions"]}
+        self.assertAlmostEqual(pos[A]["liq"], 8.00)   # 10 x (1 - 20c ask)

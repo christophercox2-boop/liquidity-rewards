@@ -3726,6 +3726,42 @@ class Family:
         summary["capital_usd"] = self.cfg.capital_usd
         summary["earned_today"] = round(self.earned_today, 2)
         summary["inventory"] = {k: dict(v) for k, v in self.inventory.items()}
+        # every held position by what it earns per dollar of
+        # liquidation value (owner, 2026-08-26: "even the ones with no
+        # earnings and no orders. The lowest should be at the top so I
+        # can hand place those") — liquidation valued like the budget
+        # does (longs at the bid, shorts at what closing recovers, no
+        # book = conservatively at cost), earnings = the reduce-side
+        # orders resting there, engine and hand alike
+        positions = []
+        for slug, inv in self.inventory.items():
+            qty = inv.get("qty") or 0.0
+            if abs(qty) < 0.005:
+                continue
+            book = self.cache.any_age(slug)
+            if qty > 0:
+                liq = (qty * book.bids[0][0]
+                       if book is not None and book.bids
+                       else max(inv.get("cost", 0.0), 0.0))
+                cover_side = "SELL"
+            else:
+                liq = (-qty * (1.0 - book.asks[0][0])
+                       if book is not None and book.asks
+                       else max(-inv.get("cost", 0.0), 0.0))
+                cover_side = "BUY"
+            covers = [o for o in self.orders.values()
+                      if o.market == slug and o.side == cover_side]
+            earn = sum(o.live_est or 0.0 for o in covers)
+            positions.append({
+                "market": slug, "qty": round(qty, 2),
+                "cost": round(inv.get("cost", 0.0), 2),
+                "liq": round(liq, 2), "earn": round(earn, 4),
+                "per_dollar": (round(earn / liq, 4)
+                               if liq > 0.01 else 0.0),
+                "covers": [{"side": o.side, "price": o.price,
+                            "qty": o.qty, "purpose": o.purpose}
+                           for o in covers]})
+        summary["positions"] = positions
         summary["scanned"] = sum(1 for sb in self.scoreboard.values()
                                  if "plans" in sb)
         # the triage sweep's progress: how much of the eligible board —
