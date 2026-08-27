@@ -1142,3 +1142,6 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787804201.3,politics,usgubewc-usgub-fl-2026-11-03-dem,SELL,1,0.25,earn,0.5682,0.53,0.15385,19,22,0.716,0.23,0.24,-0.0962,-11,4 ticks in front of the touch — we would hold 100% of the ask side,C48969A1AFSN
 1787806421.7,politics,ewc-usp-2028-11-07-marrub,SELL,30,0.19,manual,0.1164,24.64,,16,20,0.406,0.18,0.19,-0.01,-25,the owner's own order — the engine leaves it alone,C3M5HBCVYFSR
 1787806841.8,politics,enwc-usgubp-ri-2026-09-09-dem-helfou,SELL,1,0.95,sell,1.8871,36.49,,93,98,0.357,0.89,0.94,0,1,selling filled stock — it earns while it waits,C3A8K8PAAFSK
+1787833161.0,politics,enwc-usgubp-ri-2026-09-09-dem-helfou,SELL,0.51,0.95,sell,1.7477,43.8,,,,0.547,,,,0.49,selling filled stock — it earns while it waits,C3A8K8PAAFSK
+1787833161.0,politics,ewc-usp-2028-11-07-rondes,SELL,7.91,0.12,sell,1.6716,24.07,,,,0.735,,,,5.09,selling filled stock — it earns while it waits,C3V244QE0FSP
+1787833161.0,politics,ussewc-usse-ks-2026-11-03-rep,BUY,0.31,0.82,sell,0.9114,19.92,0.830325,,,0.118,,,-0.0103,-14.69,buying back the short at or under what it sold for — the bid earns while it wait,C3YMR4ZG0FSQ
