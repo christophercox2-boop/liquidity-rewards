@@ -5617,3 +5617,71 @@ class TestPostedRewardsVerification(unittest.TestCase):
         out = self._attr(cards, {}, set())          # nothing posted yet
         self.assertIsNone(out[0]["posted"])
         self.assertAlmostEqual(out[0]["unposted"], 1.0, places=6)
+
+
+class TestOwnerLiquidation(unittest.TestCase):
+    """Owner, 2026-08-27: "Take me out of all buy position on Ron
+    desantis in 2028 markets." A liquidate-listed market: the engine
+    sells the stock into the bid (never worse) up to the bid's shown
+    size each cycle until flat, cancels its own exits there first,
+    never touches the owner's asks, and never opens a BUY."""
+
+    def _rig(self, qty=63.0, cost=7.55, bid=(0.05, 40.0)):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.fam.cfg.liquidate_tokens = (A[:20],)
+        r.add_market(A, book=Book(bids=(bid, (0.02, 60000.0)),
+                                  asks=((0.13, 200.0), (0.98, 60000.0)),
+                                  tick=0.01, fetched_at=r.now))
+        r.cycle()
+        for oid in list(r.fam.orders):
+            r.fam.orders.pop(oid)
+        r.exchange.live.clear()
+        r.positions[A] = (qty, cost)
+        r.fam.inventory[A] = {"qty": qty, "cost": cost}
+        return r, A
+
+    def test_sells_into_the_bid_per_cycle_and_journals(self):
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
+        r, A = self._rig()
+        r.exchange.live["E"] = {"id": "E", "market": A, "side": "SELL",
+                                "price": 0.13, "size": 63.0,
+                                "intent": SELL_LONG}
+        r.fam.orders["E"] = FamilyOrder(
+            id="E", market=A, side="SELL", price=0.13, qty=63.0,
+            intent=SELL_LONG, placed_ts=r.now, purpose="sell")
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertNotIn("E", r.fam.orders)     # old 13c exit cancelled
+        self.assertAlmostEqual(r.fam.inventory[A]["qty"], 23.0)  # 63-40
+        self.assertTrue(any(l.get("event") == "liquidated"
+                            and abs((l.get("price") or 0) - 0.05) < 1e-9
+                            and abs((l.get("qty") or 0) - 40.0) < 1e-9
+                            for l in r.fam.log))
+
+    def test_never_buys_on_liquidating_ground(self):
+        r, A = self._rig()
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        r.cycle(advance=120.0)
+        buys = [o for o in r.fam.orders.values()
+                if o.market == A and o.side == "BUY"]
+        self.assertEqual(buys, [])
+
+    def test_the_owners_own_ask_is_never_touched_or_double_offered(self):
+        from v3.family import FamilyOrder
+        from v3.intents import SELL_LONG
+        r, A = self._rig(qty=10.0, cost=1.2, bid=(0.05, 40.0))
+        r.exchange.live["H"] = {"id": "H", "market": A, "side": "SELL",
+                                "price": 0.2, "size": 8.0,
+                                "intent": SELL_LONG}
+        r.fam.orders["H"] = FamilyOrder(
+            id="H", market=A, side="SELL", price=0.2, qty=8.0,
+            intent=SELL_LONG, placed_ts=r.now, purpose="manual")
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        self.assertIn("H", r.fam.orders)        # untouchable
+        # only the 2 uncovered shares were sold
+        self.assertAlmostEqual(r.fam.inventory[A]["qty"], 8.0)
