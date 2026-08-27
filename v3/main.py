@@ -775,6 +775,12 @@ class Monitor:
         self.actuals_by_day: dict[str, float] = {}
         self.actuals_by_fam: dict[str, float] = {}   # "day|family" -> usd
         self.rewards_seen: dict[str, float] = {}
+        # per market-day PAID (skipped rows excluded) and per market-day
+        # CLAIM snapshot — the two sides of the closed-card rewards
+        # verification (owner approved 2026-08-27: "build the
+        # verification using the posted rewards number")
+        self.paid_seen: dict[str, float] = {}
+        self.mkt_claim_day: dict[str, float] = {}
         self.rw_last: dict | None = None      # latest payout-check result
         self._rw_at = 0.0
         self._lock = threading.Lock()
@@ -937,6 +943,8 @@ class Monitor:
         self.flat_stats = dict(saved.get("flat_stats")
                                or {"cancelled": 0, "failed": 0})
         self.rewards_seen = dict(saved.get("rewards_seen") or {})
+        self.paid_seen = dict(saved.get("paid_seen") or {})
+        self.mkt_claim_day = dict(saved.get("mkt_claim_day") or {})
         self.actuals_by_day = dict(saved.get("actuals_by_day") or {})
         self.actuals_by_fam = dict(saved.get("actuals_by_fam") or {})
         self.owner_fairs = {k: float(v) for k, v in
@@ -1016,6 +1024,8 @@ class Monitor:
             "flatten_done": self.flatten_done,
             "flat_stats": self.flat_stats,
             "rewards_seen": self.rewards_seen,
+            "paid_seen": self.paid_seen,
+            "mkt_claim_day": self.mkt_claim_day,
             "actuals_by_day": self.actuals_by_day,
             "actuals_by_fam": self.actuals_by_fam,
             "owner_fairs": dict(self.owner_fairs),
@@ -1870,6 +1880,12 @@ class Monitor:
                 est = self.samplers.get(key)
                 if est is not None:
                     cal.update(est.calibration())
+            for (d_, m_, _f), a_ in per.items():
+                self.mkt_claim_day[f"{d_}|{m_}"] = round(a_["est"], 4)
+            if len(self.mkt_claim_day) > 8000:
+                for k in sorted(self.mkt_claim_day)[
+                        :len(self.mkt_claim_day) - 8000]:
+                    del self.mkt_claim_day[k]
             mrows = [(d, m, f, a["est"], a["n"],
                       (cal.get(m) or {}).get("share", 0.0),
                       (cal.get(m) or {}).get("pool_day", 0.0),
@@ -1990,9 +2006,13 @@ class Monitor:
             if abs(seen.get(key, -1.0) - round(a["usd"], 2)) > 0.005:
                 fresh.append(a)
             seen[key] = round(a["usd"], 2)
+            self.paid_seen[key] = round(a["paid"], 2)
         if len(seen) > 12000:
             for k in sorted(seen)[:len(seen) - 12000]:
                 del seen[k]
+        if len(self.paid_seen) > 12000:
+            for k in sorted(self.paid_seen)[:len(self.paid_seen) - 12000]:
+                del self.paid_seen[k]
         self.rewards_seen = seen
         for d, v in totals.items():
             self.actuals_by_day[d] = round(v, 2)
@@ -2094,6 +2114,59 @@ class Monitor:
                 "est_declared_total": round(tot_alt, 2),
                 "rows": rows[:60]}
 
+    @staticmethod
+    def attribute_posted(cards: list, paid_by_md: dict, day_posted: set,
+                         claim_by_md: dict) -> dict:
+        """The closed-card rewards verification (owner approved
+        2026-08-27). The exchange posts ONE number per market-day —
+        never per order — so each card's posted rewards are: the
+        market-day's real pay x the card's share of what we had
+        claimed resting there. The estimator's absolute dollars were
+        measured ~2x high, but it only DIVIDES a real number here; its
+        relative judgment is all that is used. The denominator is the
+        larger of the cards' combined claims and the ledger's whole-day
+        claim snapshot (which counts the never-filled orders too), so
+        cards can never soak up pay that belonged to other orders.
+        Summing every card on a market-day never exceeds what the
+        exchange actually paid. Days the exchange has not posted keep
+        the claim, reported separately as unposted."""
+        import datetime as _dt
+        from zoneinfo import ZoneInfo
+        et = ZoneInfo("America/New_York")
+        claims: dict = {}
+        out = {i: {"posted": None, "graded": 0.0, "unposted": 0.0}
+               for i in range(len(cards))}
+        for i, card in enumerate(cards):
+            est = card.get("est_day") or 0.0
+            rh = card.get("rested_h") or 0.0
+            ts = card.get("ts") or 0.0
+            m = card.get("market")
+            if est <= 0 or rh <= 0 or not m or not ts:
+                continue
+            t = ts - rh * 3600.0
+            while t < ts - 1e-6:
+                d = _dt.datetime.fromtimestamp(t, et).date()
+                day_end = _dt.datetime.combine(
+                    d + _dt.timedelta(days=1), _dt.time(0), et).timestamp()
+                seg = min(ts, day_end) - t
+                claims.setdefault((d.isoformat(), m), []).append(
+                    (i, est * seg / 86400.0))
+                t = min(ts, day_end)
+        for (di, m), lst in claims.items():
+            key = f"{di}|{m}"
+            if di in day_posted:
+                paid = paid_by_md.get(key, 0.0)
+                denom = max(sum(c for _, c in lst),
+                            claim_by_md.get(key, 0.0), 1e-9)
+                for i, c in lst:
+                    o = out[i]
+                    o["posted"] = (o["posted"] or 0.0) + paid * c / denom
+                    o["graded"] += c
+            else:
+                for i, c in lst:
+                    out[i]["unposted"] += c
+        return out
+
     def fills_view(self) -> dict:
         """Every purchase as a round trip, newest activity first, joined
         with where the market stands now — one report per entry lot,
@@ -2102,7 +2175,19 @@ class Monitor:
         hidden_open = 0
         hidden_recon = 0
         for tag, fam in self.families.items():
-            for card in pair_fills(fam.fills):
+            fam_cards = list(pair_fills(fam.fills))
+            # posted-rewards verification: hidden cards stay in the
+            # denominator so visible ones cannot soak up their share
+            ann = self.attribute_posted(
+                fam_cards, self.paid_seen, set(self.actuals_by_day),
+                self.mkt_claim_day)
+            for idx, card in enumerate(fam_cards):
+                a = ann[idx]
+                card["posted_usd"] = (round(a["posted"], 4)
+                                      if a["posted"] is not None else None)
+                card["claim_graded"] = round(a["graded"], 4)
+                card["claim_unposted"] = round(a["unposted"], 4)
+            for card in fam_cards:
                 card["family"] = tag
                 card["name"] = self.names.label(card["market"])
                 b = fam.cache.any_age(card["market"])

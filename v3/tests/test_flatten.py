@@ -5559,3 +5559,61 @@ class TestEmptyBookExitAnchor(unittest.TestCase):
         r, A = self._rig(asks=((0.08, 500.0), (0.98, 60000.0)))
         self.assertAlmostEqual(
             r.fam._ask_anchor(A, r.fam.cache.any_age(A), 0.05), 0.08)
+
+
+class TestPostedRewardsVerification(unittest.TestCase):
+    """Owner approved 2026-08-27: closed cards' reward lines are graded
+    against the exchange's posted per-market-day pay. Each card gets
+    the market-day's REAL pay x its share of our claims; the sum over
+    cards never exceeds what the exchange paid; unposted days keep the
+    claim, reported separately."""
+
+    # noon ET on 2026-08-24, well inside one ET day
+    NOON = 1787587200.0
+
+    def _attr(self, cards, paid, days, snap=None):
+        from v3.main import Monitor
+        return Monitor.attribute_posted(cards, paid, set(days), snap or {})
+
+    def test_the_split_is_proportional_and_sums_to_the_posted_pay(self):
+        cards = [
+            {"ts": self.NOON, "market": "m", "est_day": 2.0, "rested_h": 6.0},
+            {"ts": self.NOON, "market": "m", "est_day": 1.0, "rested_h": 6.0},
+        ]
+        import datetime
+        from zoneinfo import ZoneInfo
+        d = datetime.datetime.fromtimestamp(self.NOON,
+                                            ZoneInfo("America/New_York")).date().isoformat()
+        out = self._attr(cards, {f"{d}|m": 0.90}, {d})
+        self.assertAlmostEqual(out[0]["posted"] + out[1]["posted"], 0.90)
+        self.assertAlmostEqual(out[0]["posted"], 0.60, places=6)   # 2:1 split
+        self.assertAlmostEqual(out[1]["posted"], 0.30, places=6)
+
+    def test_the_ledger_snapshot_keeps_cards_from_soaking_up_others_pay(self):
+        cards = [{"ts": self.NOON, "market": "m", "est_day": 2.0,
+                  "rested_h": 12.0}]                    # claims 1.00
+        import datetime
+        from zoneinfo import ZoneInfo
+        d = datetime.datetime.fromtimestamp(self.NOON,
+                                            ZoneInfo("America/New_York")).date().isoformat()
+        # the whole day's claims (never-filled orders included) were 4.00
+        out = self._attr(cards, {f"{d}|m": 2.00}, {d}, {f"{d}|m": 4.00})
+        self.assertAlmostEqual(out[0]["posted"], 0.50, places=6)   # 1/4 of $2
+
+    def test_a_zero_pay_posted_day_grades_the_claim_to_zero(self):
+        cards = [{"ts": self.NOON, "market": "m", "est_day": 3.0,
+                  "rested_h": 8.0}]
+        import datetime
+        from zoneinfo import ZoneInfo
+        d = datetime.datetime.fromtimestamp(self.NOON,
+                                            ZoneInfo("America/New_York")).date().isoformat()
+        out = self._attr(cards, {}, {d})           # day posted, market absent
+        self.assertAlmostEqual(out[0]["posted"], 0.0)
+        self.assertGreater(out[0]["graded"], 0.9)
+
+    def test_an_unposted_day_keeps_the_claim_separately(self):
+        cards = [{"ts": self.NOON, "market": "m", "est_day": 3.0,
+                  "rested_h": 8.0}]
+        out = self._attr(cards, {}, set())          # nothing posted yet
+        self.assertIsNone(out[0]["posted"])
+        self.assertAlmostEqual(out[0]["unposted"], 1.0, places=6)
