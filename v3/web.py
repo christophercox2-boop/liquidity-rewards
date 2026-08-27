@@ -526,6 +526,34 @@ function render(d){
   +'<div style="margin:8px 0"><select id="ps" style="font-size:16px;padding:8px"><option value="BUY">bid (buy)</option><option value="SELL">ask (sell)</option></select>'
   +' <input id="pp" placeholder="price c" style="width:20%"> <input id="pq" placeholder="shares" style="width:20%">'
   +' <button onclick="pl()">Place</button></div><div id="plout"></div></details></div>';
+ var pos=[];
+ fams(d).forEach(function(kv){
+  (kv[1].positions||[]).forEach(function(p){p.fam=kv[0];pos.push(p);});
+ });
+ if(pos.length){
+  pos.sort(function(a,b){return (a.per_dollar-b.per_dollar)||(b.liq-a.liq);});
+  var idle=pos.filter(function(p){return p.earn<0.005;}).length;
+  var pb='';
+  pos.forEach(function(p,i){
+   var bid='pv_'+i;
+   var av=p.qty?Math.abs(p.cost/p.qty)*100:0;
+   var cpd=p.per_dollar*100;
+   var eline;
+   if(p.earn<0.005){eline='<span class="warn">earning NOTHING \\u2014 idle money'+(p.covers.length?'':' , no cover resting')+'</span>';}
+   else{eline='earning '+usd(p.earn)+'/day \\u2192 '+cpd.toFixed(2)+'\\u00a2 per $1 per day';}
+   var cv=p.covers.map(function(c){return (c.side==='BUY'?'bid':'ask')+' '+c.qty+' @ '+pc(c.price)+' ['+esc(c.purpose)+']';}).join(' \\u00b7 ');
+   pb+='<div style="margin:9px 0 0;border-top:1px solid #2c3527;padding-top:7px">'
+    +'<div class="name" style="cursor:pointer" onclick="showbook(\\''+esc(p.market)+'\\',\\''+bid+'\\')">'+nm(d,p.market)+' <span class="muted">\\u25be book</span></div>'
+    +'<div id="'+bid+'"></div>'
+    +'<div class="sub">'+(p.qty>0?p.qty+' shares':(-p.qty)+' short')+' at '+av.toFixed(1)+'c avg \\u00b7 worth '+usd(p.liq)+' if closed now</div>'
+    +'<div class="vrd">'+eline+'</div>'
+    +(cv?'<div class="vrd">resting: '+cv+'</div>':'<div class="vrd warn">nothing resting to work this position</div>')
+    +'</div>';
+  });
+  out+='<div class="card">'+fold('Positions \\u2014 worst earners first',
+   '\\u2014 '+pos.length+' held, '+idle+' earning nothing; each dollar of stock should be earning while it waits',pb,false)
+   +'<div class="hint">Sorted by $/day earned per $1 of liquidation value, lowest first \\u2014 the top of this list is dead money to hand-place. Tap a name for the LIVE book and place or move asks right there.</div></div>';
+ }
  var srt=window._ordSort||'est';
  out+='<div style="margin:2px 0 8px">sort: '
   +'<button class="small" '+(srt==='est'?'style="font-weight:bold;text-decoration:underline"':'')+' onclick="oSort(\\'est\\')">by $/day</button>'
