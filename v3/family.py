@@ -2021,6 +2021,26 @@ class Family:
         rec.est_peak8 = round(max((x[1] for x in rec.est_hist),
                                   default=0.0), 4)
 
+    def _ask_anchor(self, slug: str, book, break_even: float) -> float:
+        """Where the ask side 'is' when it is EMPTY. It used to be
+        break-even + 1 tick — and on 2026-08-27's post-maintenance
+        wipe that re-rested 89 exits within 2c of cost on books with
+        no competition at all (owner: "the newly placed order should
+        be at much better prices (for me) because there is less
+        competition"). An empty side means WE are the touch wherever
+        we rest: anchor high — above fair where a model exists, at
+        the ceiling on blank ground — and let the slot optimizer and
+        the scoring window pull the actual price back down to the
+        best PAYING slot. A populated side keeps the old rule: the
+        real touch is the anchor."""
+        if book.asks:
+            return book.asks[0][0]
+        fair = self.fairs(slug) if self.fairs is not None else None
+        if fair is not None:
+            return min(0.99, max(fair + 15 * book.tick,
+                                 break_even + book.tick))
+        return 0.99
+
     def _pin_check(self, rec: FamilyOrder, now: float) -> None:
         """The release rule for a hand-set order: the owner's placement
         holds until the book materially turns against it — its live
@@ -2633,8 +2653,7 @@ class Family:
             # range — join the ask touch unless it gives away against
             # the model
             fair_m2 = self.fairs(slug) if self.fairs is not None else None
-            jp = (book.asks[0][0] if book.asks
-                  else break_even + book.tick)
+            jp = self._ask_anchor(slug, book, break_even)
             if fair_m2 is not None and jp < fair_m2 - 3 * book.tick:
                 jp = fair_m2 - book.tick
             hi = max(min(jp, 0.999), lo)
@@ -2645,7 +2664,9 @@ class Family:
             hi = min(cap_px,
                      (book.asks[0][0] - book.tick) if book.asks
                      else cap_px)
-            lo = min((book.bids[0][0] if book.bids else hi), hi)
+            # empty bid side: the mirror of _ask_anchor — a buy-back
+            # with no competition bids LOW, not at the expensive end
+            lo = min((book.bids[0][0] if book.bids else 0.011), hi)
         best = (hi if side == "SELL"
                 else self._best_exit_px(slug, side, book, lo, hi, rec.qty))
         if best is None or abs(best - rec.price) < book.tick / 2:
@@ -3248,8 +3269,7 @@ class Family:
                     slug, "SELL", break_even, book.tick, book=book, qty=qty)
                 gate_px = self._exit_gate(slug, "SELL", break_even, rest,
                                           book, now)
-                ask_touch = (book.asks[0][0] if book.asks
-                             else break_even + book.tick)
+                ask_touch = self._ask_anchor(slug, book, break_even)
                 lo = max(floor_px,
                          (book.bids[0][0] + book.tick) if book.bids
                          else 0.002)
