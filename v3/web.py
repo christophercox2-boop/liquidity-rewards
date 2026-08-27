@@ -1041,7 +1041,11 @@ function fWhen(ts){var d=new Date(ts*1000);return _MO[d.getMonth()]+' '+d.getDat
 function fUsd(v){return (v<-0.005?'\\u2212$':'+$')+Math.abs(v).toFixed(2);}
 function fRest(h){if(h==null)return '';return h<1?Math.round(h*60)+' min':(h<48?h.toFixed(1)+' h':(h/24).toFixed(1)+' days');}
 function fParts(f){
- var earned=(f.est_day&&f.rested_h!=null)?f.est_day*f.rested_h/24:0;
+ var claimed=(f.est_day&&f.rested_h!=null)?f.est_day*f.rested_h/24:0;
+ // posted-grounded rewards (owner, 2026-08-27): once the exchange
+ // posts a rested day, the card's rewards use the REAL pay share;
+ // only days not yet posted keep the claim
+ var earned=(f.posted_usd!=null)?(f.posted_usd+(f.claim_unposted||0)):claimed;
  var oq=f.open_qty!=null?f.open_qty:f.qty;
  var flat=f.pos_now!=null&&Math.abs(f.pos_now)<0.005;
  var open=!f.stray_close&&oq>0.005&&!flat;
@@ -1144,7 +1148,11 @@ function fBack(f,p){
  else if(f.conc>0.0005)cl='Paid '+(f.conc*100).toFixed(1)+'c past value \\u2192 '+fUsd(lot)+' on the lot';
  else if(f.conc<-0.0005)cl='Filled '+(-f.conc*100).toFixed(1)+'c inside value \\u2192 '+fUsd(lot)+' on the lot';
  else cl='Filled right at value';
- if(p.earned)cl+=' \\u00b7 earned ~$'+p.earned.toFixed(2)+' in rewards while it rested';
+ if(f.posted_usd!=null){
+  cl+=' \\u00b7 rewards POSTED by the exchange: $'+f.posted_usd.toFixed(2);
+  if((f.claim_graded||0)>f.posted_usd+0.05)cl+=' <span class="warn">(was claimed $'+f.claim_graded.toFixed(2)+')</span>';
+  if((f.claim_unposted||0)>0.005)cl+=' \\u00b7 ~$'+f.claim_unposted.toFixed(2)+' more claimed for days not posted yet';
+ }else if(p.earned){cl+=' \\u00b7 claimed ~$'+p.earned.toFixed(2)+' in rewards while it rested (nothing posted yet)';}
  out+='<div style="margin:2px 0">'+cl+'</div>';
  if((f.closes||[]).length){
   out+='<div style="margin:2px 0">'+f.closes.map(function(c){
