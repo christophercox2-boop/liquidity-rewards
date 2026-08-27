@@ -144,6 +144,10 @@ def config() -> FamilyConfig:
         # orders. In fact don't touch those." Frozen, not avoided —
         # whatever rests there stays exactly where it is.
         freeze_tokens=("usgovcc",),
+        # owner, 2026-08-27: "Take me out of all buy position on Ron
+        # desantis in 2028 markets" — sell the stock into the bid
+        # until flat, never buy DeSantis 2028 again
+        liquidate_tokens=("rondes",),
         graduate_paid_usd=1.00, proven_usd=150.0,
         # owner, 2026-08-21: 75c is a GOAL — markets that could clear it
         # at full confidence get starter positions from this budget, and

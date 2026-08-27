@@ -269,6 +269,13 @@ class FamilyConfig:
     graduate_days: int = 3            # paid days needed in the last 7 (stability)
     dump_usd_day: float = 0.0         # taker-dump proceeds allowed per day (0 = off)
     avoid_tokens: tuple = ()
+    # markets the owner ordered CLOSED (2026-08-27, DeSantis 2028:
+    # "Take me out of all buy position"): the engine sells the held
+    # stock into the bid — never worse — up to the bid's displayed
+    # size each cycle until flat, cancels its own resting orders
+    # there first, and never opens a BUY. Manual orders are never
+    # touched. Matching is by slug fragment, like avoid_tokens.
+    liquidate_tokens: tuple = ()
     # FROZEN ground: the engine does nothing here at all — places no
     # orders, rests no exits, reprices nothing, cancels nothing. Every
     # order in a frozen market is treated exactly like one the owner
@@ -435,6 +442,11 @@ class Family:
         nothing new rests, probes, revives, or dumps here."""
         return any(t in slug for t in self.cfg.avoid_tokens)
 
+    def _liquidating(self, slug: str) -> bool:
+        """Owner-ordered close-out ground: sell the stock into the
+        bid until flat, rest nothing new, never buy."""
+        return any(t in slug for t in self.cfg.liquidate_tokens)
+
     def _frozen(self, slug: str) -> bool:
         """Hands off entirely (owner, 2026-08-24: "don't touch those").
         Unlike an avoided market, nothing is pulled: whatever rests
@@ -442,7 +454,8 @@ class Family:
         return any(t in slug for t in self.cfg.freeze_tokens)
 
     def enterable(self, slug: str) -> bool:
-        if self._avoided(slug) or self._frozen(slug):
+        if self._avoided(slug) or self._frozen(slug) \
+                or self._liquidating(slug):
             return False
         toks = self.cfg.enter_tokens
         return toks is None or any(t in slug for t in toks)
@@ -2107,7 +2120,11 @@ class Family:
             if rec.purpose == "manual" or self._frozen(rec.market):
                 continue          # frozen ground: never repriced,
                                   # never pulled, never resized
-            if self._avoided(rec.market):
+            if self._avoided(rec.market) or (
+                    self._liquidating(rec.market)
+                    and rec.purpose != "sell"):
+                # liquidating ground keeps its exits (the close-out
+                # block below replaces them); everything else leaves
                 # out means OUT — earn orders, probes, AND the engine's
                 # own exits leave (owner, 2026-08-22: the balance-of-power
                 # markets are his to work by hand; an engine order resting
@@ -2117,8 +2134,12 @@ class Family:
                 if r.ok:
                     self._log(event="pull", market=rec.market,
                               side=rec.side,
-                              why="owner: staying out of this market "
-                                  "for now — it is his to work by hand")
+                              why=("owner: closing out this market — "
+                                   "nothing new rests here"
+                                   if self._liquidating(rec.market)
+                                   else "owner: staying out of this "
+                                        "market for now — it is his "
+                                        "to work by hand"))
                     del self.orders[rec.id]
                     actions -= 1
                 continue
@@ -3154,6 +3175,52 @@ class Family:
                               # and a FROZEN market is not even tidied
             book = self.cache.fresh(slug, BOOK_MAX_AGE, now)
             if book is None:
+                continue
+            if self._liquidating(slug) and qty >= 0.01:
+                # OWNER-ORDERED CLOSE-OUT (2026-08-27, DeSantis 2028):
+                # sell into the bid, never worse, up to its displayed
+                # size each cycle until flat — regardless of basis;
+                # the loss is the owner's explicit choice. His own
+                # asks are never touched and never double-offered.
+                if not book.bids:
+                    continue
+                bid_l, bidsz_l = book.bids[0]
+                manual_l = sum(o.qty for o in self.orders.values()
+                               if o.market == slug and o.side == "SELL"
+                               and o.purpose == "manual")
+                dq_l = round(min(qty - manual_l, bidsz_l), 2)
+                if dq_l < 0.01:
+                    continue
+                for o2 in [o for o in self.orders.values()
+                           if o.market == slug and o.purpose == "sell"
+                           and o.side == "SELL" and not o.pinned]:
+                    rr = self.desk.cancel(o2.id, o2.market)
+                    if rr.ok:
+                        self.orders.pop(o2.id, None)
+                        self.evidence.order_gone(o2.market, o2.id)
+                r_l = self.desk.place_resting(
+                    slug, "SELL", bid_l, dq_l, net_position=qty,
+                    intent=SELL_LONG, taker=True, verify=False)
+                if r_l.ok:
+                    inv["qty"] = round(inv.get("qty", 0.0) - dq_l, 4)
+                    inv["cost"] = round(inv.get("cost", 0.0)
+                                        - dq_l * bid_l, 4)
+                    left_l = round(inv["qty"], 2)
+                    if abs(inv["qty"]) < 0.005:
+                        self.inventory.pop(slug, None)
+                        self.inv_since.pop(slug, None)
+                    self._journal_fill(FamilyOrder(
+                        id=r_l.order_id or f"liq{int(now)}",
+                        market=slug, side="SELL", price=bid_l, qty=dq_l,
+                        intent=SELL_LONG, placed_ts=now, purpose="sell",
+                        why="owner-ordered close-out — sold into the "
+                            "bid"), dq_l, now, left_l)
+                    self._log(event="liquidated", market=slug,
+                              price=bid_l, qty=dq_l,
+                              note=f"owner's close-out — {left_l:g} "
+                                   "left" if left_l >= 0.01
+                                   else "owner's close-out — flat")
+                    actions -= 1
                 continue
             if qty >= 0.01:
                 # long stock: an ask at break-even or better
