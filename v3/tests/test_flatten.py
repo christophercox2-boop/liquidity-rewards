@@ -5511,3 +5511,51 @@ class TestPositionsLedger(unittest.TestCase):
         s = r.cycle()
         pos = {p["market"]: p for p in s["positions"]}
         self.assertAlmostEqual(pos[A]["liq"], 8.00)   # 10 x (1 - 20c ask)
+
+
+class TestEmptyBookExitAnchor(unittest.TestCase):
+    """Owner, 2026-08-27, after the maintenance wipe re-rested 89 exits
+    within 2c of break-even on empty books: "the newly placed order
+    should be at much better prices (for me) because there is less
+    competition." An empty ask side anchors HIGH (above fair where a
+    model exists, the ceiling on blank ground); a populated side keeps
+    the old join-the-touch rule."""
+
+    def _rig(self, asks, fair=None):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.add_market(A, book=Book(bids=((0.03, 100.0), (0.02, 60000.0)),
+                                  asks=asks, tick=0.01, fetched_at=r.now))
+        r.cycle()
+        for oid in list(r.fam.orders):
+            r.fam.orders.pop(oid)
+        r.exchange.live.clear()
+        r.positions[A] = (10.0, 0.5)
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 0.5}   # 5c break-even
+        if fair is not None:
+            r.fam.fairs = lambda s: fair
+        return r, A
+
+    def test_an_empty_ask_side_rests_high_not_at_cost(self):
+        r, A = self._rig(asks=())
+        r.fam.last_action.clear()
+        r.cycle(advance=120.0)
+        exits = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "sell"]
+        self.assertTrue(exits)
+        for o in exits:                      # nowhere near 6c anymore
+            self.assertGreater(o.price, 0.15)
+
+    def test_a_modeled_empty_side_anchors_above_fair(self):
+        r, A = self._rig(asks=(), fair=0.10)
+        anchor = r.fam._ask_anchor(A, r.fam.cache.any_age(A), 0.05)
+        self.assertAlmostEqual(anchor, 0.25)   # fair + 15 ticks
+        r2, A2 = self._rig(asks=())
+        self.assertAlmostEqual(
+            r2.fam._ask_anchor(A2, r2.fam.cache.any_age(A2), 0.05), 0.99)
+
+    def test_a_populated_side_still_joins_the_touch(self):
+        r, A = self._rig(asks=((0.08, 500.0), (0.98, 60000.0)))
+        self.assertAlmostEqual(
+            r.fam._ask_anchor(A, r.fam.cache.any_age(A), 0.05), 0.08)
