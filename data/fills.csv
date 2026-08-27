@@ -1182,3 +1182,11 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787846297.8,cfb,aachc-cfb-wins-2026-11-28-frest-6pt5wins,BUY,0.5,0.52,earn,4.011,2.02,,52,64,0.46,0.52,0.77,-0.06,0.5,1 tick in front of the touch — we would hold 63% of the bid side,C4H6AR3V0GNK
 1787846778.0,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.96,earn,1.977,0.02,0.98595,93,95,0.886,0.94,0.97,-0.026,4,2 ticks in front of the touch — we would hold 95% of the bid side,C4JYCSA6PGNJ
 1787848579.0,politics,enwc-uspres-nom-dem-2028-gavnew,SELL,2.81,0.22,sell,4.0039,3.02,,21,24,0.857,0.21,0.22,0,21.19,selling filled stock — it earns while it waits,C4GXANT8YGNR
+1787848939.0,politics,enwc-uspres-nom-dem-2028-gavnew,BUY,88.42,0.2,earn,3.2659,0.28,,21,24,0.871,0.21,0.22,-0.03,109.42,1 tick behind the touch — we would hold 88% of the bid side,C4K86JXAPGNE
+1787849059.0,politics,ewc-usp-2028-11-07-jossha,SELL,1,0.17,sell,0,0,,4,8,0.435,0.17,0.18,-0.11,5,taker dump — sold into the bid (the carved exception),C4KFV69ZYGND
+1787849119.0,politics,enwc-uspres-nom-dem-2028-jossha,SELL,1,0.08,sell,0,0,0.07,6,11,0.645,0.08,0.09,-0.01,0,taker dump — sold into the bid (the carved exception),C4KGMK892GNE
+1787849779.0,politics,usgubewc-usgub-nm-2026-11-03-dem,SELL,10,0.97,sell,0,0,0.989075,90,94,0.229,0.97,0.98,0.0191,4,taker dump — sold into the bid (the carved exception),C4KP5HMAWGNK
+1787850679.5,cfb,aachc-cfb-wins-2026-11-28-ore-9pt5wins,BUY,1,0.84,sell,0.8333,2.9,,79,87,0.396,0.84,0.89,0,2,buying back the short at or under what it sold for — the bid earns while it wait,C4HFAPXEJGND
+1787850919.5,politics,enwc-uspres-nom-dem-2028-kamhar,BUY,10,0.15,earn,4.6429,3.4,,14,20,0,0.15,0.16,-0.02,25,joins the touch — the book has been quiet,C4H36TD8AGNM
+1787851699.5,politics,usgubewc-usgub-ny-2026-11-03-dem,SELL,6,0.98,sell,0,3.97,0.9852,91,94,0.638,0.92,0.93,0.0052,7,selling filled stock — it earns while it waits,C4GTCDE76GNE
+1787851879.5,politics,enwc-uspres-nom-dem-2028-jonoss,BUY,16.93,0.2,earn,4.2779,0.82,,25,29,0.59,0.2,0.21,-0.07,16.93,at the touch — a fill here is 4 ticks inside value (evidence band only; confiden,C4KFQES2CGNQ
