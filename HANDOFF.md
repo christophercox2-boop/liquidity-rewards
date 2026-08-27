@@ -1780,3 +1780,11 @@ guard means a market with no confirmed live pool gets no orders, and the
 estimate gate means no market is valued until its pool divisor is known.
 Within a poll or two of the deploy the watch reports whether the new
 families carry pools, and an arrival alert fires if they do.
+
+## 2026-08-27: monitor outage 06:14Z-, recovery restarts pushed
+The 3.0 monitor stopped saving state at ~06:16:46Z with no error in its
+final notes (clean kill or hard hang; last hourly publish 05:36Z). A
+zero-code-delta restart was pushed to deploy at 09:14Z (PR #12) and did
+not bring it back within 27 minutes; this note triggers the second
+build attempt. If this one also fails, the DigitalOcean dashboard is
+the only deeper lever (app -> Runtime Logs / Force Rebuild).
