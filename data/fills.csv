@@ -1122,3 +1122,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787790996.6,politics,usgubewc-usgub-tx-2026-11-03-rep,SELL,1,0.87,manual,0.0486,23.21,0.87435,83,86,0.785,0.84,0.87,0.0044,3.01,the owner's own order — the engine leaves it alone,C3HQPTGZGFSK
 1787791416.6,politics,ussewc-usse-fl-2026-11-03-dem,BUY,2,0.12,sell,0.3906,7.92,0.100675,11,15,0.695,0.12,0.13,0.0193,2,buying back the short at or under what it sold for — the bid earns while it wait,C3YZP56K2FSG
 1787791956.6,politics,enwc-usgubp-ri-2026-09-09-dem-danmck,BUY,16.01,0.05,manual,0.1832,8.82,,2,6,0.459,0.05,0.06,0.01,16.01,the owner's own order — the engine leaves it alone,C3YBH60QGFSJ
+1787793996.8,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,1,0.52,earn,0.8929,1.03,0.5,52,54,0.85,0.51,0.52,-0.02,-12,3 ticks in front of the touch — we would hold 94% of the ask side,C45GJV9D8FSH
