@@ -4708,7 +4708,7 @@ date,market,program_type,reward_usd,status
 2026-08-25,enwc-ussep-ma-2026-09-01-dem-edmark,liquidityProgram,0.21,PENDING
 2026-08-25,enwc-ussep-ma-2026-09-01-dem-setmou,liquidityProgram,0.28,PENDING
 2026-08-25,enwc-ussep-nh-2026-09-08-dem-chrpap,liquidityProgram,0.45,PENDING
-2026-08-25,enwc-ussep-ok-2026-08-25-dem-jimpri,liquidityProgram,0.12,PENDING
+2026-08-25,enwc-ussep-ok-2026-08-25-dem-jimpri,liquidityProgram,2.78,PENDING
 2026-08-25,ewc-usgub-az-2026-11-03-dem,liquidityProgram,0.04,PENDING
 2026-08-25,ewc-usgub-az-2026-11-03-rep,liquidityProgram,0.03,PENDING
 2026-08-25,ewc-usgub-ga-2026-11-03-dem,liquidityProgram,0.54,PENDING
