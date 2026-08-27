@@ -1118,3 +1118,7 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787788776.2,politics,usgubewc-usgub-ma-2026-11-03-rep,SELL,1,0.02,earn,0.8407,23.09,0.000425,1,3,0.348,0.01,0.02,-0.0196,-13,at the touch — a fill here is 1 ticks inside value (Silver + evidence),C3HAWX12RFSQ
 1787788836.2,politics,usgubewc-usgub-ma-2026-11-03-dem,BUY,1,0.98,sell,0.0388,33.05,0.999575,95,99,0,0.98,0.99,-0.0196,1,buying back the short at or under what it sold for — the bid earns while it wait,C38XRAD9CFSS
 1787788956.2,politics,scc-senate-gop-2026-11-03-51,SELL,2,0.15,earn,0.1443,3.59,0.114925,8,14,0,0.14,0.15,-0.0351,-9,at the touch — a fill here is 4 ticks inside value (Silver + evidence),C425GH516FSR
+1787790036.4,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.96,earn,5.5308,0.32,0.98595,93,95,0.908,0.96,0.97,-0.026,3,2 ticks in front of the touch — we would hold 89% of the bid side,C456EZKZYFSK
+1787790996.6,politics,usgubewc-usgub-tx-2026-11-03-rep,SELL,1,0.87,manual,0.0486,23.21,0.87435,83,86,0.785,0.84,0.87,0.0044,3.01,the owner's own order — the engine leaves it alone,C3HQPTGZGFSK
+1787791416.6,politics,ussewc-usse-fl-2026-11-03-dem,BUY,2,0.12,sell,0.3906,7.92,0.100675,11,15,0.695,0.12,0.13,0.0193,2,buying back the short at or under what it sold for — the bid earns while it wait,C3YZP56K2FSG
+1787791956.6,politics,enwc-usgubp-ri-2026-09-09-dem-danmck,BUY,16.01,0.05,manual,0.1832,8.82,,2,6,0.459,0.05,0.06,0.01,16.01,the owner's own order — the engine leaves it alone,C3YBH60QGFSJ
