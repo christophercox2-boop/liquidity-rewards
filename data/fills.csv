@@ -1400,3 +1400,9 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787955292.9,cfb,aachc-cfb-wins-2026-11-28-pennst-9pt5wins,SELL,1,0.4,sell,0,0,,39,44,0.726,0.4,0.41,0.02,0,taker dump — sold into the bid (the carved exception),C5CQ0FKVAKDM
 1787955593.3,cfb,aachc-cfb-wins-2026-11-28-ore-9pt5wins,SELL,0.5,0.8,sell,0,0,,80,85,0.573,0.8,0.81,0.02,0.5,taker dump — sold into the bid (the carved exception),C5CSZN8ZTKDH
 1787955893.3,cfb,aachc-cfb-wins-2026-11-28-wash-10pt5wins,BUY,0.5,0.29,earn,2.5,0.77,,31,34,0.671,0.29,0.31,-0.04,2.5,1 tick behind the touch — we would hold 96% of the bid side,C5C8QF99GKDM
+1787956913.4,politics,paccc-balpow-2026-11-03-dsweep,SELL,15,0.47,manual,1.5537,11.91,,42,48,0.066,0.46,0.47,-0.02,0,the owner's own order — the engine leaves it alone,C52YA0BGMKDH
+1787958233.5,politics,enwc-uspres-nom-rep-2028-tuccar,SELL,2,0.11,sell,0,0,,10,13,0.673,0.11,0.12,0.01,13,taker dump — sold into the bid (the carved exception),C5DEDVKG2KDE
+1787958653.6,cfb,aachc-cfb-wins-2026-11-28-col-6pt5wins,BUY,1,0.41,earn,1.8657,2.22,,44,89,0,0.41,0.46,-0.25,1,1 tick in front of the touch — we would hold 63% of the bid side,C5BMKMY0JKDM
+1787959433.9,cfb,aachc-cfb-wins-2026-11-28-ore-9pt5wins,SELL,0.5,0.8,sell,0,0,,80,85,0.568,0.8,0.81,0.02,0.5,taker dump — sold into the bid (the carved exception),C5DS6WAHCKDH
+1787959913.9,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,SELL,3,0.24,manual,4.268,5.31,,6,10,0.737,0.21,0.4,-0.16,-3,moved by the owner,C59AQHN0EKDC
+1787960273.9,cfb,aachc-cfb-wins-2026-11-28-wake-4pt5wins,SELL,0.5,0.81,sell,0,0,,81,85,0.266,0.81,0.83,0.02,0.5,taker dump — sold into the bid (the carved exception),C5DZ4FQ66KDJ
