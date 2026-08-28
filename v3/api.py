@@ -353,8 +353,18 @@ class Client:
                                  params={"symbols": batch, "pageSize": 100}, timeout=20)
                     got = {}
                     for p in j.get("programs") or []:
-                        if p.get("marketSlug"):
-                            got[p["marketSlug"]] = p
+                        s2 = p.get("marketSlug")
+                        if not s2:
+                            continue
+                        if s2 in got:
+                            # a market in TWO programs (e.g. the old tier
+                            # plus 2026-08-27's elections boost) comes back
+                            # as two rows — merge the periods, don't let
+                            # the last row silently win
+                            got[s2].setdefault("timePeriods", []).extend(
+                                p.get("timePeriods") or [])
+                        else:
+                            got[s2] = dict(p)
                     break
                 except ApiError as e:
                     errors.append(str(e))

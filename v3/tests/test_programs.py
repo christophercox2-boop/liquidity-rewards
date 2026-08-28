@@ -60,6 +60,22 @@ class TestPickPeriod(unittest.TestCase):
         got = pick_period(periods, slug, today=dt.date(2026, 8, 15))
         self.assertEqual(got["programId"], "golf_pretournament")
 
+    def test_boosted_elections_program_beats_stale_low_tier(self):
+        # 2026-08-28 (owner's screenshot): the exchange moved the MA
+        # margin-of-victory brackets into "elections_boosted_high_20260827"
+        # ($1,000/day) while July's $25 low program still read LIVE. The
+        # picker must accept "elections" ids on politics markets and, with
+        # two live programs, prefer the newest start — not API order.
+        periods = [
+            period(pid="elections_boosted_high_20260827", pool=1000,
+                   target=10000, df=0.2, start="2026-08-27T00:00:00Z"),
+            period(pid="politics_low_20260727", pool=25, target=2000,
+                   df=0.1, start="2026-07-27T00:00:00Z"),
+        ]
+        got = pick_period(periods, "vmc-ussep-mov-ma-dem-0-2")
+        self.assertEqual(got["programId"], "elections_boosted_high_20260827")
+        self.assertEqual(program_from_period(got).tier, "high")
+
     def test_closed_program_is_not_live(self):
         p = program_from_period(period(status="STATUS_CLOSED"))
         self.assertFalse(p.is_live())
