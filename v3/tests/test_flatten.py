@@ -627,6 +627,43 @@ class TestPayoutButton(unittest.TestCase):
         self.assertEqual(r3["new_rows"][0]["day"], d1)
 
 
+    def test_family_actuals_assign_not_accumulate(self):
+        # the estimates-ledger bug (owner yes, 2026-08-28): the 5-minute
+        # rewards poll re-ADDED the same market-days into the per-family
+        # totals until politics "paid" $36,525 a day. Repeat polls must
+        # leave the family totals exactly where one poll put them.
+        import datetime as dt
+        d0 = (dt.datetime.now(dt.timezone.utc)
+              - dt.timedelta(days=1)).strftime("%Y-%m-%d")
+        rows = [{"date": d0, "market": "ussewc-usse-ga-2026-11-03-rep",
+                 "program_type": "lp", "reward_usd": 2.5, "status": "PAID"},
+                {"date": d0, "market": "aachc-cfb-wins-2026-11-28-ala-9pt5",
+                 "program_type": "lp", "reward_usd": 1.0, "status": "PENDING"}]
+        m = self.mon(rows)
+        for _ in range(5):
+            m.refresh_rewards()
+        self.assertEqual(m.actuals_by_fam[f"{d0}|politics"], 2.5)
+        self.assertEqual(m.actuals_by_fam[f"{d0}|cfb"], 1.0)
+
+    def test_poisoned_family_history_is_dropped(self):
+        # rows accumulated by the old code sum far past their own day
+        # total — the heal drops that day's family rows entirely; a
+        # blank ledger cell beats a wrong one
+        import datetime as dt
+        d0 = (dt.datetime.now(dt.timezone.utc)
+              - dt.timedelta(days=1)).strftime("%Y-%m-%d")
+        rows = [{"date": d0, "market": "m-now", "program_type": "lp",
+                 "reward_usd": 1.5, "status": "PAID"}]
+        m = self.mon(rows)
+        m.actuals_by_day["2026-08-25"] = 169.58
+        m.actuals_by_fam["2026-08-25|politics"] = 36525.84   # old poison
+        m.actuals_by_fam["2026-08-25|cfb"] = 16231.54
+        m.refresh_rewards()
+        self.assertNotIn("2026-08-25|politics", m.actuals_by_fam)
+        self.assertNotIn("2026-08-25|cfb", m.actuals_by_fam)
+        self.assertEqual(m.actuals_by_fam[f"{d0}|politics"], 1.5)
+
+
 class TestSilverLogAndWatcher(unittest.TestCase):
     def test_race_moves_are_logged(self):
         from v3.silver import SilverFairs
