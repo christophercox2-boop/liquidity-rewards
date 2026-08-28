@@ -850,6 +850,12 @@ class Monitor:
         for key in ("politics", "cfb", "nfl", "nba"):
             fam = self.families.get(key)
             if fam is not None:
+                # the owner's watched races seat before everything
+                take(sorted(s2 for s2 in fam.universe
+                            if fam._watched(s2)), room=SUB_CAP)
+        for key in ("politics", "cfb", "nfl", "nba"):
+            fam = self.families.get(key)
+            if fam is not None:
                 take(sorted(fam.active_markets() | set(fam.inventory)),
                      room=SUB_CAP)
         cands: list[tuple[float, str]] = []

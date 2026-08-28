@@ -269,6 +269,13 @@ class FamilyConfig:
     graduate_days: int = 3            # paid days needed in the last 7 (stability)
     dump_usd_day: float = 0.0         # taker-dump proceeds allowed per day (0 = off)
     avoid_tokens: tuple = ()
+    # races the owner told us to keep a live watch on (2026-08-28,
+    # the MA primaries + balance of power: "Keep a websocket on those
+    # races"): their books refresh on a budget-exempt fast lane every
+    # cycle and seat first in the stream subscription, so the sampler,
+    # the nurse, the live cards and the qualification reads are never
+    # stale there. Watching only — placement rules are untouched.
+    watch_tokens: tuple = ()
     # markets the owner ordered CLOSED (2026-08-27, DeSantis 2028:
     # "Take me out of all buy position"): the engine sells the held
     # stock into the bid — never worse — up to the bid's displayed
@@ -441,6 +448,9 @@ class Family:
         governor, special rules pending). Exits still manage held stock;
         nothing new rests, probes, revives, or dumps here."""
         return any(t in slug for t in self.cfg.avoid_tokens)
+
+    def _watched(self, slug: str) -> bool:
+        return any(t in slug for t in self.cfg.watch_tokens)
 
     def _liquidating(self, slug: str) -> bool:
         """Owner-ordered close-out ground: sell the stock into the
@@ -3613,6 +3623,17 @@ class Family:
         budget = self.cfg.books_per_cycle
         scan_reserve = min(self.cfg.scan_reserve, budget)
         done = 0
+        if self.cfg.watch_tokens:
+            # the owner's watched races: fresh every cycle, off-budget
+            for slug in sorted(s2 for s2 in self.universe
+                               if self._watched(s2)):
+                if self.cache.age(slug, now) > 60.0:
+                    try:
+                        self.cache.put(slug,
+                                       client.book(slug, fetched_at=now))
+                    except Exception as e:  # noqa: BLE001
+                        self._log(event="book_error", market=slug,
+                                  error=str(e)[:60])
         active = sorted(self.active_markets() | set(self.inventory),
                         key=lambda s: self.cache.age(s, now), reverse=True)
         for slug in active:
