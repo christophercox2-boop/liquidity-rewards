@@ -1227,3 +1227,9 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787885708.2,politics,usgubewc-usgub-al-2026-11-03-rep,SELL,4,0.93,manual,2.2723,0.37,0.985625,93,95,0.874,0.89,0.93,0.0556,0,the owner's own order — the engine leaves it alone,C4VX94592KDK
 1787885948.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mou0-5,BUY,5,0.01,manual,0.947,0.15,,5,35,0.088,0.01,0.54,-0.12,6,the owner's own order — the engine leaves it alone,C4W4342KWKDE
 1787886008.3,politics,ussewc-usse-sc-2026-11-03-rep,BUY,2.99,0.84,earn,1.7123,0.22,0.871125,85,88,0.683,0.84,0.86,-0.0311,2.99,1 tick behind the touch — we would hold 22% of the bid side,C4W2V18S0KDF
+1787886167.4,politics,usgubewc-usgub-al-2026-11-03-dem,SELL,1,0.07,earn,4.4504,0.08,0.014375,6,10,0.74,0.06,0.07,-0.0556,-13,4 ticks in front of the touch — we would hold 99% of the ask side,C4W7M8D0TKDH
+1787886707.4,politics,ussewc-usse-mt-2026-11-03-setbod,BUY,1.99,0.11,earn,0.0386,0.46,,11,17,0.293,0.14,0.15,-0.03,3.99,joins the touch — the book has been quiet,C4W1Y6D2WKDE
+1787886707.4,politics,ussewc-usse-id-2026-11-03-todach,BUY,5,0.06,earn,5.1901,0.26,,5,10,0.439,0.08,0.09,-0.01,12,joins the touch — the book has been quiet,C4W6XFBJYKDC
+1787886707.4,politics,ussewc-usse-id-2026-11-03-rep,BUY,1,0.95,earn,2.0822,0.26,0.997375,97,99,0.457,0.95,0.96,-0.0474,7,6 ticks in front of the touch — we would hold 100% of the bid side,C4W6DTJ40KDE
+1787887042.3,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.05,earn,2.0796,0.02,0.039575,5,9,0.748,0.04,0.08,-0.0104,-2,3 ticks in front of the touch — we would hold 100% of the ask side,C4WGCHDP6KDN
+1787888122.6,cfb,aachc-cfb-wins-2026-11-28-pennst-9pt5wins,SELL,0.01,0.45,sell,0,0,,44,49,0.729,0.45,0.46,0.01,0.99,taker dump — sold into the bid (the carved exception),C4WPJRY2YKDF
