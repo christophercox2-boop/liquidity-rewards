@@ -1207,3 +1207,7 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787859547.7,politics,usgubewc-usgub-ny-2026-11-03-dem,SELL,1,0.92,manual,0.3717,2.18,0.984675,92,95,0.713,0.89,0.92,0.0647,6,the owner's own order — the engine leaves it alone,C4M4GQC0AGNJ
 1787859907.8,politics,ussewc-usse-sc-2026-11-03-rep,SELL,3,0.85,sell,0,0,0.871125,84,87,0.713,0.85,0.86,0.0211,0,taker dump — sold into the bid (the carved exception),C4P4PT56TGNM
 1787859967.8,politics,usgubewc-usgub-il-2026-11-03-dem,BUY,6.83,0.98,earn,3.8652,2,0.998675,97,99,0.745,0.98,0.99,-0.0187,6.83,joins the touch — the book has been quiet,C4MBYGQC0GNP
+1787860139.3,politics,usgubewc-usgub-il-2026-11-03-dem,BUY,1,0.98,earn,1.9379,0.05,0.998675,96,99,0.789,0.92,0.99,-0.0187,8,2 ticks in front of the touch — we would hold 93% of the bid side,C4P5D5VEGGNC
+1787860233.6,cfb,aachc-cfb-wins-2026-11-28-ucf-4pt5wins,BUY,0.01,0.83,manual,0,0.03,,,,0.521,,,,1.01,the owner's own order — the engine leaves it alone,C4P65VR82GNC
+1787860473.6,politics,ewc-usp-2028-11-07-rondes,SELL,63,0.02,sell,0,0,,10,13,0.795,0.02,0.1,0.1,0,owner-ordered close-out — sold into the bid,C4P8NZNPWGNP
+1787860773.6,politics,usgubewc-usgub-ny-2026-11-03-dem,SELL,5.88,0.92,manual,0.3169,2.52,0.984675,92,95,0.767,0.89,0.92,0.0647,0.12,the owner's own order — the engine leaves it alone,C4M4GQC0AGNJ
