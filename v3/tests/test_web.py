@@ -51,6 +51,10 @@ class FakeMonitor:
         self.closed = getattr(self, "closed", []) + [market]
         return {"ok": True, "note": "sold"}
 
+    def qualify_ask(self, market):
+        self.qualified = getattr(self, "qualified", []) + [market]
+        return {"ok": True, "note": "rested"}
+
     def live_view(self, slug):
         self.live_reads = getattr(self, "live_reads", 0) + 1
         return {"ok": True, "market": slug, "bids": [[0.05, 100.0]],
@@ -158,6 +162,10 @@ class TestWeb(unittest.TestCase):
                          body={"op": "close_position", "market": "m-9"})
         self.assertEqual(json.loads(body)["ok"], True)
         self.assertIn("m-9", self.mon.closed)
+        code, body = req(self.base + "/op", method="POST", headers=h,
+                         body={"op": "qualify_ask", "market": "m-8"})
+        self.assertEqual(json.loads(body)["ok"], True)
+        self.assertIn("m-8", self.mon.qualified)
 
     def test_live_stream_needs_key_and_pushes_the_book(self):
         """/live is the card's open line: locked without the key, and

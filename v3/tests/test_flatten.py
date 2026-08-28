@@ -5734,3 +5734,103 @@ class TestWatchedRaces(unittest.TestCase):
         from v3 import politics
         cfg = politics.config()
         self.assertIn("ussep-mov-ma-dem", cfg.watch_tokens)
+
+    def test_politics_engine_is_hands_off_the_mov_books(self):
+        # owner, 2026-08-28: "The model should be hands off with these
+        # markets" — avoided ground: the engine pulls its own orders
+        # and never enters; the owner's hand orders are untouchable
+        from v3 import politics
+        cfg = politics.config()
+        self.assertIn("ussep-mov-ma-dem", cfg.avoid_tokens)
+
+    def test_watched_summary_reports_the_ask_sides_standing(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.fam.cfg.watch_tokens = (A[:20],)
+        r.add_market(A)
+        s = r.cycle()
+        w = {x["market"]: x for x in s["watched"]}
+        self.assertIn(A, w)
+        # the default politics book rests 20 + 60,000 on the ask side
+        # against LIVE_PROG's 5,000 Target Size — qualifying
+        self.assertEqual(w[A]["target"], 5000)
+        self.assertAlmostEqual(w[A]["ask_total"], 60020.0)
+        self.assertTrue(w[A]["qualifies"])
+
+
+class TestQualifyAskButton(unittest.TestCase):
+    """Owner, 2026-08-28: "Let me place the orders by hand. Just give
+    me a button to auto qualify the ask side." One tap rests a single
+    deep ask sized to close the gap to Target Size, through the
+    owner's hand rail — purpose "manual", automation never touches it."""
+
+    def _monitorish(self, r):
+        import types
+        from v3.main import Monitor
+        m = types.SimpleNamespace(families={"politics": r.fam},
+                                  client=r.exchange, names=r.names)
+        m.owner_place = types.MethodType(Monitor.owner_place, m)
+        return m
+
+    def test_button_rests_the_gap_at_99c_as_a_manual_order(self):
+        from v3.main import Monitor
+        from v3.scoring import Book
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        thin = Book(bids=((0.05, 10.0),), asks=((0.40, 120.0), (0.50, 80.0)),
+                    tick=0.01, fetched_at=r.now)
+        r.add_market(A, book=thin)
+        r.cycle()
+        out = Monitor.qualify_ask(self._monitorish(r), A)
+        self.assertTrue(out["ok"], out.get("note"))
+        # gap = 5,000 target − 200 resting = 4,800 shares at 99c
+        placed = [o for o in r.fam.orders.values()
+                  if o.market == A and o.purpose == "manual"]
+        self.assertEqual(len(placed), 1)
+        self.assertEqual(placed[0].side, "SELL")
+        self.assertAlmostEqual(placed[0].price, 0.99)
+        self.assertAlmostEqual(placed[0].qty, 4800.0)
+        self.assertIn("4,800", out["note"])
+
+    def test_button_refuses_when_the_side_already_qualifies(self):
+        from v3.main import Monitor
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)          # default book: 60,020 asks vs 5,000
+        r.cycle()
+        before = len(r.fam.orders)
+        out = Monitor.qualify_ask(self._monitorish(r), A)
+        self.assertFalse(out["ok"])
+        self.assertIn("already qualifies", out["note"])
+        self.assertEqual(len(r.fam.orders), before)
+
+    def test_button_refuses_over_the_collateral_cap(self):
+        from v3.main import Monitor
+        from v3.scoring import Book
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        big = {"timePeriods": [{"programId": "politics_mid_1",
+                                "rewardPool": 100.0, "targetSize": 5_000_000,
+                                "discountFactor": 0.2, "status": "LIVE"}]}
+        thin = Book(bids=((0.05, 10.0),), asks=((0.40, 120.0),),
+                    tick=0.01, fetched_at=r.now)
+        r.add_market(A, book=thin, prog=big)
+        r.cycle()
+        before = len(r.fam.orders)
+        out = Monitor.qualify_ask(self._monitorish(r), A)
+        self.assertFalse(out["ok"])
+        self.assertIn("$150", out["note"])
+        self.assertEqual(len(r.fam.orders), before)
+
+    def test_button_refuses_without_terms(self):
+        from v3.main import Monitor
+        from v3.tests.test_family import Rig
+        r = Rig()
+        r.add_market("vmc-x-unknown")
+        # discovered, but the incentives response never carries it —
+        # no terms on record, so the button cannot size a wall
+        r.exchange.prog_raw.pop("vmc-x-unknown", None)
+        r.cycle()
+        out = Monitor.qualify_ask(self._monitorish(r), "vmc-x-unknown")
+        self.assertFalse(out["ok"])
+        self.assertIn("terms not read", out["note"])
