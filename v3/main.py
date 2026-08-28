@@ -1173,6 +1173,55 @@ class Monitor:
         return {"ok": False,
                 "note": "no family knows this market — check the slug"}
 
+    def qualify_ask(self, market: str) -> dict:
+        """The watched-races button (owner, 2026-08-28: "Let me place
+        the orders by hand. Just give me a button to auto qualify the
+        ask side"): rest ONE deep ask — the deepest price the grid and
+        the 99.9c bound allow — sized to bring the market's ask side up
+        to Target Size, so every ask on the book starts earning. Deep
+        on purpose: a fill means someone paid ~99c for the bracket, and
+        the collateral held is ~1c a share. Goes through the owner's
+        hand rail (purpose "manual") — the automation never touches the
+        result. Refused when the side already qualifies, terms are
+        unread, or the collateral would top the button's $150 cap."""
+        import math
+        for fam in self.families.values():
+            if not fam.knows(market):
+                continue
+            prog = fam.terms.get(market)
+            if prog is None or not prog.target:
+                return {"ok": False, "note": "no Target Size on record "
+                        "here — reward terms not read yet"}
+            try:
+                book = self.client.book(market, fetched_at=time.time())
+            except Exception as e:  # noqa: BLE001
+                return {"ok": False, "note": f"could not read the book: {e}"}
+            fam.cache.put(market, book)
+            ask_total = sum(q for _, q in book.asks)
+            gap = prog.target - ask_total
+            if gap <= 0:
+                return {"ok": False, "note":
+                        f"the ask side already qualifies — {ask_total:,.0f} "
+                        f"shares resting vs a Target Size of "
+                        f"{prog.target:,.0f}"}
+            qty = float(math.ceil(gap))
+            tick = book.tick or 0.01
+            px = round(math.floor(0.999 / tick + 1e-9) * tick, 3)
+            collat = qty * (1.0 - px)
+            if collat > 150.0:
+                return {"ok": False, "note":
+                        f"refused: closing the {gap:,.0f}-share gap would "
+                        f"hold ${collat:,.0f} of collateral — over the "
+                        f"button's $150 cap"}
+            r = self.owner_place(market, "SELL", px, qty)
+            if r.get("ok"):
+                r["note"] = (f"rested ask {qty:,.0f} @ {px * 100:.1f}c — "
+                             f"the ask side now reaches Target Size "
+                             f"(~${collat:,.2f} collateral held)")
+            return r
+        return {"ok": False,
+                "note": "no family knows this market — check the slug"}
+
     def order_op(self, op: str, order_id: str, price: float | None = None,
                  pin: bool = False, qty: float | None = None) -> dict:
         """Owner move/cancel/resize on one of OUR orders, from the

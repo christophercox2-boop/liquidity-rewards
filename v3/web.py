@@ -526,6 +526,30 @@ function render(d){
   +'<div style="margin:8px 0"><select id="ps" style="font-size:16px;padding:8px"><option value="BUY">bid (buy)</option><option value="SELL">ask (sell)</option></select>'
   +' <input id="pp" placeholder="price c" style="width:20%"> <input id="pq" placeholder="shares" style="width:20%">'
   +' <button onclick="pl()">Place</button></div><div id="plout"></div></details></div>';
+ var wl=[];
+ fams(d).forEach(function(kv){(kv[1].watched||[]).forEach(function(w){wl.push(w);});});
+ if(wl.length){
+  var nq=wl.filter(function(w){return w.qualifies===false;}).length;
+  var wb='';
+  wl.forEach(function(w,i){
+   var bid='wq_'+i;var st,btn='';
+   if(w.target==null){st='<span class="muted">reward terms not read yet</span>';}
+   else if(w.ask_total==null){st='<span class="muted">no book read yet</span>';}
+   else if(w.qualifies){st='<span class="ok">ask side qualifies \\u2014 '+Math.round(w.ask_total).toLocaleString()+' resting of '+Math.round(w.target).toLocaleString()+' needed</span>';}
+   else{
+    st='<span class="warn">ask side NOT qualifying \\u2014 '+Math.round(w.ask_total).toLocaleString()+' resting of '+Math.round(w.target).toLocaleString()+' needed</span>';
+    btn='<div style="margin:4px 0 0"><button class="small" onclick="qax(\\''+esc(w.market)+'\\','+Math.ceil(w.target-w.ask_total)+',\\'qo_'+i+'\\')">Qualify ask</button></div>';
+   }
+   wb+='<div style="margin:9px 0 0;border-top:1px solid #2c3527;padding-top:7px">'
+    +'<div class="name" style="cursor:pointer" onclick="showbook(\\''+esc(w.market)+'\\',\\''+bid+'\\')">'+nm(d,w.market)+' <span class="muted">\\u25be book</span></div>'
+    +'<div id="'+bid+'"></div>'
+    +'<div class="muted"><code>'+esc(w.market)+'</code></div>'
+    +'<div class="sub">'+st+'</div>'+btn+'<div id="qo_'+i+'"></div></div>';
+  });
+  out+='<div class="card">'+fold('Watched races \\u2014 qualify the ask side by hand',
+   '\\u2014 '+wl.length+' markets, '+(nq?nq+' not qualifying':'all qualifying'),wb,true)
+   +'<div class="hint">One tap rests a single deep ask (99c) sized to close the gap to Target Size \\u2014 about 1c of collateral per share, and it only fills if someone pays 99c. It is placed as YOUR order: the automation never touches it, and the engine keeps its own money out of these markets entirely.</div></div>';
+ }
  var pos=[];
  fams(d).forEach(function(kv){
   (kv[1].positions||[]).forEach(function(p){p.fam=kv[0];pos.push(p);});
@@ -623,6 +647,13 @@ function pl(){
 function cx(id){
  if(!confirm('Cancel this order?'))return;
  post({op:'cancel',order_id:id},function(j){if(!j.ok)alert(j.note||'refused');});
+}
+function qax(m,gap,outid){
+ if(!confirm('Rest one ask of ~'+gap.toLocaleString()+' shares at 99c to qualify the ask side? Holds about $'+Math.ceil(gap*0.01)+' of collateral.'))return;
+ document.getElementById(outid).innerHTML='<div class="muted">placing\\u2026</div>';
+ post({op:'qualify_ask',market:m},function(j){
+  document.getElementById(outid).innerHTML='<div class="'+(j.ok?'ok':'bad')+'">'+esc(j.note||'')+'</div>';
+ });
 }
 """
 
@@ -1379,6 +1410,8 @@ class WebServer:
                                          qty=float(qty) if qty is not None else None)
         if op == "close_position":
             return self.monitor.close_position(str(body.get("market") or ""))
+        if op == "qualify_ask":
+            return self.monitor.qualify_ask(str(body.get("market") or ""))
         if op == "backfill":
             return self.monitor.backfill_journal(
                 days=float(body.get("days") or 3.0),

@@ -138,8 +138,13 @@ def config() -> FamilyConfig:
         # exchange's self-match prevention.
         # owner, 2026-08-22: the presidential announce markets "aren't
         # doing good" — off limits ($24.92 paid all-time across 32)
+        # owner, 2026-08-28 ("Let me place the orders by hand" / "The
+        # model should be hands off with these markets"): the MA dem
+        # senate primary MoV books are his to work — the engine pulls
+        # its own orders out and never enters; his hand orders and the
+        # qualify-ask button's rests are untouchable as always
         avoid_tokens=("usgub-ak", "usgubp-ak", "paccc-balpow",
-                      "cranc-uspres28"),
+                      "cranc-uspres28", "ussep-mov-ma-dem"),
         # owner, 2026-08-24: "Don't sell my gop governor count race
         # orders. In fact don't touch those." Frozen, not avoided —
         # whatever rests there stays exactly where it is.

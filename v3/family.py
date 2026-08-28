@@ -3870,6 +3870,27 @@ class Family:
                             "qty": o.qty, "purpose": o.purpose}
                            for o in covers]})
         summary["positions"] = positions
+        # the owner's watched races: the ask side's standing against
+        # Target Size (owner, 2026-08-28: "Just give me a button to
+        # auto qualify the ask side" — the button needs the gap in
+        # front of it). Book totals include every resting order, his
+        # and anyone's; the fast lane keeps these books fresh.
+        if self.cfg.watch_tokens:
+            watched = []
+            for slug in sorted(s for s in self.universe
+                               if self._watched(s)):
+                prog = self.terms.get(slug)
+                book = self.cache.any_age(slug)
+                ask_total = (round(sum(q for _, q in book.asks), 1)
+                             if book is not None else None)
+                target = prog.target if prog is not None else None
+                watched.append({
+                    "market": slug, "ask_total": ask_total,
+                    "target": target,
+                    "qualifies": (bool(ask_total >= target)
+                                  if ask_total is not None and target
+                                  else None)})
+            summary["watched"] = watched
         summary["scanned"] = sum(1 for sb in self.scoreboard.values()
                                  if "plans" in sb)
         # the triage sweep's progress: how much of the eligible board —
