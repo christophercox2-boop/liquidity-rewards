@@ -1211,3 +1211,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787860233.6,cfb,aachc-cfb-wins-2026-11-28-ucf-4pt5wins,BUY,0.01,0.83,manual,0,0.03,,,,0.521,,,,1.01,the owner's own order — the engine leaves it alone,C4P65VR82GNC
 1787860473.6,politics,ewc-usp-2028-11-07-rondes,SELL,63,0.02,sell,0,0,,10,13,0.795,0.02,0.1,0.1,0,owner-ordered close-out — sold into the bid,C4P8NZNPWGNP
 1787860773.6,politics,usgubewc-usgub-ny-2026-11-03-dem,SELL,5.88,0.92,manual,0.3169,2.52,0.984675,92,95,0.767,0.89,0.92,0.0647,0.12,the owner's own order — the engine leaves it alone,C4M4GQC0AGNJ
+1787877185.8,politics,ussewc-usse-sc-2026-11-03-dem,SELL,0.06,0.28,manual,0.1064,6.01,0.128875,,,0.683,,,-0.1511,-4.06,the owner's own order — the engine leaves it alone,C4N3095M0GNC
