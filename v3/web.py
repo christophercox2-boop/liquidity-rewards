@@ -548,7 +548,7 @@ function render(d){
   });
   out+='<div class="card">'+fold('Watched races \\u2014 qualify the ask side by hand',
    '\\u2014 '+wl.length+' markets, '+(nq?nq+' not qualifying':'all qualifying'),wb,true)
-   +'<div class="hint">One tap rests a single deep ask (99c) sized to close the gap to Target Size \\u2014 about 1c of collateral per share, and it only fills if someone pays 99c. It is placed as YOUR order: the automation never touches it, and the engine keeps its own money out of these markets entirely.</div></div>';
+   +'<div class="hint">One tap places up to 6 deep asks (99c) toward the Target Size gap. The exchange trims every order to your free buying power \\u2014 that is the real size limit \\u2014 so the wall grows tap by tap; the result line says exactly what rested and what is still missing. A 99c ask only fills if someone pays 99c. These are YOUR orders: the automation never touches them, and the engine keeps its own money out of these markets entirely.</div></div>';
  }
  var pos=[];
  fams(d).forEach(function(kv){
@@ -649,8 +649,8 @@ function cx(id){
  post({op:'cancel',order_id:id},function(j){if(!j.ok)alert(j.note||'refused');});
 }
 function qax(m,gap,outid){
- if(!confirm('Rest one ask of ~'+gap.toLocaleString()+' shares at 99c to qualify the ask side? Holds about $'+Math.ceil(gap*0.01)+' of collateral.'))return;
- document.getElementById(outid).innerHTML='<div class="muted">placing\\u2026</div>';
+ if(!confirm('Build the ask wall toward the '+gap.toLocaleString()+'-share gap? Places up to 6 asks at 99c; the exchange trims each one to your free buying power, so this may take several taps over time. Can take ~30s.'))return;
+ document.getElementById(outid).innerHTML='<div class="muted">building the wall\\u2026 (up to 30s)</div>';
  post({op:'qualify_ask',market:m},function(j){
   document.getElementById(outid).innerHTML='<div class="'+(j.ok?'ok':'bad')+'">'+esc(j.note||'')+'</div>';
  });
