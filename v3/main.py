@@ -905,7 +905,7 @@ class Monitor:
                     try:
                         orders = [{"market": o.market, "side": o.side,
                                    "price": o.price, "size": o.qty}
-                                  for o in fam.orders.values()]
+                                  for o in list(fam.orders.values())]
                         self.samplers[key].sample(
                             now, orders, fam.cache, fam.terms,
                             side_pool=lambda s, p, f=fam: f._side_pool(s, p))
@@ -969,7 +969,7 @@ class Monitor:
         try:
             slugs = []
             for fam in self.families.values():
-                for o in fam.orders.values():
+                for o in list(fam.orders.values()):
                     if o.market not in slugs:
                         slugs.append(o.market)
                     if len(slugs) >= 4:
@@ -1385,7 +1385,7 @@ class Monitor:
                         "note": "no bid resting to sell to right now"}
             bid_px, bid_sz = book.bids[0]
             manual_cover = sum(
-                o.qty for o in fam.orders.values()
+                o.qty for o in list(fam.orders.values())
                 if o.market == market and o.side == "SELL"
                 and o.purpose == "manual")
             sellable = round(qty - manual_cover, 2)
@@ -1396,7 +1396,7 @@ class Monitor:
                                 "these shares sold here"}
             # engine exits (hand-set ones included — this tap supersedes
             # the earlier hand move) come off first
-            for o in [o for o in fam.orders.values()
+            for o in [o for o in list(fam.orders.values())
                       if o.market == market and o.purpose == "sell"
                       and o.side == "SELL"]:
                 rr = fam.desk.cancel(o.id, o.market, initiator="owner")
@@ -1928,6 +1928,20 @@ class Monitor:
                 f"{ws.get('subscribed', 0)} subscribed · last message "
                 f"{ago} · books written last hour: stream {wrote['ws']}, "
                 f"rest {wrote['rest']}")
+            # the frame-shape sampler (owner yes, 2026-08-28): what the
+            # socket actually delivers, so the dead-writes mystery gets
+            # solved from the record instead of guessed at
+            shapes = dict(getattr(self.stream, "frame_shapes", {}) or {})
+            if shapes:
+                top = sorted(shapes.items(), key=lambda kv: -kv[1]["n"])[:4]
+                self._note("ws frame shapes: " + " | ".join(
+                    f"{sig} x{rec['n']}" for sig, rec in top))
+                # one raw sample of the busiest non-lite shape, once an
+                # hour, truncated — the evidence apply_frame needs
+                for sig, rec in top:
+                    if "marketDataLite" not in sig:
+                        self._note(f"ws frame sample [{sig}]: {rec['sample']}")
+                        break
         except Exception as e:  # noqa: BLE001 — a diagnostic, never a blocker
             self._note(f"stream health line failed: {type(e).__name__}: {e}")
         try:
@@ -1942,7 +1956,7 @@ class Monitor:
             # 24h. Drift past ~2x is the tripwire to raise with the
             # owner.
             for key, fam in self.families.items():
-                exp_day = sum(o.live_pf for o in fam.orders.values()
+                exp_day = sum(o.live_pf for o in list(fam.orders.values())
                               if o.live_pf is not None
                               and o.purpose != "manual")
                 # entries against entries (owner approved 2026-08-26):
@@ -1997,7 +2011,7 @@ class Monitor:
             day = et_day(now)
             per: dict = {}
             for key, fam in self.families.items():
-                for o in fam.orders.values():
+                for o in list(fam.orders.values()):
                     if o.purpose == "manual":   # not our prediction
                         continue
                     a = per.setdefault((day, o.market, key),
@@ -2219,7 +2233,7 @@ class Monitor:
         n_cov = n_div = 0
         tot_cur = tot_alt = 0.0
         for tag, fam in self.families.items():
-            for slug in {o.market for o in fam.orders.values()}:
+            for slug in {o.market for o in list(fam.orders.values())}:
                 d = declared.get(slug)
                 if not d:
                     continue
@@ -2327,7 +2341,7 @@ class Monitor:
                 inv = fam.inventory.get(card["market"])
                 card["pos_now"] = (round(inv.get("qty", 0.0), 2)
                                    if inv else 0.0)
-                exits = [o for o in fam.orders.values()
+                exits = [o for o in list(fam.orders.values())
                          if o.market == card["market"]
                          and o.purpose == "sell"]
                 card["exit_resting"] = bool(exits)
@@ -2402,7 +2416,7 @@ class Monitor:
             ours = [{"side": o.side, "price": o.price, "qty": o.qty,
                      "purpose": o.purpose, "est": o.live_est,
                      "verdict": o.verdict}
-                    for o in fam.orders.values() if o.market == slug]
+                    for o in list(fam.orders.values()) if o.market == slug]
             inv = fam.inventory.get(slug)
             return {"ok": True, "market": slug,
                     "name": self.names.label(slug),

@@ -44,7 +44,30 @@ class Stream:
         # Lite feed (owner, 2026-08-21: does the exchange's "best" match
         # the raw touch, and is IT the scoring anchor?)
         self.declared: dict[str, tuple[float | None, float | None, float]] = {}
+        # the frame-shape sampler (owner yes, 2026-08-28): the health
+        # line shows frames arriving while zero books get written, so
+        # record WHAT actually comes down the pipe — a signature per
+        # distinct frame shape with a count and one truncated sample —
+        # instead of guessing. Read by the hourly stream-health line.
+        self.frame_shapes: dict[str, dict] = {}
         self._thread: threading.Thread | None = None
+
+    def _sample(self, msg: dict) -> None:
+        keys = []
+        for k, v in list(msg.items())[:8]:
+            if isinstance(v, dict):
+                keys.append(k + "{" + ",".join(sorted(v.keys())[:10]) + "}")
+            else:
+                keys.append(str(k))
+        sig = ",".join(sorted(keys)) or "(empty)"
+        rec = self.frame_shapes.get(sig)
+        if rec is None:
+            if len(self.frame_shapes) < 20:
+                self.frame_shapes[sig] = {"n": 1, "ts": time.time(),
+                                          "sample": json.dumps(msg)[:400]}
+        else:
+            rec["n"] += 1
+            rec["ts"] = time.time()
 
     def start(self) -> None:
         self._thread = threading.Thread(target=self._run, daemon=True, name="ws-books")
@@ -56,6 +79,8 @@ class Stream:
         socket."""
         try:
             msg = json.loads(raw)
+            if isinstance(msg, dict):
+                self._sample(msg)
             lite = msg.get("marketDataLite") or {}
             if lite.get("marketSlug"):
                 bb = to_num((lite.get("bestBid") or {}).get("value"))

@@ -474,7 +474,7 @@ class Family:
         """This family's ground: discovered markets, plus anything we
         already hold orders or stock in (so exits always stay legal)."""
         return (slug in self.universe or slug in self.inventory
-                or any(o.market == slug for o in self.orders.values()))
+                or any(o.market == slug for o in list(self.orders.values())))
 
     def _cooldown_ok(self, slug: str, side: str, now: float) -> bool:
         return now - self.last_action.get(f"{slug}|{side}", 0.0) >= self.cfg.cooldown_s
@@ -510,12 +510,12 @@ class Family:
     def market_spent(self, slug: str) -> float:
         """Expected risk resting in one market."""
         return sum(self._charge(o)
-                   for o in self.orders.values()
+                   for o in list(self.orders.values())
                    if o.market == slug and o.purpose != "sell")
 
     def market_gross(self, slug: str) -> float:
         return sum(capital_at_risk(o.intent, o.price, o.qty)
-                   for o in self.orders.values()
+                   for o in list(self.orders.values())
                    if o.market == slug and o.purpose != "sell")
 
     def _market_budget(self, slug: str) -> float:
@@ -531,7 +531,7 @@ class Family:
         positions and charge in full. family_gross() bounds the worst
         day in nominal dollars behind this."""
         spent = sum(self._charge(o)
-                    for o in self.orders.values()
+                    for o in list(self.orders.values())
                     if o.market not in self.proven
                     and not self._owner_exit(o))
         if self.cfg.holdings_in_ceiling:
@@ -543,7 +543,7 @@ class Family:
         negative risk netted — bounding a correlated day no matter what
         the fill model believes."""
         g = risk.book_risk(risk.order_legs(
-            o for o in self.orders.values()
+            o for o in list(self.orders.values())
             if not self._owner_exit(o)))
         if self.cfg.holdings_in_ceiling:
             g += self.holdings_value()
@@ -579,7 +579,7 @@ class Family:
         budget — 'no more than $50 of risk in cfb, orders + holdings').
         A market with no book values conservatively at cost."""
         total = 0.0
-        for slug, inv in self.inventory.items():
+        for slug, inv in list(self.inventory.items()):
             qty = inv.get("qty") or 0.0
             if abs(qty) < 0.005:
                 continue
@@ -598,11 +598,11 @@ class Family:
 
     def proven_spent(self) -> float:
         return sum(self._charge(o)
-                   for o in self.orders.values()
+                   for o in list(self.orders.values())
                    if o.market in self.proven and not self._owner_exit(o))
 
     def active_markets(self) -> set[str]:
-        return {o.market for o in self.orders.values() if o.purpose != "sell"}
+        return {o.market for o in list(self.orders.values()) if o.purpose != "sell"}
 
     def _dead_here(self, slug: str) -> bool:
         """Program known dead: read as paying nothing, or read as GONE
@@ -845,7 +845,7 @@ class Family:
         # side comes out of the book before the touch is read; the share
         # math below still uses the full book, because the program counts
         # our size like anyone else's.
-        mine_orders = [o for o in self.orders.values()
+        mine_orders = [o for o in list(self.orders.values())
                        if o.market == slug and o.side == side
                        and (own is None or o.id != own.id)]
         mine_at: dict[float, float] = {}
@@ -1006,7 +1006,7 @@ class Family:
                 key = f"{slug}|{side}"
                 allowed = (self.probe_ratchet.get(key) or [1, 0.0])[0]
                 already = any(
-                    o for o in self.orders.values()
+                    o for o in list(self.orders.values())
                     if o.market == slug and o.side == side
                     and o.purpose not in ("manual", "sell")
                     and (own is None or o.id != own.id)   # re-planning
@@ -1245,10 +1245,10 @@ class Family:
         for side, anchor in (("BUY", bb), ("SELL", ba)):
             levels = list(book.side(side))
             total = sum(q for _, q in levels)
-            mine = [(o.price, o.qty) for o in self.orders.values()
+            mine = [(o.price, o.qty) for o in list(self.orders.values())
                     if o.market == slug and o.side == side]
             out["est_cur"] += sum((o.live_est or 0.0)
-                                  for o in self.orders.values()
+                                  for o in list(self.orders.values())
                                   if o.market == slug and o.side == side)
             if anchor is None or not mine or total < target:
                 continue
@@ -1408,14 +1408,14 @@ class Family:
         account is shared with 1.0 and 2.0, and their fills are not ours."""
         open_by_id = {o["id"]: o for o in open_orders}
         # remember when each live order was placed, before it can vanish
-        for _oid, _rec in self.orders.items():
+        for _oid, _rec in list(self.orders.items()):
             if _rec.placed_ts:
                 self.placed_at[_oid] = _rec.placed_ts
         if len(self.placed_at) > 6000:      # keep the newest, bounded
             for _k in sorted(self.placed_at, key=self.placed_at.get)[:2000]:
                 self.placed_at.pop(_k, None)
         tracked = (set(self.positions_seen) | set(self.inventory)
-                   | {o.market for o in self.orders.values()}
+                   | {o.market for o in list(self.orders.values())}
                    | {g["rec"].market for g in self.gone_pending.values()})
         deltas = {m: (positions.get(m) or (0.0, 0.0))[0]
                   - self.positions_seen.get(m, 0.0)
@@ -1537,7 +1537,7 @@ class Family:
                            f"nothing — phantom purged")
         for m in list(self.positions_seen):
             if (m not in self.inventory
-                    and m not in {o.market for o in self.orders.values()}):
+                    and m not in {o.market for o in list(self.orders.values())}):
                 self.positions_seen.pop(m, None)
 
     def _on_fill(self, rec: FamilyOrder, filled: float, now: float) -> None:
@@ -1631,7 +1631,7 @@ class Family:
                 continue
             pnl = qty * mark - (inv.get("cost") or 0.0)
             earning = any((o.live_est or 0.0) > 0.0
-                          for o in self.orders.values() if o.market == slug)
+                          for o in list(self.orders.values()) if o.market == slug)
             if pnl < -PAGE_LOSS_USD and not earning:
                 self.alert(f"{self.cfg.tag} position under water, earning nothing",
                            f"{self._label(slug)}: {p['side']} {p['qty']:g} @ "
@@ -1767,7 +1767,7 @@ class Family:
         while long. Mislabelling them "earn" once let maintenance reprice
         and pull the owner's exits (2026-08-20 23:12Z) and counted their
         collateral against the rebuild ceiling. Idempotent, every cycle."""
-        for rec in self.orders.values():
+        for rec in list(self.orders.values()):
             if rec.purpose in ("sell", "manual"):
                 continue
             net = (positions.get(rec.market) or (0.0, 0.0))[0]
@@ -1785,8 +1785,8 @@ class Family:
         self._reclassify_exits(positions)
         self.refresh_universe(client, now)
         self.refresh_terms(client, now)
-        stock = sum(abs(v.get("qty") or 0.0) for v in self.inventory.values())
-        stock_rate = sum(o.live_est or 0.0 for o in self.orders.values()
+        stock = sum(abs(v.get("qty") or 0.0) for v in list(self.inventory.values()))
+        stock_rate = sum(o.live_est or 0.0 for o in list(self.orders.values())
                          if o.purpose == "sell")
         self._exit_rate_ps = (stock_rate / stock) if stock > 0.01 else 0.0
         refreshed = self._refresh_books(client, now)
@@ -1926,7 +1926,7 @@ class Family:
         """Refresh every order's live share/est and verdict — the reading
         happens whether or not the switch is on (the observing mode's
         whole point)."""
-        for rec in self.orders.values():
+        for rec in list(self.orders.values()):
             book = self.cache.fresh(rec.market, self.cfg.read_age_s, now)
             prog, why = self._prog_row(rec.market)
             if book is None:
@@ -2019,7 +2019,7 @@ class Family:
             else:
                 rec.verdict = (f"earning ~${rec.live_est:.2f}/day — "
                                f"{j.share * 100:.1f}% of its side")
-        for rec in self.orders.values():
+        for rec in list(self.orders.values()):
             if rec.pinned:
                 self._pin_check(rec, now)
 
@@ -2105,7 +2105,7 @@ class Family:
         # minutes to reach them — long enough for a non-compliant order
         # to fill (the jdvan buy at 57c against his 50c fair,
         # 2026-08-23). Same rails, same budget, different order.
-        recs = sorted(self.orders.values(),
+        recs = sorted(list(self.orders.values()),
                       key=lambda r: 0 if r.market in self.priority else 1)
         for rec in recs:
             if actions <= 0:
@@ -2422,7 +2422,7 @@ class Family:
         return actions
 
     def _enter(self, now: float, positions: dict, actions: int) -> int:
-        have = {(o.market, o.side) for o in self.orders.values()
+        have = {(o.market, o.side) for o in list(self.orders.values())
                 if o.purpose != "sell"}
         # proven ground first (owner, 2026-08-20: "looking at the orders
         # that were the most successful and trying to replicate those") —
@@ -2465,7 +2465,7 @@ class Family:
                     continue    # per-market worst-case ceiling
                 guess = BUY_LONG if plan["side"] == "BUY" else BUY_SHORT
                 if slug in self.proven and self.cfg.proven_usd > 0:
-                    pool_orders = [o for o in self.orders.values()
+                    pool_orders = [o for o in list(self.orders.values())
                                    if o.market in self.proven]
                     if (self.proven_spent() + plan_charge
                             > self.cfg.proven_usd + 1e-9):
@@ -2486,7 +2486,7 @@ class Family:
                     # morning after manual orders stopped counting
                     # toward the ceiling. The two sides of the
                     # comparison have to be the same book.
-                    search_orders = [o for o in self.orders.values()
+                    search_orders = [o for o in list(self.orders.values())
                                      if o.market not in self.proven
                                      and o.purpose != "manual"]
                     if (self.family_spent() + plan_charge
@@ -2540,7 +2540,7 @@ class Family:
             over_gross = gross > self.gross_cap() + 1e-9
             if not over_exp and not over_gross:
                 break
-            cands = [o for o in self.orders.values()
+            cands = [o for o in list(self.orders.values())
                      if o.purpose not in ("sell", "manual")
                      and not o.pinned
                      and not self._frozen(o.market)]
@@ -2570,8 +2570,8 @@ class Family:
         if self.cfg.grow_usd <= 0 or actions <= 0:
             return actions
         spent = sum(capital_at_risk(o.intent, o.price, o.qty)
-                    for o in self.orders.values() if o.purpose == "grow")
-        have = {(o.market, o.side) for o in self.orders.values()
+                    for o in list(self.orders.values()) if o.purpose == "grow")
+        have = {(o.market, o.side) for o in list(self.orders.values())
                 if o.purpose != "sell"}
         ranked = sorted(((s, sb) for s, sb in self.scoreboard.items()
                          if sb.get("grow")),
@@ -2624,7 +2624,7 @@ class Family:
         an over-covered short flips long when everything fills (the
         Alabama six-covers-for-five-shares case, 2026-08-21). Pull the
         worst-earning excess, never manual orders."""
-        cands = sorted((o for o in self.orders.values()
+        cands = sorted((o for o in list(self.orders.values())
                         if o.market == slug and o.purpose == "sell"
                         and o.side == side and not o.pinned),
                        key=lambda o: (o.live_est or 0.0))
@@ -2947,7 +2947,7 @@ class Family:
         or above (BUY) their positions' break-even. The exit gate's
         family-wide budget draws down against this."""
         total = 0.0
-        for o in self.orders.values():
+        for o in list(self.orders.values()):
             if o.purpose != "sell":
                 continue
             inv = self.inventory.get(o.market) or {}
@@ -3001,7 +3001,7 @@ class Family:
         budget = self.cfg.exit_giveup_cap_usd - self._exit_giveup_in_play()
         # our current exits on this side leave the book before scoring,
         # so we never count our own size as competition
-        mine_now = [(o.price, o.qty) for o in self.orders.values()
+        mine_now = [(o.price, o.qty) for o in list(self.orders.values())
                     if o.market == slug and o.purpose == "sell"
                     and o.side == side]
         raw = list(book.side(side))
@@ -3096,7 +3096,7 @@ class Family:
         deployed earn orders: the rate of the last money we chose to
         put to work, not the average of the best of it."""
         rates = []
-        for o in self.orders.values():
+        for o in list(self.orders.values()):
             if o.purpose in ("sell", "manual", "probe"):
                 continue
             risk = capital_at_risk(o.intent, o.price, o.qty)
@@ -3195,13 +3195,13 @@ class Family:
                 if not book.bids:
                     continue
                 bid_l, bidsz_l = book.bids[0]
-                manual_l = sum(o.qty for o in self.orders.values()
+                manual_l = sum(o.qty for o in list(self.orders.values())
                                if o.market == slug and o.side == "SELL"
                                and o.purpose == "manual")
                 dq_l = round(min(qty - manual_l, bidsz_l), 2)
                 if dq_l < 0.01:
                     continue
-                for o2 in [o for o in self.orders.values()
+                for o2 in [o for o in list(self.orders.values())
                            if o.market == slug and o.purpose == "sell"
                            and o.side == "SELL" and not o.pinned]:
                     rr = self.desk.cancel(o2.id, o2.market)
@@ -3234,7 +3234,7 @@ class Family:
                 continue
             if qty >= 0.01:
                 # long stock: an ask at break-even or better
-                mine = [o for o in self.orders.values()
+                mine = [o for o in list(self.orders.values())
                         if o.market == slug and o.purpose == "sell"
                         and o.side == "SELL" and not o.pinned]
                 self._maybe_move_exit(slug, "SELL", mine, book, inv, now)
@@ -3242,11 +3242,11 @@ class Family:
                 # cover too — the engine sizes around them and never
                 # offers the same shares twice (owner, 2026-08-22)
                 manual_cover = sum(
-                    o.qty for o in self.orders.values()
+                    o.qty for o in list(self.orders.values())
                     if o.market == slug and o.purpose == "manual"
                     and o.side == "SELL")
                 covered = manual_cover + sum(
-                    o.qty for o in self.orders.values()
+                    o.qty for o in list(self.orders.values())
                     if o.market == slug and o.purpose == "sell"
                     and o.side == "SELL")
                 rest = qty - covered
@@ -3276,7 +3276,7 @@ class Family:
                         # hand-set exits stay resting like manual ones —
                         # the dump sizes around them, never cancels them
                         pinned_cover = sum(
-                            o.qty for o in self.orders.values()
+                            o.qty for o in list(self.orders.values())
                             if o.market == slug and o.purpose == "sell"
                             and o.side == "SELL" and o.pinned)
                         dq = min(qty - manual_cover - pinned_cover, bid_sz,
@@ -3287,7 +3287,7 @@ class Family:
                             dq = float(int(dq))
                         dq = round(dq, 2)
                         if dq >= (1.0 if self.cfg.whole_shares else 0.01):
-                            for o2 in [o2 for o2 in self.orders.values()
+                            for o2 in [o2 for o2 in list(self.orders.values())
                                        if o2.market == slug
                                        and o2.purpose == "sell"
                                        and o2.side == "SELL"
@@ -3407,12 +3407,12 @@ class Family:
                 # break-even — the bid earns rewards while it exits and
                 # adds no collateral (owner, 2026-08-20: "try and exit
                 # positions in a way that earns liquidity reward")
-                mine = [o for o in self.orders.values()
+                mine = [o for o in list(self.orders.values())
                         if o.market == slug and o.purpose == "sell"
                         and o.side == "BUY"]
                 self._maybe_move_exit(slug, "BUY", mine, book, inv, now)
                 covered = sum(
-                    o.qty for o in self.orders.values()
+                    o.qty for o in list(self.orders.values())
                     if o.market == slug and o.side == "BUY"
                     and o.purpose in ("sell", "manual"))
                 rest = -qty - covered
@@ -3531,7 +3531,7 @@ class Family:
         if self.cfg.probe_usd <= 0 or actions <= 0:
             return actions
         spent = sum(capital_at_risk(o.intent, o.price, o.qty)
-                    for o in self.orders.values() if o.purpose == "probe")
+                    for o in list(self.orders.values()) if o.purpose == "probe")
         placed = 0
         for slug, sb in sorted(self.scoreboard.items(),
                                key=lambda kv: -(kv[1].get("pool_day") or 0.0)):
@@ -3557,7 +3557,7 @@ class Family:
                     < self.cfg.probe_cooldown_s:
                 continue
             if any(o.market == slug and o.purpose == "probe"
-                   for o in self.orders.values()):
+                   for o in list(self.orders.values())):
                 continue
             book = self.cache.fresh(slug, BOOK_MAX_AGE, now)
             if book is None or not book.bids:
@@ -3805,24 +3805,24 @@ class Family:
         self._last_accrual = now
         if not (0.0 < dt_s <= 600.0):
             return
-        mkts = {o.market for o in self.orders.values()
+        mkts = {o.market for o in list(self.orders.values())
                 if o.live_est is not None}
         if not mkts:
             return
         if self.cache.coverage(mkts, self.cfg.read_age_s, now) < 0.6:
             return
-        rate = sum(o.live_est or 0.0 for o in self.orders.values())
+        rate = sum(o.live_est or 0.0 for o in list(self.orders.values()))
         self.earned_today += rate * dt_s / 86400.0
 
     # --------------------------------------------------------------- finish
 
     def _finish(self, summary: dict, now: float) -> dict:
-        summary["orders"] = [vars(o) for o in self.orders.values()]
+        summary["orders"] = [vars(o) for o in list(self.orders.values())]
         ests = [o.live_est if o.live_est is not None else o.est_day
-                for o in self.orders.values() if o.purpose != "sell"]
+                for o in list(self.orders.values()) if o.purpose != "sell"]
         summary["est_day"] = round(sum(ests), 2)
         summary["stock_day"] = round(sum(o.live_est or 0.0
-                                         for o in self.orders.values()
+                                         for o in list(self.orders.values())
                                          if o.purpose == "sell"), 2)
         summary["spent"] = round(self.family_spent(), 2)
         if self.cfg.proven_usd > 0:
@@ -3833,7 +3833,7 @@ class Family:
         summary["holdings_counted"] = bool(self.cfg.holdings_in_ceiling)
         summary["capital_usd"] = self.cfg.capital_usd
         summary["earned_today"] = round(self.earned_today, 2)
-        summary["inventory"] = {k: dict(v) for k, v in self.inventory.items()}
+        summary["inventory"] = {k: dict(v) for k, v in list(self.inventory.items())}
         # every held position by what it earns per dollar of
         # liquidation value (owner, 2026-08-26: "even the ones with no
         # earnings and no orders. The lowest should be at the top so I
@@ -3842,7 +3842,7 @@ class Family:
         # book = conservatively at cost), earnings = the reduce-side
         # orders resting there, engine and hand alike
         positions = []
-        for slug, inv in self.inventory.items():
+        for slug, inv in list(self.inventory.items()):
             qty = inv.get("qty") or 0.0
             if abs(qty) < 0.005:
                 continue
@@ -3857,7 +3857,7 @@ class Family:
                        if book is not None and book.asks
                        else max(-inv.get("cost", 0.0), 0.0))
                 cover_side = "BUY"
-            covers = [o for o in self.orders.values()
+            covers = [o for o in list(self.orders.values())
                       if o.market == slug and o.side == cover_side]
             earn = sum(o.live_est or 0.0 for o in covers)
             positions.append({
@@ -3925,7 +3925,7 @@ class Family:
     def to_dict(self) -> dict:
         return {
             "cfg_sig": self._cfg_sig(),
-            "orders": {oid: vars(o) for oid, o in self.orders.items()},
+            "orders": {oid: vars(o) for oid, o in list(self.orders.items())},
             "probe_ratchet": self.probe_ratchet,
             "inventory": self.inventory,
             "positions_seen": self.positions_seen,
