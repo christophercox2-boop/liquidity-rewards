@@ -1306,3 +1306,11 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787921949.8,cfb,aachc-cfb-wins-2026-11-28-minnst-8pt5wins,BUY,0.01,0.33,earn,7.5,3.56,,36,46,0.152,0.25,0.43,-0.08,2.01,5 ticks in front of the touch — we would hold 98% of the bid side,C51RQVDXRKDK
 1787922009.8,politics,ewc-usp-2028-11-07-gavnew,BUY,1,0.15,earn,0,0.72,,15,19,0.768,0.15,0.16,-0.02,1,2 ticks in front of the touch — we would hold 45% of the bid side,C545QVZZ6KDK
 1787922429.8,politics,ewc-usp-2028-11-07-marrub,BUY,15,0.18,manual,1.7344,1.35,,17,21,0.449,0.18,0.19,-0.01,15,the owner's own order — the engine leaves it alone,C53PP34C0KDD
+1787923749.8,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.05,earn,2.0796,0.02,0.039575,8,11,0.909,0.04,0.08,-0.0104,-12,3 ticks in front of the touch — we would hold 100% of the ask side,C557QRT42KDK
+1787923869.8,politics,usgubewc-usgub-hi-2026-11-03-rep,SELL,1,0.03,earn,6.2498,11.65,7.5e-05,1,4,0.406,0.01,0.03,-0.0299,-3,5 ticks in front of the touch — we would hold 99% of the ask side,C4VAGAP0CKDM
+1787924529.9,politics,ewc-usgub-ca-2026-11-03-stehil,BUY,10,0.05,sell,0.0095,12.97,0.000625,4,8,0.347,0.06,0.07,0.0494,10,buying back the short at or under what it sold for — the bid earns while it wait,C4T2VWM88KDK
+1787924710.3,politics,enwc-uspres-nom-rep-2028-tuccar,SELL,1,0.08,sell,0,0,,7,12,0.428,0.08,0.09,0.01,41.01,taker dump — sold into the bid (the carved exception),C55EDTM0MKDM
+1787925130.3,politics,ussewc-usse-fl-2026-11-03-rep,BUY,1,0.88,earn,0.9952,4.58,0.898,86,90,0.635,0.88,0.91,-0.018,3,3 ticks in front of the touch — we would hold 100% of the bid side,C51NZHYA6KDF
+1787925190.3,politics,ussewc-usse-fl-2026-11-03-dem,SELL,1,0.12,earn,0.6838,9.13,0.102,10,13,0.727,0.11,0.12,-0.018,-1,3 ticks in front of the touch — we would hold 95% of the ask side,C4XNQH22YKDE
+1787925430.3,politics,ussewc-usse-id-2026-11-03-rep,BUY,1,0.94,earn,6.1516,1.43,0.997375,95,97,0.747,0.94,0.98,-0.0574,10,5 ticks in front of the touch — we would hold 98% of the bid side,C54DKHPVMKDE
+1787925550.3,politics,paccc-balpow-2026-11-03-dhou-rsen,SELL,10,0.34,manual,1.0246,3.2,,30,36,0.144,0.33,0.34,-0.01,0,the owner's own order — the engine leaves it alone,C52VKMV4MKDK
