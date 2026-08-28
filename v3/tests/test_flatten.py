@@ -828,6 +828,30 @@ class TestStreamRouter(unittest.TestCase):
         self.assertIsNotNone(
             pol.cache.any_age("ussewc-usse-ga-2026-11-03-rep"))
 
+    def test_router_accepts_the_streams_writer_tag(self):
+        # THE dead-stream bug (frame-shape sampler evidence,
+        # 2026-08-28): apply_frame calls put(..., writer="ws") and the
+        # router's put didn't take the parameter — every parsed book
+        # frame died on a TypeError inside the stream's guard. The
+        # router must accept it and pass it through to the counters.
+        from v3.main import CacheRouter
+        from v3.books import BookCache
+        from v3.scoring import Book
+
+        class F:
+            def __init__(self, universe):
+                self.universe = universe
+                self.cache = BookCache()
+        pol = F({"ussewc-usse-ga-2026-11-03-rep": {}})
+        router = CacheRouter({"politics": pol})
+        b = Book(bids=((0.4, 5.0),), asks=((0.6, 5.0),), tick=0.01,
+                 fetched_at=1.0)
+        router.put("ussewc-usse-ga-2026-11-03-rep", b, writer="ws")
+        self.assertIsNotNone(
+            pol.cache.any_age("ussewc-usse-ga-2026-11-03-rep"))
+        self.assertEqual(pol.cache.writes.get("ws"), 1)
+        self.assertEqual(pol.cache.writes.get("rest"), 0)
+
     def test_ws_list_carries_every_family(self):
         import tempfile
         with tempfile.TemporaryDirectory() as p:

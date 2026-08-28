@@ -705,15 +705,21 @@ class CacheRouter:
     def __init__(self, families: dict):
         self.families = families
 
-    def put(self, slug: str, book) -> None:
+    def put(self, slug: str, book, writer: str = "ws") -> None:
+        # the missing `writer` parameter was the WHOLE dead-stream
+        # mystery (frame-shape sampler, 2026-08-28): apply_frame calls
+        # put(..., writer="ws"), this signature didn't accept it, and
+        # every parsed book frame died on a TypeError inside the
+        # stream's never-kill-the-socket guard — 252 good frames in
+        # the sampler's first minutes, zero books written
         for key in ("cfb", "nfl", "nba"):
             fam = self.families.get(key)
             if fam is not None and slug in fam.universe:
-                fam.cache.put(slug, book)
+                fam.cache.put(slug, book, writer=writer)
                 return
         pol = self.families.get("politics")
         if pol is not None:
-            pol.cache.put(slug, book)
+            pol.cache.put(slug, book, writer=writer)
 
 
 def touch_snapshot(fam: Family, now: float, cap: int = 400) -> dict:
