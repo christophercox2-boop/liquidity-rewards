@@ -2165,13 +2165,35 @@ class Monitor:
         self.rewards_seen = seen
         for d, v in totals.items():
             self.actuals_by_day[d] = round(v, 2)
-        for key, a in agg.items():           # ...and per family, so the
-            fam = self._family_of(a["market"])   # ledger grades each
-            if not fam:                          # one on its own money
+        # ...and per family, so the ledger grades each one on its own
+        # money. RECOMPUTED and ASSIGNED like the day totals — the old
+        # += re-added the same market-days on every 5-minute poll until
+        # politics "paid" $36,525 a day (found grading Aug-26; owner
+        # yes 2026-08-28)
+        fam_totals: dict[str, float] = {}
+        for key, a in agg.items():
+            fam = self._family_of(a["market"])
+            if not fam:
                 continue
             fk = f"{a['date']}|{fam}"
-            self.actuals_by_fam[fk] = round(
-                self.actuals_by_fam.get(fk, 0.0) + a["paid"], 2)
+            fam_totals[fk] = fam_totals.get(fk, 0.0) + a["paid"]
+        for fk, v in fam_totals.items():
+            self.actuals_by_fam[fk] = round(v, 2)
+        # heal the poisoned history: a day whose family rows sum past
+        # its own day total was built by the old accumulator — drop
+        # those rows (days in the fetch window were just rewritten
+        # correctly; older ones go blank in the ledger, and blank
+        # beats wrong)
+        by_day_sum: dict[str, float] = {}
+        for fk, v in self.actuals_by_fam.items():
+            by_day_sum[fk.split("|", 1)[0]] = (
+                by_day_sum.get(fk.split("|", 1)[0], 0.0) + v)
+        for d, s in by_day_sum.items():
+            total = self.actuals_by_day.get(d)
+            if total is not None and s > total * 1.01 + 0.01:
+                for k in [k for k in self.actuals_by_fam
+                          if k.startswith(d + "|")]:
+                    del self.actuals_by_fam[k]
         if len(self.actuals_by_fam) > 4000:
             for k in sorted(self.actuals_by_fam)[:len(self.actuals_by_fam) - 4000]:
                 del self.actuals_by_fam[k]
