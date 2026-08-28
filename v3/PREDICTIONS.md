@@ -794,3 +794,31 @@ $348.13 and were paid $98.23 (~3.5x); claims ÷ 3 ≈ $116 against
 $119.79 actually paid — the ÷3 deflator is empirically almost exactly
 right where per-market prediction is hopeless. Predict the family,
 not the market.
+
+### P15 — written 2026-08-28 ~12:30Z, BEFORE the Aug-27/28 postings land
+*Context: Aug-26 posted $389.41 — the record day ($304.25 politics
+across 180 markets, best single market $9; $85.16 cfb). Raw politics
+claims metered $117 across only 10.6 hours (804 min unmeasured —
+maintenance); scaled to 24h that is ~$265 vs $304 paid, a ~0.9x
+ratio. Aug-25's same ratio was ~2.9x. The exchange re-tiered politics
+Aug-27 and created the MA MoV boost ($1,000/day/event); the owner's
+walls stood from ~03:30Z Aug-28.*
+
+1. **Aug-27 politics posts LOW: $60–$180.** The re-tier cut pools and
+   the maintenance wipe erased resting hours; the raw claim rate that
+   day metered $62 over ~16.8 hours. Wrong above $180 (the churn
+   lesson of P14 repeats) or below $60.
+2. **Aug-28: the 11 MoV brackets together post ≥ $50** (vs $2.52 on
+   Aug-26, pre-boost) — the walls qualify the sides and the near-touch
+   asks capture a real slice of 11 × ~$91/day. Wrong under $20: then
+   the boost pays differently than our terms read (the per-event
+   divisor, or deep walls counting for less than the window math
+   says).
+3. **The claims-to-paid ratio stays compressed:** Aug-27 AND Aug-28
+   politics claims ÷ paid each land ≤ 1.5x. If both hold, the ÷3
+   deflator is suppressing entries roughly 2x too hard and I will
+   propose dropping est_deflate toward 1.5 — the owner's yes decides,
+   nothing changes on this prediction alone.
+
+**Check.** data/rewards.csv days 27/28 against the frozen claims in
+data/market_est.csv; MoV = the 11 vmc-ussep-mov-ma-dem markets.
