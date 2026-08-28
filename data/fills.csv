@@ -1281,3 +1281,11 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787913969.6,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.05,earn,6.2389,0.33,0.039575,7,10,0.888,0.04,0.05,-0.0104,-9,3 ticks in front of the touch — we would hold 100% of the ask side,C52MS6WS4KDC
 1787915049.6,politics,ussewc-usse-ms-2026-11-03-dem,BUY,0.05,0.1,manual,0.0414,8.65,0.030525,7,11,0.578,0.1,0.11,0.0695,0.05,the owner's own order — the engine leaves it alone,C4VQ76WX0KDJ
 1787915169.6,cfb,aachc-cfb-wins-2026-11-28-wake-4pt5wins,SELL,0.5,0.81,sell,0,0,,81,85,0.316,0.81,0.83,0.02,0.5,taker dump — sold into the bid (the carved exception),C5374DWJWKDD
+1787915589.6,politics,ewc-usgub-nv-2026-11-03-rep,BUY,2,0.61,earn,0.3174,3.61,0.719675,61,66,0,0.61,0.62,-0.1097,2,2 ticks in front of the touch — we would hold 74% of the bid side,C504G5TPRKDG
+1787916609.6,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.05,earn,6.2389,0.07,0.039575,7,10,0.896,0.04,0.08,-0.0104,-10,3 ticks in front of the touch — we would hold 100% of the ask side,C53FHRD5RKDH
+1787916669.6,politics,ussewc-usse-id-2026-11-03-rep,BUY,1,0.98,earn,0.8778,6.26,0.997375,96,99,0.588,0.98,0.99,-0.0174,8,2 ticks in front of the touch — we would hold 96% of the bid side,C4Y2N0JP8KDD
+1787916729.6,politics,ussewc-usse-id-2026-11-03-todach,BUY,1,0.05,earn,0.2971,6.4,,5,8,0.579,0.07,0.08,-0.01,13,2 ticks behind the touch — we would hold 29% of the bid side,C4XZAESB4KDN
+1787916729.6,politics,ussewc-usse-id-2026-11-03-rep,BUY,1,0.95,earn,2.0798,0.02,0.997375,96,98,0.693,0.89,0.98,-0.0474,9,6 ticks in front of the touch — we would hold 100% of the bid side,C53HK8RKWKDF
+1787916789.6,politics,ussewc-usse-id-2026-11-03-todach,BUY,5,0.05,earn,0.2911,6.41,,4,7,0.688,0.07,0.08,-0.01,18,2 ticks behind the touch — we would hold 29% of the bid side,C4XZAESB4KDN
+1787916849.6,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.97,earn,1.3269,1.73,0.985625,94,96,0.877,0.97,0.98,-0.0156,2,joins the touch — the book has been quiet,C524640W0KDD
+1787917329.6,politics,enwc-uspres-nom-rep-2028-tuccar,SELL,1,0.08,sell,0,0,,7,13,0.438,0.08,0.09,0.02,43.01,taker dump — sold into the bid (the carved exception),C53NTYRAPKDF
