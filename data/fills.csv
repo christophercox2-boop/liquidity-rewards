@@ -1321,3 +1321,15 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787928970.4,politics,enwc-uspres-nom-rep-2028-marrub,BUY,1,0.29,earn,0.4238,0.02,0.35,28,32,0.593,0.28,0.3,-0.06,54,1 tick in front of the touch — we would hold 18% of the bid side,C56B5JC2EKDF
 1787929510.4,politics,ewc-usp-2028-11-07-wesmoo,SELL,98,0.06,sell,1.7792,7.1,,2,7,0.416,0.01,0.06,-0.01,0,selling filled stock — it earns while it waits,C50GDZTBMKDG
 1787929750.4,politics,enwc-uspres-nom-rep-2028-tuccar,SELL,27,0.14,sell,3.8266,0.32,,8,13,0.422,0.09,0.13,-0.04,14.01,selling filled stock — it earns while it waits,C5692CWV6KDM
+1787929870.4,politics,usgubewc-usgub-mn-2026-11-03-rep,SELL,1,0.06,earn,0.7526,12.83,0.006275,2,6,0.5,0.05,0.06,-0.0537,-4,5 ticks in front of the touch — we would hold 100% of the ask side,C4VPQ7PBYKDD
+1787930770.4,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar0-5,SELL,1,0.07,manual,0,-0,,14,23,0.117,0.06,0.07,0.11,-1,moved by the owner,C56WD67Y4KDN
+1787930830.4,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar0-5,SELL,1,0.08,manual,0,0.02,,14,23,0.491,0.06,0.07,0.1,-2,the owner's own order — the engine leaves it alone,C54VTDCZWKDK
+1787931310.4,politics,enwc-uspres-nom-rep-2028-tuccar,BUY,1,0.12,earn,2.3452,0.2,,11,16,0.608,0.12,0.13,-0.01,15.01,2 ticks in front of the touch — we would hold 88% of the bid side,C56TG2Z5TKDH
+1787931670.4,politics,ussewc-usse-fl-2026-11-03-dem,SELL,1,0.13,earn,2.0833,0.75,0.102,12,14,0.807,0.12,0.13,-0.028,-3,1 tick in front of the touch — we would hold 57% of the ask side,C56BR3SHTKDD
+1787931850.4,politics,ewc-usp-2028-11-07-jossha,SELL,4,0.05,sell,0,0,,3,7,0.331,0.05,0.07,0,0,taker dump — sold into the bid (the carved exception),C574XZ0X0KDG
+1787932150.4,cfb,aachc-cfb-wins-2026-11-28-clmsn-6pt5wins,SELL,1,0.74,earn,0.4031,1.48,,64,71,0.066,0.71,0.74,-0.06,-2,1 tick in front of the touch — we would hold 53% of the ask side,C55VGY4K0KDD
+1787932450.5,politics,ussewc-usse-mt-2026-11-03-setbod,BUY,44.72,0.09,earn,1.4859,12.13,,10,14,0.494,0.1,0.11,-0.03,48.72,1 tick behind the touch — we would hold 50% of the bid side,C4WVX8T08KDN
+1787932630.5,politics,enwc-uspres-nom-rep-2028-marrub,BUY,1,0.29,earn,0.4108,0.02,0.35,27,31,0.692,0.28,0.3,-0.06,55,1 tick in front of the touch — we would hold 17% of the bid side,C57A9A120KDH
+1787932690.5,politics,ussewc-usse-fl-2026-11-03-rep,BUY,1,0.88,earn,3.125,2.1,0.898,86,89,0.712,0.88,0.89,-0.018,4,joins the touch — the book has been quiet,C55FC8690KDK
+1787932752.0,politics,ewc-usse-tx-2026-11-03-dem,SELL,28,0.5,manual,0.1451,13.45,0.621925,48,51,0.334,0.49,0.5,0.1219,0,the owner's own order — the engine leaves it alone,C4VVF4GDRKDD
+1787933172.0,cfb,aachc-cfb-wins-2026-11-28-wake-4pt5wins,SELL,0.5,0.81,sell,0,0,,82,88,0.295,0.81,0.83,0.03,0.5,taker dump — sold into the bid (the carved exception),C57FC6X9RKDK
