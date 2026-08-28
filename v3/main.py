@@ -1173,18 +1173,44 @@ class Monitor:
         return {"ok": False,
                 "note": "no family knows this market — check the slug"}
 
+    QUALIFY_MAX_ORDERS = 6      # real orders per tap, at most
+    QUALIFY_BP_FLOOR = 10.0     # stop building while under $10 free
+
+    def _rested_size(self, order_id: str, max_wait: float = 10.0) -> float:
+        """How many shares of one order are actually resting, polled
+        until the open-order list shows it (it lags placements ~4s).
+        0.0 = never seen resting — the caller must NOT re-post for the
+        same intent (the first may still land late)."""
+        deadline = time.time() + max_wait
+        while True:
+            try:
+                for o in self.client.open_orders():
+                    if o["id"] == order_id:
+                        return float(o["size"])
+            except Exception:  # noqa: BLE001
+                pass
+            if time.time() >= deadline:
+                return 0.0
+            time.sleep(1.0)
+
     def qualify_ask(self, market: str) -> dict:
         """The watched-races button (owner, 2026-08-28: "Let me place
         the orders by hand. Just give me a button to auto qualify the
-        ask side"): rest ONE deep ask — the deepest price the grid and
-        the 99.9c bound allow — sized to bring the market's ask side up
-        to Target Size, so every ask on the book starts earning. Deep
-        on purpose: a fill means someone paid ~99c for the bracket, and
-        the collateral held is ~1c a share. Goes through the owner's
-        hand rail (purpose "manual") — the automation never touches the
-        result. Refused when the side already qualifies, terms are
-        unread, or the collateral would top the button's $150 cap."""
+        ask side", then "you have to make multiple orders. The sizes
+        are limited because each one locks up a lot of buying power"):
+        build the ask-side wall toward Target Size in SEVERAL deep
+        asks. Each order requests the whole remaining gap and the
+        exchange trims it to what buying power supports — the trim IS
+        the size limit, measured rather than guessed (the first tap's
+        9,996-share ask came back resting 292.56). The loop stops when
+        an order rests nothing, buying power runs under the floor, or
+        the tap's order budget is spent; the note says exactly what
+        rested and what is still missing, so the owner taps again once
+        buying power frees. Every order goes on the owner's hand rail
+        (purpose "manual") — the automation never touches it."""
         import math
+
+        from .family import FamilyOrder
         for fam in self.families.values():
             if not fam.knows(market):
                 continue
@@ -1198,27 +1224,75 @@ class Monitor:
                 return {"ok": False, "note": f"could not read the book: {e}"}
             fam.cache.put(market, book)
             ask_total = sum(q for _, q in book.asks)
-            gap = prog.target - ask_total
-            if gap <= 0:
+            target = prog.target
+            if target - ask_total <= 0:
                 return {"ok": False, "note":
                         f"the ask side already qualifies — {ask_total:,.0f} "
-                        f"shares resting vs a Target Size of "
-                        f"{prog.target:,.0f}"}
-            qty = float(math.ceil(gap))
+                        f"shares resting vs a Target Size of {target:,.0f}"}
             tick = book.tick or 0.01
             px = round(math.floor(0.999 / tick + 1e-9) * tick, 3)
-            collat = qty * (1.0 - px)
-            if collat > 150.0:
+            net = 0.0
+            try:
+                net = (self.client.positions_net().get(market) or (0.0,))[0]
+            except Exception:  # noqa: BLE001
+                pass
+            rested_chunks: list[float] = []
+            stopped = ""
+            for _ in range(self.QUALIFY_MAX_ORDERS):
+                remaining = target - ask_total - sum(rested_chunks)
+                if remaining < 1.0:
+                    break
+                bp = None
+                try:
+                    bp = self.client.buying_power()
+                except Exception:  # noqa: BLE001
+                    pass
+                if bp is not None and bp < self.QUALIFY_BP_FLOOR:
+                    stopped = (f"buying power is down to ${bp:,.2f} — "
+                               f"freeing some lets the wall grow")
+                    break
+                ask_qty = float(math.ceil(remaining))
+                r = fam.desk.place_resting(market, "SELL", px, ask_qty,
+                                           net_position=net,
+                                           initiator="owner", verify=False)
+                if not (r.ok and r.order_id):
+                    stopped = r.note
+                    break
+                rested = self._rested_size(r.order_id)
+                if rested >= 1.0:
+                    fam.orders[r.order_id] = FamilyOrder(
+                        id=r.order_id, market=market, side="SELL",
+                        price=(r.price or px), qty=rested, intent=r.intent,
+                        placed_ts=time.time(), purpose="manual",
+                        why="the owner's qualify-ask wall")
+                    rested_chunks.append(rested)
+                else:
+                    # never seen resting: it may still land late — say
+                    # so and stop, never re-post for the same shares
+                    stopped = ("an order did not show up resting — "
+                               "stopping this tap; check the book and "
+                               "tap again")
+                    break
+            got = sum(rested_chunks)
+            now_total = ask_total + got
+            if not rested_chunks:
                 return {"ok": False, "note":
-                        f"refused: closing the {gap:,.0f}-share gap would "
-                        f"hold ${collat:,.0f} of collateral — over the "
-                        f"button's $150 cap"}
-            r = self.owner_place(market, "SELL", px, qty)
-            if r.get("ok"):
-                r["note"] = (f"rested ask {qty:,.0f} @ {px * 100:.1f}c — "
-                             f"the ask side now reaches Target Size "
-                             f"(~${collat:,.2f} collateral held)")
-            return r
+                        (stopped or "nothing rested") +
+                        f" — ask side still {now_total:,.0f} of "
+                        f"{target:,.0f}"}
+            n = len(rested_chunks)
+            note = (f"rested {n} order{'s' if n != 1 else ''} totalling "
+                    f"{got:,.0f} shares @ {px * 100:.1f}c — ask side now "
+                    f"{now_total:,.0f} of {target:,.0f}")
+            if now_total >= target:
+                note += " — QUALIFIES"
+            else:
+                note += (f"; {target - now_total:,.0f} still missing "
+                         f"(each order is trimmed to your free buying "
+                         f"power — tap again when more is free)")
+                if stopped:
+                    note += f" — stopped: {stopped}"
+            return {"ok": True, "note": note}
         return {"ok": False,
                 "note": "no family knows this market — check the slug"}
 
