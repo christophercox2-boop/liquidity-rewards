@@ -148,6 +148,11 @@ def config() -> FamilyConfig:
         # desantis in 2028 markets" — sell the stock into the bid
         # until flat, never buy DeSantis 2028 again
         liquidate_tokens=("rondes",),
+        # owner, 2026-08-28: "Keep a websocket on those races",
+        # corrected to "the margin of victory in the ma dem senate
+        # primary markets" — those books stay fresh every cycle and
+        # lead the stream subscription
+        watch_tokens=("ussep-mov-ma-dem",),
         graduate_paid_usd=1.00, proven_usd=150.0,
         # owner, 2026-08-21: 75c is a GOAL — markets that could clear it
         # at full confidence get starter positions from this budget, and

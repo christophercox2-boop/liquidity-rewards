@@ -5707,3 +5707,30 @@ class TestCfbOpeningWeekWindow(unittest.TestCase):
         self.assertTrue(resting_ok(sat_morning, cfg))
         self.assertFalse(resting_ok(sat_game, cfg))    # games: out
         self.assertTrue(resting_ok(sun_back, cfg))
+
+
+class TestWatchedRaces(unittest.TestCase):
+    """Owner, 2026-08-28: "Keep a websocket on those races" — the MA
+    dem senate primary margin-of-victory books. Watched races refresh
+    on a budget-exempt fast lane every cycle and seat first in the
+    stream subscription."""
+
+    def test_watched_books_refresh_every_cycle_off_budget(self):
+        from v3.tests.test_family import Rig, A, B
+        r = Rig()
+        r.fam.cfg.watch_tokens = (A[:20],)
+        r.add_market(A)
+        r.add_market(B)
+        r.cycle()
+        # age both books far past staleness, budget squeezed to nothing
+        r.fam.cfg.books_per_cycle = 0
+        r.now += 3600
+        r.cycle(advance=60.0)
+        self.assertLess(r.fam.cache.age(A, r.now), 120.0)   # fast lane
+        # (B may still be touched by the scan lane's minimum slot —
+        # the claim here is only that the watched book cannot go stale)
+
+    def test_politics_watches_the_ma_dem_mov_books(self):
+        from v3 import politics
+        cfg = politics.config()
+        self.assertIn("ussep-mov-ma-dem", cfg.watch_tokens)
