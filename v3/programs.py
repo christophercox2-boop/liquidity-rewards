@@ -118,7 +118,12 @@ def family_keywords(slug: str | None) -> tuple[str, ...] | None:
         return ("table", "tennis", "tt", "ping")
     if s.startswith("tec-"):
         return None
-    return ("politics",)
+    # "elections_boosted_high_20260827" (owner's screenshot,
+    # 2026-08-28): the exchange launched boosted election programs
+    # whose ids say "elections", not "politics" — the keyword filter
+    # was throwing away a \$1,000/day program and keeping the stale
+    # \$25 one
+    return ("politics", "elections")
 
 
 def pid_matches(pid, keywords: tuple[str, ...]) -> bool:
@@ -167,6 +172,10 @@ def pick_period(periods: list[dict], slug: str = "",
             for tp in active:
                 if want in str(tp.get("programId") or ""):
                     return tp
+        # several live programs, no schedule to pick by: the NEWEST
+        # start wins — a boost launched today supersedes July's tier
+        # (API order proved meaningless when both were "live")
+        active = sorted(active, key=lambda tp: str(tp.get("start") or ""))
     return active[-1]
 
 

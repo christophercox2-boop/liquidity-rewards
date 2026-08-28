@@ -161,6 +161,21 @@ class TestParsing(unittest.TestCase):
         self.assertIn("api.polymarket.us", url)
         self.assertIn("X-PM-Signature", kw["headers"])
 
+    def test_programs_merges_rows_for_a_market_in_two_programs(self):
+        # 2026-08-28: a market in both July's tier and the elections
+        # boost arrives as two rows with the same marketSlug — both
+        # sets of periods must survive for pick_period to choose from.
+        c = client(FakeResponse(200, {"programs": [
+            {"marketSlug": "m1", "timePeriods": [
+                {"programId": "politics_low_20260727", "status": "LIVE"}]},
+            {"marketSlug": "m1", "timePeriods": [
+                {"programId": "elections_boosted_high_20260827", "status": "LIVE"}]},
+        ]}))
+        got = c.programs(["m1"])
+        pids = [tp["programId"] for tp in got["m1"]["timePeriods"]]
+        self.assertEqual(sorted(pids), ["elections_boosted_high_20260827",
+                                        "politics_low_20260727"])
+
 
 if __name__ == "__main__":
     unittest.main()
