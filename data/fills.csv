@@ -1314,3 +1314,10 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787925190.3,politics,ussewc-usse-fl-2026-11-03-dem,SELL,1,0.12,earn,0.6838,9.13,0.102,10,13,0.727,0.11,0.12,-0.018,-1,3 ticks in front of the touch — we would hold 95% of the ask side,C4XNQH22YKDE
 1787925430.3,politics,ussewc-usse-id-2026-11-03-rep,BUY,1,0.94,earn,6.1516,1.43,0.997375,95,97,0.747,0.94,0.98,-0.0574,10,5 ticks in front of the touch — we would hold 98% of the bid side,C54DKHPVMKDE
 1787925550.3,politics,paccc-balpow-2026-11-03-dhou-rsen,SELL,10,0.34,manual,1.0246,3.2,,30,36,0.144,0.33,0.34,-0.01,0,the owner's own order — the engine leaves it alone,C52VKMV4MKDK
+1787926630.3,politics,usgubewc-usgub-mn-2026-11-03-dem,BUY,1,0.96,earn,0.8589,3.38,0.993725,95,98,0.633,0.96,0.97,-0.0337,11,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C5315WN3AKDN
+1787927110.3,politics,usgubewc-usgub-fl-2026-11-03-dem,SELL,1,0.21,earn,6.25,3.13,0.154175,19,22,0.705,0.2,0.21,-0.0558,-13,4 ticks in front of the touch — we would hold 95% of the ask side,C53BYKM92KDE
+1787927170.3,politics,usgubewc-usgub-al-2026-11-03-dem,SELL,1,0.08,earn,0.7305,1.82,0.014375,7,10,0.747,0.07,0.08,-0.0656,-14,at the touch — a fill here is 1 ticks inside value (Silver + evidence),C54FTJH12KDG
+1787927470.3,politics,ussewc-usse-fl-2026-11-03-dem,SELL,1,0.12,earn,3.125,0.63,0.102,10,14,0.776,0.11,0.12,-0.018,-2,3 ticks in front of the touch — we would hold 96% of the ask side,C55FZ7KMWKDH
+1787928970.4,politics,enwc-uspres-nom-rep-2028-marrub,BUY,1,0.29,earn,0.4238,0.02,0.35,28,32,0.593,0.28,0.3,-0.06,54,1 tick in front of the touch — we would hold 18% of the bid side,C56B5JC2EKDF
+1787929510.4,politics,ewc-usp-2028-11-07-wesmoo,SELL,98,0.06,sell,1.7792,7.1,,2,7,0.416,0.01,0.06,-0.01,0,selling filled stock — it earns while it waits,C50GDZTBMKDG
+1787929750.4,politics,enwc-uspres-nom-rep-2028-tuccar,SELL,27,0.14,sell,3.8266,0.32,,8,13,0.422,0.09,0.13,-0.04,14.01,selling filled stock — it earns while it waits,C5692CWV6KDM
