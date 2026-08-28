@@ -5685,3 +5685,25 @@ class TestOwnerLiquidation(unittest.TestCase):
         self.assertIn("H", r.fam.orders)        # untouchable
         # only the 2 uncovered shares were sold
         self.assertAlmostEqual(r.fam.inventory[A]["qty"], 8.0)
+
+
+class TestCfbOpeningWeekWindow(unittest.TestCase):
+    def test_cfb_rests_thursday_and_friday_pulls_saturday_morning(self):
+        """Owner, 2026-08-27: no games until Saturday of the opening
+        week — cfb rests through Thu/Fri and pulls Sat 09:00 ET."""
+        import datetime as dt
+        from zoneinfo import ZoneInfo
+        from v3 import football
+        from v3.family import resting_ok
+        et = ZoneInfo("America/New_York")
+        cfg = football.cfb()
+        thu_evening = dt.datetime(2026, 8, 27, 21, 0, tzinfo=et).timestamp()
+        fri_noon = dt.datetime(2026, 8, 28, 12, 0, tzinfo=et).timestamp()
+        sat_morning = dt.datetime(2026, 8, 29, 8, 0, tzinfo=et).timestamp()
+        sat_game = dt.datetime(2026, 8, 29, 13, 0, tzinfo=et).timestamp()
+        sun_back = dt.datetime(2026, 8, 30, 7, 0, tzinfo=et).timestamp()
+        self.assertTrue(resting_ok(thu_evening, cfg))
+        self.assertTrue(resting_ok(fri_noon, cfg))
+        self.assertTrue(resting_ok(sat_morning, cfg))
+        self.assertFalse(resting_ok(sat_game, cfg))    # games: out
+        self.assertTrue(resting_ok(sun_back, cfg))
