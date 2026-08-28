@@ -68,7 +68,11 @@ def cfb() -> FamilyConfig:
         # owner, 2026-08-21 evening: "Bring cfb down to 50." — and the
         # holdings count against it at liquidation value: "no more than
         # $50 of risk in cfb, orders + holdings"
-        capital_usd=50.0, per_market_usd=1.00,
+        # owner, 2026-08-28: "You can bump it to 100" — the $50 cap was
+        # pinned with holdings eating $32 of it while the planner's idle
+        # queue claimed $100+/day across books it could not fund; the
+        # $1-per-market breadth cap stays
+        capital_usd=100.0, per_market_usd=1.00,
         holdings_in_ceiling=True,
         dump_usd_day=10.0,
         # owner, 2026-08-27, opening week: "I don't think there are any
