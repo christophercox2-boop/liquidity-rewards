@@ -1790,3 +1790,4 @@ build attempt. If this one also fails, the DigitalOcean dashboard is
 the only deeper lever (app -> Runtime Logs / Force Rebuild).
 Post-window restart trigger pushed 12:15Z (maintenance ended 12:00Z; queued builds never ran).
 Second outage 2026-08-27 ~19:58Z (state saves stopped; PR#17 build never booted); restart trigger pushed ~22:45Z.
+Restart retry pushed 00:17Z (still silent since 19:58Z; prior pushes 22:45Z and PR#17 never booted).
