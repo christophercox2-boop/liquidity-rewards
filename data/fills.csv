@@ -1379,3 +1379,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787943614.6,cfb,aachc-cfb-wins-2026-11-28-missr-6pt5wins,BUY,0.01,0.59,earn,0.0748,1.84,,47,55,0,0.59,0.6,0.08,0.01,joins the touch — the book has been quiet,C58DQVGHWKDJ
 1787944034.6,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar20-25,BUY,19,0.26,manual,10.5785,1.68,,24,28,0.773,0.26,0.27,0,50,the owner's own order — the engine leaves it alone,C58NT7T72KDM
 1787944274.6,cfb,aachc-cfb-wins-2026-11-28-wake-4pt5wins,SELL,0.5,0.82,sell,0,0,,82,87,0.283,0.82,0.83,0.02,0.5,taker dump — sold into the bid (the carved exception),C5A50GJ5GKDM
+1787945294.6,cfb,aachc-cfb-wins-2026-11-28-lsu-9pt5wins,BUY,0.01,0.44,earn,2.2546,1.38,,45,49,0.429,0.43,0.44,-0.03,1.01,9 ticks in front of the touch — we would hold 30% of the bid side,C595C5M12KDC
+1787945954.7,politics,ewc-usgub-nv-2026-11-03-rep,BUY,1,0.58,earn,0.7002,0.35,0.72055,59,64,0.605,0.56,0.59,-0.1406,4,1 tick in front of the touch — we would hold 10% of the bid side,C5A9E3CPYKDN
