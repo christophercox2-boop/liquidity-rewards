@@ -4703,6 +4703,7 @@ class TestFeedCheck(unittest.TestCase):
         st = Stream.__new__(Stream)
         st.cache = BookCache()
         st.declared = {}
+        st.frame_shapes = {}
         st.status = {"last_msg": 0.0}
         st.apply_frame(_json.dumps({"marketData": {
             "marketSlug": "m",
@@ -5756,6 +5757,25 @@ class TestWatchedRaces(unittest.TestCase):
         self.assertEqual(w[A]["target"], 5000)
         self.assertAlmostEqual(w[A]["ask_total"], 60020.0)
         self.assertTrue(w[A]["qualifies"])
+
+
+class TestSharedDictSnapshots(unittest.TestCase):
+    """Owner yes, 2026-08-28, after 03:17's "dictionary changed size
+    during iteration" killed a cycle: the owner's hand ops (the wall
+    button, live-card moves) write the shared order book-keeping from
+    the web thread while the engine's cycle iterates it. Every
+    iteration over the shared dicts must walk a list() snapshot."""
+
+    def test_no_bare_iteration_over_shared_dicts(self):
+        import inspect
+        import re
+        from v3 import family, main
+        for mod in (family, main):
+            src = inspect.getsource(mod)
+            bare = re.findall(
+                r"(?<!list\()(?:self|fam)\.(?:orders|inventory)"
+                r"\.(?:values|items)\(\)", src)
+            self.assertEqual(bare, [], f"unsnapshotted iteration in {mod.__name__}")
 
 
 class TestQualifyAskButton(unittest.TestCase):

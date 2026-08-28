@@ -24,6 +24,29 @@ class TestStream(unittest.TestCase):
         self.assertEqual(s.apply_frame("not json"), None)   # never kills the socket
         self.assertEqual(s.apply_frame(json.dumps({"x": 1})), None)
 
+    def test_frame_shape_sampler_records_what_arrives(self):
+        # owner yes, 2026-08-28: the health line shows frames arriving
+        # with zero book writes — record every distinct frame shape
+        # with a count and one truncated sample, so apply_frame gets
+        # fixed from evidence instead of guesses.
+        cache = BookCache()
+        s = Stream(cache, lambda: ["m-1"], "k", "c2VjcmV0c2VjcmV0c2VjcmV0c2VjcmV0c2Vjcg==")
+        s.apply_frame(json.dumps({"marketDataLite": {
+            "marketSlug": "m-1", "bestBid": {"value": "0.44"}}}))
+        s.apply_frame(json.dumps({"marketDataLite": {
+            "marketSlug": "m-1", "bestBid": {"value": "0.45"}}}))
+        s.apply_frame(json.dumps({"mysteryBook": {"slug": "m-1",
+                                                  "levels": []}}))
+        s.apply_frame("not json")                    # never sampled, never fatal
+        sigs = list(s.frame_shapes)
+        self.assertEqual(len(sigs), 2)
+        lite = next(k for k in sigs if "marketDataLite" in k)
+        self.assertEqual(s.frame_shapes[lite]["n"], 2)
+        odd = next(k for k in sigs if "mysteryBook" in k)
+        self.assertIn("mysteryBook", odd)
+        self.assertIn("levels", odd)                 # nested keys in the signature
+        self.assertIn("mysteryBook", s.frame_shapes[odd]["sample"])
+
     def test_priority_puts_held_markets_first_under_the_cap(self):
         uni = [f"m-{i}" for i in range(300)]
         out = ws_priority(["m-250"], ["m-299"], uni)
