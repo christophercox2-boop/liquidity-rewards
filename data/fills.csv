@@ -1474,3 +1474,10 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787990277.8,politics,usgubewc-usgub-il-2026-11-03-rep,SELL,1,0.03,earn,6.2487,0.08,0.00135,1,4,0.575,0.01,0.09,-0.0286,-2,3 ticks in front of the touch — we would hold 100% of the ask side,C5MZQRCFRKDG
 1787990937.8,politics,ussewc-usse-ms-2026-11-03-dem,SELL,1,0.06,earn,1.502,0.02,0.0301,8,10,0.784,0.05,0.07,-0.0299,-4,1 tick in front of the touch — we would hold 72% of the ask side,C5N6VSAXYKDG
 1787991417.8,politics,ussewc-usse-id-2026-11-03-rep,BUY,1,0.97,earn,5.8789,0.05,0.9975,94,97,0.851,0.95,0.98,-0.0275,15,2 ticks in front of the touch — we would hold 92% of the bid side,C5N8V2484KDJ
+1787993038.1,politics,ussewc-usse-sd-2026-11-03-rep,BUY,1,0.98,earn,6.2338,0.62,0.991075,93,98,0.481,0.96,0.99,-0.0111,1,2 ticks in front of the touch — we would hold 97% of the bid side,C5N5XRF2YKDJ
+1787994598.1,politics,ussewc-usse-sd-2026-11-03-rep,BUY,1,0.98,earn,6.2338,0.05,0.991075,93,98,0.636,0.96,0.99,-0.0111,2,2 ticks in front of the touch — we would hold 100% of the bid side,C5P15EMKJKDH
+1787994958.1,politics,usgubewc-usgub-nm-2026-11-03-rep,SELL,1,0.04,earn,5.8751,0.07,0.010275,3,6,0.771,0.03,0.06,-0.0297,-6,2 ticks in front of the touch — we would hold 94% of the ask side,C5P36NC58KDN
+1787995978.2,politics,usgubewc-usgub-ma-2026-11-03-dem,BUY,2,0.98,earn,0.0786,6.67,0.999525,97,99,0.216,0.98,0.99,-0.0195,2,3 ticks in front of the touch — we would hold 83% of the bid side,C5GW5ATHCKDD
+1787996338.2,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.06,earn,6.1407,12.77,0.040225,7,9,0.895,0.04,0.08,-0.0198,-15,2 ticks in front of the touch — we would hold 98% of the ask side,C5BJ9B11GKDF
+1787996398.2,politics,ussewc-usse-ms-2026-11-03-rep,BUY,1,0.95,earn,4.2867,1.75,0.9699,94,97,0.301,0.95,0.97,-0.0199,1,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C5N0D0ND6KDJ
+1787996398.2,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.06,earn,2.0469,0.02,0.040225,7,10,0.904,0.04,0.08,-0.0198,-16,2 ticks in front of the touch — we would hold 98% of the ask side,C5PEKXAMTKDD
