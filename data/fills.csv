@@ -1445,3 +1445,11 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1787977135.9,politics,usgubewc-usgub-ri-2026-11-03-dem,BUY,1,0.98,earn,3.9308,23.73,0.99625,97,99,0.273,0.8,0.99,-0.0162,2,joins the touch — the book has been quiet,C4XJCF9HTKDK
 1787977975.9,politics,ussewc-usse-sd-2026-11-03-rep,BUY,1,0.98,sell,6.25,1.27,0.991075,92,98,0.145,0.88,0.99,-0.0111,0,an exit — its fill reduces the position it sits on,C5H507E6EKDM
 1787978215.9,politics,usgubewc-usgub-fl-2026-11-03-dem,SELL,1,0.21,earn,0.7812,13.18,0.18825,19,22,0.705,0.2,0.25,-0.0217,-14,5 ticks in front of the touch — we would hold 100% of the ask side,C56WW30M2KDF
+1787979116.3,politics,ussewc-usse-id-2026-11-03-rep,BUY,1,0.97,earn,6.2499,1.43,0.9975,94,97,0.815,0.89,0.98,-0.0275,13,2 ticks in front of the touch — we would hold 96% of the bid side,C5H9CJP68KDE
+1787979416.3,cfb,aachc-cfb-wins-2026-11-28-ore-9pt5wins,SELL,0.01,0.81,manual,0.0061,8.8,,79,84,0.541,0.8,0.81,0.01,0.99,the owner's own order — the engine leaves it alone,C5AXZ2KK0KDJ
+1787979416.3,cfb,aachc-cfb-wins-2026-11-28-ore-9pt5wins,SELL,0.99,0.81,sell,0.603,1.02,,79,84,0.541,0.8,0.81,0.01,0,selling filled stock — it earns while it waits,C5HMZCA4JKDF
+1787979836.4,politics,ussewc-usse-tn-2026-11-03-rep,BUY,1,0.98,sell,5.6818,0.78,0.998475,95,99,0,0.49,0.99,-0.0185,0,an exit — its fill reduces the position it sits on,C5HXCQ0Q0KDN
+1787980136.4,politics,ussewc-usse-ms-2026-11-03-dem,SELL,1,0.06,earn,2.0792,0.02,0.0301,7,10,0.75,0.05,0.14,-0.0299,-3,3 ticks in front of the touch — we would hold 100% of the ask side,C5JPQEM9MKDM
+1787980556.4,politics,ussewc-usse-tn-2026-11-03-dem,SELL,2,0.02,sell,6.2453,0.45,0.001525,1,6,0.118,0.01,0.07,-0.0185,0,an exit — its fill reduces the position it sits on,C5JADV98PKDK
+1787981216.4,politics,ussewc-usse-ri-2026-11-03-dem,BUY,1,0.98,sell,0.5374,0.27,0.999275,93,98,0.184,0.91,0.99,-0.0193,1,buying back the short at or under what it sold for — the bid earns while it wait,C5JR637N8KDF
+1787981756.8,cfb,aachc-cfb-wins-2026-11-28-ncar-5pt5wins,BUY,0.5,0.53,earn,2.4518,0.18,,52,56,0.561,0.52,0.56,-0.01,4.49,2 ticks in front of the touch — we would hold 96% of the bid side,C5JX6E1Y8KDC
