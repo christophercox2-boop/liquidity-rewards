@@ -5750,25 +5750,32 @@ class TestOwnerLiquidation(unittest.TestCase):
 
 
 class TestCfbOpeningWeekWindow(unittest.TestCase):
-    def test_cfb_rests_thursday_and_friday_pulls_saturday_morning(self):
-        """Owner, 2026-08-27: no games until Saturday of the opening
-        week — cfb rests through Thu/Fri and pulls Sat 09:00 ET."""
+    def test_cfb_rests_sunday_2am_through_thursday_3pm(self):
+        """Owner, 2026-08-28 evening: "back in around 2:00 am Sunday
+        morning until Thursday September 3rd at 3 pm eastern" — the
+        Week-1+ rhythm: rest Sun 02:00 -> Thu 15:00 ET, out through
+        the Thu/Fri night slates and game Saturdays."""
         import datetime as dt
         from zoneinfo import ZoneInfo
         from v3 import football
         from v3.family import resting_ok
         et = ZoneInfo("America/New_York")
         cfg = football.cfb()
-        thu_evening = dt.datetime(2026, 8, 27, 21, 0, tzinfo=et).timestamp()
-        fri_noon = dt.datetime(2026, 8, 28, 12, 0, tzinfo=et).timestamp()
-        sat_morning = dt.datetime(2026, 8, 29, 8, 0, tzinfo=et).timestamp()
-        sat_game = dt.datetime(2026, 8, 29, 13, 0, tzinfo=et).timestamp()
-        sun_back = dt.datetime(2026, 8, 30, 7, 0, tzinfo=et).timestamp()
-        self.assertTrue(resting_ok(thu_evening, cfg))
-        self.assertTrue(resting_ok(fri_noon, cfg))
-        self.assertTrue(resting_ok(sat_morning, cfg))
-        self.assertFalse(resting_ok(sat_game, cfg))    # games: out
-        self.assertTrue(resting_ok(sun_back, cfg))
+        sun_early = dt.datetime(2026, 8, 30, 2, 30, tzinfo=et).timestamp()
+        wed_noon = dt.datetime(2026, 9, 2, 12, 0, tzinfo=et).timestamp()
+        thu_2pm = dt.datetime(2026, 9, 3, 14, 0, tzinfo=et).timestamp()
+        thu_4pm = dt.datetime(2026, 9, 3, 16, 0, tzinfo=et).timestamp()
+        fri_night = dt.datetime(2026, 9, 4, 20, 0, tzinfo=et).timestamp()
+        sat_game = dt.datetime(2026, 9, 5, 13, 0, tzinfo=et).timestamp()
+        sun_before2 = dt.datetime(2026, 9, 6, 1, 0, tzinfo=et).timestamp()
+        self.assertTrue(resting_ok(sun_early, cfg))
+        self.assertTrue(resting_ok(wed_noon, cfg))
+        self.assertTrue(resting_ok(thu_2pm, cfg))
+        self.assertFalse(resting_ok(thu_4pm, cfg))     # Thu night: out
+        self.assertFalse(resting_ok(fri_night, cfg))   # Fri slate: out
+        self.assertFalse(resting_ok(sat_game, cfg))    # game day: out
+        self.assertFalse(resting_ok(sun_before2, cfg)) # not yet 02:00
+        self.assertTrue(resting_ok(sun_early, cfg))
 
 
 class TestWatchedRaces(unittest.TestCase):

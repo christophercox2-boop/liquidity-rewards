@@ -77,13 +77,13 @@ def cfb() -> FamilyConfig:
         dump_usd_day=10.0,
         # owner, 2026-08-27, opening week: "I don't think there are any
         # games until Saturday. You can turn it on in the meantime."
-        # The Thursday-17:00 pull sat out two gameless days while the
-        # pools fattened. Resting now runs Sun 06:00 -> SATURDAY 09:00
-        # ET (earliest Week-0 kickoffs are ~noon). REVISIT when the
-        # Thursday/Friday night slates begin (Week 1+): either restore
-        # the Thu 17:00 pull or build the schedule-aware version that
-        # only pulls books whose teams play that day.
-        rest_from=(6, 6), rest_until=(5, 9),
+        # owner, 2026-08-28 evening, setting the Week-1+ rhythm: "we
+        # can go back in around 2:00 am Sunday morning until Thursday
+        # September 3rd at 3 pm eastern" — rest SUNDAY 02:00 ->
+        # THURSDAY 15:00 ET, out through the Thursday/Friday night
+        # slates and game Saturdays. (Deployed after the Sat 09:00
+        # Week-0 pull he approved, so that pull ran on the old clock.)
+        rest_from=(6, 2), rest_until=(3, 15),
         season_start=(2026, 8, 27),
         # 400+ live orders need real book coverage: the meter went blind
         # for 8 hours on the smaller budget (2026-08-21 morning)
