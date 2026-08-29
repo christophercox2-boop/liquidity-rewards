@@ -114,12 +114,15 @@ def config() -> FamilyConfig:
         # budget makes small claims carry only small charges
         min_est_day=0.02, weak_pull_s=30.0,
         # owner, 2026-08-25 ("Yes, that's fine for now"): politics
-        # decisions run on claims divided by 3 — the measured gap
-        # between its estimates and what the exchange paid (3.3x,
-        # 3.6x, 7.1x on the last three settled days). Reports stay
-        # raw. Revisit if quoting thins out badly, and re-derive from
-        # data/market_est.csv once Aug-24 settles.
-        est_deflate=3.0,
+        # decisions ran on claims divided by 3 — the measured gap
+        # between estimates and pay in the July tier era (3.3x, 3.6x,
+        # 7.1x on three settled days).
+        # owner, 2026-08-29 ("You can remove the divided by 3
+        # modifier"): the era ended — Aug-26 paid $304 on ~$265 of
+        # 24h-scaled claims (~0.9x) and Aug-27 paid $219 on ~$88
+        # (~0.4x); the deflator had the engine believing ~$29/day
+        # while earning $219. Decisions run on raw claims again.
+        est_deflate=1.0,
         # owner, 2026-08-21: "it's okay to get filled at reasonable
         # prices" — two ticks of edge earns the touch, four lifts the
         # courtesy share toward 35%; the drift alarm moves above that so
