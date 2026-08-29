@@ -4354,13 +4354,14 @@ class TestInformationProbes(unittest.TestCase):
 
 class TestDecisionDeflator(unittest.TestCase):
     """Owner, 2026-08-25: politics decisions act on reward claims
-    divided by 3 (the measured gap to what the exchange paid); the
-    grades and the calibration ledger stay raw. Revisit if quoting
-    thins out badly."""
+    divided by 3. Owner, 2026-08-29 ("You can remove the divided by 3
+    modifier"): the overshoot era ended — Aug-26/27 paid ABOVE raw
+    claims — so decisions run raw again. The mechanism stays tested
+    below in case a deflator returns."""
 
-    def test_politics_ships_with_the_deflator(self):
+    def test_politics_ships_without_the_deflator(self):
         from v3 import politics
-        self.assertEqual(politics.config().est_deflate, 3.0)
+        self.assertEqual(politics.config().est_deflate, 1.0)
 
     def test_plans_run_on_the_deflated_claim(self):
         from v3.tests.test_family import Rig, A
