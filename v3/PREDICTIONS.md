@@ -822,3 +822,16 @@ walls stood from ~03:30Z Aug-28.*
 
 **Check.** data/rewards.csv days 27/28 against the frozen claims in
 data/market_est.csv; MoV = the 11 vmc-ussep-mov-ma-dem markets.
+
+### P15 claim 1 — GRADED 2026-08-29: WRONG, HIGH again
+*Aug-27 posted $251.95 total — the second-best day ever, ON the
+maintenance-wipe day: politics $218.90 across 206 markets (best
+single market $4.44), cfb $33.05, MoV $1.16 (pre-wall). The $60–180
+band broke on the high side.*
+
+Lesson, same as P14's: every "politics goes down because X" call has
+been wrong — the re-tier and the wipe together could not hold it
+under $180. And the deflator evidence is now two days in one
+direction: raw claims ~$88 (24h-scaled) vs $219 paid (~0.4x) after
+Aug-26's ~0.9x. The engine decides on claims ÷ 3 — it believed ~$29
+while earning $219. Claims 2 and 3 wait on Aug-28's posting.
