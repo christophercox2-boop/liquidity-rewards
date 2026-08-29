@@ -2064,6 +2064,64 @@ class TestTakerDump(unittest.TestCase):
         self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
 
 
+class TestDeadShortStepUp(unittest.TestCase):
+    """Owner, 2026-08-29 ("we should find a way to get the resting
+    positions down"): a short's break-even buy-back on a book trading
+    above it never fills — once dead, it may bid up to the touch
+    (post-only, loss bounded at 5 ticks over what the short sold for)
+    so the frozen collateral comes home when someone sells into it."""
+
+    def _rig(self, drain_s=21600.0):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.fam.cfg.dead_drain_s = drain_s
+        # short 10 at 2.4c a share; the book trades 5c/6c — break-even
+        # buy-backs at <=2.4c are fantasy bids
+        book = Book(bids=((0.05, 50.0),), asks=((0.06, 800.0),),
+                    tick=0.01, fetched_at=r.now)
+        r.add_market(A, book=book)
+        r.fam.inventory[A] = {"qty": -10.0, "cost": -0.24}
+        r.positions[A] = (-10.0, -0.24)
+        r.cycle()                              # buy-back rests, capped
+        return r, A
+
+    def test_dead_short_bids_up_to_the_touch(self):
+        r, A = self._rig()
+        buybacks = [o for o in r.fam.orders.values()
+                    if o.market == A and o.side == "BUY"
+                    and o.purpose == "sell"]
+        self.assertTrue(buybacks)
+        self.assertLessEqual(max(o.price for o in buybacks), 0.03)
+        for o in buybacks:                     # dead for 7 hours
+            o.live_est = 0.0
+            o.placed_ts = r.now - 25200.0
+        r.fam.last_action.clear()
+        r.cycle()
+        ups = [e for e in r.fam.log if e.get("event") == "dead_short_stepup"]
+        self.assertTrue(ups)
+        r.fam.last_action.clear()
+        r.cycle()                              # re-rests at the touch
+        live = [o for o in r.exchange.live.values()
+                if o["market"] == A and o["side"] == "BUY"]
+        # received 2.4c + 5 ticks = 7.4c, touch 5c, ask-1t 5c -> bids 5c
+        self.assertTrue(any(abs(o["price"] - 0.05) < 1e-9 for o in live),
+                        [o["price"] for o in live])
+
+    def test_live_buyback_keeps_the_break_even_cap(self):
+        r, A = self._rig()
+        r.fam.last_action.clear()
+        r.cycle()                              # exits fresh: not dead
+        live = [o for o in r.exchange.live.values()
+                if o["market"] == A and o["side"] == "BUY"]
+        self.assertTrue(all(o["price"] <= 0.03 + 1e-9 for o in live),
+                        [o["price"] for o in live])
+
+    def test_politics_ships_with_the_dead_dwell(self):
+        from v3 import politics
+        self.assertEqual(politics.config().dead_drain_s, 21600.0)
+
+
 class TestOwnerAvoidList(unittest.TestCase):
     def test_avoided_markets_are_left_entirely_to_the_owner(self):
         """Owner, 2026-08-22 ('Don't place any orders in the balance of

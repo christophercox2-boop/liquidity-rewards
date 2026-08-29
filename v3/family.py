@@ -3463,6 +3463,36 @@ class Family:
                 rest = -qty - covered
                 if covered > -qty + 0.01:
                     self._prune_excess_exits(slug, "BUY", covered + qty, now)
+                # the dead-short step-up (owner, 2026-08-29 "we should
+                # find a way to get the resting positions down"): a
+                # buy-back pinned at break-even on a book trading well
+                # above it never fills, and the short's collateral sits
+                # frozen forever. Once its exits have measured ~$0 for
+                # dead_drain_s, the buy-back may bid UP TO THE TOUCH —
+                # never more than 5 ticks above what the short sold
+                # for, never over fair + 3 ticks — realizing a small
+                # bounded loss to free the collateral. Still post-only:
+                # it fills only when someone sells into the bid.
+                dead_s = (self.cfg.dead_drain_s > 0 and bool(mine)
+                          and all(o.live_est is not None
+                                  and o.live_est < 0.005 for o in mine)
+                          and min(o.placed_ts for o in mine)
+                          <= now - self.cfg.dead_drain_s)
+                if dead_s and rest < 0.01 and actions > 0:
+                    worst = min(mine, key=lambda o: o.price)
+                    rr = self.desk.cancel(worst.id, worst.market)
+                    if rr.ok:
+                        self.orders.pop(worst.id, None)
+                        self.evidence.order_gone(worst.market, worst.id)
+                        self._log(event="dead_short_stepup", market=slug,
+                                  price=worst.price, qty=worst.qty,
+                                  note="buy-back never fills at "
+                                       "break-even — stepping up "
+                                       "toward the touch to free the "
+                                       "collateral")
+                        covered -= worst.qty
+                        rest = -qty - covered
+                        actions -= 1
                 if rest < 0.01:
                     continue
                 if covered > 0.01 and not self._cooldown_ok(slug, "BUY",
@@ -3481,6 +3511,15 @@ class Family:
                          else cap_px)
                 if gate_px is not None:
                     hi = max(hi, gate_px)
+                if dead_s:
+                    step = min(received + 5 * book.tick, bid_touch)
+                    fair_s = (self.fairs(slug)
+                              if self.fairs is not None else None)
+                    if fair_s is not None:
+                        step = min(step, fair_s + 3 * book.tick)
+                    if book.asks:
+                        step = min(step, book.asks[0][0] - book.tick)
+                    hi = max(hi, step)
                 # a cover bidding ABOVE today's cap (the 98c-on-a-2c-
                 # basis ghosts) retreats the same way
                 high_stray = [o for o in mine if o.price > hi + 1e-9
