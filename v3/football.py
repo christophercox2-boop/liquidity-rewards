@@ -77,12 +77,14 @@ def cfb() -> FamilyConfig:
         dump_usd_day=10.0,
         # owner, 2026-08-27, opening week: "I don't think there are any
         # games until Saturday. You can turn it on in the meantime."
-        # owner, 2026-08-28 evening, setting the Week-1+ rhythm: "we
-        # can go back in around 2:00 am Sunday morning until Thursday
-        # September 3rd at 3 pm eastern" — rest SUNDAY 02:00 ->
-        # THURSDAY 15:00 ET, out through the Thursday/Friday night
-        # slates and game Saturdays. (Deployed after the Sat 09:00
-        # Week-0 pull he approved, so that pull ran on the old clock.)
+        # owner, 2026-08-28 evening: "we can go back in around 2:00 am
+        # Sunday morning until Thursday September 3rd at 3 pm eastern"
+        # — rest SUNDAY 02:00 -> THURSDAY 15:00 ET. THIS WEEK'S call,
+        # not a fixed rhythm ("Doesn't have to be weekly. Things might
+        # change, or I might get a strategy for competing"): the window
+        # repeats by default but he re-decides it week to week.
+        # (Deployed after the Sat 09:00 Week-0 pull he approved, so
+        # that pull ran on the old clock.)
         rest_from=(6, 2), rest_until=(3, 15),
         season_start=(2026, 8, 27),
         # 400+ live orders need real book coverage: the meter went blind
