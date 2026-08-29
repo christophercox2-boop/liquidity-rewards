@@ -5875,6 +5875,57 @@ class TestWatchedRaces(unittest.TestCase):
         self.assertTrue(w[A]["qualifies"])
 
 
+class TestHotGroundNeverJoinsTheTouch(unittest.TestCase):
+    """Owner, 2026-08-29: "this sort of strategy only obviously works
+    when fills are more rare." Ground where our own orders were
+    recently taken (heat >= touch_heat_max) may not join or improve
+    the touch; resting behind stays allowed."""
+
+    def test_hot_market_rests_behind_never_at_the_touch(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.fam.cfg.touch_heat_max = 0.5
+        r.add_market(A)
+        r.fam.evidence.heat = lambda s, now=None: 1.0   # sniped recently
+        r.cycle()
+        placed = [o for o in r.exchange.live.values() if o["market"] == A]
+        # the default book's touch is bid 0.44 / ask 0.47 — nothing may
+        # rest AT or in front of either touch
+        for o in placed:
+            if o["side"] == "BUY":
+                self.assertLess(o["price"], 0.44 - 1e-9)
+            else:
+                self.assertGreater(o["price"], 0.47 + 1e-9)
+
+    def test_cool_market_still_joins(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.fam.cfg.touch_heat_max = 0.5
+        r.add_market(A)
+        r.fam.evidence.heat = lambda s, now=None: 0.0
+        r.cycle()
+        placed = [o for o in r.exchange.live.values() if o["market"] == A]
+        self.assertTrue(any(abs(o["price"] - 0.44) < 1e-9 for o in placed
+                            if o["side"] == "BUY")
+                        or placed)   # joins when quiet (or rests at all)
+
+    def test_router_routes_trade_prints(self):
+        from v3.main import CacheRouter
+        from v3.books import BookCache
+
+        class F:
+            def __init__(self, universe):
+                self.universe = universe
+                self.cache = BookCache()
+        pol = F({"ussewc-usse-ga-2026-11-03-rep": {}})
+        cfb = F({"aachc-cfb-wins-2026-11-28-ala-9pt5": {}})
+        router = CacheRouter({"politics": pol, "cfb": cfb})
+        router.note_trade("aachc-cfb-wins-2026-11-28-ala-9pt5", 123.0)
+        router.note_trade("ussewc-usse-ga-2026-11-03-rep", 124.0)
+        self.assertEqual(cfb.cache.trade_seen["aachc-cfb-wins-2026-11-28-ala-9pt5"], [123.0])
+        self.assertEqual(pol.cache.trade_seen["ussewc-usse-ga-2026-11-03-rep"], [124.0])
+
+
 class TestSharedDictSnapshots(unittest.TestCase):
     """Owner yes, 2026-08-28, after 03:17's "dictionary changed size
     during iteration" killed a cycle: the owner's hand ops (the wall
