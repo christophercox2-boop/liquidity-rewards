@@ -1511,3 +1511,8 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788010259.3,politics,usgubewc-usgub-mn-2026-11-03-rep,SELL,1,0.07,earn,0.5466,1.28,0.006725,4,7,0.667,0.06,0.09,-0.0633,-6,2 ticks in front of the touch — we would hold 9% of the ask side,C5RMYS3QRKDF
 1788011099.4,politics,usgubewc-usgub-ar-2026-11-03-dem,SELL,2,0.02,earn,6.25,5.52,0.0016,1,4,0.621,0.01,0.02,-0.0184,-5,1 tick in front of the touch — we would hold 64% of the ask side,C5N9CE8DTKDH
 1788011399.4,politics,ussewc-usse-ri-2026-11-03-dem,BUY,1,0.98,earn,0.6531,4.32,0.999275,95,99,0.474,0.96,0.99,-0.0193,1,2 ticks in front of the touch — we would hold 93% of the bid side,C5PAM9V00KDM
+1788012286.3,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.95,earn,2.0211,0.02,0.98545,93,95,0.907,0.93,0.96,-0.0355,7,2 ticks in front of the touch — we would hold 97% of the bid side,C5T7PWG92KDC
+1788012826.3,politics,enwc-uspres-nom-dem-2028-andbes,BUY,1,0.05,probe,0.0047,0.7,0.09,7,11,0.241,0.04,0.09,-0.04,1,a scout — this market's pool could pay; but I don't know enough yet; what happen,C5SQQ5J02KDC
+1788013066.3,politics,ussewc-usse-sd-2026-11-03-briben,SELL,5.99,0.07,earn,0.0973,0.27,,3,7,0.473,0.01,0.07,-0.02,-5.99,1 tick behind the touch — we would hold 31% of the ask side,C5T8J89PPKDE
+1788013846.3,politics,usgubewc-usgub-il-2026-11-03-rep,SELL,1,0.03,earn,0.2233,0.02,0.00135,2,5,0.777,0.02,0.09,-0.0286,-5,joins the touch — the book has been quiet,C5TK31ZWYKDJ
+1788013846.3,politics,ussewc-usse-ms-2026-11-03-dem,SELL,0.99,0.06,earn,2.0627,0.02,0.0301,8,10,0.846,0.05,0.06,-0.0299,-6.99,joins the touch — the book has been quiet,C5TKQY89GKDK
