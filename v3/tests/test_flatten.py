@@ -2087,15 +2087,18 @@ class TestDeadShortStepUp(unittest.TestCase):
         return r, A
 
     def test_dead_short_bids_up_to_the_touch(self):
+        # owner, 2026-08-29: "the step ups can start immediately on
+        # things that aren't currently earning" — a measured-zero
+        # reading is enough; no waiting period (repricing resets
+        # order age, so a dwell keyed to it could starve forever)
         r, A = self._rig()
         buybacks = [o for o in r.fam.orders.values()
                     if o.market == A and o.side == "BUY"
                     and o.purpose == "sell"]
         self.assertTrue(buybacks)
         self.assertLessEqual(max(o.price for o in buybacks), 0.03)
-        for o in buybacks:                     # dead for 7 hours
+        for o in buybacks:                     # measured: earning nothing
             o.live_est = 0.0
-            o.placed_ts = r.now - 25200.0
         r.fam.last_action.clear()
         r.cycle()
         ups = [e for e in r.fam.log if e.get("event") == "dead_short_stepup"]
@@ -2108,14 +2111,33 @@ class TestDeadShortStepUp(unittest.TestCase):
         self.assertTrue(any(abs(o["price"] - 0.05) < 1e-9 for o in live),
                         [o["price"] for o in live])
 
-    def test_live_buyback_keeps_the_break_even_cap(self):
+    def test_stepped_up_bid_never_exceeds_touch_or_loss_bound(self):
+        # whatever deadness decides, the stepped-up bid is bounded:
+        # never above the bid touch (5c here), never above received +
+        # 5 ticks (7.4c), never crossing the ask. Run several cycles
+        # and check every buy-back the exchange ever saw.
         r, A = self._rig()
-        r.fam.last_action.clear()
-        r.cycle()                              # exits fresh: not dead
+        for _ in range(4):
+            for o in r.fam.orders.values():
+                if o.market == A and o.side == "BUY" and o.purpose == "sell":
+                    o.live_est = 0.0
+            r.fam.last_action.clear()
+            r.cycle()
         live = [o for o in r.exchange.live.values()
                 if o["market"] == A and o["side"] == "BUY"]
-        self.assertTrue(all(o["price"] <= 0.03 + 1e-9 for o in live),
+        self.assertTrue(live)
+        self.assertTrue(all(o["price"] <= 0.05 + 1e-9 for o in live),
                         [o["price"] for o in live])
+
+    def test_disabled_dwell_never_steps_up(self):
+        r, A = self._rig(drain_s=0.0)
+        for o in r.fam.orders.values():
+            if o.market == A and o.side == "BUY" and o.purpose == "sell":
+                o.live_est = 0.0
+        r.fam.last_action.clear()
+        r.cycle()
+        self.assertFalse([e for e in r.fam.log
+                          if e.get("event") == "dead_short_stepup"])
 
     def test_politics_ships_with_the_dead_dwell(self):
         from v3 import politics

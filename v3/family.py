@@ -3464,20 +3464,22 @@ class Family:
                 if covered > -qty + 0.01:
                     self._prune_excess_exits(slug, "BUY", covered + qty, now)
                 # the dead-short step-up (owner, 2026-08-29 "we should
-                # find a way to get the resting positions down"): a
-                # buy-back pinned at break-even on a book trading well
-                # above it never fills, and the short's collateral sits
-                # frozen forever. Once its exits have measured ~$0 for
-                # dead_drain_s, the buy-back may bid UP TO THE TOUCH —
-                # never more than 5 ticks above what the short sold
-                # for, never over fair + 3 ticks — realizing a small
-                # bounded loss to free the collateral. Still post-only:
-                # it fills only when someone sells into the bid.
+                # find a way to get the resting positions down", then
+                # "the step ups can start immediately on things that
+                # aren't currently earning"): a buy-back pinned at
+                # break-even on a book trading well above it never
+                # fills, and the short's collateral sits frozen. As
+                # soon as its exits MEASURE ~$0 — no waiting period;
+                # repricing resets order age, so a dwell keyed to it
+                # could starve forever — the buy-back may bid UP TO
+                # THE TOUCH: never more than 5 ticks above what the
+                # short sold for, never over fair + 3 ticks, still
+                # post-only. An unmeasured exit (live_est None) is
+                # not dead — a zero READING is required, not absence
+                # of one.
                 dead_s = (self.cfg.dead_drain_s > 0 and bool(mine)
                           and all(o.live_est is not None
-                                  and o.live_est < 0.005 for o in mine)
-                          and min(o.placed_ts for o in mine)
-                          <= now - self.cfg.dead_drain_s)
+                                  and o.live_est < 0.005 for o in mine))
                 if dead_s and rest < 0.01 and actions > 0:
                     worst = min(mine, key=lambda o: o.price)
                     rr = self.desk.cancel(worst.id, worst.market)
