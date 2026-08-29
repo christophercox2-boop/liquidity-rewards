@@ -721,6 +721,16 @@ class CacheRouter:
         if pol is not None:
             pol.cache.put(slug, book, writer=writer)
 
+    def note_trade(self, slug: str, ts: float) -> None:
+        for key in ("cfb", "nfl", "nba"):
+            fam = self.families.get(key)
+            if fam is not None and slug in fam.universe:
+                fam.cache.note_trade(slug, ts)
+                return
+        pol = self.families.get("politics")
+        if pol is not None:
+            pol.cache.note_trade(slug, ts)
+
 
 def touch_snapshot(fam: Family, now: float, cap: int = 400) -> dict:
     """Best bid/ask + side totals + age per market the family is in —
@@ -1937,6 +1947,18 @@ class Monitor:
             # the frame-shape sampler (owner yes, 2026-08-28): what the
             # socket actually delivers, so the dead-writes mystery gets
             # solved from the record instead of guessed at
+            # trade-print signal liveness (owner yes, 2026-08-29):
+            # markets where the Lite feed's lastTradePx/openInterest
+            # moved in the last hour — validated against our own fills
+            # before the quiet gate trusts it
+            prints = 0
+            for cache in {id(f.cache): f.cache
+                          for f in self.families.values()}.values():
+                prints += sum(1 for ts_l in
+                              getattr(cache, "trade_seen", {}).values()
+                              if ts_l and ts_l[-1] > now - 3600)
+            self._note(f"lite trade prints: {prints} markets saw trades "
+                       f"in the last hour")
             shapes = dict(getattr(self.stream, "frame_shapes", {}) or {})
             if shapes:
                 top = sorted(shapes.items(), key=lambda kv: -kv[1]["n"])[:4]

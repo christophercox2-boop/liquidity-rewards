@@ -156,6 +156,12 @@ class FamilyConfig:
     wall_size_up: bool = False
     revive: bool = False                # may qualify a below-target side
     vol_quiet: float = 0.15             # book EWMA below this = quiet enough to join
+    # owner, 2026-08-29 ("this sort of strategy only obviously works
+    # when fills are more rare", after showing shape-churn is blind to
+    # take-and-refill snipers): ground our OWN fills mark hot may not
+    # JOIN the touch — resting behind stays allowed. Heat is the
+    # age-weighted own-fill measure evidence already keeps. 0 = off.
+    touch_heat_max: float = 0.0
     # THE risk number: total collateral this family may hold at once.
     capital_usd: float = 25.0
     per_market_usd: float = 1.00        # both sides combined
@@ -1061,6 +1067,14 @@ class Family:
             cost_ps = px if side == "BUY" else 1.0 - px
             in_front = (px - touch) * sign > 1e-9
             k_px = 0 if in_front else round(abs(touch - px) / tick)
+            if (self.cfg.touch_heat_max > 0.0
+                    and (in_front or k_px == 0)
+                    and h >= self.cfg.touch_heat_max):
+                # hot ground (our own orders were recently taken here)
+                # may not join or improve the touch — someone is eating
+                # fresh quotes, and shape-churn cannot see it (owner,
+                # 2026-08-29). Behind-the-touch candidates still score.
+                continue
             shield = sum(q for p2, q in levels
                          if (p2 - px) * sign > 1e-9)
             queue = sum(q for p2, q in levels if abs(p2 - px) <= 1e-9)

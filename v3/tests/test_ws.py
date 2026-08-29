@@ -47,6 +47,28 @@ class TestStream(unittest.TestCase):
         self.assertIn("levels", odd)                 # nested keys in the signature
         self.assertIn("mysteryBook", s.frame_shapes[odd]["sample"])
 
+    def test_trade_prints_from_the_lite_feed(self):
+        # owner, 2026-08-29: shape churn is blind to take-and-refill —
+        # a lastTradePx or openInterest CHANGE is the real print. The
+        # first frame is a baseline, never a print.
+        cache = BookCache()
+        s = Stream(cache, lambda: ["m-1"], "k", "c2VjcmV0c2VjcmV0c2VjcmV0c2VjcmV0c2Vjcg==")
+        def lite(ltp, oi):
+            return json.dumps({"marketDataLite": {
+                "marketSlug": "m-1", "bestBid": {"value": "0.44"},
+                "lastTradePx": {"value": str(ltp)}, "openInterest": oi}})
+        s.apply_frame(lite(0.45, 100))        # baseline
+        self.assertNotIn("m-1", cache.trade_seen)
+        s.apply_frame(lite(0.45, 100))        # unchanged: no print
+        self.assertNotIn("m-1", cache.trade_seen)
+        s.apply_frame(lite(0.46, 100))        # price moved: print
+        self.assertEqual(len(cache.trade_seen["m-1"]), 1)
+        s.apply_frame(lite(0.46, 103))        # OI moved: print
+        self.assertEqual(len(cache.trade_seen["m-1"]), 2)
+        for _ in range(12):                   # ring stays small
+            s.apply_frame(lite(0.46, 103))
+        self.assertEqual(len(cache.trade_seen["m-1"]), 2)
+
     def test_priority_puts_held_markets_first_under_the_cap(self):
         uni = [f"m-{i}" for i in range(300)]
         out = ws_priority(["m-250"], ["m-299"], uni)
