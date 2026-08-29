@@ -142,6 +142,16 @@ def config() -> FamilyConfig:
         # onto the proven pool's own $150 cap — the search money keeps
         # hunting new candidates
         dump_usd_day=50.0,
+        # owner, 2026-08-29 ("we should find a way to get the resting
+        # positions down"): 76 idle positions — $91 of long stock
+        # earning nothing plus $83 of collateral frozen in 22 shorts
+        # whose break-even buy-backs could never fill. The dead-money
+        # drain (longs, through the taker rail, $50/day cap) and the
+        # dead-short step-up (buy-backs may bid to the touch, loss
+        # bounded at 5 ticks over what the short collected) both key
+        # off this dwell. His hand-covered stock and the avoided/
+        # frozen/watched books are never touched.
+        dead_drain_s=21600.0,
         # owner, 2026-08-22: stay out of the Alaska governor markets —
         # special (ranked-choice) rules pending. And the balance-of-power
         # markets are the owner's own book ("Don't place any orders in
