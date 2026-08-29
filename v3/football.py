@@ -75,6 +75,13 @@ def cfb() -> FamilyConfig:
         capital_usd=100.0, per_market_usd=1.00,
         holdings_in_ceiling=True,
         dump_usd_day=10.0,
+        # the dead-money drain (owner, 2026-08-29, choosing this over
+        # a weekly liquidation): 63 of 90 held positions were earning
+        # nothing — exits outside the paying window or on sides below
+        # Target Size. Stock whose engine exits measure ~$0 for six
+        # hours drains through the taker rail at <=2-tick spreads,
+        # never more than 5 ticks under cost. cfb only for now.
+        dead_drain_s=21600.0,
         # owner, 2026-08-27, opening week: "I don't think there are any
         # games until Saturday. You can turn it on in the meantime."
         # owner, 2026-08-28 evening: "we can go back in around 2:00 am

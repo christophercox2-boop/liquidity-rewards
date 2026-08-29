@@ -2015,6 +2015,54 @@ class TestTakerDump(unittest.TestCase):
         r.cycle()
         self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
 
+    def _dead_rig(self, bid, drain_s=21600.0):
+        # held at 50c a share; the bid sits UNDER cost so the profit
+        # gate never opens — only the dead-stock drain could act
+        r, A = self._rig(bids=((bid, 500.0),), asks=((bid + 0.01, 800.0),),
+                         cost=5.00, qty=10.0)
+        r.fam.cfg.dead_drain_s = drain_s
+        r.cycle()                          # engine rests its exit
+        exits = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "sell"]
+        self.assertTrue(exits)
+        for o in exits:                    # measured dead for 7 hours
+            o.live_est = 0.0
+            o.placed_ts = r.now - 25200.0
+        r.fam.last_action.clear()
+        return r, A
+
+    def test_dead_stock_drains_at_a_small_loss(self):
+        # owner, 2026-08-29 (choosing the slow clean over a weekly
+        # liquidation): exits measured ~$0 for 6h+ and the bid within
+        # 5 ticks of cost — the stock leaves through the taker rail
+        r, A = self._dead_rig(bid=0.47)    # 3 ticks under the 50c basis
+        r.cycle()
+        dumps = [e for e in r.fam.log if e.get("event") == "dump"]
+        self.assertTrue(dumps)
+        self.assertAlmostEqual(dumps[0]["price"], 0.47)
+        self.assertIn("dead-stock drain", dumps[0]["note"])
+
+    def test_fresh_exits_are_not_dead(self):
+        # an exit resting under 6h has not proven dead yet — the dwell
+        # is the guard (the estimator re-measures live_est each cycle,
+        # so a zero reading alone must never trigger the drain)
+        r, A = self._dead_rig(bid=0.47)
+        for o in r.fam.orders.values():
+            if o.market == A and o.purpose == "sell":
+                o.placed_ts = r.now        # fresh: dwell not served
+        r.cycle()
+        self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
+
+    def test_drain_never_sells_more_than_5_ticks_under_cost(self):
+        r, A = self._dead_rig(bid=0.44)    # 6 ticks under the 50c basis
+        r.cycle()
+        self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
+
+    def test_drain_off_by_default(self):
+        r, A = self._dead_rig(bid=0.47, drain_s=0.0)
+        r.cycle()
+        self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
+
 
 class TestOwnerAvoidList(unittest.TestCase):
     def test_avoided_markets_are_left_entirely_to_the_owner(self):
