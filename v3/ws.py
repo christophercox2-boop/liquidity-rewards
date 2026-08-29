@@ -50,6 +50,10 @@ class Stream:
         # distinct frame shape with a count and one truncated sample —
         # instead of guessing. Read by the hourly stream-health line.
         self.frame_shapes: dict[str, dict] = {}
+        # last (lastTradePx, openInterest) per market, so a CHANGE in
+        # either marks a trade PRINT (owner, 2026-08-29: shape churn is
+        # blind to take-and-refill; prints are the real quiet signal)
+        self._lite_prev: dict[str, tuple[float, float]] = {}
         self._thread: threading.Thread | None = None
 
     def _sample(self, msg: dict) -> None:
@@ -83,14 +87,29 @@ class Stream:
                 self._sample(msg)
             lite = msg.get("marketDataLite") or {}
             if lite.get("marketSlug"):
+                slug_l = lite["marketSlug"]
                 bb = to_num((lite.get("bestBid") or {}).get("value"))
                 ba = to_num((lite.get("bestAsk") or {}).get("value"))
-                self.declared[lite["marketSlug"]] = (
+                self.declared[slug_l] = (
                     bb if bb > 0 else None, ba if ba > 0 else None,
                     time.time())
                 if len(self.declared) > 600:
                     oldest = min(self.declared, key=lambda k: self.declared[k][2])
                     self.declared.pop(oldest, None)
+                # trade prints: lastTradePx or openInterest moved since
+                # the last Lite frame for this market. The first frame
+                # is a baseline, never a print.
+                ltp_raw = lite.get("lastTradePx")
+                ltp = to_num(ltp_raw.get("value") if isinstance(ltp_raw, dict)
+                             else ltp_raw)
+                oi = to_num(lite.get("openInterest"))
+                prev = self._lite_prev.get(slug_l)
+                if (prev is not None and prev != (ltp, oi)
+                        and hasattr(self.cache, "note_trade")):
+                    self.cache.note_trade(slug_l, time.time())
+                self._lite_prev[slug_l] = (ltp, oi)
+                if len(self._lite_prev) > 600:
+                    self._lite_prev.pop(next(iter(self._lite_prev)), None)
                 self.status["last_msg"] = time.time()
                 return None
             md = msg.get("marketData") or {}

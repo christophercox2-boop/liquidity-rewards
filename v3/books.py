@@ -46,6 +46,7 @@ class BookCache:
         self.on_put = None
         # EWMA of "top 3 levels changed since last refresh", 0..1
         self._volatility: dict[str, float] = {}
+        self.trade_seen: dict[str, list[float]] = {}
 
     # -- reads -------------------------------------------------------------
 
@@ -118,6 +119,17 @@ class BookCache:
         joining the touch needs evidence, not absence of it."""
         return self._volatility.get(slug)
 
+    def note_trade(self, slug: str, ts: float) -> None:
+        """A trade PRINTED in this market (the Lite stream's lastTradePx
+        or openInterest moved). Shape-churn cannot see take-and-refill
+        flow — the owner's 2026-08-29 point — so prints are recorded on
+        their own: the last few timestamps per market, for the quiet
+        gate once the signal is validated, and for grading it against
+        our own fills meanwhile."""
+        lst = self.trade_seen.setdefault(slug, [])
+        lst.append(round(ts, 1))
+        del lst[:-8]
+
     def prune(self, universe) -> None:
         """Drop markets no longer tracked so the cache can't grow stale
         entries forever."""
@@ -125,6 +137,7 @@ class BookCache:
         for s in gone:
             self._books.pop(s, None)
             self._volatility.pop(s, None)
+            self.trade_seen.pop(s, None)
 
     # -- rotation ------------------------------------------------------------
 

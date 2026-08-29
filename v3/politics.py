@@ -124,7 +124,16 @@ def config() -> FamilyConfig:
         # prices" — two ticks of edge earns the touch, four lifts the
         # courtesy share toward 35%; the drift alarm moves above that so
         # the two don't fight
-        join_edge_ticks=2.0, share_max=0.50, proven_per_market_usd=40.0, drift_share=0.45,
+        # owner, 2026-08-29 ("this sort of strategy only obviously
+        # works when fills are more rare" — 86 entry fills/day tied
+        # $94 of buying power for $2.82 of one-time edge): the touch
+        # now demands 4 ticks of model edge instead of 2, and ground
+        # our own orders were recently taken on (heat >= 0.5, roughly
+        # a fill within the hour) may not join the touch at all —
+        # resting behind stays allowed. Shape churn misses
+        # take-and-refill snipers; our own fills do not.
+        join_edge_ticks=4.0, touch_heat_max=0.5,
+        share_max=0.50, proven_per_market_usd=40.0, drift_share=0.45,
         # graduation (owner, 2026-08-21): a market that has MEASURED at
         # least 25c of accrual today moves off the $100 search ceiling
         # onto the proven pool's own $150 cap — the search money keeps
