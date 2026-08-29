@@ -1498,3 +1498,8 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788003358.7,politics,ussewc-usse-sc-2026-11-03-rep,SELL,1,0.85,sell,0.2551,17.63,0.871725,83,86,0.765,0.84,0.85,0.0217,0,selling filled stock — it earns while it waits,C591ZPK3RKDH
 1788003418.7,politics,ussewc-usse-sc-2026-11-03-dem,BUY,1,0.15,manual,0,20.6,0.128275,16,20,0.766,0.16,0.24,0.0217,-8,the owner's own order — the engine leaves it alone,C56DFAVBPKDF
 1788003427.5,politics,ewc-usgub-mi-2026-11-03-dem,SELL,7,0.87,sell,0,0,0.924875,86,90,0.413,0.87,0.88,0.0549,0,closed out by the owner from the live card — sold into the bid,C5R5B5A86KDE
+1788005038.9,politics,apdc-jerpowgov-2026-12-31,BUY,50,0.17,manual,1.5737,1.17,,7,18,0.118,0.04,0.15,0.04,50,the owner's own order — the engine leaves it alone,C5QHJFKHGKDH
+1788005038.9,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,1,0.96,earn,1.9769,0.02,0.98545,93,95,0.896,0.94,0.97,-0.0255,5,2 ticks in front of the touch — we would hold 95% of the bid side,C5RGJC8V8KDC
+1788005098.9,politics,usgubewc-usgub-tx-2026-11-03-dem,BUY,3,0.14,sell,0.0111,35.53,0.140125,12,16,0.514,0.05,0.15,-0.0001,3,buying back the short at or under what it sold for — the bid earns while it wait,C4T2VS8F2KDM
+1788005638.9,politics,usgubewc-usgub-mn-2026-11-03-rep,SELL,1,0.07,earn,0.2988,21.05,0.006725,3,7,0.55,0.06,0.09,-0.0633,-5,1 tick in front of the touch — we would hold 10% of the ask side,C56KMKNPTKDF
+1788006479.0,politics,usgubewc-usgub-il-2026-11-03-rep,SELL,1,0.02,earn,6.2499,0.22,0.00135,2,5,0.737,0.01,0.09,-0.0186,-4,2 ticks in front of the touch — we would hold 98% of the ask side,C5RMDKA2PKDK
