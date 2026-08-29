@@ -1524,3 +1524,8 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788017446.5,politics,ussewc-usse-ms-2026-11-03-dem,SELL,1,0.06,earn,1.4881,0.02,0.0301,8,11,0.861,0.05,0.12,-0.0299,-7.99,1 tick in front of the touch — we would hold 71% of the ask side,C5VHEY5JMKDK
 1788017566.5,politics,enwc-uspres-nom-rep-2028-tuccar,BUY,5,0.1,earn,4.6807,0.92,,10,13,0.683,0.1,0.12,-0.02,25,1 tick behind the touch — we would hold 66% of the bid side,C5TQDGVN4KDN
 1788017866.5,politics,ussewc-usse-id-2026-11-03-rep,BUY,1,0.97,earn,6.2499,3.15,0.9975,94,97,0.865,0.89,0.98,-0.0275,17,2 ticks in front of the touch — we would hold 96% of the bid side,C5RTCHYS8KDC
+1788020206.6,politics,enwc-uspres-nom-dem-2028-andbes,SELL,1,0.08,sell,0,0,0.09,7,10,0.525,0.08,0.09,0.01,0,taker dump — sold into the bid (the carved exception),C5W7E070AKDF
+1788020804.8,politics,enwc-uspres-nom-dem-2028-petbut,SELL,357,0.05,sell,0,0,0.12,6,10,0.447,0.05,0.06,0.07,0,closed out by the owner from the live card — sold into the bid,C5WC6WEWAKDK
+1788020843.3,politics,enwc-uspres-nom-dem-2028-rokha,SELL,213,0.04,sell,0,0,0.03,2,6,0.423,0.04,0.05,-0.01,0,closed out by the owner from the live card — sold into the bid,C5WC1AT5CKDN
+1788021099.0,politics,usgubewc-usgub-il-2026-11-03-dem,SELL,9,0.94,sell,0,0,0.99865,95,98,0.724,0.94,0.95,0.0586,0,closed out by the owner from the live card — sold into the bid,C5WE6EQXMKDN
+1788022006.6,politics,enwc-uspres-nom-rep-2028-tuccar,BUY,25.65,0.1,earn,1.3643,0.15,,9,12,0.745,0.1,0.12,-0.01,50.65,1 tick behind the touch — we would hold 85% of the bid side,C5WGQA7YGKDD
