@@ -268,6 +268,7 @@ class FamilyConfig:
     graduate_paid_usd: float = 0.25   # avg PAID $/day over recent paid days
     graduate_days: int = 3            # paid days needed in the last 7 (stability)
     dump_usd_day: float = 0.0         # taker-dump proceeds allowed per day (0 = off)
+    dead_drain_s: float = 0.0         # drain stock whose exits measured ~0 this long (0 = off)
     avoid_tokens: tuple = ()
     # races the owner told us to keep a live watch on (2026-08-28,
     # the MA primaries + balance of power: "Keep a websocket on those
@@ -3268,7 +3269,32 @@ class Family:
                     fair_d = (self.fairs(slug)
                               if self.fairs is not None else None)
                     bid_t, bid_sz = book.bids[0]
-                    if (bid_t >= be_d + 2 * book.tick
+                    profit_gate = bid_t >= be_d + 2 * book.tick
+                    # the dead-money drain (owner, 2026-08-29 "Sounds
+                    # good. Yes, thanks", after declining a weekly
+                    # liquidation): stock whose ENGINE exits have
+                    # measured ~nothing for dead_drain_s may leave AT
+                    # the bid even slightly under cost — never more
+                    # than 5 ticks under break-even; every other rail
+                    # of the carved exception is unchanged. Stock
+                    # covered only by the owner's hand exits has no
+                    # engine exit here and is never drained. A fresh
+                    # or unmeasured exit (live_est None) is not dead.
+                    dead_gate = False
+                    if self.cfg.dead_drain_s > 0 and not profit_gate:
+                        exits_here = [o for o in list(self.orders.values())
+                                      if o.market == slug
+                                      and o.purpose == "sell"
+                                      and o.side == "SELL"]
+                        dead_gate = (
+                            bool(exits_here)
+                            and all(o.live_est is not None
+                                    and o.live_est < 0.005
+                                    for o in exits_here)
+                            and min(o.placed_ts for o in exits_here)
+                            <= now - self.cfg.dead_drain_s
+                            and bid_t >= be_d - 5 * book.tick)
+                    if ((profit_gate or dead_gate)
                             and book.asks[0][0] - bid_t
                             <= 2 * book.tick + 1e-9
                             and (fair_d is None
@@ -3328,9 +3354,14 @@ class Family:
                                     dq, now, left)
                                 self._log(event="dump", market=slug,
                                           price=bid_t, qty=dq,
-                                          note="sold into the bid — "
-                                               "tight spread, above "
-                                               "basis")
+                                          note=("dead-stock drain — "
+                                                "exits measured ~$0, "
+                                                "sold into the bid"
+                                                if dead_gate and
+                                                not profit_gate else
+                                                "sold into the bid — "
+                                                "tight spread, above "
+                                                "basis"))
                                 self._mark(slug, "SELL", now)
                                 actions -= 1
                                 continue

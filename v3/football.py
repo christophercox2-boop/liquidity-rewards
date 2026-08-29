@@ -75,15 +75,24 @@ def cfb() -> FamilyConfig:
         capital_usd=100.0, per_market_usd=1.00,
         holdings_in_ceiling=True,
         dump_usd_day=10.0,
+        # the dead-money drain (owner, 2026-08-29, choosing this over
+        # a weekly liquidation): 63 of 90 held positions were earning
+        # nothing — exits outside the paying window or on sides below
+        # Target Size. Stock whose engine exits measure ~$0 for six
+        # hours drains through the taker rail at <=2-tick spreads,
+        # never more than 5 ticks under cost. cfb only for now.
+        dead_drain_s=21600.0,
         # owner, 2026-08-27, opening week: "I don't think there are any
         # games until Saturday. You can turn it on in the meantime."
-        # The Thursday-17:00 pull sat out two gameless days while the
-        # pools fattened. Resting now runs Sun 06:00 -> SATURDAY 09:00
-        # ET (earliest Week-0 kickoffs are ~noon). REVISIT when the
-        # Thursday/Friday night slates begin (Week 1+): either restore
-        # the Thu 17:00 pull or build the schedule-aware version that
-        # only pulls books whose teams play that day.
-        rest_from=(6, 6), rest_until=(5, 9),
+        # owner, 2026-08-28 evening: "we can go back in around 2:00 am
+        # Sunday morning until Thursday September 3rd at 3 pm eastern"
+        # — rest SUNDAY 02:00 -> THURSDAY 15:00 ET. THIS WEEK'S call,
+        # not a fixed rhythm ("Doesn't have to be weekly. Things might
+        # change, or I might get a strategy for competing"): the window
+        # repeats by default but he re-decides it week to week.
+        # (Deployed after the Sat 09:00 Week-0 pull he approved, so
+        # that pull ran on the old clock.)
+        rest_from=(6, 2), rest_until=(3, 15),
         season_start=(2026, 8, 27),
         # 400+ live orders need real book coverage: the meter went blind
         # for 8 hours on the smaller budget (2026-08-21 morning)
