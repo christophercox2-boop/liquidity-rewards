@@ -1509,3 +1509,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788009059.3,politics,ussewc-usse-sd-2026-11-03-rep,BUY,1,0.98,earn,1.0417,0.07,0.991075,92,97,0.799,0.79,0.99,-0.0111,5,2 ticks in front of the touch — we would hold 95% of the bid side,C5SD8ECY4KDD
 1788010159.7,politics,ewc-usgub-az-2026-11-03-dem,SELL,10,0.86,sell,0,0,0.91475,85,90,0.097,0.86,0.88,0.0547,0,closed out by the owner from the live card — sold into the bid,C5SPQF9GTKDF
 1788010259.3,politics,usgubewc-usgub-mn-2026-11-03-rep,SELL,1,0.07,earn,0.5466,1.28,0.006725,4,7,0.667,0.06,0.09,-0.0633,-6,2 ticks in front of the touch — we would hold 9% of the ask side,C5RMYS3QRKDF
+1788011099.4,politics,usgubewc-usgub-ar-2026-11-03-dem,SELL,2,0.02,earn,6.25,5.52,0.0016,1,4,0.621,0.01,0.02,-0.0184,-5,1 tick in front of the touch — we would hold 64% of the ask side,C5N9CE8DTKDH
+1788011399.4,politics,ussewc-usse-ri-2026-11-03-dem,BUY,1,0.98,earn,0.6531,4.32,0.999275,95,99,0.474,0.96,0.99,-0.0193,1,2 ticks in front of the touch — we would hold 93% of the bid side,C5PAM9V00KDM
