@@ -2015,6 +2015,54 @@ class TestTakerDump(unittest.TestCase):
         r.cycle()
         self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
 
+    def _dead_rig(self, bid, drain_s=21600.0):
+        # held at 50c a share; the bid sits UNDER cost so the profit
+        # gate never opens — only the dead-stock drain could act
+        r, A = self._rig(bids=((bid, 500.0),), asks=((bid + 0.01, 800.0),),
+                         cost=5.00, qty=10.0)
+        r.fam.cfg.dead_drain_s = drain_s
+        r.cycle()                          # engine rests its exit
+        exits = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "sell"]
+        self.assertTrue(exits)
+        for o in exits:                    # measured dead for 7 hours
+            o.live_est = 0.0
+            o.placed_ts = r.now - 25200.0
+        r.fam.last_action.clear()
+        return r, A
+
+    def test_dead_stock_drains_at_a_small_loss(self):
+        # owner, 2026-08-29 (choosing the slow clean over a weekly
+        # liquidation): exits measured ~$0 for 6h+ and the bid within
+        # 5 ticks of cost — the stock leaves through the taker rail
+        r, A = self._dead_rig(bid=0.47)    # 3 ticks under the 50c basis
+        r.cycle()
+        dumps = [e for e in r.fam.log if e.get("event") == "dump"]
+        self.assertTrue(dumps)
+        self.assertAlmostEqual(dumps[0]["price"], 0.47)
+        self.assertIn("dead-stock drain", dumps[0]["note"])
+
+    def test_fresh_exits_are_not_dead(self):
+        # an exit resting under 6h has not proven dead yet — the dwell
+        # is the guard (the estimator re-measures live_est each cycle,
+        # so a zero reading alone must never trigger the drain)
+        r, A = self._dead_rig(bid=0.47)
+        for o in r.fam.orders.values():
+            if o.market == A and o.purpose == "sell":
+                o.placed_ts = r.now        # fresh: dwell not served
+        r.cycle()
+        self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
+
+    def test_drain_never_sells_more_than_5_ticks_under_cost(self):
+        r, A = self._dead_rig(bid=0.44)    # 6 ticks under the 50c basis
+        r.cycle()
+        self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
+
+    def test_drain_off_by_default(self):
+        r, A = self._dead_rig(bid=0.47, drain_s=0.0)
+        r.cycle()
+        self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
+
 
 class TestOwnerAvoidList(unittest.TestCase):
     def test_avoided_markets_are_left_entirely_to_the_owner(self):
@@ -5750,25 +5798,32 @@ class TestOwnerLiquidation(unittest.TestCase):
 
 
 class TestCfbOpeningWeekWindow(unittest.TestCase):
-    def test_cfb_rests_thursday_and_friday_pulls_saturday_morning(self):
-        """Owner, 2026-08-27: no games until Saturday of the opening
-        week — cfb rests through Thu/Fri and pulls Sat 09:00 ET."""
+    def test_cfb_rests_sunday_2am_through_thursday_3pm(self):
+        """Owner, 2026-08-28 evening: "back in around 2:00 am Sunday
+        morning until Thursday September 3rd at 3 pm eastern" — the
+        Week-1+ rhythm: rest Sun 02:00 -> Thu 15:00 ET, out through
+        the Thu/Fri night slates and game Saturdays."""
         import datetime as dt
         from zoneinfo import ZoneInfo
         from v3 import football
         from v3.family import resting_ok
         et = ZoneInfo("America/New_York")
         cfg = football.cfb()
-        thu_evening = dt.datetime(2026, 8, 27, 21, 0, tzinfo=et).timestamp()
-        fri_noon = dt.datetime(2026, 8, 28, 12, 0, tzinfo=et).timestamp()
-        sat_morning = dt.datetime(2026, 8, 29, 8, 0, tzinfo=et).timestamp()
-        sat_game = dt.datetime(2026, 8, 29, 13, 0, tzinfo=et).timestamp()
-        sun_back = dt.datetime(2026, 8, 30, 7, 0, tzinfo=et).timestamp()
-        self.assertTrue(resting_ok(thu_evening, cfg))
-        self.assertTrue(resting_ok(fri_noon, cfg))
-        self.assertTrue(resting_ok(sat_morning, cfg))
-        self.assertFalse(resting_ok(sat_game, cfg))    # games: out
-        self.assertTrue(resting_ok(sun_back, cfg))
+        sun_early = dt.datetime(2026, 8, 30, 2, 30, tzinfo=et).timestamp()
+        wed_noon = dt.datetime(2026, 9, 2, 12, 0, tzinfo=et).timestamp()
+        thu_2pm = dt.datetime(2026, 9, 3, 14, 0, tzinfo=et).timestamp()
+        thu_4pm = dt.datetime(2026, 9, 3, 16, 0, tzinfo=et).timestamp()
+        fri_night = dt.datetime(2026, 9, 4, 20, 0, tzinfo=et).timestamp()
+        sat_game = dt.datetime(2026, 9, 5, 13, 0, tzinfo=et).timestamp()
+        sun_before2 = dt.datetime(2026, 9, 6, 1, 0, tzinfo=et).timestamp()
+        self.assertTrue(resting_ok(sun_early, cfg))
+        self.assertTrue(resting_ok(wed_noon, cfg))
+        self.assertTrue(resting_ok(thu_2pm, cfg))
+        self.assertFalse(resting_ok(thu_4pm, cfg))     # Thu night: out
+        self.assertFalse(resting_ok(fri_night, cfg))   # Fri slate: out
+        self.assertFalse(resting_ok(sat_game, cfg))    # game day: out
+        self.assertFalse(resting_ok(sun_before2, cfg)) # not yet 02:00
+        self.assertTrue(resting_ok(sun_early, cfg))
 
 
 class TestWatchedRaces(unittest.TestCase):
