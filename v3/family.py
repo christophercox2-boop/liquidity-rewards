@@ -3513,7 +3513,31 @@ class Family:
                 dead_s = (self.cfg.dead_drain_s > 0 and bool(mine)
                           and all(o.live_est is not None
                                   and o.live_est < 0.005 for o in mine))
-                if dead_s and rest < 0.01 and actions > 0:
+                # the step-up's TARGET, computed BEFORE any cancel
+                # (owner, 2026-08-30, after the audit caught buy-backs
+                # cancelled and re-placed at the same price every 60s
+                # for 18 hours): a buy-back already resting at the best
+                # price the rules allow gains nothing from a cancel —
+                # it only loses its place in the queue. No target
+                # improvement, no touch.
+                step_tgt = None
+                if dead_s:
+                    received_t = min(max(-inv.get("cost", 0.0) / -qty,
+                                         0.002), 0.999)
+                    step_tgt = min(received_t + 5 * book.tick,
+                                   book.bids[0][0] if book.bids
+                                   else received_t - book.tick)
+                    fair_t = (self.fairs(slug)
+                              if self.fairs is not None else None)
+                    if fair_t is not None:
+                        step_tgt = min(step_tgt, fair_t + 3 * book.tick)
+                    if book.asks:
+                        step_tgt = min(step_tgt,
+                                       book.asks[0][0] - book.tick)
+                if (dead_s and rest < 0.01 and actions > 0
+                        and step_tgt is not None
+                        and min(o.price for o in mine)
+                        < step_tgt - book.tick / 2):
                     worst = min(mine, key=lambda o: o.price)
                     rr = self.desk.cancel(worst.id, worst.market)
                     if rr.ok:
@@ -3546,15 +3570,8 @@ class Family:
                          else cap_px)
                 if gate_px is not None:
                     hi = max(hi, gate_px)
-                if dead_s:
-                    step = min(received + 5 * book.tick, bid_touch)
-                    fair_s = (self.fairs(slug)
-                              if self.fairs is not None else None)
-                    if fair_s is not None:
-                        step = min(step, fair_s + 3 * book.tick)
-                    if book.asks:
-                        step = min(step, book.asks[0][0] - book.tick)
-                    hi = max(hi, step)
+                if dead_s and step_tgt is not None:
+                    hi = max(hi, step_tgt)
                 # a cover bidding ABOVE today's cap (the 98c-on-a-2c-
                 # basis ghosts) retreats the same way
                 high_stray = [o for o in mine if o.price > hi + 1e-9

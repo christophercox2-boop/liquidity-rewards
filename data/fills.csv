@@ -1573,3 +1573,11 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788055208.8,politics,ussewc-usse-mt-2026-11-03-rep,BUY,16,0.9,earn,0.1755,6.32,0.984125,92,96,0.471,0.9,0.92,-0.0841,17,1 tick behind the touch — we would hold 17% of the bid side,C5Z5WYCJYKDH
 1788055268.8,politics,ussewc-usse-ok-2026-11-03-dem,SELL,20,0.02,earn,4.4074,0.03,0.00055,1,3,0.382,0.01,0.06,-0.0195,-26,at the touch — a fill here is 1 ticks inside value (Silver + evidence),C64M03M3YKDM
 1788055328.8,politics,usgubewc-usgub-ar-2026-11-03-dem,SELL,20,0.03,earn,0.4638,3,0.0016,1,4,0.661,0.02,0.09,-0.0284,-25,1 tick behind the touch — we would hold 39% of the ask side,C61ZVFQW8KDG
+1788056492.3,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar5-10,SELL,18.98,0.05,manual,0.8861,23.31,,5,9,0.308,0.04,0.05,0.02,-13.98,the owner's own order — the engine leaves it alone,C5GZTPT0EKDD
+1788058627.3,politics,usgubewc-usgub-mn-2026-11-03-rep,SELL,1,0.07,earn,0.297,13.44,0.00665,4,7,0.687,0.07,0.08,-0.0634,-7,2 ticks in front of the touch — we would hold 9% of the ask side,C5SNTV7TMKDK
+1788058867.3,politics,usgubewc-usgub-ar-2026-11-03-dem,BUY,25,0.06,manual,6.2442,0.29,0.0015,1,4,0.732,0.02,0.1,0.0585,25,the owner's own order — the engine leaves it alone,C657TQXEAKDG
+1788062516.6,politics,enwc-ussep-nh-2026-09-01-rep-johsun,SELL,2,0.98,sell,0,0,,95,99,0.153,0.98,0.99,-0.01,0,taker dump — sold into the bid (the carved exception),C669W5EKGKDM
+1788069633.3,cfb,aachc-cfb-wins-2026-11-28-fl-7pt5wins,SELL,2,0.46,sell,0,0,,42,48,0.291,0.46,0.47,-0.01,0,taker dump — sold into the bid (the carved exception),C67YYHHBPKDH
+1788069873.3,cfb,aachc-cfb-wins-2026-11-28-oregst-1pt5wins,SELL,0.01,0.98,sell,0,0,,97,99,0.075,0.98,0.99,0,0.99,taker dump — sold into the bid (the carved exception),C67ZZE7TGKDN
+1788074613.4,cfb,aachc-cfb-wins-2026-11-28-nd-10pt5wins,SELL,0.01,0.75,sell,0,0,,73,78,0.148,0.75,0.76,0,0,taker dump — sold into the bid (the carved exception),C694RWYXWKDF
+1788084033.5,cfb,aachc-cfb-wins-2026-11-28-nw-6pt5wins,SELL,1,0.33,sell,0,0,,34,40,0.065,0.33,0.34,0.04,0,taker dump — sold into the bid (the carved exception),C6BDFPA7RKDK
