@@ -1577,3 +1577,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788058627.3,politics,usgubewc-usgub-mn-2026-11-03-rep,SELL,1,0.07,earn,0.297,13.44,0.00665,4,7,0.687,0.07,0.08,-0.0634,-7,2 ticks in front of the touch — we would hold 9% of the ask side,C5SNTV7TMKDK
 1788058867.3,politics,usgubewc-usgub-ar-2026-11-03-dem,BUY,25,0.06,manual,6.2442,0.29,0.0015,1,4,0.732,0.02,0.1,0.0585,25,the owner's own order — the engine leaves it alone,C657TQXEAKDG
 1788062516.6,politics,enwc-ussep-nh-2026-09-01-rep-johsun,SELL,2,0.98,sell,0,0,,95,99,0.153,0.98,0.99,-0.01,0,taker dump — sold into the bid (the carved exception),C669W5EKGKDM
+1788069633.3,cfb,aachc-cfb-wins-2026-11-28-fl-7pt5wins,SELL,2,0.46,sell,0,0,,42,48,0.291,0.46,0.47,-0.01,0,taker dump — sold into the bid (the carved exception),C67YYHHBPKDH
+1788069873.3,cfb,aachc-cfb-wins-2026-11-28-oregst-1pt5wins,SELL,0.01,0.98,sell,0,0,,97,99,0.075,0.98,0.99,0,0.99,taker dump — sold into the bid (the carved exception),C67ZZE7TGKDN
