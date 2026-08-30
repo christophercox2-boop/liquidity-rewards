@@ -1580,3 +1580,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788069633.3,cfb,aachc-cfb-wins-2026-11-28-fl-7pt5wins,SELL,2,0.46,sell,0,0,,42,48,0.291,0.46,0.47,-0.01,0,taker dump — sold into the bid (the carved exception),C67YYHHBPKDH
 1788069873.3,cfb,aachc-cfb-wins-2026-11-28-oregst-1pt5wins,SELL,0.01,0.98,sell,0,0,,97,99,0.075,0.98,0.99,0,0.99,taker dump — sold into the bid (the carved exception),C67ZZE7TGKDN
 1788074613.4,cfb,aachc-cfb-wins-2026-11-28-nd-10pt5wins,SELL,0.01,0.75,sell,0,0,,73,78,0.148,0.75,0.76,0,0,taker dump — sold into the bid (the carved exception),C694RWYXWKDF
+1788084033.5,cfb,aachc-cfb-wins-2026-11-28-nw-6pt5wins,SELL,1,0.33,sell,0,0,,34,40,0.065,0.33,0.34,0.04,0,taker dump — sold into the bid (the carved exception),C6BDFPA7RKDK
