@@ -1600,3 +1600,11 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788097854.8,cfb,aachc-cfb-wins-2026-11-28-pitt-6pt5wins,BUY,0.01,0.84,earn,0.1406,0.55,,67,82,0,0.84,0.93,0.11,0.01,1 tick in front of the touch — we would hold 2% of the bid side,C6E5RBMTCKDC
 1788098214.8,politics,usgubewc-usgub-sd-2026-11-03-dem,SELL,2.87,0.02,earn,4.7384,0.65,0.004375,1,3,0,0.01,0.02,-0.0156,-2.87,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C6E58V8JJKDJ
 1788098334.8,cfb,aachc-cfb-wins-2026-11-28-okst-8pt5wins,SELL,0.01,0.02,earn,3.7457,1.02,,3,15,0,0.01,0.02,0.05,-0.01,joins the touch — the book has been quiet,C6DW340NPKDH
+1788099354.8,politics,ussewc-usse-id-2026-11-03-rep,SELL,16.98,0.98,sell,0.0124,16.81,0.99795,95,97,0.824,0.9,0.97,0.018,0.02,selling filled stock — it earns while it waits,C60KBMW76KDE
+1788099354.8,politics,ussewc-usse-id-2026-11-03-rep,SELL,0.02,0.98,sell,0,2.07,0.99795,95,97,0.824,0.9,0.97,0.018,0,selling filled stock — it earns while it waits,C6D8YRNW2KDN
+1788099474.8,cfb,aachc-cfb-wins-2026-11-28-ncar-5pt5wins,BUY,1,0.48,earn,0,0.9,,50,54,0.53,0.48,0.49,-0.04,5,1 tick in front of the touch — we would hold 79% of the bid side,C6E9HK1BWKDG
+1788100255.0,politics,usgubewc-usgub-ar-2026-11-03-rep,SELL,2,0.97,sell,0,0,0.9985,97,99,0.098,0.97,0.98,0.0285,0,taker dump — sold into the bid (the carved exception),C6F8CD3RTKDJ
+1788100675.0,politics,usgubewc-usgub-ok-2026-11-03-dem,BUY,5,0.09,sell,0.4473,12.14,0.060025,4,8,0.449,0.06,0.09,0.03,2,buying back the short at or under what it sold for — the bid earns while it wait,C6513JHPGKDE
+1788101035.0,politics,ussewc-usse-ok-2026-11-03-dem,SELL,5,0.06,manual,0.1076,0.43,0.000575,1,4,0.532,0.05,0.06,-0.0594,-13,the owner's own order — the engine leaves it alone,C6F1CEAVGKDJ
+1788101335.0,cfb,aachc-cfb-wins-2026-11-28-mst-5pt5wins,SELL,0.5,0.27,earn,2.4998,1,,15,24,0.131,0.26,0.27,-0.07,-0.51,joins the touch — the book has been quiet,C6EMZY9KCKDC
+1788101395.0,cfb,aachc-cfb-wins-2026-11-28-smu-10pt5wins,SELL,0.5,0.13,earn,0.1396,1.38,,5,10,0.313,0.12,0.13,-0.06,-0.51,at the touch — a fill here is 1 ticks inside value (evidence band only; confiden,C6EAXE3E4KDM
