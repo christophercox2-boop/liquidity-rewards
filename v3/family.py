@@ -2750,6 +2750,17 @@ class Family:
                 else self._best_exit_px(slug, side, book, lo, hi, rec.qty))
         if best is None or abs(best - rec.price) < book.tick / 2:
             return
+        # the placer has the LAST word on price (owner, 2026-08-30:
+        # exits were cancelled and re-placed at the same price every
+        # cycle because this mover and the re-rest path priced
+        # independently — the exit gate pinned the replacement right
+        # back where it was). Consult the same gate the placer will;
+        # if the final price would not move, the order does not move.
+        basis_g = (break_even if side == "SELL" else received)
+        gate_g = self._exit_gate(slug, side, basis_g, rec.qty, book, now)
+        predicted = gate_g if gate_g is not None else best
+        if abs(predicted - rec.price) < book.tick / 2:
+            return
         prog, _w = self._prog_row(slug)
         side_pool = self._side_pool(slug, prog) if prog is not None else None
         if prog is None or side_pool is None:
@@ -3534,11 +3545,23 @@ class Family:
                     if book.asks:
                         step_tgt = min(step_tgt,
                                        book.asks[0][0] - book.tick)
+                worst = (min(mine, key=lambda o: o.price)
+                         if mine else None)
+                step_pred = None
+                if dead_s and step_tgt is not None and worst is not None:
+                    # what will the re-rest ACTUALLY price at? The
+                    # exit gate overrides everything downstream — the
+                    # nh-dem loop proved comparing against the raw
+                    # step target is not enough (owner, 2026-08-30)
+                    gate_p = self._exit_gate(
+                        slug, "BUY",
+                        min(max(-inv.get("cost", 0.0) / -qty, 0.002),
+                            0.999),
+                        worst.qty, book, now)
+                    step_pred = gate_p if gate_p is not None else step_tgt
                 if (dead_s and rest < 0.01 and actions > 0
-                        and step_tgt is not None
-                        and min(o.price for o in mine)
-                        < step_tgt - book.tick / 2):
-                    worst = min(mine, key=lambda o: o.price)
+                        and step_pred is not None
+                        and step_pred > worst.price + book.tick / 2):
                     rr = self.desk.cancel(worst.id, worst.market)
                     if rr.ok:
                         self.orders.pop(worst.id, None)
