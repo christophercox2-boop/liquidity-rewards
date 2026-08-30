@@ -2129,6 +2129,29 @@ class TestDeadShortStepUp(unittest.TestCase):
         self.assertTrue(all(o["price"] <= 0.05 + 1e-9 for o in live),
                         [o["price"] for o in live])
 
+    def test_step_up_never_loops_at_the_target(self):
+        # owner, 2026-08-30: buy-backs already at the best allowed
+        # price were cancelled and re-placed there every 60s for 18h.
+        # Once at the target, the order ID must stay stable.
+        r, A = self._rig()
+        ids = set()
+        for _ in range(5):
+            for o in r.fam.orders.values():
+                if o.market == A and o.side == "BUY" and o.purpose == "sell":
+                    o.live_est = 0.0
+            r.fam.last_action.clear()
+            r.cycle()
+            ids.add(tuple(sorted(i for i, o in r.fam.orders.items()
+                                 if o.market == A and o.side == "BUY"
+                                 and o.purpose == "sell")))
+        ups = [e for e in r.fam.log if e.get("event") == "dead_short_stepup"]
+        self.assertLessEqual(len(ups), 1)      # one step-up, then quiet
+        live = [o for o in r.exchange.live.values()
+                if o["market"] == A and o["side"] == "BUY"]
+        self.assertTrue(any(abs(o["price"] - 0.05) < 1e-9 for o in live))
+        # after reaching the touch the id set stops changing
+        self.assertLessEqual(len(ids), 3)
+
     def test_disabled_dwell_never_steps_up(self):
         r, A = self._rig(drain_s=0.0)
         for o in r.fam.orders.values():
