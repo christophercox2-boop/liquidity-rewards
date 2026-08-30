@@ -2152,6 +2152,52 @@ class TestDeadShortStepUp(unittest.TestCase):
         # after reaching the touch the id set stops changing
         self.assertLessEqual(len(ids), 3)
 
+    def test_gate_pinned_buyback_is_never_touched(self):
+        # the nh-dem loop (owner, 2026-08-30): the step target said
+        # 0.14 but the exit gate pinned the re-rest at the old price —
+        # cancel, re-place, repeat every 60s. The step-up must predict
+        # the FINAL price, gate included, and no-op when it would not
+        # move.
+        r, A = self._rig()
+        r.cycle()   # ensure buyback rests
+        bb = [o for o in r.fam.orders.values()
+              if o.market == A and o.side == "BUY" and o.purpose == "sell"]
+        pin = bb[0].price
+        r.fam._exit_gate = lambda *a, **k: pin      # the gate pins it
+        ups0 = len([e for e in r.fam.log
+                    if e.get("event") == "dead_short_stepup"])
+        for _ in range(3):
+            for o in r.fam.orders.values():
+                if o.market == A and o.side == "BUY" and o.purpose == "sell":
+                    o.live_est = 0.0
+            r.fam.last_action.clear()
+            r.cycle()
+        ups = len([e for e in r.fam.log
+                   if e.get("event") == "dead_short_stepup"])
+        self.assertEqual(ups, ups0)     # nothing new once pinned
+
+    def test_gate_pinned_exit_is_never_moved(self):
+        # same disease in _maybe_move_exit: the mover wanted the ask
+        # anchor, the gate pinned the re-rest at the old price
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 3.0}
+        r.positions[A] = (10.0, 3.0)
+        r.cycle()   # exit rests somewhere
+        exits = [o for o in r.fam.orders.values()
+                 if o.market == A and o.side == "SELL"
+                 and o.purpose == "sell"]
+        self.assertTrue(exits)
+        pin = exits[0].price
+        r.fam._exit_gate = lambda *a, **k: pin
+        moved0 = len([e for e in r.fam.log if e.get("event") == "exit_moved"])
+        for _ in range(3):
+            r.fam.last_action.clear()
+            r.cycle()
+        moved = len([e for e in r.fam.log if e.get("event") == "exit_moved"])
+        self.assertEqual(moved, moved0)
+
     def test_disabled_dwell_never_steps_up(self):
         r, A = self._rig(drain_s=0.0)
         for o in r.fam.orders.values():
