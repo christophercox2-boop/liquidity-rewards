@@ -1584,3 +1584,12 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788090993.6,politics,ewc-usp-2028-11-07-gavnew,BUY,50,0.13,earn,1.8222,15.59,,13,16,0.674,0.13,0.14,-0.01,61,at the touch — a fill here is 1 ticks inside value (evidence band only; confiden,C5ZS1N6FWKDJ
 1788091593.7,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.06,earn,6.1407,23.13,0.0398,6,9,0.87,0.05,0.08,-0.0202,-18,2 ticks in front of the touch — we would hold 98% of the ask side,C5S9PGX4PKDD
 1788091713.7,cfb,aachc-cfb-wins-2026-11-28-oregst-1pt5wins,SELL,0.01,0.98,sell,0,0,,97,99,0.067,0.98,0.99,0,0.99,taker dump — sold into the bid (the carved exception),C6D6PX0Y6KDD
+1788091973.5,politics,enwc-uspres-nom-dem-2028-jamtal,SELL,68,0.04,sell,0,0,,4,7,0.693,0.04,0.06,0.01,0,taker dump — sold into the bid (the carved exception),C6D98984TKDH
+1788092033.5,politics,ussewc-usse-id-2026-11-03-todach,SELL,18,0.03,sell,0,0,,5,9,0.544,0.03,0.04,0.03,0,taker dump — sold into the bid (the carved exception),C6D989KEMKDH
+1788092033.5,politics,enwc-uspres-nom-dem-2028-kamhar,SELL,18,0.13,sell,0,0,,13,17,0.187,0.13,0.14,0.02,7,taker dump — sold into the bid (the carved exception),C6D9Y2ZQCKDG
+1788092033.5,politics,ussewc-usse-ri-2026-11-03-dem,SELL,1,0.98,sell,0,0,0.999275,95,99,0.53,0.98,0.99,0.0193,0,taker dump — sold into the bid (the carved exception),C6D9JJWHCKDN
+1788092033.5,cfb,aachc-cfb-wins-2026-11-28-ncst-6pt5wins,SELL,0.14,0.58,sell,0,0,,56,66,0.493,0.58,0.6,0.03,0.86,taker dump — sold into the bid (the carved exception),C6D9Y30NYKDG
+1788092093.5,politics,usgubewc-usgub-md-2026-11-03-dem,SELL,6,0.98,sell,0,0,0.9999,98,99,0.106,0.98,0.99,0.0199,0,taker dump — sold into the bid (the carved exception),C6D9X3WZEKDD
+1788092093.5,politics,ussewc-usse-il-2026-11-03-dem,SELL,4,0.98,sell,0,0,0.995475,97,99,0.1,0.98,0.99,0.0155,0,taker dump — sold into the bid (the carved exception),C6DA4B282KDJ
+1788093474.0,politics,ussewc-usse-ms-2026-11-03-rep,SELL,0.72,0.96,sell,0.2222,20.39,0.978025,95,98,0.429,0.95,0.96,0.018,0.28,selling filled stock — it earns while it waits,C5W5VKCECKDC
+1788094434.3,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar20-25,BUY,1,0.19,manual,10.5387,26.13,,20,24,0.699,0.19,0.2,-0.03,67,the owner's own order — the engine leaves it alone,C5QCFV1PWKDG
