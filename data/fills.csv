@@ -1608,3 +1608,6 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788101035.0,politics,ussewc-usse-ok-2026-11-03-dem,SELL,5,0.06,manual,0.1076,0.43,0.000575,1,4,0.532,0.05,0.06,-0.0594,-13,the owner's own order — the engine leaves it alone,C6F1CEAVGKDJ
 1788101335.0,cfb,aachc-cfb-wins-2026-11-28-mst-5pt5wins,SELL,0.5,0.27,earn,2.4998,1,,15,24,0.131,0.26,0.27,-0.07,-0.51,joins the touch — the book has been quiet,C6EMZY9KCKDC
 1788101395.0,cfb,aachc-cfb-wins-2026-11-28-smu-10pt5wins,SELL,0.5,0.13,earn,0.1396,1.38,,5,10,0.313,0.12,0.13,-0.06,-0.51,at the touch — a fill here is 1 ticks inside value (evidence band only; confiden,C6EAXE3E4KDM
+1788103038.2,cfb,aachc-cfb-wins-2026-11-28-wvir-4pt5wins,SELL,2,0.81,earn,0.0764,1.06,,75,81,0,0.8,0.81,-0.03,-2,joins the touch — the book has been quiet,C6F03S2KEKDE
+1788104118.4,politics,usgubewc-usgub-ny-2026-11-03-dem,SELL,1,0.96,sell,0,0,0.9853,94,98,0.625,0.96,0.97,0.0253,9,taker dump — sold into the bid (the carved exception),C6G8QS1QJKDF
+1788104778.4,politics,usgubewc-usgub-ma-2026-11-03-dem,SELL,1,0.97,sell,0,0,0.9997,95,99,0.586,0.97,0.98,0.0297,0,taker dump — sold into the bid (the carved exception),C6GDJTCEJKDE
