@@ -1643,3 +1643,13 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788115139.6,politics,ussewc-usse-ms-2026-11-03-rep,SELL,20,0.97,sell,0,3.53,0.978025,95,97,0.684,0.95,0.96,0.008,0,selling filled stock — it earns while it waits,C6FR5SMTRKDJ
 1788115571.7,cfb,aachc-cfb-wins-2026-11-28-oregst-1pt5wins,SELL,1,0.98,sell,0,0,,96,99,0.059,0.98,0.99,0,0,taker dump — sold into the bid (the carved exception),C6JY7SAGYKDD
 1788115691.7,cfb,aachc-cfb-wins-2026-11-28-oregst-1pt5wins,BUY,0.5,0.94,earn,0.1212,0.31,,96,99,0.059,0.93,0.99,-0.04,0.5,1 tick in front of the touch — we would hold 52% of the bid side,C6JPYKN26KDE
+1788119937.7,politics,ussewc-usse-co-2026-11-03-rep,SELL,20,0.02,earn,2.3095,5.2,0.0048,1,3,0.346,0.01,0.02,-0.0152,-23,joins the touch — the book has been quiet,C6FFPFMVMKDE
+1788120957.8,politics,usgubewc-usgub-ok-2026-11-03-dem,BUY,3,0.08,sell,2.3436,5.57,0.060025,3,8,0.597,0.02,0.09,0.02,3,buying back the short at or under what it sold for — the bid earns while it wait,C6FDH5X8AKDH
+1788121137.8,politics,usgubewc-usgub-ny-2026-11-03-rep,SELL,20,0.05,earn,4.751,0.23,0.0147,2,5,0.226,0.04,0.09,-0.0353,-23,at the touch — a fill here is 3 ticks inside value (Silver + evidence),C6M3CVSD0KDM
+1788121197.8,politics,usgubewc-usgub-wy-2026-11-03-dem,BUY,0.06,0.06,manual,0.0371,42.23,0.0001,3,7,0.076,0.06,0.07,0.0599,0.06,the owner's own order — the engine leaves it alone,C5G4TA5CRKDK
+1788121197.8,politics,enwc-uspres-nom-dem-2028-kamhar,BUY,12,0.13,earn,4.878,0.42,,13,17,0.164,0.13,0.14,-0.02,19,joins the touch — the book has been quiet,C6KZGX8Q4KDJ
+1788121917.8,politics,usgubewc-usgub-ar-2026-11-03-rep,SELL,2,0.98,sell,0,0,0.9985,97,99,0.088,0.98,0.99,0.0185,0,taker dump — sold into the bid (the carved exception),C6MG080XCKDE
+1788122337.8,politics,scc-senate-gop-2026-11-03-56,SELL,10,0.04,earn,0.1207,0.55,0.006625,1,6,0,0.03,0.08,-0.0334,-10,at the touch — a fill here is 3 ticks inside value (Silver + evidence),C6M3ACFG0KDC
+1788122637.9,politics,usgubewc-usgub-ne-2026-11-03-rep,BUY,20,0.93,earn,5,0.47,0.9602,93,96,0.505,0.83,0.94,-0.0302,24,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C6M7YEZQTKDJ
+1788122637.9,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,2,0.93,earn,0.7225,0.42,0.9853,95,99,0.601,0.89,0.96,-0.0553,11,3 ticks in front of the touch — we would hold 100% of the bid side,C6M9PFZ3GKDD
+1788122697.9,politics,usgubewc-usgub-ne-2026-11-03-dem,BUY,4,0.07,sell,0.0074,1.42,0.0398,6,9,0.863,0.07,0.08,0.0302,-10,buying back the short at or under what it sold for — the bid earns while it wait,C6KFZKC96KDJ
