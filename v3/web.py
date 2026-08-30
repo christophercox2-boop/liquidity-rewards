@@ -499,6 +499,12 @@ function odrop(o){
  if(pk<0.02)return null;
  return Math.max(0,(pk-cur)/pk);
 }
+function dur(sec){
+ if(sec==null||!(sec>0))return null;
+ if(sec<3600)return Math.round(sec/60)+'m';
+ if(sec<86400)return (sec/3600).toFixed(sec<7200?1:0)+'h';
+ return (sec/86400).toFixed(sec<172800?1:0)+'d';
+}
 function orow(d,o){
  var e=(o.live_est!=null?o.live_est:o.est_day);
  var dp=odrop(o);
@@ -512,6 +518,19 @@ function orow(d,o){
   +'<div class="sub">'+(o.side==='BUY'?'bid':'ask')+' '+(o.qty||0)+' @ '+pc(o.price)
   +' \\u2014 '+(e==null?'<span class="warn">no estimate yet</span>':usd(e)+'/day')
   +' <span class="pill">'+esc(o.purpose)+'</span></div>'
+  +(function(){
+    var now=(d.now||0), age=o.placed_ts?now-o.placed_ts:null;
+    var pf=o.live_pf, exp=null;
+    if(pf!=null&&pf>0&&pf<1){exp=86400/(-Math.log(1-pf));}
+    else if(pf!=null&&pf>=1){exp=3600;}
+    var bits=[];
+    if(age!=null)bits.push('placed '+dur(age)+' ago');
+    if(exp!=null){
+     var beaten=age!=null&&age>exp;
+     bits.push('model said fill in ~'+dur(exp)+(beaten?' \u2014 <b>outliving it</b>':''));
+    }else if(age!=null){bits.push('no fill estimate');}
+    return bits.length?'<div class="vrd'+((exp!=null&&age!=null&&age>exp)?' warn':'')+'">'+bits.join(' \u00b7 ')+'</div>':'';
+  })()
   +(dp!=null&&dp>0.05?'<div class="vrd'+(dp>=0.5?' warn':'')+'">\\u25BC '+Math.round(dp*100)+'% off its 8h peak ('+usd(o.est_peak8)+' \\u2192 '+usd((o.live_est!=null?o.live_est:o.est_day)||0)+'/day)</div>':'')
   +(o.verdict?'<div class="vrd">'+esc(o.verdict)+'</div>':'')
   +(o.why?'<div class="vrd">placed because: '+esc(o.why)+'</div>':'')
