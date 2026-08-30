@@ -2476,11 +2476,18 @@ class Family:
         # that were the most successful and trying to replicate those") —
         # a market's record of actually PAYING us counts alongside what
         # the book says it should pay now
+        # Rank purely by summed plan EV (owner, 2026-08-30: "that is
+        # what the expected value is for"). The old paid-history bonus
+        # (up to +$5) was a crutch from the era when estimates overshot
+        # 3-7x; with estimates now grading ~1.0x it dominated ranking
+        # and fought the churn lesson. History still feeds confidence
+        # and graduation — it just no longer double-counts into the
+        # queue order. EV, not raw claim: the same number the placement
+        # filter below judges by.
         ranked = sorted(((s, sb) for s, sb in self.scoreboard.items()
                          if sb.get("plans")),
-                        key=lambda kv: -(sum(p["est"] for p in kv[1]["plans"])
-                                         + min(self.history.get(kv[0], 0.0),
-                                               5.0)))
+                        key=lambda kv: -sum(p.get("ev", p["est"])
+                                            for p in kv[1]["plans"]))
         for slug, sb in ranked:
             if actions <= 0:
                 break
