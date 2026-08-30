@@ -1640,3 +1640,6 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788113839.1,politics,usgubewc-usgub-md-2026-11-03-dem,SELL,6,0.98,sell,0,0,0.9999,98,99,0.096,0.98,0.99,0.0199,0,taker dump — sold into the bid (the carved exception),C6JGW6CM8KDD
 1788114319.1,politics,enwc-ussep-de-2026-09-15-rep-johshu,BUY,10,0.17,earn,6.2375,0.23,,16,31,0.191,0.17,0.18,-0.05,13,at the touch — a fill here is 1 ticks inside value (evidence band only; confiden,C6JDEW0D4KDH
 1788114319.1,cfb,aachc-cfb-wins-2026-11-28-cah-7pt5wins,BUY,0.01,0.52,earn,0.0276,0.07,,38,53,0,0.3,0.55,0.05,0.01,1 tick in front of the touch — we would hold 69% of the bid side,C6JK60QFYKDC
+1788115139.6,politics,ussewc-usse-ms-2026-11-03-rep,SELL,20,0.97,sell,0,3.53,0.978025,95,97,0.684,0.95,0.96,0.008,0,selling filled stock — it earns while it waits,C6FR5SMTRKDJ
+1788115571.7,cfb,aachc-cfb-wins-2026-11-28-oregst-1pt5wins,SELL,1,0.98,sell,0,0,,96,99,0.059,0.98,0.99,0,0,taker dump — sold into the bid (the carved exception),C6JY7SAGYKDD
+1788115691.7,cfb,aachc-cfb-wins-2026-11-28-oregst-1pt5wins,BUY,0.5,0.94,earn,0.1212,0.31,,96,99,0.059,0.93,0.99,-0.04,0.5,1 tick in front of the touch — we would hold 52% of the bid side,C6JPYKN26KDE
