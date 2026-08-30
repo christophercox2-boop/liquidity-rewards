@@ -1581,3 +1581,6 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788069873.3,cfb,aachc-cfb-wins-2026-11-28-oregst-1pt5wins,SELL,0.01,0.98,sell,0,0,,97,99,0.075,0.98,0.99,0,0.99,taker dump — sold into the bid (the carved exception),C67ZZE7TGKDN
 1788074613.4,cfb,aachc-cfb-wins-2026-11-28-nd-10pt5wins,SELL,0.01,0.75,sell,0,0,,73,78,0.148,0.75,0.76,0,0,taker dump — sold into the bid (the carved exception),C694RWYXWKDF
 1788084033.5,cfb,aachc-cfb-wins-2026-11-28-nw-6pt5wins,SELL,1,0.33,sell,0,0,,34,40,0.065,0.33,0.34,0.04,0,taker dump — sold into the bid (the carved exception),C6BDFPA7RKDK
+1788090993.6,politics,ewc-usp-2028-11-07-gavnew,BUY,50,0.13,earn,1.8222,15.59,,13,16,0.674,0.13,0.14,-0.01,61,at the touch — a fill here is 1 ticks inside value (evidence band only; confiden,C5ZS1N6FWKDJ
+1788091593.7,politics,usgubewc-usgub-ne-2026-11-03-dem,SELL,1,0.06,earn,6.1407,23.13,0.0398,6,9,0.87,0.05,0.08,-0.0202,-18,2 ticks in front of the touch — we would hold 98% of the ask side,C5S9PGX4PKDD
+1788091713.7,cfb,aachc-cfb-wins-2026-11-28-oregst-1pt5wins,SELL,0.01,0.98,sell,0,0,,97,99,0.067,0.98,0.99,0,0.99,taker dump — sold into the bid (the carved exception),C6D6PX0Y6KDD
