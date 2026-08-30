@@ -96,9 +96,14 @@ def cfb() -> FamilyConfig:
         season_start=(2026, 8, 27),
         # 400+ live orders need real book coverage: the meter went blind
         # for 8 hours on the smaller budget (2026-08-21 morning)
-        books_per_cycle=20, scan_reserve=8,
+        # owner, 2026-08-30 ("make actions up to our limit"): the
+        # exchange's documented budget is 20 req/s — cfb's slow eyes
+        # (456 books) get 48 look-ups/cycle with a 16-slot scan lane,
+        # and the action allowance doubles. The 60s cycle and blast
+        # radius are the caps now, not the exchange.
+        books_per_cycle=48, scan_reserve=16,
         book_stale_s=300.0, read_age_s=900.0,
-        max_actions_per_cycle=6,
+        max_actions_per_cycle=12,
         # owner, 2026-08-21: football must test hypotheses too — scouts
         # and starter positions are how it learns what earns
         probe_usd=3.0, grow_usd=10.0,
