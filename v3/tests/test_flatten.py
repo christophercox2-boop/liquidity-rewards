@@ -5958,6 +5958,44 @@ class TestWatchedRaces(unittest.TestCase):
         self.assertTrue(w[A]["qualifies"])
 
 
+class TestBoostWatch(unittest.TestCase):
+    """Owner yes, 2026-08-30: the first sighting of a NEW program id
+    with a fat pool (>=$100/day) or a boost-flavored name alerts once
+    per program — the MA MoV boost paid $199.65 on its first walled
+    day and was only caught by a screenshot."""
+
+    def test_new_fat_program_alerts_once(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.cycle()                       # seed: baseline, no alert
+        boost_alerts = [a for a in r.alerts if "NEW fat" in a[0]]
+        self.assertFalse(boost_alerts)
+        r.exchange.prog_raw[A] = {"timePeriods": [{
+            "programId": "elections_boosted_high_20260901",
+            "rewardPool": 1000.0, "targetSize": 10000,
+            "discountFactor": 0.2, "status": "LIVE"}]}
+        r.cycle(advance=r.fam.cfg.terms_active_s + 1)
+        boost_alerts = [a for a in r.alerts if "NEW fat" in a[0]]
+        self.assertEqual(len(boost_alerts), 1)
+        self.assertIn("elections_boosted_high_20260901", boost_alerts[0][1])
+        self.assertIn("$1000/day", boost_alerts[0][1])
+        r.cycle(advance=r.fam.cfg.terms_active_s + 1)
+        boost_alerts = [a for a in r.alerts if "NEW fat" in a[0]]
+        self.assertEqual(len(boost_alerts), 1)    # never re-alerts
+
+    def test_small_program_rollover_stays_quiet(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        r.exchange.prog_raw[A] = {"timePeriods": [{
+            "programId": "politics_low_20260901", "rewardPool": 25.0,
+            "targetSize": 2000, "discountFactor": 0.1, "status": "LIVE"}]}
+        r.cycle(advance=r.fam.cfg.terms_active_s + 1)
+        self.assertFalse([a for a in r.alerts if "NEW fat" in a[0]])
+
+
 class TestHotGroundNeverJoinsTheTouch(unittest.TestCase):
     """Owner, 2026-08-29: "this sort of strategy only obviously works
     when fills are more rare." Ground where our own orders were
