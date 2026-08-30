@@ -412,6 +412,8 @@ class Family:
         self.scoreboard: dict[str, dict] = {}     # slug -> {ts, plans, why...}
         self.last_action: dict[str, float] = {}   # "slug|side" -> ts
         self.known_dead: set[str] = set()          # program read as gone
+        self.seen_pids: set[str] = set()           # program ids ever seen
+                                                   # (the boost watch)
         self.last_discover = 0.0
         self.last_terms_active = 0.0
         self.last_terms_full = 0.0
@@ -708,6 +710,7 @@ class Family:
                 self.known_dead.discard(slug)
             else:
                 self.known_dead.add(slug)
+        fresh_pids: dict[str, str] = {}
         for ch in changes:
             if ch.field == "program_gone":
                 self.known_dead.add(ch.slug)
@@ -719,6 +722,36 @@ class Family:
                 self.alert(f"{self.cfg.tag}: reward pool change",
                            f"{self._label(ch.slug)}: {ch.field} "
                            f"{ch.old} -> {ch.new}")
+            prog_ch = self.terms.get(ch.slug)
+            if (prog_ch is not None and prog_ch.pid
+                    and prog_ch.pid not in self.seen_pids):
+                self.seen_pids.add(prog_ch.pid)
+                if prog_ch.pool >= 100.0 or "boost" in prog_ch.pid.lower():
+                    fresh_pids.setdefault(prog_ch.pid, ch.slug)
+        # THE BOOST WATCH (owner yes, 2026-08-30, after the MA MoV
+        # boost paid $199.65 on its first walled day and was only
+        # caught by his screenshot): the first sighting of a program
+        # id with a fat pool (>=$100/day per event) or a boost-flavored
+        # name alerts ONCE per program — the play is to wall it within
+        # hours, and hours are what the alert buys.
+        for pid_b, slug_b in fresh_pids.items():
+            prog_b = self.terms.get(slug_b)
+            if prog_b is None:
+                continue
+            n_in = sum(1 for p2 in self.terms.current.values()
+                       if p2.pid == pid_b)
+            self._log(event="boost_watch", market=slug_b, note=pid_b)
+            self.alert(
+                f"{self.cfg.tag}: NEW fat reward program",
+                f"{pid_b}: ${prog_b.pool:g}/day per event, target "
+                f"{prog_b.target:g}, df {prog_b.df:g} — {n_in} of your "
+                f"markets carry it (e.g. {self._label(slug_b)}). "
+                f"The MoV play: wall the sides early.")
+        if not self.seen_pids:
+            # first run with no saved memory: today's programs are the
+            # baseline, never an alert storm
+            self.seen_pids = {p.pid for p in self.terms.current.values()
+                              if p.pid}
 
     # ------------------------------------------------------------- planning
 
@@ -4023,6 +4056,7 @@ class Family:
                              for oid, g in self.gone_pending.items()},
             "last_action": self.last_action,
             "known_dead": sorted(self.known_dead),
+            "seen_pids": sorted(self.seen_pids),
             "inv_since": self.inv_since,
             "fillmodel": self.fillmodel.to_dict(),
             "pending_marks": self.pending_marks[-60:],
@@ -4075,6 +4109,7 @@ class Family:
                 continue
         self.last_action = dict(d.get("last_action") or {})
         self.known_dead = set(d.get("known_dead") or ())
+        self.seen_pids = set(d.get("seen_pids") or ())
         self.inv_since = dict(d.get("inv_since") or {})
         if d.get("fillmodel"):
             self.fillmodel = FillModel.from_dict(d["fillmodel"])
