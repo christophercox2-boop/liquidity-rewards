@@ -4959,7 +4959,9 @@ class TestExpectedRiskBudget(unittest.TestCase):
         from v3 import politics
         c = politics.config()
         self.assertEqual(c.capital_usd, 250.0)
-        self.assertEqual(c.gross_cap_usd, 500.0)
+        # owner, 2026-08-30 "2500 is fine" — the raw-claims planner
+        # pressed the old $500 gross bound within hours
+        self.assertEqual(c.gross_cap_usd, 2500.0)
         self.assertEqual(c.per_market_usd, 20.0)
         self.assertEqual(c.per_market_gross_usd, 60.0)
         self.assertEqual(c.min_est_day, 0.02)
