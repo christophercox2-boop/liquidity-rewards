@@ -1545,3 +1545,31 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788034942.9,politics,enwc-uspres-nom-dem-2028-andbes,SELL,1,0.07,sell,0,0,0.09,7,11,0.506,0.07,0.09,0.02,0,taker dump — sold into the bid (the carved exception),C5ZSXDREGKDG
 1788036142.9,politics,ewc-usp-2028-11-07-jdvan,BUY,10.54,0.24,earn,0.3465,0.47,,24,29,0.39,0.24,0.27,-0.03,10.54,3 ticks behind the touch — we would hold 8% of the bid side,C5ZN710XYKDJ
 1788036322.9,politics,usgubewc-usgub-ri-2026-11-03-dem,BUY,1,0.96,earn,0.6572,15.44,0.99625,96,99,0.468,0.81,0.96,-0.0363,3,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C5JVE4RN2KDH
+1788038072.8,politics,enwc-uspres-nom-dem-2028-kamhar,SELL,25,0.13,sell,0,0,,13,17,0.234,0.13,0.14,0.02,0,taker dump — sold into the bid (the carved exception),C60G4Y6ATKDM
+1788038072.8,politics,ewc-usp-2028-11-07-gleyou,SELL,6,0.01,sell,0,0,,1,4,0.125,0.01,0.02,0.01,0,taker dump — sold into the bid (the carved exception),C60EZBT34KDF
+1788038072.8,politics,ussewc-usse-id-2026-11-03-todach,SELL,18,0.03,sell,0,0,,5,8,0.614,0.03,0.04,0.03,0,taker dump — sold into the bid (the carved exception),C60EZBTSCKDF
+1788038224.4,politics,usgubewc-usgub-ne-2026-11-03-rep,SELL,4,0.93,sell,0,0,0.95975,93,96,0.658,0.93,0.94,0.0297,0,taker dump — sold into the bid (the carved exception),C60GAGSCCKDG
+1788038224.4,politics,ewc-usp-2028-11-07-rokha,SELL,7,0.01,sell,0,0,,1,5,0,0.01,0.02,0.01,0,taker dump — sold into the bid (the carved exception),C60FZJ63YKDH
+1788038284.4,politics,ewc-usp-2028-11-07-kamhar,SELL,27,0.04,sell,0,0,,3,7,0.27,0.04,0.05,0.01,0,taker dump — sold into the bid (the carved exception),C60FTRZVYKDN
+1788038344.4,politics,enwc-uspres-nom-dem-2028-jonoss,SELL,6,0.17,sell,0,0,,19,23,0.536,0.17,0.19,0.04,0,taker dump — sold into the bid (the carved exception),C60GE71GRKDE
+1788038404.4,politics,enwc-uspres-nom-rep-2028-tuccar,SELL,13,0.07,sell,0,0,,8,11,0.775,0.07,0.08,0.03,38,taker dump — sold into the bid (the carved exception),C60HC7WE2KDM
+1788038404.4,politics,ussewc-usse-ri-2026-11-03-dem,SELL,1,0.98,sell,0,0,0.999275,96,99,0.6,0.98,0.99,0.0193,0,taker dump — sold into the bid (the carved exception),C60H0E0ZGKDJ
+1788038644.4,politics,enwc-uspres-nom-dem-2028-andbes,SELL,1,0.07,sell,0,0,0.09,7,11,0.501,0.07,0.09,0.02,0,taker dump — sold into the bid (the carved exception),C60J761RPKDG
+1788038764.4,politics,usgubewc-usgub-md-2026-11-03-dem,SELL,6,0.98,sell,0,0,0.999875,98,99,0.137,0.98,0.99,0.0199,0,taker dump — sold into the bid (the carved exception),C60K58CGYKDG
+1788038764.4,politics,ussewc-usse-il-2026-11-03-dem,SELL,4,0.97,sell,0,0,0.995425,96,99,0.128,0.97,0.98,0.0254,0,taker dump — sold into the bid (the carved exception),C60K58DJWKDG
+1788038764.4,politics,ussewc-usse-id-2026-11-03-rep,SELL,12,0.97,sell,0,0,0.9975,94,97,0.867,0.97,0.98,0.0275,5,taker dump — sold into the bid (the carved exception),C60JVG0CYKDH
+1788039064.4,politics,usgubewc-usgub-ma-2026-11-03-dem,SELL,2,0.98,sell,0,0,0.999525,96,99,0.468,0.98,0.99,0.0195,0,taker dump — sold into the bid (the carved exception),C60MKBB32KDD
+1788039784.4,politics,usgubewc-usgub-tn-2026-11-03-dem,SELL,1,0.04,earn,0.8621,14.57,0.002525,2,5,0.435,0.03,0.05,-0.0375,-16,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C5MBADH2RKDC
+1788043328.5,politics,enwc-uspres-nom-dem-2028-andbes,BUY,25.88,0.07,earn,0.9137,6.12,0.09,7,11,0.494,0.07,0.09,-0.02,26.88,1 tick behind the touch — we would hold 41% of the bid side,C5WFEEBQRKDM
+1788043868.5,cfb,aachc-cfb-wins-2026-11-28-cin-6pt5wins,SELL,0.01,0.38,sell,0.0008,19.74,,32,40,0.272,0.31,0.4,-0.02,-0.01,selling filled stock — it earns while it waits,C5H1EEX5JKDH
+1788045488.6,politics,usgubewc-usgub-ri-2026-11-03-kenblo,SELL,4.75,0.08,sell,0,18.2,,5,9,0.671,0.01,0.06,-0.01,25.25,an exit — its fill reduces the position it sits on,C5JNVZBAAKDC
+1788048068.6,cfb,aachc-cfb-wins-2026-11-28-missr-6pt5wins,SELL,0.01,0.54,sell,0,22.8,,47,53,0.323,0.48,0.54,-0.04,-0.01,selling filled stock — it earns while it waits,C5FDBJ82RKDM
+1788049328.6,cfb,aachc-cfb-wins-2026-11-28-ncst-6pt5wins,BUY,1,0.73,sell,0,46.95,,70,81,0.28,0.73,0.79,-0.03,2,buying back the short at or under what it sold for — the bid earns while it wait,C4TWGWBFJKDC
+1788049928.6,politics,ewc-usp-2028-11-07-jdvan,BUY,20,0.23,earn,0.5912,3.05,,23,26,0.578,0.22,0.24,-0.01,31,2 ticks behind the touch — we would hold 4% of the bid side,C60MEBNJJKDM
+1788051848.7,politics,enwc-uspres-nom-rep-2028-marrub,BUY,10,0.22,manual,0.229,14.1,0.35,24,27,0.777,0.22,0.23,-0.13,30,the owner's own order — the engine leaves it alone,C5QK507K8KDJ
+1788053588.7,politics,ussewc-usse-sd-2026-11-03-rep,BUY,1,0.95,earn,0.144,9.04,0.991075,93,97,0.817,0.95,0.96,-0.0411,7,3 ticks in front of the touch — we would hold 80% of the bid side,C5WE8RHJ2KDK
+1788053648.7,politics,ussewc-usse-nm-2026-11-03-dem,BUY,1,0.98,earn,1.7553,0.37,0.99375,97,99,0,0.98,0.99,-0.0138,1,at the touch — a fill here is 1 ticks inside value (Silver + evidence),C63Y6CMK4KDD
+1788055148.8,politics,ussewc-usse-co-2026-11-03-dem,BUY,10,0.95,earn,0.1607,18.02,0.9944,95,99,0.314,0.92,0.96,-0.0444,10,1 tick in front of the touch — we would hold 37% of the bid side,C5N1TRTMEKDF
+1788055208.8,politics,ussewc-usse-mt-2026-11-03-rep,BUY,16,0.9,earn,0.1755,6.32,0.984125,92,96,0.471,0.9,0.92,-0.0841,17,1 tick behind the touch — we would hold 17% of the bid side,C5Z5WYCJYKDH
+1788055268.8,politics,ussewc-usse-ok-2026-11-03-dem,SELL,20,0.02,earn,4.4074,0.03,0.00055,1,3,0.382,0.01,0.06,-0.0195,-26,at the touch — a fill here is 1 ticks inside value (Silver + evidence),C64M03M3YKDM
+1788055328.8,politics,usgubewc-usgub-ar-2026-11-03-dem,SELL,20,0.03,earn,0.4638,3,0.0016,1,4,0.661,0.02,0.09,-0.0284,-25,1 tick behind the touch — we would hold 39% of the ask side,C61ZVFQW8KDG

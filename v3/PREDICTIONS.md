@@ -835,3 +835,21 @@ under $180. And the deflator evidence is now two days in one
 direction: raw claims ~$88 (24h-scaled) vs $219 paid (~0.4x) after
 Aug-26's ~0.9x. The engine decides on claims ÷ 3 — it believed ~$29
 while earning $219. Claims 2 and 3 wait on Aug-28's posting.
+
+### P15 claims 2 & 3 — GRADED 2026-08-30: both RIGHT
+*Aug-28 posted $755.41 — the record, nearly double Aug-26's record:
+politics $560.26 across 194 markets, cfb $195.15 across 205. The
+postings arrived in waves at 01:09–01:15Z, ~2 days after day end.*
+
+2. **MoV ≥ $50: RIGHT, four times over.** The 11 brackets paid
+   **$199.65** ($10.49–$22.87 each) on their first boosted day with
+   the owner's walls standing — against $2.52 pre-boost. The
+   qualify-the-side mechanics work exactly as the terms said.
+3. **Claims ÷ paid ≤ 1.5x: RIGHT.** Aug-27 ~0.4x, Aug-28 ~0.55x
+   (frozen claims $233 metered / ~$309 24h-scaled vs $560 paid).
+   Acted on 2026-08-29 with the owner's yes: est_deflate removed.
+
+P15 final: claim 1 wrong (the third straight "politics goes down"
+call to break high), claims 2 and 3 right. Bonus grade: the cfb $100
+budget bump was estimated at +$40–70/day and delivered +$110
+($85.16 → $195.15) on its first full day.
