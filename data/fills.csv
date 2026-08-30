@@ -1632,3 +1632,11 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788107598.7,politics,ewc-usp-2028-11-07-marrub,BUY,15,0.01,manual,0,52.82,,12,17,0.38,0.13,0.14,-0.13,15,the owner's own order — the engine leaves it alone,C53PSW91GKDF
 1788107598.7,politics,ewc-usp-2028-11-07-thomas,BUY,99,0.06,earn,2.8727,0.48,,3,9,0,0.06,0.08,0,99,joins the touch — the book has been quiet,C6GNB28V2KDC
 1788107598.7,politics,ewc-usp-2028-11-07-marrub,SELL,15,0.13,sell,0,0,,10,15,0.591,0.13,0.14,0,0,taker dump — sold into the bid (the carved exception),C6H3TP0CTKDM
+1788112758.9,cfb,aachc-cfb-wins-2026-11-28-ore-8pt5wins,BUY,0.5,0.95,earn,0.4073,0.1,,89,97,0,0.8,0.99,0.01,0.5,joins the touch — the book has been quiet,C6J43VA0WKDE
+1788112878.9,politics,vmc-ussep-mov-ma-dem-2026-09-01-mou0-5,SELL,192,0.03,manual,5.0168,42.35,,1,3,0.75,0.01,0.02,-0.01,251,moved by the owner,C5E17ZHXWKDE
+1788112938.9,cfb,aachc-cfb-wins-2026-11-28-txtech-9pt5wins,SELL,0.01,0.63,earn,0.082,0.08,,70,79,0,0.54,0.64,0.12,-0.01,1 tick in front of the touch — we would hold 68% of the ask side,C6J56TG50KDH
+1788113719.0,politics,ussewc-usse-id-2026-11-03-todach,SELL,18,0.03,sell,0,0,,5,9,0.515,0.03,0.04,0.04,0,taker dump — sold into the bid (the carved exception),C6JG8CDBEKDC
+1788113839.1,politics,ussewc-usse-nm-2026-11-03-dem,SELL,1,0.98,sell,0,0,0.993225,96,99,0.377,0.98,0.99,0.0132,0,taker dump — sold into the bid (the carved exception),C6JHDTZFPKDG
+1788113839.1,politics,usgubewc-usgub-md-2026-11-03-dem,SELL,6,0.98,sell,0,0,0.9999,98,99,0.096,0.98,0.99,0.0199,0,taker dump — sold into the bid (the carved exception),C6JGW6CM8KDD
+1788114319.1,politics,enwc-ussep-de-2026-09-15-rep-johshu,BUY,10,0.17,earn,6.2375,0.23,,16,31,0.191,0.17,0.18,-0.05,13,at the touch — a fill here is 1 ticks inside value (evidence band only; confiden,C6JDEW0D4KDH
+1788114319.1,cfb,aachc-cfb-wins-2026-11-28-cah-7pt5wins,BUY,0.01,0.52,earn,0.0276,0.07,,38,53,0,0.3,0.55,0.05,0.01,1 tick in front of the touch — we would hold 69% of the bid side,C6JK60QFYKDC
