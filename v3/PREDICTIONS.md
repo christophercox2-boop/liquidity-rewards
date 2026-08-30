@@ -853,3 +853,21 @@ P15 final: claim 1 wrong (the third straight "politics goes down"
 call to break high), claims 2 and 3 right. Bonus grade: the cfb $100
 budget bump was estimated at +$40–70/day and delivered +$110
 ($85.16 → $195.15) on its first full day.
+
+### P16 — written 2026-08-30, BEFORE the weekend/post-primary data
+*The politics run-up decomposed: breadth (48 -> ~200 paying markets
+since Aug-25, median $1.25, top-20 just 30%), rate per market ($0.60
+-> $2.89 avg, re-tier + correct terms + live books), and the MoV
+boost + walls ($199.65/day, ends when the MA primary resolves
+Tuesday Sep 1).*
+
+1. **The structural base holds:** politics EX-MoV posts ≥ $180/day
+   for Aug-29, 30, and 31. Wrong if any day lands under — then the
+   record week was tide, not engine.
+2. **The cliff is resolution, not failure:** post-primary (Sep 2+),
+   MoV pays ~$0 and TOTAL politics still posts ≥ $200/day. Wrong
+   under $200 — then the base was leaning on the boost more than
+   the decomposition shows.
+
+**Check.** data/rewards.csv days 29-31 and Sep 2-3; MoV = the 11
+vmc-ussep-mov-ma-dem markets.
