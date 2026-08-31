@@ -18,9 +18,48 @@ Pure arithmetic on a book and a program row — no IO, no orders.
 
 from __future__ import annotations
 
+import datetime as dt
+import random
 from dataclasses import dataclass, field
 
 from .scoring import estimate_join
+
+# Owner, 2026-08-31: "we'll probably want to stay out of live events
+# until I have a way of quoting them better." A market whose game has
+# started prices off play, not off a line — and the buffer keeps us out
+# of the hour before the whistle too, when the book turns over as the
+# lines firm up. Re-checked on every pass, because a market that was
+# quiet this morning goes live at kickoff.
+LIVE_BUFFER_S = 3600.0
+
+
+def _epoch(v) -> float | None:
+    """The exchange sends times as ISO strings; some feeds send epochs."""
+    if v is None or v == "":
+        return None
+    if isinstance(v, (int, float)):
+        f = float(v)
+        return f / 1000.0 if f > 1e11 else f     # milliseconds or seconds
+    try:
+        s = str(v).replace("Z", "+00:00")
+        return dt.datetime.fromisoformat(s).timestamp()
+    except (TypeError, ValueError):
+        return None
+
+
+def is_live_event(market: dict, now: float,
+                  buffer_s: float = LIVE_BUFFER_S) -> bool:
+    """Is this market's event under way, or about to be?
+
+    A market with no gameStartTime has no in-play phase — a futures or
+    politics market trades the same way all day — so it is never live.
+    """
+    if not isinstance(market, dict):
+        return False
+    start = _epoch(market.get("gameStartTime"))
+    if start is None:
+        return False
+    return now >= start - buffer_s
 
 # how far from the touch still carries real scoring weight. Past this the
 # discount factor has usually crushed a level's contribution to nothing.
@@ -147,6 +186,148 @@ def summarise(rows: list[dict]) -> dict:
         })
     out.sort(key=lambda r: -r["median_share_per_dollar"])
     return {"kinds": out}
+
+
+def _median(xs: list[float]) -> float:
+    if not xs:
+        return 0.0
+    s = sorted(xs)
+    n = len(s)
+    return s[n // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2.0
+
+
+@dataclass
+class PrefixStat:
+    """A prefix's running evidence. Recent samples only — books change,
+    and a prefix that was juicy last month must not sit at the top for
+    ever. The window IS the decay."""
+
+    prefix: str
+    markets: int = 0            # distinct markets drawn
+    sides: int = 0              # sides scored
+    qualified: int = 0
+    live_skipped: int = 0
+    spd: list = field(default_factory=list)
+    share: list = field(default_factory=list)
+    touch: list = field(default_factory=list)
+    est: list = field(default_factory=list)
+    last_ts: float = 0.0
+
+    KEEP = 80                   # samples per prefix before the oldest fall out
+
+    def record(self, p: "SideProbe", now: float) -> None:
+        self.sides += 1
+        self.last_ts = now
+        if not p.qualifies:
+            return
+        self.qualified += 1
+        for lst, v in ((self.spd, p.share_per_dollar),
+                       (self.share, p.share * 100.0),
+                       (self.touch, p.touch_size),
+                       (self.est, p.est_day)):
+            lst.append(v)
+            del lst[:-self.KEEP]
+
+    def row(self) -> dict:
+        return {"prefix": self.prefix, "markets": self.markets,
+                "sides": self.sides, "qualified": self.qualified,
+                "live_skipped": self.live_skipped,
+                "n": len(self.spd),
+                "median_spd": round(_median(self.spd), 3),
+                "median_share_pct": round(_median(self.share), 3),
+                "median_touch": round(_median(self.touch), 0),
+                "median_est_day": round(_median(self.est), 4),
+                "last_ts": round(self.last_ts, 1)}
+
+
+# Below this many scored sides a prefix's median is noise, so it is not
+# ranked at all — it is listed as still sampling. The AFC South market
+# (one share at the touch, 14% share) is exactly the single lucky draw
+# that would otherwise crown a prefix (owner, 2026-08-31).
+MIN_SAMPLES = 12
+
+
+def leaderboard(stats: dict, min_samples: int = MIN_SAMPLES) -> dict:
+    """Ranked on the MEDIAN share per dollar at risk — never the max,
+    and never before there is enough evidence to mean anything."""
+    rows = [s.row() for s in stats.values()]
+    ranked = [r for r in rows if r["n"] >= min_samples]
+    young = [r for r in rows if r["n"] < min_samples]
+    ranked.sort(key=lambda r: -r["median_spd"])
+    young.sort(key=lambda r: -r["n"])
+    return {"ranked": ranked, "sampling": young,
+            "min_samples": min_samples}
+
+
+class Sampler:
+    """Stratified round-robin over prefixes, uniformly random within
+    each one.
+
+    Uniform over MARKETS would be the obvious choice and the wrong one:
+    a prefix holding 8,000 markets would swamp the sample while one
+    holding 20 went years without a draw, which is the opposite of a
+    prefix leaderboard. So every prefix takes its turn, and which of its
+    markets represents it is a random draw without replacement until the
+    prefix is exhausted, then reshuffled.
+
+    The seed is kept and reported so any run can be reproduced and
+    audited — no hand-picking (owner, 2026-08-31: "so that we can
+    guarantee that you'd being random with how you are sampling").
+    """
+
+    def __init__(self, seed: int = 0):
+        self.seed = int(seed)
+        self.rng = random.Random(self.seed)
+        self.pools: dict[str, list[str]] = {}
+        self.all: dict[str, list[str]] = {}
+        self.order: list[str] = []
+        self.cursor = 0
+        self.passes = 0
+
+    def load(self, slugs) -> None:
+        """Group the population by prefix. Adding markets later keeps
+        the pools that are part-drawn, so a refresh does not restart the
+        sampling."""
+        for s in slugs:
+            k = kind_of(s)
+            bucket = self.all.setdefault(k, [])
+            if s not in bucket:
+                bucket.append(s)
+        for k, v in self.all.items():
+            if k not in self.pools:
+                self.pools[k] = self._shuffled(v)
+        self.order = sorted(self.all)
+
+    def _shuffled(self, slugs: list[str]) -> list[str]:
+        out = list(slugs)
+        self.rng.shuffle(out)
+        return out
+
+    def next_batch(self, k: int) -> list[str]:
+        """The next k markets to probe: one prefix at a time, round
+        robin, so every prefix gains evidence at the same rate."""
+        out: list[str] = []
+        if not self.order:
+            return out
+        for _ in range(k * max(len(self.order), 1)):
+            if len(out) >= k:
+                break
+            pref = self.order[self.cursor % len(self.order)]
+            self.cursor += 1
+            pool = self.pools.get(pref) or []
+            if not pool:                      # exhausted — reshuffle it
+                pool = self.pools[pref] = self._shuffled(self.all.get(pref, []))
+                self.passes += 1
+                if not pool:
+                    continue
+            out.append(pool.pop())
+        return out
+
+    def state(self) -> dict:
+        return {"seed": self.seed, "prefixes": len(self.all),
+                "population": sum(len(v) for v in self.all.values()),
+                "left_this_pass": sum(len(v) for v in self.pools.values()),
+                "passes": self.passes}
 
 
 CSV_COLUMNS = ("market", "kind", "side", "touch_px", "touch_size",

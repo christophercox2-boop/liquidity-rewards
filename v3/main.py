@@ -797,6 +797,14 @@ class Monitor:
         # verification using the posted rewards number")
         self.paid_seen: dict[str, float] = {}
         self.mkt_claim_day: dict[str, float] = {}
+        # the cycling market survey: a seeded sampler and the running
+        # per-prefix evidence. The seed is recorded so a run can be
+        # reproduced and audited (owner, 2026-08-31).
+        from . import survey as _sv
+        self.survey = _sv.Sampler(seed=20260831)
+        self.survey_stats: dict[str, _sv.PrefixStat] = {}
+        self.survey_at = 0.0
+        self.survey_frame_note = ""
         self.rw_last: dict | None = None      # latest payout-check result
         self._rw_at = 0.0
         self._lock = threading.Lock()
@@ -971,6 +979,13 @@ class Monitor:
         self.rewards_seen = dict(saved.get("rewards_seen") or {})
         self.paid_seen = dict(saved.get("paid_seen") or {})
         self.mkt_claim_day = dict(saved.get("mkt_claim_day") or {})
+        from . import survey as _sv2
+        for pref, row in (saved.get("survey_stats") or {}).items():
+            st = _sv2.PrefixStat(prefix=pref)
+            st.__dict__.update({k: v for k, v in row.items()
+                                if k in st.__dict__})
+            self.survey_stats[pref] = st
+        self.survey_frame_note = str(saved.get("survey_frame") or "")
         self.actuals_by_day = dict(saved.get("actuals_by_day") or {})
         self.actuals_by_fam = dict(saved.get("actuals_by_fam") or {})
         self.owner_fairs = {k: float(v) for k, v in
@@ -1052,6 +1067,9 @@ class Monitor:
             "rewards_seen": self.rewards_seen,
             "paid_seen": self.paid_seen,
             "mkt_claim_day": self.mkt_claim_day,
+            "survey_stats": {p: st.__dict__ for p, st
+                             in list(self.survey_stats.items())[:200]},
+            "survey_frame": self.survey_frame_note,
             "actuals_by_day": self.actuals_by_day,
             "actuals_by_fam": self.actuals_by_fam,
             "owner_fairs": dict(self.owner_fairs),
@@ -1995,90 +2013,105 @@ class Monitor:
                        "posting or the hourly publish")
         return ok
 
-    # a survey reads books and terms and writes a file. It never places,
-    # moves or cancels anything, and it is only ever started by the owner
-    # tapping the button (owner, 2026-08-31).
-    SURVEY_MAX_MARKETS = 400        # terms fetched per tag
-    SURVEY_MAX_BOOKS = 140          # books read per tag — the expensive part
+    # The surveyor reads books and terms and writes a file. It never
+    # places, moves or cancels anything. It runs a few markets per cycle
+    # for ever, so the leaderboard keeps improving instead of being one
+    # snapshot of whatever the API happened to return first.
+    SURVEY_PER_CYCLE = 6            # markets probed per cycle
+    SURVEY_TERMS_BATCH = 300        # terms fetched when the frame is refreshed
 
-    def survey_tags(self, tags: list[str], out_path: str = "data/survey.csv",
-                    max_books: int | None = None) -> dict:
-        """Where could a cent of risk hold a real share?
+    def _survey_frame(self, now: float) -> str:
+        """Load the population to sample from, refreshed a few times a
+        day. Prefers the exchange's own enumeration of every market
+        carrying a program; falls back to the tags we can name, and SAYS
+        which one it got, because a random draw from a frame we cannot
+        prove is complete is not a random draw from the market (owner,
+        2026-08-31)."""
+        from . import survey as sv
+        if now - getattr(self, "_survey_frame_at", 0.0) < 6 * 3600.0:
+            return getattr(self, "survey_frame_note", "")
+        self._survey_frame_at = now
+        rows, note = self.client.all_programs()
+        slugs = [str(r.get("marketSlug")) for r in rows if r.get("marketSlug")]
+        if slugs:
+            self.survey_frame_note = f"exchange enumeration: {len(slugs):,} markets"
+        else:
+            seen: set[str] = set()
+            for fam in self.families.values():
+                seen.update(fam.universe or {})
+            slugs = sorted(seen)
+            self.survey_frame_note = (
+                f"NOT a full frame — {note}; sampling the "
+                f"{len(slugs):,} markets our own tags return")
+        self.survey.load(slugs)
+        self._note("survey frame: " + self.survey_frame_note)
+        return self.survey_frame_note
 
-        Walks a tag's markets WITHOUT the slug-prefix filter the families
-        use, so it reports what kinds of market a tag actually holds —
-        that is how "NFL beyond futures" gets answered rather than
-        assumed (owner, 2026-08-31). Read-only: books, terms, a file.
-        """
+    def survey_step(self, now: float) -> dict:
+        """One turn of the cycling survey: draw a few markets at random
+        within their prefix, skip anything whose event is live or about
+        to be, score both sides, and fold the result into the running
+        leaderboard."""
         from . import survey as sv
         from .programs import pick_period, program_from_period, with_event_n
 
-        rows: list[dict] = []
-        seen_kinds: dict[str, int] = {}
-        found: dict[str, int] = {}
-        cap = max_books or self.SURVEY_MAX_BOOKS
-        for tag in tags:
-            try:
-                events = self.client.events_by_tag(tag, max_pages=8)
-            except Exception as e:  # noqa: BLE001 — a dud tag is a finding
-                self._note(f"survey {tag}: no events ({type(e).__name__})")
-                found[tag] = 0
-                continue
-            uni: dict[str, int] = {}
-            for ev in events:
-                open_m = [m for m in ev.get("markets") or []
-                          if m.get("slug") and not m.get("closed")]
-                for m in open_m:
-                    uni[m["slug"]] = len(open_m)
-            found[tag] = len(uni)
-            for s in uni:
-                k = sv.kind_of(s)
-                seen_kinds[k] = seen_kinds.get(k, 0) + 1
-            slugs = list(uni)[:self.SURVEY_MAX_MARKETS]
-            try:
-                raw = self.client.programs(slugs)
-            except Exception as e:  # noqa: BLE001
-                self._note(f"survey {tag}: terms failed ({type(e).__name__})")
-                continue
-            # only markets that actually pay are worth a book read
-            payers = []
-            for s in slugs:
-                per = pick_period((raw.get(s) or {}).get("timePeriods") or [], s)
-                if not per:
-                    continue
-                prog = with_event_n(program_from_period(per), uni.get(s, 1))
-                if prog.pool > 0 and prog.is_live():
-                    payers.append((s, prog))
-            for s, prog in payers[:cap]:
-                try:
-                    book = self.client.book(s, fetched_at=time.time())
-                except Exception:  # noqa: BLE001 — one bad book is not fatal
-                    continue
-                pool_side = (prog.pool / max(prog.event_n, 1)) / 2.0
-                for side in ("BUY", "SELL"):
-                    rows.append(sv.probe_side(book, prog, side,
-                                              pool_side).row(s, sv.kind_of(s)))
-                self.client._sleep(0.05)
-        res = sv.summarise(rows)
-        res["found"] = found
-        res["kinds_seen"] = dict(sorted(seen_kinds.items(),
-                                        key=lambda kv: -kv[1])[:40])
-        res["rows"] = len(rows)
+        self._survey_frame(now)
+        picks = self.survey.next_batch(self.SURVEY_PER_CYCLE)
+        if not picks:
+            return {"ok": False, "note": "nothing to sample"}
         try:
-            existing, sha = self._gh_file(out_path)
-            self._gh_put(out_path, sv.to_csv(rows), sha,
-                         f"market survey: {len(rows)} sides [skip ci]")
-            res["written"] = out_path
-        except Exception as e:  # noqa: BLE001 — the numbers still return
-            res["written"] = f"failed: {type(e).__name__}"
-        top = res["kinds"][:6]
-        self._note("survey: " + " | ".join(
-            f"{k['kind']} {k['qualified']}/{k['sides']} sides, "
-            f"median share {k['median_share_pct']:.2f}%, "
-            f"{k['median_share_per_dollar']:.2f} share%/$"
-            for k in top) or "survey: nothing found")
-        self.survey_last = res
-        return res
+            raw = self.client.programs(picks)
+        except Exception as e:  # noqa: BLE001 — a survey never breaks a cycle
+            return {"ok": False, "note": f"terms: {type(e).__name__}"}
+        done = 0
+        for slug in picks:
+            pref = sv.kind_of(slug)
+            st = self.survey_stats.setdefault(pref, sv.PrefixStat(prefix=pref))
+            per = pick_period((raw.get(slug) or {}).get("timePeriods") or [], slug)
+            if not per:
+                continue
+            prog = with_event_n(program_from_period(per), 1)
+            if not (prog.pool > 0 and prog.is_live()):
+                continue
+            try:
+                md = self.client.market_details(slug)
+            except Exception:  # noqa: BLE001
+                md = {}
+            # owner, 2026-08-31: stay out of live events until he has a
+            # way of quoting them. Re-checked every pass — a market that
+            # was quiet this morning goes live at kickoff.
+            if sv.is_live_event(md, now):
+                st.live_skipped += 1
+                continue
+            if md:
+                n_ev = int(md.get("eventMarketCount") or 0)
+                if n_ev > 1:
+                    prog = with_event_n(prog, n_ev)
+                tick = self.client.declared_tick(md)
+                if tick:
+                    for fam in self.families.values():
+                        fam.cache.declared[slug] = tick
+            try:
+                book = self.client.book(slug, fetched_at=now)
+            except Exception:  # noqa: BLE001
+                continue
+            st.markets += 1
+            done += 1
+            pool_side = (prog.pool / max(prog.event_n, 1)) / 2.0
+            for side in ("BUY", "SELL"):
+                st.record(sv.probe_side(book, prog, side, pool_side), now)
+            self.client._sleep(0.05)
+        self.survey_at = now
+        return {"ok": True, "probed": done,
+                "frame": getattr(self, "survey_frame_note", "")}
+
+    def survey_view(self) -> dict:
+        from . import survey as sv
+        out = sv.leaderboard(self.survey_stats)
+        out["frame"] = getattr(self, "survey_frame_note", "")
+        out["sampler"] = self.survey.state()
+        out["at"] = round(getattr(self, "survey_at", 0.0), 1)
+        return out
 
     def _tick_probe(self) -> None:
         """Ask the exchange what price grid a market actually has, and
@@ -2178,6 +2211,19 @@ class Monitor:
             self._tick_probe()
         except Exception as e:  # noqa: BLE001 — a diagnostic, never a blocker
             self._note(f"tick probe failed: {type(e).__name__}: {e}")
+        try:
+            lb = self.survey_view()
+            top = lb["ranked"][:5]
+            if top:
+                self._note("survey leaderboard: " + " | ".join(
+                    f"{r['prefix']} {r['median_spd']:.2f} share%/$ "
+                    f"(n={r['n']}, touch {r['median_touch']:,.0f})"
+                    for r in top))
+            self._note(f"survey: {lb['sampler']['population']:,} markets in "
+                       f"frame, {len(lb['ranked'])} prefixes ranked, "
+                       f"{len(lb['sampling'])} still sampling")
+        except Exception as e:  # noqa: BLE001 — a diagnostic, never a blocker
+            self._note(f"survey report failed: {type(e).__name__}: {e}")
         try:
             # FILL-MODEL CALIBRATION, out loud (owner, 2026-08-25: the
             # expected-risk budget leans on these odds, so they are
@@ -2752,12 +2798,10 @@ class Monitor:
         d["boot"] = dict(self.boot_stage or {})
         # the last market survey's per-kind summary. Copied, not shared,
         # and only the summary — the full rows live in data/survey.csv.
-        sl = getattr(self, "survey_last", None)
-        if sl:
-            d["survey"] = {"kinds": [dict(k) for k in (sl.get("kinds") or [])],
-                           "found": dict(sl.get("found") or {}),
-                           "rows": sl.get("rows", 0),
-                           "written": sl.get("written", "")}
+        try:
+            d["survey"] = self.survey_view()
+        except Exception:  # noqa: BLE001 — the payload never dies for research
+            pass
         return d
 
     def boot_payload(self) -> bytes:
@@ -3004,6 +3048,14 @@ class Monitor:
             except ApiError as e:
                 self._note(f"{key}: {e}")
                 summaries[key] = {"name": fam.cfg.name, "error": str(e)[:120]}
+        # the survey rides at the BACK of the cycle, after every family
+        # has been managed, and never on the boot cycle — it is research,
+        # and the money comes first (owner, 2026-08-31)
+        if self._first_cycle_done:
+            try:
+                self.survey_step(now)
+            except Exception as e:  # noqa: BLE001 — research never breaks it
+                self._note(f"survey step: {type(e).__name__}: {e}")
         self._stage("first save", 98)
         st = self._state(now, summaries)
         self.last_state = st
