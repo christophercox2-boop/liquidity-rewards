@@ -12,8 +12,9 @@ import unittest
 from v3.programs import Program
 from v3.scoring import Book
 from v3.survey import (LIVE_BUFFER_S, PrefixStat, Sampler,
-                       is_live_event, kind_of, leaderboard,
-                       probe_side, summarise, to_csv)
+                       category_banned, group_of, is_live_event,
+                       kind_of, leaderboard, probe_side,
+                       summarise, to_csv)
 
 
 def book(bids, asks, tick=0.01):
@@ -216,6 +217,52 @@ class TestLeaderboard(unittest.TestCase):
         for _ in range(PrefixStat.KEEP + 30):
             st.record(self.probe(0.5, 0.5), 1000.0)
         self.assertEqual(len(st.spd), PrefixStat.KEEP)
+
+
+class TestIncentivesMetadata(unittest.TestCase):
+    """The docs (owner supplied, 2026-08-31) settled what the listing
+    carries: category, subcategory, instrumentProduct and
+    eventStartTime on every row. That replaces a per-market detail call
+    and a slug-prefix guess."""
+
+    def test_the_group_is_the_exchanges_own_labels(self):
+        row = {"marketSlug": "aec-nba-bos-nyk-2026-04-01",
+               "category": "Sports", "subcategory": "Basketball",
+               "instrumentProduct": "moneyline"}
+        self.assertEqual(group_of(row), "sports/basketball/moneyline")
+
+    def test_the_product_separates_games_from_futures(self):
+        # the thing the slug prefix could never do
+        a = group_of({"marketSlug": "x-2026-01-01", "category": "sports",
+                      "subcategory": "football", "instrumentProduct": "moneyline"})
+        b = group_of({"marketSlug": "x-2026-01-01", "category": "sports",
+                      "subcategory": "football", "instrumentProduct": "futures"})
+        self.assertNotEqual(a, b)
+
+    def test_an_unlabelled_row_falls_back_to_the_prefix(self):
+        self.assertEqual(group_of({"marketSlug": "aachc-cfb-wins-2026-11-28-x"}),
+                         "aachc-cfb-wins")
+
+    def test_event_start_time_drives_the_live_check(self):
+        now = 1_788_200_000.0
+        self.assertTrue(is_live_event({"eventStartTime": now - 60}, now))
+        self.assertFalse(is_live_event(
+            {"eventStartTime": now + LIVE_BUFFER_S + 60}, now))
+
+    def test_econ_is_kept_out_by_the_exchanges_category(self):
+        self.assertTrue(category_banned({"category": "Economics"}))
+        self.assertTrue(category_banned({"category": "sports",
+                                         "subcategory": "CPI"}))
+        self.assertFalse(category_banned({"category": "sports",
+                                          "subcategory": "basketball"}))
+        self.assertFalse(category_banned({}))
+
+    def test_strata_can_be_supplied_rather_than_derived(self):
+        s = Sampler(seed=5)
+        s.load([("a-2026-01-01-1", "sports/football/moneyline"),
+                ("b-2026-01-01-2", "sports/football/moneyline"),
+                ("c-2026-01-01-3", "politics/senate/winner")])
+        self.assertEqual(s.state()["prefixes"], 2)
 
 
 if __name__ == "__main__":
