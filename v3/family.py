@@ -4123,6 +4123,24 @@ class Family:
                    <= self.cfg.rescan_s)
         summary["triage"] = {"total": len(elig), "done": done,
                              "per_cycle": max(self.cfg.scan_reserve, 1)}
+        # how much of the scored board is actually worth funding (owner,
+        # 2026-08-31: "give an overview for each cycle what percentage
+        # are coming in as being worth the budget"). Scored = markets
+        # carrying a verdict; worth = markets whose best plan clears the
+        # entry bar. The rotating cards said the same thing one market
+        # at a time; this says it in one number.
+        scored = [sb for sb in self.scoreboard.values() if "plans" in sb]
+        worth = [sb for sb in scored
+                 if any(p.get("ev", p.get("est", 0.0)) >= self.cfg.min_est_day
+                        for p in (sb.get("plans") or []))]
+        cyc = [t for t in self.triage_feed[-self.cfg.scan_reserve:]]
+        cyc_worth = sum(1 for t in cyc if t.get("picks"))
+        summary["worth"] = {
+            "scored": len(scored), "n": len(worth),
+            "pct": round(100.0 * len(worth) / len(scored), 1) if scored else 0.0,
+            "cycle_n": len(cyc), "cycle_worth": cyc_worth,
+            "cycle_pct": (round(100.0 * cyc_worth / len(cyc), 1)
+                          if cyc else 0.0)}
         summary["triage_feed"] = self.triage_feed[-16:]
         top = sorted(((s, sb) for s, sb in self.scoreboard.items()
                       if sb.get("plans")),

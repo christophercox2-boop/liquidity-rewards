@@ -56,9 +56,13 @@ def authed(get_header, query_string: str, password: str) -> bool:
     return False
 
 
-NAV = (("meter", "."), ("watch", "watch"), ("fills", "fills"), ("status", "status"), ("orders", "orders"),
-       ("plan", "plan"), ("model", "silver"),
-       ("grades", "grades"), ("log", "log"), ("switch", "switch"))
+# Owner, 2026-08-31: plan and model run in the background — their
+# routes still answer for a bookmark, but they are off the bar. Fills
+# and watch became sub-pages of quick look.
+NAV = (("quick look", "."), ("status", "status"), ("orders", "orders"),
+       ("pay", "pay"), ("log", "log"), ("switch", "switch"))
+SUBNAV = {"quick": (("meter", "."), ("fills", "fills"), ("watch", "watch")),
+          "orders": (("orders", "orders"),)}
 
 _CSS = """
  body{background:#151b12;color:#e8ecdf;font:16px/1.45 -apple-system,system-ui,sans-serif;
@@ -77,7 +81,22 @@ _CSS = """
  button{background:#4c7a2f;color:#fff;border:0;margin-left:6px}
  button.off{background:#7a3a2f}
  button.small{font-size:13px;padding:4px 9px;margin:0 0 0 6px}
- .nav{margin:2px 0 10px}
+ .nav{margin:2px 0 6px}
+ .subnav{margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid #2c3527}
+ .subnav a,.subnav span{margin-right:14px;font-size:13.5px}
+ .subnav a{color:#93a08a;text-decoration:none}
+ .subnav .here{color:#b9d98f;font-weight:700}
+ .tabs{display:flex;gap:6px;margin:8px 0 6px;flex-wrap:wrap}
+ .tabs button{font-size:13px;padding:5px 12px;margin:0;background:#2c3527;color:#cfd8c2}
+ .tabs button.on{background:#4c7a2f;color:#fff;font-weight:700}
+ .hero{font-size:40px;font-weight:700;line-height:1.05;margin:2px 0}
+ .hero .u{font-size:15px;font-weight:400;color:#93a08a}
+ .kpi{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 2px}
+ .kpi .v{font-size:26px;font-weight:700;line-height:1.1}
+ .kpi .l{color:#93a08a;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+ .orow{border-top:1px solid #2c3527;padding:9px 0 7px}
+ .orow .px{font-size:22px;font-weight:700}
+ .orow .rt{font-size:18px;font-weight:700;color:#9ec49a}
  .nav a,.nav span{margin-right:12px;font-size:15px}
  .nav a{color:#b9d98f;text-decoration:none}
  .nav .here{color:#e8ecdf;font-weight:700}
@@ -362,16 +381,23 @@ if(window.addEventListener)window.addEventListener('scroll',function(){
 """
 
 
-def _shell(title: str, here: str, render_js: str) -> str:
+def _shell(title: str, here: str, render_js: str, sub: str = "") -> str:
     nav = "".join(
         (f'<span class="here">{label}</span>' if label == here
          else f'<a href="{href}">{label}</a>')
         for label, href in NAV)
+    subs = SUBNAV.get(sub or "", ())
+    subrow = ""
+    if subs:
+        subrow = '<div class="subnav">' + "".join(
+            (f'<span class="here">{label}</span>' if label == here
+             else f'<a href="{href}">{label}</a>')
+            for label, href in subs) + "</div>"
     return f"""<!doctype html><html><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-store">
 <title>{title}</title><style>{_CSS}</style></head><body>
-<h1>{title}</h1><div class="nav">{nav}</div>
+<h1>{title}</h1><div class="nav">{nav}</div>{subrow}
 <div id="login" style="display:none" class="card">
  <div class="sub">This page needs the dashboard key.</div>
  <input id="k" type="password" placeholder="key"><button onclick="saveKey()">Open</button>
@@ -386,110 +412,52 @@ def _shell(title: str, here: str, render_js: str) -> str:
 # ---------------------------------------------------------------------------
 
 STATUS_JS = """
+function bar(pct,col){return '<div class="mtrack"><div class="mfill" style="width:'+Math.min(100,Math.max(0,pct))+'%'+(col?';background:'+col:'')+'"></div></div>';}
 function render(d){
  var out='';
  var age=Math.max(0,Math.round(Date.now()/1000-(d.saved_at||0)));
  var bt=(d.boot||{});var btage=(Date.now()/1000)-(bt.ts||0);
  if(age>=180&&bt.pct!=null&&bt.pct<100&&btage<900){
-  out+='<div class="card"><span class="warn">\\u23F3 starting up \\u2014 '+esc(bt.stage||'')+'</span>'
-   +'<div class="mtrack"><div class="mfill" style="width:'+bt.pct+'%"></div></div>'
-   +'<div class="hint">The first cycle after a restart walks the whole board \\u2014 orders, positions, discovery, terms, books. The page fills in when it completes, usually two to five minutes.</div>';
- } else
- out+='<div class="card">'+(age<180
-   ?'<span class="ok">\\u2705 fresh</span> <span class="muted">\\u2014 updated '+age+'s ago</span>'
-   :'<span class="bad">\\u274C stale</span> <span class="muted">\\u2014 last update '+Math.round(age/60)+' min ago; the loop may be down</span>');
- var sv=(d.switch_view||{});var m=(sv.master||{});
- out+='<div style="margin-top:6px">'
-   +'<span class="pill'+(m.on?' on':'')+'">master '+(m.on?'ON':'off')+'</span>';
- for(var k in sv){if(k==='master')continue;
-  out+='<span class="pill'+(sv[k].on?' on':'')+'">'+esc(k)+' '+(sv[k].on?'ON':'off')+'</span>';}
- out+='</div>';
- var fl=(d.floor||{});
- if(m.on&&!fl.acked){out+='<div class="warn" style="margin-top:6px">Armed \\u2014 waiting for 1.0 and 2.0 to stand down (they halt within a minute; nothing is touched until both confirm).</div>';}
- else if(m.on&&fl.acked){out+='<div class="ok" style="margin-top:6px">3.0 has the floor \\u2014 1.0 and 2.0 automation is standing down.</div>';}
- var fz=(d.flatten||{});
- if(fz.active&&fz.phase!=='rebuild'){out+='<div class="warn" style="margin-top:6px">FLATTEN: cancelling every order that isn\\u2019t an exit \\u2014 '+(fz.cancelled_total||0)+' cancelled, '+(fz.kept_exits||0)+' exits kept, '+(fz.remaining||0)+' to go. Nothing that costs money will be placed.</div>';}
- else if(fz.active&&!fz.done){out+='<div class="ok" style="margin-top:6px">Flat \\u2014 '+(fz.kept_exits||0)+' exits resting and earning. Rebuilding under the family ceilings, best-paying markets first.</div>';}
- out+='<div class="hint">Nothing places orders unless the master switch AND that family\\u2019s own switch are on. Master ON hands ALL automation to 3.0: 1.0 and 2.0 halt first, then 3.0 takes over their resting orders and runs them under its own rules. Master OFF hands it back. Flips happen on the switch page, never here.</div></div>';
- fams(d).forEach(function(kv){
-  var k=kv[0],s=kv[1];
-  out+='<div class="card"><b>'+esc(s.name||k)+'</b> ';
-  if(s.error){out+='<div class="bad">cycle error: '+esc(s.error)+'</div></div>';return;}
-  out+='<span class="pill">'+esc(s.mode)+'</span>';
-  if(s.mode==='observing'){out+='<div class="hint">The switch is off, so this family is watching only \\u2014 scoring the board and showing what it WOULD do on the plan page. Nothing is placed.</div>';}
-  if(s.mode==='waiting for the floor'){out+='<div class="warn">Armed, but 1.0/2.0 have not yet confirmed they\\u2019ve stood down \\u2014 acting the moment they do.</div>';}
-  if(s.would_adopt){out+='<div class="sub">Will take over <b>'+s.would_adopt+'</b> resting orders from the earlier versions the moment it\\u2019s armed \\u2014 they keep resting; 3.0 just becomes the one maintaining them.</div>';}
-  out+='<div class="stats">'
-   +'<div class="stat"><div class="lab">resting earns about</div><div class="val">'+usd(Math.min(s.est_day||0,(s.est_rate!=null?s.est_rate:1e9)))+'<span class="u">/day</span></div></div>'
-   +'<div class="stat"><div class="lab">earned today so far</div><div class="val">'+usd(s.earned_today)+'</div></div>'
-   +'<div class="stat"><div class="lab">orders</div><div class="val">'+(s.orders||[]).length+'<span class="u"> in '+(s.active||0)+' mkts</span></div></div>'
-   +'</div>';
-  if(s.est_rate!=null&&(s.est_day||0)>s.est_rate*1.2){out+='<div class="muted">orders claim '+usd(s.est_day)+'/day unaudited \u2014 the headline is the meter\u2019s audited rate.</div>';}
-  var cap=s.capital_usd||0,sp=s.spent||0;
-  out+='<div class="mtrack"><div class="mfill" style="width:'+Math.min(100,cap?100*sp/cap:0)+'%"></div></div>'
-   +'<div class="muted">'+usd(sp)+' of the '+usd(cap)+' search ceiling is on the book.'+(s.proven_usd?' Proven markets ('+(s.proven_n||0)+') hold '+usd(s.proven_spent||0)+' more under their own '+usd(s.proven_usd)+' cap.':'')+'</div>';
-  if(s.stock_day){out+='<div class="sub">Stock waiting to sell is earning '+usd(s.stock_day)+'/day while it waits.</div>';}
-  var inv=s.inventory||{};var invn=Object.keys(inv).length;
-  if(invn){out+='<div class="muted">'+invn+' position'+(invn>1?'s':'')+' held from fills \\u2014 see orders page.</div>';}
-  var tg=s.triage||{};
-  if(tg.total){
-   var pctT=Math.min(100,100*(tg.done||0)/tg.total);
-   out+='<div class="mtrack"><div class="mfill" style="width:'+pctT+'%;background:#5a7a9a"></div></div>';
-   out+='<div class="muted">Triage: '+(tg.done||0)+' of '+tg.total+' markets scored this pass'
-    +((tg.done||0)>=tg.total?' \\u2014 all scored; rescanning the oldest first.'
-    :' \\u2014 about '+Math.ceil((tg.total-(tg.done||0))/(tg.per_cycle||1))+' min to finish.')+'</div>';
-  }
-  var tf=s.triage_feed||[];
-  if(tf.length){
-   if(!window._tseen)window._tseen={};
-   var outs='',ins='';
-   tf.slice().reverse().slice(0,12).forEach(function(t){
-    var key=k+'|'+t.market+'|'+t.ts;
-    var fresh=!window._tseen[key];window._tseen[key]=1;
-    var info=[];
-    if(t.in)info.push('worth '+usd(t.ev)+'/day');
-    if(t.in&&t.plan)info.push(t.plan);
-    if(t.spread!=null)info.push('spread '+t.spread+'c');
-    if(t.pool!=null)info.push('pool '+usd(t.pool)+'/day');
-    if(t.conf!=null&&t.conf>0)info.push('conf '+Math.round(t.conf*100)+'%');
-    var chip='<div class="tchip '+(t.in?'win':'')+' '+(fresh?(t.in?'new-r':'new-l'):'')+'">'
-     +'<div class="tn">'+nm(d,t.market)+'</div>'
-     +'<div class="tm">'+esc(info.join(' \\u00b7 '))+(t.in?'':(info.length?' \\u00b7 ':'')+esc(t.why||''))+'</div></div>';
-    if(t.in)ins+=chip;else outs+=chip;
-   });
-   out+='<div class="tri"><div class="tri-col"><div class="tri-h">passed on</div>'+outs+'</div>'
-    +'<div class="tri-col"><div class="tri-h">worth budget</div>'+ins+'</div></div>';
-  }
-  out+='<div class="muted">'+(s.markets||0)+' markets known, '+(s.scanned||0)+' scored'
-  if(s.unmeasured_min>1){out+='<div class="muted">'+s.unmeasured_min+' min of today went unmeasured (books too stale to score) \\u2014 counted as zero, never guessed.</div>';}
-   +(s.resting_ok===false?' \\u2014 <span class="warn">game window: resting is paused</span>':'')+'.</div>';
+  out+='<div class="card"><span class="warn">starting up \u2014 '+esc(bt.stage||'')+'</span>'+bar(bt.pct)+'</div>';
+ }else{
+  out+='<div class="card">'+(age<180
+   ?'<span class="ok">\u2705 fresh</span> <span class="muted">'+age+'s</span>'
+   :'<span class="bad">\u274C stale</span> <span class="muted">'+Math.round(age/60)+' min</span>');
+  var sv=(d.switch_view||{});var m=(sv.master||{});
+  out+='<div style="margin-top:6px"><span class="pill'+(m.on?' on':'')+'">master '+(m.on?'ON':'off')+'</span>';
+  for(var k in sv){if(k==='master')continue;
+   out+='<span class="pill'+(sv[k].on?' on':'')+'">'+esc(k)+' '+(sv[k].on?'ON':'off')+'</span>';}
   out+='</div>';
+  var fz=(d.flatten||{});
+  if(fz.active&&fz.phase!=='rebuild'){out+='<div class="warn">FLATTEN \u2014 '+(fz.cancelled_total||0)+' cancelled, '+(fz.remaining||0)+' to go</div>';}
+  out+='</div>';
+ }
+ fams(d).forEach(function(kv){
+  var k=kv[0],s2=kv[1];
+  if(s2.error){out+='<div class="card"><b>'+esc(s2.name||k)+'</b><div class="bad">'+esc(s2.error)+'</div></div>';return;}
+  var cap=s2.capital_usd||0, spent=s2.spent||0;
+  var w=s2.worth||{};
+  var tri=s2.triage||{};
+  out+='<div class="card"><b>'+esc(s2.name||k)+'</b> <span class="pill">'+esc(s2.mode)+'</span>'
+   +'<div class="kpi">'
+   +'<div><div class="v">'+usd(s2.earned_today||0)+'</div><div class="l">earned today</div></div>'
+   +'<div><div class="v">'+usd(s2.est_day||0)+'</div><div class="l">rate $/day</div></div>'
+   +'<div><div class="v">'+(s2.orders||[]).length+'</div><div class="l">orders</div></div>'
+   +'</div>'
+   +'<div class="l" style="margin-top:6px">budget '+usd(spent)+' / '+usd(cap)+'</div>'
+   +bar(cap?100*spent/cap:0)
+   +'<div class="l" style="margin-top:8px">worth the budget \u2014 '+(w.pct||0)+'% of '+(w.scored||0)+' scored'
+   +(w.cycle_n?' \u00b7 this cycle '+(w.cycle_pct||0)+'% of '+w.cycle_n:'')+'</div>'
+   +bar(w.pct||0,'#6fa8dc')
+   +'<div class="l" style="margin-top:8px">board covered '+(tri.done||0)+' / '+(tri.total||0)+'</div>'
+   +bar(tri.total?100*(tri.done||0)/tri.total:0,'#8a7a2f')
+   +'</div>';
  });
- var ws=(d.ws||{});
- if(ws.state){out+='<div class="muted">book stream: '+esc(ws.state)+(ws.subscribed?' ('+ws.subscribed+' markets live)':'')+'</div>';}
- var sv2=(d.silver||{});
- if(sv2.senate_races){out+='<div class="muted">Silver model: '+sv2.senate_races+' senate + '+(sv2.gov_races||0)+' governor races, tables checked '+(sv2.tables_age_min==null?'?':sv2.tables_age_min)+' min ago'+(sv2.tables_changed_h==null?'':' \u00b7 senate numbers last MOVED '+sv2.tables_changed_h+'h ago')+(sv2.gov_changed_h==null?'':' \u00b7 governor '+sv2.gov_changed_h+'h ago')+(sv2.note?' \u00b7 '+esc(sv2.note):'')+(sv2.official_age_h!=null?' \\u00b7 seat simulations from '+sv2.official_age_h+'h ago ('+esc(sv2.official_source||'')+')':'')+'</div>';}
- var errs=d.errors||[];
- if(errs.length){out+='<div class="card"><details><summary class="muted">recent notes ('+errs.length+')</summary>';
-  errs.slice(-8).reverse().forEach(function(e){out+='<div class="muted">'+esc(e)+'</div>';});
-  out+='</details></div>';}
- out+='<details class="how"><summary>what these numbers mean</summary>'
-  +'"Resting earns about" is the live arithmetic on real reward terms: our share of each side\\u2019s score times the side\\u2019s daily pool, using the exchange\\u2019s own pool, Target Size and discount factor. No fudge factors \\u2014 if it\\u2019s wrong, an input is wrong. '
-  +'"Earned today" adds that rate up through the day, and only while enough books are fresh; blind stretches add nothing rather than a guess. '
-  +'A market only ever shows a dollar figure once I\\u2019ve confirmed how many markets share its event\\u2019s pool.</details>';
- out+='<div class="muted" style="margin-top:8px">build '+esc(d.build||'?')+'</div>';
  return out;
 }
 """
 
 ORDERS_JS = """
-function sfair(m){
- var v=prompt('Fair value in CENTS for\\n'+m+'\\n\\nYour number beats the model everywhere fair is used.\\nLeave empty to go back to the model.');
- if(v===null)return;
- var f=(v==='')?'':(parseFloat(v)/100);
- if(v!==''&&!(f>0&&f<1)){alert('enter cents, 0.1 to 99.9');return;}
- post({op:'set_fair',market:m,fair:f},function(j){alert(j.note||'done');});
-}
 function fold(title,sub,body,open){
  return '<details'+(open?' open':'')+'><summary><b>'+title+'</b> <span class="muted">'+sub+'</span></summary>'+body+'</details>';
 }
@@ -505,129 +473,40 @@ function dur(sec){
  if(sec<86400)return (sec/3600).toFixed(sec<7200?1:0)+'h';
  return (sec/86400).toFixed(sec<172800?1:0)+'d';
 }
+function oTab(t){window._oTab=t;if(window._d)document.getElementById('view').innerHTML=render(window._d);}
 function orow(d,o){
  var e=(o.live_est!=null?o.live_est:o.est_day);
- var dp=odrop(o);
  var bid='bk_'+esc(o.id);
- return '<div style="margin:9px 0 0;border-top:1px solid #2c3527;padding-top:7px">'
-  +'<div class="name" style="cursor:pointer" onclick="showbook(\\''+esc(o.market)+'\\',\\''+bid+'\\')">'+nm(d,o.market)+' <span class="muted">\u25be book</span></div>'
+ var now=(d.now||0), age=o.placed_ts?now-o.placed_ts:null;
+ var pf=o.live_pf, exp=null;
+ if(pf!=null&&pf>0&&pf<1)exp=86400/(-Math.log(1-pf)); else if(pf!=null&&pf>=1)exp=3600;
+ var beaten=(exp!=null&&age!=null&&age>exp);
+ var facts=[];
+ if(age!=null)facts.push('rested '+dur(age));
+ if(exp!=null)facts.push('fill ~'+dur(exp)+(beaten?' \u00b7 outliving':''));
+ var dp=odrop(o);
+ return '<div class="orow">'
+  +'<div class="name" style="cursor:pointer;font-size:15px" onclick="showbook(\\''+esc(o.market)+'\\',\\''+bid+'\\')">'+nm(d,o.market)+'</div>'
   +'<div id="'+bid+'"></div>'
-  +'<div class="muted"><code>'+esc(o.market)+'</code></div>'
-  +'<div class="muted">fair: '+((d.owner_fairs&&d.owner_fairs[o.market]!=null)?('<b>'+pc(d.owner_fairs[o.market])+' (yours)</b>'):'model')
-  +' <a style="cursor:pointer;text-decoration:underline" onclick="sfair(\\''+esc(o.market)+'\\')">set</a></div>'
-  +'<div class="sub">'+(o.side==='BUY'?'bid':'ask')+' '+(o.qty||0)+' @ '+pc(o.price)
-  +' \\u2014 '+(e==null?'<span class="warn">no estimate yet</span>':usd(e)+'/day')
-  +' <span class="pill">'+esc(o.purpose)+'</span></div>'
-  +(function(){
-    var now=(d.now||0), age=o.placed_ts?now-o.placed_ts:null;
-    var pf=o.live_pf, exp=null;
-    if(pf!=null&&pf>0&&pf<1){exp=86400/(-Math.log(1-pf));}
-    else if(pf!=null&&pf>=1){exp=3600;}
-    var bits=[];
-    if(age!=null)bits.push('placed '+dur(age)+' ago');
-    if(exp!=null){
-     var beaten=age!=null&&age>exp;
-     bits.push('model said fill in ~'+dur(exp)+(beaten?' \u2014 <b>outliving it</b>':''));
-    }else if(age!=null){bits.push('no fill estimate');}
-    return bits.length?'<div class="vrd'+((exp!=null&&age!=null&&age>exp)?' warn':'')+'">'+bits.join(' \u00b7 ')+'</div>':'';
-  })()
-  +(dp!=null&&dp>0.05?'<div class="vrd'+(dp>=0.5?' warn':'')+'">\\u25BC '+Math.round(dp*100)+'% off its 8h peak ('+usd(o.est_peak8)+' \\u2192 '+usd((o.live_est!=null?o.live_est:o.est_day)||0)+'/day)</div>':'')
-  +(o.verdict?'<div class="vrd">'+esc(o.verdict)+'</div>':'')
-  +(o.why?'<div class="vrd">placed because: '+esc(o.why)+'</div>':'')
+  +'<div style="display:flex;gap:16px;align-items:baseline;margin:3px 0">'
+  +'<span class="px">'+(o.side==='BUY'?'bid':'ask')+' '+pc(o.price)+'</span>'
+  +'<span class="rt">'+(e==null?'\u2014':usd(e)+'/d')+'</span>'
+  +'<span class="muted">'+(o.qty||0)+' sh</span>'
+  +'<span class="pill">'+esc(o.purpose)+'</span></div>'
+  +(facts.length?'<div class="vrd'+(beaten?' warn':'')+'">'+facts.join(' \u00b7 ')+'</div>':'')
+  +(dp!=null&&dp>0.05?'<div class="vrd'+(dp>=0.5?' warn':'')+'">\u25BC '+Math.round(dp*100)+'% off peak</div>':'')
   +'<div><button class="small" onclick="mv(\\''+esc(o.id)+'\\','+o.price+')">Move</button>'
   +'<button class="small off" onclick="cx(\\''+esc(o.id)+'\\')">Cancel</button></div>'
   +'</div>';
 }
-function render(d){
- var out='';var any=false;
- out+='<div class="card"><details><summary><b>Place an order by hand</b> <span class="muted">\\u2014 bypasses the switches, keeps every safety rail; the automation never touches it</span></summary>'
-  +'<div style="margin:8px 0"><input id="pm" placeholder="market slug" style="width:95%"></div>'
-  +'<div style="margin:8px 0"><select id="ps" style="font-size:16px;padding:8px"><option value="BUY">bid (buy)</option><option value="SELL">ask (sell)</option></select>'
-  +' <input id="pp" placeholder="price c" style="width:20%"> <input id="pq" placeholder="shares" style="width:20%">'
-  +' <button onclick="pl()">Place</button></div><div id="plout"></div></details></div>';
- var wl=[];
- fams(d).forEach(function(kv){(kv[1].watched||[]).forEach(function(w){wl.push(w);});});
- if(wl.length){
-  var nq=wl.filter(function(w){return w.qualifies===false;}).length;
-  var wb='';
-  wl.forEach(function(w,i){
-   var bid='wq_'+i;var st,btn='';
-   if(w.target==null){st='<span class="muted">reward terms not read yet</span>';}
-   else if(w.ask_total==null){st='<span class="muted">no book read yet</span>';}
-   else if(w.qualifies){st='<span class="ok">ask side qualifies \\u2014 '+Math.round(w.ask_total).toLocaleString()+' resting of '+Math.round(w.target).toLocaleString()+' needed</span>';}
-   else{
-    st='<span class="warn">ask side NOT qualifying \\u2014 '+Math.round(w.ask_total).toLocaleString()+' resting of '+Math.round(w.target).toLocaleString()+' needed</span>';
-    btn='<div style="margin:4px 0 0"><button class="small" onclick="qax(\\''+esc(w.market)+'\\','+Math.ceil(w.target-w.ask_total)+',\\'qo_'+i+'\\')">Qualify ask</button></div>';
-   }
-   wb+='<div style="margin:9px 0 0;border-top:1px solid #2c3527;padding-top:7px">'
-    +'<div class="name" style="cursor:pointer" onclick="showbook(\\''+esc(w.market)+'\\',\\''+bid+'\\')">'+nm(d,w.market)+' <span class="muted">\\u25be book</span></div>'
-    +'<div id="'+bid+'"></div>'
-    +'<div class="muted"><code>'+esc(w.market)+'</code></div>'
-    +'<div class="sub">'+st+'</div>'+btn+'<div id="qo_'+i+'"></div></div>';
-  });
-  out+='<div class="card">'+fold('Watched races \\u2014 qualify the ask side by hand',
-   '\\u2014 '+wl.length+' markets, '+(nq?nq+' not qualifying':'all qualifying'),wb,true)
-      +'<div class="hint">One tap builds the wall until the side reaches Target Size. The exchange trims each order to your free buying power, so it places as many as it takes \\u2014 in the background, re-reading the book every pass. Tap again any time for progress. It stops on its own if buying power runs low. A 99c ask only fills if someone pays 99c. These are YOUR orders: the automation never touches them, and the engine keeps its own money out of these markets entirely.</div></div>';
- }
- var wd={day_n:0,day_usd:0,week_n:0,week_usd:0,flat_day:0,by:{},recent:[]};
+function ordersTab(d){
+ var srt=window._ordSort||'est';var out='';
+ out+='<div class="tabs" style="margin-top:0">'
+  +'<button class="'+(srt==='est'?'on':'')+'" onclick="oSort(\\'est\\')">$/day</button>'
+  +'<button class="'+(srt==='drop'?'on':'')+'" onclick="oSort(\\'drop\\')">off peak</button></div>';
+ var any=false;
  fams(d).forEach(function(kv){
-  var w=kv[1].wind_down;if(!w)return;
-  wd.day_n+=w.day_n||0;wd.day_usd+=w.day_usd||0;wd.week_n+=w.week_n||0;
-  wd.week_usd+=w.week_usd||0;wd.flat_day+=w.flat_day||0;
-  for(var k in (w.by_kind||{})){var b=w.by_kind[k];wd.by[k]=wd.by[k]||{n:0,usd:0};
-   wd.by[k].n+=b.n;wd.by[k].usd+=b.usd;}
-  (w.recent||[]).forEach(function(r){r.fam=kv[0];wd.recent.push(r);});
- });
- if(wd.week_n){
-  var kb='';
-  for(var k in wd.by){kb+='<div class="vrd">'+esc(k)+': '+wd.by[k].n+' \u2014 '+usd(wd.by[k].usd)+'</div>';}
-  wd.recent.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
-  var rb='';
-  wd.recent.slice(0,10).forEach(function(r){
-   rb+='<div class="vrd">'+when(r.ts)+' \u2014 '+nm(d,r.market)+': '+esc(r.kind)
-    +' '+r.qty+' @ '+pc(r.px)+' = '+usd(r.usd)+(r.flat?' <b>(flat)</b>':'')+'</div>';
-  });
-  out+='<div class="card">'+fold('Winding down \u2014 what actually sold',
-   '\u2014 '+wd.day_n+' in 24h ('+usd(wd.day_usd)+'), '+wd.week_n+' this week ('+usd(wd.week_usd)+'), '
-   +wd.flat_day+' went flat today',
-   kb+'<div class="sub" style="margin-top:8px">most recent</div>'+rb,true)
-   +'<div class="hint">Every position the engine actually retired: drains of idle stock, dumps into a tight spread, buy-backs stepped toward filling, and your close-outs. Position counts alone cannot tell a sale from a fill \u2014 this is the selling itself.</div></div>';
- }
- var pos=[];
- fams(d).forEach(function(kv){
-  (kv[1].positions||[]).forEach(function(p){p.fam=kv[0];pos.push(p);});
- });
- if(pos.length){
-  pos.sort(function(a,b){return (a.per_dollar-b.per_dollar)||(b.liq-a.liq);});
-  var idle=pos.filter(function(p){return p.earn<0.005;}).length;
-  var pb='';
-  pos.forEach(function(p,i){
-   var bid='pv_'+i;
-   var av=p.qty?Math.abs(p.cost/p.qty)*100:0;
-   var cpd=p.per_dollar*100;
-   var eline;
-   if(p.earn<0.005){eline='<span class="warn">earning NOTHING \\u2014 idle money'+(p.covers.length?'':' , no cover resting')+'</span>';}
-   else{eline='earning '+usd(p.earn)+'/day \\u2192 '+cpd.toFixed(2)+'\\u00a2 per $1 per day';}
-   var cv=p.covers.map(function(c){return (c.side==='BUY'?'bid':'ask')+' '+c.qty+' @ '+pc(c.price)+' ['+esc(c.purpose)+']';}).join(' \\u00b7 ');
-   pb+='<div style="margin:9px 0 0;border-top:1px solid #2c3527;padding-top:7px">'
-    +'<div class="name" style="cursor:pointer" onclick="showbook(\\''+esc(p.market)+'\\',\\''+bid+'\\')">'+nm(d,p.market)+' <span class="muted">\\u25be book</span></div>'
-    +'<div id="'+bid+'"></div>'
-    +'<div class="sub">'+(p.qty>0?p.qty+' shares':(-p.qty)+' short')+' at '+av.toFixed(1)+'c avg \\u00b7 worth '+usd(p.liq)+' if closed now</div>'
-    +'<div class="vrd">'+eline+'</div>'
-    +(cv?'<div class="vrd">resting: '+cv+'</div>':'<div class="vrd warn">nothing resting to work this position</div>')
-    +'</div>';
-  });
-  out+='<div class="card">'+fold('Positions \\u2014 worst earners first',
-   '\\u2014 '+pos.length+' held, '+idle+' earning nothing; each dollar of stock should be earning while it waits',pb,false)
-   +'<div class="hint">Sorted by $/day earned per $1 of liquidation value, lowest first \\u2014 the top of this list is dead money to hand-place. Tap a name for the LIVE book and place or move asks right there.</div></div>';
- }
- var srt=window._ordSort||'est';
- out+='<div style="margin:2px 0 8px">sort: '
-  +'<button class="small" '+(srt==='est'?'style="font-weight:bold;text-decoration:underline"':'')+' onclick="oSort(\\'est\\')">by $/day</button>'
-  +'<button class="small" '+(srt==='drop'?'style="font-weight:bold;text-decoration:underline"':'')+' onclick="oSort(\\'drop\\')">by drop from 8h peak</button></div>';
- fams(d).forEach(function(kv){
-  var k=kv[0],s=kv[1];var os=(s.orders||[]);
-  if(!os.length)return; any=true;
+  var k=kv[0],s=kv[1];var os=(s.orders||[]);if(!os.length)return;any=true;
   var byest=function(a,b){return ((b.live_est!=null?b.live_est:b.est_day)||0)-((a.live_est!=null?a.live_est:a.est_day)||0);};
   var bydrop=function(a,b){var x=odrop(a),y=odrop(b);return (y==null?-1:y)-(x==null?-1:x);};
   var cmp=srt==='drop'?bydrop:byest;
@@ -635,68 +514,107 @@ function render(d){
   var sell=os.filter(function(o){return o.purpose==='sell';}).sort(cmp);
   var esum=0;earn.forEach(function(o){esum+=(o.live_est!=null?o.live_est:o.est_day)||0;});
   var ssum=0;sell.forEach(function(o){ssum+=(o.live_est!=null?o.live_est:o.est_day)||0;});
-  out+='<div class="card"><b>'+esc(s.name||k)+'</b>';
-  if(earn.length){
-   var eb='';earn.forEach(function(o){eb+=orow(d,o);});
-   out+=fold('Earning','\\u2014 '+earn.length+' order'+(earn.length!==1?'s':'')+', ~'+usd(esum)+'/day',eb,true);
-  }else{out+='<div class="muted" style="margin:8px 0 0">No earning orders resting.</div>';}
-  if(sell.length){
-   var sb='';sell.forEach(function(o){sb+=orow(d,o);});
-   out+=fold('Exits','\\u2014 '+sell.length+' order'+(sell.length!==1?'s':'')+', earning ~'+usd(ssum)+'/day while they wait',sb,false);
-  }
-  var lg=(d['fam_log_'+k]||[]).filter(function(r){
-   return ['place','pull','silent_cancel','reprice','exit','trim','probe','probe_done','zombie_cancelled','window_pull'].indexOf(r.event)>=0;
-  }).slice(-14).reverse();
-  if(lg.length){
-   var lb='';
-   lg.forEach(function(r){
-    var what={place:'placed',pull:'pulled',silent_cancel:'the exchange dropped it on arrival',
-     reprice:'moved',exit:'left the market',trim:'trimmed for the ceiling',
-     probe:'scout sent',probe_done:'scout finished its watch',
-     zombie_cancelled:'stuck order finally cancelled',window_pull:'pulled for the game window'}[r.event]||r.event;
-    lb+='<div class="vrd">'+when(r.ts||0)+' \\u2014 '+what+' \\u2014 '+nm(d,r.market||'')
-     +(r.why?' <span class="muted">('+esc(r.why)+')</span>':'')
-     +(r.to!=null?' <span class="muted">to '+pc(r.to)+'</span>':'')+'</div>';
-   });
-   out+=fold('Recent changes','\\u2014 what appeared and what left, and why',lb,false);
-  }
+  out+='<div class="card"><b>'+esc(s.name||k)+'</b>'
+   +'<div class="kpi">'
+   +'<div><div class="v">'+usd(s.earned_today||0)+'</div><div class="l">earned today</div></div>'
+   +'<div><div class="v">'+usd(esum+ssum)+'</div><div class="l">rate $/day</div></div>'
+   +'<div><div class="v">'+os.length+'</div><div class="l">orders</div></div>'
+   +'</div>';
+  if(earn.length){var eb='';earn.forEach(function(o){eb+=orow(d,o);});
+   out+=fold('Earning','\u2014 '+earn.length+' \u00b7 '+usd(esum)+'/d',eb,true);}
+  if(sell.length){var sb='';sell.forEach(function(o){sb+=orow(d,o);});
+   out+=fold('Exits','\u2014 '+sell.length+' \u00b7 '+usd(ssum)+'/d',sb,false);}
   out+='</div>';
  });
- if(!any)out+='<div class="card muted">No resting orders. When a family is armed and finds something worth resting in, each order shows here with its name, its verdict, and its own Move/Cancel.</div>';
+ if(!any)out+='<div class="card muted">No resting orders.</div>';
  return out;
 }
-function oSort(which){
- window._ordSort=which;
- if(window._d)document.getElementById('view').innerHTML=render(window._d);
-}
-function mv(id,px){
- var v=prompt('New price in cents (e.g. 3.4):',(px*100).toFixed(1));
- if(v==null)return; var p=parseFloat(v)/100;
- if(!(p>0&&p<1)){alert('price must be between 0.1c and 99.9c');return;}
- post({op:'move',order_id:id,price:p},function(j){if(!j.ok)alert(j.note||'refused');});
-}
-function pl(){
- var m=document.getElementById('pm').value.trim();
- var s=document.getElementById('ps').value;
- var p=parseFloat(document.getElementById('pp').value)/100;
- var q=parseFloat(document.getElementById('pq').value);
- if(!m||!(p>0&&p<1)||!(q>0)){alert('need a slug, a price in cents, and shares');return;}
- if(!confirm('Place '+(s==='BUY'?'bid':'ask')+' '+q+' @ '+(p*100).toFixed(1)+'c on '+m+'?'))return;
- document.getElementById('plout').innerHTML='<div class="muted">placing\\u2026</div>';
- post({op:'place',market:m,side:s,price:p,qty:q},function(j){
-  document.getElementById('plout').innerHTML='<div class="'+(j.ok?'ok':'bad')+'">'+esc(j.note||'')+'</div>';
+function wallsTab(d){
+ var wl=[];fams(d).forEach(function(kv){(kv[1].watched||[]).forEach(function(w){wl.push(w);});});
+ if(!wl.length)return '<div class="card muted">No watched races.</div>';
+ var out='';
+ wl.forEach(function(w,i){
+  var bid='wq_'+i, pctv=(w.target?100*(w.ask_total||0)/w.target:0);
+  out+='<div class="card"><div class="name" style="cursor:pointer;font-size:15px" onclick="showbook(\\''+esc(w.market)+'\\',\\''+bid+'\\')">'+nm(d,w.market)+'</div><div id="'+bid+'"></div>'
+   +'<div class="kpi"><div><div class="v'+(w.qualifies?' ok':' bad')+'">'+Math.round(w.ask_total||0).toLocaleString()+'</div><div class="l">of '+Math.round(w.target||0).toLocaleString()+' needed</div></div></div>'
+   +'<div class="mtrack"><div class="mfill" style="width:'+Math.min(100,pctv)+'%'+(w.qualifies?'':';background:#8a5a2f')+'"></div></div>';
+  if(w.qualifies===false){out+='<div style="margin-top:6px"><button class="small" onclick="qax(\\''+esc(w.market)+'\\','+Math.ceil((w.target||0)-(w.ask_total||0))+',\\'qo_'+i+'\\')">Qualify ask</button></div><div id="qo_'+i+'"></div>';}
+  out+='</div>';
  });
+ return out;
+}
+function posTab(d){
+ var pos=[];fams(d).forEach(function(kv){(kv[1].positions||[]).forEach(function(p){p.fam=kv[0];pos.push(p);});});
+ if(!pos.length)return '<div class="card muted">No positions.</div>';
+ pos.sort(function(a,b){return (a.per_dollar-b.per_dollar)||(b.liq-a.liq);});
+ var idle=pos.filter(function(p){return p.earn<0.005;}).length;
+ var out='<div class="card"><div class="kpi">'
+  +'<div><div class="v">'+pos.length+'</div><div class="l">positions</div></div>'
+  +'<div><div class="v">'+usd(pos.reduce(function(a,p){return a+p.liq;},0))+'</div><div class="l">if closed now</div></div>'
+  +'<div><div class="v'+(idle?' warn':'')+'">'+idle+'</div><div class="l">earning nothing</div></div>'
+  +'</div></div>';
+ pos.forEach(function(p,i){
+  var bid='pv_'+i;
+  out+='<div class="orow"><div class="name" style="cursor:pointer" onclick="showbook(\\''+esc(p.market)+'\\',\\''+bid+'\\')">'+nm(d,p.market)+'</div><div id="'+bid+'"></div>'
+   +'<div style="display:flex;gap:16px;align-items:baseline;margin:3px 0">'
+   +'<span class="px">'+(p.qty>0?p.qty+' sh':(-p.qty)+' short')+'</span>'
+   +'<span class="rt">'+usd(p.liq)+'</span>'
+   +'<span class="'+(p.earn<0.005?'warn':'muted')+'">'+(p.earn<0.005?'idle':usd(p.earn)+'/d')+'</span></div></div>';
+ });
+ return out;
+}
+function soldTab(d){
+ var wd={day_n:0,day_usd:0,week_n:0,week_usd:0,flat_day:0,by:{},recent:[]};
+ fams(d).forEach(function(kv){var w=kv[1].wind_down;if(!w)return;
+  wd.day_n+=w.day_n||0;wd.day_usd+=w.day_usd||0;wd.week_n+=w.week_n||0;wd.week_usd+=w.week_usd||0;
+  wd.flat_day+=w.flat_day||0;
+  for(var k in (w.by_kind||{})){var b=w.by_kind[k];wd.by[k]=wd.by[k]||{n:0,usd:0};wd.by[k].n+=b.n;wd.by[k].usd+=b.usd;}
+  (w.recent||[]).forEach(function(r){wd.recent.push(r);});});
+ if(!wd.week_n)return '<div class="card muted">Nothing sold yet.</div>';
+ var out='<div class="card"><div class="kpi">'
+  +'<div><div class="v">'+wd.day_n+'</div><div class="l">sold 24h</div></div>'
+  +'<div><div class="v">'+usd(wd.day_usd)+'</div><div class="l">proceeds 24h</div></div>'
+  +'<div><div class="v">'+wd.flat_day+'</div><div class="l">went flat</div></div>'
+  +'<div><div class="v">'+usd(wd.week_usd)+'</div><div class="l">week</div></div>'
+  +'</div>';
+ for(var k in wd.by){out+='<div class="vrd">'+esc(k)+': '+wd.by[k].n+' \u00b7 '+usd(wd.by[k].usd)+'</div>';}
+ out+='</div>';
+ wd.recent.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+ wd.recent.slice(0,12).forEach(function(r){
+  out+='<div class="orow"><div class="name">'+nm(d,r.market)+'</div>'
+   +'<div style="display:flex;gap:16px;align-items:baseline"><span class="px">'+usd(r.usd)+'</span>'
+   +'<span class="muted">'+esc(r.kind)+' '+r.qty+' @ '+pc(r.px)+'</span>'
+   +(r.flat?'<span class="ok">flat</span>':'')+'</div></div>';});
+ return out;
+}
+function render(d){
+ window._d=d;
+ var t=window._oTab||'orders';
+ var tabs=[['orders','Orders'],['walls','Walls'],['pos','Positions'],['sold','Sold']];
+ var out='<div class="tabs">'+tabs.map(function(x){
+  return '<button class="'+(t===x[0]?'on':'')+'" onclick="oTab(\\''+x[0]+'\\')">'+x[1]+'</button>';}).join('')+'</div>';
+ if(t==='walls')return out+wallsTab(d);
+ if(t==='pos')return out+posTab(d);
+ if(t==='sold')return out+soldTab(d);
+ return out+ordersTab(d);
+}
+function oSort(which){window._ordSort=which;
+ if(window._d)document.getElementById('view').innerHTML=render(window._d);}
+function mv(id,px){
+ var v=prompt('New price in cents:',(px*100).toFixed(1));
+ if(v==null)return; var p=parseFloat(v)/100;
+ if(!(p>0&&p<1)){alert('0.1c to 99.9c');return;}
+ post({op:'move',order_id:id,price:p},function(j){if(!j.ok)alert(j.note||'refused');});
 }
 function cx(id){
  if(!confirm('Cancel this order?'))return;
  post({op:'cancel',order_id:id},function(j){if(!j.ok)alert(j.note||'refused');});
 }
 function qax(m,gap,outid){
- if(!confirm('Build the ask wall toward the '+gap.toLocaleString()+'-share gap? Places up to 6 asks at 99c; the exchange trims each one to your free buying power, so this may take several taps over time. Can take ~30s.'))return;
- document.getElementById(outid).innerHTML='<div class="muted">building the wall\\u2026 (up to 30s)</div>';
+ if(!confirm('Build the ask wall until it qualifies? '+gap.toLocaleString()+' shares to go at 99c (~$'+Math.ceil(gap*0.01)+').'))return;
+ document.getElementById(outid).innerHTML='<div class="muted">starting\u2026</div>';
  post({op:'qualify_ask',market:m},function(j){
-  document.getElementById(outid).innerHTML='<div class="'+(j.ok?'ok':'bad')+'">'+esc(j.note||'')+'</div>';
- });
+  document.getElementById(outid).innerHTML='<div class="'+(j.ok?'ok':'bad')+'">'+esc(j.note||'')+'</div>';});
 }
 """
 
@@ -985,104 +903,122 @@ function render(d){
 
 GRAPH_JS = """
 function fmtT(ts){var d=new Date(ts*1000);return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
-function drawGraph(name,dots){
- if(!dots||dots.length<2)return '<div class="card"><b>'+esc(name)+'</b><div class="muted">not enough samples yet \u2014 one dot arrives every 20 seconds</div></div>';
- var W=340,H=150,PL=34,PB=18,PT=8,PR=6;
- var t0=dots[0][0],t1=dots[dots.length-1][0];var span=Math.max(t1-t0,60);
- var ymax=0;dots.forEach(function(d){if(d[1]>ymax)ymax=d[1];});
- ymax=Math.max(ymax*1.08,1);
+var FAMS=[['Politics','est_politics','#7fd77f'],['College football','est_cfb','#e0b83a'],
+          ['NFL','est_nfl','#6fa8dc'],['NBA','est_nba','#c08fd0']];
+function stacked(d,win){
+ var now=Date.now()/1000, series=[], names=[];
+ FAMS.forEach(function(f){
+  var dots=((d[f[1]]||{}).dots)||[];
+  if(win)dots=dots.filter(function(x){return x[0]>=now-win;});
+  if(dots.length)  {series.push(dots); names.push(f);}
+ });
+ if(!series.length)return '<div class="card muted">no samples yet</div>';
+ var stamps={};
+ series.forEach(function(ds){ds.forEach(function(x){stamps[Math.round(x[0]/20)*20]=1;});});
+ var ts=Object.keys(stamps).map(Number).sort(function(a,b){return a-b;});
+ if(ts.length<2)return '<div class="card muted">not enough samples yet</div>';
+ var vals=series.map(function(ds){
+  var m={};ds.forEach(function(x){m[Math.round(x[0]/20)*20]=x[1];});
+  var last=0;return ts.map(function(t){if(m[t]!=null)last=m[t];return last;});
+ });
+ var tot=ts.map(function(_,i){var v=0;vals.forEach(function(col){v+=col[i];});return v;});
+ var ymax=Math.max.apply(null,tot)*1.08||1;
+ var W=340,H=190,PL=36,PB=18,PT=8,PR=6,t0=ts[0],t1=ts[ts.length-1],span=Math.max(t1-t0,60);
  function X(t){return PL+(W-PL-PR)*(t-t0)/span;}
  function Y(v){return PT+(H-PT-PB)*(1-v/ymax);}
- var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto" role="img" aria-label="'+esc(name)+' earning rate samples">';
- [0,0.5,1].forEach(function(f){
-  var v=ymax*f,y=Y(v);
-  s+='<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
-  s+='<text x="'+(PL-4)+'" y="'+(y+3)+'" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.45)">$'+v.toFixed(0)+'</text>';
- });
+ var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto" role="img" aria-label="earning rate by family, stacked">';
+ [0,0.5,1].forEach(function(f){var y=Y(ymax*f);
+  s+='<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="rgba(255,255,255,0.08)"/>'
+   +'<text x="'+(PL-4)+'" y="'+(y+3)+'" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.45)">$'+(ymax*f).toFixed(0)+'</text>';});
+ var base=ts.map(function(){return 0;});
+ for(var k=vals.length-1;k>=0;k--){
+  var top=base.map(function(b,i){return b+vals[k][i];});
+  var pts=ts.map(function(t,i){return X(t).toFixed(1)+','+Y(top[i]).toFixed(1);}).join(' ');
+  var back=ts.map(function(t,i){return X(t).toFixed(1)+','+Y(base[i]).toFixed(1);}).reverse().join(' ');
+  s+='<polygon points="'+pts+' '+back+'" fill="'+names[k][2]+'" fill-opacity="0.5"/>';
+  s+='<polyline points="'+pts+'" fill="none" stroke="'+names[k][2]+'" stroke-width="1.4"/>';
+  base=top;
+ }
  [t0,(t0+t1)/2,t1].forEach(function(t,i){
-  var x=X(t);var anch=i===0?'start':(i===2?'end':'middle');
-  s+='<text x="'+x+'" y="'+(H-4)+'" text-anchor="'+anch+'" font-size="8" fill="rgba(255,255,255,0.45)">'+fmtT(t)+'</text>';
- });
- dots.forEach(function(d){
-  s+='<circle cx="'+X(d[0]).toFixed(1)+'" cy="'+Y(d[1]).toFixed(1)+'" r="1.6" fill="#9ec49a" fill-opacity="0.85"/>';
- });
+  s+='<text x="'+X(t)+'" y="'+(H-4)+'" text-anchor="'+(i===0?'start':i===2?'end':'middle')+'" font-size="8" fill="rgba(255,255,255,0.45)">'+fmtT(t)+'</text>';});
  s+='</svg>';
- var last=dots[dots.length-1];
- return '<div class="card"><b>'+esc(name)+'</b> <span class="muted">\u2014 $/day, one dot per 20-second sample \u00b7 now $'+last[1].toFixed(2)+'/day, '+last[2]+' markets in view</span>'+s
-  +'<div class="hint">Gaps are minutes the meter could not see a fresh book. The sampling clock is independent \u2014 nothing that places, moves, or cancels orders can touch it.</div></div>';
+ var leg=names.map(function(f,i){
+  var v=vals[i][vals[i].length-1];
+  return '<span class="pill" style="border-left:4px solid '+f[2]+'">'+esc(f[0])+' '+usd(v)+'</span>';}).join(' ');
+ return '<div class="card"><div class="hero">'+usd(tot[tot.length-1])+'<span class="u">/day</span></div>'
+  +'<div style="margin:2px 0 6px">'+leg+'</div>'+s+'</div>';
 }
-function mWin(sec){
- window._meterWin=sec;
- if(window._meterD){var el=document.getElementById('view');if(el)el.innerHTML=render(window._meterD);}
-}
+function mWin(sec){window._meterWin=sec;
+ if(window._meterD){var el=document.getElementById('view');if(el)el.innerHTML=render(window._meterD);}}
 function render(d){
  window._meterD=d;
- var win=window._meterWin||0;
- var btn=function(sec,label){
-  var on=(window._meterWin||0)===sec;
-  return '<button onclick="mWin('+sec+')" style="font-size:14px;padding:6px 14px;margin-right:8px'+(on?';font-weight:bold;text-decoration:underline':'')+'">'+label+'</button>';
- };
- var out='<div style="margin:2px 0 8px 0">'+btn(900,'last 15 min')+btn(0,'all day')+'</div>';
- var now=Date.now()/1000;
- [['Politics','est_politics'],['College football','est_cfb'],['NFL','est_nfl'],['NBA','est_nba']].forEach(function(p){
-  var e=d[p[1]]||{};
-  var dots=e.dots||[];
-  if(win)dots=dots.filter(function(x){return x[0]>=now-win;});
-  if(dots.length||p[1]!=='est_nfl')out+=drawGraph(p[0],dots);
- });
- return out||'<div class="card muted">no samplers armed</div>';
+ var w=window._meterWin||0;
+ var b=function(sec,label){return '<button class="'+((window._meterWin||0)===sec?'on':'')+'" onclick="mWin('+sec+')">'+label+'</button>';};
+ var earned=0;
+ fams(d).forEach(function(kv){earned+=(kv[1].earned_today||0);});
+ var out='<div class="tabs">'+b(900,'15 min')+b(0,'today')+'</div>';
+ out+=stacked(d,w);
+ out+='<div class="card"><div class="kpi">'
+  +'<div><div class="v">'+usd(earned)+'</div><div class="l">earned today</div></div>';
+ fams(d).forEach(function(kv){
+  out+='<div><div class="v">'+usd(kv[1].earned_today||0)+'</div><div class="l">'+esc(kv[0])+'</div></div>';});
+ out+='</div></div>';
+ return out;
 }
 """
 
-GRADES_JS = """
+PAY_JS = """
+function taxLine(gross){
+ var res=gross*0.22;
+ return '<div class="card"><div class="kpi">'
+  +'<div><div class="v">'+usd(gross)+'</div><div class="l">gross paid</div></div>'
+  +'<div><div class="v warn">'+usd(res)+'</div><div class="l">set aside \u2014 tax at 22%</div></div>'
+  +'<div><div class="v">'+usd(gross-res)+'</div><div class="l">yours after</div></div>'
+  +'</div></div>';
+}
 function render(d){
  var rows=(d.grades||[]);
- var out='<div class="card"><b>Estimate vs. what the exchange paid</b>';
- out+='<div style="margin:6px 0"><button onclick="ckrw()">Check for new payouts now</button></div>'+rwcard();
- out+='<div class="hint">The estimate is 3.0\\u2019s own sampler \\u2014 measured on an independent clock, accruing only while books are fresh. Actuals are the account\\u2019s posted rewards (during the transition the older versions\\u2019 books pay into the same number). No fudge factors: a gap means an input was wrong, and the unmeasured minutes say how much of the day went unscored.</div>';
- if(!rows.length){out+='<div class="muted">Nothing to grade yet \\u2014 the first full day under 3.0 lands tomorrow.</div>';}
- var pend=0;
- rows.forEach(function(r){if(r.actual==null&&r.est!=null){pend+=r.est;}});
  var pt=d.paid_total;
- if(!pt){var tot=0,nd=0;rows.forEach(function(r){if(r.actual!=null){tot+=r.actual;nd++;}});pt=nd?{usd:tot,days:nd,since:''}:null;}
- if(pt){out+='<div style="margin:8px 0 2px;font-size:1.15em"><b>'+usd(pt.usd)+' paid in total</b> <span class="muted">over '+pt.days+' posted days'+(pt.since?' since '+esc(pt.since):'')+(pend>0.005?' \\u00b7 '+usd(pend)+' more estimated, not posted yet':'')+'</span></div>';}
+ if(!pt){var tot=0,nd=0;rows.forEach(function(r){if(r.actual!=null){tot+=r.actual;nd++;}});
+  pt=nd?{usd:tot,days:nd,since:''}:{usd:0,days:0,since:''};}
+ var out=taxLine(pt.usd||0);
+ out+='<div class="card"><div class="tabs"><button onclick="ckrw()">Check for new payouts</button></div>'+rwcard()+'</div>';
  var mx=1;rows.forEach(function(r){mx=Math.max(mx,r.est||0,r.actual||0);});
+ var body='';
  rows.slice().reverse().forEach(function(r){
-  out+='<div style="margin:10px 0 0"><b>'+esc(r.day)+'</b>';
-  out+=' <span class="muted">est '+(r.est==null?'\\u2014':usd(r.est))+' \\u00b7 paid '+(r.actual==null?'not posted yet':usd(r.actual))+(r.unmeasured_min>1?' \\u00b7 '+r.unmeasured_min+'m unmeasured':'')+'</span>';
-  if(r.est!=null){out+='<div class="mtrack"><div class="mfill" style="width:'+(100*(r.est||0)/mx)+'%"></div></div>';}
-  if(r.actual!=null){out+='<div class="mtrack"><div class="mfill" style="width:'+(100*(r.actual||0)/mx)+'%;background:#8a7a2f"></div></div>';}
-  out+='</div>';
+  body+='<div style="margin:12px 0 0"><b>'+esc(r.day)+'</b>'
+   +'<div class="kpi" style="margin:2px 0 4px">'
+   +'<div><div class="v">'+(r.actual==null?'\u2014':usd(r.actual))+'</div><div class="l">paid</div></div>'
+   +'<div><div class="v muted">'+(r.est==null?'\u2014':usd(r.est))+'</div><div class="l">estimate</div></div>'
+   +(r.actual!=null&&r.est?'<div><div class="v">'+(r.actual/r.est).toFixed(2)+'x</div><div class="l">paid/est</div></div>':'')
+   +'</div>';
+  if(r.est!=null){body+='<div class="mtrack"><div class="mfill" style="width:'+(100*(r.est||0)/mx)+'%"></div></div>';}
+  if(r.actual!=null){body+='<div class="mtrack"><div class="mfill" style="width:'+(100*(r.actual||0)/mx)+'%;background:#8a7a2f"></div></div>';}
+  body+='</div>';
  });
- return out+'</div>';
+ out+='<div class="card"><b>'+usd(pt.usd)+'</b> <span class="muted">over '+pt.days+' posted days</span>'+body+'</div>';
+ return out;
 }
-
 function rwcard(){
- if(window._rwbusy)return '<div class="muted">checking the exchange\\u2026</div>';
- var j=window._rw||(window._d&&window._d.rewards_last);
- if(!j)return '<div class="muted">The watcher checks every 5 minutes and pushes your phone when rewards post. The button forces a check now.</div>';
+ if(window._rwbusy)return '<div class="muted">checking\u2026</div>';
+ var j=window._rw;                       // ONLY after the button (owner)
+ if(!j)return '<div class="muted">Press to check.</div>';
  if(!j.ok)return '<div class="bad">'+esc(j.note||'failed')+'</div>';
- var h='<div class="card">';
- if(j.note){h+='<div class="sub">'+esc(j.note)+'</div>';}
- else{h+='<b>'+(j.new_count||0)+' new or changed row'+(j.new_count!==1?'s':'')+'</b>';}
+ var h='';
+ var nr=(j.new_rows||[]);
+ h+='<div class="kpi"><div><div class="v">'+(j.new_count||0)+'</div><div class="l">new rows</div></div></div>';
  var dk=Object.keys(j.days||{}).sort().reverse().slice(0,4);
- if(dk.length){
-  var dl=dk.map(function(d){return d.slice(5)+' '+usd(j.days[d]);}).join(' \\u00b7 ');
-  h+='<div class="muted">Posted day totals: '+dl+'</div>';
- }
- (j.new_rows||[]).slice().reverse().forEach(function(r){
-  h+='<div class="sub">'+esc(r.day)+' \\u00b7 '+usd(r.usd)+' \\u00b7 '+esc(r.name)+' <span class="muted">'+esc(r.status)+'</span></div>';
- });
- if(!(j.new_rows||[]).length)h+='<div class="muted">Nothing new since the last check.</div>';
- return h+'</div>';
+ if(dk.length){h+='<div class="sub">'+dk.map(function(x){return x.slice(5)+' '+usd(j.days[x]);}).join(' \u00b7 ')+'</div>';}
+ nr.slice().reverse().forEach(function(r){
+  h+='<div class="sub">'+esc(r.day)+' \u00b7 <b>'+usd(r.usd)+'</b> \u00b7 '+esc(r.name)+'</div>';});
+ if(!nr.length)h+='<div class="muted">Nothing new.</div>';
+ return h;
 }
 function ckrw(){
  window._rwbusy=true;
  if(window._d)document.getElementById('view').innerHTML=render(window._d);
- post({op:'refresh_rewards'},function(j){
-  window._rwbusy=false;
-  window._rw=j;
- });
+ post({op:'refresh_rewards'},function(j){window._rwbusy=false;window._rw=j;
+  if(window._d)document.getElementById('view').innerHTML=render(window._d);});
 }
 """
 
@@ -1352,18 +1288,21 @@ function render(d){
 }
 """
 
+# (title, nav highlight, page JS, sub-nav group). Plan and model keep
+# their routes for a bookmark but are off the bar (owner, 2026-08-31).
 PAGES = {
-    "/": ("3.0 — the meter", "meter", GRAPH_JS),
-    "/fills": ("3.0 — purchases", "fills", FILLS_JS),
-    "/status": ("3.0 — status", "status", STATUS_JS),
-    "/orders": ("3.0 — orders", "orders", ORDERS_JS),
-    "/plan": ("3.0 — the plan", "plan", PLAN_JS),
-    "/switch": ("3.0 — switches", "switch", SWITCH_JS),
-    "/silver": ("3.0 — the model", "model", SILVER_JS),
-    "/grades": ("3.0 — grades", "grades", GRADES_JS),
-    "/graph": ("3.0 — the meter", "meter", GRAPH_JS),
-    "/watch": ("3.0 — considering", "watch", WATCH_JS),
-    "/log": ("3.0 — log", "log", LOG_JS),
+    "/": ("Quick look", "meter", GRAPH_JS, "quick"),
+    "/graph": ("Quick look", "meter", GRAPH_JS, "quick"),
+    "/fills": ("Fills", "fills", FILLS_JS, "quick"),
+    "/watch": ("Watch", "watch", WATCH_JS, "quick"),
+    "/status": ("Status", "status", STATUS_JS, ""),
+    "/orders": ("Orders", "orders", ORDERS_JS, ""),
+    "/pay": ("Pay", "pay", PAY_JS, ""),
+    "/grades": ("Pay", "pay", PAY_JS, ""),
+    "/switch": ("Switches", "switch", SWITCH_JS, ""),
+    "/log": ("Log", "log", LOG_JS, ""),
+    "/plan": ("Plan", "", PLAN_JS, ""),
+    "/silver": ("Model", "", SILVER_JS, ""),
 }
 
 
@@ -1507,9 +1446,9 @@ class WebServer:
                     return
                 route = path.rstrip("/") or "/"
                 if route in PAGES:
-                    title, here, js = PAGES[route]
+                    title, here, js, sub = PAGES[route]
                     self._send(200, "text/html; charset=utf-8",
-                               _shell(title, here, js).encode())
+                               _shell(title, here, js, sub).encode())
                     return
                 if route == "/live":
                     # the live card's open line. EventSource cannot set

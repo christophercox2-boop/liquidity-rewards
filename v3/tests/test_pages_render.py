@@ -106,7 +106,7 @@ class TestEveryPageRenders(unittest.TestCase):
                 json.dump(PAYLOAD, f)
             failures = []
             seen = set()
-            for route, (_t, _h, js) in PAGES.items():
+            for route, (_t, _h, js, _sub) in PAGES.items():
                 if id(js) in seen:
                     continue
                 seen.add(id(js))
