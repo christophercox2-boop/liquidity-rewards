@@ -1777,3 +1777,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788177628.9,politics,ussewc-usse-ma-2026-11-03-dem,BUY,6.12,0.98,sell,5.7171,81.26,0.99985,94,99,0.018,0.98,0.99,-0.0199,-85.88,buying back the short at or under what it sold for — the bid earns while it wait,C4W2F5Y2WKDF
 1788177808.9,cfb,aachc-cfb-wins-2026-11-28-miss-9pt5wins,SELL,0.01,0.46,sell,0,0,,42,49,0.085,0.46,0.47,0,0,taker dump — sold into the bid (the carved exception),C71RW7YXJKDM
 1788177928.9,politics,enwc-usgubp-ri-2026-09-09-rep-elapel,BUY,20,0.9,manual,0,8.9,,89,94,0.334,0.9,0.91,-0.01,20,moved by the owner,C6SZZA258KDC
+1788178873.2,politics,enwc-ussep-de-2026-09-15-rep-johshu,SELL,11,0.14,sell,0,0,,13,17,0.431,0.14,0.15,0.01,2,taker dump — sold into the bid (the carved exception),C7211KKB4KDK
