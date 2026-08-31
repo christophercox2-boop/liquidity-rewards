@@ -294,11 +294,17 @@ class PrefixStat:
     share: list = field(default_factory=list)
     touch: list = field(default_factory=list)
     est: list = field(default_factory=list)
+    best: list = field(default_factory=list)   # the markets worth looking at
     last_ts: float = 0.0
 
-    KEEP = 80                   # samples per prefix before the oldest fall out
+    KEEP = 80
+    KEEP_BEST = 5                   # samples per prefix before the oldest fall out
 
-    def record(self, p: "SideProbe", now: float) -> None:
+    def record(self, p: "SideProbe", now: float, slug: str = "") -> None:
+        """One scored side. `slug` is kept for the best few so the board
+        can name a market to go and look at — a leaderboard of market
+        kinds is no use if you cannot get from it to an order (owner,
+        2026-08-31: "Can you give the slugs of the top programs")."""
         self.sides += 1
         self.last_ts = now
         if not p.qualifies:
@@ -311,6 +317,17 @@ class PrefixStat:
                        (self.est, p.est_day)):
             lst.append(v)
             del lst[:-self.KEEP]
+        if slug:
+            self.best = [b for b in self.best if b["market"] != slug]
+            self.best.append({
+                "market": slug, "side": p.side,
+                "ypd": round(p.yield_per_dollar, 4),
+                "share_pct": round(p.share * 100.0, 3),
+                "touch": round(p.touch_size, 1),
+                "px": round(p.touch_px or 0.0, 4),
+                "est_day": round(p.est_day, 4), "ts": round(now, 1)})
+            self.best.sort(key=lambda b: -b["ypd"])
+            del self.best[self.KEEP_BEST:]
 
     def row(self) -> dict:
         return {"prefix": self.prefix, "markets": self.markets,
@@ -322,6 +339,7 @@ class PrefixStat:
                 "median_share_pct": round(_median(self.share), 3),
                 "median_touch": round(_median(self.touch), 0),
                 "median_est_day": round(_median(self.est), 4),
+                "best": list(self.best),
                 "last_ts": round(self.last_ts, 1)}
 
 

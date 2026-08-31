@@ -402,5 +402,50 @@ class TestTournamentPools(unittest.TestCase):
         self.assertAlmostEqual(a.est_day, c.est_day, places=6)
 
 
+class TestBestMarkets(unittest.TestCase):
+    """Owner, 2026-08-31: "Can you give the slugs of the top programs."
+    A leaderboard of market kinds is no use if you cannot get from it to
+    an actual order. The cycling survey kept only aggregates."""
+
+    def probe(self, share, pool, risk):
+        p = probe_side(book(bids=[(risk, 50.0)], asks=[]),
+                       Program(pool=1.0, target=1.0, df=0.5, event_n=1),
+                       "BUY", 1.0)
+        p.share, p.risk_usd, p.qualifies = share, risk, True
+        p.est_day, p.touch_px, p.touch_size = share * pool, risk, 40.0
+        return p
+
+    def test_the_best_markets_are_kept_with_their_slugs(self):
+        st = PrefixStat(prefix="geo/treaty/dipcc")
+        st.record(self.probe(0.02, 8.0, 0.20), 1000.0, "dipcc-ukraine-2026")
+        row = st.row()
+        self.assertEqual(row["best"][0]["market"], "dipcc-ukraine-2026")
+        self.assertAlmostEqual(row["best"][0]["ypd"], 0.8, places=3)
+        self.assertEqual(row["best"][0]["side"], "BUY")
+
+    def test_only_the_best_few_are_kept(self):
+        st = PrefixStat(prefix="x")
+        for i in range(20):
+            st.record(self.probe(0.001 * (i + 1), 8.0, 0.20), 1000.0, f"m{i}")
+        self.assertEqual(len(st.best), PrefixStat.KEEP_BEST)
+        # the strongest survived, the weakest did not
+        self.assertEqual(st.best[0]["market"], "m19")
+        self.assertNotIn("m0", [b["market"] for b in st.best])
+
+    def test_a_market_seen_twice_is_not_listed_twice(self):
+        st = PrefixStat(prefix="x")
+        st.record(self.probe(0.01, 8.0, 0.20), 1000.0, "same")
+        st.record(self.probe(0.02, 8.0, 0.20), 2000.0, "same")
+        self.assertEqual(len(st.best), 1)
+        self.assertAlmostEqual(st.best[0]["ypd"], 0.8, places=3)
+
+    def test_a_side_that_does_not_qualify_is_never_listed(self):
+        st = PrefixStat(prefix="x")
+        p = self.probe(0.01, 8.0, 0.20)
+        p.qualifies = False
+        st.record(p, 1000.0, "under-target")
+        self.assertEqual(st.best, [])
+
+
 if __name__ == "__main__":
     unittest.main()
