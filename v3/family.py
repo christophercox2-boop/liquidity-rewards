@@ -693,7 +693,12 @@ class Family:
         n = u.get("event_n")
         if not n:
             return None
-        return (prog.pool or 0.0) / max(int(n), 1) / 2.0
+        # daily_pool, not pool: a bounded program's rewardPool covers
+        # its whole period, so a tournament-length one read as daily
+        # overstates by the length of the event (owner, 2026-08-31).
+        # Every live program in our four families is open-ended, so this
+        # is the same number for them.
+        return (prog.daily_pool or 0.0) / max(int(n), 1) / 2.0
 
     # ------------------------------------------------------------ discovery
 

@@ -2149,7 +2149,7 @@ class Monitor:
                 continue
             st.markets += 1
             done += 1
-            pool_side = (prog.pool / max(prog.event_n, 1)) / 2.0
+            pool_side = (prog.daily_pool / max(prog.event_n, 1)) / 2.0
             for side in ("BUY", "SELL"):
                 st.record(sv.probe_side(book, prog, side, pool_side), now)
             self.client._sleep(0.05)
