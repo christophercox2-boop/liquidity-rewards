@@ -2160,6 +2160,36 @@ class TestWindDownLedger(unittest.TestCase):
         r.fam._note_wind_down(A, "short step-up", 1.0, 0.24, r.now)
         self.assertFalse(r.fam.wind_down[-1]["flat"])
 
+    def test_repricings_collapse_to_one_four_hour_number(self):
+        """Owner, 2026-08-31: "Just have a number that says x markets
+        dropped prices in the last 4 hours and increased earning from
+        exits by x cents." The moves carry where they came from and
+        what the model says the move adds per day."""
+        from v3.tests.test_family import Rig, A, B
+        r = Rig()
+        r.add_market(A)
+        r.add_market(B)
+        r.fam._note_wind_down(A, "short step-up", 1.0, 0.24, r.now,
+                              left=-40.0, from_px=0.21, gain=0.031)
+        r.fam._note_wind_down(B, "exit move", 4.0, 0.11, r.now,
+                              left=4.0, from_px=0.13, gain=0.014)
+        # a second move in a market already counted: one market, two moves
+        r.fam._note_wind_down(A, "exit move", 2.0, 0.25, r.now,
+                              left=-40.0, from_px=0.24, gain=0.005)
+        # and one outside the window, which the 4h number must exclude
+        r.fam._note_wind_down(B, "exit move", 1.0, 0.30, r.now - 5 * 3600.0,
+                              left=1.0, from_px=0.32, gain=9.99)
+        row = r.fam.wind_down[0]
+        self.assertAlmostEqual(row["from_px"], 0.21)
+        self.assertAlmostEqual(row["gain"], 0.031)
+        wd = r.cycle()["wind_down"]
+        self.assertEqual(wd["moves_4h_markets"], 2)
+        self.assertEqual(wd["moves_4h_n"], 3)
+        self.assertAlmostEqual(wd["moves_4h_gain"], 0.050, places=3)
+        # none of it leaked into the sale figures
+        self.assertEqual(wd["day_n"], 0)
+        self.assertEqual(wd["day_usd"], 0)
+
     def test_rows_written_before_the_flag_are_classed_by_kind(self):
         """The ledger persists, so the restart that ships this reads
         50 rows that carry no sale flag at all."""
