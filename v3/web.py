@@ -596,10 +596,39 @@ function ordersTab(d){
  if(!any)out+='<div class="card muted">No resting orders.</div>';
  return out;
 }
+function svRun(){
+ if(!confirm('Survey WNBA, MLB and all NFL markets? Reads books and terms only — it places nothing. Takes a few minutes.'))return;
+ document.getElementById('svout').innerHTML='<div class="muted">surveying…</div>';
+ post({op:'survey',tags:['wnba','mlb','nfl','baseball','basketball']},function(j){
+  document.getElementById('svout').innerHTML='<div class="'+(j.ok?'ok':'bad')+'">'+esc(j.note||'')+'</div>';});
+}
+function svCard(d){
+ // what a tag's markets are actually worth to an order OUR size — the
+ // share a single share buys per dollar at risk, not the pool (owner,
+ // 2026-08-31: "We're getting a high share with low order size")
+ var s=d.survey;
+ var out='<div class="card"><b>Market survey</b>'
+  +'<div class="muted" style="font-size:12px">Reads books and terms. Places nothing.</div>'
+  +'<div style="margin:6px 0"><button class="small" onclick="svRun()">Survey WNBA, MLB, NFL</button></div>'
+  +'<div id="svout"></div>';
+ if(s&&s.kinds&&s.kinds.length){
+  out+='<table><tr><th>market kind</th><th class="r">sides</th>'
+   +'<th class="r">qualified</th><th class="r">median share</th>'
+   +'<th class="r">share%/$</th><th class="r">$/day</th></tr>';
+  s.kinds.slice(0,14).forEach(function(k){
+   out+='<tr><td>'+esc(k.kind)+'</td><td class="r">'+k.sides+'</td>'
+    +'<td class="r">'+k.qualified+'</td>'
+    +'<td class="r">'+k.median_share_pct.toFixed(2)+'%</td>'
+    +'<td class="r">'+k.median_share_per_dollar.toFixed(2)+'</td>'
+    +'<td class="r">'+usd(k.est_day_usd)+'</td></tr>';});
+  out+='</table><div class="hint">share%/$ is the measure college football is exceptional at: how much of a side one dollar at risk buys. cfb holds 13% of a side for 41 cents. NBA holds 0.02%.</div>';
+ }
+ return out+'</div>';
+}
 function wallsTab(d){
+ var out=svCard(d);
  var wl=[];fams(d).forEach(function(kv){(kv[1].watched||[]).forEach(function(w){wl.push(w);});});
- if(!wl.length)return '<div class="card muted">No watched races.</div>';
- var out='';
+ if(!wl.length)return out+'<div class="card muted">No watched races.</div>';
  wl.forEach(function(w,i){
   var bid='wq_'+i, pctv=(w.target?100*(w.ask_total||0)/w.target:0);
   out+='<div class="card"><div class="name" style="cursor:pointer;font-size:15px" onclick="showbook(\\''+esc(w.market)+'\\',\\''+bid+'\\')">'+nm(d,w.market)+'</div><div id="'+bid+'"></div>'
@@ -1476,6 +1505,26 @@ class WebServer:
                                                      str(body.get("which") or "master"))}
         if op == "refresh_rewards":
             return self.monitor.refresh_rewards()
+        if op == "survey":
+            # read-only: books, terms and a file. Runs on its own thread
+            # because a few hundred book reads outlast a phone request.
+            tags = [str(t) for t in (body.get("tags") or []) if str(t)][:6]
+            if not tags:
+                return {"ok": False, "note": "no tags given"}
+            if getattr(self.monitor, "_survey_running", False):
+                return {"ok": False, "note": "a survey is already running"}
+            self.monitor._survey_running = True
+
+            def run(m=self.monitor, tg=tags):
+                try:
+                    m.survey_tags(tg)
+                except Exception as e:  # noqa: BLE001 — never kill the thread
+                    m._note(f"survey failed: {type(e).__name__}: {e}")
+                finally:
+                    m._survey_running = False
+            threading.Thread(target=run, daemon=True, name="survey").start()
+            return {"ok": True, "note": f"surveying {', '.join(tags)} — the "
+                    "result lands on this page and in data/survey.csv"}
         if op == "place":
             return self.monitor.owner_place(
                 str(body.get("market") or ""), str(body.get("side") or ""),

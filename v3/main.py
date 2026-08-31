@@ -1995,6 +1995,91 @@ class Monitor:
                        "posting or the hourly publish")
         return ok
 
+    # a survey reads books and terms and writes a file. It never places,
+    # moves or cancels anything, and it is only ever started by the owner
+    # tapping the button (owner, 2026-08-31).
+    SURVEY_MAX_MARKETS = 400        # terms fetched per tag
+    SURVEY_MAX_BOOKS = 140          # books read per tag — the expensive part
+
+    def survey_tags(self, tags: list[str], out_path: str = "data/survey.csv",
+                    max_books: int | None = None) -> dict:
+        """Where could a cent of risk hold a real share?
+
+        Walks a tag's markets WITHOUT the slug-prefix filter the families
+        use, so it reports what kinds of market a tag actually holds —
+        that is how "NFL beyond futures" gets answered rather than
+        assumed (owner, 2026-08-31). Read-only: books, terms, a file.
+        """
+        from . import survey as sv
+        from .programs import pick_period, program_from_period, with_event_n
+
+        rows: list[dict] = []
+        seen_kinds: dict[str, int] = {}
+        found: dict[str, int] = {}
+        cap = max_books or self.SURVEY_MAX_BOOKS
+        for tag in tags:
+            try:
+                events = self.client.events_by_tag(tag, max_pages=8)
+            except Exception as e:  # noqa: BLE001 — a dud tag is a finding
+                self._note(f"survey {tag}: no events ({type(e).__name__})")
+                found[tag] = 0
+                continue
+            uni: dict[str, int] = {}
+            for ev in events:
+                open_m = [m for m in ev.get("markets") or []
+                          if m.get("slug") and not m.get("closed")]
+                for m in open_m:
+                    uni[m["slug"]] = len(open_m)
+            found[tag] = len(uni)
+            for s in uni:
+                k = sv.kind_of(s)
+                seen_kinds[k] = seen_kinds.get(k, 0) + 1
+            slugs = list(uni)[:self.SURVEY_MAX_MARKETS]
+            try:
+                raw = self.client.programs(slugs)
+            except Exception as e:  # noqa: BLE001
+                self._note(f"survey {tag}: terms failed ({type(e).__name__})")
+                continue
+            # only markets that actually pay are worth a book read
+            payers = []
+            for s in slugs:
+                per = pick_period((raw.get(s) or {}).get("timePeriods") or [], s)
+                if not per:
+                    continue
+                prog = with_event_n(program_from_period(per), uni.get(s, 1))
+                if prog.pool > 0 and prog.is_live():
+                    payers.append((s, prog))
+            for s, prog in payers[:cap]:
+                try:
+                    book = self.client.book(s, fetched_at=time.time())
+                except Exception:  # noqa: BLE001 — one bad book is not fatal
+                    continue
+                pool_side = (prog.pool / max(prog.event_n, 1)) / 2.0
+                for side in ("BUY", "SELL"):
+                    rows.append(sv.probe_side(book, prog, side,
+                                              pool_side).row(s, sv.kind_of(s)))
+                self.client._sleep(0.05)
+        res = sv.summarise(rows)
+        res["found"] = found
+        res["kinds_seen"] = dict(sorted(seen_kinds.items(),
+                                        key=lambda kv: -kv[1])[:40])
+        res["rows"] = len(rows)
+        try:
+            existing, sha = self._gh_file(out_path)
+            self._gh_put(out_path, sv.to_csv(rows), sha,
+                         f"market survey: {len(rows)} sides [skip ci]")
+            res["written"] = out_path
+        except Exception as e:  # noqa: BLE001 — the numbers still return
+            res["written"] = f"failed: {type(e).__name__}"
+        top = res["kinds"][:6]
+        self._note("survey: " + " | ".join(
+            f"{k['kind']} {k['qualified']}/{k['sides']} sides, "
+            f"median share {k['median_share_pct']:.2f}%, "
+            f"{k['median_share_per_dollar']:.2f} share%/$"
+            for k in top) or "survey: nothing found")
+        self.survey_last = res
+        return res
+
     def _tick_probe(self) -> None:
         """Ask the exchange what price grid a market actually has, and
         write down what it answers.
@@ -2665,6 +2750,14 @@ class Monitor:
         d["labels"] = labels
         d["now"] = time.time()
         d["boot"] = dict(self.boot_stage or {})
+        # the last market survey's per-kind summary. Copied, not shared,
+        # and only the summary — the full rows live in data/survey.csv.
+        sl = getattr(self, "survey_last", None)
+        if sl:
+            d["survey"] = {"kinds": [dict(k) for k in (sl.get("kinds") or [])],
+                           "found": dict(sl.get("found") or {}),
+                           "rows": sl.get("rows", 0),
+                           "written": sl.get("written", "")}
         return d
 
     def boot_payload(self) -> bytes:
