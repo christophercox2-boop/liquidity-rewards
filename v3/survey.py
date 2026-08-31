@@ -97,7 +97,7 @@ def group_of(row: dict) -> str:
     parts = [p for p in parts if p]
     if parts:
         return "/".join(parts)
-    return kind_of(str(row.get("marketSlug") or ""))
+    return slug_group(str(row.get("marketSlug") or ""))
 
 # how far from the touch still carries real scoring weight. Past this the
 # discount factor has usually crushed a level's contribution to nothing.
@@ -121,6 +121,36 @@ def kind_of(slug: str) -> str:
             break
         out.append(p)
     return "-".join(out) or str(slug)
+
+
+# A slug like astatc-cfb-akron-wake names one FIXTURE, not a kind of
+# market — Akron vs Wake Forest, 67 markets of its own. Left at that
+# grain the frame produces a stratum per game, each waiting days for a
+# turn, and the board never ranks anything (owner, 2026-08-31: "just
+# try and keep it going so I can get some data"). Two segments is the
+# market type: astatc-cfb, aachc-cfb, tec-nba, vmc-ussep.
+SLUG_GROUP_SEGMENTS = 2
+
+
+def slug_group(slug: str) -> str:
+    """The market TYPE from a slug, coarse enough to accumulate."""
+    return "-".join(kind_of(slug).split("-")[:SLUG_GROUP_SEGMENTS])
+
+
+# A stratum needs MIN_SAMPLES scored sides to rank, which is half that
+# many markets. One holding fewer can NEVER rank however long it runs,
+# so it is merged into its parent rather than left collecting draws it
+# can do nothing with: cul/awd/tac -> cul/awd -> cul.
+MIN_MARKETS = 6
+
+
+def parent_of(group: str) -> str | None:
+    """One level coarser, or None at the top."""
+    sep = "/" if "/" in group else "-"
+    parts = [p for p in group.split(sep) if p]
+    if len(parts) <= 1:
+        return None
+    return sep.join(parts[:-1])
 
 
 @dataclass
@@ -359,10 +389,43 @@ class Sampler:
             bucket = self.all.setdefault(k, [])
             if s not in bucket:
                 bucket.append(s)
+        self.merged = self._merge_small()
         for k, v in self.all.items():
             if k not in self.pools:
                 self.pools[k] = self._shuffled(v)
+        for gone in [k for k in self.pools if k not in self.all]:
+            self.pools.pop(gone, None)
         self.order = sorted(self.all)
+
+    def _merge_small(self, min_markets: int = MIN_MARKETS) -> int:
+        """Fold strata too small to ever rank into their parent.
+
+        A stratum needs MIN_SAMPLES scored sides, so a stratum holding
+        three markets can never get there however long it runs — it just
+        keeps taking turns in the round robin and doing nothing with
+        them. Merging up a level, repeatedly, gives it a chance instead
+        (owner, 2026-08-31)."""
+        merged = 0
+        while True:
+            small = [k for k, v in self.all.items()
+                     if len(v) < min_markets and parent_of(k)]
+            if not small:
+                return merged
+            moved = False
+            for k in small:
+                par = parent_of(k)
+                if par is None or par == k:
+                    continue
+                bucket = self.all.setdefault(par, [])
+                for slug in self.all.pop(k):
+                    if slug not in bucket:
+                        bucket.append(slug)
+                self.pools.pop(k, None)
+                self.pools.pop(par, None)      # reshuffle the grown parent
+                merged += 1
+                moved = True
+            if not moved:
+                return merged
 
     def _shuffled(self, slugs: list[str]) -> list[str]:
         out = list(slugs)
@@ -390,7 +453,11 @@ class Sampler:
         return out
 
     def state(self) -> dict:
+        sizes = sorted((len(v) for v in self.all.values()), reverse=True)
         return {"seed": self.seed, "prefixes": len(self.all),
+                "merged": getattr(self, "merged", 0),
+                "biggest": sizes[0] if sizes else 0,
+                "too_small": sum(1 for n in sizes if n < MIN_MARKETS),
                 "population": sum(len(v) for v in self.all.values()),
                 "left_this_pass": sum(len(v) for v in self.pools.values()),
                 "passes": self.passes}

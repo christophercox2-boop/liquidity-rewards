@@ -239,9 +239,15 @@ class TestIncentivesMetadata(unittest.TestCase):
                       "subcategory": "football", "instrumentProduct": "futures"})
         self.assertNotEqual(a, b)
 
-    def test_an_unlabelled_row_falls_back_to_the_prefix(self):
+    def test_an_unlabelled_row_falls_back_to_the_market_type(self):
+        # coarse on purpose: at fixture grain every game was a stratum,
+        # 67 markets each, waiting days for a turn (owner, 2026-08-31)
         self.assertEqual(group_of({"marketSlug": "aachc-cfb-wins-2026-11-28-x"}),
-                         "aachc-cfb-wins")
+                         "aachc-cfb")
+        self.assertEqual(group_of({"marketSlug": "astatc-cfb-akron-wake"}),
+                         "astatc-cfb")
+        self.assertEqual(group_of({"marketSlug": "astatc-cfb-col-gtech"}),
+                         "astatc-cfb")
 
     def test_event_start_time_drives_the_live_check(self):
         now = 1_788_200_000.0
@@ -308,6 +314,51 @@ class TestYieldRanking(unittest.TestCase):
         row = st.row()
         self.assertAlmostEqual(row["median_ypd"], 2.0, places=3)
         self.assertAlmostEqual(row["median_spd"], 0.25, places=3)
+
+
+class TestStrataStayUsable(unittest.TestCase):
+    """Owner, 2026-08-31: "just try and keep it going so I can get some
+    data." A stratum per fixture, or one holding three markets, both
+    mean the board never ranks anything."""
+
+    def test_fixtures_collapse_into_one_market_type(self):
+        s = Sampler(seed=1)
+        s.load([(f"astatc-cfb-{a}-{b}-2026-01-01-{i}",
+                 group_of({"marketSlug": f"astatc-cfb-{a}-{b}-2026-01-01-{i}"}))
+                for a, b in (("akron", "wake"), ("col", "gtech"),
+                             ("merri", "del"))
+                for i in range(9)])
+        self.assertEqual(list(s.all), ["astatc-cfb"])
+        self.assertEqual(len(s.all["astatc-cfb"]), 27)
+
+    def test_a_stratum_too_small_to_rank_merges_upward(self):
+        s = Sampler(seed=1)
+        s.load([(f"m{i}", "cul/awd/tac") for i in range(3)]
+               + [(f"n{i}", "cul/awd/tpoyc") for i in range(3)])
+        self.assertEqual(list(s.all), ["cul/awd"])
+        self.assertEqual(s.state()["merged"], 2)
+        self.assertEqual(s.state()["too_small"], 0)
+
+    def test_it_merges_again_if_the_parent_is_also_too_small(self):
+        s = Sampler(seed=1)
+        s.load([("a", "cul/awd/tac"), ("b", "cul/movies/x"),
+                ("c", "cul/music/y"), ("d", "cul/tv/z"),
+                ("e", "cul/game/w"), ("f", "cul/book/v")])
+        self.assertEqual(list(s.all), ["cul"])
+
+    def test_a_top_level_stratum_is_left_alone_even_if_small(self):
+        # nothing to merge into; it stays and simply never ranks
+        s = Sampler(seed=1)
+        s.load([("a", "solo"), ("b", "solo")])
+        self.assertEqual(list(s.all), ["solo"])
+        self.assertEqual(s.state()["too_small"], 1)
+
+    def test_the_state_reports_the_shape(self):
+        s = Sampler(seed=1)
+        s.load([(f"m{i}", "big-one") for i in range(40)])
+        st = s.state()
+        self.assertEqual(st["biggest"], 40)
+        self.assertEqual(st["prefixes"], 1)
 
 
 if __name__ == "__main__":
