@@ -1722,3 +1722,10 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788132058.6,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar10-15,BUY,1,0.19,manual,0,5.08,,15,17,0.939,0.19,0.2,0.03,210,the owner's own order — the engine leaves it alone,C6JGN1718KDH
 1788132178.6,cfb,aachc-cfb-wins-2026-11-28-tx-10pt5wins,BUY,1,0.33,earn,1.1196,8.04,,33,39,0.198,0.33,0.34,-0.03,4,joins the touch — the book has been quiet,C6FZT2ZJCKDK
 1788132238.6,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar10-15,BUY,1,0.19,manual,0,5.13,,15,17,0.942,0.19,0.2,0.03,211,the owner's own order — the engine leaves it alone,C6JGN1718KDH
+1788136078.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar10-15,BUY,85,0.19,manual,0,6.19,,15,17,0.943,0.18,0.2,0.03,296,the owner's own order — the engine leaves it alone,C6JGN1718KDH
+1788136258.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mou0-5,BUY,1,0.01,manual,8.3908,6.49,,1,1,0.936,0.01,0.02,0,37,the owner's own order — the engine leaves it alone,C6J7NPRFGKDF
+1788136258.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,SELL,3,0.2,manual,28.3189,6.29,,16,19,0.892,0.19,0.2,-0.03,56,the owner's own order — the engine leaves it alone,C6JED5AVEKDN
+1788136258.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,BUY,3,0.19,manual,4.7058,6.29,,16,19,0.892,0.19,0.2,0.02,59,the owner's own order — the engine leaves it alone,C6JDMJ43TKDD
+1788136258.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar5-10,BUY,2,0.04,manual,0,6.28,,2,5,0.887,0.04,0.05,0,58,the owner's own order — the engine leaves it alone,C6JE8ANTEKDD
+1788136258.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,BUY,3,0.2,manual,0,6.19,,19,22,0.805,0.2,0.21,0,16,the owner's own order — the engine leaves it alone,C6JJ2JDT6KDG
+1788136258.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,SELL,2,0.21,manual,0,6.19,,19,22,0.805,0.2,0.21,-0.01,14,the owner's own order — the engine leaves it alone,C6JHG1JGTKDD
