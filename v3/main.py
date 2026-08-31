@@ -815,6 +815,10 @@ class Monitor:
                 switch_on=lambda s=sw: (self.master.on and s.on
                                         and self._floor_ok),
                 fresh_book=lambda slug, c=cache: c.fresh(slug, 120.0, time.time()),
+                # the price grid, resolved apart from book freshness:
+                # the exchange's own figure where we have it, else the
+                # last book of any age. No grid, no order.
+                tick_for=lambda slug, c=cache: c.grid(slug),
                 log=self._audit,
             )
             fam.desk = desk
@@ -1991,6 +1995,42 @@ class Monitor:
                        "posting or the hourly publish")
         return ok
 
+    def _tick_probe(self) -> None:
+        """Ask the exchange what price grid a market actually has, and
+        write down what it answers.
+
+        Until 2026-08-31 the tick was only ever INFERRED from the prices
+        already resting in a book — "any sub-cent price here means a
+        tenth-cent book". That is self-reinforcing: one decimal order
+        from any source flips a whole-cent market to a finer grid, and
+        the engine then prices there forever. This reads the exchange's
+        own market object instead, logs its field names once per family
+        so the true name can be read rather than guessed at, and records
+        a declared tick only when it is unambiguous.
+        """
+        for key, fam in self.families.items():
+            if key in getattr(self, "_tick_probed", ()):  # once per family
+                continue
+            slug = next((s for s in fam.terms.current), None)
+            if slug is None:
+                continue
+            self._tick_probed = set(getattr(self, "_tick_probed", ())) | {key}
+            md = self.client.market_details(slug)
+            if not isinstance(md, dict) or not md:
+                self._note(f"tick probe {key}: no market object for {slug}")
+                continue
+            tick = self.client.declared_tick(md)
+            if tick:
+                fam.cache.declared[slug] = tick
+                self._note(f"tick probe {key}: {slug} declares a "
+                           f"{tick * 100:.3g}c grid")
+            else:
+                # the whole point of the probe: show what IS there, so
+                # the field can be named from the record next time
+                self._note(f"tick probe {key}: no unambiguous grid on "
+                           f"{slug} — market fields: "
+                           + ",".join(sorted(md.keys()))[:400])
+
     def publish_files(self, now: float) -> None:
         """Hourly, and only while 1.0 is retired (one writer per file)."""
         if os.environ.get("V1_ENABLED", "0") != "0":
@@ -2049,6 +2089,10 @@ class Monitor:
             self._feed_check(now)
         except Exception as e:  # noqa: BLE001 — a diagnostic, never a blocker
             self._note(f"feed check failed: {type(e).__name__}: {e}")
+        try:
+            self._tick_probe()
+        except Exception as e:  # noqa: BLE001 — a diagnostic, never a blocker
+            self._note(f"tick probe failed: {type(e).__name__}: {e}")
         try:
             # FILL-MODEL CALIBRATION, out loud (owner, 2026-08-25: the
             # expected-risk budget leans on these odds, so they are

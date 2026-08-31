@@ -52,7 +52,7 @@ def resting(oid="new1", market="scc-x", side="BUY", price=0.08, size=45.0,
 
 
 def make_desk(client=None, whitelisted=True, switch=True, book="normal",
-              closing_only=None):
+              closing_only=None, tick_for=None):
     client = client or StubClient()
     books = {
         "normal": Book(bids=((0.44, 100.0),), asks=((0.46, 50.0),), tick=0.01),
@@ -69,8 +69,107 @@ def make_desk(client=None, whitelisted=True, switch=True, book="normal",
         sleep=clock.sleep,
         clock=clock.clock,
         closing_only=closing_only,
+        tick_for=tick_for,
     )
     return desk, client, logs
+
+
+class TestPriceGrid(unittest.TestCase):
+    """Owner, 2026-08-31: "Confirm that no systems are placing orders
+    with decimal prices unless you verify the order book accepts these
+    orders through the book terms."
+
+    The grid was only ever INFERRED from the prices already resting in
+    a book — one sub-cent price from any source, ours included, flips a
+    whole-cent market to a tenth-cent grid and it prices there for good.
+    A declared grid from the exchange overrides that inference."""
+
+    def test_a_declared_grid_beats_the_inferred_one(self):
+        # the book says tenth-cent (someone left 25.8c resting); the
+        # exchange says whole cents. The exchange wins.
+        desk, client, _ = make_desk(tick_for=lambda s: 0.01)
+        r = desk.place_resting("scc-x", "SELL", 0.468, 5, verify=False)
+        self.assertTrue(r.ok, r.note)
+        self.assertEqual(client.posts[-1][1]["price"]["value"], "0.47")
+
+    def test_an_ask_snaps_up_and_a_bid_snaps_down(self):
+        # never toward crossing: an ask rounds away from the bid and a
+        # bid away from the ask, so every guard only gets safer
+        desk, client, _ = make_desk(tick_for=lambda s: 0.01)
+        desk.place_resting("scc-x", "SELL", 0.468, 5, verify=False)
+        self.assertEqual(client.posts[-1][1]["price"]["value"], "0.47")
+        desk.place_resting("scc-x", "BUY", 0.358, 5, verify=False)
+        self.assertEqual(client.posts[-1][1]["price"]["value"], "0.35")
+
+    def test_a_tenth_cent_market_keeps_its_finer_grid(self):
+        desk, client, _ = make_desk(tick_for=lambda s: 0.001)
+        r = desk.place_resting("scc-x", "SELL", 0.4684, 5, verify=False)
+        self.assertTrue(r.ok, r.note)
+        self.assertEqual(client.posts[-1][1]["price"]["value"], "0.469")
+
+    def test_the_grid_survives_a_book_too_stale_to_place_on(self):
+        # tick_for reads the last book of ANY age: a tick does not go
+        # stale the way a price does. The blind-book rail still stops
+        # the order, so this is belt, not a new door.
+        desk, client, _ = make_desk(book="none", tick_for=lambda s: 0.01)
+        r = desk.place_resting("scc-x", "SELL", 0.468, 5, verify=False)
+        self.assertFalse(r.ok)
+        self.assertIn("refusing to place blind", r.note)
+        self.assertEqual(client.posts, [])
+
+    def test_no_grid_at_all_refuses_rather_than_guessing(self):
+        desk, client, _ = make_desk(tick_for=lambda s: None)
+        # the stub's fresh book still carries a tick, so this proves the
+        # fallback rather than the refusal
+        r = desk.place_resting("scc-x", "SELL", 0.468, 5, verify=False)
+        self.assertTrue(r.ok, r.note)
+        self.assertEqual(client.posts[-1][1]["price"]["value"], "0.47")
+
+
+class TestDeclaredGrid(unittest.TestCase):
+    """Reading the exchange's own price grid instead of inferring it.
+    The field name is unconfirmed, so the parser takes only what is
+    unambiguous and the probe logs the rest — a wrong grid places wrong
+    prices, which is the thing being fixed."""
+
+    def test_reads_a_dollar_tick_from_the_market_object(self):
+        from v3.api import Client
+        self.assertEqual(Client.declared_tick({"minPriceIncrement": 0.01}), 0.01)
+        self.assertEqual(Client.declared_tick({"tick_size": "0.001"}), 0.001)
+        # nested where the exchange buries it
+        self.assertEqual(
+            Client.declared_tick({"marketMetadata": {"minTick": 0.01}}), 0.01)
+
+    def test_refuses_to_guess_units(self):
+        from v3.api import Client
+        # a bare 1 could be a cent or a hundredth of one — not ours to
+        # decide; the probe line shows it instead
+        self.assertIsNone(Client.declared_tick({"tickSize": 1}))
+        self.assertIsNone(Client.declared_tick({"minTick": 0}))
+        self.assertIsNone(Client.declared_tick({"minTick": "wide"}))
+        self.assertIsNone(Client.declared_tick({"somethingElse": 0.01}))
+        self.assertIsNone(Client.declared_tick({}))
+
+    def test_the_cache_prefers_a_declared_grid_over_the_inferred_one(self):
+        from v3.books import BookCache
+        c = BookCache()
+        # a book carrying one sub-cent price infers a tenth-cent grid
+        c.put("m", Book(bids=((0.258, 10.0),), asks=((0.46, 5.0),),
+                        tick=0.001, fetched_at=1000.0))
+        self.assertEqual(c.grid("m"), 0.001)
+        # the exchange's own figure overrides it
+        c.declared["m"] = 0.01
+        self.assertEqual(c.grid("m"), 0.01)
+
+    def test_the_grid_outlives_the_books_freshness(self):
+        from v3.books import BookCache
+        c = BookCache()
+        c.put("m", Book(bids=((0.44, 10.0),), asks=((0.46, 5.0),),
+                        tick=0.01, fetched_at=1.0))
+        # ancient book, but a tick is a property of the market
+        self.assertIsNone(c.fresh("m", 120.0, 1e9))
+        self.assertEqual(c.grid("m"), 0.01)
+        self.assertIsNone(c.grid("never-seen"))
 
 
 class TestPriceString(unittest.TestCase):
