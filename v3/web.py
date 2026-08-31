@@ -567,7 +567,7 @@ function render(d){
   });
   out+='<div class="card">'+fold('Watched races \\u2014 qualify the ask side by hand',
    '\\u2014 '+wl.length+' markets, '+(nq?nq+' not qualifying':'all qualifying'),wb,true)
-   +'<div class="hint">One tap places up to 6 deep asks (99c) toward the Target Size gap. The exchange trims every order to your free buying power \\u2014 that is the real size limit \\u2014 so the wall grows tap by tap; the result line says exactly what rested and what is still missing. A 99c ask only fills if someone pays 99c. These are YOUR orders: the automation never touches them, and the engine keeps its own money out of these markets entirely.</div></div>';
+      +'<div class="hint">One tap builds the wall until the side reaches Target Size. The exchange trims each order to your free buying power, so it places as many as it takes \\u2014 in the background, re-reading the book every pass. Tap again any time for progress. It stops on its own if buying power runs low. A 99c ask only fills if someone pays 99c. These are YOUR orders: the automation never touches them, and the engine keeps its own money out of these markets entirely.</div></div>';
  }
  var pos=[];
  fams(d).forEach(function(kv){
