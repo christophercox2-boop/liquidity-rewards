@@ -1804,3 +1804,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788196690.6,politics,enwc-uspres-nom-rep-2028-jdvan,BUY,2,0.47,earn,4.109,5.19,0.5,48,52,0.548,0.47,0.48,-0.03,2,at the touch — a fill here is 3 ticks inside value (Silver + evidence),C71S2T50JKDF
 1788196870.6,cfb,aachc-cfb-wins-2026-11-28-aubrn-7pt5wins,SELL,0.5,0.28,manual,7.4963,4.27,,24,31,0,0.27,0.28,-0.01,-0.5,the owner's own order — the engine leaves it alone,C72JC0E9WKDG
 1788198070.7,politics,ewc-usp-2028-11-07-gavnew,BUY,14.71,0.13,manual,3.4205,5.71,,12,16,0.621,0.13,0.14,-0.01,75.71,the owner's own order — the engine leaves it alone,C71M8DYREKDE
+1788199505.6,politics,enwc-usgubp-ma-2026-09-01-rep-brisho,SELL,131,0.06,manual,0.0005,73.17,,1,4,0.311,,0.01,-0.04,0,the owner's own order — the engine leaves it alone,C5868XKCJKDN
