@@ -1824,3 +1824,10 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788212396.6,politics,enwc-uspres-nom-rep-2028-jdvan,BUY,5.55,0.47,earn,6.4804,4.36,0.5,47,51,0.651,0.47,0.48,-0.03,7.55,at the touch — a fill here is 3 ticks inside value (Silver + evidence),C768Q8V3MKDG
 1788212456.6,cfb,aachc-cfb-wins-2026-11-28-cin-5pt5wins,SELL,1,0.42,sell,0,0,,32,43,0.466,0.42,0.43,-0.04,0,taker dump — sold into the bid (the carved exception),C79Y01J1WKDG
 1788212516.6,cfb,aachc-cfb-wins-2026-11-28-txtech-9pt5wins,BUY,0.01,0.71,sell,0,26.6,,69,77,0.329,0.47,0.77,-0.03,0.01,buying back the short at or under what it sold for — the bid earns while it wait,C6K919SHYKDH
+1788213208.7,cfb,aachc-cfb-wins-2026-11-28-txst-5pt5wins,BUY,0.5,0.62,earn,1.2584,31.48,,62,68,0,0.62,0.63,-0.03,0.5,joins the touch — the book has been quiet,C6F5E4EK4KDD
+1788213568.7,politics,paccc-balpow-2026-11-03-rhou-dsen,SELL,96.98,0.02,manual,2.101,91.44,,1,4,0.026,0.02,0.04,0,0.02,the owner's own order — the engine leaves it alone,C4VXA9WA6KDC
+1788213928.7,politics,paccc-usse-midterms-2026-11-03-dem,BUY,20,0.465,earn,0.0343,17.65,0.5,46,50,0.251,0.465,0.466,-0.035,32,at the touch — a fill here is 25 ticks inside value (Silver + evidence),C6V3GKE10KDJ
+1788214468.7,cfb,aachc-cfb-wins-2026-11-28-wash-9pt5wins,BUY,1,0.45,earn,1.2458,1.76,,45,50,0.446,0.45,0.49,-0.02,2,1 tick behind the touch — we would hold 92% of the bid side,C7906MQTGKDF
+1788215308.7,cfb,aachc-cfb-wins-2026-11-28-arz-6pt5wins,SELL,0.06,0.88,sell,0,0,,87,92,0.381,0.88,0.89,0.01,0.94,taker dump — sold into the bid (the carved exception),C7AP6Q4NAKDK
+1788215848.7,cfb,aachc-cfb-wins-2026-11-28-hou-7pt5wins,SELL,0.01,0.67,earn,0.551,0.05,,57,67,0.031,0.59,0.67,-0.05,-1.01,13 ticks in front of the touch — we would hold 3% of the ask side,C7AS926ZYKDK
+1788215908.7,politics,usgubewc-usgub-ma-2026-11-03-dem,SELL,1,0.97,sell,0.2002,29.22,0.999625,97,99,0.439,0.96,0.97,0.0296,0,selling filled stock — it earns while it waits,C6HP76AHTKDM
