@@ -1389,60 +1389,59 @@ function render(d){
 # (title, nav highlight, page JS, sub-nav group). Plan and model keep
 # their routes for a bookmark but are off the bar (owner, 2026-08-31).
 SURVEY_JS = r"""
-// Owner, 2026-08-31: its own tab, not a sub-page. What a category is
-// worth to an order OUR size — cfb holds 13% of a side for 41 cents,
-// NBA holds 0.02% — so the ranking is share per dollar at risk, never
-// the size of the reward pool.
-var SV_TAGS = ['wnba','mlb','nfl','baseball','basketball'];
-function svPick(t){
- var i=SV_TAGS.indexOf(t);
- if(i<0)SV_TAGS.push(t); else SV_TAGS.splice(i,1);
- render_(window._d);
-}
-function svRun(){
- if(!SV_TAGS.length){alert('pick at least one category');return;}
- if(!confirm('Survey '+SV_TAGS.join(', ')+'? Reads books and terms only — it places nothing. Takes a few minutes.'))return;
- document.getElementById('svout').innerHTML='<div class="muted">surveying… this page updates itself when it finishes</div>';
- post({op:'survey',tags:SV_TAGS},function(j){
-  document.getElementById('svout').innerHTML='<div class="'+(j.ok?'ok':'bad')+'">'+esc(j.note||'')+'</div>';});
-}
-function render_(d){document.getElementById('view').innerHTML=render(d);}
+// A continuously cycling leaderboard of market prefixes (owner,
+// 2026-08-31). It samples a few markets every cycle, at random within
+// each prefix, and ranks on the MEDIAN share of a side per dollar at
+// risk — cfb holds 13% of a side for 41 cents, about 32 on this scale.
+// Never on the max: one lucky thin book would crown a prefix.
+function svNum(x,d){return (x||0).toFixed(d==null?2:d);}
 function render(d){
  if(d.starting)return bootCard(d);
- window._d=d;
  var s=d.survey;
- var known=['wnba','mlb','nfl','baseball','basketball','nba','football','tennis','golf','soccer'];
- var out='<div class="card"><b>What is worth resting in?</b>'
-  +'<div class="muted" style="font-size:12px">Reads books and reward terms. It places nothing, and only runs when you tap it.</div>'
-  +'<div class="tabs" style="margin-top:8px">'
-  +known.map(function(t){return '<button class="'+(SV_TAGS.indexOf(t)>=0?'on':'')
-    +'" onclick="svPick(\''+t+'\')">'+t+'</button>';}).join('')
+ if(!s)return '<div class="card muted">The survey has not run yet.</div>';
+ var sm=s.sampler||{}, full=(s.frame||'').indexOf('NOT a full frame')<0;
+ var out='<div class="card"><b>Prefix leaderboard</b>'
+  +'<div class="muted" style="font-size:12px">Samples a few markets every cycle, at random within each prefix. Reads books and terms; it places nothing.</div>'
+  +'<div class="kpi" style="margin-top:8px">'
+  +'<div><div class="v">'+(sm.population||0).toLocaleString()+'</div><div class="l">markets in frame</div></div>'
+  +'<div><div class="v">'+(sm.prefixes||0)+'</div><div class="l">prefixes</div></div>'
+  +'<div><div class="v">'+(s.ranked||[]).length+'</div><div class="l">ranked</div></div>'
+  +'<div><div class="v">'+(s.sampling||[]).length+'</div><div class="l">still sampling</div></div>'
   +'</div>'
-  +'<div style="margin:8px 0"><button class="small" onclick="svRun()">Run survey</button></div>'
-  +'<div id="svout"></div></div>';
- if(!s||!s.kinds||!s.kinds.length){
-  out+='<div class="card muted">No survey yet. Pick the categories above and tap Run survey.</div>';
-  return out;
+  +'<div class="vrd'+(full?'':' warn')+'">'+esc(s.frame||'frame not loaded yet')+'</div>'
+  +'<div class="muted" style="font-size:12px">seed '+esc(String(sm.seed))
+  +' \u00b7 '+(sm.left_this_pass||0).toLocaleString()+' left in this pass'
+  +' \u00b7 '+(sm.passes||0)+' passes'
+  +(s.at?' \u00b7 last sampled '+when(s.at):'')+'</div></div>';
+ var r=s.ranked||[];
+ if(r.length){
+  out+='<div class="card"><table><tr><th>prefix</th><th class="r">n</th>'
+   +'<th class="r">share%/$</th><th class="r">share</th>'
+   +'<th class="r">touch</th><th class="r">$/day</th></tr>';
+  r.forEach(function(k){
+   var good=k.median_spd>=1.0;
+   out+='<tr><td>'+esc(k.prefix)+'</td><td class="r">'+k.n+'</td>'
+    +'<td class="r'+(good?' ok':'')+'"><b>'+svNum(k.median_spd)+'</b></td>'
+    +'<td class="r">'+svNum(k.median_share_pct,3)+'%</td>'
+    +'<td class="r">'+(k.median_touch||0).toLocaleString()+'</td>'
+    +'<td class="r">'+usd(k.median_est_day)+'</td></tr>';});
+  out+='</table><div class="hint">share%/$ is how much of a side one dollar at risk buys. College football \u2014 the one that works \u2014 sits near 32, holding 13% of a side with a 41c order against a touch of about 8 shares. Anything near that is worth a look; 0.02 is NBA, and not.</div></div>';
+ }else{
+  out+='<div class="card muted">Nothing ranked yet. A prefix needs '
+   +(s.min_samples||12)+' scored sides before its median means anything.</div>';
  }
- var f=s.found||{};var fl=[];for(var k in f)fl.push(k+' '+f[k]);
- out+='<div class="card"><div class="kpi">'
-  +'<div><div class="v">'+s.kinds.length+'</div><div class="l">market kinds</div></div>'
-  +'<div><div class="v">'+(s.rows||0)+'</div><div class="l">sides read</div></div>'
-  +'</div>'
-  +(fl.length?'<div class="vrd muted">markets found: '+esc(fl.join(' · '))+'</div>':'')
-  +'<table><tr><th>market kind</th><th class="r">sides</th>'
-  +'<th class="r">qualified</th><th class="r">median share</th>'
-  +'<th class="r">share%/$</th><th class="r">$/day</th></tr>';
- s.kinds.forEach(function(k){
-  var good=k.median_share_per_dollar>=1.0;
-  out+='<tr><td>'+esc(k.kind)+'</td><td class="r">'+k.sides+'</td>'
-   +'<td class="r">'+k.qualified+'</td>'
-   +'<td class="r">'+k.median_share_pct.toFixed(2)+'%</td>'
-   +'<td class="r'+(good?' ok':'')+'">'+k.median_share_per_dollar.toFixed(2)+'</td>'
-   +'<td class="r">'+usd(k.est_day_usd)+'</td></tr>';});
- out+='</table>'
-  +'<div class="hint">share%/$ is what college football is exceptional at: how much of a side one dollar at risk buys. cfb holds 13% of a side for 41 cents; NBA holds 0.02%. A kind worth trying looks like cfb on this column, whatever its pool. Full rows are in data/survey.csv'
-  +(s.written?' ('+esc(s.written)+')':'')+'.</div></div>';
+ var y=s.sampling||[];
+ if(y.length){
+  var body='';
+  y.slice(0,40).forEach(function(k){
+   body+='<div class="vrd muted">'+esc(k.prefix)+' \u2014 '+k.n+' of '
+    +(s.min_samples||12)+' sides'
+    +(k.live_skipped?' \u00b7 '+k.live_skipped+' skipped, event live':'')
+    +'</div>';});
+  out+='<div class="card"><details><summary><b>Still sampling</b> '
+   +'<span class="muted">\u2014 '+y.length+' prefixes</span></summary>'
+   +body+'</details></div>';
+ }
  return out;
 }
 """
@@ -1537,26 +1536,6 @@ class WebServer:
                                                      str(body.get("which") or "master"))}
         if op == "refresh_rewards":
             return self.monitor.refresh_rewards()
-        if op == "survey":
-            # read-only: books, terms and a file. Runs on its own thread
-            # because a few hundred book reads outlast a phone request.
-            tags = [str(t) for t in (body.get("tags") or []) if str(t)][:6]
-            if not tags:
-                return {"ok": False, "note": "no tags given"}
-            if getattr(self.monitor, "_survey_running", False):
-                return {"ok": False, "note": "a survey is already running"}
-            self.monitor._survey_running = True
-
-            def run(m=self.monitor, tg=tags):
-                try:
-                    m.survey_tags(tg)
-                except Exception as e:  # noqa: BLE001 — never kill the thread
-                    m._note(f"survey failed: {type(e).__name__}: {e}")
-                finally:
-                    m._survey_running = False
-            threading.Thread(target=run, daemon=True, name="survey").start()
-            return {"ok": True, "note": f"surveying {', '.join(tags)} — the "
-                    "result lands on this page and in data/survey.csv"}
         if op == "place":
             return self.monitor.owner_place(
                 str(body.get("market") or ""), str(body.get("side") or ""),

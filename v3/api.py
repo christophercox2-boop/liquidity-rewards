@@ -374,6 +374,59 @@ class Client:
             self._sleep(0.05)
         return out
 
+    def all_programs(self, max_pages: int = 200) -> tuple[list[dict], str]:
+        """Every market carrying a reward program, not just ones we can
+        already name.
+
+        The families discover through events_by_tag with tag names we
+        chose, so the survey could only ever find what those tags return
+        — 300 markets out of the 67,569 the exchange says carry programs
+        (owner, 2026-08-31). This asks /v1/incentives with no symbols
+        filter and pages. Returns (rows, note); an empty list with a
+        note means the endpoint will not enumerate and the sampling
+        frame is whatever the tags give us, which is worth saying out
+        loud rather than calling it random.
+        """
+        out: list[dict] = []
+        seen: set[str] = set()
+        cursor = None
+        for page in range(max_pages):
+            params: dict = {"pageSize": 500}
+            if cursor:
+                params["cursor"] = cursor
+            try:
+                for host in INCENTIVES_HOSTS:
+                    try:
+                        j = self.get(host + "/v1/incentives",
+                                     signed=(host == TRADE_API),
+                                     path="/v1/incentives", params=params,
+                                     timeout=25)
+                        break
+                    except ApiError:
+                        j = None
+                if not j:
+                    return out, f"no host answered on page {page}"
+            except Exception as e:  # noqa: BLE001
+                return out, f"{type(e).__name__} on page {page}"
+            rows = j.get("programs") or []
+            if not rows:
+                return out, ("enumerated" if out else
+                             "endpoint returns nothing without a symbols "
+                             "filter — cannot enumerate")
+            fresh = 0
+            for r in rows:
+                s = str(r.get("marketSlug") or "")
+                if s and s not in seen:
+                    seen.add(s)
+                    out.append(r)
+                    fresh += 1
+            cursor = (j.get("nextCursor") or j.get("cursor")
+                      or (j.get("page") or {}).get("nextCursor"))
+            if not cursor or fresh == 0:
+                break
+            self._sleep(0.05)
+        return out, "enumerated"
+
     def earnings(self, start_date: str) -> list[dict]:
         """The published-payout ground truth, complete from start_date.
         Explicit big pages (the server default ~31/page once silently
