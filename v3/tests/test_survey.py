@@ -265,5 +265,50 @@ class TestIncentivesMetadata(unittest.TestCase):
         self.assertEqual(s.state()["prefixes"], 2)
 
 
+class TestYieldRanking(unittest.TestCase):
+    """Owner, 2026-08-31: "Number 1 was the concern I had." Share per
+    dollar says how cheaply a side can be owned and nothing about
+    whether it pays. Ranking on it made MLB look 1300x worse than cfb
+    when on yield it is within a whisker."""
+
+    def probe(self, share, pool, risk):
+        p = probe_side(book(bids=[(risk, 50.0)], asks=[]),
+                       Program(pool=1.0, target=1.0, df=0.5, event_n=1),
+                       "BUY", 1.0)
+        p.share, p.risk_usd, p.qualifies = share, risk, True
+        p.est_day = share * pool
+        return p
+
+    def test_yield_is_earnings_over_risk(self):
+        p = self.probe(0.10, 8.0, 0.40)     # 10% of an $8 side for 40c
+        self.assertAlmostEqual(p.est_day, 0.80, places=4)
+        self.assertAlmostEqual(p.yield_per_dollar, 2.0, places=4)
+        self.assertAlmostEqual(p.share_per_dollar, 0.25, places=4)
+
+    def test_a_cheap_side_that_pays_nothing_does_not_win(self):
+        # half a side for a penny, but the side is worth 1c a day
+        cheap = PrefixStat(prefix="cheap-and-worthless")
+        # a fifth of a side for a dollar, but the side pays $20 a day
+        rich = PrefixStat(prefix="pays-real-money")
+        for _ in range(14):
+            cheap.record(self.probe(0.50, 0.01, 0.01), 1000.0)
+            rich.record(self.probe(0.20, 20.0, 1.00), 1000.0)
+        out = leaderboard({"cheap-and-worthless": cheap,
+                           "pays-real-money": rich}, min_samples=12)
+        # share per dollar would crown the worthless one, 50 against 0.2
+        self.assertGreater(cheap.row()["median_spd"],
+                           rich.row()["median_spd"])
+        # yield puts the money first
+        self.assertEqual(out["ranked"][0]["prefix"], "pays-real-money")
+
+    def test_the_row_carries_both_measures(self):
+        st = PrefixStat(prefix="x")
+        for _ in range(12):
+            st.record(self.probe(0.10, 8.0, 0.40), 1000.0)
+        row = st.row()
+        self.assertAlmostEqual(row["median_ypd"], 2.0, places=3)
+        self.assertAlmostEqual(row["median_spd"], 0.25, places=3)
+
+
 if __name__ == "__main__":
     unittest.main()
