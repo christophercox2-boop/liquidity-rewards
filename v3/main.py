@@ -2623,6 +2623,31 @@ class Monitor:
         d["boot"] = dict(self.boot_stage or {})
         return d
 
+    def boot_payload(self) -> bytes:
+        """What /data.json serves before the first cycle has frozen a
+        real one (owner, 2026-08-31, after the app booted, served, and
+        every page still read "unreachable"): a SAFE snapshot built
+        only from scalars this thread owns. The old fallback rebuilt
+        the payload from live dicts on the web thread while the cycle
+        thread mutated them — the 2026-08-22 race, which returns
+        whenever a first cycle runs long. Never touch a live dict
+        here."""
+        try:
+            body = {
+                "saved_at": float(getattr(self, "boot_ts", 0.0) or 0.0),
+                "build": str(getattr(self, "build", "")),
+                "now": time.time(),
+                "boot": dict(self.boot_stage or {}),
+                "summaries": {}, "labels": {}, "errors": [],
+                "switch_view": {
+                    "master": self.master.state(),
+                    **{k: self.switches[k].state() for k in self.families}},
+                "starting": True,
+            }
+            return json.dumps(body).encode()
+        except Exception:  # noqa: BLE001 — a bare page beats a dropped socket
+            return b'{"starting": true, "summaries": {}, "labels": {}}'
+
     def freeze_payload(self) -> None:
         try:
             self.payload_json = json.dumps(
@@ -2696,7 +2721,33 @@ class Monitor:
             self.boot_stage = {"stage": stage, "pct": pct,
                                "ts": round(time.time(), 1)}
 
+    # the first cycle after a restart walks the whole board, and when
+    # the exchange is erroring its retry ladders can stretch that past
+    # any health check — the app then serves nothing, gets recycled,
+    # and boots into the same wedge (owner, 2026-08-31). The boot cycle
+    # runs on a smaller board so it FINISHES, freezes a payload, and
+    # lets the pages come alive; the next cycle uses the full budgets.
+    BOOT_BOOKS = 8
+    BOOT_SCAN = 2
+
     def _cycle_locked(self, now: float) -> dict:
+        boot_caps = []
+        if not self._first_cycle_done:
+            for fam in self.families.values():
+                boot_caps.append((fam, fam.cfg.books_per_cycle,
+                                  fam.cfg.scan_reserve))
+                fam.cfg.books_per_cycle = min(fam.cfg.books_per_cycle,
+                                              self.BOOT_BOOKS)
+                fam.cfg.scan_reserve = min(fam.cfg.scan_reserve,
+                                           self.BOOT_SCAN)
+        try:
+            return self._cycle_body(now)
+        finally:
+            for fam, books, scan in boot_caps:
+                fam.cfg.books_per_cycle = books
+                fam.cfg.scan_reserve = scan
+
+    def _cycle_body(self, now: float) -> dict:
         self._stage("checking the floor and switches", 5)
         self.flatten = flatten_active()
         self.floor.write_want(self.master.on or self.flatten)

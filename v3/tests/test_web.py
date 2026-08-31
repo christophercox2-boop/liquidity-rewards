@@ -27,6 +27,7 @@ class FakeMonitor:
     from v3.main import Monitor as _M
     PHONE_KEYS = _M.PHONE_KEYS
     build_phone_payload = _M.build_phone_payload
+    boot_payload = _M.boot_payload
 
     def public_state(self):
         return {"saved_at": 123.0, "build": "abc",
@@ -113,6 +114,9 @@ class TestWeb(unittest.TestCase):
         self.assertEqual(j["fills"][0]["market"], "m-1")
 
     def test_data_needs_the_key_and_carries_labels(self):
+        import json as _j
+        self.mon.payload_json = _j.dumps(
+            self.mon.build_phone_payload()).encode()
         code, _ = req(self.base + "/data.json")
         self.assertEqual(code, 401)
         code, body = req(self.base + "/data.json",
@@ -234,6 +238,45 @@ class TestRedesign(unittest.TestCase):
         from v3 import web
         self.assertNotIn("tchip", web.STATUS_JS)
         self.assertIn("worth the budget", web.STATUS_JS)
+
+
+class TestBootPayload(unittest.TestCase):
+    """Owner, 2026-08-31: the app booted, served on :8080, and every
+    page still read "unreachable" — the pre-first-cycle fallback
+    rebuilt the payload from live dicts on the web thread while the
+    cycle mutated them (the 2026-08-22 race, back whenever a first
+    cycle runs long). /data.json now serves a safe boot snapshot."""
+
+    def test_data_json_serves_a_boot_snapshot_before_the_first_cycle(self):
+        import types
+        from v3.main import Monitor
+        m = FakeMonitor()
+        m.payload_json = None
+        m.boot_stage = {"stage": "reading the board", "pct": 20}
+        m.build = "abc123"
+        m.boot_ts = 5.0
+        m.master = types.SimpleNamespace(state=lambda: {"on": False})
+        m.switches = {}
+        m.families = {}
+        body = Monitor.boot_payload(m)
+        d = json.loads(body)
+        self.assertTrue(d["starting"])
+        self.assertEqual(d["build"], "abc123")
+        self.assertEqual(d["boot"]["pct"], 20)
+        self.assertEqual(d["summaries"], {})
+
+    def test_boot_payload_never_raises(self):
+        from v3.main import Monitor
+        broken = object()          # no attributes at all
+        body = Monitor.boot_payload(broken)
+        self.assertIn(b"starting", body)
+        json.loads(body)           # still valid JSON
+
+    def test_every_page_renders_the_boot_card(self):
+        from v3 import web
+        for js in (web.GRAPH_JS, web.STATUS_JS, web.ORDERS_JS, web.PAY_JS):
+            self.assertIn("if(d.starting)return bootCard(d);", js)
+        self.assertIn("function bootCard(d)", web._PLUMBING)
 
 
 class TestPageScriptsParse(unittest.TestCase):
