@@ -624,27 +624,36 @@ function posTab(d){
  return out;
 }
 function soldTab(d){
- var wd={day_n:0,day_usd:0,week_n:0,week_usd:0,flat_day:0,by:{},recent:[]};
+ var wd={day_n:0,day_usd:0,week_n:0,week_usd:0,flat_day:0,
+         moves_n:0,moves_usd:0,by:{},recent:[]};
  fams(d).forEach(function(kv){var w=kv[1].wind_down;if(!w)return;
   wd.day_n+=w.day_n||0;wd.day_usd+=w.day_usd||0;wd.week_n+=w.week_n||0;wd.week_usd+=w.week_usd||0;
   wd.flat_day+=w.flat_day||0;
+  wd.moves_n+=w.moves_n||0;wd.moves_usd+=w.moves_usd||0;
   for(var k in (w.by_kind||{})){var b=w.by_kind[k];wd.by[k]=wd.by[k]||{n:0,usd:0};wd.by[k].n+=b.n;wd.by[k].usd+=b.usd;}
   (w.recent||[]).forEach(function(r){wd.recent.push(r);});});
- if(!wd.week_n)return '<div class="card muted">Nothing sold yet.</div>';
+ if(!wd.week_n&&!wd.moves_n)return '<div class="card muted">Nothing sold yet.</div>';
  var out='<div class="card"><div class="kpi">'
   +'<div><div class="v">'+wd.day_n+'</div><div class="l">sold 24h</div></div>'
   +'<div><div class="v">'+usd(wd.day_usd)+'</div><div class="l">proceeds 24h</div></div>'
   +'<div><div class="v">'+wd.flat_day+'</div><div class="l">went flat</div></div>'
   +'<div><div class="v">'+usd(wd.week_usd)+'</div><div class="l">week</div></div>'
   +'</div>';
- for(var k in wd.by){out+='<div class="vrd">'+esc(k)+': '+wd.by[k].n+' \u00b7 '+usd(wd.by[k].usd)+'</div>';}
+ // a repricing is not a sale: shown apart, and its dollars are what
+ // closing the short would COST, never proceeds (owner, 2026-08-31)
+ if(wd.moves_n)out+='<div class="vrd">'+wd.moves_n+' short buy-back'
+  +(wd.moves_n===1?'':'s')+' repriced \u2014 '+usd(wd.moves_usd)+' to close, not earned</div>';
+ for(var k in wd.by){out+='<div class="vrd muted">'+esc(k)+': '+wd.by[k].n+' \u00b7 '+usd(wd.by[k].usd)+'</div>';}
  out+='</div>';
  wd.recent.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
  wd.recent.slice(0,12).forEach(function(r){
+  var sale=r.sale!==false;
   out+='<div class="orow"><div class="name">'+nm(d,r.market)+'</div>'
-   +'<div style="display:flex;gap:16px;align-items:baseline"><span class="px">'+usd(r.usd)+'</span>'
+   +'<div style="display:flex;gap:16px;align-items:baseline">'
+   +'<span class="'+(sale?'px':'muted')+'">'+usd(r.usd)+(sale?'':' to close')+'</span>'
    +'<span class="muted">'+esc(r.kind)+' '+r.qty+' @ '+pc(r.px)+'</span>'
-   +(r.flat?'<span class="ok">flat</span>':'')+'</div></div>';});
+   +(sale?(r.flat?'<span class="ok">flat</span>':''):'<span class="muted">repriced</span>')
+   +'</div></div>';});
  return out;
 }
 function render(d){
