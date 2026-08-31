@@ -60,7 +60,8 @@ def authed(get_header, query_string: str, password: str) -> bool:
 # routes still answer for a bookmark, but they are off the bar. Fills
 # and watch became sub-pages of quick look.
 NAV = (("quick look", "."), ("status", "status"), ("orders", "orders"),
-       ("pay", "pay"), ("log", "log"), ("switch", "switch"))
+       ("pay", "pay"), ("survey", "survey"), ("log", "log"),
+       ("switch", "switch"))
 SUBNAV = {"quick": (("meter", "."), ("fills", "fills"), ("watch", "watch")),
           "orders": (("orders", "orders"),)}
 
@@ -596,39 +597,10 @@ function ordersTab(d){
  if(!any)out+='<div class="card muted">No resting orders.</div>';
  return out;
 }
-function svRun(){
- if(!confirm('Survey WNBA, MLB and all NFL markets? Reads books and terms only — it places nothing. Takes a few minutes.'))return;
- document.getElementById('svout').innerHTML='<div class="muted">surveying…</div>';
- post({op:'survey',tags:['wnba','mlb','nfl','baseball','basketball']},function(j){
-  document.getElementById('svout').innerHTML='<div class="'+(j.ok?'ok':'bad')+'">'+esc(j.note||'')+'</div>';});
-}
-function svCard(d){
- // what a tag's markets are actually worth to an order OUR size — the
- // share a single share buys per dollar at risk, not the pool (owner,
- // 2026-08-31: "We're getting a high share with low order size")
- var s=d.survey;
- var out='<div class="card"><b>Market survey</b>'
-  +'<div class="muted" style="font-size:12px">Reads books and terms. Places nothing.</div>'
-  +'<div style="margin:6px 0"><button class="small" onclick="svRun()">Survey WNBA, MLB, NFL</button></div>'
-  +'<div id="svout"></div>';
- if(s&&s.kinds&&s.kinds.length){
-  out+='<table><tr><th>market kind</th><th class="r">sides</th>'
-   +'<th class="r">qualified</th><th class="r">median share</th>'
-   +'<th class="r">share%/$</th><th class="r">$/day</th></tr>';
-  s.kinds.slice(0,14).forEach(function(k){
-   out+='<tr><td>'+esc(k.kind)+'</td><td class="r">'+k.sides+'</td>'
-    +'<td class="r">'+k.qualified+'</td>'
-    +'<td class="r">'+k.median_share_pct.toFixed(2)+'%</td>'
-    +'<td class="r">'+k.median_share_per_dollar.toFixed(2)+'</td>'
-    +'<td class="r">'+usd(k.est_day_usd)+'</td></tr>';});
-  out+='</table><div class="hint">share%/$ is the measure college football is exceptional at: how much of a side one dollar at risk buys. cfb holds 13% of a side for 41 cents. NBA holds 0.02%.</div>';
- }
- return out+'</div>';
-}
 function wallsTab(d){
- var out=svCard(d);
+ var out='';
  var wl=[];fams(d).forEach(function(kv){(kv[1].watched||[]).forEach(function(w){wl.push(w);});});
- if(!wl.length)return out+'<div class="card muted">No watched races.</div>';
+ if(!wl.length)return '<div class="card muted">No watched races.</div>';
  wl.forEach(function(w,i){
   var bid='wq_'+i, pctv=(w.target?100*(w.ask_total||0)/w.target:0);
   out+='<div class="card"><div class="name" style="cursor:pointer;font-size:15px" onclick="showbook(\\''+esc(w.market)+'\\',\\''+bid+'\\')">'+nm(d,w.market)+'</div><div id="'+bid+'"></div>'
@@ -1416,6 +1388,65 @@ function render(d){
 
 # (title, nav highlight, page JS, sub-nav group). Plan and model keep
 # their routes for a bookmark but are off the bar (owner, 2026-08-31).
+SURVEY_JS = r"""
+// Owner, 2026-08-31: its own tab, not a sub-page. What a category is
+// worth to an order OUR size — cfb holds 13% of a side for 41 cents,
+// NBA holds 0.02% — so the ranking is share per dollar at risk, never
+// the size of the reward pool.
+var SV_TAGS = ['wnba','mlb','nfl','baseball','basketball'];
+function svPick(t){
+ var i=SV_TAGS.indexOf(t);
+ if(i<0)SV_TAGS.push(t); else SV_TAGS.splice(i,1);
+ render_(window._d);
+}
+function svRun(){
+ if(!SV_TAGS.length){alert('pick at least one category');return;}
+ if(!confirm('Survey '+SV_TAGS.join(', ')+'? Reads books and terms only — it places nothing. Takes a few minutes.'))return;
+ document.getElementById('svout').innerHTML='<div class="muted">surveying… this page updates itself when it finishes</div>';
+ post({op:'survey',tags:SV_TAGS},function(j){
+  document.getElementById('svout').innerHTML='<div class="'+(j.ok?'ok':'bad')+'">'+esc(j.note||'')+'</div>';});
+}
+function render_(d){document.getElementById('view').innerHTML=render(d);}
+function render(d){
+ if(d.starting)return bootCard(d);
+ window._d=d;
+ var s=d.survey;
+ var known=['wnba','mlb','nfl','baseball','basketball','nba','football','tennis','golf','soccer'];
+ var out='<div class="card"><b>What is worth resting in?</b>'
+  +'<div class="muted" style="font-size:12px">Reads books and reward terms. It places nothing, and only runs when you tap it.</div>'
+  +'<div class="tabs" style="margin-top:8px">'
+  +known.map(function(t){return '<button class="'+(SV_TAGS.indexOf(t)>=0?'on':'')
+    +'" onclick="svPick(\''+t+'\')">'+t+'</button>';}).join('')
+  +'</div>'
+  +'<div style="margin:8px 0"><button class="small" onclick="svRun()">Run survey</button></div>'
+  +'<div id="svout"></div></div>';
+ if(!s||!s.kinds||!s.kinds.length){
+  out+='<div class="card muted">No survey yet. Pick the categories above and tap Run survey.</div>';
+  return out;
+ }
+ var f=s.found||{};var fl=[];for(var k in f)fl.push(k+' '+f[k]);
+ out+='<div class="card"><div class="kpi">'
+  +'<div><div class="v">'+s.kinds.length+'</div><div class="l">market kinds</div></div>'
+  +'<div><div class="v">'+(s.rows||0)+'</div><div class="l">sides read</div></div>'
+  +'</div>'
+  +(fl.length?'<div class="vrd muted">markets found: '+esc(fl.join(' · '))+'</div>':'')
+  +'<table><tr><th>market kind</th><th class="r">sides</th>'
+  +'<th class="r">qualified</th><th class="r">median share</th>'
+  +'<th class="r">share%/$</th><th class="r">$/day</th></tr>';
+ s.kinds.forEach(function(k){
+  var good=k.median_share_per_dollar>=1.0;
+  out+='<tr><td>'+esc(k.kind)+'</td><td class="r">'+k.sides+'</td>'
+   +'<td class="r">'+k.qualified+'</td>'
+   +'<td class="r">'+k.median_share_pct.toFixed(2)+'%</td>'
+   +'<td class="r'+(good?' ok':'')+'">'+k.median_share_per_dollar.toFixed(2)+'</td>'
+   +'<td class="r">'+usd(k.est_day_usd)+'</td></tr>';});
+ out+='</table>'
+  +'<div class="hint">share%/$ is what college football is exceptional at: how much of a side one dollar at risk buys. cfb holds 13% of a side for 41 cents; NBA holds 0.02%. A kind worth trying looks like cfb on this column, whatever its pool. Full rows are in data/survey.csv'
+  +(s.written?' ('+esc(s.written)+')':'')+'.</div></div>';
+ return out;
+}
+"""
+
 PAGES = {
     "/": ("Quick look", "meter", GRAPH_JS, "quick"),
     "/graph": ("Quick look", "meter", GRAPH_JS, "quick"),
@@ -1425,6 +1456,7 @@ PAGES = {
     "/orders": ("Orders", "orders", ORDERS_JS, ""),
     "/pay": ("Pay", "pay", PAY_JS, ""),
     "/grades": ("Pay", "pay", PAY_JS, ""),
+    "/survey": ("Survey", "survey", SURVEY_JS, ""),
     "/switch": ("Switches", "switch", SWITCH_JS, ""),
     "/log": ("Log", "log", LOG_JS, ""),
     "/plan": ("Plan", "", PLAN_JS, ""),
