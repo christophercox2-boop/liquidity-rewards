@@ -1775,3 +1775,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788177531.6,politics,ewc-usgub-oh-2026-11-03-rep,SELL,2,0.46,sell,0.6788,48.78,0.501525,45,49,0.053,0.45,0.46,0.0415,18,hand-set from the live card — the engine holds off,C5QS84CRCKDM
 1788177531.6,politics,usgubewc-usgub-id-2026-11-03-dem,SELL,20,0.02,earn,1.8235,21.85,0.001075,1,3,0.269,0.01,0.02,-0.0189,-22,at the touch — a fill here is 1 ticks inside value (Silver + evidence),C6EX5YW1CKDN
 1788177628.9,politics,ussewc-usse-ma-2026-11-03-dem,BUY,6.12,0.98,sell,5.7171,81.26,0.99985,94,99,0.018,0.98,0.99,-0.0199,-85.88,buying back the short at or under what it sold for — the bid earns while it wait,C4W2F5Y2WKDF
+1788177808.9,cfb,aachc-cfb-wins-2026-11-28-miss-9pt5wins,SELL,0.01,0.46,sell,0,0,,42,49,0.085,0.46,0.47,0,0,taker dump — sold into the bid (the carved exception),C71RW7YXJKDM
+1788177928.9,politics,enwc-usgubp-ri-2026-09-09-rep-elapel,BUY,20,0.9,manual,0,8.9,,89,94,0.334,0.9,0.91,-0.01,20,moved by the owner,C6SZZA258KDC
