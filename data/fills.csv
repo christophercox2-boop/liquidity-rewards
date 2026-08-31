@@ -1771,3 +1771,7 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788161072.3,cfb,aachc-cfb-wins-2026-11-28-ncst-9pt5wins,SELL,0.01,0.11,earn,5.7957,0.03,,7,12,0.454,0.08,0.26,-0.01,-1.01,15 ticks in front of the touch — we would hold 77% of the ask side,C6XMSA4W4KDG
 1788162932.3,cfb,aachc-cfb-wins-2026-11-28-ncst-9pt5wins,BUY,1,0.14,sell,0.0596,0.37,,9,14,0.623,0.18,0.25,0.03,1,buying back the short at or under what it sold for — the bid earns while it wait,C6XTMBAEPKDG
 1788165272.4,politics,usgubewc-usgub-ar-2026-11-03-rep,SELL,2,0.98,sell,0,0,0.998375,97,99,0.071,0.98,0.99,0.0184,0,taker dump — sold into the bid (the carved exception),C6YQ20060KDK
+1788177531.6,politics,ussewc-usse-va-2026-11-03-rep,SELL,20,0.02,sell,1.7295,61.17,0.00525,1,5,0.063,0.01,0.02,-0.0147,5,selling filled stock — it earns while it waits,C5D7P0ZEWKDM
+1788177531.6,politics,ewc-usgub-oh-2026-11-03-rep,SELL,2,0.46,sell,0.6788,48.78,0.501525,45,49,0.053,0.45,0.46,0.0415,18,hand-set from the live card — the engine holds off,C5QS84CRCKDM
+1788177531.6,politics,usgubewc-usgub-id-2026-11-03-dem,SELL,20,0.02,earn,1.8235,21.85,0.001075,1,3,0.269,0.01,0.02,-0.0189,-22,at the touch — a fill here is 1 ticks inside value (Silver + evidence),C6EX5YW1CKDN
+1788177628.9,politics,ussewc-usse-ma-2026-11-03-dem,BUY,6.12,0.98,sell,5.7171,81.26,0.99985,94,99,0.018,0.98,0.99,-0.0199,-85.88,buying back the short at or under what it sold for — the bid earns while it wait,C4W2F5Y2WKDF
