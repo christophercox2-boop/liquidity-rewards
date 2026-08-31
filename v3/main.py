@@ -2720,6 +2720,9 @@ class Monitor:
         if not self._first_cycle_done:
             self.boot_stage = {"stage": stage, "pct": pct,
                                "ts": round(time.time(), 1)}
+            # printed too, so a boot that dies names its own last step
+            # in the container log (owner, 2026-08-31)
+            print(f"v3: boot {pct}% — {stage}", flush=True)
 
     # the first cycle after a restart walks the whole board, and when
     # the exchange is erroring its retry ladders can stretch that past
@@ -2811,7 +2814,15 @@ class Monitor:
                         self.publish_rewards_csv()
             except Exception as e:  # noqa: BLE001 — watching never breaks
                 self._note(f"rewards watch: {e}")
-        self.publish_files(now)
+        # boot has to be cheap enough to FINISH (owner, 2026-08-31). The
+        # hourly housekeeping — a 2,500-row trade-history pull and five
+        # GitHub file round-trips — is ~30 seconds of the heaviest work
+        # this process does, and running it before the first cycle had
+        # ever completed left the container being recycled mid-boot, over
+        # and over. It runs on the next cycle instead; nothing in it
+        # touches orders.
+        if self._first_cycle_done:
+            self.publish_files(now)
         if now - self._history_at > 6 * 3600.0:
             self._history_at = now
             hist, day_totals, recent = load_history()
@@ -2872,17 +2883,25 @@ class Monitor:
         from .web import WebServer
         web = WebServer(self)
         web.start()
-        if self.stream is not None:
-            self.stream.start()
         threading.Thread(target=self._sampler_loop, daemon=True,
                          name="sampler").start()
         self._note(f"serving on :{web.port}")
         backoff = 5.0
+        stream_started = False
         while True:
             t0 = time.time()
             try:
                 self.cycle()
                 backoff = 5.0
+                # the feed pours ~54 book updates a second across 200
+                # markets through this one shared CPU. Holding it back
+                # until the first cycle has finished stops it competing
+                # with boot for the GIL, so the health check still gets
+                # answered while the board is being read (owner,
+                # 2026-08-31).
+                if not stream_started and self.stream is not None:
+                    stream_started = True
+                    self.stream.start()
             except Exception as e:  # noqa: BLE001 — the loop survives anything
                 self._note(f"cycle failed: {type(e).__name__}: {e}")
                 time.sleep(backoff)
