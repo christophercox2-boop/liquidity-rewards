@@ -107,11 +107,18 @@ class OrderDesk:
     """
 
     def __init__(self, client: Client, whitelist, switch_on, fresh_book, log,
-                 sleep=None, clock=None, closing_only=None):
+                 sleep=None, clock=None, closing_only=None, tick_for=None):
         self.client = client
         self.whitelist = whitelist
         self.switch_on = switch_on
         self.fresh_book = fresh_book
+        # the price grid is a property of the MARKET, not of how recent
+        # our book is — resolving it separately from fresh_book closes
+        # the window where a 2-to-15-minute-old book meant no snapping
+        # at all (owner, 2026-08-31: "Confirm that no systems are
+        # placing orders with decimal prices unless you verify the
+        # order book accepts these orders through the book terms")
+        self.tick_for = tick_for
         self.log = log
         self._sleep = sleep if sleep is not None else time.sleep
         self._clock = clock if clock is not None else time.time
@@ -176,15 +183,32 @@ class OrderDesk:
         is derived from the position unless the caller pins it (a reprice
         keeps the original's)."""
         qty = round(qty, 2)
-        book0 = self.fresh_book(slug)
-        if book0 is not None and book0.tick:
-            price = snap_price(price, book0.tick, side)
+        # The price grid is a property of the MARKET, not of how recent
+        # our book is: the exchange's own figure where it gives one,
+        # else the last book of any age. Snapped BEFORE the rails, so
+        # every bound and never-cross guard sees the price that will
+        # really be sent (owner, 2026-08-31).
+        tick0 = self.tick_for(slug) if self.tick_for else None
+        if not tick0:
+            book0 = self.fresh_book(slug)
+            tick0 = book0.tick if book0 is not None else None
+        if tick0:
+            price = snap_price(price, tick0, side)
         if intent is None:
             intent = intent_for(side, net_position, qty, close_short)
         reason = self._check("place", slug, side, price, qty, initiator,
                              intent=intent, taker=taker)
         if reason:
             return self._refuse("place", slug, reason)
+        # belt: an unsnapped decimal on a whole-cent book is rejected or
+        # SILENTLY ROUNDED, and a silently rounded price is one nobody
+        # chose. The blind-book rail above already covers this in
+        # practice; this fails closed if it ever stops.
+        if not tick0:
+            return self._refuse("place", slug,
+                                "no price grid known for this market — "
+                                "refusing rather than sending a price the "
+                                "exchange may silently round")
         if REST_SIDE[intent] != side:
             return self._refuse("place", slug,
                                 f"intent {intent} rests on {REST_SIDE[intent]}, not {side}")

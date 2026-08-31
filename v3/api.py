@@ -430,6 +430,42 @@ class Client:
             offset += 100
         return out
 
+    # Field names the exchange might use for its own price grid. The
+    # name is UNCONFIRMED — declared_tick logs whatever a market object
+    # actually carries, so this list gets corrected from the record
+    # rather than guessed at twice (owner, 2026-08-23: "It's always out
+    # there for you to find").
+    TICK_FIELDS = ("minpriceincrement", "priceincrement", "ticksize",
+                   "mintick", "minimumpriceincrement", "minimumticksize",
+                   "pricetick", "tickvalue", "minimumtick")
+
+    @staticmethod
+    def declared_tick(md: dict) -> float | None:
+        """The exchange's own price grid for a market, if it says so.
+
+        Only an unambiguous DOLLAR figure is accepted — a tick is never
+        bigger than a dime, and a bare "1" could mean a cent or a
+        hundredth of one. Anything outside that is left for the probe
+        line to show rather than guessed at: a wrong grid places wrong
+        prices, which is the whole thing being fixed here.
+        """
+        pools = [md]
+        for k in ("marketMetadata", "metadata", "market", "terms"):
+            v = md.get(k)
+            if isinstance(v, dict):
+                pools.append(v)
+        for pool in pools:
+            for key, val in pool.items():
+                if str(key).lower().replace("_", "") not in Client.TICK_FIELDS:
+                    continue
+                try:
+                    f = float(val)
+                except (TypeError, ValueError):
+                    continue
+                if 0.0 < f <= 0.1:
+                    return f
+        return None
+
     def market_details(self, slug: str) -> dict:
         j = self.get(f"{GATEWAY}/v1/market/slug/{slug}")
         return j.get("market") or j.get("marketData") or j

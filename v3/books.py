@@ -47,6 +47,9 @@ class BookCache:
         # EWMA of "top 3 levels changed since last refresh", 0..1
         self._volatility: dict[str, float] = {}
         self.trade_seen: dict[str, list[float]] = {}
+        # slug -> the exchange's OWN minimum price increment, where it
+        # tells us. Authoritative; overrides the inferred tick.
+        self.declared: dict[str, float] = {}
 
     # -- reads -------------------------------------------------------------
 
@@ -112,6 +115,22 @@ class BookCache:
                 self.on_put(slug, book)
             except Exception:  # noqa: BLE001 — an observer never breaks a write
                 pass
+
+    def grid(self, slug: str) -> float | None:
+        """The market's price grid, for snapping an outgoing price.
+
+        A tick is a property of the market, so the LAST book of any age
+        answers it — unlike a price or a size, it does not go stale.
+        `declared` holds the exchange's own figure where we have it and
+        always wins; the book-inferred tick is a fallback, and it is
+        only ever inferred, so it can read 0.001 the moment one sub-cent
+        price appears in the book from any source (owner, 2026-08-31).
+        """
+        d = self.declared.get(slug)
+        if d:
+            return d
+        b = self._books.get(slug)
+        return b.tick if b is not None and b.tick else None
 
     def volatility_of(self, slug: str) -> float | None:
         """The book's churn EWMA (0 quiet .. 1 busy), or None until two
