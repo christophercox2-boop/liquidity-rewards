@@ -141,10 +141,23 @@ class SideProbe:
 
     @property
     def share_per_dollar(self) -> float:
-        """The measure cfb is exceptional at: share of a side bought per
-        dollar put at risk. Ranking on this rather than on pool size is
-        the correction that this whole survey exists for."""
+        """Share of a side bought per dollar put at risk. Kept as a
+        secondary column: it says how cheaply we can own a side, but it
+        is blind to whether that side pays anything."""
         return (self.share / self.risk_usd) if self.risk_usd > 1e-9 else 0.0
+
+    @property
+    def yield_per_dollar(self) -> float:
+        """Dollars earned a day per dollar at risk — what we are
+        actually buying.
+
+        Share alone missed the pool and pool alone missed the share;
+        this is their product over the risk, and it is directly
+        comparable across categories priced differently. College
+        football, the one that works, runs a median of 0.16 (owner,
+        2026-08-31: "Number 1 was the concern I had").
+        """
+        return (self.est_day / self.risk_usd) if self.risk_usd > 1e-9 else 0.0
 
     def row(self, slug: str, kind: str) -> dict:
         return {"market": slug, "kind": kind, "side": self.side,
@@ -158,6 +171,7 @@ class SideProbe:
                 "est_day_usd": round(self.est_day, 4),
                 "risk_usd": round(self.risk_usd, 4),
                 "share_per_dollar": round(self.share_per_dollar, 4),
+                "yield_per_dollar": round(self.yield_per_dollar, 4),
                 "note": self.note}
 
 
@@ -245,6 +259,7 @@ class PrefixStat:
     sides: int = 0              # sides scored
     qualified: int = 0
     live_skipped: int = 0
+    ypd: list = field(default_factory=list)   # $/day per $1 at risk
     spd: list = field(default_factory=list)
     share: list = field(default_factory=list)
     touch: list = field(default_factory=list)
@@ -259,7 +274,8 @@ class PrefixStat:
         if not p.qualifies:
             return
         self.qualified += 1
-        for lst, v in ((self.spd, p.share_per_dollar),
+        for lst, v in ((self.ypd, p.yield_per_dollar),
+                       (self.spd, p.share_per_dollar),
                        (self.share, p.share * 100.0),
                        (self.touch, p.touch_size),
                        (self.est, p.est_day)):
@@ -270,7 +286,8 @@ class PrefixStat:
         return {"prefix": self.prefix, "markets": self.markets,
                 "sides": self.sides, "qualified": self.qualified,
                 "live_skipped": self.live_skipped,
-                "n": len(self.spd),
+                "n": len(self.ypd),
+                "median_ypd": round(_median(self.ypd), 4),
                 "median_spd": round(_median(self.spd), 3),
                 "median_share_pct": round(_median(self.share), 3),
                 "median_touch": round(_median(self.touch), 0),
@@ -286,12 +303,18 @@ MIN_SAMPLES = 12
 
 
 def leaderboard(stats: dict, min_samples: int = MIN_SAMPLES) -> dict:
-    """Ranked on the MEDIAN share per dollar at risk — never the max,
-    and never before there is enough evidence to mean anything."""
+    """Ranked on the MEDIAN dollars a day per dollar at risk — never
+    the max, and never before there is enough evidence to mean anything.
+
+    Ranking on share per dollar was the earlier mistake: it says how
+    cheaply a side can be owned while saying nothing about whether the
+    side pays. MLB sits within a whisker of college football on yield
+    and nowhere near it on share (owner, 2026-08-31).
+    """
     rows = [s.row() for s in stats.values()]
     ranked = [r for r in rows if r["n"] >= min_samples]
     young = [r for r in rows if r["n"] < min_samples]
-    ranked.sort(key=lambda r: -r["median_spd"])
+    ranked.sort(key=lambda r: -r["median_ypd"])
     young.sort(key=lambda r: -r["n"])
     return {"ranked": ranked, "sampling": young,
             "min_samples": min_samples}
