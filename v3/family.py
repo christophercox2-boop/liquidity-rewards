@@ -421,6 +421,12 @@ class Family:
         self.earned_today = 0.0
         self.earned_day = ""
         self.dump_today = 0.0                     # taker-dump proceeds today
+        # the wind-down ledger (owner, 2026-08-31: "you can fix so
+        # there is a more clear answer"): every position the engine
+        # actually retires, with what it fetched and how. Position
+        # COUNTS alone could not tell a sale from a fill; this is the
+        # record of the selling itself, kept across restarts.
+        self.wind_down: list[dict] = []
         self.earned_history: list[list] = []      # [day, $] rolling
         self._last_accrual = 0.0
         self.silent_cancels = 0
@@ -490,6 +496,19 @@ class Family:
 
     def _mark(self, slug: str, side: str, now: float) -> None:
         self.last_action[f"{slug}|{side}"] = now
+
+    def _note_wind_down(self, slug: str, kind: str, qty: float,
+                        px: float, now: float, left: float = 0.0) -> None:
+        """One line in the wind-down ledger: stock actually sold, a
+        short's buy-back stepped toward filling, or an owner close-out.
+        `left` is what remains of the position after it, so the report
+        can say how many went fully flat."""
+        self.wind_down.append({
+            "ts": round(now, 1), "market": slug, "kind": kind,
+            "qty": round(float(qty), 2), "px": round(float(px), 4),
+            "usd": round(float(qty) * float(px), 2),
+            "flat": abs(float(left)) < 0.01})
+        del self.wind_down[:-400]
 
     def _charge(self, o) -> float:
         """What one order costs the EXPECTED-risk budget: collateral x
@@ -3291,6 +3310,8 @@ class Family:
                         intent=SELL_LONG, placed_ts=now, purpose="sell",
                         why="owner-ordered close-out — sold into the "
                             "bid"), dq_l, now, left_l)
+                    self._note_wind_down(slug, "close-out", dq_l, bid_l,
+                                         now, left=left_l)
                     self._log(event="liquidated", market=slug,
                               price=bid_l, qty=dq_l,
                               note=f"owner's close-out — {left_l:g} "
@@ -3417,6 +3438,11 @@ class Family:
                                     why="taker dump — sold into the "
                                         "bid (the carved exception)"),
                                     dq, now, left)
+                                self._note_wind_down(
+                                    slug, "drain" if (dead_gate and
+                                                      not profit_gate)
+                                    else "dump", dq, bid_t, now,
+                                    left=left)
                                 self._log(event="dump", market=slug,
                                           price=bid_t, qty=dq,
                                           note=("dead-stock drain — "
@@ -3573,6 +3599,8 @@ class Family:
                     if rr.ok:
                         self.orders.pop(worst.id, None)
                         self.evidence.order_gone(worst.market, worst.id)
+                        self._note_wind_down(slug, "short step-up",
+                                             worst.qty, step_pred, now)
                         self._log(event="dead_short_stepup", market=slug,
                                   price=worst.price, qty=worst.qty,
                                   note="buy-back never fills at "
@@ -4036,6 +4064,32 @@ class Family:
                             "qty": o.qty, "purpose": o.purpose}
                            for o in covers]})
         summary["positions"] = positions
+        # the wind-down report: what the engine has actually retired,
+        # so "where are we on selling off positions" has a number
+        # instead of an inference from position counts
+        day = now - 86400.0
+        week = now - 7 * 86400.0
+        recent = [w for w in self.wind_down if w["ts"] > week]
+        today_w = [w for w in recent if w["ts"] > day]
+        by_kind: dict = {}
+        for w in today_w:
+            k = by_kind.setdefault(w["kind"], {"n": 0, "usd": 0.0})
+            k["n"] += 1
+            k["usd"] += w["usd"]
+        summary["wind_down"] = {
+            "day_n": len(today_w),
+            "day_usd": round(sum(w["usd"] for w in today_w), 2),
+            "week_n": len(recent),
+            "week_usd": round(sum(w["usd"] for w in recent), 2),
+            "by_kind": {k: {"n": v["n"], "usd": round(v["usd"], 2)}
+                        for k, v in by_kind.items()},
+            "flat_day": sum(1 for w in today_w if w["flat"]),
+            "recent": [{"market": w["market"], "kind": w["kind"],
+                        "qty": w["qty"], "px": w["px"],
+                        "usd": round(w["usd"], 2), "ts": w["ts"],
+                        "flat": w["flat"]}
+                       for w in today_w[-12:]],
+        }
         # the owner's watched races: the ask side's standing against
         # Target Size (owner, 2026-08-28: "Just give me a button to
         # auto qualify the ask side" — the button needs the gap in
@@ -4103,6 +4157,7 @@ class Family:
                              for oid, g in self.gone_pending.items()},
             "last_action": self.last_action,
             "known_dead": sorted(self.known_dead),
+            "wind_down": self.wind_down[-400:],
             "seen_pids": sorted(self.seen_pids),
             "inv_since": self.inv_since,
             "fillmodel": self.fillmodel.to_dict(),
@@ -4156,6 +4211,7 @@ class Family:
                 continue
         self.last_action = dict(d.get("last_action") or {})
         self.known_dead = set(d.get("known_dead") or ())
+        self.wind_down = list(d.get("wind_down") or ())
         self.seen_pids = set(d.get("seen_pids") or ())
         self.inv_since = dict(d.get("inv_since") or {})
         if d.get("fillmodel"):

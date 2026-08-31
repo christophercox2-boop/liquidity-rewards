@@ -569,6 +569,30 @@ function render(d){
    '\\u2014 '+wl.length+' markets, '+(nq?nq+' not qualifying':'all qualifying'),wb,true)
       +'<div class="hint">One tap builds the wall until the side reaches Target Size. The exchange trims each order to your free buying power, so it places as many as it takes \\u2014 in the background, re-reading the book every pass. Tap again any time for progress. It stops on its own if buying power runs low. A 99c ask only fills if someone pays 99c. These are YOUR orders: the automation never touches them, and the engine keeps its own money out of these markets entirely.</div></div>';
  }
+ var wd={day_n:0,day_usd:0,week_n:0,week_usd:0,flat_day:0,by:{},recent:[]};
+ fams(d).forEach(function(kv){
+  var w=kv[1].wind_down;if(!w)return;
+  wd.day_n+=w.day_n||0;wd.day_usd+=w.day_usd||0;wd.week_n+=w.week_n||0;
+  wd.week_usd+=w.week_usd||0;wd.flat_day+=w.flat_day||0;
+  for(var k in (w.by_kind||{})){var b=w.by_kind[k];wd.by[k]=wd.by[k]||{n:0,usd:0};
+   wd.by[k].n+=b.n;wd.by[k].usd+=b.usd;}
+  (w.recent||[]).forEach(function(r){r.fam=kv[0];wd.recent.push(r);});
+ });
+ if(wd.week_n){
+  var kb='';
+  for(var k in wd.by){kb+='<div class="vrd">'+esc(k)+': '+wd.by[k].n+' \u2014 '+usd(wd.by[k].usd)+'</div>';}
+  wd.recent.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+  var rb='';
+  wd.recent.slice(0,10).forEach(function(r){
+   rb+='<div class="vrd">'+when(r.ts)+' \u2014 '+nm(d,r.market)+': '+esc(r.kind)
+    +' '+r.qty+' @ '+pc(r.px)+' = '+usd(r.usd)+(r.flat?' <b>(flat)</b>':'')+'</div>';
+  });
+  out+='<div class="card">'+fold('Winding down \u2014 what actually sold',
+   '\u2014 '+wd.day_n+' in 24h ('+usd(wd.day_usd)+'), '+wd.week_n+' this week ('+usd(wd.week_usd)+'), '
+   +wd.flat_day+' went flat today',
+   kb+'<div class="sub" style="margin-top:8px">most recent</div>'+rb,true)
+   +'<div class="hint">Every position the engine actually retired: drains of idle stock, dumps into a tight spread, buy-backs stepped toward filling, and your close-outs. Position counts alone cannot tell a sale from a fill \u2014 this is the selling itself.</div></div>';
+ }
  var pos=[];
  fams(d).forEach(function(kv){
   (kv[1].positions||[]).forEach(function(p){p.fam=kv[0];pos.push(p);});

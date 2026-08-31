@@ -2083,6 +2083,67 @@ class TestTakerDump(unittest.TestCase):
         self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
 
 
+class TestWindDownLedger(unittest.TestCase):
+    """Owner, 2026-08-31 ("you can fix so there is a more clear
+    answer"): position counts cannot tell a sale from a fill. Every
+    retirement the engine performs is recorded — what sold, for how
+    much, by which mechanism, and whether it went flat."""
+
+    def test_a_drain_is_recorded_with_its_proceeds(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        r.fam.cfg.dump_usd_day = 50.0
+        r.fam.cfg.dead_drain_s = 21600.0
+        r.add_market(A, book=Book(bids=((0.47, 500.0),),
+                                  asks=((0.48, 800.0),), tick=0.01,
+                                  fetched_at=r.now))
+        r.fam.inventory[A] = {"qty": 10.0, "cost": 5.00}
+        r.positions[A] = (10.0, 5.00)
+        r.cycle()
+        for o in r.fam.orders.values():
+            if o.market == A and o.purpose == "sell":
+                o.live_est = 0.0
+                o.placed_ts = r.now - 25200.0
+        r.fam.last_action.clear()
+        summary = r.cycle()
+        led = r.fam.wind_down
+        self.assertTrue(led, "nothing recorded")
+        row = led[-1]
+        self.assertEqual(row["market"], A)
+        self.assertIn(row["kind"], ("drain", "dump"))
+        self.assertAlmostEqual(row["usd"], row["qty"] * row["px"], places=2)
+        wd = summary["wind_down"]
+        self.assertEqual(wd["day_n"], len(led))
+        self.assertGreater(wd["day_usd"], 0)
+        self.assertIn(row["kind"], wd["by_kind"])
+
+    def test_the_report_is_empty_and_harmless_with_no_sales(self):
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        summary = r.cycle()
+        wd = summary["wind_down"]
+        self.assertEqual(wd["day_n"], 0)
+        self.assertEqual(wd["week_usd"], 0)
+        self.assertEqual(wd["recent"], [])
+
+    def test_the_ledger_survives_a_restart(self):
+        from v3.tests.test_family import Rig, A
+        from v3.family import Family
+        from v3 import politics
+        r = Rig()
+        r.add_market(A)
+        r.cycle()
+        r.fam._note_wind_down(A, "drain", 5.0, 0.40, r.now, left=0.0)
+        d = r.fam.to_dict()
+        f2 = Family(None, r.cache, politics.discover, config=r.fam.cfg,
+                    names=r.names, clock=lambda: r.now)
+        f2.restore(d)
+        self.assertEqual(len(f2.wind_down), 1)
+        self.assertTrue(f2.wind_down[0]["flat"])
+
+
 class TestDeadShortStepUp(unittest.TestCase):
     """Owner, 2026-08-29 ("we should find a way to get the resting
     positions down"): a short's break-even buy-back on a book trading
