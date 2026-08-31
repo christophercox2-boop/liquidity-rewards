@@ -234,6 +234,22 @@ class TestRedesign(unittest.TestCase):
         # the payload's stored last result
         self.assertIn("var j=window._rw;", web.PAY_JS)
 
+    def test_orders_rates_are_stamped_with_their_age(self):
+        """Owner, 2026-08-31: the orders page showed an order at
+        $46.35/day while the live card read $0.17/day for the same
+        order. Same field, one cycle apart — the ask side filled in
+        front of it and its share went from 93% to 0.3%. The number
+        was not wrong, it was old, and nothing on screen said so."""
+        from v3 import web
+        self.assertIn("function estAge(d)", web.ORDERS_JS)
+        # the age comes off the payload's own clock, not the row's
+        self.assertIn("(Date.now()/1000)-(d.now||0)", web.ORDERS_JS)
+        # shown once at the top of the orders page, warned past 5 min
+        self.assertIn("rates as of ", web.ORDERS_JS)
+        self.assertIn("ag>300", web.ORDERS_JS)
+        # and a collapsed estimate still shows how far off its peak
+        self.assertIn("off peak", web.ORDERS_JS)
+
     def test_status_drops_the_rotating_cards_for_a_percentage(self):
         from v3 import web
         self.assertNotIn("tchip", web.STATUS_JS)
