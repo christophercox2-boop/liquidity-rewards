@@ -805,6 +805,8 @@ class Monitor:
         self.survey_stats: dict[str, _sv.PrefixStat] = {}
         self.survey_at = 0.0
         self.survey_frame_note = ""
+        self.survey_meta: dict = {}
+        self.survey_event_n: dict = {}
         self.rw_last: dict | None = None      # latest payout-check result
         self._rw_at = 0.0
         self._lock = threading.Lock()
@@ -2042,6 +2044,24 @@ class Monitor:
                 if r.get("marketSlug") and not sv.category_banned(r)]
         if kept:
             self.survey_meta = {str(r["marketSlug"]): r for r in kept}
+            # How many markets SHARE this pool? A reward pool belongs to
+            # the program period, not to one market, so a market in a
+            # 30-market event competes for a thirtieth of it. The survey
+            # had this hardcoded to 1, overstating every multi-market
+            # side by up to 30x (owner, 2026-08-31). The full enumeration
+            # makes the real divisor countable: markets carrying the same
+            # programId.
+            from .programs import pick_period as _pp
+            share_n: dict[str, int] = {}
+            pid_of: dict[str, str] = {}
+            for r in kept:
+                per = _pp(r.get("timePeriods") or [], str(r["marketSlug"]))
+                pid = str((per or {}).get("programId") or "")
+                if pid:
+                    pid_of[str(r["marketSlug"])] = pid
+                    share_n[pid] = share_n.get(pid, 0) + 1
+            self.survey_event_n = {slug: share_n.get(pid, 1)
+                                   for slug, pid in pid_of.items()}
             self.survey.load([(str(r["marketSlug"]), sv.group_of(r))
                               for r in kept])
             dropped = len(rows) - len(kept)
@@ -2099,7 +2119,8 @@ class Monitor:
             per = pick_period(row.get("timePeriods") or [], slug)
             if not per:
                 continue
-            prog = with_event_n(program_from_period(per), 1)
+            prog = with_event_n(program_from_period(per),
+                                getattr(self, "survey_event_n", {}).get(slug, 1))
             if not (prog.pool > 0 and prog.is_live()):
                 continue
             try:
