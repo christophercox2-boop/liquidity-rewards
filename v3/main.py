@@ -2022,34 +2022,50 @@ class Monitor:
 
     def _survey_frame(self, now: float) -> str:
         """Load the population to sample from, refreshed a few times a
-        day. Prefers the exchange's own enumeration of every market
-        carrying a program; falls back to the tags we can name, and SAYS
-        which one it got, because a random draw from a frame we cannot
-        prove is complete is not a random draw from the market (owner,
-        2026-08-31)."""
+        day.
+
+        Asks the exchange for every market on a LIVE liquidity program —
+        which is the population that matters, not every market that ever
+        carried one. Each row brings its own category, subcategory,
+        product and event start time, so the sampler strata are the
+        exchange's labels and the live-event filter costs no extra call.
+        Falls back to the tags we can name, and SAYS which it got: a
+        random draw from a frame we cannot prove is complete is not a
+        random draw from the market (owner, 2026-08-31).
+        """
         from . import survey as sv
         if now - getattr(self, "_survey_frame_at", 0.0) < 6 * 3600.0:
             return getattr(self, "survey_frame_note", "")
         self._survey_frame_at = now
         rows, note = self.client.all_programs()
-        slugs = [str(r.get("marketSlug")) for r in rows if r.get("marketSlug")]
-        if slugs:
-            self.survey_frame_note = f"exchange enumeration: {len(slugs):,} markets"
+        kept = [r for r in rows
+                if r.get("marketSlug") and not sv.category_banned(r)]
+        if kept:
+            self.survey_meta = {str(r["marketSlug"]): r for r in kept}
+            self.survey.load([(str(r["marketSlug"]), sv.group_of(r))
+                              for r in kept])
+            dropped = len(rows) - len(kept)
+            full = note == "enumerated"
+            self.survey_frame_note = (
+                ("exchange enumeration: " if full else "NOT a full frame — "
+                 + note + "; ")
+                + f"{len(kept):,} markets on live liquidity programs"
+                + (f", {dropped} excluded by category" if dropped else ""))
         else:
             seen: set[str] = set()
             for fam in self.families.values():
                 seen.update(fam.universe or {})
-            slugs = sorted(seen)
+            self.survey_meta = {}
+            self.survey.load(sorted(seen))
             self.survey_frame_note = (
                 f"NOT a full frame — {note}; sampling the "
-                f"{len(slugs):,} markets our own tags return")
-        self.survey.load(slugs)
+                f"{len(seen):,} markets our own tags return")
         self._note("survey frame: " + self.survey_frame_note)
         return self.survey_frame_note
 
     def survey_step(self, now: float) -> dict:
         """One turn of the cycling survey: draw a few markets at random
-        within their prefix, skip anything whose event is live or about
+        within their stratum, skip anything whose event is live or about
         to be, score both sides, and fold the result into the running
         leaderboard."""
         from . import survey as sv
@@ -2059,38 +2075,33 @@ class Monitor:
         picks = self.survey.next_batch(self.SURVEY_PER_CYCLE)
         if not picks:
             return {"ok": False, "note": "nothing to sample"}
-        try:
-            raw = self.client.programs(picks)
-        except Exception as e:  # noqa: BLE001 — a survey never breaks a cycle
-            return {"ok": False, "note": f"terms: {type(e).__name__}"}
+        meta = getattr(self, "survey_meta", {})
+        need = [p for p in picks if p not in meta]
+        raw = {}
+        if need:
+            try:
+                raw = self.client.programs(need)
+            except Exception as e:  # noqa: BLE001 — never breaks a cycle
+                return {"ok": False, "note": f"terms: {type(e).__name__}"}
         done = 0
         for slug in picks:
-            pref = sv.kind_of(slug)
-            st = self.survey_stats.setdefault(pref, sv.PrefixStat(prefix=pref))
-            per = pick_period((raw.get(slug) or {}).get("timePeriods") or [], slug)
+            row = meta.get(slug) or raw.get(slug) or {}
+            group = sv.group_of(row) if row else sv.kind_of(slug)
+            st = self.survey_stats.setdefault(group,
+                                              sv.PrefixStat(prefix=group))
+            # owner, 2026-08-31: stay out of live events until he has a
+            # way of quoting them. Re-checked every pass — a market that
+            # was quiet this morning goes live at kickoff. eventStartTime
+            # rides on the incentives row, so this costs nothing.
+            if sv.is_live_event(row, now):
+                st.live_skipped += 1
+                continue
+            per = pick_period(row.get("timePeriods") or [], slug)
             if not per:
                 continue
             prog = with_event_n(program_from_period(per), 1)
             if not (prog.pool > 0 and prog.is_live()):
                 continue
-            try:
-                md = self.client.market_details(slug)
-            except Exception:  # noqa: BLE001
-                md = {}
-            # owner, 2026-08-31: stay out of live events until he has a
-            # way of quoting them. Re-checked every pass — a market that
-            # was quiet this morning goes live at kickoff.
-            if sv.is_live_event(md, now):
-                st.live_skipped += 1
-                continue
-            if md:
-                n_ev = int(md.get("eventMarketCount") or 0)
-                if n_ev > 1:
-                    prog = with_event_n(prog, n_ev)
-                tick = self.client.declared_tick(md)
-                if tick:
-                    for fam in self.families.values():
-                        fam.cache.declared[slug] = tick
             try:
                 book = self.client.book(slug, fetched_at=now)
             except Exception:  # noqa: BLE001
