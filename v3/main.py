@@ -1962,7 +1962,7 @@ class Monitor:
                     f"  fresh-REST={_shape(fresh)}")
                 done += 1
 
-    def publish_rewards_csv(self) -> bool:
+    def publish_rewards_csv(self, rows: list | None = None) -> bool:
         """The exchange's posted-payout file, written NOW. Owner,
         2026-08-26: politics Aug-24 posted at 01:13Z, the watcher saw
         it and pushed the phone, but the file sat cfb-only until the
@@ -1973,10 +1973,11 @@ class Monitor:
         land. One writer per file: skipped while 1.0 runs."""
         if os.environ.get("V1_ENABLED", "0") != "0":
             return False
-        import datetime as _dt3
-        start = (_dt3.datetime.now(_dt3.timezone.utc)
-                 - _dt3.timedelta(days=40)).strftime("%Y-%m-%d")
-        rows = self.client.earnings(start)
+        if rows is None:
+            import datetime as _dt3
+            start = (_dt3.datetime.now(_dt3.timezone.utc)
+                     - _dt3.timedelta(days=40)).strftime("%Y-%m-%d")
+            rows = self.client.earnings(start)
         existing, sha = self._gh_file("data/rewards.csv")
         text = self.compose_rewards_csv(rows, existing)
         if text == existing:
@@ -2257,6 +2258,18 @@ class Monitor:
             for k in sorted(self.paid_seen)[:len(self.paid_seen) - 12000]:
                 del self.paid_seen[k]
         self.rewards_seen = seen
+        # write the file from HERE, not only from the watcher (owner,
+        # 2026-08-31: "make sure rewards.csv is up to date... it's
+        # out"). The phone's refresh button routes to this method and
+        # CONSUMED the new-postings diff without writing, so the
+        # watcher then saw "0 new" and its instant write never fired —
+        # tapping refresh actively kept the file stale. Any caller
+        # publishes now; the write is a no-op when nothing changed,
+        # and these rows spare it a second fetch.
+        try:
+            self.publish_rewards_csv(rows=rows)
+        except Exception as e:  # noqa: BLE001 — reporting never breaks
+            self._note(f"rewards.csv publish: {e}")
         for d, v in totals.items():
             self.actuals_by_day[d] = round(v, 2)
         # ...and per family, so the ledger grades each one on its own
