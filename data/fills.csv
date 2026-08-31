@@ -1791,3 +1791,7 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788184102.8,politics,ussewc-usse-sd-2026-11-03-rep,BUY,13,0.95,manual,0.9391,1.83,0.99245,94,98,0.768,0.95,0.97,-0.0425,13,the owner's own order — the engine leaves it alone,C6ZVJGWQ0KDK
 1788184102.8,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,20,0.95,manual,0.5676,1.83,0.984775,95,98,0.698,0.92,0.94,-0.0348,20,the owner's own order — the engine leaves it alone,C703YECD2KDN
 1788184162.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar30-35,SELL,12,0.1,manual,36.4204,12.75,,8,13,0.395,0.09,0.1,0,65,the owner's own order — the engine leaves it alone,C6R9F8T44KDC
+1788184662.8,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,6,0.91,earn,1.0764,0.16,0.984775,95,98,0.757,0.91,0.94,-0.0748,26,1 tick behind the touch — we would hold 97% of the bid side,C737JGQ9JKDC
+1788185322.8,politics,ussewc-usse-ky-2026-11-03-dem,SELL,2,0.04,manual,6.2494,2.16,0.0031,1,4,0.455,0.03,0.04,-0.0369,-5,the owner's own order — the engine leaves it alone,C6ZGRST2CKDG
+1788187002.9,politics,usgubewc-usgub-ar-2026-11-03-rep,SELL,2,0.98,sell,0,0,0.998375,97,99,0.064,0.98,0.99,0.0184,0,taker dump — sold into the bid (the carved exception),C73W31VR8KDE
+1788187302.9,politics,ussewc-usse-ar-2026-11-03-rep,SELL,20,0.98,manual,0,2.71,0.982125,94,98,0.497,0.93,0.94,0.0021,0,the owner's own order — the engine leaves it alone,C6ZW46XHGKDE
