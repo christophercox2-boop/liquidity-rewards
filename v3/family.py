@@ -497,17 +497,39 @@ class Family:
     def _mark(self, slug: str, side: str, now: float) -> None:
         self.last_action[f"{slug}|{side}"] = now
 
+    # Only these put money IN. A short step-up moves a buy-back order
+    # up the book: no shares change hands, nothing closes, and when it
+    # does fill the cash goes the other way. Counting those as sales
+    # made 42 of 51 lines read as sold and overstated a day's proceeds
+    # by two thirds — $16.01 against a real $9.82 (owner, 2026-08-31:
+    # "Fix all of this").
+    SALE_KINDS = ("close-out", "drain", "dump")
+
+    @classmethod
+    def _wd_sale(cls, w: dict) -> bool:
+        """Was this ledger line money coming in? Rows written before
+        the flag existed carry none, so they are classed by kind and
+        the ledger still reads right across the restart that ships
+        this."""
+        if "sale" in w:
+            return bool(w["sale"])
+        return w.get("kind") in cls.SALE_KINDS
+
     def _note_wind_down(self, slug: str, kind: str, qty: float,
                         px: float, now: float, left: float = 0.0) -> None:
         """One line in the wind-down ledger: stock actually sold, a
         short's buy-back stepped toward filling, or an owner close-out.
         `left` is what remains of the position after it, so the report
-        can say how many went fully flat."""
+        can say how many went fully flat. Only a SALE can go flat — a
+        repricing leaves the position exactly where it was, so it never
+        counts as one however `left` was passed."""
+        sale = kind in self.SALE_KINDS
         self.wind_down.append({
             "ts": round(now, 1), "market": slug, "kind": kind,
             "qty": round(float(qty), 2), "px": round(float(px), 4),
             "usd": round(float(qty) * float(px), 2),
-            "flat": abs(float(left)) < 0.01})
+            "sale": sale,
+            "flat": sale and abs(float(left)) < 0.01})
         del self.wind_down[:-400]
 
     def _charge(self, o) -> float:
@@ -3599,8 +3621,12 @@ class Family:
                     if rr.ok:
                         self.orders.pop(worst.id, None)
                         self.evidence.order_gone(worst.market, worst.id)
+                        # the short is untouched by a repricing — pass
+                        # what is really still open rather than letting
+                        # left default to zero and read as "flat"
                         self._note_wind_down(slug, "short step-up",
-                                             worst.qty, step_pred, now)
+                                             worst.qty, step_pred, now,
+                                             left=-qty)
                         self._log(event="dead_short_stepup", market=slug,
                                   price=worst.price, qty=worst.qty,
                                   note="buy-back never fills at "
@@ -4076,18 +4102,27 @@ class Family:
             k = by_kind.setdefault(w["kind"], {"n": 0, "usd": 0.0})
             k["n"] += 1
             k["usd"] += w["usd"]
+        # sold is SOLD: proceeds count stock that went out the door.
+        # The repricings are reported beside them, never inside them —
+        # their dollars are what closing a short would COST.
+        sold_wk = [w for w in recent if self._wd_sale(w)]
+        sold_day = [w for w in today_w if self._wd_sale(w)]
+        moved_day = [w for w in today_w if not self._wd_sale(w)]
         summary["wind_down"] = {
-            "day_n": len(today_w),
-            "day_usd": round(sum(w["usd"] for w in today_w), 2),
-            "week_n": len(recent),
-            "week_usd": round(sum(w["usd"] for w in recent), 2),
+            "day_n": len(sold_day),
+            "day_usd": round(sum(w["usd"] for w in sold_day), 2),
+            "week_n": len(sold_wk),
+            "week_usd": round(sum(w["usd"] for w in sold_wk), 2),
             "by_kind": {k: {"n": v["n"], "usd": round(v["usd"], 2)}
                         for k, v in by_kind.items()},
-            "flat_day": sum(1 for w in today_w if w["flat"]),
+            "flat_day": sum(1 for w in sold_day if w["flat"]),
+            "moves_n": len(moved_day),
+            "moves_usd": round(sum(w["usd"] for w in moved_day), 2),
             "recent": [{"market": w["market"], "kind": w["kind"],
                         "qty": w["qty"], "px": w["px"],
                         "usd": round(w["usd"], 2), "ts": w["ts"],
-                        "flat": w["flat"]}
+                        "sale": self._wd_sale(w),
+                        "flat": w["flat"] and self._wd_sale(w)}
                        for w in today_w[-12:]],
         }
         # the owner's watched races: the ask side's standing against

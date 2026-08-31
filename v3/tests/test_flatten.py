@@ -2118,6 +2118,58 @@ class TestWindDownLedger(unittest.TestCase):
         self.assertGreater(wd["day_usd"], 0)
         self.assertIn(row["kind"], wd["by_kind"])
 
+    def test_a_repricing_is_not_a_sale(self):
+        """Owner, 2026-08-31 ("Fix all of this"): the Sold tab read 51
+        sold / $16.01 proceeds / 50 went flat when only 9 lines were
+        sales worth $9.82. The other 42 were short buy-backs being
+        moved up the book — no shares change hands, the cash goes the
+        other way when they fill, and the call site never passed what
+        was left so every one flagged itself flat."""
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        # a repricing: the short is untouched, 40 shares still open
+        r.fam._note_wind_down(A, "short step-up", 2.0, 0.61, r.now,
+                              left=-40.0)
+        # a real sale that did go flat
+        r.fam._note_wind_down(A, "drain", 11.0, 0.14, r.now, left=0.0)
+        step, sale = r.fam.wind_down[-2], r.fam.wind_down[-1]
+        self.assertFalse(step["sale"])
+        self.assertFalse(step["flat"], "a repricing closes nothing")
+        self.assertTrue(sale["sale"])
+        self.assertTrue(sale["flat"])
+        summary = r.cycle()
+        wd = summary["wind_down"]
+        # proceeds and the sold count are the SALE only
+        self.assertEqual(wd["day_n"], 1)
+        self.assertAlmostEqual(wd["day_usd"], 1.54, places=2)
+        self.assertEqual(wd["flat_day"], 1)
+        # the repricing is reported beside it, as a cost to close
+        self.assertEqual(wd["moves_n"], 1)
+        self.assertAlmostEqual(wd["moves_usd"], 1.22, places=2)
+        # both still appear in the by-kind breakdown and the rows
+        self.assertIn("short step-up", wd["by_kind"])
+        self.assertIn("drain", wd["by_kind"])
+
+    def test_flat_never_defaults_true_however_left_is_passed(self):
+        """The defect exactly: left defaulted to 0.0, so abs(0) < 0.01
+        marked every repricing flat. 41 of 41 in the live ledger."""
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        r.fam._note_wind_down(A, "short step-up", 1.0, 0.24, r.now)
+        self.assertFalse(r.fam.wind_down[-1]["flat"])
+
+    def test_rows_written_before_the_flag_are_classed_by_kind(self):
+        """The ledger persists, so the restart that ships this reads
+        50 rows that carry no sale flag at all."""
+        from v3.family import Family
+        self.assertTrue(Family._wd_sale({"kind": "drain"}))
+        self.assertTrue(Family._wd_sale({"kind": "close-out"}))
+        self.assertFalse(Family._wd_sale({"kind": "short step-up"}))
+        # an explicit flag still wins over the kind
+        self.assertFalse(Family._wd_sale({"kind": "drain", "sale": False}))
+
     def test_the_report_is_empty_and_harmless_with_no_sales(self):
         from v3.tests.test_family import Rig, A
         r = Rig()
