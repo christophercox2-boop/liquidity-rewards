@@ -1729,3 +1729,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788136258.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar5-10,BUY,2,0.04,manual,0,6.28,,2,5,0.887,0.04,0.05,0,58,the owner's own order — the engine leaves it alone,C6JE8ANTEKDD
 1788136258.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,BUY,3,0.2,manual,0,6.19,,19,22,0.805,0.2,0.21,0,16,the owner's own order — the engine leaves it alone,C6JJ2JDT6KDG
 1788136258.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,SELL,2,0.21,manual,0,6.19,,19,22,0.805,0.2,0.21,-0.01,14,the owner's own order — the engine leaves it alone,C6JHG1JGTKDD
+1788137459.0,cfb,aachc-cfb-wins-2026-11-28-txst-5pt5wins,SELL,0.01,0.62,sell,0,0,,63,69,0,0.62,0.63,0.04,0,taker dump — sold into the bid (the carved exception),C6R3S0F4RKDJ
+1788137879.1,politics,ussewc-usse-mt-2026-11-03-rep,SELL,21,0.98,sell,0,0.7,0.983075,91,95,0.525,0.89,0.9,0.0031,0,selling filled stock — it earns while it waits,C6QMECPM8KDK
