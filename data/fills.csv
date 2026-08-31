@@ -1811,3 +1811,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788201569.9,politics,enwc-usgubp-ri-2026-09-09-rep-elapel,SELL,5,0.89,sell,0,0,,87,91,0.54,0.89,0.9,0,0,closed out by the owner from the live card — sold into the bid,C77CFE1FTKDN
 1788201722.4,politics,scc-senate-gop-2026-11-03-52,BUY,4,0.13,sell,0.047,5.19,0.08275,8,14,0.045,0.09,0.14,0.0473,3,buying back the short at or under what it sold for — the bid earns while it wait,C72YQV7VRKDE
 1788202082.5,cfb,aachc-cfb-wins-2026-11-28-sdst-7pt5wins,SELL,0.01,0.37,earn,0.0045,0.78,,32,37,0.411,0.36,0.37,-0.02,-1.01,3 ticks in front of the touch — we would hold 0% of the ask side,C76TKXRMWKDE
+1788206497.2,politics,usgubewc-usgub-tx-2026-11-03-rep,SELL,3.71,0.87,earn,0.1533,12.9,0.8591,85,89,0.514,0.85,0.86,-0.0109,-3.7,1 tick behind the touch — we would hold 95% of the ask side,C6XFBCJ0TKDN
