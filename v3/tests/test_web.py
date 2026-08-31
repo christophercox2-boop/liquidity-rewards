@@ -250,6 +250,23 @@ class TestRedesign(unittest.TestCase):
         # and a collapsed estimate still shows how far off its peak
         self.assertIn("off peak", web.ORDERS_JS)
 
+    def test_orders_are_grouped_one_row_per_market(self):
+        """Owner, 2026-08-31: "the orders daily estimate is only
+        considering one side of the book and not adding them together.
+        Each market should have one row with all the orders together."
+        A market's bid and ask each earn from their own side's pool, so
+        the market's total is their sum — mar15-20 was showing $43.78
+        for the bid alone when the pair was earning $68.98."""
+        from v3 import web
+        self.assertIn("function mgroups(os)", web.ORDERS_JS)
+        self.assertIn("g.est+=oest(o)", web.ORDERS_JS)
+        self.assertIn("function mrow(d,g)", web.ORDERS_JS)
+        # the market header carries the summed rate and the order count
+        self.assertIn("usd(g.est)+'/d</span>'", web.ORDERS_JS)
+        # and the page no longer splits a market across Earning/Exits
+        self.assertNotIn("fold('Earning'", web.ORDERS_JS)
+        self.assertNotIn("fold('Exits'", web.ORDERS_JS)
+
     def test_status_drops_the_rotating_cards_for_a_percentage(self):
         from v3 import web
         self.assertNotIn("tchip", web.STATUS_JS)
