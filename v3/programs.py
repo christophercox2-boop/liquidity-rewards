@@ -72,6 +72,38 @@ class Program:
     event_n: int = 1     # open markets in the event sharing the pool
     pool_n: int = 0      # markets sharing the programId — diagnostic/fallback only
 
+    @property
+    def period_days(self) -> float | None:
+        """Days this pool is spread over, or None when open-ended.
+
+        Owner, 2026-08-31: "golf may be on a tournament time scale so I
+        think we would have to divide by the number of days between the
+        listing date and the conclusion." The docs call rewardPool the
+        "Total reward pool for this period" — for an open-ended program
+        that is what it pays a day, but for one running start-to-end
+        over a tournament it is the whole thing, and reading it as daily
+        overstates by the length of the event.
+        """
+        if not (self.start and self.end):
+            return None
+        try:
+            a = dt.datetime.fromisoformat(str(self.start).replace("Z", "+00:00"))
+            b = dt.datetime.fromisoformat(str(self.end).replace("Z", "+00:00"))
+        except (TypeError, ValueError):
+            return None
+        d = (b - a).total_seconds() / 86400.0
+        return d if d > 0 else None
+
+    @property
+    def daily_pool(self) -> float:
+        """What the pool pays PER DAY. A period shorter than a day still
+        pays its pool once, so the divisor never goes below one — that
+        way this can only ever reduce an estimate, never inflate one."""
+        d = self.period_days
+        if d is None:
+            return self.pool
+        return self.pool / max(d, 1.0)
+
     def is_live(self) -> bool:
         s = self.status.lower()
         return not s or s in ("active", "live", "status_live")
