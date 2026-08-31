@@ -1731,3 +1731,9 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788136258.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,SELL,2,0.21,manual,0,6.19,,19,22,0.805,0.2,0.21,-0.01,14,the owner's own order — the engine leaves it alone,C6JHG1JGTKDD
 1788137459.0,cfb,aachc-cfb-wins-2026-11-28-txst-5pt5wins,SELL,0.01,0.62,sell,0,0,,63,69,0,0.62,0.63,0.04,0,taker dump — sold into the bid (the carved exception),C6R3S0F4RKDJ
 1788137879.1,politics,ussewc-usse-mt-2026-11-03-rep,SELL,21,0.98,sell,0,0.7,0.983075,91,95,0.525,0.89,0.9,0.0031,0,selling filled stock — it earns while it waits,C6QMECPM8KDK
+1788137994.3,politics,usgubewc-usgub-tx-2026-11-03-rep,SELL,3,0.86,sell,0.8005,1.98,0.8591,84,89,0.412,0.85,0.86,-0.0009,0.01,selling filled stock — it earns while it waits,C6PH3V3Q0KDF
+1788137994.3,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar10-15,SELL,120,0.19,manual,38.919,0.5,,15,17,0.945,0.16,0.18,-0.03,176,the owner's own order — the engine leaves it alone,C6QSV1CG0KDD
+1788138261.0,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar30-35,SELL,147,0.99,manual,0,0.04,,6,10,0.586,0.08,0.09,-0.91,77,the owner's qualify-ask wall,C6R8T9SRAKDF
+1788138261.0,cfb,aachc-cfb-wins-2026-11-28-ore-8pt5wins,SELL,1,0.95,sell,0,0,,89,94,0.421,0.95,0.96,-0.03,0,taker dump — sold into the bid (the carved exception),C6R9EMRXYKDF
+1788138921.0,politics,enwc-uspres-nom-rep-2028-tuccar,BUY,154,0.06,earn,1.2689,4.41,,7,11,0.668,0.06,0.07,-0.03,192,at the touch — a fill here is 2 ticks inside value (evidence band only; confiden,C6MQZXRQ0KDM
+1788139221.0,cfb,aachc-cfb-wins-2026-11-28-syra-6pt5wins,BUY,1,0.47,earn,6.8201,0.02,,31,68,0,0.26,0.52,-0.01,1,joins the touch — the book has been quiet,C6RGNC97PKDM
