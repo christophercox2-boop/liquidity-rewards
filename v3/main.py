@@ -2040,6 +2040,26 @@ class Monitor:
             return getattr(self, "survey_frame_note", "")
         self._survey_frame_at = now
         rows, note = self.client.all_programs()
+        # Why do culture and crypto rows carry category/subcategory while
+        # sports rows fall back to the slug? Show one of each rather than
+        # guess — the same probe that found orderPriceMinTickSize (owner,
+        # 2026-08-31).
+        if rows and not getattr(self, "_inc_shape_noted", False):
+            self._inc_shape_noted = True
+            with_lab = next((r for r in rows if r.get("category")), None)
+            without = next((r for r in rows if not r.get("category")), None)
+            self._note("incentives row keys: "
+                       + ",".join(sorted(rows[0].keys())))
+            for tag, r in (("labelled", with_lab), ("unlabelled", without)):
+                if not r:
+                    self._note(f"incentives {tag}: none in {len(rows)} rows")
+                    continue
+                self._note(f"incentives {tag}: {r.get('marketSlug')} "
+                           f"category={r.get('category')!r} "
+                           f"subcategory={r.get('subcategory')!r} "
+                           f"product={r.get('instrumentProduct')!r} "
+                           f"state={r.get('instrumentState')!r} "
+                           f"eventStart={r.get('eventStartTime')!r}")
         kept = [r for r in rows
                 if r.get("marketSlug") and not sv.category_banned(r)]
         if kept:
@@ -2251,9 +2271,12 @@ class Monitor:
                     f"{r['prefix']} {r['median_spd']:.2f} share%/$ "
                     f"(n={r['n']}, touch {r['median_touch']:,.0f})"
                     for r in top))
-            self._note(f"survey: {lb['sampler']['population']:,} markets in "
-                       f"frame, {len(lb['ranked'])} prefixes ranked, "
-                       f"{len(lb['sampling'])} still sampling")
+            sm = lb["sampler"]
+            self._note(f"survey: {sm['population']:,} markets in frame, "
+                       f"{sm['prefixes']} strata (biggest {sm['biggest']}, "
+                       f"{sm['merged']} merged up, {sm['too_small']} still "
+                       f"too small), {len(lb['ranked'])} ranked, "
+                       f"{len(lb['sampling'])} sampling")
         except Exception as e:  # noqa: BLE001 — a diagnostic, never a blocker
             self._note(f"survey report failed: {type(e).__name__}: {e}")
         try:
