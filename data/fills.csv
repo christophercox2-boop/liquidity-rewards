@@ -1795,3 +1795,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788185322.8,politics,ussewc-usse-ky-2026-11-03-dem,SELL,2,0.04,manual,6.2494,2.16,0.0031,1,4,0.455,0.03,0.04,-0.0369,-5,the owner's own order — the engine leaves it alone,C6ZGRST2CKDG
 1788187002.9,politics,usgubewc-usgub-ar-2026-11-03-rep,SELL,2,0.98,sell,0,0,0.998375,97,99,0.064,0.98,0.99,0.0184,0,taker dump — sold into the bid (the carved exception),C73W31VR8KDE
 1788187302.9,politics,ussewc-usse-ar-2026-11-03-rep,SELL,20,0.98,manual,0,2.71,0.982125,94,98,0.497,0.93,0.94,0.0021,0,the owner's own order — the engine leaves it alone,C6ZW46XHGKDE
+1788188983.3,politics,ussewc-usse-ky-2026-11-03-rep,BUY,20,0.94,manual,4.6425,3.18,0.9969,93,97,0.535,0.9,0.95,-0.0569,20,the owner's own order — the engine leaves it alone,C70287D1RKDK
