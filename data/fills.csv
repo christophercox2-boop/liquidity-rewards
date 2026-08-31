@@ -1831,3 +1831,6 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788215308.7,cfb,aachc-cfb-wins-2026-11-28-arz-6pt5wins,SELL,0.06,0.88,sell,0,0,,87,92,0.381,0.88,0.89,0.01,0.94,taker dump — sold into the bid (the carved exception),C7AP6Q4NAKDK
 1788215848.7,cfb,aachc-cfb-wins-2026-11-28-hou-7pt5wins,SELL,0.01,0.67,earn,0.551,0.05,,57,67,0.031,0.59,0.67,-0.05,-1.01,13 ticks in front of the touch — we would hold 3% of the ask side,C7AS926ZYKDK
 1788215908.7,politics,usgubewc-usgub-ma-2026-11-03-dem,SELL,1,0.97,sell,0.2002,29.22,0.999625,97,99,0.439,0.96,0.97,0.0296,0,selling filled stock — it earns while it waits,C6HP76AHTKDM
+1788216688.8,cfb,aachc-cfb-wins-2026-11-28-tx-10pt5wins,SELL,4,0.32,sell,0,0,,32,37,0.407,0.32,0.33,0.03,0,taker dump — sold into the bid (the carved exception),C7B2086K6KDF
+1788217048.8,cfb,aachc-cfb-wins-2026-11-28-mst-3pt5wins,BUY,0.01,0.8,earn,0.026,0.5,,79,84,0.441,0.8,0.81,-0.02,1.01,6 ticks in front of the touch — we would hold 97% of the bid side,C7AKWARQPKDE
+1788217768.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,SELL,6,0.2,manual,0,0.02,,16,19,0.878,0.12,0.13,-0.03,153,the owner's own order — the engine leaves it alone,C6QV2J0MYKDD

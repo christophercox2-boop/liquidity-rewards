@@ -1394,6 +1394,8 @@ SURVEY_JS = r"""
 // each prefix, and ranks on the MEDIAN share of a side per dollar at
 // risk — cfb holds 13% of a side for 41 cents, about 32 on this scale.
 // Never on the max: one lucky thin book would crown a prefix.
+function svBest(i){window._svOpen=(window._svOpen===i?null:i);
+ if(window._d)document.getElementById('view').innerHTML=render(window._d);}
 function svNum(x,d){return (x||0).toFixed(d==null?2:d);}
 function render(d){
  if(d.starting)return bootCard(d);
@@ -1418,14 +1420,25 @@ function render(d){
   out+='<div class="card"><table><tr><th>market kind</th><th class="r">n</th>'
    +'<th class="r">$/day per $1</th><th class="r">side per $1</th>'
    +'<th class="r">share</th><th class="r">touch</th></tr>';
-  r.forEach(function(k){
+  r.forEach(function(k,i){
    var good=k.median_ypd>=0.16;
-   out+='<tr><td>'+esc(k.prefix)+'</td><td class="r">'+k.n+'</td>'
+   out+='<tr'+((k.best||[]).length?' style="cursor:pointer" onclick="svBest('+i+')"':'')+'>'
+    +'<td>'+esc(k.prefix)+((k.best||[]).length?' <span class="muted">\u25be</span>':'')+'</td>'
+    +'<td class="r">'+k.n+'</td>'
     +'<td class="r'+(good?' ok':'')+'"><b>'+svNum(k.median_ypd,3)+'</b></td>'
     +'<td class="r muted">'+svNum(k.median_spd,3)+'</td>'
     +'<td class="r">'+svNum(k.median_share_pct,3)+'%</td>'
-    +'<td class="r">'+(k.median_touch||0).toLocaleString()+'</td></tr>';});
-  out+='</table><div class="hint">Ranked on <b>$/day per $1 at risk</b> \u2014 what a dollar resting here earns in a day. College football, the one that works, runs a median of <b>0.16</b>; politics 0.05. Marked green at 0.16 or better. "side per $1" is how much of a side that dollar buys: high on its own means the side is cheap to own but may pay nothing, which is why it is not the ranking.</div></div>';
+    +'<td class="r">'+(k.median_touch||0).toLocaleString()+'</td></tr>';
+   if(window._svOpen===i){
+    (k.best||[]).forEach(function(b){
+     out+='<tr><td colspan="6" class="muted" style="font-size:12px;padding-left:14px">'
+      +'<code>'+esc(b.market)+'</code> '+(b.side==='BUY'?'bid':'ask')+' '+pc(b.px)
+      +' \u00b7 '+svNum(b.ypd,3)+' $/day per $1'
+      +' \u00b7 '+svNum(b.share_pct,2)+'% of side'
+      +' \u00b7 touch '+(b.touch||0).toLocaleString()
+      +' \u00b7 '+usd(b.est_day)+'/day</td></tr>';});
+   }});
+  out+='</table><div class="hint">Ranked on <b>$/day per $1 at risk</b> \u2014 what a dollar resting here earns in a day. College football, the one that works, runs a median of <b>0.16</b>; politics 0.05. Marked green at 0.16 or better. Tap a row for the actual markets behind it. "side per $1" is how much of a side that dollar buys: high on its own means the side is cheap to own but may pay nothing, which is why it is not the ranking.</div></div>';
  }else{
   out+='<div class="card muted">Nothing ranked yet. A prefix needs '
    +(s.min_samples||12)+' scored sides before its median means anything.</div>';
