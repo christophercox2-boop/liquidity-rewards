@@ -1770,3 +1770,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788160952.3,cfb,aachc-cfb-wins-2026-11-28-ncst-9pt5wins,SELL,0.5,0.09,earn,0.4956,2.83,,6,11,0,0.08,0.09,-0.01,-0.5,joins the touch — the book has been quiet,C6V7YC52JKDK
 1788161072.3,cfb,aachc-cfb-wins-2026-11-28-ncst-9pt5wins,SELL,0.01,0.11,earn,5.7957,0.03,,7,12,0.454,0.08,0.26,-0.01,-1.01,15 ticks in front of the touch — we would hold 77% of the ask side,C6XMSA4W4KDG
 1788162932.3,cfb,aachc-cfb-wins-2026-11-28-ncst-9pt5wins,BUY,1,0.14,sell,0.0596,0.37,,9,14,0.623,0.18,0.25,0.03,1,buying back the short at or under what it sold for — the bid earns while it wait,C6XTMBAEPKDG
+1788165272.4,politics,usgubewc-usgub-ar-2026-11-03-rep,SELL,2,0.98,sell,0,0,0.998375,97,99,0.071,0.98,0.99,0.0184,0,taker dump — sold into the bid (the carved exception),C6YQ20060KDK
