@@ -361,5 +361,46 @@ class TestStrataStayUsable(unittest.TestCase):
         self.assertEqual(st["prefixes"], 1)
 
 
+class TestTournamentPools(unittest.TestCase):
+    """Owner, 2026-08-31: "golf may be on a tournament time scale so I
+    think we would have to divide by the number of days between the
+    listing date and the conclusion." rewardPool is the total for the
+    PERIOD; read as daily it overstates by the length of the event."""
+
+    def test_an_open_ended_pool_is_already_daily(self):
+        p = Program(pool=100.0, target=1.0, df=0.2,
+                    start="2026-07-28T00:00:00Z", end="")
+        self.assertIsNone(p.period_days)
+        self.assertAlmostEqual(p.daily_pool, 100.0)
+
+    def test_a_tournament_pool_is_spread_over_its_days(self):
+        p = Program(pool=3000.0, target=1.0, df=0.2,
+                    start="2026-03-28T04:00:00Z", end="2026-04-01T21:00:00Z")
+        self.assertAlmostEqual(p.period_days, 4.7083, places=3)
+        self.assertAlmostEqual(p.daily_pool, 637.17, places=1)
+
+    def test_a_period_under_a_day_is_never_inflated(self):
+        # dividing by 0.25 would QUADRUPLE it; the divisor floors at one
+        p = Program(pool=50.0, target=1.0, df=0.2,
+                    start="2026-03-28T04:00:00Z", end="2026-03-28T10:00:00Z")
+        self.assertAlmostEqual(p.daily_pool, 50.0)
+
+    def test_junk_dates_fall_back_to_the_raw_pool(self):
+        for a, b in (("", "2026-04-01T21:00:00Z"), ("soon", "later"),
+                     ("2026-04-01T21:00:00Z", "2026-03-28T04:00:00Z")):
+            p = Program(pool=80.0, target=1.0, df=0.2, start=a, end=b)
+            self.assertAlmostEqual(p.daily_pool, 80.0)
+
+    def test_the_probe_prices_a_tournament_per_day(self):
+        # the same book scored against a 5-day pool and a daily one
+        b = book(bids=[(0.30, 6.0), (0.01, 20000.0)], asks=[])
+        five = Program(pool=500.0, target=7500.0, df=0.25, event_n=1,
+                       start="2026-04-01T00:00:00Z", end="2026-04-06T00:00:00Z")
+        one = Program(pool=100.0, target=7500.0, df=0.25, event_n=1)
+        a = probe_side(b, five, "BUY", five.daily_pool / 2.0)
+        c = probe_side(b, one, "BUY", one.daily_pool / 2.0)
+        self.assertAlmostEqual(a.est_day, c.est_day, places=6)
+
+
 if __name__ == "__main__":
     unittest.main()
