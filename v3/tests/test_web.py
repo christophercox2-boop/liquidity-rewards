@@ -267,6 +267,24 @@ class TestRedesign(unittest.TestCase):
         self.assertNotIn("fold('Earning'", web.ORDERS_JS)
         self.assertNotIn("fold('Exits'", web.ORDERS_JS)
 
+    def test_market_rows_collapse_and_hide_dead_qualifiers(self):
+        """Owner, 2026-08-31: "Don't show all the individual orders on
+        the order page. But if I click on it then you can show all the
+        non qualifying ones. Hide the qualifiers so long as they are
+        not earning." A wall order rests at 98-99c only to lift its
+        side over Target Size — it is not a decision until it earns."""
+        from v3 import web
+        # rows are a closed <details>: the orders appear on a click
+        self.assertIn("'<details class=\"orow\"><summary>'", web.ORDERS_JS)
+        self.assertNotIn("<details open", web.ORDERS_JS)
+        # a wall is the button's own order, or any deep ask
+        self.assertIn("qualify-ask wall", web.ORDERS_JS)
+        self.assertIn("o.side==='SELL'&&(o.price||0)>=0.98", web.ORDERS_JS)
+        # hidden only while it earns nothing
+        self.assertIn("return !(oqual(o)&&oest(o)<0.005);", web.ORDERS_JS)
+        # and the count of what was hidden is still stated
+        self.assertIn("qualifying order", web.ORDERS_JS)
+
     def test_status_drops_the_rotating_cards_for_a_percentage(self):
         from v3 import web
         self.assertNotIn("tchip", web.STATUS_JS)

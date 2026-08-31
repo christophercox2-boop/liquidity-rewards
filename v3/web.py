@@ -524,22 +524,42 @@ function gdrop(g){
  if(!(g.peak>0.02))return null;
  return Math.max(0,(g.peak-g.est)/g.peak);
 }
+function oqual(o){
+ // a QUALIFIER is a wall order: it exists only to lift its side over
+ // Target Size and rests far from the touch, so it earns nothing and
+ // is not a decision. The button's own orders say so in their why; a
+ // wall built by hand is a deep ask up at 98-99c.
+ if(String(o.why||'').indexOf('qualify-ask wall')>=0)return true;
+ return o.side==='SELL'&&(o.price||0)>=0.98;
+}
+function oshow(o){
+ // owner, 2026-08-31: "Hide the qualifiers so long as they are not
+ // earning." One that IS earning is a real order again, so it shows.
+ return !(oqual(o)&&oest(o)<0.005);
+}
 function mrow(d,g){
  var bid='bk_'+esc(g.m);
  var dp=gdrop(g);
  var sides={};g.os.forEach(function(o){sides[o.side==='BUY'?'bid':'ask']=1;});
  var sl=[];for(var s in sides)sl.push(s);
- var body='';g.os.forEach(function(o){body+=orow(d,o);});
- return '<div class="orow">'
-  +'<div class="name" style="cursor:pointer;font-size:15px" onclick="showbook(\\''+esc(g.m)+'\\',\\''+bid+'\\')">'+nm(d,g.m)+'</div>'
-  +'<div id="'+bid+'"></div>'
+ var shown=g.os.filter(oshow);
+ var hid=g.os.length-shown.length;
+ var body='';shown.forEach(function(o){body+=orow(d,o);});
+ if(!shown.length)body+='<div class="muted" style="font-size:12px">nothing here but wall orders</div>';
+ if(hid)body+='<div class="muted" style="font-size:12px">'+hid+' qualifying order'
+  +(hid===1?'':'s')+' holding the side over Target Size, earning nothing \u2014 hidden</div>';
+ body+='<div><button class="small" onclick="showbook(\\''+esc(g.m)+'\\',\\''+bid+'\\')">Book</button></div>'
+  +'<div id="'+bid+'"></div>';
+ return '<details class="orow"><summary>'
+  +'<span class="name" style="font-size:15px">'+nm(d,g.m)+'</span>'
   +'<div style="display:flex;gap:16px;align-items:baseline;margin:3px 0">'
   +'<span class="rt" style="font-size:20px">'+usd(g.est)+'/d</span>'
-  +'<span class="muted">'+g.os.length+' order'+(g.os.length===1?'':'s')
-  +' \u00b7 '+sl.join('+')+'</span></div>'
+  +'<span class="muted">'+shown.length+' order'+(shown.length===1?'':'s')
+  +(hid?' +'+hid+' wall':'')+' \u00b7 '+sl.join('+')+'</span></div>'
   +(dp!=null&&dp>0.05?'<div class="vrd'+(dp>=0.5?' warn':'')+'">\u25BC '+Math.round(dp*100)+'% off peak</div>':'')
+  +'</summary>'
   +'<div style="margin-left:10px;border-left:2px solid rgba(255,255,255,0.08);padding-left:8px">'+body+'</div>'
-  +'</div>';
+  +'</details>';
 }
 function ordersTab(d){
  var srt=window._ordSort||'est';var out='';
