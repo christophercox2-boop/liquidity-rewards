@@ -1189,8 +1189,10 @@ class Monitor:
         return {"ok": False,
                 "note": "no family knows this market — check the slug"}
 
-    QUALIFY_MAX_ORDERS = 6      # real orders per tap, at most
+    QUALIFY_MAX_ORDERS = 80     # hard stop on one run, whatever happens
+    QUALIFY_MAX_S = 900.0       # and a wall clock on it
     QUALIFY_BP_FLOOR = 10.0     # stop building while under $10 free
+    QUALIFY_MAX_COLLATERAL = 500.0   # refuse a gap that would hold more
 
     def _rested_size(self, order_id: str, max_wait: float = 10.0) -> float:
         """How many shares of one order are actually resting, polled
@@ -1210,23 +1212,26 @@ class Monitor:
             time.sleep(1.0)
 
     def qualify_ask(self, market: str) -> dict:
-        """The watched-races button (owner, 2026-08-28: "Let me place
-        the orders by hand. Just give me a button to auto qualify the
-        ask side", then "you have to make multiple orders. The sizes
-        are limited because each one locks up a lot of buying power"):
-        build the ask-side wall toward Target Size in SEVERAL deep
-        asks. Each order requests the whole remaining gap and the
-        exchange trims it to what buying power supports — the trim IS
-        the size limit, measured rather than guessed (the first tap's
-        9,996-share ask came back resting 292.56). The loop stops when
-        an order rests nothing, buying power runs under the floor, or
-        the tap's order budget is spent; the note says exactly what
-        rested and what is still missing, so the owner taps again once
-        buying power frees. Every order goes on the owner's hand rail
-        (purpose "manual") — the automation never touches it."""
-        import math
+        """The watched-races button (owner, 2026-08-28 "give me a button
+        to auto qualify the ask side", then 2026-08-30 "keeps placing
+        orders until the target size is reached"): build the ask side up
+        to Target Size, however many orders that takes.
 
-        from .family import FamilyOrder
+        The exchange trims each order to free buying power (~300 shares
+        at a time on the boosted races), so a 10,000-share wall is ~30
+        orders and several minutes — far too long to hold a phone
+        request open. The run happens in a background thread; this
+        returns at once, and tapping again reports progress. Every
+        order goes on the owner's hand rail (purpose "manual") — the
+        automation never touches the result."""
+        import math
+        import threading
+        jobs = getattr(self, "_qualify_jobs", None)
+        if jobs is None:
+            jobs = self._qualify_jobs = {}
+        job = jobs.get(market)
+        if job and job.get("state") == "running":
+            return {"ok": True, "note": self._qualify_note(job)}
         for fam in self.families.values():
             if not fam.knows(market):
                 continue
@@ -1240,23 +1245,92 @@ class Monitor:
                 return {"ok": False, "note": f"could not read the book: {e}"}
             fam.cache.put(market, book)
             ask_total = sum(q for _, q in book.asks)
-            target = prog.target
-            if target - ask_total <= 0:
+            gap = prog.target - ask_total
+            if gap <= 0:
                 return {"ok": False, "note":
                         f"the ask side already qualifies — {ask_total:,.0f} "
-                        f"shares resting vs a Target Size of {target:,.0f}"}
+                        f"shares resting vs a Target Size of "
+                        f"{prog.target:,.0f}"}
             tick = book.tick or 0.01
             px = round(math.floor(0.999 / tick + 1e-9) * tick, 3)
-            net = 0.0
-            try:
-                net = (self.client.positions_net().get(market) or (0.0,))[0]
-            except Exception:  # noqa: BLE001
-                pass
-            rested_chunks: list[float] = []
-            stopped = ""
-            for _ in range(self.QUALIFY_MAX_ORDERS):
-                remaining = target - ask_total - sum(rested_chunks)
-                if remaining < 1.0:
+            collat = gap * (1.0 - px)
+            if collat > self.QUALIFY_MAX_COLLATERAL:
+                return {"ok": False, "note":
+                        f"refused: closing the {gap:,.0f}-share gap would "
+                        f"hold ${collat:,.0f} of collateral — over the "
+                        f"button's ${self.QUALIFY_MAX_COLLATERAL:,.0f} cap"}
+            job = jobs[market] = {"state": "running", "placed": 0,
+                                  "shares": 0.0, "target": prog.target,
+                                  "started": time.time(), "stop": "",
+                                  "ask_total": ask_total}
+            threading.Thread(target=self._qualify_run, args=(market, fam),
+                             daemon=True,
+                             name=f"qualify-{market[:20]}").start()
+            return {"ok": True, "note":
+                    f"building the wall: {gap:,.0f} shares to go at "
+                    f"{px * 100:.1f}c (~${collat:,.2f} collateral). "
+                    f"Running in the background — tap again for progress."}
+        return {"ok": False,
+                "note": "no family knows this market — check the slug"}
+
+    @staticmethod
+    def _qualify_note(job: dict) -> str:
+        """One phone-readable line about a wall run."""
+        got, n = job.get("shares", 0.0), job.get("placed", 0)
+        tgt, now_t = job.get("target", 0.0), job.get("ask_total", 0.0)
+        head = (f"{'building' if job.get('state') == 'running' else 'done'}: "
+                f"{n} order{'s' if n != 1 else ''}, {got:,.0f} shares "
+                f"rested — ask side {now_t:,.0f} of {tgt:,.0f}")
+        if job.get("state") == "running":
+            return head + " — still going"
+        if now_t >= tgt:
+            return head + " — QUALIFIES"
+        return head + (f" — stopped: {job['stop']}" if job.get("stop")
+                       else " — stopped")
+
+    def _qualify_run(self, market: str, fam) -> dict:
+        """Place asks until the side reaches Target Size. The gap is
+        recomputed from a FRESH book every pass, so the run
+        self-corrects for other people's orders, for the exchange's
+        trims, and for an order that lands late — it never re-posts
+        blind for shares it already has."""
+        import math
+
+        from .family import FamilyOrder
+        job = self._qualify_jobs[market]
+        deadline = time.time() + self.QUALIFY_MAX_S
+        zero_streak = 0
+        # the shares this run set out to add. A second belt beside the
+        # book reading: if we have verifiably rested that many, stop —
+        # even if the book we fetch has not caught up with our own
+        # orders yet. Without it a lagging book would keep the loop
+        # placing against a gap it has already closed.
+        need = max(job["target"] - job["ask_total"], 0.0)
+        try:
+            while True:
+                if job["placed"] >= self.QUALIFY_MAX_ORDERS:
+                    job["stop"] = (f"{self.QUALIFY_MAX_ORDERS}-order limit "
+                                   f"for one run — tap again to continue")
+                    break
+                if time.time() >= deadline:
+                    job["stop"] = "15-minute limit — tap again to continue"
+                    break
+                try:
+                    book = self.client.book(market, fetched_at=time.time())
+                except Exception as e:  # noqa: BLE001
+                    job["stop"] = f"could not read the book: {e}"
+                    break
+                fam.cache.put(market, book)
+                prog = fam.terms.get(market)
+                target = prog.target if prog is not None else job["target"]
+                ask_total = sum(q for _, q in book.asks)
+                job["ask_total"], job["target"] = ask_total, target
+                gap = target - ask_total
+                if gap < 1.0:
+                    break                       # qualifies — done
+                if job["shares"] >= need - 0.5 and job["placed"] > 0:
+                    job["stop"] = ("rested the full gap already — the "
+                                   "book has not caught up yet")
                     break
                 bp = None
                 try:
@@ -1264,53 +1338,51 @@ class Monitor:
                 except Exception:  # noqa: BLE001
                     pass
                 if bp is not None and bp < self.QUALIFY_BP_FLOOR:
-                    stopped = (f"buying power is down to ${bp:,.2f} — "
-                               f"freeing some lets the wall grow")
+                    job["stop"] = (f"buying power down to ${bp:,.2f} — "
+                                   f"free some and tap again")
                     break
-                ask_qty = float(math.ceil(remaining))
-                r = fam.desk.place_resting(market, "SELL", px, ask_qty,
+                tick = book.tick or 0.01
+                px = round(math.floor(0.999 / tick + 1e-9) * tick, 3)
+                net = 0.0
+                try:
+                    net = (self.client.positions_net().get(market)
+                           or (0.0,))[0]
+                except Exception:  # noqa: BLE001
+                    pass
+                r = fam.desk.place_resting(market, "SELL", px,
+                                           float(math.ceil(gap)),
                                            net_position=net,
                                            initiator="owner", verify=False)
                 if not (r.ok and r.order_id):
-                    stopped = r.note
+                    job["stop"] = r.note
                     break
                 rested = self._rested_size(r.order_id)
                 if rested >= 1.0:
+                    zero_streak = 0
+                    job["placed"] += 1
+                    job["shares"] += rested
                     fam.orders[r.order_id] = FamilyOrder(
                         id=r.order_id, market=market, side="SELL",
                         price=(r.price or px), qty=rested, intent=r.intent,
                         placed_ts=time.time(), purpose="manual",
                         why="the owner's qualify-ask wall")
-                    rested_chunks.append(rested)
                 else:
-                    # never seen resting: it may still land late — say
-                    # so and stop, never re-post for the same shares
-                    stopped = ("an order did not show up resting — "
-                               "stopping this tap; check the book and "
-                               "tap again")
-                    break
-            got = sum(rested_chunks)
-            now_total = ask_total + got
-            if not rested_chunks:
-                return {"ok": False, "note":
-                        (stopped or "nothing rested") +
-                        f" — ask side still {now_total:,.0f} of "
-                        f"{target:,.0f}"}
-            n = len(rested_chunks)
-            note = (f"rested {n} order{'s' if n != 1 else ''} totalling "
-                    f"{got:,.0f} shares @ {px * 100:.1f}c — ask side now "
-                    f"{now_total:,.0f} of {target:,.0f}")
-            if now_total >= target:
-                note += " — QUALIFIES"
-            else:
-                note += (f"; {target - now_total:,.0f} still missing "
-                         f"(each order is trimmed to your free buying "
-                         f"power — tap again when more is free)")
-                if stopped:
-                    note += f" — stopped: {stopped}"
-            return {"ok": True, "note": note}
-        return {"ok": False,
-                "note": "no family knows this market — check the slug"}
+                    # never seen resting: it may still land late, so
+                    # never re-post for those shares — the next pass
+                    # reads the book and works from what is really there
+                    zero_streak += 1
+                    if zero_streak >= 3:
+                        job["stop"] = ("orders are not showing up resting "
+                                       "— check the book and tap again")
+                        break
+                    time.sleep(3.0)
+        except Exception as e:  # noqa: BLE001 — a run never kills the app
+            job["stop"] = f"{type(e).__name__}: {e}"
+        job["state"] = "done"
+        fam._log(event="qualify_wall", market=market,
+                 qty=round(job["shares"], 1),
+                 note=self._qualify_note(job)[:150])
+        return job
 
     def order_op(self, op: str, order_id: str, price: float | None = None,
                  pin: bool = False, qty: float | None = None) -> dict:
