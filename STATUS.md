@@ -1,6 +1,6 @@
 # Liquidity rewards — 3.0
 
-✅ Updated Aug 31, 05:23 AM ET — the app writes this file every hour.
+✅ Updated Aug 31, 05:29 AM ET — the app writes this file every hour.
 
 - **Politics**: about $532.12/day resting ($96.47 accrued today), 374 orders, $241.95 of $250 at risk.
 - **College football**: about $75.97/day resting ($13.39 accrued today), 192 orders, $83.06 of $100 at risk — includes holdings worth $46.63 at liquidation.
