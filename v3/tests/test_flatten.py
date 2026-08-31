@@ -627,6 +627,25 @@ class TestPayoutButton(unittest.TestCase):
         self.assertEqual(r3["new_rows"][0]["day"], d1)
 
 
+    def test_every_refresh_writes_the_csv(self):
+        # owner, 2026-08-31: Aug-29 posted while he tapped refresh, and
+        # the file stayed a day stale — the button consumed the
+        # new-postings diff without writing, so the watcher's instant
+        # write never fired. Any refresh must publish.
+        import datetime as dt
+        d0 = (dt.datetime.now(dt.timezone.utc)
+              - dt.timedelta(days=1)).strftime("%Y-%m-%d")
+        rows = [{"date": d0, "market": "m1", "program_type": "lp",
+                 "reward_usd": 4.0, "status": "PAID"}]
+        m = self.mon(rows)
+        wrote = []
+        m.publish_rewards_csv = lambda rows=None: wrote.append(rows) or True
+        m.refresh_rewards()
+        self.assertEqual(len(wrote), 1)
+        self.assertEqual(wrote[0], rows)      # its own rows, no refetch
+        m.refresh_rewards()                   # nothing new: still writes
+        self.assertEqual(len(wrote), 2)
+
     def test_family_actuals_assign_not_accumulate(self):
         # the estimates-ledger bug (owner yes, 2026-08-28): the 5-minute
         # rewards poll re-ADDED the same market-days into the per-family
