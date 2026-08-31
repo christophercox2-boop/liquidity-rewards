@@ -485,7 +485,6 @@ function dur(sec){
 function oTab(t){window._oTab=t;if(window._d)document.getElementById('view').innerHTML=render(window._d);}
 function orow(d,o){
  var e=(o.live_est!=null?o.live_est:o.est_day);
- var bid='bk_'+esc(o.id);
  var now=(d.now||0), age=o.placed_ts?now-o.placed_ts:null;
  var pf=o.live_pf, exp=null;
  if(pf!=null&&pf>0&&pf<1)exp=86400/(-Math.log(1-pf)); else if(pf!=null&&pf>=1)exp=3600;
@@ -495,8 +494,6 @@ function orow(d,o){
  if(exp!=null)facts.push('fill ~'+dur(exp)+(beaten?' \u00b7 outliving':''));
  var dp=odrop(o);
  return '<div class="orow">'
-  +'<div class="name" style="cursor:pointer;font-size:15px" onclick="showbook(\\''+esc(o.market)+'\\',\\''+bid+'\\')">'+nm(d,o.market)+'</div>'
-  +'<div id="'+bid+'"></div>'
   +'<div style="display:flex;gap:16px;align-items:baseline;margin:3px 0">'
   +'<span class="px">'+(o.side==='BUY'?'bid':'ask')+' '+pc(o.price)+'</span>'
   +'<span class="rt">'+(e==null?'\u2014':usd(e)+'/d')+'</span>'
@@ -506,6 +503,42 @@ function orow(d,o){
   +(dp!=null&&dp>0.05?'<div class="vrd'+(dp>=0.5?' warn':'')+'">\u25BC '+Math.round(dp*100)+'% off peak</div>':'')
   +'<div><button class="small" onclick="mv(\\''+esc(o.id)+'\\','+o.price+')">Move</button>'
   +'<button class="small off" onclick="cx(\\''+esc(o.id)+'\\')">Cancel</button></div>'
+  +'</div>';
+}
+function oest(o){return (o.live_est!=null?o.live_est:o.est_day)||0;}
+function mgroups(os){
+ // one row per MARKET, both sides added together (owner, 2026-08-31:
+ // "the orders daily estimate is only considering one side of the book
+ // and not adding them together"). A market's bid and ask each earn
+ // from their own side's pool, so the market's total is their sum.
+ var by={},seq=[];
+ os.forEach(function(o){
+  var m=o.market;
+  if(!by[m]){by[m]={m:m,os:[],est:0,peak:0,qty:0};seq.push(m);}
+  var g=by[m];g.os.push(o);g.est+=oest(o);g.peak+=(o.est_peak8||0);
+  g.qty+=(o.qty||0);
+ });
+ return seq.map(function(m){return by[m];});
+}
+function gdrop(g){
+ if(!(g.peak>0.02))return null;
+ return Math.max(0,(g.peak-g.est)/g.peak);
+}
+function mrow(d,g){
+ var bid='bk_'+esc(g.m);
+ var dp=gdrop(g);
+ var sides={};g.os.forEach(function(o){sides[o.side==='BUY'?'bid':'ask']=1;});
+ var sl=[];for(var s in sides)sl.push(s);
+ var body='';g.os.forEach(function(o){body+=orow(d,o);});
+ return '<div class="orow">'
+  +'<div class="name" style="cursor:pointer;font-size:15px" onclick="showbook(\\''+esc(g.m)+'\\',\\''+bid+'\\')">'+nm(d,g.m)+'</div>'
+  +'<div id="'+bid+'"></div>'
+  +'<div style="display:flex;gap:16px;align-items:baseline;margin:3px 0">'
+  +'<span class="rt" style="font-size:20px">'+usd(g.est)+'/d</span>'
+  +'<span class="muted">'+g.os.length+' order'+(g.os.length===1?'':'s')
+  +' \u00b7 '+sl.join('+')+'</span></div>'
+  +(dp!=null&&dp>0.05?'<div class="vrd'+(dp>=0.5?' warn':'')+'">\u25BC '+Math.round(dp*100)+'% off peak</div>':'')
+  +'<div style="margin-left:10px;border-left:2px solid rgba(255,255,255,0.08);padding-left:8px">'+body+'</div>'
   +'</div>';
 }
 function ordersTab(d){
@@ -518,23 +551,19 @@ function ordersTab(d){
  var any=false;
  fams(d).forEach(function(kv){
   var k=kv[0],s=kv[1];var os=(s.orders||[]);if(!os.length)return;any=true;
-  var byest=function(a,b){return ((b.live_est!=null?b.live_est:b.est_day)||0)-((a.live_est!=null?a.live_est:a.est_day)||0);};
-  var bydrop=function(a,b){var x=odrop(a),y=odrop(b);return (y==null?-1:y)-(x==null?-1:x);};
-  var cmp=srt==='drop'?bydrop:byest;
-  var earn=os.filter(function(o){return o.purpose!=='sell';}).sort(cmp);
-  var sell=os.filter(function(o){return o.purpose==='sell';}).sort(cmp);
-  var esum=0;earn.forEach(function(o){esum+=(o.live_est!=null?o.live_est:o.est_day)||0;});
-  var ssum=0;sell.forEach(function(o){ssum+=(o.live_est!=null?o.live_est:o.est_day)||0;});
+  var gs=mgroups(os);
+  var byest=function(a,b){return b.est-a.est;};
+  var bydrop=function(a,b){var x=gdrop(a),y=gdrop(b);return (y==null?-1:y)-(x==null?-1:x);};
+  gs.sort(srt==='drop'?bydrop:byest);
+  var tot=0;gs.forEach(function(g){tot+=g.est;});
   out+='<div class="card"><b>'+esc(s.name||k)+'</b>'
    +'<div class="kpi">'
    +'<div><div class="v">'+usd(s.earned_today||0)+'</div><div class="l">earned today</div></div>'
-   +'<div><div class="v">'+usd(esum+ssum)+'</div><div class="l">rate $/day</div></div>'
+   +'<div><div class="v">'+usd(tot)+'</div><div class="l">rate $/day</div></div>'
+   +'<div><div class="v">'+gs.length+'</div><div class="l">markets</div></div>'
    +'<div><div class="v">'+os.length+'</div><div class="l">orders</div></div>'
    +'</div>';
-  if(earn.length){var eb='';earn.forEach(function(o){eb+=orow(d,o);});
-   out+=fold('Earning','\u2014 '+earn.length+' \u00b7 '+usd(esum)+'/d',eb,true);}
-  if(sell.length){var sb='';sell.forEach(function(o){sb+=orow(d,o);});
-   out+=fold('Exits','\u2014 '+sell.length+' \u00b7 '+usd(ssum)+'/d',sb,false);}
+  gs.forEach(function(g){out+=mrow(d,g);});
   out+='</div>';
  });
  if(!any)out+='<div class="card muted">No resting orders.</div>';
