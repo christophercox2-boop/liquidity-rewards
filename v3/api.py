@@ -350,7 +350,7 @@ class Client:
                 try:
                     j = self.get(host + "/v1/incentives", signed=(host == TRADE_API),
                                  path="/v1/incentives",
-                                 params={"symbols": batch, "pageSize": 100}, timeout=20)
+                                 params={"symbols": batch, "page_size": 100}, timeout=20)
                     got = {}
                     for p in j.get("programs") or []:
                         s2 = p.get("marketSlug")
@@ -374,58 +374,69 @@ class Client:
             self._sleep(0.05)
         return out
 
-    def all_programs(self, max_pages: int = 200) -> tuple[list[dict], str]:
-        """Every market carrying a reward program, not just ones we can
-        already name.
+    def all_programs(self, max_pages: int = 400, page_size: int = 500,
+                     program_type: str = "liquidityProgram",
+                     statuses: tuple = ("active",)) -> tuple[list[dict], str]:
+        """Every market currently paying a liquidity program.
 
-        The families discover through events_by_tag with tag names we
-        chose, so the survey could only ever find what those tags return
-        — 300 markets out of the 67,569 the exchange says carry programs
-        (owner, 2026-08-31). This asks /v1/incentives with no symbols
-        filter and pages. Returns (rows, note); an empty list with a
-        note means the endpoint will not enumerate and the sampling
-        frame is whatever the tags give us, which is worth saying out
-        loud rather than calling it random.
+        The docs settle two things I had guessed wrong (owner supplied
+        them, 2026-08-31). Query parameters are snake_case and a
+        camelCase one is SILENTLY IGNORED — our pageSize was dropped
+        without an error, so a first page of defaults read like the
+        whole population. And pagination is page_token in, nextPageToken
+        out; the cursor names I tried do not exist, so it stopped after
+        one page with 500 of ~67,569 markets and reported success.
+
+        Returns (rows, note). Rows carry the exchange's own category,
+        subcategory, eventStartTime and instrumentProduct, so the survey
+        needs no per-market detail call to know what a market is or when
+        its event starts.
         """
         out: list[dict] = []
         seen: set[str] = set()
-        cursor = None
+        token = None
         for page in range(max_pages):
-            params: dict = {"pageSize": 500}
-            if cursor:
-                params["cursor"] = cursor
-            try:
-                for host in INCENTIVES_HOSTS:
-                    try:
-                        j = self.get(host + "/v1/incentives",
-                                     signed=(host == TRADE_API),
-                                     path="/v1/incentives", params=params,
-                                     timeout=25)
-                        break
-                    except ApiError:
-                        j = None
-                if not j:
-                    return out, f"no host answered on page {page}"
-            except Exception as e:  # noqa: BLE001
-                return out, f"{type(e).__name__} on page {page}"
+            params: dict = {"page_size": int(page_size)}
+            if token:
+                params["page_token"] = token
+            if program_type:
+                params["program_type"] = program_type
+            if statuses:
+                params["statuses"] = list(statuses)
+            j = None
+            for host in INCENTIVES_HOSTS:
+                try:
+                    j = self.get(host + "/v1/incentives",
+                                 signed=(host == TRADE_API),
+                                 path="/v1/incentives", params=params,
+                                 timeout=25)
+                    break
+                except ApiError:
+                    j = None
+            if j is None:
+                return out, (f"no host answered on page {page + 1}"
+                             if not out else
+                             f"stopped after {len(out):,} — page "
+                             f"{page + 1} failed")
             rows = j.get("programs") or []
-            if not rows:
-                return out, ("enumerated" if out else
-                             "endpoint returns nothing without a symbols "
-                             "filter — cannot enumerate")
-            fresh = 0
             for r in rows:
-                s = str(r.get("marketSlug") or "")
-                if s and s not in seen:
-                    seen.add(s)
+                s2 = str(r.get("marketSlug") or "")
+                if s2 and s2 not in seen:
+                    seen.add(s2)
                     out.append(r)
-                    fresh += 1
-            cursor = (j.get("nextCursor") or j.get("cursor")
-                      or (j.get("page") or {}).get("nextCursor"))
-            if not cursor or fresh == 0:
-                break
-            self._sleep(0.05)
-        return out, "enumerated"
+            token = j.get("nextPageToken")
+            if not token:
+                # a page exactly the size we asked for, with no token to
+                # follow, is the signature of the bug this replaces —
+                # never report that as a complete enumeration
+                if len(rows) >= page_size:
+                    return out, (f"stopped at {len(out):,} — a full page "
+                                 "with no nextPageToken, so pagination is "
+                                 "not understood")
+                return out, "enumerated"
+            self._sleep(0.2)          # these endpoints allow 5/second
+        return out, (f"stopped at the {max_pages}-page cap with "
+                     f"{len(out):,} markets and more to come")
 
     def earnings(self, start_date: str) -> list[dict]:
         """The published-payout ground truth, complete from start_date.

@@ -51,15 +51,53 @@ def is_live_event(market: dict, now: float,
                   buffer_s: float = LIVE_BUFFER_S) -> bool:
     """Is this market's event under way, or about to be?
 
-    A market with no gameStartTime has no in-play phase — a futures or
-    politics market trades the same way all day — so it is never live.
+    Reads eventStartTime, which the incentives listing carries on every
+    row, or gameStartTime from a market object — so the check costs no
+    extra call. A market with neither has no in-play phase: a futures or
+    politics market trades the same way all day, and is never live.
     """
     if not isinstance(market, dict):
         return False
-    start = _epoch(market.get("gameStartTime"))
+    start = _epoch(market.get("eventStartTime")
+                   or market.get("gameStartTime"))
     if start is None:
         return False
     return now >= start - buffer_s
+
+
+# The standing rule, and the reason a blind sampler needs one: it will
+# wander into everything the exchange lists (owner's scope rule, and
+# 2026-08-31: "at 67,569 markets a blind sampler will wander into
+# everything"). Matched against the exchange's own category and
+# subcategory rather than guessed from slugs.
+BANNED_CATEGORIES = ("econ", "economics", "economy", "macro", "inflation",
+                     "fed", "rates", "cpi")
+
+
+def category_banned(row: dict) -> bool:
+    for k in ("category", "subcategory"):
+        v = str(row.get(k) or "").strip().lower()
+        if v and any(b in v for b in BANNED_CATEGORIES):
+            return True
+    return False
+
+
+def group_of(row: dict) -> str:
+    """What to call a market's KIND on the leaderboard.
+
+    The exchange labels every incentives row with a category, a
+    subcategory and a product — "sports / basketball / moneyline" — which
+    beats the slug-prefix guess and is the discriminator for the weekly
+    game markets the prefix heuristic could never separate from futures
+    (owner, 2026-08-31). Falls back to the prefix when a row carries no
+    labels.
+    """
+    parts = [str(row.get(k) or "").strip().lower()
+             for k in ("category", "subcategory", "instrumentProduct")]
+    parts = [p for p in parts if p]
+    if parts:
+        return "/".join(parts)
+    return kind_of(str(row.get("marketSlug") or ""))
 
 # how far from the touch still carries real scoring weight. Past this the
 # discount factor has usually crushed a level's contribution to nothing.
@@ -284,12 +322,17 @@ class Sampler:
         self.cursor = 0
         self.passes = 0
 
-    def load(self, slugs) -> None:
-        """Group the population by prefix. Adding markets later keeps
-        the pools that are part-drawn, so a refresh does not restart the
+    def load(self, items) -> None:
+        """Group the population into strata. Takes plain slugs, or
+        (slug, group) pairs so the exchange's own category labels can be
+        the stratum instead of a slug prefix. Adding markets later keeps
+        pools that are part-drawn, so a refresh does not restart the
         sampling."""
-        for s in slugs:
-            k = kind_of(s)
+        for it in items:
+            if isinstance(it, (tuple, list)) and len(it) == 2:
+                s, k = str(it[0]), str(it[1])
+            else:
+                s, k = str(it), kind_of(str(it))
             bucket = self.all.setdefault(k, [])
             if s not in bucket:
                 bucket.append(s)
