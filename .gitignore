@@ -2,3 +2,4 @@ __pycache__/
 .venv/
 v3_state.json
 v2_state.json
+v3_floor.json

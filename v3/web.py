@@ -158,6 +158,13 @@ function post(body,cb){
   .then(function(r){return r.json();}).then(function(j){if(cb)cb(j);load();})
   .catch(function(){alert('unreachable');});
 }
+function bootCard(d){
+ var b=(d.boot||{});
+ return '<div class="card"><b>starting up</b>'
+  +'<div class="sub">'+esc(b.stage||'reading the board')+'</div>'
+  +'<div class="mtrack"><div class="mfill" style="width:'+(b.pct||5)+'%"></div></div>'
+  +'<div class="muted">The first pass after a restart reads the board before the pages fill in. This refreshes itself.</div></div>';
+}
 function fmtsz(q){if(q>=1e6)return (q/1e6).toFixed(1)+'M';if(q>=1e3)return (q/1e3).toFixed(1)+'k';return ''+Math.round(q);}
 function lvKey(){return encodeURIComponent(localStorage.getItem('dashKey')||'');}
 function lvBox(m,box,onclose){
@@ -414,6 +421,7 @@ def _shell(title: str, here: str, render_js: str, sub: str = "") -> str:
 STATUS_JS = """
 function bar(pct,col){return '<div class="mtrack"><div class="mfill" style="width:'+Math.min(100,Math.max(0,pct))+'%'+(col?';background:'+col:'')+'"></div></div>';}
 function render(d){
+ if(d.starting)return bootCard(d);
  var out='';
  var age=Math.max(0,Math.round(Date.now()/1000-(d.saved_at||0)));
  var bt=(d.boot||{});var btage=(Date.now()/1000)-(bt.ts||0);
@@ -588,6 +596,7 @@ function soldTab(d){
  return out;
 }
 function render(d){
+ if(d.starting)return bootCard(d);
  window._d=d;
  var t=window._oTab||'orders';
  var tabs=[['orders','Orders'],['walls','Walls'],['pos','Positions'],['sold','Sold']];
@@ -952,6 +961,7 @@ function mWin(sec){window._meterWin=sec;
  if(window._meterD){var el=document.getElementById('view');if(el)el.innerHTML=render(window._meterD);}}
 function render(d){
  window._meterD=d;
+ if(d.starting)return bootCard(d);
  var w=window._meterWin||0;
  var b=function(sec,label){return '<button class="'+((window._meterWin||0)===sec?'on':'')+'" onclick="mWin('+sec+')">'+label+'</button>';};
  var earned=0;
@@ -977,6 +987,7 @@ function taxLine(gross){
   +'</div></div>';
 }
 function render(d){
+ if(d.starting)return bootCard(d);
  var rows=(d.grades||[]);
  var pt=d.paid_total;
  if(!pt){var tot=0,nd=0;rows.forEach(function(r){if(r.actual!=null){tot+=r.actual;nd++;}});
@@ -1484,14 +1495,17 @@ class WebServer:
                         self._send(401, "application/json", b'{"error":"key required"}')
                         return
                     body = getattr(server.monitor, "payload_json", None)
-                    if body is None:
-                        try:      # first cycle still running: build live
-                            body = json.dumps(server.data_payload()).encode()
-                        except Exception as e:  # noqa: BLE001 — fail
-                            # VISIBLY, never drop the socket
-                            self._send(500, "application/json", json.dumps(
-                                {"error": f"{type(e).__name__}: {e}"}).encode())
-                            return
+                    if not body:
+                        # before the first cycle freezes one: a safe
+                        # boot snapshot, never a live-dict rebuild.
+                        # Never let this drop the socket — a bare page
+                        # beats "unreachable".
+                        try:
+                            body = server.monitor.boot_payload()
+                        except Exception:  # noqa: BLE001
+                            body = (b'{"starting": true, "summaries": {},'
+                                    b' "labels": {}}')
+
                     self._send(200, "application/json", body)
                     return
                 self._send(404, "text/plain", b"not found")
