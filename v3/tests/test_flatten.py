@@ -6136,113 +6136,129 @@ class TestSharedDictSnapshots(unittest.TestCase):
 
 
 class TestQualifyAskButton(unittest.TestCase):
-    """Owner, 2026-08-28: "Let me place the orders by hand. Just give
-    me a button to auto qualify the ask side." One tap rests a single
-    deep ask sized to close the gap to Target Size, through the
-    owner's hand rail — purpose "manual", automation never touches it."""
+    """Owner, 2026-08-28: "give me a button to auto qualify the ask
+    side." Owner, 2026-08-30: "keeps placing orders until the target
+    size is reached" — the run fills to Target Size in the background,
+    recomputing the gap from a fresh book on every pass."""
 
-    def _monitorish(self, r):
+    def _mon(self, r, trim=None):
         import types
         from v3.main import Monitor
-        m = types.SimpleNamespace(families={"politics": r.fam},
-                                  client=r.exchange, names=r.names,
-                                  QUALIFY_MAX_ORDERS=Monitor.QUALIFY_MAX_ORDERS,
-                                  QUALIFY_BP_FLOOR=Monitor.QUALIFY_BP_FLOOR)
-        m.owner_place = types.MethodType(Monitor.owner_place, m)
+        m = types.SimpleNamespace(
+            families={"politics": r.fam}, client=r.exchange, names=r.names,
+            QUALIFY_MAX_ORDERS=Monitor.QUALIFY_MAX_ORDERS,
+            QUALIFY_MAX_S=Monitor.QUALIFY_MAX_S,
+            QUALIFY_BP_FLOOR=Monitor.QUALIFY_BP_FLOOR,
+            QUALIFY_MAX_COLLATERAL=Monitor.QUALIFY_MAX_COLLATERAL,
+            _qualify_jobs={})
+        m._qualify_note = Monitor._qualify_note
         m._rested_size = types.MethodType(Monitor._rested_size, m)
+        m._qualify_run = types.MethodType(Monitor._qualify_run, m)
+        m.qualify_ask = types.MethodType(Monitor.qualify_ask, m)
+        # a real exchange puts our rested order INTO the book; the fake
+        # one must too, or the gap never closes
+        real = r.exchange.post
+        def trimming(url, body, path=None, **kw):
+                resp = real(url, body, path=path, **kw)
+                if url.endswith("/v1/orders"):
+                    from v3.scoring import Book
+                    live = r.exchange.live[resp["order"]["id"]]
+                    if trim is not None:
+                        live["size"] = min(live["size"], trim)
+                    b = r.exchange.books[body["marketSlug"]]
+                    asks = list(b.asks) + [(float(body["price"]["value"]),
+                                            live["size"])]
+                    r.exchange.books[body["marketSlug"]] = Book(
+                        bids=b.bids, asks=tuple(asks), tick=b.tick,
+                        fetched_at=b.fetched_at)
+                return resp
+        r.exchange.post = trimming
         return m
 
-    def test_untrimmed_first_order_closes_the_gap(self):
-        from v3.main import Monitor
-        from v3.scoring import Book
+    def _rig(self, asks=((0.40, 120.0), (0.50, 80.0))):
         from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
         r = Rig()
-        thin = Book(bids=((0.05, 10.0),), asks=((0.40, 120.0), (0.50, 80.0)),
-                    tick=0.01, fetched_at=r.now)
-        r.add_market(A, book=thin)
+        r.add_market(A, book=Book(bids=((0.05, 10.0),), asks=asks,
+                                  tick=0.01, fetched_at=1_000_000.0))
         r.cycle()
-        out = Monitor.qualify_ask(self._monitorish(r), A)
-        self.assertTrue(out["ok"], out.get("note"))
-        # gap = 5,000 target − 200 resting; the fake exchange never
-        # trims, so one 4,800-share ask closes it
-        placed = [o for o in r.fam.orders.values()
-                  if o.market == A and o.purpose == "manual"]
-        self.assertEqual(len(placed), 1)
-        self.assertEqual(placed[0].side, "SELL")
-        self.assertAlmostEqual(placed[0].price, 0.99)
-        self.assertAlmostEqual(placed[0].qty, 4800.0)
-        self.assertIn("QUALIFIES", out["note"])
+        return r, A
 
-    def test_trimmed_orders_stack_and_the_note_stays_honest(self):
-        # owner, 2026-08-28: "you have to make multiple orders. The
-        # sizes are limited because each one locks up a lot of buying
-        # power" — the live exchange trimmed a 9,996-share ask to
-        # 292.56 resting. Play that: every order rests at most 300.
-        from v3.main import Monitor
-        from v3.scoring import Book
-        from v3.tests.test_family import Rig, A
-        r = Rig()
-        thin = Book(bids=((0.05, 10.0),), asks=((0.40, 120.0), (0.50, 80.0)),
-                    tick=0.01, fetched_at=r.now)
-        r.add_market(A, book=thin)
-        r.cycle()
-        real_post = r.exchange.post
-        def trimming(url, body, path=None, **kw):
-            resp = real_post(url, body, path=path, **kw)
-            if url.endswith("/v1/orders"):
-                oid = resp["order"]["id"]
-                live = r.exchange.live[oid]
-                live["size"] = min(live["size"], 300.0)
-            return resp
-        r.exchange.post = trimming
-        out = Monitor.qualify_ask(self._monitorish(r), A)
-        self.assertTrue(out["ok"], out.get("note"))
-        placed = [o for o in r.fam.orders.values()
-                  if o.market == A and o.purpose == "manual"]
-        # six orders (the per-tap budget), each resting the trimmed 300
-        self.assertEqual(len(placed), 6)
-        self.assertTrue(all(abs(o.qty - 300.0) < 1e-9 for o in placed))
-        self.assertIn("1,800", out["note"])            # what rested
-        self.assertIn("2,000 of 5,000", out["note"])   # where the side is
-        self.assertIn("still missing", out["note"])
+    def test_run_keeps_placing_until_target_is_reached(self):
+        # every order is trimmed to 300 shares, yet the 5,000-share
+        # target still fills: each pass recomputes the gap from a
+        # fresh book
+        r, A = self._rig()
+        m = self._mon(r, trim=300.0)
+        self.assertTrue(m.qualify_ask(A)["ok"])
+        job = m._qualify_run(A, r.fam)
+        self.assertGreaterEqual(job["ask_total"], 5000.0)
+        self.assertGreater(job["placed"], 10)      # many orders, not 6
+        walls = [o for o in r.fam.orders.values()
+                 if o.market == A and o.purpose == "manual"]
+        self.assertEqual(len(walls), job["placed"])
+        self.assertTrue(all(abs(o.price - 0.99) < 1e-9 for o in walls))
 
-    def test_button_stops_under_the_buying_power_floor(self):
-        from v3.main import Monitor
-        from v3.scoring import Book
-        from v3.tests.test_family import Rig, A
-        r = Rig()
-        thin = Book(bids=((0.05, 10.0),), asks=((0.40, 120.0),),
-                    tick=0.01, fetched_at=r.now)
-        r.add_market(A, book=thin)
-        r.cycle()
+    def test_one_untrimmed_order_finishes_it(self):
+        r, A = self._rig()
+        m = self._mon(r)
+        m.qualify_ask(A)
+        job = m._qualify_run(A, r.fam)
+        self.assertEqual(job["placed"], 1)
+        self.assertEqual(job["stop"], "")
+
+    def test_stops_at_the_buying_power_floor(self):
+        r, A = self._rig()
+        m = self._mon(r, trim=300.0)
         r.exchange.buying_power = lambda: 5.0
-        before = len(r.fam.orders)
-        out = Monitor.qualify_ask(self._monitorish(r), A)
-        self.assertFalse(out["ok"])
-        self.assertIn("buying power", out["note"])
-        self.assertEqual(len(r.fam.orders), before)
+        m.qualify_ask(A)
+        job = m._qualify_run(A, r.fam)
+        self.assertIn("buying power", job["stop"])
+        self.assertEqual(job["placed"], 0)
 
     def test_button_refuses_when_the_side_already_qualifies(self):
-        from v3.main import Monitor
-        from v3.tests.test_family import Rig, A
-        r = Rig()
-        r.add_market(A)          # default book: 60,020 asks vs 5,000
-        r.cycle()
-        before = len(r.fam.orders)
-        out = Monitor.qualify_ask(self._monitorish(r), A)
+        r, A = self._rig(asks=((0.40, 120.0), (0.98, 60000.0)))
+        out = self._mon(r).qualify_ask(A)
         self.assertFalse(out["ok"])
         self.assertIn("already qualifies", out["note"])
-        self.assertEqual(len(r.fam.orders), before)
+
+    def test_button_refuses_over_the_collateral_cap(self):
+        from v3.tests.test_family import Rig, A
+        from v3.scoring import Book
+        r = Rig()
+        big = {"timePeriods": [{"programId": "politics_mid_1",
+                                "rewardPool": 100.0, "targetSize": 5_000_000,
+                                "discountFactor": 0.2, "status": "LIVE"}]}
+        r.add_market(A, book=Book(bids=((0.05, 10.0),),
+                                  asks=((0.40, 120.0),), tick=0.01,
+                                  fetched_at=1_000_000.0), prog=big)
+        r.cycle()
+        out = self._mon(r).qualify_ask(A)
+        self.assertFalse(out["ok"])
+        self.assertIn("$500", out["note"])
+
+    def test_a_second_tap_reports_progress_instead_of_starting_again(self):
+        # while a run is in flight, tapping again must report where it
+        # is — never launch a second run against the same market
+        r, A = self._rig()
+        m = self._mon(r, trim=300.0)
+        m._qualify_jobs[A] = {"state": "running", "placed": 4,
+                              "shares": 1200.0, "target": 5000.0,
+                              "started": 0.0, "stop": "",
+                              "ask_total": 1400.0}
+        before = len(r.exchange.live)
+        again = m.qualify_ask(A)
+        self.assertTrue(again["ok"])
+        self.assertIn("still going", again["note"])
+        self.assertIn("1,200 shares rested", again["note"])
+        self.assertEqual(len(r.exchange.live), before)   # nothing placed
 
     def test_button_refuses_without_terms(self):
-        from v3.main import Monitor
         from v3.tests.test_family import Rig
         r = Rig()
         r.add_market("vmc-x-unknown")
-        # discovered, but the incentives response never carries it —
-        # no terms on record, so the button cannot size a wall
         r.exchange.prog_raw.pop("vmc-x-unknown", None)
         r.cycle()
-        out = Monitor.qualify_ask(self._monitorish(r), "vmc-x-unknown")
+        out = self._mon(r).qualify_ask("vmc-x-unknown")
         self.assertFalse(out["ok"])
         self.assertIn("terms not read", out["note"])
