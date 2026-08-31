@@ -1765,3 +1765,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788151171.4,cfb,aachc-cfb-wins-2026-11-28-ucla-8pt5wins,SELL,0.01,0.02,earn,0.0249,11.44,,3,12,0,0.01,0.16,0.06,-0.01,joins the touch — the book has been quiet,C6HJJWK0EKDE
 1788153871.5,cfb,aachc-cfb-wins-2026-11-28-tx-10pt5wins,SELL,4,0.32,sell,0,0,,33,37,0.49,0.32,0.33,0.03,0,taker dump — sold into the bid (the carved exception),C6VYW9XKJKDF
 1788154111.5,politics,ussewc-usse-ar-2026-11-03-dem,SELL,1.72,0.13,earn,0.5776,0.53,0.017875,2,6,0.513,0.11,0.13,-0.1121,-21.72,1 tick behind the touch — we would hold 43% of the ask side,C6VHKZ9N6KDM
+1788158972.1,cfb,aachc-cfb-wins-2026-11-28-arz-6pt5wins,BUY,0.5,0.9,earn,4.9961,0.87,,90,97,0,0.87,0.95,-0.03,0.5,joins the touch — the book has been quiet,C6WDAA4CEKDF
