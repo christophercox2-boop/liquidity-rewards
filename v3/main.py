@@ -2151,7 +2151,8 @@ class Monitor:
             done += 1
             pool_side = (prog.daily_pool / max(prog.event_n, 1)) / 2.0
             for side in ("BUY", "SELL"):
-                st.record(sv.probe_side(book, prog, side, pool_side), now)
+                st.record(sv.probe_side(book, prog, side, pool_side),
+                          now, slug)
             self.client._sleep(0.05)
         self.survey_at = now
         return {"ok": True, "probed": done,
