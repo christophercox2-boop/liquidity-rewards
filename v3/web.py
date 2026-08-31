@@ -475,6 +475,7 @@ function odrop(o){
  if(pk<0.02)return null;
  return Math.max(0,(pk-cur)/pk);
 }
+function estAge(d){var a=(Date.now()/1000)-(d.now||0);return (a>0&&a<86400)?a:null;}
 function dur(sec){
  if(sec==null||!(sec>0))return null;
  if(sec<3600)return Math.round(sec/60)+'m';
@@ -512,6 +513,8 @@ function ordersTab(d){
  out+='<div class="tabs" style="margin-top:0">'
   +'<button class="'+(srt==='est'?'on':'')+'" onclick="oSort(\\'est\\')">$/day</button>'
   +'<button class="'+(srt==='drop'?'on':'')+'" onclick="oSort(\\'drop\\')">off peak</button></div>';
+ var ag=estAge(d);
+ if(ag!=null&&ag>60)out+='<div class="card vrd'+(ag>300?' warn':'')+'">rates as of '+dur(ag)+' ago</div>';
  var any=false;
  fams(d).forEach(function(kv){
   var k=kv[0],s=kv[1];var os=(s.orders||[]);if(!os.length)return;any=true;
