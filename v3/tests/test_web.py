@@ -208,9 +208,13 @@ class TestRedesign(unittest.TestCase):
     def test_nav_and_routes(self):
         from v3 import web
         labels = [l for l, _h in web.NAV]
+        # survey is its own tab, not a sub-page (owner, 2026-08-31:
+        # "Put it in its own tab, not a sub tab")
         self.assertEqual(labels,
                          ["quick look", "status", "orders", "pay",
-                          "log", "switch"])
+                          "survey", "log", "switch"])
+        self.assertEqual(web.PAGES["/survey"][3], "")
+        self.assertNotIn("svCard", web.ORDERS_JS)
         # plan and model keep their routes but are off the bar
         self.assertIn("/plan", web.PAGES)
         self.assertIn("/silver", web.PAGES)
