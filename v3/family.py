@@ -516,7 +516,9 @@ class Family:
         return w.get("kind") in cls.SALE_KINDS
 
     def _note_wind_down(self, slug: str, kind: str, qty: float,
-                        px: float, now: float, left: float = 0.0) -> None:
+                        px: float, now: float, left: float = 0.0,
+                        from_px: float | None = None,
+                        gain: float | None = None) -> None:
         """One line in the wind-down ledger: stock actually sold, a
         short's buy-back stepped toward filling, or an owner close-out.
         `left` is what remains of the position after it, so the report
@@ -524,12 +526,20 @@ class Family:
         repricing leaves the position exactly where it was, so it never
         counts as one however `left` was passed."""
         sale = kind in self.SALE_KINDS
-        self.wind_down.append({
+        row = {
             "ts": round(now, 1), "market": slug, "kind": kind,
             "qty": round(float(qty), 2), "px": round(float(px), 4),
             "usd": round(float(qty) * float(px), 2),
             "sale": sale,
-            "flat": sale and abs(float(left)) < 0.01})
+            "flat": sale and abs(float(left)) < 0.01}
+        # a repricing carries where it came from and what the model
+        # expects the move to add per day, so the report can say what
+        # was gained instead of listing the moves (owner, 2026-08-31)
+        if from_px is not None:
+            row["from_px"] = round(float(from_px), 4)
+        if gain is not None:
+            row["gain"] = round(float(gain), 4)
+        self.wind_down.append(row)
         del self.wind_down[:-400]
 
     def _charge(self, o) -> float:
@@ -2827,6 +2837,15 @@ class Family:
         if r.ok:
             self.orders.pop(rec.id, None)
             self.evidence.order_gone(rec.market, rec.id)
+            # the gain is already in hand: best_est is what the model
+            # scores the new slot at, cur_est what it was earning. The
+            # Sold tab reports the sum of these instead of one line per
+            # move (owner, 2026-08-31). best_est is measured at `best`,
+            # the target slot; the order rests at the gate's price.
+            self._note_wind_down(slug, "exit move", rec.qty, predicted,
+                                 now, left=(qty or rec.qty),
+                                 from_px=rec.price,
+                                 gain=best_est - cur_est)
             self._log(event="exit_moved", market=slug, price=rec.price,
                       qty=rec.qty,
                       note=f"a slot at {best:.2f} earns more — moving")
@@ -3621,12 +3640,32 @@ class Family:
                     if rr.ok:
                         self.orders.pop(worst.id, None)
                         self.evidence.order_gone(worst.market, worst.id)
+                        # what the step buys, scored the same way the
+                        # exit mover scores its own moves: the model's
+                        # estimate at the new price less what it was
+                        # earning where it sat (owner, 2026-08-31)
+                        gain_s = None
+                        prog_s, _ws = self._prog_row(slug)
+                        pool_s = (self._side_pool(slug, prog_s)
+                                  if prog_s is not None else None)
+                        if prog_s is not None and pool_s is not None:
+                            lv_s = [(p, q) for p, q in book.side("BUY")
+                                    if q > 1e-9]
+                            j_s = estimate_join(
+                                "BUY", lv_s, book.tick, float(prog_s.df),
+                                float(prog_s.target), step_pred, worst.qty)
+                            gain_s = ((j_s.share * pool_s
+                                       if j_s.qualifies and j_s.in_window
+                                       else 0.0)
+                                      - (worst.live_est or 0.0))
                         # the short is untouched by a repricing — pass
                         # what is really still open rather than letting
                         # left default to zero and read as "flat"
                         self._note_wind_down(slug, "short step-up",
                                              worst.qty, step_pred, now,
-                                             left=-qty)
+                                             left=-qty,
+                                             from_px=worst.price,
+                                             gain=gain_s)
                         self._log(event="dead_short_stepup", market=slug,
                                   price=worst.price, qty=worst.qty,
                                   note="buy-back never fills at "
@@ -4108,6 +4147,7 @@ class Family:
         sold_wk = [w for w in recent if self._wd_sale(w)]
         sold_day = [w for w in today_w if self._wd_sale(w)]
         moved_day = [w for w in today_w if not self._wd_sale(w)]
+        moved_4h = [w for w in moved_day if w["ts"] > now - 4 * 3600.0]
         summary["wind_down"] = {
             "day_n": len(sold_day),
             "day_usd": round(sum(w["usd"] for w in sold_day), 2),
@@ -4118,10 +4158,18 @@ class Family:
             "flat_day": sum(1 for w in sold_day if w["flat"]),
             "moves_n": len(moved_day),
             "moves_usd": round(sum(w["usd"] for w in moved_day), 2),
+            # the repricings collapse to one line: how many markets
+            # moved a price in the last four hours, and what the model
+            # says that added per day (owner, 2026-08-31)
+            "moves_4h_markets": len({w["market"] for w in moved_4h}),
+            "moves_4h_n": len(moved_4h),
+            "moves_4h_gain": round(sum(w.get("gain") or 0.0
+                                       for w in moved_4h), 4),
             "recent": [{"market": w["market"], "kind": w["kind"],
                         "qty": w["qty"], "px": w["px"],
                         "usd": round(w["usd"], 2), "ts": w["ts"],
                         "sale": self._wd_sale(w),
+                        "from_px": w.get("from_px"), "gain": w.get("gain"),
                         "flat": w["flat"] and self._wd_sale(w)}
                        for w in today_w[-12:]],
         }

@@ -285,6 +285,23 @@ class TestRedesign(unittest.TestCase):
         # and the count of what was hidden is still stated
         self.assertIn("qualifying order", web.ORDERS_JS)
 
+    def test_sold_tab_shows_sales_only_until_asked(self):
+        """Owner, 2026-08-31: "Most of the time I only want to see
+        sales ... Those price drops should be hidden from the list by
+        default, but I should be able to click a button and see them."
+        """
+        from v3 import web
+        # the list keeps a row only if it is a sale, or the button is on
+        self.assertIn("return r.sale!==false||window._showMoves;",
+                      web.ORDERS_JS)
+        self.assertIn("function oMoves()", web.ORDERS_JS)
+        # one line for the moves: markets, window, and what it added
+        self.assertIn("moved a price in the last 4h", web.ORDERS_JS)
+        self.assertIn("exits earning ", web.ORDERS_JS)
+        # small gains read in cents, not $0.03
+        self.assertIn("function perday(x)", web.ORDERS_JS)
+        self.assertIn("¢/day", web.ORDERS_JS)
+
     def test_status_drops_the_rotating_cards_for_a_percentage(self):
         from v3 import web
         self.assertNotIn("tchip", web.STATUS_JS)
