@@ -1778,3 +1778,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788177808.9,cfb,aachc-cfb-wins-2026-11-28-miss-9pt5wins,SELL,0.01,0.46,sell,0,0,,42,49,0.085,0.46,0.47,0,0,taker dump — sold into the bid (the carved exception),C71RW7YXJKDM
 1788177928.9,politics,enwc-usgubp-ri-2026-09-09-rep-elapel,BUY,20,0.9,manual,0,8.9,,89,94,0.334,0.9,0.91,-0.01,20,moved by the owner,C6SZZA258KDC
 1788178873.2,politics,enwc-ussep-de-2026-09-15-rep-johshu,SELL,11,0.14,sell,0,0,,13,17,0.431,0.14,0.15,0.01,2,taker dump — sold into the bid (the carved exception),C7211KKB4KDK
+1788180468.9,politics,ussewc-usse-ks-2026-11-03-dem,SELL,10,0.2,earn,0.136,31.34,0.171475,15,19,0.157,0.19,0.22,-0.0285,-10,1 tick in front of the touch — we would hold 21% of the ask side,C67FFY2J8KDJ
+1788181369.0,cfb,aachc-cfb-wins-2026-11-28-pitt-6pt5wins,SELL,0.01,0.83,sell,0,0,,73,84,0.348,0.83,0.85,-0.03,0,taker dump — sold into the bid (the carved exception),C72HHDM4WKDE
