@@ -197,6 +197,45 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class TestRedesign(unittest.TestCase):
+    """The 2026-08-31 redesign: quick look with sub-pages, slim status,
+    orders-first orders page, grades renamed pay with a tax reserve."""
+
+    def test_nav_and_routes(self):
+        from v3 import web
+        labels = [l for l, _h in web.NAV]
+        self.assertEqual(labels,
+                         ["quick look", "status", "orders", "pay",
+                          "log", "switch"])
+        # plan and model keep their routes but are off the bar
+        self.assertIn("/plan", web.PAGES)
+        self.assertIn("/silver", web.PAGES)
+        self.assertNotIn("plan", labels)
+        self.assertNotIn("model", labels)
+        # fills and watch hang under quick look
+        self.assertEqual(web.PAGES["/fills"][3], "quick")
+        self.assertEqual(web.PAGES["/watch"][3], "quick")
+        self.assertEqual(web.PAGES["/pay"][0], "Pay")
+
+    def test_orders_page_has_no_hand_place_form(self):
+        from v3 import web
+        self.assertNotIn("op:'place'", web.ORDERS_JS)
+        self.assertNotIn("Place an order by hand", web.ORDERS_JS)
+
+    def test_pay_page_reserves_22_percent(self):
+        from v3 import web
+        self.assertIn("0.22", web.PAY_JS)
+        self.assertIn("tax at 22%", web.PAY_JS)
+        # rows only after the button: the card reads window._rw, never
+        # the payload's stored last result
+        self.assertIn("var j=window._rw;", web.PAY_JS)
+
+    def test_status_drops_the_rotating_cards_for_a_percentage(self):
+        from v3 import web
+        self.assertNotIn("tchip", web.STATUS_JS)
+        self.assertIn("worth the budget", web.STATUS_JS)
+
+
 class TestPageScriptsParse(unittest.TestCase):
     """The grades page shipped with a raw apostrophe inside a JS string
     and every visitor got a permanent 'loading…' (2026-08-21). Every
@@ -210,7 +249,7 @@ class TestPageScriptsParse(unittest.TestCase):
         node = shutil.which("node")
         if not node:
             self.skipTest("node not available")
-        for route, (_title, _here, js) in web.PAGES.items():
+        for route, (_title, _here, js, _sub) in web.PAGES.items():
             with tempfile.NamedTemporaryFile("w", suffix=".js",
                                              delete=False) as f:
                 f.write(js + web._PLUMBING)
