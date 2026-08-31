@@ -1747,3 +1747,6 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788140901.2,politics,ussewc-usse-sd-2026-11-03-rep,SELL,1,0.99,sell,0,34.29,0.99245,93,97,0.769,0.95,0.96,0.0025,1,selling filled stock — it earns while it waits,C5VJKHA6GKDM
 1788140901.2,politics,ussewc-usse-sd-2026-11-03-rep,SELL,1,0.99,sell,0,13.57,0.99245,93,97,0.769,0.95,0.96,0.0025,0,selling filled stock — it earns while it waits,C6DAWDN3RKDC
 1788141381.3,politics,usgubewc-usgub-ny-2026-11-03-dem,SELL,11,0.98,sell,0,0.28,0.984775,94,98,0.674,0.96,0.97,0.0048,0,selling filled stock — it earns while it waits,C6RSS9266KDH
+1788142675.6,politics,usgubewc-usgub-ne-2026-11-03-dem,BUY,0.4,0.09,manual,0.6081,0.38,0.04015,6,8,0.864,0.06,0.15,0.0498,0.4,the owner's own order — the engine leaves it alone,C6S1VF6VTKDC
+1788143598.4,politics,usgubewc-usgub-ar-2026-11-03-rep,SELL,2,0.98,sell,0,0,0.998375,97,99,0.079,0.98,0.99,0.0184,0,taker dump — sold into the bid (the carved exception),C6SG8Y604KDH
+1788144438.5,politics,ussewc-usse-ar-2026-11-03-dem,SELL,20,0.07,earn,1.52,11.18,0.017875,1,4,0.216,0.09,0.1,-0.0521,-20,at the touch — a fill here is 5 ticks inside value (Silver + evidence),C6G93631JKDG
