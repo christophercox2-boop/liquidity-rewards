@@ -11,7 +11,9 @@ import unittest
 
 from v3.programs import Program
 from v3.scoring import Book
-from v3.survey import kind_of, probe_side, summarise, to_csv
+from v3.survey import (LIVE_BUFFER_S, PrefixStat, Sampler,
+                       is_live_event, kind_of, leaderboard,
+                       probe_side, summarise, to_csv)
 
 
 def book(bids, asks, tick=0.01):
@@ -102,6 +104,118 @@ class TestReport(unittest.TestCase):
         self.assertTrue(text.startswith("market,kind,side,"))
         self.assertEqual(len(text.strip().split("\n")), 2)
         self.assertNotIn("a,b", text)            # the comma was neutralised
+
+
+class TestLiveEvents(unittest.TestCase):
+    """Owner, 2026-08-31: "we'll probably want to stay out of live
+    events until I have a way of quoting them better." Re-checked every
+    pass, because a market that is quiet in the morning goes live at
+    kickoff."""
+
+    NOW = 1_788_200_000.0
+
+    def test_a_game_already_started_is_live(self):
+        self.assertTrue(is_live_event(
+            {"gameStartTime": self.NOW - 600}, self.NOW))
+
+    def test_the_hour_before_kickoff_is_live_too(self):
+        self.assertTrue(is_live_event(
+            {"gameStartTime": self.NOW + 600}, self.NOW))
+        self.assertFalse(is_live_event(
+            {"gameStartTime": self.NOW + LIVE_BUFFER_S + 60}, self.NOW))
+
+    def test_a_market_with_no_game_never_goes_live(self):
+        # futures and politics trade the same way all day
+        self.assertFalse(is_live_event({"slug": "x"}, self.NOW))
+        self.assertFalse(is_live_event({"gameStartTime": None}, self.NOW))
+        self.assertFalse(is_live_event({}, self.NOW))
+
+    def test_it_reads_the_exchanges_time_formats(self):
+        iso = "2026-09-01T00:00:00Z"
+        self.assertFalse(is_live_event({"gameStartTime": iso}, 1_788_100_000.0))
+        self.assertTrue(is_live_event({"gameStartTime": iso}, 1_788_300_000.0))
+        # milliseconds, as some feeds send
+        self.assertTrue(is_live_event(
+            {"gameStartTime": self.NOW * 1000}, self.NOW))
+        # junk is not a reason to skip a market
+        self.assertFalse(is_live_event({"gameStartTime": "soon"}, self.NOW))
+
+
+class TestSampling(unittest.TestCase):
+    """The guarantee he asked for: random within prefix, every prefix
+    gets its turn, seeded so a run can be audited."""
+
+    def pop(self):
+        return (["big-2026-01-01-%d" % i for i in range(200)]
+                + ["small-2026-01-01-%d" % i for i in range(3)])
+
+    def test_a_tiny_prefix_is_sampled_as_often_as_a_huge_one(self):
+        # uniform over MARKETS would draw 'small' about 1 time in 68
+        s = Sampler(seed=1)
+        s.load(self.pop())
+        got = s.next_batch(20)
+        n_small = sum(1 for x in got if x.startswith("small"))
+        self.assertGreaterEqual(n_small, 9, "round robin should alternate")
+
+    def test_the_draw_within_a_prefix_is_not_the_api_order(self):
+        s = Sampler(seed=7)
+        s.load(self.pop())
+        got = [x for x in s.next_batch(40) if x.startswith("big")]
+        in_order = ["big-2026-01-01-%d" % i for i in range(len(got))]
+        self.assertNotEqual(got, in_order)
+
+    def test_no_market_repeats_until_its_prefix_is_exhausted(self):
+        s = Sampler(seed=3)
+        s.load(["small-2026-01-01-%d" % i for i in range(3)])
+        first = s.next_batch(3)
+        self.assertEqual(len(set(first)), 3, "drew the same market twice")
+
+    def test_the_same_seed_reproduces_the_run(self):
+        a, b = Sampler(seed=42), Sampler(seed=42)
+        a.load(self.pop())
+        b.load(self.pop())
+        self.assertEqual(a.next_batch(25), b.next_batch(25))
+        c = Sampler(seed=43)
+        c.load(self.pop())
+        self.assertNotEqual(a.next_batch(25), c.next_batch(25))
+
+    def test_the_state_reports_the_seed_and_the_frame(self):
+        s = Sampler(seed=99)
+        s.load(self.pop())
+        st = s.state()
+        self.assertEqual(st["seed"], 99)
+        self.assertEqual(st["population"], 203)
+        self.assertEqual(st["prefixes"], 2)
+
+
+class TestLeaderboard(unittest.TestCase):
+    def probe(self, share, risk):
+        p = probe_side(book(bids=[(risk, 50.0)], asks=[]),
+                       Program(pool=1.0, target=1.0, df=0.5, event_n=1),
+                       "BUY", 1.0)
+        p.share, p.risk_usd, p.qualifies = share, risk, True
+        return p
+
+    def test_a_prefix_is_not_ranked_on_too_few_samples(self):
+        st = PrefixStat(prefix="lucky")
+        st.record(self.probe(0.14, 0.47), 1000.0)     # the AFC South outlier
+        out = leaderboard({"lucky": st}, min_samples=12)
+        self.assertEqual(out["ranked"], [])
+        self.assertEqual(out["sampling"][0]["prefix"], "lucky")
+
+    def test_ranking_uses_the_median_not_the_max(self):
+        st = PrefixStat(prefix="mixed")
+        for _ in range(14):
+            st.record(self.probe(0.0001, 0.5), 1000.0)   # mostly awful
+        st.record(self.probe(0.90, 0.01), 1000.0)        # one jackpot
+        row = leaderboard({"mixed": st}, min_samples=12)["ranked"][0]
+        self.assertLess(row["median_spd"], 1.0, "a single outlier won")
+
+    def test_old_samples_fall_out_of_the_window(self):
+        st = PrefixStat(prefix="drifty")
+        for _ in range(PrefixStat.KEEP + 30):
+            st.record(self.probe(0.5, 0.5), 1000.0)
+        self.assertEqual(len(st.spd), PrefixStat.KEEP)
 
 
 if __name__ == "__main__":
