@@ -1899,3 +1899,10 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788238453.6,politics,ussewc-usse-il-2026-11-03-dem,BUY,9,0.98,earn,0.8916,7.08,0.995725,98,99,0.048,0.98,0.99,-0.0157,9,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C7A2G4RXPKDG
 1788238573.6,cfb,aachc-cfb-wins-2026-11-28-nw-7pt5wins,SELL,1,0.27,sell,0,0,,25,32,0.02,0.27,0.28,0.01,0,taker dump — sold into the bid (the carved exception),C7G6VJ1NTKDC
 1788238633.7,politics,usgubewc-usgub-ok-2026-11-03-rep,BUY,10,0.93,earn,1.1089,24.86,0.940725,93,98,0.084,0.87,0.92,-0.0107,10,at the touch — a fill here is 1 ticks inside value (Silver + evidence),C6TTHY5PCKDF
+1788240493.8,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.47,sell,0,0,0.5,47,50,0.698,0.47,0.48,0.03,0,taker dump — sold into the bid (the carved exception),C7GPE57EAKDM
+1788240973.8,politics,ewc-usp-2028-11-07-gavnew,BUY,1,0.13,manual,3.4419,17.62,,12,15,0.662,0.13,0.14,-0.01,77,the owner's own order — the engine leaves it alone,C71M8DYREKDE
+1788241153.8,politics,ewc-usp-2028-11-07-gavnew,BUY,3,0.13,manual,3.3443,17.67,,12,15,0.736,0.13,0.14,0,80,the owner's own order — the engine leaves it alone,C71M8DYREKDE
+1788241453.8,politics,ewc-usp-2028-11-07-gavnew,BUY,4,0.13,manual,3.3135,17.76,,11,14,0.784,0.13,0.14,0,84,the owner's own order — the engine leaves it alone,C71M8DYREKDE
+1788241573.8,politics,ewc-usp-2028-11-07-gavnew,BUY,1,0.13,manual,3.2631,17.79,,11,14,0.817,0.13,0.14,0.01,85,the owner's own order — the engine leaves it alone,C71M8DYREKDE
+1788241633.8,politics,ewc-usp-2028-11-07-gavnew,BUY,10,0.13,manual,3.2484,17.81,,11,14,0.841,0.13,0.14,0.01,95,the owner's own order — the engine leaves it alone,C71M8DYREKDE
+1788242233.8,cfb,aachc-cfb-wins-2026-11-28-tx-10pt5wins,SELL,1,0.32,sell,0,0,,32,37,0.375,0.32,0.33,0.02,3,taker dump — sold into the bid (the carved exception),C7GZ2E522KDN
