@@ -1877,3 +1877,13 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788229489.0,politics,usgubewc-usgub-mn-2026-11-03-rep,SELL,1,0.08,earn,0.5471,0.13,0.00635,3,8,0.548,0.07,0.08,-0.0737,-6,1 tick in front of the touch — we would hold 9% of the ask side,C7E0WKVT4KDM
 1788229549.0,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,20,0.95,earn,0.2928,1.15,0.984775,94,97,0.796,0.94,0.97,-0.0348,66,1 tick behind the touch — we would hold 5% of the bid side,C7D448ZJMKDM
 1788230029.0,cfb,aachc-cfb-wins-2026-11-28-wvir-7pt5wins,SELL,1,0.32,sell,0,1.15,,20,32,0.053,0.01,0.02,-0.05,0,selling filled stock — it earns while it waits,C7D7K3Y88KDM
+1788231829.1,cfb,aachc-cfb-wins-2026-11-28-nd-8pt5wins,SELL,1,0.96,sell,0,0,,89,96,0.444,0.96,0.97,-0.03,0,taker dump — sold into the bid (the carved exception),C7EHD34C4KDN
+1788232189.1,politics,ewc-usp-2028-11-07-stasmi,SELL,10,0.02,manual,0.036,15.18,,1,3,0,0.01,0.02,0,-10,the owner's own order — the engine leaves it alone,C6ZVJGWSCKDK
+1788232609.2,politics,ussewc-usse-ky-2026-11-03-rep,SELL,20,0.99,sell,0,12.12,0.9969,93,97,0.604,0.94,0.95,0.0069,0,selling filled stock — it earns while it waits,C74BX1P0JKDF
+1788233029.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,BUY,4.58,0.12,manual,0.0022,4.24,,18,20,0.891,0.13,0.16,-0.07,153.58,the owner's own order — the engine leaves it alone,C7BAC04AAKDD
+1788233029.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,BUY,22.59,0.18,manual,7.5905,4.22,,18,20,0.891,0.13,0.16,-0.01,176.17,the owner's own order — the engine leaves it alone,C7BAHM1YAKDE
+1788233029.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,BUY,100,0.18,manual,0,0.02,,18,20,0.891,0.13,0.16,-0.01,276.17,the owner's own order — the engine leaves it alone,C7EV80766KDM
+1788233089.2,politics,ussewc-usse-ks-2026-11-03-dem,SELL,10,0.26,earn,5.2083,0.07,0.171475,18,22,0.602,0.23,0.32,-0.0885,-22,1 tick behind the touch — we would hold 50% of the ask side,C7ERWQQQWKDK
+1788233149.2,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.47,sell,0,0,0.5,47,50,0.706,0.47,0.48,0.03,0,taker dump — sold into the bid (the carved exception),C7EWRPYV8KDF
+1788234049.3,politics,ussewc-usse-ky-2026-11-03-dem,BUY,18,0.1,manual,2.5619,0.4,0.0031,1,5,0.676,0.09,0.16,0.0969,18,the owner's own order — the engine leaves it alone,C7ERA68YTKDM
+1788234649.3,politics,usgubewc-usgub-vt-2026-11-03-rep,BUY,12,0.9,manual,0.6376,15.87,0.9056,87,92,0.064,0.71,0.91,-0.0056,12,the owner's own order — the engine leaves it alone,C6ZGSEMVWKDK
