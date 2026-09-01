@@ -807,6 +807,7 @@ class Monitor:
         self.survey_frame_note = ""
         self.survey_meta: dict = {}
         self.survey_event_n: dict = {}
+        self.cancel_jobs: list = []
         self.rw_last: dict | None = None      # latest payout-check result
         self._rw_at = 0.0
         self._lock = threading.Lock()
@@ -988,6 +989,7 @@ class Monitor:
                                 if k in st.__dict__})
             self.survey_stats[pref] = st
         self.survey_frame_note = str(saved.get("survey_frame") or "")
+        self.cancel_jobs = list(saved.get("cancel_jobs") or [])
         self.actuals_by_day = dict(saved.get("actuals_by_day") or {})
         self.actuals_by_fam = dict(saved.get("actuals_by_fam") or {})
         self.owner_fairs = {k: float(v) for k, v in
@@ -1069,6 +1071,7 @@ class Monitor:
             "rewards_seen": self.rewards_seen,
             "paid_seen": self.paid_seen,
             "mkt_claim_day": self.mkt_claim_day,
+            "cancel_jobs": list(getattr(self, "cancel_jobs", [])),
             "survey_stats": {p: st.__dict__ for p, st
                              in list(self.survey_stats.items())[:200]},
             "survey_frame": self.survey_frame_note,
@@ -2185,6 +2188,66 @@ class Monitor:
         out["at"] = round(getattr(self, "survey_at", 0.0), 1)
         return out
 
+    def schedule_cancel(self, match: str, at_ts: float, note: str = "") -> dict:
+        """Cancel every resting order whose market contains `match`, at
+        `at_ts`. One shot, then it forgets.
+
+        Owner, 2026-09-01, on the Massachusetts primary resolving today:
+        "set them to cancel by noon eastern time". This is the ONLY path
+        that touches his hand-placed orders — the engine itself never
+        does (2026-08-22: "Don't let it cancel orders I set by hand"),
+        so it runs as initiator "owner", names him in the audit line,
+        and covers exactly the markets he named and no others.
+        """
+        if not match:
+            return {"ok": False, "note": "no market pattern given"}
+        self.cancel_jobs = [j for j in getattr(self, "cancel_jobs", [])
+                            if j.get("match") != match]
+        self.cancel_jobs.append({"match": match, "at": float(at_ts),
+                                 "note": note, "set_at": time.time()})
+        left = (at_ts - time.time()) / 3600.0
+        return {"ok": True, "note": f"scheduled: cancel every resting order "
+                f"in markets matching '{match}' in {left:.1f}h"}
+
+    def clear_cancel(self, match: str = "") -> dict:
+        jobs = getattr(self, "cancel_jobs", [])
+        before = len(jobs)
+        self.cancel_jobs = [j for j in jobs
+                            if match and j.get("match") != match]
+        return {"ok": True, "note": f"cleared {before - len(self.cancel_jobs)} "
+                f"scheduled cancel(s)"}
+
+    def _run_due_cancels(self, now: float) -> None:
+        """Fire any scheduled cancel that has come due."""
+        jobs = getattr(self, "cancel_jobs", None)
+        if not jobs:
+            return
+        for job in list(jobs):
+            if now < job.get("at", 0.0):
+                continue
+            match = str(job.get("match") or "")
+            done = failed = 0
+            for fam in self.families.values():
+                for o in list(fam.orders.values()):
+                    if match not in o.market:
+                        continue
+                    r = fam.desk.cancel(o.id, o.market, initiator="owner")
+                    if r.ok:
+                        fam.orders.pop(o.id, None)
+                        fam.evidence.order_gone(o.market, o.id)
+                        done += 1
+                    else:
+                        failed += 1
+            # one shot: gone whether or not every cancel landed, so a
+            # market that keeps refusing cannot loop for ever. What is
+            # left is reported, and he can schedule another.
+            self.cancel_jobs = [j for j in self.cancel_jobs if j is not job]
+            line = (f"scheduled cancel fired for '{match}': {done} cancelled"
+                    + (f", {failed} refused" if failed else ""))
+            self._note(line)
+            self.alerts.notify("Scheduled cancel ran", line
+                               + (f" — {job['note']}" if job.get("note") else ""))
+
     def _tick_probe(self) -> None:
         """Ask the exchange what price grid a market actually has, and
         write down what it answers.
@@ -2873,6 +2936,9 @@ class Monitor:
         d["boot"] = dict(self.boot_stage or {})
         # the last market survey's per-kind summary. Copied, not shared,
         # and only the summary — the full rows live in data/survey.csv.
+        cj = [dict(j) for j in getattr(self, "cancel_jobs", [])]
+        if cj:
+            d["cancel_jobs"] = cj
         try:
             d["survey"] = self.survey_view()
         except Exception:  # noqa: BLE001 — the payload never dies for research
@@ -3123,6 +3189,10 @@ class Monitor:
             except ApiError as e:
                 self._note(f"{key}: {e}")
                 summaries[key] = {"name": fam.cfg.name, "error": str(e)[:120]}
+        try:
+            self._run_due_cancels(now)
+        except Exception as e:  # noqa: BLE001 — never breaks the cycle
+            self._note(f"scheduled cancel: {type(e).__name__}: {e}")
         # the survey rides at the BACK of the cycle, after every family
         # has been managed, and never on the boot cycle — it is research,
         # and the money comes first (owner, 2026-08-31)

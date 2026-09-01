@@ -569,8 +569,28 @@ function mrow(d,g){
   +'<div style="margin-left:10px;border-left:2px solid rgba(255,255,255,0.08);padding-left:8px">'+body+'</div>'
   +'</details>';
 }
+function cancelBanner(d){
+ // a pending scheduled cancel is money-affecting and time-boxed, so it
+ // is stated at the top of the orders page with a way to call it off
+ var cj=d.cancel_jobs||[];
+ if(!cj.length)return '';
+ var out='';
+ cj.forEach(function(j){
+  var left=((j.at||0)-(Date.now()/1000))/3600;
+  out+='<div class="card"><b>Scheduled cancel</b>'
+   +'<div class="vrd warn">every resting order matching <code>'+esc(j.match)+'</code>'
+   +' will be cancelled '+(left>0?('in '+left.toFixed(1)+'h'):'on the next cycle')+'</div>'
+   +(j.note?'<div class="muted">'+esc(j.note)+'</div>':'')
+   +'<div><button class="small off" onclick="clrCancel(\\''+esc(j.match)+'\\')">Call it off</button></div></div>';
+ });
+ return out;
+}
+function clrCancel(m){
+ if(!confirm('Call off the scheduled cancel for '+m+'? Your orders stay resting.'))return;
+ post({op:'clear_cancel',match:m},function(j){alert(j.note||'done');});
+}
 function ordersTab(d){
- var srt=window._ordSort||'est';var out='';
+ var srt=window._ordSort||'est';var out=cancelBanner(d);
  out+='<div class="tabs" style="margin-top:0">'
   +'<button class="'+(srt==='est'?'on':'')+'" onclick="oSort(\\'est\\')">$/day</button>'
   +'<button class="'+(srt==='drop'?'on':'')+'" onclick="oSort(\\'drop\\')">off peak</button></div>';
@@ -1550,6 +1570,12 @@ class WebServer:
                                                      str(body.get("which") or "master"))}
         if op == "refresh_rewards":
             return self.monitor.refresh_rewards()
+        if op == "schedule_cancel":
+            return self.monitor.schedule_cancel(
+                str(body.get("match") or ""), float(body.get("at") or 0),
+                str(body.get("note") or ""))
+        if op == "clear_cancel":
+            return self.monitor.clear_cancel(str(body.get("match") or ""))
         if op == "place":
             return self.monitor.owner_place(
                 str(body.get("market") or ""), str(body.get("side") or ""),

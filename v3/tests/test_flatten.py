@@ -2083,6 +2083,80 @@ class TestTakerDump(unittest.TestCase):
         self.assertFalse([e for e in r.fam.log if e.get("event") == "dump"])
 
 
+class TestScheduledCancel(unittest.TestCase):
+    """Owner, 2026-09-01, with the Massachusetts primary resolving that
+    day: "set them to cancel by noon eastern time". The only path that
+    touches his hand-placed orders, so it must fire once, at the time
+    he said, and reach nothing he did not name."""
+
+    def rig(self):
+        from v3.tests.test_family import Rig
+        from v3.main import Monitor
+        m = Monitor.__new__(Monitor)
+        m.cancel_jobs = []
+        m.families = {}
+        m.alerts = type("A", (), {"notify": lambda *a, **k: None})()
+        m._note = lambda msg: m.__dict__.setdefault("notes", []).append(msg)
+        return m, Rig
+
+    def test_it_does_not_fire_before_its_time(self):
+        m, Rig = self.rig()
+        r = Rig()
+        m.families = {"politics": r.fam}
+        m.schedule_cancel("mov-ma-dem", 5000.0, "the primary resolves")
+        m._run_due_cancels(4999.0)
+        self.assertEqual(len(m.cancel_jobs), 1, "fired early")
+
+    def test_it_cancels_only_the_markets_named(self):
+        from v3.tests.test_family import Rig, A, B
+        m, _ = self.rig()
+        r = Rig()
+        r.add_market(A)
+        r.add_market(B)
+        m.families = {"politics": r.fam}
+        from v3.family import FamilyOrder
+        from v3.intents import BUY_LONG
+        for oid, mkt in (("keep", A), ("kill", B)):
+            r.fam.orders[oid] = FamilyOrder(
+                id=oid, market=mkt, side="BUY", price=0.10, qty=5.0,
+                intent=BUY_LONG, placed_ts=0.0, purpose="manual",
+                why="the owner's own order")
+        m.schedule_cancel(B, 100.0)
+        m._run_due_cancels(200.0)
+        self.assertIn("keep", r.fam.orders)
+        self.assertNotIn("kill", r.fam.orders)
+
+    def test_it_fires_once_and_forgets(self):
+        m, _ = self.rig()
+        from v3.tests.test_family import Rig, A
+        r = Rig()
+        r.add_market(A)
+        m.families = {"politics": r.fam}
+        m.schedule_cancel(A, 100.0)
+        m._run_due_cancels(200.0)
+        self.assertEqual(m.cancel_jobs, [], "job survived its own firing")
+        m._run_due_cancels(300.0)          # must be harmless
+
+    def test_calling_it_off_removes_it(self):
+        m, _ = self.rig()
+        m.schedule_cancel("mov-ma-dem", 9e9)
+        self.assertEqual(len(m.cancel_jobs), 1)
+        m.clear_cancel("mov-ma-dem")
+        self.assertEqual(m.cancel_jobs, [])
+
+    def test_scheduling_the_same_pattern_twice_does_not_stack(self):
+        m, _ = self.rig()
+        m.schedule_cancel("mov-ma-dem", 9e9)
+        m.schedule_cancel("mov-ma-dem", 9e8)
+        self.assertEqual(len(m.cancel_jobs), 1)
+        self.assertEqual(m.cancel_jobs[0]["at"], 9e8)
+
+    def test_an_empty_pattern_is_refused(self):
+        m, _ = self.rig()
+        self.assertFalse(m.schedule_cancel("", 9e9)["ok"])
+        self.assertEqual(m.cancel_jobs, [])
+
+
 class TestWindDownLedger(unittest.TestCase):
     """Owner, 2026-08-31 ("you can fix so there is a more clear
     answer"): position counts cannot tell a sale from a fill. Every
