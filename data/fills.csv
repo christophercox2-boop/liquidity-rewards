@@ -1913,3 +1913,4 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788261075.7,politics,ewc-usp-2028-11-07-gavnew,BUY,16.29,0.13,manual,3.2764,23.21,,,,0.846,,,,111.29,the owner's own order — the engine leaves it alone,C71M8DYREKDE
 1788261075.7,politics,ussewc-usse-il-2026-11-03-dem,BUY,7,0.98,earn,0.3557,13.37,0.995725,,,0.439,,,-0.0157,20,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C7A2G4RXPKDG
 1788261075.7,politics,ussewc-usse-co-2026-11-03-rep,BUY,0.05,0.06,manual,0.5694,10.62,0.004475,,,0.65,,,0.0555,-19.95,the owner's own order — the engine leaves it alone,C7CHKVHGTKDM
+1788263947.7,politics,ewc-usse-oh-2026-11-03-rep,BUY,10,0.66,sell,24.9999,0.23,0.3851,40,47,0.08,0.51,0.67,0.2749,0,buying back the short at or under what it sold for — the bid earns while it wait,C7P9SSH88MA6
