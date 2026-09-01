@@ -6161,6 +6161,7 @@ date,market,program_type,reward_usd,status
 2026-08-30,aachc-cfb-wins-2026-11-28-ark-1pt5wins,liquidityProgram,0.02,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-ark-2pt5wins,liquidityProgram,0.09,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-ark-5pt5wins,liquidityProgram,0.08,PENDING
+2026-08-30,aachc-cfb-wins-2026-11-28-arz-6pt5wins,liquidityProgram,0.13,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-arz-8pt5wins,liquidityProgram,0.01,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-arzst-6pt5wins,liquidityProgram,0.47,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-aubrn-5pt5wins,liquidityProgram,0.06,PENDING
@@ -6230,6 +6231,7 @@ date,market,program_type,reward_usd,status
 2026-08-30,aachc-cfb-wins-2026-11-28-miss-5pt5wins,liquidityProgram,0.38,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-missr-5pt5wins,liquidityProgram,0.19,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-mspst-4pt5wins,liquidityProgram,1.4,PENDING
+2026-08-30,aachc-cfb-wins-2026-11-28-mspst-6pt5wins,liquidityProgram,0.37,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-mst-3pt5wins,liquidityProgram,0.11,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-mst-4pt5wins,liquidityProgram,0.02,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-mst-5pt5wins,liquidityProgram,0.95,PENDING
@@ -6288,6 +6290,7 @@ date,market,program_type,reward_usd,status
 2026-08-30,aachc-cfb-wins-2026-11-28-uk-5pt5wins,liquidityProgram,0.35,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-uk-6pt5wins,liquidityProgram,0.01,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-usc-6pt5wins,liquidityProgram,0.02,PENDING
+2026-08-30,aachc-cfb-wins-2026-11-28-utah-10pt5wins,liquidityProgram,0.84,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-utah-6pt5wins,liquidityProgram,0.35,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-utahst-3pt5wins,liquidityProgram,0.59,PENDING
 2026-08-30,aachc-cfb-wins-2026-11-28-utahst-6pt5wins,liquidityProgram,0.16,PENDING
@@ -6311,7 +6314,7 @@ date,market,program_type,reward_usd,status
 2026-08-30,aachc-cfb-wins-2026-11-28-wvir-6pt5wins,liquidityProgram,0.02,PENDING
 2026-08-30,aachc-cfb-wins-ou-2026-11-28-stan,liquidityProgram,0.05,PENDING
 2026-08-30,apdc-jerpowgov-2026-12-31,liquidityProgram,0.1,PENDING
-2026-08-30,enwc-usgubp-ri-2026-09-09-dem-danmck,liquidityProgram,0.01,PENDING
+2026-08-30,enwc-usgubp-ri-2026-09-09-dem-danmck,liquidityProgram,0.2,PENDING
 2026-08-30,enwc-usgubp-ri-2026-09-09-rep-aarguc,liquidityProgram,0.57,PENDING
 2026-08-30,enwc-usgubp-ri-2026-09-09-rep-elapel,liquidityProgram,0.25,PENDING
 2026-08-30,enwc-uspres-nom-dem-2028-andbes,liquidityProgram,0.18,PENDING
@@ -6383,6 +6386,7 @@ date,market,program_type,reward_usd,status
 2026-08-30,usgubewc-usgub-mn-2026-11-03-rep,liquidityProgram,0.03,PENDING
 2026-08-30,usgubewc-usgub-ne-2026-11-03-dem,liquidityProgram,3.77,PENDING
 2026-08-30,usgubewc-usgub-ne-2026-11-03-rep,liquidityProgram,2.25,PENDING
+2026-08-30,usgubewc-usgub-nh-2026-11-03-rep,liquidityProgram,3.67,PENDING
 2026-08-30,usgubewc-usgub-nm-2026-11-03-dem,liquidityProgram,1.57,PENDING
 2026-08-30,usgubewc-usgub-nm-2026-11-03-rep,liquidityProgram,0.55,PENDING
 2026-08-30,usgubewc-usgub-ny-2026-11-03-dem,liquidityProgram,0.6,PENDING
@@ -6423,6 +6427,7 @@ date,market,program_type,reward_usd,status
 2026-08-30,ussewc-usse-ky-2026-11-03-rep,liquidityProgram,0.07,PENDING
 2026-08-30,ussewc-usse-la-2026-11-03-dem,liquidityProgram,0.39,PENDING
 2026-08-30,ussewc-usse-ma-2026-11-03-dem,liquidityProgram,3.09,PENDING
+2026-08-30,ussewc-usse-ma-2026-11-03-rep,liquidityProgram,0.89,PENDING
 2026-08-30,ussewc-usse-ms-2026-11-03-dem,liquidityProgram,0.01,PENDING
 2026-08-30,ussewc-usse-ms-2026-11-03-rep,liquidityProgram,0.61,PENDING
 2026-08-30,ussewc-usse-mt-2026-11-03-dem,liquidityProgram,0.06,PENDING
@@ -6444,12 +6449,12 @@ date,market,program_type,reward_usd,status
 2026-08-30,ussewc-usse-wy-2026-11-03-dem,liquidityProgram,0.91,PENDING
 2026-08-30,ussewc-usse-wy-2026-11-03-rep,liquidityProgram,0.01,PENDING
 2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-mar0-5,liquidityProgram,10.83,PENDING
-2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-mar10-15,liquidityProgram,0.4,PENDING
+2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-mar10-15,liquidityProgram,9.09,PENDING
 2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,liquidityProgram,18.29,PENDING
 2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-mar20-25,liquidityProgram,22.92,PENDING
 2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,liquidityProgram,13.7,PENDING
 2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-mar30-35,liquidityProgram,19.91,PENDING
 2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-mar35-40,liquidityProgram,7.29,PENDING
-2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-mar5-10,liquidityProgram,0.27,PENDING
+2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-mar5-10,liquidityProgram,9.02,PENDING
 2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-margte40,liquidityProgram,40.64,PENDING
 2026-08-30,vmc-ussep-mov-ma-dem-2026-09-01-mou0-5,liquidityProgram,10.32,PENDING
