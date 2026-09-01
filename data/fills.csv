@@ -1906,3 +1906,10 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788241573.8,politics,ewc-usp-2028-11-07-gavnew,BUY,1,0.13,manual,3.2631,17.79,,11,14,0.817,0.13,0.14,0.01,85,the owner's own order — the engine leaves it alone,C71M8DYREKDE
 1788241633.8,politics,ewc-usp-2028-11-07-gavnew,BUY,10,0.13,manual,3.2484,17.81,,11,14,0.841,0.13,0.14,0.01,95,the owner's own order — the engine leaves it alone,C71M8DYREKDE
 1788242233.8,cfb,aachc-cfb-wins-2026-11-28-tx-10pt5wins,SELL,1,0.32,sell,0,0,,32,37,0.375,0.32,0.33,0.02,3,taker dump — sold into the bid (the carved exception),C7GZ2E522KDN
+1788244153.9,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.47,sell,0,0,0.5,47,51,0.694,0.47,0.48,0.03,0,taker dump — sold into the bid (the carved exception),C7HBMZ9DEKDK
+1788261075.7,politics,scc-hrep-rep-2026-11-03-gte215,BUY,27,0.01,manual,0,69.79,0.216375,,,0.353,,,-0.2064,27,the owner's own order — the engine leaves it alone,C5SM65HECKDH
+1788261075.7,politics,usgubewc-usgub-sc-2026-11-03-rep,BUY,4,0.95,earn,0.3425,36.12,0.9755,,,0.469,,,-0.0255,30,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C6PJE3BV2KDD
+1788261075.7,politics,usgubewc-usgub-sc-2026-11-03-dem,SELL,0.03,0.04,manual,6.2438,23.21,0.0245,,,0.378,,,-0.0155,-0.03,the owner's own order — the engine leaves it alone,C6ZBZBQH8KDM
+1788261075.7,politics,ewc-usp-2028-11-07-gavnew,BUY,16.29,0.13,manual,3.2764,23.21,,,,0.846,,,,111.29,the owner's own order — the engine leaves it alone,C71M8DYREKDE
+1788261075.7,politics,ussewc-usse-il-2026-11-03-dem,BUY,7,0.98,earn,0.3557,13.37,0.995725,,,0.439,,,-0.0157,20,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C7A2G4RXPKDG
+1788261075.7,politics,ussewc-usse-co-2026-11-03-rep,BUY,0.05,0.06,manual,0.5694,10.62,0.004475,,,0.65,,,0.0555,-19.95,the owner's own order — the engine leaves it alone,C7CHKVHGTKDM
