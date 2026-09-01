@@ -1938,3 +1938,8 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788287009.2,cfb,aachc-cfb-wins-2026-11-28-iowa-6pt5wins,BUY,0.01,0.75,earn,2.6535,0.22,,80,85,0.549,0.66,0.73,-0.08,1.01,12 ticks in front of the touch — we would hold 54% of the bid side,C7VMJMS8JM99
 1788287969.3,politics,usgubewc-usgub-nm-2026-11-03-dem,SELL,2,0.96,sell,0,0,0.98185,89,93,0.019,0.96,0.97,0.0219,12,taker dump — sold into the bid (the carved exception),C7W53529JM9G
 1788288749.4,cfb,aachc-cfb-wins-2026-11-28-ucf-3pt5wins,BUY,0.01,0.81,sell,0.0005,4.61,,74,85,0.021,0.91,0.92,0.01,0,buying back the short at or under what it sold for — the bid earns while it wait,C7R2W8PD4M9G
+1788290789.5,politics,ewc-usgub-ga-2026-11-03-rep,SELL,2,0.38,earn,0.0508,3.27,0.3122,33,38,0.068,0.37,0.38,-0.0678,-12,at the touch — a fill here is 6 ticks inside value (Silver + evidence),C7SZE7AYTM99
+1788290789.5,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,3,0.92,earn,9.842,2.3,0.98515,94,96,0.799,0.92,0.97,-0.0651,89,1 tick behind the touch — we would hold 10% of the bid side,C7TTTX2PEM9G
+1788290789.5,cfb,aachc-cfb-wins-2026-11-28-stan-5pt5wins,BUY,0.01,0.36,earn,9.0663,0.27,,35,42,0.531,0.01,0.51,-0.02,2.02,10 ticks in front of the touch — we would hold 97% of the bid side,C7WJHGHZ8M99
+1788291089.6,politics,ewc-usse-tx-2026-11-03-rep,SELL,1,0.52,earn,0.1848,3.37,0.37715,45,51,0,0.51,0.52,-0.1428,-1,at the touch — a fill here is 14 ticks inside value (Silver + evidence),C7SY3T7VYMAC
+1788291449.6,cfb,aachc-cfb-wins-2026-11-28-utah-10pt5wins,BUY,1,0.3,earn,2.8846,0.08,,34,40,0.131,0.01,0.37,-0.07,2,1 tick in front of the touch — we would hold 36% of the bid side,C7WYRP89YMA6
