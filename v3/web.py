@@ -573,8 +573,12 @@ function cancelBanner(d){
  // a pending scheduled cancel is money-affecting and time-boxed, so it
  // is stated at the top of the orders page with a way to call it off
  var cj=d.cancel_jobs||[];
- if(!cj.length)return '';
  var out='';
+ if(!cj.length){
+  return '<div class="card"><button class="small off" onclick="setCancel()">'
+   +'Schedule a cancel</button>'
+   +'<div class="muted" style="font-size:12px">Cancels every resting order in the markets you name, once, at the hour you set. Nothing else is touched.</div></div>';
+ }
  cj.forEach(function(j){
   var left=((j.at||0)-(Date.now()/1000))/3600;
   out+='<div class="card"><b>Scheduled cancel</b>'
@@ -584,6 +588,18 @@ function cancelBanner(d){
    +'<div><button class="small off" onclick="clrCancel(\\''+esc(j.match)+'\\')">Call it off</button></div></div>';
  });
  return out;
+}
+function setCancel(){
+ var m=prompt('Cancel orders in which markets? Any part of the slug, e.g. mov-ma-dem');
+ if(!m)return;
+ var h=prompt('In how many hours?','6');
+ if(h==null)return; var hrs=parseFloat(h);
+ if(!(hrs>0&&hrs<72)){alert('give a number of hours between 0 and 72');return;}
+ var when=new Date(Date.now()+hrs*3600*1000);
+ if(!confirm('Cancel EVERY resting order matching "'+m+'" at '
+   +when.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+'?'))return;
+ post({op:'schedule_cancel',match:m,at:Math.round(Date.now()/1000+hrs*3600),
+       note:'set from the phone'},function(j){alert(j.note||'done');});
 }
 function clrCancel(m){
  if(!confirm('Call off the scheduled cancel for '+m+'? Your orders stay resting.'))return;
