@@ -1855,3 +1855,16 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788222888.4,politics,ewc-usgub-wi-2026-11-03-rep,SELL,50,0.29,sell,0,0.4,0.296375,20,24,0.453,0.2,0.21,0.0064,0,selling filled stock — it earns while it waits,C7C95MVRCKDJ
 1788223488.4,cfb,aachc-cfb-wins-2026-11-28-nd-8pt5wins,BUY,0.5,0.94,earn,0.1194,0.7,,91,98,0,0.94,0.98,-0.01,0.5,1 tick in front of the touch — we would hold 2% of the bid side,C7C4CFGKEKDN
 1788224088.5,cfb,aachc-cfb-wins-2026-11-28-ncst-6pt5wins,BUY,0.5,0.58,manual,0,12.73,,58,64,0.324,0.58,0.6,-0.03,0.5,the owner's own order — the engine leaves it alone,C71SMGZJAKDH
+1788224808.7,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,20,0.95,earn,6.25,10.3,0.984775,94,97,0.761,0.94,0.97,-0.0348,46,1 tick behind the touch — we would hold 10% of the bid side,C741K7Z74KDH
+1788225468.7,cfb,aachc-cfb-wins-2026-11-28-lou-10pt5wins,BUY,2,0.15,earn,0.2303,1.61,,15,21,0,0.15,0.16,-0.02,2,joins the touch — the book has been quiet,C7BRN0B4CKDE
+1788225708.8,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.47,sell,0,0,0.5,47,50,0.714,0.47,0.48,0.03,0,taker dump — sold into the bid (the carved exception),C7D6S3XJ0KDK
+1788226488.9,politics,ussewc-usse-ky-2026-11-03-dem,SELL,17.55,0.04,manual,4.838,13.6,0.0031,1,4,0.572,0.03,0.09,-0.0369,-22.55,the owner's own order — the engine leaves it alone,C6ZGRST2CKDG
+1788226548.9,politics,ussewc-usse-or-2026-11-03-rep,SELL,1,0.03,manual,1.3557,13.62,0.001625,1,5,0.016,0.01,0.16,-0.0284,0,the owner's own order — the engine leaves it alone,C6ZB7JD3PKDN
+1788226608.9,politics,ussewc-usse-sc-2026-11-03-rep,BUY,14.94,0.83,earn,1.0588,6.61,0.87015,84,88,0.55,0.83,0.84,-0.0402,14.94,at the touch — a fill here is 3 ticks inside value (Silver + evidence),C77P30MT4KDC
+1788226608.9,cfb,aachc-cfb-wins-2026-11-28-wash-9pt5wins,BUY,1,0.44,earn,2.537,3.36,,43,48,0.606,0.45,0.46,-0.02,3,1 tick behind the touch — we would hold 7% of the bid side,C7AE7Z1HMKDJ
+1788226788.9,cfb,aachc-cfb-wins-2026-11-28-colst-2pt5wins,SELL,0.01,0.71,sell,0,0,,68,73,0.042,0.71,0.72,0,0,taker dump — sold into the bid (the carved exception),C7DGMK910KDK
+1788226848.9,politics,ussewc-usse-wy-2026-11-03-dem,SELL,10,0.02,manual,0.1031,13.7,0,1,3,0,0.01,0.02,-0.02,75,the owner's own order — the engine leaves it alone,C6ZDVK3WCKDC
+1788226848.9,politics,ussewc-usse-ok-2026-11-03-dem,SELL,20,0.07,manual,0.3325,13.7,0.000425,3,6,0.501,0.05,0.07,-0.0696,-33,the owner's own order — the engine leaves it alone,C6ZRPGC8AKDD
+1788226848.9,politics,ussewc-usse-wy-2026-11-03-dem,SELL,33,0.02,sell,0.7735,12.65,0,1,3,0,0.01,0.02,-0.02,42,selling filled stock — it earns while it waits,C72HQKA9CKDD
+1788226908.9,politics,usgubewc-usgub-ar-2026-11-03-dem,SELL,20,0.02,earn,4.845,0.05,0.001625,1,3,0.588,0.01,0.09,-0.0184,-20,joins the touch — the book has been quiet,C7DED9PNJKDM
+1788227388.9,cfb,aachc-cfb-wins-2026-11-28-wash-9pt5wins,BUY,0.01,0.43,earn,6.5446,0.17,,43,47,0.702,0.27,0.46,-0.02,3.01,16 ticks in front of the touch — we would hold 87% of the bid side,C7DGMK9FWKDK
