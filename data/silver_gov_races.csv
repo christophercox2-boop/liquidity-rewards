@@ -1,37 +1,37 @@
 state,abbr,winner_Dparty,winner_Rparty,name_D1,name_D2,name_D3,name_D4,name_R1,name_R2,name_R3,name_R4,winner_D1,winner_D2,winner_D3,winner_D4,winner_R1,winner_R2,winner_R3,winner_R4,rating
-Alabama,AL,1.3675,98.6325,Doug Jones,,,,Tommy Tuberville,,,,1.3675,,,,98.632503,,,,3
-Alaska,AK,38.6625,61.3375,Tom Begich,Jonathan Kreiss-Tomkins,,,Bernadette Wilson,David Bronson,,,22.315,16.347501,,,41.277501,20.06,,,1
-Arizona,AZ,91.515,8.485,Katie Hobbs,,,,Andy Biggs,,,,91.514999,,,,8.485,,,,-2
-Arkansas,AR,0.1625,99.8375,Fredrick Love,,,,Sarah Huckabee Sanders,,,,0.1625,,,,99.8375,,,,3
-California,CA,99.9475,0.0525,Xavier Becerra,,,,Steve Hilton,,,,99.9475,,,,0.0525,,,,-3
-Colorado,CO,99.83,0.17,Phil Weiser,,,,Victor Marx,,,,99.830002,,,,0.17,,,,-3
-Connecticut,CT,99.705,0.295,Ned Lamont,,,,Ryan Fazio,,,,99.704999,,,,0.295,,,,-3
-Florida,FL,18.925,81.075,David Jolly,,,,Byron Donalds,,,,18.925001,,,,81.075001,,,,2
-Georgia,GA,68.79,31.21,Keisha Bottoms,,,,Rick Jackson,,,,68.790001,,,,31.209999,,,,-1
-Hawaii,HI,99.995,0.005,Joshua Green,,,,Gary Cordery,,,,99.994999,,,,0.005,,,,-3
-Idaho,ID,0.1075,99.8925,Terri Pickens,,,,Brad Little,,,,0.1075,,,,99.892503,,,,3
-Illinois,IL,99.8475,0.1525,J.B. Pritzker,,,,Darren Bailey,,,,99.847502,,,,0.1525,,,,-3
-Iowa,IA,83.675,16.325,Rob Sand,,,,Zach Lahn,,,,83.674997,,,,16.325,,,,-2
-Kansas,KS,42.5675,57.4325,Cindy Holscher,,,,Ty Masterson,,,,42.5675,,,,57.432503,,,,0
-Maine,ME,98.845,1.155,Hannah Pingree,,,,Bobby Charles,,,,98.844999,,,,1.155,,,,-3
-Maryland,MD,99.99,0.01,Wes Moore,,,,Dan Cox,,,,99.989998,,,,0.01,,,,-3
-Massachusetts,MA,99.9625,0.0375,Maura Healey,,,,Michael Minogue,,,,99.962503,,,,0.0375,,,,-3
-Michigan,MI,91.165,8.835,Jocelyn Benson,,,,John James,,,,91.165,,,,8.835,,,,-2
-Minnesota,MN,99.365,0.635,Amy Klobuchar,,,,Lisa Demuth,,,,99.365002,,,,0.635,,,,-3
-Nebraska,NE,4.015,95.985,Lynne Walz,,,,Jim Pillen,,,,4.015,,,,95.985001,,,,3
-Nevada,NV,27.79,72.21,Aaron Ford,,,,Joe Lombardo,,,,27.790001,,,,72.210002,,,,1
-New Hampshire,NH,6.7125,93.285,Cinde Warmington,,,,Kelly Ayotte,,,,6.7125,,,,93.285,,,,2
-New Mexico,NM,98.1575,1.8425,Debra Haaland,,,,Gregg Hull,,,,98.157501,,,,1.8425,,,,-3
-New York,NY,98.4775,1.5225,Kathy Hochul,,,,Bruce Blakeman,,,,98.477501,,,,1.5225,,,,-3
-Ohio,OH,49.8475,50.1525,Amy Acton,,,,Vivek Ramaswamy,,,,49.847499,,,,50.152498,,,,0
-Oklahoma,OK,5.885,94.115,Cyndi Munson,,,,Mike Mazzei,,,,5.885,,,,94.115001,,,,2
-Oregon,OR,92.195,7.805,Tina Kotek,,,,Christine Drazan,,,,92.194998,,,,7.805,,,,-2
-Pennsylvania,PA,99.875,0.125,Josh Shapiro,,,,Stacy Garrity,,,,99.874997,,,,0.125,,,,-3
-Rhode Island,RI,99.66,0.3375,Helena Foulkes,,,,Aaron Guckian,,,,99.660003,,,,0.3375,,,,-3
-South Carolina,SC,2.33,97.67,Jermaine Johnson,,,,Alan Wilson,,,,2.33,,,,97.670001,,,,3
-South Dakota,SD,0.4225,99.5775,Dan Ahlers,,,,Larry Rhoden,,,,0.4225,,,,99.577498,,,,3
-Tennessee,TN,0.24,99.76,Jerri Green,,,,Marsha Blackburn,,,,0.24,,,,99.760002,,,,3
-Texas,TX,14.09,85.91,Gina Hinojosa,,,,Greg Abbott,,,,14.09,,,,85.909998,,,,2
-Vermont,VT,9.44,90.56,Amanda Janoo,,,,Phil Scott,,,,9.44,,,,90.560001,,,,2
-Wisconsin,WI,70.3625,29.6375,David Crowley,,,,Tom Tiffany,,,,70.362502,,,,29.637501,,,,-1
+Alabama,AL,1.475,98.525,Doug Jones,,,,Tommy Tuberville,,,,1.475,,,,98.525,,,,3
+Alaska,AK,72.665,27.335,Jonathan Kreiss-Tomkins,,,,Bernadette Wilson,David Bronson,Treg Taylor,,72.665,,,,15.172499,6.91,5.2525,,-1
+Arizona,AZ,91.58,8.42,Katie Hobbs,,,,Andy Biggs,,,,91.579998,,,,8.42,,,,-2
+Arkansas,AR,0.165,99.835,Fredrick Love,,,,Sarah Huckabee Sanders,,,,0.165,,,,99.834996,,,,3
+California,CA,99.9375,0.0625,Xavier Becerra,,,,Steve Hilton,,,,99.937499,,,,0.0625,,,,-3
+Colorado,CO,99.8325,0.1675,Phil Weiser,,,,Victor Marx,,,,99.832499,,,,0.1675,,,,-3
+Connecticut,CT,99.7225,0.2775,Ned Lamont,,,,Ryan Fazio,,,,99.722499,,,,0.2775,,,,-3
+Florida,FL,18.655,81.345,David Jolly,,,,Byron Donalds,,,,18.655001,,,,81.344998,,,,2
+Georgia,GA,68.78,31.22,Keisha Bottoms,,,,Rick Jackson,,,,68.779999,,,,31.220001,,,,-1
+Hawaii,HI,99.9925,0.0075,Joshua Green,,,,Gary Cordery,,,,99.992502,,,,0.0075,,,,-3
+Idaho,ID,0.1225,99.8775,Terri Pickens,,,,Brad Little,,,,0.1225,,,,99.877501,,,,3
+Illinois,IL,99.85,0.15,J.B. Pritzker,,,,Darren Bailey,,,,99.849999,,,,0.15,,,,-3
+Iowa,IA,83.6725,16.3275,Rob Sand,,,,Zach Lahn,,,,83.6725,,,,16.3275,,,,-2
+Kansas,KS,42.725,57.275,Cindy Holscher,,,,Ty Masterson,,,,42.725,,,,57.274997,,,,0
+Maine,ME,98.78,1.22,Hannah Pingree,,,,Bobby Charles,,,,98.78,,,,1.22,,,,-3
+Maryland,MD,99.985,0.015,Wes Moore,,,,Dan Cox,,,,99.984998,,,,0.015,,,,-3
+Massachusetts,MA,99.965,0.035,Maura Healey,,,,Michael Minogue,,,,99.965,,,,0.035,,,,-3
+Michigan,MI,91.3425,8.6575,Jocelyn Benson,,,,John James,,,,91.342497,,,,8.6575,,,,-2
+Minnesota,MN,99.355,0.645,Amy Klobuchar,,,,Lisa Demuth,,,,99.355,,,,0.645,,,,-3
+Nebraska,NE,3.9275,96.07,Lynne Walz,,,,Jim Pillen,,,,3.9275,,,,96.069998,,,,3
+Nevada,NV,28.05,71.95,Aaron Ford,,,,Joe Lombardo,,,,28.049999,,,,71.950001,,,,1
+New Hampshire,NH,6.6175,93.3825,Cinde Warmington,,,,Kelly Ayotte,,,,6.6175,,,,93.382502,,,,2
+New Mexico,NM,98.185,1.815,Debra Haaland,,,,Gregg Hull,,,,98.185003,,,,1.815,,,,-3
+New York,NY,98.515,1.485,Kathy Hochul,,,,Bruce Blakeman,,,,98.514998,,,,1.485,,,,-3
+Ohio,OH,49.7575,50.2425,Amy Acton,,,,Vivek Ramaswamy,,,,49.757499,,,,50.242501,,,,0
+Oklahoma,OK,5.9275,94.0725,Cyndi Munson,,,,Mike Mazzei,,,,5.9275,,,,94.072503,,,,2
+Oregon,OR,92.145,7.855,Tina Kotek,,,,Christine Drazan,,,,92.145002,,,,7.855,,,,-2
+Pennsylvania,PA,99.8625,0.1375,Josh Shapiro,,,,Stacy Garrity,,,,99.862498,,,,0.1375,,,,-3
+Rhode Island,RI,99.67,0.33,Helena Foulkes,,,,Aaron Guckian,,,,99.669999,,,,0.33,,,,-3
+South Carolina,SC,2.45,97.55,Jermaine Johnson,,,,Alan Wilson,,,,2.45,,,,97.549999,,,,3
+South Dakota,SD,0.485,99.515,Dan Ahlers,,,,Larry Rhoden,,,,0.485,,,,99.514997,,,,3
+Tennessee,TN,0.225,99.775,Jerri Green,,,,Marsha Blackburn,,,,0.225,,,,99.774998,,,,3
+Texas,TX,13.94,86.06,Gina Hinojosa,,,,Greg Abbott,,,,13.940001,,,,86.059999,,,,2
+Vermont,VT,9.48,90.52,Amanda Janoo,,,,Phil Scott,,,,9.48,,,,90.52,,,,2
+Wisconsin,WI,70.585,29.415,David Crowley,,,,Tom Tiffany,,,,70.585001,,,,29.414999,,,,-1
 Wyoming,WY,0.01,99.99,Ken Casner,,,,Eric Barlow,,,,0.01,,,,99.989998,,,,3
