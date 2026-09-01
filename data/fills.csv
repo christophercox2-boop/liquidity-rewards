@@ -1932,3 +1932,9 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788284309.1,politics,usgubewc-usgub-nm-2026-11-03-dem,SELL,14,0.96,sell,0,0,0.98185,89,93,0.019,0.96,0.97,0.0219,0,taker dump — sold into the bid (the carved exception),C7V3GNDA4M9F
 1788284489.1,cfb,aachc-cfb-wins-2026-11-28-lou-10pt5wins,SELL,2,0.16,sell,0,0,,13,18,0.378,0.16,0.17,-0.01,0,taker dump — sold into the bid (the carved exception),C7V664ZT4M99
 1788284789.1,cfb,aachc-cfb-wins-2026-11-28-lsu-9pt5wins,SELL,1,0.42,sell,0,0,,42,48,0.189,0.42,0.43,0.03,0,taker dump — sold into the bid (the carved exception),C7V8T0P6WMCR
+1788285809.1,cfb,aachc-cfb-wins-2026-11-28-gtech-8pt5wins,BUY,0.01,0.18,earn,0.0297,0.35,,18,26,0.071,0.18,0.21,-0.03,2.01,12 ticks in front of the touch — we would hold 2% of the bid side,C7V5R5AQEMCK
+1788286109.1,cfb,aachc-cfb-wins-ou-2026-11-28-tcu,BUY,0.5,0.41,earn,0.1187,0.32,,36,46,0,0.41,0.42,0,0.5,joins the touch — the book has been quiet,C7V9AE3W6MCK
+1788286229.1,cfb,aachc-cfb-wins-2026-11-28-iowa-6pt5wins,BUY,0.5,0.8,earn,4.3242,2.04,,81,87,0.297,0.63,0.76,-0.04,0.5,1 tick in front of the touch — we would hold 97% of the bid side,C7SY5A02TMCK
+1788287009.2,cfb,aachc-cfb-wins-2026-11-28-iowa-6pt5wins,BUY,0.01,0.75,earn,2.6535,0.22,,80,85,0.549,0.66,0.73,-0.08,1.01,12 ticks in front of the touch — we would hold 54% of the bid side,C7VMJMS8JM99
+1788287969.3,politics,usgubewc-usgub-nm-2026-11-03-dem,SELL,2,0.96,sell,0,0,0.98185,89,93,0.019,0.96,0.97,0.0219,12,taker dump — sold into the bid (the carved exception),C7W53529JM9G
+1788288749.4,cfb,aachc-cfb-wins-2026-11-28-ucf-3pt5wins,BUY,0.01,0.81,sell,0.0005,4.61,,74,85,0.021,0.91,0.92,0.01,0,buying back the short at or under what it sold for — the bid earns while it wait,C7R2W8PD4M9G
