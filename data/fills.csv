@@ -1914,3 +1914,8 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788261075.7,politics,ussewc-usse-il-2026-11-03-dem,BUY,7,0.98,earn,0.3557,13.37,0.995725,,,0.439,,,-0.0157,20,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C7A2G4RXPKDG
 1788261075.7,politics,ussewc-usse-co-2026-11-03-rep,BUY,0.05,0.06,manual,0.5694,10.62,0.004475,,,0.65,,,0.0555,-19.95,the owner's own order — the engine leaves it alone,C7CHKVHGTKDM
 1788263947.7,politics,ewc-usse-oh-2026-11-03-rep,BUY,10,0.66,sell,24.9999,0.23,0.3851,40,47,0.08,0.51,0.67,0.2749,0,buying back the short at or under what it sold for — the bid earns while it wait,C7P9SSH88MA6
+1788273488.2,politics,ussewc-usse-ks-2026-11-03-rep,BUY,10,0.83,sell,0,3.18,0.829775,73,82,0.084,0.68,0.81,0.0002,10,buying back the short at or under what it sold for — the bid earns while it wait,C7P1GNBS0MCK
+1788273668.2,politics,ewc-usp-2028-11-07-gavnew,SELL,42,0.13,sell,0,2.92,,10,13,0.856,0.05,0.13,-0.01,53,selling filled stock — it earns while it waits,C7PAQEFYEMCK
+1788274928.3,cfb,aachc-cfb-wins-2026-11-28-tx-10pt5wins,SELL,0.17,0.34,sell,0,0,,33,38,0.335,0.34,0.35,0.01,3.83,taker dump — sold into the bid (the carved exception),C7S3R2MB6MCR
+1788276308.5,cfb,aachc-cfb-wins-2026-11-28-txam-9pt5wins,BUY,0.01,0.42,sell,0.1702,0.15,,43,48,0,0.42,0.43,-0.03,0,buying back the short at or under what it sold for — the bid earns while it wait,C7S8C9F20MCS
+1788276428.5,politics,usgubewc-usgub-pa-2026-11-03-dem,SELL,2,0.98,sell,0,0,0.998625,97,99,0.095,0.98,0.99,0.0186,0,taker dump — sold into the bid (the carved exception),C7SBK9GZPMA6
