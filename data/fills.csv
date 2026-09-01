@@ -1887,3 +1887,15 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788233149.2,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.47,sell,0,0,0.5,47,50,0.706,0.47,0.48,0.03,0,taker dump — sold into the bid (the carved exception),C7EWRPYV8KDF
 1788234049.3,politics,ussewc-usse-ky-2026-11-03-dem,BUY,18,0.1,manual,2.5619,0.4,0.0031,1,5,0.676,0.09,0.16,0.0969,18,the owner's own order — the engine leaves it alone,C7ERA68YTKDM
 1788234649.3,politics,usgubewc-usgub-vt-2026-11-03-rep,BUY,12,0.9,manual,0.6376,15.87,0.9056,87,92,0.064,0.71,0.91,-0.0056,12,the owner's own order — the engine leaves it alone,C6ZGSEMVWKDK
+1788235863.2,politics,ewc-usgub-ca-2026-11-03-xavbec,BUY,10,0.95,earn,0.1919,36.11,0.999375,94,98,0,0.95,0.96,-0.0494,10,at the touch — a fill here is 5 ticks inside value (Silver + evidence),C6GNK5C2YKDN
+1788236833.6,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.47,sell,0,0,0.5,47,50,0.702,0.47,0.48,0.03,0,taker dump — sold into the bid (the carved exception),C7FS7NG20KDD
+1788237973.6,cfb,aachc-cfb-wins-2026-11-28-nebr-8pt5wins,BUY,1,0.47,probe,0.2614,0.15,,30,49,0.091,0.46,0.51,0.06,0.99,a scout — this market's pool could pay; but I don't know enough yet; what happen,C7FVKJ2Q8KDG
+1788238273.6,cfb,aachc-cfb-wins-2026-11-28-vir-8pt5wins,SELL,1,0.54,earn,0.1692,0.5,,50,55,0.527,0.51,0.52,-0.02,-1,2 ticks behind the touch — we would hold 3% of the ask side,C7FPSNBE8KDC
+1788238333.6,cfb,aachc-cfb-wins-2026-11-28-wash-9pt5wins,SELL,3,0.47,sell,0.0243,0.2,,42,47,0.751,0.42,0.5,-0.02,0.01,selling filled stock — it earns while it waits,C7FYX2XF2KDN
+1788238393.6,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,20,0.95,earn,0.2703,1.61,0.98515,94,96,0.818,0.89,0.97,-0.0352,86,1 tick behind the touch — we would hold 5% of the bid side,C7EQB8TS6KDJ
+1788238453.6,politics,ussewc-usse-wv-2026-11-03-dem,SELL,2,0.07,manual,0.0005,85.93,0.0001,1,4,0.164,0.04,0.05,-0.0699,-2,the owner's own order — the engine leaves it alone,C56CDVFMRKDK
+1788238453.6,politics,usgubewc-usgub-sc-2026-11-03-rep,BUY,16,0.95,earn,1.6443,29.84,0.9755,95,99,0.141,0.95,0.96,-0.0255,26,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C6PJE3BV2KDD
+1788238453.6,politics,usgubewc-usgub-md-2026-11-03-dem,BUY,20,0.98,manual,1.9531,16.92,0.99985,98,99,0.018,0.93,0.99,-0.0199,20,the owner's own order — the engine leaves it alone,C6ZGSEMC4KDK
+1788238453.6,politics,ussewc-usse-il-2026-11-03-dem,BUY,9,0.98,earn,0.8916,7.08,0.995725,98,99,0.048,0.98,0.99,-0.0157,9,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C7A2G4RXPKDG
+1788238573.6,cfb,aachc-cfb-wins-2026-11-28-nw-7pt5wins,SELL,1,0.27,sell,0,0,,25,32,0.02,0.27,0.28,0.01,0,taker dump — sold into the bid (the carved exception),C7G6VJ1NTKDC
+1788238633.7,politics,usgubewc-usgub-ok-2026-11-03-rep,BUY,10,0.93,earn,1.1089,24.86,0.940725,93,98,0.084,0.87,0.92,-0.0107,10,at the touch — a fill here is 1 ticks inside value (Silver + evidence),C6TTHY5PCKDF
