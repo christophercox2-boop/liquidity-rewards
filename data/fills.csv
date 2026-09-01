@@ -1943,3 +1943,11 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788290789.5,cfb,aachc-cfb-wins-2026-11-28-stan-5pt5wins,BUY,0.01,0.36,earn,9.0663,0.27,,35,42,0.531,0.01,0.51,-0.02,2.02,10 ticks in front of the touch — we would hold 97% of the bid side,C7WJHGHZ8M99
 1788291089.6,politics,ewc-usse-tx-2026-11-03-rep,SELL,1,0.52,earn,0.1848,3.37,0.37715,45,51,0,0.51,0.52,-0.1428,-1,at the touch — a fill here is 14 ticks inside value (Silver + evidence),C7SY3T7VYMAC
 1788291449.6,cfb,aachc-cfb-wins-2026-11-28-utah-10pt5wins,BUY,1,0.3,earn,2.8846,0.08,,34,40,0.131,0.01,0.37,-0.07,2,1 tick in front of the touch — we would hold 36% of the bid side,C7WYRP89YMA6
+1788293610.9,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar10-15,SELL,7,0.08,manual,34.2853,4.2,,2,9,0,0.04,0.06,-0.03,169,the owner's own order — the engine leaves it alone,C7SSZ0RTYMAC
+1788294211.0,politics,enwc-uspres-nom-rep-2028-marrub,SELL,30,0.34,sell,0.0002,4.59,0.35,23,28,0.54,0.26,0.38,0.01,0,selling filled stock — it earns while it waits,C7SPZ3XG4M99
+1788295711.1,politics,ussewc-usse-de-2026-11-03-dem,SELL,2,0.98,sell,0,9.07,0.998625,96,99,0.097,0.94,0.98,0.0186,0,selling filled stock — it earns while it waits,C7P94WP4GMCR
+1788295891.2,politics,enwc-uspres-nom-rep-2028-tedcru,BUY,199,0.04,earn,0.1576,0.03,,4,15,0.012,0.04,0.11,-0.05,199,6 ticks behind the touch — we would hold 2% of the bid side,C7Y0V6TXYMCG
+1788295951.2,politics,enwc-uspres-nom-rep-2028-marrub,BUY,15,0.28,earn,5.6817,0.28,0.35,25,30,0.665,0.28,0.31,-0.07,15,1 tick behind the touch — we would hold 79% of the bid side,C7XTTNZYEM99
+1788296251.2,cfb,aachc-cfb-wins-2026-11-28-mst-3pt5wins,BUY,0.5,0.66,earn,0.6686,0.45,,72,79,0.515,0.67,0.68,-0.1,1.5,1 tick behind the touch — we would hold 4% of the bid side,C7XRDWZR8MCR
+1788296371.2,politics,ewc-usse-mi-2026-11-03-rep,SELL,8,0.36,earn,0.96,3.83,0.262075,32,38,0,0.35,0.36,-0.0979,-8,at the touch — a fill here is 10 ticks inside value (Silver + evidence),C7TVA2EAMM9G
+1788296551.2,cfb,aachc-cfb-wins-2026-11-28-fl-7pt5wins,BUY,1,0.38,sell,0,6.26,,39,45,0.109,0.4,0.41,-0.04,0,buying back the short at or under what it sold for — the bid earns while it wait,C7RV22Z4AM9G
