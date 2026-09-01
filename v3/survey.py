@@ -137,6 +137,15 @@ def slug_group(slug: str) -> str:
     return "-".join(kind_of(slug).split("-")[:SLUG_GROUP_SEGMENTS])
 
 
+# Owner, 2026-09-01: "make it so my orders buy 125% of the target
+# size". A side resting exactly AT Target Size flips on and off as
+# other people's orders come and go, and BELOW the line the whole side
+# pays nobody — so being one share short costs the entire day's reward
+# for everyone on it, not a proportional slice. A quarter over the line
+# is headroom against that.
+QUALIFY_TARGET_MULT = 1.25
+
+
 # A stratum needs MIN_SAMPLES scored sides to rank, which is half that
 # many markets. One holding fewer can NEVER rank however long it runs,
 # so it is merged into its parent rather than left collecting draws it

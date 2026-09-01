@@ -1834,3 +1834,56 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788216688.8,cfb,aachc-cfb-wins-2026-11-28-tx-10pt5wins,SELL,4,0.32,sell,0,0,,32,37,0.407,0.32,0.33,0.03,0,taker dump — sold into the bid (the carved exception),C7B2086K6KDF
 1788217048.8,cfb,aachc-cfb-wins-2026-11-28-mst-3pt5wins,BUY,0.01,0.8,earn,0.026,0.5,,79,84,0.441,0.8,0.81,-0.02,1.01,6 ticks in front of the touch — we would hold 97% of the bid side,C7AKWARQPKDE
 1788217768.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,SELL,6,0.2,manual,0,0.02,,16,19,0.878,0.12,0.13,-0.03,153,the owner's own order — the engine leaves it alone,C6QV2J0MYKDD
+1788218328.2,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.47,sell,0,0,0.5,47,50,0.722,0.47,0.48,0.03,0,taker dump — sold into the bid (the carved exception),C7BFEGTVYKDG
+1788219004.7,politics,usgovcc-demvrep-2026-11-03-tie,SELL,5,0.08,manual,0.0394,8.63,,6,11,0.235,0.1,0.12,0.01,-10,moved by the owner,C7438CTN2KDJ
+1788219304.7,politics,scc-hrep-rep-2026-11-03-gte220,SELL,5,0.13,manual,0.0359,58.13,0.119425,11,14,0,0.12,0.13,-0.0106,-5,the owner's own order — the engine leaves it alone,C5SN5ADM0KDD
+1788219364.7,politics,scc-hrep-rep-2026-11-03-gte225,SELL,5,0.11,manual,0.019,58.15,0.056125,6,10,0,0.1,0.11,-0.0539,-5,the owner's own order — the engine leaves it alone,C5SN5AG9TKDD
+1788219844.7,politics,ussewc-usse-co-2026-11-03-rep,SELL,16,0.06,manual,0.2486,11.75,0.005025,2,5,0.598,0.05,0.06,-0.055,-20,the owner's own order — the engine leaves it alone,C70FVBAKRKDN
+1788220204.7,politics,ussewc-usse-ms-2026-11-03-rep,BUY,20,0.96,earn,0.5274,2.78,0.97625,95,98,0.631,0.81,0.96,-0.0162,20,1 tick in front of the touch — we would hold 60% of the bid side,C79H7SA5YKDK
+1788220264.7,politics,ussewc-usse-ms-2026-11-03-dem,BUY,0.54,0.07,manual,0.0029,29.2,0.02375,7,11,0.728,0.05,0.08,0.0463,0.54,the owner's own order — the engine leaves it alone,C6JVY077GKDG
+1788221268.3,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,SELL,6.41,0.19,manual,35.1445,0.97,,17,20,0.888,0.18,0.19,0,149.59,the owner's own order — the engine leaves it alone,C7BAH4SKGKDK
+1788221448.3,politics,ewc-usgub-wi-2026-11-03-rep,BUY,50,0.2,earn,0.1075,19.3,0.296375,20,25,0,0.2,0.21,-0.0964,50,at the touch — a fill here is 10 ticks inside value (Silver + evidence),C6VFYJQTWKDF
+1788221628.3,politics,usgubewc-usgub-al-2026-11-03-rep,BUY,20,0.93,earn,0.0736,22.44,0.986325,92,95,0.813,0.89,0.93,-0.0563,40,1 tick behind the touch — we would hold 5% of the bid side,C6RXNXHV4KDH
+1788221688.3,politics,ussewc-usse-sd-2026-11-03-rep,BUY,7,0.95,manual,6.25,12.27,0.99245,93,96,0.772,0.88,0.96,-0.0425,20,the owner's own order — the engine leaves it alone,C6ZVJGWQ0KDK
+1788221688.3,politics,scc-hrep-rep-2026-11-03-gte190,BUY,10,0.76,earn,0.0833,0.13,0.839,77,82,0.142,0.76,0.77,-0.079,10,at the touch — a fill here is 7 ticks inside value (Silver + evidence),C7C3TWNQTKDH
+1788221808.3,cfb,aachc-cfb-wins-2026-11-28-ill-8pt5wins,BUY,2,0.25,earn,0.2888,0.71,,33,42,0.045,0.25,0.26,-0.12,3,joins the touch — the book has been quiet,C7BP7JFP0KDC
+1788222048.3,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar30-35,SELL,64.8,0.1,manual,29.8123,23.27,,10,15,0.548,0.09,0.1,0.02,0.2,the owner's own order — the engine leaves it alone,C6R9F8T44KDC
+1788222048.3,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.47,sell,0,0,0.5,47,50,0.718,0.47,0.48,0.03,0,taker dump — sold into the bid (the carved exception),C7CAJCHMJKDD
+1788222168.3,cfb,aachc-cfb-wins-2026-11-28-sdst-7pt5wins,BUY,1,0.35,manual,0.5323,1.09,,35,39,0.579,0.36,0.39,-0.02,0,the owner's own order — the engine leaves it alone,C7BEPG8EEKDF
+1788222828.4,politics,paccc-usse-midterms-2026-11-03-dem,SELL,32,0.499,sell,0,2.46,0.5,46,49,0.527,0.465,0.466,0.001,0,selling filled stock — it earns while it waits,C7A9C294YKDE
+1788222828.4,politics,ussewc-usse-sd-2026-11-03-rep,SELL,13,0.99,sell,0.0004,0.73,0.99245,93,96,0.807,0.89,0.94,0.0025,7,selling filled stock — it earns while it waits,C7BWEPKK4KDD
+1788222888.4,politics,ewc-usgub-wi-2026-11-03-rep,SELL,50,0.29,sell,0,0.4,0.296375,20,24,0.453,0.2,0.21,0.0064,0,selling filled stock — it earns while it waits,C7C95MVRCKDJ
+1788223488.4,cfb,aachc-cfb-wins-2026-11-28-nd-8pt5wins,BUY,0.5,0.94,earn,0.1194,0.7,,91,98,0,0.94,0.98,-0.01,0.5,1 tick in front of the touch — we would hold 2% of the bid side,C7C4CFGKEKDN
+1788224088.5,cfb,aachc-cfb-wins-2026-11-28-ncst-6pt5wins,BUY,0.5,0.58,manual,0,12.73,,58,64,0.324,0.58,0.6,-0.03,0.5,the owner's own order — the engine leaves it alone,C71SMGZJAKDH
+1788224808.7,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,20,0.95,earn,6.25,10.3,0.984775,94,97,0.761,0.94,0.97,-0.0348,46,1 tick behind the touch — we would hold 10% of the bid side,C741K7Z74KDH
+1788225468.7,cfb,aachc-cfb-wins-2026-11-28-lou-10pt5wins,BUY,2,0.15,earn,0.2303,1.61,,15,21,0,0.15,0.16,-0.02,2,joins the touch — the book has been quiet,C7BRN0B4CKDE
+1788225708.8,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.47,sell,0,0,0.5,47,50,0.714,0.47,0.48,0.03,0,taker dump — sold into the bid (the carved exception),C7D6S3XJ0KDK
+1788226488.9,politics,ussewc-usse-ky-2026-11-03-dem,SELL,17.55,0.04,manual,4.838,13.6,0.0031,1,4,0.572,0.03,0.09,-0.0369,-22.55,the owner's own order — the engine leaves it alone,C6ZGRST2CKDG
+1788226548.9,politics,ussewc-usse-or-2026-11-03-rep,SELL,1,0.03,manual,1.3557,13.62,0.001625,1,5,0.016,0.01,0.16,-0.0284,0,the owner's own order — the engine leaves it alone,C6ZB7JD3PKDN
+1788226608.9,politics,ussewc-usse-sc-2026-11-03-rep,BUY,14.94,0.83,earn,1.0588,6.61,0.87015,84,88,0.55,0.83,0.84,-0.0402,14.94,at the touch — a fill here is 3 ticks inside value (Silver + evidence),C77P30MT4KDC
+1788226608.9,cfb,aachc-cfb-wins-2026-11-28-wash-9pt5wins,BUY,1,0.44,earn,2.537,3.36,,43,48,0.606,0.45,0.46,-0.02,3,1 tick behind the touch — we would hold 7% of the bid side,C7AE7Z1HMKDJ
+1788226788.9,cfb,aachc-cfb-wins-2026-11-28-colst-2pt5wins,SELL,0.01,0.71,sell,0,0,,68,73,0.042,0.71,0.72,0,0,taker dump — sold into the bid (the carved exception),C7DGMK910KDK
+1788226848.9,politics,ussewc-usse-wy-2026-11-03-dem,SELL,10,0.02,manual,0.1031,13.7,0,1,3,0,0.01,0.02,-0.02,75,the owner's own order — the engine leaves it alone,C6ZDVK3WCKDC
+1788226848.9,politics,ussewc-usse-ok-2026-11-03-dem,SELL,20,0.07,manual,0.3325,13.7,0.000425,3,6,0.501,0.05,0.07,-0.0696,-33,the owner's own order — the engine leaves it alone,C6ZRPGC8AKDD
+1788226848.9,politics,ussewc-usse-wy-2026-11-03-dem,SELL,33,0.02,sell,0.7735,12.65,0,1,3,0,0.01,0.02,-0.02,42,selling filled stock — it earns while it waits,C72HQKA9CKDD
+1788226908.9,politics,usgubewc-usgub-ar-2026-11-03-dem,SELL,20,0.02,earn,4.845,0.05,0.001625,1,3,0.588,0.01,0.09,-0.0184,-20,joins the touch — the book has been quiet,C7DED9PNJKDM
+1788227388.9,cfb,aachc-cfb-wins-2026-11-28-wash-9pt5wins,BUY,0.01,0.43,earn,6.5446,0.17,,43,47,0.702,0.27,0.46,-0.02,3.01,16 ticks in front of the touch — we would hold 87% of the bid side,C7DGMK9FWKDK
+1788228648.9,politics,usgubewc-usgub-tx-2026-11-03-dem,SELL,20,0.18,earn,0.5275,0.85,0.1409,13,17,0.351,0.17,0.2,-0.0391,-20,at the touch — a fill here is 4 ticks inside value (Silver + evidence),C7D4Q6ZGRKDH
+1788229008.9,politics,usgubewc-usgub-mn-2026-11-03-dem,SELL,36,0.93,manual,1.6541,12.35,0.99365,93,96,0.622,0.92,0.95,0.0636,0,the owner's own order — the engine leaves it alone,C73B25GBRKDD
+1788229068.9,politics,usgubewc-usgub-ny-2026-11-03-rep,BUY,15.66,0.1,manual,0.7725,24.36,0.015225,4,8,0.387,0.09,0.1,0.0848,-0.34,the owner's own order — the engine leaves it alone,C6S14PXSRKDN
+1788229068.9,politics,ussewc-usse-ok-2026-11-03-dem,BUY,1,0.06,manual,0,0.02,0.000425,4,7,0.645,0.05,0.07,0.0596,-31,the owner's own order — the engine leaves it alone,C7E14NXH6KDK
+1788229128.9,politics,ussewc-usse-sc-2026-11-03-rep,SELL,15,0.87,sell,0.0099,0.7,0.87015,83,87,0.67,0.83,0.84,0.0001,0,selling filled stock — it earns while it waits,C7DERJV0TKDN
+1788229428.9,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.47,sell,0,0,0.5,47,50,0.71,0.47,0.48,0.03,0,taker dump — sold into the bid (the carved exception),C7E3N6JKRKDG
+1788229489.0,politics,usgubewc-usgub-mn-2026-11-03-rep,SELL,1,0.08,earn,0.5471,0.13,0.00635,3,8,0.548,0.07,0.08,-0.0737,-6,1 tick in front of the touch — we would hold 9% of the ask side,C7E0WKVT4KDM
+1788229549.0,politics,usgubewc-usgub-ny-2026-11-03-dem,BUY,20,0.95,earn,0.2928,1.15,0.984775,94,97,0.796,0.94,0.97,-0.0348,66,1 tick behind the touch — we would hold 5% of the bid side,C7D448ZJMKDM
+1788230029.0,cfb,aachc-cfb-wins-2026-11-28-wvir-7pt5wins,SELL,1,0.32,sell,0,1.15,,20,32,0.053,0.01,0.02,-0.05,0,selling filled stock — it earns while it waits,C7D7K3Y88KDM
+1788231829.1,cfb,aachc-cfb-wins-2026-11-28-nd-8pt5wins,SELL,1,0.96,sell,0,0,,89,96,0.444,0.96,0.97,-0.03,0,taker dump — sold into the bid (the carved exception),C7EHD34C4KDN
+1788232189.1,politics,ewc-usp-2028-11-07-stasmi,SELL,10,0.02,manual,0.036,15.18,,1,3,0,0.01,0.02,0,-10,the owner's own order — the engine leaves it alone,C6ZVJGWSCKDK
+1788232609.2,politics,ussewc-usse-ky-2026-11-03-rep,SELL,20,0.99,sell,0,12.12,0.9969,93,97,0.604,0.94,0.95,0.0069,0,selling filled stock — it earns while it waits,C74BX1P0JKDF
+1788233029.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,BUY,4.58,0.12,manual,0.0022,4.24,,18,20,0.891,0.13,0.16,-0.07,153.58,the owner's own order — the engine leaves it alone,C7BAC04AAKDD
+1788233029.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,BUY,22.59,0.18,manual,7.5905,4.22,,18,20,0.891,0.13,0.16,-0.01,176.17,the owner's own order — the engine leaves it alone,C7BAHM1YAKDE
+1788233029.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,BUY,100,0.18,manual,0,0.02,,18,20,0.891,0.13,0.16,-0.01,276.17,the owner's own order — the engine leaves it alone,C7EV80766KDM
+1788233089.2,politics,ussewc-usse-ks-2026-11-03-dem,SELL,10,0.26,earn,5.2083,0.07,0.171475,18,22,0.602,0.23,0.32,-0.0885,-22,1 tick behind the touch — we would hold 50% of the ask side,C7ERWQQQWKDK
+1788233149.2,politics,enwc-uspres-nom-rep-2028-jdvan,SELL,8,0.47,sell,0,0,0.5,47,50,0.706,0.47,0.48,0.03,0,taker dump — sold into the bid (the carved exception),C7EWRPYV8KDF
+1788234049.3,politics,ussewc-usse-ky-2026-11-03-dem,BUY,18,0.1,manual,2.5619,0.4,0.0031,1,5,0.676,0.09,0.16,0.0969,18,the owner's own order — the engine leaves it alone,C7ERA68YTKDM
+1788234649.3,politics,usgubewc-usgub-vt-2026-11-03-rep,BUY,12,0.9,manual,0.6376,15.87,0.9056,87,92,0.064,0.71,0.91,-0.0056,12,the owner's own order — the engine leaves it alone,C6ZGSEMVWKDK

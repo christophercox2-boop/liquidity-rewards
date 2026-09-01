@@ -602,11 +602,12 @@ function wallsTab(d){
  var wl=[];fams(d).forEach(function(kv){(kv[1].watched||[]).forEach(function(w){wl.push(w);});});
  if(!wl.length)return '<div class="card muted">No watched races.</div>';
  wl.forEach(function(w,i){
-  var bid='wq_'+i, pctv=(w.target?100*(w.ask_total||0)/w.target:0);
+  var bid='wq_'+i, goal=w.goal||w.target||0;
+  var pctv=(w.target?100*(w.ask_total||0)/w.target:0);
   out+='<div class="card"><div class="name" style="cursor:pointer;font-size:15px" onclick="showbook(\\''+esc(w.market)+'\\',\\''+bid+'\\')">'+nm(d,w.market)+'</div><div id="'+bid+'"></div>'
-   +'<div class="kpi"><div><div class="v'+(w.qualifies?' ok':' bad')+'">'+Math.round(w.ask_total||0).toLocaleString()+'</div><div class="l">of '+Math.round(w.target||0).toLocaleString()+' needed</div></div></div>'
-   +'<div class="mtrack"><div class="mfill" style="width:'+Math.min(100,pctv)+'%'+(w.qualifies?'':';background:#8a5a2f')+'"></div></div>';
-  if(w.qualifies===false){out+='<div style="margin-top:6px"><button class="small" onclick="qax(\\''+esc(w.market)+'\\','+Math.ceil((w.target||0)-(w.ask_total||0))+',\\'qo_'+i+'\\')">Qualify ask</button></div><div id="qo_'+i+'"></div>';}
+   +'<div class="kpi"><div><div class="v'+(w.has_room?' ok':(w.qualifies?' warn':' bad'))+'">'+Math.round(w.ask_total||0).toLocaleString()+'</div><div class="l">of '+Math.round(w.target||0).toLocaleString()+' needed \u00b7 '+Math.round(pctv)+'%</div></div></div>'
+   +'<div class="mtrack"><div class="mfill" style="width:'+Math.min(100,(goal?100*(w.ask_total||0)/goal:0))+'%'+(w.has_room?'':';background:#8a5a2f')+'"></div></div>';
+  if(w.has_room===false){out+='<div style="margin-top:6px"><button class="small" onclick="qax(\\''+esc(w.market)+'\\','+Math.ceil(goal-(w.ask_total||0))+',\\'qo_'+i+'\\')">'+(w.qualifies?'Top up to 125%':'Qualify ask')+'</button></div><div id="qo_'+i+'"></div>';}
   out+='</div>';
  });
  return out;
@@ -707,7 +708,7 @@ function cx(id){
  post({op:'cancel',order_id:id},function(j){if(!j.ok)alert(j.note||'refused');});
 }
 function qax(m,gap,outid){
- if(!confirm('Build the ask wall until it qualifies? '+gap.toLocaleString()+' shares to go at 99c (~$'+Math.ceil(gap*0.01)+').'))return;
+ if(!confirm('Build the ask wall to 125% of Target Size? '+gap.toLocaleString()+' shares to go at 99c (~$'+Math.ceil(gap*0.01)+').'))return;
  document.getElementById(outid).innerHTML='<div class="muted">starting\u2026</div>';
  post({op:'qualify_ask',market:m},function(j){
   document.getElementById(outid).innerHTML='<div class="'+(j.ok?'ok':'bad')+'">'+esc(j.note||'')+'</div>';});

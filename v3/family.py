@@ -4192,12 +4192,19 @@ class Family:
                 ask_total = (round(sum(q for _, q in book.asks), 1)
                              if book is not None else None)
                 target = prog.target if prog is not None else None
+                # the button builds PAST the line, so the page shows the
+                # same goal it is working to (owner, 2026-09-01)
+                from .survey import QUALIFY_TARGET_MULT
+                goal = target * QUALIFY_TARGET_MULT if target else None
                 watched.append({
                     "market": slug, "ask_total": ask_total,
-                    "target": target,
+                    "target": target, "goal": goal,
                     "qualifies": (bool(ask_total >= target)
                                   if ask_total is not None and target
-                                  else None)})
+                                  else None),
+                    "has_room": (bool(ask_total >= goal)
+                                 if ask_total is not None and goal
+                                 else None)})
             summary["watched"] = watched
         summary["scanned"] = sum(1 for sb in self.scoreboard.values()
                                  if "plans" in sb)

@@ -1250,6 +1250,8 @@ class Monitor:
         automation never touches the result."""
         import math
         import threading
+
+        from . import survey as sv
         jobs = getattr(self, "_qualify_jobs", None)
         if jobs is None:
             jobs = self._qualify_jobs = {}
@@ -1269,12 +1271,19 @@ class Monitor:
                 return {"ok": False, "note": f"could not read the book: {e}"}
             fam.cache.put(market, book)
             ask_total = sum(q for _, q in book.asks)
-            gap = prog.target - ask_total
+            # build PAST the line, not to it (owner, 2026-09-01: "make
+            # it so my orders buy 125% of the target size"). A side
+            # sitting exactly at Target Size drops under it the moment
+            # somebody else pulls, and under the line the whole side
+            # pays nobody.
+            goal = prog.target * sv.QUALIFY_TARGET_MULT
+            gap = goal - ask_total
             if gap <= 0:
                 return {"ok": False, "note":
-                        f"the ask side already qualifies — {ask_total:,.0f} "
-                        f"shares resting vs a Target Size of "
-                        f"{prog.target:,.0f}"}
+                        f"the ask side already qualifies with room — "
+                        f"{ask_total:,.0f} shares resting vs a Target Size "
+                        f"of {prog.target:,.0f} "
+                        f"({ask_total / prog.target:.0%})"}
             tick = book.tick or 0.01
             px = round(math.floor(0.999 / tick + 1e-9) * tick, 3)
             collat = gap * (1.0 - px)
@@ -1285,13 +1294,15 @@ class Monitor:
                         f"button's ${self.QUALIFY_MAX_COLLATERAL:,.0f} cap"}
             job = jobs[market] = {"state": "running", "placed": 0,
                                   "shares": 0.0, "target": prog.target,
+                                  "goal": goal,
                                   "started": time.time(), "stop": "",
                                   "ask_total": ask_total}
             threading.Thread(target=self._qualify_run, args=(market, fam),
                              daemon=True,
                              name=f"qualify-{market[:20]}").start()
             return {"ok": True, "note":
-                    f"building the wall: {gap:,.0f} shares to go at "
+                    f"building the wall to {sv.QUALIFY_TARGET_MULT:.0%} of "
+                    f"Target Size ({goal:,.0f} shares): {gap:,.0f} to go at "
                     f"{px * 100:.1f}c (~${collat:,.2f} collateral). "
                     f"Running in the background — tap again for progress."}
         return {"ok": False,
@@ -1302,23 +1313,29 @@ class Monitor:
         """One phone-readable line about a wall run."""
         got, n = job.get("shares", 0.0), job.get("placed", 0)
         tgt, now_t = job.get("target", 0.0), job.get("ask_total", 0.0)
+        goal = job.get("goal", tgt)
         head = (f"{'building' if job.get('state') == 'running' else 'done'}: "
                 f"{n} order{'s' if n != 1 else ''}, {got:,.0f} shares "
-                f"rested — ask side {now_t:,.0f} of {tgt:,.0f}")
+                f"rested — ask side {now_t:,.0f} of {goal:,.0f} "
+                f"({(now_t / tgt) if tgt else 0:.0%} of Target Size)")
         if job.get("state") == "running":
             return head + " — still going"
+        if now_t >= goal:
+            return head + " — QUALIFIES with room"
         if now_t >= tgt:
-            return head + " — QUALIFIES"
+            return head + " — qualifies, but no headroom yet"
         return head + (f" — stopped: {job['stop']}" if job.get("stop")
                        else " — stopped")
 
     def _qualify_run(self, market: str, fam) -> dict:
-        """Place asks until the side reaches Target Size. The gap is
-        recomputed from a FRESH book every pass, so the run
-        self-corrects for other people's orders, for the exchange's
-        trims, and for an order that lands late — it never re-posts
-        blind for shares it already has."""
+        """Place asks until the side clears Target Size with the
+        owner's headroom. The gap is recomputed from a FRESH book every
+        pass, so the run self-corrects for other people's orders, for
+        the exchange's trims, and for an order that lands late — it
+        never re-posts blind for shares it already has."""
         import math
+
+        from . import survey as sv
 
         from .family import FamilyOrder
         job = self._qualify_jobs[market]
@@ -1329,7 +1346,7 @@ class Monitor:
         # even if the book we fetch has not caught up with our own
         # orders yet. Without it a lagging book would keep the loop
         # placing against a gap it has already closed.
-        need = max(job["target"] - job["ask_total"], 0.0)
+        need = max(job.get("goal", job["target"]) - job["ask_total"], 0.0)
         try:
             while True:
                 if job["placed"] >= self.QUALIFY_MAX_ORDERS:
@@ -1347,9 +1364,11 @@ class Monitor:
                 fam.cache.put(market, book)
                 prog = fam.terms.get(market)
                 target = prog.target if prog is not None else job["target"]
+                goal = target * sv.QUALIFY_TARGET_MULT
                 ask_total = sum(q for _, q in book.asks)
                 job["ask_total"], job["target"] = ask_total, target
-                gap = target - ask_total
+                job["goal"] = goal
+                gap = goal - ask_total
                 if gap < 1.0:
                     break                       # qualifies — done
                 if job["shares"] >= need - 0.5 and job["placed"] > 0:

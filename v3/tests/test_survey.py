@@ -11,7 +11,8 @@ import unittest
 
 from v3.programs import Program
 from v3.scoring import Book
-from v3.survey import (LIVE_BUFFER_S, PrefixStat, Sampler,
+from v3.survey import (LIVE_BUFFER_S, QUALIFY_TARGET_MULT,
+                       PrefixStat, Sampler,
                        category_banned, group_of, is_live_event,
                        kind_of, leaderboard, probe_side,
                        summarise, to_csv)
@@ -445,6 +446,34 @@ class TestBestMarkets(unittest.TestCase):
         p.qualifies = False
         st.record(p, 1000.0, "under-target")
         self.assertEqual(st.best, [])
+
+
+class TestQualifyHeadroom(unittest.TestCase):
+    """Owner, 2026-09-01: "make it so my orders buy 125% of the target
+    size." Sitting exactly ON the line means one other trader pulling
+    drops the side under it, and under the line the whole side pays
+    nobody — the cost of being a share short is the entire day."""
+
+    def test_the_multiplier_is_a_quarter_over(self):
+        self.assertAlmostEqual(QUALIFY_TARGET_MULT, 1.25)
+
+    def test_the_goal_is_target_times_the_multiplier(self):
+        self.assertAlmostEqual(7500 * QUALIFY_TARGET_MULT, 9375)
+
+    def test_a_side_already_over_target_still_has_a_gap(self):
+        # the case the old code called done: at Target Size exactly
+        target, resting = 7500.0, 7500.0
+        self.assertEqual(target - resting, 0.0)          # old: nothing to do
+        self.assertAlmostEqual(target * QUALIFY_TARGET_MULT - resting, 1875.0)
+
+    def test_it_stops_once_the_headroom_is_there(self):
+        target, resting = 7500.0, 9400.0
+        self.assertLess(target * QUALIFY_TARGET_MULT - resting, 0)
+
+    def test_the_extra_shares_cost_a_cent_each_at_99c(self):
+        # 25% of 7,500 shares at 99c is collateral of (1 - 0.99) each
+        extra = 7500 * (QUALIFY_TARGET_MULT - 1.0)
+        self.assertAlmostEqual(extra * (1.0 - 0.99), 18.75, places=2)
 
 
 if __name__ == "__main__":
