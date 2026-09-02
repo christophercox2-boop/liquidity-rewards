@@ -1979,3 +1979,23 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788306870.5,politics,usgubewc-usgub-ne-2026-11-03-rep,SELL,1,0.95,sell,0.0116,7.47,0.9607,90,94,0.399,0.81,0.93,0.0107,21,selling filled stock — it earns while it waits,C7T5KCPQGMAC
 1788306870.5,politics,usgubewc-usgub-nh-2026-11-03-rep,SELL,7,0.93,sell,0,0.85,0.933825,87,94,0.096,0.77,0.78,0.0038,0,selling filled stock — it earns while it waits,C7ZYJ5Y0MMCG
 1788307230.5,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar10-15,SELL,6,0.99,manual,0,0.02,,2,8,0.436,,0.04,-0.94,163,the owner's qualify-ask wall,C80NZKK76MAC
+1788308070.6,politics,usgubewc-usgub-al-2026-11-03-dem,SELL,7,0.08,earn,1.48,1.15,0.01475,7,11,0.33,0.07,0.08,-0.0653,-9,2 ticks in front of the touch — we would hold 87% of the ask side,C7ZZN0GDGMA6
+1788308131.1,politics,usgubewc-usgub-al-2026-11-03-dem,SELL,3,0.08,earn,0.5818,1.17,0.01475,8,12,0.57,0.07,0.13,-0.0653,-12,2 ticks in front of the touch — we would hold 87% of the ask side,C7ZZN0GDGMA6
+1788308131.1,cfb,aachc-cfb-wins-2026-11-28-ga-8pt5wins,SELL,1,0.8,earn,0.2911,0.1,,71,80,0.117,0.78,0.8,-0.05,-2,1 tick in front of the touch — we would hold 4% of the ask side,C80TZ8RMGMCR
+1788308671.1,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,BUY,50,0.2,manual,35.6227,0.45,,2,8,0,0.01,0.07,0.16,63,the owner's own order — the engine leaves it alone,C80NR13DCM9G
+1788308791.1,politics,ewc-usp-2028-11-07-dontru,SELL,19,0.06,sell,0.0115,0.3,,5,10,0,0.03,0.1,0.01,0,selling filled stock — it earns while it waits,C80TRJGVCM99
+1788308791.1,cfb,aachc-cfb-wins-2026-11-28-pennst-10pt5wins,SELL,2,0.26,sell,0.0333,0.6,,21,28,0.424,0.17,0.18,-0.02,0,selling filled stock — it earns while it waits,C80J9VSS8M99
+1788309031.1,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar30-35,BUY,9,0.01,manual,0.032,0.53,,19,28,0,0.23,0.24,-0.23,9,the owner's own order — the engine leaves it alone,C80N8ZC9TM9F
+1788309391.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar35-40,BUY,6,0.39,manual,45.4536,0.03,,6,14,0,0.39,0.56,0.29,141,the owner's own order — the engine leaves it alone,C817BCXJTMA3
+1788309571.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,SELL,63,0.99,manual,0,-0,,2,10,0.453,0.02,0.06,-0.93,-63,the owner's qualify-ask wall,C819F4DD2MCK
+1788309631.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,SELL,63,0.99,manual,0,0.02,,95,99,0.624,0.02,0.06,-0.02,-126,the owner's qualify-ask wall,C81A6TPHGMA6
+1788309631.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar30-35,BUY,2,0.25,manual,0,0.07,,1,5,0.454,0.3,0.97,0.23,131,the owner's own order — the engine leaves it alone,C817TH286M9F
+1788309691.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,SELL,63,0.99,manual,0,0.03,,98,99,0.625,0.02,0.04,0,-189,the owner's qualify-ask wall,C819TM8VRMAC
+1788309691.2,politics,usgubewc-usgub-nm-2026-11-03-dem,SELL,14,0.97,sell,0.0042,6.02,0.98185,91,94,0.017,0.96,0.97,0.0119,0,selling filled stock — it earns while it waits,C7W57GWMPM99
+1788309751.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,SELL,63,0.99,manual,0,0.05,,98,99,0.625,0.02,0.04,0,-252,the owner's qualify-ask wall,C81A6437YM9G
+1788309751.2,politics,ewc-usgub-ca-2026-11-03-xavbec,SELL,10,0.99,sell,0,10.87,0.999375,94,98,0.359,0.95,0.96,0.0094,0,selling filled stock — it earns while it waits,C7QZ7TNYPM9F
+1788309811.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,SELL,63,0.99,manual,0,0.06,,98,99,0.714,0.02,0.04,0,-63,the owner's qualify-ask wall,C819R6VWTMCR
+1788309811.2,politics,ussewc-usse-ky-2026-11-03-dem,BUY,0.38,0.11,manual,6.25,0.03,0.003375,2,5,0.732,0.02,0.1,0.1066,0.38,the owner's own order — the engine leaves it alone,C81A6KZ8RMCR
+1788310531.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-margte40,BUY,3,0.35,manual,21.4915,0.32,,39,87,0,0.35,0.56,-0.28,235,the owner's own order — the engine leaves it alone,C817THAC4M9F
+1788310531.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar30-35,BUY,6,0.3,manual,0,0.25,,1,5,0.624,0.3,0.54,0.28,137,the owner's own order — the engine leaves it alone,C81AHXXZPM9G
+1788310771.3,politics,usgubewc-usgub-il-2026-11-03-rep,SELL,20,0.03,earn,2.8217,0.12,0.0015,1,4,0.554,0.02,0.03,-0.0285,-27,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C81FWSR28MCS
