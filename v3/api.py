@@ -73,6 +73,15 @@ class ApiError(RuntimeError):
         self.status = status
 
 
+def events_of(client, tag: str, max_pages: int = 30):
+    """Discovery's event feed: a page at a time where the client can
+    stream (the real one), the whole list where a fake cannot."""
+    it = getattr(client, "iter_events", None)
+    if it is not None:
+        return it(tag, max_pages)
+    return client.events_by_tag(tag, max_pages=max_pages)
+
+
 class Client:
     """One HTTP client with the retry discipline 1.0 learned the hard way:
     429/5xx retried in place honouring Retry-After (a throttled response
@@ -376,8 +385,13 @@ class Client:
 
     def all_programs(self, max_pages: int = 400, page_size: int = 500,
                      program_type: str = "liquidityProgram",
-                     statuses: tuple = ("active",)) -> tuple[list[dict], str]:
+                     statuses: tuple = ("active",),
+                     compact=None) -> tuple[list[dict], str]:
         """Every market currently paying a liquidity program.
+
+        `compact`, when given, is applied to each row AS ITS PAGE
+        ARRIVES, so the raw 4.5 KB rows never pile up (owner,
+        2026-09-02: 28,081 of them were the biggest thing in memory).
 
         The docs settle two things I had guessed wrong (owner supplied
         them, 2026-08-31). Query parameters are snake_case and a
@@ -423,7 +437,7 @@ class Client:
                 s2 = str(r.get("marketSlug") or "")
                 if s2 and s2 not in seen:
                     seen.add(s2)
-                    out.append(r)
+                    out.append(compact(r) if compact is not None else r)
             token = j.get("nextPageToken")
             if not token:
                 # a page exactly the size we asked for, with no token to
@@ -479,20 +493,28 @@ class Client:
 
     # -- discovery (public) ---------------------------------------------------
 
-    def events_by_tag(self, tag: str, max_pages: int = 30) -> list[dict]:
-        """Events under a tag (paginates with limit/offset, not pageToken)."""
-        out: list[dict] = []
+    def iter_events(self, tag: str, max_pages: int = 30):
+        """Events under a tag, ONE PAGE AT A TIME (limit/offset, not
+        pageToken). Discovery walks this so a tag's whole feed — every
+        market object of every event, 100 to 200 MB of Python for the
+        politics tag — is never alive at once (owner, 2026-09-02: the
+        six-hour discovery and survey refreshes landing together on a
+        1 GB box killed the container)."""
         offset = 0
         for _ in range(max_pages):
             j = self.get(GATEWAY + "/v1/events",
                          params={"tagSlug": tag, "active": "true",
                                  "limit": 100, "offset": offset})
             events = j.get("events") or []
-            out.extend(events)
+            yield from events
             if len(events) < 100:
                 break
             offset += 100
-        return out
+
+    def events_by_tag(self, tag: str, max_pages: int = 30) -> list[dict]:
+        """The whole list — kept for callers that want it; discovery
+        streams iter_events instead."""
+        return list(self.iter_events(tag, max_pages))
 
     # Field names the exchange might use for its own price grid. The
     # name is UNCONFIRMED — declared_tick logs whatever a market object
