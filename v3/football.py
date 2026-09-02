@@ -14,6 +14,7 @@ never guessed.
 
 from __future__ import annotations
 
+from .api import events_of
 from .family import FamilyConfig
 from .names import name_from_market
 
@@ -26,21 +27,25 @@ def _feed_discover(tags: tuple[str, ...], prefixes: tuple[str, ...]):
         out: dict[str, dict] = {}
         order: list[str] = []
         for tag in tags:
+            n_tag = 0
             try:
-                events = client.events_by_tag(tag, max_pages=8)
-            except Exception:  # noqa: BLE001 — an unknown tag must not sink the rest
-                continue
-            for ev in events:
-                title = str(ev.get("title") or ev.get("name") or "").strip()
-                rows = [m for m in ev.get("markets") or []
-                        if m.get("slug") and not m.get("closed")
-                        and m["slug"].startswith(prefixes)]
-                for m in rows:
-                    slug = m["slug"]
-                    if slug not in out:
-                        order.append(slug)
-                    out[slug] = {"event_n": len(rows),
-                                 "name": name_from_market(m, title)[:110]}
+                # a page at a time, never a tag's whole feed (2026-09-02)
+                for ev in events_of(client, tag, max_pages=8):
+                    n_tag += 1
+                    title = str(ev.get("title") or ev.get("name") or "").strip()
+                    rows = [m for m in ev.get("markets") or []
+                            if m.get("slug") and not m.get("closed")
+                            and m["slug"].startswith(prefixes)]
+                    for m in rows:
+                        slug = m["slug"]
+                        if slug not in out:
+                            order.append(slug)
+                        out[slug] = {"event_n": len(rows),
+                                     "name": name_from_market(m, title)[:110]}
+            except Exception:  # noqa: BLE001
+                if n_tag:
+                    raise     # died mid-feed: no partial universe
+                continue      # an unknown tag must not sink the rest
         groups: dict[str, list[str]] = {}
         for s in order:
             groups.setdefault(s.rsplit("-", 1)[0], []).append(s)

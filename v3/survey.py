@@ -99,6 +99,53 @@ def group_of(row: dict) -> str:
         return "/".join(parts)
     return slug_group(str(row.get("marketSlug") or ""))
 
+
+# The incentives row, slimmed to what the survey reads (owner, 2026-09-02,
+# after the memory graph: a raw row is ~4.5 KB of Python, and 28,081 of
+# them held all day — twice over while refetching — were the biggest
+# thing in the 1 GB box). group_of, category_banned, is_live_event and
+# pick_period/program_from_period read exactly these and nothing else.
+from sys import intern as _intern  # noqa: E402 — belongs with its use
+
+ROW_KEEP = ("marketSlug", "category", "subcategory", "instrumentProduct",
+            "instrumentState", "eventStartTime", "gameStartTime")
+PERIOD_KEEP = ("programId", "status", "rewardPool", "targetSize",
+               "discountFactor", "start", "end", "period")
+# label strings repeat across thousands of rows ("sports", "LIVE", one
+# programId per family): interned, every row points at one copy
+_SHARED = ("category", "subcategory", "instrumentProduct",
+           "instrumentState", "programId", "status", "period")
+_NUMERIC = ("rewardPool", "targetSize", "discountFactor")
+
+
+def _slim(src: dict, keep: tuple) -> dict:
+    out: dict = {}
+    for k in keep:
+        v = src.get(k)
+        if v is None or v == "":
+            continue
+        if k in _NUMERIC:
+            try:
+                v = float(v)
+            except (TypeError, ValueError):
+                pass
+        elif k in _SHARED and isinstance(v, str):
+            v = _intern(v)
+        out[k] = v
+    return out
+
+
+def compact_row(row: dict) -> dict:
+    """The seven row fields and eight period fields the survey uses;
+    empty values dropped, labels shared, pool figures as floats — a
+    slim row costs a slim row."""
+    out = _slim(row, ROW_KEEP)
+    tps = row.get("timePeriods")
+    if isinstance(tps, list):
+        out["timePeriods"] = [_slim(tp, PERIOD_KEEP)
+                              for tp in tps if isinstance(tp, dict)]
+    return out
+
 # how far from the touch still carries real scoring weight. Past this the
 # discount factor has usually crushed a level's contribution to nothing.
 NEAR_TICKS = 3
