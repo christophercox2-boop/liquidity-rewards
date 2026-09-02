@@ -2075,3 +2075,43 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788356180.1,cfb,aachc-cfb-wins-2026-11-28-oregst-4pt5wins,BUY,1,0.98,sell,0,0.67,,40,47,0.274,0.98,0.99,0.55,2,buying back the short at or under what it sold for — the bid earns while it wait,C8BTH8SMRMVF
 1788356840.4,politics,ussewc-usse-la-2026-11-03-rep,BUY,1,0.95,sell,0,0.03,0.95875,89,97,0.015,0.94,0.96,-0.0088,1,buying back the short at or under what it sold for — the bid earns while it wait,C8CJ66SS6MVK
 1788356960.4,politics,ewc-usse-tx-2026-11-03-dem,BUY,19,0.5,earn,0.5869,4.16,0.6235,50,55,0.121,0.5,0.51,-0.1235,19,at the touch — a fill here is 11 ticks inside value (Silver + evidence),C895S5DGAMVR
+1788357500.6,cfb,aachc-cfb-wins-2026-11-28-pitt-7pt5wins,SELL,0.01,0.24,earn,0.0721,0.55,,49,64,0,0.23,0.24,0.31,-0.01,joins the touch — the book has been quiet,C8C7JZVWAMVG
+1788357800.8,cfb,aachc-cfb-wins-2026-11-28-stan-5pt5wins,SELL,1.04,0.44,sell,0,0,,34,40,0.577,0.44,0.46,-0.07,0.96,taker dump — sold into the bid (the carved exception),C8CSPECGRMVY
+1788357980.9,politics,usgubewc-usgub-ne-2026-11-03-dem,BUY,6.99,0.12,sell,6.2497,0.07,0.039725,6,9,0.784,0.07,0.13,0.0803,6.99,buying back the short at or under what it sold for — the bid earns while it wait,C8CTBGDPAMVK
+1788358281.1,politics,usgubewc-usgub-ok-2026-11-03-dem,SELL,20,0.09,earn,6.2313,0.67,0.06045,4,8,0.574,0.08,0.11,-0.0295,-40,1 tick behind the touch — we would hold 21% of the ask side,C8CACGDAJMW0
+1788358401.2,cfb,aachc-cfb-wins-2026-11-28-vtech-4pt5wins,BUY,0.01,0.95,earn,0,0.13,,72,83,0,0.73,0.96,0.18,0.01,1 tick in front of the touch — we would hold 69% of the bid side,C8CTQFJV6MVY
+1788358761.8,politics,usgubewc-usgub-ok-2026-11-03-rep,SELL,22,0.93,sell,0.0164,2.78,0.93955,89,93,0.543,0.87,0.91,0.0095,0,selling filled stock — it earns while it waits,C8AK11E4EMVZ
+1788358821.8,politics,usgubewc-usgub-ok-2026-11-03-rep,BUY,20,0.91,earn,0.5755,1.85,0.93955,90,94,0.669,0.87,0.93,-0.0295,20,1 tick behind the touch — we would hold 86% of the bid side,C8BF36HG0MVF
+1788358821.8,cfb,aachc-cfb-wins-2026-11-28-iowast-6pt5wins,BUY,1,0.36,sell,1.5,1.42,,24,35,0.034,0.36,0.37,0.06,0,buying back the short at or under what it sold for — the bid earns while it wait,C8BRTT8A2MW1
+1788358941.8,cfb,aachc-cfb-wins-2026-11-28-iowa-8pt5wins,BUY,1,0.5,earn,0.1154,0.02,,49,56,0.156,0.33,0.56,-0.03,1,6 ticks behind the touch — we would hold 2% of the bid side,C8D33Y78RMVF
+1788359062.1,cfb,aachc-cfb-wins-2026-11-28-boise-9pt5wins,BUY,0.01,0.4,earn,0.0219,0.83,,27,34,0,0.34,0.4,0.1,0.01,joins the touch — the book has been quiet,C8CBM83JYMVV
+1788359122.1,cfb,aachc-cfb-wins-2026-11-28-ind-8pt5wins,SELL,1,0.88,sell,0,0,,90,96,0,0.88,0.9,0.05,0,taker dump — sold into the bid (the carved exception),C8D4V04TTMVK
+1788359422.2,politics,ewc-usse-me-2026-11-03-rep,SELL,10,0.33,earn,0.1157,1.62,0.2739,30,34,0,0.32,0.33,-0.0561,-10,at the touch — a fill here is 6 ticks inside value (Silver + evidence),C8BRJC4QCMVP
+1788359782.2,politics,enwc-uspres-nom-rep-2028-tedcru,SELL,4,0.23,sell,0,0,,2,9,0.375,0.23,0.24,-0.18,192,taker dump — sold into the bid (the carved exception),C8D7R726YMVY
+1788359962.2,cfb,aachc-cfb-wins-2026-11-28-iowa-8pt5wins,SELL,2,0.34,sell,0.8889,0.28,,44,49,0.503,0.33,0.34,0.12,0,selling filled stock — it earns while it waits,C8D2VPG9AMVY
+1788360022.3,cfb,aachc-cfb-wins-2026-11-28-ucla-4pt5wins,BUY,1,0.98,sell,3.75,3.86,,79,94,0.006,0.98,0.99,0.11,1,buying back the short at or under what it sold for — the bid earns while it wait,C89ZWDP5AMVZ
+1788360022.3,cfb,aachc-cfb-wins-2026-11-28-ill-7pt5wins,BUY,0.01,0.77,earn,3.7499,1.32,,66,78,0,0.57,0.78,0.04,0.01,joins the touch — the book has been quiet,C8C5CSHFCMVF
+1788360022.3,cfb,aachc-cfb-wins-2026-11-28-okst-6pt5wins,BUY,0.01,0.94,earn,3.0612,1.27,,81,94,0,0.94,0.95,0.04,0.01,joins the touch — the book has been quiet,C8C5C5V8AMVZ
+1788360022.3,cfb,aachc-cfb-wins-2026-11-28-ucla-6pt5wins,BUY,0.01,0.93,earn,1.0714,0.3,,61,86,0,0.93,0.94,0.18,0.01,joins the touch — the book has been quiet,C8D3T7TW6MVG
+1788360082.3,politics,enwc-ussep-de-2026-09-15-rep-johshu,BUY,100,0.14,earn,0.6898,3.18,,15,19,0.221,0.14,0.15,-0.03,102,1 tick behind the touch — we would hold 85% of the bid side,C8AK59NJ4MVK
+1788360142.3,cfb,aachc-cfb-wins-2026-11-28-lou-8pt5wins,BUY,0.01,0.36,earn,0.0027,0.13,,36,48,0.053,0.23,0.52,-0.07,0.01,13 ticks in front of the touch — we would hold 23% of the bid side,C8D7M8H0JMVV
+1788360502.3,cfb,aachc-cfb-wins-2026-11-28-ucf-6pt5wins,SELL,1,0.44,sell,0.0156,5.33,,40,45,0.408,0.4,0.44,-0.01,0,selling filled stock — it earns while it waits,C88YHJP2CMVG
+1788360502.3,cfb,aachc-cfb-wins-2026-11-28-mich-9pt5wins,SELL,1,0.2,sell,0.8838,2.3,,23,32,0.008,0.19,0.2,0.07,0,selling filled stock — it earns while it waits,C8BEZD3Q2MVG
+1788360502.3,cfb,aachc-cfb-wins-2026-11-28-frest-6pt5wins,BUY,0.73,0.58,sell,7.4997,1.97,,44,58,0.141,0.58,0.59,0.06,-0.27,an exit — its fill reduces the position it sits on,C8BQEHVG4MVY
+1788360502.3,cfb,aachc-cfb-wins-2026-11-28-aubrn-7pt5wins,SELL,1,0.43,sell,0.0016,1.27,,29,38,0.534,0.39,0.43,-0.09,0,selling filled stock — it earns while it waits,C8CAW6GJJMW0
+1788360502.3,cfb,aachc-cfb-wins-2026-11-28-clmsn-6pt5wins,SELL,2,0.81,earn,0.0032,0.83,,69,79,0.084,0.8,0.81,-0.06,-4,joins the touch — the book has been quiet,C8CQ5WAMRMVY
+1788360502.3,cfb,aachc-cfb-wins-2026-11-28-missr-4pt5wins,BUY,0.5,0.84,earn,2.2521,0.75,,84,92,0.027,0.84,0.89,-0.04,0.5,1 tick in front of the touch — we would hold 17% of the bid side,C8CSF4D9MMW1
+1788360502.3,cfb,aachc-cfb-wins-2026-11-28-rutger-4pt5wins,BUY,0.5,0.66,earn,0.3448,0.72,,63,72,0,0.66,0.67,-0.01,0.5,joins the touch — the book has been quiet,C8CT5NDDMMVP
+1788360502.3,cfb,aachc-cfb-wins-2026-11-28-kanst-6pt5wins,BUY,0.5,0.8,earn,2.4448,0.7,,79,86,0,0.68,0.8,-0.03,0.5,joins the touch — the book has been quiet,C8CTH03R6MW1
+1788360502.3,cfb,aachc-cfb-wins-ou-2026-11-28-ind,BUY,0.5,0.47,earn,0.0987,0.67,,41,68,0,0.47,0.68,-0.07,0.5,joins the touch — the book has been quiet,C8CW6WRHCMVG
+1788360502.3,cfb,aachc-cfb-wins-ou-2026-11-28-ncar,SELL,1,0.62,earn,0.0126,0.65,,34,59,0,0.27,0.62,-0.15,-1,joins the touch — the book has been quiet,C8CVKAV68MVR
+1788360502.3,cfb,aachc-cfb-wins-ou-2026-11-28-bayl,SELL,0.5,0.46,earn,0.1592,0.65,,25,53,0,0.2,0.46,-0.08,-0.5,1 tick behind the touch — we would hold 13% of the ask side,C8CWY36J6MVG
+1788360502.3,cfb,aachc-cfb-wins-2026-11-28-utah-7pt5wins,BUY,0.5,0.78,earn,3.926,0.27,,79,86,0.018,0.78,0.79,-0.04,1.5,joins the touch — the book has been quiet,C8D6WGX9JMVG
+1788360502.3,cfb,aachc-cfb-wins-2026-11-28-utahst-3pt5wins,SELL,1,0.75,sell,0,0,,78,94,0.055,0.75,0.76,0.1,0,taker dump — sold into the bid (the carved exception),C8DC5MTBRMVR
+1788360562.3,cfb,aachc-cfb-wins-2026-11-28-vir-8pt5wins,BUY,1,0.59,manual,2.4753,4.01,,53,59,0.503,0.54,0.58,0.03,1,the owner's own order — the engine leaves it alone,C89Z4WP04MW0
+1788360562.3,cfb,aachc-cfb-wins-2026-11-28-mia-9pt5wins,SELL,0.01,0.9,sell,0,1.48,,72,85,0.017,0.89,0.9,-0.12,0,selling filled stock — it earns while it waits,C8C3ZYK0CMW1
+1788360562.3,cfb,aachc-cfb-wins-2026-11-28-wisc-5pt5wins,BUY,0.5,0.74,earn,0.895,1.4,,74,85,0.028,0.74,0.76,-0.04,2.5,2 ticks behind the touch — we would hold 56% of the bid side,C8C5P098PMVR
+1788360562.3,cfb,aachc-cfb-wins-2026-11-28-utahst-3pt5wins,BUY,1,0.75,sell,0.6803,1.13,,78,94,0.055,0.75,0.76,-0.1,1,buying back the short at or under what it sold for — the bid earns while it wait,C8CG1S8JMMVK
+1788360562.3,cfb,aachc-cfb-wins-2026-11-28-mspst-2pt5wins,BUY,0.01,0.98,earn,0.035,0.7,,87,98,0,0.98,0.99,0.04,0.01,joins the touch — the book has been quiet,C8CV4RK84MW0
+1788360562.3,cfb,aachc-cfb-wins-ou-2026-11-28-mich,SELL,0.01,0.42,earn,0.0047,0.68,,28,54,0,0.36,0.42,0,-0.01,1 tick in front of the touch — we would hold 24% of the ask side,C8CW6WRV8MVG
+1788360562.3,cfb,aachc-cfb-wins-2026-11-28-fl-5pt5wins,BUY,0.5,0.76,earn,0.5213,0.75,,73,80,0,0.71,0.77,-0.01,0.5,joins the touch — the book has been quiet,C8CSQJ24PMVP
