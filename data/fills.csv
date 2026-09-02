@@ -2005,3 +2005,5 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788311911.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-margte40,BUY,39.13,0.09,manual,0,0.8,,5,17,0.624,0.01,0.06,-0.01,286.13,the owner's own order — the engine leaves it alone,C8158Q828MCK
 1788311911.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-margte40,BUY,624.87,0.01,manual,45.4545,0.75,,5,17,0.624,0.01,0.06,-0.09,911,the owner's own order — the engine leaves it alone,C816WQWRGM99
 1788312031.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar35-40,BUY,4,0.43,manual,45.3892,0.42,,6,15,0.451,0.43,0.58,0.33,178,the owner's own order — the engine leaves it alone,C81H2XD9RMCS
+1788315212.0,cfb,aachc-cfb-wins-2026-11-28-ucla-7pt5wins,SELL,0.01,0.11,earn,0,0.17,,38,48,0,0.1,0.26,0.32,-0.01,joins the touch — the book has been quiet,C82EJPJTTMAC
+1788315692.1,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar20-25,SELL,80,0.01,manual,42.6334,1.72,,1,5,0,,0.01,0.01,24,the owner's own order — the engine leaves it alone,C819ESMQJMA3
