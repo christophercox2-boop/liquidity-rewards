@@ -2146,3 +2146,10 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788364163.0,cfb,aachc-cfb-wins-2026-11-28-kan-7pt5wins,SELL,0.5,0.09,earn,1.494,2.43,,6,11,0,0.08,0.34,-0.01,-0.5,joins the touch — the book has been quiet,C8C4VHWT0MVZ
 1788364163.0,cfb,aachc-cfb-wins-2026-11-28-utahst-3pt5wins,BUY,1,0.75,sell,0,0.53,,71,77,0.466,0.67,0.76,0.01,0,buying back the short at or under what it sold for — the bid earns while it wait,C8DW47HGMMVK
 1788364163.0,cfb,aachc-cfb-wins-2026-11-28-duke-3pt5wins,BUY,0.5,0.85,earn,0.9431,0.52,,87,96,0.035,0.76,0.9,-0.07,0.5,2 ticks behind the touch — we would hold 6% of the bid side,C8DW6ZWFEMVP
+1788364283.1,politics,ussewc-usse-fl-2026-11-03-rep,SELL,1,0.88,sell,0,0,0.897275,90,94,0.551,0.88,0.89,0.0173,0,taker dump — sold into the bid (the carved exception),C8EAY4BTEMVF
+1788365843.4,politics,ewc-usp-2028-11-07-dontru,BUY,3.94,0.07,earn,0,0.92,,7,13,0.381,0.07,0.14,-0.02,3.94,3 ticks behind the touch — we would hold 91% of the bid side,C8DYF29SGMW0
+1788365963.4,politics,ewc-usp-2028-11-07-dontru,SELL,4,0.02,sell,3.7037,0.03,,5,10,0.591,0.01,0.14,0.05,0,selling filled stock — it earns while it waits,C8ER7F35PMVK
+1788366503.6,cfb,aachc-cfb-wins-2026-11-28-ind-8pt5wins,SELL,0.5,0.89,sell,0,0,,91,97,0,0.89,0.9,0.05,0.5,taker dump — sold into the bid (the carved exception),C8EXDVB6YMVG
+1788366683.6,politics,enwc-usgubp-ri-2026-09-09-dem-greste,BUY,500,0.01,earn,0.6049,2.43,,1,4,0,,0.02,-0.01,500,joins the touch — the book has been quiet,C8CTQFHK8MVY
+1788371483.5,politics,ewc-usgub-ia-2026-11-03-dem,BUY,10,0.73,earn,0.0047,1.65,0.85075,,,0.029,,,-0.1208,18,at the touch — a fill here is 11 ticks inside value (Silver + evidence),C8EN161C8MVP
+1788371483.5,cfb,aachc-cfb-wins-2026-11-28-sc-5pt5wins,SELL,0.76,0.64,sell,2.7229,2.13,,,,0.042,,,,1.25,selling filled stock — it earns while it waits,C8E7FFN8EMW0
