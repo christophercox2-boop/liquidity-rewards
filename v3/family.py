@@ -260,6 +260,14 @@ class FamilyConfig:
     # family's exits may have in play at once — the belt on the exit
     # gate, so twenty small approved risks cannot add up quietly
     exit_giveup_cap_usd: float = 5.0
+    # A SMALL exit — one whose whole give-up is under this — rests at
+    # the touch OUTSIDE that budget (owner, 2026-09-02, from the cfb
+    # week-1 read: a 2-share Kansas cover measured at $6.61/day and 88%
+    # of its side was pulled 8 ticks back to save 16 cents the hour the
+    # $5 budget filled). The reward must still beat the fill loss by
+    # the gate's margin; only the family-wide budget stops applying,
+    # and small exits neither draw on it nor count against it.
+    exit_small_giveup_usd: float = 0.50
     # Cycle-out rule (owner, 2026-08-20: "be very picky... and if
     # something's not working cycle out of it"): an order measured under
     # min_est_day for this long, with no plan at this market that clears
@@ -1921,7 +1929,10 @@ class Family:
             return self._finish(summary, now)
         actions = self.cfg.max_actions_per_cycle
 
-        # game window: pull everything that isn't an exit
+        # game window: pull everything that isn't an exit — the owner's
+        # hand orders included (owner, 2026-09-02, shown the Week-1 pull
+        # took 28 of them: "that's a good idea to pull hand orders during
+        # game windows"). The one place the hands-off rule yields.
         if not resting_ok(now, self.cfg):
             summary["mode"] = "game window"
             for rec in list(self.orders.values()):
@@ -3088,7 +3099,8 @@ class Family:
             basis = abs((inv.get("cost") or 0.0) / q)
             give = ((basis - o.price) if o.side == "SELL"
                     else (o.price - basis)) * o.qty
-            if give > 0:
+            # small exits live outside the budget (owner, 2026-09-02)
+            if give > self.cfg.exit_small_giveup_usd:
                 total += give
         return total
 
@@ -3106,7 +3118,14 @@ class Family:
         the same discount on a 183-share lot fails on size alone.
         Candidates are the achievable fronts (one tick inside each
         touch); the one with the LEAST give-up that passes wins, so the
-        engine never gives more price than the reward justifies."""
+        engine never gives more price than the reward justifies.
+
+        SMALL exits (owner, 2026-09-02): when the whole give-up is under
+        exit_small_giveup_usd the family budget does not apply, and
+        joining our own touch is a candidate too — a wide book has no
+        achievable front worth the extra give-up, and the cfb earners
+        that paid $4-8/day were 1-2 share covers sitting AT the touch.
+        The reward-beats-fill-loss test is unchanged for them."""
         if book is None or qty <= 0:
             return None
         prog, _w = self._prog_row(slug)
@@ -3116,11 +3135,17 @@ class Family:
         if side_pool is None or side_pool <= 0:
             return None
         tick = book.tick
+        small_cap = self.cfg.exit_small_giveup_usd
         cands = set()
         if book.bids:
             cands.add(round(book.bids[0][0] + tick, 3))
         if book.asks:
             cands.add(round(book.asks[0][0] - tick, 3))
+        # joining our own side's touch never crosses; small exits only
+        joins = set()
+        own = book.bids if side == "BUY" else book.asks
+        if own:
+            joins.add(round(own[0][0], 3))
         if book.bids:      # post-only: a SELL never crosses the bid
             lo_ok = book.bids[0][0] + tick - 1e-9
         else:
@@ -3141,14 +3166,25 @@ class Family:
                    for p2, q2 in raw]
         lv = [(p2, q2) for p2, q2 in raw if q2 > 1e-9]
         best = None
-        for px in cands:
+        for px in cands | joins:
             if not (0.002 <= px <= 0.998):
                 continue
-            if px < lo_ok or px > hi_ok:
+            joining = px in joins
+            if joining:
+                # our own touch crosses only on a locked book
+                if ((side == "BUY" and px > hi_ok)
+                        or (side == "SELL" and px < lo_ok)):
+                    continue
+            elif px < lo_ok or px > hi_ok:
                 continue
             give = ((basis - px) if side == "SELL"
                     else (px - basis)) * qty
-            if give <= 0.01 or give > budget:
+            if give <= 0.01:
+                continue
+            small = give <= small_cap
+            if joining and not small:
+                continue            # joining is the small exit's privilege
+            if not small and give > budget:
                 continue
             j = estimate_join(side, lv, tick, float(prog.df),
                               float(prog.target), px, qty)
