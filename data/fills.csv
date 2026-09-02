@@ -1999,3 +1999,9 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788310531.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-margte40,BUY,3,0.35,manual,21.4915,0.32,,39,87,0,0.35,0.56,-0.28,235,the owner's own order — the engine leaves it alone,C817THAC4M9F
 1788310531.2,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar30-35,BUY,6,0.3,manual,0,0.25,,1,5,0.624,0.3,0.54,0.28,137,the owner's own order — the engine leaves it alone,C81AHXXZPM9G
 1788310771.3,politics,usgubewc-usgub-il-2026-11-03-rep,SELL,20,0.03,earn,2.8217,0.12,0.0015,1,4,0.554,0.02,0.03,-0.0285,-27,at the touch — a fill here is 2 ticks inside value (Silver + evidence),C81FWSR28MCS
+1788311371.7,politics,vmc-ussep-mov-ma-dem-2026-09-01-margte40,BUY,5,0.17,manual,0,0.62,,10,19,0.453,0.09,0.17,0.02,240,the owner's own order — the engine leaves it alone,C816G84TCMAC
+1788311371.7,politics,vmc-ussep-mov-ma-dem-2026-09-01-margte40,BUY,6.23,0.35,manual,45.4545,0.55,,10,19,0.453,0.09,0.17,0.2,246.23,the owner's own order — the engine leaves it alone,C817THAC4M9F
+1788311671.8,politics,usgubewc-usgub-tx-2026-11-03-rep,BUY,4,0.89,sell,6.2495,3.19,0.8606,84,88,0.516,0.85,0.87,0.0294,4,buying back the short at or under what it sold for — the bid earns while it wait,C7Z2J8W0TMCG
+1788311911.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-margte40,BUY,39.13,0.09,manual,0,0.8,,5,17,0.624,0.01,0.06,-0.01,286.13,the owner's own order — the engine leaves it alone,C8158Q828MCK
+1788311911.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-margte40,BUY,624.87,0.01,manual,45.4545,0.75,,5,17,0.624,0.01,0.06,-0.09,911,the owner's own order — the engine leaves it alone,C816WQWRGM99
+1788312031.8,politics,vmc-ussep-mov-ma-dem-2026-09-01-mar35-40,BUY,4,0.43,manual,45.3892,0.42,,6,15,0.451,0.43,0.58,0.33,178,the owner's own order — the engine leaves it alone,C81H2XD9RMCS
