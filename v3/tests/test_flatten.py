@@ -4393,12 +4393,20 @@ class TestExitGate(unittest.TestCase):
                                            book, r.now))
 
     def test_covers_gate_symmetrically(self):
-        # a short that received 90c may bid 95c only through the gate
+        # a short that received 90c may bid above it only through the
+        # gate. It used to front at 95c; since 2026-09-02 a SMALL exit
+        # (4c of give-up on one share) joins the 94c touch instead —
+        # the least give-up that the reward pays for
         r, A = self._rig(book=dict(bids=((0.94, 20.0), (0.02, 60000.0)),
                                    asks=((0.97, 30.0),)))
         book = r.fam.cache.fresh(A, 999, r.now)
         px = r.fam._exit_gate(A, "BUY", 0.90, 1.0, book, r.now)
-        self.assertEqual(px, 0.95)
+        self.assertEqual(px, 0.94)
+        # a big lot has no such privilege: 200 shares front at 95c or
+        # nothing, exactly as before
+        big = r.fam._exit_gate(A, "BUY", 0.90, 200.0, book, r.now)
+        self.assertIn(big, (0.95, 0.96, None))
+        self.assertNotEqual(big, 0.94)
 
     def test_without_the_gate_the_floor_is_break_even(self):
         # the dust/dry freedom is gone from the floor itself. Basis is
