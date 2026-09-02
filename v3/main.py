@@ -824,6 +824,66 @@ def prune_ladder_seen(seen: dict, day: str,
     return {s: d for s, d in seen.items() if d >= cutoff}
 
 
+# Memory (owner, 2026-09-02, from the DigitalOcean graph: flat at 33% of
+# the 1 GB box all day, a step to 57% when discovery and the survey
+# frame refetched in the same minute on the boot+6h clock, a spike to
+# 90% at the hourly publish three minutes later, then the kill — and
+# every boot since replaying the same peak in its own second cycle).
+# The number the app could not state is now stated every cycle.
+SURVEY_FRAME_EVERY_S = 6 * 3600.0
+SURVEY_BOOT_WAIT_S = 600.0          # discovery and the first publish own
+                                    # a boot's first minutes
+SURVEY_FIRST_OFFSET_S = 3 * 3600.0  # puts the refetch clock three hours
+                                    # off discovery's, for good
+
+
+def rss_mb() -> float:
+    """Resident memory of this process in MB: /proc where it exists,
+    the getrusage peak as the fallback, 0 when neither answers."""
+    try:
+        with open("/proc/self/status") as f:
+            for line in f:
+                if line.startswith("VmRSS:"):
+                    return float(line.split()[1]) / 1024.0
+    except (OSError, ValueError, IndexError):
+        pass
+    try:
+        import resource
+        return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0
+    except Exception:  # noqa: BLE001
+        return 0.0
+
+
+def mem_limit_mb() -> float | None:
+    """The container's memory ceiling in MB, from the cgroup, or None."""
+    for p in ("/sys/fs/cgroup/memory.max",
+              "/sys/fs/cgroup/memory/memory.limit_in_bytes"):
+        try:
+            with open(p) as f:
+                v = f.read().strip()
+        except OSError:
+            continue
+        if v.isdigit() and int(v) < (1 << 50):
+            return int(v) / 1048576.0
+    return None
+
+
+def survey_frame_due(now: float, boot_ts: float, last_at: float,
+                     every: float = SURVEY_FRAME_EVERY_S,
+                     boot_wait: float = SURVEY_BOOT_WAIT_S,
+                     first_offset: float = SURVEY_FIRST_OFFSET_S):
+    """When the survey frame refetches: never in a boot's first minutes,
+    then every six hours on a clock three hours off discovery's, so the
+    two biggest fetches never share a minute. Returns the value to keep
+    as last_at when due, None otherwise. The first fetch after a boot
+    stores now + first_offset, which is what shifts the clock."""
+    if now - boot_ts < boot_wait:
+        return None
+    if last_at and now - last_at < every:
+        return None
+    return now + (first_offset if not last_at else 0.0)
+
+
 class Monitor:
     def __init__(self):
         self.client = Client()
@@ -1155,6 +1215,7 @@ class Monitor:
             "paid_seen": self.paid_seen,
             "mkt_claim_day": self.mkt_claim_day,
             "cancel_jobs": list(getattr(self, "cancel_jobs", [])),
+            "rss_mb": round(rss_mb(), 1),
             "ladder_day": getattr(self, "ladder_day", ""),
             "ladder_seen": dict(getattr(self, "ladder_seen", {})),
             "survey_stats": {p: st.__dict__ for p, st
@@ -1812,6 +1873,11 @@ class Monitor:
                  f"",
                  f"✅ Updated {et.strftime('%b %d, %I:%M %p ET')} — the app "
                  f"writes this file every hour.", ""]
+        lim = mem_limit_mb()
+        lines += [f"Memory: {rss_mb():.0f} MB in use"
+                  + (f" of the box's {lim:,.0f} MB" if lim else "")
+                  + ". The six-hour fetches are the peaks; discovery "
+                  "and the survey refetch now run three hours apart.", ""]
         total_rate = 0.0
         total_today = 0.0
         for key, fam in self.families.items():
@@ -2143,10 +2209,17 @@ class Monitor:
         random draw from the market (owner, 2026-08-31).
         """
         from . import survey as sv
-        if now - getattr(self, "_survey_frame_at", 0.0) < 6 * 3600.0:
+        nxt = survey_frame_due(now, getattr(self, "boot_ts", 0.0),
+                               getattr(self, "_survey_frame_at", 0.0))
+        if nxt is None:
             return getattr(self, "survey_frame_note", "")
-        self._survey_frame_at = now
-        rows, note = self.client.all_programs()
+        self._survey_frame_at = nxt
+        mem0 = rss_mb()
+        # rows arrive already slimmed to the seven fields the sampler
+        # reads — never the 4.5 KB raw row (owner, 2026-09-02)
+        rows, note = self.client.all_programs(compact=sv.compact_row)
+        self._note(f"memory: {mem0:.0f} -> {rss_mb():.0f} MB resident "
+                   f"across the survey frame refetch ({len(rows):,} rows)")
         # Why do culture and crypto rows carry category/subcategory while
         # sports rows fall back to the slug? Show one of each rather than
         # guess — the same probe that found orderPriceMinTickSize (owner,
@@ -2409,6 +2482,9 @@ class Monitor:
         if now - getattr(self, "_pub_at", 0.0) < 3600.0:
             return
         self._pub_at = now
+        lim = mem_limit_mb()
+        self._note(f"memory: {rss_mb():.0f} MB resident"
+                   + (f" of {lim:,.0f} MB" if lim else ""))
         try:
             # the stream-health line (owner approved 2026-08-26, after
             # the meter sawtooth traced back to the dead feed): is the
@@ -3311,6 +3387,9 @@ class Monitor:
             except ApiError as e:
                 self._note(f"{key}: {e}")
                 summaries[key] = {"name": fam.cfg.name, "error": str(e)[:120]}
+        if any(getattr(fam, "last_discover", 0.0) == now
+               for fam in self.families.values()):
+            self._note(f"memory: {rss_mb():.0f} MB resident after discovery")
         try:
             self._run_due_cancels(now)
         except Exception as e:  # noqa: BLE001 — never breaks the cycle

@@ -27,6 +27,7 @@ usually losses here, not wins."
 
 from __future__ import annotations
 
+from .api import events_of
 from .family import FamilyConfig
 from .names import disambiguate, name_from_market
 from .programs import is_econ
@@ -39,24 +40,30 @@ def discover(client) -> dict[str, dict]:
     out: dict[str, dict] = {}
     order: list[str] = []
     for tag in TAGS:
+        n_tag = 0
         try:
-            events = client.events_by_tag(tag)
-        except Exception:  # noqa: BLE001 — one bad tag must not sink the other
-            continue
-        for ev in events:
-            title = str(ev.get("title") or ev.get("name") or "").strip()
-            rows = [m for m in ev.get("markets") or []
-                    if m.get("slug") and not m.get("closed")
-                    and not is_econ(m["slug"])]
-            labels = disambiguate([(m["slug"],
-                                    name_from_market(m, title)[:110])
-                                   for m in rows])
-            for m in rows:
-                slug = m["slug"]
-                if slug not in out:
-                    order.append(slug)
-                out[slug] = {"event_n": len(rows),
-                             "name": labels[slug]}
+            # streamed a page at a time — a tag's whole feed was
+            # 100-200 MB of Python held at once (owner, 2026-09-02)
+            for ev in events_of(client, tag):
+                n_tag += 1
+                title = str(ev.get("title") or ev.get("name") or "").strip()
+                rows = [m for m in ev.get("markets") or []
+                        if m.get("slug") and not m.get("closed")
+                        and not is_econ(m["slug"])]
+                labels = disambiguate([(m["slug"],
+                                        name_from_market(m, title)[:110])
+                                       for m in rows])
+                for m in rows:
+                    slug = m["slug"]
+                    if slug not in out:
+                        order.append(slug)
+                    out[slug] = {"event_n": len(rows),
+                                 "name": labels[slug]}
+        except Exception:  # noqa: BLE001
+            if n_tag:
+                raise     # a feed that died mid-way must not hand back a
+                          # partial universe (the 09-01 list collapse)
+            continue      # an unknown tag must not sink the other
     # single-market events that are really one race sharing one pool
     groups: dict[str, list[str]] = {}
     for s in order:
