@@ -749,6 +749,81 @@ def touch_snapshot(fam: Family, now: float, cap: int = 400) -> dict:
     return out
 
 
+# The daily ladder record (owner yes, 2026-09-02). After cfb's week 1 the
+# state file's touch-and-totals could not show WHAT changed on the books
+# that had paid $4-8/day — only that the touch moved. Once a day, the
+# full ladders of every market the meter has us earning in, and of
+# every market that earned in the last week, go to data/ladders/ so
+# the next drop can be read from the record instead of the touch.
+LADDER_HOUR_UTC = 16      # noon ET — inside every family's quiet hours
+LADDER_KEEP_DAYS = 7
+LADDER_LEVELS = 20        # nearest the touch; the deepest 4 ride along
+
+
+def _ladder_levels(levels, keep: int = LADDER_LEVELS,
+                   tail: int = 4) -> tuple[list, int]:
+    """(levels kept, levels omitted): the touch end whole, the deep end
+    where the qualifying walls sit, the middle counted."""
+    lv = [[round(p, 3), round(q, 1)] for p, q in levels]
+    if len(lv) <= keep + tail:
+        return lv, 0
+    return lv[:keep] + lv[-tail:], len(lv) - keep - tail
+
+
+def ladder_snapshot(fam: Family, now: float, extra=(), cap: int = 400,
+                    max_age: float = 600.0) -> tuple[dict, set]:
+    """slug -> ladder for the markets the family is EARNING in (any
+    order the meter has at a positive share or estimate) plus `extra`
+    — the recent earners, so a market that STOPS earning still gets
+    its after picture. Books come from the cache; nothing is fetched.
+    Returns (ladders, the slugs earning right now)."""
+    earning: set = set()
+    ours_by: dict[str, list] = {}
+    for o in list(fam.orders.values()):
+        ours_by.setdefault(o.market, []).append(o)
+        if (o.live_share or 0.0) > 0 or (o.live_est or 0.0) > 0:
+            earning.add(o.market)
+    out: dict = {}
+    for s in sorted(earning | set(extra))[:cap]:
+        b = fam.cache.any_age(s)
+        if b is None or now - b.fetched_at > max_age:
+            continue
+        bids, bmore = _ladder_levels(b.bids)
+        asks, amore = _ladder_levels(b.asks)
+        out[s] = {
+            "t": int(b.fetched_at), "tick": b.tick,
+            "bids": bids, "asks": asks,
+            "bids_more": bmore, "asks_more": amore,
+            "bid_total": round(sum(q for _, q in b.bids)),
+            "ask_total": round(sum(q for _, q in b.asks)),
+            "ours": [[o.side, o.price, round(o.qty, 2), o.purpose,
+                      round(o.live_share or 0.0, 4),
+                      round(o.live_est or 0.0, 4)]
+                     for o in ours_by.get(s, [])],
+        }
+    return out, earning
+
+
+def ladder_due(now: float, last_day: str,
+               hour: int = LADDER_HOUR_UTC) -> str | None:
+    """The UTC day to write, once its hour has come and it is not yet
+    written; None otherwise."""
+    t = time.gmtime(now)
+    day = time.strftime("%Y-%m-%d", t)
+    if day == last_day or t.tm_hour < hour:
+        return None
+    return day
+
+
+def prune_ladder_seen(seen: dict, day: str,
+                      keep_days: int = LADDER_KEEP_DAYS) -> dict:
+    """Recent earners are remembered for a week, then dropped."""
+    import datetime as _dt
+    cutoff = (_dt.date.fromisoformat(day)
+              - _dt.timedelta(days=keep_days)).isoformat()
+    return {s: d for s, d in seen.items() if d >= cutoff}
+
+
 class Monitor:
     def __init__(self):
         self.client = Client()
@@ -808,6 +883,11 @@ class Monitor:
         self.survey_meta: dict = {}
         self.survey_event_n: dict = {}
         self.cancel_jobs: list = []
+        # the daily ladder snapshot (owner, 2026-09-02): which UTC day
+        # has been written, and which markets earned recently so a
+        # market that STOPS earning still gets its "after" picture
+        self.ladder_day: str = ""
+        self.ladder_seen: dict[str, str] = {}
         self.rw_last: dict | None = None      # latest payout-check result
         self._rw_at = 0.0
         self._lock = threading.Lock()
@@ -990,6 +1070,9 @@ class Monitor:
             self.survey_stats[pref] = st
         self.survey_frame_note = str(saved.get("survey_frame") or "")
         self.cancel_jobs = list(saved.get("cancel_jobs") or [])
+        self.ladder_day = str(saved.get("ladder_day") or "")
+        self.ladder_seen = {str(k): str(v) for k, v in
+                            (saved.get("ladder_seen") or {}).items()}
         self.actuals_by_day = dict(saved.get("actuals_by_day") or {})
         self.actuals_by_fam = dict(saved.get("actuals_by_fam") or {})
         self.owner_fairs = {k: float(v) for k, v in
@@ -1072,6 +1155,8 @@ class Monitor:
             "paid_seen": self.paid_seen,
             "mkt_claim_day": self.mkt_claim_day,
             "cancel_jobs": list(getattr(self, "cancel_jobs", [])),
+            "ladder_day": getattr(self, "ladder_day", ""),
+            "ladder_seen": dict(getattr(self, "ladder_seen", {})),
             "survey_stats": {p: st.__dict__ for p, st
                              in list(self.survey_stats.items())[:200]},
             "survey_frame": self.survey_frame_note,
@@ -2284,6 +2369,39 @@ class Monitor:
                            f"{slug} — market fields: "
                            + ",".join(sorted(md.keys()))[:400])
 
+    def publish_ladders(self, now: float) -> None:
+        """Once a day (owner yes, 2026-09-02): the full ladders of every
+        market we are earning in, and of every market that earned in
+        the last week, to data/ladders/<day>.json on main."""
+        day = ladder_due(now, self.ladder_day)
+        if day is None:
+            return
+        fams: dict = {}
+        earning: set = set()
+        for key, fam in self.families.items():
+            snap, earn = ladder_snapshot(fam, now, extra=self.ladder_seen)
+            if snap:
+                fams[key] = snap
+            earning |= earn
+        for s in earning:
+            self.ladder_seen[s] = day
+        self.ladder_seen = prune_ladder_seen(self.ladder_seen, day)
+        n = sum(len(v) for v in fams.values())
+        path = f"data/ladders/{day}.json"
+        text = json.dumps({"day": day,
+                           "taken_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                                     time.gmtime(now)),
+                           "families": fams},
+                          separators=(",", ":"))
+        _old, sha = self._gh_file(path)
+        if self._gh_put(path, text, sha, f"ladders: {n} markets [skip ci]"):
+            self.ladder_day = day
+            self._note(f"ladders: {n} markets across {len(fams)} "
+                       f"families -> {path}")
+        else:
+            self._note(f"ladders: could not write {path} ({n} markets) "
+                       f"— trying again next hour")
+
     def publish_files(self, now: float) -> None:
         """Hourly, and only while 1.0 is retired (one writer per file)."""
         if os.environ.get("V1_ENABLED", "0") != "0":
@@ -2459,6 +2577,10 @@ class Monitor:
                                  f"market estimates: {n} rows [skip ci]")
         except Exception as e:  # noqa: BLE001
             self._note(f"market estimate ledger: {e}")
+        try:
+            self.publish_ladders(now)
+        except Exception as e:  # noqa: BLE001 — a record, never a blocker
+            self._note(f"ladders: {type(e).__name__}: {e}")
         try:
             self.publish_trades(now, deep=not getattr(self, "_trades_deep",
                                                       False))
