@@ -6526,6 +6526,7 @@ date,market,program_type,reward_usd,status
 2026-08-31,ewc-usgub-ga-2026-11-03-rep,liquidityProgram,0.03,PENDING
 2026-08-31,ewc-usgub-ia-2026-11-03-rep,liquidityProgram,0.01,PENDING
 2026-08-31,ewc-usgub-ks-2026-11-03-dem,liquidityProgram,0.06,PENDING
+2026-08-31,ewc-usgub-oh-2026-11-03-dem,liquidityProgram,0.35,PENDING
 2026-08-31,ewc-usgub-oh-2026-11-03-rep,liquidityProgram,2.31,PENDING
 2026-08-31,ewc-usgub-wi-2026-11-03-rep,liquidityProgram,0.18,PENDING
 2026-08-31,ewc-usp-2028-11-07-dontru,liquidityProgram,0.19,PENDING
@@ -6560,6 +6561,7 @@ date,market,program_type,reward_usd,status
 2026-08-31,usgubewc-usgub-ma-2026-11-03-dem,liquidityProgram,0.78,PENDING
 2026-08-31,usgubewc-usgub-md-2026-11-03-dem,liquidityProgram,2.2,PENDING
 2026-08-31,usgubewc-usgub-me-2026-11-03-rep,liquidityProgram,0.76,PENDING
+2026-08-31,usgubewc-usgub-mn-2026-11-03-dem,liquidityProgram,0.98,PENDING
 2026-08-31,usgubewc-usgub-mn-2026-11-03-rep,liquidityProgram,1.98,PENDING
 2026-08-31,usgubewc-usgub-nh-2026-11-03-dem,liquidityProgram,0.08,PENDING
 2026-08-31,usgubewc-usgub-nh-2026-11-03-rep,liquidityProgram,2.86,PENDING
@@ -6585,6 +6587,7 @@ date,market,program_type,reward_usd,status
 2026-08-31,ussewc-usse-al-2026-11-03-dem,liquidityProgram,1.53,PENDING
 2026-08-31,ussewc-usse-al-2026-11-03-rep,liquidityProgram,0.31,PENDING
 2026-08-31,ussewc-usse-ar-2026-11-03-dem,liquidityProgram,0.29,PENDING
+2026-08-31,ussewc-usse-ar-2026-11-03-rep,liquidityProgram,0.42,PENDING
 2026-08-31,ussewc-usse-co-2026-11-03-rep,liquidityProgram,2.09,PENDING
 2026-08-31,ussewc-usse-de-2026-11-03-dem,liquidityProgram,0.33,PENDING
 2026-08-31,ussewc-usse-de-2026-11-03-rep,liquidityProgram,1.31,PENDING
@@ -6617,11 +6620,11 @@ date,market,program_type,reward_usd,status
 2026-08-31,ussewc-usse-wy-2026-11-03-rep,liquidityProgram,0.04,PENDING
 2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-mar0-5,liquidityProgram,25.03,PENDING
 2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-mar10-15,liquidityProgram,24.88,PENDING
-2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,liquidityProgram,55.03,PENDING
+2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-mar15-20,liquidityProgram,56.53,PENDING
 2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-mar20-25,liquidityProgram,0.66,PENDING
 2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-mar25-30,liquidityProgram,0.55,PENDING
 2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-mar30-35,liquidityProgram,39.83,PENDING
 2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-mar35-40,liquidityProgram,29.05,PENDING
-2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-mar5-10,liquidityProgram,0.85,PENDING
+2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-mar5-10,liquidityProgram,25.98,PENDING
 2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-margte40,liquidityProgram,30,PENDING
 2026-08-31,vmc-ussep-mov-ma-dem-2026-09-01-mou0-5,liquidityProgram,6.36,PENDING
