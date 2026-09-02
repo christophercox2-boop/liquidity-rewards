@@ -2049,3 +2049,14 @@ ts,family,market,side,qty,px,purpose,est_day,rested_h,fair,band_lo,band_hi,conf,
 1788348452.4,cfb,aachc-cfb-wins-2026-11-28-ncst-6pt5wins,SELL,1,0.02,sell,0,0.02,,56,69,0.403,0.01,0.74,0.59,0,selling filled stock — it earns while it waits,C8AHSPAZWMVR
 1788349472.5,politics,ewc-usp-2028-11-07-markel,BUY,2,0.1,sell,3.4283,0.5,,6,12,0.021,0.02,0.11,0.01,2,buying back the short at or under what it sold for — the bid earns while it wait,C8AC0PZ3YMVY
 1788349638.1,cfb,aachc-cfb-wins-2026-11-28-flst-7pt5wins,BUY,0.01,0.31,earn,0,0.28,,28,34,0.015,0.13,0.3,0,1.01,17 ticks in front of the touch — we would hold 71% of the bid side,C8AKB12C4MVP
+1788349996.8,cfb,aachc-cfb-wins-2026-11-28-hou-7pt5wins,SELL,0.01,0.75,earn,0,0.45,,64,75,0.297,0.68,0.78,-0.06,-1.01,24 ticks in front of the touch — we would hold 96% of the ask side,C8AHGFSTPMVG
+1788350296.5,cfb,aachc-cfb-wins-2026-11-28-hou-8pt5wins,BUY,1,0.73,sell,2.3814,0.38,,32,43,0.198,0.3,0.98,0.36,0,buying back the short at or under what it sold for — the bid earns while it wait,C8AN62BCMMW0
+1788350356.6,politics,ewc-usse-mi-2026-11-03-dem,SELL,1,0.62,sell,3.1134,0.61,0.740775,64,71,0.051,0.61,0.65,0.1208,0,selling filled stock — it earns while it waits,C8AFZ2VSRMVP
+1788350656.6,politics,ewc-usp-2028-11-07-rahema,BUY,1,0.1,earn,0,0.56,,14,44,0.03,0.1,0.51,-0.17,42,8 ticks in front of the touch — we would hold 94% of the bid side,C8AKC1XX2MVR
+1788350716.6,cfb,aachc-cfb-wins-2026-11-28-txam-9pt5wins,SELL,1,0.24,sell,0,0.93,,39,42,0.544,0.23,0.24,0.16,0,selling filled stock — it earns while it waits,C8A9JYTCMMVY
+1788351796.7,politics,ewc-usp-2028-11-07-jonoss,SELL,1,0.22,sell,0,0,,18,25,0.488,0.22,0.23,-0.01,45,taker dump — sold into the bid (the carved exception),C8BBKGYMJMVR
+1788351976.8,cfb,aachc-cfb-wins-2026-11-28-utah-10pt5wins,SELL,2,0.4,sell,0,0,,31,37,0.416,0.4,0.41,-0.06,0,taker dump — sold into the bid (the carved exception),C8BD8H70YMVY
+1788352096.8,cfb,aachc-cfb-wins-2026-11-28-tx-10pt5wins,SELL,0.85,0.35,sell,0,0,,34,41,0.25,0.35,0.36,0.02,2.15,taker dump — sold into the bid (the carved exception),C8BF39ZX2MVK
+1788352396.9,cfb,aachc-cfb-wins-2026-11-28-aubrn-7pt5wins,BUY,1,0.7,sell,0,0.03,,26,37,0.266,0.39,0.68,0.39,2,buying back the short at or under what it sold for — the bid earns while it wait,C8BFW792JMVV
+1788352396.9,cfb,aachc-cfb-wins-2026-11-28-ucla-7pt5wins,BUY,0.01,0.5,sell,0,0.4,,46,67,0.406,0.05,0.71,-0.07,0,buying back the short at or under what it sold for — the bid earns while it wait,C8B61GHA8MVZ
+1788353357.2,cfb,aachc-cfb-wins-2026-11-28-byu-9pt5wins,BUY,0.01,0.54,sell,0.3105,0.3,,50,60,0.049,0.51,0.61,-0.01,0,buying back the short at or under what it sold for — the bid earns while it wait,C8BDKHEFWMVZ
